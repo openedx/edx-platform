@@ -12,9 +12,9 @@ Establishing a grading policy takes several steps. You must:
 
 #. :ref:`Set the Grade Range`
 #. :ref:`Set the Grace Period`
-#. :ref:`configure`
-#. :ref:`set_assignment`
-#. :ref:`student_view`
+#. :ref:`Configure the Assignment Types`
+#. :ref:`Set the Assignment Type for Graded Subsections`
+#. :ref:`The Student View of Grades`
 
 
 .. _Set the Grade Range:
@@ -50,7 +50,11 @@ You use the grade range control to change these settings:
 
   You can see the range numbers of the two grades adjacent to the line change. Release the mouse button when the line is where you want it.
   
-* To remove a grade, hover the mouse button over the grade. 
+* To change the name of the grade, double-click the current name of the grade to select it, and then start typing the name of the new grade. For example, if the original name of the grade is "Pass", you can double-click "Pass" and then type "Excellent" to replace the name.
+
+  You cannot change **F** or **Fail**. 
+
+* To remove a grade, hover the mouse over the grade. 
 
   A **remove** link appears above the grade. Click the link.
   
@@ -71,7 +75,7 @@ You can set a grace period that extends homework due dates for your students.
   
 In the Grading page, under **Grading Rules & Policies**, enter a value in the **Grace Period on Deadline** field. Enter the value in Hours:Minutes format.
 
-.. _configure:
+.. _Configure the Assignment Types:
 
 ******************************
 Configure the Assignment Types
@@ -134,7 +138,7 @@ You configure the following fields for each assignment type:
   The number of assignments of this type that the grader will drop. The grader will drop the lowest-scored assignments first.            
 
 
-.. _set_assignment:
+.. _Set the Assignment Type for Graded Subsections:
 
 **********************************************
 Set the Assignment Type for Graded Subsections
@@ -142,9 +146,9 @@ Set the Assignment Type for Graded Subsections
 After you configure assignment types, as you are organizing your course, 
 you set the assignment type for Subsections that contain problems that are to be graded.
 
-You can designate a Subsection as one, and only one, of the assignment types you configured. You can also set a due date.
+.. note:: You can designate a Subsection as one, and only one, of the assignment types you configured. You can also set a due date.
   
-See :ref:`subsections` for instructions on configuring a Subsection. 
+See :ref:`subsections` for general instructions on configuring a Subsection. See :ref:`Set the Grading Policy` for instructions on designating a subsection as a graded assignment.
 
 Within a graded Subsection, you create problems of the type designated for that Subsection. 
 You should not mix problems of different assignment types in the same Subsection.
@@ -157,7 +161,7 @@ Both Subsections can contain other content as well as the actual homework or lab
 
 See :ref:`Working with Problem Components` for instructions on creating problems. 
 
-
+.. _Set the Grading Policy:
 
 =======================
 Set the Grading Policy
@@ -165,7 +169,10 @@ Set the Grading Policy
 
 You can designate a subsection as one of the assignment types that you specified in the grading policy.
 
-You set the grading policy for the subsection from the course outline or from the subsection page.
+You set the grading policy for the subsection from two places:
+
+* The course outline 
+* The subsection page
 
 From the course outline, click the checkmark next to the subsection.  Then select a grading policy from the popup menu:
 
@@ -173,7 +180,7 @@ From the course outline, click the checkmark next to the subsection.  Then selec
        :width: 600
        :alt: Image of the assignment type for a subsection
 
-From the Subsection page, click the text next to the **Graded as** label, then select a grading policy from the popup menu:
+From the subsection page, click the text next to the **Graded as** label, then select a grading policy from the popup menu:
 
     .. image:: Images/subsection_set_grade.png
        :width: 600
@@ -194,7 +201,7 @@ For subsections that contain graded problems, you can set a due date. Students m
 
 .. note:: When you set a due date, keep in mind that students will be in different time zones. By default, the time zone appears as UTC, not the student's local time. If you tell your students an assignment is due at 5:00 PM, make sure to specify that the time is 5:00 PM UTC and point them to a time converter.
 
-Alternatively, you can :ref:`Set the Grace Period` for your assignments to cover any misunderstandings about time. For example, some classes have set a grace period of 1 day, 6 hours, and 1 minute. The grace period applies to all assignments.
+You can also :ref:`Set the Grace Period` for your assignments to cover any misunderstandings about time. For example, some classes have set a grace period of 1 day, 6 hours, and 1 minute. The grace period applies to all assignments.
 
 Students see the due date in the course accordian under the subsection title. For example:
 
@@ -206,7 +213,7 @@ There are several problems in this subsection, all due November 3, 2013 at 23:30
 
 
 
-.. _student_view:
+.. _The Student View of Grades:
 
 **************************
 The Student View of Grades
@@ -216,3 +223,5 @@ Once a grading policy is in place, students can view both their problem scores a
   .. image:: Images/Progress_tab.png
     :width: 800
     :alt: Image of the student Progress tab
+
+.. note:: The **x** for an assignment in the Progress tab indicates that the assignment grade is currently dropped. You configure how many assignments are dropped when you :ref:`Configure the Assignment Types`.

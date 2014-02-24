@@ -17,7 +17,7 @@
 %>
 
 <%!
-from xmodule.util.date_utils import get_time_display
+from util.date_utils import get_time_display
 from django.conf import settings
 %>
 
@@ -77,7 +77,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
                 %if section.get('due') is not None:
                   <%
-                      formatted_string = get_time_display(section['due'], course.due_date_display_format, coerce_tz=settings.TIME_ZONE)
+                      formatted_string = get_time_display(section['due'], course.due_date_display_format, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
                       due_date = '' if len(formatted_string)==0 else _(u'due {date}').format(date=formatted_string)
                   %>
                   <em>

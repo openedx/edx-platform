@@ -23,7 +23,9 @@ generates output conf/locale/$DUMMY_LOCALE/LC_MESSAGES,
 where $DUMMY_LOCALE is the dummy_locale value set in the i18n config
 """
 
+import re
 import sys
+
 import polib
 from path import path
 
@@ -173,6 +175,10 @@ def make_dummy(filename, locale, converter):
         raise IOError('File does not exist: %r' % filename)
     pofile = polib.pofile(filename)
     for msg in pofile:
+        # Some strings are actually formatting strings, don't dummy-ify them,
+        # or dates will look like "DÀTÉ_TÌMÉ_FÖRMÀT Ⱡ'σ# EST"
+        if re.match(r"^[A-Z_]+_FORMAT$", msg.msgid):
+            continue
         converter.convert_msg(msg)
 
     # Apply declaration for English pluralization rules so that ngettext will

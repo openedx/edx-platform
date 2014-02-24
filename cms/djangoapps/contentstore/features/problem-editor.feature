@@ -105,6 +105,14 @@ Feature: CMS.Problem Editor
     And I click on "delete draft"
     Then the problem display name is "Blank Common Problem"
 
+  Scenario: Problems can be made private after being made public
+    Given I have created a Blank Common Problem
+    When I publish the unit
+    And I click on "edit a draft"
+    And I click on "delete draft"
+    And I unpublish the unit
+    Then I can edit the problem
+
   # Disabled 11/13/2013 after failing in master
   # The screenshot showed that the LaTeX editor had the text "hi",
   # but Selenium timed out waiting for the text to appear.

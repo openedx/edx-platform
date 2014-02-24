@@ -510,7 +510,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         locator = loc_mapper().translate_location(
             course_items[0].location.course_id, location, True, True
         )
-        resp = self.client.get_fragment(locator.url_reverse('xblock'))
+        resp = self.client.get_fragment(locator.url_reverse('xblock', 'student_view'))
         self.assertEqual(resp.status_code, 200)
         # TODO: uncomment when preview no longer has locations being returned.
         # _test_no_locations(self, resp)

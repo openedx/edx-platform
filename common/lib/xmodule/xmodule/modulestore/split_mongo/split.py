@@ -105,6 +105,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                  default_class=None,
                  error_tracker=null_error_tracker,
                  loc_mapper=None,
+                 i18n_service=None,
                  **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
@@ -129,6 +130,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         self.fs_root = path(fs_root)
         self.error_tracker = error_tracker
         self.render_template = render_template
+        self.i18n_service = i18n_service
 
         # TODO: Don't have a runtime just to generate the appropriate mixin classes (cpennington)
         # This is only used by _partition_fields_by_scope, which is only needed because
@@ -180,6 +182,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         '''
         system = self._get_cache(course_entry['structure']['_id'])
         if system is None:
+            services = {}
+            if self.i18n_service:
+                services["i18n"] = self.i18n_service
+
             system = CachingDescriptorSystem(
                 modulestore=self,
                 course_entry=course_entry,
@@ -191,6 +197,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 resources_fs=None,
                 mixins=self.xblock_mixins,
                 select=self.xblock_select,
+                services=services,
             )
             self._add_cache(course_entry['structure']['_id'], system)
             self.cache_items(system, block_ids, depth, lazy)

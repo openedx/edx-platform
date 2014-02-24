@@ -95,31 +95,20 @@ class XBlockFixtureDesc(object):
         self.children.extend(args)
         return self
 
-    def serialize(self, parent_loc=None):
+    def serialize(self):
         """
         Return a JSON representation of the XBlock, suitable
         for sending as POST data to /xblock
 
         XBlocks are always set to public visibility.
         """
-        payload = {
-            'category': self.category,
+        return json.dumps({
             'display_name': self.display_name,
             'data': self.data,
             'metadata': self.metadata,
-            'grader_type': self.grader_type,
+            'graderType': self.grader_type,
             'publish': self.publish
-        }
-
-        # Need to handle detached categories differently, since they are not published
-        # This may change in the future.
-        if self.category in ['static_tab']:
-            del payload['publish']
-
-        if parent_loc is not None:
-            payload['parent_locator'] = parent_loc
-
-        return json.dumps(payload)
+        })
 
     def __str__(self):
         """
@@ -395,15 +384,25 @@ class CourseFixture(StudioApiFixture):
             loc = self._create_xblock(parent_loc, desc)
             self._create_xblock_children(loc, desc.children)
 
+        self._publish_xblock(parent_loc)
+
     def _create_xblock(self, parent_loc, xblock_desc):
         """
         Create an XBlock with `parent_loc` (the location of the parent block)
         and `xblock_desc` (an `XBlockFixtureDesc` instance).
         """
+        create_payload = {
+            'category': xblock_desc.category,
+            'display_name': xblock_desc.display_name,
+        }
+
+        if parent_loc is not None:
+            create_payload['parent_locator'] = parent_loc
+
         # Create the new XBlock
         response = self.session.post(
             STUDIO_BASE_URL + '/xblock',
-            data=xblock_desc.serialize(parent_loc=parent_loc),
+            data=json.dumps(create_payload),
             headers=self.headers,
         )
 
@@ -417,24 +416,34 @@ class CourseFixture(StudioApiFixture):
         except ValueError:
             raise CourseFixtureError("Could not decode JSON from '{0}'".format(response.content))
 
-        if loc is not None:
+        # Configure the XBlock
+        response = self.session.post(
+            STUDIO_BASE_URL + '/xblock/' + loc,
+            data=xblock_desc.serialize(),
+            headers=self.headers,
+        )
 
-            # Configure the XBlock
-            response = self.session.post(
-                STUDIO_BASE_URL + '/xblock/' + loc,
-                data=xblock_desc.serialize(),
-                headers=self.headers,
-            )
-
-            if response.ok:
-                return loc
-            else:
-                raise CourseFixtureError(
-                    "Could not update {0}.  Status code: {1}".format(
-                        xblock_desc, response.status_code))
-
+        if response.ok:
+            return loc
         else:
-            raise CourseFixtureError("Could not retrieve location of {0}".format(xblock_desc))
+            raise CourseFixtureError(
+                "Could not update {0}.  Status code: {1}".format(
+                    xblock_desc, response.status_code))
+
+    def _publish_xblock(self, locator):
+        """
+        Publish the xblock at `locator`.
+        """
+        # Create the new XBlock
+        response = self.session.put(
+            "{}/xblock/{}".format(STUDIO_BASE_URL, locator),
+            data=json.dumps({'publish': 'make_public'}),
+            headers=self.headers,
+        )
+
+        if not response.ok:
+            msg = "Could not publish {}.  Status was {}".format(locator, response.status_code)
+            raise CourseFixtureError(msg)
 
     def _encode_post_dict(self, post_dict):
         """

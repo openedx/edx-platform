@@ -51,6 +51,16 @@ class AcidView(PageObject):
         """
         return self.test_passed('.document-ready-run')
 
+    @property
+    def child_tests_passed(self):
+        """
+        Whether the tests of children passed
+        """
+        return all([
+            self.test_passed('.child-counts-match'),
+            self.test_passed('.child-values-match')
+        ])
+
     def scope_passed(self, scope):
         return all(
             self.test_passed('.scope-storage-test.scope-{} {}'.format(scope, test))

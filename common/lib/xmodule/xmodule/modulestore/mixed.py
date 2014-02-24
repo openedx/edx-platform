@@ -23,7 +23,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
     ModuleStore knows how to route requests to the right persistence ms and how to convert any
     references in the xblocks to the type required by the app and the persistence layer.
     """
-    def __init__(self, mappings, stores, reference_type=None, **kwargs):
+    def __init__(self, mappings, stores, reference_type=None, i18n_service=None, **kwargs):
         """
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
         collection of other modulestore configuration informations
@@ -44,11 +44,19 @@ class MixedModuleStore(ModuleStoreWriteBase):
             raise Exception('Missing a default modulestore in the MixedModuleStore __init__ method.')
 
         for key, store in stores.items():
+            is_xml = 'XMLModuleStore' in store['ENGINE']
+            if is_xml:
+                store['OPTIONS']['course_ids'] = [
+                    course_id
+                    for course_id, store_key in self.mappings.iteritems()
+                    if store_key == key
+                ]
             self.modulestores[key] = create_modulestore_instance(
                 store['ENGINE'],
                 # XMLModuleStore's don't have doc store configs
                 store.get('DOC_STORE_CONFIG', {}),
-                store['OPTIONS']
+                store['OPTIONS'],
+                i18n_service=i18n_service,
             )
 
     def _get_modulestore_for_courseid(self, course_id):

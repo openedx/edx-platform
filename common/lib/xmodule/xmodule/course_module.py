@@ -408,7 +408,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             # set the due_date_display_format to what would have been shown previously (with no timezone).
             # Then remove show_timezone so that if the user clears out the due_date_display_format,
             # they get the default date display.
-            self.due_date_display_format = u"%b %d, %Y at %H:%M"
+            self.due_date_display_format = "DATE_TIME"
             delattr(self, 'show_timezone')
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
@@ -802,8 +802,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         '''Convert the given course_id (org/course/name) to a location object.
         Throws ValueError if course_id is of the wrong format.
         '''
-        org, course, name = course_id.split('/')
-        return Location('i4x', org, course, 'course', name)
+        course_id_dict = Location.parse_course_id(course_id)
+        course_id_dict['tag'] = 'i4x'
+        course_id_dict['category'] = 'course'
+        return Location(course_id_dict)
 
     @staticmethod
     def location_to_id(location):
@@ -828,13 +830,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Returns the desired text corresponding the course's start date.  Prefers .advertised_start,
         then falls back to .start
         """
+        i18n = self.runtime.service(self, "i18n")
+        _ = i18n.ugettext
+        strftime = i18n.strftime
+
         def try_parse_iso_8601(text):
             try:
                 result = Date().from_json(text)
                 if result is None:
                     result = text.title()
                 else:
-                    result = result.strftime("%b %d, %Y")
+                    result = strftime(result, "SHORT_DATE")
             except ValueError:
                 result = text.title()
 
@@ -843,12 +849,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         if isinstance(self.advertised_start, basestring):
             return try_parse_iso_8601(self.advertised_start)
         elif self.start_date_is_still_default:
-            _ = self.runtime.service(self, "i18n").ugettext
             # Translators: TBD stands for 'To Be Determined' and is used when a course
             # does not yet have an announced start date.
             return _('TBD')
         else:
-            return (self.advertised_start or self.start).strftime("%b %d, %Y")
+            when = self.advertised_start or self.start
+            return strftime(when, "SHORT_DATE")
 
     @property
     def start_date_is_still_default(self):
@@ -865,7 +871,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
         """
-        return '' if self.end is None else self.end.strftime("%b %d, %Y")
+        if self.end is None:
+            return ''
+        else:
+            strftime = self.runtime.service(self, "i18n").strftime
+            return strftime(self.end, "SHORT_DATE")
 
     @property
     def forum_posts_allowed(self):

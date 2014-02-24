@@ -565,7 +565,11 @@ class TestEditItem(ItemTest):
         self.assertNotEqual(draft.data, published.data)
 
         # Get problem by 'xblock_handler'
-        resp = self.client.get('/xblock/' + self.problem_locator, HTTP_ACCEPT='application/x-fragment+json')
+        resp = self.client.get('/xblock/' + self.problem_locator + '/student_view', HTTP_ACCEPT='application/x-fragment+json')
+        self.assertEqual(resp.status_code, 200)
+
+        # Activate the editing view
+        resp = self.client.get('/xblock/' + self.problem_locator + '/studio_view', HTTP_ACCEPT='application/x-fragment+json')
         self.assertEqual(resp.status_code, 200)
 
         # Both published and draft content should still be different

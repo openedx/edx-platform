@@ -41,6 +41,9 @@ Most problems have the following tags.
    * - ``<solution> <div class="detailed-solution"> </div> </solution>`` (optional)
      - If you want to include more information in the problem, such as a detailed explanation of the problem's answer, you'll enter the text between the two ``<div>`` tags, which are inside the ``<solution>`` tags. (These tags do not have to be on the same line.)
 
+Additionally, all problems must include a **label** attribute. This attribute adds a descriptive label that helps visually impaired students navigate through the problem.
+You'll add a **label** attribute to one of the XML tags for the problem. Each example problem below includes a label.
+
 .. _Choice Response:
 
 Choice Response (Checkbox Problems)
@@ -61,7 +64,7 @@ Although you can create checkbox problems by using the Simple Editor in Studio, 
    * - ``<choiceresponse>``
      - Specifies that the problem lists answer options for students to choose from.
    * - ``<checkboxgroup>``
-     - A child of ``<choiceresponse>``. Specifies that the problem is a checkbox problem.
+     - A child of ``<choiceresponse>``. Specifies that the problem is a checkbox problem. Can include a ``direction`` attribute and a ``label`` attribute.
    * - ``<choice>``
      - A child of ``<checkboxgroup>``. Designates an answer option. Each choice must include the ``correct`` attribute, set to ``true`` (for a correct answer) or ``false`` (for an incorrect answer). For checkbox problems, more than one option can be a correct answer.
 
@@ -75,7 +78,7 @@ Although you can create checkbox problems by using the Simple Editor in Studio, 
      difficult. Check all of the reasons below why this may be the case.</p>
 
   <choiceresponse>
-    <checkboxgroup>
+    <checkboxgroup direction="vertical" label="Check all of the reasons below why this may be the case">
       <choice correct="true"><text>A large amount of time passes between undertaking
       a preventative measure and seeing the result.</text></choice>
       <choice correct="false"><text>Non-immunized people will always fall sick.</text>
@@ -112,7 +115,7 @@ Although you can create checkbox problems by using the Simple Editor in Studio, 
 
   <choiceresponse>
 
-  <checkboxgroup>
+  <checkboxgroup direction="vertical" label="label text">
   <choice correct="false"><text>Answer option 1 (incorrect)</text></choice>
   <choice correct="true"><text>Answer option 2 (correct)</text></choice>
   </checkboxgroup>
@@ -147,7 +150,7 @@ In chemical equation problems, students enter text that represents a chemical eq
    * - ``<customresponse>``
      - Indicates that this problem has a custom response. The ``<customresponse>`` tags must surround the ``<chemicalequation>`` tags.
    * - ``<chemicalequationinput>``
-     - A child of ``<customresponse>``. Indicates that the answer to this problem is a chemical equation.
+     - A child of ``<customresponse>``. Indicates that the answer to this problem is a chemical equation. Must contain the ``size`` and ``label`` attributes.
    * - ``<answer type=loncapa/python>``
      - A child of ``<chemicalequationinput>``. Contains the Python script that grades the problem.
 
@@ -164,7 +167,7 @@ Chemical equation problems use MathJax to create formulas. For more information 
   \( \text{H}_2\text{SO}_4 \longrightarrow \text { H}^+ + \text{ HSO}_4^-\)
 
     <customresponse>
-      <chemicalequationinput size="50"/>
+      <chemicalequationinput size="50" label="Practice by writing out the following reaction in the box below."/>
       <answer type="loncapa/python">
 
   if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -> H^+ + HSO4^-'):
@@ -202,7 +205,7 @@ Chemical equation problems use MathJax to create formulas. For more information 
     <p>Problem text</p>
 
     <customresponse>
-      <chemicalequationinput size="50"/>
+      <chemicalequationinput size="50" label="label text"/>
       <answer type="loncapa/python">
 
   if chemcalc.chemical_equations_equal(submission[0], 'TEXT REPRESENTING CHEMICAL EQUATION'):
@@ -246,7 +249,7 @@ In custom Python-evaluated input (also called “write-your-own-grader”) probl
    * - ``<customresponse cfn="test_add" expect="20">``
      - 
    * - <textline size="10" correct_answer="3"/>
-     - This tag includes the ``size`` and ``correct_answer`` attributes. The ``correct_answer`` attribute is optional.
+     - This tag includes the ``size``, ``correct_answer``, and ``label`` attributes. The ``correct_answer`` attribute is optional.
 
 **Sample Problem XML**:
 
@@ -272,14 +275,14 @@ In custom Python-evaluated input (also called “write-your-own-grader”) probl
 
   <p>Part 1: Enter two integers that sum to 10. </p>
   <customresponse cfn="test_add_to_ten">
-          <textline size="10" correct_answer="3"/><br/>
-          <textline size="10" correct_answer="7"/>
+          <textline size="10" correct_answer="3" label="Integer #1"/><br/>
+          <textline size="10" correct_answer="7" label="Integer #2"/>
   </customresponse>
 
   <p>Part 2: Enter two integers that sum to 20. </p>
   <customresponse cfn="test_add" expect="20">
-          <textline size="10"/><br/>
-          <textline size="10"/>
+          <textline size="10" label="Integer #1"/><br/>
+          <textline size="10" label="Integer #2"/>
   </customresponse>
 
   <solution>
@@ -309,8 +312,8 @@ The following template includes answers that appear when the student clicks **Sh
 
   <p>Problem text</p>
   <customresponse cfn="test_add" expect="20">
-          <textline size="10" correct_answer="11"/><br/>
-          <textline size="10" correct_answer="9"/>
+          <textline size="10" correct_answer="11" label="Integer #1"/><br/>
+          <textline size="10" correct_answer="9" label="Integer #2"/>
   </customresponse>
 
       <solution>
@@ -337,8 +340,8 @@ The following template does not return answers when the student clicks **Show An
 
   <p>Enter two real numbers that sum to 20: </p>
   <customresponse cfn="test_add" expect="20">
-          <textline size="10" /><br/>
-          <textline size="10" />
+          <textline size="10"  label="Integer #1"/><br/>
+          <textline size="10"  label="Integer #2"/>
   </customresponse>
 
       <solution>
@@ -366,11 +369,9 @@ Formula Response (Math Expression Input Problems)
    * - ``<formularesponse>``
      - 
    * - ``<formulaequationinput>``
-     - 
+     - This tag includes the ``size`` and ``label`` attributes.
    * - ``<script type="loncapa/python">``
      - 
-   * - ``<textline size="10" correct_answer="3"/>``
-     - This tag includes the ``size`` and ``correct_answer`` attributes. The ``correct_answer`` attribute is optional.
 
 **Sample Problem XML**
 
@@ -390,7 +391,7 @@ Formula Response (Math Expression Input Problems)
     <p>Write an expression for the product of R_1, R_2, and the inverse of R_3.</p>
     <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
       <responseparam type="tolerance" default="0.00001"/>
-      <formulaequationinput size="20" />
+      <formulaequationinput size="40" label="Enter the equation"/>
     </formularesponse>
 
   <script type="loncapa/python">
@@ -403,7 +404,7 @@ Formula Response (Math Expression Input Problems)
   </script>
     <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
       <responseparam type="tolerance" default="0.00001"/>
-      <formulaequationinput size="20" />
+      <formulaequationinput size="40"  label="Enter the equation"/>
     </formularesponse>
 
     <solution>
@@ -422,7 +423,7 @@ Formula Response (Math Expression Input Problems)
     <p>Problem text</p>
     <formularesponse type="ci" samples="VARIABLES@LOWER_BOUNDS:UPPER_BOUNDS#NUMBER_OF_SAMPLES" answer="$VoVi">
       <responseparam type="tolerance" default="0.00001"/>
-      <formulaequationinput size="20" />
+      <formulaequationinput size="20"  label="Enter the equation"/>
     </formularesponse>
 
   <script type="loncapa/python">
@@ -549,7 +550,7 @@ Although you can create multiple choice problems by using the Simple Editor in S
    * - ``<multiplechoiceresponse>``
      - Indicates that the problem is a multiple choice problem.
    * - ``<choicegroup type="MultipleChoice">``
-     - Indicates the beginning of the list of options.
+     - Indicates the beginning of the list of options. Contains the ``label`` attribute.
    * - ``<choice>``
      - Lists an option. This tag includes the ``correct`` and ``name`` attributes.
 
@@ -560,7 +561,7 @@ Although you can create multiple choice problems by using the Simple Editor in S
   <problem>
   <p>Lateral inhibition, as was first discovered in the horsehoe crab...</p>
   <multiplechoiceresponse>
-    <choicegroup type="MultipleChoice">
+    <choicegroup type="MultipleChoice" label="Lateral inhibition, as was first discovered in the horsehoe crab">
       <choice correct="false">is a property of touch sensation, referring to the ability of crabs to detect nearby predators.</choice>
       <choice correct="false">is a property of hearing, referring to the ability of crabs to detect low frequency noises.</choice>
       <choice correct="false">is a property of vision, referring to the ability of crabs eyes to enhance contrasts.</choice>
@@ -584,7 +585,7 @@ Although you can create multiple choice problems by using the Simple Editor in S
   <problem>
   <p>Question text</p>
   <multiplechoiceresponse>
-    <choicegroup type="MultipleChoice">
+    <choicegroup type="MultipleChoice" label="label text">
       <choice correct="false" name="a">Incorrect choice</choice>
       <choice correct="true" name="b">Correct choice</choice>
     </choicegroup>
@@ -618,8 +619,8 @@ Although you can create multiple choice problems by using the Simple Editor in S
 
 .. _Numerical Response:
 
-Numerical Response
-------------------
+Numerical Response (Numerical Input Problems)
+---------------------------------------------
 
 The Numerical Response input type accepts a line of text input from the student
 and evaluates the input for correctness based on its numerical value. The input
@@ -648,49 +649,49 @@ Sample Problem:
 
 .. code-block:: xml
 
-  <problem>
-    <p><b>Example Problem</b></p>
+<problem>
+  <p><b>Example Problem</b></p>
 
-  <p>What base is the decimal numeral system in?
-      <numericalresponse answer="10">
-          <formulaequationinput />
-      </numericalresponse>
-  </p>
-
-    <p>What is the value of the standard gravity constant <i>g</i>, measured in m/s<sup>2</sup>? Give your answer to at least two decimal places.
-    <numericalresponse answer="9.80665">
-      <responseparam type="tolerance" default="0.01" />
-      <formulaequationinput />
+<p>What base is the decimal numeral system in?
+    <numericalresponse answer="10">
+        <formulaequationinput label="What base is the decimal numeral system in?"/>
     </numericalresponse>
-  </p>
+</p>
 
-  <!-- Use python script spacing. The following should not be indented! -->
-  <script type="loncapa/python">
-  computed_response = math.sqrt(math.fsum([math.pow(math.pi,2), math.pow(math.e,2)]))
-  </script>
+  <p>What is the value of the standard gravity constant <i>g</i>, measured in m/s<sup>2</sup>? Give your answer to at least two decimal places.
+  <numericalresponse answer="9.80665">
+    <responseparam type="tolerance" default="0.01" />
+    <formulaequationinput label="Give your answer to at least two decimal places"/>
+  </numericalresponse>
+</p>
 
-  <p>What is the distance in the plane between the points (pi, 0) and (0, e)? You can type math.
-      <numericalresponse answer="$computed_response">
-          <responseparam type="tolerance" default="0.0001" />
-          <formulaequationinput />
-      </numericalresponse>
-  </p>
-  <solution>
-    <div class="detailed-solution">
-      <p>Explanation</p>
-      <p>The decimal numerical system is base ten.</p>
-      <p>The standard gravity constant is defined to be precisely 9.80665 m/s<sup>2</sup>.
-      This is 9.80 to two decimal places. Entering 9.8 also works.</p>
-      <p>By the distance formula, the distance between two points in the plane is
-         the square root of the sum of the squares of the differences of each coordinate.
-        Even though an exact numerical value is checked in this case, the
-        easiest way to enter this answer is to type
-        <code>sqrt(pi^2+e^2)</code> into the editor.
-        Other answers like <code>sqrt((pi-0)^2+(0-e)^2)</code> also work.
-      </p>
-    </div>
-  </solution>
-  </problem>
+<!-- Use python script spacing. The following should not be indented! -->
+<script type="loncapa/python">
+computed_response = math.sqrt(math.fsum([math.pow(math.pi,2), math.pow(math.e,2)]))
+</script>
+
+<p>What is the distance in the plane between the points (pi, 0) and (0, e)? You can type math.
+    <numericalresponse answer="$computed_response">
+        <responseparam type="tolerance" default="0.0001" />
+        <formulaequationinput label="What is the distance in the plane between the points (pi, 0) and (0, e)?"/>
+    </numericalresponse>
+</p>
+<solution>
+  <div class="detailed-solution">
+    <p>Explanation</p>
+    <p>The decimal numerical system is base ten.</p>
+    <p>The standard gravity constant is defined to be precisely 9.80665 m/s<sup>2</sup>.
+    This is 9.80 to two decimal places. Entering 9.8 also works.</p>
+    <p>By the distance formula, the distance between two points in the plane is
+       the square root of the sum of the squares of the differences of each coordinate.
+      Even though an exact numerical value is checked in this case, the
+      easiest way to enter this answer is to type
+      <code>sqrt(pi^2+e^2)</code> into the editor.
+      Other answers like <code>sqrt((pi-0)^2+(0-e)^2)</code> also work.
+    </p>
+  </div>
+</solution>
+</problem>
 
 **Templates**
 
@@ -701,7 +702,7 @@ Exact values
   <problem>
 
     <numericalresponse answer="10">
-      <formulaequationinput />
+      <formulaequationinput label="label text"/>
     </numericalresponse>
 
     <solution>
@@ -719,7 +720,7 @@ Answers with decimal precision
 
     <numericalresponse answer="9.80665">
       <responseparam type="tolerance" default="0.01" />
-      <formulaequationinput />
+      <formulaequationinput label="label text"/>
     </numericalresponse>
 
     <solution>
@@ -737,7 +738,7 @@ Answers with percentage precision
 
     <numericalresponse answer="100">
       <responseparam type="tolerance" default="10%" />
-      <formulaequationinput />
+      <formulaequationinput label="label text"/>
     </numericalresponse>
 
     <solution>
@@ -760,7 +761,7 @@ Answers with scripts
 
     <numericalresponse answer="$computed_response">
       <responseparam type="tolerance" default="0.0001" />
-      <formulaequationinput />
+      <formulaequationinput label="label text"/>
     </numericalresponse>
 
     <solution>
@@ -932,7 +933,7 @@ Although you can create dropdown problems by using the Simple Editor in Studio, 
    * - ``<optionresponse>``
      - Indicates that the problem is a dropdown problem.
    * - ``<optioninput>``
-     - Lists the answer options. This tag includes the ``options`` and ``correct`` attributes.
+     - Lists the answer options. This tag includes the ``options``, ``correct``, and ``label`` attributes.
 
 
 **Problem Code:**
@@ -946,15 +947,15 @@ Although you can create dropdown problems by using the Simple Editor in Studio, 
   <p>What type of data are the following?</p>
   <p>Age:</p>
   <optionresponse>
-    <optioninput options="('Nominal','Discrete','Continuous')" correct="Continuous"/>
+    <optioninput options="('Nominal','Discrete','Continuous')" correct="Continuous" label="Age"/>
   </optionresponse>
   <p>Age, rounded to the nearest year:</p>
   <optionresponse>
-    <optioninput options="('Nominal','Discrete','Continuous')" correct="Discrete"/>
+    <optioninput options="('Nominal','Discrete','Continuous')" correct="Discrete" label="Age, rounded to the nearest year"/>
   </optionresponse>
   <p>Life stage - infant, child, and adult:</p>
   <optionresponse>
-    <optioninput options="('Nominal','Discrete','Continuous')" correct="Nominal"/>
+    <optioninput options="('Nominal','Discrete','Continuous')" correct="Nominal" label="Life stage"/>
   </optionresponse>
   </problem>
 
@@ -966,7 +967,7 @@ Although you can create dropdown problems by using the Simple Editor in Studio, 
   <p>
     Problem text</p>
   <optionresponse>
-    <optioninput options="('Option 1','Option 2','Option 3')" correct="Option 2"/>
+    <optioninput options="('Option 1','Option 2','Option 3')" correct="Option 2" label="label text"/>
   </optionresponse>
     <solution>
       <div class="detailed-solution">
@@ -983,6 +984,7 @@ Although you can create dropdown problems by using the Simple Editor in Studio, 
     <optionresponse>
      options="('A','B')"
       correct="A"/>
+      label="label text"
     </optionresponse>
    
     <solution>
@@ -1103,7 +1105,7 @@ You can add ``regexp`` to the value of the ``type`` attribute, for example: ``ty
    * - ``<stringresponse>``
      - Indicates that the problem is a text input problem. 
    * - ``<textline>``
-     - Child of ``<stringresponse>``. Lists the answer options.
+     - Child of ``<stringresponse>``. Lists the answer options and contains the ``label`` attribute.
    * - ``<additional_answer>`` (optional)
      - Specifies an additional correct answer for the problem. A problem can contain an unlimited number of additional answers.
    * - ``<hintgroup>`` (optional)
@@ -1129,7 +1131,7 @@ You can add ``regexp`` to the value of the ``type`` attribute, for example: ``ty
   <stringresponse answer=".*herd immunity.*" type="ci regexp">
          <additional_answer>community immunity</additional_answer>
           <additional_answer>population immunity</additional_answer>
-          <textline size="20"/>
+          <textline size="20" label="What is the technical term that refers to the fact that, when enough people sleep under a bednet, the disease may altogether disappear?"/>
           <hintgroup>
               <stringhint answer="contact immunity" type="ci" name="contact_immunity_hint" />
               <hintpart on="contact_immunity_hint">
@@ -1162,7 +1164,7 @@ You can add ``regexp`` to the value of the ``type`` attribute, for example: ``ty
       <stringresponse answer="**.Correct answer 1.**" type="ci regexp">
           <additional_answer>Correct answer 2</additional_answer>
           <additional_answer>Correct answer 3</additional_answer>
-          <textline size="20"/>
+          <textline size="20" label="label text"/>
           <hintgroup>
               <stringhint answer="Incorrect answer A" type="ci" name="hintA" />
                 <hintpart on="hintA">

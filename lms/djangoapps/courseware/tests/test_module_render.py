@@ -2,6 +2,7 @@
 Test for lms courseware app, module render unit
 """
 from ddt import ddt, data
+from functools import partial
 from mock import MagicMock, patch, Mock
 import json
 
@@ -657,6 +658,9 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ),
             scope_ids=Mock(spec=ScopeIds),
         )
+        # Use the xblock_class's bind_for_student method
+        descriptor.bind_for_student = partial(xblock_class.bind_for_student, descriptor)
+
         if hasattr(xblock_class, 'module_class'):
             descriptor.module_class = xblock_class.module_class
 

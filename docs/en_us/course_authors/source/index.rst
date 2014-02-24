@@ -40,6 +40,7 @@ Contents
    course_data
    course_enrollment
    course_staffing
+   beta_testing
    course_student
    course_grades
    glossary

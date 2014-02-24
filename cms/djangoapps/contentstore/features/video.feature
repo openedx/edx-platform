@@ -97,21 +97,22 @@ Feature: CMS.Video Component
     Then I see a range on slider
 
   # 12
-  Scenario: Check that position is stored on page refresh, position within start-end range
-    Given I have created a Video component with subtitles
-    And Make sure captions are closed
-    And I edit the component
-    And I open tab "Advanced"
-    And I set value "00:00:12" to the field "Start Time"
-    And I set value "00:00:24" to the field "End Time"
-    And I save changes
-    And I click video button "play"
-    Then I see a range on slider
-    Then I seek video to "16" seconds
-    And I click video button "pause"
-    And I reload the page
-    And I click video button "play"
-    Then I see video starts playing from "0:16" position
+  # Disabled 2/19/14 after intermittent failures in master
+  #Scenario: Check that position is stored on page refresh, position within start-end range
+  #  Given I have created a Video component with subtitles
+  #  And Make sure captions are closed
+  #  And I edit the component
+  #  And I open tab "Advanced"
+  #  And I set value "00:00:12" to the field "Start Time"
+  #  And I set value "00:00:24" to the field "End Time"
+  #  And I save changes
+  #  And I click video button "play"
+  #  Then I see a range on slider
+  #  Then I seek video to "16" seconds
+  #  And I click video button "pause"
+  #  And I reload the page
+  #  And I click video button "play"
+  #  Then I see video starts playing from "0:16" position
 
   # 13
 # Disabled 2/18/14 after intermittent failures in master

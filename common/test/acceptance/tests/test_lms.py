@@ -3,7 +3,7 @@
 E2E tests for the LMS.
 """
 
-from unittest import skip
+from unittest import skip, expectedFailure
 
 from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise, fulfill_before, fulfill, Promise
@@ -69,6 +69,23 @@ class RegistrationTest(UniqueCourseTest):
         course_names = dashboard.available_courses
         self.assertIn(self.course_info['display_name'], course_names)
 
+    def assert_course_available(self, course_id):
+        # Occassionally this does not show up immediately,
+        # so we wait and try reloading the page
+        def _check_course_available():
+            available = self.find_courses_page.course_id_list
+            if course_id in available:
+                return True
+            else:
+                self.find_courses_page.visit()
+                return False
+
+        return fulfill(EmptyPromise(
+            _check_course_available,
+            "Found course {course_id} in the list of available courses".format(course_id=course_id),
+            try_limit=3, try_interval=2
+        ))
+
 
 class LanguageTest(UniqueCourseTest):
     """
@@ -99,6 +116,7 @@ class LanguageTest(UniqueCourseTest):
         self.password = "testpass"
         self.email = "test@example.com"
 
+    @skip("Flakey in its present form; re-enable when fixed")
     def test_change_lang(self):
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.dashboard_page.visit()
@@ -109,6 +127,7 @@ class LanguageTest(UniqueCourseTest):
         # We should see the dummy-language text on the page
         self.assertIn(self.current_courses_text, changed_text)
 
+    @skip("Flakey in its present form; re-enable when fixed")
     def test_language_persists(self):
         auto_auth_page = AutoAuthPage(self.browser, username=self.username, password=self.password, email=self.email, course_id=self.course_id)
         auto_auth_page.visit()
@@ -273,8 +292,9 @@ class VideoTest(UniqueCourseTest):
         course_fix.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
-                    XBlockFixtureDesc('video', 'Video')
-        ))).install()
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('video', 'Video')
+        )))).install()
 
 
         # Auto-auth register for the course
@@ -319,18 +339,48 @@ class VideoTest(UniqueCourseTest):
             self.assertGreaterEqual(self.video.duration, self.video.elapsed_time)
 
 
-class XBlockAcidTest(UniqueCourseTest):
+class XBlockAcidBase(UniqueCourseTest):
     """
-    Tests that verify that XBlock integration is working correctly
+    Base class for tests that verify that XBlock integration is working correctly
     """
+    __test__ = False
 
     def setUp(self):
         """
         Create a unique identifier for the course used in this test.
         """
         # Ensure that the superclass sets up
-        super(XBlockAcidTest, self).setUp()
+        super(XBlockAcidBase, self).setUp()
 
+        self.setup_fixtures()
+
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.tab_nav = TabNavPage(self.browser)
+
+    def test_acid_block(self):
+        """
+        Verify that all expected acid block tests pass in the lms.
+        """
+
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Courseware')
+
+        acid_block = AcidView(self.browser, '.xblock-student_view[data-block-type=acid]')
+        self.assertTrue(acid_block.init_fn_passed)
+        self.assertTrue(acid_block.doc_ready_passed)
+        self.assertTrue(acid_block.child_tests_passed)
+        self.assertTrue(acid_block.scope_passed('user_state'))
+
+
+class XBlockAcidNoChildTest(XBlockAcidBase):
+    """
+    Tests of an AcidBlock with no children
+    """
+    __test__ = True
+
+    def setup_fixtures(self):
         course_fix = CourseFixture(
             self.course_info['org'],
             self.course_info['number'],
@@ -341,24 +391,43 @@ class XBlockAcidTest(UniqueCourseTest):
         course_fix.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
-                    XBlockFixtureDesc('acid', 'Acid Block')
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('acid', 'Acid Block')
+                    )
                 )
             )
         ).install()
 
-        AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
-        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
-        self.tab_nav = TabNavPage(self.browser)
+class XBlockAcidChildTest(XBlockAcidBase):
+    """
+    Tests of an AcidBlock with children
+    """
+    __test__ = True
 
-        self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+    def setup_fixtures(self):
+        course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
 
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('acid', 'Acid Block').add_children(
+                            XBlockFixtureDesc('acid', 'First Acid Child', metadata={'name': 'first'}),
+                            XBlockFixtureDesc('acid', 'Second Acid Child', metadata={'name': 'second'}),
+                            XBlockFixtureDesc('html', 'Html Child', data="<html>Contents</html>"),
+                        )
+                    )
+                )
+            )
+        ).install()
+
+    # This will fail until we fix support of children in pure XBlocks
+    @expectedFailure
     def test_acid_block(self):
-        """
-        Verify that all expected acid block tests pass in the lms.
-        """
-        acid_block = AcidView(self.browser, '.xblock-student_view[data-block-type=acid]')
-        self.assertTrue(acid_block.init_fn_passed)
-        self.assertTrue(acid_block.doc_ready_passed)
-        self.assertTrue(acid_block.scope_passed('user_state'))
+        super(XBlockAcidChildTest, self).test_acid_block()

@@ -11,6 +11,7 @@ from django.utils.translation import ugettext as _
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
+from xmodule.modulestore.django import ModuleI18nService
 
 from courseware.access import has_access
 from lms.lib.xblock.runtime import LmsModuleSystem
@@ -83,6 +84,10 @@ class StaffGradingService(GradingService):
             get_module=None,
             render_template=render_to_string,
             replace_urls=None,
+            descriptor_runtime=None,
+            services={
+                'i18n': ModuleI18nService(),
+            },
         )
         super(StaffGradingService, self).__init__(config)
         self.url = config['url'] + config['staff_grading']

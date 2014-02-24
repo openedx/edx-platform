@@ -13,7 +13,6 @@ from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
-import django.utils
 from django.views.decorators.csrf import csrf_exempt
 
 from capa.xqueue_interface import XQueueInterface
@@ -25,8 +24,6 @@ from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes
 from edxmako.shortcuts import render_to_string
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
-from util.json_request import JsonResponse
-from util.sandboxing import can_execute_unsafe_code
 from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, KeyValueStore
@@ -35,12 +32,15 @@ from xblock.django.request import django_to_webob_request, webob_to_django_respo
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_debug_info, wrap_xblock
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
+
+from util.json_request import JsonResponse
+from util.sandboxing import can_execute_unsafe_code
 
 
 log = logging.getLogger(__name__)
@@ -225,7 +225,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             return None
 
     student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
-    descriptor._field_data = LmsFieldData(descriptor._field_data, student_data)
 
 
     def make_xqueue_callback(dispatch='score_update'):
@@ -318,12 +317,12 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
         # Bin score into range and increment stats
         score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
-        org, course_num, run = course_id.split("/")
+        course_id_dict = Location.parse_course_id(course_id)
 
         tags = [
-            u"org:{0}".format(org),
-            u"course:{0}".format(course_num),
-            u"run:{0}".format(run),
+            u"org:{org}".format(**course_id_dict),
+            u"course:{course}".format(**course_id_dict),
+            u"run:{name}".format(**course_id_dict),
             u"score_bucket:{0}".format(score_bucket)
         ]
 
@@ -428,12 +427,10 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
         services={
-            # django.utils.translation implements the gettext.Translations
-            # interface (it has ugettext, ungettext, etc), so we can use it
-            # directly as the runtime i18n service.
-            'i18n': django.utils.translation,
+            'i18n': ModuleI18nService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
+        descriptor_runtime=descriptor.runtime,
     )
 
     # pass position specified in URL to module through ModuleSystem
@@ -452,8 +449,8 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     else:
         system.error_descriptor_class = NonStaffErrorDescriptor
 
-    descriptor.xmodule_runtime = system
-    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)
+    descriptor.bind_for_student(system, LmsFieldData(descriptor._field_data, student_data))  # pylint: disable=protected-access
+    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
     return descriptor
 
 
