@@ -466,8 +466,11 @@ def course_info_update_handler(request, tag=None, package_id=None, branch=None, 
     """
     if 'application/json' not in request.META.get('HTTP_ACCEPT', 'application/json'):
         return HttpResponseBadRequest("Only supports json requests")
-    updates_locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    updates_location = loc_mapper().translate_locator_to_location(updates_locator)
+
+    course_location = loc_mapper().translate_locator_to_location(
+        CourseLocator(package_id=package_id), get_course=True
+    )
+    updates_location = course_location.replace(category='course_info', name=block)
     if provided_id == '':
         provided_id = None
 

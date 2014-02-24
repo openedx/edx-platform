@@ -1,7 +1,12 @@
-'''unit tests for course_info views and models.'''
-from contentstore.tests.test_course_settings import CourseTestCase
+"""
+unit tests for course_info views and models.
+"""
 import json
+
+from contentstore.tests.test_course_settings import CourseTestCase
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.locator import BlockUsageLocator
 
 
 class CourseUpdateTest(CourseTestCase):
@@ -142,3 +147,46 @@ class CourseUpdateTest(CourseTestCase):
         resp = self.client.get_json(course_update_url)
         payload = json.loads(resp.content)
         self.assertTrue(len(payload) == 2)
+
+    def test_post_course_update(self):
+        """
+        Test that a user can successfully post on course updates of a course whose location in not in loc_mapper
+        """
+        # create a course via the view handler
+        course_location = Location(['i4x', 'Org_1', 'Course_1', 'course', 'Run_1'])
+        course_locator = loc_mapper().translate_location(
+            course_location.course_id, course_location, False, True
+        )
+        self.client.ajax_post(
+            course_locator.url_reverse('course'),
+            {
+                'org': course_location.org,
+                'number': course_location.course,
+                'display_name': 'test course',
+                'run': course_location.name,
+            }
+        )
+
+        branch = u'draft'
+        version = None
+        block = u'updates'
+        updates_locator = BlockUsageLocator(
+            package_id=course_location.course_id.replace('/', '.'), branch=branch, version_guid=version, block_id=block
+        )
+
+        content = u"Sample update"
+        payload = {'content': content, 'date': 'January 8, 2013'}
+        course_update_url = updates_locator.url_reverse('course_info_update')
+        resp = self.client.ajax_post(course_update_url, payload)
+
+        # check that response status is 200 not 400
+        self.assertEqual(resp.status_code, 200)
+
+        payload = json.loads(resp.content)
+        self.assertHTMLEqual(payload['content'], content)
+
+        # now test that calling translate_location returns a locator whose block_id is 'updates'
+        updates_location = course_location.replace(category='course_info', name=block)
+        updates_locator = loc_mapper().translate_location(course_location.course_id, updates_location)
+        self.assertTrue(isinstance(updates_locator, BlockUsageLocator))
+        self.assertEqual(updates_locator.block_id, block)
