@@ -51,6 +51,12 @@ class Locator(object):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
+    def __hash__(self):
+        """
+        Hash on contents.
+        """
+        return hash(unicode(self))
+
     def __repr__(self):
         '''
         repr(self) returns something like this: CourseLocator("mit.eecs.6002x")
@@ -198,16 +204,16 @@ class CourseLocator(Locator):
         """
         Return a string representing this location.
         """
+        result = u""
         if self.package_id:
-            result = unicode(self.package_id)
+            result += unicode(self.package_id)
             if self.branch:
                 result += '/' + BRANCH_PREFIX + self.branch
-            return result
-        elif self.version_guid:
-            return u"{prefix}{guid}".format(prefix=VERSION_PREFIX, guid=self.version_guid)
-        else:
-            # raise InsufficientSpecificationError("missing package_id or version_guid")
-            return '<InsufficientSpecificationError: missing package_id or version_guid>'
+        if self.version_guid:
+            if self.package_id:
+                result += u"/"
+            result += u"{prefix}{guid}".format(prefix=VERSION_PREFIX, guid=self.version_guid)
+        return result
 
     def url(self):
         """
@@ -432,22 +438,29 @@ class BlockUsageLocator(CourseLocator):
 
     def version_agnostic(self):
         """
-        Returns a copy of itself.
-        If both version_guid and package_id are known, use a blank package_id in the copy.
-
         We don't care if the locator's version is not the current head; so, avoid version conflict
         by reducing info.
+        Returns a copy of itself without any version info.
+
+        :raises: ValueError if the block locator has no package_id
 
         :param block_locator:
         """
-        if self.version_guid:
-            return BlockUsageLocator(version_guid=self.version_guid,
-                                     branch=self.branch,
-                                     block_id=self.block_id)
-        else:
-            return BlockUsageLocator(package_id=self.package_id,
-                                     branch=self.branch,
-                                     block_id=self.block_id)
+        return BlockUsageLocator(package_id=self.package_id,
+                                 branch=self.branch,
+                                 block_id=self.block_id)
+
+    def course_agnostic(self):
+        """
+        We only care about the locator's version not its course.
+        Returns a copy of itself without any course info.
+
+        :raises: ValueError if the block locator has no version_guid
+
+        :param block_locator:
+        """
+        return BlockUsageLocator(version_guid=self.version_guid,
+                                 block_id=self.block_id)
 
     def set_block_id(self, new):
         """

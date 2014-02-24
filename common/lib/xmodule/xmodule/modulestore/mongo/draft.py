@@ -92,7 +92,7 @@ class DraftModuleStore(MongoModuleStore):
         except ItemNotFoundError:
             return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=depth))
 
-    def create_xmodule(self, location, definition_data=None, metadata=None, system=None):
+    def create_xmodule(self, location, definition_data=None, metadata=None, system=None, fields={}):
         """
         Create the new xmodule but don't save it. Returns the new module with a draft locator
 
@@ -104,7 +104,7 @@ class DraftModuleStore(MongoModuleStore):
         draft_loc = as_draft(location)
         if draft_loc.category in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(location)
-        return super(DraftModuleStore, self).create_xmodule(draft_loc, definition_data, metadata, system)
+        return super(DraftModuleStore, self).create_xmodule(draft_loc, definition_data, metadata, system, fields)
 
     def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         """

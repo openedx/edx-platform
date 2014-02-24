@@ -202,7 +202,12 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
                 log.debug("unable to render studio_view for %r", component, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
-            store.save_xmodule(component)
+            # change not authored by requestor but by xblocks. should not convert to draft if not
+            # already draft
+            if getattr(component, 'is_draft', False):
+                modulestore('draft').update_item(component, None)
+            else:
+                modulestore('direct').update_item(component, None)
         elif view_name == 'student_view' and component.has_children:
             # For non-leaf xblocks on the unit page, show the special rendering
             # which links to the new container page.

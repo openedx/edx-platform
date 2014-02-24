@@ -1,23 +1,23 @@
 import pymongo
 from uuid import uuid4
-import copy
 import ddt
-from mock import patch
+from mock import patch, Mock
+from importlib import import_module
 
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE, SPLIT_MONGO_MODULESTORE_TYPE, \
     XML_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDjango, loc_mapper
-
-# FIXME remove settings
+# Mixed modulestore depends on django, so we'll manually configure some django settings
+# before importing the module
 from django.conf import settings
 if not settings.configured:
     settings.configure()
-
 from xmodule.modulestore.mixed import MixedModuleStore
+
 
 @ddt.ddt
 class TestMixedModuleStore(LocMapperSetupSansDjango):
@@ -32,7 +32,6 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
     FS_ROOT = DATA_DIR
     DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
     RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
-    REFERENCE_TYPE = 'xmodule.modulestore.Location'
 
     IMPORT_COURSEID = 'MITx/999/2013_Spring'
     XML_COURSEID1 = 'edX/toy/2012_Fall'
@@ -54,7 +53,6 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             XML_COURSEID2: 'xml',
             IMPORT_COURSEID: 'default'
         },
-        'reference_type': REFERENCE_TYPE,
         'stores': {
             'xml': {
                 'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
@@ -101,10 +99,13 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.connection.drop_database(self.DB)
         self.addCleanup(self.connection.drop_database, self.DB)
         self.addCleanup(self.connection.close)
-        
         super(TestMixedModuleStore, self).setUp()
 
-        patcher = patch('xmodule.modulestore.mixed.loc_mapper', return_value=LocMapperSetupSansDjango.loc_store)
+        patcher = patch.multiple(
+            'xmodule.modulestore.mixed',
+            loc_mapper=Mock(return_value=LocMapperSetupSansDjango.loc_store),
+            create_modulestore_instance=create_modulestore_instance,
+        )
         patcher.start()
         self.addCleanup(patcher.stop)
         self.addTypeEqualityFunc(BlockUsageLocator, '_compareIgnoreVersion')
@@ -115,28 +116,26 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         NOTE: course_location and item_location must be Location regardless of the app reference type in order
         to cause the right mapping to be created.
         """
-        if default == 'split':
-            course = self.store.create_course(course_location, store_name=default)
-            chapter = self.store.create_item(
-                # don't use course_location as it may not be the repr
-                course.location, item_location.category, location=item_location, block_id=item_location.name
-            )
-        else:
-            course = self.store.create_course(
-                course_location, store_name=default, metadata={'display_name': course_location.name}
-            )
-            chapter = self.store.create_item(course_location, item_location.category, location=item_location)
-        if self.REFERENCE_TYPE == 'xmodule.modulestore.locator.CourseLocator':
+        course = self.store.create_course(
+            course_location, store_name=default, metadata={'display_name': course_location.name}
+        )
+        chapter = self.store.create_item(
+            # don't use course_location as it may not be the repr
+            course.location, item_location.category, location=item_location, block_id=item_location.name
+        )
+        if isinstance(course.location, CourseLocator):
             # add_entry is false b/c this is a test that the right thing happened w/o
             # wanting any additional side effects
             lookup_map = loc_mapper().translate_location(
                 course_location.course_id, course_location, add_entry_if_missing=False
             )
             self.assertEqual(lookup_map, course.location)
+            self.course_locations[self.IMPORT_COURSEID] = course.location.version_agnostic()
             lookup_map = loc_mapper().translate_location(
                 course_location.course_id, item_location, add_entry_if_missing=False
             )
             self.assertEqual(lookup_map, chapter.location)
+            self.import_chapter_location = chapter.location.version_agnostic()
         else:
             self.assertEqual(course.location, course_location)
             self.assertEqual(chapter.location, item_location)
@@ -154,8 +153,10 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             """
             Generate the locations for the given ids
             """
-            org, course, run = course_id.split('/')
-            return Location('i4x', org, course, 'course', run)
+            course_dict = Location.parse_course_id(course_id)
+            course_dict['tag'] = 'i4x'
+            course_dict['category'] = 'course'
+            return Location(course_dict)
 
         self.course_locations = {
              course_id: generate_location(course_id)
@@ -171,18 +172,8 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         # grab old style location b4 possibly converted
         import_location = self.course_locations[self.IMPORT_COURSEID]
         # get Locators and set up the loc mapper if app is Locator based
-        if self.REFERENCE_TYPE == 'xmodule.modulestore.locator.CourseLocator':
+        if default == 'split':
             self.fake_location = loc_mapper().translate_location('foo/bar/2012_Fall', self.fake_location)
-            self.import_chapter_location = loc_mapper().translate_location(
-                self.IMPORT_COURSEID, self.import_chapter_location
-            )
-            self.xml_chapter_location = loc_mapper().translate_location(
-                self.XML_COURSEID1, self.xml_chapter_location
-            )
-            self.course_locations = {
-                course_id: loc_mapper().translate_location(course_id, locn)
-                for course_id, locn in self.course_locations.iteritems()
-            }
 
         self._create_course(default, import_location, self.import_chapter_location)
 
@@ -206,8 +197,11 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             self.assertTrue(self.store.has_item(course_id, course_locn))
 
         # try negative cases
-        self.assertFalse(self.store.has_item(self.XML_COURSEID1, self.course_locations[self.IMPORT_COURSEID]))
-        self.assertFalse(self.store.has_item(self.IMPORT_COURSEID, self.course_locations[self.XML_COURSEID1]))
+        self.assertFalse(self.store.has_item(
+                self.XML_COURSEID1,
+                self.course_locations[self.XML_COURSEID1].replace(name='not_findable', category='problem')
+        ))
+        self.assertFalse(self.store.has_item(self.IMPORT_COURSEID, self.fake_location))
 
     @ddt.data('direct', 'split')
     def test_get_item(self, default_ms):
@@ -223,9 +217,12 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
 
         # try negative cases
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_instance(self.XML_COURSEID1, self.course_locations[self.IMPORT_COURSEID])
+            self.store.get_instance(
+                self.XML_COURSEID1,
+                self.course_locations[self.XML_COURSEID1].replace(name='not_findable', category='problem')
+            )
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_instance(self.IMPORT_COURSEID, self.course_locations[self.XML_COURSEID1])
+            self.store.get_instance(self.IMPORT_COURSEID, self.fake_location)
 
     @ddt.data('direct', 'split')
     def test_get_items(self, default_ms):
@@ -246,11 +243,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         Update should fail for r/o dbs and succeed for r/w ones
         """
         self.initdb(default_ms)
-        # try a r/o db
-        if self.REFERENCE_TYPE == 'xmodule.modulestore.locator.CourseLocator':
-            course_id = self.course_locations[self.XML_COURSEID1]
-        else:
-            course_id = self.XML_COURSEID1
+        course_id = self.XML_COURSEID1
         course = self.store.get_course(course_id)
         # if following raised, then the test is really a noop, change it
         self.assertFalse(course.show_calculator, "Default changed making test meaningless")
@@ -288,10 +281,14 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
     @ddt.data('direct', 'split')
     def test_get_courses(self, default_ms):
         self.initdb(default_ms)
-        # we should have 3 total courses aggregated
+        # we should have 3 total courses across all stores
         courses = self.store.get_courses()
         self.assertEqual(len(courses), 3)
-        course_ids = [course.location for course in courses]
+        course_ids = [
+            course.location.version_agnostic()
+            if hasattr(course.location, 'version_agnostic') else course.location
+            for course in courses
+        ]
         self.assertIn(self.course_locations[self.IMPORT_COURSEID], course_ids)
         self.assertIn(self.course_locations[self.XML_COURSEID1], course_ids)
         self.assertIn(self.course_locations[self.XML_COURSEID2], course_ids)
@@ -300,6 +297,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         """
         Test that the xml modulestore only loaded the courses from the maps.
         """
+        self.initdb('direct')
         courses = self.store.modulestores['xml'].get_courses()
         self.assertEqual(len(courses), 2)
         course_ids = [course.location.course_id for course in courses]
@@ -339,33 +337,28 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.assertEqual(len(parents), 1)
         self.assertEqual(parents[0], self.course_locations[self.XML_COURSEID1])
 
-@ddt.ddt
-class TestMixedUseLocator(TestMixedModuleStore):
-    """
-    Tests a mixed ms which uses Locators instead of Locations
-    """
-    REFERENCE_TYPE = 'xmodule.modulestore.locator.CourseLocator'
+#=============================================================================================================
+# General utils for not using django settings
+#=============================================================================================================
 
-    def setUp(self):
-        self.options = copy.copy(self.OPTIONS)
-        self.options['reference_type'] = self.REFERENCE_TYPE
-        super(TestMixedUseLocator, self).setUp()
-
-@ddt.ddt
-class TestMixedMSInit(TestMixedModuleStore):
+def load_function(path):
     """
-    Test initializing w/o a reference_type
-    """
-    REFERENCE_TYPE = None
-    def setUp(self):
-        self.options = copy.copy(self.OPTIONS)
-        del self.options['reference_type']
-        super(TestMixedMSInit, self).setUp()
+    Load a function by name.
 
-    @ddt.data('direct', 'split')
-    def test_use_locations(self, default_ms):
-        """
-        Test that use_locations defaulted correctly
-        """
-        self.initdb(default_ms)
-        self.assertEqual(self.store.reference_type, Location)
+    path is a string of the form "path.to.module.function"
+    returns the imported python object `function` from `path.to.module`
+    """
+    module_path, _, name = path.rpartition('.')
+    return getattr(import_module(module_path), name)
+
+
+def create_modulestore_instance(engine, doc_store_config, options, i18n_service=None):
+    """
+    This will return a new instance of a modulestore given an engine and options
+    """
+    class_ = load_function(engine)
+
+    return class_(
+        doc_store_config=doc_store_config,
+        **options
+    )

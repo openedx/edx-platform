@@ -633,8 +633,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             raise ValueError(u"Course roots must be of category 'course': {}".format(unicode(location)))
         return self.create_and_save_xmodule(location, definition_data, metadata, runtime)
 
-    def create_xmodule(self, location, definition_data=None, metadata=None, system=None,
-                       fields={}):
+    def create_xmodule(self, location, definition_data=None, metadata=None, system=None, fields={}):
         """
         Create the new xmodule but don't save it. Returns the new module.
 

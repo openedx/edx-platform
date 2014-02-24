@@ -479,7 +479,9 @@ class ModuleStoreReadBase(ModuleStoreRead):
         metadata_inheritance_cache_subsystem=None, request_cache=None,
         modulestore_update_signal=None, xblock_mixins=(), xblock_select=None,
         # temporary parms to enable backward compatibility. remove once all envs migrated
-        db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None
+        db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None,
+        # allow lower level init args to pass harmlessly
+        ** kwargs
     ):
         '''
         Set up the error-tracking logic.

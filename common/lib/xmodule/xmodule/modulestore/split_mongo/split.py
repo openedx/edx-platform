@@ -556,8 +556,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         The block's history tracks its explicit changes but not the changes in its children.
 
         '''
-        # version_agnostic means we don't care if the head and version don't align, trust the version
-        course_struct = self._lookup_course(block_locator.version_agnostic())['structure']
+        # course_agnostic means we don't care if the head and version don't align, trust the version
+        course_struct = self._lookup_course(block_locator.course_agnostic())['structure']
         block_id = block_locator.block_id
         update_version_field = 'blocks.{}.edit_info.update_version'.format(block_id)
         all_versions_with_block = self.db_connection.find_matching_structures({'original_version': course_struct['original_version'],

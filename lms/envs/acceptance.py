@@ -45,7 +45,6 @@ MODULESTORE = {
         'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
         'OPTIONS': {
             'mappings': {},
-            'reference_type': 'xmodule.modulestore.Location',
             'stores': {
                 'default': {
                     'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
