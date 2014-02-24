@@ -29,7 +29,7 @@
         .textbook-title {
           @extend %t-title4;
           @extend %t-strong;
-          margin-right: ($baseline*14);
+          #{$margin-right}: ($baseline*14);
         }
 
         .ui-toggle-expansion {
@@ -83,7 +83,7 @@
           opacity: 0.0;
           position: absolute;
           top: $baseline;
-          right: $baseline;
+          #{$right}: $baseline;
 
           .action {
             display: inline-block;
