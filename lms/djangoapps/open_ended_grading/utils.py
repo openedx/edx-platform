@@ -2,7 +2,7 @@ import json
 import logging
 
 from xmodule.modulestore import search
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
@@ -34,6 +34,9 @@ SYSTEM = LmsModuleSystem(
     render_template=render_to_string,
     replace_urls=None,
     descriptor_runtime=None,
+    services={
+        'i18n': ModuleI18nService(),
+    },
 )
 
 

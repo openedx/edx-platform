@@ -347,8 +347,10 @@ class XMLModuleStore(ModuleStoreReadBase):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, data_dir, default_class=None, course_dirs=None, course_ids=None,
-                 load_error_modules=True, **kwargs):
+    def __init__(
+        self, data_dir, default_class=None, course_dirs=None, course_ids=None,
+        load_error_modules=True, i18n_service=None, **kwargs
+    ):
         """
         Initialize an XMLModuleStore from data_dir
 
@@ -381,6 +383,8 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         # All field data will be stored in an inheriting field data.
         self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
+
+        self.i18n_service = i18n_service
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -522,6 +526,10 @@ class XMLModuleStore(ModuleStoreReadBase):
                 """
                 return policy.get(policy_key(usage_id), {})
 
+            services = {}
+            if self.i18n_service:
+                services['i18n'] = self.i18n_service
+
             system = ImportSystem(
                 xmlstore=self,
                 course_id=course_id,
@@ -534,6 +542,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 default_class=self.default_class,
                 select=self.xblock_select,
                 field_data=self.field_data,
+                services=services,
             )
 
             course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))

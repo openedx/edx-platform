@@ -4,7 +4,6 @@ Tests for util.date_utils
 """
 
 from datetime import datetime, timedelta, tzinfo
-from functools import partial
 import unittest
 
 import ddt
@@ -118,18 +117,22 @@ def test_almost_same_datetime():
     )
 
 
-def fake_ugettext(text, translations):
+def fake_ugettext(translations):
     """
-    A fake implementation of ugettext, for testing.
+    Create a fake implementation of ugettext, for testing.
     """
-    return translations.get(text, text)
+    def _ugettext(text):                # pylint: disable=missing-docstring
+        return translations.get(text, text)
+    return _ugettext
 
 
-def fake_pgettext(context, text, translations):
+def fake_pgettext(translations):
     """
-    A fake implementation of pgettext, for testing.
+    Create a fake implementation of pgettext, for testing.
     """
-    return translations.get((context, text), text)
+    def _pgettext(context, text):       # pylint: disable=missing-docstring
+        return translations.get((context, text), text)
+    return _pgettext
 
 
 @ddt.ddt
@@ -161,7 +164,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         dtime = datetime(2013, 02, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
-    @patch('util.date_utils.pgettext', partial(fake_pgettext, translations={
+    @patch('util.date_utils.pgettext', fake_pgettext(translations={
         ("abbreviated month name", "Feb"): "XXfebXX",
         ("month name", "February"): "XXfebruaryXX",
         ("abbreviated weekday name", "Thu"): "XXthuXX",
@@ -179,7 +182,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         dtime = datetime(2013, 02, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
-    @patch('util.date_utils.ugettext', partial(fake_ugettext, translations={
+    @patch('util.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "date(%Y.%m.%d)",
         "LONG_DATE_FORMAT": "date(%A.%Y.%B.%d)",
         "DATE_TIME_FORMAT": "date(%Y.%m.%d@%H.%M)",
@@ -198,7 +201,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         dtime = datetime(2013, 02, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
-    @patch('util.date_utils.ugettext', partial(fake_ugettext, translations={
+    @patch('util.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "oops date(%Y.%x.%d)",
         "TIME_FORMAT": "oops %Hh.%Xm.%Ss",
     }))
