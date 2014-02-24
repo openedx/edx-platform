@@ -26,8 +26,8 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('embargo', ['EmbargoedState'])
 
-        # Adding model 'IPException'
-        db.create_table('embargo_ipexception', (
+        # Adding model 'IPFilter'
+        db.create_table('embargo_ipfilter', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('change_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('changed_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.PROTECT)),
@@ -35,7 +35,7 @@ class Migration(SchemaMigration):
             ('whitelist', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('blacklist', self.gf('django.db.models.fields.TextField')(blank=True)),
         ))
-        db.send_create_signal('embargo', ['IPException'])
+        db.send_create_signal('embargo', ['IPFilter'])
 
 
     def backwards(self, orm):
@@ -45,8 +45,8 @@ class Migration(SchemaMigration):
         # Deleting model 'EmbargoedState'
         db.delete_table('embargo_embargoedstate')
 
-        # Deleting model 'IPException'
-        db.delete_table('embargo_ipexception')
+        # Deleting model 'IPFilter'
+        db.delete_table('embargo_ipfilter')
 
 
     models = {
@@ -100,8 +100,8 @@ class Migration(SchemaMigration):
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
-        'embargo.ipexception': {
-            'Meta': {'object_name': 'IPException'},
+        'embargo.ipfilter': {
+            'Meta': {'object_name': 'IPFilter'},
             'blacklist': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),

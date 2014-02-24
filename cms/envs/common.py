@@ -188,6 +188,8 @@ MIDDLEWARE_CLASSES = (
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
 
+    'embargo.middleware.EmbargoMiddleware',
+
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
 
@@ -200,8 +202,6 @@ MIDDLEWARE_CLASSES = (
 
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
-
-    'embargo.middleware.EmbargoMiddleware',
 )
 
 ############# XBlock Configuration ##########

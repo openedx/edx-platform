@@ -60,10 +60,12 @@ class EmbargoedState(ConfigurationModel):
         """
         Return a list of upper case country codes
         """
+        if self.embargoed_countries == '':
+            return []
         return [country.strip().upper() for country in self.embargoed_countries.split(',')]  # pylint: disable=no-member
 
 
-class IPException(ConfigurationModel):
+class IPFilter(ConfigurationModel):
     """
     Register specific IP addresses to explicitly block or unblock.
     """
@@ -82,6 +84,8 @@ class IPException(ConfigurationModel):
         """
         Return a list of valid IP addresses to whitelist
         """
+        if self.whitelist == '':
+            return []
         return [addr.strip() for addr in self.whitelist.split(',')]  # pylint: disable=no-member
 
     @property
@@ -89,4 +93,6 @@ class IPException(ConfigurationModel):
         """
         Return a list of valid IP addresses to blacklist
         """
+        if self.blacklist == '':
+            return []
         return [addr.strip() for addr in self.blacklist.split(',')]  # pylint: disable=no-member
