@@ -24,12 +24,15 @@ class EmbargoMiddlewareTests(TestCase):
         self.client = Client()
         self.user = User()
         self.client.login(username='fred', password='secret')
-        self.course = CourseFactory.create()
-        self.course.save()
-        self.page = '/courses/' + self.course.id + '/info'
+        self.embargo_course = CourseFactory.create()
+        self.embargo_course.save()
+        self.regular_course = CourseFactory.create()
+        self.regular_course.save()
+        self.embargoed_page = '/courses/' + self.embargo_course.id + '/info'
+        self.regular_page = '/courses/' + self.regular_course.id + '/info'
         EmbargoConfig(
             embargoed_countries="CU, IR, SY,SD",
-            embargoed_courses=self.course.id,
+            embargoed_courses=self.embargo_course.id,
             changed_by=self.user,
             enabled=True
         ).save()
@@ -47,5 +50,18 @@ class EmbargoMiddlewareTests(TestCase):
 
         with mock.patch.object(pygeoip.GeoIP, 'country_code_by_addr') as mocked_method:
             mocked_method.side_effect = mock_country_code_by_addr
-            response = self.client.get(self.page, HTTP_X_FORWADED_FOR='0.0.0.0')
+
+            # Accessing an embargoed page from a blocked IP should cause a redirect
+            response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
+            self.assertEqual(response.status_code, 302)
+
+            # Accessing a regular course from a blocked IP should succeed
+            response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
+            self.assertEqual(response.status_code, 200)
+
+            # Accessing any course from non-embaroged IPs should succeed
+            response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
+            self.assertEqual(response.status_code, 200)
+
+            response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
             self.assertEqual(response.status_code, 200)
