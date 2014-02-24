@@ -42,7 +42,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-15 08:19-0500\n"
+"POT-Creation-Date: 2014-02-19 16:57-0500\n"
 "PO-Revision-Date: 2014-02-15 10:50+0000\n"
 "Last-Translator: harry75369 <harry75369@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
@@ -132,6 +132,90 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
+msgstr ""
+
+#. Translators: A "rating" is a score a student gives to indicate how well
+#. they feel they were graded on this problem
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "You need to pick a rating before you can submit."
+msgstr ""
+
+#. Translators: this message appears when transitioning between openended
+#. grading
+#. types (i.e. self assesment to peer assessment). Sometimes, if a student
+#. did not perform well at one step, they cannot move on to the next one.
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Your score did not meet the criteria to move to the next step."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Submit"
+msgstr ""
+
+#. Translators: one clicks this button after one has finished filling out the
+#. grading
+#. form for an openended assessment
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Submit assessment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"Your response has been submitted. Please check back later for your grade."
+msgstr ""
+
+#. Translators: this button is clicked to submit a student's rating of
+#. an evaluator's assessment
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Submit post-assessment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Answer saved, but not yet submitted."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"Please confirm that you wish to submit your work. You will not be able to "
+"make any changes after submitting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"You are trying to upload a file that is too large for our system.  Please "
+"choose a file under 2MB or paste a link to it into the answer box."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"Are you sure you want to remove your previous response to this question?"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Moved to next step."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"File uploads are required for this question, but are not supported in your "
+"browser. Try the newest version of Google Chrome. Alternatively, if you have"
+" uploaded the image to another website, you can paste a link to it into the "
+"answer box."
+msgstr ""
+
+#. Translators: "Show Question" is some text that, when clicked, shows a
+#. question's
+#. content that had been hidden
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Show Question"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Hide Question"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
@@ -258,6 +342,7 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
 msgstr ""
 
@@ -421,6 +506,14 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Misuse Reported, click to remove report"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/response_comment_view.js
+msgid "Are you sure you want to delete this comment?"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/response_comment_view.js
+msgid "We had some trouble deleting this comment. Please try again."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
@@ -922,19 +1015,15 @@ msgid "Try loading again"
 msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "<%= num %> available"
+msgid "<%= num %> available "
 msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "<%= num %> graded"
+msgid "<%= num %> graded "
 msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> more needed to start ML"
-msgstr ""
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Submit"
 msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
