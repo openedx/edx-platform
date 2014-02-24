@@ -155,11 +155,6 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             category="static_tab", parent_location=self.course.location,
             data="OOGIE BLOOGIE", display_name="new_tab"
         )
-        # The following XML course is closed; we're testing that
-        # static tabs still appear when the course is already closed
-        self.xml_data = "static 463139"
-        self.xml_url = "8e4cce2b4aaf4ba28b1220804619e41f"
-        self.xml_course_id = 'edX/detached_pages/2014'
 
     def test_logged_in(self):
         self.setup_user()
@@ -173,6 +168,19 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    # The following XML test course (which lives at common/test/data/2014)
+    # is closed; we're testing that tabs still appear when
+    # the course is already closed
+    xml_course_id = 'edX/detached_pages/2014'
+
+    # this text appears in the test course's tab
+    # common/test/data/2014/tabs/8e4cce2b4aaf4ba28b1220804619e41f.html
+    xml_data = "static 463139"
+    xml_url = "8e4cce2b4aaf4ba28b1220804619e41f"
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):

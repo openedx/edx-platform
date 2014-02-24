@@ -19,10 +19,6 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             category="course_info", parent_location=self.course.location,
             data="OOGIE BLOOGIE", display_name="updates"
         )
-        # The following XML course is closed; we're testing that
-        # a course info page still appears when the course is already closed
-        self.xml_data = "course info 463139"
-        self.xml_course_id = "edX/detached_pages/2014"
 
     def test_logged_in(self):
         self.setup_user()
@@ -36,6 +32,18 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn("OOGIE BLOOGIE", resp.content)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    # The following XML test course (which lives at common/test/data/2014)
+    # is closed; we're testing that a course info page still appears when
+    # the course is already closed
+    xml_course_id = 'edX/detached_pages/2014'
+
+    # this text appears in that course's course info page
+    # common/test/data/2014/info/updates.html
+    xml_data = "course info 463139"
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
