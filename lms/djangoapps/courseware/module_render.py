@@ -22,6 +22,7 @@ from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.lib.xblock.field_data import LmsFieldData
 from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes
 from edxmako.shortcuts import render_to_string
+from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from xblock.core import XBlock
@@ -571,6 +572,13 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         )
         raise Http404
 
+    tracking_context_name = 'module_callback_handler'
+    tracking_context = {
+        'module': {
+            'display_name': descriptor.display_name_with_default,
+        }
+    }
+
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
         user,
@@ -585,7 +593,8 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
 
     req = django_to_webob_request(request)
     try:
-        resp = instance.handle(handler, req, suffix)
+        with tracker.get_tracker().context(tracking_context_name, tracking_context):
+            resp = instance.handle(handler, req, suffix)
 
     except NoSuchHandlerError:
         log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
