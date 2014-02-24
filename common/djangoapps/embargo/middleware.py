@@ -20,6 +20,9 @@ class EmbargoMiddleware(object):
     """
 
     def process_request(self, request):
+        """
+        Processes embargo requests
+        """
         url = request.path
         course_id = course_id_from_url(url)
 

@@ -2,14 +2,11 @@
 Tests for EmbargoMiddleware
 """
 
-from django.contrib.auth.models import User
 from xmodule.modulestore.tests.factories import CourseFactory
-from django.test import RequestFactory
 from django.test import TestCase
 from django.test.utils import override_settings
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from embargo.models import EmbargoConfig
-from courseware.views import course_info
 from django.test import Client
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -42,9 +39,11 @@ class EmbargoMiddlewareTests(TestCase):
         CourseEnrollment.enroll(self.user, self.regular_course.id)
         CourseEnrollment.enroll(self.user, self.embargo_course.id)
 
-
     def test_countries(self):
         def mock_country_code_by_addr(ip):
+            """
+            Gives us a fake set of IPs
+            """
             ip_dict = {
                 '1.0.0.0': 'CU',
                 '2.0.0.0': 'IR',
