@@ -703,6 +703,7 @@ MIDDLEWARE_CLASSES = (
 
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
+    'embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences
     # should be after DarkLangMiddleware
@@ -728,7 +729,6 @@ MIDDLEWARE_CLASSES = (
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
 
-    'embargo.middleware.EmbargoMiddleware',
 )
 
 ############################### Pipeline #######################################

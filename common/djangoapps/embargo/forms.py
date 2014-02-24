@@ -4,7 +4,7 @@ Defines forms for providing validation of embargo admin details.
 
 from django import forms
 
-from embargo.models import EmbargoedCourse, EmbargoedState, IPException
+from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
 from embargo.fixtures.country_codes import COUNTRY_CODES
 
 import socket
@@ -50,13 +50,16 @@ class EmbargoedStateForm(forms.ModelForm):  # pylint: disable=incomplete-protoco
 
     def _is_valid_code(self, code):
         """Whether or not code is a valid country code"""
-        if len(code) == 2 and code in COUNTRY_CODES:
+        if code in COUNTRY_CODES:
             return True
         return False
 
     def clean_embargoed_countries(self):
         """Validate the country list"""
         embargoed_countries = self.cleaned_data["embargoed_countries"]
+        if embargoed_countries == '':
+            return ''
+
         error_countries = []
 
         for country in embargoed_countries.split(','):
@@ -72,11 +75,11 @@ class EmbargoedStateForm(forms.ModelForm):  # pylint: disable=incomplete-protoco
         return embargoed_countries
 
 
-class IPExceptionForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
+class IPFilterForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
     """Form validating entry of IP addresses"""
 
     class Meta:  # pylint: disable=missing-docstring
-        model = IPException
+        model = IPFilter
 
     def _is_valid_ipv4(self, address):
         """Whether or not address is a valid ipv4 address"""

@@ -1,7 +1,10 @@
 """ Utility functions related to HTTP requests """
+import re
+
 from django.conf import settings
 from microsite_configuration.middleware import MicrositeConfiguration
-from track.contexts import COURSE_REGEX
+
+COURSE_REGEX = re.compile(r'^.*?/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)')
 
 
 def safe_get_host(request):
