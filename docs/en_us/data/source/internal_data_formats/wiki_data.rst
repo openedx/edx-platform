@@ -16,7 +16,7 @@ In the data package, wiki data is delivered in two SQL files:
 Fields in the wiki_article file
 ***********************************
 
-The header row of the wiki-article SQL file, and a row of sample data, follow.
+The header row of the wiki_article SQL file, and a row of sample data, follow.
 
 .. code-block:: json
 
@@ -96,7 +96,7 @@ other_write
 Fields in the wiki_articlerevision file 
 ******************************************************
 
-The header row of the wiki-articlerevision SQL file, and a row of sample data, follow.
+The header row of the wiki_articlerevision SQL file, and a row of sample data, follow.
 
 .. code-block:: json
 
