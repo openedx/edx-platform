@@ -1,22 +1,40 @@
 describe 'ResponseCommentView', ->
     beforeEach ->
-
+        window.$$course_id = 'edX/999/test'
+        window.user = new DiscussionUser {id: '567'}
+        DiscussionUtil.loadRoles []
         @comment = new Comment {
                 id: '01234567',
-                user_id: '567',
-                course_id: 'edX/999/test',
+                user_id: user.id,
+                course_id: $$course_id,
                 body: 'this is a response',
                 created_at: '2013-04-03T20:08:39Z',
                 abuse_flaggers: ['123']
                 roles: ['Student']
         }
-        @view = new ResponseCommentView({ model: @comment })
-        spyOn(@view, "render")
+        setFixtures """
+        <script id="response-comment-show-template" type="text/template">
+            <div id="response-comment-show-div"/>
+        </script>
+        <script id="response-comment-edit-template" type="text/template">
+            <div id="response-comment-edit-div">
+                <div class="edit-comment-body"><textarea/></div>
+                <ul class="edit-comment-form-errors"/>
+            </div>
+        </script>
+        <div id="response-comment-fixture"/>
+        """
+        @view = new ResponseCommentView({ model: @comment, el: $("#response-comment-fixture") })
+        spyOn(ResponseCommentShowView.prototype, "convertMath")
+        spyOn(DiscussionUtil, "makeWmdEditor")
+        @view.render()
+
+    makeEventSpy = () -> jasmine.createSpyObj('event', ['preventDefault', 'target'])
 
     describe '_delete', ->
         beforeEach ->
             @comment.updateInfo {ability: {can_delete: true}}
-            @event = jasmine.createSpyObj('event', ['preventDefault', 'target'])
+            @event = makeEventSpy()
             spyOn(@comment, "remove")
             spyOn(@view.$el, "remove")
 
@@ -68,3 +86,82 @@ describe 'ResponseCommentView', ->
             expect(@comment.remove).not.toHaveBeenCalled()
             expect(@view.$el.remove).not.toHaveBeenCalled()
 
+    describe 'renderShowView', ->
+        it 'renders the show view, removes the edit view, and registers event handlers', ->
+            spyOn(@view, "_delete")
+            spyOn(@view, "edit")
+            # Without calling renderEditView first, renderShowView is a no-op
+            @view.renderEditView()
+            @view.renderShowView()
+            @view.showView.trigger "comment:_delete", makeEventSpy()
+            expect(@view._delete).toHaveBeenCalled()
+            @view.showView.trigger "comment:edit", makeEventSpy()
+            expect(@view.edit).toHaveBeenCalled()
+            expect(@view.$("#response-comment-show-div").length).toEqual(1)
+            expect(@view.$("#response-comment-edit-div").length).toEqual(0)
+
+    describe 'renderEditView', ->
+        it 'renders the edit view, removes the show view, and registers event handlers', ->
+            spyOn(@view, "update")
+            spyOn(@view, "cancelEdit")
+            @view.renderEditView()
+            @view.editView.trigger "comment:update", makeEventSpy()
+            expect(@view.update).toHaveBeenCalled()
+            @view.editView.trigger "comment:cancel_edit", makeEventSpy()
+            expect(@view.cancelEdit).toHaveBeenCalled()
+            expect(@view.$("#response-comment-show-div").length).toEqual(0)
+            expect(@view.$("#response-comment-edit-div").length).toEqual(1)
+
+    describe 'edit', ->
+        it 'triggers the appropriate event and switches to the edit view', ->
+            spyOn(@view, 'renderEditView')
+            editTarget = jasmine.createSpy()
+            @view.bind "comment:edit", editTarget
+            @view.edit()
+            expect(@view.renderEditView).toHaveBeenCalled()
+            expect(editTarget).toHaveBeenCalled()
+
+    describe 'with edit view displayed', ->
+        beforeEach ->
+            @view.renderEditView()
+
+        describe 'cancelEdit', ->
+            it 'triggers the appropriate event and switches to the show view', ->
+                spyOn(@view, 'renderShowView')
+                cancelEditTarget = jasmine.createSpy()
+                @view.bind "comment:cancel_edit", cancelEditTarget
+                @view.cancelEdit()
+                expect(@view.renderShowView).toHaveBeenCalled()
+                expect(cancelEditTarget).toHaveBeenCalled()
+
+        describe 'update', ->
+            beforeEach ->
+                @updatedBody = "updated body"
+                @view.$el.find(".edit-comment-body textarea").val(@updatedBody)
+                spyOn(@view, 'cancelEdit')
+                spyOn($, "ajax").andCallFake(
+                    (params) =>
+                        expect(params.url._parts.path).toEqual("/courses/edX/999/test/discussion/comments/01234567/update")
+                        expect(params.data.body).toEqual(@updatedBody)
+                        if @ajaxSucceed
+                            params.success()
+                        else
+                            params.error({status: 500})
+                        {always: ->}
+                )
+
+            it 'calls the update endpoint correctly and displays the show view on success', ->
+                @ajaxSucceed = true
+                @view.update(makeEventSpy())
+                expect($.ajax).toHaveBeenCalled()
+                expect(@view.model.get("body")).toEqual(@updatedBody)
+                expect(@view.cancelEdit).toHaveBeenCalled()
+
+            it 'handles AJAX errors', ->
+                originalBody = @comment.get("body")
+                @ajaxSucceed = false
+                @view.update(makeEventSpy())
+                expect($.ajax).toHaveBeenCalled()
+                expect(@view.model.get("body")).toEqual(originalBody)
+                expect(@view.cancelEdit).not.toHaveBeenCalled()
+                expect(@view.$(".edit-comment-form-errors *").length).toEqual(1)

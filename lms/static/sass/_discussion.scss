@@ -342,6 +342,10 @@ body.discussion {
 
   }
 
+  .comments .edit-post-form h1 {
+    @extend %t-title6;
+  }
+
   .new-post-form {
     width: 100%;
     margin-bottom: 20px;
@@ -539,13 +543,14 @@ body.discussion {
     height: 20px;
     list-style: none;
     cursor: pointer;
+    background: none;
   }
 
   .wmd-button > span {
     display: inline-block;
     width: 20px;
     height: 20px;
-    background-image: url('/static/images/wmd-buttons.png');
+    background-image: url('/static/images/wmd-buttons-transparent.png');
     background-position: 0px 0px;
     background-repeat: no-repeat;
   }
@@ -1631,6 +1636,7 @@ body.discussion {
     > li {
       background: #f6f6f6;
       border-bottom: 1px solid #ddd;
+      padding: ($baseline/2) $baseline;
     }
 
     blockquote {
@@ -1667,7 +1673,7 @@ body.discussion {
 
     .response-body {
       font-size: 13px;
-      padding: $baseline/2 $baseline;
+      margin-bottom: $baseline/2;
 
       p + p {
         margin-top: 12px;
@@ -1675,7 +1681,6 @@ body.discussion {
     }
 
     .posted-details {
-      margin: 0 $baseline $baseline/2;
       font-size: 11px;
     }
 
@@ -2529,49 +2534,28 @@ body.discussion {
 display:none;
 }
 
-.discussion-flag-abuse, .discussion-delete-comment {
+.discussion-flag-abuse, .discussion-delete-comment, .discussion-edit-comment {
   font-size: 12px;
   float:right;
-  padding-right: 5px;
+  margin-left: $baseline/2;
   font-style: italic;
   cursor:pointer;
+  color: $dark-gray;
   opacity: 0.8;
 
   &:hover, &:focus {
     @include transition(opacity .2s linear 0s);
     opacity: 1.0;
   }
+
+  .flag-label {
+    font-style: italic;
+    margin-left: $baseline/4;
+  }
 }
 
-.notflagged .icon {
-  display: block;
-  color: #333;
-  float: left;
-  margin: 3px;
-  width: 10px;
-  height: 14px;
-  padding-right: 3px;
-}
-
-.flagged .icon
-{
-  display: block;
-  float: left;
-  margin: 3px;
-  width: 10px;
-  height: 14px;
-  padding-right: 3px;
+.flagged * {
   color: $pink;
-}
-
-.flagged span {
-  color: $pink;
-  font-style: italic;
-}
-
-.notflagged span {
-  color: #333;
-  font-style: italic;
 }
 
 .response-count {
