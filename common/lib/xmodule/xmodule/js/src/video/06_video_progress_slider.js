@@ -180,6 +180,10 @@ function () {
     function onSlide(event, ui) {
         this.videoProgressSlider.frozen = true;
 
+        // Remember the seek to value so that we don't repeat ourselves on the
+        // 'stop' slider event.
+        this.videoProgressSlider.lastSeekValue = ui.value;
+
         this.trigger(
             'videoPlayer.onSlideSeek',
             {'type': 'onSlideSeek', 'time': ui.value}
@@ -196,10 +200,16 @@ function () {
 
         this.videoProgressSlider.frozen = true;
 
-        this.trigger(
-            'videoPlayer.onSlideSeek',
-            {'type': 'onSlideSeek', 'time': ui.value}
-        );
+        // Only perform a seek if we haven't made a seek for the new slider value.
+        // This is necessary so that if the user only clicks on the slider, without
+        // dragging it, then only one seek is made, even when a 'slide' and a 'stop'
+        // events are triggered on the slider.
+        if (this.videoProgressSlider.lastSeekValue !== ui.value) {
+            this.trigger(
+                'videoPlayer.onSlideSeek',
+                {'type': 'onSlideSeek', 'time': ui.value}
+            );
+        }
 
         // ARIA
         this.videoProgressSlider.handle.attr(
@@ -216,8 +226,8 @@ function () {
             duration = Math.floor(params.duration);
 
         if (
-            (this.videoProgressSlider.slider) &&
-            (!this.videoProgressSlider.frozen)
+            this.videoProgressSlider.slider &&
+            !this.videoProgressSlider.frozen
         ) {
             this.videoProgressSlider.slider
                 .slider('option', 'max', duration)

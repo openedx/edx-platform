@@ -17,6 +17,7 @@ function (HTML5Video, Resizer) {
         methodsDict = {
             duration: duration,
             handlePlaybackQualityChange: handlePlaybackQualityChange,
+            isEnded: isEnded,
             isPlaying: isPlaying,
             log: log,
             onCaptionSeek: onSeek,
@@ -85,12 +86,8 @@ function (HTML5Video, Resizer) {
 
         state.videoPlayer.currentTime = 0;
 
-        state.videoPlayer.initialSeekToStartTime = true;
-
-        // At the start, the initial value of the variable
-        // `seekToStartTimeOldSpeed` should always differ from the value
-        // of `state.speed` variable.
-        state.videoPlayer.seekToStartTimeOldSpeed = 'void';
+        state.videoPlayer.goToStartTime = true;
+        state.videoPlayer.stopAtEndTime = true;
 
         state.videoPlayer.playerVars = {
             controls: 0,
@@ -287,6 +284,13 @@ function (HTML5Video, Resizer) {
 
     function play() {
         if (this.videoPlayer.player.playVideo) {
+            if (this.videoPlayer.isEnded()) {
+                // When the video will start playing again from the start, the
+                // start-time and end-time will come back into effect.
+                this.videoPlayer.goToStartTime = true;
+                this.videoPlayer.stopAtEndTime = true;
+            }
+
             this.videoPlayer.player.playVideo();
         }
     }
@@ -302,22 +306,15 @@ function (HTML5Video, Resizer) {
 
             // We need to pause the video if current time is smaller (or equal)
             // than end time. Also, we must make sure that this is only done
-            // once.
-            //
-            // If `endTime` is not `null`, then we are safe to pause the
-            // video. `endTime` will be set to `null`, and this if statement
-            // will not be executed on next runs.
+            // once per video playing from start to end.
             if (
+                this.videoPlayer.stopAtEndTime === true &&
                 this.videoPlayer.endTime !== null &&
                 this.videoPlayer.endTime <= this.videoPlayer.currentTime
             ) {
-                this.videoPlayer.pause();
+                this.videoPlayer.stopAtEndTime = false;
 
-                // After the first time the video reached the `endTime`,
-                // `startTime` and `endTime` are disabled. The video will play
-                // from start to the end on subsequent runs.
-                this.videoPlayer.startTime = 0;
-                this.videoPlayer.endTime = null;
+                this.videoPlayer.pause();
 
                 this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
                     end: true
@@ -412,10 +409,12 @@ function (HTML5Video, Resizer) {
             }
         );
 
-        // After the user seeks, startTime and endTime are disabled. The video
-        // will play from start to the end on subsequent runs.
-        this.videoPlayer.startTime = 0;
-        this.videoPlayer.endTime = null;
+        // After the user seeks, the video will start playing from
+        // the seeked to point, and stop playing at the end.
+        this.videoPlayer.goToStartTime = false;
+        if (newTime > this.videoPlayer.endTime || this.videoPlayer.endTime === null) {
+            this.videoPlayer.stopAtEndTime = false;
+        }
 
         this.videoPlayer.player.seekTo(newTime, true);
 
@@ -449,13 +448,6 @@ function (HTML5Video, Resizer) {
 
         if (this.videoPlayer.skipOnEndedStartEndReset) {
             this.videoPlayer.skipOnEndedStartEndReset = undefined;
-        } else {
-            // When only `startTime` is set, the video will play to the end
-            // starting at `startTime`. After the first time the video reaches the
-            // end, `startTime` and `endTime` are disabled. The video will play
-            // from start to the end on subsequent runs.
-            this.videoPlayer.startTime = 0;
-            this.videoPlayer.endTime = null;
         }
 
         // Sometimes `onEnded` events fires when `currentTime` not equal
@@ -654,61 +646,27 @@ function (HTML5Video, Resizer) {
         var videoPlayer = this.videoPlayer,
             duration = this.videoPlayer.duration(),
             savedVideoPosition = this.config.savedVideoPosition,
-            isNewSpeed = videoPlayer.seekToStartTimeOldSpeed !== this.speed,
-            durationChange, tempStartTime, tempEndTime, youTubeId,
-            startTime, endTime;
+            youTubeId, startTime, endTime;
 
-        if (
-            duration > 0 &&
-            (isNewSpeed || videoPlayer.initialSeekToStartTime)
-        ) {
-            if (isNewSpeed && videoPlayer.initialSeekToStartTime === false) {
-                durationChange = true;
-            } else { // this.videoPlayer.initialSeekToStartTime === true
-                videoPlayer.initialSeekToStartTime = false;
+        if (duration > 0 && videoPlayer.goToStartTime === true) {
+            videoPlayer.goToStartTime = false;
 
-                durationChange = false;
-            }
-
-            videoPlayer.seekToStartTimeOldSpeed = this.speed;
-
-            // Current startTime and endTime could have already been reset.
-            // We will remember their current values, and reset them at the
-            // end. We need to perform the below calculations on start and end
-            // times so that the range on the slider gets correctly updated in
-            // the case of speed change in Flash player mode (for YouTube
-            // videos).
-            tempStartTime = videoPlayer.startTime;
-            tempEndTime = videoPlayer.endTime;
-
-            // We retrieve the original times. They could have been changed due
-            // to the fact of speed change (duration change). This happens when
-            // in YouTube Flash mode. There each speed is a different video,
-            // with a different length.
             videoPlayer.startTime = this.config.startTime;
-            videoPlayer.endTime = this.config.endTime;
-
-            if (videoPlayer.startTime > duration) {
+            if (videoPlayer.startTime >= duration) {
                 videoPlayer.startTime = 0;
             } else if (this.currentPlayerMode === 'flash') {
                 videoPlayer.startTime /= Number(this.speed);
             }
 
-            // An `endTime` of `null` means that either the user didn't set
-            // and `endTime`, or it was set to a value greater than the
-            // duration of the video.
-            //
-            // If `endTime` is `null`, the video will play to the end. We do
-            // not set the `endTime` to the duration of the video because
-            // sometimes in YouTube mode the duration changes slightly during
-            // the course of playback. This would cause the video to pause just
-            // before the actual end of the video.
-            if (videoPlayer.endTime !== null) {
-                if (videoPlayer.endTime > duration) {
-                    this.videoPlayer.endTime = null;
-                } else if (this.currentPlayerMode === 'flash') {
-                    this.videoPlayer.endTime /= Number(this.speed);
-                }
+            videoPlayer.endTime = this.config.endTime;
+            if (
+                videoPlayer.endTime <= videoPlayer.startTime ||
+                videoPlayer.endTime >= duration
+            ) {
+                videoPlayer.stopAtEndTime = false;
+                videoPlayer.endTime = null;
+            } else if (this.currentPlayerMode === 'flash') {
+                videoPlayer.endTime /= Number(this.speed);
             }
 
             this.trigger(
@@ -718,30 +676,45 @@ function (HTML5Video, Resizer) {
                 }
             );
 
-            // If this is not a duration change (if it is, we continue playing
-            // from current time), then we need to seek the video to the start
-            // time.
-            //
-            // We seek only if start time differs from zero, and we haven't
-            // performed already such a seek.
-            if (
-                durationChange === false &&
-                (videoPlayer.startTime > 0 || savedVideoPosition !== 0) &&
-                !(tempStartTime === 0 && tempEndTime === null)
-            ) {
-                startTime = this.videoPlayer.startTime;
-                endTime = this.videoPlayer.endTime;
+            startTime = videoPlayer.startTime;
+            endTime = videoPlayer.endTime;
 
-                if (startTime) {
-                    if (startTime < savedVideoPosition && endTime > savedVideoPosition) {
-                        time = savedVideoPosition;
-                    } else {
-                        time = startTime;
-                    }
-                } else {
+            if (startTime) {
+                if (
+                    startTime < savedVideoPosition &&
+                    (endTime > savedVideoPosition || endTime === null) &&
+
+                    // We do not want to jump to the end of the video.
+                    // We subtract 1 from the duration for a 1 second
+                    // safety net.
+                    savedVideoPosition < duration - 1
+                ) {
                     time = savedVideoPosition;
-                }
 
+                    // When the video finishes playing, we will start from the
+                    // start-time, rather than from the remembered position
+                    this.config.savedVideoPosition = 0;
+                } else {
+                    time = startTime;
+                }
+            } else if (
+                (endTime > savedVideoPosition || endTime === null) &&
+
+                // We do not want to jump to the end of the video.
+                // We subtract 1 from the duration for a 1 second
+                // safety net.
+                savedVideoPosition < duration - 1
+            ) {
+                time = savedVideoPosition;
+
+                // When the video finishes playing, we will start from the
+                // start-time, rather than from the remembered position
+                this.config.savedVideoPosition = 0;
+            } else {
+                time = 0;
+            }
+
+            if (time > 0) {
                 // After a bug came up (BLD-708: "In Firefox YouTube video with
                 // start time plays from 00:00:00") the video refused to play
                 // from start time, and only played from the beginning.
@@ -768,21 +741,13 @@ function (HTML5Video, Resizer) {
                     // onEnded() callback for the ENDED event that just this
                     // once there is no need in resetting the start and end
                     // times
-                    this.videoPlayer.skipOnEndedStartEndReset = true;
+                    videoPlayer.skipOnEndedStartEndReset = true;
 
-                    this.videoPlayer.seekToTimeOnCued = time;
-                    this.videoPlayer.player.cueVideoById(youTubeId, time);
+                    videoPlayer.seekToTimeOnCued = time;
+                    videoPlayer.player.cueVideoById(youTubeId, time);
                 } else {
-                    this.videoPlayer.player.seekTo(time);
+                    videoPlayer.player.seekTo(time);
                 }
-            }
-
-            // Reset back the actual startTime and endTime if they have been
-            // already reset (a seek event happened, the video already ended
-            // once, or endTime has already been reached once).
-            if (tempStartTime === 0 && tempEndTime === null) {
-                videoPlayer.startTime = 0;
-                videoPlayer.endTime = null;
             }
         }
 
@@ -803,6 +768,13 @@ function (HTML5Video, Resizer) {
         );
 
         this.trigger('videoCaption.updatePlayTime', time);
+    }
+
+    function isEnded() {
+        var playerState = this.videoPlayer.player.getPlayerState(),
+            ENDED = this.videoPlayer.PlayerState.ENDED;
+
+        return playerState === ENDED;
     }
 
     function isPlaying() {
