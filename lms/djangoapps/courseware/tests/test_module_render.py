@@ -375,6 +375,26 @@ class TestTOC(TestCase):
         for toc_section in expected:
             self.assertIn(toc_section, actual)
 
+    def test_toc_prev_section(self):
+        chapter = 'Overview'
+        chapter_url = '%s/%s/%s' % ('/courses', self.course_name, chapter)
+        section = 'Welcome'
+        factory = RequestFactory()
+        request = factory.get(chapter_url)
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.toy_course.id, self.portal_user, self.toy_course, depth=2)
+
+        prev_section, next_section = render.get_prev_next_section(self.portal_user, request, self.toy_course, chapter, section)
+
+        expected_prev = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, field_data_cache)[0]['sections'][0]['display_name']
+        expected_next = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, field_data_cache)[0]['sections'][2]['display_name']
+
+        actual_prev = prev_section.display_name
+        actual_next = next_section.display_name
+
+        self.assertEquals(expected_prev, actual_prev)
+        self.assertEquals(expected_next, actual_next)
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestHtmlModifiers(ModuleStoreTestCase):

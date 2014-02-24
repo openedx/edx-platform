@@ -36,7 +36,8 @@ class SequenceFields(object):
         default=None,
         scope=Scope.user_state,
     )
-
+    prev_section_url = None
+    next_section_url = None
 
 class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
@@ -54,6 +55,12 @@ class SequenceModule(SequenceFields, XModule):
         # if position is specified in system, then use that instead
         if getattr(self.system, 'position', None) is not None:
             self.position = int(self.system.position)
+
+        if getattr(self.system, 'prev_section_url', None) is not None:
+            self.prev_section_url = self.system.get('prev_section_url')
+
+        if getattr(self.system, 'next_section_url', None) is not None:
+            self.next_section_url = self.system.get('next_section_url')
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.
@@ -106,6 +113,8 @@ class SequenceModule(SequenceFields, XModule):
                   'element_id': self.location.html_id(),
                   'item_id': self.id,
                   'position': self.position,
+                  'prev_section_url': self.prev_section_url,
+                  'next_section_url': self.next_section_url,
                   'tag': self.location.category,
                   'ajax_url': self.system.ajax_url,
                   }
