@@ -391,6 +391,13 @@ class MixedModuleStore(ModuleStoreWriteBase):
         if self.use_locations:
             raise NotImplementedError
 
-        store = self._get_modulestore_for_courseid(location.package_id)
-        decoded_ref = self._incoming_reference_adaptor(store, location.package_id, location)
-        return store.delete_item(decoded_ref, **kwargs)
+
+    def close_all_connections(self):
+        """
+        Close all db connections
+        """
+        for mstore in self.modulestores:
+            if hasattr(mstore, 'connection'):
+                mstore.connection.close()
+            elif hasattr(mstore, 'db'):
+                mstore.db.connection.close()
