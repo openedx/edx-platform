@@ -10,12 +10,106 @@
     padding: 12px 0;
   }
 
-  .nav-introduction-supplementary {
+  .content-primary {
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
 
-    .icon-question-sign {
-      display: inline-block;
-      vertical-align: baseline;
-      margin-right: ($baseline/4);
+    .no-pages-content {
+      @extend %ui-well;
+      padding: ($baseline*2);
+      background-color: $gray-l4;
+      text-align: center;
+      color: $gray;
+
+      .new-button {
+        @include font-size(14);
+        margin-left: $baseline;
+
+        [class^="icon-"] {
+          margin-right: ($baseline/2);
+        }
+      }
+    }
+
+    .actions-list-wrap {
+      top: 6px;
+
+      .actions-list {
+
+        .action-item {
+          position: relative;
+          display: inline-block;
+          margin: 0;
+          text-align: center;
+
+          .action-button,
+          .toggle-actions-view {
+            @include transition(all $tmg-f2 ease-in-out 0s);
+            display: inline-block;
+            border: 0;
+            background: none;
+            color: $gray-l3;
+
+            &:hover {
+              background-color: $blue;
+              color: $gray-l6;
+            }
+          }
+
+          &.action-visible {
+            position: relative;
+          }
+
+          &.action-visible label {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 30px;
+            width: 30px;
+
+            &:hover {
+              background-color: $blue;
+            }
+          }
+
+          &.action-visible .toggle-checkbox {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 30px;
+            width: 30px;
+            opacity: 0;
+          }
+
+          &.action-visible .toggle-checkbox:hover ~ .action-button {
+            background-color: $blue;
+            color: $gray-l6;
+          }
+
+          &.action-visible .toggle-checkbox ~ .action-button {
+            .icon-eye-open {
+              display: inline-block;
+            }
+
+            .icon-eye-close {
+              display: none;
+            }
+          }
+
+          &.action-visible .toggle-checkbox:checked ~ .action-button {
+            background-color: $gray;
+            color: $white;
+
+            .icon-eye-open {
+              display: none;
+            }
+
+            .icon-eye-close {
+              display: inline-block;
+            }
+          }
+        }
+      }
     }
 
   }
@@ -78,7 +172,8 @@
     }
   }
 
-  .component {
+  .component,
+  .course-nav-tab {
     position: relative;
     border: 1px solid $mediumGrey;
     border-top: none;
@@ -130,7 +225,8 @@
       display: none;
     }
 
-    .component-actions {
+    .component-actions,
+    .course-nav-tab-actions {
       display: inline-block;
       float: right;
       margin-right: $baseline*2;
@@ -176,6 +272,30 @@
           display: none;
         }
       }
+    }
+  }
+
+  // basic course nav items
+  .course-nav-tab {
+    padding: ($baseline*.75) $baseline;
+
+    &.locked {
+      background-color: $gray-l6;
+    }
+
+    .course-nav-tab-header {
+      display: inline-block;
+      max-width: 80%;
+
+      .title {
+        @extend %t-title4;
+        font-weight: 300;
+      }
+    }
+
+    .course-nav-tab-actions {
+      padding: ($baseline/10);
+      margin-right: ($baseline*1.5);
     }
   }
 
