@@ -25,10 +25,7 @@ class AcidView(PageObject):
         self.context_selector = context_selector
 
     def is_browser_on_page(self):
-        return (
-            self.is_css_present('{} .acid-block'.format(self.context_selector)) and
-            self.browser.evaluate_script("$({!r}).data('initialized')".format(self.context_selector))
-        )
+        return self.is_css_present('{}.xblock-initialized .acid-block'.format(self.context_selector))
 
     def test_passed(self, test_selector):
         """
