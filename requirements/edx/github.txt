@@ -16,7 +16,7 @@
 # TODO clear this library with appropriate people
 -e git+https://github.com/un33k/django-ipware.git@42cb1bb1dc680a60c6452e8bb2b843c2a0382c90#egg=django-ipware
 # TODO clear this library with appropriate people
--e git+https://github.com/mitsuhiko/python-geoip.git@80b888b18cccaf57ab830befe1fc530e818c4d0a#egg=python-geoip
+-e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@893cd83dfb24405ce81b07f49c1c2e3053cdc865#egg=XBlock
