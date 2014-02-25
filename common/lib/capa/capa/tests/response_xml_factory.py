@@ -58,6 +58,7 @@ class ResponseXMLFactory(object):
         script = kwargs.get('script', None)
         num_responses = kwargs.get('num_responses', 1)
         num_inputs = kwargs.get('num_inputs', 1)
+        hints = kwargs.get('hints', None)
 
         # The root is <problem>
         root = etree.Element("problem")
@@ -82,6 +83,12 @@ class ResponseXMLFactory(object):
                 input_element = self.create_input_element(**kwargs)
                 if not (None == input_element):
                     response_element.append(input_element)
+
+             # Add hintgroup, if specified
+            if hints is not None and hasattr(self, 'create_hintgroup_element'):
+                hintgroup_element = self.create_hintgroup_element(**kwargs)
+                if hintgroup_element is not None:
+                    response_element.append(hintgroup_element)
 
             # The problem has an explanation of the solution
             if explanation_text:
@@ -158,6 +165,28 @@ class ResponseXMLFactory(object):
             if name:
                 choice_element.text = str(name)
                 choice_element.set("name", str(name))
+
+        return group_element
+
+    @staticmethod
+    def hintgroup_input_xml(**kwargs):
+        """ Create a <hintgroup> XML element"""
+
+        # Gather the troops
+        choice_names = kwargs.get("choice_names")
+        hints = kwargs.get("hints")
+
+        # Build the <hintgroup> child tree
+        group_element = etree.Element("hintgroup")
+        for (choice_name, hint) in zip(choice_names, hints):
+            choicehint_element = etree.SubElement(group_element, "choicehint")
+            choicehint_answer = "choice_" + choice_name
+            choicehint_element.set("answer", choicehint_answer)
+            choicehint_name = choice_name + "_hint"
+            choicehint_element.set("name", choicehint_name)
+            hintpart_element = etree.SubElement(group_element, "hintpart")
+            hintpart_element.set("on", choicehint_name)
+            hintpart_element.text = hint
 
         return group_element
 
@@ -618,7 +647,14 @@ class MultipleChoiceResponseXMLFactory(ResponseXMLFactory):
     def create_input_element(self, **kwargs):
         """ Create the <choicegroup> element"""
         kwargs['choice_type'] = 'multiple'
-        return ResponseXMLFactory.choicegroup_input_xml(**kwargs)
+        choice_group = ResponseXMLFactory.choicegroup_input_xml(**kwargs)
+        return choice_group
+
+    def create_hintgroup_element(self, **kwargs):
+        """ Create the <hintgroup> element"""
+
+        hintgroup_element = ResponseXMLFactory.hintgroup_input_xml(**kwargs)
+        return hintgroup_element
 
 
 class TrueFalseResponseXMLFactory(ResponseXMLFactory):
