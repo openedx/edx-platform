@@ -3,12 +3,13 @@
 
 from lettuce import world, step
 import json
+import os
+import requests
 from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from cache_toolbox.core import del_cached_content
 from xmodule.contentstore.content import StaticContent
-import os
 from xmodule.contentstore.django import contentstore
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 LANGUAGES = settings.ALL_LANGUAGES
@@ -32,16 +33,56 @@ VIDEO_BUTTONS = {
     'play': '.video_control.play',
     'pause': '.video_control.pause',
     'fullscreen': '.add-fullscreen',
+    'download_transcript': '.video-tracks > a',
 }
 
 VIDEO_MENUS = {
     'language': '.lang .menu',
     'speed': '.speed .menu',
+    'download_transcript': '.video-tracks .a11y-menu-list',
 }
 
 coursenum = 'test_course'
 sequence = {}
 
+
+class ReuqestHandlerWithSessionId(object):
+    def get(self, url):
+        """
+        Sends a request.
+        """
+        kwargs = dict()
+
+        session_id = [{i['name']:i['value']} for i in  world.browser.cookies.all() if i['name']==u'sessionid']
+        if session_id:
+            kwargs.update({
+                'cookies': session_id[0]
+            })
+
+        response = requests.get(url, **kwargs)
+        self.response = response
+        self.status_code = response.status_code
+        self.headers = response.headers
+        self.content = response.content
+
+        return self
+
+    def is_success(self):
+        """
+        Returns `True` if the response was succeed, otherwise, returns `False`.
+        """
+        if self.status_code < 400:
+            return True
+        return False
+
+    def check_header(self, name, value):
+        """
+        Returns `True` if the response header exist and has appropriate value,
+        otherwise, returns `False`.
+        """
+        if value in self.headers.get(name, ''):
+            return True
+        return False
 
 def add_video_to_course(course, player_mode, hashes, display_name='Video'):
     category = 'video'
@@ -80,15 +121,23 @@ def add_video_to_course(course, player_mode, hashes, display_name='Video'):
 
     if hashes:
         kwargs['metadata'].update(hashes[0])
-    course_location = world.scenario_dict['COURSE'].location
+    course_location =world.scenario_dict['COURSE'].location
+
+    conversions = {
+        'transcripts': json.loads,
+        'download_track': json.loads,
+        'download_video': json.loads,
+    }
+
+    for key in kwargs['metadata']:
+        if key in conversions:
+            kwargs['metadata'][key] = conversions[key](kwargs['metadata'][key])
 
     if 'sub' in kwargs['metadata']:
         filename = _get_sjson_filename(kwargs['metadata']['sub'], 'en')
         _upload_file(filename, course_location)
 
     if 'transcripts' in kwargs['metadata']:
-        kwargs['metadata']['transcripts'] = json.loads(kwargs['metadata']['transcripts'])
-
         for lang, filename in kwargs['metadata']['transcripts'].items():
             _upload_file(filename, course_location)
 
@@ -322,6 +371,10 @@ def upload_to_assets(_step, filename):
 def is_hidden_button(_step, button):
     assert not world.css_visible(VIDEO_BUTTONS[button])
 
+@step('menu "([^"]*)" doesn\'t exist$')
+def is_hidden_menu(_step, menu):
+    assert world.is_css_not_present(VIDEO_MENUS[menu])
+
 
 @step('I see video aligned correctly (with(?:out)?) enabled transcript$')
 def video_alignment(_step, transcript_visibility):
@@ -345,3 +398,45 @@ def video_alignment(_step, transcript_visibility):
     )
 
     assert all([width, height])
+
+
+@step('I can download transcript in "([^"]*)" format$')
+def i_can_download_transcript(_step, format):
+    button = world.css_find('.video-tracks .a11y-menu-button').first
+    assert button.text.strip() == '.' + format
+
+    formats = {
+        'srt': {
+            'content': '0\n00:00:00,270',
+            'mime_type': 'application/x-subrip'
+        },
+        'txt': {
+            'content': 'Hi, welcome to Edx.',
+            'mime_type': 'text/plain'
+        },
+    }
+
+    url = world.css_find(VIDEO_BUTTONS['download_transcript'])[0]['href']
+    request = ReuqestHandlerWithSessionId()
+    assert request.get(url).is_success()
+    assert request.check_header('content-type', formats[format]['mime_type'])
+    assert request.content.startswith(formats[format]['content'])
+
+
+@step('I select the transcript format "([^"]*)"$')
+def select_transcript_format(_step, format):
+    button = world.css_find('.video-tracks .a11y-menu-button').first
+    button.mouse_over()
+    assert button.text.strip() == '...'
+
+    menu_selector = VIDEO_MENUS['download_transcript']
+    menu_items = world.css_find(menu_selector + ' a')
+
+    for item in menu_items:
+        if item['data-value'] == format:
+            item.click()
+            world.wait_for_ajax_complete()
+            break
+
+    assert world.css_find(menu_selector + ' .active a')[0]['data-value'] == format
+    assert button.text.strip() == '.' + format

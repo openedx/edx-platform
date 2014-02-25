@@ -112,7 +112,29 @@
     % endif
     % if track:
         <li class="video-tracks">
-            ${('<a href="%s">' + _('Download timed transcript') + '</a>') % track}
+          % if transcript_download_format:
+            ${('<a href="%s">' + _('Download transcript') + '</a>') % track
+            }
+            <div class="a11y-menu-container">
+                <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
+                <ol class="a11y-menu-list">
+                % for item in transcript_download_formats_list:
+                  % if item['value'] == transcript_download_format:
+                  <li class="a11y-menu-item active">
+                  % else:
+                  <li class="a11y-menu-item">
+                  % endif
+                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_('{file_format}'.format(file_format=item['display_name']))}" data-value="${item['value']}">
+                        ${_('{file_format}'.format(file_format=item['display_name']))}
+                      </a>
+                  </li>
+                % endfor
+                </ol>
+            </div>
+          % else:
+            ${('<a href="%s" class="external-track">' + _('Download transcript') + '</a>') % track
+            }
+          % endif
         </li>
     % endif
   </ul>
