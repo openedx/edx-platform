@@ -18,6 +18,7 @@ Below, we provide you with all the files and code that you need to create the fo
 * :ref:`Interactive Periodic Table`
 * :ref:`Molecule Editor`
 * :ref:`Multiple Choice and Numerical Input`
+* :ref:`Polls`
 * :ref:`Protein Builder`
 
 .. _Gene Explorer:
@@ -386,6 +387,50 @@ Multiple Choice and Numerical Input Problem Code
   </radiotextgroup>
   </choicetextresponse>
   </problem>
+
+.. _Polls:
+
+******
+Polls
+******
+
+You can run polls in your course to gauge students' responses to different questions.
+
+.. image:: /Images/PollExample.png
+
+Create a Unit all the Components you want other than the polls (see "Regular Section" for an example of a pre-poll section).
+Export the tarball of your course ("Tools")
+Find the problem you wish to edit in the "verticals" folder. Open it with a text editor (an editor such as Sublime 2 is geared towards programming).
+Add poll questions in between the <vertical> and </vertical> tags. A template is below.
+
+.. code-block:: xml
+  <poll_question display_name="Poll Question">
+    <p>This is where you put the prompt</p>
+    <answer id="yes">Yes</answer>
+    <answer id="no">No</answer>
+  </poll_question>
+
+As a result, your code should look something like the below:
+
+.. code-block:: xml
+  <vertical display_name="Test Unit">
+    <html url_name="b59c54e2f6fc4cf69ba3a43c49097d0b"/>
+    <poll_question display_name="Poll Question">
+      <p>This is where you put the prompt</p>
+      <answer id="yes">Yes</answer>
+      <answer id="no">No</answer>
+    </poll_question>
+    <discussion url_name="8320c3d511484f3b96bdedfd4a44ac8b"/>
+  </vertical>
+
+Re-tarball your course (how to do this in Terminal here)
+Import the tarball
+Notes
+
+Although the polls will render correctly in Studio, you will not be able to edit them in Studio. You will need to follow the export/import process outlined above to make any edits to your polls.
+You will be editing the raw XML code of your course to add this feature. We do not recommend attempting to edit other areas of your course in this method unless you have the necessary background and training. 
+A CSV for student responses to the problem is not currently available for polls, though the aggregate data is easily obtained directly in the problem.  
+
 
 .. _Protein Builder:
 
