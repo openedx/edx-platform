@@ -224,6 +224,11 @@ FEATURES = {
 
     # Toggle embargo functionality
     'EMBARGO': False,
+
+    # Whether the Wiki subsystem should be accessible via the direct /wiki/ paths. Setting this to True means
+    # that people can submit content and modify the Wiki in any arbitrary manner. We're leaving this as True in the
+    # defaults, so that we maintain current behavior
+    'ALLOW_WIKI_ROOT_ACCESS': True,
 }
 
 # Used for A/B testing
