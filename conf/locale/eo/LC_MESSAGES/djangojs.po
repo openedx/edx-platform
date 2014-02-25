@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-25 10:10-0800\n"
-"PO-Revision-Date: 2014-02-25 18:11:53.548896\n"
+"POT-Creation-Date: 2014-02-25 14:01-0500\n"
+"PO-Revision-Date: 2014-02-25 19:01:45.260096\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -538,12 +538,10 @@ msgid "Are you sure you want to delete this response?"
 msgstr "Àré ýöü süré ýöü wänt tö délété thïs réspönsé? Ⱡ'σяєм ιρѕυм #"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%s ago"
 msgstr "%s ägö Ⱡ'σяєм ιρѕ#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%s from now"
 msgstr "%s fröm nöw Ⱡ#"
 
@@ -556,7 +554,6 @@ msgid "about a minute"
 msgstr "äßöüt ä mïnüté Ⱡ'#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d mïnüté #"
@@ -567,7 +564,6 @@ msgid "about an hour"
 msgstr "äßöüt än höür Ⱡ'#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] "äßöüt %d höür Ⱡ'#"
@@ -578,7 +574,6 @@ msgid "a day"
 msgstr "ä däý Ⱡ'σяєм ι#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d däý Ⱡ'σяєм ιρѕ#"
@@ -589,7 +584,6 @@ msgid "about a month"
 msgstr "äßöüt ä mönth Ⱡ'#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d mönth #"
@@ -600,19 +594,16 @@ msgid "about a year"
 msgstr "äßöüt ä ýéär Ⱡ#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d ýéär #"
 msgstr[1] "%d ýéärs #"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Available %s"
 msgstr "Àväïläßlé %s Ⱡ#"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -622,7 +613,6 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
 "Týpé ïntö thïs ßöx tö fïltér döwn thé lïst öf äväïläßlé %s. Ⱡ'σяєм ιρѕυм "
@@ -637,7 +627,6 @@ msgid "Choose all"
 msgstr "Çhöösé äll Ⱡ#"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Click to choose all %s at once."
 msgstr "Çlïçk tö çhöösé äll %s ät önçé. Ⱡ'σяєм ι#"
 
@@ -650,12 +639,10 @@ msgid "Remove"
 msgstr "Rémövé Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Chosen %s"
 msgstr "Çhösén %s #"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -669,7 +656,6 @@ msgid "Remove all"
 msgstr "Rémövé äll Ⱡ#"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Çlïçk tö rémövé äll çhösén %s ät önçé. Ⱡ'σяєм ιρѕ#"
 
@@ -1271,7 +1257,6 @@ msgid "Studio's having trouble saving your work"
 msgstr "Stüdïö's hävïng tröüßlé sävïng ýöür wörk Ⱡ'σяєм ιρѕυ#"
 
 #: cms/static/coffee/src/views/module_edit.js
-#, c-format
 msgid "<em>Editing:</em> %s"
 msgstr "<em>Édïtïng:</em> %s Ⱡ'σ#"
 

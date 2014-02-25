@@ -53,8 +53,7 @@ def merge(locale, target='django.po', sources=('django-partial.po',), fail_if_mi
 
     # clean up redunancies in the metadata
     merged_filename = locale_directory.joinpath('merged.po')
-    clean_metadata(merged_filename)
-    clean_line_numbers(merged_filename)
+    clean_pofile(merged_filename)
 
     # rename merged.po -> django.po (default)
     target_filename = locale_directory.joinpath(target)
@@ -69,25 +68,32 @@ def merge_files(locale, fail_if_missing=True):
         merge(locale, target, sources, fail_if_missing)
 
 
-def clean_metadata(file):
+def clean_pofile(file):
     """
-    Clean up redundancies in the metadata caused by merging.
+    Clean various aspect of a .po file.
+
+    Fixes:
+
+        - Removes the ,fuzzy flag on metadata.
+
+        - Removes occurrence line numbers so that the generated files don't
+          generate a lot of line noise when they're committed.
+
+        - Removes any flags ending with "-format".  Mac gettext seems to add
+          these flags, Linux does not, and we don't seem to need them.  By
+          removing them, we reduce the unimportant differences that clutter
+          diffs as different developers work on the files.
+
     """
     # Reading in the .po file and saving it again fixes redundancies.
     pomsgs = pofile(file)
     # The msgcat tool marks the metadata as fuzzy, but it's ok as it is.
     pomsgs.metadata_is_fuzzy = False
-    pomsgs.save()
-
-
-def clean_line_numbers(file):
-    """
-    Remove occurrence line numbers so that the generated files don't generate a lot of
-    line noise when they're committed.
-    """
-    pomsgs = pofile(file)
     for entry in pomsgs:
+        # Remove line numbers
         entry.occurrences = [(filename, None) for (filename, lineno) in entry.occurrences]
+        # Remove -format flags
+        entry.flags = [f for f in entry.flags if not f.endswith("-format")]
     pomsgs.save()
 
 
