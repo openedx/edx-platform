@@ -19,8 +19,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-19 16:57-0500\n"
-"PO-Revision-Date: 2014-02-15 05:30+0000\n"
+"POT-Creation-Date: 2014-02-24 16:00-0500\n"
+"PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: h_yoshida <h_yoshida@matsumo-sys.com>\n"
 "Language-Team: Japanese (Japan) (http://www.transifex.com/projects/p/edx-platform/language/ja_JP/)\n"
 "MIME-Version: 1.0\n"
@@ -580,7 +580,7 @@ msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Filter"
-msgstr ""
+msgstr "フィルタ"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Choose all"
