@@ -218,6 +218,14 @@ FEATURES = {
 
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+
+    # Hide any Personally Identifiable Information from application logs
+    'SQUELCH_PII_IN_LOGS': False,
+
+    # Whether the Wiki subsystem should be accessible via the direct /wiki/ paths. Setting this to True means
+    # that people can submit content and modify the Wiki in any arbitrary manner. We're leaving this as True in the
+    # defaults, so that we maintain current behavior
+    'ALLOW_WIKI_ROOT_ACCESS': True,
 }
 
 # Used for A/B testing

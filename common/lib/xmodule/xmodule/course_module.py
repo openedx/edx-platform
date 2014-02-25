@@ -387,6 +387,10 @@ class CourseFields(object):
     max_student_enrollments_allowed = Integer(help="Limit the number of students allowed to enroll in this course.",
                                               scope=Scope.settings)
 
+    allow_public_wiki_access = Boolean(help="Whether to allow an unenrolled user to view the Wiki",
+                                       default=False,
+                                       scope=Scope.settings)
+
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
 

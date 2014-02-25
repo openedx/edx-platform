@@ -3,10 +3,13 @@ from urlparse import urlparse
 
 from django.http import Http404
 from django.shortcuts import redirect
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
 from wiki.models import reverse as wiki_reverse
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
+from student.models import CourseEnrollment
 
 
 IN_COURSE_WIKI_REGEX = r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/(?P<wiki_path>.*|)$'
@@ -44,6 +47,11 @@ class Middleware(object):
         referer = request.META.get('HTTP_REFERER')
         destination = request.path
 
+        # Check to see if we don't allow top-level access to the wiki via the /wiki/xxxx/yyy/zzz URLs
+        # this will help prevent people from writing pell-mell to the Wiki in an unstructured way
+        path_match = re.match(r'^/wiki/(?P<wiki_path>.*|)$', destination)
+        if path_match and not settings.FEATURES.get('ALLOW_WIKI_ROOT_ACCESS', False):
+            raise PermissionDenied()
 
         if request.method == 'GET':
             new_destination = self.get_redirected_url(request.user, referer, destination)
@@ -56,7 +64,17 @@ class Middleware(object):
         course_match = re.match(IN_COURSE_WIKI_REGEX, destination)
         if course_match:
             course_id = course_match.group('course_id')
-            prepend_string = '/courses/' + course_match.group('course_id')
+
+            # Authorization Check
+            # Let's see if user is enrolled or the course allows for public access
+            course = get_course_with_access(request.user, course_id, 'load')
+            if not course.allow_public_wiki_access:
+                is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
+                is_staff = has_access(request.user, course, 'staff')
+                if not (is_enrolled or is_staff):
+                    raise PermissionDenied()
+
+            prepend_string = '/courses/' + course_id
             wiki_reverse._transform_url = lambda url: prepend_string + url
 
         return None
