@@ -1274,8 +1274,8 @@ def auto_auth(request):
 
     # Provide the user with a valid CSRF token
     # then return a 200 response
-    success_msg = u"Logged in user {0} ({1}) with password {2}".format(
-        username, email, password
+    success_msg = u"Logged in user {0} ({1}) with password {2} and user_id {3}".format(
+        username, email, password, user.id
     )
     response = HttpResponse(success_msg)
     response.set_cookie('csrftoken', csrf(request)['csrf_token'])
