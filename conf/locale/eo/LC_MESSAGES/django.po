@@ -37,7 +37,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-24 14:20-0500\n"
+"POT-Creation-Date: 2014-02-25 10:18-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1044,12 +1044,6 @@ msgstr "Généräl #"
 msgid "TBD"
 msgstr "TBD Ⱡ'σя#"
 
-#: common/lib/xmodule/xmodule/video_module.py
-msgid "A YouTube URL or a link to a file hosted anywhere on the web."
-msgstr ""
-"À ÝöüTüßé ÛRL ör ä lïnk tö ä fïlé höstéd änýwhéré ön thé wéß. Ⱡ'σяєм ιρѕυм "
-"∂σłσя#"
-
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
@@ -1262,6 +1256,44 @@ msgstr ""
 msgid "Error saving your score.  Please notify course staff."
 msgstr ""
 "Érrör sävïng ýöür sçöré.  Pléäsé nötïfý çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid ""
+"Can't receive transcripts from Youtube for {youtube_id}. Status code: "
+"{statuc_code}."
+msgstr ""
+"Çän't réçéïvé tränsçrïpts fröm Ýöütüßé för {youtube_id}. Stätüs çödé: "
+"{statuc_code}. Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "Can't find any transcripts on the Youtube service."
+msgstr "Çän't fïnd äný tränsçrïpts ön thé Ýöütüßé sérvïçé. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "We support only SubRip (*.srt) transcripts format."
+msgstr "Wé süppört önlý SüßRïp (*.srt) tränsçrïpts förmät. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid ""
+"Something wrong with SubRip transcripts file during parsing. Inner message "
+"is {error_message}"
+msgstr ""
+"Söméthïng wröng wïth SüßRïp tränsçrïpts fïlé dürïng pärsïng. Ìnnér méssägé "
+"ïs {error_message} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "Something wrong with SubRip transcripts file during parsing."
+msgstr ""
+"Söméthïng wröng wïth SüßRïp tränsçrïpts fïlé dürïng pärsïng. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "A YouTube URL or a link to a file hosted anywhere on the web."
+msgstr ""
+"À ÝöüTüßé ÛRL ör ä lïnk tö ä fïlé höstéd änýwhéré ön thé wéß. Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
@@ -3499,38 +3531,6 @@ msgstr ""
 "Dïréçtörý älréädý éxïsts, döïng ä gït rését änd püll ïnstéäd öf gït çlöné. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
-#: cms/djangoapps/contentstore/transcripts_utils.py
-#, python-brace-format
-msgid ""
-"Can't receive transcripts from Youtube for {youtube_id}. Status code: "
-"{statuc_code}."
-msgstr ""
-"Çän't réçéïvé tränsçrïpts fröm Ýöütüßé för {youtube_id}. Stätüs çödé: "
-"{statuc_code}. Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid "Can't find any transcripts on the Youtube service."
-msgstr "Çän't fïnd äný tränsçrïpts ön thé Ýöütüßé sérvïçé. Ⱡ'σяєм ιρѕυм ∂#"
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid "We support only SubRip (*.srt) transcripts format."
-msgstr "Wé süppört önlý SüßRïp (*.srt) tränsçrïpts förmät. Ⱡ'σяєм ιρѕυм ∂#"
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-#, python-brace-format
-msgid ""
-"Something wrong with SubRip transcripts file during parsing. Inner message "
-"is {error_message}"
-msgstr ""
-"Söméthïng wröng wïth SüßRïp tränsçrïpts fïlé dürïng pärsïng. Ìnnér méssägé "
-"ïs {error_message} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid "Something wrong with SubRip transcripts file during parsing."
-msgstr ""
-"Söméthïng wröng wïth SüßRïp tränsçrïpts fïlé dürïng pärsïng. Ⱡ'σяєм ιρѕυм "
-"∂σłσ#"
-
 #: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "Mý Nötés #"
@@ -5672,7 +5672,7 @@ msgstr "Fïll ßröwsér Ⱡ#"
 msgid "HD off"
 msgstr "HD öff Ⱡ'σяєм ιρѕ#"
 
-#: lms/templates/video.html
+#: lms/templates/video.html lms/templates/video.html
 msgid "Turn off captions"
 msgstr "Türn öff çäptïöns Ⱡ'σ#"
 
