@@ -256,6 +256,36 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             xpath = "//div[@class='indicator_container']/span"
             self.assert_no_xpath(xml, xpath, self.context)
 
+
+    def test_option_marked_incorrect_with_feedback(self):
+        """
+        Test conditions under which a particular option
+        (not the entire problem) is marked incorrect, with feedback.
+        """
+        conditions = [
+        {'input_type': 'radio', 'value': '2'},
+        {'input_type': 'radio', 'value': ['2']}]
+
+        self.context['status'] = 'incorrect'
+        self.context['msg'] = "This is the feedback"
+
+        for test_conditions in conditions:
+            self.context.update(test_conditions)
+            xml = self.render_to_xml(self.context)
+
+            # Should include a choicegroup_incorrect class
+            xpath = "//label[@class='choicegroup_incorrect']"
+            self.assert_has_xpath(xml, xpath, self.context)
+
+            # Should include a fieldset_message type
+            xpath = "//div[@id='fieldset_message_" + self.context['id'] + "']"
+            self.assert_has_xpath(xml, xpath, self.context)
+
+
+            # Should include a fieldset_message_title type
+            xpath = "//span[@id='fieldset_message_title_" + self.context['id'] + "']"
+            self.assert_has_xpath(xml, xpath, self.context)
+
     def test_never_show_correctness(self):
         """
         Test conditions under which we tell the template to
