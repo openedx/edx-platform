@@ -347,7 +347,10 @@ class LoncapaResponse(object):
             hintmode = hintgroup.get('mode', 'always')
             for hintpart in hintgroup.findall('hintpart'):
                 if hintpart.get('on') in hints_to_show:
-                    hint_text = hintpart.find('text').text
+                    if hintpart.find('text') is not None:
+                        hint_text = hintpart.find('text').text
+                    elif hintpart.text:
+                        hint_text = hintpart.text
                     # make the hint appear after the last answer box in this
                     # response
                     aid = self.answer_ids[-1]
@@ -718,9 +721,14 @@ class ChoiceResponse(LoncapaResponse):
 
 @registry.register
 class MultipleChoiceResponse(LoncapaResponse):
+    """
+    MultipleChoiceResponse is a specialized ChoiceResponse type responsible
+    for handling all aspects of MCQ behavior, including hinting
+    """
     # TODO: handle direction and randomize
 
     tags = ['multiplechoiceresponse']
+    hint_tag = 'choicehint'
     max_inputfields = 1
     allowed_inputfields = ['choicegroup']
     correct_choices = None
@@ -773,6 +781,29 @@ class MultipleChoiceResponse(LoncapaResponse):
 
     def get_answers(self):
         return {self.answer_id: self.correct_choices}
+
+    def check_string(self, expected, given):
+        """
+        Attempt to match the given value with what the caller expects
+        For now we ignore the case -- at some point we might add a switch
+        We're also a bit lenient in terms of matching at the present time
+        """
+        flags = re.IGNORECASE
+        regexp = re.compile('^' + '|'.join(expected) + '$', flags=flags | re.UNICODE)
+        result = re.search(regexp, given)
+        return bool(result)
+
+    def check_hint_condition(self, hxml_set, student_answers):
+        # stolen from StringResponse.check_hint_condition
+        given = student_answers[self.answer_id].strip()
+        hints_to_show = []
+        for hxml in hxml_set:
+            name = hxml.get('name')
+            hinted_answer = contextualize_text(hxml.get('answer'), self.context).strip()
+
+            if self.check_string([hinted_answer], given):
+                hints_to_show.append(name)
+        return hints_to_show
 
 
 @registry.register

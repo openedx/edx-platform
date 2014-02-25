@@ -1,4 +1,64 @@
+<%
+    fieldset_width = 775
+    fieldset_message_width = 0
+    if (not msg is UNDEFINED) and (len(msg) > 0):
+        fieldset_width = 480
+        fieldset_message_width = 295
+
+%>
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
+    <style>
+        #fieldset_container_${id} {
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
+            height: 100;
+            width: 100%;
+        }
+
+        #fieldset_${id} {
+            float: left;
+            margin-right: 20px;
+            word-wrap: normal;
+            height: 100%;
+        }
+
+        #fieldset_message_${id} {
+            background: #5c9dd5;
+            opacity: 0.9;
+            color: #FFFFFF;
+            font-size: 14px;
+            float: right;
+            height: 100%;
+            margin: 0 auto;
+            padding: 10px;
+            position: absolute;
+            right: 10px;
+            width: 300px;
+        }
+
+        #fieldset_message_title_${id} {
+            color: #FFFFFF;
+            font-family: arial;
+            font-size: 18pt;
+        }
+
+        .fieldset_message_close {
+             color: #FFFFFF;
+             float: right;
+             width: 10px;
+             height: 10px;
+             margin-right: -6px;
+             margin-top: -10px;
+         }
+    </style>
+    <script type="text/javascript">
+        $( function() {
+            $('.fieldset_message_close').click(function() {
+                    $(this).parent().hide();
+                });
+        });
+    </script>
     <div class="indicator_container">
     % if input_type == 'checkbox' or not value:
         <span class="status ${status_class if show_correctness != 'never' else 'unanswered'}"
@@ -16,6 +76,8 @@
         </span>
     % endif
     </div>
+    <div id="fieldset_container_${id}">
+        <div id="fieldset_${id}">
 
     <fieldset role="${input_type}group" aria-label="${label}">
 
@@ -43,22 +105,39 @@
             % elif input_type != 'radio' and choice_id in value:
             checked="true"
             % endif
-            % if input_type != 'radio':
-            aria-multiselectable="true"
-            % endif
 
             /> ${choice_description}
 
             % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
-            % if status in ('correct', 'incorrect') and not show_correctness=='never':
-            <span class="sr status">${choice_description|h} - ${status_display}</span>
+            <%
+                if status == 'correct':
+                    correctness = 'correct'
+                elif status == 'incorrect':
+                    correctness = 'incorrect'
+                else:
+                    correctness = None
+            %>
+            % if correctness and not show_correctness=='never':
+            <span class="sr" aria-describedby="input_${id}_${choice_id}">Status: ${correctness}</span>
             % endif
             % endif
         </label>
         % endfor
         <span id="answer_${id}"></span>
     </fieldset>
-
+        </div>
+        ## Message/hint display block -- empty/invisible unless msg is populated
+        <div
+            % if (not msg is UNDEFINED) and (len(msg) > 0):
+            id="fieldset_message_${id}"
+            % endif
+        >
+            <div class="fieldset_message_close">X</div>
+            % if (not msg is UNDEFINED) and (len(msg) > 0):
+            ${msg}
+            % endif
+        </div>
+    </div>
     % if show_correctness == "never" and (value or status not in ['unsubmitted']):
     <div class="capa_alert">${submitted_message}</div>
     %endif
