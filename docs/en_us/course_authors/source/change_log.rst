@@ -16,6 +16,8 @@ August, 2014
      - Updated documentation in :ref:`Developing Your Course Index`
        for new capabilities to publish or hide multiple units 
        from the outline.
+   * - 
+     - Added documentation for :ref:`Creating Content Experiments`
    * - 08/22/14
      - Added warnings about the effects of changing the course grading policy,
        graded subsections, or graded components after the course begins.
