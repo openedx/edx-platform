@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import json
 import logging
 from collections import defaultdict
@@ -147,7 +149,7 @@ def _load_mixed_class(category):
     """
     Load an XBlock by category name, and apply all defined mixins
     """
-    component_class = XBlock.load_class(category, select=prefer_xmodules)
+    component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
 

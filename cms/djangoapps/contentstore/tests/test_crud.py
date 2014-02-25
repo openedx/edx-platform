@@ -1,4 +1,6 @@
 import unittest
+from django.conf import settings
+
 from xmodule import templates
 from xmodule.modulestore.tests import persistent_factories
 from xmodule.course_module import CourseDescriptor
@@ -9,7 +11,6 @@ from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, LocalI
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore import inheritance
-from xmodule.x_module import prefer_xmodules
 from xblock.core import XBlock
 
 
@@ -252,7 +253,7 @@ class TemplateTests(unittest.TestCase):
         class_ = XBlock.load_class(
             json_data.get('category', json_data.get('location', {}).get('category')),
             default_class,
-            select=prefer_xmodules
+            select=settings.XBLOCK_SELECT_FUNCTION
         )
         usage_id = json_data.get('_id', None)
         if not '_inherited_settings' in json_data and parent_xblock is not None:

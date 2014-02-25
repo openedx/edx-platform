@@ -190,6 +190,9 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xblock/(?P<usage_id>[^/]*)/handler_noauth/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
             'courseware.module_render.handle_xblock_callback_noauth',
             name='xblock_handler_noauth'),
+        url(r'xblock/resource/(?P<block_type>[^/]+)/(?P<uri>.*)$',
+            'courseware.module_render.xblock_resource',
+            name='xblock_resource_url'),
 
         # Software Licenses
 

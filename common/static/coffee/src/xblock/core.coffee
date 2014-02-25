@@ -22,6 +22,7 @@
 
     $element.trigger("xblock-initialized")
     $element.data("initialized", true)
+    $element.addClass("xblock-initialized")
     block
 
   initializeBlocks: (element) ->

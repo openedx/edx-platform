@@ -23,4 +23,4 @@
 -e git+https://github.com/edx/event-tracking.git@f0211d702d#egg=event-tracking
 -e git+https://github.com/edx/bok-choy.git@62de7b576a08f36cde5b030c52bccb1a2f3f8df1#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@15bf143b15714e22fc451ff1b0f8a7a2a9483172#egg=django-splash
--e git+https://github.com/edx/acid-block.git@9c832513f0c01f79227bea894fba11c66fe4c08c#egg=acid-xblock
+-e git+https://github.com/edx/acid-block.git@bf61f0fcd5916a9236bb5681c98374a48a13a74c#egg=acid-xblock

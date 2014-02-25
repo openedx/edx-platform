@@ -1,6 +1,7 @@
 """
 An :class:`~xblock.runtime.KeyValueStore` that stores data in the django session
 """
+from __future__ import absolute_import
 
 from xblock.runtime import KeyValueStore
 

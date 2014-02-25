@@ -99,6 +99,15 @@ class LmsHandlerUrls(object):
 
         return url
 
+    def local_resource_url(self, block, uri):
+        """
+        local_resource_url for Studio
+        """
+        return reverse('xblock_resource_url', kwargs={
+            'block_type': block.scope_ids.block_type,
+            'uri': uri,
+        })
+
 
 class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract-method
     """
