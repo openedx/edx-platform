@@ -193,7 +193,12 @@ MIDDLEWARE_CLASSES = (
 
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
+
+    # use Django built in clickjacking protection
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+X_FRAME_OPTIONS = 'DENY'
 
 ############# XBlock Configuration ##########
 
