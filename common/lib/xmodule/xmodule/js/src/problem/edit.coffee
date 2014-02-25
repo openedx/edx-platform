@@ -195,9 +195,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/\n^\=\=+$/gm, '');
 
       // group multiple choice answers
-      var choices = '';
-      var shuffle = false;
       xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
+        var choices = '';
+        var shuffle = false;
         var options = match.split('\n');
         for(var i = 0; i < options.length; i++) {
           if(options[i].length > 0) {
