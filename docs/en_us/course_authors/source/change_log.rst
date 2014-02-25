@@ -10,6 +10,10 @@ Change Log
 
    * - Date
      - Change
+   * - 02/25/14
+     - Updated :ref:`Add Files to a Course` section to include new External URL feature.
+   * -
+     - Updated :ref:`Add a Link to a File` and :ref:`Add an Image to an HTML Component` to specify you must use the file's Embed URL.
    * - 02/24/14
      - Created new chapter, :ref:`Getting Started with edX`.
    * -
