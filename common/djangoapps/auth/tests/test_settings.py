@@ -16,3 +16,5 @@ class TestCommonSettings(TestCase):
     @unittest.skipUnless(_AUTH_FEATURES_KEY in settings.FEATURES, '%s not present' % _AUTH_FEATURES_KEY)
     def test_enable_third_party_auth_is_disabled(self):
         self.assertIs(False, settings.FEATURES.get(_AUTH_FEATURES_KEY))
+
+    # TODO(johncox@google.com): happy path test when True.

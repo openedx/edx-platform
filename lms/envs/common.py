@@ -222,6 +222,9 @@ FEATURES = {
     # Turn on third-party auth. Disabled for now because full implementations
     # are not yet available.
     'ENABLE_THIRD_PARTY_AUTH': False,
+    # Placeholder for list of strings, where each string is a dot-delimited module.Class
+    # target that maps to a third-party provider configuration object.
+    'THIRD_PARTY_AUTH_PROVIDERS': None,
 }
 
 # Used for A/B testing
@@ -1286,9 +1289,12 @@ LINKEDIN_API = {
 
 ##### Third-party auth opitons ################################################
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
-    # Seam for later. Force a loud error until implementations are available.
-    raise NotImplementedError(
-        'Third-party auth not yet implemented; disable in common.py')
+    INSTALLED_APPS += (
+        'auth',
+    )
+    from auth import settings as auth_settings
+    auth_settings.patch(globals())
+
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
