@@ -37,7 +37,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-25 10:18-0500\n"
+"POT-Creation-Date: 2014-02-25 10:11-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4250,22 +4250,27 @@ msgstr ""
 msgid "Change your name"
 msgstr "Çhängé ýöür nämé Ⱡ'σ#"
 
+#. Translators: note that {platform} {cert_name_short} will look something
+#. like: "edX certificate". Please do not change the order of these
+#. placeholders.
 #: lms/templates/dashboard.html
-#: lms/templates/verify_student/_modal_editname.html
 msgid ""
-"To uphold the credibility of {platform} certificates, all name changes will "
-"be logged and recorded."
+"To uphold the credibility of your {platform} {cert_name_short}, all name "
+"changes will be logged and recorded."
 msgstr ""
-"Tö üphöld thé çrédïßïlïtý öf {platform} çértïfïçätés, äll nämé çhängés wïll "
-"ßé löggéd änd réçördéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+"Tö üphöld thé çrédïßïlïtý öf ýöür {platform} {cert_name_short}, äll nämé "
+"çhängés wïll ßé löggéd änd réçördéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
+#. Translators: note that {platform} {cert_name_short} will look something
+#. like: "edX certificate". Please do not change the order of these
+#. placeholders.
 #: lms/templates/dashboard.html
 msgid ""
-"Enter your desired full name, as it will appear on the {platform} "
-"certificates:"
+"Enter your desired full name, as it will appear on your {platform} "
+"{cert_name_short}:"
 msgstr ""
-"Éntér ýöür désïréd füll nämé, äs ït wïll äppéär ön thé {platform} "
-"çértïfïçätés: Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+"Éntér ýöür désïréd füll nämé, äs ït wïll äppéär ön ýöür {platform} "
+"{cert_name_short}: Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/dashboard.html
 #: lms/templates/verify_student/_modal_editname.html
@@ -6699,45 +6704,45 @@ msgid "Your final grade:"
 msgstr "Ýöür fïnäl grädé: Ⱡ'σ#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Grade required for a certificate:"
-msgstr "Grädé réqüïréd för ä çértïfïçäté: Ⱡ'σяєм ι#"
+msgid "Grade required for a {cert_name_short}:"
+msgstr "Grädé réqüïréd för ä {cert_name_short}: Ⱡ'σяєм#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
-"Your verified certificate is being held pending confirmation that the "
-"issuance of your certificate is in compliance with strict U.S. embargoes on "
+"Your verified {cert_name_long} is being held pending confirmation that the "
+"issuance of your {cert_name_short} is in compliance with strict U.S. "
+"embargoes on Iran, Cuba, Syria and Sudan. If you think our system has "
+"mistakenly identified you as being connected with one of those countries, "
+"please let us know by contacting {email}. If you would like a refund on your"
+" {cert_name_long}, please contact our billing address {billing_email}"
+msgstr ""
+"Ýöür vérïfïéd {cert_name_long} ïs ßéïng héld péndïng çönfïrmätïön thät thé "
+"ïssüänçé öf ýöür {cert_name_short} ïs ïn çömplïänçé wïth strïçt Û.S. "
+"émßärgöés ön Ìrän, Çüßä, Sýrïä änd Südän. Ìf ýöü thïnk öür sýstém häs "
+"mïstäkénlý ïdéntïfïéd ýöü äs ßéïng çönnéçtéd wïth öné öf thösé çöüntrïés, "
+"pléäsé lét üs knöw ßý çöntäçtïng {email}. Ìf ýöü wöüld lïké ä réfünd ön ýöür"
+" {cert_name_long}, pléäsé çöntäçt öür ßïllïng äddréss {billing_email} Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιq#"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid ""
+"Your {cert_name_long} is being held pending confirmation that the issuance "
+"of your {cert_name_short} is in compliance with strict U.S. embargoes on "
 "Iran, Cuba, Syria and Sudan. If you think our system has mistakenly "
 "identified you as being connected with one of those countries, please let us"
-" know by contacting {email}. If you would like a refund on your certificate,"
-" please contact our billing address {billing_email}"
+" know by contacting {email}."
 msgstr ""
-"Ýöür vérïfïéd çértïfïçäté ïs ßéïng héld péndïng çönfïrmätïön thät thé "
-"ïssüänçé öf ýöür çértïfïçäté ïs ïn çömplïänçé wïth strïçt Û.S. émßärgöés ön "
+"Ýöür {cert_name_long} ïs ßéïng héld péndïng çönfïrmätïön thät thé ïssüänçé "
+"öf ýöür {cert_name_short} ïs ïn çömplïänçé wïth strïçt Û.S. émßärgöés ön "
 "Ìrän, Çüßä, Sýrïä änd Südän. Ìf ýöü thïnk öür sýstém häs mïstäkénlý "
 "ïdéntïfïéd ýöü äs ßéïng çönnéçtéd wïth öné öf thösé çöüntrïés, pléäsé lét üs"
-" knöw ßý çöntäçtïng {email}. Ìf ýöü wöüld lïké ä réfünd ön ýöür çértïfïçäté,"
-" pléäsé çöntäçt öür ßïllïng äddréss {billing_email} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт є#"
+" knöw ßý çöntäçtïng {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υ#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"Your certificate is being held pending confirmation that the issuance of "
-"your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, "
-"Syria and Sudan. If you think our system has mistakenly identified you as "
-"being connected with one of those countries, please let us know by "
-"contacting {email}."
-msgstr ""
-"Ýöür çértïfïçäté ïs ßéïng héld péndïng çönfïrmätïön thät thé ïssüänçé öf "
-"ýöür çértïfïçäté ïs ïn çömplïänçé wïth strïçt Û.S. émßärgöés ön Ìrän, Çüßä, "
-"Sýrïä änd Südän. Ìf ýöü thïnk öür sýstém häs mïstäkénlý ïdéntïfïéd ýöü äs "
-"ßéïng çönnéçtéd wïth öné öf thösé çöüntrïés, pléäsé lét üs knöw ßý "
-"çöntäçtïng {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαв#"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your Certificate is Generating"
-msgstr "Ýöür Çértïfïçäté ïs Générätïng Ⱡ'σяєм #"
+msgid "Your {cert_name_short} is Generating"
+msgstr "Ýöür {cert_name_short} ïs Générätïng Ⱡ'σяє#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -6746,32 +6751,31 @@ msgstr "Thïs lïnk wïll öpén/döwnlöäd ä PDF döçümént Ⱡ'σяєм ι
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download Your Certificate (PDF)"
-msgstr "Döwnlöäd Ýöür Çértïfïçäté (PDF) Ⱡ'σяєм ι#"
+msgid "Download Your {cert_name_short} (PDF)"
+msgstr "Döwnlöäd Ýöür {cert_name_short} (PDF) Ⱡ'σяє#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
-"Since we did not have a valid set of verification photos from you when "
-"certificates were generated, we could not grant you a verified certificate. "
-"An honor code certificate has been granted instead."
+"Since we did not have a valid set of verification photos from you when your "
+"{cert_name_long} was generated, we could not grant you a verified "
+"{cert_name_short}. An honor code {cert_name_short} has been granted instead."
 msgstr ""
-"Sïnçé wé dïd nöt hävé ä välïd sét öf vérïfïçätïön phötös fröm ýöü whén "
-"çértïfïçätés wéré générätéd, wé çöüld nöt gränt ýöü ä vérïfïéd çértïfïçäté. "
-"Àn hönör çödé çértïfïçäté häs ßéén gräntéd ïnstéäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ #"
+"Sïnçé wé dïd nöt hävé ä välïd sét öf vérïfïçätïön phötös fröm ýöü whén ýöür "
+"{cert_name_long} wäs générätéd, wé çöüld nöt gränt ýöü ä vérïfïéd "
+"{cert_name_short}. Àn hönör çödé {cert_name_short} häs ßéén gräntéd ïnstéäd."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłι#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
-"This link will open/download a PDF document of your verified certificate."
+"This link will open/download a PDF document of your verified "
+"{cert_name_long}."
 msgstr ""
-"Thïs lïnk wïll öpén/döwnlöäd ä PDF döçümént öf ýöür vérïfïéd çértïfïçäté. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+"Thïs lïnk wïll öpén/döwnlöäd ä PDF döçümént öf ýöür vérïfïéd "
+"{cert_name_long}. Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download Your ID Verified Certificate of Achievement (PDF)"
-msgstr ""
-"Döwnlöäd Ýöür ÌD Vérïfïéd Çértïfïçäté öf Àçhïévémént (PDF) Ⱡ'σяєм ιρѕυм "
-"∂σłσ#"
+msgid "Download Your ID Verified {cert_name_short} (PDF)"
+msgstr "Döwnlöäd Ýöür ÌD Vérïfïéd {cert_name_short} (PDF) Ⱡ'σяєм ιρ#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
@@ -6824,14 +6828,16 @@ msgstr "Täké thïs çöürsé äs än ÌD-vérïfïéd stüdént. Ⱡ'σяєм
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"You can still sign up for an ID verified certificate for this course. If you"
-" plan to complete the whole course, it is a great way to recognize your "
-"achievement. {a_start}Learn more about verified certificates{a_end}."
+"You can still sign up for an ID verified {cert_name_long} for this course. "
+"If you plan to complete the whole course, it is a great way to recognize "
+"your achievement. {link_start}Learn more about the verified "
+"{cert_name_long}{link_end}."
 msgstr ""
-"Ýöü çän stïll sïgn üp för än ÌD vérïfïéd çértïfïçäté för thïs çöürsé. Ìf ýöü"
-" plän tö çömplété thé whölé çöürsé, ït ïs ä gréät wäý tö réçögnïzé ýöür "
-"äçhïévémént. {a_start}Léärn möré äßöüt vérïfïéd çértïfïçätés{a_end}. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ#"
+"Ýöü çän stïll sïgn üp för än ÌD vérïfïéd {cert_name_long} för thïs çöürsé. "
+"Ìf ýöü plän tö çömplété thé whölé çöürsé, ït ïs ä gréät wäý tö réçögnïzé "
+"ýöür äçhïévémént. {link_start}Léärn möré äßöüt thé vérïfïéd "
+"{cert_name_long}{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified Track"
@@ -6844,6 +6850,21 @@ msgstr "Vïéw Àrçhïvéd Çöürsé Ⱡ'σя#"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Course"
 msgstr "Vïéw Çöürsé Ⱡ#"
+
+#. Translators: The course's name will be added to the end of this sentence.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unregister from"
+msgstr "Àré ýöü süré ýöü wänt tö ünrégïstér fröm Ⱡ'σяєм ιρѕυ#"
+
+#. Translators: The course's name will be added to the end of this sentence.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"Are you sure you want to unregister from the verified {cert_name_long} track"
+" of"
+msgstr ""
+"Àré ýöü süré ýöü wänt tö ünrégïstér fröm thé vérïfïéd {cert_name_long} träçk"
+" öf Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
@@ -8756,6 +8777,14 @@ msgstr "Édït Ýöür Nämé Ⱡ'#"
 msgid "The following error occurred while editing your name:"
 msgstr ""
 "Thé föllöwïng érrör öççürréd whïlé édïtïng ýöür nämé: Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: lms/templates/verify_student/_modal_editname.html
+msgid ""
+"To uphold the credibility of {platform} certificates, all name changes will "
+"be logged and recorded."
+msgstr ""
+"Tö üphöld thé çrédïßïlïtý öf {platform} çértïfïçätés, äll nämé çhängés wïll "
+"ßé löggéd änd réçördéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/verify_student/_modal_editname.html
 msgid "Change my name"
