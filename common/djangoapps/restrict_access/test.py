@@ -62,6 +62,21 @@ class RestrictAccessTest(unittest.TestCase):
 
         self.assertIsNone(self.middleware.process_request(self.request))
 
+    @override_settings(RESTRICT_ACCESS_ALLOW=('10.0.2.2',))
+    def test_restrict_access_with_request_ip_proxy_allow(self):
+        """
+        Test restrict access with a our request ip address in allow settings,
+        when behing a proxy.
+        """
+
+        # create a request to simulate a deployment behing a proxy
+        request = Mock(
+            META={'REMOTE_ADDR': '10.0.1.1', 'HTTP_X_FORWARDED_FOR': '10.0.2.2'},
+        )
+        del request.user
+
+        self.assertIsNone(self.middleware.process_request(request))
+
     @override_settings(RESTRICT_ACCESS_ALLOW=('192.168.4.4',))
     def test_restrict_access_with_unknown_ip_allow(self):
         """

@@ -65,7 +65,7 @@ class RestrictAccessMiddleware(object):
 
             # read the ip addresses/networks settings
             try:
-                request_addr = ipaddr.IPAddress(request.META['REMOTE_ADDR'])
+                request_addr = ipaddr.IPAddress(self.get_client_ip(request))
                 networks_allowed = [ipaddr.IPNetwork(network) for network in allow]
                 if deny:
                     networks_denied = [ipaddr.IPNetwork(network) for network in deny]
@@ -91,6 +91,25 @@ class RestrictAccessMiddleware(object):
             if not request_is_allowed:
                 return self.deny_request()
 
+
+    def get_client_ip(self, request):
+        """
+        Get the real client ip. Useful when deployed behing a proxy.
+        """
+
+        addr = request.META['REMOTE_ADDR']
+
+        # code from http://www.djangobook.com/en/2.0/chapter17.html
+        try:
+            real_ip = request.META['HTTP_X_FORWARDED_FOR']
+        except KeyError:
+            pass
+        else:
+            # HTTP_X_FORWARDED_FOR can be a comma-separated list of IPs.
+            # Take just the first one.
+            addr = real_ip.split(",")[0]
+
+        return addr
 
     def deny_request(self):
         """
