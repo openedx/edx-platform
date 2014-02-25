@@ -729,8 +729,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-X_FRAME_OPTIONS = 'DENY'
-
 ############################### Pipeline #######################################
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'

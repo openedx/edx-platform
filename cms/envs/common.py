@@ -198,8 +198,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-X_FRAME_OPTIONS = 'DENY'
-
 ############# XBlock Configuration ##########
 
 # This should be moved into an XBlock Runtime/Application object
