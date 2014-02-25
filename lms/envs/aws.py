@@ -383,3 +383,6 @@ if ENV_TOKENS.get('XBLOCK_SELECT_FUNCTION') == 'prefer_xmodules':
 ##### LMS DEADLINE DISPLAY TIME_ZONE #######
 TIME_ZONE_DISPLAYED_FOR_DEADLINES = ENV_TOKENS.get("TIME_ZONE_DISPLAYED_FOR_DEADLINES",
                                                    TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+
+##### X-Frame-Options response header settings #####
+X_FRAME_OPTIONS = ENV_TOKENS.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)

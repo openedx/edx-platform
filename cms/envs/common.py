@@ -195,7 +195,14 @@ MIDDLEWARE_CLASSES = (
 
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
+
+    # use Django built in clickjacking protection
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+# This can be overridden if one does not want LMS/CMS to be embeddable in
+# an iframe
+X_FRAME_OPTIONS = 'ALLOW'
 
 ############# XBlock Configuration ##########
 
