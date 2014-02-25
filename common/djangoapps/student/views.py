@@ -70,6 +70,7 @@ import track.views
 from dogapi import dog_stats_api
 
 from util.json_request import JsonResponse
+from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from microsite_configuration.middleware import MicrositeConfiguration
 
@@ -83,7 +84,6 @@ AUDIT_LOG = logging.getLogger("audit")
 
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
-
 
 def csrf_token(context):
     """A csrf token that can be included in a form."""
@@ -1323,12 +1323,23 @@ def password_reset(request):
     if request.method != "POST":
         raise Http404
 
+    # Add some rate limiting here by re-using the RateLimitMixin as a helper class
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rated_limit_exceeded(request):
+        AUDIT_LOG.warning("Rate limit exceeded in password_reset")
+        return HttpResponseForbidden()
+
     form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
         form.save(use_https=request.is_secure(),
                   from_email=settings.DEFAULT_FROM_EMAIL,
                   request=request,
                   domain_override=request.get_host())
+    else:
+        # bad user? tick the rate limiter counter
+        AUDIT_LOG.info("Bad password_reset user passed in.")
+        limiter.tick_bad_request_counter(request)
+
     return JsonResponse({
         'success': True,
         'value': render_to_string('registration/password_reset_done.html', {}),
