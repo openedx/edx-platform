@@ -97,15 +97,19 @@ class @DiscussionViewSpecHelper
         expect(view.unvote).toHaveBeenCalled()
         expect(event.preventDefault.callCount).toEqual(2)
 
-    @checkVoteButtonEvents = (view) ->
-        spyOn(view, "toggleVote")
-        button = view.$el.find(".vote-btn")
+    @checkButtonEvents = (view, viewFunc, buttonSelector) ->
+        spy = spyOn(view, viewFunc)
+        button = view.$el.find(buttonSelector)
 
         button.click()
-        expect(view.toggleVote).toHaveBeenCalled()
-        view.toggleVote.reset()
+        expect(spy).toHaveBeenCalled()
+        spy.reset()
         button.trigger($.Event("keydown", {which: 13}))
-        expect(view.toggleVote).not.toHaveBeenCalled()
-        view.toggleVote.reset()
+        expect(spy).not.toHaveBeenCalled()
+        spy.reset()
         button.trigger($.Event("keydown", {which: 32}))
-        expect(view.toggleVote).toHaveBeenCalled()
+        expect(spy).toHaveBeenCalled()
+        
+
+    @checkVoteButtonEvents = (view) ->
+        @checkButtonEvents(view, "toggleVote", ".vote-btn")
