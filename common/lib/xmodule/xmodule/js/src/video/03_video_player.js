@@ -305,10 +305,10 @@ function (HTML5Video, Resizer) {
             this.videoPlayer.updatePlayTime(this.videoPlayer.currentTime);
 
             // We need to pause the video if current time is smaller (or equal)
-            // than end time. Also, we must make sure that this is only done
+            // than end-time. Also, we must make sure that this is only done
             // once per video playing from start to end.
             if (
-                this.videoPlayer.stopAtEndTime === true &&
+                this.videoPlayer.stopAtEndTime &&
                 this.videoPlayer.endTime !== null &&
                 this.videoPlayer.endTime <= this.videoPlayer.currentTime
             ) {
@@ -648,7 +648,7 @@ function (HTML5Video, Resizer) {
             savedVideoPosition = this.config.savedVideoPosition,
             youTubeId, startTime, endTime;
 
-        if (duration > 0 && videoPlayer.goToStartTime === true) {
+        if (duration > 0 && videoPlayer.goToStartTime) {
             videoPlayer.goToStartTime = false;
 
             videoPlayer.startTime = this.config.startTime;
@@ -716,14 +716,14 @@ function (HTML5Video, Resizer) {
 
             if (time > 0) {
                 // After a bug came up (BLD-708: "In Firefox YouTube video with
-                // start time plays from 00:00:00") the video refused to play
-                // from start time, and only played from the beginning.
+                // start-time plays from 00:00:00") the video refused to play
+                // from start-time, and only played from the beginning.
                 //
                 // It turned out that for some reason if Firefox you couldn't
                 // seek beyond some amount of time before the video loaded.
                 // Very strange, but in Chrome there is no such bug.
                 //
-                // HTML5 video sources play fine from start time in both Chrome
+                // HTML5 video sources play fine from start-time in both Chrome
                 // and Firefox.
                 if (this.browserIsFirefox && this.videoType === 'youtube') {
                     if (this.currentPlayerMode === 'flash') {
@@ -734,7 +734,7 @@ function (HTML5Video, Resizer) {
 
                     // When we will call cueVideoById() for some strange reason
                     // an ENDED event will be fired. It really does no damage
-                    // except for the fact that the end time is reset to null.
+                    // except for the fact that the end-time is reset to null.
                     // We do not want this.
                     //
                     // The flag `skipOnEndedStartEndReset` will notify the
@@ -808,7 +808,7 @@ function (HTML5Video, Resizer) {
         // Sometimes the YouTube API doesn't finish instantiating all of it's
         // methods, but the execution point arrives here.
         //
-        // This happens when you have start and end times set, and click "Edit"
+        // This happens when you have start-time and end-time set, and click "Edit"
         // in Studio, and then "Save". The Video editor dialog closes, the
         // video reloads, but the start-end range is not visible.
         if (this.videoPlayer.player.getDuration) {

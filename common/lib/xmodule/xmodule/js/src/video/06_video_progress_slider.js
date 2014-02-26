@@ -101,7 +101,7 @@ function () {
     }
 
     // Rebuild the slider start-end range (if it doesn't take up the
-    // whole slider). Remember that endTime === null means the end time
+    // whole slider). Remember that endTime === null means the end-time
     // is set to the end of video by default.
     function updateStartEndTimeRegion(params) {
         var isFlashMode = this.currentPlayerMode === 'flash',
