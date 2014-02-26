@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-25 14:01-0500\n"
-"PO-Revision-Date: 2014-02-25 19:01:45.523355\n"
+"POT-Creation-Date: 2014-02-26 18:23+0000\n"
+"PO-Revision-Date: 2014-02-26 18:23:44.603503\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -302,6 +302,14 @@ msgstr "À çïtý ïs réqüïréd Ⱡ'σ#"
 #: common/djangoapps/student/views.py
 msgid "A country is required"
 msgstr "À çöüntrý ïs réqüïréd Ⱡ'σя#"
+
+#: common/djangoapps/student/views.py
+msgid "Username cannot be more than {0} characters long"
+msgstr "Ûsérnämé çännöt ßé möré thän {0} çhäräçtérs löng Ⱡ'σяєм ιρѕυм #"
+
+#: common/djangoapps/student/views.py
+msgid "Email cannot be more than {0} characters long"
+msgstr "Émäïl çännöt ßé möré thän {0} çhäräçtérs löng Ⱡ'σяєм ιρѕυм#"
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail is required."
@@ -8582,6 +8590,27 @@ msgstr ""
 "Thïs pägé léft ïnténtïönällý ßlänk. Ìt ïs nöt üséd ßý édx.örg ßüt ïs léft "
 "héré för pössïßlé üsé ßý ïnställätïöns öf Öpén édX. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/static_templates/embargo.html
+msgid "This Course Unavailable In Your Country"
+msgstr "Thïs Çöürsé Ûnäväïläßlé Ìn Ýöür Çöüntrý Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/static_templates/embargo.html
+msgid ""
+"Our system indicates that you are trying to access an edX course from an IP "
+"address associated with a country currently subjected to U.S. economic and "
+"trade sanctions. Unfortunately, at this time edX must comply with export "
+"controls, and we cannot allow you to access this particular course. Feel "
+"free to browse our catalogue to find other courses you may be interested in "
+"taking."
+msgstr ""
+"Öür sýstém ïndïçätés thät ýöü äré trýïng tö äççéss än édX çöürsé fröm än ÌP "
+"äddréss ässöçïätéd wïth ä çöüntrý çürréntlý süßjéçtéd tö Û.S. éçönömïç änd "
+"trädé sänçtïöns. Ûnförtünätélý, ät thïs tïmé édX müst çömplý wïth éxpört "
+"çöntröls, änd wé çännöt ällöw ýöü tö äççéss thïs pärtïçülär çöürsé. Féél "
+"fréé tö ßröwsé öür çätälögüé tö fïnd öthér çöürsés ýöü mäý ßé ïntéréstéd ïn "
+"täkïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυ#"
 
 #: lms/templates/static_templates/honor.html
 #: lms/templates/static_templates/honor.html

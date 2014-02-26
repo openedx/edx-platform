@@ -54,6 +54,7 @@ urlpatterns += patterns(
     # ajax view that actually does the work
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
+    url(r'^embargo$', 'student.views.embargo', name="embargo"),
 )
 
 # restful api
