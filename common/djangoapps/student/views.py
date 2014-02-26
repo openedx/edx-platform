@@ -1080,6 +1080,19 @@ def create_account(request, post_override=None):
             js['field'] = field_name
             return JsonResponse(js, status=400)
 
+        max_length = 75
+        if field_name == 'username':
+            max_length = 30
+
+        if field_name in ('email', 'username') and len(post_vars[field_name]) > max_length:
+            error_str = {
+                'username': _('Username cannot be more than {0} characters long').format(max_length),
+                'email': _('Email cannot be more than {0} characters long').format(max_length)
+            }
+            js['value'] = error_str[field_name]
+            js['field'] = field_name
+            return JsonResponse(js, status=400)
+
     try:
         validate_email(post_vars['email'])
     except ValidationError:
