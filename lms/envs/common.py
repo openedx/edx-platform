@@ -224,6 +224,14 @@ FEATURES = {
 
     # Toggle embargo functionality
     'EMBARGO': False,
+
+    # Turn on to enable restricting user registraion to e-mails in domains
+    # that are given in ALLOWED_USER_EMAIL_DOMAINS
+    'RESTRICT_USER_EMAIL_DOMAINS': False,
+
+    # The list of domains in which users can have their e-mails.
+    # * can be used as wildcard. By default filled with e-mails used in tests.
+    'ALLOWED_USER_EMAIL_DOMAINS': ["example.com", "*.example.com", "*.edx.org", "bar.com"]
 }
 
 # Used for A/B testing
