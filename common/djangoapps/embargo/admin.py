@@ -15,14 +15,15 @@ class EmbargoedCourseAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('course_id', 'embargoed'),
-            'description': textwrap.dedent("""Enter a course id in the following box.
-            Do not enter leading or trailing slashes. There is no need to surround the
-            course ID with quotes.
-            Validation will be performed on the course name, and if it is invalid, an
-            error message will display.
+            'description': textwrap.dedent("""\
+                Enter a course id in the following box.
+                Do not enter leading or trailing slashes. There is no need to surround the
+                course ID with quotes.
+                Validation will be performed on the course name, and if it is invalid, an
+                error message will display.
 
-            To enable embargos against this course (restrict course access from embargoed
-            states), check the "Embargoed" box, then click "Save".
+                To enable embargos against this course (restrict course access from embargoed
+                states), check the "Embargoed" box, then click "Save".
             """)
         }),
     )

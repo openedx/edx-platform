@@ -81,6 +81,9 @@ FEATURES = {
 
     # Hide any Personally Identifiable Information from application logs
     'SQUELCH_PII_IN_LOGS': False,
+
+    # Toggles embargo functionality
+    'EMBARGO': False,
 }
 ENABLE_JASMINE = False
 

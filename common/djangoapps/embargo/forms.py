@@ -23,18 +23,17 @@ class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protoc
     def clean_course_id(self):
         """Validate the course id"""
         course_id = self.cleaned_data["course_id"]
+        
+        # Try to get the course.  If this returns None, it's not a real course
         try:
-            # Try to get the course descriptor, if we can do that,
-            # it's a real course.
-            course_loc = CourseDescriptor.id_to_location(course_id)
-            modulestore().get_instance(course_id, course_loc, depth=1)
-        except (KeyError, ItemNotFoundError):
+            course = modulestore().get_course(course_id)
+        except ValueError:
             msg = 'COURSE NOT FOUND'
             msg += u' --- Entered course id was: "{0}". '.format(course_id)
             msg += 'Please recheck that you have supplied a valid course id.'
             raise forms.ValidationError(msg)
-        except (ValueError, InvalidLocationError):
-            msg = 'INVALID LOCATION'
+        if not course:
+            msg = 'COURSE NOT FOUND'
             msg += u' --- Entered course id was: "{0}". '.format(course_id)
             msg += 'Please recheck that you have supplied a valid course id.'
             raise forms.ValidationError(msg)
@@ -50,14 +49,12 @@ class EmbargoedStateForm(forms.ModelForm):  # pylint: disable=incomplete-protoco
 
     def _is_valid_code(self, code):
         """Whether or not code is a valid country code"""
-        if code in COUNTRY_CODES:
-            return True
-        return False
+        return code in COUNTRY_CODES
 
     def clean_embargoed_countries(self):
         """Validate the country list"""
         embargoed_countries = self.cleaned_data["embargoed_countries"]
-        if embargoed_countries == '':
+        if not embargoed_countries:
             return ''
 
         error_countries = []

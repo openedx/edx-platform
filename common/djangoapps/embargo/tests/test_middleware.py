@@ -45,10 +45,14 @@ class EmbargoMiddlewareTests(TestCase):
         # Text from lms/templates/static_templates/embargo.html
         self.embargo_text = "Unfortunately, at this time edX must comply with export controls, and we cannot allow you to access this particular course."
 
+        self.patcher = mock.patch.object(pygeoip.GeoIP, 'country_code_by_addr', self.mock_country_code_by_addr)
+        self.patcher.start()
+
     def tearDown(self):
         # Explicitly clear ConfigurationModel's cache so tests have a clear cache
         # and don't interfere with each other
         cache.clear()
+        self.patcher.stop()
 
     def mock_country_code_by_addr(self, ip_addr):
         """
@@ -65,32 +69,29 @@ class EmbargoMiddlewareTests(TestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_countries(self):
-        with mock.patch.object(pygeoip.GeoIP, 'country_code_by_addr') as mocked_method:
-            mocked_method.side_effect = self.mock_country_code_by_addr
+        # Accessing an embargoed page from a blocked IP should cause a redirect
+        response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
+        self.assertEqual(response.status_code, 302)
+        # Following the redirect should give us the embargo page
+        response = self.client.get(
+            self.embargoed_page,
+            HTTP_X_FORWARDED_FOR='1.0.0.0',
+            REMOTE_ADDR='1.0.0.0',
+            follow=True
+        )
+        self.assertIn(self.embargo_text, response.content)
 
-            # Accessing an embargoed page from a blocked IP should cause a redirect
-            response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
-            self.assertEqual(response.status_code, 302)
-            # Following the redirect should give us the embargo page
-            response = self.client.get(
-                self.embargoed_page,
-                HTTP_X_FORWARDED_FOR='1.0.0.0',
-                REMOTE_ADDR='1.0.0.0',
-                follow=True
-            )
-            self.assertIn(self.embargo_text, response.content)
+        # Accessing a regular page from a blocked IP should succeed
+        response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
+        self.assertEqual(response.status_code, 200)
 
-            # Accessing a regular page from a blocked IP should succeed
-            response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
-            self.assertEqual(response.status_code, 200)
+        # Accessing an embargoed page from a non-embargoed IP should succeed
+        response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
+        self.assertEqual(response.status_code, 200)
 
-            # Accessing an embargoed page from a non-embargoed IP should succeed
-            response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
-            self.assertEqual(response.status_code, 200)
-
-            # Accessing a regular page from a non-embargoed IP should succeed
-            response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
-            self.assertEqual(response.status_code, 200)
+        # Accessing a regular page from a non-embargoed IP should succeed
+        response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
+        self.assertEqual(response.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_ip_exceptions(self):
@@ -102,31 +103,28 @@ class EmbargoMiddlewareTests(TestCase):
             enabled=True
         ).save()
 
-        with mock.patch.object(pygeoip.GeoIP, 'country_code_by_addr') as mocked_method:
-            mocked_method.side_effect = self.mock_country_code_by_addr
+        # Accessing an embargoed page from a blocked IP that's been whitelisted
+        #  should succeed
+        response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
+        self.assertEqual(response.status_code, 200)
 
-            # Accessing an embargoed page from a blocked IP that's been whitelisted
-            #  should succeed
-            response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
-            self.assertEqual(response.status_code, 200)
+        # Accessing a regular course from a blocked IP that's been whitelisted should succeed
+        response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
+        self.assertEqual(response.status_code, 200)
 
-            # Accessing a regular course from a blocked IP that's been whitelisted should succeed
-            response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
-            self.assertEqual(response.status_code, 200)
+        # Accessing an embargoed course from non-embargoed IP that's been blacklisted
+        #  should cause a redirect
+        response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
+        self.assertEqual(response.status_code, 302)
+        # Following the redirect should give us the embargo page
+        response = self.client.get(
+            self.embargoed_page,
+            HTTP_X_FORWARDED_FOR='5.0.0.0',
+            REMOTE_ADDR='1.0.0.0',
+            follow=True
+        )
+        self.assertIn(self.embargo_text, response.content)
 
-            # Accessing an embargoed course from non-embargoed IP that's been blacklisted
-            #  should cause a redirect
-            response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
-            self.assertEqual(response.status_code, 302)
-            # Following the redirect should give us the embargo page
-            response = self.client.get(
-                self.embargoed_page,
-                HTTP_X_FORWARDED_FOR='5.0.0.0',
-                REMOTE_ADDR='1.0.0.0',
-                follow=True
-            )
-            self.assertIn(self.embargo_text, response.content)
-
-            # Accessing a regular course from a non-embargoed IP that's been blacklisted should succeed
-            response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
-            self.assertEqual(response.status_code, 200)
+        # Accessing a regular course from a non-embargoed IP that's been blacklisted should succeed
+        response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
+        self.assertEqual(response.status_code, 200)
