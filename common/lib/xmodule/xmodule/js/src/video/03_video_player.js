@@ -410,7 +410,7 @@ function (HTML5Video, Resizer) {
         );
 
         // After the user seeks, the video will start playing from
-        // the seeked to point, and stop playing at the end.
+        // the sought point, and stop playing at the end.
         this.videoPlayer.goToStartTime = false;
         if (newTime > this.videoPlayer.endTime || this.videoPlayer.endTime === null) {
             this.videoPlayer.stopAtEndTime = false;
@@ -738,9 +738,8 @@ function (HTML5Video, Resizer) {
                     // We do not want this.
                     //
                     // The flag `skipOnEndedStartEndReset` will notify the
-                    // onEnded() callback for the ENDED event that just this
-                    // once there is no need in resetting the start and end
-                    // times
+                    // onEnded() callback for the ENDED event that there
+                    // is no need in resetting the start-time and end-time.
                     videoPlayer.skipOnEndedStartEndReset = true;
 
                     videoPlayer.seekToTimeOnCued = time;
