@@ -218,6 +218,10 @@ FEATURES = {
 
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+
+    # Turn on third-party auth. Disabled for now because full implementations
+    # are not yet available.
+    'ENABLE_THIRD_PARTY_AUTH': False,
 }
 
 # Used for A/B testing
@@ -1283,6 +1287,7 @@ LINKEDIN_API = {
     'EMAIL_WHITELIST': [],
     'COMPANY_ID': '2746406',
 }
+
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
