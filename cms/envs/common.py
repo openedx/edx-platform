@@ -47,7 +47,7 @@ FEATURES = {
     'AUTH_USE_CERTIFICATES': False,
 
     # email address for studio staff (eg to request course creation)
-    'STUDIO_REQUEST_EMAIL': '',
+    'STUDIO_REQUEST_EMAIL': 'tanner.huggins@saylor.org',
 
     'STUDIO_NPS_SURVEY': True,
 
@@ -63,7 +63,10 @@ FEATURES = {
     # If set to True, new Studio users won't be able to author courses unless
     # edX has explicitly added them to the course creator group.
     'ENABLE_CREATOR_GROUP': False,
-
+    
+    #Disallow course creation unless user is in staff group.
+   'DISABLE_COURSE_CREATION': True,
+   
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': False,
 
