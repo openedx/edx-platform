@@ -845,10 +845,16 @@ def update_user_information(sender, instance, created, **kwargs):
 @receiver(user_logged_in)
 def log_successful_login(sender, request, user, **kwargs):
     """Handler to log when logins have occurred successfully."""
-    AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.info(u"Login success - user.id: {0}".format(user.id))
+    else:
+        AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
 
 
 @receiver(user_logged_out)
 def log_successful_logout(sender, request, user, **kwargs):
     """Handler to log when logouts have occurred successfully."""
-    AUDIT_LOG.info(u"Logout - {0}".format(request.user))
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))
+    else:
+        AUDIT_LOG.info(u"Logout - {0}".format(request.user))

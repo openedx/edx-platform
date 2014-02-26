@@ -702,7 +702,10 @@ def login_user(request, error=""):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
-        AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.warning(u"Login failed - Unknown user email")
+        else:
+            AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
         user = None
 
     # check if the user has a linked shibboleth account, if so, redirect the user to shib-login
@@ -749,7 +752,11 @@ def login_user(request, error=""):
         # if we didn't find this username earlier, the account for this email
         # doesn't exist, and doesn't have a corresponding password
         if username != "":
-            AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
+            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                loggable_id = user_found_by_email_lookup.id if user_found_by_email_lookup else "<unknown>"
+                AUDIT_LOG.warning(u"Login failed - password for user.id: {0} is invalid".format(loggable_id))
+            else:
+                AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
         return JsonResponse({
             "success": False,
             "value": _('Email or password is incorrect.'),
@@ -803,7 +810,10 @@ def login_user(request, error=""):
 
         return response
 
-    AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.warning(u"Login failed - Account not active for user.id: {0}, resending activation".format(user.id))
+    else:
+        AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
     not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
