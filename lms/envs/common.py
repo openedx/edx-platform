@@ -222,9 +222,6 @@ FEATURES = {
     # Turn on third-party auth. Disabled for now because full implementations
     # are not yet available.
     'ENABLE_THIRD_PARTY_AUTH': False,
-    # Placeholder for list of strings, where each string is a dot-delimited module.Class
-    # target that maps to a third-party provider configuration object.
-    'THIRD_PARTY_AUTH_PROVIDERS': None,
 }
 
 # Used for A/B testing
@@ -1286,14 +1283,6 @@ LINKEDIN_API = {
     'EMAIL_WHITELIST': [],
     'COMPANY_ID': '2746406',
 }
-
-##### Third-party auth opitons ################################################
-if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
-    INSTALLED_APPS += (
-        'auth',
-    )
-    from auth import settings as auth_settings
-    auth_settings.patch(globals())
 
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####

@@ -10,6 +10,8 @@ from auth import provider
 class RegistryTest(unittest.TestCase):
     """Tests registry discovery."""
 
+    # Allow descriptive test method names. pylint: disable-msg=invalid-name
+    # Allow access to protected methods (or module-protected methods) under test: pylint: disable-msg=protected-access
     def setUp(self):
         super(RegistryTest, self).setUp()
         provider.Registry._reset()
