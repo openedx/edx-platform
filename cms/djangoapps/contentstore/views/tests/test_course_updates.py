@@ -120,6 +120,86 @@ class CourseUpdateTest(CourseTestCase):
         payload = json.loads(resp.content)
         self.assertTrue(len(payload) == before_delete - 1)
 
+    def test_course_updates_compatibility(self):
+        '''
+        Test that course updates doesn't break on old data (content in 'data' field).
+        Note: new data will save as list in 'items' field.
+        '''
+        # get the updates and populate 'data' field with some data.
+        location = self.course.location.replace(category='course_info', name='updates')
+        modulestore('direct').create_and_save_xmodule(location)
+        course_updates = modulestore('direct').get_item(location)
+        update_date = u"January 23, 2014"
+        update_content = u"Hello world!"
+        update_data = u"<ol><li><h2>" + update_date + "</h2>" + update_content + "</li></ol>"
+        course_updates.data = update_data
+        modulestore('direct').update_item(course_updates, self.user)
+
+        update_locator = loc_mapper().translate_location(
+            self.course.location.course_id, location, False, True
+        )
+        # test getting all updates list
+        course_update_url = update_locator.url_reverse('course_info_update/')
+        resp = self.client.get_json(course_update_url)
+        payload = json.loads(resp.content)
+        self.assertEqual(payload, [{u'date': update_date, u'content': update_content, u'id': 1}])
+        self.assertTrue(len(payload) == 1)
+
+        # test getting single update item
+        first_update_url = update_locator.url_reverse('course_info_update', str(payload[0]['id']))
+        resp = self.client.get_json(first_update_url)
+        payload = json.loads(resp.content)
+        self.assertEqual(payload, {u'date': u'January 23, 2014', u'content': u'Hello world!', u'id': 1})
+        self.assertHTMLEqual(update_date, payload['date'])
+        self.assertHTMLEqual(update_content, payload['content'])
+
+        # test that while updating it converts old data (with string format in 'data' field)
+        # to new data (with list format in 'items' field) and respectively updates 'data' field.
+        course_updates = modulestore('direct').get_item(location)
+        self.assertEqual(course_updates.items, [])
+        # now try to update first update item
+        update_content = 'Testing'
+        payload = {'content': update_content, 'date': update_date}
+        resp = self.client.ajax_post(
+            course_update_url + '/1', payload, HTTP_X_HTTP_METHOD_OVERRIDE="PUT", REQUEST_METHOD="POST"
+        )
+        self.assertHTMLEqual(update_content, json.loads(resp.content)['content'])
+        course_updates = modulestore('direct').get_item(location)
+        self.assertEqual(course_updates.items, [{u'date': update_date, u'content': update_content, u'id': 1}])
+        # course_updates 'data' field should update accordingly
+        update_data = u"<ol><li><h2>" + update_date + "</h2>" + update_content + "</li></ol>"
+        self.assertEqual(course_updates.data, update_data)
+
+        # test delete course update item (soft delete)
+        course_updates = modulestore('direct').get_item(location)
+        self.assertEqual(course_updates.items, [{u'date': update_date, u'content': update_content, u'id': 1}])
+        # now try to delete first update item
+        resp = self.client.delete(course_update_url + '/1')
+        self.assertEqual(json.loads(resp.content), [])
+        # confirm that course update is soft deleted ('status' flag set to 'deleted') in db
+        course_updates = modulestore('direct').get_item(location)
+        self.assertEqual(course_updates.items,
+                         [{u'date': update_date, u'content': update_content, u'id': 1, u'status': 'deleted'}])
+
+        # now try to get deleted update
+        resp = self.client.get_json(course_update_url + '/1')
+        payload = json.loads(resp.content)
+        self.assertEqual(payload.get('error'), u"Course update not found.")
+        self.assertEqual(resp.status_code, 404)
+
+        # now check that course update don't munges html
+        update_content = u"""&lt;problem>
+                           &lt;p>&lt;/p>
+                           &lt;multiplechoiceresponse>
+                           <pre>&lt;problem>
+                               &lt;p>&lt;/p></pre>
+                           <div><foo>bar</foo></div>"""
+        payload = {'content': update_content, 'date': update_date}
+        resp = self.client.ajax_post(
+            course_update_url, payload, REQUEST_METHOD="POST"
+        )
+        self.assertHTMLEqual(update_content, json.loads(resp.content)['content'])
+
     def test_no_ol_course_update(self):
         '''Test trying to add to a saved course_update which is not an ol.'''
         # get the updates and set to something wrong
@@ -143,10 +223,10 @@ class CourseUpdateTest(CourseTestCase):
 
         self.assertHTMLEqual(payload['content'], content)
 
-        # now confirm that the bad news and the iframe make up 2 updates
+        # now confirm that the bad news and the iframe make up single update
         resp = self.client.get_json(course_update_url)
         payload = json.loads(resp.content)
-        self.assertTrue(len(payload) == 2)
+        self.assertTrue(len(payload) == 1)
 
     def test_post_course_update(self):
         """

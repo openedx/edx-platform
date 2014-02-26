@@ -479,7 +479,11 @@ def course_info_update_handler(request, tag=None, package_id=None, branch=None, 
         raise PermissionDenied()
 
     if request.method == 'GET':
-        return JsonResponse(get_course_updates(updates_location, provided_id))
+        course_updates = get_course_updates(updates_location, provided_id)
+        if isinstance(course_updates, dict) and course_updates.get('error'):
+            return JsonResponse(get_course_updates(updates_location, provided_id), course_updates.get('status', 400))
+        else:
+            return JsonResponse(get_course_updates(updates_location, provided_id))
     elif request.method == 'DELETE':
         try:
             return JsonResponse(delete_course_update(updates_location, request.json, provided_id, request.user))
