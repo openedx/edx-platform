@@ -204,16 +204,14 @@ class CourseLocator(Locator):
         """
         Return a string representing this location.
         """
-        result = u""
+        parts = []
         if self.package_id:
-            result += unicode(self.package_id)
+            parts.append(unicode(self.package_id))
             if self.branch:
-                result += '/' + BRANCH_PREFIX + self.branch
+                parts.append(u"{prefix}{branch}".format(prefix=BRANCH_PREFIX, branch=self.branch))
         if self.version_guid:
-            if self.package_id:
-                result += u"/"
-            result += u"{prefix}{guid}".format(prefix=VERSION_PREFIX, guid=self.version_guid)
-        return result
+            parts.append(u"{prefix}{guid}".format(prefix=VERSION_PREFIX, guid=self.version_guid))
+        return u"/".join(parts)
 
     def url(self):
         """
