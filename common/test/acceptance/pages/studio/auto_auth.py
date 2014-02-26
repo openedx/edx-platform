@@ -2,6 +2,7 @@
 Auto-auth page (used to automatically log in during testing).
 """
 
+import re
 import urllib
 from bok_choy.page_object import PageObject
 from . import BASE_URL
@@ -14,7 +15,7 @@ class AutoAuthPage(PageObject):
     this url will create a user and log them in.
     """
 
-    def __init__(self, browser, username=None, email=None, password=None, staff=None, course_id=None):
+    def __init__(self, browser, username=None, email=None, password=None, staff=None, course_id=None, roles=None):
         """
         Auto-auth is an end-point for HTTP GET requests.
         By default, it will create accounts with random user credentials,
@@ -47,6 +48,9 @@ class AutoAuthPage(PageObject):
         if course_id is not None:
             self._params['course_id'] = course_id
 
+        if roles is not None:
+            self._params['roles'] = roles
+
     @property
     def url(self):
         """
@@ -62,3 +66,8 @@ class AutoAuthPage(PageObject):
 
     def is_browser_on_page(self):
         return True
+
+    def get_user_id(self):
+        message = self.css_text('BODY')[0].strip()
+        match = re.search(r' user_id ([^$]+)$', message)
+        return match.groups()[0] if match else None

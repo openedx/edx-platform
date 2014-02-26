@@ -57,6 +57,8 @@ from collections import namedtuple
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
 
+from django_comment_common.models import Role
+
 from external_auth.models import ExternalAuthMap
 import external_auth.views
 
@@ -1224,6 +1226,7 @@ def auto_auth(request):
     * `full_name` for the user profile (the user's full name; defaults to the username)
     * `staff`: Set to "true" to make the user global staff.
     * `course_id`: Enroll the student in the course with `course_id`
+    * `roles`: Comma-separated list of roles to grant the student in the course with `course_id`
 
     If username, email, or password are not provided, use
     randomly generated credentials.
@@ -1239,6 +1242,7 @@ def auto_auth(request):
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
     course_id = request.GET.get('course_id', None)
+    role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object
     post_data = {
@@ -1281,14 +1285,19 @@ def auto_auth(request):
     if course_id is not None:
         CourseEnrollment.enroll(user, course_id)
 
+    # Apply the roles
+    for role_name in role_names:
+        role = Role.objects.get(name=role_name, course_id=course_id)
+        user.roles.add(role)
+
     # Log in as the user
     user = authenticate(username=username, password=password)
     login(request, user)
 
     # Provide the user with a valid CSRF token
     # then return a 200 response
-    success_msg = u"Logged in user {0} ({1}) with password {2}".format(
-        username, email, password
+    success_msg = u"Logged in user {0} ({1}) with password {2} and user_id {3}".format(
+        username, email, password, user.id
     )
     response = HttpResponse(success_msg)
     response.set_cookie('csrftoken', csrf(request)['csrf_token'])
