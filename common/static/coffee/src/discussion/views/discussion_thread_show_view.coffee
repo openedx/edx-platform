@@ -9,7 +9,10 @@ if Backbone?
       "click .discussion-flag-abuse": "toggleFlagAbuse"
       "keydown .discussion-flag-abuse":
         (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
-      "click .admin-pin": "togglePin"
+      "click .admin-pin":
+        (event) -> @togglePin(event)
+      "keydown .admin-pin":
+        (event) -> DiscussionUtil.activateOnSpace(event, @togglePin)
       "click .action-follow": "toggleFollowing"
       "keydown .action-follow":
         (event) -> DiscussionUtil.activateOnSpace(event, @toggleFollowing)
@@ -59,15 +62,36 @@ if Backbone?
         @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
 
     renderPinned: =>
+      pinElem = @$(".discussion-pin")
+      pinLabelElem = pinElem.find(".pin-label")
       if @model.get("pinned")
-        @$("[data-role=thread-pin]").addClass("pinned")  
-        @$("[data-role=thread-pin]").removeClass("notpinned")  
-        @$(".discussion-pin .pin-label").html(gettext("Pinned"))
+        pinElem.addClass("pinned")
+        pinElem.removeClass("notpinned")
+        if @model.can("can_openclose")
+          ###
+          Translators: The text between start_sr_span and end_span is not shown
+          in most browsers but will be read by screen readers.
+          ###
+          pinLabelElem.html(
+              interpolate(
+                  gettext("Pinned%(start_sr_span)s, click to unpin%(end_span)s"),
+                  {"start_sr_span": "<span class='sr'>", "end_span": "</span>"},
+                  true
+              )
+          )
+          pinElem.attr("data-tooltip", gettext("Click to unpin"))
+          pinElem.attr("aria-pressed", "true")
+        else
+          pinLabelElem.html(gettext("Pinned"))
+          pinElem.removeAttr("data-tooltip")
+          pinElem.removeAttr("aria-pressed")
       else
-        @$("[data-role=thread-pin]").removeClass("pinned")  
-        @$("[data-role=thread-pin]").addClass("notpinned")  
-        @$(".discussion-pin .pin-label").html(gettext("Pin Thread"))
-
+        # If not pinned and not able to pin, pin is not shown
+        pinElem.removeClass("pinned")  
+        pinElem.addClass("notpinned")  
+        pinLabelElem.html(gettext("Pin Thread"))
+        pinElem.removeAttr("data-tooltip")
+        pinElem.attr("aria-pressed", "false")
 
     updateModelDetails: =>
       @renderVote()
@@ -85,14 +109,14 @@ if Backbone?
     _delete: (event) ->
       @trigger "thread:_delete", event
 
-    togglePin: (event) ->
+    togglePin: (event) =>
       event.preventDefault()
       if @model.get('pinned')
         @unPin()
       else
         @pin()
       
-    pin: ->
+    pin: =>
       url = @model.urlFor("pinThread")
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-pin")
@@ -102,9 +126,9 @@ if Backbone?
           if textStatus == 'success'
             @model.set('pinned', true)
         error: =>
-          $('.admin-pin').text(gettext("Pinning is not currently available"))
+          DiscussionUtil.discussionAlert("Sorry", "We had some trouble pinning this thread. Please try again.")
        
-    unPin: ->
+    unPin: =>
       url = @model.urlFor("unPinThread")
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-pin")
@@ -113,7 +137,8 @@ if Backbone?
         success: (response, textStatus) =>
           if textStatus == 'success'
             @model.set('pinned', false)
-
+        error: =>
+          DiscussionUtil.discussionAlert("Sorry", "We had some trouble unpinning this thread. Please try again.")
 
     toggleClosed: (event) ->
       $elem = $(event.target)

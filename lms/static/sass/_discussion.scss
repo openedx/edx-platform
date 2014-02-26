@@ -2471,17 +2471,16 @@ body.discussion {
       float:right;
       padding-right: 5px;
       font-style: italic;
-      cursor: pointer; 
       margin-right: $baseline/2;
       opacity: 0.8;
 
-      span {
+      &.admin-pin {
         cursor: pointer;
-      }
 
-      &:hover, &:focus {
-        @include transition(opacity .2s linear 0s);
-        opacity: 1.0;
+        &:hover, &:focus {
+          @include transition(opacity .2s linear 0s);
+          opacity: 1.0;
+        }
       }
     }
 
@@ -2520,8 +2519,6 @@ body.discussion {
 .pinned span {
   color: $pink;
   font-style: italic;
-  //cursor change is here since pins are read-only for inline discussions.
-  cursor: default;
 }
 
 .notpinned span {
