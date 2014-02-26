@@ -1377,7 +1377,9 @@ class ContentStoreTest(ModuleStoreTestCase):
         course_id = _get_course_id(test_course_data)
         self.assertTrue(are_permissions_roles_seeded(course_id))
         delete_course_and_groups(course_id, commit=True)
-        self.assertFalse(are_permissions_roles_seeded(course_id))
+        # should raise an exception for checking permissions on deleted course
+        with self.assertRaises(ItemNotFoundError):
+            are_permissions_roles_seeded(course_id)
 
     def test_forum_unseeding_with_multiple_courses(self):
         """Test new course creation and verify forum unseeding when there are multiple courses"""
@@ -1387,11 +1389,30 @@ class ContentStoreTest(ModuleStoreTestCase):
         # unseed the forums for the first course
         course_id = _get_course_id(test_course_data)
         delete_course_and_groups(course_id, commit=True)
-        self.assertFalse(are_permissions_roles_seeded(course_id))
+        # should raise an exception for checking permissions on deleted course
+        with self.assertRaises(ItemNotFoundError):
+            are_permissions_roles_seeded(course_id)
 
         second_course_id = _get_course_id(second_course_data)
         # permissions should still be there for the other course
         self.assertTrue(are_permissions_roles_seeded(second_course_id))
+
+    def test_course_enrollments_and_roles_on_delete(self):
+        """
+        Test that course deletion doesn't remove course enrollments or user's roles
+        """
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        course_id = _get_course_id(test_course_data)
+
+        # test that a user gets his enrollment and its 'student' role as default on creating a course
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
+        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))  # pylint: disable=no-member
+
+        delete_course_and_groups(course_id, commit=True)
+        # check that user's enrollment for this course is not deleted
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
+        # check that user has form role "Student" for this course even after deleting it
+        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))  # pylint: disable=no-member
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""

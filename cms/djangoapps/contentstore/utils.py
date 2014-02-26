@@ -40,8 +40,6 @@ def delete_course_and_groups(course_id, commit=False):
 
     loc = CourseDescriptor.id_to_location(course_id)
     if delete_course(module_store, content_store, loc, commit):
-        print 'removing forums permissions and roles...'
-        unseed_permissions_roles(course_id)
 
         print 'removing User permissions from course....'
         # in the django layer, we need to remove all the user permissions groups associated with this course
