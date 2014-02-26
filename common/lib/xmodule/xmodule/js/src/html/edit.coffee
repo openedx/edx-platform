@@ -42,7 +42,8 @@ class @HTMLEditingDescriptor
       # Disable visual aid on borderless table.
       visual:false,
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
-      theme_advanced_buttons1 : "formatselect,fontselect,bold,italic,underline,forecolor,|,bullist,numlist,outdent,indent,|,blockquote,wrapAsCode,|,link,unlink,|,image,",
+      theme_advanced_buttons1 : "formatselect,fontselect,bold,italic,underline,forecolor,",
+      theme_advanced_buttons2 : "bullist,numlist,outdent,indent,|,blockquote,wrapAsCode,|,link,unlink,|,image,",
       theme_advanced_toolbar_location : "top",
       theme_advanced_toolbar_align : "left",
       theme_advanced_statusbar_location : "none",
@@ -80,6 +81,15 @@ class @HTMLEditingDescriptor
     )
 
     @visualEditor = ed
+    
+    ed.onExecCommand.add(@onExecCommandHandler)
+
+  # Intended to run after the "image" plugin is used so that static urls are set
+  # correctly in the Visual editor immediately after command use.
+  onExecCommandHandler: (ed, cmd, ui, val) =>
+      if cmd == 'mceInsertContent' and val.match(/^<img/)
+        content = rewriteStaticLinks(ed.getContent(), '/static/', @base_asset_url)
+        ed.setContent(content)
 
   onSwitchEditor: (e) =>
     e.preventDefault();
