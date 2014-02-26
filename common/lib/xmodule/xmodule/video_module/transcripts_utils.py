@@ -101,9 +101,9 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n):
     data = requests.get(youtube_api['url'], params=youtube_api['params'])
 
     if data.status_code != 200 or not data.text:
-        msg = _("Can't receive transcripts from Youtube for {youtube_id}. Status code: {statuc_code}.").format(
+        msg = _("Can't receive transcripts from Youtube for {youtube_id}. Status code: {status_code}.").format(
             youtube_id=youtube_id,
-            statuc_code=data.status_code
+            status_code=data.status_code
         )
         raise GetTranscriptsFromYouTubeException(msg)
 
