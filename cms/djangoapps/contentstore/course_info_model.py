@@ -226,8 +226,8 @@ def _get_html(course_updates_items):
     for update in reversed(course_updates_items):
         # filter course update items which have status "deleted".
         if update.get("status") != CourseInfoModule.STATUS_DELETED:
-            list_items.append(u"<li><h2>{date}</h2>{content}</li>".format(**update))
-    return u"<ol>{list_items}</ol>".format(list_items="".join(list_items))
+            list_items.append(u"<article><h2>{date}</h2>{content}</article>".format(**update))
+    return u"<section>{list_items}</section>".format(list_items="".join(list_items))
 
 
 def save_course_update_items(location, course_updates, course_update_items, user=None):

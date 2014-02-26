@@ -167,7 +167,7 @@ class CourseUpdateTest(CourseTestCase):
         course_updates = modulestore('direct').get_item(location)
         self.assertEqual(course_updates.items, [{u'date': update_date, u'content': update_content, u'id': 1}])
         # course_updates 'data' field should update accordingly
-        update_data = u"<ol><li><h2>" + update_date + "</h2>" + update_content + "</li></ol>"
+        update_data = u"<section><article><h2>{date}</h2>{content}</article></section>".format(date=update_date, content=update_content)
         self.assertEqual(course_updates.data, update_data)
 
         # test delete course update item (soft delete)
