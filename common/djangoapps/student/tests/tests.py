@@ -10,6 +10,7 @@ import re
 import unittest
 from datetime import datetime, timedelta
 import pytz
+import uuid
 
 from django.core.cache import cache
 from django.conf import settings
@@ -32,7 +33,8 @@ from textwrap import dedent
 
 from student.models import anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user
 from student.views import (process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper,
-                           change_enrollment, complete_course_mode_info, token, course_from_id)
+                           change_enrollment, complete_course_mode_info, token, course_from_id,
+                           create_account)
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.test_email import mock_render_to_string
 
@@ -553,6 +555,45 @@ class PaidRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(response.content, reverse('shoppingcart.views.show_cart'))
         self.assertTrue(shoppingcart.models.PaidCourseRegistration.contained_in_order(
             shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class AllowedDomainsRegistrationTest(ModuleStoreTestCase):
+    """
+    Tests for registering a user with listed and unlisted e-mail
+    """
+
+    def setUp(self):
+        super(AllowedDomainsRegistrationTest, self).setUp()
+        self.url = reverse('create_account')
+        self.url_params = {
+            'username': 'foo_bar' + uuid.uuid4().hex,
+            'name': 'username',
+            'terms_of_service': 'true',
+            'honor_code': 'true',
+            'password': 'whatever812!'
+        }
+
+    @unittest.skipUnless(settings.FEATURES.get('RESTRICT_USER_EMAIL_DOMAINS'), "Restriction to allowed domains is not enabled in settings")
+    def test_invalid_domain(self):
+        self.assertTrue(settings.FEATURES.get('ALLOWED_USER_EMAIL_DOMAINS'))
+        domain = settings.FEATURES.get('ALLOWED_USER_EMAIL_DOMAINS')[0]
+        self.url_params['email'] = 'testuser@wrongdomain{0}.com'.format(domain.replace('*', 'wildcard'))
+
+        response = self.client.post(self.url, self.url_params)
+
+        self.assertEqual(response.status_code, 400)
+        response_dict = json.loads(response.content)
+        self.assertEqual(response_dict['field'], "email")
+        self.assertEqual(response_dict['value'], "Valid e-mail in an allowed domain is required.")
+
+    def test_valid_domain(self):
+        self.assertTrue(settings.FEATURES.get('ALLOWED_USER_EMAIL_DOMAINS'))
+        for i, domain in enumerate(settings.FEATURES.get('ALLOWED_USER_EMAIL_DOMAINS')):
+            self.url_params['email'] = 'testuser@{0}'.format(domain.replace('*', 'wildcard'))
+            self.url_params['username'] += repr(i)
+            response = self.client.post(self.url, self.url_params)
+            self.assertEqual(response.status_code, 200)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
