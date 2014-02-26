@@ -327,7 +327,10 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
     This whole action ensures that after user changes video fields, proper `sub` files, corresponding
     to new values of video fields, will be presented in system.
 
-    # 2. Generate transcripts translation only  when user clicks `save` button, not while switching tabs.
+    # 2 convert /static/filename.srt  to filename.srt in self.transcripts.
+    (it is done to allow user to enter both /static/filename.srt and filename.srt)
+
+    # 3. Generate transcripts translation only  when user clicks `save` button, not while switching tabs.
     a) delete sjson translation for those languages, which were removed from `item.transcripts`.
         Note: we are not deleting old SRT files to give user more flexibility.
     b) For all SRT files in`item.transcripts` regenerate new SJSON files.
@@ -359,16 +362,21 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
 
     # 2.
     if generate_translation:
+        for lang, filename in item.transcripts.items():
+            item.transcripts[lang] = os.path.split(filename)[-1]
+
+    # 3.
+    if generate_translation:
         old_langs = set(old_metadata.get('transcripts', {})) if old_metadata else set()
         new_langs = set(item.transcripts)
 
-        for lang in old_langs.difference(new_langs):  # 2a
+        for lang in old_langs.difference(new_langs):  # 3a
             for video_id in possible_video_id_list:
                 if video_id:
                     remove_subs_from_store(video_id, item, lang)
 
         reraised_message = ''
-        for lang in new_langs:  # 2b
+        for lang in new_langs:  # 3b
             try:
                 generate_sjson_for_all_speeds(
                     item,
