@@ -222,7 +222,7 @@ TEMPLATE_DEBUG = False
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "localhost:8001"
+SITE_NAME = "edx.saylor.org"
 HTTPS = 'on'
 ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
@@ -234,9 +234,9 @@ EMAIL_PORT = 25
 EMAIL_USE_TLS = False
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'registration@example.com'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
-SERVER_EMAIL = 'devops@example.com'
+DEFAULT_FROM_EMAIL = 'registration@edx.saylor.org'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.saylor.org'
+SERVER_EMAIL = 'devops@edx.saylor.org'
 ADMINS = ()
 MANAGERS = ADMINS
 
