@@ -366,7 +366,7 @@ class VideoModule(VideoFields, XModule):
                 try:
                     asset(self.location, self.sub, 'en')
                 except NotFoundError:
-                    passs
+                    pass
                 else:
                     available_translations = ['en']
             for lang in self.transcripts:
