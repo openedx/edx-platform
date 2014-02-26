@@ -25,6 +25,13 @@ class EmbargoMiddleware(object):
     This is configured by creating ``DarkLangConfig`` rows in the database,
     using the django admin site.
     """
+    def __init__(self):
+        # If embargoing is not turned off, make this middleware do nothing
+        if not settings.FEATURES.get('EMBARGO', False):
+            self.process_request = self.return_unaltered
+
+    def return_unaltered(self, request):
+        return
 
     def process_request(self, request):
         """

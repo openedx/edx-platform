@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-25 17:34-0500\n"
-"PO-Revision-Date: 2014-02-25 22:34:11.966883\n"
+"POT-Creation-Date: 2014-02-26 18:23+0000\n"
+"PO-Revision-Date: 2014-02-26 18:23:44.603503\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -302,6 +302,14 @@ msgstr "À çïtý ïs réqüïréd Ⱡ'σ#"
 #: common/djangoapps/student/views.py
 msgid "A country is required"
 msgstr "À çöüntrý ïs réqüïréd Ⱡ'σя#"
+
+#: common/djangoapps/student/views.py
+msgid "Username cannot be more than {0} characters long"
+msgstr "Ûsérnämé çännöt ßé möré thän {0} çhäräçtérs löng Ⱡ'σяєм ιρѕυм #"
+
+#: common/djangoapps/student/views.py
+msgid "Email cannot be more than {0} characters long"
+msgstr "Émäïl çännöt ßé möré thän {0} çhäräçtérs löng Ⱡ'σяєм ιρѕυм#"
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail is required."

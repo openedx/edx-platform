@@ -25,14 +25,6 @@ class EmbargoCourseFormTest(ModuleStoreTestCase):
         self.true_form_data = {'course_id': self.course.id, 'embargoed': True}
         self.false_form_data = {'course_id': self.course.id, 'embargoed': False}
 
-    def tearDown(self):
-        # Delete any EmbargoedCourse record we may have created
-        try:
-            record = EmbargoedCourse.objects.get(course_id=self.course.id)
-            record.delete()
-        except EmbargoedCourse.DoesNotExist:
-            return
-
     def test_embargo_course(self):
         self.assertFalse(EmbargoedCourse.is_embargoed(self.course.id))
         # Test adding embargo to this course
@@ -94,7 +86,7 @@ class EmbargoCourseFormTest(ModuleStoreTestCase):
         # Validation shouldn't work
         self.assertFalse(form.is_valid())
 
-        msg = 'INVALID LOCATION'
+        msg = 'COURSE NOT FOUND'
         msg += u' --- Entered course id was: "{0}". '.format(bad_id)
         msg += 'Please recheck that you have supplied a valid course id.'
         self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
@@ -105,6 +97,10 @@ class EmbargoCourseFormTest(ModuleStoreTestCase):
 
 class EmbargoedStateFormTest(TestCase):
     """Test form for adding new states"""
+
+    def setUp(self):
+        # Explicitly clear the cache, since ConfigurationModel relies on the cache
+        cache.clear()
 
     def tearDown(self):
         # Explicitly clear ConfigurationModel's cache so tests have a clear cache
