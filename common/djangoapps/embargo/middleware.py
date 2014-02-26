@@ -9,8 +9,8 @@ HTTP_X_FORWARDED_FOR).
 """
 
 import pygeoip
-import django.core.exceptions
 
+from django.core.exceptions import MiddlewareNotUsed
 from django.conf import settings
 from django.shortcuts import redirect
 from ipware.ip import get_ip
@@ -29,7 +29,7 @@ class EmbargoMiddleware(object):
     def __init__(self):
         # If embargoing is turned off, make this middleware do nothing
         if not settings.FEATURES.get('EMBARGO', False):
-            raise django.core.exceptions.MiddlewareNotUsed()
+            raise MiddlewareNotUsed()
 
     def process_request(self, request):
         """

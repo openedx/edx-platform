@@ -218,6 +218,9 @@ FEATURES = {
 
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+
+    # Toggle embargo functionality
+    'EMBARGO': False,
 }
 
 # Used for A/B testing

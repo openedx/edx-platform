@@ -78,6 +78,9 @@ FEATURES = {
 
     # Allow editing of short description in course settings in cms
     'EDITABLE_SHORT_DESCRIPTION': True,
+
+    # Toggles embargo functionality
+    'EMBARGO': False,
 }
 ENABLE_JASMINE = False
 
