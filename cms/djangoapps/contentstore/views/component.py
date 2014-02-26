@@ -23,7 +23,6 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
-from xmodule.modulestore import prefer_xmodules
 
 from lms.lib.xblock.runtime import unquote_slashes
 
@@ -370,6 +369,11 @@ def component_handler(request, usage_id, handler, suffix=''):
         log.info("XBlock %s attempted to access missing handler %r", descriptor, handler, exc_info=True)
         raise Http404
 
-    modulestore().update_item(descriptor)
+    # unintentional update to handle any side effects of handle call; so, request user didn't author
+    # the change
+    if getattr(descriptor, 'is_draft', False):
+        modulestore('draft').update_item(descriptor, None)
+    else:
+        modulestore('direct').update_item(descriptor, None)
 
     return webob_to_django_response(resp)
