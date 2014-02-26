@@ -3,6 +3,7 @@ if Backbone?
 
     events:
         "click .action-delete": "_delete"
+        "click .action-edit": "edit"
 
     tagName: "li"
 
@@ -14,6 +15,9 @@ if Backbone?
       can_delete:
         enable: -> @$(".action-delete").show()
         disable: -> @$(".action-delete").hide()
+      editable:
+        enable: -> @$(".action-edit").show()
+        disable: -> @$(".action-edit").hide()
 
     render: ->
       @template = _.template($("#response-comment-show-template").html())
@@ -68,4 +72,5 @@ if Backbone?
     updateModelDetails: =>
       @renderFlagged()
 
-
+    edit: (event) =>
+      @trigger "comment:edit", event
