@@ -8,6 +8,7 @@ define(["backbone"], function(Backbone) {
       thumbnail: "",
       date_added: "",
       url: "",
+      external_url: "",
       portable_url: "",
       locked: false
     }
