@@ -17,6 +17,7 @@
 # jmc <jmc@edx.org>, 2014
 # jmc <jmc@edx.org>, 2014
 # JRolland <julien.rolland33@gmail.com>, 2013
+# jsa_edx <jsa@edx.org>, 2014
 # jsicsic <jsicsic@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # JRolland <julien.rolland33@gmail.com>, 2013
@@ -113,8 +114,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-15 08:19-0500\n"
-"PO-Revision-Date: 2014-02-16 14:10+0000\n"
+"POT-Creation-Date: 2014-02-24 16:01-0500\n"
+"PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: francoisedocq\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -123,6 +124,17 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. Translators: "Open Ended Panel" appears on a tab that, when clicked,
+#. opens up a panel that displays information about openended problems
+#. that a user has submitted or needs to grade
+#: cms/djangoapps/contentstore/utils.py lms/djangoapps/courseware/tabs.py
+msgid "Open Ended Panel"
+msgstr ""
+
+#: lms/templates/courseware/courseware-error.html
+msgid "Courseware"
+msgstr "Contenu du cours"
 
 #. Translators: "Course Info" is the name of the course's information and
 #. updates page
@@ -135,8 +147,12 @@ msgid "Course Info"
 msgstr "Informations sur le cours"
 
 #. Translators: "Discussion" is the title of the course forum page
+#. Translators: "Discussion" is the title of the course forum page
+#. Translators: 'Discussion' refers to the tab in the courseware
+#. that leads to the discussion forums
 #: cms/djangoapps/contentstore/views/tabs.py
 #: common/lib/xmodule/xmodule/course_module.py
+#: lms/djangoapps/courseware/tabs.py
 msgid "Discussion"
 msgstr "Discussion"
 
@@ -194,6 +210,7 @@ msgid "Student"
 msgstr "Étudiant"
 
 #: common/djangoapps/student/middleware.py
+#, python-brace-format
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {link_start}{support_email}{link_end}"
@@ -287,14 +304,17 @@ msgid "Unexpected account status"
 msgstr "Statut du compte inattendu"
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
 msgstr "Un compte avec le même nom d'utilisateur '{username}' existe déjà."
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "An account with the Email '{email}' already exists."
 msgstr "Un compte avec l'adresse e-mail '{email}' existe déjà."
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "Error (401 {field}). E-mail us."
 msgstr "Erreur (401 {field}). Contactez-nous par mail."
 
@@ -420,7 +440,7 @@ msgstr "ID invalide"
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "LONG_DATE_FORMAT"
-msgstr ""
+msgstr "%A %d %B %Y"
 
 #. Translators: the translation for "DATE_TIME_FORMAT" must be a format
 #. string for formatting dates with times.  For example, the American
@@ -428,7 +448,7 @@ msgstr ""
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "DATE_TIME_FORMAT"
-msgstr ""
+msgstr "%d %b %Y, à %H:%M"
 
 #. Translators: the translation for "SHORT_DATE_FORMAT" must be a
 #. format string for formatting dates in a brief form.  For example,
@@ -436,14 +456,14 @@ msgstr ""
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "SHORT_DATE_FORMAT"
-msgstr ""
+msgstr "%d %b %Y"
 
 #. Translators: the translation for "TIME_FORMAT" must be a format
 #. string for formatting times.  For example, the American English
 #. form is "%H:%M:%S". See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "%H:%M:%S"
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
@@ -451,7 +471,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "AM"
-msgstr "AM"
+msgstr ""
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
@@ -459,7 +479,7 @@ msgstr "AM"
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "PM"
-msgstr "PM"
+msgstr ""
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Monday Februrary 10, 2014". It is used for the %A
@@ -467,7 +487,7 @@ msgstr "PM"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Monday"
-msgstr "Lundi"
+msgstr "lundi"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Tuesday Februrary 11, 2014". It is used for the %A
@@ -475,7 +495,7 @@ msgstr "Lundi"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Tuesday"
-msgstr "Mardi"
+msgstr "mardi"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Wednesday Februrary 12, 2014". It is used for the %A
@@ -483,7 +503,7 @@ msgstr "Mardi"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Wednesday"
-msgstr "Mercredi"
+msgstr "mercredi"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Thursday Februrary 13, 2014". It is used for the %A
@@ -491,7 +511,7 @@ msgstr "Mercredi"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Thursday"
-msgstr "Jeudi"
+msgstr "jeudi"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Friday Februrary 14, 2014". It is used for the %A
@@ -499,7 +519,7 @@ msgstr "Jeudi"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Friday"
-msgstr "Vendredi"
+msgstr "vendredi"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Saturday Februrary 15, 2014". It is used for the %A
@@ -507,7 +527,7 @@ msgstr "Vendredi"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Saturday"
-msgstr "Samedi"
+msgstr "samedi"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Sunday Februrary 16, 2014". It is used for the %A
@@ -515,7 +535,7 @@ msgstr "Samedi"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Sunday"
-msgstr "Dimanche"
+msgstr "dimanche"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Mon Feb 10, 2014". It is used for the %a
@@ -523,7 +543,7 @@ msgstr "Dimanche"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Mon"
-msgstr "Lun"
+msgstr "lun"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Tue Feb 11, 2014". It is used for the %a
@@ -531,7 +551,7 @@ msgstr "Lun"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Tue"
-msgstr "Mar"
+msgstr "mar"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Wed Feb 12, 2014". It is used for the %a
@@ -539,7 +559,7 @@ msgstr "Mar"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Wed"
-msgstr "Mer"
+msgstr "mer"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Thu Feb 13, 2014". It is used for the %a
@@ -547,7 +567,7 @@ msgstr "Mer"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Thu"
-msgstr "Jeu"
+msgstr "jeu"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Fri Feb 14, 2014". It is used for the %a
@@ -555,7 +575,7 @@ msgstr "Jeu"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Fri"
-msgstr "Ven"
+msgstr "ven"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sat Feb 15, 2014". It is used for the %a
@@ -563,7 +583,7 @@ msgstr "Ven"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Sat"
-msgstr "Sam"
+msgstr "sam"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sun Feb 16, 2014". It is used for the %a
@@ -571,7 +591,7 @@ msgstr "Sam"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Sun"
-msgstr "Dim"
+msgstr "dim"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jan 10, 2014". It is used for the %b
@@ -579,7 +599,7 @@ msgstr "Dim"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jan"
-msgstr "Jan"
+msgstr "janv"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Feb 10, 2014". It is used for the %b
@@ -587,7 +607,7 @@ msgstr "Jan"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Feb"
-msgstr "Fév"
+msgstr "févr"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Mar 10, 2014". It is used for the %b
@@ -595,7 +615,7 @@ msgstr "Fév"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Mar"
-msgstr "Mars"
+msgstr "mars"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Apr 10, 2014". It is used for the %b
@@ -603,7 +623,7 @@ msgstr "Mars"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Apr"
-msgstr "Avr"
+msgstr "avril"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "May 10, 2014". It is used for the %b
@@ -611,7 +631,7 @@ msgstr "Avr"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "May"
-msgstr "Mai"
+msgstr "mai"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jun 10, 2014". It is used for the %b
@@ -619,7 +639,7 @@ msgstr "Mai"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jun"
-msgstr "Juin"
+msgstr "juin"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jul 10, 2014". It is used for the %b
@@ -627,7 +647,7 @@ msgstr "Juin"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jul"
-msgstr "Juil"
+msgstr "juil"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Aug 10, 2014". It is used for the %b
@@ -635,7 +655,7 @@ msgstr "Juil"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Aug"
-msgstr "Août"
+msgstr "août"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Sep 10, 2014". It is used for the %b
@@ -643,7 +663,7 @@ msgstr "Août"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Sep"
-msgstr "Sep"
+msgstr "sept"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Oct 10, 2014". It is used for the %b
@@ -651,7 +671,7 @@ msgstr "Sep"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Oct"
-msgstr "Oct"
+msgstr "oct"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Nov 10, 2014". It is used for the %b
@@ -659,7 +679,7 @@ msgstr "Oct"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Nov"
-msgstr "Nov"
+msgstr "nov"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Dec 10, 2014". It is used for the %b
@@ -667,7 +687,7 @@ msgstr "Nov"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Dec"
-msgstr "Déc"
+msgstr "déc"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "January 10, 2014". It is used for the %B directive in
@@ -675,7 +695,7 @@ msgstr "Déc"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "January"
-msgstr "Janvier"
+msgstr "janvier"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "February 10, 2014". It is used for the %B directive in
@@ -683,7 +703,7 @@ msgstr "Janvier"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "February"
-msgstr "Février"
+msgstr "février"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "March 10, 2014". It is used for the %B directive in
@@ -691,7 +711,7 @@ msgstr "Février"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "March"
-msgstr "Mars"
+msgstr "mars"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "April 10, 2014". It is used for the %B directive in
@@ -699,7 +719,7 @@ msgstr "Mars"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "April"
-msgstr "Avril"
+msgstr "avril"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "May 10, 2014". It is used for the %B directive in
@@ -707,7 +727,7 @@ msgstr "Avril"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "May"
-msgstr "Mai"
+msgstr "mai"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "June 10, 2014". It is used for the %B directive in
@@ -715,7 +735,7 @@ msgstr "Mai"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "June"
-msgstr "Juin"
+msgstr "juin"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "July 10, 2014". It is used for the %B directive in
@@ -723,7 +743,7 @@ msgstr "Juin"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "July"
-msgstr "Juillet"
+msgstr "juillet"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "August 10, 2014". It is used for the %B directive in
@@ -731,7 +751,7 @@ msgstr "Juillet"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "August"
-msgstr "Août"
+msgstr "août"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "September 10, 2014". It is used for the %B directive in
@@ -739,7 +759,7 @@ msgstr "Août"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "September"
-msgstr "Septembre"
+msgstr "eptembre"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "October 10, 2014". It is used for the %B directive in
@@ -747,7 +767,7 @@ msgstr "Septembre"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "October"
-msgstr "Octobre"
+msgstr "octobre"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "November 10, 2014". It is used for the %B directive in
@@ -755,7 +775,7 @@ msgstr "Octobre"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "November"
-msgstr "Novembre"
+msgstr "novembre"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "December 10, 2014". It is used for the %B directive in
@@ -763,45 +783,55 @@ msgstr "Novembre"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "December"
-msgstr "Décembre"
+msgstr "décembre"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "Invalid Length ({0})"
 msgstr "Longueur invalide ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must be {0} characters or more"
 msgstr "doit contenir {0} caractères ou plus"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must be {0} characters or less"
 msgstr "doit contenir {0} caractères ou moins"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "Must be more complex ({0})"
 msgstr "Doit être plus complexe ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more uppercase characters"
 msgstr "doit contenir {0} ou plus de lettres majuscules"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more lowercase characters"
 msgstr "doit contenir {0} ou plus de lettres minuscules"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more digits"
 msgstr "doit contenir {0} ou plus de chiffres"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more punctuation characters"
 msgstr "doit contenir {0} ou plus d'éléments de ponctuation"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more non ascii characters"
 msgstr "doit contenir {0} ou plus de caractères non ascii"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more unique words"
 msgstr "doit contenir {0} ou plus de mots"
 
@@ -840,6 +870,7 @@ msgstr ""
 "réponse. "
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr "Erreur {err} dans la fonction d'indice {hintfn}."
 
@@ -848,6 +879,7 @@ msgid "(Source code line unavailable)"
 msgstr "(Ligne de code source non disponible)"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "See XML source line {sourcenum}."
 msgstr "Regardez la ligne de source XML {sourcenum}."
 
@@ -858,20 +890,24 @@ msgstr ""
 "question."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Could not interpret '{student_answer}' as a number."
 msgstr "Ne sait pas interpréter '{student_answer}' comme un nombre. "
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "You may not use variables ({bad_variables}) in numerical problems."
 msgstr ""
 "Vous ne pouvez pas utiliser les variables ({bad_variables}) dans les "
 "problèmes numériques."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "factorial function evaluated outside its domain:'{student_answer}'"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid math syntax: '{student_answer}'"
 msgstr "Syntaxe mathématique invalide: '{student_answer}'"
 
@@ -900,6 +936,7 @@ msgid "CustomResponse: check function returned an invalid dictionary!"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid ""
 "Unable to deliver your submission to grader (Reason: {error_msg}). Please "
 "try again later."
@@ -908,16 +945,23 @@ msgstr ""
 "Veuillez réessayer plus tard."
 
 #. Translators: 'grader' refers to the edX automatic code grader.
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
 #: common/lib/capa/capa/responsetypes.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Invalid grader reply. Please contact the course staff."
 msgstr ""
 "Réponse invalide de l'évaluateur. Veuillez contacter l'équipe pédagogique."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: {bad_input} not permitted in answer."
 msgstr "Donnée invalide : {bad_input} non autorisé dans la réponse."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid ""
 "factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
@@ -926,11 +970,13 @@ msgstr ""
 "donnée était : {bad_input}"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula."
 msgstr ""
 "Donnée invalide: Ne peut pas analyser '{bad_input}' comme une formule."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula"
 msgstr ""
 "Donnée invalide : Ne peut pas analyser '{bad_input}' comme une formule"
@@ -938,6 +984,7 @@ msgstr ""
 #. Translators: 'SchematicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr ""
 "Erreur dans l'évaluation de SchematicResponse. L'erreur est: {error_msg}"
@@ -949,6 +996,7 @@ msgstr ""
 "nombre."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Could not interpret '{given_answer}' as a number."
 msgstr "Ne peut pas interpréter '{given_answer}' comme étant un nombre."
 
@@ -992,11 +1040,13 @@ msgstr ""
 "Le problème doit être réinitialisé avant de pouvoir être vérifié à nouveau."
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr "Vous devez attendre au moins {wait} secondes entre les soumissions."
 
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "Error: {msg}"
 msgstr "Erreur : {msg}"
 
@@ -1057,7 +1107,226 @@ msgstr "Général"
 msgid "TBD"
 msgstr "A déterminer"
 
-#: common/lib/xmodule/xmodule/video_module.py
+#. Translators: "Self" is used to denote an openended response that is self-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Self"
+msgstr ""
+
+#. Translators: "AI" is used to denote an openended response that is machine-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "AI"
+msgstr ""
+
+#. Translators: "Peer" is used to denote an openended response that is peer-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Peer"
+msgstr ""
+
+#. Translators: "Not started" is used to communicate to a student that their
+#. response
+#. has not yet been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Not started."
+msgstr ""
+
+#. Translators: "Being scored." is used to communicate to a student that their
+#. response
+#. are in the process of being scored
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Being scored."
+msgstr ""
+
+#. Translators: "Scoring finished" is used to communicate to a student that
+#. their response
+#. have been scored, but the full scoring process is not yet complete
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Scoring finished."
+msgstr ""
+
+#. Translators: "Complete" is used to communicate to a student that their
+#. openended response has been fully scored
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Complete."
+msgstr ""
+
+#. Translators: "Scored rubric" appears to a user as part of a longer
+#. string that looks something like: "Scored rubric from grader 1".
+#. "Scored" is an adjective that modifies the noun "rubric".
+#. That longer string appears when a user is viewing a graded rubric
+#. returned from one of the graders of their openended response problem.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Scored rubric"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+#, python-brace-format
+msgid ""
+"You have attempted this question {number_of_student_attempts} times. You are"
+" only allowed to attempt it {max_number_of_attempts} times."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "The problem state got out-of-sync. Please try reloading the page."
+msgstr ""
+
+#. Translators: "Self-Assessment" refers to the self-assessed mode of
+#. openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Self-Assessment"
+msgstr ""
+
+#. Translators: "Peer-Assessment" refers to the peer-assessed mode of
+#. openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Peer-Assessment"
+msgstr ""
+
+#. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
+#. of openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Instructor-Assessment"
+msgstr ""
+
+#. Translators: "AI-Assessment" refers to the machine-graded mode of openended
+#. evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "AI-Assessment"
+msgstr ""
+
+#. Translators: 'tag' is one of 'feedback', 'submission_id',
+#. 'grader_id', or 'score'. They are categories that a student
+#. responds to when filling out a post-assessment survey
+#. of his or her grade from an openended problem.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+#, python-brace-format
+msgid ""
+"Could not find needed tag {tag_name} in the survey responses. Please try "
+"submitting again."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "There was an error saving your feedback. Please contact course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Couldn't submit feedback."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Successfully saved your feedback."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Unable to save your feedback. Please try again later."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Successfully saved your submission."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid ""
+"Unable to submit your submission to the grader. Please try again later."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Error getting feedback from grader."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "No feedback available from grader."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Error handling action. Please try again."
+msgstr ""
+
+#. Translators: this string appears once an openended response
+#. is submitted but before it has been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid ""
+"Your response has been submitted. Please check back later for your grade."
+msgstr ""
+
+#. Translators: "Not started" communicates to a student that their response
+#. has not yet been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "Not started"
+msgstr ""
+
+#. Translators: "In progress" communicates to a student that their response
+#. is currently in the grading process
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "In progress"
+msgstr ""
+
+#. Translators: "Done" communicates to a student that their response
+#. has been fully graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "Done"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid ""
+"We could not find a file in your submission. Please try choosing a file or "
+"pasting a URL to your file into the answer box."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid ""
+"We are having trouble saving your file. Please try another file or paste a "
+"URL to your file into the answer box."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/self_assessment_module.py
+msgid "Error saving your score.  Please notify course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid ""
+"Can't receive transcripts from Youtube for {youtube_id}. Status code: "
+"{statuc_code}."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "Can't find any transcripts on the Youtube service."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "We support only SubRip (*.srt) transcripts format."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid ""
+"Something wrong with SubRip transcripts file during parsing. Inner message "
+"is {error_message}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "Something wrong with SubRip transcripts file during parsing."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
 "Une adresse YouTube ou un lien vers un fichier hébergé n'importe où sur le "
@@ -1090,6 +1359,7 @@ msgstr "Copyright"
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
+#, python-brace-format
 msgid "This is the wiki for **{organization}**'s _{course_name}_."
 msgstr "Ceci est le wiki pour _{course_name}_ de **{organization}**."
 
@@ -1105,6 +1375,33 @@ msgstr "Bienvenue sur le Wiki edX"
 msgid "Visit a course wiki to add an article."
 msgstr "Visitez le wiki d'un cours pour ajouter un article."
 
+#. Translators: 'Course Content' refers to the tab in the courseware
+#. that leads to the content of a course
+#: lms/djangoapps/courseware/tabs.py
+msgid "Course Content"
+msgstr ""
+
+#: lms/templates/instructor/staff_grading.html
+msgid "Staff grading"
+msgstr "Notation de l'équipe pédagogique"
+
+#: lms/templates/courseware/syllabus.html
+msgid "Syllabus"
+msgstr "Syllabus"
+
+#. Translators: "Peer grading" appears on a tab that allows
+#. students to view openended problems that require grading
+#: lms/djangoapps/courseware/tabs.py
+msgid "Peer grading"
+msgstr ""
+
+#. Translators: 'Instructor' appears on the tab that leads to
+#. the instructor dashboard, which is a portal where an instructor
+#. can get data and perform various actions on their course
+#: lms/djangoapps/courseware/tabs.py
+msgid "Instructor"
+msgstr ""
+
 #: lms/djangoapps/courseware/features/video.py lms/templates/video.html
 #, fuzzy
 msgid "ERROR: No playable video sources found!"
@@ -1115,6 +1412,7 @@ msgstr ""
 "ERREUR: Aucune source vidéo trouvée!"
 
 #: lms/djangoapps/dashboard/git_import.py
+#, python-brace-format
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
 " GIT_REPO_DIR"
@@ -1145,10 +1443,12 @@ msgid "The underlying module store does not support import."
 msgstr "Le module de stockage sous-jacent ne supporte pas l'importation."
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed in authenticating {0}, error {1}\n"
 msgstr "Échec dans l'authentification {0}, erreur {1}\n"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed in authenticating {0}\n"
 msgstr "Échec lors de l’authentification {0}\n"
 
@@ -1178,6 +1478,7 @@ msgid "email must end in"
 msgstr "L'e-mail doit se terminer par"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed - email {0} already exists as external_id"
 msgstr "Echec - l'e-mail {0} existe déjà en tant que external_id"
 
@@ -1191,23 +1492,28 @@ msgid "email address required (not username)"
 msgstr "adresse email requise (pas de nom d'utilisateur)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Oops, failed to create user {0}, IntegrityError"
 msgstr "Oups, impossible de créer l'utilisateur {0}, IntegrityError"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "User {0} created successfully!"
 msgstr "Utilisateur {0} créé avec succès !"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Cannot find user with email address {0}"
 msgstr "Impossible de trouver l’utilisateur avec l’adresse e-mail {0}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Cannot find user with username {0} - {1}"
 msgstr ""
 "Impossible de trouver l’utilisateur avec le nom d’utilisateur {0} - {1}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Deleted user {0}"
 msgstr "Utilisateur {0} supprimé"
 
@@ -1278,6 +1584,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
+#, python-brace-format
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
@@ -1291,10 +1598,12 @@ msgstr ""
 "url."
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed to clone repository to {0}"
 msgstr "Échec lors du clonage du répertoire vers {0}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Loaded course {0} {1}<br/>Errors:"
 msgstr "Cours chargé {0} {1}<br/>Erreurs :"
 
@@ -1329,6 +1638,7 @@ msgid "Information about all courses"
 msgstr "Informations sur tous les cours"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
 msgstr ""
 "Erreur - impossible de trouver le cours avec l'identifiant "
@@ -1482,12 +1792,14 @@ msgstr ""
 "rapport sera disponible au téléchargement dans le tableau ci-dessous."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr ""
 "Le changement de la date d'échéance pour l'étudiant {0} de {1} à {2} a été "
 "effectué avec succès"
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr ""
 "La réinitialisation de la date d'échéance pour l'étudiant {0} de {1} à {2} a"
@@ -1537,6 +1849,7 @@ msgid "Unable to parse date: "
 msgstr "Impossible d'analyser la date :"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr "Impossible de trouver un module pour l'URL : {0}"
 
@@ -1559,6 +1872,7 @@ msgid "Extended Due Date"
 msgstr "Extension de la date d'échéance"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Users with due date extensions for {0}"
 msgstr "Utilisateurs avec prolongations de la date d'échéance pour {0}"
 
@@ -1567,6 +1881,7 @@ msgid "Unit"
 msgstr "Unité"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "Prolongation de la date d'échéance pour {0} {1} ({2})"
 
@@ -1606,10 +1921,12 @@ msgid "No status information available"
 msgstr "Aucune information de statut disponible"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No task_output information found for instructor_task {0}"
 msgstr "Aucune information task_output trouvée pour instructor_task {0}"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No parsable task_output information found for instructor_task {0}: {1}"
 msgstr ""
 "Aucune information task_output analysable trouvée pour instructor_task {0}: "
@@ -1624,6 +1941,7 @@ msgid "No message provided"
 msgstr "Aucun message fourni"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Invalid task_output information found for instructor_task {0}: {1}"
 msgstr "Information task_output invalide pour instructor_task {0}: {1}"
 
@@ -1632,6 +1950,7 @@ msgid "No progress status information available"
 msgstr "Aucune information disponible sur l'état d'avancement"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No parsable task_input information found for instructor_task {0}: {1}"
 msgstr ""
 "Aucune information task_input analysable trouvée pour instructor_task {0}: "
@@ -1640,12 +1959,14 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} and {succeeded} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Progress: {action} {succeeded} of {attempted} so far"
 msgstr "Progression : {action} {succeeded} des {attempted} jusqu'à présent"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find submission to be {action} for student '{student}'"
 msgstr ""
 "Impossible de trouver une soumission à être {action} pour l'étudiant "
@@ -1654,17 +1975,20 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem failed to be {action} for student '{student}'"
 msgstr "Echec dans le problème à être {action} pour l'étudiant '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem successfully {action} for student '{student}'"
 msgstr "Le problème a été {action} avec succès pour l'étudiant '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find any students with submissions to be {action}"
 msgstr ""
 "Impossible de trouver des étudiants avec des soumissions qui doivent être "
@@ -1673,18 +1997,21 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem failed to be {action} for any of {attempted} students"
 msgstr "Echec dans le problème à être {action} pour les {attempted} étudiants"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem successfully {action} for {attempted} students"
 msgstr "Le problème a été {action} avec succès pour les {attempted} students"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem {action} for {succeeded} of {attempted} students"
 msgstr ""
 "Le problème a été {action} pour les {succeeded} parmi les {attempted} "
@@ -1692,12 +2019,14 @@ msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find any recipients to be {action}"
 msgstr "Impossible de trouver un bénéficiaire à être {action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message failed to be {action} for any of {attempted} recipients "
 msgstr ""
 "Echec du message à être {action} pour chacun des {attempted} bénéficiaires"
@@ -1705,6 +2034,7 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message successfully {action} for {attempted} recipients"
 msgstr ""
 "Le message a été {action} avec succès pour les {attempted} bénéficiaires"
@@ -1712,6 +2042,7 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message {action} for {succeeded} of {attempted} recipients"
 msgstr ""
 "Le message a été {action} pour les {succeeded} des {attempted} bénéficiaires"
@@ -1719,18 +2050,21 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Status: {action} {succeeded} of {attempted}"
 msgstr "Statut: {action} {succeeded} des {attempted}"
 
 #. Translators: {skipped} is a count.  This message is appended to task
 #. progress status messages.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid " (skipping {skipped})"
 msgstr "(ignorer {skipped})"
 
 #. Translators: {total} is a count.  This message is appended to task progress
 #. status messages.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid " (out of {total})"
 msgstr "(sur {total})"
 
@@ -1764,6 +2098,7 @@ msgid "Add to profile"
 msgstr "Ajouter au profil"
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
+#, python-brace-format
 msgid ""
 "Could not contact the external grading server. Please contact the "
 "development team at {email}."
@@ -1808,6 +2143,7 @@ msgstr ""
 "Veuillez prévenir votre contact edX."
 
 #: lms/djangoapps/open_ended_grading/utils.py
+#, python-brace-format
 msgid "for course {0} and student {1}."
 msgstr "pour le cours {0} et l'étudiant {1}."
 
@@ -1874,6 +2210,7 @@ msgid "Trying to add a different currency into the cart"
 msgstr "Essaye d'ajouter une devise différente dans le panier"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
 "Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
 " enrollments."
@@ -1886,14 +2223,17 @@ msgid "[Refund] User-Requested Refund"
 msgstr "[Remboursement] Demande de remboursement de l'utilisateur"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr "Le mode {mode} n'existe pas pour {course_id}"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Certificate of Achievement, {mode_name} for course {course}"
 msgstr "Attestation de réussite,  {mode_name} pour le cours {course}"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
 "Note - you have up to 2 weeks into the course to unenroll from the Verified "
 "Certificate option and receive a full refund. To receive your refund, "
@@ -2070,11 +2410,13 @@ msgstr "Le cours demandé n'existe pas."
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
+#, python-brace-format
 msgid "The course {0} is already in your cart."
 msgstr "Le cours {0} est déjà dans votre panier."
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
+#, python-brace-format
 msgid "You are already registered in course {0}."
 msgstr "Vous êtes déjà inscrit pour le cours {0}."
 
@@ -2087,12 +2429,14 @@ msgid "You do not have permission to view this page."
 msgstr "Vous n’avez pas les droits pour voir cette page."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr ""
 "Le processus de payement n'a pas retourné un paramètre obligatoire: {0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
 "Le processus de payement a retourné une valeur mal typée {0} pour le "
@@ -2106,6 +2450,7 @@ msgstr ""
 "dans notre système."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
@@ -2114,6 +2459,7 @@ msgstr ""
 "la commande {2} {3}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "            <p class=\"error_msg\">\n"
@@ -2135,6 +2481,7 @@ msgstr ""
 "</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2154,6 +2501,7 @@ msgstr ""
 "</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2171,6 +2519,7 @@ msgstr ""
 "</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2347,6 +2696,7 @@ msgstr ""
 "autre forme de paiement"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "            There is a problem with our CyberSource merchant configuration.  Please let us know at {0}\n"
@@ -2758,12 +3108,15 @@ msgstr "Enregistrer les modifications"
 msgid "Preview"
 msgstr "Aperçu"
 
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/forgot_password_modal.html
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/help_modal.html lms/templates/login_modal.html
 #: lms/templates/signup_modal.html
+#: lms/templates/modal/_modal-settings-language.html
 msgid "Close Modal"
 msgstr "Fermer la fenêtre contextuelle"
 
@@ -2771,11 +3124,15 @@ msgstr "Fermer la fenêtre contextuelle"
 msgid "Wiki Preview"
 msgstr "Aperçu du wiki"
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this text gives status on if the modal interface (a menu or
+#. piece of UI that takes the full focus of the screen) is open or not
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html
+#: lms/templates/modal/_modal-settings-language.html
 msgid "modal open"
 msgstr ""
 
@@ -3091,6 +3448,7 @@ msgid "There are no attachments for this article."
 msgstr "Pas de pièce jointe à cet article."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
+#, python-brace-format
 msgid ""
 "GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
 "configure a different path with GIT_REPO_EXPORT_DIR"
@@ -3157,40 +3515,6 @@ msgid ""
 "Directory already exists, doing a git reset and pull instead of git clone."
 msgstr ""
 
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid ""
-"Can't receive transcripts from Youtube for {youtube_id}. Status code: "
-"{statuc_code}."
-msgstr ""
-"Echec de la réception de la transcription de Youtube pour l'utilisateur "
-"{youtube_id}. Code du status : {statuc_code}."
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid "Can't find any transcripts on the Youtube service."
-msgstr "Aucune transcription trouvée sur le service Youtube."
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid "We support only SubRip (*.srt) transcripts format."
-msgstr "Seul le format SubRip (*.srt) est supporté pour les transcriptions."
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid ""
-"Something wrong with SubRip transcripts file during parsing. Inner message "
-"is {error_message}"
-msgstr ""
-"Une erreur est survenue pendant l'analyse du fichier de transcription "
-"SubRip. Le message interne est {error_message}"
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid "Something wrong with SubRip transcripts file during parsing."
-msgstr ""
-"Une erreur est survenue pendant l'analyse du fichier de transcription "
-"SubRip."
-
-#: cms/djangoapps/contentstore/utils.py
-msgid "Open Ended Panel"
-msgstr "Tableau de bord des questions ouvertes"
-
 #: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "Mes Notes"
@@ -3206,6 +3530,7 @@ msgid "Upload completed"
 msgstr "Téléchargement terminé"
 
 #: cms/djangoapps/contentstore/views/course.py
+#, python-brace-format
 msgid ""
 "Unable to create course '{name}'.\n"
 "\n"
@@ -3258,20 +3583,14 @@ msgid "Could not find the course.xml file in the package."
 msgstr "Ne peut trouver le fichier course.xml dans le paquet."
 
 #: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Duplication de {0}"
 
 #: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Duplication de '{0}'"
-
-#. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-#. Translators: "Courseware" is the title of the page where you access a
-#. course's videos and problems.
-#: cms/djangoapps/contentstore/views/tabs.py
-#: lms/templates/courseware/courseware-error.html
-msgid "Courseware"
-msgstr "Contenu du cours"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -3290,10 +3609,12 @@ msgid "Insufficient permissions"
 msgstr "Permissions insuffisantes"
 
 #: cms/djangoapps/contentstore/views/user.py
+#, python-brace-format
 msgid "Could not find user by email address '{email}'."
 msgstr "Impossible de trouver un utilisateur avec l'adresse email '{email}'."
 
 #: cms/djangoapps/contentstore/views/user.py
+#, python-brace-format
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
 "L'utilisateur {email} s'est enregistré mais n'a pas encore activé son "
@@ -3443,6 +3764,11 @@ msgstr "S'inscrire"
 #: lms/templates/register.html
 msgid "Public Username"
 msgstr "Nom d'utilisateur public"
+
+#: cms/templates/register.html
+#: lms/templates/dashboard/_dashboard_info_language.html
+msgid "Preferred Language"
+msgstr "Langue préférée"
 
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
@@ -3812,6 +4138,7 @@ msgid "Please verify your new email"
 msgstr "Veuillez vérifier votre nouvelle adresse email"
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
 msgstr "éditer"
 
@@ -4675,7 +5002,7 @@ msgstr "Entrez un nom d'utilisateur public :"
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/register.html
 msgid "example: JaneDoe"
-msgstr "exemple : jean.dupont"
+msgstr "exemple : jdupont"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/register.html
@@ -5294,7 +5621,7 @@ msgstr "Remplir le navigateur"
 msgid "HD off"
 msgstr "HD désactivée"
 
-#: lms/templates/video.html
+#: lms/templates/video.html lms/templates/video.html
 msgid "Turn off captions"
 msgstr "Masquer les sous-titres"
 
@@ -5380,10 +5707,32 @@ msgstr "Rubrique soumise"
 msgid "Toggle Full Rubric"
 msgstr "Basculer la rubrique complète"
 
+#. Translators: an example of what this string will look
+#. like is: "Scored rubric from grader 1", where
+#. "Scored rubric" replaces {result_of_task} and
+#. "1" replaces {number}.
+#. This string appears when a user is viewing one of
+#. their graded rubrics for an openended response problem.
+#. the number distinguishes between the different
+#. graded rubrics the user might have received
+#: lms/templates/combinedopenended/combined_open_ended_results.html
+msgid "{result_of_task} from grader {number}"
+msgstr "{result_of_task} de l'évaluateur {number}"
+
+#. Translators: "See full feedback" is the text of
+#. a link that allows a user to see more detailed
+#. feedback from a self, peer, or instructor
+#. graded openended problem
 #: lms/templates/combinedopenended/open_ended_result_table.html
 msgid "See full feedback"
 msgstr "Afficher le commentaire complet"
 
+#. Translators: this text forms a link that, when
+#. clicked, allows a user to respond to the feedback
+#. the user received on his or her openended problem
+#. Translators: when "Respond to Feedback" is clicked, a survey
+#. appears on which a user can respond to the feedback the user
+#. received on an openended problem
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Respond to Feedback"
@@ -5429,6 +5778,16 @@ msgstr "Commentaires supplémentaires :"
 msgid "Submit Feedback"
 msgstr "Soumettre un commentaire"
 
+#. Translators: "Response" labels an area that contains the user's
+#. Response to an openended problem. It is a noun.
+#. Translators: "Response" labels a text area into which a user enters
+#. his or her response to a prompt from an openended problem.
+#: lms/templates/combinedopenended/openended/open_ended.html
+#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+msgid "Response"
+msgstr "Réponse"
+
 #: lms/templates/combinedopenended/openended/open_ended.html
 msgid "Unanswered"
 msgstr "Sans réponse"
@@ -5436,6 +5795,12 @@ msgstr "Sans réponse"
 #: lms/templates/combinedopenended/openended/open_ended.html
 msgid "Skip Post-Assessment"
 msgstr "Sauter la post-évaluation"
+
+#: lms/templates/combinedopenended/openended/open_ended_combined_rubric.html
+msgid "{num} point: {explanatory_text}"
+msgid_plural "{num} points: {explanatory_text}"
+msgstr[0] "{num} points : {explanatory_text}"
+msgstr[1] "{num} points : {explanatory_text}"
 
 #: lms/templates/combinedopenended/openended/open_ended_error.html
 msgid "There was an error with your submission.  Please contact course staff."
@@ -6247,10 +6612,6 @@ msgstr "Pas d'exercice noté dans cette section"
 msgid "{course.display_number_with_default} Course Info"
 msgstr "Info cours {course.display_number_with_default}"
 
-#: lms/templates/courseware/syllabus.html
-msgid "Syllabus"
-msgstr "Syllabus"
-
 #: lms/templates/courseware/welcome-back.html
 msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
@@ -6794,6 +7155,11 @@ msgid "Update response"
 msgstr "Mettre à jour la réponse"
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Delete Comment"
+msgstr "Effacer le commentaire"
+
+#: lms/templates/discussion/_underscore_templates.html
 #, python-format
 msgid "-posted %(time_ago)s by"
 msgstr "-posté il y a %(time_ago)s par"
@@ -6947,10 +7313,6 @@ msgstr "…"
 #: lms/templates/instructor/staff_grading.html
 msgid "{course_number} Staff Grading"
 msgstr "Notation de l'équipe pédagogique {course_number}"
-
-#: lms/templates/instructor/staff_grading.html
-msgid "Staff grading"
-msgstr "Notation de l'équipe pédagogique"
 
 #: lms/templates/instructor/staff_grading.html
 msgid ""
@@ -7588,6 +7950,26 @@ msgstr "Afficher Historique des tâches d'arrière plan pour l'Exercice"
 msgid "None Available"
 msgstr "Aucun disponible"
 
+#: lms/templates/modal/_modal-settings-language.html
+msgid "Change Preferred Language"
+msgstr "Changer les préférences de langue"
+
+#: lms/templates/modal/_modal-settings-language.html
+msgid "Please choose your preferred language"
+msgstr "Merci de choisir la langue que vous préférez"
+
+#: lms/templates/modal/_modal-settings-language.html
+msgid "Save Language Settings"
+msgstr "Enregistrement des préférences de langue"
+
+#: lms/templates/modal/_modal-settings-language.html
+msgid ""
+"Don't see your preferred language? {link_start}Volunteer to become a "
+"translator!{link_end}"
+msgstr ""
+"Vous ne trouvez pas votre langue préférée ? {link_start}Proposez-vous comme "
+"traducteur volontaire !{link_end}"
+
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
 msgstr "Notifications groupées {course_number}"
@@ -7623,10 +8005,6 @@ msgstr ""
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "No flagged problems exist."
 msgstr "Pas de problème marqué existant."
-
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Response"
-msgstr "Réponse"
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Unflag"
@@ -10854,10 +11232,6 @@ msgid "Your Location"
 msgstr "Votre emplacement géographique"
 
 #: cms/templates/register.html
-msgid "Preferred Language"
-msgstr "Langage préféré"
-
-#: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
 msgstr "J’accepte les {a_start}conditions d’utilisation{a_end} du service"
 
@@ -11323,7 +11697,7 @@ msgid ""
 "Name field."
 msgstr ""
 
-#: cms/templates/unit.html
+#: cms/templates/unit.html cms/templates/ux/reference/unit.html
 msgid "Individual Unit"
 msgstr "Unité individuelle"
 
@@ -11486,6 +11860,10 @@ msgid ""
 msgstr ""
 "Un lien d'activation a été envoyé à {email}, contenant des instructions pour"
 " activer votre compte."
+
+#: cms/templates/ux/reference/container.html
+msgid "Container"
+msgstr ""
 
 #: cms/templates/widgets/footer.html
 msgid "All rights reserved."

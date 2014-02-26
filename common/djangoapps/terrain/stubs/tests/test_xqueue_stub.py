@@ -11,6 +11,17 @@ import copy
 from ..xqueue import StubXQueueService, StubXQueueHandler
 
 
+class FakeTimer(object):
+    """
+    Fake timer implementation that executes immediately.
+    """
+    def __init__(self, delay, func):
+        self.func = func
+
+    def start(self):
+        self.func()
+
+
 class StubXQueueServiceTest(unittest.TestCase):
 
     def setUp(self):
@@ -18,11 +29,18 @@ class StubXQueueServiceTest(unittest.TestCase):
         self.url = "http://127.0.0.1:{0}/xqueue/submit".format(self.server.port)
         self.addCleanup(self.server.shutdown)
 
-        # For testing purposes, do not delay the grading response
-        self.server.config['response_delay'] = 0
+        # Patch the timer async calls
+        patcher = mock.patch('terrain.stubs.xqueue.post')
+        self.post = patcher.start()
+        self.addCleanup(patcher.stop)
 
-    @mock.patch('terrain.stubs.xqueue.post')
-    def test_grade_request(self, post):
+        # Patch POST requests
+        patcher = mock.patch('terrain.stubs.xqueue.Timer')
+        timer = patcher.start()
+        timer.side_effect = FakeTimer
+        self.addCleanup(patcher.stop)
+
+    def test_grade_request(self):
 
         # Post a submission to the stub XQueue
         callback_url = 'http://127.0.0.1:8000/test_callback'
@@ -38,10 +56,9 @@ class StubXQueueServiceTest(unittest.TestCase):
         # Check the response we receive
         # (Should be the default grading response)
         expected_body = json.dumps({'correct': True, 'score': 1, 'msg': '<div></div>'})
-        self._check_grade_response(post, callback_url, expected_header, expected_body)
+        self._check_grade_response(callback_url, expected_header, expected_body)
 
-    @mock.patch('terrain.stubs.xqueue.post')
-    def test_configure_default_response(self, post):
+    def test_configure_default_response(self):
 
         # Configure the default response for submissions to any queue
         response_content = {'test_response': 'test_content'}
@@ -60,12 +77,9 @@ class StubXQueueServiceTest(unittest.TestCase):
 
         # Check the response we receive
         # (Should be the default grading response)
-        self._check_grade_response(
-            post, callback_url, expected_header, json.dumps(response_content)
-        )
+        self._check_grade_response(callback_url, expected_header, json.dumps(response_content))
 
-    @mock.patch('terrain.stubs.xqueue.post')
-    def test_configure_specific_response(self, post):
+    def test_configure_specific_response(self):
 
         # Configure the XQueue stub response to any submission to the test queue
         response_content = {'test_response': 'test_content'}
@@ -79,12 +93,9 @@ class StubXQueueServiceTest(unittest.TestCase):
         )
 
         # Check that we receive the response we configured
-        self._check_grade_response(
-            post, callback_url, expected_header, json.dumps(response_content)
-        )
+        self._check_grade_response(callback_url, expected_header, json.dumps(response_content))
 
-    @mock.patch('terrain.stubs.xqueue.post')
-    def test_multiple_response_matches(self, post):
+    def test_multiple_response_matches(self):
 
         # Configure the XQueue stub with two responses that
         # match the same submission
@@ -100,17 +111,12 @@ class StubXQueueServiceTest(unittest.TestCase):
                 json.dumps({'submission': 'test_1 and test_2'})
             )
 
-            # Wait for the delayed grade response
-            self._wait_for_mock_called(logger.error)
-
             # Expect that we do NOT receive a response
             # and that an error message is logged
-            self.assertFalse(post.called)
+            self.assertFalse(self.post.called)
             self.assertTrue(logger.error.called)
 
-    @mock.patch('terrain.stubs.xqueue.post')
-    def test_register_submission_url(self, post):
-
+    def test_register_submission_url(self):
         # Configure the XQueue stub to notify another service
         # when it receives a submission.
         register_url = 'http://127.0.0.1:8000/register_submission'
@@ -118,12 +124,10 @@ class StubXQueueServiceTest(unittest.TestCase):
 
         callback_url = 'http://127.0.0.1:8000/test_callback'
         submission = json.dumps({'grader_payload': 'test payload'})
-        self._post_submission(
-            callback_url, 'test_queuekey', 'test_queue', submission
-        )
+        self._post_submission(callback_url, 'test_queuekey', 'test_queue', submission)
 
         # Check that a notification was sent
-        post.assert_any_call(register_url, data={'grader_payload': u'test payload'})
+        self.post.assert_any_call(register_url, data={'grader_payload': u'test payload'})
 
     def _post_submission(self, callback_url, lms_key, queue_name, xqueue_body):
         """
@@ -155,22 +159,17 @@ class StubXQueueServiceTest(unittest.TestCase):
         # Return back the header, so we can authenticate the response we receive
         return grade_request['xqueue_header']
 
-    def _check_grade_response(self, post_mock, callback_url, expected_header, expected_body):
+    def _check_grade_response(self, callback_url, expected_header, expected_body):
         """
         Verify that the stub sent a POST request back to us
         with the expected data.
 
-        `post_mock` is our mock for `requests.post`
         `callback_url` is the URL we expect the stub to POST to
         `expected_header` is the header (a string) we expect to receive with the grade.
         `expected_body` is the content (a string) we expect to receive with the grade.
 
         Raises an `AssertionError` if the check fails.
         """
-        # Wait for the server to POST back to the callback URL
-        # If it takes too long, continue anyway
-        self._wait_for_mock_called(post_mock)
-
         # Check the response posted back to us
         # This is the default response
         expected_callback_dict = {
@@ -179,15 +178,4 @@ class StubXQueueServiceTest(unittest.TestCase):
         }
 
         # Check that the POST request was made with the correct params
-        post_mock.assert_called_with(callback_url, data=expected_callback_dict)
-
-    def _wait_for_mock_called(self, mock_obj, max_time=120):
-        """
-        Wait for `mock` (a `Mock` object) to be called.
-        If seconds elapsed exceeds `max_time`, continue without error.
-        """
-        start_time = time.time()
-        while time.time() - start_time < max_time:
-            if mock_obj.called:
-                break
-            time.sleep(1)
+        self.post.assert_called_with(callback_url, data=expected_callback_dict)

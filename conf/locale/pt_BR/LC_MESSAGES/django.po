@@ -86,8 +86,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-15 08:19-0500\n"
-"PO-Revision-Date: 2014-02-12 04:00+0000\n"
+"POT-Creation-Date: 2014-02-24 16:01-0500\n"
+"PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: RenataBarboza\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -96,6 +96,17 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. Translators: "Open Ended Panel" appears on a tab that, when clicked,
+#. opens up a panel that displays information about openended problems
+#. that a user has submitted or needs to grade
+#: cms/djangoapps/contentstore/utils.py lms/djangoapps/courseware/tabs.py
+msgid "Open Ended Panel"
+msgstr ""
+
+#: lms/templates/courseware/courseware-error.html
+msgid "Courseware"
+msgstr "Material Didático"
 
 #. Translators: "Course Info" is the name of the course's information and
 #. updates page
@@ -108,8 +119,12 @@ msgid "Course Info"
 msgstr "Informações sobre o Curso"
 
 #. Translators: "Discussion" is the title of the course forum page
+#. Translators: "Discussion" is the title of the course forum page
+#. Translators: 'Discussion' refers to the tab in the courseware
+#. that leads to the discussion forums
 #: cms/djangoapps/contentstore/views/tabs.py
 #: common/lib/xmodule/xmodule/course_module.py
+#: lms/djangoapps/courseware/tabs.py
 msgid "Discussion"
 msgstr "Discussão"
 
@@ -168,6 +183,7 @@ msgid "Student"
 msgstr "Aluno"
 
 #: common/djangoapps/student/middleware.py
+#, python-brace-format
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {link_start}{support_email}{link_end}"
@@ -258,14 +274,17 @@ msgid "Unexpected account status"
 msgstr "Status da conta não esperado"
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
 msgstr "Já existe uma conta com o nome de usuário público '{username}'."
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "An account with the Email '{email}' already exists."
 msgstr "Já existe uma conta com o e-mail '{email}'."
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "Error (401 {field}). E-mail us."
 msgstr "Erro (401 {field}). Envie-nos um e-mail."
 
@@ -736,42 +755,52 @@ msgid "December"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "Invalid Length ({0})"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must be {0} characters or more"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must be {0} characters or less"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "Must be more complex ({0})"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more uppercase characters"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more lowercase characters"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more digits"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more punctuation characters"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more non ascii characters"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more unique words"
 msgstr ""
 
@@ -810,6 +839,7 @@ msgstr ""
 "substituída pelo feedback."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr "Ocorreu um erro {err} ao avaliar a função de sugestão {hintfn}."
 
@@ -818,6 +848,7 @@ msgid "(Source code line unavailable)"
 msgstr "(A linha de código fonte não está disponível)"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "See XML source line {sourcenum}."
 msgstr "Veja a linha de origem em XML {sourcenum}."
 
@@ -826,20 +857,24 @@ msgid "There was a problem with the staff answer to this problem."
 msgstr "Houve um problema com a resposta da equipe para este problema."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Could not interpret '{student_answer}' as a number."
 msgstr "Não foi possível interpretar '{student_answer}' como um número."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "You may not use variables ({bad_variables}) in numerical problems."
 msgstr ""
 "Você não pode usar variáveis ​​({bad_variables}) em problemas numéricos."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "factorial function evaluated outside its domain:'{student_answer}'"
 msgstr ""
 "a função fatorial foi avaliada fora do seu domínio: '{student_answer}'"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid math syntax: '{student_answer}'"
 msgstr "Sintaxe matemática inválida: '{student_answer}'"
 
@@ -864,6 +899,7 @@ msgstr ""
 "inválido!"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid ""
 "Unable to deliver your submission to grader (Reason: {error_msg}). Please "
 "try again later."
@@ -872,17 +908,24 @@ msgstr ""
 "Por favor tente novamente mais tarde."
 
 #. Translators: 'grader' refers to the edX automatic code grader.
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
 #: common/lib/capa/capa/responsetypes.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Invalid grader reply. Please contact the course staff."
 msgstr ""
 "A resposta do corretor foi inválida. Por favor, entre em contato com a "
 "equipe do curso."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: {bad_input} not permitted in answer."
 msgstr "Entrada inválida: {bad_input} não é permitido em uma resposta."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid ""
 "factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
@@ -891,11 +934,13 @@ msgstr ""
 "resposta dada foi: {bad_input}"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula."
 msgstr ""
 "Entrada inválida: Não foi possível analisar '{bad_input}' como uma fórmula."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula"
 msgstr ""
 "Entrada inválida: Não foi possível analisar '{bad_input}' como uma fórmula"
@@ -903,6 +948,7 @@ msgstr ""
 #. Translators: 'SchematicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr ""
 "Ocorreu um erro na avaliação da resposta esquemática. O erro foi: "
@@ -913,6 +959,7 @@ msgid "The Staff answer could not be interpreted as a number."
 msgstr "A resposta da equipe não pode ser interpretada como um número."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Could not interpret '{given_answer}' as a number."
 msgstr "Não foi possível interpretar '{given_answer}' como um número."
 
@@ -957,11 +1004,13 @@ msgstr ""
 "O problema deve ser redefinido antes que ele possa ser verificado novamente."
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr "Você deve aguardar pelo menos {wait} segundos entre as submissões."
 
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "Error: {msg}"
 msgstr "Erro: {msg}"
 
@@ -1021,7 +1070,226 @@ msgstr "Geral"
 msgid "TBD"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/video_module.py
+#. Translators: "Self" is used to denote an openended response that is self-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Self"
+msgstr ""
+
+#. Translators: "AI" is used to denote an openended response that is machine-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "AI"
+msgstr ""
+
+#. Translators: "Peer" is used to denote an openended response that is peer-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Peer"
+msgstr ""
+
+#. Translators: "Not started" is used to communicate to a student that their
+#. response
+#. has not yet been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Not started."
+msgstr ""
+
+#. Translators: "Being scored." is used to communicate to a student that their
+#. response
+#. are in the process of being scored
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Being scored."
+msgstr ""
+
+#. Translators: "Scoring finished" is used to communicate to a student that
+#. their response
+#. have been scored, but the full scoring process is not yet complete
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Scoring finished."
+msgstr ""
+
+#. Translators: "Complete" is used to communicate to a student that their
+#. openended response has been fully scored
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Complete."
+msgstr ""
+
+#. Translators: "Scored rubric" appears to a user as part of a longer
+#. string that looks something like: "Scored rubric from grader 1".
+#. "Scored" is an adjective that modifies the noun "rubric".
+#. That longer string appears when a user is viewing a graded rubric
+#. returned from one of the graders of their openended response problem.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Scored rubric"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+#, python-brace-format
+msgid ""
+"You have attempted this question {number_of_student_attempts} times. You are"
+" only allowed to attempt it {max_number_of_attempts} times."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "The problem state got out-of-sync. Please try reloading the page."
+msgstr ""
+
+#. Translators: "Self-Assessment" refers to the self-assessed mode of
+#. openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Self-Assessment"
+msgstr ""
+
+#. Translators: "Peer-Assessment" refers to the peer-assessed mode of
+#. openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Peer-Assessment"
+msgstr ""
+
+#. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
+#. of openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Instructor-Assessment"
+msgstr ""
+
+#. Translators: "AI-Assessment" refers to the machine-graded mode of openended
+#. evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "AI-Assessment"
+msgstr ""
+
+#. Translators: 'tag' is one of 'feedback', 'submission_id',
+#. 'grader_id', or 'score'. They are categories that a student
+#. responds to when filling out a post-assessment survey
+#. of his or her grade from an openended problem.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+#, python-brace-format
+msgid ""
+"Could not find needed tag {tag_name} in the survey responses. Please try "
+"submitting again."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "There was an error saving your feedback. Please contact course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Couldn't submit feedback."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Successfully saved your feedback."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Unable to save your feedback. Please try again later."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Successfully saved your submission."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid ""
+"Unable to submit your submission to the grader. Please try again later."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Error getting feedback from grader."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "No feedback available from grader."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Error handling action. Please try again."
+msgstr ""
+
+#. Translators: this string appears once an openended response
+#. is submitted but before it has been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid ""
+"Your response has been submitted. Please check back later for your grade."
+msgstr ""
+
+#. Translators: "Not started" communicates to a student that their response
+#. has not yet been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "Not started"
+msgstr ""
+
+#. Translators: "In progress" communicates to a student that their response
+#. is currently in the grading process
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "In progress"
+msgstr ""
+
+#. Translators: "Done" communicates to a student that their response
+#. has been fully graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "Done"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid ""
+"We could not find a file in your submission. Please try choosing a file or "
+"pasting a URL to your file into the answer box."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid ""
+"We are having trouble saving your file. Please try another file or paste a "
+"URL to your file into the answer box."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/self_assessment_module.py
+msgid "Error saving your score.  Please notify course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid ""
+"Can't receive transcripts from Youtube for {youtube_id}. Status code: "
+"{statuc_code}."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "Can't find any transcripts on the Youtube service."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "We support only SubRip (*.srt) transcripts format."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid ""
+"Something wrong with SubRip transcripts file during parsing. Inner message "
+"is {error_message}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "Something wrong with SubRip transcripts file during parsing."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
 "Uma URL do YouTube ou um link para um arquivo hospedado em qualquer lugar na"
@@ -1059,6 +1327,7 @@ msgstr "Copyright"
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
+#, python-brace-format
 msgid "This is the wiki for **{organization}**'s _{course_name}_."
 msgstr ""
 
@@ -1074,6 +1343,33 @@ msgstr ""
 msgid "Visit a course wiki to add an article."
 msgstr ""
 
+#. Translators: 'Course Content' refers to the tab in the courseware
+#. that leads to the content of a course
+#: lms/djangoapps/courseware/tabs.py
+msgid "Course Content"
+msgstr ""
+
+#: lms/templates/instructor/staff_grading.html
+msgid "Staff grading"
+msgstr "Avaliação pela equipe"
+
+#: lms/templates/courseware/syllabus.html
+msgid "Syllabus"
+msgstr "Conteúdo programático"
+
+#. Translators: "Peer grading" appears on a tab that allows
+#. students to view openended problems that require grading
+#: lms/djangoapps/courseware/tabs.py
+msgid "Peer grading"
+msgstr ""
+
+#. Translators: 'Instructor' appears on the tab that leads to
+#. the instructor dashboard, which is a portal where an instructor
+#. can get data and perform various actions on their course
+#: lms/djangoapps/courseware/tabs.py
+msgid "Instructor"
+msgstr ""
+
 #: lms/djangoapps/courseware/features/video.py lms/templates/video.html
 #, fuzzy
 msgid "ERROR: No playable video sources found!"
@@ -1084,6 +1380,7 @@ msgstr ""
 "ERRO: Não foram encontradas fontes de vídeos reproduzíveis!"
 
 #: lms/djangoapps/dashboard/git_import.py
+#, python-brace-format
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
 " GIT_REPO_DIR"
@@ -1116,10 +1413,12 @@ msgid "The underlying module store does not support import."
 msgstr "A loja do módulo subjacente não dá suporte à importação."
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed in authenticating {0}, error {1}\n"
 msgstr "A autenticação de {0} falhou, erro {1}\n"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed in authenticating {0}\n"
 msgstr "Falha na autenticação de {0}\n"
 
@@ -1149,6 +1448,7 @@ msgid "email must end in"
 msgstr "o e-mail deve terminar com"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed - email {0} already exists as external_id"
 msgstr "Falha - o e-mail {0} já existe como uma identificação externa  "
 
@@ -1161,22 +1461,27 @@ msgid "email address required (not username)"
 msgstr "o endereço de e-mail é obrigatório (não o nome de usuário)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Oops, failed to create user {0}, IntegrityError"
 msgstr "Não foi possível criar o usuário {0}, erro de integridade"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "User {0} created successfully!"
 msgstr "Usuário {0} criado com sucesso!"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Cannot find user with email address {0}"
 msgstr "Não foi possível encontrar um usuário com o endereço de e-mail {0}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Cannot find user with username {0} - {1}"
 msgstr "Não foi possível encontrar um usuário com o nome {0} - {1}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Deleted user {0}"
 msgstr "Usuário excluído {0}"
 
@@ -1249,6 +1554,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
+#, python-brace-format
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
@@ -1261,10 +1567,12 @@ msgstr ""
 "url."
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed to clone repository to {0}"
 msgstr "Houve uma falha ao clonar o repositório {0}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Loaded course {0} {1}<br/>Errors:"
 msgstr "Curso carregado {0} {1}<br/>Erros:"
 
@@ -1293,6 +1601,7 @@ msgid "Information about all courses"
 msgstr "Informação sobre todos os cursos"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
 msgstr ""
 "Erro - não foi possível carregar o curso com identificador "
@@ -1446,12 +1755,14 @@ msgstr ""
 " tabela abaixo."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr ""
 "A mudança da data de entrega para o aluno {0} de {1} para {2} foi feita com "
 "sucesso"
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr ""
 "A redefinição da data de entrega para o aluno {0} de {1} para {2} foi "
@@ -1491,6 +1802,7 @@ msgid "Unable to parse date: "
 msgstr "Houve um problema analisando a data:"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr "Não foi possível encontrar o módulo para a url: {0}"
 
@@ -1518,6 +1830,7 @@ msgid "Extended Due Date"
 msgstr "Data de Entrega Prolongada"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Users with due date extensions for {0}"
 msgstr "Usuários com prorrogação para data de entrega para {0}"
 
@@ -1526,6 +1839,7 @@ msgid "Unit"
 msgstr "Unidade"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "Prorrogação da data de entrega para {0} {1} ({2})"
 
@@ -1565,12 +1879,14 @@ msgid "No status information available"
 msgstr "Não há informações disponíveis sobre o status"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No task_output information found for instructor_task {0}"
 msgstr ""
 "Não foram encontradas informações de a saída da tarefa para a tarefa do "
 "instrutor {0}"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No parsable task_output information found for instructor_task {0}: {1}"
 msgstr ""
 "Não houve nenhuma informação de tarefas de saída encontrada para a tarefa do"
@@ -1586,6 +1902,7 @@ msgid "No message provided"
 msgstr "Nenhuma mensagem foi fornecida"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Invalid task_output information found for instructor_task {0}: {1}"
 msgstr ""
 "As informações para saída de tarefas não são inválidas para a tarefa do "
@@ -1596,6 +1913,7 @@ msgid "No progress status information available"
 msgstr "Não há informações disponíveis sobre o status do progresso "
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No parsable task_input information found for instructor_task {0}: {1}"
 msgstr ""
 "Não houve nenhuma entrada para tarefas encontradas para a tarefa do "
@@ -1604,12 +1922,14 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} and {succeeded} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Progress: {action} {succeeded} of {attempted} so far"
 msgstr "Progresso: {action} {succeeded} de {attempted} até então"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find submission to be {action} for student '{student}'"
 msgstr ""
 "Não foi possível encontrar uma submissão a ser {action} para o estudante "
@@ -1618,23 +1938,27 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem failed to be {action} for student '{student}'"
 msgstr "Houve um problema sendo {action} para o aluno '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem successfully {action} for student '{student}'"
 msgstr "O problema foi {action} com sucesso para o aluno '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find any students with submissions to be {action}"
 msgstr "Não foi possível encontrar um aluno com submissões para ser {action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem failed to be {action} for any of {attempted} students"
 msgstr ""
 "Houve um problema para {action} em relação a qualquer um dos estudantes "
@@ -1643,6 +1967,7 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem successfully {action} for {attempted} students"
 msgstr ""
 "O problema foi {action} com sucesso para em relação aos estudantes "
@@ -1651,17 +1976,20 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem {action} for {succeeded} of {attempted} students"
 msgstr "Problema {action} para {succeeded} de estudantes {attempted}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find any recipients to be {action}"
 msgstr "Não foi possível encontrar nenhum recipiente para ser {action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message failed to be {action} for any of {attempted} recipients "
 msgstr ""
 "Houve uma falha da mensagem para ser {action} para qualquer um dos "
@@ -1670,12 +1998,14 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message successfully {action} for {attempted} recipients"
 msgstr "A mensagem foi {action} com sucesso para recipientes {attempted}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message {action} for {succeeded} of {attempted} recipients"
 msgstr ""
 "{action} em referência à mensagem para {succeeded} de destinatários "
@@ -1684,18 +2014,21 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Status: {action} {succeeded} of {attempted}"
 msgstr "Status: {action} {succeeded} de {attempted}"
 
 #. Translators: {skipped} is a count.  This message is appended to task
 #. progress status messages.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid " (skipping {skipped})"
 msgstr "(pulando {skipped})"
 
 #. Translators: {total} is a count.  This message is appended to task progress
 #. status messages.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid " (out of {total})"
 msgstr "(de um total de {total})"
 
@@ -1730,6 +2063,7 @@ msgid "Add to profile"
 msgstr "Adicionar ao perfil"
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
+#, python-brace-format
 msgid ""
 "Could not contact the external grading server. Please contact the "
 "development team at {email}."
@@ -1774,6 +2108,7 @@ msgstr ""
 "avise a sua pessoa de contato com o edX."
 
 #: lms/djangoapps/open_ended_grading/utils.py
+#, python-brace-format
 msgid "for course {0} and student {1}."
 msgstr "para o curso {0} e estudante {1}"
 
@@ -1841,6 +2176,7 @@ msgid "Trying to add a different currency into the cart"
 msgstr "Tentando adicionar uma moeda diferente ao carrinho"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
 "Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
 " enrollments."
@@ -1853,14 +2189,17 @@ msgid "[Refund] User-Requested Refund"
 msgstr "[Refund] restituição solicitada pelo usuário"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr "Modo {mode} não existe para {course_id}"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Certificate of Achievement, {mode_name} for course {course}"
 msgstr "Certificado de Conclusão, {mode_name} para o curso {course}"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
 "Note - you have up to 2 weeks into the course to unenroll from the Verified "
 "Certificate option and receive a full refund. To receive your refund, "
@@ -2042,11 +2381,13 @@ msgstr "O curso que você solicitou não existe."
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
+#, python-brace-format
 msgid "The course {0} is already in your cart."
 msgstr "O curso {0} já está no seu carrinho."
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
+#, python-brace-format
 msgid "You are already registered in course {0}."
 msgstr "Você já está inscrito no curso {0}."
 
@@ -2059,11 +2400,13 @@ msgid "You do not have permission to view this page."
 msgstr "Você não tem permissão para visualizar esta página. "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr "O processador de pagamentos não retornou o parâmetro exigido: {0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
 "O processador de pagamento retornou um valor mal-digitado {0} para o "
@@ -2077,6 +2420,7 @@ msgstr ""
 " sistemas."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
@@ -2085,6 +2429,7 @@ msgstr ""
 "pedido {2} {3}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "            <p class=\"error_msg\">\n"
@@ -2106,6 +2451,7 @@ msgstr ""
 "</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2118,6 +2464,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2135,6 +2482,7 @@ msgstr ""
 "</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2310,6 +2658,7 @@ msgstr ""
 "forma de pagamento"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "            There is a problem with our CyberSource merchant configuration.  Please let us know at {0}\n"
@@ -2720,6 +3069,9 @@ msgstr "Salvar alterações"
 msgid "Preview"
 msgstr "Pré-visualizar"
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
@@ -2728,6 +3080,7 @@ msgstr "Pré-visualizar"
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/help_modal.html lms/templates/login_modal.html
 #: lms/templates/signup_modal.html
+#: lms/templates/modal/_modal-settings-language.html
 #, fuzzy
 msgid "Close Modal"
 msgstr ""
@@ -2740,11 +3093,15 @@ msgstr ""
 msgid "Wiki Preview"
 msgstr "Pré-visualização do Wiki"
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this text gives status on if the modal interface (a menu or
+#. piece of UI that takes the full focus of the screen) is open or not
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html
+#: lms/templates/modal/_modal-settings-language.html
 msgid "modal open"
 msgstr "modal aberto"
 
@@ -3059,6 +3416,7 @@ msgid "There are no attachments for this article."
 msgstr "Não há anexos para este artigo."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
+#, python-brace-format
 msgid ""
 "GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
 "configure a different path with GIT_REPO_EXPORT_DIR"
@@ -3125,34 +3483,6 @@ msgid ""
 "Directory already exists, doing a git reset and pull instead of git clone."
 msgstr ""
 
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid ""
-"Can't receive transcripts from Youtube for {youtube_id}. Status code: "
-"{statuc_code}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid "Can't find any transcripts on the Youtube service."
-msgstr ""
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid "We support only SubRip (*.srt) transcripts format."
-msgstr ""
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid ""
-"Something wrong with SubRip transcripts file during parsing. Inner message "
-"is {error_message}"
-msgstr ""
-
-#: cms/djangoapps/contentstore/transcripts_utils.py
-msgid "Something wrong with SubRip transcripts file during parsing."
-msgstr ""
-
-#: cms/djangoapps/contentstore/utils.py
-msgid "Open Ended Panel"
-msgstr ""
-
 #: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "Minhas anotações"
@@ -3168,6 +3498,7 @@ msgid "Upload completed"
 msgstr "Carregamento concluído"
 
 #: cms/djangoapps/contentstore/views/course.py
+#, python-brace-format
 msgid ""
 "Unable to create course '{name}'.\n"
 "\n"
@@ -3218,16 +3549,14 @@ msgid "Could not find the course.xml file in the package."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid "Duplicate of {0}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr ""
-
-#: lms/templates/courseware/courseware-error.html
-msgid "Courseware"
-msgstr "Material Didático"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -3246,10 +3575,12 @@ msgid "Insufficient permissions"
 msgstr "Permissões insuficientes"
 
 #: cms/djangoapps/contentstore/views/user.py
+#, python-brace-format
 msgid "Could not find user by email address '{email}'."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
+#, python-brace-format
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
 
@@ -3397,6 +3728,11 @@ msgstr "Registrar-se"
 #: lms/templates/register.html
 msgid "Public Username"
 msgstr "Nome de Usuário Público"
+
+#: cms/templates/register.html
+#: lms/templates/dashboard/_dashboard_info_language.html
+msgid "Preferred Language"
+msgstr ""
 
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
@@ -3743,6 +4079,7 @@ msgid "Please verify your new email"
 msgstr "Por favor verifique a sua nova mensagem de email"
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
 msgstr "editar"
 
@@ -3794,7 +4131,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 msgid "Change Email"
-msgstr ""
+msgstr "Alterar e-mail"
 
 #: lms/templates/dashboard.html
 msgid "Please enter your new email address:"
@@ -3802,7 +4139,7 @@ msgstr "Insira seu novo e-mail: "
 
 #: lms/templates/dashboard.html
 msgid "Please confirm your password:"
-msgstr ""
+msgstr "Confirme sua senha:"
 
 #: lms/templates/dashboard.html
 msgid ""
@@ -3840,7 +4177,7 @@ msgstr "Motivo para a alteração do nome: "
 
 #: lms/templates/dashboard.html
 msgid "Change My Name"
-msgstr ""
+msgstr "Alterar meu nome"
 
 #: lms/templates/dashboard.html
 msgid ""
@@ -3887,7 +4224,7 @@ msgstr "Uma conta com seu novo e-mail já existe."
 
 #: lms/templates/enroll_students.html
 msgid "Student Enrollment Form"
-msgstr ""
+msgstr "Formulário de matrícula"
 
 #: lms/templates/enroll_students.html
 msgid "Course: "
@@ -4026,7 +4363,7 @@ msgstr "Este é o e-mail que você usou para inscrever-se em {platform}"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Reset My Password"
-msgstr ""
+msgstr "Redefinir minha senha"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -4079,7 +4416,7 @@ msgstr "Fazer uma sugestão"
 
 #: lms/templates/help_modal.html
 msgid "Ask a question"
-msgstr ""
+msgstr "Fazer uma pergunta"
 
 #: lms/templates/help_modal.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
@@ -4233,7 +4570,7 @@ msgstr "As chaves são válidas por um tempo limitado. A chave está expirada? "
 
 #: lms/templates/login-sidebar.html
 msgid "Helpful Information"
-msgstr ""
+msgstr "Informações úteis"
 
 #: lms/templates/login-sidebar.html lms/templates/login-sidebar.html
 msgid "Login via OpenID"
@@ -4272,7 +4609,7 @@ msgstr "Entrar na minha conta de {platform_name}"
 
 #: lms/templates/login.html lms/templates/login_modal.html
 msgid "Access My Courses"
-msgstr ""
+msgstr "Acessar meus cursos "
 
 #: lms/templates/login.html lms/templates/register.html
 msgid "Processing your account information…"
@@ -4312,7 +4649,7 @@ msgstr "Por exemplo: nomedousuario@dominio.com.br"
 
 #: lms/templates/login.html
 msgid "Account Preferences"
-msgstr ""
+msgstr "Preferências da conta"
 
 #: lms/templates/login.html lms/templates/login_modal.html
 msgid "Remember me"
@@ -4720,7 +5057,7 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Country"
-msgstr ""
+msgstr "País"
 
 #: lms/templates/register.html
 msgid "Highest Level of Education Completed"
@@ -5175,7 +5512,7 @@ msgstr "Preencher navegador"
 msgid "HD off"
 msgstr "Alta definição desligada"
 
-#: lms/templates/video.html
+#: lms/templates/video.html lms/templates/video.html
 msgid "Turn off captions"
 msgstr "Desativar a legenda"
 
@@ -5262,10 +5599,32 @@ msgstr "Rubrica Enviada"
 msgid "Toggle Full Rubric"
 msgstr "Abrir/Fechar Rubrica Completa"
 
+#. Translators: an example of what this string will look
+#. like is: "Scored rubric from grader 1", where
+#. "Scored rubric" replaces {result_of_task} and
+#. "1" replaces {number}.
+#. This string appears when a user is viewing one of
+#. their graded rubrics for an openended response problem.
+#. the number distinguishes between the different
+#. graded rubrics the user might have received
+#: lms/templates/combinedopenended/combined_open_ended_results.html
+msgid "{result_of_task} from grader {number}"
+msgstr ""
+
+#. Translators: "See full feedback" is the text of
+#. a link that allows a user to see more detailed
+#. feedback from a self, peer, or instructor
+#. graded openended problem
 #: lms/templates/combinedopenended/open_ended_result_table.html
 msgid "See full feedback"
 msgstr "Visualizar opinião completa"
 
+#. Translators: this text forms a link that, when
+#. clicked, allows a user to respond to the feedback
+#. the user received on his or her openended problem
+#. Translators: when "Respond to Feedback" is clicked, a survey
+#. appears on which a user can respond to the feedback the user
+#. received on an openended problem
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Respond to Feedback"
@@ -5311,6 +5670,16 @@ msgstr "Comentários adicionais:"
 msgid "Submit Feedback"
 msgstr "Enviar Opinião"
 
+#. Translators: "Response" labels an area that contains the user's
+#. Response to an openended problem. It is a noun.
+#. Translators: "Response" labels a text area into which a user enters
+#. his or her response to a prompt from an openended problem.
+#: lms/templates/combinedopenended/openended/open_ended.html
+#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+msgid "Response"
+msgstr "Resposta"
+
 #: lms/templates/combinedopenended/openended/open_ended.html
 msgid "Unanswered"
 msgstr "Não respondida"
@@ -5318,6 +5687,12 @@ msgstr "Não respondida"
 #: lms/templates/combinedopenended/openended/open_ended.html
 msgid "Skip Post-Assessment"
 msgstr "Pular Pós-Avaliação"
+
+#: lms/templates/combinedopenended/openended/open_ended_combined_rubric.html
+msgid "{num} point: {explanatory_text}"
+msgid_plural "{num} points: {explanatory_text}"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/templates/combinedopenended/openended/open_ended_error.html
 msgid "There was an error with your submission.  Please contact course staff."
@@ -6122,10 +6497,6 @@ msgstr "Não há avaliações de questões nesta seção"
 msgid "{course.display_number_with_default} Course Info"
 msgstr "Informação do Curso {course.display_number_with_default}"
 
-#: lms/templates/courseware/syllabus.html
-msgid "Syllabus"
-msgstr "Conteúdo programático"
-
 #: lms/templates/courseware/welcome-back.html
 msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
@@ -6658,6 +7029,11 @@ msgid "Update response"
 msgstr "Atualizar resposta"
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Delete Comment"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
 #, python-format
 msgid "-posted %(time_ago)s by"
 msgstr "-publicado %(time_ago)s por"
@@ -6809,10 +7185,6 @@ msgstr "…"
 #: lms/templates/instructor/staff_grading.html
 msgid "{course_number} Staff Grading"
 msgstr "Avaliação pela Equipe {course_number}"
-
-#: lms/templates/instructor/staff_grading.html
-msgid "Staff grading"
-msgstr "Avaliação pela equipe"
 
 #: lms/templates/instructor/staff_grading.html
 msgid ""
@@ -7445,6 +7817,24 @@ msgstr "Mostrar Histórico da Tarefa para o Problema"
 msgid "None Available"
 msgstr "Nenhum Disponível"
 
+#: lms/templates/modal/_modal-settings-language.html
+msgid "Change Preferred Language"
+msgstr ""
+
+#: lms/templates/modal/_modal-settings-language.html
+msgid "Please choose your preferred language"
+msgstr ""
+
+#: lms/templates/modal/_modal-settings-language.html
+msgid "Save Language Settings"
+msgstr ""
+
+#: lms/templates/modal/_modal-settings-language.html
+msgid ""
+"Don't see your preferred language? {link_start}Volunteer to become a "
+"translator!{link_end}"
+msgstr ""
+
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
 msgstr "Notificações Combinadas {course_number} "
@@ -7480,10 +7870,6 @@ msgstr ""
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "No flagged problems exist."
 msgstr "Não há nenhuma questão sinalizada."
-
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Response"
-msgstr "Resposta"
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Unflag"
@@ -8445,7 +8831,7 @@ msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 msgid "Yes! You can confirm my identity with this information."
-msgstr ""
+msgstr "SIm! Você pode confirmar a minha identidade com essa informação."
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 msgid "Submit photos &amp; re-verify"
@@ -10533,10 +10919,6 @@ msgid "Your Location"
 msgstr ""
 
 #: cms/templates/register.html
-msgid "Preferred Language"
-msgstr ""
-
-#: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
 msgstr ""
 
@@ -10962,7 +11344,7 @@ msgid ""
 "Name field."
 msgstr ""
 
-#: cms/templates/unit.html
+#: cms/templates/unit.html cms/templates/ux/reference/unit.html
 msgid "Individual Unit"
 msgstr ""
 
@@ -11110,6 +11492,10 @@ msgid ""
 msgstr ""
 "Um link de ativação foi enviado para {email} junto a instruções para ativar "
 "a sua conta."
+
+#: cms/templates/ux/reference/container.html
+msgid "Container"
+msgstr ""
 
 #: cms/templates/widgets/footer.html
 msgid "All rights reserved."

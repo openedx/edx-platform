@@ -104,6 +104,7 @@ django_debug_toolbar==0.9.4
 django-debug-toolbar-mongo
 
 # Used for testing
+chrono==1.0.2
 coverage==3.7
 ddt==0.6.0
 django-crum==0.5

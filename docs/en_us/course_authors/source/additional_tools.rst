@@ -111,7 +111,7 @@ Chemical Equation Problem Code
   \( \text{H}_2\text{SO}_4 \longrightarrow \text { H}^+ + \text{ HSO}_4^-\)
 
     <customresponse>
-      <chemicalequationinput size="50"/>
+      <chemicalequationinput size="50" label="Enter the chemical equation"/>
       <answer type="loncapa/python">
 
   if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -> H^+ + HSO4^-'):

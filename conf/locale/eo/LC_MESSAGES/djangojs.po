@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-18 13:34-0500\n"
-"PO-Revision-Date: 2014-02-18 18:34:51.762964\n"
+"POT-Creation-Date: 2014-02-25 10:17-0500\n"
+"PO-Revision-Date: 2014-02-25 15:18:19.594059\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -331,6 +331,7 @@ msgstr "Shöw Dïsçüssïön Ⱡ'#"
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
 msgstr "Sörrý Ⱡ'σяєм ι#"
 
@@ -521,6 +522,16 @@ msgstr "Çömmünïtý TÀ Ⱡ#"
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Misuse Reported, click to remove report"
 msgstr "Mïsüsé Répörtéd, çlïçk tö rémövé répört Ⱡ'σяєм ιρѕ#"
+
+#: common/static/coffee/src/discussion/views/response_comment_view.js
+msgid "Are you sure you want to delete this comment?"
+msgstr "Àré ýöü süré ýöü wänt tö délété thïs çömmént? Ⱡ'σяєм ιρѕυм#"
+
+#: common/static/coffee/src/discussion/views/response_comment_view.js
+msgid "We had some trouble deleting this comment. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé délétïng thïs çömmént. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"

@@ -78,6 +78,7 @@ def get_test_system(course_id=''):
         course_id=course_id,
         error_descriptor_class=ErrorDescriptor,
         get_user_role=Mock(is_staff=False),
+        descriptor_runtime=get_test_descriptor_system(),
     )
 
 
@@ -112,7 +113,7 @@ class ModelsTest(unittest.TestCase):
 
     def test_load_class(self):
         vc = XModuleDescriptor.load_class('video')
-        vc_str = "<class 'xmodule.video_module.VideoDescriptor'>"
+        vc_str = "<class 'xmodule.video_module.video_module.VideoDescriptor'>"
         self.assertEqual(str(vc), vc_str)
 
 

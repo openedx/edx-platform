@@ -57,9 +57,11 @@ function (VideoPlayer, VideoStorage) {
                     });
             });
     },
+
     methodsDict = {
         bindTo: bindTo,
         fetchMetadata: fetchMetadata,
+        getCurrentLanguage: getCurrentLanguage,
         getDuration: getDuration,
         getVideoMetadata: getVideoMetadata,
         initialize: initialize,
@@ -305,6 +307,11 @@ function (VideoPlayer, VideoStorage) {
                             value ||
                             '1.0';
                      },
+                    'transcriptLanguage': function (value) {
+                        return storage.getItem('language') ||
+                            value ||
+                            'en';
+                     },
                     'ytTestTimeout': function (value) {
                         value = parseInt(value, 10);
 
@@ -432,6 +439,7 @@ function (VideoPlayer, VideoStorage) {
             this.config.endTime = null;
         }
 
+        this.lang = this.config.transcriptLanguage;
         this.speed = Number(
             this.config.speed || this.config.generalSpeed
         ).toFixed(2).replace(/\.00$/, '.0');
@@ -631,17 +639,16 @@ function (VideoPlayer, VideoStorage) {
 
     function setSpeed(newSpeed, updateStorage) {
         // Possible speeds for each player type.
-        // flash =          [0.75, 1, 1.25, 1.5]
-        // html5 =          [0.75, 1, 1.25, 1.5]
-        // youtube html5 =  [0.25, 0.5, 1, 1.5, 2]
+        // HTML5 =          [0.75, 1, 1.25, 1.5]
+        // Youtube Flash =  [0.75, 1, 1.25, 1.5]
+        // Youtube HTML5 =  [0.25, 0.5, 1, 1.5, 2]
         var map = {
-                '0.25': '0.75',
-                '0.50': '0.75',
-                '0.75': '0.50',
-                '1.25': '1.50',
-                '2.0': '1.50'
-            },
-            useSession = true;
+                '0.25': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
+                '0.50': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
+                '0.75': '0.50', // HTML5 or Youtube Flash -> Youtube HTML5
+                '1.25': '1.50', // HTML5 or Youtube Flash -> Youtube HTML5
+                '2.0': '1.50'   // Youtube HTML5 -> HTML5 or Youtube Flash
+            };
 
         if (_.contains(this.speeds, newSpeed)) {
             this.speed = newSpeed;
@@ -710,6 +717,24 @@ function (VideoPlayer, VideoStorage) {
         } catch (err) {
             return this.metadata[this.youtubeId('1.0')].duration;
         }
+    }
+
+    function getCurrentLanguage() {
+        var keys = _.keys(this.config.transcriptLanguages);
+
+        if (keys.length) {
+            if (!_.contains(keys, this.lang)) {
+                if (_.contains(keys, 'en')) {
+                    this.lang = 'en';
+                } else {
+                    this.lang = keys.pop();
+                }
+            }
+        } else {
+            return null;
+        }
+
+        return this.lang;
     }
 
     /*

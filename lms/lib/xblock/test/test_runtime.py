@@ -48,6 +48,7 @@ class TestHandlerUrl(TestCase):
             render_template=Mock(),
             replace_urls=str,
             course_id=self.course_id,
+            descriptor_runtime=Mock(),
         )
 
     def test_trailing_characters(self):

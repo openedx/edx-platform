@@ -149,14 +149,10 @@ def import_from_xml(
     for course_id in xml_module_store.modules.keys():
 
         if target_location_namespace is not None:
-            pseudo_course_id = '/'.join(
-                [target_location_namespace.org, target_location_namespace.course]
-            )
+            pseudo_course_id = u'{0.org}/{0.course}'.format(target_location_namespace)
         else:
-            course_id_components = course_id.split('/')
-            pseudo_course_id = '/'.join(
-                [course_id_components[0], course_id_components[1]]
-            )
+            course_id_components = Location.parse_course_id(course_id)
+            pseudo_course_id = u'{org}/{course}'.format(**course_id_components)
 
         try:
             # turn off all write signalling while importing as this
@@ -761,11 +757,11 @@ def perform_xlint(
         )
 
         # check for a presence of a course marketing video
-        location_elements = course_id.split('/')
-        loc = Location([
-            'i4x', location_elements[0], location_elements[1],
-            'about', 'video', None
-        ])
+        location_elements = Location.parse_course_id(course_id)
+        location_elements['tag'] = 'i4x'
+        location_elements['category'] = 'about'
+        location_elements['name'] = 'video'
+        loc = Location(location_elements)
         if loc not in module_store.modules[course_id]:
             print(
                 "WARN: Missing course marketing video. It is recommended "

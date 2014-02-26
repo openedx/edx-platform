@@ -90,9 +90,11 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)
 
         self.item_descriptor.xmodule_runtime = self.new_module_runtime()
-        self.item_module = self.item_descriptor
 
-        self.item_url = Location(self.item_module.location).url()
+        #self.item_module = self.item_descriptor.xmodule_runtime.xmodule_instance
+        #self.item_module is None at this time
+
+        self.item_url = Location(self.item_descriptor.location).url()
 
     def setup_course(self):
         self.course = CourseFactory.create(data=self.COURSE_DATA)
@@ -130,7 +132,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.assertTrue(all(self.login_statuses))
 
     def setUp(self):
-        self.setup_course();
+        self.setup_course()
         self.initialize_module(metadata=self.METADATA, data=self.DATA)
 
     def get_url(self, dispatch):

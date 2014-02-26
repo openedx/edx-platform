@@ -31,8 +31,8 @@ describe "XBlock", ->
       @missingInitBlock = XBlock.initializeBlock($('#missing-init')[0])
 
     it "loads the right runtime version", ->
-      expect(TestRuntime.vA).toHaveBeenCalledWith($('#vA')[0], @fakeChildren)
-      expect(TestRuntime.vZ).toHaveBeenCalledWith($('#vZ')[0], @fakeChildren)
+      expect(TestRuntime.vA).toHaveBeenCalledWith()
+      expect(TestRuntime.vZ).toHaveBeenCalledWith()
 
     it "loads the right init function", ->
       expect(window.initFnA).toHaveBeenCalledWith(@runtimeA, $('#vA')[0])

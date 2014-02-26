@@ -24,7 +24,7 @@ from django.utils import timezone
 
 from xmodule_modifiers import wrap_xblock
 import xmodule.graders as xmgraders
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
@@ -170,8 +170,9 @@ def instructor_dashboard(request, course_id):
             urlname = "problem/" + urlname
 
         # complete the url using information about the current course:
-        (org, course_name, _) = course_id.split("/")
-        return u"i4x://{org}/{name}/{url}".format(org=org, name=course_name, url=urlname)
+        parts = Location.parse_course_id(course_id)
+        parts['url'] = urlname
+        return u"i4x://{org}/{name}/{url}".format(**parts)
 
     def get_student_from_identifier(unique_student_identifier):
         """Gets a student object using either an email address or username"""
@@ -571,10 +572,12 @@ def instructor_dashboard(request, course_id):
         if problem_to_dump[-4:] == ".xml":
             problem_to_dump = problem_to_dump[:-4]
         try:
-            (org, course_name, _) = course_id.split("/")
-            module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_dump
-            smdat = StudentModule.objects.filter(course_id=course_id,
-                                                 module_state_key=module_state_key)
+            course_id_dict = Location.parse_course_id(course_id)
+            module_state_key = u"i4x://{org}/{course}/problem/{0}".format(problem_to_dump, **course_id_dict)
+            smdat = StudentModule.objects.filter(
+                course_id=course_id,
+                module_state_key=module_state_key
+            )
             smdat = smdat.order_by('student')
             msg += _u("Found {num} records to dump.").format(num=smdat)
         except Exception as err:
