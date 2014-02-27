@@ -122,10 +122,14 @@ class MixedModuleStore(ModuleStoreWriteBase):
         Returns a list containing the top level XModuleDescriptors of the courses
         in this modulestore.
         '''
-        courses = {}
+        courses = {}  # a dictionary of stringified course locations to course objects
         # order the modulestores and ensure no dupes: an awkward bit of hardcoding to ensure precedence
         # xml is in here because mappings trump discovery
-        stores = [self.modulestores['default'], self.modulestores['xml']]
+        if self.modulestores.has_key('xml'):
+            stores = [self.modulestores['default'], self.modulestores['xml']]
+        else:
+            stores = [self.modulestores['default']]
+
         for key, store in self.modulestores.iteritems():
             # awkward hardcoding of knowledge that 'draft' is a dupe of 'direct'
             if key != 'draft' and store not in stores:
@@ -194,7 +198,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
         use children to point to their dependents.
         """
-        course_id = getattr(course_location, 'course_id', getattr(course_location, 'package_id', None))
+        course_id = self._get_course_id_from_course_location(course_location)
         store = self._get_modulestore_for_courseid(course_id)
         return store.get_orphans(course_location, branch)
 
