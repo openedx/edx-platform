@@ -38,7 +38,7 @@ from xmodule.x_module import XModuleMixin, only_xmodules
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "edX"
+PLATFORM_NAME = "edX.saylor.org"
 CC_MERCHANT_NAME = PLATFORM_NAME
 
 COURSEWARE_ENABLED = True
@@ -466,20 +466,25 @@ CMS_BASE = 'localhost:8001'
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "edx.org"
+SITE_NAME = "edx.saylor.org"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
 
 # Platform Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@example.com'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
-SERVER_EMAIL = 'devops@example.com'
-TECH_SUPPORT_EMAIL = 'technical@example.com'
-CONTACT_EMAIL = 'info@example.com'
-BUGS_EMAIL = 'bugs@example.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'registration@edx.saylor.org'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.saylor.org'
+SERVER_EMAIL = 'devops@edx.saylor.org'
+TECH_SUPPORT_EMAIL = 'devops@edx.saylor.org'
+CONTACT_EMAIL = 'info@edx.saylor.org'
+BUGS_EMAIL = 'bugs@edx.saylor.org'
+EMAIL_HOST = 'smtp.google.com'
+EMAIL_HOST_USER = 'registration@edx.saylor.org'
+EMAIL_HOST_PASSWORD = '*regeducere38294...'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = 'true' 
 ADMINS = ()
 MANAGERS = ADMINS
 
@@ -633,7 +638,7 @@ PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
 #By setting up the default settings with an incorrect user name and password,
 # will get an error when attempting to connect
 OPEN_ENDED_GRADING_INTERFACE = {
-    'url': 'http://example.com/peer_grading',
+    'url': 'http://edx.saylor.org/peer_grading',
     'username': 'incorrect_user',
     'password': 'incorrect_pass',
     'staff_grading': 'staff_grading',
@@ -994,7 +999,7 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 
 # Suffix used to construct 'from' email address for bulk emails.
 # A course-specific identifier is prepended.
-BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
+BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@edx.saylor.org'
 
 # Parameters for breaking down course enrollment into subtasks.
 BULK_EMAIL_EMAILS_PER_TASK = 100

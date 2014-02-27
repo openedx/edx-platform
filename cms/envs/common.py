@@ -231,16 +231,17 @@ ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
-EMAIL_USE_TLS = False
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.saylor.org'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.saylor.org'
 SERVER_EMAIL = 'devops@edx.saylor.org'
-ADMINS = ()
+TECH_SUPPORT_EMAIL = 'devops@edx.saylor.org'
+CONTACT_EMAIL = 'info@edx.saylor.org'
+BUGS_EMAIL = 'bugs@edx.saylor.org'
+EMAIL_HOST = 'smtp.google.com'
+EMAIL_HOST_USER = 'registration@edx.saylor.org'
+EMAIL_HOST_PASSWORD = '*regeducere38294...'
+EMAIL_PORT = 465
 MANAGERS = ADMINS
 
 # Static content
