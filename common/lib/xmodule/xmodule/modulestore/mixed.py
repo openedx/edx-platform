@@ -9,8 +9,8 @@ import logging
 
 from . import ModuleStoreWriteBase
 from xmodule.modulestore.django import create_modulestore_instance, loc_mapper
-from xmodule.modulestore import Location, SPLIT_MONGO_MODULESTORE_TYPE
-from xmodule.modulestore.locator import CourseLocator
+from xmodule.modulestore import Location, SPLIT_MONGO_MODULESTORE_TYPE, XML_MODULESTORE_TYPE
+from xmodule.modulestore.locator import CourseLocator, Locator
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from uuid import uuid4
 from xmodule.modulestore.mongo.base import MongoModuleStore
@@ -122,20 +122,13 @@ class MixedModuleStore(ModuleStoreWriteBase):
         Returns a list containing the top level XModuleDescriptors of the courses
         in this modulestore.
         '''
+        # order the modulestores and ensure no dupes (default may be a dupe of a named store)
+        # remove 'draft' as we know it's a functional dupe of 'direct' (ugly hardcoding)
+        stores = set([value for key, value in self.modulestores.iteritems() if key != 'draft'])
+        stores = sorted(stores, _compare_stores)
+
         courses = {}  # a dictionary of stringified course locations to course objects
-        # order the modulestores and ensure no dupes: an awkward bit of hardcoding to ensure precedence
-        # xml is in here because mappings trump discovery
-        if self.modulestores.has_key('xml'):
-            stores = [self.modulestores['default'], self.modulestores['xml']]
-        else:
-            stores = [self.modulestores['default']]
-
-        for key, store in self.modulestores.iteritems():
-            # awkward hardcoding of knowledge that 'draft' is a dupe of 'direct'
-            if key != 'draft' and store not in stores:
-                stores.append(store)
-
-        has_locators = False
+        has_locators = any(issubclass(CourseLocator, store.reference_type) for store in stores)
         for store in stores:
             store_courses = store.get_courses()
             # filter out ones which were fetched from earlier stores but locations may not be ==
@@ -143,6 +136,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 course_location = unicode(course.location)
                 if course_location not in courses:
                     if has_locators and isinstance(course.location, Location):
+                        # see if a locator version of course is in the result
                         try:
                             # if there's no existing mapping, then the course can't have been in split
                             course_locator = loc_mapper().translate_location(
@@ -152,9 +146,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
                                 courses[course_location] = course
                         except ItemNotFoundError:
                             courses[course_location] = course
-                    elif isinstance(course.location, CourseLocator):
-                        has_locators = True
-                        courses[course_location] = course
                     else:
                         courses[course_location] = course
 
@@ -448,3 +439,30 @@ class MixedModuleStore(ModuleStoreWriteBase):
             raise NotImplementedError(u"Cannot create maps from %s" % store.reference_type)
         for course in store.get_courses():
             loc_mapper().translate_location(course.location.course_id, course.location)
+
+
+def _compare_stores(alpha, aleph):
+    """
+    Order stores via precedence: if a course is found in an earlier store, it shadows the later store.
+
+    xml stores take precedence b/c they only contain hardcoded mappings, then Locator-based ones,
+    then others. Locators before Locations because if some courses may be in both,
+    the ones in the Locator-based stores shadow the others.
+    """
+    if alpha.get_modulestore_type(None) == XML_MODULESTORE_TYPE:
+        if aleph.get_modulestore_type(None) == XML_MODULESTORE_TYPE:
+            return 0
+        else:
+            return -1
+    elif aleph.get_modulestore_type(None) == XML_MODULESTORE_TYPE:
+        return 1
+
+    if issubclass(alpha.reference_type, Locator):
+        if issubclass(aleph.reference_type, Locator):
+            return 0
+        else:
+            return -1
+    elif issubclass(aleph.reference_type, Locator):
+        return 1
+
+    return 0
