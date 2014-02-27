@@ -4,6 +4,8 @@
 
 // For containers rendered at the element level, the container is rendered in a way that allows the user to navigate to a separate container page for that container making its children populate the nesting and element levels.
 
+// ====================
+
 // UI: container page view
 body.view-container {
 
@@ -64,11 +66,21 @@ body.view-container  .content-primary{
         border-bottom: none;
         background: none;
       }
+
+      .xblock-render {
+        margin: 0 $baseline $baseline $baseline;
+      }
+
+      // STATE: nesting level xblock is collapsed
+      &.collapsed {
+        padding-bottom: 0;
+        background-color: $gray-l7;
+        box-shadow: 0 0 1px $shadow-d2 inset;
+      }
     }
 
     // CASE: element level xblock rendering
     &.level-element {
-      margin: 0 ($baseline*2) $baseline ($baseline*2);
       box-shadow: none;
 
       &:hover {
@@ -77,6 +89,7 @@ body.view-container  .content-primary{
       }
 
       .xblock-header {
+        display: flex;
         margin-bottom: 0;
         border-bottom: 1px solid $gray-l4;
         background-color: $gray-l6;
@@ -101,5 +114,23 @@ body.view-container  .content-primary{
         }
       }
     }
+  }
+}
+
+// ====================
+
+// UI: xblocks - internal styling
+
+// In order to ensure visual consistency across the unit and container pages, certain styles need to be applied to render on the container page until they are also cleaned up and applied differently on the unit page.
+.wrapper-xblock {
+
+    // UI: xblocks - internal headings for problems and video components
+    h2 {
+    margin: 30px 40px 30px 0;
+    color: #646464;
+    font-size: 19px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    text-transform: uppercase;
   }
 }

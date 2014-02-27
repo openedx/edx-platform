@@ -3,7 +3,7 @@
 
 // extends - UI archetypes - xblock rendering
 %wrap-xblock {
-  margin: ($baseline/2);
+  margin: $baseline;
   border: 1px solid $gray-l4;
   border-radius: ($baseline/5);
   background: $white;
@@ -57,6 +57,10 @@
 // UI: xblock is collapsible
 .wrapper-xblock.is-collapsible {
 
+  [class^="icon-"] {
+  font-style: normal;
+  }
+
   .expand-collapse {
     @extend %expand-collapse;
     margin: 0 ($baseline/4);
@@ -74,4 +78,3 @@
     }
   }
 }
-

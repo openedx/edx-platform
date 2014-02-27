@@ -70,6 +70,28 @@ class ItemTest(CourseTestCase):
 class GetItem(ItemTest):
     """Tests for '/xblock' GET url."""
 
+    def _create_vertical(self, parent_locator=None):
+        """
+        Creates a vertical, returning its locator.
+        """
+        resp = self.create_xblock(category='vertical', parent_locator=parent_locator)
+        self.assertEqual(resp.status_code, 200)
+        return self.response_locator(resp)
+
+    def _get_container_preview(self, locator):
+        """
+        Returns the HTML and resources required for the xblock at the specified locator
+        """
+        preview_url = '/xblock/{locator}/container_preview'.format(locator=locator)
+        resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
+        self.assertEqual(resp.status_code, 200)
+        resp_content = json.loads(resp.content)
+        html = resp_content['html']
+        self.assertTrue(html)
+        resources = resp_content['resources']
+        self.assertIsNotNone(resources)
+        return html, resources
+
     def test_get_vertical(self):
         # Add a vertical
         resp = self.create_xblock(category='vertical')
@@ -79,6 +101,36 @@ class GetItem(ItemTest):
         resp_content = json.loads(resp.content)
         resp = self.client.get('/xblock/' + resp_content['locator'])
         self.assertEqual(resp.status_code, 200)
+
+    def test_get_empty_container_fragment(self):
+        root_locator = self._create_vertical()
+        html, __ = self._get_container_preview(root_locator)
+
+        # Verify that the Studio wrapper is not added
+        self.assertNotIn('wrapper-xblock', html)
+
+        # Verify that the header and article tags are still added
+        self.assertIn('<header class="xblock-header">', html)
+        self.assertIn('<article class="xblock-render">', html)
+
+    def test_get_container_fragment(self):
+        root_locator = self._create_vertical()
+
+        # Add a problem beneath a child vertical
+        child_vertical_locator = self._create_vertical(parent_locator=root_locator)
+        resp = self.create_xblock(parent_locator=child_vertical_locator, category='problem', boilerplate='multiplechoice.yaml')
+        self.assertEqual(resp.status_code, 200)
+
+        # Get the preview HTML
+        html, __ = self._get_container_preview(root_locator)
+
+        # Verify that the Studio nesting wrapper has been added
+        self.assertIn('level-nesting', html)
+        self.assertIn('<header class="xblock-header">', html)
+        self.assertIn('<article class="xblock-render">', html)
+
+        # Verify that the Studio element wrapper has been added
+        self.assertIn('level-element', html)
 
 
 class DeleteItem(ItemTest):
@@ -565,11 +617,12 @@ class TestEditItem(ItemTest):
         self.assertNotEqual(draft.data, published.data)
 
         # Get problem by 'xblock_handler'
-        resp = self.client.get('/xblock/' + self.problem_locator + '/student_view', HTTP_ACCEPT='application/x-fragment+json')
+        view_url = '/xblock/{locator}/student_view'.format(locator=self.problem_locator)
+        resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
 
         # Activate the editing view
-        resp = self.client.get('/xblock/' + self.problem_locator + '/studio_view', HTTP_ACCEPT='application/x-fragment+json')
+        resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
 
         # Both published and draft content should still be different
@@ -647,8 +700,8 @@ class TestNativeXBlock(ItemTest):
         native_loc = json.loads(resp.content)['locator']
 
         # Render the XBlock
-        resp_content = json.loads(resp.content)
-        resp = self.client.get('/xblock/' + native_loc + '/student_view', HTTP_ACCEPT='application/x-fragment+json')
+        view_url = '/xblock/{locator}/student_view'.format(locator=native_loc)
+        resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
 
         # Check that the save and cancel buttons are hidden for native XBlocks,

@@ -10,7 +10,7 @@ from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_string
 
-from xmodule_modifiers import replace_static_urls, wrap_xblock
+from xmodule_modifiers import replace_static_urls, wrap_xblock, wrap_fragment
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore, loc_mapper, ModuleI18nService
@@ -108,6 +108,17 @@ def _preview_module_system(request, descriptor):
         course_id = course_location.course_id
     else:
         course_id = get_course_for_item(descriptor.location).location.course_id
+    display_name_only = (descriptor.category == 'static_tab')
+
+    wrappers = [
+        # This wrapper wraps the module in the template specified above
+        partial(wrap_xblock, 'PreviewRuntime', display_name_only=display_name_only),
+
+        # This wrapper replaces urls in the output that start with /static
+        # with the correct course-specific url for the static content
+        partial(replace_static_urls, None, course_id=course_id),
+        _studio_wrap_xblock,
+    ]
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
@@ -125,14 +136,7 @@ def _preview_module_system(request, descriptor):
         anonymous_student_id='student',
 
         # Set up functions to modify the fragment produced by student_view
-        wrappers=(
-            # This wrapper wraps the module in the template specified above
-            partial(wrap_xblock, 'PreviewRuntime', display_name_only=descriptor.category == 'static_tab'),
-
-            # This wrapper replaces urls in the output that start with /static
-            # with the correct course-specific url for the static content
-            partial(replace_static_urls, None, course_id=course_id),
-        ),
+        wrappers=wrappers,
         error_descriptor_class=ErrorDescriptor,
         # get_user_role accepts a location or a CourseLocator.
         # If descriptor.location is a CourseLocator, course_id is unused.
@@ -159,14 +163,38 @@ def _load_preview_module(request, descriptor):
     return descriptor
 
 
-def get_preview_fragment(request, descriptor):
+# pylint: disable=unused-argument
+def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
+    """
+    Wraps the results of rendering an XBlock view in a div which adds a header and Studio action buttons.
+    """
+    # Only add the Studio wrapper when on the container page. The unit page will remain as is for now.
+    if context.get('container_view', None) and view == 'student_view':
+        locator = loc_mapper().translate_location(xblock.course_id, xblock.location)
+        template_context = {
+            'xblock_context': context,
+            'xblock': xblock,
+            'locator': locator,
+            'content': frag.content,
+        }
+        if xblock.category == 'vertical':
+            template = 'studio_vertical_wrapper.html'
+        else:
+            template = 'studio_xblock_wrapper.html'
+        html = render_to_string(template, template_context)
+        frag = wrap_fragment(frag, html)
+    return frag
+
+
+def get_preview_fragment(request, descriptor, context):
     """
     Returns the HTML returned by the XModule's student_view,
     specified by the descriptor and idx.
     """
     module = _load_preview_module(request, descriptor)
+
     try:
-        fragment = module.render("student_view")
+        fragment = module.render("student_view", context)
     except Exception as exc:                          # pylint: disable=W0703
         log.warning("Unable to render student_view for %r", module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
