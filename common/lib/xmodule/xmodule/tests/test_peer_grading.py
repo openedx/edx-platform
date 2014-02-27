@@ -1,7 +1,7 @@
 import unittest
 import json
 import logging
-from mock import Mock
+from mock import Mock, patch
 from webob.multidict import MultiDict
 
 from xblock.field_data import DictFieldData
@@ -78,12 +78,13 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         success, _data = self.peer_grading.query_data_for_location(self.problem_location.url())
         self.assertTrue(success)
 
-    def test_get_score(self):
+    def test_get_score_none(self):
         """
-        Test getting the score
-        @return:
+        Test getting the score.
         """
         score = self.peer_grading.get_score()
+
+        # Score should be None.
         self.assertIsNone(score['score'])
 
     def test_get_max_score(self):
@@ -178,6 +179,56 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
                 MAX_ALLOWED_FEEDBACK_LENGTH
             )
         )
+
+    def test_get_score_success_fails(self):
+        """
+        Test if query_data_for_location not succeed, their score is None.
+        """
+        score_dict = self.get_score(False, 0, 0)
+
+        # Score dict should be None.
+        self.assertIsNone(score_dict)
+
+    def test_get_score(self):
+        """
+        Test if the student has graded equal to required submissions,
+        their score is 1.0.
+        """
+
+        score_dict = self.get_score(True, 3, 3)
+
+        # Score should be 1.0.
+        self.assertEqual(score_dict["score"], 1.0)
+
+        # Testing score after data is stored in student_data_for_location in xmodule.
+        _score_dict = self.peer_grading.get_score()
+
+        # Score should be 1.0.
+        self.assertEqual(_score_dict["score"], 1.0)
+
+    def test_get_score_zero(self):
+        """
+        Test if the student has graded not equal to required submissions,
+        their score is 0.0.
+        """
+        score_dict = self.get_score(True, 2, 3)
+
+        # Score should be 0.0.
+        self.assertEqual(score_dict["score"], 0.0)
+
+    def get_score(self, success, count_graded, count_required):
+        self.peer_grading.use_for_single_location_local = True
+        self.peer_grading.graded = True
+
+        # Patch for external grading service.
+        with patch('xmodule.peer_grading_module.PeerGradingModule.query_data_for_location') as mock_query_data_for_location:
+            mock_query_data_for_location.return_value = (
+                success,
+                {"count_graded": count_graded, "count_required": count_required}
+            )
+
+            # Returning score dict.
+            return self.peer_grading.get_score()
 
 
 class MockPeerGradingServiceProblemList(MockPeerGradingService):
