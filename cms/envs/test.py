@@ -156,6 +156,12 @@ INSTALLED_APPS += ('external_auth', )
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
+
+################################# XBLOCK ######################################
+from xmodule.x_module import prefer_xmodules
+XBLOCK_SELECT_FUNCTION = prefer_xmodules
+
+
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
