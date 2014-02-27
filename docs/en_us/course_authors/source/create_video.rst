@@ -236,6 +236,8 @@ Transcripts in Additional Languages
 You can provide transcripts for your video in other languages. To do this, you'll work with a third-party service to obtain an .srt transcript file for each language, and then associate the .srt file with the video in Studio.
 
 #. After you've obtained the .srt files for additional languages, upload the .srt transcript files for those languages to the **Files & Uploads** page. Make a note of the URL for each .srt file.
+  
+   For more information about uploading files, see :ref:`Add Files to a Course`.
 
 #. In Studio, open the Video component for the video.
 
