@@ -1,7 +1,7 @@
 import unittest
 import json
 import logging
-from mock import Mock
+from mock import Mock, patch
 from webob.multidict import MultiDict
 
 from xblock.field_data import DictFieldData
@@ -46,6 +46,9 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         test_system.open_ended_grading_interface = None
         return test_system
 
+    def _query_data_for_location_return_value(self, success, count_graded, count_required):
+        return success, {"count_graded": count_graded, "count_required": count_required}
+
     def setUp(self):
         """
         Create a peer grading module from a test system
@@ -78,13 +81,45 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         success, _data = self.peer_grading.query_data_for_location(self.problem_location.url())
         self.assertTrue(success)
 
-    def test_get_score(self):
+    def test_get_score_for_multiple_locations(self):
         """
-        Test getting the score
-        @return:
+        Test get_score when use_for_single_location_local and graded are equal to False.
         """
         score = self.peer_grading.get_score()
+
+        # Score should be None.
         self.assertIsNone(score['score'])
+
+    def test_get_score_for_single_location(self):
+        """
+        Test get score.
+        """
+        self.peer_grading.use_for_single_location_local = True
+        self.peer_grading.graded = True
+
+        # Patch for external grading service.
+        with patch('xmodule.peer_grading_module.PeerGradingModule.query_data_for_location') as mock_query_data_for_location:
+
+            # Test if query_data_for_location not succeed, their score is None.
+            mock_query_data_for_location.return_value = self._query_data_for_location_return_value(False, 0, 0)
+            score_dict = self.peer_grading.get_score()
+            self.assertIsNone(score_dict)
+
+            # Test if the student graded count is less than required submissions, their score is 0.0.
+            mock_query_data_for_location.return_value = self._query_data_for_location_return_value(True, 1, 3)
+            score_dict = self.peer_grading.get_score()
+            self.assertEqual(score_dict["score"], 0.0)
+
+            # Test if the student has graded equal to required submissions, their score is 1.0.
+            mock_query_data_for_location.return_value = self._query_data_for_location_return_value(True, 3, 3)
+            score_dict = self.peer_grading.get_score()
+            self.assertEqual(score_dict["score"], 1.0)
+
+            # Calling get_score again should return value from xmodule.
+            self.assertEqual(mock_query_data_for_location.call_count, 3)
+            _score_dict = self.peer_grading.get_score()
+            self.assertEqual(_score_dict["score"], 1.0)
+            self.assertEqual(mock_query_data_for_location.call_count, 3)
 
     def test_get_max_score(self):
         """
