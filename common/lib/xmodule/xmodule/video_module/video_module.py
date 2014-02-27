@@ -251,8 +251,10 @@ class VideoModule(VideoFields, XModule):
         else:
             if self.transcript_language in self.transcripts:
                 transcript_language = self.transcript_language
+            elif self.sub:
+                transcript_language = 'en'
             else:
-                transcript_language = self.transcripts.keys()[0]
+                transcript_language = sorted(self.transcripts.keys())[0]
 
             languages = {
                 lang: display
@@ -264,7 +266,7 @@ class VideoModule(VideoFields, XModule):
                 languages['en'] = 'English'
 
         # OrderedDict for easy testing of rendered context in tests
-        transcript_languages = OrderedDict(sorted(languages.items(), key=itemgetter(1)))
+        sorted_languages = OrderedDict(sorted(languages.items(), key=itemgetter(1)))
 
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
@@ -289,7 +291,7 @@ class VideoModule(VideoFields, XModule):
             'yt_test_timeout': 1500,
             'yt_test_url': settings.YOUTUBE_TEST_URL,
             'transcript_language': transcript_language,
-            'transcript_languages': json.dumps(transcript_languages),
+            'transcript_languages': json.dumps(sorted_languages),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript').rstrip('/?') + '/translation',
             'transcript_available_translations_url': self.runtime.handler_url(self, 'transcript').rstrip('/?') + '/available_translations',
         })
