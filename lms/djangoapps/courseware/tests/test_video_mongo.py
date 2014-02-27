@@ -208,8 +208,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             context = self.item_descriptor.render('student_view').content
 
             expected_context.update({
-                'transcript_languages': '{"en": "English"}' if self.item_descriptor.sub else '{}',
-                'transcript_language': 'en' if self.item_descriptor.sub else json.dumps(None),
+                'transcript_languages': '{"en": "English"}',
+                'transcript_language': 'en',
                 'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript'
                 ).rstrip('/?') + '/translation',
