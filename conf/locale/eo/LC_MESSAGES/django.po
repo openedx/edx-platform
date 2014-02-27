@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-25 14:01-0500\n"
-"PO-Revision-Date: 2014-02-25 19:01:45.523355\n"
+"POT-Creation-Date: 2014-02-26 16:15-0500\n"
+"PO-Revision-Date: 2014-02-26 21:15:47.512922\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -302,6 +302,14 @@ msgstr "À çïtý ïs réqüïréd Ⱡ'σ#"
 #: common/djangoapps/student/views.py
 msgid "A country is required"
 msgstr "À çöüntrý ïs réqüïréd Ⱡ'σя#"
+
+#: common/djangoapps/student/views.py
+msgid "Username cannot be more than {0} characters long"
+msgstr "Ûsérnämé çännöt ßé möré thän {0} çhäräçtérs löng Ⱡ'σяєм ιρѕυм #"
+
+#: common/djangoapps/student/views.py
+msgid "Email cannot be more than {0} characters long"
+msgstr "Émäïl çännöt ßé möré thän {0} çhäräçtérs löng Ⱡ'σяєм ιρѕυм#"
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail is required."
@@ -2906,6 +2914,14 @@ msgstr ""
 "∂σłσ#"
 
 #: lms/templates/registration/password_reset_email.html
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet reset your password."
+msgstr ""
+"Ìf ýöü dïdn't réqüést thïs çhängé, ýöü çän dïsrégärd thïs émäïl - wé hävé "
+"nöt ýét rését ýöür pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/registration/password_reset_email.html
 msgid "Thanks for using our site!"
 msgstr "Thänks för üsïng öür sïté! Ⱡ'σяєм#"
 
@@ -2987,6 +3003,8 @@ msgid "You are deleting an article. Please confirm."
 msgstr "Ýöü äré délétïng än ärtïçlé. Pléäsé çönfïrm. Ⱡ'σяєм ιρѕυм#"
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
@@ -3348,6 +3366,15 @@ msgstr "révïsïöns #"
 msgid "There are no attachments for this article."
 msgstr "Théré äré nö ättäçhménts för thïs ärtïçlé. Ⱡ'σяєм ιρѕυ#"
 
+#: cms/djangoapps/contentstore/course_info_model.py
+#: cms/djangoapps/contentstore/course_info_model.py
+msgid "Invalid course update id."
+msgstr "Ìnvälïd çöürsé üpdäté ïd. Ⱡ'σяєм#"
+
+#: cms/djangoapps/contentstore/course_info_model.py
+msgid "Course update not found."
+msgstr "Çöürsé üpdäté nöt föünd. Ⱡ'σяє#"
+
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
@@ -3619,6 +3646,7 @@ msgstr "Sävé Ⱡ'σяєм#"
 #: cms/templates/overview.html cms/templates/overview.html
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
+#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_discussion.mustache
@@ -7091,14 +7119,13 @@ msgid "Report Misuse"
 msgstr "Répört Mïsüsé Ⱡ'#"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "pin this thread"
-msgstr "pïn thïs thréäd Ⱡ'#"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Pin Thread"
 msgstr "Pïn Thréäd Ⱡ#"
+
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
+msgid "Pinned"
+msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "(this post is about %(courseware_title_linked)s)"
@@ -7150,6 +7177,14 @@ msgstr "Délété Çömmént Ⱡ'#"
 #: lms/templates/discussion/_underscore_templates.html
 msgid "-posted %(time_ago)s by"
 msgstr "-pöstéd %(time_ago)s ßý Ⱡ'#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Editing comment"
+msgstr "Édïtïng çömmént Ⱡ'#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Update comment"
+msgstr "Ûpdäté çömmént Ⱡ'#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid ""
@@ -7284,10 +7319,6 @@ msgstr "Hïdé dïsçüssïön Ⱡ'#"
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "This thread has been pinned by course staff."
 msgstr "Thïs thréäd häs ßéén pïnnéd ßý çöürsé stäff. Ⱡ'σяєм ιρѕυм#"
-
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "Pinned"
-msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/discussion/mustache/_pagination.mustache
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -9853,6 +9884,28 @@ msgstr ""
 "téxtßöök çhäptérs, änd fïlés thät äppéär ön ýöür Çöürsé Händöüts sïdéßär. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕ#"
 
+#: cms/templates/asset_index.html
+msgid "File URLs"
+msgstr "Fïlé ÛRLs #"
+
+#: cms/templates/asset_index.html
+msgid ""
+"You use the Embed URL value to link to the file or image from a component, a"
+" course update, or a course handout."
+msgstr ""
+"Ýöü üsé thé Émßéd ÛRL välüé tö lïnk tö thé fïlé ör ïmägé fröm ä çömpönént, ä"
+" çöürsé üpdäté, ör ä çöürsé händöüt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: cms/templates/asset_index.html
+msgid ""
+"You use the External URL value to reference the file or image from outside "
+"of your course. Do not use the External URL as a link value within your "
+"course."
+msgstr ""
+"Ýöü üsé thé Éxtérnäl ÛRL välüé tö référénçé thé fïlé ör ïmägé fröm öütsïdé "
+"öf ýöür çöürsé. Dö nöt üsé thé Éxtérnäl ÛRL äs ä lïnk välüé wïthïn ýöür "
+"çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
+
 #: cms/templates/asset_index.html cms/templates/overview.html
 #: cms/templates/settings_graders.html
 msgid "What can I do on this page?"
@@ -9867,15 +9920,6 @@ msgstr ""
 "Ýöü çän üplöäd néw fïlés ör vïéw, döwnlöäd, ör délété éxïstïng fïlés. Ýöü "
 "çän löçk ä fïlé sö thät péöplé whö äré nöt énrölléd ïn ýöür çöürsé çännöt "
 "äççéss thät fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg#"
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the URL listed for a file to create a link to that file in the Course "
-"Handouts sidebar or in the body of the course."
-msgstr ""
-"Ûsé thé ÛRL lïstéd för ä fïlé tö çréäté ä lïnk tö thät fïlé ïn thé Çöürsé "
-"Händöüts sïdéßär ör ïn thé ßödý öf thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тє#"
 
 #: cms/templates/asset_index.html
 msgid "Your file has been deleted."
