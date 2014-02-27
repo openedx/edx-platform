@@ -221,6 +221,9 @@ FEATURES = {
 
     # Hide any Personally Identifiable Information from application logs
     'SQUELCH_PII_IN_LOGS': False,
+
+    # Toggle embargo functionality
+    'EMBARGO': False,
 }
 
 # Used for A/B testing
@@ -258,6 +261,9 @@ node_paths = [
     system_node_path,
 ]
 NODE_PATH = ':'.join(node_paths)
+
+# For geolocation ip database
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
 
 
 # Where to look for a status message
@@ -703,6 +709,7 @@ MIDDLEWARE_CLASSES = (
 
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
+    'embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences
     # should be after DarkLangMiddleware
@@ -727,6 +734,7 @@ MIDDLEWARE_CLASSES = (
 
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
+
 )
 
 ############################### Pipeline #######################################
@@ -1141,6 +1149,8 @@ INSTALLED_APPS = (
 
     # Student Identity Reverification
     'reverification',
+
+    'embargo',
 )
 
 ######################### MARKETING SITE ###############################
