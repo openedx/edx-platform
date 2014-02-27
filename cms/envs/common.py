@@ -525,3 +525,13 @@ YOUTUBE_API = {
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
+
+
+### JSdraw (only installed in some instances)
+
+try:
+    import edx_jsdraw
+except ImportError:
+    pass
+else:
+    INSTALLED_APPS += ('edx_jsdraw',)
