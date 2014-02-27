@@ -10,6 +10,10 @@ Change Log
 
    * - Date
      - Change
+   * - 31 Mar 2014
+     - Added new fields for the server ``problem_check`` event type to the :ref:`Tracking Logs` chapter.
+   * -
+     - Reformatted the :ref:`Tracking Logs` chapter to improve readability.
    * - 28 Mar 2014
      - Added the :ref:'Data_Czar' chapter.
    * - 24 Mar 2014
@@ -18,7 +22,7 @@ Change Log
      - Provided alternative formatting for the examples in the :ref:`Discussion Forums Data` chapter.
    * - 13 Mar 2014
      - Updated the :ref:`Student_Info` chapter.
-   * - 24 Feb 2014
+   * - 24 Feb 14
      - Added descriptions of new fields to the :ref:`Wiki_Data` chapter.
    * - 21 Feb 2014
      - Added descriptions of new fields to the :ref:`Discussion Forums Data` chapter.

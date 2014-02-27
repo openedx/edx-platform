@@ -9,7 +9,9 @@ Change Log
    :header-rows: 1
 
    * - Date
-     - Change
+     - Change   
+   * - 3/31/14 
+     - Expanded the :ref:`Grades` chapter to include the new :ref:`Review_Answers` section.
    * - 03/27/14
      - Updated the :ref:`Add Pages` section to reflect feature changes.
    * - 3/27/14
