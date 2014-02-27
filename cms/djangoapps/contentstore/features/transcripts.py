@@ -103,7 +103,7 @@ def i_do_not_see_error_message(_step):
 
 @step('I see error message "([^"]*)"$')
 def i_see_error_message(_step, error):
-    assert world.css_has_text(SELECTORS['error_bar'], ERROR_MESSAGES[error])
+    assert world.css_has_text(SELECTORS['error_bar'], ERROR_MESSAGES[error.strip()])
 
 
 @step('I do not see status message$')
@@ -114,7 +114,7 @@ def i_do_not_see_status_message(_step):
 @step('I see status message "([^"]*)"$')
 def i_see_status_message(_step, status):
     assert not world.css_visible(SELECTORS['error_bar'])
-    assert world.css_has_text(SELECTORS['status_bar'], STATUSES[status])
+    assert world.css_has_text(SELECTORS['status_bar'], STATUSES[status.strip()])
 
     DOWNLOAD_BUTTON = TRANSCRIPTS_BUTTONS["download_to_edit"][0]
     if world.is_css_present(DOWNLOAD_BUTTON, wait_time=1) \

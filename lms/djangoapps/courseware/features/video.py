@@ -1,19 +1,8 @@
-# -*- coding: utf-8 -*-
 #pylint: disable=C0111
 
 from lettuce import world, step
-import json
 from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 from django.utils.translation import ugettext as _
-from django.conf import settings
-from cache_toolbox.core import del_cached_content
-from xmodule.contentstore.content import StaticContent
-import os
-from functools import partial
-from xmodule.contentstore.django import contentstore
-TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
-LANGUAGES = settings.ALL_LANGUAGES
-
 
 ############### ACTIONS ####################
 
@@ -25,16 +14,6 @@ HTML5_SOURCES = [
 HTML5_SOURCES_INCORRECT = [
     'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp99',
 ]
-VIDEO_BUTTONS = {
-    'CC': '.hide-subtitles',
-    'volume': '.volume',
-    'play': '.video_control.play',
-    'pause': '.video_control.pause',
-}
-VIDEO_MENUS = {
-    'language': '.lang .menu',
-    'speed': '.speed .menu',
-}
 
 VIDEO_BUTTONS = {
     'CC': '.hide-subtitles',
@@ -42,6 +21,9 @@ VIDEO_BUTTONS = {
     'play': '.video_control.play',
     'pause': '.video_control.pause',
 }
+
+# We should wait 300 ms for event handler invocation + 200ms for safety.
+DELAY = 0.5
 
 coursenum = 'test_course'
 sequence = {}
@@ -51,20 +33,20 @@ def does_not_autoplay(_step, video_type):
     assert(world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False')
 
 
-@step('the course has a Video component in (.*) mode(?:\:)?$')
+@step('the course has a Video component in (.*) mode$')
 def view_video(_step, player_mode):
 
     i_am_registered_for_the_course(_step, coursenum)
 
     # Make sure we have a video
-    add_video_to_course(coursenum, player_mode.lower(), _step.hashes)
+    add_video_to_course(coursenum, player_mode.lower())
     visit_scenario_item('SECTION')
 
 
-@step('a video "([^"]*)" in "([^"]*)" mode in position "([^"]*)" of sequential(?:\:)?$')
+@step('a video "([^"]*)" in "([^"]*)" mode in position "([^"]*)" of sequential$')
 def add_video(_step, player_id, player_mode, position):
     sequence[player_id] = position
-    add_video_to_course(coursenum, player_mode.lower(), _step.hashes, display_name=player_id)
+    add_video_to_course(coursenum, player_mode.lower(), display_name=player_id)
 
 
 @step('I open the section with videos$')
@@ -88,55 +70,49 @@ def check_video_speed(_step, player_id, speed):
     speed_css = '.speeds p.active'
     assert world.css_has_text(speed_css, '{0}x'.format(speed))
 
-
-def add_video_to_course(course, player_mode, hashes, display_name='Video'):
+def add_video_to_course(course, player_mode, display_name='Video'):
     category = 'video'
 
     kwargs = {
         'parent_location': section_location(course),
         'category': category,
-        'display_name': display_name,
-        'metadata': {},
+        'display_name': display_name
     }
 
     if player_mode == 'html5':
-        kwargs['metadata'].update({
-            'youtube_id_1_0': '',
-            'youtube_id_0_75': '',
-            'youtube_id_1_25': '',
-            'youtube_id_1_5': '',
-            'html5_sources': HTML5_SOURCES
+        kwargs.update({
+            'metadata': {
+                'youtube_id_1_0': '',
+                'youtube_id_0_75': '',
+                'youtube_id_1_25': '',
+                'youtube_id_1_5': '',
+                'html5_sources': HTML5_SOURCES
+            }
         })
     if player_mode == 'youtube_html5':
-        kwargs['metadata'].update({
-            'html5_sources': HTML5_SOURCES
+        kwargs.update({
+            'metadata': {
+                'html5_sources': HTML5_SOURCES
+            }
         })
     if player_mode == 'youtube_html5_unsupported_video':
-        kwargs['metadata'].update({
-            'html5_sources': HTML5_SOURCES_INCORRECT
+        kwargs.update({
+            'metadata': {
+                'html5_sources': HTML5_SOURCES_INCORRECT
+            }
         })
     if player_mode == 'html5_unsupported_video':
-        kwargs['metadata'].update({
-            'youtube_id_1_0': '',
-            'youtube_id_0_75': '',
-            'youtube_id_1_25': '',
-            'youtube_id_1_5': '',
-            'html5_sources': HTML5_SOURCES_INCORRECT
+        kwargs.update({
+            'metadata': {
+                'youtube_id_1_0': '',
+                'youtube_id_0_75': '',
+                'youtube_id_1_25': '',
+                'youtube_id_1_5': '',
+                'html5_sources': HTML5_SOURCES_INCORRECT
+            }
         })
 
-    if hashes:
-        kwargs['metadata'].update(hashes[0])
-
-    if 'transcripts' in kwargs['metadata']:
-        kwargs['metadata']['transcripts'] = json.loads(kwargs['metadata']['transcripts'])
-
-        if 'sub' in kwargs['metadata']:
-            _upload_file(kwargs['metadata']['sub'], 'en', world.scenario_dict['COURSE'].location)
-
-        for lang, videoId in kwargs['metadata']['transcripts'].items():
-            _upload_file(videoId, lang, world.scenario_dict['COURSE'].location)
-
-    world.scenario_dict['VIDEO'] = world.ItemFactory.create(**kwargs)
+    world.ItemFactory.create(**kwargs)
 
 
 @step('youtube server is up and response time is (.*) seconds$')
@@ -176,92 +152,6 @@ def error_message_has_correct_text(_step):
     assert world.css_has_text(selector, text)
 
 
-@step('I make sure captions are (.+)$')
-def set_captions_visibility_state(_step, captions_state):
-    SELECTOR = '.closed .subtitles'
-    if world.is_css_not_present(SELECTOR):
-        if captions_state == 'closed':
-            world.css_find('.hide-subtitles').click()
-    else:
-        if captions_state != 'closed':
-            world.css_find('.hide-subtitles').click()
-
-
-@step('I see video menu "([^"]*)" with correct items$')
-def i_see_menu(_step, menu):
-    _open_menu(menu)
-    menu_items = world.css_find(VIDEO_MENUS[menu] + ' li')
-    Video = world.scenario_dict['VIDEO']
-    transcripts = dict(Video.transcripts)
-    if Video.sub:
-        transcripts.update({
-            'en': Video.sub
-        })
-
-    languages = {i[0]: i[1] for i in LANGUAGES}
-    transcripts = {k: languages[k] for k in transcripts}
-
-    for code, label in transcripts.items():
-        assert any([i.text == label for i in menu_items])
-        assert any([i['data-lang-code'] == code for i in menu_items])
-
-
-@step('I see "([^"]*)" text in the captions$')
-def check_text_in_the_captions(_step, text):
-    assert world.browser.is_text_present(text.strip())
-
-
-@step('I select language with code "([^"]*)"$')
-def select_language(_step, code):
-    _open_menu("language")
-    selector = VIDEO_MENUS["language"] + ' li[data-lang-code={code}]'.format(
-        code=code
-    )
-    item = world.css_find(selector)
-
-    item.click()
-
-    assert world.css_has_class(selector, 'active')
-    assert len(world.css_find(VIDEO_MENUS["language"] + ' li.active')) == 1
-    assert world.css_visible('.subtitles')
-    world.wait_for_ajax_complete()
-
-
-@step('I click on video button "([^"]*)"$')
-def click_button(_step, button):
-    world.css_find(VIDEO_BUTTONS[button]).click()
-
-
-def _upload_file(videoId, lang, location):
-    if lang == 'en':
-        filename = 'subs_{0}.srt.sjson'.format(videoId)
-    else:
-        filename = '{0}_subs_{1}.srt.sjson'.format(lang, videoId)
-
-    path = os.path.join(TEST_ROOT, 'uploads/', filename)
-    f = open(os.path.abspath(path))
-    mime_type = "application/json"
-
-    content_location = StaticContent.compute_location(
-        location.org, location.course, filename
-    )
-
-    sc_partial = partial(StaticContent, content_location, filename, mime_type)
-    content = sc_partial(f.read())
-
-    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(
-        content,
-        tempfile_path=None
-    )
-    del_cached_content(thumbnail_location)
-
-    if thumbnail_content is not None:
-        content.thumbnail_location = thumbnail_location
-
-    contentstore().save(content)
-    del_cached_content(content.location)
-
-
 def _navigate_to_an_item_in_a_sequence(number):
     sequence_css = 'a[data-element="{0}"]'.format(number)
     world.css_click(sequence_css)
@@ -275,6 +165,7 @@ def _change_video_speed(speed):
 
 @step('I click video button "([^"]*)"$')
 def click_button_video(_step, button_type):
+    world.wait(DELAY)
     world.wait_for_ajax_complete()
     button = button_type.strip()
     world.css_click(VIDEO_BUTTONS[button])
@@ -293,9 +184,3 @@ def seek_video_to_n_seconds(_step, seconds):
     time = float(seconds.strip())
     jsCode = "$('.video').data('video-player-state').videoPlayer.onSlideSeek({{time: {0:f}}})".format(time)
     world.browser.execute_script(jsCode)
-
-
-def _open_menu(menu):
-    world.browser.execute_script("$('{selector}').parent().addClass('open')".format(
-        selector=VIDEO_MENUS[menu]
-    ))
