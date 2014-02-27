@@ -9,7 +9,7 @@ class BadRequestRateLimiter(RateLimitMixin):
     Use the 3rd party RateLimitMixin to help do rate limiting on the Password Reset flows
     """
 
-    def is_rated_limit_exceeded(self, request):
+    def is_rate_limit_exceeded(self, request):
         """
         Returns if the client has been rated limited
         """

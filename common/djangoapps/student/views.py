@@ -1347,7 +1347,7 @@ def password_reset(request):
 
     # Add some rate limiting here by re-using the RateLimitMixin as a helper class
     limiter = BadRequestRateLimiter()
-    if limiter.is_rated_limit_exceeded(request):
+    if limiter.is_rate_limit_exceeded(request):
         AUDIT_LOG.warning("Rate limit exceeded in password_reset")
         return HttpResponseForbidden()
 
