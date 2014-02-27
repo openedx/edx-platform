@@ -76,7 +76,11 @@ if Backbone?
         @$("[data-role=thread-flag]").removeClass("notflagged")
         @$(".discussion-flag-abuse").attr("aria-pressed", "true")
         @$(".discussion-flag-abuse").attr("data-tooltip", gettext("Misuse Reported, click to remove report"))
-        @$(".discussion-flag-abuse .flag-label").html(interpolate(gettext("Misuse Reported, %(start_sr_span)s click to remove report%(end_span)s"), {"start_sr_span": "<span class='sr'>", "end_span": "</span>"}, true))
+        ###
+        Translators: The text between start_sr_span and end_span is not shown
+        in most browsers but will be read by screen readers.
+        ###
+        @$(".discussion-flag-abuse .flag-label").html(interpolate(gettext("Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"), {"start_sr_span": "<span class='sr'>", "end_span": "</span>"}, true))
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      

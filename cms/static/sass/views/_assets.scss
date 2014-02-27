@@ -304,7 +304,7 @@
             @include transition(all $tmg-f2 ease-in-out 0s);
             @extend %t-copy-sub2;
             box-shadow: none;
-            border: none;
+            border: 1px solid transparent;
             background: none;
             width: 100%;
             color: $gray-l2;

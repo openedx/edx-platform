@@ -218,6 +218,12 @@ FEATURES = {
 
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+
+    # Hide any Personally Identifiable Information from application logs
+    'SQUELCH_PII_IN_LOGS': False,
+
+    # Toggle embargo functionality
+    'EMBARGO': False,
 }
 
 # Used for A/B testing
@@ -255,6 +261,9 @@ node_paths = [
     system_node_path,
 ]
 NODE_PATH = ':'.join(node_paths)
+
+# For geolocation ip database
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
 
 
 # Where to look for a status message
@@ -700,6 +709,7 @@ MIDDLEWARE_CLASSES = (
 
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
+    'embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences
     # should be after DarkLangMiddleware
@@ -724,6 +734,7 @@ MIDDLEWARE_CLASSES = (
 
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
+
 )
 
 ############################### Pipeline #######################################
@@ -1138,6 +1149,8 @@ INSTALLED_APPS = (
 
     # Student Identity Reverification
     'reverification',
+
+    'embargo',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1251,6 +1264,10 @@ REGISTRATION_EXTRA_FIELDS = {
     'city': 'hidden',
     'country': 'hidden',
 }
+
+########################## CERTIFICATE NAME ########################
+CERT_NAME_SHORT = "Certificate"
+CERT_NAME_LONG = "Certificate of Achievement"
 
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE

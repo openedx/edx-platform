@@ -15,13 +15,13 @@ def get_visible_courses():
                if isinstance(c, CourseDescriptor)]
     courses = sorted(courses, key=lambda course: course.number)
 
-    subdomain = MicrositeConfiguration.get_microsite_configuration_value('subdomain')
+    subdomain = MicrositeConfiguration.get_microsite_configuration_value('subdomain', 'default')
 
     # See if we have filtered course listings in this domain
     filtered_visible_ids = None
 
-    # this is legacy format which is outside of the microsite feature
-    if hasattr(settings, 'COURSE_LISTINGS') and subdomain in settings.COURSE_LISTINGS:
+    # this is legacy format which is outside of the microsite feature -- also handle dev case, which should not filter
+    if hasattr(settings, 'COURSE_LISTINGS') and subdomain in settings.COURSE_LISTINGS and not settings.DEBUG:
         filtered_visible_ids = frozenset(settings.COURSE_LISTINGS[subdomain])
 
     filtered_by_org = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')

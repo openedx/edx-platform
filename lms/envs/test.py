@@ -40,6 +40,9 @@ FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 
+# Toggles embargo on for testing
+FEATURES['EMBARGO'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 

@@ -221,7 +221,7 @@
                 expect(state.videoPlayer.play).toHaveBeenCalled();
             });
 
-            it('when cued, onEnded resets start and end time only the second time', function () {
+            it('even when cued, onEnded does not resets start and end time', function () {
                 state.videoPlayer.skipOnEndedStartEndReset = true;
                 state.videoPlayer.onEnded();
                 expect(state.videoPlayer.startTime).toBe(10);
@@ -229,8 +229,8 @@
 
                 state.videoPlayer.skipOnEndedStartEndReset = undefined;
                 state.videoPlayer.onEnded();
-                expect(state.videoPlayer.startTime).toBe(0);
-                expect(state.videoPlayer.endTime).toBe(null);
+                expect(state.videoPlayer.startTime).toBe(10);
+                expect(state.videoPlayer.endTime).toBe(30);
             });
         });
 

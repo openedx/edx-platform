@@ -43,6 +43,7 @@ from .component import (
     OPEN_ENDED_COMPONENT_TYPES, NOTE_COMPONENT_TYPES,
     ADVANCED_COMPONENT_POLICY_KEY)
 
+from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 
 from student.models import CourseEnrollment
@@ -206,7 +207,7 @@ def _accessible_courses_list_from_groups(request):
         course_ids.add(course_id.replace('/', '.').lower())
 
     for course_id in course_ids:
-        # get course_location with lowercase idget_item
+        # get course_location with lowercase id
         course_location = loc_mapper().translate_locator_to_location(
             CourseLocator(package_id=course_id), get_course=True, lower_only=True
         )
@@ -407,8 +408,18 @@ def create_new_course(request):
     # auto-enroll the course creator in the course so that "View Live" will
     # work.
     CourseEnrollment.enroll(request.user, new_course.location.course_id)
+    _users_assign_default_role(new_course.location)
 
     return JsonResponse({'url': new_location.url_reverse("course/", "")})
+
+
+def _users_assign_default_role(course_location):
+    """
+    Assign 'Student' role to all previous users (if any) for this course
+    """
+    enrollments = CourseEnrollment.objects.filter(course_id=course_location.course_id)
+    for enrollment in enrollments:
+        assign_default_role(course_location.course_id, enrollment.user)
 
 
 # pylint: disable=unused-argument
@@ -479,7 +490,11 @@ def course_info_update_handler(request, tag=None, package_id=None, branch=None, 
         raise PermissionDenied()
 
     if request.method == 'GET':
-        return JsonResponse(get_course_updates(updates_location, provided_id))
+        course_updates = get_course_updates(updates_location, provided_id)
+        if isinstance(course_updates, dict) and course_updates.get('error'):
+            return JsonResponse(get_course_updates(updates_location, provided_id), course_updates.get('status', 400))
+        else:
+            return JsonResponse(get_course_updates(updates_location, provided_id))
     elif request.method == 'DELETE':
         try:
             return JsonResponse(delete_course_update(updates_location, request.json, provided_id, request.user))

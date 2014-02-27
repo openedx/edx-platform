@@ -7,7 +7,7 @@ from lxml import etree
 from path import path
 
 from pkg_resources import resource_string
-from xblock.fields import Scope, String, Boolean
+from xblock.fields import Scope, String, Boolean, List
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
@@ -293,6 +293,11 @@ class CourseInfoFields(object):
     """
     Field overrides
     """
+    items = List(
+        help="List of course update items",
+        default=[],
+        scope=Scope.content
+    )
     data = String(
         help="Html contents to display for this module",
         default="<ol></ol>",
@@ -305,7 +310,9 @@ class CourseInfoModule(CourseInfoFields, HtmlModule):
     """
     Just to support xblock field overrides
     """
-    pass
+    # statuses
+    STATUS_VISIBLE = 'visible'
+    STATUS_DELETED = 'deleted'
 
 
 @XBlock.tag("detached")

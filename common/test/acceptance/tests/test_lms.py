@@ -369,9 +369,12 @@ class XBlockAcidBase(UniqueCourseTest):
 
         acid_block = AcidView(self.browser, '.xblock-student_view[data-block-type=acid]')
         self.assertTrue(acid_block.init_fn_passed)
-        self.assertTrue(acid_block.doc_ready_passed)
         self.assertTrue(acid_block.child_tests_passed)
+        self.assertTrue(acid_block.resource_url_passed)
         self.assertTrue(acid_block.scope_passed('user_state'))
+        self.assertTrue(acid_block.scope_passed('user_state_summary'))
+        self.assertTrue(acid_block.scope_passed('preferences'))
+        self.assertTrue(acid_block.scope_passed('user_info'))
 
 
 class XBlockAcidNoChildTest(XBlockAcidBase):

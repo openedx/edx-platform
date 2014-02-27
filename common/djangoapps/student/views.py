@@ -57,6 +57,8 @@ from collections import namedtuple
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
 
+from django_comment_common.models import Role
+
 from external_auth.models import ExternalAuthMap
 import external_auth.views
 
@@ -138,6 +140,15 @@ def _get_date_for_press(publish_date):
     else:
         date = datetime.datetime.strptime(date, "%B, %Y").replace(tzinfo=UTC)
     return date
+
+
+def embargo(_request):
+    """
+    Render the embargo page.
+
+    Explains to the user why they are not able to access a particular embargoed course.
+    """
+    return render_to_response('static_templates/embargo.html')
 
 
 def press(request):
@@ -700,7 +711,10 @@ def login_user(request, error=""):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
-        AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.warning(u"Login failed - Unknown user email")
+        else:
+            AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
         user = None
 
     # check if the user has a linked shibboleth account, if so, redirect the user to shib-login
@@ -718,7 +732,7 @@ def login_user(request, error=""):
             # This is actually the common case, logging in user without external linked login
             AUDIT_LOG.info("User %s w/o external auth attempting login", user)
 
-    # see if account has been locked out due to excessive login failres
+    # see if account has been locked out due to excessive login failures
     user_found_by_email_lookup = user
     if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
         if LoginFailures.is_user_locked_out(user_found_by_email_lookup):
@@ -747,7 +761,11 @@ def login_user(request, error=""):
         # if we didn't find this username earlier, the account for this email
         # doesn't exist, and doesn't have a corresponding password
         if username != "":
-            AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
+            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                loggable_id = user_found_by_email_lookup.id if user_found_by_email_lookup else "<unknown>"
+                AUDIT_LOG.warning(u"Login failed - password for user.id: {0} is invalid".format(loggable_id))
+            else:
+                AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
         return JsonResponse({
             "success": False,
             "value": _('Email or password is incorrect.'),
@@ -801,7 +819,10 @@ def login_user(request, error=""):
 
         return response
 
-    AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.warning(u"Login failed - Account not active for user.id: {0}, resending activation".format(user.id))
+    else:
+        AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
     not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
@@ -1080,6 +1101,19 @@ def create_account(request, post_override=None):
             js['field'] = field_name
             return JsonResponse(js, status=400)
 
+        max_length = 75
+        if field_name == 'username':
+            max_length = 30
+
+        if field_name in ('email', 'username') and len(post_vars[field_name]) > max_length:
+            error_str = {
+                'username': _('Username cannot be more than {0} characters long').format(max_length),
+                'email': _('Email cannot be more than {0} characters long').format(max_length)
+            }
+            js['value'] = error_str[field_name]
+            js['field'] = field_name
+            return JsonResponse(js, status=400)
+
     try:
         validate_email(post_vars['email'])
     except ValidationError:
@@ -1211,6 +1245,7 @@ def auto_auth(request):
     * `full_name` for the user profile (the user's full name; defaults to the username)
     * `staff`: Set to "true" to make the user global staff.
     * `course_id`: Enroll the student in the course with `course_id`
+    * `roles`: Comma-separated list of roles to grant the student in the course with `course_id`
 
     If username, email, or password are not provided, use
     randomly generated credentials.
@@ -1226,6 +1261,7 @@ def auto_auth(request):
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
     course_id = request.GET.get('course_id', None)
+    role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object
     post_data = {
@@ -1268,14 +1304,19 @@ def auto_auth(request):
     if course_id is not None:
         CourseEnrollment.enroll(user, course_id)
 
+    # Apply the roles
+    for role_name in role_names:
+        role = Role.objects.get(name=role_name, course_id=course_id)
+        user.roles.add(role)
+
     # Log in as the user
     user = authenticate(username=username, password=password)
     login(request, user)
 
     # Provide the user with a valid CSRF token
     # then return a 200 response
-    success_msg = u"Logged in user {0} ({1}) with password {2}".format(
-        username, email, password
+    success_msg = u"Logged in user {0} ({1}) with password {2} and user_id {3}".format(
+        username, email, password, user.id
     )
     response = HttpResponse(success_msg)
     response.set_cookie('csrftoken', csrf(request)['csrf_token'])

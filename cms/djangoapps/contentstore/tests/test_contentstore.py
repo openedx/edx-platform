@@ -679,6 +679,62 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         return content_store, trash_store, thumbnail_location
 
+    def test_course_info_updates_import_export(self):
+        """
+        Test that course info updates are imported and exported with all content fields ('data', 'items')
+        """
+        content_store = contentstore()
+        module_store = modulestore('direct')
+        data_dir = "common/test/data/"
+        import_from_xml(module_store, data_dir, ['course_info_updates'],
+                        static_content_store=content_store, verbose=True)
+
+        course_location = CourseDescriptor.id_to_location('edX/course_info_updates/2014_T1')
+        course = module_store.get_item(course_location)
+
+        self.assertIsNotNone(course)
+
+        course_updates = module_store.get_item(
+            Location(['i4x', 'edX', 'course_info_updates', 'course_info', 'updates', None]))
+
+        self.assertIsNotNone(course_updates)
+
+         # check that course which is imported has files 'updates.html' and 'updates.items.json'
+        filesystem = OSFS(data_dir + 'course_info_updates/info')
+        self.assertTrue(filesystem.exists('updates.html'))
+        self.assertTrue(filesystem.exists('updates.items.json'))
+
+        # verify that course info update module has same data content as in data file from which it is imported
+        # check 'data' field content
+        with filesystem.open('updates.html', 'r') as course_policy:
+            on_disk = course_policy.read()
+            self.assertEqual(course_updates.data, on_disk)
+
+        # check 'items' field content
+        with filesystem.open('updates.items.json', 'r') as course_policy:
+            on_disk = loads(course_policy.read())
+            self.assertEqual(course_updates.items, on_disk)
+
+        # now export the course to a tempdir and test that it contains files 'updates.html' and 'updates.items.json'
+        # with same content as in course 'info' directory
+        root_dir = path(mkdtemp_clean())
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+        export_to_xml(module_store, content_store, course_location, root_dir, 'test_export')
+
+        # check that exported course has files 'updates.html' and 'updates.items.json'
+        filesystem = OSFS(root_dir / 'test_export/info')
+        self.assertTrue(filesystem.exists('updates.html'))
+        self.assertTrue(filesystem.exists('updates.items.json'))
+
+        # verify that exported course has same data content as in course_info_update module
+        with filesystem.open('updates.html', 'r') as grading_policy:
+            on_disk = grading_policy.read()
+            self.assertEqual(on_disk, course_updates.data)
+
+        with filesystem.open('updates.items.json', 'r') as grading_policy:
+            on_disk = loads(grading_policy.read())
+            self.assertEqual(on_disk, course_updates.items)
+
     def test_empty_trashcan(self):
         '''
         This test will exercise the emptying of the asset trashcan
@@ -1377,7 +1433,9 @@ class ContentStoreTest(ModuleStoreTestCase):
         course_id = _get_course_id(test_course_data)
         self.assertTrue(are_permissions_roles_seeded(course_id))
         delete_course_and_groups(course_id, commit=True)
-        self.assertFalse(are_permissions_roles_seeded(course_id))
+        # should raise an exception for checking permissions on deleted course
+        with self.assertRaises(ItemNotFoundError):
+            are_permissions_roles_seeded(course_id)
 
     def test_forum_unseeding_with_multiple_courses(self):
         """Test new course creation and verify forum unseeding when there are multiple courses"""
@@ -1387,11 +1445,30 @@ class ContentStoreTest(ModuleStoreTestCase):
         # unseed the forums for the first course
         course_id = _get_course_id(test_course_data)
         delete_course_and_groups(course_id, commit=True)
-        self.assertFalse(are_permissions_roles_seeded(course_id))
+        # should raise an exception for checking permissions on deleted course
+        with self.assertRaises(ItemNotFoundError):
+            are_permissions_roles_seeded(course_id)
 
         second_course_id = _get_course_id(second_course_data)
         # permissions should still be there for the other course
         self.assertTrue(are_permissions_roles_seeded(second_course_id))
+
+    def test_course_enrollments_and_roles_on_delete(self):
+        """
+        Test that course deletion doesn't remove course enrollments or user's roles
+        """
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        course_id = _get_course_id(test_course_data)
+
+        # test that a user gets his enrollment and its 'student' role as default on creating a course
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
+        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))  # pylint: disable=no-member
+
+        delete_course_and_groups(course_id, commit=True)
+        # check that user's enrollment for this course is not deleted
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
+        # check that user has form role "Student" for this course even after deleting it
+        self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))  # pylint: disable=no-member
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""

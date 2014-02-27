@@ -1,10 +1,12 @@
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
+from django_comment_common.models import (
+    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT)
+from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment, UserProfile
 from util.testing import UrlResetMixin
 from mock import patch
-from django.core.urlresolvers import reverse, NoReverseMatch
 
 
 class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
@@ -103,6 +105,39 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         enrollment = CourseEnrollment.objects.get(course_id=course_id)
         self.assertEqual(enrollment.user.username, "test")
 
+    def test_set_roles(self):
+
+        course_id = "edX/Test101/2014_Spring"
+        seed_permissions_roles(course_id)
+        course_roles = dict((r.name, r) for r in Role.objects.filter(course_id=course_id))
+        self.assertEqual(len(course_roles), 4)  # sanity check
+
+        # Student role is assigned by default on course enrollment.
+        self._auto_auth(username='a_student', course_id=course_id)
+        user = User.objects.get(username='a_student')
+        user_roles = user.roles.all()
+        self.assertEqual(len(user_roles), 1)
+        self.assertEqual(user_roles[0], course_roles[FORUM_ROLE_STUDENT])
+
+        self._auto_auth(username='a_moderator', course_id=course_id, roles='Moderator')
+        user = User.objects.get(username='a_moderator')
+        user_roles = user.roles.all()
+        self.assertEqual(
+            set(user_roles),
+            set([course_roles[FORUM_ROLE_STUDENT],
+                course_roles[FORUM_ROLE_MODERATOR]]))
+
+        # check multiple roles work.
+        self._auto_auth(username='an_admin', course_id=course_id,
+                        roles='{},{}'.format(FORUM_ROLE_MODERATOR, FORUM_ROLE_ADMINISTRATOR))
+        user = User.objects.get(username='an_admin')
+        user_roles = user.roles.all()
+        self.assertEqual(
+            set(user_roles),
+            set([course_roles[FORUM_ROLE_STUDENT],
+                course_roles[FORUM_ROLE_MODERATOR],
+                course_roles[FORUM_ROLE_ADMINISTRATOR]]))
+
     def _auto_auth(self, **params):
         """
         Make a request to the auto-auth end-point and check
@@ -113,8 +148,8 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
 
         # Check that session and CSRF are set in the response
         for cookie in ['csrftoken', 'sessionid']:
-            self.assertIn(cookie, response.cookies)  #pylint: disable=E1103
-            self.assertTrue(response.cookies[cookie].value)  #pylint: disable=E1103
+            self.assertIn(cookie, response.cookies)  # pylint: disable=E1103
+            self.assertTrue(response.cookies[cookie].value)  # pylint: disable=E1103
 
 
 class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):
