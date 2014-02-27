@@ -5,16 +5,30 @@ define(
 'video/03_video_player.js',
 ['video/02_html5_video.js', 'video/00_resizer.js'],
 function (HTML5Video, Resizer) {
-    var dfd = $.Deferred(),
-        VideoPlayer = function (state) {
-            state.videoPlayer = {};
-            _makeFunctionsPublic(state);
-            _initialize(state);
-            // No callbacks to DOM events (click, mousemove, etc.).
+     var dfd = $.Deferred();
 
-            return dfd.promise();
-        },
-        methodsDict = {
+    // VideoPlayer() function - what this module "exports".
+    return function (state) {
+
+        state.videoPlayer = {};
+
+        _makeFunctionsPublic(state);
+        _initialize(state);
+        // No callbacks to DOM events (click, mousemove, etc.).
+
+        return dfd.promise();
+    };
+
+    // ***************************************************************
+    // Private functions start here.
+    // ***************************************************************
+
+    // function _makeFunctionsPublic(state)
+    //
+    //     Functions which will be accessible via 'state' object. When called,
+    //     these functions will get the 'state' object as a context.
+    function _makeFunctionsPublic(state) {
+        var methodsDict = {
             duration: duration,
             handlePlaybackQualityChange: handlePlaybackQualityChange,
             isPlaying: isPlaying,
@@ -32,25 +46,10 @@ function (HTML5Video, Resizer) {
             onVolumeChange: onVolumeChange,
             pause: pause,
             play: play,
-            setPlaybackRate: setPlaybackRate,
             update: update,
             updatePlayTime: updatePlayTime
         };
 
-    VideoPlayer.prototype = methodsDict;
-
-    // VideoPlayer() function - what this module "exports".
-    return VideoPlayer;
-
-    // ***************************************************************
-    // Private functions start here.
-    // ***************************************************************
-
-    // function _makeFunctionsPublic(state)
-    //
-    //     Functions which will be accessible via 'state' object. When called,
-    //     these functions will get the 'state' object as a context.
-    function _makeFunctionsPublic(state) {
         state.bindTo(methodsDict, state.videoPlayer, state);
     }
 
@@ -71,7 +70,7 @@ function (HTML5Video, Resizer) {
             $(window).on('unload', state.saveState);
 
             if (state.currentPlayerMode !== 'flash') {
-                state.videoPlayer.setPlaybackRate(state.speed);
+                state.videoPlayer.onSpeedChange(state.speed);
             }
             state.videoPlayer.player.setVolume(state.currentVolume);
         });
@@ -326,9 +325,32 @@ function (HTML5Video, Resizer) {
         }
     }
 
-    function setPlaybackRate(newSpeed) {
+    function onSpeedChange(newSpeed) {
         var time = this.videoPlayer.currentTime,
             methodName, youtubeId;
+
+        if (this.currentPlayerMode === 'flash') {
+            this.videoPlayer.currentTime = Time.convert(
+                time,
+                parseFloat(this.speed),
+                newSpeed
+            );
+        }
+
+        newSpeed = parseFloat(newSpeed).toFixed(2).replace(/\.00$/, '.0');
+
+        if (this.speed != newSpeed) {
+            this.videoPlayer.log(
+                'speed_change_video',
+                {
+                    current_time: time,
+                    old_speed: this.speed,
+                    new_speed: newSpeed
+                }
+            );
+        }
+
+        this.setSpeed(newSpeed, true);
 
         if (
             this.currentPlayerMode === 'html5' &&
@@ -355,33 +377,7 @@ function (HTML5Video, Resizer) {
             this.videoPlayer.player[methodName](youtubeId, time);
             this.videoPlayer.updatePlayTime(time);
         }
-    }
 
-    function onSpeedChange(newSpeed) {
-        var time = this.videoPlayer.currentTime,
-            isFlash = this.currentPlayerMode === 'flash';
-
-        if (isFlash) {
-            this.videoPlayer.currentTime = Time.convert(
-                time,
-                parseFloat(this.speed),
-                newSpeed
-            );
-        }
-
-        newSpeed = parseFloat(newSpeed).toFixed(2).replace(/\.00$/, '.0');
-
-        this.videoPlayer.log(
-            'speed_change_video',
-            {
-                current_time: time,
-                old_speed: this.speed,
-                new_speed: newSpeed
-            }
-        );
-
-        this.setSpeed(newSpeed, true);
-        this.videoPlayer.setPlaybackRate(newSpeed);
         this.el.trigger('speedchange', arguments);
 
         this.saveState(true, { speed: newSpeed });

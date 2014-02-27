@@ -164,37 +164,6 @@ div.video {
         }
       }
 
-      %video-button {
-        @include transition(none);
-        display: block;
-        font-weight: 800;
-        line-height: 46px;
-        margin: 0;
-        padding: 0 0 0 15px;
-        text-indent: -9999px;
-        -webkit-font-smoothing: antialiased;
-        box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
-        color: #fff;
-        cursor: pointer;
-        border-width: 0 1px;
-        border-style: solid;
-        border-color: #000;
-
-        &:hover {
-          background-color: #444;
-          color: #fff;
-          text-decoration: none;
-          outline: 0;
-        }
-
-        &:active,
-        &:focus {
-          color: #fff;
-          background-color: #444;
-          text-decoration: none;
-        }
-      }
-
       div.slider {
         @include clearfix();
         @include transform(scaleY(0.5) translate3d(0, 50%, 0));
@@ -261,33 +230,48 @@ div.video {
           margin-bottom: 0;
 
           a {
-            @extend %video-button;
-            background-image: url('../images/vcr.png');
-            background-position: 15px 15px ;
-            background-repeat: no-repeat;
-            border-left: none;
+            border-bottom: none;
+            border-right: 1px solid #000;
             box-shadow: 1px 0 0 #555;
+            cursor: pointer;
+            display: block;
+            line-height: 46px;
             padding: 0 lh(.75);
+            text-indent: -9999px;
             width: 14px;
+            background: url('../images/vcr.png') 15px 15px no-repeat;
 
             &:focus {
               position: relative;
               z-index: 10000;
               outline: #fff dotted thin;
               outline-offset: -2px;
+              background: #333;
+            }
+
+            &:hover {
+              outline: 0;
             }
 
             &:empty {
               height: 46px;
-              background-position: 15px 15px;
+              background: url('../images/vcr.png') 15px 15px no-repeat;
             }
 
             &.play {
               background-position: 17px -114px;
+
+              &:hover {
+                background-color: #444;
+              }
             }
 
             &.pause {
               background-position: 16px -50px;
+
+              &:hover {
+                background-color: #444;
+              }
             }
           }
 
@@ -317,12 +301,16 @@ div.video {
           }
         }
 
-        .menu-container {
+        div.speeds {
           float: left;
           position: relative;
 
           &.open {
-            .menu {
+            & > a {
+              background: url('../images/open-arrow.png') 10px center no-repeat;
+            }
+
+            ol.video_speeds {
               display: block;
               opacity: 1;
               padding: 0;
@@ -331,77 +319,22 @@ div.video {
             }
           }
 
-          .menu {
-            @include transition(none);
-            box-shadow: inset 1px 0 0 #555, 0 1px 0 #444;
-            background-color: #444;
-            border: 1px solid #000;
-            bottom: 46px;
-            display: none;
-            opacity: 0;
-            position: absolute;
-            z-index: 10;
-
-            li {
-              box-shadow:  0 1px 0 #555;
-              border-bottom: 1px solid #000;
-              color: #fff;
-              cursor: pointer;
-
-              a {
-                border: 0;
-                color: #fff;
-                display: block;
-                padding: lh(.5);
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-
-                &:hover {
-                  background-color: #666;
-                  color: #aaa;
-                  outline-offset: -4px;
-                }
-              }
-
-              &.active{
-                a {
-                  font-weight: bold;
-                }
-              }
-
-              &:last-child {
-                box-shadow: none;
-                border-bottom: 0;
-                margin-top: 0;
-              }
-            }
-          }
-        }
-
-        div.speeds {
-          &.open {
-            & > a {
-              background-image: url('../images/open-arrow.png');
-            }
-          }
-
-          .menu{
-            width: 131px;
-
-            @media (max-width: 1024px) {
-              width: 101px;
-            }
-          }
-
           & > a {
-            @extend %video-button;
             @include clearfix();
-            background-image: url('../images/closed-arrow.png');
-            background-position: 10px center;
-            background-repeat: no-repeat;
+            @include transition(none);
+            background: url('../images/closed-arrow.png') 10px center no-repeat;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
+            color: #fff;
+            cursor: pointer;
+            display: block;
+            line-height: 46px; //height of play pause buttons
+            margin-right: 0;
+            padding-left: 15px;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
             min-width: 116px;
-            text-indent: 0;
 
             @media (max-width: 1024px) {
               min-width: 0;
@@ -409,6 +342,26 @@ div.video {
             }
 
             h3 {
+              display: block;
+
+              @media (max-width: 1024px) {
+                display: none;
+              }
+            }
+
+            &:hover {
+              outline: 0;
+              opacity: 1;
+              background-color: #444;
+            }
+
+            &:active {
+              opacity: 1;
+              background-color: #444;
+            }
+
+            h3 {
+              color: #999;
               float: left;
               font-size: em(14);
               font-weight: normal;
@@ -416,11 +369,6 @@ div.video {
               padding: 0 lh(.25) 0 lh(.5);
               line-height: 46px;
               text-transform: uppercase;
-              color: #999;
-
-              @media (max-width: 1024px) {
-                display: none;
-              }
             }
 
             p.active {
@@ -435,6 +383,55 @@ div.video {
 
               line-height: 46px;
               color: #fff;
+            }
+          }
+
+          // fix for now
+          ol.video_speeds {
+            @include transition(none);
+            box-shadow: inset 1px 0 0 #555, 0 4px 0 #444;
+            background-color: #444;
+            border: 1px solid #000;
+            bottom: 46px;
+            display: none;
+            opacity: 0;
+            position: absolute;
+            width: 131px;
+
+            @media (max-width: 1024px) {
+              width: 101px;
+            }
+
+            z-index: 10;
+
+            li {
+              box-shadow:  0 1px 0 #555;
+              border-bottom: 1px solid #000;
+              color: #fff;
+              cursor: pointer;
+
+              a {
+                border: 0;
+                color: #fff;
+                display: block;
+                padding: lh(.5);
+
+                &:hover {
+                  background-color: #666;
+                  color: #aaa;
+                  outline-offset: -4px;
+                }
+              }
+
+              &.active {
+                font-weight: bold;
+              }
+
+              &:last-child {
+                box-shadow: none;
+                border-bottom: 0;
+                margin-top: 0;
+              }
             }
           }
         }
@@ -457,14 +454,29 @@ div.video {
           }
 
           & > a {
-            @extend %video-button;
             @include clearfix();
+            @include transition(none);
             background-image: url('../images/volume.png');
             background-position: 10px center;
             background-repeat: no-repeat;
-            border-left: none;
-            width: 30px;
+            border-right: 1px solid #000;
+            box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
+            color: #fff;
+            cursor: pointer;
+            display: block;
             height: 46px;
+            margin-right: 0;
+            padding-left: 15px;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            width: 30px;
+
+            &:hover, &:active {
+              background-color: #444;
+              color: #fff;
+              text-decoration: none;
+              outline: 0;
+            }
           }
 
           .volume-slider-container {
@@ -511,23 +523,48 @@ div.video {
         }
 
         a.add-fullscreen {
-          @extend %video-button;
+          @include transition(none);
           background: url(../images/fullscreen.png) center no-repeat;
-          border-left: none;
+          border-right: 1px solid #000;
+          box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
+          color: #797979;
+          display: block;
           float: left;
-          padding: 0 11px;
+          line-height: 46px; //height of play pause buttons
+          margin-left: 0;
+          padding: 0 lh(.5);
+          text-indent: -9999px;
           width: 30px;
+
+          &:hover, &:active {
+            background-color: #444;
+            color: #fff;
+            text-decoration: none;
+            outline: 0;
+          }
         }
 
 
         a.quality_control {
-          @extend %video-button;
+          @include transition(none);
           background: url(../images/hd.png) center no-repeat;
-          border-left: none;
+          border-right: 1px solid #000;
+          box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
+          color: #797979;
           display: none;
           float: left;
-          padding: 0 11px;
+          line-height: 46px; //height of play pause buttons
+          margin-left: 0;
+          padding: 0 lh(.5);
+          text-indent: -9999px;
           width: 30px;
+
+          &:hover {
+            background-color: #444;
+            color: #fff;
+            text-decoration: none;
+            outline: 0;
+          }
 
           &.active {
             background-color: #F44;
@@ -537,26 +574,33 @@ div.video {
           }
         }
 
-        div.lang {
-          & > a.hide-subtitles {
-            @extend %video-button;
-            @include transition(none);
-            box-shadow: inset 1px 0 0 #555;
-            background: url('../images/cc.png') center no-repeat;
-            border-left: none;
-            border-right: none;
-            padding: 0 11px;
-            width: 30px;
 
-            &.off {
-              opacity: 0.7;
-            }
+        a.hide-subtitles {
+          @include transition(none);
+          background: url('../images/cc.png') center no-repeat;
+          float: left;
+          font-weight: 800;
+          line-height: 46px; //height of play pause buttons
+          margin-left: 0;
+          opacity: 1;
+          padding: 0 lh(.5);
+          position: relative;
+          text-indent: -9999px;
+          -webkit-font-smoothing: antialiased;
+          width: 30px;
+
+          &:hover {
+            background-color: #444;
+            color: #fff;
+            text-decoration: none;
+            outline: 0;
           }
 
-          .menu.langs-list {
-            right: -1px;
-            width: 150px;
+          &.off {
+            opacity: 0.7;
           }
+
+          color: #797979;
         }
       }
     }

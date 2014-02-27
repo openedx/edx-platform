@@ -9,7 +9,6 @@
 
             state = jasmine.initializePlayer();
             videoControl = state.videoControl;
-            $.fn.scrollTo.reset();
         });
 
         afterEach(function () {
@@ -29,7 +28,12 @@
             describe('always', function () {
                 beforeEach(function () {
                     spyOn($, 'ajaxWithPrefix').andCallThrough();
+
                     state = jasmine.initializePlayer();
+
+                    videoControl = state.videoControl;
+
+                    $.fn.scrollTo.reset();
                 });
 
                 it('create the caption element', function () {
@@ -60,12 +64,8 @@
 
                     runs(function () {
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
-                            url: '/transcript/translation',
+                            url: state.videoCaption.captionURL(),
                             notifyOnError: false,
-                            data: {
-                                videoId: 'Z5KLxerq05Y',
-                                language: 'en'
-                            },
                             success: jasmine.any(Function),
                             error: jasmine.any(Function)
                         });
@@ -100,98 +100,23 @@
                     expect($('.subtitles')).toHandleWith(
                         'DOMMouseScroll', state.videoCaption.onMovement
                     );
-                 });
-
-                 it('bind the scroll', function () {
-                     expect($('.subtitles'))
-                         .toHandleWith('scroll', state.videoControl.showControls);
-                 });
-
-            });
-
-            describe('renderLanguageMenu', function () {
-                describe('is rendered', function () {
-                    it('if languages more than 1', function () {
-                        state = jasmine.initializePlayer();
-                        var transcripts = state.config.transcriptLanguages,
-                            langCodes = _.keys(transcripts),
-                            langLabels = _.values(transcripts);
-
-                        expect($('.langs-list')).toExist();
-                        expect($('.langs-list')).toHandle('click');
-
-
-                        $('.langs-list li').each(function(index) {
-                            var code = $(this).data('lang-code'),
-                                link = $(this).find('a'),
-                                label = link.text();
-
-                            expect(code).toBeInArray(langCodes);
-                            expect(label).toBeInArray(langLabels);
-                        });
-                    });
-
-                    it('when clicking on link with new language', function () {
-                        state = jasmine.initializePlayer();
-                        var Caption = state.videoCaption,
-                            link = $('.langs-list li[data-lang-code="de"] a');
-
-                        spyOn(Caption, 'fetchCaption');
-                        spyOn(state.storage, 'setItem');
-
-                        state.lang = 'en';
-                        link.trigger('click');
-
-                        expect(Caption.fetchCaption).toHaveBeenCalled();
-                        expect(state.lang).toBe('de');
-                        expect(state.storage.setItem)
-                            .toHaveBeenCalledWith('language', 'de');
-                        expect($('.langs-list li.active').length).toBe(1);
-                    });
-
-                    it('when clicking on link with current language', function () {
-                        state = jasmine.initializePlayer();
-                        var Caption = state.videoCaption,
-                            link = $('.langs-list li[data-lang-code="en"] a');
-
-                        spyOn(Caption, 'fetchCaption');
-                        spyOn(state.storage, 'setItem');
-
-                        state.lang = 'en';
-                        link.trigger('click');
-
-                        expect(Caption.fetchCaption).not.toHaveBeenCalled();
-                        expect(state.lang).toBe('en');
-                        expect(state.storage.setItem)
-                            .not.toHaveBeenCalledWith('language', 'en');
-                        expect($('.langs-list li.active').length).toBe(1);
-                    });
-
-                    it('open the language toggle on hover', function () {
-                        state = jasmine.initializePlayer();
-                        $('.lang').mouseenter();
-                        expect($('.lang')).toHaveClass('open');
-                        $('.lang').mouseleave();
-                        expect($('.lang')).not.toHaveClass('open');
-                    });
                 });
 
-                describe('is not rendered', function () {
-                    it('if just 1 language', function () {
-                        state = jasmine.initializePlayer(null, {
-                            'transcriptLanguages': {"en": "English"}
-                        });
-
-                        expect($('.langs-list')).not.toExist();
-                        expect($('.lang')).not.toHandle('mouseenter');
-                        expect($('.lang')).not.toHandle('mouseleave');
-                    });
+                it('bind the scroll', function () {
+                    expect($('.subtitles'))
+                        .toHandleWith('scroll', state.videoCaption.autoShowCaptions);
+                    expect($('.subtitles'))
+                        .toHandleWith('scroll', videoControl.showControls);
                 });
             });
 
             describe('when on a non touch-based device', function () {
                 beforeEach(function () {
                     state = jasmine.initializePlayer();
+
+                    videoControl = state.videoControl;
+
+                    $.fn.scrollTo.reset();
                 });
 
                 it('render the caption', function () {
@@ -217,46 +142,35 @@
                         .toBe(true);
                 });
 
-
                 it('bind all the caption link', function () {
-                    var handlerList = ['captionMouseOverOut', 'captionClick',
-                        'captionMouseDown', 'captionFocus', 'captionBlur',
-                        'captionKeyDown'
-                    ];
-
-                    $.each(handlerList, function(index, handler) {
-                        spyOn(state.videoCaption, handler);
-                    });
                     $('.subtitles li[data-index]').each(
                         function (index, link) {
 
-
-                        $(link).trigger('mouseover');
-                        expect(state.videoCaption.captionMouseOverOut).toHaveBeenCalled();
-
-                        state.videoCaption.captionMouseOverOut.reset();
-                        $(link).trigger('mouseout');
-                        expect(state.videoCaption.captionMouseOverOut).toHaveBeenCalled();
-
-                        $(this).click();
-                        expect(state.videoCaption.captionClick).toHaveBeenCalled();
-
-                        $(this).trigger('mousedown');
-                        expect(state.videoCaption.captionMouseDown).toHaveBeenCalled();
-
-                        $(this).trigger('focus');
-                        expect(state.videoCaption.captionFocus).toHaveBeenCalled();
-
-                        $(this).trigger('blur');
-                        expect(state.videoCaption.captionBlur).toHaveBeenCalled();
-
-                        $(this).trigger('keydown');
-                        expect(state.videoCaption.captionKeyDown).toHaveBeenCalled();
+                        expect($(link)).toHandleWith(
+                            'mouseover', state.videoCaption.captionMouseOverOut
+                        );
+                        expect($(link)).toHandleWith(
+                            'mouseout', state.videoCaption.captionMouseOverOut
+                        );
+                        expect($(link)).toHandleWith(
+                            'mousedown', state.videoCaption.captionMouseDown
+                        );
+                        expect($(link)).toHandleWith(
+                            'click', state.videoCaption.captionClick
+                        );
+                        expect($(link)).toHandleWith(
+                            'focus', state.videoCaption.captionFocus
+                        );
+                        expect($(link)).toHandleWith(
+                            'blur', state.videoCaption.captionBlur
+                        );
+                        expect($(link)).toHandleWith(
+                            'keydown', state.videoCaption.captionKeyDown
+                        );
                     });
                 });
 
                 it('set rendered to true', function () {
-                    state = jasmine.initializePlayer();
                     expect(state.videoCaption.rendered).toBeTruthy();
                 });
             });
@@ -266,6 +180,9 @@
                     window.onTouchBasedDevice.andReturn(['iPad']);
 
                     state = jasmine.initializePlayer();
+
+                    videoControl = state.videoControl;
+
                     $.fn.scrollTo.reset();
                 });
 
@@ -283,9 +200,12 @@
 
             describe('when no captions file was specified', function () {
                 beforeEach(function () {
-                    state = jasmine.initializePlayer('video_all.html', {
-                        'sub': ''
-                    });
+                    loadFixtures('video_all.html');
+
+                    // Unspecify the captions file.
+                    $('#example').find('#video_id').data('sub', '');
+
+                    state = new Video('#example');
                 });
 
                 it('captions panel is not shown', function () {
@@ -298,7 +218,6 @@
             beforeEach(function () {
                 jasmine.Clock.useMock();
                 spyOn(window, 'clearTimeout');
-                state = jasmine.initializePlayer();
             });
 
             describe('when cursor is outside of the caption box', function () {
@@ -394,254 +313,8 @@
             });
         });
 
-        it('reRenderCaption', function () {
-            var Caption = state.videoCaption,
-                li;
-
-            Caption.captions = ['test'];
-            Caption.start = [500];
-
-            spyOn(Caption, 'addPaddings');
-
-            Caption.reRenderCaption();
-            li = $('ol.subtitles li');
-
-            expect(Caption.addPaddings).toHaveBeenCalled();
-            expect(li.length).toBe(1);
-            expect(li).toHaveData('start', '500');
-        });
-
-        describe('fetchCaption', function () {
-            var Caption, msg;
-
-            beforeEach(function () {
-                state = jasmine.initializePlayer();
-                Caption = state.videoCaption;
-                spyOn($, 'ajaxWithPrefix').andCallThrough();
-                spyOn(Caption, 'reRenderCaption');
-                spyOn(Caption, 'renderCaption');
-                spyOn(Caption, 'bindHandlers');
-                spyOn(Caption, 'updatePlayTime');
-                spyOn(Caption, 'hideCaptions');
-                spyOn(state, 'youtubeId').andReturn('Z5KLxerq05Y');
-            });
-
-            it('do not fetch captions, if 1.0 speed is absent', function () {
-                state.youtubeId.andReturn(void(0));
-                Caption.fetchCaption();
-
-                expect($.ajaxWithPrefix).not.toHaveBeenCalled();
-                expect(Caption.hideCaptions).not.toHaveBeenCalled();
-            });
-
-            it('show caption on language change', function () {
-                Caption.loaded = true;
-                Caption.fetchCaption();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.hideCaptions).toHaveBeenCalledWith(false);
-            });
-
-            msg = 'use cookie to show/hide captions if they have not been ' +
-                    'loaded yet';
-            it(msg, function () {
-                Caption.loaded = false;
-                state.hide_captions = false;
-                Caption.fetchCaption();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.hideCaptions).toHaveBeenCalledWith(false, false);
-
-                Caption.loaded = false;
-                Caption.hideCaptions.reset();
-                state.hide_captions = true;
-                Caption.fetchCaption();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.hideCaptions).toHaveBeenCalledWith(true, false);
-            });
-
-            it('on success: on touch devices', function () {
-                state.isTouch = true;
-                Caption.loaded = false;
-                Caption.fetchCaption();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.bindHandlers).toHaveBeenCalled();
-                expect(Caption.renderCaption).not.toHaveBeenCalled();
-                expect(Caption.updatePlayTime).not.toHaveBeenCalled();
-                expect(Caption.reRenderCaption).not.toHaveBeenCalled();
-                expect(Caption.loaded).toBeTruthy();
-            });
-
-            msg = 'on success: change language on touch devices when ' +
-                 'captions have not been rendered yet';
-            it(msg, function () {
-                state.isTouch = true;
-                Caption.loaded = true;
-                Caption.rendered = false;
-                Caption.fetchCaption();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.bindHandlers).not.toHaveBeenCalled();
-                expect(Caption.renderCaption).not.toHaveBeenCalled();
-                expect(Caption.updatePlayTime).not.toHaveBeenCalled();
-                expect(Caption.reRenderCaption).not.toHaveBeenCalled();
-                expect(Caption.loaded).toBeTruthy();
-            });
-
-            it('on success: re-render on touch devices', function () {
-                state.isTouch = true;
-                Caption.loaded = true;
-                Caption.rendered = true;
-                Caption.fetchCaption();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.bindHandlers).not.toHaveBeenCalled();
-                expect(Caption.renderCaption).not.toHaveBeenCalled();
-                expect(Caption.updatePlayTime).toHaveBeenCalled();
-                expect(Caption.reRenderCaption).toHaveBeenCalled();
-                expect(Caption.loaded).toBeTruthy();
-            });
-
-            it('on success: rendered correct', function () {
-                Caption.loaded = false;
-                Caption.fetchCaption();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.bindHandlers).toHaveBeenCalled();
-                expect(Caption.renderCaption).toHaveBeenCalled();
-                expect(Caption.updatePlayTime).not.toHaveBeenCalled();
-                expect(Caption.reRenderCaption).not.toHaveBeenCalled();
-                expect(Caption.loaded).toBeTruthy();
-            });
-
-            it('on success: re-rendered correct', function () {
-                Caption.loaded = true;
-                Caption.fetchCaption();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.bindHandlers).not.toHaveBeenCalled();
-                expect(Caption.renderCaption).not.toHaveBeenCalled();
-                expect(Caption.updatePlayTime).toHaveBeenCalled();
-                expect(Caption.reRenderCaption).toHaveBeenCalled();
-                expect(Caption.loaded).toBeTruthy();
-            });
-
-            msg = 'on error: captions are hidden if there are no transcripts';
-            it(msg, function () {
-                spyOn(Caption, 'fetchAvailableTranslations');
-                $.ajax.andCallFake(function (settings) {
-                    settings.error([]);
-                });
-
-                state.config.transcriptLanguages = {};
-
-                Caption.fetchCaption();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.fetchAvailableTranslations).not.toHaveBeenCalled();
-                expect(Caption.hideCaptions.mostRecentCall.args)
-                    .toEqual([true, false]);
-                expect(Caption.hideSubtitlesEl).toBeHidden();
-            });
-
-            msg = 'on error: fetch available translations if there are ' +
-                    'additional transcripts';
-            xit(msg, function () {
-                $.ajax
-                    .andCallFake(function (settings) {
-                        settings.error([]);
-                    });
-
-                state.config.transcriptLanguages = {
-                    'en': 'English',
-                    'uk': 'Ukrainian',
-                };
-
-                spyOn(Caption, 'fetchAvailableTranslations');
-                Caption.fetchCaption();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.fetchAvailableTranslations).toHaveBeenCalled();
-                expect(Caption.hideCaptions).not.toHaveBeenCalled();
-            });
-        });
-
-        describe('fetchAvailableTranslations', function () {
-            var Caption, msg;
-
-            beforeEach(function () {
-                state = jasmine.initializePlayer();
-                Caption = state.videoCaption;
-                spyOn($, 'ajaxWithPrefix').andCallThrough();
-                spyOn(Caption, 'hideCaptions');
-                spyOn(Caption, 'fetchCaption');
-                spyOn(Caption, 'renderLanguageMenu');
-            });
-
-            it('request created with correct parameters', function () {
-                Caption.fetchAvailableTranslations();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalledWith({
-                    url: '/transcript/available_translations',
-                    notifyOnError: false,
-                    success: jasmine.any(Function),
-                    error: jasmine.any(Function)
-                });
-            });
-
-            msg = 'on succes: language menu is rendered if translations available';
-            it(msg, function () {
-                state.config.transcriptLanguages = {
-                    'en': 'English',
-                    'uk': 'Ukrainian',
-                    'de': 'German'
-                };
-                Caption.fetchAvailableTranslations();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.fetchCaption).toHaveBeenCalled();
-                expect(state.config.transcriptLanguages).toEqual({
-                    'uk': 'Ukrainian',
-                    'de': 'German'
-                });
-                expect(Caption.renderLanguageMenu).toHaveBeenCalledWith({
-                    'uk': 'Ukrainian',
-                    'de': 'German'
-                });
-            });
-
-            msg = 'on succes: language menu isn\'t rendered if translations unavailable';
-            it(msg, function () {
-                state.config.transcriptLanguages = {
-                    'en': 'English',
-                    'ru': 'Russian'
-                };
-                Caption.fetchAvailableTranslations();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.fetchCaption).not.toHaveBeenCalled();
-                expect(state.config.transcriptLanguages).toEqual({});
-                expect(Caption.renderLanguageMenu).not.toHaveBeenCalled();
-            });
-
-            msg = 'on error: captions are hidden if there are no transcript';
-            it(msg, function () {
-                $.ajax.andCallFake(function (settings) {
-                    settings.error();
-                });
-                Caption.fetchAvailableTranslations();
-
-                expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.hideCaptions).toHaveBeenCalledWith(true, false);
-                expect(Caption.hideSubtitlesEl).toBeHidden();
-            });
-        });
-
         describe('search', function () {
             it('return a correct caption index', function () {
-                state = jasmine.initializePlayer();
                 expect(state.videoCaption.search(0)).toEqual(-1);
                 expect(state.videoCaption.search(3120)).toEqual(1);
                 expect(state.videoCaption.search(6270)).toEqual(2);
@@ -655,7 +328,13 @@
             describe('when the caption was not rendered', function () {
                 beforeEach(function () {
                     window.onTouchBasedDevice.andReturn(['iPad']);
+
                     state = jasmine.initializePlayer();
+
+                    videoControl = state.videoControl;
+
+                    $.fn.scrollTo.reset();
+
                     state.videoCaption.play();
                 });
 
@@ -680,6 +359,34 @@
                     expect($('.subtitles li:last')).toBe('.spacing');
                 });
 
+                it('bind all the caption link', function () {
+                    $('.subtitles li[data-index]').each(
+                        function (index, link) {
+
+                        expect($(link)).toHandleWith(
+                            'mouseover', state.videoCaption.captionMouseOverOut
+                        );
+                        expect($(link)).toHandleWith(
+                            'mouseout', state.videoCaption.captionMouseOverOut
+                        );
+                        expect($(link)).toHandleWith(
+                            'mousedown', state.videoCaption.captionMouseDown
+                        );
+                        expect($(link)).toHandleWith(
+                            'click', state.videoCaption.captionClick
+                        );
+                        expect($(link)).toHandleWith(
+                            'focus', state.videoCaption.captionFocus
+                        );
+                        expect($(link)).toHandleWith(
+                            'blur', state.videoCaption.captionBlur
+                        );
+                        expect($(link)).toHandleWith(
+                            'keydown', state.videoCaption.captionKeyDown
+                        );
+                    });
+                });
+
                 it('set rendered to true', function () {
                     expect(state.videoCaption.rendered).toBeTruthy();
                 });
@@ -692,7 +399,6 @@
 
         describe('pause', function () {
             beforeEach(function () {
-                state = jasmine.initializePlayer();
                 state.videoCaption.playing = true;
                 state.videoCaption.pause();
             });
@@ -703,10 +409,6 @@
         });
 
         describe('updatePlayTime', function () {
-            beforeEach(function () {
-                state = jasmine.initializePlayer();
-            });
-
             describe('when the video speed is 1.0x', function () {
                 beforeEach(function () {
                     state.videoSpeedControl.currentSpeed = '1.0';
@@ -773,7 +475,11 @@
         describe('resize', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
+
                 videoControl = state.videoControl;
+
+                $.fn.scrollTo.reset();
+
                 $('.subtitles li[data-index=1]').addClass('current');
                 state.videoCaption.resize();
             });
@@ -836,6 +542,10 @@
         xdescribe('scrollCaption', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
+
+                videoControl = state.videoControl;
+
+                $.fn.scrollTo.reset();
             });
 
             describe('when frozen', function () {
@@ -880,10 +590,6 @@
 
         // Disabled 10/9/13 due to flakiness in master
         xdescribe('seekPlayer', function () {
-            beforeEach(function () {
-                state = jasmine.initializePlayer();
-            });
-
             describe('when the video speed is 1.0x', function () {
                 beforeEach(function () {
                     state.videoSpeedControl.currentSpeed = '1.0';
@@ -897,6 +603,12 @@
 
             describe('when the video speed is not 1.0x', function () {
                 beforeEach(function () {
+                    state = jasmine.initializePlayer();
+
+                    videoControl = state.videoControl;
+
+                    $.fn.scrollTo.reset();
+
                     state.videoSpeedControl.currentSpeed = '0.75';
                     $('.subtitles li[data-start="14910"]').trigger('click');
                 });
@@ -910,6 +622,12 @@
                 function () {
 
                 beforeEach(function () {
+                    state = jasmine.initializePlayer();
+
+                    videoControl = state.videoControl;
+
+                    $.fn.scrollTo.reset();
+
                     state.videoSpeedControl.currentSpeed = '0.75';
                     state.currentPlayerMode = 'flash';
                     $('.subtitles li[data-start="14910"]').trigger('click');
@@ -924,6 +642,11 @@
         describe('toggle', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
+
+                videoControl = state.videoControl;
+
+                $.fn.scrollTo.reset();
+
                 spyOn(state.videoPlayer, 'log');
                 $('.subtitles li[data-index=1]').addClass('current');
             });
@@ -999,6 +722,10 @@
         describe('caption accessibility', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
+
+                videoControl = state.videoControl;
+
+                $.fn.scrollTo.reset();
             });
 
             describe('when getting focus through TAB key', function () {

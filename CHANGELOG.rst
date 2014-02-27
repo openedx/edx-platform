@@ -5,8 +5,6 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
-Blades: Allow multiple transcripts with video. BLD-642.
-
 CMS: Add feature to allow exporting a course to a git repository by
 specifying the giturl in the course settings.
 

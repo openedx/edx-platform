@@ -1,10 +1,4 @@
-(function (requirejs, require, define, undefined) {
-
-'use strict';
-
-require(
-['video/03_video_player.js'],
-function (VideoPlayer) {
+(function (undefined) {
     describe('VideoPlayer', function () {
         var state, oldOTBD;
 
@@ -17,9 +11,7 @@ function (VideoPlayer) {
         afterEach(function () {
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
-            if (state.storage) {
-                state.storage.clear();
-            }
+            state.storage.clear();
         });
 
         describe('constructor', function () {
@@ -47,8 +39,8 @@ function (VideoPlayer) {
                     expect(state.videoCaption).toBeDefined();
                     expect(state.youtubeId('1.0')).toEqual('Z5KLxerq05Y');
                     expect(state.speed).toEqual('1.50');
-                    expect(state.config.transcriptTranslationUrl)
-                        .toEqual('/transcript/translation');
+                    expect(state.config.captionAssetPath)
+                        .toEqual('/static/subs/');
                 });
 
                 it('create video speed control', function () {
@@ -315,7 +307,7 @@ function (VideoPlayer) {
                 });
 
                 waitsFor(function () {
-                    var duration = state.videoPlayer.duration();
+                    duration = state.videoPlayer.duration();
 
                     return duration > 0 && state.videoPlayer.isPlaying();
                 }, 'video begins playing', WAIT_TIMEOUT);
@@ -387,33 +379,85 @@ function (VideoPlayer) {
             });
         });
 
-        describe('when the video is not playing', function () {
+        describe('onSpeedChange', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
+
+                state.videoEl = $('video, iframe');
 
                 spyOn(state.videoPlayer, 'updatePlayTime').andCallThrough();
                 spyOn(state, 'setSpeed').andCallThrough();
                 spyOn(state.videoPlayer, 'log').andCallThrough();
                 spyOn(state.videoPlayer.player, 'setPlaybackRate').andCallThrough();
-                spyOn(state.videoPlayer, 'setPlaybackRate').andCallThrough();
             });
 
-            it('video has a correct speed', function () {
-                state.speed = '2.0';
-                state.videoPlayer.onPlay();
-                expect(state.videoPlayer.setPlaybackRate)
-                    .toHaveBeenCalledWith('2.0');
-                state.videoPlayer.onPlay();
-                expect(state.videoPlayer.setPlaybackRate.calls.length)
-                    .toEqual(1);
+            describe('always', function () {
+                beforeEach(function () {
+
+                    state.videoPlayer.currentTime = 60;
+                    state.videoPlayer.onSpeedChange('0.75', false);
+                });
+
+                it('check if speed_change_video is logged', function () {
+                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
+                        'speed_change_video',
+                        {
+                            current_time: state.videoPlayer.currentTime,
+                            old_speed: '1.50',
+                            new_speed: '0.75'
+                        }
+                    );
+                });
+
+                it('convert the current time to the new speed', function () {
+                    expect(state.videoPlayer.currentTime).toEqual(60);
+                });
+
+                it('set video speed to the new speed', function () {
+                    expect(state.setSpeed).toHaveBeenCalledWith('0.75', true);
+                });
             });
 
-            it('video has a correct volume', function () {
-                spyOn(state.videoPlayer.player, 'setVolume');
-                state.currentVolume = '0.26';
-                state.videoPlayer.onPlay();
-                expect(state.videoPlayer.player.setVolume)
-                    .toHaveBeenCalledWith('0.26');
+            describe('when the video is playing', function () {
+                beforeEach(function () {
+                    state.videoPlayer.currentTime = 60;
+                    state.videoPlayer.play();
+                    state.videoPlayer.onSpeedChange('0.75', false);
+                });
+
+                it('trigger updatePlayTime event', function () {
+                    expect(state.videoPlayer.player.setPlaybackRate)
+                        .toHaveBeenCalledWith('0.75');
+                });
+            });
+
+            describe('when the video is not playing', function () {
+                beforeEach(function () {
+                    state.videoPlayer.onSpeedChange('0.75', false);
+                });
+
+                it('trigger updatePlayTime event', function () {
+                    expect(state.videoPlayer.player.setPlaybackRate)
+                        .toHaveBeenCalledWith('0.75');
+                });
+
+                it('video has a correct speed', function () {
+                    spyOn(state.videoPlayer, 'onSpeedChange');
+                    state.speed = '2.0';
+                    state.videoPlayer.onPlay();
+                    expect(state.videoPlayer.onSpeedChange)
+                        .toHaveBeenCalledWith('2.0');
+                    state.videoPlayer.onPlay();
+                    expect(state.videoPlayer.onSpeedChange.calls.length).toEqual(1);
+                });
+
+                it('video has a correct volume', function () {
+                    spyOn(state.videoPlayer.player, 'setVolume');
+                    state.currentVolume = '0.26';
+                    state.videoPlayer.onPlay();
+                    expect(state.videoPlayer.player.setVolume)
+                        .toHaveBeenCalledWith('0.26');
+                });
             });
         });
 
@@ -745,7 +789,7 @@ function (VideoPlayer) {
 
                     state.el.addClass('video-fullscreen');
                     state.videoControl.fullScreenState = true;
-                    state.videoControl.isFullScreen = true;
+                    isFullScreen = true;
                     state.videoControl.fullScreenEl.attr('title', 'Exit-fullscreen');
 
                     state.videoControl.toggleFullScreen(jQuery.Event('click'));
@@ -887,6 +931,20 @@ function (VideoPlayer) {
             });
         });
 
+        describe('playback rate', function () {
+            beforeEach(function () {
+                state = jasmine.initializePlayer();
+
+                state.videoEl = $('video, iframe');
+
+                state.videoPlayer.player.setPlaybackRate(1.5);
+            });
+
+            it('set the player playback rate', function () {
+                expect(state.videoPlayer.player.video.playbackRate).toEqual(1.5);
+            });
+        });
+
         describe('volume', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
@@ -965,7 +1023,7 @@ function (VideoPlayer) {
                     });
 
                     waitsFor(function () {
-                        var duration = state.videoPlayer.duration();
+                        duration = state.videoPlayer.duration();
 
                         return duration > 0 && state.videoPlayer.isPlaying();
                     },'Video does not play.' , WAIT_TIMEOUT);
@@ -976,108 +1034,6 @@ function (VideoPlayer) {
                 });
             });
         });
-
-        describe('onSpeedChange', function () {
-            beforeEach(function () {
-                state = {
-                    el: $(document),
-                    speed: '1.50',
-                    setSpeed: jasmine.createSpy(),
-                    saveState: jasmine.createSpy(),
-                    videoPlayer: {
-                        currentTime: 60,
-                        log: jasmine.createSpy(),
-                        updatePlayTime: jasmine.createSpy(),
-                        setPlaybackRate: jasmine.createSpy(),
-                        player: jasmine.createSpyObj('player', ['setPlaybackRate'])
-                    }
-                };
-            });
-
-            describe('always', function () {
-                it('check if speed_change_video is logged', function () {
-                    VideoPlayer.prototype.onSpeedChange.call(state, '0.75', false);
-                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
-                        'speed_change_video',
-                        {
-                            current_time: state.videoPlayer.currentTime,
-                            old_speed: '1.50',
-                            new_speed: '0.75'
-                        }
-                    );
-                });
-
-                it('convert the current time to the new speed', function () {
-                    state.currentPlayerMode = 'flash';
-                    VideoPlayer.prototype.onSpeedChange.call(state, '0.75', false);
-                    expect(state.videoPlayer.currentTime).toBe('120.000');
-                });
-
-                it('set video speed to the new speed', function () {
-                    VideoPlayer.prototype.onSpeedChange.call(state, '0.75', false);
-                    expect(state.setSpeed).toHaveBeenCalledWith('0.75', true);
-                    expect(state.saveState).toHaveBeenCalledWith(true, {
-                        speed: '0.75'
-                    });
-                    expect(state.videoPlayer.setPlaybackRate)
-                        .toHaveBeenCalledWith('0.75');
-                });
-            });
-        });
-
-        describe('setPlaybackRate', function () {
-            beforeEach(function () {
-                state = {
-                    youtubeId: jasmine.createSpy().andReturn('videoId'),
-                    videoPlayer: {
-                        currentTime: 60,
-                        isPlaying: jasmine.createSpy(),
-                        updatePlayTime: jasmine.createSpy(),
-                        setPlaybackRate: jasmine.createSpy(),
-                        player: jasmine.createSpyObj('player', [
-                            'setPlaybackRate', 'loadVideoById', 'cueVideoById'
-                        ])
-                    }
-                };
-            });
-
-            it('in Flash mode and video is playing', function () {
-                state.currentPlayerMode = 'flash';
-                state.videoPlayer.isPlaying.andReturn(true);
-                VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
-                expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
-                expect(state.videoPlayer.player.loadVideoById)
-                    .toHaveBeenCalledWith('videoId', 60);
-            });
-
-            it('in Flash mode and video not started', function () {
-                state.currentPlayerMode = 'flash';
-                state.videoPlayer.isPlaying.andReturn(false);
-                VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
-                expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
-                expect(state.videoPlayer.player.cueVideoById)
-                    .toHaveBeenCalledWith('videoId', 60);
-            });
-
-            it('in HTML5 mode', function () {
-                state.currentPlayerMode = 'html5';
-                VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
-                expect(state.videoPlayer.player.setPlaybackRate).toHaveBeenCalledWith('0.75');
-            });
-
-            it('Youtube video in FF, with new speed equal 1.0', function () {
-                state.currentPlayerMode = 'html5';
-                state.videoType = 'youtube';
-                state.browserIsFirefox = true;
-
-                state.videoPlayer.isPlaying.andReturn(false);
-                VideoPlayer.prototype.setPlaybackRate.call(state, '1.0');
-                expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
-                expect(state.videoPlayer.player.cueVideoById)
-                    .toHaveBeenCalledWith('videoId', 60);
-            });
-        });
     });
-});
 
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+}).call(this);
