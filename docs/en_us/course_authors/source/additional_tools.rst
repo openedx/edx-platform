@@ -394,9 +394,34 @@ Multiple Choice and Numerical Input Problem Code
 Polls
 ******
 
-You can run polls in your course to gauge students' responses to different questions.
+You can run polls in your course so that your students can share opinions on different questions.
 
 .. image:: /Images/PollExample.png
+
+Note that creating a poll requires you to export your course, edit it in a text editor, and then re-import your course. We recommend that you create a backup copy of your course before you create the poll.
+
+==========================
+Terminology
+==========================
+
+In the **Course Outline** view, your content is arranged in sections, subsections, units, and components. When you edit your course in a text editor, sections are **chapters**, subsections are **sequentials**, units are **verticals**, and components are **videos**, **HTMLs**, **problems**, or **discussions**.
+
+.. _Create a Poll:
+
+==========================
+Create a Poll
+==========================
+
+#. In the unit where you want to create the poll, create components that contain all the content that you want *except* for the poll.
+
+#. Export your course. For information about how to do this, see :ref:`Exporting and Importing a Course`. Save your course in a memorable location so that you can find it easily.
+
+#. Locate the .tar.gz file that contains your course, and then unpack the file.
+
+   - To do this on a Windows computer, you'll need to download a third-party program. For more information, see `How to Unpack a tar File in Windows <http://www.haskell.org/haskellwiki/How_to_unpack_a_tar_file_in_Windows>`_, `How to Extract a Gz File <http://www.wikihow.com/Extract-a-Gz-File>`_, `The gzip Home Page <http://www.gzip.org/>`_, or the `Windows <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/#windows>`_ section of the `How to Open .tar.gz Files` <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/>`_ page.
+
+   - For information about how to do this on a Mac, see the `Mac OS X <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/#mac-os-x>`_ section of the `How to Open .tar.gz Files` <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/>`_ page.
+
 
 Create a Unit all the Components you want other than the polls (see "Regular Section" for an example of a pre-poll section).
 Export the tarball of your course ("Tools")
