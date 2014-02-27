@@ -78,6 +78,9 @@ FEATURES = {
 
     # Allow editing of short description in course settings in cms
     'EDITABLE_SHORT_DESCRIPTION': True,
+
+    # Toggles embargo functionality
+    'EMBARGO': False,
 }
 ENABLE_JASMINE = False
 
@@ -96,6 +99,9 @@ sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
+
+# For geolocation ip database
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
 
 
 ############################# WEB CONFIGURATION #############################
@@ -182,6 +188,8 @@ MIDDLEWARE_CLASSES = (
 
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
+
+    'embargo.middleware.EmbargoMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
@@ -465,6 +473,8 @@ INSTALLED_APPS = (
     # User preferences
     'user_api',
     'django_openid_auth',
+
+    'embargo',
 )
 
 
