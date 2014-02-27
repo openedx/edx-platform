@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-26 16:15-0500\n"
-"PO-Revision-Date: 2014-02-26 21:15:47.512922\n"
+"POT-Creation-Date: 2014-02-27 08:57-0500\n"
+"PO-Revision-Date: 2014-02-27 13:57:20.220825\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4455,6 +4455,16 @@ msgstr "Mäké ä süggéstïön Ⱡ'σ#"
 #: lms/templates/help_modal.html
 msgid "Ask a question"
 msgstr "Àsk ä qüéstïön Ⱡ'#"
+
+#: lms/templates/help_modal.html
+msgid ""
+"Please note: The {platform_name} support team is English speaking. While we "
+"will do our best to address your inquiry in any language, our responses will"
+" be in English."
+msgstr ""
+"Pléäsé nöté: Thé {platform_name} süppört téäm ïs Énglïsh spéäkïng. Whïlé wé "
+"wïll dö öür ßést tö äddréss ýöür ïnqüïrý ïn äný längüägé, öür réspönsés wïll"
+" ßé ïn Énglïsh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢#"
 
 #: lms/templates/help_modal.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
