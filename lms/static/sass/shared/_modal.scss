@@ -304,7 +304,12 @@
       padding-left: 0;
     }
 
-
+    .note {
+      @include font-size(12);
+      @include line-height(12);
+      margin-top: ($baseline/2);
+      color: $lighter-base-font-color;
+    }
   }
 
   .discussion-alert-wrapper button {
