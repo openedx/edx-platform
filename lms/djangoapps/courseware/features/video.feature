@@ -83,7 +83,7 @@ Feature: LMS Video component
   Scenario: Language menu works correctly in Video component
     Given the course has a Video component in Youtube mode:
       | transcripts           | sub         |
-      | {"zh": "OEoXaMPEzfM"} | OEoXaMPEzfM |
+      | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM |
     And I make sure captions are closed
     And I see video menu "language" with correct items
     And I select language with code "zh"
@@ -95,7 +95,7 @@ Feature: LMS Video component
   Scenario: CC button works correctly w/o english transcript in HTML5 mode of Video component
     Given the course has a Video component in HTML5 mode:
       | transcripts           |
-      | {"zh": "OEoXaMPEzfM"} |
+      | {"zh": "chinese_transcripts.srt"} |
     And I make sure captions are opened
     Then I see "好 各位同学" text in the captions
 
@@ -113,7 +113,7 @@ Feature: LMS Video component
   Scenario: CC button works correctly w/o english transcript in Youtube mode of Video component
     Given the course has a Video component in Youtube mode:
       | transcripts           |
-      | {"zh": "OEoXaMPEzfM"} |
+      | {"zh": "chinese_transcripts.srt"} |
     And I make sure captions are opened
     Then I see "好 各位同学" text in the captions
 
@@ -129,3 +129,29 @@ Feature: LMS Video component
   Scenario: CC button is hidden if no translations
     Given the course has a Video component in Youtube mode
     Then button "CC" is hidden
+
+  # 16
+  Scenario: Video is aligned correctly if transcript is visible in fullscreen mode
+    Given the course has a Video component in HTML5 mode:
+      | sub         |
+      | OEoXaMPEzfM |
+    And I make sure captions are opened
+    And I click video button "fullscreen"
+    Then I see video aligned correctly with enabled transcript
+
+  # 17
+  Scenario: Video is aligned correctly if transcript is hidden in fullscreen mode
+    Given the course has a Video component in Youtube mode
+    And I click video button "fullscreen"
+    Then I see video aligned correctly without enabled transcript
+
+  # 18
+  Scenario: Video is aligned correctly on transcript toggle in fullscreen mode
+    Given the course has a Video component in Youtube mode:
+      | sub         |
+      | OEoXaMPEzfM |
+    And I make sure captions are opened
+    And I click video button "fullscreen"
+    Then I see video aligned correctly with enabled transcript
+    And I click video button "CC"
+    Then I see video aligned correctly without enabled transcript

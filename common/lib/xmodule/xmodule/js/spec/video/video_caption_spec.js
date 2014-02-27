@@ -106,13 +106,6 @@
                     });
                 });
 
-                it('bind window resize event', function () {
-                    state = jasmine.initializePlayer();
-                    expect($(window)).toHandleWith(
-                        'resize', state.videoCaption.resize
-                    );
-                });
-
                 it('bind the hide caption button', function () {
                     state = jasmine.initializePlayer();
                     expect($('.hide-subtitles')).toHandleWith(

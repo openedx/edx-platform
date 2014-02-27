@@ -256,6 +256,11 @@ div.video {
         margin: 0 lh() 0 0;
         padding: 0;
 
+        @media (max-width: 1120px) {
+          margin-right: lh(.5);
+          font-size: em(14);
+        }
+
         li {
           float: left;
           margin-bottom: 0;
@@ -292,11 +297,13 @@ div.video {
           }
 
           div.vidtime {
-            padding-left: lh(.75);
             font-weight: bold;
             line-height: 46px; //height of play pause buttons
-            padding-left: lh(.75);
             -webkit-font-smoothing: antialiased;
+            padding-left: lh(.75);
+            @media (max-width: 1120px) {
+              padding-left: lh(.5);
+            }
           }
         }
       }
@@ -389,8 +396,8 @@ div.video {
           .menu{
             width: 131px;
 
-            @media (max-width: 1024px) {
-              width: 101px;
+            @media (max-width: 1120px) {
+              width: 80px;
             }
           }
 
@@ -403,9 +410,9 @@ div.video {
             min-width: 116px;
             text-indent: 0;
 
-            @media (max-width: 1024px) {
+            @media (max-width: 1120px) {
               min-width: 0;
-              width: 86px;
+              width: 60px;
             }
 
             h3 {
@@ -418,7 +425,7 @@ div.video {
               text-transform: uppercase;
               color: #999;
 
-              @media (max-width: 1024px) {
+              @media (max-width: 1120px) {
                 display: none;
               }
             }
@@ -429,7 +436,7 @@ div.video {
               margin-bottom: 0;
               padding: 0 lh(.5) 0 0;
 
-              @media (max-width: 1024px) {
+              @media (max-width: 1120px) {
                 padding: 0 lh(.5) 0 lh(.5);
               }
 
@@ -676,9 +683,10 @@ div.video {
     vertical-align: middle;
 
     &.closed {
-      ol.subtitles {
-        right: -(flex-grid(4));
-        width: auto;
+      div.tc-wrapper {
+        article.video-wrapper {
+          width: 100%;
+        }
       }
     }
 
@@ -698,17 +706,16 @@ div.video {
 
     div.tc-wrapper {
       @include clearfix;
-      display: table;
       width: 100%;
       height: 100%;
 
       position: static;
 
       article.video-wrapper {
-        width: 100%;
-        display: table-cell;
+        height: 100%;
+        width: 75%;
         vertical-align: middle;
-        float: none;
+        margin-right: 0;
 
         object, iframe, video{
           position: absolute;
@@ -727,16 +734,12 @@ div.video {
     }
 
     ol.subtitles {
+      @include box-sizing(border-box);
       @include transition(none);
-      background: rgba(#000, .8);
-      bottom: 0;
+      background: #000;
       height: 100%;
-      max-height: 460px;
-      max-width: flex-grid(3);
+      width: 25%;
       padding: lh();
-      position: fixed;
-      right: 0;
-      top: 0;
       visibility: visible;
 
       li {
