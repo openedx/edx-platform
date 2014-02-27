@@ -41,7 +41,7 @@ define [
 
             # Starting to save, so show the "Saving..." notification
             if data.state == 'start'
-                @_hide_editor()
+                @_hideEditor()
                 @savingNotification.show()
 
             # Finished saving, so hide the "Saving..." notification
@@ -50,12 +50,23 @@ define [
                 @savingNotification.hide()
 
         else if name == 'cancel'
-            @_hide_editor()
+            @_hideEditor()
 
-      _hide_editor: () ->
+        else if name == 'error'
+            if 'msg' of data
+                @_showAlert(data.msg)
+
+      _hideEditor: () ->
           # This will close all open component editors, which works
           # if we assume that <= 1 are open at a time.
           el = $('.component.editing')
           el.removeClass('editing')
           el.find('.component-editor').slideUp(150)
           ModalUtils.hideModalCover()
+
+      _showAlert: (msg) ->
+        new NotificationView.Error({
+            title: "OpenAssessment Save Error",
+            message: msg,
+            closeIcon: false
+        }).show()
