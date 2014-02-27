@@ -42,6 +42,11 @@ edX Studio
 * The following problem is resolved:  When viewing a multiple choice problem in Studio, if you selected the correct answer, Studio cleared your selection and marked the problem as incorrect. This problem only occurred in Studio and did not affect students. (BLD-788)
 
 
+*************
+Discussions
+*************
 
+
+* Course staff can now delete comments made on discussion responses.
 
 
