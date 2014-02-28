@@ -703,6 +703,10 @@ MIDDLEWARE_CLASSES = (
     'contentserver.middleware.StaticContentServer',
     'crum.CurrentRequestUserMiddleware',
 
+    # Adds user tags to tracking events
+    # Must go before TrackMiddleware, to get the context set up
+    'user_api.middleware.UserTagsEventContextMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
