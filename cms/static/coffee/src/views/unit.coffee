@@ -117,6 +117,24 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       return editor
 
     saveNewComponent: (event) =>
+      cat = $(event.currentTarget).data().category
+      if(cat == "textannotation" || cat == "videoannotation")
+        found = false
+        msg = new PromptView.Warning(
+          title: gettext('Reached Annotation Component Limit'),
+          message: gettext('Only one (1) annotation item can exist per unit.'),
+          actions:
+            primary:
+              text: gettext('OK'),
+              click: (view) =>
+                @closeNewComponent(event)
+                view.hide()
+        )
+        @components().forEach (element)=>
+          if(element.indexOf("textannotation") != -1 || element.indexOf("videoannotation")!= -1)
+            found = true;
+        if(found)
+          return msg.show()
       success_callback = =>
         @$newComponentItem.before(editor.$el)
       editor = @createComponent(
