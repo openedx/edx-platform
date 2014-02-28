@@ -20,7 +20,8 @@ class CodeMirrorWidget(forms.Widget):
         super(CodeMirrorWidget, self).__init__(default_attrs)
 
     def render(self, name, value, attrs=None):
-        if value is None: value = ''
+        if value is None:
+            value = ''
 
         final_attrs = self.build_attrs(attrs, name=name)
 
