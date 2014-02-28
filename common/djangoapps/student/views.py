@@ -26,6 +26,7 @@ from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST, require_GET
 
 from django.template.response import TemplateResponse
@@ -328,7 +329,7 @@ def signin_user(request):
         # SSL login doesn't require a view, so redirect
         # branding and allow that to process the login if it
         # is enabled and the header is in the request.
-         return external_auth.views.redirect_with_get('root', request.GET)
+        return external_auth.views.redirect_with_get('root', request.GET)
     if settings.FEATURES.get('AUTH_USE_CAS'):
         # If CAS is enabled, redirect auth handling to there
         return redirect(reverse('cas-login'))
@@ -675,6 +676,7 @@ def _get_course_enrollment_domain(course_id):
         return None
 
 
+@never_cache
 @ensure_csrf_cookie
 def accounts_login(request):
     """
@@ -684,9 +686,9 @@ def accounts_login(request):
     if settings.FEATURES.get('AUTH_USE_CAS'):
         return redirect(reverse('cas-login'))
     if settings.FEATURES['AUTH_USE_CERTIFICATES']:
-        # SSL login doesn't require a view, so redirect
-        # to branding and allow that to process the login.
-        return external_auth.views.redirect_with_get('root', request.GET)
+        # SSL login doesn't require a view, so login
+        # directly here
+        return external_auth.views.ssl_login(request)
     # see if the "next" parameter has been set, whether it has a course context, and if so, whether
     # there is a course-specific place to redirect
     redirect_to = request.GET.get('next')
@@ -776,7 +778,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             # This is actually the common case, logging in user without external linked login
             AUDIT_LOG.info("User %s w/o external auth attempting login", user)
 
-    # see if account has been locked out due to excessive login failres
+    # see if account has been locked out due to excessive login failures
     user_found_by_email_lookup = user
     if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
         if LoginFailures.is_user_locked_out(user_found_by_email_lookup):

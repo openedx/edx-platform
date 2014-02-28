@@ -11,7 +11,7 @@ from edxmako.shortcuts import render_to_response
 
 from external_auth.views import (ssl_login_shortcut, ssl_get_cert_from_request,
                                  redirect_with_get)
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 __all__ = ['signup', 'login_page', 'howitworks']
 
@@ -52,6 +52,7 @@ def login_page(request):
     if settings.FEATURES.get('AUTH_USE_CAS'):
         # If CAS is enabled, redirect auth handling to there
         return redirect(reverse('cas-login'))
+
     return render_to_response(
         'login.html',
         {

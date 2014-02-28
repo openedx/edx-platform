@@ -194,7 +194,8 @@ class SSLClientTest(ModuleStoreTestCase):
         response = self.client.get(
             reverse('register_user'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        self.assertIn(reverse('dashboard'), response['location'])
+        self.assertEquals(('http://testserver/dashboard', 302),
+                          response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
@@ -236,7 +237,8 @@ class SSLClientTest(ModuleStoreTestCase):
         response = self.client.get(
             reverse('signin_user'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        self.assertIn(reverse('dashboard'), response['location'])
+        self.assertEquals(('http://testserver/dashboard', 302),
+                          response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
 
@@ -393,4 +395,28 @@ class SSLClientTest(ModuleStoreTestCase):
         )
         self.assertEqual(('http://testserver{0}'.format(course_private_url), 302),
                          response.redirect_chain[-1])
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE)
+    def test_ssl_logout(self):
+        """
+        Because the branding view is cached for anonymous users and we
+        use that to login users, the browser wasn't actually making the
+        request to that view as the redirect was being cached. This caused
+        a redirect loop, and this test confirms that that won't happen.
+
+        Test is only in LMS because we don't use / in studio to login SSL users.
+        """
+        response = self.client.get(
+            reverse('dashboard'), follow=True,
+            SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
+        self.assertEquals(('http://testserver/dashboard', 302),
+                          response.redirect_chain[-1])
+        self.assertIn(SESSION_KEY, self.client.session)
+        response = self.client.get(
+            reverse('logout'), follow=True,
+            SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
+        )
+        # Make sure that even though we logged out, we have logged back in
         self.assertIn(SESSION_KEY, self.client.session)
