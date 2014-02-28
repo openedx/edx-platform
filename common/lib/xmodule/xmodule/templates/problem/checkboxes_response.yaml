@@ -2,8 +2,8 @@
 metadata:
     display_name: Checkboxes
     markdown: |
-      A checkboxes problem presents checkbox buttons for student input. Students can select more
-      than one option presented.
+      A checkboxes problem presents checkbox buttons for student input. Students can select more than one option presented.
+      >>Select the answer that matches<<
 
       [x] correct
       [ ] incorrect
@@ -12,6 +12,7 @@ metadata:
 data: |
       <problem>
         <p>A checkboxes problem presents checkbox buttons for student input. Students can select more than one option presented.</p>
+        <p>Select the answer that matches</p>
         <choiceresponse>
           <checkboxgroup direction="vertical" label="Select the answer that matches">
             <choice correct="true">correct</choice>
