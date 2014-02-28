@@ -3,6 +3,8 @@
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from xmodule.modulestore.django import loc_mapper
+  from django.utils import translation
+  from django.utils.translation import get_language_bidi
 %>
 
 <div class="wrapper-header wrapper" id="view-top">
@@ -38,7 +40,7 @@
       </h2>
 
       <nav class="nav-course nav-dd ui-left">
-        <h2 class="sr">${_("{course_name}'s Navigation:").format(course_name=context_course.display_name_with_default)}</h2>
+        <h2 class="sr">${_(u"{course_name}'s Navigation:").format(course_name=context_course.display_name_with_default)}</h2>
         <ol>
           <li class="nav-item nav-course-courseware">
             <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
@@ -122,8 +124,11 @@
       % if user.is_authenticated():
       <nav class="nav-account nav-is-signedin nav-dd ui-right">
         <h2 class="sr">${_("Help &amp; Account Navigation")}</h2>
-
-        <ol>
+        % if get_language_bidi():
+          <ol style="margin: 0 0 0 90px">
+        % else:
+          <ol style="margin: 0 80px 0 0">
+        % endif
           <li class="nav-item nav-account-help">
             <h3 class="title"><span class="label">${_("Help")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
@@ -166,7 +171,7 @@
       % else:
       <nav class="nav-not-signedin nav-pitch">
         <h2 class="sr">${_("You're not currently signed in")}</h2>
-        <ol>
+        <ol style="float: right; margin-right: 15px; margin-left: 15px">
           <li class="nav-item nav-not-signedin-hiw">
             <a href="/">${_("How Studio Works")}</a>
           </li>
@@ -185,3 +190,5 @@
     </div>
   </header>
 </div>
+
+

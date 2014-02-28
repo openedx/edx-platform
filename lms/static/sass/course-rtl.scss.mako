@@ -13,21 +13,21 @@
 ## called themes/<theme-name>/, with its base Sass file in
 ## themes/<theme-name>/static/sass/_<theme-name>.scss. That one entry
 ## point can be used to @import in as many other things as needed.
-% if env["FEATURES"].get("USE_CUSTOM_THEME", False):
+% if env['FEATURES'].get("USE_CUSTOM_THEME", False):
   // import theme's Sass overrides
   @import '${env.get('THEME_NAME')}';
 % endif
 
-@import 'base/base';
+@import 'base/base_rtl';
 @import 'base/extends';
 @import 'base/animations';
 @import 'shared/tooltips';
 
 // Course base / layout styles
-@import 'course/layout/courseware_header';
+@import 'course/layout/courseware_header_rtl';
 @import 'course/layout/footer';
 @import 'course/base/mixins';
-@import 'course/base/base';
+@import 'course/base/base_rtl';
 @import 'course/base/extends';
 @import 'xmodule/modules/css/module-styles.scss';
 

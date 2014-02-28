@@ -1,0 +1,32 @@
+@import "footer";
+
+.wrapper-footer {
+  footer {
+    .colophon {
+      margin-right: flex-gutter();
+      margin-left: 0;
+      float: left;
+
+      .nav-colophon {
+        li {
+          float: left;
+          margin-right: ($baseline*0.75);
+          margin-left: 0;
+        }
+      }
+    }
+    .references {
+      float: right;
+
+      .nav-social {
+        text-align: right;
+      }
+      .copyright {
+        text-align: right;
+      }
+      .nav-legal {
+        text-align: right;
+      }
+    }
+  }
+}

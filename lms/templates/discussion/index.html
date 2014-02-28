@@ -2,6 +2,7 @@
 <%! import django_comment_client.helpers as helpers %>
 <%! from django.template.defaultfilters import escapejs %>
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import get_language_bidi %>
 
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
@@ -10,8 +11,12 @@
 <%block name="nav_skip">#discussion-container</%block>
 
 <%block name="headextra">
-<%static:css group='style-course-vendor'/>
-<%static:css group='style-course'/>
+    <%static:css group='style-course-vendor'/>
+    % if get_language_bidi():
+    <%static:css group='style-course-rtl'/>
+    % else:
+    <%static:css group='style-course'/>
+    % endif
 
 <%include file="_js_head_dependencies.html" />
 </%block>

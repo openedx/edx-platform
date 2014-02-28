@@ -1,0 +1,14 @@
+// studio - elements - global header
+// ====================
+
+@import "header";
+
+.wrapper-header {
+  .wrapper-l {
+    float: right;
+  }
+  .wrapper-r {
+    float: left;
+    text-align: left;
+  }
+}

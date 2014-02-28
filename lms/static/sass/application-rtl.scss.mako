@@ -1,7 +1,6 @@
-## NOTE: This Sass infrastructure is redundant, but needed in order to address an IE9 rule limit within CSS - http://blogs.msdn.com/b/ieinternals/archive/2011/05/14/10164546.aspx
+## Note: This Sass infrastructure is repeated in application-extend1 and application-extend2, but needed in order to address an IE9 rule limit within CSS - http://blogs.msdn.com/b/ieinternals/archive/2011/05/14/10164546.aspx
 
-
-// lms - css application architecture (platform)
+// lms - css application architecture
 // ====================
 
 // libs and resets *do not edit*
@@ -23,12 +22,12 @@
 ## called themes/<theme-name>/, with its base Sass file in
 ## themes/<theme-name>/static/sass/_<theme-name>.scss. That one entry
 ## point can be used to @import in as many other things as needed.
-% if env["FEATURES"].get("USE_CUSTOM_THEME", False):
+% if env['FEATURES'].get("USE_CUSTOM_THEME", False):
   // import theme's Sass overrides
   @import '${env.get('THEME_NAME')}';
 % endif
 
-@import 'base/base';
+@import 'base/base_rtl';
 
 // base - assets
 @import 'base/font_face';
@@ -36,22 +35,21 @@
 @import 'base/animations';
 
 // base - starter
-@import 'base/base';
+@import 'base/base_rtl';
 
 // base - elements
 @import 'elements/typography';
 @import 'elements/controls';
-@import 'elements/system-feedback';
 
-// base - specific views
-@import 'views/verification';
-@import 'views/shoppingcart';
+// shared - course
+@import 'shared/forms';
+@import 'shared/footer_rtl';
+@import 'shared/header_rtl';
+@import 'shared/course_object_rtl';
+@import 'shared/course_filter';
+@import 'shared/modal';
+@import 'shared/activation_messages';
+@import 'shared/unsubscribe';
 
-// applications
-@import 'discussion';
-@import 'news';
-
-// temp - shame and developer
-@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
-@import 'shame';     // used for any bad-form/orphaned scss
 ## NOTE: needed here for cascade and dependency purposes, but not a great permanent solution
+@import 'shame'; // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)

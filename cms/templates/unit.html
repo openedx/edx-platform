@@ -1,7 +1,7 @@
 <%inherit file="base.html" />
 <%!
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 from xmodule.modulestore.django import loc_mapper
 %>
 <%namespace name='static' file='static_content.html'/>
