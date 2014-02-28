@@ -3,6 +3,7 @@ Module for running content split tests
 """
 
 import logging
+from webob import Response
 
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceDescriptor
@@ -50,7 +51,8 @@ class SplitTestModule(SplitTestFields, XModule):
       - There is more dark magic in this code than I'd like.  The whole varying-children +
         grading interaction is a tangle between super and subclasses of descriptors and
         modules.
-"""
+    """
+
     def __init__(self, *args, **kwargs):
 
         super(SplitTestModule, self).__init__(*args, **kwargs)
@@ -146,7 +148,21 @@ class SplitTestModule(SplitTestFields, XModule):
         if self.system.user_is_staff:
             return self._staff_view(context)
         else:
-            return self.child.render('student_view', context)
+            child_fragment = self.child.render('student_view', context)
+            fragment = Fragment(self.system.render_template('split_test_student_view.html', {
+                'child_content': child_fragment.content,
+                'child_id': self.child.scope_ids.usage_id,
+            }))
+            fragment.add_frag_resources(child_fragment)
+            fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_student.js'))
+            fragment.initialize_js('SplitTestStudentView')
+            return fragment
+
+    @XBlock.handler
+    def log_child_render(self, request, suffix=''):
+        # TODO: use publish instead, when publish is wired to the tracking logs
+        self.system.track_function('split-test-child-render', {'child-id': self.child.scope_ids.usage_id})
+        return Response()
 
     def get_icon_class(self):
         return self.child.get_icon_class() if self.child else 'other'
@@ -167,6 +183,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
     filename_extension = "xml"
 
     child_descriptor = module_attr('child_descriptor')
+    log_child_render = module_attr('log_child_render')
 
     def definition_to_xml(self, resource_fs):
 
