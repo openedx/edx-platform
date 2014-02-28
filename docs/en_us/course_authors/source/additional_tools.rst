@@ -398,19 +398,36 @@ You can run polls in your course so that your students can share opinions on dif
 
 .. image:: /Images/PollExample.png
 
-.. note:: Creating a poll requires you to export your course, edit it in a text editor, and then re-import your course. We recommend that you create a backup copy of your course before you create the poll. We also do not recommend that you try to edit other areas of your course while you're working in the text editor unless you have the necessary background and training. 
+.. note:: Creating a poll requires you to export your course, edit some of your course's XML files in a text editor, and then re-import your course. We recommend that you create a backup copy of your course before you create the poll. We also recommend that you only edit the files that will contain polls in the text editor if you're very familiar with editing XML. 
 
-==========================
+===========
 Terminology
-==========================
+===========
 
-In the **Course Outline** view, your content is arranged in sections, subsections, units, and components. When you edit your course in a text editor, sections are **chapters**, subsections are **sequentials**, units are **verticals**, and components are **videos**, **HTMLs**, **problems**, or **discussions**.
+Sections, subsections, units, and components have different names in the **Course Outline** view and in the list of files that you'll see after you export your course and open the .xml files for editing. The following table lists the names of these elements in the **Course Outline** view and in a list of files.
+
+.. list-table::
+   :widths: 15 15
+   :header-rows: 0
+
+   * - Course Outline View
+     - File List
+   * - Section
+     - Chapter
+   * - Subsection
+     - Sequential
+   * - Unit
+     - Vertical
+   * - Component
+     - Discussion, HTML, problem, or video
+
+For example, when you want to find a specific section in your course, you'll look in the **Chapter** folder when you open the list of files that your course contains. To find a unit, you'll look in the **Vertical** folder.
 
 .. _Create a Poll:
 
-==========================
+=============
 Create a Poll
-==========================
+=============
 
 #. In the unit where you want to create the poll, create components that contain all the content that you want *except* for the poll. Make a note of the 32-digit unit ID that appears in the **Unit Identifier** field under **Unit Location**.
 
@@ -469,7 +486,7 @@ Create a Poll
 
    * For information about how to do this on a Windows computer, see `How to Make a .tar.gz on Windows <http://stackoverflow.com/questions/12774707/how-to-make-a-tar-gz-on-windows>`_.
 
-#. In Studio, re-import your course.
+#. In Studio, re-import your course. You can now review the poll question and answers that you added in Studio.
 
 .. note::
 
