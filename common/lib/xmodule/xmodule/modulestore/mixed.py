@@ -125,7 +125,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         # order the modulestores and ensure no dupes (default may be a dupe of a named store)
         # remove 'draft' as we know it's a functional dupe of 'direct' (ugly hardcoding)
         stores = set([value for key, value in self.modulestores.iteritems() if key != 'draft'])
-        stores = sorted(stores, _compare_stores)
+        stores = sorted(stores, cmp=_compare_stores)
 
         courses = {}  # a dictionary of stringified course locations to course objects
         has_locators = any(issubclass(CourseLocator, store.reference_type) for store in stores)
@@ -214,9 +214,9 @@ class MixedModuleStore(ModuleStoreWriteBase):
             pass
         try:
             course = store._get_course_for_item(block.scope_ids.usage_id)
-            if course:
+            if course is not None:
                 return course.scope_ids.usage_id.course_id
-        except:  # sorry, that method just raises vanilla Exception if it doesn't find course
+        except Exception:  # sorry, that method just raises vanilla Exception if it doesn't find course
             pass
 
     def _infer_course_id_try(self, location):
@@ -436,7 +436,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         store = self.modulestores[store_name]
         if store.reference_type != Location:
-            raise NotImplementedError(u"Cannot create maps from %s" % store.reference_type)
+            raise ValueError(u"Cannot create maps from %s" % store.reference_type)
         for course in store.get_courses():
             loc_mapper().translate_location(course.location.course_id, course.location)
 

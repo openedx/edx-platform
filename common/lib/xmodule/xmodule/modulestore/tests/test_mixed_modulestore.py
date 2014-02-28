@@ -33,7 +33,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
     DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
     RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
 
-    IMPORT_COURSEID = 'MITx/999/2013_Spring'
+    MONGO_COURSEID = 'MITx/999/2013_Spring'
     XML_COURSEID1 = 'edX/toy/2012_Fall'
     XML_COURSEID2 = 'edX/simple/2012_Fall'
 
@@ -51,7 +51,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         'mappings': {
             XML_COURSEID1: 'xml',
             XML_COURSEID2: 'xml',
-            IMPORT_COURSEID: 'default'
+            MONGO_COURSEID: 'default'
         },
         'stores': {
             'xml': {
@@ -124,17 +124,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             course.location, item_location.category, location=item_location, block_id=item_location.name
         )
         if isinstance(course.location, CourseLocator):
-            # add_entry is false b/c this is a test that the right thing happened w/o
-            # wanting any additional side effects
-            lookup_map = loc_mapper().translate_location(
-                course_location.course_id, course_location, add_entry_if_missing=False
-            )
-            self.assertEqual(lookup_map, course.location)
-            self.course_locations[self.IMPORT_COURSEID] = course.location.version_agnostic()
-            lookup_map = loc_mapper().translate_location(
-                course_location.course_id, item_location, add_entry_if_missing=False
-            )
-            self.assertEqual(lookup_map, chapter.location)
+            self.course_locations[self.MONGO_COURSEID] = course.location.version_agnostic()
             self.import_chapter_location = chapter.location.version_agnostic()
         else:
             self.assertEqual(course.location, course_location)
@@ -160,17 +150,17 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
 
         self.course_locations = {
              course_id: generate_location(course_id)
-             for course_id in [self.IMPORT_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
+             for course_id in [self.MONGO_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
         }
         self.fake_location = Location('i4x', 'foo', 'bar', 'vertical', 'baz')
-        self.import_chapter_location = self.course_locations[self.IMPORT_COURSEID].replace(
+        self.import_chapter_location = self.course_locations[self.MONGO_COURSEID].replace(
             category='chapter', name='Overview'
         )
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             category='chapter', name='Overview'
         )
         # grab old style location b4 possibly converted
-        import_location = self.course_locations[self.IMPORT_COURSEID]
+        import_location = self.course_locations[self.MONGO_COURSEID]
         # get Locators and set up the loc mapper if app is Locator based
         if default == 'split':
             self.fake_location = loc_mapper().translate_location('foo/bar/2012_Fall', self.fake_location)
@@ -186,7 +176,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.assertEqual(self.store.get_modulestore_type(self.XML_COURSEID1), XML_MODULESTORE_TYPE)
         self.assertEqual(self.store.get_modulestore_type(self.XML_COURSEID2), XML_MODULESTORE_TYPE)
         mongo_ms_type = MONGO_MODULESTORE_TYPE if default_ms == 'direct' else SPLIT_MONGO_MODULESTORE_TYPE
-        self.assertEqual(self.store.get_modulestore_type(self.IMPORT_COURSEID), mongo_ms_type)
+        self.assertEqual(self.store.get_modulestore_type(self.MONGO_COURSEID), mongo_ms_type)
         # try an unknown mapping, it should be the 'default' store
         self.assertEqual(self.store.get_modulestore_type('foo/bar/2012_Fall'), mongo_ms_type)
 
@@ -201,7 +191,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
                 self.XML_COURSEID1,
                 self.course_locations[self.XML_COURSEID1].replace(name='not_findable', category='problem')
         ))
-        self.assertFalse(self.store.has_item(self.IMPORT_COURSEID, self.fake_location))
+        self.assertFalse(self.store.has_item(self.MONGO_COURSEID, self.fake_location))
 
     @ddt.data('direct', 'split')
     def test_get_item(self, default_ms):
@@ -222,7 +212,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
                 self.course_locations[self.XML_COURSEID1].replace(name='not_findable', category='problem')
             )
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_instance(self.IMPORT_COURSEID, self.fake_location)
+            self.store.get_instance(self.MONGO_COURSEID, self.fake_location)
 
     @ddt.data('direct', 'split')
     def test_get_items(self, default_ms):
@@ -252,10 +242,10 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             self.store.update_item(course, None)
         # now do it for a r/w db
         # get_course api's are inconsistent: one takes Locators the other an old style course id
-        if hasattr(self.course_locations[self.IMPORT_COURSEID], 'as_course_locator'):
-            locn = self.course_locations[self.IMPORT_COURSEID]
+        if hasattr(self.course_locations[self.MONGO_COURSEID], 'as_course_locator'):
+            locn = self.course_locations[self.MONGO_COURSEID]
         else:
-            locn = self.IMPORT_COURSEID
+            locn = self.MONGO_COURSEID
         course = self.store.get_course(locn)
         # if following raised, then the test is really a noop, change it
         self.assertFalse(course.show_calculator, "Default changed making test meaningless")
@@ -276,7 +266,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.store.delete_item(self.import_chapter_location, '**replace_user**')
         # verify it's gone
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_instance(self.IMPORT_COURSEID, self.import_chapter_location)
+            self.store.get_instance(self.MONGO_COURSEID, self.import_chapter_location)
 
     @ddt.data('direct', 'split')
     def test_get_courses(self, default_ms):
@@ -289,7 +279,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             if hasattr(course.location, 'version_agnostic') else course.location
             for course in courses
         ]
-        self.assertIn(self.course_locations[self.IMPORT_COURSEID], course_ids)
+        self.assertIn(self.course_locations[self.MONGO_COURSEID], course_ids)
         self.assertIn(self.course_locations[self.XML_COURSEID1], course_ids)
         self.assertIn(self.course_locations[self.XML_COURSEID2], course_ids)
 
@@ -325,10 +315,10 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.initdb(default_ms)
         parents = self.store.get_parent_locations(
             self.import_chapter_location,
-            self.IMPORT_COURSEID
+            self.MONGO_COURSEID
         )
         self.assertEqual(len(parents), 1)
-        self.assertEqual(parents[0], self.course_locations[self.IMPORT_COURSEID])
+        self.assertEqual(parents[0], self.course_locations[self.MONGO_COURSEID])
 
         parents = self.store.get_parent_locations(
             self.xml_chapter_location,

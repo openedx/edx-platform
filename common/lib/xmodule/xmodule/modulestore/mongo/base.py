@@ -681,7 +681,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             dbmodel,
         )
         for key, value in fields.iteritems():
-            xmodule[key] = value
+            setattr(xmodule, key, value)
         # decache any pending field settings from init
         xmodule.save()
         return xmodule
