@@ -1121,6 +1121,16 @@ def create_account(request, post_override=None):
         js['field'] = 'email'
         return JsonResponse(js, status=400)
 
+    if settings.FEATURES.get('RESTRICT_USER_EMAIL_DOMAINS', False):
+        for domain in settings.FEATURES.get('ALLOWED_USER_EMAIL_DOMAINS', []):
+            domain_pattern = r"^{0}$".format(re.escape(domain).replace('\\*', '.+?'))
+            if re.match(domain_pattern, post_vars['email'].split("@")[1]):
+                break
+        else:
+            js['value'] = _("Valid e-mail in an allowed domain is required.").format(field=a)
+            js['field'] = 'email'
+            return JsonResponse(js, status=400)
+
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
