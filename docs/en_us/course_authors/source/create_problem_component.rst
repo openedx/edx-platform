@@ -22,6 +22,7 @@ For more information, see the following topics.
 * :ref:`Components and the User Interface`
 * :ref:`Problem Settings`
 * :ref:`Multiple Problems in One Component`
+* :ref:`Problem Randomization`
 * :ref:`Modifying a Released Problem`
 
 
@@ -415,7 +416,109 @@ attempts to answer each problem individually. If a student clicks
 If a student clicks **Show Answer**, the answers for all the problems in
 the component appear.
 
-.. _Modifying a Released Problem:
+.. _Problem Randomization:
+
+*********************
+Problem Randomization
+*********************
+
+You may want to present different students with different problems, or different versions of the same problem. To do this, you'll create a Problem component for each problem or version in Studio, and then edit your course outside of Studio to randomize the problem that students see.
+
+Note that *problem randomization* is different from the **Randomization** setting in Studio. The **Randomization** setting randomizes variables within a single problem. Problem randomization offers different problems or problem versions to different students.
+
+.. note:: Creating problems with versions that can be randomized requires you to export your course, edit some of your course's XML files in a text editor, and then re-import your course. We recommend that you create a backup copy of your course before you do this. We also recommend that you only edit the files that will contain polls in the text editor if you're very familiar with editing XML.
+
+==========================
+Terminology
+==========================
+
+===========
+Terminology
+===========
+
+Sections, subsections, units, and components have different names in the **Course Outline** view and in the list of files that you'll see after you export your course and open the .xml files for editing. The following table lists the names of these elements in the **Course Outline** view and in a list of files.
+
+.. list-table::
+   :widths: 15 15
+   :header-rows: 0
+
+   * - Course Outline View
+     - File List
+   * - Section
+     - Chapter
+   * - Subsection
+     - Sequential
+   * - Unit
+     - Vertical
+   * - Component
+     - Discussion, HTML, problem, or video
+
+For example, when you want to find a specific section in your course, you'll look in the **Chapter** folder when you open the list of files that your course contains. To find a unit, you'll look in the **Vertical** folder.
+
+.. _Create Randomized Problems:
+
+==========================
+Create Randomized Problems
+==========================
+
+#. In the unit where you want to create a randomized problem, create a separate Problem component for each version or problem that you want to randomize. For example, if you want to offer four versions or problems, you'll create four separate Problem components. Make a note of the 32-digit unit ID that appears in the **Unit Identifier** field under **Unit Location**.
+
+#. Export your course. For information about how to do this, see :ref:`Exporting and Importing a Course`. Save the .tar.gz file that contains your course in a memorable location so that you can find it easily.
+
+#. Locate the .tar.gz file that contains your course, and then unpack the .tar.gz file so that you can see its contents in a list of folders and files.
+
+   - To do this on a Windows computer, you'll need to download a third-party program. For more information, see `How to Unpack a tar File in Windows <http://www.haskell.org/haskellwiki/How_to_unpack_a_tar_file_in_Windows>`_, `How to Extract a Gz File <http://www.wikihow.com/Extract-a-Gz-File>`_, `The gzip Home Page <http://www.gzip.org/>`_, or the `Windows <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/#windows>`_ section of the `How to Open .tar.gz Files <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/>`_ page.
+
+   - For information about how to do this on a Mac, see the `Mac OS X <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/#mac-os-x>`_ section of the `How to Open .tar.gz Files <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/>`_ page.
+
+#. In the list of folders and files, open the **Vertical** folder. 
+
+   .. note:: If your unit is not published, open the **Drafts** folder, and then open the **Vertical** folder in the **Drafts** folder.
+
+#. In the **Vertical** folder, locate the .xml file that has the same name as the unit ID that you noted in step 1, and then open the file in a text editor such as Sublime 2. For example, if the unit ID is e461de7fe2b84ebeabe1a97683360d31, you'll open the e461de7fe2b84ebeabe1a97683360d31.xml file.
+
+   The file contains a list of all the components in the unit, together with the URL names of the components. For example, the following file contains four Problem components.
+
+   .. code-block:: xml
+     
+       <vertical display_name="Test Unit">
+          <problem url_name="d9d0ceb3ffc74eacb29501183e26ad6e"/>
+          <problem url_name="ea66d875f4bf4a9898d8e6d2cc9f3d6f"/>
+          <problem url_name="2616cd6324704f85bc315ec46521485d"/>
+          <problem url_name="88987707294d4ff0ba3b86921438d0c0"/>
+       </vertical>
+
+#. Add ``<randomize> </randomize>`` tags around the components for the problems that you want to randomize.
+
+   .. code-block:: xml
+      
+       <vertical display_name="Test Unit">
+         <randomize>
+            <problem url_name="d9d0ceb3ffc74eacb29501183e26ad6e"/>
+            <problem url_name="ea66d875f4bf4a9898d8e6d2cc9f3d6f"/>
+            <problem url_name="2616cd6324704f85bc315ec46521485d"/>
+            <problem url_name="88987707294d4ff0ba3b86921438d0c0"/>
+         </randomize>
+       </vertical>
+
+#. After you add the ``<randomize> </randomize>`` tags, save and close the .xml file.
+
+#. Re-package your course as a .tar.gz file.
+
+   * For information about how to do this on a Mac, see `How to Create a Tar GZip File from the Command Line <http://osxdaily.com/2012/04/05/create-tar-gzip/>`_.
+
+   * For information about how to do this on a Windows computer, see `How to Make a .tar.gz on Windows <http://stackoverflow.com/questions/12774707/how-to-make-a-tar-gz-on-windows>`_.
+
+#. In Studio, re-import your course.
+
+.. note::
+
+  * Once you've implemented randomization, you can only see one of the versions or problems in Studio. You can edit that single problem directly in Studio, but to edit any of the other problems, you'll have to export your course, edit the problems in a text editor, and then re-import the course. This is true for instructors as well as course teams.
+  
+  * A .csv file for student responses contains the responses to each of the problems in the problem bank. 
+
+
+  .. _Modifying a Released Problem:
 
 ************************************
 Modifying a Released Problem
