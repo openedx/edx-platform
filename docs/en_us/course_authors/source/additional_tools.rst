@@ -398,7 +398,7 @@ You can run polls in your course so that your students can share opinions on dif
 
 .. image:: /Images/PollExample.png
 
-Note that creating a poll requires you to export your course, edit it in a text editor, and then re-import your course. We recommend that you create a backup copy of your course before you create the poll.
+.. note:: Creating a poll requires you to export your course, edit it in a text editor, and then re-import your course. We recommend that you create a backup copy of your course before you create the poll. We also do not recommend that you try to edit other areas of your course while you're working in the text editor unless you have the necessary background and training. 
 
 ==========================
 Terminology
@@ -412,49 +412,70 @@ In the **Course Outline** view, your content is arranged in sections, subsection
 Create a Poll
 ==========================
 
-#. In the unit where you want to create the poll, create components that contain all the content that you want *except* for the poll.
+#. In the unit where you want to create the poll, create components that contain all the content that you want *except* for the poll. Make a note of the 32-digit unit ID that appears in the **Unit Identifier** field under **Unit Location**.
 
-#. Export your course. For information about how to do this, see :ref:`Exporting and Importing a Course`. Save your course in a memorable location so that you can find it easily.
+#. Export your course. For information about how to do this, see :ref:`Exporting and Importing a Course`. Save the .tar.gz file that contains your course in a memorable location so that you can find it easily.
 
-#. Locate the .tar.gz file that contains your course, and then unpack the file.
+#. Locate the .tar.gz file that contains your course, and then unpack the .tar.gz file so that you can see its contents in a list of folders and files.
 
-   - To do this on a Windows computer, you'll need to download a third-party program. For more information, see `How to Unpack a tar File in Windows <http://www.haskell.org/haskellwiki/How_to_unpack_a_tar_file_in_Windows>`_, `How to Extract a Gz File <http://www.wikihow.com/Extract-a-Gz-File>`_, `The gzip Home Page <http://www.gzip.org/>`_, or the `Windows <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/#windows>`_ section of the `How to Open .tar.gz Files` <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/>`_ page.
+   - To do this on a Windows computer, you'll need to download a third-party program. For more information, see `How to Unpack a tar File in Windows <http://www.haskell.org/haskellwiki/How_to_unpack_a_tar_file_in_Windows>`_, `How to Extract a Gz File <http://www.wikihow.com/Extract-a-Gz-File>`_, `The gzip Home Page <http://www.gzip.org/>`_, or the `Windows <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/#windows>`_ section of the `How to Open .tar.gz Files <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/>`_ page.
 
-   - For information about how to do this on a Mac, see the `Mac OS X <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/#mac-os-x>`_ section of the `How to Open .tar.gz Files` <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/>`_ page.
+   - For information about how to do this on a Mac, see the `Mac OS X <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/#mac-os-x>`_ section of the `How to Open .tar.gz Files <http://www.ofzenandcomputing.com/how-to-open-tar-gz-files/>`_ page.
 
+#. In the list of folders and files, open the **Vertical** folder. 
 
-Create a Unit all the Components you want other than the polls (see "Regular Section" for an example of a pre-poll section).
-Export the tarball of your course ("Tools")
-Find the problem you wish to edit in the "verticals" folder. Open it with a text editor (an editor such as Sublime 2 is geared towards programming).
-Add poll questions in between the <vertical> and </vertical> tags. A template is below.
+   .. note:: If your unit is not published, open the **Drafts** folder, and then open the **Vertical** folder in the **Drafts** folder.
 
-.. code-block:: xml
-  <poll_question display_name="Poll Question">
-    <p>This is where you put the prompt</p>
-    <answer id="yes">Yes</answer>
-    <answer id="no">No</answer>
-  </poll_question>
+#. In the **Vertical** folder, locate the .xml file that has the same name as the unit ID that you noted in step 1, and then open the file in a text editor such as Sublime 2. For example, if the unit ID is e461de7fe2b84ebeabe1a97683360d31, you'll open the e461de7fe2b84ebeabe1a97683360d31.xml file.
 
-As a result, your code should look something like the below:
+   The file contains a list of all the components in the unit, together with the URL names of the components. For example, the following file contains an HTML component followed by a Discussion component.
 
-.. code-block:: xml
-  <vertical display_name="Test Unit">
-    <html url_name="b59c54e2f6fc4cf69ba3a43c49097d0b"/>
+   .. code-block:: xml
+     
+       <vertical display_name="Test Unit">
+        <html url_name="b59c54e2f6fc4cf69ba3a43c49097d0b"/>
+        <discussion url_name="8320c3d511484f3b96bdedfd4a44ac8b"/>
+       </vertical>
+
+#. Add the following poll code in the location where you want the poll. Change the text of the prompt to the text that you want.
+
+   .. code-block:: xml
+      
     <poll_question display_name="Poll Question">
-      <p>This is where you put the prompt</p>
+      <p>Text of the prompt</p>
       <answer id="yes">Yes</answer>
       <answer id="no">No</answer>
     </poll_question>
-    <discussion url_name="8320c3d511484f3b96bdedfd4a44ac8b"/>
-  </vertical>
 
-Re-tarball your course (how to do this in Terminal here)
-Import the tarball
-Notes
+   In the example above, if you wanted your poll to appear between the HTML component and the Discussion component in the unit, your code would resemble the following.
 
-Although the polls will render correctly in Studio, you will not be able to edit them in Studio. You will need to follow the export/import process outlined above to make any edits to your polls.
-You will be editing the raw XML code of your course to add this feature. We do not recommend attempting to edit other areas of your course in this method unless you have the necessary background and training. 
-A CSV for student responses to the problem is not currently available for polls, though the aggregate data is easily obtained directly in the problem.  
+   .. code-block:: xml
+
+     <vertical display_name="Test Unit">
+      <html url_name="b59c54e2f6fc4cf69ba3a43c49097d0b"/>
+      <poll_question display_name="Poll Question">
+        <p>Text of the prompt</p>
+        <answer id="yes">Yes</answer>
+        <answer id="no">No</answer>
+      </poll_question>
+      <discussion url_name="8320c3d511484f3b96bdedfd4a44ac8b"/>
+     </vertical>
+
+#. After you add the poll code, save and close the .xml file.
+
+#. Re-package your course as a .tar.gz file.
+
+   * For information about how to do this on a Mac, see `How to Create a Tar GZip File from the Command Line <http://osxdaily.com/2012/04/05/create-tar-gzip/>`_.
+
+   * For information about how to do this on a Windows computer, see `How to Make a .tar.gz on Windows <http://stackoverflow.com/questions/12774707/how-to-make-a-tar-gz-on-windows>`_.
+
+#. In Studio, re-import your course.
+
+.. note::
+
+  * Although polls render correctly in Studio, you cannot edit them in Studio. You will need to follow the export/import process outlined above to make any edits to your polls.
+  
+  * A .csv file that contains student responses to the problem is not currently available for polls. However, you can obtain the aggregate data directly in the problem.  
 
 
 .. _Protein Builder:
