@@ -17,6 +17,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       )
 
       @options.mast.find('.new-tab').on('click', @addNewTab)
+      $('.add-pages .new-tab').on('click', @addNewTab)
       @$('.components').sortable(
         handle: '.drag-handle'
         update: @tabMoved
@@ -34,7 +35,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
           tabs.push($(element).data('locator'))
       )
 
-      analytics.track "Reordered Static Pages",
+      analytics.track "Reordered Pages",
         course: course_location_analytics
 
       saving = new NotificationView.Mini({title: gettext("Saving&hellip;")})
@@ -68,7 +69,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
         {category: 'static_tab'}
       )
 
-      analytics.track "Added Static Page",
+      analytics.track "Added Page",
         course: course_location_analytics
 
     deleteTab: (event) =>
@@ -82,7 +83,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
               view.hide()
               $component = $(event.currentTarget).parents('.component')
 
-              analytics.track "Deleted Static Page",
+              analytics.track "Deleted Page",
                 course: course_location_analytics
                 id: $component.data('locator')
               deleting = new NotificationView.Mini

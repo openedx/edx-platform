@@ -94,6 +94,8 @@ BULK_EMAIL_DEFAULT_FROM_EMAIL = "test@test.org"
 
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
+# For consistency in user-experience, keep the value of this setting in sync with
+# the one in cms/envs/acceptance.py
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
 # Use the auto_auth workflow for creating users and logging them in

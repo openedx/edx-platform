@@ -1,23 +1,24 @@
-// studio - views - course static pages
+// studio - views - course pages
 // ====================
 
 .view-static-pages {
 
-  .new-static-page-button {
-    @include grey-button;
-    display: block;
-    text-align: center;
-    padding: 12px 0;
+  // page structure
+  .content-primary,
+  .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
   }
 
   .content-primary {
     width: flex-grid(9, 12);
     margin-right: flex-gutter();
 
-    .no-pages-content {
+    .add-pages {
       @extend %ui-well;
-      padding: ($baseline*2);
+      margin: ($baseline*1.5) 0;
       background-color: $gray-l4;
+      padding: ($baseline*2);
       text-align: center;
       color: $gray;
 
@@ -30,89 +31,95 @@
         }
       }
     }
+  }
 
-    .actions-list-wrap {
-      top: 6px;
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
 
-      .actions-list {
+  .wrapper-actions-list {
+    top: 6px;
 
-        .action-item {
-          position: relative;
+    .actions-list {
+
+      .action-item {
+        position: relative;
+        display: inline-block;
+        min-width: ($baseline*1.5);
+        margin: 0;
+        text-align: center;
+
+        .action-button,
+        .toggle-actions-view {
+          @include transition(all $tmg-f2 ease-in-out 0s);
           display: inline-block;
-          margin: 0;
-          text-align: center;
+          border: 0;
+          background: none;
+          color: $gray-l3;
 
-          .action-button,
-          .toggle-actions-view {
-            @include transition(all $tmg-f2 ease-in-out 0s);
-            display: inline-block;
-            border: 0;
-            background: none;
-            color: $gray-l3;
-
-            &:hover {
-              background-color: $blue;
-              color: $gray-l6;
-            }
-          }
-
-          &.action-visible {
-            position: relative;
-          }
-
-          &.action-visible label {
-            position: absolute;
-            top: 0;
-            right: 0;
-            height: 30px;
-            width: 30px;
-
-            &:hover {
-              background-color: $blue;
-            }
-          }
-
-          &.action-visible .toggle-checkbox {
-            position: absolute;
-            top: 0;
-            right: 0;
-            height: 30px;
-            width: 30px;
-            opacity: 0;
-          }
-
-          &.action-visible .toggle-checkbox:hover ~ .action-button {
+          &:hover {
             background-color: $blue;
             color: $gray-l6;
           }
+        }
 
-          &.action-visible .toggle-checkbox ~ .action-button {
-            .icon-eye-open {
-              display: inline-block;
-            }
+        &.action-visible {
+          position: relative;
+        }
 
-            .icon-eye-close {
-              display: none;
-            }
+        &.action-visible label {
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 30px;
+          width: 30px;
+
+          &:hover {
+            background-color: $blue;
+          }
+        }
+
+        &.action-visible .toggle-checkbox {
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 30px;
+          width: 30px;
+          opacity: 0;
+        }
+
+        &.action-visible .toggle-checkbox:hover ~ .action-button,
+        &.action-visible .toggle-checkbox:checked:hover ~ .action-button {
+          background-color: $blue;
+          color: $gray-l6;
+        }
+
+        &.action-visible .toggle-checkbox ~ .action-button {
+          .icon-eye-open {
+            display: inline-block;
           }
 
-          &.action-visible .toggle-checkbox:checked ~ .action-button {
-            background-color: $gray;
-            color: $white;
+          .icon-eye-close {
+            display: none;
+          }
+        }
 
-            .icon-eye-open {
-              display: none;
-            }
+        &.action-visible .toggle-checkbox:checked ~ .action-button {
+          background-color: $gray;
+          color: $white;
 
-            .icon-eye-close {
-              display: inline-block;
-            }
+          .icon-eye-open {
+            display: none;
+          }
+
+          .icon-eye-close {
+            display: inline-block;
           }
         }
       }
     }
-
   }
+
 
   .unit-body {
     padding: 0;
@@ -209,6 +216,12 @@
       &:hover {
         background: url(../img/drag-handles.png) center no-repeat #fff;
       }
+
+      &.is-fixed {
+        cursor: default;
+        width: ($baseline*1.5);
+        background: $gray-l4 none;
+      }
     }
 
     // uses similar styling as assets.scss, unit.scss
@@ -229,14 +242,14 @@
     .course-nav-tab-actions {
       display: inline-block;
       float: right;
-      margin-right: $baseline*2;
+      margin-right: ($baseline*2);
       padding: 8px 0px;
       vertical-align: middle;
       text-align: center;
 
       .action-item {
         display: inline-block;
-        margin: ($baseline/4) 0 ($baseline/4) ($baseline/4);
+        margin: ($baseline/4) 0 ($baseline/4) ($baseline/2);
 
         .action-button {
           @include transition(all $tmg-f2 ease-in-out 0s);
@@ -275,27 +288,33 @@
     }
   }
 
-  // basic course nav items
+  // basic course nav items - overrides from above
   .course-nav-tab {
-    padding: ($baseline*.75) $baseline;
+    padding: ($baseline*.75) ($baseline/4) ($baseline*.75) $baseline;
 
-    &.locked {
-      background-color: $gray-l6;
+    &.fixed {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+      opacity: .7;
+
+      &:hover {
+        opacity: 1;
+      }
     }
 
     .course-nav-tab-header {
       display: inline-block;
-      max-width: 80%;
+      width:80%;
 
       .title {
         @extend %t-title4;
         font-weight: 300;
+        color: $gray;
       }
     }
 
     .course-nav-tab-actions {
+      display: inline-block;
       padding: ($baseline/10);
-      margin-right: ($baseline*1.5);
     }
   }
 

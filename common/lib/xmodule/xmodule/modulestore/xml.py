@@ -20,6 +20,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
+from xmodule.tabs import CourseTabList
 
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
@@ -662,9 +663,9 @@ class XMLModuleStore(ModuleStoreReadBase):
                         # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
                         # from the course policy
                         if category == "static_tab":
-                            for tab in course_descriptor.tabs or []:
-                                if tab.get('url_slug') == slug:
-                                    module.display_name = tab['name']
+                            tab = CourseTabList.get_tab_by_slug(course=course_descriptor, url_slug=slug)
+                            if tab:
+                                module.display_name = tab.name
                         module.data_dir = course_dir
                         module.save()
 

@@ -264,7 +264,7 @@ class StaticTabFields(object):
     )
     data = String(
         default=textwrap.dedent(u"""\
-            <p>This is where you can add additional pages to your courseware. Click the 'edit' button to begin editing.</p>
+            <p>Add the content you want students to see on this page.</p>
         """),
         scope=Scope.content,
         help="HTML for the additional pages"

@@ -1393,10 +1393,15 @@ class TestCourseCreation(SplitModuleTest):
         original_index = modulestore().get_course_index_info(original_locator)
         fields = {}
         for field in original.fields.values():
+            value = getattr(original, field.name)
+            if not isinstance(value, datetime.datetime):
+                json_value = field.to_json(value)
+            else:
+                json_value = value
             if field.scope == Scope.content and field.name != 'location':
-                fields[field.name] = getattr(original, field.name)
+                fields[field.name] = json_value
             elif field.scope == Scope.settings:
-                fields[field.name] = getattr(original, field.name)
+                fields[field.name] = json_value
         fields['grading_policy']['GRADE_CUTOFFS'] = {'A': .9, 'B': .8, 'C': .65}
         fields['display_name'] = 'Derivative'
         new_draft = modulestore().create_course(

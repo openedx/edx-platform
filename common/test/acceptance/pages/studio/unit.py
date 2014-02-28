@@ -21,7 +21,7 @@ class UnitPage(PageObject):
 
     @property
     def url(self):
-        """URL to the static pages UI in a course."""
+        """URL to the pages UI in a course."""
         return "{}/unit/{}".format(BASE_URL, self.unit_locator)
 
     def is_browser_on_page(self):
