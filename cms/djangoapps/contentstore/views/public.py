@@ -9,8 +9,9 @@ from django.conf import settings
 
 from edxmako.shortcuts import render_to_response
 
-from external_auth.views import ssl_login_shortcut, ssl_get_cert_from_request
-from microsite_configuration import microsite
+from external_auth.views import (ssl_login_shortcut, ssl_get_cert_from_request,
+                                 redirect_with_get)
+from microsite_configuration.middleware import MicrositeConfiguration
 
 __all__ = ['signup', 'login_page', 'howitworks']
 
@@ -26,7 +27,7 @@ def signup(request):
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to course to login to process their certificate if SSL is enabled
         # and registration is disabled.
-        return redirect(reverse('login'))
+        return redirect_with_get('login', request.GET, False)
 
     return render_to_response('register.html', {'csrf': csrf_token})
 
@@ -43,11 +44,14 @@ def login_page(request):
         # SSL login doesn't require a login view, so redirect
         # to course now that the user is authenticated via
         # the decorator.
-        return redirect('/course')
+        next_url = request.GET.get('next')
+        if next_url:
+            return redirect(next_url)
+        else:
+            return redirect('/course')
     if settings.FEATURES.get('AUTH_USE_CAS'):
         # If CAS is enabled, redirect auth handling to there
         return redirect(reverse('cas-login'))
-
     return render_to_response(
         'login.html',
         {

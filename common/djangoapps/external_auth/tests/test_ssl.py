@@ -21,19 +21,29 @@ from mock import Mock
 from edxmako.middleware import MakoMiddleware
 from external_auth.models import ExternalAuthMap
 import external_auth.views
+from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
+from student.models import CourseEnrollment
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
+from xmodule.modulestore.tests.django_utils import (ModuleStoreTestCase,
+                                                    mixed_store_config)
+from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP = FEATURES_WITH_SSL_AUTH.copy()
 FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP['AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'] = True
+FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE = FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP.copy()
+FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
 FEATURES_WITHOUT_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITHOUT_SSL_AUTH['AUTH_USE_CERTIFICATES'] = False
 
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
 @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH)
-class SSLClientTest(TestCase):
+class SSLClientTest(ModuleStoreTestCase):
     """
     Tests SSL Authentication code sections of external_auth
     """
@@ -170,7 +180,8 @@ class SSLClientTest(TestCase):
         response = self.client.get(
             reverse('dashboard'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        self.assertIn(reverse('dashboard'), response['location'])
+        self.assertEquals(('http://testserver/dashboard', 302),
+                          response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -316,3 +327,70 @@ class SSLClientTest(TestCase):
         self.assertEqual(1, len(ExternalAuthMap.objects.all()))
 
         self.assertTrue(self.mock.called)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE,
+                       MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+    def test_ssl_lms_redirection(self):
+        """
+        Auto signup auth user and ensure they return to the original
+        url they visited after being logged in.
+        """
+        course = CourseFactory.create(
+            org='MITx',
+            number='999',
+            display_name='Robot Super Course'
+        )
+
+        external_auth.views.ssl_login(self._create_ssl_request('/'))
+        user = User.objects.get(email=self.USER_EMAIL)
+        CourseEnrollment.enroll(user, course.id)
+        course_private_url = '/courses/MITx/999/Robot_Super_Course/courseware'
+
+        self.assertFalse(SESSION_KEY in self.client.session)
+
+        response = self.client.get(
+            course_private_url,
+            follow=True,
+            SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL),
+            HTTP_ACCEPT='text/html'
+        )
+        self.assertEqual(('http://testserver{0}'.format(course_private_url), 302),
+                         response.redirect_chain[-1])
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE)
+    def test_ssl_cms_redirection(self):
+        """
+        Auto signup auth user and ensure they return to the original
+        url they visited after being logged in.
+        """
+        course = CourseFactory.create(
+            org='MITx',
+            number='999',
+            display_name='Robot Super Course'
+        )
+
+        external_auth.views.ssl_login(self._create_ssl_request('/'))
+        user = User.objects.get(email=self.USER_EMAIL)
+        CourseEnrollment.enroll(user, course.id)
+
+        CourseStaffRole(course.location).add_users(user)
+        location = Location(['i4x', 'MITx', '999', 'course',
+                             Location.clean('Robot Super Course'), None])
+        new_location = loc_mapper().translate_location(
+            location.course_id, location, True, True
+        )
+        course_private_url = new_location.url_reverse('course/', '')
+        self.assertFalse(SESSION_KEY in self.client.session)
+
+        response = self.client.get(
+            course_private_url,
+            follow=True,
+            SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL),
+            HTTP_ACCEPT='text/html'
+        )
+        self.assertEqual(('http://testserver{0}'.format(course_private_url), 302),
+                         response.redirect_chain[-1])
+        self.assertIn(SESSION_KEY, self.client.session)
