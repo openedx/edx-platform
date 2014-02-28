@@ -184,7 +184,7 @@ The following options appear on the **Advanced** tab in the Video component.
 
 * **Display Name**: The name that you want your students to see. This is the same as the **Display Name** field on the **Basic** tab.
 
-* **Download Transcript**: The URL for the transcript file for the video. This file is usually an .srt file, but can also be a .txt or .pdf file. (For more information aobut .txt and .pdf files, see :ref:`Additional Transcripts`.) The URL can be an external URL, such as **http://example.org/transcript.srt**, or the URL for a file that you've uploaded to your **Files & Uploads** page, such as **/static/example.srt**.
+* **Download Transcript**: The URL for the transcript file for the video. This file is usually an .srt file, but can also be a .txt or .pdf file. (For more information about .txt and .pdf files, see :ref:`Additional Transcripts`.) The URL can be an external URL, such as **http://example.org/transcript.srt**, or the URL for a file that you've uploaded to your **Files & Uploads** page, such as **/static/example.srt**.
 
   This setting is related to **Transcript Download Allowed**. 
 
@@ -282,6 +282,6 @@ If your course uses .sjson files, you'll upload the .sjson file for the video to
       https://s3.amazonaws.com/edx-course-videos/edx-edx101/EDXSPCPJSP13-G030300.mp4
 
 #. Click the **Advanced** tab.
-#. In the **HTML5 Transcript** field, enter the file name of your video. Do not include "subs\_" or ".sjson". For the example in step 2, you would only enter **Lecture1a**.
+#. In the **Transcript (primary)** field, enter the file name of your video. Do not include `subs_` or `.sjson`. For the example in step 2, you would only enter **Lecture1a**.
 #. Set the other options that you want.
 #. Click **Save**.
