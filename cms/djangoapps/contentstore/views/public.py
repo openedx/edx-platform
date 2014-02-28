@@ -10,7 +10,7 @@ from django.conf import settings
 from edxmako.shortcuts import render_to_response
 
 from external_auth.views import ssl_login_shortcut, ssl_get_cert_from_request
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 __all__ = ['signup', 'login_page', 'howitworks']
 
@@ -49,7 +49,7 @@ def login_page(request):
         {
             'csrf': csrf_token,
             'forgot_password_link': "//{base}/login#forgot-password-modal".format(base=settings.LMS_BASE),
-            'platform_name': MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME),
+            'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         }
     )
 

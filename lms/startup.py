@@ -9,6 +9,9 @@ settings.INSTALLED_APPS  # pylint: disable=W0104
 
 from django_startup import autostartup
 import edxmako
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def run():
@@ -19,6 +22,9 @@ def run():
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
+
+    if settings.FEATURES.get('USE_MICROSITES', False):
+        enable_microsites()
 
 
 def enable_theme():
@@ -51,3 +57,45 @@ def enable_theme():
     settings.STATICFILES_DIRS.append(
         (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
     )
+
+
+def enable_microsites():
+    """
+    Enable the use of microsites, which are websites that allow
+    for subdomains for the edX platform, e.g. foo.edx.org
+    """
+
+    microsites_root = settings.MICROSITE_ROOT_DIR
+    microsite_config_dict = settings.MICROSITE_CONFIGURATION
+
+    for ms_name, ms_config in microsite_config_dict.items():
+        # Calculate the location of the microsite's files
+        ms_root = microsites_root / ms_name
+        ms_config = microsite_config_dict[ms_name]
+
+        # pull in configuration information from each
+        # microsite root
+
+        if ms_root.isdir():
+            # store the path on disk for later use
+            ms_config['microsite_root'] = ms_root
+
+            template_dir = ms_root / 'templates'
+            ms_config['template_dir'] = template_dir
+
+            ms_config['microsite_name'] = ms_name
+            log.info('Loading microsite {0}'.format(ms_root))
+        else:
+            # not sure if we have application logging at this stage of
+            # startup
+            log.error('Error loading microsite {0}. Directory does not exist'.format(ms_root))
+            # remove from our configuration as it is not valid
+            del microsite_config_dict[ms_name]
+
+    # if we have any valid microsites defined, let's wire in the Mako and STATIC_FILES search paths
+    if microsite_config_dict:
+        settings.TEMPLATE_DIRS.append(microsites_root)
+        settings.MAKO_TEMPLATES['main'].append(microsites_root)
+        edxmako.startup.run()
+
+        settings.STATICFILES_DIRS.insert(0, microsites_root)

@@ -74,7 +74,7 @@ from dogapi import dog_stats_api
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
@@ -350,7 +350,7 @@ def signin_user(request):
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action'),
-        'platform_name': MicrositeConfiguration.get_microsite_configuration_value(
+        'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
         ),
@@ -373,7 +373,7 @@ def register_user(request, extra_context=None):
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action'),
-        'platform_name': MicrositeConfiguration.get_microsite_configuration_value(
+        'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
         ),
@@ -416,11 +416,11 @@ def dashboard(request):
 
     # for microsites, we want to filter and only show enrollments for courses within
     # the microsites 'ORG'
-    course_org_filter = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')
+    course_org_filter = microsite.get_value('course_org_filter')
 
     # Let's filter out any courses in an "org" that has been declared to be
     # in a Microsite
-    org_filter_out_set = MicrositeConfiguration.get_all_microsite_orgs()
+    org_filter_out_set = microsite.get_all_orgs()
 
     # remove our current Microsite from the "filter out" list, if applicable
     if course_org_filter:
@@ -1160,7 +1160,7 @@ def create_account(request, post_override=None):
 
     # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
-        from_address = MicrositeConfiguration.get_microsite_configuration_value(
+        from_address = microsite.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
@@ -1502,7 +1502,7 @@ def change_email_request(request):
 
     message = render_to_string('emails/email_change.txt', context)
 
-    from_address = MicrositeConfiguration.get_microsite_configuration_value(
+    from_address = microsite.get_value(
         'email_from_address',
         settings.DEFAULT_FROM_EMAIL
     )

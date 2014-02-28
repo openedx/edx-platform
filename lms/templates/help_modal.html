@@ -5,8 +5,8 @@
 <%! import pytz %>
 <%! from django.conf import settings %>
 <%! from courseware.tabs import get_discussion_link %>
-<%! from microsite_configuration.middleware import MicrositeConfiguration %>
-<%! platform_name = MicrositeConfiguration.get_microsite_configuration_value("platform_name", settings.PLATFORM_NAME) %>
+<%! from microsite_configuration import microsite %>
+<%! platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME) %>
 
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
@@ -53,7 +53,6 @@ discussion_link = get_discussion_link(course) if course else None
     <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(
         platform_name=platform_name
       )}</p>
-
     <hr>
 
     <div class="help-buttons">

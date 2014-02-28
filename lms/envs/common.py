@@ -229,6 +229,9 @@ FEATURES = {
     # that people can submit content and modify the Wiki in any arbitrary manner. We're leaving this as True in the
     # defaults, so that we maintain current behavior
     'ALLOW_WIKI_ROOT_ACCESS': True,
+
+    # Turn on/off Microsites feature
+    'USE_MICROSITES': False,
 }
 
 # Used for A/B testing
@@ -693,7 +696,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
-    'microsite_configuration.middleware.MicrositeConfiguration',
+    'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -1181,64 +1184,6 @@ MKTG_URL_LINK_MAP = {
     # Verified Certificates
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
-
-
-############################### MICROSITES ################################
-def enable_microsites(microsite_config_dict, subdomain_branding, virtual_universities, microsites_root=ENV_ROOT / "microsites"):
-    """
-    Enable the use of microsites, which are websites that allow
-    for subdomains for the edX platform, e.g. foo.edx.org
-    """
-
-    if not microsite_config_dict:
-        return
-
-    FEATURES['USE_MICROSITES'] = True
-
-    for microsite_name in microsite_config_dict.keys():
-        # Calculate the location of the microsite's files
-        microsite_root = microsites_root / microsite_name
-        microsite_config = microsite_config_dict[microsite_name]
-
-        # pull in configuration information from each
-        # microsite root
-
-        if os.path.isdir(microsite_root):
-            # store the path on disk for later use
-            microsite_config['microsite_root'] = microsite_root
-
-            # get the domain that this should reside
-            domain = microsite_config['domain_prefix']
-
-            # get the virtual university that this should use
-            university = microsite_config['university']
-
-            # add to the existing maps in our settings
-            subdomain_branding[domain] = university
-            virtual_universities.append(university)
-
-            template_dir = microsite_root / 'templates'
-            microsite_config['template_dir'] = template_dir
-
-            microsite_config['microsite_name'] = microsite_name
-
-        else:
-            # not sure if we have application logging at this stage of
-            # startup
-            print '**** Error loading microsite {0}. Directory does not exist'.format(microsite_root)
-            # remove from our configuration as it is not valid
-            del microsite_config_dict[microsite_name]
-
-    # if we have microsites, then let's turn on SUBDOMAIN_BRANDING
-    # Note check size of the dict because some microsites might not be found on disk and
-    # we could be left with none
-    if microsite_config_dict:
-        FEATURES['SUBDOMAIN_BRANDING'] = True
-
-        TEMPLATE_DIRS.append(microsites_root)
-        MAKO_TEMPLATES['main'].append(microsites_root)
-
-        STATICFILES_DIRS.append(microsites_root)
 
 
 ################# Student Verification #################
