@@ -53,6 +53,7 @@ from instructor_task.api import (
 )
 from instructor_task.views import get_task_completion_info
 from edxmako.shortcuts import render_to_response, render_to_string
+from class_dashboard import dashboard_data
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, unique_id_for_user
 from student.views import course_from_id
@@ -818,6 +819,14 @@ def instructor_dashboard(request, course_id):
             analytics_results[analytic_name] = get_analytics_result(analytic_name)
 
     #----------------------------------------
+    # Metrics
+
+    metrics_results = {}
+    if settings.FEATURES.get('CLASS_DASHBOARD') and idash_mode == 'Metrics':
+        metrics_results['section_display_name'] = dashboard_data.get_section_display_name(course_id)
+        metrics_results['section_has_problem'] = dashboard_data.get_array_section_has_problem(course_id)
+
+    #----------------------------------------
     # offline grades?
 
     if use_offline:
@@ -900,7 +909,8 @@ def instructor_dashboard(request, course_id):
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
         'analytics_results': analytics_results,
-        'disable_buttons': disable_buttons
+        'disable_buttons': disable_buttons,
+        'metrics_results': metrics_results,
     }
 
     if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):

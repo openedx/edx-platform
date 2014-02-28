@@ -269,6 +269,9 @@ PASSWORD_HASHERS = (
     # 'django.contrib.auth.hashers.CryptPasswordHasher',
 )
 
+### This enables the Metrics tab for the Instructor dashboard ###########
+FEATURES['CLASS_DASHBOARD'] = True
+
 ################### Make tests quieter
 
 # OpenID spews messages like this to stderr, we don't need to see them:
