@@ -1504,3 +1504,13 @@ ALL_LANGUAGES = (
     [u"za", u"Zhuang; Chuang"],
     [u"zu", u"Zulu"]
 )
+
+
+### JSdraw (only installed in some instances)
+
+try:
+    import edx_jsdraw
+except ImportError:
+    pass
+else:
+    INSTALLED_APPS += ('edx_jsdraw',)
