@@ -88,6 +88,9 @@ FEATURES = {
     # Toggles embargo functionality
     'EMBARGO': False,
 
+    # Toggle embargo site functionality
+    'EMBARGO_SITE': False,
+
     # Turn on/off Microsites feature
     'USE_MICROSITES': False,
 

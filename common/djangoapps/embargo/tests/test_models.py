@@ -78,3 +78,19 @@ class EmbargoModelsTest(TestCase):
         self.assertTrue(whitelist in cwhitelist)
         cblacklist = IPFilter.current().blacklist_ips
         self.assertTrue(blacklist in cblacklist)
+
+        # network tests
+        whitelist = '1.0.0.0/24'
+        blacklist = '1.1.0.0/16'
+
+        IPFilter(whitelist=whitelist, blacklist=blacklist).save()
+
+        cwhitelist = IPFilter.current().whitelist_ips
+        self.assertTrue('1.0.0.100' in cwhitelist)
+        self.assertTrue('1.0.0.10' in cwhitelist)
+        self.assertFalse('1.0.1.0' in cwhitelist)
+        cblacklist = IPFilter.current().blacklist_ips
+        self.assertTrue('1.1.0.0' in cblacklist)
+        self.assertTrue('1.1.0.1' in cblacklist)
+        self.assertTrue('1.1.1.0' in cblacklist)
+        self.assertFalse('1.2.0.0' in cblacklist)
