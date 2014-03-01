@@ -3,6 +3,7 @@ Test the partitions and partitions service
 
 """
 
+from collections import defaultdict
 from unittest import TestCase
 from mock import Mock, MagicMock
 
@@ -49,6 +50,131 @@ class TestGroup(TestCase):
         self.assertEqual(group.id, test_id)
         self.assertEqual(group.name, name)
 
+    def test_from_json_broken(self):
+        test_id = 5
+        name = "Grendel"
+        # Bad version
+        jsonified = {
+            "id": test_id,
+            "name": name,
+            "version": 9001
+        }
+        with self.assertRaisesRegexp(TypeError, "has unexpected version"):
+            group = Group.from_json(jsonified)
+
+        # Missing key "id"
+        jsonified = {
+            "name": name,
+            "version": Group.VERSION
+        }
+        with self.assertRaisesRegexp(TypeError, "missing value key 'id'"):
+            group = Group.from_json(jsonified)
+
+        # Has extra key - should not be a problem
+        jsonified = {
+            "id": test_id,
+            "name": name,
+            "version": Group.VERSION,
+            "programmer": "Cale"
+        }
+        group = Group.from_json(jsonified)
+        self.assertNotIn("programmer", group.to_json())
+
+
+class TestUserPartition(TestCase):
+    """Test constructing UserPartitions"""
+    def test_construct(self):
+        groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
+        user_partition = UserPartition(0, 'Test Partition', 'for testing purposes', groups)
+        self.assertEqual(user_partition.id, 0)
+        self.assertEqual(user_partition.name, "Test Partition")
+        self.assertEqual(user_partition.description, "for testing purposes")
+        self.assertEqual(user_partition.groups, groups)
+
+    def test_string_id(self):
+        groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
+        user_partition = UserPartition("70", 'Test Partition', 'for testing purposes', groups)
+        self.assertEqual(user_partition.id, 70)
+
+    def test_to_json(self):
+        groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
+        upid = 0
+        upname = "Test Partition"
+        updesc = "for testing purposes"
+        user_partition = UserPartition(upid, upname, updesc, groups)
+
+        jsonified = user_partition.to_json()
+        act_jsonified = {
+            "id": upid,
+            "name": upname,
+            "description": updesc,
+            "groups": [group.to_json() for group in groups],
+            "version": user_partition.VERSION
+        }
+        self.assertEqual(jsonified, act_jsonified)
+
+    def test_from_json(self):
+        groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
+        upid = 1
+        upname = "Test Partition"
+        updesc = "For Testing Purposes"
+
+        jsonified = {
+            "id": upid,
+            "name": upname,
+            "description": updesc,
+            "groups": [group.to_json() for group in groups],
+            "version": UserPartition.VERSION
+        }
+        user_partition = UserPartition.from_json(jsonified)
+        self.assertEqual(user_partition.id, upid)
+        self.assertEqual(user_partition.name, upname)
+        self.assertEqual(user_partition.description, updesc)
+        for act_group in user_partition.groups:
+            self.assertIn(act_group.id, [0, 1])
+            exp_group = groups[act_group.id]
+            self.assertEqual(exp_group.id, act_group.id)
+            self.assertEqual(exp_group.name, act_group.name)
+
+    def test_from_json_broken(self):
+        groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
+        upid = 1
+        upname = "Test Partition"
+        updesc = "For Testing Purposes"
+
+        # Missing field
+        jsonified = {
+            "name": upname,
+            "description": updesc,
+            "groups": [group.to_json() for group in groups],
+            "version": UserPartition.VERSION
+        }
+        with self.assertRaisesRegexp(TypeError, "missing value key 'id'"):
+            user_partition = UserPartition.from_json(jsonified)
+
+        # Wrong version (it's over 9000!)
+        jsonified = {
+            'id': upid,
+            "name": upname,
+            "description": updesc,
+            "groups": [group.to_json() for group in groups],
+            "version": 9001
+        }
+        with self.assertRaisesRegexp(TypeError, "has unexpected version"):
+            user_partition = UserPartition.from_json(jsonified)
+
+        # Has extra key - should not be a problem
+        jsonified = {
+            'id': upid,
+            "name": upname,
+            "description": updesc,
+            "groups": [group.to_json() for group in groups],
+            "version": UserPartition.VERSION,
+            "programmer": "Cale"
+        }
+        user_partition = UserPartition.from_json(jsonified)
+        self.assertNotIn("programmer", user_partition.to_json())
+
 
 class StaticPartitionService(PartitionService):
     """
@@ -63,32 +189,37 @@ class StaticPartitionService(PartitionService):
         return self._partitions
 
 
+class MemoryUserTagsService(object):
+    """
+    An implementation of a user_tags XBlock service that
+    uses an in-memory dictionary for storage
+    """
+    COURSE_SCOPE = 'course'
+
+    def __init__(self):
+        self._tags = defaultdict(dict)
+
+    def get_tag(self, scope, key):
+        """Sets the value of ``key`` to ``value``"""
+        print 'GETTING', scope, key, self._tags
+        return self._tags[scope].get(key)
+
+    def set_tag(self, scope, key, value):
+        """Gets the value of ``key``"""
+        self._tags[scope][key] = value
+        print 'SET', scope, key, value, self._tags
+
+
 class TestPartitionsService(TestCase):
     """
     Test getting a user's group out of a partition
-
     """
 
     def setUp(self):
         groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
         self.partition_id = 0
 
-        # construct the user_service
-        self.user_tags = dict()
-        self.user_tags_service = MagicMock()
-
-        def mock_set_tag(_scope, key, value):
-            """Sets the value of ``key`` to ``value``"""
-            self.user_tags[key] = value
-
-        def mock_get_tag(_scope, key):
-            """Gets the value of ``key``"""
-            if key in self.user_tags:
-                return self.user_tags[key]
-            return None
-
-        self.user_tags_service.set_tag = mock_set_tag
-        self.user_tags_service.get_tag = mock_get_tag
+        self.user_tags_service = MemoryUserTagsService()
 
         user_partition = UserPartition(self.partition_id, 'Test Partition', 'for testing purposes', groups)
         self.partitions_service = StaticPartitionService(

@@ -19,6 +19,7 @@
            data-element="${idx+1}"
            href="javascript:void(0);"
            title="${item['title']|h}"
+           data-page-title="${item['page_title']|h}"
            aria-controls="seq_contents_${idx}"
            id="tab_${idx}"
            tabindex="0"
@@ -36,7 +37,7 @@
   </nav>
 
   % for idx, item in enumerate(items):
-  <div id="seq_contents_${idx}" 
+  <div id="seq_contents_${idx}"
        aria-labelledby="tab_${idx}"
        aria-hidden="true"
        class="seq_contents tex2jax_ignore asciimath2jax_ignore">

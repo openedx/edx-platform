@@ -12,15 +12,18 @@ from xmodule.x_module import XModule, module_attr
 from lxml import etree
 
 from xblock.core import XBlock
-from xblock.fields import Scope, Integer, Dict
+from xblock.fields import Scope, Integer, ReferenceValueDict
 from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
 
 
 class SplitTestFields(object):
-    user_partition_id = Integer(help="Which user partition is used for this test",
-                                scope=Scope.content)
+    """Fields needed for split test module"""
+    user_partition_id = Integer(
+        help="Which user partition is used for this test",
+        scope=Scope.content
+    )
 
     # group_id is an int
     # child is a serialized UsageId (aka Location).  This child
@@ -31,9 +34,10 @@ class SplitTestFields(object):
     # TODO: is there a way to add some validation around this, to
     # be run on course load or in studio or ....
 
-    group_id_to_child = Dict(help="Which child module students in a particular "
-                             "group_id should see",
-                             scope=Scope.content)
+    group_id_to_child = ReferenceValueDict(
+        help="Which child module students in a particular group_id should see",
+        scope=Scope.content
+    )
 
 
 @XBlock.needs('user_tags')
@@ -78,6 +82,25 @@ class SplitTestModule(SplitTestFields, XModule):
                 return child
 
         return None
+
+    def get_content_titles(self):
+        """
+        Returns list of content titles for split_test's child.
+
+        This overwrites the get_content_titles method included in x_module by default.
+
+        WHY THIS OVERWRITE IS NECESSARY: If we fetch *all* of split_test's children,
+        we'll end up getting all of the possible conditions users could ever see.
+        Ex: If split_test shows a video to group A and HTML to group B, the
+        regular get_content_titles in x_module will get the title of BOTH the video
+        AND the HTML.
+
+        We only want the content titles that should actually be displayed to the user.
+
+        split_test's .child property contains *only* the child that should actually
+        be shown to the user, so we call get_content_titles() on only that child.
+        """
+        return self.child.get_content_titles()
 
     def get_child_descriptors(self):
         """
@@ -127,13 +150,9 @@ class SplitTestModule(SplitTestFields, XModule):
         fragment.add_content(self.system.render_template('split_test_staff_view.html', {
             'items': contents,
         }))
-        frag_js = """
-            $(document).ready(function() {{
-                ABTestSelector($('.split-test-view'));
-            }});
-        """
-        fragment.add_javascript(frag_js)
+        fragment.add_css('.split-test-child { display: none; }')
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_staff.js'))
+        fragment.initialize_js('ABTestSelector')
         return fragment
 
     def student_view(self, context):
@@ -159,9 +178,12 @@ class SplitTestModule(SplitTestFields, XModule):
             return fragment
 
     @XBlock.handler
-    def log_child_render(self, request, suffix=''):
+    def log_child_render(self, request, suffix=''):  # pylint: disable=unused-argument
+        """
+        Record in the tracking logs which child was rendered
+        """
         # TODO: use publish instead, when publish is wired to the tracking logs
-        self.system.track_function('split-test-child-render', {'child-id': self.child.scope_ids.usage_id})
+        self.system.track_function('xblock.split_test.child_render', {'child-id': self.child.scope_ids.usage_id})
         return Response()
 
     def get_icon_class(self):
@@ -184,6 +206,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
 
     child_descriptor = module_attr('child_descriptor')
     log_child_render = module_attr('log_child_render')
+    get_content_titles = module_attr('get_content_titles')
 
     def definition_to_xml(self, resource_fs):
 
@@ -200,3 +223,4 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         makes it use module.get_child_descriptors().
         """
         return True
+

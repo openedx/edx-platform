@@ -158,6 +158,7 @@ class TextbookList(List):
 
 
 class UserPartitionList(List):
+    """Special List class for listing UserPartitions"""
     def from_json(self, values):
         return [UserPartition.from_json(v) for v in values]
 
@@ -175,8 +176,9 @@ class CourseFields(object):
     # advanced_settings.
     user_partitions = UserPartitionList(
         help="List of user partitions of this course into groups, used e.g. for experiments",
-        default=[], scope=Scope.content)
-
+        default=[],
+        scope=Scope.content
+    )
 
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
