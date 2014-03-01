@@ -127,13 +127,8 @@ class SplitTestModule(SplitTestFields, XModule):
         fragment.add_content(self.system.render_template('split_test_staff_view.html', {
             'items': contents,
         }))
-        frag_js = """
-            $(document).ready(function() {{
-                ABTestSelector($('.split-test-view'));
-            }});
-        """
-        fragment.add_javascript(frag_js)
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_staff.js'))
+        fragment.initialize_js('ABTestSelector')
         return fragment
 
     def student_view(self, context):
