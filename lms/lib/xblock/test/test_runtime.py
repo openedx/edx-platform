@@ -88,7 +88,8 @@ class TestHandlerUrl(TestCase):
         self.assertIn('handler_a', self._parsed_path('handler_a'))
 
 
-class TestUserServiceInterface(TestCase):
+class TestUserServiceAPI(TestCase):
+    """Test the user service interface"""
 
     def setUp(self):
         self.course_id = "org/course/run"
@@ -97,6 +98,7 @@ class TestUserServiceInterface(TestCase):
         self.user.save()
 
         def mock_get_real_user(_anon_id):
+            """Just returns the test user"""
             return self.user
 
         self.runtime = LmsModuleSystem(
@@ -126,3 +128,11 @@ class TestUserServiceInterface(TestCase):
         tag = self.runtime.service(self.mock_block, 'user_tags').get_tag(self.scope, self.key)
 
         self.assertEqual(tag, set_value)
+
+        # Try to set tag in wrong scope
+        with self.assertRaises(ValueError):
+            self.runtime.service(self.mock_block, 'user_tags').set_tag('fake_scope', self.key, set_value)
+
+        # Try to get tag in wrong scope
+        with self.assertRaises(ValueError):
+            self.runtime.service(self.mock_block, 'user_tags').get_tag('fake_scope', self.key)

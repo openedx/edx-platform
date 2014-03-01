@@ -88,7 +88,7 @@ class PartitionService(object):
         and persist the info.
         """
         key = self._key_for_partition(user_partition)
-        scope = self._user_tags_service.COURSE
+        scope = self._user_tags_service.COURSE_SCOPE
 
         group_id = self._user_tags_service.get_tag(scope, key)
         if group_id is not None:
@@ -133,6 +133,6 @@ class PartitionService(object):
             'partition_name': user_partition.name
         }
         # TODO: Use the XBlock publish api instead
-        self._track_function('edx.split_test.assigned_user_to_partition', event_info)
+        self._track_function('xmodule.partitions.assigned_user_to_partition', event_info)
 
         return group.id

@@ -1,8 +1,14 @@
+"""
+Middleware for user api.
+Adds user's tags to tracking event context.
+"""
 from track.contexts import COURSE_REGEX
 from eventtracking import tracker
 from user_api.models import UserCourseTag
 
+
 class UserTagsEventContextMiddleware(object):
+    """Middleware that adds a user's tags to tracking event context."""
     CONTEXT_NAME = 'user_tags_context'
 
     def process_request(self, request):

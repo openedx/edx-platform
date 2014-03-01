@@ -8,7 +8,7 @@ class UserPreference(models.Model):
     key = models.CharField(max_length=255, db_index=True)
     value = models.TextField()
 
-    class Meta:
+    class Meta:  # pylint: disable=missing-docstring
         unique_together = ("user", "key")
 
     @classmethod
@@ -45,5 +45,5 @@ class UserCourseTag(models.Model):
     course_id = models.CharField(max_length=255, db_index=True)
     value = models.TextField()
 
-    class Meta:
+    class Meta:  # pylint: disable=missing-docstring
         unique_together = ("user", "course_id", "key")

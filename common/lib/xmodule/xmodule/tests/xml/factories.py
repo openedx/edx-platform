@@ -146,6 +146,10 @@ class SequenceFactory(XmlImportFactory):
     """Factory for <sequential> nodes"""
     tag = 'sequential'
 
+class VerticalFactory(XmlImportFactory):
+    """Factory for <vertical> nodes"""
+    tag = 'vertical'
+
 
 class ProblemFactory(XmlImportFactory):
     """Factory for <problem> nodes"""
@@ -154,5 +158,5 @@ class ProblemFactory(XmlImportFactory):
 
 
 class HtmlFactory(XmlImportFactory):
-    """Factory for <problem> nodes"""
+    """Factory for <html> nodes"""
     tag = 'html'
