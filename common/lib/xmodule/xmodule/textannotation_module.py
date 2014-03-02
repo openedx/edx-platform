@@ -48,7 +48,7 @@ class AnnotatableFields(object):
     annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
     diacritics = String(
         display_name="Diacritic Marks",
-        help = "Add diacritic marks to be added to a text using the comma-separated form, i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2",
+        help="Add diacritic marks to be added to a text using the comma-separated form, i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2",
         scope=Scope.settings,
         default='',
     )

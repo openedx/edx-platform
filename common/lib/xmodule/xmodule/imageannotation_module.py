@@ -29,17 +29,17 @@ class AnnotatableFields(object):
                     Image:  {
                         xmlns: "http://schemas.microsoft.com/deepzoom/2009",
                         Url: "http://static.seadragon.com/content/misc/milwaukee_files/",
-                        TileSize: "254", 
-                        Overlap: "1", 
-                        Format: "jpg", 
+                        TileSize: "254",
+                        Overlap: "1",
+                        Format: "jpg",
                         ServerFormat: "Default",
                         showNavigationControl: true,
                         showNavigator: true,
-                        Size: { 
+                        Size: {
                             Width: "15497",
                             Height: "5378"
                         }
-		    }
+                    }
                 },],
             </json>
         </annotatable>

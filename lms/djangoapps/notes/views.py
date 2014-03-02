@@ -1,6 +1,7 @@
+''' my notes python lib '''
 import datetime
 from django.contrib.auth.decorators import login_required
-from django.http import (Http404, HttpResponse)
+from django.http import (Http404)
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from notes.models import Note
