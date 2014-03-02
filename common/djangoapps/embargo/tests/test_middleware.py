@@ -156,8 +156,8 @@ class EmbargoMiddlewareTests(TestCase):
         # Following the redirect should give us the embargo page
         response = self.client.get(
             self.embargoed_page,
-            HTTP_X_FORWARDED_FOR='5.0.0.0',
-            REMOTE_ADDR='1.0.0.0',
+            HTTP_X_FORWARDED_FOR='5.0.0.100',
+            REMOTE_ADDR='5.0.0.100',
             follow=True
         )
         self.assertIn(self.embargo_text, response.content)
