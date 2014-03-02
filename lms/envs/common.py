@@ -1164,6 +1164,9 @@ INSTALLED_APPS = (
     'reverification',
 
     'embargo',
+
+    # XBlocks containing migrations
+    'mentoring',
 )
 
 ######################### MARKETING SITE ###############################

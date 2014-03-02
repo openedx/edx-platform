@@ -1,1 +1,4 @@
+# Requirements for edx.org that aren't necessarily needed for Open edX.
+
 -e git+ssh://git@github.com/jazkarta/edX-jsdraw.git@1e580c06061a10235fb0df6575e49a2cd9dcf126#egg=edx-jsdraw
+-e git+https://github.com/gsehub/xblock-mentoring.git@943e08e24617f0c5aaacddab04fed19b901288e3#egg=xblock-mentoring
