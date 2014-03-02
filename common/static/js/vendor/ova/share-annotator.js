@@ -298,7 +298,7 @@ Annotator.Plugin.Share = (function(_super) {
 		// -- Detect API in the URL -- //
 		/*
 		The first option is to give a known id of an annotation
-		Example http://url.com/#id=rTcpOjIMT2aF1apDtboC-Q
+		Example http://url.com/?id=rTcpOjIMT2aF1apDtboC-Q
 		*/
 		var API = {},
 			ovaId = this.getParameterByName('ovaId'), //Method 1 (Obligatory)
@@ -513,6 +513,69 @@ Annotator.Plugin.Share = (function(_super) {
 					$('html,body').animate({
 						scrollTop: $(annotation.highlights[0]).offset().top},
 						'slow');
+				}
+				//variable for text
+				var Left = API.Left, 
+					Top = API.Top, 
+					Width = API.Width, 
+					Height = API.Height, 
+					leftZoom = API.leftZoom, 
+					topZoom = API.topZoom, 
+					widthZoom = API.widthZoom,
+					heightZoom = API.heightZoom; 
+				
+				//Image Annotation
+				if(!isVideo && typeof Left!='undefined' && typeof Top!='undefined' && typeof Width!='undefined' && typeof Height!='undefined' && typeof leftZoom!='undefined' && typeof topZoom!='undefined' && typeof widthZoom!='undefined' && typeof heightZoom!='undefined'){ 
+					var an = {
+						rangePosition: {
+							width:parseFloat(decodeURIComponent(API.Width)),
+							top:parseFloat(decodeURIComponent(API.Top)),
+							left:parseFloat(decodeURIComponent(API.Left)),
+							height:parseFloat(decodeURIComponent(API.Height)),
+						},
+						bounds: {
+							width:parseFloat(decodeURIComponent(API.widthZoom)),
+							x:parseFloat(decodeURIComponent(API.leftZoom)),
+							y:parseFloat(decodeURIComponent(API.topZoom)),
+							height:parseFloat(decodeURIComponent(API.heightZoom)),
+						},
+						target:{
+							container: API.container,
+							src: API.src
+						},
+						created: new Date().toISOString(),
+						updated: new Date().toISOString(),
+						media: 'image',
+						text:decodeURIComponent(API.text),
+						user:decodeURIComponent(API.user)
+					};
+
+					var isOpenViewer = typeof annotator.osda !="undefined" && typeof annotator.osda.viewer!="undefined"; 
+					function waitingOsda(){
+						isOpenViewer = typeof annotator.osda !="undefined" && typeof annotator.osda.viewer!="undefined";
+						if(!isOpenViewer){
+						    setTimeout(waitingOsda,200);
+						}else{
+						    //show the annotation
+						    annotator.plugins['Store'].annotations.push(an);
+						    annotator.osda.viewer.annotationInstance.drawRect(an);
+						    //change the color
+						    $(an.highlights).addClass('api');
+						    //change zoom
+					    	    var currentBounds = annotator.osda.viewer.drawer.viewport.getBounds(),
+			    				    bounds = typeof an.bounds!='undefined'?an.bounds:{};
+						    if (typeof bounds.x!='undefined') currentBounds.x = bounds.x;
+						    if (typeof bounds.y!='undefined') currentBounds.y = bounds.y;
+						    if (typeof bounds.width!='undefined') currentBounds.width = bounds.width;
+						    if (typeof bounds.height!='undefined') currentBounds.height = bounds.height;
+						    annotator.osda.viewer.drawer.viewport.fitBounds(currentBounds); 
+						    //animate to the annotation
+						    $('html,body').animate({
+							scrollTop: $(annotator.osda.viewer.element).offset().top},
+							'slow');
+						}
+					}
+					waitingOsda();
 				}
 				
 			}
