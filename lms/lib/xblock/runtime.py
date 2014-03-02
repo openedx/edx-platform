@@ -142,6 +142,7 @@ class UserTagsService(object):
         self.runtime = runtime
 
     def _get_current_user(self):
+        """Returns the real, not anonymized, current user."""
         real_user = self.runtime.get_real_user(self.runtime.anonymous_student_id)
         return real_user
 

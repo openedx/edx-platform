@@ -1,7 +1,8 @@
+"""Tests for user API middleware"""
 from mock import Mock, patch
 from unittest import TestCase
 
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpResponse
 from django.test.client import RequestFactory
 
 from student.tests.factories import UserFactory, AnonymousUserFactory
@@ -41,7 +42,8 @@ class TagsMiddlewareTest(TestCase):
         self.assertEquals(self.middleware.process_request(self.request), None)
 
     def assertContextSetTo(self, context):
-        self.tracker.get_tracker.return_value.enter_context.assert_called_with(
+        """Asserts UserTagsEventContextMiddleware.CONTEXT_NAME matches ``context``"""
+        self.tracker.get_tracker.return_value.enter_context.assert_called_with(  # pylint: disable=maybe-no-member
             UserTagsEventContextMiddleware.CONTEXT_NAME,
             context
         )
@@ -98,7 +100,7 @@ class TagsMiddlewareTest(TestCase):
         self.assertContextSetTo({'course_id': self.course_id, 'course_user_tags': {}})
 
     def test_remove_context(self):
-        get_tracker = self.tracker.get_tracker
+        get_tracker = self.tracker.get_tracker  # pylint: disable=maybe-no-member
         exit_context = get_tracker.return_value.exit_context
 
         # The middleware should clean up the context when the request is done

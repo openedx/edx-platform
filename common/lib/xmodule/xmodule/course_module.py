@@ -158,6 +158,7 @@ class TextbookList(List):
 
 
 class UserPartitionList(List):
+    """Special List class for listing UserPartitions"""
     def from_json(self, values):
         return [UserPartition.from_json(v) for v in values]
 

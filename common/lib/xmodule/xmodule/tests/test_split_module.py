@@ -8,9 +8,7 @@ from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests import get_test_system
 from xmodule.partitions.partitions import Group, UserPartition
-from xmodule.partitions.partitions_service import PartitionService
 from xmodule.partitions.test_partitions import StaticPartitionService
-
 
 
 class SplitTestModuleFactory(xml.XmlImportFactory):
@@ -46,7 +44,7 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         self.module_system = get_test_system()
 
         self.tags_service = Mock(name='user_tags')
-        self.module_system._services['user_tags'] = self.tags_service
+        self.module_system._services['user_tags'] = self.tags_service  # pylint: disable=protected-access
 
         self.partitions_service = StaticPartitionService(
             [
@@ -57,13 +55,12 @@ class SplitTestModuleTest(XModuleXmlImportTest):
             course_id=self.course.id,
             track_function=Mock(name='track_function'),
         )
-        self.module_system._services['partitions'] = self.partitions_service
-
+        self.module_system._services['partitions'] = self.partitions_service  # pylint: disable=protected-access
 
         self.split_test_descriptor = course_seq.get_children()[0]
         self.split_test_descriptor.bind_for_student(
             self.module_system,
-            self.split_test_descriptor._field_data
+            self.split_test_descriptor._field_data  # pylint: disable=protected-access
         )
 
     @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))

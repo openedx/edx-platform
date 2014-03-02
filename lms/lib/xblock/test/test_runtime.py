@@ -88,7 +88,8 @@ class TestHandlerUrl(TestCase):
         self.assertIn('handler_a', self._parsed_path('handler_a'))
 
 
-class TestUserServiceInterface(TestCase):
+class TestUserServiceInterface(TestCase):  # pylint: disable=interface-not-implemented
+    """Test the user service interface"""
 
     def setUp(self):
         self.course_id = "org/course/run"
@@ -97,6 +98,7 @@ class TestUserServiceInterface(TestCase):
         self.user.save()
 
         def mock_get_real_user(_anon_id):
+            """Just returns the test user"""
             return self.user
 
         self.runtime = LmsModuleSystem(
