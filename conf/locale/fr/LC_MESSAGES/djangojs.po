@@ -39,7 +39,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-27 15:42-0500\n"
+"POT-Creation-Date: 2014-03-02 15:08-0500\n"
 "PO-Revision-Date: 2014-03-01 21:10+0000\n"
 "Last-Translator: cpennington <cale@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -474,6 +474,8 @@ msgstr "Cliquez pour supprimer le rapport"
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
 msgstr ""
+"Utilisation incorrecte signaléee%(start_sr_span)s, cliquer pour annuler le "
+"signalement%(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
@@ -486,7 +488,7 @@ msgstr "Signaler un abus"
 #. in most browsers but will be read by screen readers.
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
-msgstr ""
+msgstr "Epinglé%(start_sr_span)s, cliquer pour annuler%(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to unpin"
@@ -552,7 +554,7 @@ msgstr "Équipe pédagogique"
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Community TA"
-msgstr ""
+msgstr "Assistant communauté d'apprentissage"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
@@ -580,7 +582,7 @@ msgstr "il y a %s "
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
-msgstr ""
+msgstr "depuis %s "
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
@@ -798,11 +800,11 @@ msgstr "Demain"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
-msgstr ""
+msgstr "Afficher la calculatrice"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Close Calculator"
-msgstr ""
+msgstr "Fermer la calculatrice"
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Preview"
@@ -810,7 +812,7 @@ msgstr "Aperçu"
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
-msgstr ""
+msgstr "Corps du message"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Loading..."
@@ -967,6 +969,9 @@ msgid ""
 "Error getting student progress url for '<%= student_id %>'. Check that the "
 "student identifier is spelled correctly."
 msgstr ""
+"Erreur lors de l'obtention de l'adresse du progrès pour l'étudiant '<%= "
+"student_id %>'. Vérifiez que l'identifiant de l'étudiant est correctement "
+"orthographié."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -1187,7 +1192,7 @@ msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
-msgstr ""
+msgstr "Aide de saisie Markdown"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
@@ -1276,11 +1281,11 @@ msgstr "Titre"
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
-msgstr ""
+msgstr "Impossible de récupérer les données, merci de réessayer plus tard."
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
-msgstr ""
+msgstr "Nombre d'étudiants"
 
 #: cms/static/coffee/src/main.js
 msgid ""

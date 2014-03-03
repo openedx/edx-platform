@@ -1229,11 +1229,11 @@ msgstr "Başlık"
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
-msgstr ""
+msgstr "Veri alınamadı, lütfen tekrar deneyin."
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
-msgstr ""
+msgstr "Öğrencilerin Sayısı"
 
 #: cms/static/coffee/src/main.js
 msgid ""

@@ -13,6 +13,7 @@
 # harry75369 <harry75369@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # liuyang <liuyang2011@tsinghua.edu.cn>, 2013
+# csc <am15501@163.com>, 2014
 # thinxer <me@thinxer.com>, 2013
 # vicapple22 <vicapple22@gmail.com>, 2013
 # hanwentao <wentao.han@gmail.com>, 2013
