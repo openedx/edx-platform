@@ -7,7 +7,7 @@
 <div class="input-wrap field text required field-add-chapter-asset chapter<%= order %>-asset
     <% if (error && error.attributes && error.attributes.asset_path) { print('error'); } %>">
   <label for="chapter<%= order %>-asset-path"><%= gettext("Chapter Asset") %></label>
-  <input id="chapter<%= order %>-asset-path" name="chapter<%= order %>-asset-path" class="chapter-asset-path" placeholder="<%= _.str.sprintf(gettext("path/to/introductionToCookieBaking-CH%d.pdf"), order) %>" value="<%= asset_path %>" type="text">
+  <input id="chapter<%= order %>-asset-path" name="chapter<%= order %>-asset-path" class="chapter-asset-path" placeholder="<%= _.str.sprintf(gettext("path/to/introductionToCookieBaking-CH%d.pdf"), order) %>" value="<%= asset_path %>" type="text" dir="ltr">
   <span class="tip tip-stacked"><%= gettext("upload a PDF file or provide the path to a Studio asset file") %></span>
 <button class="action action-upload"><%= gettext("Upload PDF") %></button>
 </div>

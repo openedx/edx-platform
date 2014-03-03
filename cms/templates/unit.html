@@ -34,7 +34,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
   });
 });
   </script>
-  
+
   <script type="text/template" id="image-modal-tpl">
     <%static:include path="js/imageModal.underscore" />
   </script>
@@ -189,7 +189,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
             <div class="row wrapper-unit-id">
               <p class="unit-id">
                 <label for="unit-location-id-input">${_("Unit Identifier:")}</label>
-                <input type="text" class="url value" id="unit-location-id-input" value="${unit.location.name}" readonly />
+                <input type="text" dir="ltr" class="url value" id="unit-location-id-input" value="${unit.location.name}" readonly />
               </p>
             </div>
             <div class="unit-tree-location">
@@ -214,7 +214,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       </div>
     </div>
   </div>
-  
-  
+
+
 
 </%block>

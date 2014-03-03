@@ -546,58 +546,59 @@
               position: absolute;
               top: 52px;
               width: 30px;
-              #{$margin-left}: -15px;
+              margin-left: -15px;
               font-size: 9px;
               text-align: center;
 
               &.increment-0 {
-                #{$left}: 0;
+                left: 0;
               }
 
               &.increment-10 {
-                #{$left}: 10%;
+                left: 10%;
               }
 
               &.increment-20 {
-                #{$left}: 20%;
+                left: 20%;
               }
 
               &.increment-30 {
-                #{$left}: 30%;
+                left: 30%;
               }
 
               &.increment-40 {
-                #{$left}: 40%;
+                left: 40%;
               }
 
               &.increment-50 {
-                #{$left}: 50%;
+                left: 50%;
               }
 
               &.increment-60 {
-                #{$left}: 60%;
+                left: 60%;
               }
 
               &.increment-70 {
-                #{$left}: 70%;
+                left: 70%;
               }
 
               &.increment-80 {
-                #{$left}: 80%;
+                left: 80%;
               }
 
               &.increment-90 {
-                #{$left}: 90%;
+                left: 90%;
               }
 
               &.increment-100 {
-                #{$left}: 100%;
+                left: 100%;
               }
             }
           }
 
           .grade-specific-bar {
             height: 50px !important;
+            text-align: left;
           }
 
           .grades {
@@ -607,7 +608,7 @@
               position: absolute;
               top: 0;
               height: 50px;
-              text-align: $right;
+              text-align: right;
               border-radius: 2px;
 
               &:hover,
@@ -625,7 +626,7 @@
                 display: none;
                 position: absolute;
                 top: -17px;
-                #{$right}: 1px;
+                right: 1px;
                 height: 17px;
                 font-size: 10px;
               }
@@ -661,7 +662,7 @@
 
               .range {
                 display: block;
-                #{$margin-right}: 15px;
+                margin-right: 15px;
                 font-size: 10px;
                 line-height: 12px;
               }

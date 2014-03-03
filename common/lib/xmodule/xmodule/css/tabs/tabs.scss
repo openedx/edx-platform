@@ -23,7 +23,7 @@
 
   .edit-header {
     @include box-sizing(border-box);
-    padding: 18px 0 18px $baseline;
+    padding: 18px $baseline;
     top: 0 !important; // ugly override for second level tab override
     right: 0;
     background-color: $blue;
@@ -52,7 +52,7 @@
     //Nav-Edit Modes
     .editor-tabs {
       list-style: none;
-      right: 0;
+      #{$right}: 0;
       top: ($baseline/4);
       position: absolute;
       padding: 12px ($baseline*0.75);

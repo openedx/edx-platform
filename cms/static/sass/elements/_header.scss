@@ -144,7 +144,7 @@
     }
 
     .course-org {
-      margin-right: ($baseline/4);
+      #{$margin-right}: ($baseline/4);
     }
 
     .course-title {

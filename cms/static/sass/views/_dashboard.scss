@@ -382,7 +382,7 @@
         @extend %ui-depth3;
         position: static;
         width: flex-grid(2, 9);
-        text-align: right;
+        text-align: $right;
 
         // view live button
         .view-live-button {
