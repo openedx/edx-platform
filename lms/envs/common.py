@@ -239,6 +239,9 @@ FEATURES = {
 
     # Toggle to enable alternate urls for marketing links
     'ENABLE_MKTG_SITE': False,
+
+    # Prevent concurrent logins per user
+    'PREVENT_CONCURRENT_LOGINS': False,
 }
 
 # Used for A/B testing
