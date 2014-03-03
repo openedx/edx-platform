@@ -1396,8 +1396,10 @@ body.unit .xblock-type-container {
   }
 }
 
-// UI: special case discussion xmodule styling
+// UI: special case discussion, HTML xmodule styling
 
-body.unit .component .xmodule_DiscussionModule {
-  margin-top: ($baseline*1.5);
+body.unit .component {
+  .xmodule_DiscussionModule, .xmodule_HtmlModule {
+    margin-top: ($baseline*1.5);
+  }
 }
