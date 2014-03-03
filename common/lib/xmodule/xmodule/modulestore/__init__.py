@@ -451,7 +451,7 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
     @abstractmethod
-    def delete_item(self, location, user_id=None, delete_all_versions=False, delete_children=False, force=False):
+    def delete_item(self, location, user_id=None, **kwargs):
         """
         Delete an item from persistence. Pass the user's unique id which the persistent store
         should save with the update if it has that ability.

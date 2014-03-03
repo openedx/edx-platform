@@ -109,7 +109,11 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         patcher.start()
         self.addCleanup(patcher.stop)
         self.addTypeEqualityFunc(BlockUsageLocator, '_compareIgnoreVersion')
+        # define attrs which get set in initdb to quell pylint
+        self.import_chapter_location = self.store = self.fake_location = self.xml_chapter_location = None
+        self.course_locations = []
 
+    # pylint: disable=invalid-name
     def _create_course(self, default, course_id):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
@@ -147,8 +151,8 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             return Location(course_dict)
 
         self.course_locations = {
-             course_id: generate_location(course_id)
-             for course_id in [self.MONGO_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
+            course_id: generate_location(course_id)
+            for course_id in [self.MONGO_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
         }
         self.fake_location = Location('i4x', 'foo', 'bar', 'vertical', 'baz')
         self.import_chapter_location = self.course_locations[self.MONGO_COURSEID].replace(
@@ -184,8 +188,8 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
 
         # try negative cases
         self.assertFalse(self.store.has_item(
-                self.XML_COURSEID1,
-                self.course_locations[self.XML_COURSEID1].replace(name='not_findable', category='problem')
+            self.XML_COURSEID1,
+            self.course_locations[self.XML_COURSEID1].replace(name='not_findable', category='problem')
         ))
         self.assertFalse(self.store.has_item(self.MONGO_COURSEID, self.fake_location))
 
@@ -323,9 +327,11 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.assertEqual(len(parents), 1)
         self.assertEqual(parents[0], self.course_locations[self.XML_COURSEID1])
 
+
 #=============================================================================================================
 # General utils for not using django settings
 #=============================================================================================================
+
 
 def load_function(path):
     """
@@ -338,6 +344,7 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
+# pylint: disable=unused-argument
 def create_modulestore_instance(engine, doc_store_config, options, i18n_service=None):
     """
     This will return a new instance of a modulestore given an engine and options

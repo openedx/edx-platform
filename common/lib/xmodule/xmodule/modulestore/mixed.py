@@ -344,7 +344,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 parent.children.append(location.url())
                 store.update_item(parent)
         elif isinstance(store, SplitMongoModuleStore):
-            if isinstance(course_or_parent_loc, basestring): # course_id
+            if isinstance(course_or_parent_loc, basestring):  # course_id
                 course_or_parent_loc = loc_mapper().translate_location_to_course_locator(
                     course_or_parent_loc, None
                 )
@@ -377,15 +377,15 @@ class MixedModuleStore(ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(course_id)
         return store.update_item(xblock, user_id)
 
-    def delete_item(self, location, user_id=None):
+    def delete_item(self, location, user_id=None, **kwargs):
         """
-        Delete the given item from persistence.
+        Delete the given item from persistence. kwargs allow modulestore specific parameters.
         """
         course_id = self._infer_course_id_try(location)
         if course_id is None:
             raise ItemNotFoundError(u"Cannot find modulestore for %s" % location)
         store = self._get_modulestore_for_courseid(course_id)
-        return store.delete_item(location, user_id=user_id)
+        return store.delete_item(location, user_id=user_id, **kwargs)
 
     def close_all_connections(self):
         """

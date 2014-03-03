@@ -58,8 +58,8 @@ class ItemFactory(SplitFactory):
     # pylint: disable=W0613
     @classmethod
     def _create(cls, target_class, parent_location, category='chapter',
-        user_id='test_user', block_id=None, definition_locator=None, force=False,
-        continue_version=False, **kwargs):
+                user_id='test_user', block_id=None, definition_locator=None, force=False,
+                continue_version=False, **kwargs):
         """
         passes *kwargs* as the new item's field values:
 
