@@ -239,8 +239,8 @@ TECH_SUPPORT_EMAIL = 'devops@edx.saylor.org'
 CONTACT_EMAIL = 'info@edx.saylor.org'
 BUGS_EMAIL = 'bugs@edx.saylor.org'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'registration@edx.saylor.org'
-EMAIL_HOST_PASSWORD = '*regeducere38294...'
+#EMAIL_HOST_USER = 'registration@edx.saylor.org'
+#EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = 465
 MANAGERS = ADMINS
 
