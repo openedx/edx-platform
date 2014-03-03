@@ -16,6 +16,7 @@ from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.utils.html import strip_tags
 from util.json_request import JsonResponse
 
 from courseware.access import has_access
@@ -248,7 +249,9 @@ def students_update_enrollment(request, course_id):
             elif action == 'unenroll':
                 before, after = unenroll_email(course_id, email, email_students, email_params)
             else:
-                return HttpResponseBadRequest("Unrecognized action '{}'".format(action))
+                return HttpResponseBadRequest(strip_tags(
+                    "Unrecognized action '{}'".format(action)
+                ))
 
             results.append({
                 'email': email,
@@ -303,9 +306,9 @@ def modify_access(request, course_id):
     action = request.GET.get('action')
 
     if not rolename in ['instructor', 'staff', 'beta']:
-        return HttpResponseBadRequest(
+        return HttpResponseBadRequest(strip_tags(
             "unknown rolename '{}'".format(rolename)
-        )
+        ))
 
     user = User.objects.get(email=email)
 
@@ -320,7 +323,9 @@ def modify_access(request, course_id):
     elif action == 'revoke':
         revoke_access(course, user, rolename)
     else:
-        return HttpResponseBadRequest("unrecognized action '{}'".format(action))
+        return HttpResponseBadRequest(strip_tags(
+            "unrecognized action '{}'".format(action)
+        ))
 
     response_payload = {
         'email': email,
@@ -486,9 +491,9 @@ def get_distribution(request, course_id):
     available_features = analytics.distributions.AVAILABLE_PROFILE_FEATURES
     # allow None so that requests for no feature can list available features
     if not feature in available_features + (None,):
-        return HttpResponseBadRequest(
+        return HttpResponseBadRequest(strip_tags(
             "feature '{}' not available.".format(feature)
-        )
+        ))
 
     response_payload = {
         'course_id': course_id,
@@ -833,7 +838,9 @@ def list_forum_members(request, course_id):
 
     # filter out unsupported for roles
     if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest("Unrecognized rolename '{}'.".format(rolename))
+        return HttpResponseBadRequest(strip_tags(
+            "Unrecognized rolename '{}'.".format(rolename)
+        ))
 
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)
@@ -931,7 +938,9 @@ def update_forum_role_membership(request, course_id):
         return HttpResponseBadRequest("Operation requires instructor access.")
 
     if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest("Unrecognized rolename '{}'.".format(rolename))
+        return HttpResponseBadRequest(strip_tags(
+            "Unrecognized rolename '{}'.".format(rolename)
+        ))
 
     user = User.objects.get(email=email)
     target_is_instructor = has_access(user, course, 'instructor')
