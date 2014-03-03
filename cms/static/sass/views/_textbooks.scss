@@ -41,7 +41,7 @@
 
         .textbook-title {
           @extend %t-title4;
-          margin-right: ($baseline*14);
+          #{$margin-right}: ($baseline*14);
           font-weight: bold;
         }
 
@@ -96,7 +96,7 @@
           opacity: 0.0;
           position: absolute;
           top: $baseline;
-          right: $baseline;
+          #{$right}: $baseline;
 
           .action {
             display: inline-block;

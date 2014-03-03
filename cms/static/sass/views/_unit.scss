@@ -1080,7 +1080,7 @@ body.unit {
       padding: ($baseline/4) ($baseline/2);
       font-weight: normal;
       color: $gray-l2;
-      text-align: left;
+      text-align: $left;
 
       &:hover {
         box-shadow: none;
