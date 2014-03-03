@@ -48,13 +48,9 @@ External Graders and XQueue
 
 The edX Platform communicates with your external grader through XQueue.  XQueue provides students' input to the grader; it then receives results from the grader and returns them to students.  
 
-The queue for your course must be set up in Pull mode. 
-
-In Pull mode, student submissions are collected in XQueue, where they remain until the grader actively retrieves, or pulls, the next submission from the queue for grading.
+Student submissions are collected in XQueue, where they remain until the grader actively retrieves, or pulls, the next submission from the queue for grading.
 
 The external grader polls the XQueue through a RESTful interface at a regular interval. When the external grader pulls a submission, it runs the tests on it, then pushes the response back to XQueue through the RESTful interface. XQueue then delivers the response to the edX Learning Management System.
-
-Pull mode prevents your grader from being overloaded by submissions it is not ready to process.
 
 For example code of an external grader that uses Pull mode, see the `Stanford-Online repository xqueue_pull_ref <https://github.com/Stanford-Online/xqueue_pull_ref>`_.
 
