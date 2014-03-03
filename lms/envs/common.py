@@ -243,6 +243,10 @@ FEATURES = {
 
     # Turn off Advanced Security by default
     'ADVANCED_SECURITY': False,
+
+    # Show a "Download your certificate" on the Progress page if the lowest
+    # nonzero grade cutoff is met
+    'SHOW_PROGRESS_SUCCESS_BUTTON': False,
 }
 
 # Used for A/B testing
@@ -1282,6 +1286,11 @@ GRADES_DOWNLOAD = {
     'BUCKET': 'edx-grades',
     'ROOT_PATH': '/tmp/edx-s3/grades',
 }
+
+######################## PROGRESS SUCCESS BUTTON ##############################
+# The course id will be appended to the following url
+PROGRESS_SUCCESS_BUTTON_URL = 'http://<domain>/<path>/'
+PROGRESS_SUCCESS_BUTTON_TEXT = "Download your certificate"
 
 #### PASSWORD POLICY SETTINGS #####
 

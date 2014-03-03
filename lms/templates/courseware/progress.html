@@ -48,6 +48,20 @@ from django.conf import settings
         <h1>${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
       </header>
 
+      %if settings.FEATURES['SHOW_PROGRESS_SUCCESS_BUTTON']:
+        <%
+          nonzero_cutoffs = [cutoff for cutoff in course.grade_cutoffs.values() if cutoff > 0]
+          success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
+        %>
+        %if success_cutoff and grade_summary['percent'] > success_cutoff:
+          <div id="course-success">
+            <a href="${settings.PROGRESS_SUCCESS_BUTTON_URL}${course.id}">
+              ${settings.PROGRESS_SUCCESS_BUTTON_TEXT}
+            </a>
+          </div>
+        %endif
+      %endif
+
       %if not course.disable_progress_graph:
         <div id="grade-detail-graph" aria-hidden="true"></div>
       %endif
