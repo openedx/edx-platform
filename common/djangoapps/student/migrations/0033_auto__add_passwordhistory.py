@@ -8,19 +8,19 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'LoginFailures'
-        db.create_table('student_loginfailures', (
+        # Adding model 'PasswordHistory'
+        db.create_table('student_passwordhistory', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('failure_count', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('lockout_until', self.gf('django.db.models.fields.DateTimeField')(null=True)),
+            ('password', self.gf('django.db.models.fields.CharField')(max_length=128)),
+            ('time_set', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
         ))
-        db.send_create_signal('student', ['LoginFailures'])
+        db.send_create_signal('student', ['PasswordHistory'])
 
 
     def backwards(self, orm):
-        # Deleting model 'LoginFailures'
-        db.delete_table('student_loginfailures')
+        # Deleting model 'PasswordHistory'
+        db.delete_table('student_passwordhistory')
 
 
     models = {
@@ -91,6 +91,13 @@ class Migration(SchemaMigration):
             'lockout_until': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
+        'student.passwordhistory': {
+            'Meta': {'object_name': 'PasswordHistory'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'time_set': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
         'student.pendingemailchange': {
             'Meta': {'object_name': 'PendingEmailChange'},
             'activation_key': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
@@ -113,9 +120,9 @@ class Migration(SchemaMigration):
         },
         'student.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
+            'allow_certificate': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'city': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'country': ('django_countries.fields.CountryField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
-            'allow_certificate': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'courseware': ('django.db.models.fields.CharField', [], {'default': "'course.xml'", 'max_length': '255', 'blank': 'True'}),
             'gender': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '6', 'null': 'True', 'blank': 'True'}),
             'goals': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
