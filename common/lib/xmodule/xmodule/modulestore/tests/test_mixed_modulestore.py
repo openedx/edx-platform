@@ -110,25 +110,23 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.addCleanup(patcher.stop)
         self.addTypeEqualityFunc(BlockUsageLocator, '_compareIgnoreVersion')
 
-    def _create_course(self, default, course_location, item_location):
+    def _create_course(self, default, course_id):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
-        NOTE: course_location and item_location must be Location regardless of the app reference type in order
-        to cause the right mapping to be created.
         """
-        course = self.store.create_course(
-            course_location, store_name=default, metadata={'display_name': course_location.name}
-        )
+        course = self.store.create_course(course_id, store_name=default)
+        category = self.import_chapter_location.category
+        block_id = self.import_chapter_location.name
         chapter = self.store.create_item(
             # don't use course_location as it may not be the repr
-            course.location, item_location.category, location=item_location, block_id=item_location.name
+            course.location, category, location=self.import_chapter_location, block_id=block_id
         )
         if isinstance(course.location, CourseLocator):
             self.course_locations[self.MONGO_COURSEID] = course.location.version_agnostic()
             self.import_chapter_location = chapter.location.version_agnostic()
         else:
-            self.assertEqual(course.location, course_location)
-            self.assertEqual(chapter.location, item_location)
+            self.assertEqual(course.location.course_id, course_id)
+            self.assertEqual(chapter.location, self.import_chapter_location)
 
     def initdb(self, default):
         """
@@ -159,13 +157,11 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             category='chapter', name='Overview'
         )
-        # grab old style location b4 possibly converted
-        import_location = self.course_locations[self.MONGO_COURSEID]
         # get Locators and set up the loc mapper if app is Locator based
         if default == 'split':
             self.fake_location = loc_mapper().translate_location('foo/bar/2012_Fall', self.fake_location)
 
-        self._create_course(default, import_location, self.import_chapter_location)
+        self._create_course(default, self.MONGO_COURSEID)
 
     @ddt.data('direct', 'split')
     def test_get_modulestore_type(self, default_ms):
@@ -273,12 +269,12 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.initdb(default_ms)
         # we should have 3 total courses across all stores
         courses = self.store.get_courses()
-        self.assertEqual(len(courses), 3)
         course_ids = [
             course.location.version_agnostic()
             if hasattr(course.location, 'version_agnostic') else course.location
             for course in courses
         ]
+        self.assertEqual(len(courses), 3, "Not 3 courses: {}".format(course_ids))
         self.assertIn(self.course_locations[self.MONGO_COURSEID], course_ids)
         self.assertIn(self.course_locations[self.XML_COURSEID1], course_ids)
         self.assertIn(self.course_locations[self.XML_COURSEID2], course_ids)

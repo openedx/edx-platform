@@ -441,8 +441,6 @@ class BlockUsageLocator(CourseLocator):
         Returns a copy of itself without any version info.
 
         :raises: ValueError if the block locator has no package_id
-
-        :param block_locator:
         """
         return BlockUsageLocator(package_id=self.package_id,
                                  branch=self.branch,
@@ -454,8 +452,6 @@ class BlockUsageLocator(CourseLocator):
         Returns a copy of itself without any course info.
 
         :raises: ValueError if the block locator has no version_guid
-
-        :param block_locator:
         """
         return BlockUsageLocator(version_guid=self.version_guid,
                                  block_id=self.block_id)

@@ -207,11 +207,9 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         Get the course_id from the block or from asking its store. Expensive.
         """
-        try:
-            if block.course_id is not None:
-                return block.course_id
-        except AssertionError:  # will occur if no xmodule set
-            pass
+        # HACK: check xmodule_runtime to avoid an assertion error
+        if block.xmodule_runtime is not None and block.course_id is not None:
+            return block.course_id
         try:
             course = store._get_course_for_item(block.scope_ids.usage_id)
             if course is not None:
@@ -264,55 +262,49 @@ class MixedModuleStore(ModuleStoreWriteBase):
                     blocks = store.get_items(location)
                     if len(blocks) == 1:
                         block = blocks[0]
-                        try:
-                            if block.course_id is not None:
-                                return block.course_id
-                        except AssertionError:
-                            pass
+                        # HACK violate abstraction to avoid assertion error
+                        if block.xmodule_runtime is not None and block.course_id is not None:
+                            return block.course_id
                 except ItemNotFoundError:
                     pass
         # if we get here, it must be in a Locator based store, but we won't be able to find
         # it.
         return None
 
-    def create_course(self, course_location, user_id=None, store_name='default', **kwargs):
+    def create_course(self, course_id, user_id=None, store_name='default', **kwargs):
         """
-        Creates and returns the course. It creates a loc map from the course_location to
-        the new one (if provided as id_root).
+        Creates and returns the course.
 
-        NOTE: course_location must be a Location not
-        a Locator until we no longer need to do loc mapping.
-
-        NOTE: unlike the other mixed modulestore methods, this does not adapt its argument
-        to the persistence store but requires its caller to know what the persistence store
-        wants for args.
-
+        :param org: the org
+        :param fields: a dict of xblock field name - value pairs for the course module.
+        :param metadata: the old way of setting fields by knowing which ones are scope.settings v scope.content
+        :param definition_data: the complement to metadata which is also a subset of fields
+        :param id_root: the split-mongo course_id starting value (see split.create_course)
+        :param pretty_id: a field split.create_course uses and may quit using
         :returns: course xblock
         """
         store = self.modulestores[store_name]
         if not hasattr(store, 'create_course'):
             raise NotImplementedError(u"Cannot create a course on store %s" % store_name)
-        if store.get_modulestore_type(course_location.course_id) == SPLIT_MONGO_MODULESTORE_TYPE:
-            org = kwargs.pop('org', course_location.org)
-            pretty_id = kwargs.pop('pretty_id', None)
-            fields = kwargs.get('fields', {})
+        if store.get_modulestore_type(course_id) == SPLIT_MONGO_MODULESTORE_TYPE:
+            id_root = kwargs.get('id_root')
+            try:
+                course_dict = Location.parse_course_id(course_id)
+                org = course_dict['org']
+                if id_root is None:
+                    id_root = "{org}.{course}.{name}".format(**course_dict)
+            except ValueError:
+                org = None
+                if id_root is None:
+                    id_root = course_id
+            org = kwargs.pop('org', org)
+            pretty_id = kwargs.pop('pretty_id', id_root)
+            fields = kwargs.pop('fields', {})
             fields.update(kwargs.pop('metadata', {}))
             fields.update(kwargs.pop('definition_data', {}))
-            kwargs['fields'] = fields
-            # TODO rename id_root to package_id for consistency. It's too confusing
-            id_root = kwargs.pop('id_root', u"{0.org}.{0.course}.{0.name}".format(course_location))
-            course = store.create_course(
-                org, pretty_id, user_id, id_root=id_root, master_branch=course_location.revision or 'published',
-                **kwargs
-            )
-            block_map = {course_location.name: {'course': course.location.block_id}}
-            # NOTE: course.location will be a Locator not == course_location
-            loc_mapper().create_map_entry(
-                course_location, course.location.package_id, block_map=block_map
-            )
+            course = store.create_course(org, pretty_id, user_id, id_root=id_root, fields=fields, **kwargs)
         else:  # assume mongo
-            course = store.create_course(course_location, **kwargs)
-            loc_mapper().translate_location(course_location.course_id, course_location)
+            course = store.create_course(course_id, **kwargs)
 
         return course
 
@@ -322,29 +314,23 @@ class MixedModuleStore(ModuleStoreWriteBase):
         it installs the new item as a child of the parent (if the parent_loc is a specific
         xblock reference).
 
-        Adds an entry to the loc map using the kwarg location if provided (must be a
-        Location if provided) or block_id and category if provided.
-
         :param course_or_parent_loc: Can be a course_id (org/course/run), CourseLocator,
         Location, or BlockUsageLocator but must be what the persistence modulestore expects
         """
         # find the store for the course
         course_id = self._infer_course_id_try(course_or_parent_loc)
+        if course_id is None:
+            raise ItemNotFoundError(u"Cannot find modulestore for %s" % course_or_parent_loc)
 
         store = self._get_modulestore_for_courseid(course_id)
 
         location = kwargs.pop('location', None)
         # invoke its create_item
         if isinstance(store, MongoModuleStore):
+            block_id = kwargs.pop('block_id', getattr(location, 'name', uuid4().hex))
             # convert parent loc if it's legit
-            block_id = kwargs.pop('block_id', uuid4().hex)
             if isinstance(course_or_parent_loc, basestring):
                 parent_loc = None
-                if location is None:
-                    locn_dict = Location.parse_course_id(course_id)
-                    locn_dict['category'] = category
-                    locn_dict['name'] = block_id
-                    location = Location(locn_dict)
             else:
                 parent_loc = course_or_parent_loc
                 # must have a legitimate location, compute if appropriate
@@ -352,8 +338,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
                     location = parent_loc.replace(category=category, name=block_id)
             # do the actual creation
             xblock = store.create_and_save_xmodule(location, **kwargs)
-            # add the loc mapping
-            loc_mapper().translate_location(course_id, location)
             # don't forget to attach to parent
             if parent_loc is not None and not 'detached' in xblock._class_tags:
                 parent = store.get_item(parent_loc)
@@ -361,16 +345,10 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 store.update_item(parent)
         elif isinstance(store, SplitMongoModuleStore):
             if isinstance(course_or_parent_loc, basestring): # course_id
-                old_course_id = course_or_parent_loc
                 course_or_parent_loc = loc_mapper().translate_location_to_course_locator(
                     course_or_parent_loc, None
                 )
-            elif isinstance(course_or_parent_loc, CourseLocator):
-                old_course_loc = loc_mapper().translate_locator_to_location(
-                    course_or_parent_loc, get_course=True
-                )
-                old_course_id = old_course_loc.course_id
-            else:
+            elif not isinstance(course_or_parent_loc, CourseLocator):
                 raise ValueError(u"Cannot create a child of {} in split. Wrong repr.".format(course_or_parent_loc))
 
             # split handles all the fields in one dict not separated by scope
@@ -379,16 +357,10 @@ class MixedModuleStore(ModuleStoreWriteBase):
             fields.update(kwargs.pop('definition_data', {}))
             kwargs['fields'] = fields
 
+            if not kwargs.get('block_id', False) and getattr(location, 'name', False):
+                kwargs['block_id'] = getattr(location, 'name')
+
             xblock = store.create_item(course_or_parent_loc, category, user_id, **kwargs)
-            if location is None:
-                locn_dict = Location.parse_course_id(old_course_id)
-                locn_dict['category'] = category
-                locn_dict['name'] = xblock.location.block_id
-                location = Location(locn_dict)
-            # map location.name to xblock.location.block_id
-            loc_mapper().translate_location(
-                old_course_id, location, passed_block_id=xblock.location.block_id
-            )
         else:
             raise NotImplementedError(u"Cannot create an item on store %s" % store)
 
@@ -441,7 +413,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
             loc_mapper().translate_location(course.location.course_id, course.location)
 
 
-def _compare_stores(alpha, aleph):
+def _compare_stores(left, right):
     """
     Order stores via precedence: if a course is found in an earlier store, it shadows the later store.
 
@@ -449,20 +421,20 @@ def _compare_stores(alpha, aleph):
     then others. Locators before Locations because if some courses may be in both,
     the ones in the Locator-based stores shadow the others.
     """
-    if alpha.get_modulestore_type(None) == XML_MODULESTORE_TYPE:
-        if aleph.get_modulestore_type(None) == XML_MODULESTORE_TYPE:
+    if left.get_modulestore_type(None) == XML_MODULESTORE_TYPE:
+        if right.get_modulestore_type(None) == XML_MODULESTORE_TYPE:
             return 0
         else:
             return -1
-    elif aleph.get_modulestore_type(None) == XML_MODULESTORE_TYPE:
+    elif right.get_modulestore_type(None) == XML_MODULESTORE_TYPE:
         return 1
 
-    if issubclass(alpha.reference_type, Locator):
-        if issubclass(aleph.reference_type, Locator):
+    if issubclass(left.reference_type, Locator):
+        if issubclass(right.reference_type, Locator):
             return 0
         else:
             return -1
-    elif issubclass(aleph.reference_type, Locator):
+    elif issubclass(right.reference_type, Locator):
         return 1
 
     return 0

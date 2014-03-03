@@ -625,12 +625,19 @@ class MongoModuleStore(ModuleStoreWriteBase):
         modules = self._load_items(list(items), depth)
         return modules
 
-    def create_course(self, location, definition_data=None, metadata=None, runtime=None):
+    def create_course(self, course_id, definition_data=None, metadata=None, runtime=None):
         """
-        Create a course with the given location. The location category must be 'course'.
+        Create a course with the given course_id.
         """
-        if location.category != 'course':
-            raise ValueError(u"Course roots must be of category 'course': {}".format(unicode(location)))
+        if isinstance(course_id, Location):
+            location = course_id
+            if location.category != 'course':
+                raise ValueError(u"Course roots must be of category 'course': {}".format(unicode(location)))
+        else:
+            course_dict = Location.parse_course_id(course_id)
+            course_dict['category'] = 'course'
+            course_dict['tag'] = 'i4x'
+            location = Location(course_dict)
         return self.create_and_save_xmodule(location, definition_data, metadata, runtime)
 
     def create_xmodule(self, location, definition_data=None, metadata=None, system=None, fields={}):
