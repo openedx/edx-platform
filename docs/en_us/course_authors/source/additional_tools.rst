@@ -13,13 +13,166 @@ Individual course teams frequently create tools and problem types that don't hav
 
 Below, we provide you with all the files and code that you need to create the following tools and problem types.
 
-* :ref:`Gene Explorer`
 * :ref:`Chemical Equation`
+* :ref:`Conditional Module`
+* :ref:`Gene Explorer`
 * :ref:`Interactive Periodic Table`
 * :ref:`Molecule Editor`
 * :ref:`Multiple Choice and Numerical Input`
 * :ref:`Polls`
 * :ref:`Protein Builder`
+
+
+.. _Chemical Equation:
+
+**************************
+Chemical Equation Problem
+**************************
+
+The chemical equation problem type allows the student to enter text that represents a chemical equation into a text box. The LMS converts that text into a chemical equation below the text box. The grader evaluates the student's response by using a Python script that you create and embed in the problem.
+
+.. image:: /Images/ChemicalEquationExample.png
+ :alt: Image of a chemical equation response problem
+
+====================================
+Create the Chemical Equation Problem
+====================================
+
+Chemical equation problems use MathJax to create formulas. For more information about using MathJax in Studio, see :ref:`MathJax in Studio`.
+
+To create the above chemical equation problem:
+
+#. In the unit where you want to create the problem, click **Problem** under **Add New Component**, and then click the **Advanced** tab.
+#. Click **Blank Advanced Problem**.
+#. In the component that appears, click **Edit**.
+#. In the component editor, paste the code from below.
+#. Click **Save**.
+
+
+Sample Chemical Equation Problem Code
+-------------------------------------
+
+.. code-block:: xml
+
+  <problem>
+    <startouttext/>
+    <p>Some problems may ask for a particular chemical equation. Practice by writing out the following reaction in the box below.</p>
+    
+  \( \text{H}_2\text{SO}_4 \longrightarrow \text { H}^+ + \text{ HSO}_4^-\)
+
+    <customresponse>
+      <chemicalequationinput size="50" label="Enter the chemical equation"/>
+      <answer type="loncapa/python">
+
+  if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -> H^+ + HSO4^-'):
+      correct = ['correct']
+  else:
+      correct = ['incorrect']
+
+      </answer>
+    </customresponse>
+    <p>Some tips:</p>
+    <ul>
+    <li>Use real element symbols.</li>
+    <li>Create subscripts by using plain text.</li>
+    <li>Create superscripts by using a caret (^).</li>
+    <li>Create the reaction arrow (\(\longrightarrow\)) by using "->".</li>
+    </ul>
+
+    <endouttext/>
+  
+   <solution>
+   <div class="detailed-solution">
+   <p>Solution</p>
+   <p>To create this equation, enter the following:</p>
+     <p>H2SO4 -> H^+ + HSO4^-</p>
+   </div>
+   </solution>
+  </problem>
+
+.. _Conditional Module:
+
+******************
+Conditional Module
+******************
+
+==================
+Format description
+==================
+
+The main tag of Conditional module input is:
+
+.. code-block:: xml
+
+    <conditional> ... </conditional>
+
+``conditional`` can include any number of any xmodule tags (``html``, ``video``, ``poll``, etc.) or ``show`` tags.
+
+conditional tag
+---------------
+
+The main container for a single instance of Conditional module. The following attributes can
+be specified for this tag::
+
+    sources - location id of required modules, separated by ';'
+    [message | ""] - message for case, where one or more are not passed. Here you can use variable {link}, which generate link to required module.
+
+    [submitted] - map to `is_submitted` module method.
+    (pressing RESET button makes this function to return False.)
+
+    [correct] - map to `is_correct` module method
+    [attempted] - map to `is_attempted` module method
+    [poll_answer] - map to `poll_answer` module attribute
+    [voted] - map to `voted` module attribute
+
+show tag
+--------
+
+Symlink to some set of xmodules. The following attributes can
+be specified for this tag::
+
+    sources - location id of modules, separated by ';'
+
+=======
+Example
+=======
+
+Examples of conditional depends on poll
+-------------------------------------------
+
+.. code-block:: xml
+
+    <conditional sources="i4x://MITx/0.000x/poll_question/first_real_poll_seq_with_reset" poll_answer="man"
+    message="{link} must be answered for this to become visible.">
+        <html>
+            <h2>You see this, cause your vote value for "First question" was "man"</h2>
+        </html>
+    </conditional>
+
+Examples of conditional depends on poll (use <show> tag)
+--------------------------------------------------------
+
+.. code-block:: xml
+
+    <conditional sources="i4x://MITx/0.000x/poll_question/first_real_poll_seq_with_reset" poll_answer="man"
+    message="{link} must be answered for this to become visible.">
+        <html>
+            <show sources="i4x://MITx/0.000x/problem/test_1; i4x://MITx/0.000x/Video/Avi_resources; i4x://MITx/0.000x/problem/test_1"/>
+        </html>
+    </conditional>
+
+Examples of conditional depends on problem
+-------------------------------------------
+
+.. code-block:: xml
+
+    <conditional sources="i4x://MITx/0.000x/problem/Conditional:lec27_Q1" attempted="True">
+        <html display_name="HTML for attempted problem">You see this, cause "lec27_Q1" is attempted.</html>
+    </conditional>
+    <conditional sources="i4x://MITx/0.000x/problem/Conditional:lec27_Q1" attempted="False">
+        <html display_name="HTML for not attempted problem">You see this, cause "lec27_Q1" is not attempted.</html>
+    </conditional>
+
 
 .. _Gene Explorer:
 
@@ -70,76 +223,6 @@ In this code:
 * **genex_dna_sequence** is the default DNA sequence that appears when the problem opens.
 * **dna_sequence** contains the application's state and the student's answer. This value must be the same as **genex_dna_sequence**. 
 * **genex_problem_number** specifies the number of the problem. This number is based on the five gene editor problems in the MITx 7.00x course--for example, if you want this problem to look like the second gene editor problem in the 7.00x course, you would set the **genex_problem_number** value to 2. The number must be 1, 2, 3, 4, or 5.
-
-
-.. _Chemical Equation:
-
-**************************
-Chemical Equation Problem
-**************************
-
-The chemical equation problem type allows the student to enter chemical equations. The grader evaluates student responses by using a Python script that you create and embed in the problem.
-
-.. image:: /Images/ChemicalEquationExample.png
- :alt: Image of a chemical equation response problem
-
-====================================
-Create the Chemical Equation Problem
-====================================
-
-To create the above chemical equation problem:
-
-#. In the unit where you want to create the problem, click **Problem** under **Add New Component**, and then click the **Advanced** tab.
-#. Click **Blank Advanced Problem**.
-#. In the component that appears, click **Edit**.
-#. In the component editor, paste the code from below.
-#. Click **Save**.
-
-
-
-
-
-====================================
-Chemical Equation Problem Code
-====================================
-
-.. code-block:: xml
-
-  <problem>
-    <startouttext/>
-    <p>Some problems may ask for a particular chemical equation. Practice by writing out the following reaction in the box below.</p>
-    
-  \( \text{H}_2\text{SO}_4 \longrightarrow \text { H}^+ + \text{ HSO}_4^-\)
-
-    <customresponse>
-      <chemicalequationinput size="50" label="Enter the chemical equation"/>
-      <answer type="loncapa/python">
-
-  if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -> H^+ + HSO4^-'):
-      correct = ['correct']
-  else:
-      correct = ['incorrect']
-
-      </answer>
-    </customresponse>
-    <p>Some tips:</p>
-    <ul>
-    <li>Use real element symbols.</li>
-    <li>Create subscripts by using plain text.</li>
-    <li>Create superscripts by using a caret (^).</li>
-    <li>Create the reaction arrow (\(\longrightarrow\)) by using "->".</li>
-    </ul>
-
-    <endouttext/>
-  
-   <solution>
-   <div class="detailed-solution">
-   <p>Solution</p>
-   <p>To create this equation, enter the following:</p>
-     <p>H2SO4 -> H^+ + HSO4^-</p>
-   </div>
-   </solution>
-  </problem>
 
 
 .. _Interactive Periodic Table:
@@ -494,6 +577,68 @@ Create a Poll
   
   * A .csv file that contains student responses to the problem is not currently available for polls. However, you can obtain the aggregate data directly in the problem.  
 
+==================
+Format description
+==================
+
+The main tag of Poll module input is:
+
+.. code-block:: xml
+
+    <poll_question> ... </poll_question>
+
+``poll_question`` can include any number of the following tags:
+any xml and ``answer`` tag. All inner xml, except for ``answer`` tags, we call "question".
+
+poll_question tag
+-----------------
+
+Xmodule for creating poll functionality - voting system. The following attributes can
+be specified for this tag::
+
+    name - Name of xmodule.
+    [display_name| AUTOGENERATE] - Display name of xmodule. When this attribute is not defined - display name autogenerate with some hash.
+    [reset | False] - Can reset/revote many time (value = True/False)
+
+
+answer tag
+----------
+
+Define one of the possible answer for poll module. The following attributes can
+be specified for this tag::
+
+    id - unique identifier (using to identify the different answers)
+
+Inner text - Display text for answer choice.
+
+Example
+=======
+
+Examples of poll
+----------------
+
+.. code-block:: xml
+
+    <poll_question name="second_question" display_name="Second question">
+        <h3>Age</h3>
+        <p>How old are you?</p>
+        <answer id="less18">&lt; 18</answer>
+        <answer id="10_25">from 10 to 25</answer>
+        <answer id="more25">&gt; 25</answer>
+    </poll_question>
+
+Examples of poll with unable reset functionality
+------------------------------------------------
+
+.. code-block:: xml
+
+    <poll_question name="first_question_with_reset" display_name="First question with reset"
+        reset="True">
+        <h3>Your gender</h3>
+        <p>You are man or woman?</p>
+        <answer id="man">Man</answer>
+        <answer id="woman">Woman</answer>
+    </poll_question>
 
 .. _Protein Builder:
 

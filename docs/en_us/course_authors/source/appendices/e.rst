@@ -1,30 +1,29 @@
 
 .. _Appendix E:
 
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+################################
 APPENDIX E: Problem and Tool XML
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+################################
 
-This appendix provides information about the XML for most problem and tool types in Studio:
+This appendix provides information about the XML tags for most problem and tool types in Studio:
 
 * :ref:`General`
-* :ref:`Choice Response`
-* :ref:`Chemical Equation Input`
-* :ref:`Custom Response`
-* :ref:`Formula Response`
-* :ref:`Image Response`
-* :ref:`Multiple Choice Response`
-* :ref:`Numerical Response`
-* :ref:`Option Response`
-* :ref:`Schematic Response`
-* :ref:`String Response`
-
+* :ref:`Checkbox Problem XML`
+* :ref:`Chemical Equation Problem XML`
+* :ref:`Drag and Drop Problem XML`
+* :ref:`Dropdown Problem XML`
+* :ref:`Image Mapped Input Problem XML`
+* :ref:`JS Input Problem XML`
+* :ref:`Multiple Choice Problem XML`
+* :ref:`Numerical Input Problem XML`
+* :ref:`Math Expression Input Problem XML`
+* :ref:`Text Input Problem XML`
 
 .. _General:
 
+=======
 General
--------
+=======
  
 Most problems have the following tags.
 
@@ -32,8 +31,7 @@ Most problems have the following tags.
    :widths: 20 80
 
    * - ``<problem> </problem>``
-     - These must be the first and last tags for any content created in the Advanced
-       Editor in a Problem component.
+     - These must be the first and last tags for any content created in the Advanced Editor in a Problem component.
    * - ``<startouttext/>``
      - The ``<startouttext />`` tag indicates the beginning of a line or block of text.
    * - ``<endouttext/>``
@@ -42,70 +40,17 @@ Most problems have the following tags.
      - If you want to include more information in the problem, such as a detailed explanation of the problem's answer, you'll enter the text between the two ``<div>`` tags, which are inside the ``<solution>`` tags. (These tags do not have to be on the same line.)
 
 Additionally, all problems must include a **label** attribute. This attribute adds a descriptive label that helps visually impaired students navigate through the problem.
+
 You'll add a **label** attribute to one of the XML tags for the problem. Each example problem below includes a label.
 
-.. _Choice Response:
+.. _Checkbox Problem XML:
 
-Choice Response (Checkbox Problems)
------------------------------------
+=============================
+Checkbox Problem XML 
+=============================
 
-Although you can create checkbox problems by using the Simple Editor in Studio, you may want to see or change the problem's underlying XML.
-
-**Sample Problem**
-
-.. image:: ../Images/CheckboxExample.gif
- :alt: Image of a checkbox problem
-
-**Tags**
-
-.. list-table::
-   :widths: 20 80
-
-   * - ``<choiceresponse>``
-     - Specifies that the problem lists answer options for students to choose from.
-   * - ``<checkboxgroup>``
-     - A child of ``<choiceresponse>``. Specifies that the problem is a checkbox problem. Can include a ``direction`` attribute and a ``label`` attribute.
-   * - ``<choice>``
-     - A child of ``<checkboxgroup>``. Designates an answer option. Each choice must include the ``correct`` attribute, set to ``true`` (for a correct answer) or ``false`` (for an incorrect answer). For checkbox problems, more than one option can be a correct answer.
-
-**Sample Problem XML**
-
-.. code-block:: xml
-
-  <problem>
-  <startouttext/>
-    <p>Learning about the benefits of preventative healthcare can be particularly
-     difficult. Check all of the reasons below why this may be the case.</p>
-
-  <choiceresponse>
-    <checkboxgroup direction="vertical" label="Check all of the reasons below why this may be the case">
-      <choice correct="true"><text>A large amount of time passes between undertaking
-      a preventative measure and seeing the result.</text></choice>
-      <choice correct="false"><text>Non-immunized people will always fall sick.</text>
-      </choice>
-      <choice correct="true"><text>If others are immunized, fewer people will fall 
-      sick regardless of a particular individual's choice to get immunized or not.
-      </text></choice>
-      <choice correct="true"><text>Trust in healthcare professionals and government 
-      officials is fragile.</text></choice>
-    </checkboxgroup>
-
-   <solution>
-   <div class="detailed-solution">
-   <p>Explanation</p>
-   <p>People who are not immunized against a disease may still not fall sick from the 
-   disease. If someone is trying to learn whether or not preventative measures 
-   against the disease have any impact, he or she may see these people and conclude, 
-   since they have remained healthy despite not being immunized, that immunizations 
-   have no effect. Consequently, he or she would tend to believe that immunization 
-   (or other preventative measures) have fewer benefits than they actually do.</p>
-   </div>
-   </solution>
-  </choiceresponse>
-  </problem>
-
-
-**Template**
+Template
+--------
 
 .. code-block:: xml
 
@@ -130,73 +75,74 @@ Although you can create checkbox problems by using the Simple Editor in Studio, 
   </choiceresponse>
   </problem>
 
-.. _Chemical Equation Input:
+Tags
+----
 
-Chemical Equation Input (Chemical Equation Problems)
-----------------------------------------------------
+* ``<choiceresponse>`` (required): Specifies that the problem contains options for students to choose from.
+* ``<checkboxgroup>`` (required): Specifies that the problem is a checkbox problem.
+* ``<choice>`` (required): Designates an answer option.
 
-In chemical equation problems, students enter text that represents a chemical equation into a text box. The LMS converts that text into a chemical equation below the text box.
+**Tag:** ``<choiceresponse>``
 
-**Sample Problem**
+Specifies that the problem contains options for students to choose from.
 
-.. image:: ../Images/ChemicalEquationExample.png
- :alt: Image of a chemical equation response problem
+  Attributes
 
-**Required Tags**
+  (none)
 
-.. list-table::
-   :widths: 20 80
+  Children
 
-   * - ``<customresponse>``
-     - Indicates that this problem has a custom response. The ``<customresponse>`` tags must surround the ``<chemicalequation>`` tags.
-   * - ``<chemicalequationinput>``
-     - A child of ``<customresponse>``. Indicates that the answer to this problem is a chemical equation. Must contain the ``size`` and ``label`` attributes.
-   * - ``<answer type=loncapa/python>``
-     - A child of ``<chemicalequationinput>``. Contains the Python script that grades the problem.
+  * ``<checkboxgroup>``
 
-Chemical equation problems use MathJax to create formulas. For more information about using MathJax in Studio, see :ref:`MathJax in Studio`.
+**Tag:** ``<checkboxgroup>``
 
-**Sample Problem XML**:
+Specifies that the problem is a checkbox problem.
 
-.. code-block:: xml
+  Attributes
 
-  <problem>
-    <startouttext/>
-    <p>Some problems may ask for a particular chemical equation. Practice by writing out the following reaction in the box below.</p>
-    
-  \( \text{H}_2\text{SO}_4 \longrightarrow \text { H}^+ + \text{ HSO}_4^-\)
+  .. list-table::
+     :widths: 20 80
 
-    <customresponse>
-      <chemicalequationinput size="50" label="Practice by writing out the following reaction in the box below."/>
-      <answer type="loncapa/python">
+     * - Attribute
+       - Description
+     * - direction (optional)
+       - Specifies the orientation of the list of answers. The default is vertical.
+     * - label (required)
+       - Specifies the name of the response field.
 
-  if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -> H^+ + HSO4^-'):
-      correct = ['correct']
-  else:
-      correct = ['incorrect']
+  Children
 
-      </answer>
-    </customresponse>
-    <p>Some tips:</p>
-    <ul>
-    <li>Use real element symbols.</li>
-    <li>Create subscripts by using plain text.</li>
-    <li>Create superscripts by using a caret (^).</li>
-    <li>Create the reaction arrow (\(\longrightarrow\)) by using "->".</li>
-    </ul>
+  * ``<choice>`` 
 
-    <endouttext/>
+**Tag:** ``<choice>``
+
+Designates an answer option.
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - Attribute
+       - Description
+     * - true (at least one required)
+       - Indicates a correct answer. For checkbox problems, one or more ``<choice>`` tags can contain a correct answer.
+     * - false (at least one required)
+       - Indicates an incorrect answer.
+
+  Children
   
-   <solution>
-   <div class="detailed-solution">
-   <p>Solution</p>
-   <p>To create this equation, enter the following:</p>
-     <p>H2SO4 -> H^+ + HSO4^-</p>
-   </div>
-   </solution>
-  </problem>
+  (none)
 
-**Problem Template**:
+
+.. _Chemical Equation Problem XML:
+
+=============================
+Chemical Equation Problem XML
+=============================
+
+Template
+--------
 
 .. code-block:: xml
 
@@ -205,7 +151,7 @@ Chemical equation problems use MathJax to create formulas. For more information 
     <p>Problem text</p>
 
     <customresponse>
-      <chemicalequationinput size="50" label="label text"/>
+      <chemicalequationinput size="NUMBER" label="LABEL TEXT"/>
       <answer type="loncapa/python">
 
   if chemcalc.chemical_equations_equal(submission[0], 'TEXT REPRESENTING CHEMICAL EQUATION'):
@@ -226,740 +172,192 @@ Chemical equation problems use MathJax to create formulas. For more information 
    </solution>
   </problem>
 
+Tags
+----
+* ``<customresponse>``: Indicates that this problem has a custom response. 
+* ``<chemicalequationinput>``: Specifies that the answer to this problem is a chemical equation. 
+* ``<answer type=loncapa/python>``: Contains the Python script that grades the problem.
 
-.. _Custom Response:
+**Tag:** ``<customresponse>``
 
-Custom Response ("Custom Python-Evaluated Input") Problems
------------------------------------------------------------
+Indicates that this problem has a custom response. The ``<customresponse>`` tags must surround the ``<chemicalequation>`` tags.
 
-In custom Python-evaluated input (also called “write-your-own-grader”) problems, the grader evaluates a student’s response using a Python script that you create and embed in the problem. 
+  Attributes
 
-**Sample Problem**
+  (none)
 
-.. image:: ../Images/CustomPythonExample.png
- :alt: Image of a custom response problem
+  Children
 
-.. list-table::
-   :widths: 20 80
+  * ``<chemicalequationinput>``
+  * ``<answer>``
 
-   * - ``<script type="loncapa/python">``
-     - Indicates that the problem contains a Python script.
-   * - ``<customresponse cfn="test_add_to_ten">``
-     - 
-   * - ``<customresponse cfn="test_add" expect="20">``
-     - 
-   * - <textline size="10" correct_answer="3"/>
-     - This tag includes the ``size``, ``correct_answer``, and ``label`` attributes. The ``correct_answer`` attribute is optional.
+**Tag:** ``<chemicalequationinput>``
 
-**Sample Problem XML**:
+Indicates that the answer to this problem is a chemical equation and creates a response field where the student enters an answer.
 
-.. code-block:: xml
+  Attributes
 
-  <problem>
-  <p>This question has two parts.</p>
+  .. list-table::
+     :widths: 20 80
 
-  <script type="loncapa/python">
+     * - Attribute
+       - Description
+     * - size 
+       - Specifies the size of the response field, in characters.
+     * - label (required)
+       - Contains the text of the principal question in the problem.
 
-  def test_add(expect, ans):
-      try:
-          a1=int(ans[0])
-          a2=int(ans[1])
-          return (a1+a2) == int(expect)
-      except ValueError:
-          return False
+  Children
+  
+  (none)
 
-  def test_add_to_ten(expect, ans):
-      return test_add(10, ans)
+**Tag:** ``<answer>``
 
-  </script>
+Contains the Python script that grades the problem.
 
-  <p>Part 1: Enter two integers that sum to 10. </p>
-  <customresponse cfn="test_add_to_ten">
-          <textline size="10" correct_answer="3" label="Integer #1"/><br/>
-          <textline size="10" correct_answer="7" label="Integer #2"/>
-  </customresponse>
+  Attributes
 
-  <p>Part 2: Enter two integers that sum to 20. </p>
-  <customresponse cfn="test_add" expect="20">
-          <textline size="10" label="Integer #1"/><br/>
-          <textline size="10" label="Integer #2"/>
-  </customresponse>
+  .. list-table::
+     :widths: 20 80
 
-  <solution>
-      <div class="detailed-solution">
-          <p>Explanation</p>
-          <p>For part 1, any two numbers of the form <i>n</i> and <i>10-n</i>, where <i>n</i> is any integer, will work. One possible answer would be the pair 0 and 10.</p>
-          <p>For part 2, any pair <i>x</i> and <i>20-x</i> will work, where <i>x</i> is any real number with a finite decimal representation. Both inputs have to be entered either in standard decimal notation or in scientific exponential notation. One possible answer would be the pair 0.5 and 19.5. Another way to write this would be 5e-1 and 1.95e1.</p>
-      </div>
-  </solution>
-  </problem>
+     * - Attribute
+       - Description
+     * - type (required) 
+       - Must be "loncapa/python".
 
-**Templates**
+  Children
+  
+  (none)
+     
 
-The following template includes answers that appear when the student clicks **Show Answer**. 
+.. _Drag and Drop Problem XML:
 
-.. code-block:: xml
+=========================
+Drag and Drop Problem XML
+=========================
 
-  <problem>
-
-  <script type="loncapa/python">
-  def test_add(expect,ans):
-    a1=float(ans[0])
-    a2=float(ans[1])
-    return (a1+a2)== float(expect)
-  </script>
-
-
-  <p>Problem text</p>
-  <customresponse cfn="test_add" expect="20">
-          <textline size="10" correct_answer="11" label="Integer #1"/><br/>
-          <textline size="10" correct_answer="9" label="Integer #2"/>
-  </customresponse>
-
-      <solution>
-          <div class="detailed-solution">
-            <p>Solution or Explanation Heading</p>
-            <p>Solution or explanation text</p>
-          </div>
-      </solution>
-  </problem>
-
-The following template does not return answers when the student clicks **Show Answer**. If your problem doesn't include answers for the student to see, make sure to set **Show Answer** to **Never** in the problem component.
-
-.. code-block:: xml
-
-  <problem>
-
-  <script type="loncapa/python">
-  def test_add(expect,ans):
-    a1=float(ans[0])
-    a2=float(ans[1])
-    return (a1+a2)== float(expect)
-  </script>
-
-
-  <p>Enter two real numbers that sum to 20: </p>
-  <customresponse cfn="test_add" expect="20">
-          <textline size="10"  label="Integer #1"/><br/>
-          <textline size="10"  label="Integer #2"/>
-  </customresponse>
-
-      <solution>
-          <div class="detailed-solution">
-            <p>Solution or Explanation Heading</p>
-            <p>Solution or explanation text</p>
-          </div>
-      </solution>
-  </problem>
-
-.. _Formula Response:
-
-Formula Response (Math Expression Input Problems)
--------------------------------------------------
-
-**Sample Problem**
-
-.. image:: ../Images/MathExpressionInputExample.gif
- :alt: Image of a math expression input problem
-
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
-
-   * - ``<formularesponse>``
-     - 
-   * - ``<formulaequationinput>``
-     - This tag includes the ``size`` and ``label`` attributes.
-   * - ``<script type="loncapa/python">``
-     - 
-
-**Sample Problem XML**
-
-.. code-block:: xml
-
-  <problem>
-    <p>Some problems may ask for a mathematical expression. Practice creating mathematical expressions by answering the questions below.</p>
-    <p>Notes:</p>
-    <ul>
-      <li>Use standard arithmetic operation symbols.</li>
-      <li>Indicate multiplication explicitly by using an asterisk (*).</li>
-      <li>Use a caret (^) to raise to a power.</li>
-      <li>Use an underscore (_) to indicate a subscript.</li>
-      <li>Use parentheses to specify the order of operations.</li>
-    </ul>
-
-    <p>Write an expression for the product of R_1, R_2, and the inverse of R_3.</p>
-    <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
-      <responseparam type="tolerance" default="0.00001"/>
-      <formulaequationinput size="40" label="Enter the equation"/>
-    </formularesponse>
-
-  <script type="loncapa/python">
-  VoVi = "(R_1*R_2)/R_3"
-  </script>
-
-    <p>Let <i>x</i> be a variable, and let <i>n</i> be an arbitrary constant. What is the derivative of <i>x<sup>n</sup></i>?</p>
-  <script type="loncapa/python">
-  derivative = "n*x^(n-1)"
-  </script>
-    <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
-      <responseparam type="tolerance" default="0.00001"/>
-      <formulaequationinput size="40"  label="Enter the equation"/>
-    </formularesponse>
-
-    <solution>
-      <div class="detailed-solution">
-        <p>Explanation or Solution Header</p>
-        <p>Explanation or solution text</p>
-      </div>
-    </solution>
-  </problem>
-
-**Template XML**
+Template
+--------
 
 .. code-block:: xml
 
   <problem>
     <p>Problem text</p>
-    <formularesponse type="ci" samples="VARIABLES@LOWER_BOUNDS:UPPER_BOUNDS#NUMBER_OF_SAMPLES" answer="$VoVi">
-      <responseparam type="tolerance" default="0.00001"/>
-      <formulaequationinput size="20"  label="Enter the equation"/>
-    </formularesponse>
-
-  <script type="loncapa/python">
-  VoVi = "(R_1*R_2)/R_3"
-  </script>
-
+    <customresponse>
+      <drag_and_drop_input no_labels="false" one_per_target="true" target_outline="true" img="/static/TARGET_IMAGE.gif">
+        <draggable can_reuse="true" label="NAME 1" id="1"/>
+        <draggable can_reuse="true" label="NAME 2" id="2"/>
+        <target id="0" h="HEIGHT (in pixels)" w="WIDTH (in pixels)" y="Y-COORDINATE" x="X-COORDINATE"/>
+        <target id="1" h="HEIGHT (in pixels)" w="WIDTH (in pixels)" y="Y-COORDINATE" x="X-COORDINATE"/>
+      </drag_and_drop_input>
+      <answer type="loncapa/python"> correct_answer = [ {'draggables': ['2'], 'targets': ['0' ], 'rule':'unordered_equal' }, {'draggables': ['none'], 'targets': ['1' ], 'rule':'unordered_equal' }] if draganddrop.grade(submission[0], correct_answer): correct = ['correct'] else: correct = ['incorrect'] </answer>
+    </customresponse>
     <solution>
-      <div class="detailed-solution">
-        <p>Explanation or Solution Header</p>
-        <p>Explanation or solution text</p>
-      </div>
+      <img src="/static/ANSWER_IMAGE.gif"/>
     </solution>
   </problem>
 
+Tags
+----
 
-**XML Attribute Information**
+* ``<drag_and_drop_input/>``: Indicates the problem is a drag and drop problem.
+* ``<draggable/>``: Specifies a single object that a student will drag onto the base image.
+* ``<target>``: Specifies the location on the base image where a draggable must be dropped.
 
-<script>
+**Tag:** ``<drag_and_drop_input/>``
 
+  Attributes
 
-  .. image:: ../Images/formularesponse.png
+  .. list-table::
+     :widths: 20 80
 
+     * - Attribute
+       - Description
+     * - img (required)
+       - Relative path to an image that will be the base image. All draggables can be dragged onto it.
+     * - target_outline 
+       - Specifies whether an outline (gray dashed line) should be drawn around targets (if they are specified). It can be either 'true' or 'false'. If not specified, the targets do not have outlines.
+     * - one_per_target 
+       - Specify whether to allow more than one draggable to be placed onto a single target. It can be either 'true' or 'false'. If not specified, the default value is 'true'.
+     * - no_labels (required)
+       - default is false, in default behaviour if label is not set, label is obtained from id. If no_labels is true, labels are not automatically populated from id, and one can not set labels and obtain only icons.
 
-<formularesponse>
+  Children
 
+     * ``<draggable>``
+     * ``<target>``
 
-  .. image:: ../Images/formularesponse3.png
+**Tag:** ``<draggable/>``
 
-Children may include ``<formulaequationinput/>``.
+Specifies a single draggable object in a drag and drop problem.
 
-If you do not need to specify any samples, you should look into the use of the
-Numerical Response input type, as it provides all the capabilities of Formula
-Response without the need to specify any unknown variables.
+A draggable is what the user must drag out of the slider and drop onto the base image. After a drag operation, if the center of the draggable is located outside the rectangular dimensions of the image, it will be returned to the slider.
 
-<responseparam>
+For the grader to work, each draggable must have a unique ID.
 
+  Attributes
 
-  .. image:: ../Images/formularesponse6.png
+  .. list-table::
+     :widths: 20 80
 
-<formulaequationinput/>
+     * - Attribute
+       - Description
+     * - id (required)
+       - Unique identifier of the draggable object.
+     * - label (optional)
+       - Text label that the user sees.
+     * - icon (optional)
+       - For draggables that are images, the relative path to the image file.
+     * - can_reuse
+       - true or false, default is false. If true, same draggable can be used multiple times.
 
-========= ============================================= =====
-Attribute                  Description                  Notes
-========= ============================================= =====
-size      (optional) defines the size (i.e. the width)
-          of the input box displayed to students for
-          typing their math expression.
-========= ============================================= =====
+  Children
+  
+  (none)
 
-.. _Image Response:
+**Tag:** ``<target>``
 
-Image Response (Image Mapped Input Problems)
---------------------------------------------
+Specifies the location on the base image where a student must drop a draggable item. By design, if the center of a draggable lies within the target (i.e. in the rectangle defined by [[x, y], [x + w, y + h]],  it is within the target. Otherwise, it is outside.
 
-**Sample Problem**
+If you specify at least one target, and a student drops a draggable item on a location that is outside a target, the draggable item returns to the slider.
 
-.. image:: ../Images/image294.png
- :alt: Image of an image mapped input problem
+If you don't specify a target, a student can drop a draggable item anywhere on the base image.
 
-**XML Tags**
+  Attributes
 
-.. list-table::
-   :widths: 20 80
+  .. list-table::
+     :widths: 20 80
 
-   * - ``<imageresponse>``
-     - Indicates that the problem is an image mapped input problem.
-   * - ``<imageinput>``
-     - Specifies the image file and the region the student must click. This tag includes the ``src``, ``width``, ``height``, and ``rectangle`` attributes.
+     * - Attribute
+       - Description
+     * - id (required)
+       - Unique identifier of the target object.
+     * - x
+       - X-coordinate on the base image where the top left corner of the target will be positioned.
+     * - y
+       - Y-coordinate on the base image where the top left corner of the target will be positioned.
+     * - w
+       - Width of the target, in pixels.
+     * - h
+       - Height of the target, in pixels.
 
-**Problem Code**:
+  Children
 
-.. code-block:: xml
+  (none)
 
-  <problem>
-    <p><b>Example Problem</b></p>
-     <startouttext/>
-      <p>In the image below, click the triangle.</p>
-      <endouttext/>
-      <imageresponse>
-      <imageinput src="/static/threeshapes.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
-      </imageresponse>
-  </problem>
 
-**Problem Template**
+For more information about how to create drag and drop problems, see `XML Format of Drag and Drop Input
+<https://edx.readthedocs.org/en/latest/course_data_formats/drag_and_drop/drag_and_drop_input.html>`_.
 
-.. code-block:: xml
 
-  <problem>
-    <startouttext/>
-      <p>In the image below, click the triangle.</p>
-    <endouttext/>
-        <imageresponse>
-         <imageinput src="IMAGE FILE PATH" width="NUMBER" height="NUMBER" rectangle="(X-AXIS,Y-AXIS)-(X-AXIS,Y-AXIS)" />
-        </imageresponse>
-  </problem>
+.. _Dropdown Problem XML:
 
-**XML Attribute Information**
+==========================
+Dropdown Problem XML
+==========================
 
-<imageresponse>
-
-  .. image:: ../Images/imageresponse1.png
-
-<imageinput>
-
-  .. image:: ../Images/imageresponse2.png
-
-.. _Multiple Choice Response:
-
-Multiple Choice Response (Multiple Choice Problems)
------------------------------------------------------
-
-Although you can create multiple choice problems by using the Simple Editor in Studio, you may want to see or change the problem's underlying XML.
-
-**Sample Problem**
-
-.. image:: ../Images/MultipleChoiceExample.gif
- :alt: Image of a multiple choice problem
-
-**XML Tags**
-
-.. list-table::
-   :widths: 20 80
-
-   * - ``<multiplechoiceresponse>``
-     - Indicates that the problem is a multiple choice problem.
-   * - ``<choicegroup type="MultipleChoice">``
-     - Indicates the beginning of the list of options. Contains the ``label`` attribute.
-   * - ``<choice>``
-     - Lists an option. This tag includes the ``correct`` and ``name`` attributes.
-
-**Problem Code:**
-
-.. code-block:: xml
-
-  <problem>
-  <p>Lateral inhibition, as was first discovered in the horsehoe crab...</p>
-  <multiplechoiceresponse>
-    <choicegroup type="MultipleChoice" label="Lateral inhibition, as was first discovered in the horsehoe crab">
-      <choice correct="false">is a property of touch sensation, referring to the ability of crabs to detect nearby predators.</choice>
-      <choice correct="false">is a property of hearing, referring to the ability of crabs to detect low frequency noises.</choice>
-      <choice correct="false">is a property of vision, referring to the ability of crabs eyes to enhance contrasts.</choice>
-      <choice correct="true">has to do with the ability of crabs to use sonar to detect fellow horseshoe crabs nearby.</choice>
-      <choice correct="false">has to do with a weighting system in the crabs skeleton that allows it to balance in turbulent water.</choice>
-    </choicegroup>
-  </multiplechoiceresponse>
-  <solution>
-    <div class="detailed-solution">
-      <p>Explanation</p>
-      <p>Horseshoe crabs were essential to the discovery of lateral inhibition, a property of vision present in horseshoe crabs as well as humans, that enables enhancement of contrast at edges of objects as was demonstrated in class. In 1967, Haldan Hartline received the Nobel prize for his research on vision and in particular his research investigating lateral inhibition using horseshoe crabs.</p>
-    </div>
-  </solution>
-  </problem>
-
-
-**Template**
-
-.. code-block:: xml
-
-  <problem>
-  <p>Question text</p>
-  <multiplechoiceresponse>
-    <choicegroup type="MultipleChoice" label="label text">
-      <choice correct="false" name="a">Incorrect choice</choice>
-      <choice correct="true" name="b">Correct choice</choice>
-    </choicegroup>
-  </multiplechoiceresponse>
-
-  <solution>
-    <div class="detailed-solution">
-    <p>Explanation or solution header</p>
-    <p>Explanation or solution text</p>
-    </div>
-  </solution>
-  </problem>
-
-
-**XML Attribute Information**
-
-
-<multiplechoiceresponse>
-
-.. image:: ../Images/multipleresponse.png
-
-
-<choicegroup>
-
-  .. image:: ../Images/multipleresponse2.png
-
-
-<choice>
-
-  .. image:: ../Images/multipleresponse3.png
-
-.. _Numerical Response:
-
-Numerical Response (Numerical Input Problems)
----------------------------------------------
-
-The Numerical Response input type accepts a line of text input from the student
-and evaluates the input for correctness based on its numerical value. The input
-is allowed to be a number or a mathematical expression in a fixed syntax.
-
-The answer is correct if it is within a specified numerical tolerance of the
-expected answer.
-
-The expected answer can be specified explicitly or precomputed by a Python
-script.
-
-Accepted input types include ``<formulaequationinput />`` and ``<textline />``.
-However, the math display on ``<textline math="1" />`` uses a different parser
-and has different capabilities than the response type--this may lead to student
-confusion. For this reason, we strongly urge using ``<formulaequationinput />``
-only, and the examples below show its use.
-
-Sample Problem:
-
-.. image:: ../Images/image292.png
- :width: 600
- :alt: Image of a numerical response problem
-
-
-**Problem Code**:
-
-.. code-block:: xml
-
-<problem>
-  <p><b>Example Problem</b></p>
-
-<p>What base is the decimal numeral system in?
-    <numericalresponse answer="10">
-        <formulaequationinput label="What base is the decimal numeral system in?"/>
-    </numericalresponse>
-</p>
-
-  <p>What is the value of the standard gravity constant <i>g</i>, measured in m/s<sup>2</sup>? Give your answer to at least two decimal places.
-  <numericalresponse answer="9.80665">
-    <responseparam type="tolerance" default="0.01" />
-    <formulaequationinput label="Give your answer to at least two decimal places"/>
-  </numericalresponse>
-</p>
-
-<!-- Use python script spacing. The following should not be indented! -->
-<script type="loncapa/python">
-computed_response = math.sqrt(math.fsum([math.pow(math.pi,2), math.pow(math.e,2)]))
-</script>
-
-<p>What is the distance in the plane between the points (pi, 0) and (0, e)? You can type math.
-    <numericalresponse answer="$computed_response">
-        <responseparam type="tolerance" default="0.0001" />
-        <formulaequationinput label="What is the distance in the plane between the points (pi, 0) and (0, e)?"/>
-    </numericalresponse>
-</p>
-<solution>
-  <div class="detailed-solution">
-    <p>Explanation</p>
-    <p>The decimal numerical system is base ten.</p>
-    <p>The standard gravity constant is defined to be precisely 9.80665 m/s<sup>2</sup>.
-    This is 9.80 to two decimal places. Entering 9.8 also works.</p>
-    <p>By the distance formula, the distance between two points in the plane is
-       the square root of the sum of the squares of the differences of each coordinate.
-      Even though an exact numerical value is checked in this case, the
-      easiest way to enter this answer is to type
-      <code>sqrt(pi^2+e^2)</code> into the editor.
-      Other answers like <code>sqrt((pi-0)^2+(0-e)^2)</code> also work.
-    </p>
-  </div>
-</solution>
-</problem>
-
-**Templates**
-
-Exact values
-
-.. code-block:: xml
-
-  <problem>
-
-    <numericalresponse answer="10">
-      <formulaequationinput label="label text"/>
-    </numericalresponse>
-
-    <solution>
-    <div class="detailed-solution">
-
-    </div>
-  </solution>
-  </problem>
-
-Answers with decimal precision
-
-.. code-block:: xml
-
-  <problem>
-
-    <numericalresponse answer="9.80665">
-      <responseparam type="tolerance" default="0.01" />
-      <formulaequationinput label="label text"/>
-    </numericalresponse>
-
-    <solution>
-    <div class="detailed-solution">
-
-    </div>
-  </solution>
-  </problem>
-
-Answers with percentage precision
-
-.. code-block:: xml
-
-  <problem>
-
-    <numericalresponse answer="100">
-      <responseparam type="tolerance" default="10%" />
-      <formulaequationinput label="label text"/>
-    </numericalresponse>
-
-    <solution>
-    <div class="detailed-solution">
-
-    </div>
-  </solution>
-  </problem>
-
-Answers with scripts
-
-.. code-block:: xml
-
-  <problem>
-
-  <!-- Use python script spacing. The following should not be indented! -->
-  <script type="loncapa/python">
-  computed_response = math.sqrt(math.fsum([math.pow(math.pi,2), math.pow(math.e,2)]))
-  </script>
-
-    <numericalresponse answer="$computed_response">
-      <responseparam type="tolerance" default="0.0001" />
-      <formulaequationinput label="label text"/>
-    </numericalresponse>
-
-    <solution>
-    <div class="detailed-solution">
-
-    </div>
-  </solution>
-  </problem>
-
-
-**XML Attribute Information**
-
-<script>
-
-  .. image:: ../Images/numericalresponse.png
-
-
-``<numericalresponse>``
-
-+------------+----------------------------------------------+-------------------------------+
-| Attribute  |                 Description                  |              Notes            |
-+============+==============================================+===============================+
-| ``answer`` | A value to which student input must be       | Note that any numeric         |
-|            | equivalent. Note that this expression can be | expression provided by the    |
-|            | expressed in terms of a variable that is     | student will be automatically |
-|            | computed in a script provided in the problem | simplified on the grader's    |
-|            | by preceding the appropriate variable name   | backend.                      |
-|            | with a dollar sign.                          |                               |
-|            |                                              |                               |
-|            | This answer will be evaluated similar to a   |                               |
-|            | student's input. Thus '1/3' and 'sin(pi/5)'  |                               |
-|            | are valid, as well as simpler expressions,   |                               |
-|            | such as '0.3' and '42'                       |                               |
-+------------+----------------------------------------------+-------------------------------+
-
-
-+------------------------+--------------------------------------------+--------------------------------------+
-|       Children         |                 Description                |                 Notes                |
-+========================+============================================+======================================+
-| ``responseparam``      | used to specify a tolerance on the accepted|                                      |
-|                        | values of a number. See description below. |                                      |
-+------------------------+--------------------------------------------+--------------------------------------+
-|``formulaequationinput``| An input specifically for taking math      |                                      |
-|                        | input from students. See below.            |                                      |
-+------------------------+--------------------------------------------+--------------------------------------+
-| ``textline``           | A format to take input from students, see  | Deprecated for NumericalResponse.    |
-|                        | description below.                         | Use ``formulaequationinput`` instead.|
-+------------------------+--------------------------------------------+--------------------------------------+
-
-
-<responseparam>
-
-  .. image:: ../Images/numericalresponse4.png
-
-<formulaequationinput/>
-
-========= ============================================= =====
-Attribute                  Description                  Notes
-========= ============================================= =====
-size      (optional) defines the size (i.e. the width)
-          of the input box displayed to students for
-          typing their math expression.
-========= ============================================= =====
-
-<textline> (While <textline /> is supported, its use is extremely discouraged.
-We urge usage of <formulaequationinput />. See the opening paragraphs of the
-`Numerical Response`_ section for more information.)
-
-  .. image:: ../Images/numericalresponse5.png
-
-.. _Math Expression Syntax:
-
-Math Expression Syntax
-----------------------
-
-In NumericalResponses, the student's input may be more complicated than a
-simple number. Expressions like ``sqrt(3)`` and even ``1+e^(sin(pi/2)+2*i)``
-are valid, and evaluate to 1.73 and -0.13 + 2.47i, respectively.
-
-A summary of the syntax follows:
-
-Numbers
-~~~~~~~
-
-Accepted number types:
-
-- Integers: '2520'
-- Normal floats: '3.14'
-- With no integer part: '.98'
-- Scientific notation: '1.2e-2' (=0.012)
-- More s.n.: '-4.4e+5' = '-4.4e5' (=-440,000)
-- Appending SI suffixes: '2.25k' (=2,250). The full list:
-
-  ====== ========== ===============
-  Suffix Stands for One of these is
-  ====== ========== ===============
-  %      percent    0.01 = 1e-2
-  k      kilo       1000 = 1e3
-  M      mega       1e6
-  G      giga       1e9
-  T      tera       1e12
-  c      centi      0.01 = 1e-2
-  m      milli      0.001 = 1e-3
-  u      micro      1e-6
-  n      nano       1e-9
-  p      pico       1e-12
-  ====== ========== ===============
-
-The largest possible number handled currently is exactly the largest float
-possible (in the Python language). This number is 1.7977e+308. Any expression
-containing larger values will not evaluate correctly, so it's best to avoid
-this situation.
-
-Default Constants
-~~~~~~~~~~~~~~~~~
-
-Simple and commonly used mathematical/scientific constants are included by
-default. These include:
-
-- ``i`` and ``j`` as ``sqrt(-1)``
-- ``e`` as Euler's number (2.718...)
-- ``pi``
-- ``k``: the Boltzmann constant (~1.38e-23 in Joules/Kelvin)
-- ``c``: the speed of light in m/s (2.998e8)
-- ``T``: the positive difference between 0K and 0°C (285.15)
-- ``q``: the fundamental charge (~1.602e-19 Coloumbs)
-
-Operators and Functions
-~~~~~~~~~~~~~~~~~~~~~~~
-
-As expected, the normal operators apply (with normal order of operations):
-``+ - * / ^``. Also provided is a special "parallel resistors" operator given
-by ``||``. For example, an input of ``1 || 2`` would represent the resistance
-of a pair of parallel resistors (of resistance 1 and 2 ohms), evaluating to 2/3
-(ohms).
-
-At the time of writing, factorials written in the form '3!' are invalid, but
-there is a workaround. Students can specify ``fact(3)`` or ``factorial(3)`` to
-access the factorial function.
-
-The default included functions are the following:
-
-- Trig functions: sin, cos, tan, sec, csc, cot
-- Their inverses: arcsin, arccos, arctan, arcsec, arccsc, arccot
-- Other common functions: sqrt, log10, log2, ln, exp, abs
-- Factorial: ``fact(3)`` or ``factorial(3)`` are valid. However, you must take
-  care to only input integers. For example, ``fact(1.5)`` would fail.
-- Hyperbolic trig functions and their inverses: sinh, cosh, tanh, sech, csch,
-  coth, arcsinh, arccosh, arctanh, arcsech, arccsch, arccoth
-
-
-.. _Option Response:
-
-Option Response (Dropdown Problems)
------------------------------------
-
-Although you can create dropdown problems by using the Simple Editor in Studio, you may want to see or change the problem's underlying XML.
-
-**Sample Problem**
-
-.. image:: ../Images/DropdownExample.gif
-    :alt: Image of an option response problem
-
-**XML Tags**
-
-.. list-table::
-   :widths: 20 80
-
-   * - ``<optionresponse>``
-     - Indicates that the problem is a dropdown problem.
-   * - ``<optioninput>``
-     - Lists the answer options. This tag includes the ``options``, ``correct``, and ``label`` attributes.
-
-
-**Problem Code:**
-
-.. code-block:: xml
-
-  <problem>
-  <p>
-    <em>This exercise first appeared in HarvardX's PH207x Health in Numbers: Quantitative Methods in Clinical &amp; Public Health Research course, fall 2012.</em>
-  </p>
-  <p>What type of data are the following?</p>
-  <p>Age:</p>
-  <optionresponse>
-    <optioninput options="('Nominal','Discrete','Continuous')" correct="Continuous" label="Age"/>
-  </optionresponse>
-  <p>Age, rounded to the nearest year:</p>
-  <optionresponse>
-    <optioninput options="('Nominal','Discrete','Continuous')" correct="Discrete" label="Age, rounded to the nearest year"/>
-  </optionresponse>
-  <p>Life stage - infant, child, and adult:</p>
-  <optionresponse>
-    <optioninput options="('Nominal','Discrete','Continuous')" correct="Nominal" label="Life stage"/>
-  </optionresponse>
-  </problem>
-
-**Template**
+Template
+--------
 
 .. code-block:: xml
 
@@ -995,167 +393,607 @@ Although you can create dropdown problems by using the Simple Editor in Studio, 
     </solution>
   </problem>
 
+Tags
+----
 
+* ``<optionresponse>`` (required): Indicates that the problem is a dropdown problem.
+* ``<optioninput>`` (required): Lists the answer options.
 
-**XML Attribute Information**
+**Tag:** ``<optionresponse>``
 
-<optionresponse>
+Indicates that the problem is a dropdown problem.
 
+  Attributes
 
-  .. image:: ../Images/option_response1.png
+  (none)
 
+  Children
 
-<optioninput>
+  * ``<optioninput>``  
 
-  .. image:: ../Images/optionresponse2.png
+**Tag:** ``<optioninput>``
 
+Lists the answer options.
 
-.. _Schematic Response:
+  Attributes
 
-Schematic Response (Circuit Schematic Problems)
------------------------------------------------
+  .. list-table::
+     :widths: 20 80
 
-The Schematic Response input type provides an interactive grid on which the
-student can construct a schematic answer, such as a circuit.
+     * - Attribute
+       - Description
+     * - options (required)
+       - Lists the answer options. The list of all answer options is surrounded by parentheses. Individual answer options are surrounded by single quotation marks (') and separated by commas (,).
+     * - correct (required)
+       - Indicates whether an answer is correct. Possible values are "true" and "false". Only one **correct** attribute can be set to "true".
+     * - label (required)
+       - Specifies the name of the response field.
+  
+  Children
 
-**Sample Problem**
+  (none)
 
-.. image:: ../Images/CircuitSchematicExample.gif
- :alt: Image of a schematic response explanation
+.. _Image Mapped Input Problem XML:
 
-**Problem Code**:
+==============================
+Image Mapped Input Problem XML 
+==============================
 
-.. code-block:: xml
-
-
-    <problem>
-      <p>Make a voltage divider that splits the provided voltage evenly.</p>
-    <schematicresponse>
-    <center>
-    <schematic height="500" width="600" parts="g,r" analyses="dc"
-    initial_value="[["v",[168,144,0],{"value":"dc(1)","_json_":0},["1","0"]],["r",[296,120,0],{"r":"1","_json_":1},["1","output"]],["L",[296,168,3],{"label":"output","_json_":2},["output"]],["w",[296,216,168,216]],["w",[168,216,168,192]],["w",[168,144,168,120]],["w",[168,120,296,120]],["g",[168,216,0],{"_json_":7},["0"]],["view",-67.49999999999994,-78.49999999999994,1.6000000000000003,"50","10","1G",null,"100","1","1000"]]"
-    />
-    </center>
-    <answer type="loncapa/python">
-    dc_value = "dc analysis not found"
-    for response in submission[0]:
-      if response[0] == 'dc':
-          for node in response[1:]:
-              dc_value = node['output']
-    if dc_value == .5:
-      correct = ['correct']
-    else:
-      correct = ['incorrect']
-    </answer>
-    </schematicresponse>
-    <schematicresponse>
-    <p>Make a high pass filter.</p>
-    <center>
-    <schematic height="500" width="600" parts="g,r,s,c" analyses="ac"
-    submit_analyses="{"ac":[["NodeA",1,9]]}"
-    initial_value="[["v",[160,152,0],{"name":"v1","value":"sin(0,1,1,0,0)","_json_":0},["1","0"]],["w",[160,200,240,200]],["g",[160,200,0],{"_json_":2},["0"]],["L",[240,152,3],{"label":"NodeA","_json_":3},["NodeA"]],["s",[240,152,0],{"color":"cyan","offset":"0","_json_":4},["NodeA"]],["view",64.55878906250004,54.114697265625054,2.5000000000000004,"50","10","1G",null,"100","1","1000"]]"/>
-    </center>
-    <answer type="loncapa/python">
-    ac_values = None
-    for response in submission[0]:
-      if response[0] == 'ac':
-          for node in response[1:]:
-              ac_values = node['NodeA']
-    print "the ac analysis value:", ac_values
-    if ac_values == None:
-      correct = ['incorrect']
-    elif ac_values[0][1] < ac_values[1][1]:
-      correct = ['correct']
-    else:
-      correct = ['incorrect']
-    </answer>
-    </schematicresponse>
-        <solution>
-            <div class="detailed-solution">
-                <p>Explanation</p>
-                <p>A voltage divider that evenly divides the input voltage can be formed with two identically valued resistors, with the sampled voltage taken in between the two.</p>
-                <p><img src="/c4x/edX/edX101/asset/images_voltage_divider.png"/></p>
-                <p>A simple high-pass filter without any further constaints can be formed by simply putting a resister in series with a capacitor. The actual values of the components do not really matter in order to meet the constraints of the problem.</p>
-                <p><img src="/c4x/edX/edX101/asset/images_high_pass_filter.png"/></p>
-            </div>
-        </solution>
-    </problem>
-
-.. _String Response:
-
-String Response (Text Input Problems)
--------------------------------------
-
-Although you can create text input problems by using the Simple Editor in Studio, you may want to see or change the problem's underlying XML. For example, you can add hints that appear when students enter common incorrect answers, or modify the problem's XML so that students can submit regular expressions as answers. 
-
-The regular expression that the student enters must contain the part of the answer that the instructor specifies. For example, if an instructor has specified  ``<answer=".*example answer.*" type="regexp">``, correct answers include ``example answered``, ``two example answers``, or even ``==example answer==``, but not ``examples`` or ``example anser``.
-
-You can add ``regexp`` to the value of the ``type`` attribute, for example: ``type="ci regexp"`` or ``type="regexp"`` or ``type="regexp cs"``. In this case, any answer or hint will be treated as regular expressions.
-
-**Sample Problem**
-
-.. image:: ../Images/TextInputExample.gif
- :alt: Image of a string response problem
-
-**XML Tags**
-
-.. list-table::
-   :widths: 20 80
-
-   * - ``<stringresponse>``
-     - Indicates that the problem is a text input problem. 
-   * - ``<textline>``
-     - Child of ``<stringresponse>``. Lists the answer options and contains the ``label`` attribute.
-   * - ``<additional_answer>`` (optional)
-     - Specifies an additional correct answer for the problem. A problem can contain an unlimited number of additional answers.
-   * - ``<hintgroup>`` (optional)
-     - Indicates that the instructor has provided hints for certain common incorrect answers.
-   * - ``<stringhint />`` (optional)
-     - Child of ``<hintgroup>``. Specifies the text of the incorrect answer to provide the hint for. Contains answer, type, name.
-   * - ``<hintpart>``
-     - Contains the name from ``<stringhint>``. Associates the incorrect answer with the hint text for that incorrect answer.
-   * - ``<startouttext />``
-     - Indicates the beginning of the text of the hint.
-   * - ``<endouttext />``
-     - Indicates the end of the text of the hint.
-
-**Sample Problem Code**
+Template
+--------
 
 .. code-block:: xml
 
   <problem>
-  <p>
-    <em>This problem is adapted from an exercise that first appeared in MITx's 14.73x The Challenges of Global Poverty course, spring 2013.</em>
-  </p>
-  <p>What is the technical term that refers to the fact that, when enough people sleep under a bednet, the disease may altogether disappear?</p>
-  <stringresponse answer=".*herd immunity.*" type="ci regexp">
-         <additional_answer>community immunity</additional_answer>
-          <additional_answer>population immunity</additional_answer>
-          <textline size="20" label="What is the technical term that refers to the fact that, when enough people sleep under a bednet, the disease may altogether disappear?"/>
-          <hintgroup>
-              <stringhint answer="contact immunity" type="ci" name="contact_immunity_hint" />
-              <hintpart on="contact_immunity_hint">
-                  <startouttext />
-                  In contact immunity, a vaccinated individual passes along his immunity to another person through contact with feces or bodily fluids. The answer to the question above refers to the form of immunity that occurs when so many members of a population are protected, an infectious disease is unlikely to spread to the unprotected population.
-                  <endouttext />
-              </hintpart >
-              <stringhint answer="firewall immunity" type="ci" name="firewall_immunity_hint" />
-              <hintpart on="firewall_immunity_hint">
-                  <startouttext />
-                  Although a firewall provides protection for a population, the term "firewall" is used more in computing and technology than in epidemiology.
-                  <endouttext />
-              </hintpart >
-          </hintgroup>
-  </stringresponse>
+    <startouttext/>
+      <p>In the image below, click the triangle.</p>
+    <endouttext/>
+        <imageresponse>
+         <imageinput src="IMAGE FILE PATH" width="NUMBER" height="NUMBER" rectangle="(X-AXIS,Y-AXIS)-(X-AXIS,Y-AXIS)" />
+        </imageresponse>
+  </problem>
+
+Tags
+====
+
+* ``<imageresponse>``: Indicates that the problem is an image mapped input problem.
+* ``<imageinput>``: Specifies the image file and the region in the file that the student must click.
+
+**Tag:** ``<imageresponse>``
+
+Indicates that the problem is an image mapped input problem.
+
+  Attributes
+
+  (none)
+
+  Children
+
+  * ``<imageinput>``
+
+**Tag:** ``<imageinput>``
+
+Specifies the image file and the region in the file that the student must click.
+
+  Attributes
+
+   .. list-table::
+      :widths: 20 80
+
+      * - Attribute
+        - Description
+      * - src (required)
+        - The URL of the image
+      * - height (required)
+        - The height of the image, in pixels
+      * - width (required)
+        - The width of the image, in pixels
+      * - rectangle (required)
+        - An attribute with four embedded values in the format (<start_width>,<start_height>)-(<end_width>,<end-height>). All coordinates start with (0,0) in the top left corner and increase in value toward the bottom right corner, very similar to the progression of reading English. The two coordinates defined form the two opposite corners of a box which a student can click inside of.
+
+  Children
+  
+  (none)
+
+
+
+.. _JS Input Problem XML:
+
+=============================
+JavaScript Input Problem XML 
+=============================
+
+JSInput allows problem authors to turn stand-alone HTML files into problems that can be integrated into the edX platform. Since its aim is flexibility, it can be seen as the input and client-side equivalent of **CustomResponse**.
+
+A JSInput exercise creates an IFrame in a static HTML page, and passes the return value of author-specified functions to the enclosing response type (generally **CustomResponse**). JSInput can also store and retrieve state.
+
+Template
+--------
+
+The following is the basic format of a JSInput problem:
+
+.. code-block:: xml
+
+ <problem>
+        <script type="loncapa/python">
+ def all_true(exp, ans): return ans == "hi"
+        </script>
+        <customresponse cfn="all_true">
+            <jsinput gradefn="gradefn" 
+                height="500"
+                get_statefn="getstate"
+                set_statefn="setstate"
+                html_file="/static/jsinput.html"/>
+        </customresponse>
+ </problem>
+
+The accepted attributes are:
+
+==============  ==============  =========  ==========
+Attribute Name   Value Type     Required   Default
+==============  ==============  =========  ==========
+html_file        URL string     Yes        None
+gradefn          Function name  Yes        `gradefn`
+set_statefn      Function name  No         None
+get_statefn      Function name  No         None
+height           Integer        No         `500`
+width            Integer        No         `400`
+==============  ==============  =========  ==========
+
+
+Required Attributes
+-------------------
+
+* **html_file**
+
+  The **html_file** attribute specifies the HTML file that the IFrame will point to. The HTML file
+  must be located in the content directory.
+
+  The IFrame is created using the sandbox attribute. Although pop-ups, scripts, and pointer locks are allowed, the IFrame cannot access its parent's attributes.
+
+  The HTML file must contain a **gradefn** function that the JSInput file can access. To determine whether the **gradefn** function is accessible, in the console, make sure that **gradefn** returns the right thing. When JSInput uses the **gradefn** function, `gradefn` is called with `gradefn`.call(`obj`), where **obj** is the object-part of **gradefn**. For example, if **gradefn** is **myprog.myfn**, JSInput calls **myprog.myfun.call(myprog)**. (This is to ensure "`this`" continues to refer to what `gradefn` expects.)
+
+  Aside from that, more or less anything goes. Note that currently there is no support for inheriting CSS or JavaScript from the parent (aside from the Chrome-only **seamless** attribute, which is set to True by default).
+
+* **gradefn**
+
+  The **gradefn** attribute specifies the name of the function that will be called when a user clicks **Check**, and that returns the student's answer. Unless both the **get_statefn** and **set_statefn** attributes are also used, this answer is passed as a string to the enclosing response type. In the **customresponse** example above, this means **cfn** will be passed this answer as ``ans``.
+
+  If the **gradefn** function throws an exception when a student attempts to submit a problem, the submission is aborted, and the student receives a generic alert. The alert can be customised by making the exception name ``Waitfor Exception``; in that case, the alert message will be the exception message.
+
+  .. important:: To make sure the student's latest answer is passed correctly, make sure that the **gradefn** function is not asynchronous. Additionally, make sure that the function returns promptly. Currently the student has no indication that her answer is being calculated or produced.
+
+Optional Attributes
+-------------------
+
+* **set_statefn**
+
+  Sometimes a problem author will want information about a student's previous answers ("state") to be saved and reloaded. If the attribute **set_statefn** is used, the function given as its value will be passed the state as a string argument whenever there is a state, and the student returns to a problem. The function has the responsibility to then use this state approriately.
+
+  The state that is passed is:
+
+  * The previous output of **gradefn** (i.e., the previous answer) if **get_statefn** is not defined.
+  * The previous output of **get_statefn** (see below) otherwise.
+
+  It is the responsibility of the iframe to do proper verification of the argument that it receives via **set_statefn**.
+
+* **get_statefn**
+
+  Sometimes the state and the answer are quite different. For instance, a problem that involves using a javascript program that allows the student to alter a molecule may grade based on the molecule's hydrophobicity, but from the hydrophobicity it might be incapable of restoring the state. In that case, a
+  *separate* state may be stored and loaded by **set_statefn**. Note that if **get_statefn** is defined, the answer (i.e., what is passed to the enclosing response type) will be a json string with the following format:
+
+  .. code-block:: xml
+
+      {
+          answer: `[answer string]`
+          state: `[state string]`
+      }
+
+
+  The enclosing response type must then parse this as json.
+
+* **height** and **width**
+
+  The **height** and **width** attributes are straightforward: they specify the height and width of the IFrame. Both are limited by the enclosing DOM elements, so for instance there is an implicit max-width of around 900. 
+
+  In the future, JSInput may attempt to make these dimensions match the HTML file's dimensions (up to the aforementioned limits), but currently it defaults to `500` and `400` for **height** and **width**, respectively.
+
+.. _Multiple Choice Problem XML:
+
+=============================
+Multiple Choice Problem XML 
+=============================
+
+Template
+--------
+
+.. code-block:: xml
+
+  <problem>
+  <p>Question text</p>
+  <multiplechoiceresponse>
+    <choicegroup type="MultipleChoice" label="label text">
+      <choice correct="false" name="a">Incorrect choice</choice>
+      <choice correct="true" name="b">Correct choice</choice>
+    </choicegroup>
+  </multiplechoiceresponse>
+
   <solution>
     <div class="detailed-solution">
-      <p>Explanation</p>
-      <p>The correct answer is <b>herd immunity</b>. As more and more people use bednets, the risk of malaria begins to fall for everyone – users and non-users alike. This can fall to such a low probability that malaria is effectively eradicated from the group (even when the group does not have 100% bednet coverage).</p>
+    <p>Explanation or solution header</p>
+    <p>Explanation or solution text</p>
     </div>
   </solution>
   </problem>
 
-**Template**
+Tags
+----
+
+* ``<multiplechoiceresponse>`` (required): Indicates that the problem is a multiple choice problem.
+* ``<choicegroup>`` (required): Indicates the beginning of the list of options. 
+* ``<choice>`` (required): Lists an answer option.
+
+**Tag:** ``<multiplechoiceresponse>``
+
+Indicates that the problem is a multiple choice problem.
+
+  Attributes
+
+  (none)
+
+  Children
+
+  * ``<choicegroup>``
+  * All standard HTML tags (can be used to format text)
+
+**Tag:** ``<choicegroup>``
+
+Indicates the beginning of the list of options.
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - Attribute
+       - Description
+     * - label (required)
+       - Specifies the name of the response field.
+     * - type (required)
+       - Must be set to "MultipleChoice".
+
+  Children
+
+  * ``<choice>`` 
+
+**Tag:** ``<choice>``
+
+Lists an answer option. 
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - Attribute
+       - Description
+     * - correct (at least one required)
+       - Indicates a correct or incorrect answer. When the attribute is set to "true", the choice is a correct answer. When the attribute is set to "false", the choice is an incorrect answer. Only one choice can be a correct answer.
+     * - name
+       - A unique name that the back end uses to refer to the choice.
+
+  Children
+  
+  (none)
+
+.. _Numerical Input Problem XML:
+
+===========================
+Numerical Input Problem XML
+===========================
+
+Templates
+---------
+
+The following templates represent problems with and without a decimal or percentage tolerance.
+
+Problem with no tolerance
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: xml
+
+  <p>TEXT OF PROBLEM
+      <numericalresponse answer="ANSWER (NUMBER)">
+          <formulaequationinput label="TEXT OF PROBLEM"/>
+      </numericalresponse>
+  </p>
+   
+    <solution>
+    <div class="detailed-solution">
+    <p>TEXT OF SOLUTION</p>
+    </div>
+  </solution>
+  </problem>
+
+Problem with a decimal tolerance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: xml
+
+  <problem>
+   
+    <p>TEXT OF PROBLEM
+    <numericalresponse answer="ANSWER (NUMBER)">
+      <responseparam type="tolerance" default="NUMBER (DECIMAL, e.g., .02)" />
+      <formulaequationinput label="TEXT OF PROBLEM"/>
+    </numericalresponse>
+  </p>
+   
+    <solution>
+    <div class="detailed-solution">
+    <p>TEXT OF SOLUTION</p>
+    </div>
+  </solution>
+  </problem>
+
+Problem with a percentage tolerance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: xml
+
+  <problem>
+   
+   <p>TEXT OF PROBLEM
+    <numericalresponse answer="ANSWER (NUMBER)">
+      <responseparam type="tolerance" default="NUMBER (PERCENTAGE, e.g., 3%)" />
+      <formulaequationinput label="TEXT OF PROBLEM"/>
+    </numericalresponse>
+   </p>
+
+    <solution>
+    <div class="detailed-solution">
+    <p>TEXT OF SOLUTION</p>
+    </div>
+  </solution>
+  </problem>
+
+Answer created with a script
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: xml
+
+  <problem>
+
+  <!-- Use python script spacing. The following should not be indented! -->
+  <script type="loncapa/python">
+  computed_response = math.sqrt(math.fsum([math.pow(math.pi,2), math.pow(math.e,2)]))
+  </script>
+
+  <p>TEXT OF PROBLEM
+      <numericalresponse answer="$computed_response">
+          <responseparam type="tolerance" default="0.0001" />
+          <formulaequationinput label="TEXT OF PROBLEM"/>
+      </numericalresponse>
+  </p>
+
+    <solution>
+    <div class="detailed-solution">
+     <p>TEXT OF SOLUTION</p>
+    </div>
+  </solution>
+  </problem>
+
+Tags
+----
+
+* ``<numericalresponse>`` (required): Specifies that the problem is a numerical input problem.
+* ``<formulaequationinput />`` (required): Provides a response field where the student enters a response.
+* ``<responseparam>`` (optional): Specifies a tolerance, or margin of error, for an answer.
+* ``<script>`` (optional):
+
+.. note:: Some older problems use the ``<textline math="1" />`` tag instead of the ``<formulaequationinput />`` tag. However, the ``<textline math="1" />`` tag has been deprecated. All new problems should use the ``<formulaequationinput />`` tag.
+
+**Tag:** ``<numericalresponse>``
+
+Specifies that the problem is a numerical input problem. The ``<numericalresponse>`` tag is similar to the ``<formularesponse>`` tag, but the ``<numericalresponse>`` tag does not allow unspecified variables.
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - Attribute
+       - Description
+     * - answer (required)
+       - The correct answer to the problem, given as a mathematical expression. 
+
+  .. note:: If you include a variable name preceded with a dollar sign ($) in the problem, you can include a script in the problem that computes the expression in terms of that variable.
+
+  The grader evaluates the answer that you provide and the student's response in the same way. The grader also automatically simplifies any numeric expressions that you or a student provides. Answers can include simple expressions such as "0.3" and "42", or more complex expressions such as "1/3" and "sin(pi/5)". 
+
+  Children
+  
+  * ``<responseparam>``
+  * ``<formulaequationinput>``
+
+**Tag:** * ``<formulaequationinput>``
+
+Creates a response field in the LMS where students enter a response.
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - size (optional)
+       - Defines the width, in characters, of the response field in the LMS.
+  
+  Children
+
+  (none)
+
+**Tag:** ``<responseparam>``
+
+Specifies a tolerance, or margin of error, for an answer.
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - type (optional)
+       - "tolerance": Defines a tolerance for a number
+     * - default (optional)
+       - A number or a percentage specifying a numerical or percent tolerance.
+
+  Children
+  
+  (none)
+
+**Tag:** ``<script>``
+
+Specifies a script that the grader uses to evaluate a student's response. A problem behaves as if all of the code in all of the script tags were in a single script tag. Specifically, any variables that are used in multiple ``<script>`` tags share a namespace and can be overriden.
+
+As with all Python, indentation matters, even though the code is embedded in XML.
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - type (required)
+       - Must be set to "loncapa/python".
+
+  Children
+  
+  (none)
+
+
+.. _Math Expression Input Problem XML:
+
+==================================
+Math Expression Input Problem XML
+==================================
+
+Templates
+---------
+
+.. code-block:: xml
+
+  <problem>
+    <p>Write an expression for the product of R_1, R_2, and the inverse of R_3.</p>
+    <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="R_1*R_2/R_3">
+      <responseparam type="tolerance" default="0.00001"/> 
+      <formulaequationinput size="40" />
+    </formularesponse>
+  </problem>
+
+.. code-block:: xml
+
+  <problem>
+    <p>Problem text</p>
+    <formularesponse type="ci" samples="VARIABLES@LOWER_BOUNDS:UPPER_BOUNDS#NUMBER_OF_SAMPLES" answer="$VoVi">
+      <responseparam type="tolerance" default="0.00001"/>
+      <formulaequationinput size="20"  label="Enter the equation"/>
+    </formularesponse>
+
+  <script type="loncapa/python">
+  PYTHON SCRIPT
+  </script>
+
+    <solution>
+      <div class="detailed-solution">
+        <p>Explanation or Solution Header</p>
+        <p>Explanation or solution text</p>
+      </div>
+    </solution>
+  </problem>
+
+Tags
+----
+
+* ``<formularesponse>``
+* ``<formulaequationinput />``
+* ``<responseparam>``
+* ``<script>``
+
+**Tag:** ``<formularesponse>``
+
+Specifies that the problem is a math expression input problem. The ``<formularesponse>`` tag is similar to ``<numericalresponse>``, but ``<formularesponse>`` allows unknown variables.
+
+  Attributes
+
+  **type**: Can be "cs" (case sensitive, the default) or "ci" (case insensitive, so that capitalization doesn't matter in variable names).
+
+  **answer**: The correct answer to the problem, given as a mathematical expression. If you precede a variable name in the problem with a dollar sign ($), you can include a script in the problem that computes the expression in terms of that variable.
+
+  **samples**: Specifies important information about the problem in four lists:
+
+    * **variables**: A set of variables that students can enter.
+    * **lower_bounds**: For every defined variable, a lower bound on the numerical tests to use for that variable.
+    * **upper_bounds**: For every defined variable, an upper bound on the numerical tests to use for that variable.
+    * **num_samples**: The number of times to test the expression.
+
+    Commas separate items inside each of the four individual lists, and the at sign (@), colon (:), and pound sign (#) characters separate the four lists. The format is the following:
+
+    ``"variables@lower_bounds:upper_bounds#num_samples``
+
+    For example, a ``<formularesponse>`` tag that includes the **samples** attribute may look like either of the following.
+
+    ``<formularesponse samples="x,n@1,2:3,4#10">``
+
+    ``<formularesponse samples="R_1,R_2,R_3@1,2,3:3,4,5#10">``
+
+  Children
+
+  * ``<formulaequationinput />``
+
+**Tag:** ``<formulaequationinput />``
+
+Creates a response field where a student types an answer to the problem in plain text, as well as a second field below the response field where the student sees a typeset version of the plain text. The parser that renders the student's plain text into typeset math is the same parser that evaluates the student's response for grading.
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - Attribute
+       - Description
+     * - size (optional)
+       - Specifies the width, in characters, of the response field where students enter answers.
+
+  Children
+  
+  (none)
+
+**Tag:** ``<responseparam>``
+
+Used to define an upper bound on the variance of the numerical methods used to approximate a test for equality.
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - Attribute
+       - Description
+     * - default (required)
+       - A number or a percentage specifying how close the student and grader expressions must be. Failure to include a tolerance leaves expressions vulnerable to unavoidable rounding errors during sapling, causing some student input to be graded as incorrect, even if it is algebraically equivalent to the grader's expression.
+     * - type
+       - "tolerance"--defines a tolerance for a number
+
+  Children
+  
+  (none)
+
+.. _Text Input Problem XML:
+
+======================
+Text Input Problem XML
+======================
+
+Template
+--------
 
 .. code-block:: xml
 
@@ -1188,61 +1026,141 @@ You can add ``regexp`` to the value of the ``type`` attribute, for example: ``ty
     </solution>
   </problem>
 
-**XML Attribute Information**
+Tags
+----
 
-<stringresponse>
+* ``<stringresponse>``: Indicates that the problem is a text input problem. 
+* ``<textline>``: Child of ``<stringresponse>``. Creates a response field in the LMS where the student enters a response.
+* ``<additional_answer>`` (optional): Specifies an additional correct answer for the problem. A problem can contain an unlimited number of additional answers.
+* ``<hintgroup>`` (optional): Indicates that the instructor has provided hints for certain common incorrect answers.
+* ``<stringhint />`` (optional): Child of ``<hintgroup>``. Specifies the text of the incorrect answer to provide the hint for. Contains answer, type, name.
+* ``<hintpart>``: Contains the name from ``<stringhint>``. Associates the incorrect answer with the hint text for that incorrect answer.
+* ``<startouttext />``: Indicates the beginning of the text of the hint.
+* ``<endouttext />``: Indicates the end of the text of the hint.
 
- .. raw:: html
+**Tag:** ``<stringresponse>``
 
-      <table border="1" class="docutils" width="60%">
-        <colgroup>
-        <col width="15%">
-        <col width="75%">
-        <col width="10%">
-        </colgroup>
-        <thead valign="bottom">
-        <tr class="row-odd"><th class="head">Attribute</th>
-        <th class="head">Description</th>
-        <th class="head">Notes</th>
-        </tr>
-        </thead>
-        <tbody valign="top">
-        <tr class="row-even"><td>type</td>
-        <td>(optional) “[ci] [regex]”. Add “ci” if the student response should be graded case-insensitively. The default is to take case into consideration when grading. Add “regexp” for correct answer to be treated as regular expression.</td>
-        <td>&nbsp;</td>
-        </tr>
-        <tr class="row-odd"><td>answer</td>
-        <td>The string that is used to compare with student answer. If "regexp" is not presented in value of <em>type</em> attribute, student should enter value equal to exact value of this attribute in order to get credit. If  "regexp" is presented in value of <em>type</em> attribute, value of <em>answer</em> is treated as regular expression and exact match of this expression and student answer will be done. If search is successful, student will get credit.</td>
-        <td>&nbsp;</td>
-        </tr>
-        </tbody>
-      </table>
+Indicates that the problem is a text input problem.
 
-      <table border="1" class="docutils" width="60%">
-        <colgroup>
-        <col width="15%">
-        <col width="75%">
-        <col width="10%">
-        </colgroup>
-        <thead valign="bottom">
-        <tr class="row-odd"><th class="head">Children</th>
-        <th class="head">Description</th>
-        <th class="head">Notes</th>
-        </tr>
-        </thead>
-        <tbody valign="top">
-        <tr class="row-even"><td>textline</td>
-        <td>used to accept student input. See description below.</td>
-        <td>&nbsp;</td>
-        </tr>
-        <tr class="row-odd"><td>additional_answer</td>
-        <td>todo</td>
-        <td>&nbsp;</td>
-        </tr>
-        </tbody>
-      </table>
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - Attribute
+       - Description
+     * - answer (required)
+       - Specifies the correct answer. To designate the answer as a regular expression, add "regexp" to the **type** attribute. If you do not add "regexp" to the **type** attribute, the student's answer must match the value in this attribute exactly.
+     * - type (optional)
+       - Can specify whether the problem is case sensitive and allows regular expressions. If the ``<stringresponse>`` tag includes ``type="ci"``, the problem is not case sensitive. If the tag includes ``type="cs"``, the problem is case sensitive. If the tag includes ``type="regexp"``, the problem allows regular expressions. A **type** attribute in a ``<stringresponse>`` tag can also combine these values. For example, ``<stringresponse type="regexp cs">`` specifies that the prolem allows regular expressions and is case sensitive.
+
+  Children
+
+  * ``<textline />`` (required)
+  * ``<additional_answer>`` (optional)
+  * ``<hintgroup>`` (optional)
+    
+**Tag:** ``<textline />``
+
+Creates a response field in the LMS where the student enters a response.
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - Attribute
+       - Description
+     * - label (required)
+       - Contains the text of the problem.
+     * - size (optional)
+       - Specifies the size, in characters, of the response field in the LMS.
+     * - hidden (optional)
+       - If set to "true", students cannot see the response field.
+     * - correct_answer (optional)
+       - Lists the correct answer to the problem.
+
+  Children
+  
+  (none)
+
+**Tag:** ``<additional_answer>``
+
+Specifies an additional correct answer for the problem. A problem can contain an unlimited number of additional answers.
+
+  Attributes
+
+  (none)
+
+  Children
+
+  (none)
+
+**Tag:** ``<hintgroup>``
+
+Indicates that the instructor has provided hints for certain common incorrect answers.
+
+  Attributes
+
+  (none)
+
+  Children
+  
+  * ``<stringhint>`` (required)
+
+**Tag:** ``<stringhint>``
+
+Specifies a common incorrect answer to the problem.
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - Attribute
+       - Description
+     * - answer (required)
+       - The text of the incorrect answer.
+     * - name (required)
+       - The name of the hint that you want to provide.
+     * - type
+       - Specifies whether the text of the specified incorrect answer is case sensitive. Can be set to "cs" (case sensitive) or "ci" (case insensitive).
+
+  Children
+
+  * ``<hintpart>`` (required)
+
+**Tag:** ``<hintpart>``
+
+Associates a common incorrect answer with the hint for that incorrect answer.
+
+  Attributes
+
+  .. list-table::
+     :widths: 20 80
+
+     * - Attribute
+       - Description
+     * - on
+       - The name of the hint. This must be the same as the **name** attribute of the ``<stringhint>`` tag. (The ``<stringhint>`` tag provides the name of the hint and the incorrect answer to associate with the hint. The ``<hintpart>`` tag contains the name of the hint and the text of the hint.)
+
+  Children
+
+  * ``<startouttext />`` (required)
+  * ``<endouttext />`` (required)
+
+**Tags:** ``<startouttext />`` and ``<endouttext>``
+
+Surround the text of the hint.
+
+  Attributes
+  
+  (none)
+
+  Children
+  
+  (none)
 
 
-<textline>
 
-  .. image:: ../Images/stringresponse2.png
+
