@@ -7554,6 +7554,9 @@ msgid ""
 "appear in a table on the Course Info tab. To see status for all tasks "
 "submitted for this problem, click on this button"
 msgstr ""
+"ये एक्शन्स बैकग्राउन्ड में होते हैं, और एक्टिव टास्क कोर्स के बारे में "
+"जानकारी के टैब में एक टेबल में दिखाई देंगे। इस प्रौबलम के लिए प्रस्तुत किए "
+"गए सभी कामों की अभी की स्थिति को देखने के लिए इस बटन पर क्लिक करें:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"

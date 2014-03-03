@@ -120,9 +120,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-27 15:43-0500\n"
-"PO-Revision-Date: 2014-03-01 21:40+0000\n"
-"Last-Translator: sarina <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-03-02 15:08-0500\n"
+"PO-Revision-Date: 2014-03-03 14:01+0000\n"
+"Last-Translator: antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -213,9 +213,15 @@ msgstr "Administrateur"
 msgid "Moderator"
 msgstr "Modérateur"
 
+#: common/djangoapps/django_comment_common/models.py
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#, fuzzy
 msgid "Community TA"
-msgstr "Assistant professeur communautaire"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"Assistant communauté d'apprentissage\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Assistant professeur communautaire"
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Student"
@@ -1377,28 +1383,34 @@ msgid ""
 "{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
 "{grade:.0f}/{max_grade:.0f} {questions})"
 msgstr ""
+"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
+"{grade:.0f}/{max_grade:.0f} {questions})"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "students"
-msgstr ""
+msgstr "étudiants"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "questions"
-msgstr ""
+msgstr "questions"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid ""
 "{num_students} student(s) opened Subsection {subsection_num}: "
 "{subsection_name}"
 msgstr ""
+"{num_students} étudiant(s) ont ouvert la sous-section {subsection_num}: "
+"{subsection_name}"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid ""
 "{problem_info_x} {problem_info_n} - {count_grade} {students} "
 "({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
 msgstr ""
+"{problem_info_x} {problem_info_n} - {count_grade} {students} "
+"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
 
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
@@ -1485,7 +1497,7 @@ msgstr "Impossible d'obtenir le log git"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "git clone or pull failed!"
-msgstr ""
+msgstr "Echec de git clone ou pull !"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to run import command."
@@ -1665,7 +1677,7 @@ msgstr "Dossier/ID"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Git Commit"
-msgstr ""
+msgstr "Git Commit"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Last Change"
@@ -2558,6 +2570,10 @@ msgid ""
 "            Possible fix: retry the payment after 15 minutes.\n"
 "            "
 msgstr ""
+"\n"
+"Le codeD'ReferenceMarchand envoyé avec cette demande d'autorisation correspond à \n"
+"le codeD'ReferenceMarchand d'un autre demande d'autorisation que vous avez envoyé dans les 15 dernières minutes. \n"
+"Solution possible: réessayer le paiement après 15 minutes."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2619,6 +2635,9 @@ msgid ""
 "            Possible fix: retry with another form of payment\n"
 "            "
 msgstr ""
+"\n"
+"Baisse générale de la carte. Aucune autre information fournie par la banque émettrice.\n"
+"Solution possible: réessayer avec une autre forme de paiement"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2743,6 +2762,8 @@ msgid ""
 "            You requested a capture through the API, but there is no corresponding, unused authorization record.\n"
 "            "
 msgstr ""
+"\n"
+"Vous avez demandé une capture via l'API, mais il n'y a pas d'autorisation correspondant qui n'est pas utilisé."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The transaction has already been settled or reversed."
@@ -2755,6 +2776,9 @@ msgid ""
 "            submitted to your processor. Or, you requested a void for a type of transaction that cannot be voided.\n"
 "            "
 msgstr ""
+"\n"
+"La capture ou crédit n'est pas annulable, car il a déjà été \n"
+"soumis à votre processeur. Ou, vous avez demandé d'annuler une opération qui ne peut être annulée."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "You requested a credit for a capture that was previously voided"
@@ -3109,8 +3133,11 @@ msgstr "Enregistrer les modifications"
 msgid "Preview"
 msgstr "Aperçu"
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a control to allow users to exit out of this modal
 #. interface (a menu or piece of UI that takes the full focus of the screen)
+#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/forgot_password_modal.html
@@ -3136,8 +3163,13 @@ msgstr "Aperçu du wiki"
 #: lms/templates/dashboard.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
+#, fuzzy
 msgid "modal open"
 msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"ouverture modale\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"ouverture modale "
 
 #: lms/templates/wiki/edit.html
 msgid "Back to editor"
@@ -4717,7 +4749,7 @@ msgstr "Connectez vous à votre compte {platform_name}"
 
 #: lms/templates/login.html
 msgid "Log into My {platform_name} Account"
-msgstr ""
+msgstr "Connexion à mon compte {platform_name}"
 
 #: lms/templates/login.html lms/templates/login_modal.html
 msgid "Access My Courses"
@@ -5441,7 +5473,7 @@ msgstr "Encadrement et Inscriptions"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Logs"
-msgstr ""
+msgstr "Journaux Git"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "User Management"
@@ -5490,7 +5522,7 @@ msgstr "Administrer les cours"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo location"
-msgstr ""
+msgstr "Emplacement du Repo"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
@@ -5529,11 +5561,11 @@ msgstr "Action Git"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for"
-msgstr ""
+msgstr "Activités récente de la charge git pour"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "git action"
-msgstr ""
+msgstr "action git"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -5665,6 +5697,8 @@ msgid ""
 "Activating an item in this group will spool the video to the corresponding "
 "time point. To skip transcript, go to previous item."
 msgstr ""
+"Activer un élément dans ce groupe jouera la vidéo à partir du point temporel"
+" correspondant. Pour ignorer le sous-titrage, allez à l'élément précédent."
 
 #: lms/templates/video.html
 msgid "Go back to start of transcript."
@@ -6013,7 +6047,7 @@ msgstr "Afficher la calculatrice"
 
 #: lms/templates/courseware/courseware.html
 msgid "Calculator Input Field"
-msgstr ""
+msgstr "Champ de saisie de la Calculatrice"
 
 #: lms/templates/courseware/courseware.html
 msgid ""
@@ -6041,11 +6075,11 @@ msgstr "Notation scientifique"
 
 #: lms/templates/courseware/courseware.html
 msgid "Appending SI postfixes"
-msgstr ""
+msgstr "Ajout des suffixes SI"
 
 #: lms/templates/courseware/courseware.html
 msgid "Supported SI postfixes"
-msgstr ""
+msgstr "Suffixes SI supportés"
 
 #: lms/templates/courseware/courseware.html
 msgid "Operators"
@@ -6053,7 +6087,7 @@ msgstr "Opérateurs"
 
 #: lms/templates/courseware/courseware.html
 msgid "parallel resistors function"
-msgstr ""
+msgstr "fonction des résistances parralèles"
 
 #: lms/templates/courseware/courseware.html
 msgid "Functions"
@@ -6093,7 +6127,7 @@ msgstr "Calculer"
 
 #: lms/templates/courseware/courseware.html
 msgid "Calculator Output Field"
-msgstr ""
+msgstr "Champ de sortie de la Calculatrice"
 
 #: lms/templates/courseware/grade_summary.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6173,7 +6207,7 @@ msgstr "Gestion des groupes"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Metrics"
-msgstr ""
+msgstr "Métriques"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
@@ -6341,6 +6375,8 @@ msgid ""
 "Community TAs: have forum moderator privileges, and their posts are labelled"
 " 'Community TA'."
 msgstr ""
+"Community TA: Ils ont les privilèges des modérateurs du forum, et leurs "
+"messages sont labellisés avec un 'Community TA'."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Enrollment Data"
@@ -6520,7 +6556,7 @@ msgstr "Points gagnés (nombre d'étudiants)"
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "There is no data available to display at this time."
-msgstr ""
+msgstr "Il n'y a pas de données disponibles pour l'instant."
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -6528,26 +6564,28 @@ msgid ""
 "Loading the latest graphs for you; depending on your class size, this may "
 "take a few minutes."
 msgstr ""
+"Chargement des graphiques à jour ; en fonction de la taille de votre classe,"
+" cela peut prendre plusieurs minutes."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Count of Students that Opened a Subsection"
-msgstr ""
+msgstr "Nombre d'étudiants qui ont ouvert une sous-section"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Loading..."
-msgstr ""
+msgstr "Chargement en cours..."
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Grade Distribution per Problem"
-msgstr ""
+msgstr "Répartition des notes par problème"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "There are no problems in this section."
-msgstr ""
+msgstr "Cette section ne contient pas de problèmes."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students answering correctly"
@@ -6691,6 +6729,8 @@ msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
 msgstr ""
+"Les derniers détails du cours sont en cours de préparation. Votre note "
+"finale sera disponible sous peu."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -6761,10 +6801,12 @@ msgid ""
 "This link will open/download a PDF document of your verified "
 "{cert_name_long}."
 msgstr ""
+"Ce lien ouvrira/téléchargera un document PDF contenant votre "
+"{cert_name_long} vérifié."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Download Your ID Verified {cert_name_short} (PDF)"
-msgstr ""
+msgstr "Télécharger votre {cert_name_short} vérifié (PDF)"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
@@ -6993,7 +7035,7 @@ msgstr "Filtrer les sujets"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "filter topics"
-msgstr ""
+msgstr "filtrer les sujets"
 
 #: lms/templates/discussion/_filter_dropdown.html
 #: lms/templates/discussion/_new_post.html
@@ -7081,7 +7123,7 @@ msgstr "Filtrer la liste"
 
 #: lms/templates/discussion/_new_post.html
 msgid "Filter discussion areas"
-msgstr ""
+msgstr "Filtrer les zones de discussion"
 
 #: lms/templates/discussion/_recent_active_posts.html
 msgid "Following"
@@ -7195,7 +7237,7 @@ msgstr "Epinglé"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "(this post is about %(courseware_title_linked)s)"
-msgstr ""
+msgstr "(ce message concerne %(courseware_title_linked)s)"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -7246,7 +7288,7 @@ msgstr "-posté il y a %(time_ago)s par"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing comment"
-msgstr ""
+msgstr "Commentaire en cours d'édition"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Update comment"
@@ -7282,7 +7324,7 @@ msgstr "Trouver des discussions"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Focus in on specific topics"
-msgstr ""
+msgstr "Se concentrer sur des sujets spécifiques."
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Search for specific posts "
@@ -7518,7 +7560,7 @@ msgstr "Le cours est-il terminé ?"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
-msgstr ""
+msgstr "Seuils de notation:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -7641,6 +7683,10 @@ msgid ""
 "you cannot use this tool to make an assignment due earlier for a particular "
 "student."
 msgstr ""
+"Dans cette section, vous avez la possibilité d'accorder une prolongation "
+"pour des unités spécifiques à certains étudiants. Veuillez noter que la "
+"dernière date est toujours prise : vous ne pouvez utiliser cet outil pour "
+"assigner une date d'échéance anticipée à un étudiant."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -7662,19 +7708,23 @@ msgstr "Changer l'échéance pour l'étudiant"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Viewing granted extensions"
-msgstr ""
+msgstr "Visualisation des prolongations accordées"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
 "Here you can see what extensions have been granted on particular units or "
 "for a particular student."
 msgstr ""
+"Ici, vous pouvez consulter les prolongations qui ont été attribuées pour "
+"certaines unités, ou à un étudiant spécifique."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
 "Choose a graded unit and click the button to obtain a list of all students "
 "who have extensions for the given unit."
 msgstr ""
+"Choisissez une unité notée, et cliquez sur le bouton pour obtenir la liste "
+"de tous les étudiants ayant une prolongation pour cette unité."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List all students with due date extensions"
@@ -7689,11 +7739,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List date extensions for student"
-msgstr ""
+msgstr "Afficher les prolongations d'échéance pour l'étudiant"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Resetting extensions"
-msgstr ""
+msgstr "Remise à zéro des prolongations"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
@@ -7701,6 +7751,9 @@ msgid ""
 "on a particular unit. This will revert the due date for the student back to "
 "the problem's original due date."
 msgstr ""
+"La remise à zéro de la date d'échéance d'un exercice annule la prolongation "
+"de la date d'échéance d'un étudiant sur une unité donnée. La date d'échéance"
+" de l'étudiant deviendra alors la date d'échéance initiale de l'exercice."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
@@ -7883,14 +7936,19 @@ msgid ""
 " close and re-open threads, endorse responses, and see posts from all "
 "cohorts. Their posts are marked 'Community TA'."
 msgstr ""
+"Les community AS sont des membres de la communauté qui ont été "
+"particulièrement utiles sur les forums. Ils peuvent éditer ou supprimer "
+"n'importe quel message, effacer les indicateurs inappropriés, fermer et "
+"rouvrir des sujets, approuver des réponses, et voir les messages de tous les"
+" groupes. Leurs messages sont marqués comme 'Community TA'."
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
-msgstr ""
+msgstr "Rafraîchissement des graphiques"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Count of Students Opened a Subsection"
-msgstr ""
+msgstr "Nombre d'étudiants qui ont ouvert une sous-section"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -8138,6 +8196,15 @@ msgid ""
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
 msgstr ""
+"\n"
+"{p_tag}Vous n'avez actuellement pas d'évaluation par les pairs à faire.  Pour avoir des évaluation par des pairs à faire:\n"
+"{ul_tag}\n"
+"{li_tag}Vous devez avoir envoyé une réponse à une question évaluée par des pairs.{end_li_tag}\n"
+"{li_tag}L'enseignant a besoin d'évaluer les essais qui sont utilisés pour vous aider à mieux comprendre les \n"
+"critères d'évaluations.{end_li_tag}\n"
+"{li_tag} Il doit y avoir des soumissions en attente d'une évaluation.{end_li_tag}\n"
+"{end_ul_tag}\n"
+"{end_p_tag}\n"
 
 #: lms/templates/peer_grading/peer_grading.html
 #: lms/templates/peer_grading/peer_grading_closed.html
@@ -8344,7 +8411,7 @@ msgstr "Télécharger les données CSV"
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "These reports are delimited by start and end dates."
-msgstr ""
+msgstr "Ces rapports sont délimités par les dates de début et de fin."
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "Start Date: "
@@ -8360,6 +8427,9 @@ msgid ""
 "generating a report with 'Start Letter' A and 'End Letter' C will generate "
 "reports for all universities starting with A, B, and C."
 msgstr ""
+"Ces rapports sont délimités alphabétiquement par le nom de l'université. Par"
+" exemple, générer un rapport avec la 'Start Letter' A et la 'End Letter' C "
+"va générer des rapports pour toutes les universités commençant par A,B ou C."
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "Start Letter: "
@@ -8642,7 +8712,7 @@ msgstr ""
 
 #: lms/templates/static_templates/embargo.html
 msgid "This Course Unavailable In Your Country"
-msgstr ""
+msgstr "Ce cours n'est pas disponible dans votre pays"
 
 #: lms/templates/static_templates/embargo.html
 msgid ""
@@ -8653,6 +8723,12 @@ msgid ""
 "free to browse our catalogue to find other courses you may be interested in "
 "taking."
 msgstr ""
+"Notre système a détecté que vous tentez d'accéder à un cours edX depuis une "
+"adresse IP associée à un pays faisant actuellement l'objet de sanctions "
+"économiques des Etats-Unis. Malheureusement, edX doit se conformer aux "
+"mesures de contrôle d'export, et nous ne pouvons vous permettre d'accéder à "
+"ce cours. Vous pouvez consulter notre catalogue pour trouver d'autres cours "
+"susceptibles de vous intéresser."
 
 #: lms/templates/static_templates/honor.html
 #: lms/templates/static_templates/honor.html
@@ -9232,6 +9308,10 @@ msgid ""
 " be able to correct a failed verification</strong>. If you think there was "
 "an error in the review, please contact us at {email}"
 msgstr ""
+"A cause du faible laps de temps depuis que la revérification est ouverte, "
+"vous <strong> n'êtes pas capable de corriger une mauvaise "
+"vérification</strong>. Si vous pensez qu'il y a une erreur dans cette revue,"
+" veuillez nous contacter à {email}"
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Re-Verification"
@@ -9550,6 +9630,10 @@ msgid ""
 "status within 1-2 days. In the meantime, you still have access to all of "
 "your course content."
 msgstr ""
+"Nous avons obtenu vos nouvelles informations et nous allons les passer en "
+"revue sous peu pour vérifier votre identité. Vous devriez recevoir une mise "
+"à jour de votre statut dans les 1-2 jours. Entre temps, vous avez toujours "
+"accès à tout le contenu de votre cours."
 
 #: lms/templates/verify_student/reverification_confirmation.html
 #: lms/templates/verify_student/reverification_window_expired.html
@@ -9692,11 +9776,15 @@ msgstr ""
 msgid ""
 "Missing something? You can always continue to audit this course instead."
 msgstr ""
+"Quelque chose de manquant? Vous pouvez toujours continuer à vérifier ce "
+"cours à la place."
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
 "Missing something? You can always {a_start}audit this course instead{a_end}"
 msgstr ""
+"Quelque chose de manquant? Vous pouvez toujours {a_start}vérifier ce cours à"
+" la place{a_end}"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Go to Step 1: Take my Photo"
@@ -12518,7 +12606,7 @@ msgstr ""
 
 #: wiki/models/urlpath.py
 msgid "Cache lookup value for articles"
-msgstr ""
+msgstr "Valeur de la recherche dans la cache pour les articles"
 
 #: wiki/models/urlpath.py
 msgid "slug"

@@ -1298,28 +1298,34 @@ msgid ""
 "{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
 "{grade:.0f}/{max_grade:.0f} {questions})"
 msgstr ""
+"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
+"{grade:.0f}/{max_grade:.0f} {questions})"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "students"
-msgstr ""
+msgstr "öğrenciler"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "questions"
-msgstr ""
+msgstr "sorular"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid ""
 "{num_students} student(s) opened Subsection {subsection_num}: "
 "{subsection_name}"
 msgstr ""
+"{num_students} sayıda öğrenci(ler) Altbölüm açtı {subsection_num}: "
+"{subsection_name}"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid ""
 "{problem_info_x} {problem_info_n} - {count_grade} {students} "
 "({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
 msgstr ""
+"{problem_info_x} {problem_info_n} - {count_grade} {students} "
+"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
 
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
@@ -6019,7 +6025,7 @@ msgstr "Grupları yönet"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Metrics"
-msgstr ""
+msgstr "Ölçümler"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
@@ -6365,7 +6371,7 @@ msgstr "Kazanılan Puanlar (Öğrenci Sayısı)"
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "There is no data available to display at this time."
-msgstr ""
+msgstr "Şu anda gösterilecek veri bulunmuyor."
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -6373,26 +6379,28 @@ msgid ""
 "Loading the latest graphs for you; depending on your class size, this may "
 "take a few minutes."
 msgstr ""
+"En son grafikler yükleniyor; sınıfınızın büyüklüğüne göre, bu bir kaç dakika"
+" alabilir."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Count of Students that Opened a Subsection"
-msgstr ""
+msgstr "Bir Altbölüm Açmış Öğrencilerin Sayısı"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Loading..."
-msgstr ""
+msgstr "Yüklüyor..."
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Grade Distribution per Problem"
-msgstr ""
+msgstr "Her Problem için Not Dağılımı"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "There are no problems in this section."
-msgstr ""
+msgstr "Bu bölümde problem bulunmamaktadır."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students answering correctly"
@@ -7722,11 +7730,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
-msgstr ""
+msgstr "Grafikleri Yeniden Yükle"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Count of Students Opened a Subsection"
-msgstr ""
+msgstr "Bir Altbölüm Açmış Öğrencilerin Sayısı"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -8475,7 +8483,7 @@ msgstr ""
 
 #: lms/templates/static_templates/embargo.html
 msgid "This Course Unavailable In Your Country"
-msgstr ""
+msgstr "Bu Ders Ülkenizde Sunulmamaktadır"
 
 #: lms/templates/static_templates/embargo.html
 msgid ""
