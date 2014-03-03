@@ -132,22 +132,6 @@ class VideoDescriptorTest(unittest.TestCase):
             field_data=DictFieldData({}),
         )
 
-    def test_get_context(self):
-        """"test get_context"""
-        correct_tabs = [
-            {
-                'name': "Basic",
-                'template': "video/transcripts.html",
-                'current': True
-            },
-            {
-                'name': 'Advanced',
-                'template': 'tabs/metadata-edit-tab.html'
-            }
-        ]
-        rendered_context = self.descriptor.get_context()
-        self.assertListEqual(rendered_context['tabs'], correct_tabs)
-
     def test_create_youtube_string(self):
         """
         Test that Youtube ID strings are correctly created when writing

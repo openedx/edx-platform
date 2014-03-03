@@ -51,7 +51,7 @@ def setUp(scenario):
     world.video_sequences = {}
 
 
-class ReuqestHandlerWithSessionId(object):
+class RequestHandlerWithSessionId(object):
     def get(self, url):
         """
         Sends a request.
@@ -449,7 +449,6 @@ def select_language(_step, code):
 def click_button(_step, button):
     world.css_click(VIDEO_BUTTONS[button])
 
-
 @step('I see video starts playing from "([^"]*)" position$')
 def start_playing_video_from_n_seconds(_step, position):
     world.wait_for(
@@ -522,7 +521,7 @@ def i_can_download_transcript(_step, format, text):
     }
 
     url = world.css_find(VIDEO_BUTTONS['download_transcript'])[0]['href']
-    request = ReuqestHandlerWithSessionId()
+    request = RequestHandlerWithSessionId()
     assert request.get(url).is_success()
     assert request.check_header('content-type', formats[format])
     assert (text.encode('utf-8') in request.content)

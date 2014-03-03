@@ -10,13 +10,18 @@ import json
 
 % for template_name in ["metadata-videolist-entry", "file-upload"]:
     <script type="text/template" id="${template_name}">
-        <%static:include path="js/transcripts/${template_name}.underscore" />
+        <%static:include path="js/video/transcripts/${template_name}.underscore" />
     </script>
 % endfor
 
 % for template_name in ["transcripts-found", "transcripts-uploaded", "transcripts-use-existing", "transcripts-not-found", "transcripts-replace", "transcripts-import", "transcripts-choose"]:
     <script type="text/template" id="${template_name}">
-        <%static:include path="js/transcripts/messages/${template_name}.underscore" />
+        <%static:include path="js/video/transcripts/messages/${template_name}.underscore" />
+    </script>
+% endfor
+% for template_name in ["metadata-translations-entry", "metadata-translations-item"]:
+    <script id="${template_name}" type="text/template">
+        <%static:include path="js/video/${template_name}.underscore" />
     </script>
 % endfor
 
@@ -27,7 +32,7 @@ import json
         [
             "domReady!",
             "jquery",
-            "js/views/transcripts/editor"
+            "js/views/video/transcripts/editor"
         ],
 
         function(doc, $, Editor) {

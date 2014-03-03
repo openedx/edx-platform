@@ -1,9 +1,9 @@
 define(
     [
         "jquery", "backbone", "underscore",
-        "js/views/transcripts/utils",
+        "js/views/video/transcripts/utils",
         "js/views/metadata", "js/collections/metadata",
-        "js/views/transcripts/metadata_videolist"
+        "js/views/video/transcripts/metadata_videolist"
     ],
 function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 

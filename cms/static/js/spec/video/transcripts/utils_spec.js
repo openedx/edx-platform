@@ -1,7 +1,7 @@
 define(
     [
         "jquery", "underscore",
-        "js/views/transcripts/utils",
+        "js/views/video/transcripts/utils",
         "underscore.string", "xmodule", "jasmine-jquery"
     ],
 function ($, _, Utils, _str) {

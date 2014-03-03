@@ -1,9 +1,9 @@
 define(
     [
         "jquery", "backbone", "underscore",
-        "js/views/transcripts/utils", "js/views/transcripts/editor",
+        "js/views/video/transcripts/utils", "js/views/video/transcripts/editor",
         "js/views/metadata", "js/models/metadata", "js/collections/metadata",
-        "underscore.string", "xmodule", "js/views/transcripts/metadata_videolist",
+        "underscore.string", "xmodule", "js/views/video/transcripts/metadata_videolist",
         "jasmine-jquery"
     ],
 function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCollection, _str) {

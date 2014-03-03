@@ -1,18 +1,18 @@
 define(
     [
         "jquery", "underscore",
-        "js/views/transcripts/utils", "js/views/transcripts/message_manager",
-        "js/views/transcripts/file_uploader", "sinon", "jasmine-jquery",
+        "js/views/video/transcripts/utils", "js/views/video/transcripts/message_manager",
+        "js/views/video/transcripts/file_uploader", "sinon", "jasmine-jquery",
         "xmodule"
     ],
 function ($, _, Utils, MessageManager, FileUploader, sinon) {
 
     describe('Transcripts.MessageManager', function () {
         var videoListEntryTemplate = readFixtures(
-                'transcripts/metadata-videolist-entry.underscore'
+                'video/transcripts/metadata-videolist-entry.underscore'
             ),
             foundTemplate = readFixtures(
-                'transcripts/messages/transcripts-found.underscore'
+                'video/transcripts/messages/transcripts-found.underscore'
             ),
             handlers = {
                 importHandler: ['replace', 'Error: Import failed.'],
