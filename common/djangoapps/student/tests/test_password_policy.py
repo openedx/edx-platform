@@ -87,7 +87,7 @@ class TestPasswordPolicy(TestCase):
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'LOWER': 3})
-    def test_password_not_enough_lowercase(self):
+    def test_password_enough_lowercase(self):
         self.url_params['password'] = 'ThisShouldPass'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)

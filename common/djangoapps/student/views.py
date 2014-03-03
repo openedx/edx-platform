@@ -30,6 +30,8 @@ from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.http import require_POST, require_GET
 
+from django.template.response import TemplateResponse
+
 from ratelimitbackend.exceptions import RateLimitException
 
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -39,7 +41,7 @@ from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
-    create_comments_service_user
+    create_comments_service_user, PasswordHistory
 )
 from student.forms import PasswordResetFormNoActive
 from student.firebase_token_generator import create_token
@@ -747,6 +749,15 @@ def login_user(request, error=""):
                 "value": _('This account has been temporarily locked due to excessive login failures. Try again later.'),
             })  # TODO: this should be status code 429  # pylint: disable=fixme
 
+    # see if the user must reset his/her password due to any policy settings
+    if PasswordHistory.should_user_reset_password_now(user_found_by_email_lookup):
+        return JsonResponse({
+            "success": False,
+            "value": _('Your password has expired due to password policy on this account. You must '
+                       'reset your password before you can log in again. Please click the '
+                       'Forgot Password" link on this page to reset your password before logging in again.'),
+        })  # TODO: this should be status code 403  # pylint: disable=fixme
+
     # if the user doesn't exist, we want to set the username to an invalid
     # username so that authentication is guaranteed to fail and we can take
     # advantage of the ratelimited backend
@@ -971,6 +982,7 @@ def _do_create_account(post_vars):
                 is_active=False)
     user.set_password(post_vars['password'])
     registration = Registration()
+
     # TODO: Rearrange so that if part of the process fails, the whole process fails.
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
     try:
@@ -989,6 +1001,11 @@ def _do_create_account(post_vars):
                 )
         else:
             raise
+
+    # add this account creation to password history
+    # NOTE, this will be a NOP unless the feature has been turned on in configuration
+    password_history_entry = PasswordHistory()
+    password_history_entry.create(user)
 
     registration.register(user)
 
@@ -1419,12 +1436,71 @@ def password_reset_confirm_wrapper(
         user.save()
     except (ValueError, User.DoesNotExist):
         pass
-    # we also want to pass settings.PLATFORM_NAME in as extra_context
 
-    extra_context = {"platform_name": settings.PLATFORM_NAME}
-    return password_reset_confirm(
-        request, uidb36=uidb36, token=token, extra_context=extra_context
-    )
+    # tie in password strength enforcement as an optional level of
+    # security protection
+    err_msg = None
+
+    if request.method == 'POST':
+        password = request.POST['new_password1']
+        if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+            try:
+                validate_password_length(password)
+                validate_password_complexity(password)
+                validate_password_dictionary(password)
+            except ValidationError, err:
+                err_msg = _('Password: ') + '; '.join(err.messages)
+
+        # also, check the password reuse policy
+        if not PasswordHistory.is_allowable_password_reuse(user, password):
+            if user.is_staff:
+                num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
+            else:
+                num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
+            err_msg = _("You are re-using a password that you have used recently. You must "
+                        "have {0} distinct password(s) before reusing a previous password.").format(num_distinct)
+
+        # also, check to see if passwords are getting reset too frequent
+        if PasswordHistory.is_password_reset_too_soon(user):
+            num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
+            err_msg = _("You are resetting passwords too frequently. Due to security policies, "
+                        "{0} day(s) must elapse between password resets").format(num_days)
+
+    if err_msg:
+        # We have an password reset attempt which violates some security policy, use the
+        # existing Django template to communicate this back to the user
+        context = {
+            'validlink': True,
+            'form': None,
+            'title': _('Password reset unsuccessful'),
+            'err_msg': err_msg,
+        }
+        return TemplateResponse(request, 'registration/password_reset_confirm.html', context)
+    else:
+        # we also want to pass settings.PLATFORM_NAME in as extra_context
+        extra_context = {"platform_name": settings.PLATFORM_NAME}
+
+        if request.method == 'POST':
+            # remember what the old password hash is before we call down
+            old_password_hash = user.password
+
+            result = password_reset_confirm(
+                request, uidb36=uidb36, token=token, extra_context=extra_context
+            )
+
+            # get the updated user
+            updated_user = User.objects.get(id=uid_int)
+
+            # did the password hash change, if so record it in the PasswordHistory
+            if updated_user.password != old_password_hash:
+                entry = PasswordHistory()
+                entry.create(updated_user)
+
+            return result
+        else:
+            return password_reset_confirm(
+                request, uidb36=uidb36, token=token, extra_context=extra_context
+            )
 
 
 def reactivation_email_for_user(user):
