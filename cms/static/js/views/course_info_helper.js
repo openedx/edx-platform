@@ -7,9 +7,10 @@ define(["codemirror", 'js/utils/handle_iframe_binding', "utility"],
                 mode: "text/html",
                 lineNumbers: true,
                 lineWrapping: true,
-                onChange: function () {
+                autoCloseTags: true
+            });
+            $codeMirror.on('change', function () {
                     $('.save-button').removeClass('is-disabled');
-                }
             });
             $codeMirror.setValue(content);
             $codeMirror.clearHistory();

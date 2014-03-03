@@ -838,7 +838,7 @@ PIPELINE_CSS = {
     },
     'style-course-vendor': {
         'source_filenames': [
-            'js/vendor/CodeMirror/codemirror.css',
+            'js/vendor/CodeMirror/codemirror-3.21.0.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
         ],
