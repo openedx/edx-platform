@@ -288,6 +288,14 @@ class InputTypeBase(object):
         html = self.capa_system.render_template(self.template, context)
         return etree.XML(html)
 
+    def get_user_visible_answer(self, internal_answer):
+        """
+        Given the internal representation of the answer provided by the user, return the representation of the answer
+        as the user saw it.  Subclasses should override this method if and only if the internal represenation of the
+        answer is different from the answer that is displayed to the user.
+        """
+        return internal_answer
+
 
 #-----------------------------------------------------------------------------
 
@@ -385,6 +393,7 @@ class ChoiceGroup(InputTypeBase):
             raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
 
         self.choices = self.extract_choices(self.xml)
+        self._choices_map = dict(self.choices)  # pylint: disable=attribute-defined-outside-init
 
     @classmethod
     def get_attributes(cls):
@@ -418,6 +427,12 @@ class ChoiceGroup(InputTypeBase):
                     % choice.tag)
             choices.append((choice.get("name"), stringify_children(choice)))
         return choices
+
+    def get_user_visible_answer(self, internal_answer):
+        if isinstance(internal_answer, basestring):
+            return self._choices_map[internal_answer]
+
+        return [self._choices_map[i] for i in internal_answer]
 
 
 #-----------------------------------------------------------------------------
@@ -1021,7 +1036,7 @@ class ChemicalEquationInput(InputTypeBase):
         """
         Can set size of text field.
         """
-        return [Attribute('size', '20'),             
+        return [Attribute('size', '20'),
                 Attribute('label', ''),]
 
     def _extra_context(self):
