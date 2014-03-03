@@ -274,7 +274,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         }
         return envelope
 
-    def get_courses(self, branch='published', qualifiers=None):
+    def get_courses(self, branch='draft', qualifiers=None):
         '''
         Returns a list of course descriptors matching any given qualifiers.
 
@@ -284,7 +284,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         Note, this is to find the current head of the named branch type
         (e.g., 'draft'). To get specific versions via guid use get_course.
 
-        :param branch: the branch for which to return courses. Default value is 'published'.
+        :param branch: the branch for which to return courses. Default value is 'draft'.
         :param qualifiers: a optional dict restricting which elements should match
         '''
         if qualifiers is None:

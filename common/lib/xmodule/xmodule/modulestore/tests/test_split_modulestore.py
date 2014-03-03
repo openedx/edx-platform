@@ -163,8 +163,6 @@ class SplitModuleCourseTests(SplitModuleTest):
                              "children")
 
         _verify_published_course(modulestore().get_courses(branch='published'))
-        # default for branch is 'published'.
-        _verify_published_course(modulestore().get_courses())
 
     def test_search_qualifiers(self):
         # query w/ search criteria
