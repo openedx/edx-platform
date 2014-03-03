@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-28 13:57-0800\n"
-"PO-Revision-Date: 2014-02-28 21:57:20.716655\n"
+"POT-Creation-Date: 2014-03-02 22:29-0500\n"
+"PO-Revision-Date: 2014-03-03 03:29:55.069887\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3750,6 +3750,7 @@ msgstr "Püßlïç Ûsérnämé Ⱡ'#"
 msgid "Preferred Language"
 msgstr "Préférréd Längüägé Ⱡ'σ#"
 
+#. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/unit_container_xblock_component.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "View"
@@ -4214,6 +4215,9 @@ msgstr ""
 msgid "Change your name"
 msgstr "Çhängé ýöür nämé Ⱡ'σ#"
 
+#. Translators: note that {platform} {cert_name_short} will look something
+#. like: "edX certificate". Please do not change the order of these
+#. placeholders.
 #: lms/templates/dashboard.html
 msgid ""
 "To uphold the credibility of your {platform} {cert_name_short}, all name "
@@ -4222,6 +4226,9 @@ msgstr ""
 "Tö üphöld thé çrédïßïlïtý öf ýöür {platform} {cert_name_short}, äll nämé "
 "çhängés wïll ßé löggéd änd réçördéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
+#. Translators: note that {platform} {cert_name_short} will look something
+#. like: "edX certificate". Please do not change the order of these
+#. placeholders.
 #: lms/templates/dashboard.html
 msgid ""
 "Enter your desired full name, as it will appear on your {platform} "
@@ -5746,10 +5753,20 @@ msgstr "Tögglé Füll Rüßrïç Ⱡ'σ#"
 msgid "{result_of_task} from grader {number}"
 msgstr "{result_of_task} fröm grädér {number} Ⱡ'σя#"
 
+#. Translators: "See full feedback" is the text of
+#. a link that allows a user to see more detailed
+#. feedback from a self, peer, or instructor
+#. graded openended problem
 #: lms/templates/combinedopenended/open_ended_result_table.html
 msgid "See full feedback"
 msgstr "Séé füll féédßäçk Ⱡ'σ#"
 
+#. Translators: this text forms a link that, when
+#. clicked, allows a user to respond to the feedback
+#. the user received on his or her openended problem
+#. Translators: when "Respond to Feedback" is clicked, a survey
+#. appears on which a user can respond to the feedback the user
+#. received on an openended problem
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Respond to Feedback"
@@ -6848,10 +6865,12 @@ msgstr "Vïéw Àrçhïvéd Çöürsé Ⱡ'σя#"
 msgid "View Course"
 msgstr "Vïéw Çöürsé Ⱡ#"
 
+#. Translators: The course's name will be added to the end of this sentence.
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Are you sure you want to unregister from"
 msgstr "Àré ýöü süré ýöü wänt tö ünrégïstér fröm Ⱡ'σяєм ιρѕυ#"
 
+#. Translators: The course's name will be added to the end of this sentence.
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -10314,6 +10333,7 @@ msgstr "Çöürsé Éxpört Ⱡ'#"
 msgid "About Exporting Courses"
 msgstr "Àßöüt Éxpörtïng Çöürsés Ⱡ'σяє#"
 
+#. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
 msgid ""
 "You can export courses and edit them outside of Studio. The exported file is"
@@ -10418,6 +10438,7 @@ msgstr ""
 msgid "Opening the downloaded file"
 msgstr "Öpénïng thé döwnlöädéd fïlé Ⱡ'σяєм#"
 
+#. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
 msgid ""
 "Use an archive program to extract the data from the .tar.gz file. Extracted "
@@ -10753,6 +10774,8 @@ msgstr ""
 "çürrént çöürsé, sö ýöü hävé ä ßäçküp çöpý öf ït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя #"
 
+#. Translators: ".tar.gz" is a file extension, and files with that extension
+#. are called "gzipped tar files": these terms should not be translated
 #: cms/templates/import.html
 msgid ""
 "The course that you import must be in a .tar.gz file (that is, a .tar file "
@@ -10777,6 +10800,8 @@ msgstr ""
 "ýöür çöürsé üntïl thé ïmpört öpérätïön häs çömplétéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
 " αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂#"
 
+#. Translators: ".tar.gz" is a file extension, and files with that extension
+#. are called "gzipped tar files": these terms should not be translated
 #: cms/templates/import.html
 msgid "Select a .tar.gz File to Replace Your Course Content"
 msgstr "Séléçt ä .tär.gz Fïlé tö Répläçé Ýöür Çöürsé Çöntént Ⱡ'σяєм ιρѕυм ∂σ#"
