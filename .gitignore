@@ -93,3 +93,11 @@ lms/lib/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
 dist
+
+edx-platform.sdf
+edx-platform.opensdf
+edx-platform.v11.suo
+edx-platform.sln
+edx-platform.vcxproj
+edx-platform.vcxproj.filters
+edx-platform.vcxproj.user
