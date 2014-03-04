@@ -162,6 +162,18 @@ class TestUserPartition(TestCase):
         with self.assertRaisesRegexp(TypeError, "has unexpected version"):
             user_partition = UserPartition.from_json(jsonified)
 
+        # Has extra key - should not be a problem
+        jsonified = {
+            'id': upid,
+            "name": upname,
+            "description": updesc,
+            "groups": [group.to_json() for group in groups],
+            "version": UserPartition.VERSION,
+            "programmer": "Cale"
+        }
+        user_partition = UserPartition.from_json(jsonified)
+        self.assertNotIn("programmer", user_partition.to_json())
+
 
 class StaticPartitionService(PartitionService):
     """

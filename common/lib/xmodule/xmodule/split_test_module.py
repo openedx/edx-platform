@@ -128,7 +128,7 @@ class SplitTestModule(SplitTestFields, XModule):
         fragment.add_content(self.system.render_template('split_test_staff_view.html', {
             'items': contents,
         }))
-        fragment.add_css('.split-test-child { display: none; }');
+        fragment.add_css('.split-test-child { display: none; }')
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_staff.js'))
         fragment.initialize_js('ABTestSelector')
         return fragment
@@ -156,7 +156,7 @@ class SplitTestModule(SplitTestFields, XModule):
             return fragment
 
     @XBlock.handler
-    def log_child_render(self, request, suffix=''):
+    def log_child_render(self, request, suffix=''):  # pylint: disable=unused-argument
         """
         Record in the tracking logs which child was rendered
         """

@@ -72,16 +72,8 @@ class SplitTestModuleTest(XModuleXmlImportTest):
 
     @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))
     @ddt.unpack
-    def test_child_old_tag_value(self, user_tag, child_url_name):
+    def test_child_old_tag_value(self, user_tag, child_url_name):  # pylint: disable=unused-argument
         # If user_tag has a stale value, we should still get back a valid child url
         self.tags_service.get_tag.return_value = '2'
-
-        self.assertIn(self.split_test_descriptor.child_descriptor.url_name, ['split_test_cond0', 'split_test_cond1'])
-
-    @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))
-    @ddt.unpack
-    def test_test(self, user_tag, child_url_name):
-        self.runtime.service(self, 'partitions').get_user_group_for_partition.return_value = 7
-        self.tags_service.get_tag.return_value = user_tag
 
         self.assertIn(self.split_test_descriptor.child_descriptor.url_name, ['split_test_cond0', 'split_test_cond1'])
