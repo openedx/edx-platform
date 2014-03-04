@@ -49,6 +49,119 @@ class TestGroup(TestCase):
         self.assertEqual(group.id, test_id)
         self.assertEqual(group.name, name)
 
+    def test_from_json_broken(self):
+        test_id = 5
+        name = "Grendel"
+        # Bad version
+        jsonified = {
+            "id": test_id,
+            "name": name,
+            "version": 9001
+        }
+        with self.assertRaisesRegexp(TypeError, "has unexpected version"):
+            group = Group.from_json(jsonified)
+
+        # Missing key "id"
+        jsonified = {
+            "name": name,
+            "version": Group.VERSION
+        }
+        with self.assertRaisesRegexp(TypeError, "missing value key 'id'"):
+            group = Group.from_json(jsonified)
+
+        # Has extra key - should not be a problem
+        jsonified = {
+            "id": test_id,
+            "name": name,
+            "version": Group.VERSION,
+            "programmer": "Cale"
+        }
+        group = Group.from_json(jsonified)
+        self.assertNotIn("programmer", group.to_json())
+
+
+class TestUserPartition(TestCase):
+    """Test constructing UserPartitions"""
+    def test_construct(self):
+        groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
+        user_partition = UserPartition(0, 'Test Partition', 'for testing purposes', groups)
+        self.assertEqual(user_partition.id, 0)
+        self.assertEqual(user_partition.name, "Test Partition")
+        self.assertEqual(user_partition.description, "for testing purposes")
+        self.assertEqual(user_partition.groups, groups)
+
+    def test_string_id(self):
+        groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
+        user_partition = UserPartition("70", 'Test Partition', 'for testing purposes', groups)
+        self.assertEqual(user_partition.id, 70)
+
+    def test_to_json(self):
+        groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
+        upid = 0
+        upname = "Test Partition"
+        updesc = "for testing purposes"
+        user_partition = UserPartition(upid, upname, updesc, groups)
+
+        jsonified = user_partition.to_json()
+        act_jsonified = {
+            "id": upid,
+            "name": upname,
+            "description": updesc,
+            "groups": [group.to_json() for group in groups],
+            "version": user_partition.VERSION
+        }
+        self.assertEqual(jsonified, act_jsonified)
+
+    def test_from_json(self):
+        groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
+        upid = 1
+        upname = "Test Partition"
+        updesc = "For Testing Purposes"
+
+        jsonified = {
+            "id": upid,
+            "name": upname,
+            "description": updesc,
+            "groups": [group.to_json() for group in groups],
+            "version": UserPartition.VERSION
+        }
+        user_partition = UserPartition.from_json(jsonified)
+        self.assertEqual(user_partition.id, upid)
+        self.assertEqual(user_partition.name, upname)
+        self.assertEqual(user_partition.description, updesc)
+        for act_group in user_partition.groups:
+            self.assertIn(act_group.id, [0, 1])
+            exp_group = groups[act_group.id]
+            self.assertEqual(exp_group.id, act_group.id)
+            self.assertEqual(exp_group.name, act_group.name)
+
+    def test_from_json_broken(self):
+        groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
+        upid = 1
+        upname = "Test Partition"
+        updesc = "For Testing Purposes"
+
+        # Missing field
+        jsonified = {
+            "name": upname,
+            "description": updesc,
+            "groups": [group.to_json() for group in groups],
+            "version": UserPartition.VERSION
+        }
+        with self.assertRaisesRegexp(TypeError, "missing value key 'id'"):
+            user_partition = UserPartition.from_json(jsonified)
+
+        # Wrong version (it's over 9000!)
+        jsonified = {
+            'id': upid,
+            "name": upname,
+            "description": updesc,
+            "groups": [group.to_json() for group in groups],
+            "version": 9001
+        }
+        with self.assertRaisesRegexp(TypeError, "has unexpected version"):
+            user_partition = UserPartition.from_json(jsonified)
+
 
 class StaticPartitionService(PartitionService):
     """
