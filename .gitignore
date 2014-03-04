@@ -94,6 +94,7 @@ autodeploy.properties
 .ws_migrations_complete
 dist
 
+<<<<<<< HEAD
 edx-platform.sdf
 edx-platform.opensdf
 edx-platform.v11.suo
@@ -101,3 +102,8 @@ edx-platform.sln
 edx-platform.vcxproj
 edx-platform.vcxproj.filters
 edx-platform.vcxproj.user
+=======
+.settings/org.eclipse.core.resources.prefs
+*.pydevproject
+*.project
+>>>>>>> .gitignore update
