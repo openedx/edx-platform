@@ -47,13 +47,15 @@ xblock_info = {
     <header class="mast has-actions has-navigation">
         <h1 class="page-header">
             <small class="navigation navigation-parents">
-                <%
-                parent_url = xblock_studio_url(parent_xblock, context_course)
-                %>
-                % if parent_url:
-                <a href="${parent_url}"
-                   class="navigation-link navigation-parent">${parent_xblock.display_name | h}</a>
-                % endif
+                % for parent in parent_xblocks:
+                    <%
+                    parent_url = xblock_studio_url(parent, context_course)
+                    %>
+                    % if parent_url:
+                    <a href="${parent_url}"
+                       class="navigation-link navigation-parent">${parent.display_name | h}</a>
+                    % endif
+                % endfor
                 <a href="#" class="navigation-link navigation-current">${xblock.display_name | h}</a>
             </small>
         </h1>

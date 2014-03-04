@@ -310,13 +310,20 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
             old_location, course, xblock, __ = _get_item_in_course(request, locator)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
-        parent_xblock = get_parent_xblock(xblock)
+
+        parent_xblocks = []
+        parent = get_parent_xblock(xblock)
+        while parent and parent.category != 'sequential':
+            parent_xblocks.append(parent)
+            parent = get_parent_xblock(parent)
+
+        parent_xblocks.reverse()
 
         return render_to_response('container.html', {
             'context_course': course,
             'xblock': xblock,
             'xblock_locator': locator,
-            'parent_xblock': parent_xblock,
+            'parent_xblocks': parent_xblocks,
         })
     else:
         return HttpResponseBadRequest("Only supports html requests")
