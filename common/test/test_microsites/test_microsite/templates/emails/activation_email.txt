@@ -5,9 +5,9 @@ ${_("Thank you for signing up for Open edX! To activate "
 "browser's address bar:")}
 
 % if is_secure:
-  https://${ site }/activate/${ key }
+  https://edx.saylor.org/activate/${ key }
 % else:
-  http://${ site }/activate/${ key }
+  http://edx.saylor.org/activate/${ key }
 % endif
 
 ${_("If you didn't request this, you don't need to do anything; you won't "
