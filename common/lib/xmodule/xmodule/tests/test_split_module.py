@@ -43,6 +43,15 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         course_seq = self.course.get_children()[0]
         self.module_system = get_test_system()
 
+        def get_module(descriptor):
+            module_system = get_test_system()
+            module_system.get_module = get_module
+            descriptor.bind_for_student(module_system, descriptor._field_data)
+            return descriptor
+
+        self.module_system.get_module = get_module
+        self.module_system.descriptor_system = self.course.runtime
+
         self.tags_service = Mock(name='user_tags')
         self.module_system._services['user_tags'] = self.tags_service  # pylint: disable=protected-access
 
@@ -57,18 +66,16 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         )
         self.module_system._services['partitions'] = self.partitions_service  # pylint: disable=protected-access
 
-        self.split_test_descriptor = course_seq.get_children()[0]
-        self.split_test_descriptor.bind_for_student(
-            self.module_system,
-            self.split_test_descriptor._field_data  # pylint: disable=protected-access
-        )
+        self.split_test_module = course_seq.get_children()[0]
+        self.split_test_module.bind_for_student(self.module_system, self.split_test_module._field_data)
+
 
     @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))
     @ddt.unpack
     def test_child(self, user_tag, child_url_name):
         self.tags_service.get_tag.return_value = user_tag
 
-        self.assertEquals(self.split_test_descriptor.child_descriptor.url_name, child_url_name)
+        self.assertEquals(self.split_test_module.child_descriptor.url_name, child_url_name)
 
     @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))
     @ddt.unpack
@@ -76,4 +83,10 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         # If user_tag has a stale value, we should still get back a valid child url
         self.tags_service.get_tag.return_value = '2'
 
-        self.assertIn(self.split_test_descriptor.child_descriptor.url_name, ['split_test_cond0', 'split_test_cond1'])
+        self.assertIn(self.split_test_module.child_descriptor.url_name, ['split_test_cond0', 'split_test_cond1'])
+
+    @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))
+    @ddt.unpack
+    def test_get_html(self, user_tag, child_url_name):
+        self.tags_service.get_tag.return_value = user_tag
+        self.module_system.render(self.split_test_module, 'student_view').content
