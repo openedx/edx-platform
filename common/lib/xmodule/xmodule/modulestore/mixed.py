@@ -353,7 +353,8 @@ class MixedModuleStore(ModuleStoreWriteBase):
         elif isinstance(store, SplitMongoModuleStore):
             if isinstance(course_or_parent_loc, basestring):  # course_id
                 course_or_parent_loc = loc_mapper().translate_location_to_course_locator(
-                    course_or_parent_loc, None
+                    # hardcode draft version until we figure out how we're handling branches from app
+                    course_or_parent_loc, None, published=False
                 )
             elif not isinstance(course_or_parent_loc, CourseLocator):
                 raise ValueError(u"Cannot create a child of {} in split. Wrong repr.".format(course_or_parent_loc))
@@ -363,9 +364,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
             fields.update(kwargs.pop('metadata', {}))
             fields.update(kwargs.pop('definition_data', {}))
             kwargs['fields'] = fields
-
-            if not kwargs.get('block_id', False) and getattr(location, 'name', False):
-                kwargs['block_id'] = getattr(location, 'name')
 
             xblock = store.create_item(course_or_parent_loc, category, user_id, **kwargs)
         else:

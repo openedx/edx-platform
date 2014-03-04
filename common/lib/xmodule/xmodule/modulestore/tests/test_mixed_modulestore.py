@@ -141,15 +141,6 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.store = MixedModuleStore(**self.options)
         self.addCleanup(self.store.close_all_connections)
 
-        def generate_location(course_id):
-            """
-            Generate the locations for the given ids
-            """
-            course_dict = Location.parse_course_id(course_id)
-            course_dict['tag'] = 'i4x'
-            course_dict['category'] = 'course'
-            return Location(course_dict)
-
         self.course_locations = {
             course_id: generate_location(course_id)
             for course_id in [self.MONGO_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
@@ -351,6 +342,32 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         else:
             self.assertEqual(found_orphans, [unicode(orphan.location)])
 
+    @ddt.data('split')
+    def test_create_item_from_course_id(self, default_ms):
+        """
+        Test code paths missed by the above:
+        * passing an old-style course_id which has a loc map to split's create_item
+        """
+        self.initdb(default_ms)
+        # create loc_map entry
+        loc_mapper().translate_location(self.MONGO_COURSEID, generate_location(self.MONGO_COURSEID))
+        orphan = self.store.create_item(self.MONGO_COURSEID, 'problem', block_id='orphan')
+        self.assertEqual(
+            orphan.location.version_agnostic().as_course_locator(),
+            self.course_locations[self.MONGO_COURSEID].as_course_locator()
+        )
+
+    @ddt.data('direct')
+    def test_create_item_from_parent_location(self, default_ms):
+        """
+        Test a code path missed by the above: passing an old-style location as parent but no
+        new location for the child
+        """
+        self.initdb(default_ms)
+        self.store.create_item(self.course_locations[self.MONGO_COURSEID], 'problem', block_id='orphan')
+        orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID], None)
+        self.assertEqual(len(orphans), 0, "unexpected orphans: {}".format(orphans))
+
 #=============================================================================================================
 # General utils for not using django settings
 #=============================================================================================================
@@ -378,3 +395,13 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
         doc_store_config=doc_store_config,
         **options
     )
+
+
+def generate_location(course_id):
+    """
+    Generate the locations for the given ids
+    """
+    course_dict = Location.parse_course_id(course_id)
+    course_dict['tag'] = 'i4x'
+    course_dict['category'] = 'course'
+    return Location(course_dict)
