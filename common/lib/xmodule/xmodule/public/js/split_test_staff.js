@@ -7,20 +7,18 @@
 function ABTestSelector(runtime, elem) {
     var _this = this;
     _this.elem = $(elem);
+    _this.children = _this.elem.find('.split-test-child');
+    _this.content_container = _this.elem.find('.split-test-child-container');
 
     function select_child(group_id) {
         // iterate over all the children and hide all the ones that haven't been selected
         // and show the one that was selected
-        _this.elem.find('.split-test-child').each(function() {
+        _this.children.each(function() {
             // force this id to remain a string, even if it looks like something else
-            child_group_id = $(this).data('group-id').toString();
+            var child_group_id = $(this).data('group-id').toString();
             if(child_group_id === group_id) {
-                $(this).show();
+                _this.content_container.html($(this).text());
             }
-            else {
-                $(this).hide();
-            }
-
         });
     }
 

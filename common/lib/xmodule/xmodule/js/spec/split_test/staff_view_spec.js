@@ -8,14 +8,10 @@ describe('Tests for split_test staff view switching', function() {
     });
 
     it("test that we have only one visible condition", function() {
-        var num_visible = 0;
-        elem.find('.split-test-child').each(function() {
-            if($(this).is(':visible')) {
-                num_visible++;
-            }
-        });
-        expect(num_visible).toEqual(1);
-
+        var containers = elem.find('.split-test-child-container').length;
+        var conditions_shown = elem.find('.split-test-child-container .condition-text').length;
+        expect(containers).toEqual(1);
+        expect(conditions_shown).toEqual(1);
     });
 
     it("test that the right child is visible when selected", function() {
@@ -24,14 +20,8 @@ describe('Tests for split_test staff view switching', function() {
         for(var i = 0; i < groups.length; i++) {
             var to_select = groups[i];
             elem.find('.split-test-select').val(to_select).change();
-            elem.find('.split-test-child').each(function() {
-                if($(this).data('group-id').toString() === to_select) {
-                    expect($(this).is(':visible')).toBeTruthy();
-                }
-                else {
-                    expect($(this).is(':visible')).toBeFalsy();
-                }
-            });
+            var child_text = elem.find('.split-test-child-container .condition-text').text();
+            expect(child_text).toContain(to_select);
         }
 
     });
