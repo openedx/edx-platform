@@ -36,7 +36,7 @@ class SplitTestFields(object):
                              "group_id should see",
                              scope=Scope.content)
 
-    
+
 @XBlock.needs('user_tags')
 @XBlock.needs('partitions')
 class SplitTestModule(SplitTestFields, XModule):
@@ -82,14 +82,20 @@ class SplitTestModule(SplitTestFields, XModule):
 
     def get_content_titles(self):
         """
-        Return's the split_test module's content titles as a list.
+        Returns list of content titles for split_test's child.
 
-        This overwrites the get_content_title method included in x_module by default.
+        This overwrites the get_content_titles method included in x_module by default.
 
-        For split_test modules, we don't want to get our own content title; we want
-        the content title of the child that actually gets displayed to the user.
+        WHY THIS OVERWRITE IS NECESSARY: If we fetch *all* of split_test's children,
+        we'll end up getting all of the possible conditions users could ever see.
+        Ex: If split_test shows a video to group A and HTML to group B, the
+        regular get_content_titles in x_module will get the title of BOTH the video
+        AND the HTML.
 
+        We only want the content titles that should actually be displayed to the user.
 
+        split_test's .child property contains *only* the child that should actually
+        be shown to the user, so we call get_content_titles() on only that child.
         """
         if self.child.display_name is None:
             return []

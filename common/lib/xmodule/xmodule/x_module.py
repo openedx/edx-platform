@@ -221,12 +221,26 @@ class XModuleMixin(XBlockMixin):
         """
         Returns list of content titles for all of self's children.
 
-        Useful in the seq_module, which needs the content titles for each vertical.
+                         SEQUENCE
+                            |
+                         VERTICAL
+                        /        \
+                 SPLIT_TEST      DISCUSSION
+                /        \
+           VIDEO A      VIDEO B
+
+        Essentially, this function returns a list of display_names (e.g. content titles)
+        for all of the leaf nodes.  In the diagram above, calling get_content_titles on
+        SEQUENCE would return the display_names of `VIDEO A`, `VIDEO B`, and `DISCUSSION`.
+
+        This is most obviously useful for sequence_modules, which need this list to display
+        tooltips to users, though in theory this should work for any tree that needs
+        the display_names of all its leaf nodes.
         """
         if self.has_children:
             return sum((child.get_content_titles() for child in self.get_children()), [])
         else:
-            if self.display_name == None:
+            if self.display_name is None:
                 return []
             else:
                 return [self.display_name]
