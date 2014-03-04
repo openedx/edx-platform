@@ -15,6 +15,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from uuid import uuid4
 from xmodule.modulestore.mongo.base import MongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
+from xmodule.exceptions import UndefinedContext
 
 log = logging.getLogger(__name__)
 
@@ -207,9 +208,10 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         Get the course_id from the block or from asking its store. Expensive.
         """
-        # HACK: check xmodule_runtime to avoid an assertion error
-        if block.xmodule_runtime is not None and block.course_id is not None:
+        try:
             return block.course_id
+        except UndefinedContext:
+            pass
         try:
             course = store._get_course_for_item(block.scope_ids.usage_id)
             if course is not None:
@@ -262,9 +264,10 @@ class MixedModuleStore(ModuleStoreWriteBase):
                     blocks = store.get_items(location)
                     if len(blocks) == 1:
                         block = blocks[0]
-                        # HACK violate abstraction to avoid assertion error
-                        if block.xmodule_runtime is not None and block.course_id is not None:
+                        try:
                             return block.course_id
+                        except UndefinedContext:
+                            pass
                 except ItemNotFoundError:
                     pass
         # if we get here, it must be in a Locator based store, but we won't be able to find

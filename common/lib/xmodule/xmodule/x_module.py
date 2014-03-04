@@ -26,6 +26,7 @@ from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.exceptions import UndefinedContext
 
 
 log = logging.getLogger(__name__)
@@ -795,7 +796,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         Returns the XModule corresponding to this descriptor. Expects that the system
         already supports all of the attributes needed by xmodules
         """
-        assert self.xmodule_runtime is not None
+        if self.xmodule_runtime is None:
+            raise UndefinedContext()
         assert self.xmodule_runtime.error_descriptor_class is not None
         if self.xmodule_runtime.xmodule_instance is None:
             try:
