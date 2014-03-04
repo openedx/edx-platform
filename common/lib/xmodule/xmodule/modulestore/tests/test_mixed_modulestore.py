@@ -296,6 +296,14 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         # this course is in the directory from which we loaded courses but not in the map
         self.assertNotIn("edX/toy/TT_2012_Fall", course_ids)
 
+    def test_xml_no_write(self):
+        """
+        Test that the xml modulestore doesn't allow write ops.
+        """
+        self.initdb('direct')
+        with self.assertRaises(NotImplementedError):
+            self.store.create_course("org/course/run", store_name='xml')
+
     @ddt.data('direct', 'split')
     def test_get_course(self, default_ms):
         self.initdb(default_ms)
