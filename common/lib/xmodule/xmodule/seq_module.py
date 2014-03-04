@@ -96,7 +96,7 @@ class SequenceModule(SequenceFields, XModule):
                 title = child.display_name_with_default
             childinfo = {
                 'content': rendered_child.content,
-                'title': "\n".join(item for item in child.get_child_display_names()),
+                'title': "\n".join(item for item in child.get_content_titles()),
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),

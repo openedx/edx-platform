@@ -154,5 +154,5 @@ class ProblemFactory(XmlImportFactory):
 
 
 class HtmlFactory(XmlImportFactory):
-    """Factory for <problem> nodes"""
+    """Factory for <html> nodes"""
     tag = 'html'

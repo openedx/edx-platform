@@ -217,33 +217,19 @@ class XModuleMixin(XBlockMixin):
         self.save()
         return self._field_data._kvs  # pylint: disable=protected-access
 
-    def get_child_display_names(self):
+    def get_content_titles(self):
         """
-        Returns list of display names for self's children.
+        Returns list of content titles for all of self's children.
 
-        Useful in the seq_module, which needs the display names for each vertical.
-
-        Has a special case for split_block, so that split_block returns the name
-        of its child rather than its own name.
+        Useful in the seq_module, which needs the content titles for each vertical.
         """
-        display_names = []
-        split_names = []
-        for child in self.get_children():
-
-            if child.scope_ids.block_type == 'split_test':
-                # Use the display name of split_test's *children*, not the name "split_test" itself
-                for item in child.get_child_descriptors():
-                    if item.display_name:
-                        split_names.append(item.display_name)
-                # Add the split_names to display_names and then reset
-                display_names = display_names + split_names
-                split_names = []
-
-            elif child.display_name is not None:
-                display_names.append(child.display_name)
-
-        display_names = display_names + split_names
-        return display_names
+        if self.has_children:
+            return sum((child.get_content_titles() for child in self.get_children()), [])
+        else:
+            if self.display_name == None:
+                return []
+            else:
+                return [self.display_name]
 
     def get_children(self):
         """Returns a list of XBlock instances for the children of

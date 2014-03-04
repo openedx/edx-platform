@@ -36,7 +36,7 @@ class SplitTestFields(object):
                              "group_id should see",
                              scope=Scope.content)
 
-
+    
 @XBlock.needs('user_tags')
 @XBlock.needs('partitions')
 class SplitTestModule(SplitTestFields, XModule):
@@ -79,6 +79,22 @@ class SplitTestModule(SplitTestFields, XModule):
                 return child
 
         return None
+
+    def get_content_titles(self):
+        """
+        Return's the split_test module's content titles as a list.
+
+        This overwrites the get_content_title method included in x_module by default.
+
+        For split_test modules, we don't want to get our own content title; we want
+        the content title of the child that actually gets displayed to the user.
+
+
+        """
+        if self.child.display_name is None:
+            return []
+        else:
+            return [self.child.display_name]
 
     def get_child_descriptors(self):
         """
@@ -184,6 +200,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
 
     child_descriptor = module_attr('child_descriptor')
     log_child_render = module_attr('log_child_render')
+    get_content_titles = module_attr('get_content_titles')
 
     def definition_to_xml(self, resource_fs):
 
@@ -200,3 +217,4 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         makes it use module.get_child_descriptors().
         """
         return True
+
