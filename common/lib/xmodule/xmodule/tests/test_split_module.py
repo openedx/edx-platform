@@ -52,6 +52,22 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         self.module_system.get_module = get_module
         self.module_system.descriptor_system = self.course.runtime
 
+        # There's a few tests we want to mock out set_tag and get_tag for,
+        # to test persistence
+        self.user_tags = dict()
+
+        def mock_set_tag(_scope, key, value):
+            """Sets the value of ``key`` to ``value``"""
+            self.user_tags[key] = value
+        self.mock_set_tag = mock_set_tag
+
+        def mock_get_tag(_scope, key):
+            """Gets the value of ``key``"""
+            if key in self.user_tags:
+                return self.user_tags[key]
+            return None
+        self.mock_get_tag = mock_get_tag
+
         self.tags_service = Mock(name='user_tags')
         self.module_system._services['user_tags'] = self.tags_service  # pylint: disable=protected-access
 
@@ -94,3 +110,19 @@ class SplitTestModuleTest(XModuleXmlImportTest):
             self.module_system.render(self.split_test_module, 'student_view').content
         )
 
+    @ddt.data(('0',), ('1',))
+    @ddt.unpack
+    def test_child_missing_tag_value(self, user_tag):
+        # If user_tag has a missing value, we should still get back a valid child url
+        self.tags_service.get_tag.return_value = None
+        self.assertIn(self.split_test_module.child_descriptor.url_name, ['split_test_cond0', 'split_test_cond1'])
+
+    @ddt.data(('100',), ('200',), ('300',), ('400',), ('500',), ('600',), ('700',), ('800',), ('900',), ('1000',))
+    @ddt.unpack
+    def test_child_missing_tag_value(self, user_tag):
+        # If a user_tag has a missing value, a group should be saved/persisted for that user.
+        # So, we check that we get the same url_name when we call on the url_name twice.
+        # We run the test ten times so that, if our storage is failing, we'll be most likely to notice it.
+        self.tags_service.set_tag = self.mock_set_tag
+        self.tags_service.get_tag = self.mock_get_tag
+        self.assertEquals(self.split_test_module.child_descriptor.url_name, self.split_test_module.child_descriptor.url_name)
