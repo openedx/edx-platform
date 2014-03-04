@@ -472,6 +472,9 @@ INSTALLED_APPS = (
     # for course creator table
     'django.contrib.admin',
 
+    # XBlocks containing migrations
+    'mentoring',
+
     # for managing course modes
     'course_modes',
 
