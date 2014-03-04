@@ -15,13 +15,13 @@ body {
 }
 
 body, input, button {
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 a {
   @include transition(color $tmg-f2 ease-in-out 0s);
   text-decoration: none;
-  color: $blue;
+  color: $blue-l2;
 
   &:hover {
     color: $orange-d1;
