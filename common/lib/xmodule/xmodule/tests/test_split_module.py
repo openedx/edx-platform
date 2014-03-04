@@ -36,8 +36,8 @@ class SplitTestModuleTest(XModuleXmlImportTest):
                 'group_id_to_child': '{"0": "i4x://edX/xml_test_course/html/split_test_cond0", "1": "i4x://edX/xml_test_course/html/split_test_cond1"}'
             }
         )
-        xml.HtmlFactory(parent=split_test, url_name='split_test_cond0')
-        xml.HtmlFactory(parent=split_test, url_name='split_test_cond1')
+        xml.HtmlFactory(parent=split_test, url_name='split_test_cond0', text='HTML FOR GROUP 0')
+        xml.HtmlFactory(parent=split_test, url_name='split_test_cond1', text='HTML FOR GROUP 1')
 
         self.course = self.process_xml(course)
         course_seq = self.course.get_children()[0]
@@ -77,16 +77,20 @@ class SplitTestModuleTest(XModuleXmlImportTest):
 
         self.assertEquals(self.split_test_module.child_descriptor.url_name, child_url_name)
 
-    @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))
+    @ddt.data(('0',), ('1',))
     @ddt.unpack
-    def test_child_old_tag_value(self, user_tag, child_url_name):  # pylint: disable=unused-argument
+    def test_child_old_tag_value(self, user_tag):
         # If user_tag has a stale value, we should still get back a valid child url
         self.tags_service.get_tag.return_value = '2'
 
         self.assertIn(self.split_test_module.child_descriptor.url_name, ['split_test_cond0', 'split_test_cond1'])
 
-    @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))
+    @ddt.data(('0', 'HTML FOR GROUP 0'), ('1', 'HTML FOR GROUP 1'))
     @ddt.unpack
-    def test_get_html(self, user_tag, child_url_name):
+    def test_get_html(self, user_tag, child_content):
         self.tags_service.get_tag.return_value = user_tag
-        self.module_system.render(self.split_test_module, 'student_view').content
+        self.assertIn(
+            child_content,
+            self.module_system.render(self.split_test_module, 'student_view').content
+        )
+
