@@ -55,7 +55,7 @@ class CmeUserProfile(UserProfile):
     specialty = models.CharField(blank=True, null=True, max_length=255)
     sub_specialty = models.CharField(blank=True, null=True, max_length=255)
 
-    AFFILIATION_CHOICES = (('Lucile Packard Children\'s Hospital', 'Lucile Packard Children\'s Hospital'),
+    AFFILIATION_CHOICES = (('Lucile Packard Children\'s Hospital Stanford', 'Lucile Packard Children\'s Hospital Stanford'),
                            ('Packard Children\'s Health Alliance', 'Packard Children\'s Health Alliance'),
                            ('Stanford Hospital and Clinics', 'Stanford Hospital and Clinics'),
                            ('Stanford University', 'Stanford University'),
