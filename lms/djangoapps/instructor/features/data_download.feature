@@ -29,7 +29,7 @@ Feature: LMS.Instructor Dash Data Download
     Scenario: Generate & download a grade report
        Given I am "<Role>" for a course
        When I click "Generate Grade Report"
-       Then I see a csv file in the grade reports table
+       Then I see a grade report csv file in the reports table
        Examples:
        | Role          |
        | instructor    |
