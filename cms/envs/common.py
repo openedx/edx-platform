@@ -240,8 +240,8 @@ CONTACT_EMAIL = 'info@edx.saylor.org'
 BUGS_EMAIL = 'bugs@edx.saylor.org'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = 'true'
-#EMAIL_HOST_USER = 'registration@edx.saylor.org'
-#EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = 'registration@edx.saylor.org'
+EMAIL_HOST_PASSWORD = ''
 #=======
 #>>>>>>> ADMINS restored
 EMAIL_PORT = 465
