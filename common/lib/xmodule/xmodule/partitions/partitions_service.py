@@ -133,6 +133,6 @@ class PartitionService(object):
             'partition_name': user_partition.name
         }
         # TODO: Use the XBlock publish api instead
-        self._track_function('edx.split_test.assigned_user_to_partition', event_info)
+        self._track_function('xmodule.partitions.assigned_user_to_partition', event_info)
 
         return group.id

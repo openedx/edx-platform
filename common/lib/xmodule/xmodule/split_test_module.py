@@ -158,7 +158,7 @@ class SplitTestModule(SplitTestFields, XModule):
     @XBlock.handler
     def log_child_render(self, _request, _suffix=''):
         # TODO: use publish instead, when publish is wired to the tracking logs
-        self.system.track_function('split-test-child-render', {'child-id': self.child.scope_ids.usage_id})
+        self.system.track_function('xblock.split_test.child_render', {'child-id': self.child.scope_ids.usage_id})
         return Response()
 
     def get_icon_class(self):
