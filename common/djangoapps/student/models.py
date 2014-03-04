@@ -193,6 +193,7 @@ class UserProfile(models.Model):
     GENDER_CHOICES = (
         ('m', ugettext_noop('Male')),
         ('f', ugettext_noop('Female')),
+        # Translators: 'Other' refers to the student's gender
         ('o', ugettext_noop('Other'))
     )
     gender = models.CharField(
@@ -211,7 +212,9 @@ class UserProfile(models.Model):
         ('hs', ugettext_noop("Secondary/high school")),
         ('jhs', ugettext_noop("Junior secondary/junior high/middle school")),
         ('el', ugettext_noop("Elementary/primary school")),
+        # Translators: 'None' refers to the student's level of education
         ('none', ugettext_noop("None")),
+        # Translators: 'Other' refers to the student's level of education
         ('other', ugettext_noop("Other"))
     )
     level_of_education = models.CharField(
