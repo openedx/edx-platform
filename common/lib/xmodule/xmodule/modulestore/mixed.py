@@ -334,6 +334,10 @@ class MixedModuleStore(ModuleStoreWriteBase):
             # convert parent loc if it's legit
             if isinstance(course_or_parent_loc, basestring):
                 parent_loc = None
+                if location is None:
+                    loc_dict = Location.parse_course_id(course_id)
+                    loc_dict['name'] = block_id
+                    location = Location(category=category, **loc_dict)
             else:
                 parent_loc = course_or_parent_loc
                 # must have a legitimate location, compute if appropriate

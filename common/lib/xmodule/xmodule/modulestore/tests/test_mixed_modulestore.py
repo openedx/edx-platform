@@ -317,7 +317,6 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             self.assertIsNotNone(course)
             self.assertEqual(course.location, course_locn)
 
-    # pylint: disable=E1101
     @ddt.data('direct', 'split')
     def test_get_parent_locations(self, default_ms):
         self.initdb(default_ms)
@@ -335,6 +334,22 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.assertEqual(len(parents), 1)
         self.assertEqual(parents[0], self.course_locations[self.XML_COURSEID1])
 
+    @ddt.data('direct', 'split')
+    def test_get_orphans(self, default_ms):
+        self.initdb(default_ms)
+        # create an orphan
+        if default_ms == 'split':
+            course_id = self.course_locations[self.MONGO_COURSEID].as_course_locator()
+            branch = course_id.branch
+        else:
+            course_id = self.MONGO_COURSEID
+            branch = None
+        orphan = self.store.create_item(course_id, 'problem', block_id='orphan')
+        found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID], branch)
+        if default_ms == 'split':
+            self.assertEqual(found_orphans, [orphan.location.version_agnostic()])
+        else:
+            self.assertEqual(found_orphans, [unicode(orphan.location)])
 
 #=============================================================================================================
 # General utils for not using django settings
