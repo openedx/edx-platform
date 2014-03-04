@@ -136,7 +136,7 @@ class MasterClassModule(MasterClassFields, XModule):
 
             # Student words from client.
             # FIXME: we must use raw JSON, not a post data (multipart/form-data)
-            master_class = data.getlist('master_class')[0]
+            master_class = data.getall('master_class[]')
 
             self.all_registrations.append(self.runtime.user.email)
 
@@ -148,7 +148,7 @@ class MasterClassModule(MasterClassFields, XModule):
         elif dispatch == 'register':
             logging.error(data)
             if self.runtime.user_is_staff:
-                for email in data.getlist('emails[]'):
+                for email in data.getall('emails[]'):
                     if (len(self.passed_registrations) < self.total_places):
                         if (self.all_registrations.count(email) > 0):
                             self.passed_registrations.append(email)
