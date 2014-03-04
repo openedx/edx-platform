@@ -3,7 +3,12 @@
 <!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
-<head dir="rtl">
+<%
+    # This should be done someplace more central.
+    from django.utils.translation import get_language_bidi
+    dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
+%>
+<head dir="${dir_rtl}">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <%! from django.utils.translation import ugettext as _ %>
@@ -102,8 +107,8 @@
 
 </head>
 
-<body class="rtl <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-  <div class="window-wrap" dir="rtl">
+<body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE} ${dir_rtl}">
+  <div class="window-wrap" dir="${dir_rtl}">
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
 
     <%include file="mathjax_accessible.html" />
