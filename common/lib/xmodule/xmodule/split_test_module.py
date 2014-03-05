@@ -12,7 +12,7 @@ from xmodule.x_module import XModule, module_attr
 from lxml import etree
 
 from xblock.core import XBlock
-from xblock.fields import Scope, Integer, Dict
+from xblock.fields import Scope, Integer, ReferenceValueDict
 from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
@@ -20,8 +20,10 @@ log = logging.getLogger('edx.' + __name__)
 
 class SplitTestFields(object):
     """Fields needed for split test module"""
-    user_partition_id = Integer(help="Which user partition is used for this test",
-                                scope=Scope.content)
+    user_partition_id = Integer(
+        help="Which user partition is used for this test",
+        scope=Scope.content
+    )
 
     # group_id is an int
     # child is a serialized UsageId (aka Location).  This child
@@ -32,9 +34,10 @@ class SplitTestFields(object):
     # TODO: is there a way to add some validation around this, to
     # be run on course load or in studio or ....
 
-    group_id_to_child = Dict(help="Which child module students in a particular "
-                             "group_id should see",
-                             scope=Scope.content)
+    group_id_to_child = ReferenceValueDict(
+        help="Which child module students in a particular group_id should see",
+        scope=Scope.content
+    )
 
 
 @XBlock.needs('user_tags')
