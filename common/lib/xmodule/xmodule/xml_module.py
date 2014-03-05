@@ -363,6 +363,10 @@ class XmlDescriptor(XModuleDescriptor):
         resource_fs is a pyfilesystem object (from the fs package)
         """
 
+        # Set up runtime.export_fs so that it's available through future
+        # uses of the pure xblock add_xml_to_node api
+        self.runtime.export_fs = resource_fs
+
         # Get the definition
         xml_object = self.definition_to_xml(resource_fs)
         self.clean_metadata_from_xml(xml_object)
@@ -377,12 +381,11 @@ class XmlDescriptor(XModuleDescriptor):
                 val = serialize_field(self._field_data.get(self, attr))
                 try:
                     xml_object.set(attr, val)
-                except Exception, e:
+                except Exception:
                     logging.exception(
-                        u'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!! Exception: %s',
-                        attr, val, self.url_name, e
+                        u'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!!',
+                        attr, val, self.url_name
                     )
-                    pass
 
         for key, value in self.xml_attributes.items():
             if key not in self.metadata_to_strip:

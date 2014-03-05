@@ -748,7 +748,7 @@ class TestItemCrud(SplitModuleTest):
 
         problem.max_attempts = 4
         problem.save()  # decache above setting into the kvs
-        updated_problem = modulestore().update_item(problem, 'changeMaven')
+        updated_problem = modulestore().update_item(problem, '**replace_user**')
         # check that course version changed and course's previous is the other one
         self.assertEqual(updated_problem.definition_locator.definition_id, pre_def_id)
         self.assertNotEqual(updated_problem.location.version_guid, pre_version_guid)
@@ -767,7 +767,7 @@ class TestItemCrud(SplitModuleTest):
         history_info = modulestore().get_course_history_info(current_course.location)
         self.assertEqual(history_info['previous_version'], pre_version_guid)
         self.assertEqual(str(history_info['original_version']), self.GUID_D3)
-        self.assertEqual(history_info['edited_by'], "changeMaven")
+        self.assertEqual(history_info['edited_by'], "**replace_user**")
         self.assertGreaterEqual(history_info['edited_on'], premod_time)
         self.assertLessEqual(history_info['edited_on'], datetime.datetime.now(UTC))
 
@@ -784,7 +784,7 @@ class TestItemCrud(SplitModuleTest):
         self.assertGreater(len(block.children), 0, "meaningless test")
         moved_child = block.children.pop()
         block.save()  # decache model changes
-        updated_problem = modulestore().update_item(block, 'childchanger')
+        updated_problem = modulestore().update_item(block, '**replace_user**')
         # check that course version changed and course's previous is the other one
         self.assertEqual(updated_problem.definition_locator.definition_id, pre_def_id)
         self.assertNotEqual(updated_problem.location.version_guid, pre_version_guid)
@@ -794,7 +794,7 @@ class TestItemCrud(SplitModuleTest):
         other_block = modulestore().get_item(locator)
         other_block.children.append(moved_child)
         other_block.save()  # decache model changes
-        other_updated = modulestore().update_item(other_block, 'childchanger')
+        other_updated = modulestore().update_item(other_block, '**replace_user**')
         self.assertIn(moved_child, other_updated.children)
 
     def test_update_definition(self):
@@ -808,7 +808,7 @@ class TestItemCrud(SplitModuleTest):
 
         block.grading_policy['GRADER'][0]['min_count'] = 13
         block.save()  # decache model changes
-        updated_block = modulestore().update_item(block, 'definition_changer')
+        updated_block = modulestore().update_item(block, '**replace_user**')
 
         self.assertNotEqual(updated_block.definition_locator.definition_id, pre_def_id)
         self.assertNotEqual(updated_block.location.version_guid, pre_version_guid)
@@ -846,7 +846,7 @@ class TestItemCrud(SplitModuleTest):
         block.advertised_start = "Soon"
 
         block.save()  # decache model changes
-        updated_block = modulestore().update_item(block, "test_update_manifold")
+        updated_block = modulestore().update_item(block, "**replace_user**")
         self.assertNotEqual(updated_block.definition_locator.definition_id, pre_def_id)
         self.assertNotEqual(updated_block.location.version_guid, pre_version_guid)
         self.assertEqual(updated_block.grading_policy['GRADER'][0]['min_count'], 13)

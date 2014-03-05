@@ -27,14 +27,14 @@ data: |
 
       <p>Enter two integers which sum to 10: </p>
       <customresponse cfn="test_add_to_ten">
-              <textline size="40" correct_answer="3"/><br/>
-              <textline size="40" correct_answer="7"/>
+              <textline size="40" correct_answer="3" label="Integer #1"/><br/>
+              <textline size="40" correct_answer="7" label="Integer #2"/>
       </customresponse>
 
       <p>Enter two integers which sum to 20: </p>
       <customresponse cfn="test_add" expect="20">
-              <textline size="40" correct_answer="11"/><br/>
-              <textline size="40" correct_answer="9"/>
+              <textline size="40" correct_answer="11" label="Integer #1"/><br/>
+              <textline size="40" correct_answer="9" label="Integer #2"/>
       </customresponse>
     
           <solution>

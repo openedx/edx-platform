@@ -25,7 +25,15 @@
                             % endif
                         ><i class="icon-chevron-left"></i></button>
                     % endif 
-                    ${result['task_name']} from grader ${i+1}
+                    ## Translators: an example of what this string will look
+                    ## like is: "Scored rubric from grader 1", where
+                    ## "Scored rubric" replaces {result_of_task} and
+                    ## "1" replaces {number}.
+                    ## This string appears when a user is viewing one of
+                    ## their graded rubrics for an openended response problem.
+                    ## the number distinguishes between the different
+                    ## graded rubrics the user might have received
+                    ${_("{result_of_task} from grader {number}").format(result_of_task = result['task_name'], number = i + 1)}
                     % if num_results>1:
                         <button href="#" alt="Next" class="rubric-button rubric-next-button"
                             % if (i+1) >= num_results:
@@ -45,4 +53,3 @@
     %endif
 
 % endfor
-

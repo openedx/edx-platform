@@ -12,4 +12,4 @@ title = Bok Choy Test Coverage Report
 directory = reports/bok_choy/cover
 
 [xml]
-output = reports/bok_choy/coverage.xml
+output = reports/bok_choy/acceptance_coverage.xml

@@ -119,11 +119,13 @@ In the LMS, each unit in the subsection appears as a link on the course ribbon a
 .. image:: Images/Units_LMS.gif
  :alt: Image of units from a student's point of view
 
+The titles in the pop-up dialog, in white text on a black background, are the display names of the components in that unit.  
+
 You can create a unit from the course outline or the subsection page. To create a unit, click **New Unit** within the subsection that you want.
 
 When you create a new unit, a page opens for that unit. On the unit page, you can do the following.
 
-- Specify the name that you want students to see. To do this, enter the name that you want in the **Display Name** field.
+- Enter the unit name that you want in the **Display Name** field. Note that students do not see the unit name.
 - Create components in the unit.
 - Change the visibility of the unit. By default, the unit visibility is set to **Private**, so students will not be able to see the unit.Unless you want students to see the unit immediately, leave this setting as-is. For more information, see :ref:`Publishing Your Course`.
 - Preview a draft of the unit.
@@ -179,14 +181,31 @@ Edit a Component
 
 You can edit a component only if the unit that contains it is Private, or if you are editing a new draft of the unit. For more information, see :ref:`Public and Private Units`.
 
-When you can edit the component, the Edit icon appears in the component header:
+When you can edit the component, the Edit icon and the Display Name appear in the component header:
 
 .. image:: Images/unit-edit.png
   :alt: Image of a unit with Edit icon circled
 
-
-
 Click the Edit icon.  Then follow instructions for the type of component you are editing.
+
+=====================================
+Set the Display Name for a Component
+=====================================
+
+Each component has a display name that shows in the component header when you can edit the component. The display name also shows to students when they hover the mouse pointer over the unit icon in the course accordian.
+
+To set the display name for a component:
+
+#. Edit the component.
+#. Click **Settings**.
+#. Edit the **Display Name** field.
+
+  .. image:: Images/display-name.png
+   :alt: Image of the Display Name field for a component.
+
+4. Click **Save**.
+
+Different types of components have different fields in the Settings dialog box, but all have the **Display Name** field.
 
 ======================
 Duplicate a Component

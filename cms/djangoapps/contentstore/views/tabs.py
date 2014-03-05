@@ -10,8 +10,6 @@ from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
-from xmodule.modulestore import Location
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
@@ -23,7 +21,7 @@ from django.utils.translation import ugettext as _
 __all__ = ['tabs_handler']
 
 
-def initialize_course_tabs(course):
+def initialize_course_tabs(course, user):
     """
     set up the default tabs
     I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
@@ -47,7 +45,7 @@ def initialize_course_tabs(course):
         {"type": "progress", "name": _("Progress")},
     ]
 
-    modulestore('direct').update_metadata(course.location.url(), own_metadata(course))
+    modulestore('direct').update_item(course, user.id)
 
 @expect_json
 @login_required
@@ -123,14 +121,14 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
 
                 # OK, re-assemble the static tabs in the new order
                 course_item.tabs = reordered_tabs
-                modulestore('direct').update_metadata(course_item.location, own_metadata(course_item))
+                modulestore('direct').update_item(course_item, request.user.id)
                 return JsonResponse()
             else:
                 raise NotImplementedError('Creating or changing tab content is not supported.')
     elif request.method == 'GET':  # assume html
         # see tabs have been uninitialized (e.g. supporting courses created before tab support in studio)
         if course_item.tabs is None or len(course_item.tabs) == 0:
-            initialize_course_tabs(course_item)
+            initialize_course_tabs(course_item, request.user)
 
         # first get all static tabs from the tabs list
         # we do this because this is also the order in which items are displayed in the LMS
@@ -179,7 +177,7 @@ def primitive_delete(course, num):
     # Note for future implementations: if you delete a static_tab, then Chris Dodge
     # points out that there's other stuff to delete beyond this element.
     # This code happens to not delete static_tab so it doesn't come up.
-    modulestore('direct').update_metadata(course.location, own_metadata(course))
+    modulestore('direct').update_item(course, '**replace_user**')
 
 
 def primitive_insert(course, num, tab_type, name):
@@ -188,5 +186,5 @@ def primitive_insert(course, num, tab_type, name):
     new_tab = {u'type': unicode(tab_type), u'name': unicode(name)}
     tabs = course.tabs
     tabs.insert(num, new_tab)
-    modulestore('direct').update_metadata(course.location, own_metadata(course))
+    modulestore('direct').update_item(course, '**replace_user**')
 

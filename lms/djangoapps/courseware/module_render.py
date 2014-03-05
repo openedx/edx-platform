@@ -13,7 +13,6 @@ from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
-import django.utils
 from django.views.decorators.csrf import csrf_exempt
 
 from capa.xqueue_interface import XQueueInterface
@@ -21,12 +20,10 @@ from courseware.access import has_access, get_user_role
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.lib.xblock.field_data import LmsFieldData
-from lms.lib.xblock.runtime import LmsModuleSystem, handler_prefix, unquote_slashes
+from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes
 from edxmako.shortcuts import render_to_string
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
-from util.json_request import JsonResponse
-from util.sandboxing import can_execute_unsafe_code
 from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, KeyValueStore
@@ -35,12 +32,15 @@ from xblock.django.request import django_to_webob_request, webob_to_django_respo
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
-from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
+from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_debug_info, wrap_xblock
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
+
+from util.json_request import JsonResponse
+from util.sandboxing import can_execute_unsafe_code
 
 
 log = logging.getLogger(__name__)
@@ -225,7 +225,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             return None
 
     student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
-    descriptor._field_data = LmsFieldData(descriptor._field_data, student_data)
 
 
     def make_xqueue_callback(dispatch='score_update'):
@@ -318,12 +317,12 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
         # Bin score into range and increment stats
         score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
-        org, course_num, run = course_id.split("/")
+        course_id_dict = Location.parse_course_id(course_id)
 
         tags = [
-            u"org:{0}".format(org),
-            u"course:{0}".format(course_num),
-            u"run:{0}".format(run),
+            u"org:{org}".format(**course_id_dict),
+            u"course:{course}".format(**course_id_dict),
+            u"run:{name}".format(**course_id_dict),
             u"score_bucket:{0}".format(score_bucket)
         ]
 
@@ -339,7 +338,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # Wrap the output display in a single div to allow for the XModule
     # javascript to be bound correctly
     if wrap_xmodule_display is True:
-        block_wrappers.append(partial(wrap_xblock, partial(handler_prefix, course_id)))
+        block_wrappers.append(partial(wrap_xblock, 'LmsRuntime', extra_data={'course-id': course_id}))
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -368,9 +367,9 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''}),
     ))
 
-    if settings.FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
+    if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if has_access(user, descriptor, 'staff', course_id):
-            block_wrappers.append(partial(add_histogram, user))
+            block_wrappers.append(partial(add_staff_debug_info, user))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with
@@ -379,7 +378,8 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # As we have the time to manually test more modules, we can add to the list
     # of modules that get the per-course anonymized id.
     is_pure_xblock = isinstance(descriptor, XBlock) and not isinstance(descriptor, XModuleDescriptor)
-    is_lti_module = not is_pure_xblock and issubclass(descriptor.module_class, LTIModule)
+    module_class = getattr(descriptor, 'module_class', None)
+    is_lti_module = not is_pure_xblock and issubclass(module_class, LTIModule)
     if is_pure_xblock or is_lti_module:
         anonymous_student_id = anonymous_id_for_user(user, course_id)
     else:
@@ -427,12 +427,10 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
         services={
-            # django.utils.translation implements the gettext.Translations
-            # interface (it has ugettext, ungettext, etc), so we can use it
-            # directly as the runtime i18n service.
-            'i18n': django.utils.translation,
+            'i18n': ModuleI18nService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
+        descriptor_runtime=descriptor.runtime,
     )
     if settings.FEATURES.get('SEND_USERS_EMAILADDR_WITH_CODERESPONSE', False):
         system.set('send_users_emailaddr_with_coderesponse', True)
@@ -457,8 +455,8 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     else:
         system.error_descriptor_class = NonStaffErrorDescriptor
 
-    descriptor.xmodule_runtime = system
-    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)
+    descriptor.bind_for_student(system, LmsFieldData(descriptor._field_data, student_data))  # pylint: disable=protected-access
+    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
     return descriptor
 
 

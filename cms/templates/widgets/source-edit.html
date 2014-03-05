@@ -162,15 +162,5 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
       el.find('.hls-data').val(el.data('editor').getValue());
       el.closest('.component').find('.save-button').click();
   }
-
-  ## add upload and download links / buttons to component edit box
-  hlsmodal.closest('.component').find('.component-actions').append('<div id="link-${hlskey}" style="float:right;"></div>');
-  $('#link-${hlskey}').html('<a class="upload-button standard" id="upload-${hlskey}">upload</a>');
-  $('#upload-${hlskey}').click(function() {
-      hlsmodal.closest('.component').find('.edit-button').trigger('click'); // open up editor window
-      $('#hls-trig-${hlskey}').trigger('click'); // open up HLS editor window
-      hlsmodal.find('#hlsfile').trigger('click');
-  });
-
 }); // end require()
   </script>

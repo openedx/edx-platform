@@ -36,11 +36,12 @@ Specific Problem Types
 
 Internal Data Formats
 ---------------------
-These document describe how we store course structure, student state/progress, and events internally. Useful for developers or researchers who interact with our raw data exports.
+These documents describe how we store course structure, student state/progress, and events internally. Useful for developers or researchers who interact with our raw data exports.
 
 .. toctree::
    :maxdepth: 2
 
+   internal_data_formats/change_log.rst
    internal_data_formats/sql_schema.rst
    internal_data_formats/discussion_data.rst
    internal_data_formats/wiki_data.rst

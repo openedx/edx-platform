@@ -8,21 +8,11 @@
     <%static:include path="js/metadata-editor.underscore" />
 </script>
 
-<script id="metadata-number-entry" type="text/template">
-    <%static:include path="js/metadata-number-entry.underscore" />
-</script>
-
-<script id="metadata-string-entry" type="text/template">
-    <%static:include path="js/metadata-string-entry.underscore" />
-</script>
-
-<script id="metadata-option-entry" type="text/template">
-    <%static:include path="js/metadata-option-entry.underscore" />
-</script>
-
-<script id="metadata-list-entry" type="text/template">
-    <%static:include path="js/metadata-list-entry.underscore" />
-</script>
+% for template_name in ["metadata-number-entry", "metadata-string-entry", "metadata-option-entry", "metadata-list-entry", "metadata-dict-entry"]:
+    <script id="${template_name}" type="text/template">
+        <%static:include path="js/${template_name}.underscore" />
+    </script>
+% endfor
 
 <div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(editable_metadata_fields) | h}'/>
 

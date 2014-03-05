@@ -257,7 +257,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             count_graded = self.student_data_for_location['count_graded']
             count_required = self.student_data_for_location['count_required']
         except:
-            success, response = self.query_data_for_location(self.location)
+            success, response = self.query_data_for_location(self.link_to_location)
             if not success:
                 log.exception(
                     "No instance data found and could not get data from controller for loc {0} student {1}".format(
@@ -708,6 +708,7 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     closed = module_attr('closed')
     get_instance_state = module_attr('get_instance_state')
     get_next_submission = module_attr('get_next_submission')
+    graded = module_attr('graded')
     is_student_calibrated = module_attr('is_student_calibrated')
     peer_grading = module_attr('peer_grading')
     peer_grading_closed = module_attr('peer_grading_closed')
@@ -717,4 +718,6 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     save_calibration_essay = module_attr('save_calibration_essay')
     save_grade = module_attr('save_grade')
     show_calibration_essay = module_attr('show_calibration_essay')
+    use_for_single_location_local = module_attr('use_for_single_location_local')
     _find_corresponding_module_for_location = module_attr('_find_corresponding_module_for_location')
+

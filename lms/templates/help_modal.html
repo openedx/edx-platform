@@ -16,7 +16,13 @@
 <section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=MicrositeConfiguration.get_microsite_configuration_value("platform_name", settings.PLATFORM_NAME))}">
   <div class="inner-wrapper" id="help_wrapper">
     ## TODO: find a way to refactor this
-    <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal "tabindex="0">
+      &#10005;
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close Modal')}
+      </span>
+    </button>
 
     <header>
       <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME))}</h2>
@@ -54,7 +60,13 @@ discussion_link = get_discussion_link(course) if course else None
   </div>
 
   <div class="inner-wrapper" id="feedback_form_wrapper">
-    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal">
+      &#10005;
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close Modal')}
+      </span>
+    </button>
 
     <header></header>
 
@@ -82,7 +94,13 @@ discussion_link = get_discussion_link(course) if course else None
   </div>
 
   <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="0">
-    <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal" tabindex="0">
+      &#10005;
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close Modal')}
+      </span>
+    </button>
 
     <header>
       <h2>${_('Thank You!')}</h2>

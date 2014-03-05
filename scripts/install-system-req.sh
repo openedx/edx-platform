@@ -18,7 +18,6 @@ output() {
 
 SELF_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REQUIREMENTS_DIR="$SELF_DIR/../requirements/system"
-BREW_FILE=$REQUIREMENTS_DIR/"mac_os_x/brew-formulas.txt"
 APT_REPOS_FILE=$REQUIREMENTS_DIR/"ubuntu/apt-repos.txt"
 APT_PKGS_FILE=$REQUIREMENTS_DIR/"ubuntu/apt-packages.txt"
 
@@ -31,7 +30,7 @@ case `uname -s` in
 
         distro=`lsb_release -cs`
         case $distro in
-            #Tries to install the same 
+            #Tries to install the same
             squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
                 output "Installing Debian family requirements"
 
@@ -69,21 +68,12 @@ EO
         fi
 
         output "Installing OSX requirements"
-        if [[ ! -r $BREW_FILE ]]; then
-            error "$BREW_FILE does not exist, please include the brew formulas file in the requirements/system/mac_os_x directory"
+        if [[ -r Brewfile ]]; then
+            brew bundle
+        else
+            error "Brewfile does not exist"
             exit 1
         fi
-
-        # for some reason openssl likes to be installed by itself first
-        brew install openssl
-
-        # brew errors if the package is already installed
-        for pkg in $(cat $BREW_FILE); do
-            grep $pkg <(brew list) &>/dev/null || {
-                output "Installing $pkg"
-                brew install $pkg
-            }
-        done
 
         # paths where brew likes to install python scripts
         PATH=/usr/local/share/python:/usr/local/bin:$PATH

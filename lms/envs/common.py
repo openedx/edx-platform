@@ -55,7 +55,10 @@ DISCUSSION_SETTINGS = {
 FEATURES = {
     'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
-    'DISPLAY_HISTOGRAMS_TO_STAFF': True,
+
+    'DISPLAY_DEBUG_INFO_TO_STAFF': True,
+    'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
+
     'REROUTE_ACTIVATION_EMAIL': False,  # nonempty string = address for all activation emails
     'DEBUG_LEVEL': 0,  # 0 = lowest level, least verbose, 255 = max level, most verbose
 
@@ -98,7 +101,7 @@ FEATURES = {
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
-    'AUTH_USE_MIT_CERTIFICATES': False,
+    'AUTH_USE_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
     # Even though external_auth is in common, shib assumes the LMS views / urls, so it should only be enabled
     # in LMS
@@ -228,6 +231,9 @@ FEATURES = {
 
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+
+    # Toggle embargo functionality
+    'EMBARGO': False,
 }
 
 # Used for A/B testing
@@ -268,6 +274,9 @@ node_paths = [
     system_node_path,
 ]
 NODE_PATH = ':'.join(node_paths)
+
+# For geolocation ip database
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
 
 
 # Where to look for a status message
@@ -428,10 +437,6 @@ DOC_STORE_CONFIG = {
     'collection': 'modulestore',
 }
 
-# Should we initialize the modulestores at startup, or wait until they are
-# needed?
-INIT_MODULESTORE_ON_STARTUP = True
-
 ############# XBlock Configuration ##########
 
 # This should be moved into an XBlock Runtime/Application object
@@ -521,16 +526,20 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
+    ('en', u'English'),
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
+    ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
     ('ach', u'Acholi'),  # Acoli
     ('ar', u'العربية'),  # Arabic
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
     ('bn', u'বাংলা'),  # Bengali
     ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+    ('ca@valencia', u'Català (València)'),  # Catalan (Valencia)
     ('cs', u'Čeština'),  # Czech
     ('cy', u'Cymraeg'),  # Welsh
     ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
+    ('el', u'Ελληνικά'),  # Greek
     ('en@lolcat', u'LOLCAT English'),  # LOLCAT English
     ('en@pirate', u'Pirate English'),  # Pirate English
     ('es-419', u'Español (Latinoamérica)'),  # Spanish (Latin America)
@@ -570,6 +579,8 @@ LANGUAGES = (
     ('zh-cn', u'大陆简体'),  # Chinese (China)
     ('zh-tw', u'台灣正體'),  # Chinese (Taiwan)
 )
+
+LANGUAGE_DICT = dict(LANGUAGES)
 
 USE_I18N = True
 USE_L10N = True
@@ -708,11 +719,17 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'splash.middleware.SplashMiddleware',
 
     'course_wiki.course_nav.Middleware',
 
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
+    'embargo.middleware.EmbargoMiddleware',
+
+    # Allows us to set user preferences
+    # should be after DarkLangMiddleware
+    'lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
@@ -733,6 +750,7 @@ MIDDLEWARE_CLASSES = (
 
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
+
 )
 
 ############################### Pipeline #######################################
@@ -772,7 +790,8 @@ main_vendor_js = [
     'js/vendor/ova/jquery-Watch.js',
     'js/vendor/ova/ova.js',
     'js/vendor/ova/catch/js/catch.js',
-    'js/vendor/ova/catch/js/handlebars-1.1.2.js'
+    'js/vendor/ova/catch/js/handlebars-1.1.2.js',
+    'js/vendor/URI.min.js',
 ]
 
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
@@ -838,17 +857,18 @@ PIPELINE_CSS = {
 }
 
 
+common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
+project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
+
+
+
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
 PIPELINE_JS = {
     'application': {
 
         # Application will contain all paths not in courseware_only_js
-        'source_filenames': sorted(
-            set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
-                rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) -
-            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
-        ) + [
+        'source_filenames': sorted(common_js) + sorted(project_js) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',
@@ -1116,6 +1136,9 @@ INSTALLED_APPS = (
     'django_comment_common',
     'notes',
 
+    # Splash screen
+    'splash',
+
     # Monitoring
     'datadog',
 
@@ -1146,6 +1169,8 @@ INSTALLED_APPS = (
 
     # Student Identity Reverification
     'reverification',
+
+    'embargo',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1308,3 +1333,197 @@ LINKEDIN_API = {
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
+
+
+##### LMS DEADLINE DISPLAY TIME_ZONE #######
+TIME_ZONE_DISPLAYED_FOR_DEADLINES = 'UTC'
+
+
+# Source:
+# http://loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt according to http://en.wikipedia.org/wiki/ISO_639-1
+ALL_LANGUAGES = (
+    [u"aa", u"Afar"],
+    [u"ab", u"Abkhazian"],
+    [u"af", u"Afrikaans"],
+    [u"ak", u"Akan"],
+    [u"sq", u"Albanian"],
+    [u"am", u"Amharic"],
+    [u"ar", u"Arabic"],
+    [u"an", u"Aragonese"],
+    [u"hy", u"Armenian"],
+    [u"as", u"Assamese"],
+    [u"av", u"Avaric"],
+    [u"ae", u"Avestan"],
+    [u"ay", u"Aymara"],
+    [u"az", u"Azerbaijani"],
+    [u"ba", u"Bashkir"],
+    [u"bm", u"Bambara"],
+    [u"eu", u"Basque"],
+    [u"be", u"Belarusian"],
+    [u"bn", u"Bengali"],
+    [u"bh", u"Bihari languages"],
+    [u"bi", u"Bislama"],
+    [u"bs", u"Bosnian"],
+    [u"br", u"Breton"],
+    [u"bg", u"Bulgarian"],
+    [u"my", u"Burmese"],
+    [u"ca", u"Catalan; Valencian"],
+    [u"ch", u"Chamorro"],
+    [u"ce", u"Chechen"],
+    [u"zh", u"Chinese"],
+    [u"cu", u"Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic"],
+    [u"cv", u"Chuvash"],
+    [u"kw", u"Cornish"],
+    [u"co", u"Corsican"],
+    [u"cr", u"Cree"],
+    [u"cs", u"Czech"],
+    [u"da", u"Danish"],
+    [u"dv", u"Divehi; Dhivehi; Maldivian"],
+    [u"nl", u"Dutch; Flemish"],
+    [u"dz", u"Dzongkha"],
+    [u"en", u"English"],
+    [u"eo", u"Esperanto"],
+    [u"et", u"Estonian"],
+    [u"ee", u"Ewe"],
+    [u"fo", u"Faroese"],
+    [u"fj", u"Fijian"],
+    [u"fi", u"Finnish"],
+    [u"fr", u"French"],
+    [u"fy", u"Western Frisian"],
+    [u"ff", u"Fulah"],
+    [u"ka", u"Georgian"],
+    [u"de", u"German"],
+    [u"gd", u"Gaelic; Scottish Gaelic"],
+    [u"ga", u"Irish"],
+    [u"gl", u"Galician"],
+    [u"gv", u"Manx"],
+    [u"el", u"Greek, Modern (1453-)"],
+    [u"gn", u"Guarani"],
+    [u"gu", u"Gujarati"],
+    [u"ht", u"Haitian; Haitian Creole"],
+    [u"ha", u"Hausa"],
+    [u"he", u"Hebrew"],
+    [u"hz", u"Herero"],
+    [u"hi", u"Hindi"],
+    [u"ho", u"Hiri Motu"],
+    [u"hr", u"Croatian"],
+    [u"hu", u"Hungarian"],
+    [u"ig", u"Igbo"],
+    [u"is", u"Icelandic"],
+    [u"io", u"Ido"],
+    [u"ii", u"Sichuan Yi; Nuosu"],
+    [u"iu", u"Inuktitut"],
+    [u"ie", u"Interlingue; Occidental"],
+    [u"ia", u"Interlingua (International Auxiliary Language Association)"],
+    [u"id", u"Indonesian"],
+    [u"ik", u"Inupiaq"],
+    [u"it", u"Italian"],
+    [u"jv", u"Javanese"],
+    [u"ja", u"Japanese"],
+    [u"kl", u"Kalaallisut; Greenlandic"],
+    [u"kn", u"Kannada"],
+    [u"ks", u"Kashmiri"],
+    [u"kr", u"Kanuri"],
+    [u"kk", u"Kazakh"],
+    [u"km", u"Central Khmer"],
+    [u"ki", u"Kikuyu; Gikuyu"],
+    [u"rw", u"Kinyarwanda"],
+    [u"ky", u"Kirghiz; Kyrgyz"],
+    [u"kv", u"Komi"],
+    [u"kg", u"Kongo"],
+    [u"ko", u"Korean"],
+    [u"kj", u"Kuanyama; Kwanyama"],
+    [u"ku", u"Kurdish"],
+    [u"lo", u"Lao"],
+    [u"la", u"Latin"],
+    [u"lv", u"Latvian"],
+    [u"li", u"Limburgan; Limburger; Limburgish"],
+    [u"ln", u"Lingala"],
+    [u"lt", u"Lithuanian"],
+    [u"lb", u"Luxembourgish; Letzeburgesch"],
+    [u"lu", u"Luba-Katanga"],
+    [u"lg", u"Ganda"],
+    [u"mk", u"Macedonian"],
+    [u"mh", u"Marshallese"],
+    [u"ml", u"Malayalam"],
+    [u"mi", u"Maori"],
+    [u"mr", u"Marathi"],
+    [u"ms", u"Malay"],
+    [u"mg", u"Malagasy"],
+    [u"mt", u"Maltese"],
+    [u"mn", u"Mongolian"],
+    [u"na", u"Nauru"],
+    [u"nv", u"Navajo; Navaho"],
+    [u"nr", u"Ndebele, South; South Ndebele"],
+    [u"nd", u"Ndebele, North; North Ndebele"],
+    [u"ng", u"Ndonga"],
+    [u"ne", u"Nepali"],
+    [u"nn", u"Norwegian Nynorsk; Nynorsk, Norwegian"],
+    [u"nb", u"Bokmål, Norwegian; Norwegian Bokmål"],
+    [u"no", u"Norwegian"],
+    [u"ny", u"Chichewa; Chewa; Nyanja"],
+    [u"oc", u"Occitan (post 1500); Provençal"],
+    [u"oj", u"Ojibwa"],
+    [u"or", u"Oriya"],
+    [u"om", u"Oromo"],
+    [u"os", u"Ossetian; Ossetic"],
+    [u"pa", u"Panjabi; Punjabi"],
+    [u"fa", u"Persian"],
+    [u"pi", u"Pali"],
+    [u"pl", u"Polish"],
+    [u"pt", u"Portuguese"],
+    [u"ps", u"Pushto; Pashto"],
+    [u"qu", u"Quechua"],
+    [u"rm", u"Romansh"],
+    [u"ro", u"Romanian; Moldavian; Moldovan"],
+    [u"rn", u"Rundi"],
+    [u"ru", u"Russian"],
+    [u"sg", u"Sango"],
+    [u"sa", u"Sanskrit"],
+    [u"si", u"Sinhala; Sinhalese"],
+    [u"sk", u"Slovak"],
+    [u"sl", u"Slovenian"],
+    [u"se", u"Northern Sami"],
+    [u"sm", u"Samoan"],
+    [u"sn", u"Shona"],
+    [u"sd", u"Sindhi"],
+    [u"so", u"Somali"],
+    [u"st", u"Sotho, Southern"],
+    [u"es", u"Spanish; Castilian"],
+    [u"sc", u"Sardinian"],
+    [u"sr", u"Serbian"],
+    [u"ss", u"Swati"],
+    [u"su", u"Sundanese"],
+    [u"sw", u"Swahili"],
+    [u"sv", u"Swedish"],
+    [u"ty", u"Tahitian"],
+    [u"ta", u"Tamil"],
+    [u"tt", u"Tatar"],
+    [u"te", u"Telugu"],
+    [u"tg", u"Tajik"],
+    [u"tl", u"Tagalog"],
+    [u"th", u"Thai"],
+    [u"bo", u"Tibetan"],
+    [u"ti", u"Tigrinya"],
+    [u"to", u"Tonga (Tonga Islands)"],
+    [u"tn", u"Tswana"],
+    [u"ts", u"Tsonga"],
+    [u"tk", u"Turkmen"],
+    [u"tr", u"Turkish"],
+    [u"tw", u"Twi"],
+    [u"ug", u"Uighur; Uyghur"],
+    [u"uk", u"Ukrainian"],
+    [u"ur", u"Urdu"],
+    [u"uz", u"Uzbek"],
+    [u"ve", u"Venda"],
+    [u"vi", u"Vietnamese"],
+    [u"vo", u"Volapük"],
+    [u"cy", u"Welsh"],
+    [u"wa", u"Walloon"],
+    [u"wo", u"Wolof"],
+    [u"xh", u"Xhosa"],
+    [u"yi", u"Yiddish"],
+    [u"yo", u"Yoruba"],
+    [u"za", u"Zhuang; Chuang"],
+    [u"zu", u"Zulu"]
+)

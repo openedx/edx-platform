@@ -10,11 +10,13 @@ import static_replace
 from django.conf import settings
 from django.utils.timezone import UTC
 from edxmako.shortcuts import render_to_string
+from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
 
 from xmodule.seq_module import SequenceModule
 from xmodule.vertical_module import VerticalModule
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule
+from lms.lib.xblock.runtime import quote_slashes
 
 log = logging.getLogger(__name__)
 
@@ -29,26 +31,28 @@ def wrap_fragment(fragment, new_content):
     return wrapper_frag
 
 
-def wrap_xblock(handler_prefix, block, view, frag, context, display_name_only=False):  # pylint: disable=unused-argument
+def wrap_xblock(runtime_class, block, view, frag, context, display_name_only=False, extra_data=None):  # pylint: disable=unused-argument
     """
     Wraps the results of rendering an XBlock view in a standard <section> with identifying
     data so that the appropriate javascript module can be loaded onto it.
 
-    :param handler_prefix: A function that takes a block and returns the url prefix for
-        the javascript handler_url. This prefix should be able to have {handler_name}/{suffix}?{query}
-        appended to it to return a valid handler_url
+    :param runtime_class: The name of the javascript runtime class to use to load this block
     :param block: An XBlock (that may be an XModule or XModuleDescriptor)
     :param view: The name of the view that rendered the fragment being wrapped
     :param frag: The :class:`Fragment` to be wrapped
     :param context: The context passed to the view being rendered
     :param display_name_only: If true, don't render the fragment content at all.
         Instead, just render the `display_name` of `block`
+    :param extra_data: A dictionary with extra data values to be set on the wrapper
     """
+    if extra_data is None:
+        extra_data = {}
 
     # If any mixins have been applied, then use the unmixed class
     class_name = getattr(block, 'unmixed_class', block.__class__).__name__
 
     data = {}
+    data.update(extra_data)
     css_classes = ['xblock', 'xblock-' + view]
 
     if isinstance(block, (XModule, XModuleDescriptor)):
@@ -65,14 +69,16 @@ def wrap_xblock(handler_prefix, block, view, frag, context, display_name_only=Fa
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
+        data['runtime-class'] = runtime_class
         data['runtime-version'] = frag.js_init_version
-        data['handler-prefix'] = handler_prefix(block)
         data['block-type'] = block.scope_ids.block_type
+        data['usage-id'] = quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8'))
 
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
-        'data_attributes': ' '.join('data-{}="{}"'.format(key, value) for key, value in data.items()),
+        'display_name': block.display_name_with_default,
+        'data_attributes': ' '.join(u'data-{}="{}"'.format(key, value) for key, value in data.items()),
     }
 
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
@@ -121,8 +127,12 @@ def replace_static_urls(data_dir, block, view, frag, context, course_id=None, st
 
 
 def grade_histogram(module_id):
-    ''' Print out a histogram of grades on a given problem.
-        Part of staff member debug info.
+    '''
+    Print out a histogram of grades on a given problem in staff member debug info.
+
+    Warning: If a student has just looked at an xmodule and not attempted
+    it, their grade is None. Since there will always be at least one such student
+    this function almost always returns [].
     '''
     from django.db import connection
     cursor = connection.cursor()
@@ -142,7 +152,7 @@ def grade_histogram(module_id):
     return grades
 
 
-def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-argument
+def add_staff_debug_info(user, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
     the output of the old get_html function with additional information
@@ -156,7 +166,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
         return frag
 
     block_id = block.id
-    if block.has_score:
+    if block.has_score and settings.FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         histogram = grade_histogram(block_id)
         render_histogram = len(histogram) > 0
     else:
@@ -190,7 +200,15 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
     if mstart is not None:
         is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
 
-    staff_context = {'fields': [(name, field.read_from(block)) for name, field in block.fields.items()],
+    field_contents = []
+    for name, field in block.fields.items():
+        try:
+            field_contents.append((name, field.read_from(block)))
+        except InvalidScopeError:
+            log.warning("Unable to read field in Staff Debug information", exc_info=True)
+            field_contents.append((name, "WARNING: Unable to read field"))
+
+    staff_context = {'fields': field_contents,
                      'xml_attributes': getattr(block, 'xml_attributes', {}),
                      'location': block.location,
                      'xqa_key': block.xqa_key,

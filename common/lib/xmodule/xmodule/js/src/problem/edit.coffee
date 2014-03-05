@@ -339,6 +339,33 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
           return selectString;
       });
+      
+      // replace labels
+      // looks for >>arbitrary text<< and inserts it into the label attribute of the input type directly below the text. 
+      var split = xml.split('\n');
+      var new_xml = [];
+      var line, i, curlabel = '';
+      var didinput = false;
+      for (i = 0; i < split.length; i++) {
+        line = split[i];
+        if (match = line.match(/>>(.*)<</)) {
+          curlabel = match[1].replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;');
+          line = line.replace(/>>|<</g, '');
+        } else if (line.match(/<\w+response/) && didinput) {
+          // reset label to prevent gobbling up previous one (if multiple questions)
+          curlabel = '';
+          didinput = false;
+        } else if (line.match(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/) && curlabel != '') {
+          line = line.replace(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/, '<$1 label="' + curlabel + '"');
+          didinput = true;
+        }
+        new_xml.push(line);
+      }
+      xml = new_xml.join('\n');
 
       // replace code blocks
       xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {

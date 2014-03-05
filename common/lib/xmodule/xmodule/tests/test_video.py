@@ -20,7 +20,7 @@ from mock import Mock
 from . import LogicTest
 from lxml import etree
 from xmodule.modulestore import Location
-from xmodule.video_module import VideoDescriptor, _create_youtube_string
+from xmodule.video_module import VideoDescriptor, create_youtube_string
 from .test_import import DummySystem
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -150,7 +150,7 @@ class VideoDescriptorTest(unittest.TestCase):
         descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
         descriptor.youtube_id_1_5 = 'rABDYkeK0x8'
         expected = "0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8"
-        self.assertEqual(_create_youtube_string(descriptor), expected)
+        self.assertEqual(create_youtube_string(descriptor), expected)
 
     def test_create_youtube_string_missing(self):
         """
@@ -165,7 +165,7 @@ class VideoDescriptorTest(unittest.TestCase):
         descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
         descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
         expected = "0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA"
-        self.assertEqual(_create_youtube_string(descriptor), expected)
+        self.assertEqual(create_youtube_string(descriptor), expected)
 
 
 class VideoDescriptorImportTestCase(unittest.TestCase):
@@ -193,6 +193,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
               <source src="http://www.example.com/source.mp4"/>
               <source src="http://www.example.com/source.ogg"/>
               <track src="http://www.example.com/track"/>
+              <transcript language="ua" src="ukrainian_translation.srt" />
+              <transcript language="ge" src="german_translation.srt" />
             </video>
         '''
         location = Location(["i4x", "edX", "video", "default",
@@ -215,7 +217,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'track': 'http://www.example.com/track',
             'download_track': True,
             'html5_sources': ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg'],
-            'data': ''
+            'data': '',
+            'transcripts': {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
         })
 
     def test_from_xml(self):
@@ -230,6 +233,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
                    end_time="00:01:00">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
+              <transcript language="ua" src="ukrainian_translation.srt" />
+              <transcript language="ge" src="german_translation.srt" />
             </video>
         '''
         output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
@@ -245,7 +250,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'download_track': False,
             'download_video': False,
             'html5_sources': ['http://www.example.com/source.mp4'],
-            'data': ''
+            'data': '',
+            'transcripts': {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'},
         })
 
     def test_from_xml_missing_attributes(self):
@@ -272,9 +278,40 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'end_time': datetime.timedelta(seconds=0.0),
             'track': '',
             'download_track': False,
-            'download_video': False,
+            'download_video': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
+        })
+
+    def test_from_xml_missing_download_track(self):
+        """
+        Ensure that attributes have the right values if they aren't
+        explicitly set in XML.
+        """
+        module_system = DummySystem(load_error_modules=True)
+        xml_data = '''
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,1.25:1EeWXzPdhSA"
+                   show_captions="true">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+            </video>
+        '''
+        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        self.assert_attributes_equal(output, {
+            'youtube_id_0_75': '',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': '',
+            'show_captions': True,
+            'start_time': datetime.timedelta(seconds=0.0),
+            'end_time': datetime.timedelta(seconds=0.0),
+            'track': 'http://www.example.com/track',
+            'download_track': True,
+            'download_video': True,
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'data': '',
+            'transcripts': {},
         })
 
     def test_from_xml_no_attributes(self):
@@ -296,7 +333,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'download_track': False,
             'download_video': False,
             'html5_sources': [],
-            'data': ''
+            'data': '',
+            'transcripts': {},
         })
 
     def test_from_xml_double_quotes(self):
@@ -384,7 +422,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=1),
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
-            'download_track': True,
+            # 'download_track': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': '',
         })
@@ -414,7 +452,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=1),
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
-            'download_track': True,
+            # 'download_track': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
         })
@@ -444,7 +482,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=1),
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
-            'download_track': True,
+            # 'download_track': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
         })
@@ -478,6 +516,7 @@ class VideoExportTestCase(unittest.TestCase):
         desc.download_track = True
         desc.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg']
         desc.download_video = True
+        desc.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
 
         xml = desc.definition_to_xml(None)  # We don't use the `resource_fs` parameter
         expected = etree.fromstring('''\
@@ -485,9 +524,10 @@ class VideoExportTestCase(unittest.TestCase):
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source.ogg"/>
            <track src="http://www.example.com/track"/>
+           <transcript language="ge" src="german_translation.srt" />
+           <transcript language="ua" src="ukrainian_translation.srt" />
          </video>
         ''')
-
         self.assertXmlEqual(expected, xml)
 
     def test_export_to_xml_empty_end_time(self):

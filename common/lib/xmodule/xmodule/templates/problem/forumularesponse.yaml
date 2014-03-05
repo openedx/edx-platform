@@ -32,7 +32,7 @@ data: |
 
   <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
       <responseparam type="tolerance" default="0.00001"/> 
-      <formulaequationinput size="40" />    
+      <formulaequationinput size="40" label="Enter the equation"/>    
   </formularesponse>
       <solution>
           <div class="detailed-solution">

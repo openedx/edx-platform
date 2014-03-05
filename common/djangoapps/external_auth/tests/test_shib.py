@@ -331,9 +331,7 @@ class ShibSPTest(ModuleStoreTestCase):
         for domain in ["", "shib:https://idp.stanford.edu/"]:
             # set domains
             course.enrollment_domain = domain
-            metadata = own_metadata(course)
-            metadata['enrollment_domain'] = domain
-            self.store.update_metadata(course.location.url(), metadata)
+            self.store.update_item(course, '**replace_user**')
 
             # setting location to test that GET params get passed through
             login_request = self.request_factory.get('/course_specific_login/MITx/999/Robot_Super_Course' +
@@ -402,15 +400,11 @@ class ShibSPTest(ModuleStoreTestCase):
         # create 2 course, one with limited enrollment one without
         shib_course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
         shib_course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        metadata = own_metadata(shib_course)
-        metadata['enrollment_domain'] = shib_course.enrollment_domain
-        self.store.update_metadata(shib_course.location.url(), metadata)
+        self.store.update_item(shib_course, '**replace_user**')
 
         open_enroll_course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         open_enroll_course.enrollment_domain = ''
-        metadata = own_metadata(open_enroll_course)
-        metadata['enrollment_domain'] = open_enroll_course.enrollment_domain
-        self.store.update_metadata(open_enroll_course.location.url(), metadata)
+        self.store.update_item(open_enroll_course, '**replace_user**')
 
         # create 3 kinds of students, external_auth matching shib_course, external_auth not matching, no external auth
         shib_student = UserFactory.create()
@@ -476,9 +470,7 @@ class ShibSPTest(ModuleStoreTestCase):
 
         course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
         course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        metadata = own_metadata(course)
-        metadata['enrollment_domain'] = course.enrollment_domain
-        self.store.update_metadata(course.location.url(), metadata)
+        self.store.update_item(course, '**replace_user**')
 
         # use django test client for sessions and url processing
         # no enrollment before trying

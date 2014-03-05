@@ -8,20 +8,14 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=W0104
 
 from django_startup import autostartup
-from xmodule.modulestore.django import modulestore
 import edxmako
+
 
 def run():
     """
     Executed during django startup
     """
     autostartup()
-
-    # Trigger a forced initialization of our modulestores since this can take a
-    # while to complete and we want this done before HTTP requests are accepted.
-    if settings.INIT_MODULESTORE_ON_STARTUP:
-        for store_name in settings.MODULESTORE:
-            modulestore(store_name)
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()

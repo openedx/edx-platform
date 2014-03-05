@@ -2,7 +2,6 @@ from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 import logging
 import inspect
-import re
 
 from path import path
 from django.http import Http404

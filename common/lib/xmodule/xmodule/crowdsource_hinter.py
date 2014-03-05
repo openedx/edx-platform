@@ -400,6 +400,5 @@ class CrowdsourceHinterDescriptor(CrowdsourceHinterFields, RawDescriptor):
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('crowdsource_hinter')
         for child in self.get_children():
-            xml_object.append(
-                etree.fromstring(child.export_to_xml(resource_fs)))
+            self.runtime.add_block_as_child_node(child, xml_object)
         return xml_object

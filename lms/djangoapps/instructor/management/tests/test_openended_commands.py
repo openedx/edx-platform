@@ -2,7 +2,7 @@
 
 from datetime import datetime
 import json
-from mock import patch, ANY
+from mock import patch
 from pytz import UTC
 
 from django.test.utils import override_settings

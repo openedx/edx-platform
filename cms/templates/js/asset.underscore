@@ -17,7 +17,7 @@
     <input type="text" class="embeddable-xml-input" value="<%= portable_url %>" readonly>
 </td>
 <td class="actions-col">
-    <ul>
+    <ul class="actions-list">
         <li class="action-item action-delete">
             <a href="#" data-tooltip="<%= gettext('Delete this asset') %>" class="remove-asset-button action-button"><i class="icon-remove-sign"></i> <span class="sr"><%= gettext('Delete this asset') %></span></a>
         </li>

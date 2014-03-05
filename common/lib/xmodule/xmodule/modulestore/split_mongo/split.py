@@ -57,7 +57,9 @@ from pytz import UTC
 
 from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import prefer_xmodules
-from xmodule.modulestore.locator import BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree, LocalId
+from xmodule.modulestore.locator import (
+    BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree, LocalId, Locator
+)
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError
 from xmodule.modulestore import inheritance, ModuleStoreWriteBase, Location, SPLIT_MONGO_MODULESTORE_TYPE
 
@@ -98,10 +100,12 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
     A Mongodb backed ModuleStore supporting versions, inheritance,
     and sharing.
     """
+    reference_type = Locator
     def __init__(self, doc_store_config, fs_root, render_template,
                  default_class=None,
                  error_tracker=null_error_tracker,
                  loc_mapper=None,
+                 i18n_service=None,
                  **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
@@ -126,6 +130,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         self.fs_root = path(fs_root)
         self.error_tracker = error_tracker
         self.render_template = render_template
+        self.i18n_service = i18n_service
 
         # TODO: Don't have a runtime just to generate the appropriate mixin classes (cpennington)
         # This is only used by _partition_fields_by_scope, which is only needed because
@@ -177,6 +182,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         '''
         system = self._get_cache(course_entry['structure']['_id'])
         if system is None:
+            services = {}
+            if self.i18n_service:
+                services["i18n"] = self.i18n_service
+
             system = CachingDescriptorSystem(
                 modulestore=self,
                 course_entry=course_entry,
@@ -188,6 +197,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 resources_fs=None,
                 mixins=self.xblock_mixins,
                 select=self.xblock_select,
+                services=services,
             )
             self._add_cache(course_entry['structure']['_id'], system)
             self.cache_items(system, block_ids, depth, lazy)
@@ -936,7 +946,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         self.db_connection.insert_course_index(index_entry)
         return self.get_course(CourseLocator(package_id=new_id, branch=master_branch))
 
-    def update_item(self, descriptor, user_id, force=False):
+    def update_item(self, descriptor, user_id, allow_not_found=False, force=False):
         """
         Save the descriptor's fields. it doesn't descend the course dag to save the children.
         Return the new descriptor (updated location).
@@ -1115,14 +1125,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 if key not in new_keys or original_fields[key] != settings[key]:
                     return True
 
-    def update_children(self, location, children):
-        '''Deprecated, use update_item.'''
-        raise NotImplementedError('use update_item')
-
-    def update_metadata(self, location, metadata):
-        '''Deprecated, use update_item.'''
-        raise NotImplementedError('use update_item')
-
     def xblock_publish(self, user_id, source_course, destination_course, subtree_list, blacklist):
         """
         Publishes each xblock in subtree_list and those blocks descendants excluding blacklist
@@ -1211,7 +1213,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         self.db_connection.update_course_index(updated_index_entry)
 
-    def delete_item(self, usage_locator, user_id, delete_children=False, force=False):
+    # TODO impl delete_all_versions
+    def delete_item(self, usage_locator, user_id, delete_all_versions=False, delete_children=False, force=False):
         """
         Delete the block or tree rooted at block (if delete_children) and any references w/in the course to the block
         from a new version of the course structure.
@@ -1361,6 +1364,16 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         else:
             return DefinitionLocator(definition['_id'])
 
+    def get_modulestore_type(self, course_id):
+        """
+        Returns an enumeration-like type reflecting the type of this modulestore
+        The return can be one of:
+        "xml" (for XML based courses),
+        "mongo" for old-style MongoDB backed courses,
+        "split" for new-style split MongoDB backed courses.
+        """
+        return SPLIT_MONGO_MODULESTORE_TYPE
+
     def internal_clean_children(self, course_locator):
         """
         Only intended for rather low level methods to use. Goes through the children attrs of
@@ -1508,16 +1521,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         if 'category' in fields:
             del fields['category']
         return fields
-
-    def get_modulestore_type(self, course_id):
-        """
-        Returns an enumeration-like type reflecting the type of this modulestore
-        The return can be one of:
-        "xml" (for XML based courses),
-        "mongo" for old-style MongoDB backed courses,
-        "split" for new-style split MongoDB backed courses.
-        """
-        return SPLIT_MONGO_MODULESTORE_TYPE
 
     def _new_structure(self, user_id, root_block_id,
                        root_category=None, block_fields=None, definition_id=None):

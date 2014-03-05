@@ -10,8 +10,6 @@ photo verification process as generic as possible.
 """
 from datetime import datetime, timedelta
 from email.utils import formatdate
-from hashlib import md5
-import base64
 import functools
 import json
 import logging

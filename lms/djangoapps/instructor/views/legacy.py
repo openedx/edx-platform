@@ -9,7 +9,6 @@ import re
 import requests
 
 from collections import defaultdict, OrderedDict
-from functools import partial
 from markupsafe import escape
 from requests.status_codes import codes
 from StringIO import StringIO
@@ -25,7 +24,7 @@ from django.utils import timezone
 
 from xmodule_modifiers import wrap_xblock
 import xmodule.graders as xmgraders
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
@@ -62,7 +61,6 @@ import track.views
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
-from lms.lib.xblock.runtime import handler_prefix
 
 from microsite_configuration.middleware import MicrositeConfiguration
 
@@ -111,7 +109,7 @@ def instructor_dashboard(request, course_id):
     else:
         idash_mode = request.session.get('idash_mode', 'Grades')
 
-    enrollment_number = CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()
+    enrollment_number = CourseEnrollment.num_enrolled_in(course_id)
 
     # assemble some course statistics for output to instructor
     def get_course_stats_table():
@@ -173,8 +171,9 @@ def instructor_dashboard(request, course_id):
             urlname = "problem/" + urlname
 
         # complete the url using information about the current course:
-        (org, course_name, _) = course_id.split("/")
-        return u"i4x://{org}/{name}/{url}".format(org=org, name=course_name, url=urlname)
+        parts = Location.parse_course_id(course_id)
+        parts['url'] = urlname
+        return u"i4x://{org}/{name}/{url}".format(**parts)
 
     def get_student_from_identifier(unique_student_identifier):
         """Gets a student object using either an email address or username"""
@@ -574,10 +573,12 @@ def instructor_dashboard(request, course_id):
         if problem_to_dump[-4:] == ".xml":
             problem_to_dump = problem_to_dump[:-4]
         try:
-            (org, course_name, _) = course_id.split("/")
-            module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_dump
-            smdat = StudentModule.objects.filter(course_id=course_id,
-                                                 module_state_key=module_state_key)
+            course_id_dict = Location.parse_course_id(course_id)
+            module_state_key = u"i4x://{org}/{course}/problem/{0}".format(problem_to_dump, **course_id_dict)
+            smdat = StudentModule.objects.filter(
+                course_id=course_id,
+                module_state_key=module_state_key
+            )
             smdat = smdat.order_by('student')
             msg += _u("Found {num} records to dump.").format(num=smdat)
         except Exception as err:
@@ -844,7 +845,7 @@ def instructor_dashboard(request, course_id):
         instructor_tasks = None
 
     # determine if this is a studio-backed course so we can provide a link to edit this course in studio
-    is_studio_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
+    is_studio_course = modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE
 
     studio_url = None
     if is_studio_course:
@@ -859,7 +860,7 @@ def instructor_dashboard(request, course_id):
             ScopeIds(None, None, None, 'i4x://dummy_org/dummy_course/html/dummy_name')
         )
         fragment = html_module.render('studio_view')
-        fragment = wrap_xblock(partial(handler_prefix, course_id), html_module, 'studio_view', fragment, None)
+        fragment = wrap_xblock('LmsRuntime', html_module, 'studio_view', fragment, None, extra_data={"course-id": course_id})
         email_editor = fragment.content
 
     # Enable instructor email only if the following conditions are met:

@@ -53,6 +53,7 @@ from .tools import (
     set_due_date_extension,
     strip_if_string,
 )
+from xmodule.modulestore import Location
 
 log = logging.getLogger(__name__)
 
@@ -1115,6 +1116,7 @@ def _msk_from_problem_urlname(course_id, urlname):
     if "combinedopenended" not in urlname:
         urlname = "problem/" + urlname
 
-    (org, course_name, __) = course_id.split("/")
-    module_state_key = "i4x://" + org + "/" + course_name + "/" + urlname
+    parts = Location.parse_course_id(course_id)
+    parts['urlname'] = urlname
+    module_state_key = u"i4x://{org}/{course}/{urlname}".format(**parts)
     return module_state_key

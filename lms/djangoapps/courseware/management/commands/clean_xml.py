@@ -1,3 +1,4 @@
+import lxml.etree
 import os
 import sys
 import traceback
@@ -30,9 +31,11 @@ def export(course, export_dir):
                '  May clobber/confuse things'.format(dir=export_dir))
 
     try:
-        xml = course.export_to_xml(fs)
+        course.runtime.export_fs = fs
+        root = lxml.etree.Element('root')
+        course.add_xml_to_node(root)
         with fs.open('course.xml', mode='w') as f:
-            f.write(xml)
+            root.write(f)
 
         return True
     except:

@@ -5,6 +5,8 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="pagetitle">${_("Instructor Dashboard")}</%block>
+<%block name="nav_skip">#instructor-dashboard-content</%block>
+
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
@@ -173,7 +175,7 @@ function goto( mode)
   %endif
 
 
-  <section class="instructor-dashboard-content">
+  <section class="instructor-dashboard-content" id="instructor-dashboard-content">
     <h1>${_("Instructor Dashboard")}</h1>
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
@@ -207,7 +209,7 @@ function goto( mode)
     %if offline_grade_log:
       <p>
         <span class="copy-warning">Pre-computed grades ${offline_grade_log} available: Use?
-          <input type='checkbox' name='use_offline_grades' value="${_("yes")}">
+          <input type='checkbox' name='use_offline_grades' value="yes">
         </span>
       </p>
     %endif

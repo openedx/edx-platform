@@ -149,7 +149,7 @@ class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
 
             for child_loc in group:
                 child = self.system.load_item(child_loc)
-                group_elem.append(etree.fromstring(child.export_to_xml(resource_fs)))
+                self.runtime.add_block_as_child_node(child, group_elem)
 
         return xml_object
 

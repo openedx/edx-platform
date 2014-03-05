@@ -1,0 +1,54 @@
+###################################
+February 5, 2014
+###################################
+
+You can now access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
+
+
+*************
+edX Studio
+*************
+
+New documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface.
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+Recent documentation additions include:
+
+* `Using an Instant Hangout in Your Course <http://edx.readthedocs.org/projects/ca/en/latest/google_hangouts.html>`_
+* `Student Data <http://edx.readthedocs.org/projects/ca/en/latest/course_student.html>`_
+* `Grades <http://edx.readthedocs.org/projects/ca/en/latest/course_grades.html>`_
+* `Multiple Choice and Numerical Input Problem <http://edx.readthedocs.org/projects/ca/en/latest/additional_tools.html#multiple-choice-and-numerical-input>`_
+
+
+==========================
+Changes and Updates
+==========================
+
+* The Display Name of a component is now shown if the unit is Private or a draft. For more information, see the `updated documentation on components <http://edx.readthedocs.org/projects/ca/en/latest/organizing_course.html#components>`_.
+
+
+***************************************
+edX Learning Management System
+***************************************
+
+* The Role element is now added to LTI components.  For edX users with the Instructor role, the Instructor role is passed to LTI.  EdX users with the Staff role have the Administrator role passed to LTI.  All students are passed as Student to LTI. (BLD-583)
+
+===========================
+Accessibility Improvements
+===========================
+
+* The HTML language is now set by the language setting of the user's browser. This enables screen readers to detect the current language.
+
+* Page titles are now more descriptive, enabling screen readers to better interpret the user's location.  The page titles contain the subsection or tab, then the course, then edX. For example, a title from edX101 is ``Creating Video Segments | edX101 Courseware | edX``.
+
+
+***************************************
+Discussions
+***************************************
+
+* Long discussion threads are now paginated. When a student opens the discussion thread, first 25 responses are loaded. The student can then load 100 more responses at a time. The field and button to submit a new response are always available at the bottom of the listed responses. (FOR-371)
+
+* When you hover the mouse button over a discussion thread in the left side bar, the pop-up tool-tip now correctly displays the number of unread comments you have in the thread. (FOR-434)

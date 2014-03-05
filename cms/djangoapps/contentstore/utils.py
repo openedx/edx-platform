@@ -35,8 +35,8 @@ def delete_course_and_groups(course_id, commit=False):
     module_store = modulestore('direct')
     content_store = contentstore()
 
-    org, course_num, _ = course_id.split("/")
-    module_store.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
+    course_id_dict = Location.parse_course_id(course_id)
+    module_store.ignore_write_events_on_courses.append('{org}/{course}'.format(**course_id_dict))
 
     loc = CourseDescriptor.id_to_location(course_id)
     if delete_course(module_store, content_store, loc, commit):
@@ -220,16 +220,6 @@ def compute_unit_state(unit):
             return UnitState.private
     else:
         return UnitState.public
-
-
-def update_item(location, value):
-    """
-    If value is None, delete the db entry. Otherwise, update it using the correct modulestore.
-    """
-    if value is None:
-        get_modulestore(location).delete_item(location)
-    else:
-        get_modulestore(location).update_item(location, value)
 
 
 def add_extra_panel_tab(tab_type, course):

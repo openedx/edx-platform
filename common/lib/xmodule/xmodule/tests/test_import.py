@@ -158,9 +158,9 @@ class ImportTestCase(BaseCourseTestCase):
         system = self.get_system()
         descriptor = system.process_xml(bad_xml)
 
-        resource_fs = None
-        tag_xml = descriptor.export_to_xml(resource_fs)
-        re_import_descriptor = system.process_xml(tag_xml)
+        node = etree.Element('unknown')
+        descriptor.add_xml_to_node(node)
+        re_import_descriptor = system.process_xml(etree.tostring(node))
 
         self.assertEqual(re_import_descriptor.__class__.__name__, 'ErrorDescriptorWithMixins')
 
@@ -182,12 +182,11 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor = system.process_xml(xml_str_in)
 
         # export it
-        resource_fs = None
-        xml_str_out = descriptor.export_to_xml(resource_fs)
+        node = etree.Element('unknown')
+        descriptor.add_xml_to_node(node)
 
         # Now make sure the exported xml is a sequential
-        xml_out = etree.fromstring(xml_str_out)
-        self.assertEqual(xml_out.tag, 'sequential')
+        self.assertEqual(node.tag, 'sequential')
 
     def test_metadata_import_export(self):
         """Two checks:
@@ -221,19 +220,19 @@ class ImportTestCase(BaseCourseTestCase):
         )
 
         # Now export and check things
-        resource_fs = MemoryFS()
-        exported_xml = descriptor.export_to_xml(resource_fs)
+        descriptor.runtime.export_fs = MemoryFS()
+        node = etree.Element('unknown')
+        descriptor.add_xml_to_node(node)
 
         # Check that the exported xml is just a pointer
-        print("Exported xml:", exported_xml)
-        pointer = etree.fromstring(exported_xml)
-        self.assertTrue(is_pointer_tag(pointer))
+        print("Exported xml:", etree.tostring(node))
+        self.assertTrue(is_pointer_tag(node))
         # but it's a special case course pointer
-        self.assertEqual(pointer.attrib['course'], COURSE)
-        self.assertEqual(pointer.attrib['org'], ORG)
+        self.assertEqual(node.attrib['course'], COURSE)
+        self.assertEqual(node.attrib['org'], ORG)
 
         # Does the course still have unicorns?
-        with resource_fs.open('course/{url_name}.xml'.format(url_name=url_name)) as f:
+        with descriptor.runtime.export_fs.open('course/{url_name}.xml'.format(url_name=url_name)) as f:
             course_xml = etree.fromstring(f.read())
 
         self.assertEqual(course_xml.attrib['unicorn'], 'purple')
@@ -247,7 +246,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         # Does the chapter tag now have a due attribute?
         # hardcoded path to child
-        with resource_fs.open('chapter/ch.xml') as f:
+        with descriptor.runtime.export_fs.open('chapter/ch.xml') as f:
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')
         self.assertFalse('due' in chapter_xml.attrib)

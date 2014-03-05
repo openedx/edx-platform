@@ -4,9 +4,7 @@ Student Views
 import datetime
 import json
 import logging
-import random
 import re
-import string       # pylint: disable=W0402
 import urllib
 import uuid
 import time
@@ -18,13 +16,11 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import password_reset_confirm
-# from django.contrib.sessions.models import Session
 from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          Http404)
@@ -45,14 +41,16 @@ from student.models import (
     CourseEnrollmentAllowed, UserStanding, LoginFailures
 )
 from student.forms import PasswordResetFormNoActive
+from student.firebase_token_generator import create_token
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
+from dark_lang.models import DarkLangConfig
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
 
 from collections import namedtuple
 
@@ -67,11 +65,12 @@ from bulk_email.models import Optout, CourseAuthorization
 from cme_registration.views import cme_register_user, cme_create_account
 
 import shoppingcart
+from user_api.models import UserPreference
+from lang_pref import LANGUAGE_KEY
 
 import track.views
 
 from dogapi import dog_stats_api
-from pytz import UTC
 
 from util.json_request import JsonResponse
 
@@ -155,6 +154,15 @@ def _get_date_for_press(publish_date):
     else:
         date = datetime.datetime.strptime(date, "%B, %Y").replace(tzinfo=UTC)
     return date
+
+
+def embargo(_request):
+    """
+    Render the embargo page.
+
+    Explains to the user why they are not able to access a particular embargoed course.
+    """
+    return render_to_response('static_templates/embargo.html')
 
 
 def press(request):
@@ -280,7 +288,6 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
                       .format(user.username, enrollment.course_id))
 
 
-
 def _cert_info(user, course, cert_status):
     """
     Implements the logic for cert_info -- split out for testing.
@@ -345,7 +352,7 @@ def signin_user(request):
     """
     This view will display the non-modal login form
     """
-    if (settings.FEATURES['AUTH_USE_MIT_CERTIFICATES'] and
+    if (settings.FEATURES['AUTH_USE_CERTIFICATES'] and
             external_auth.views.ssl_get_cert_from_request(request)):
         # SSL login doesn't require a view, so redirect
         # branding and allow that to process the login if it
@@ -375,7 +382,7 @@ def register_user(request, extra_context=None):
 
     if UserProfile.has_registered(request.user):
         return redirect(reverse('dashboard'))
-    if settings.FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP'):
+    if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to branding to process their certificate if SSL is enabled
         # and registration is disabled.
         return redirect(reverse('root'))
@@ -469,7 +476,7 @@ def dashboard(request):
     show_email_settings_for = frozenset(
         course.id for course, _enrollment in course_enrollment_pairs if (
             settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
-            modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE and
+            modulestore().get_modulestore_type(course.id) != XML_MODULESTORE_TYPE and
             CourseAuthorization.instructor_email_enabled(course.id)
         )
     )
@@ -496,23 +503,42 @@ def dashboard(request):
     # we'll display the banner
     denied_banner = any(item.display for item in reverifications["denied"])
 
-    context = {'course_enrollment_pairs': course_enrollment_pairs,
-               'course_optouts': course_optouts,
-               'message': message,
-               'external_auth_map': external_auth_map,
-               'staff_access': staff_access,
-               'errored_courses': errored_courses,
-               'show_courseware_links_for': show_courseware_links_for,
-               'all_course_modes': course_modes,
-               'cert_statuses': cert_statuses,
-               'show_email_settings_for': show_email_settings_for,
-               'reverifications': reverifications,
-               'verification_status': verification_status,
-               'verification_msg': verification_msg,
-               'show_refund_option_for': show_refund_option_for,
-               'denied_banner': denied_banner,
-               'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
-               }
+    language_options = DarkLangConfig.current().released_languages_list
+
+    # add in the default language if it's not in the list of released languages
+    if settings.LANGUAGE_CODE not in language_options:
+        language_options.append(settings.LANGUAGE_CODE)
+
+    # try to get the prefered language for the user
+    cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
+    if cur_lang_code:
+        # if the user has a preference, get the name from the code
+        current_language = settings.LANGUAGE_DICT[cur_lang_code]
+    else:
+        # if the user doesn't have a preference, use the default language
+        current_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
+
+    context = {
+        'course_enrollment_pairs': course_enrollment_pairs,
+        'course_optouts': course_optouts,
+        'message': message,
+        'external_auth_map': external_auth_map,
+        'staff_access': staff_access,
+        'errored_courses': errored_courses,
+        'show_courseware_links_for': show_courseware_links_for,
+        'all_course_modes': course_modes,
+        'cert_statuses': cert_statuses,
+        'show_email_settings_for': show_email_settings_for,
+        'reverifications': reverifications,
+        'verification_status': verification_status,
+        'verification_msg': verification_msg,
+        'show_refund_option_for': show_refund_option_for,
+        'denied_banner': denied_banner,
+        'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
+        'language_options': language_options,
+        'current_language': current_language,
+        'current_language_code': cur_lang_code,
+    }
 
     return render_to_response('dashboard.html', context)
 
@@ -603,10 +629,23 @@ def change_enrollment(request):
     if action == "enroll":
         # Make sure the course exists
         # We don't do this check on unenroll, or a bad course id can't be unenrolled from
+        try:
+            course = course_from_id(course_id)
+        except ItemNotFoundError:
+            log.warning("User {0} tried to enroll in non-existent course {1}"
+                        .format(user.username, course_id))
+            return HttpResponseBadRequest(_("Course id is invalid"))
+
         can_enroll, error_msg = _check_can_enroll_in_course(user, course_id)
 
         if not can_enroll:
             return HttpResponseBadRequest(error_msg)
+
+        # see if we have already filled up all allowed enrollments
+        is_course_full = CourseEnrollment.is_course_full(course)
+
+        if is_course_full:
+            return HttpResponseBadRequest(_("Course is full"))
 
         # If this course is available in multiple modes, redirect them to a page
         # where they can choose which mode they want.
@@ -618,12 +657,12 @@ def change_enrollment(request):
 
         current_mode = available_modes[0]
 
-        org, course_num, run = course_id.split("/")
+        course_id_dict = Location.parse_course_id(course_id)
         dog_stats_api.increment(
             "common.student.enrollment",
-            tags=[u"org:{0}".format(org),
-                  u"course:{0}".format(course_num),
-                  u"run:{0}".format(run)]
+            tags=[u"org:{org}".format(**course_id_dict),
+                  u"course:{course}".format(**course_id_dict),
+                  u"run:{name}".format(**course_id_dict)]
         )
 
         CourseEnrollment.enroll(user, course_id, mode=current_mode.slug)
@@ -647,12 +686,12 @@ def change_enrollment(request):
         if not CourseEnrollment.is_enrolled(user, course_id):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
         CourseEnrollment.unenroll(user, course_id)
-        org, course_num, run = course_id.split("/")
+        course_id_dict = Location.parse_course_id(course_id)
         dog_stats_api.increment(
             "common.student.unenrollment",
-            tags=["org:{0}".format(org),
-                  "course:{0}".format(course_num),
-                  "run:{0}".format(run)]
+            tags=[u"org:{org}".format(**course_id_dict),
+                  u"course:{course}".format(**course_id_dict),
+                  u"run:{name}".format(**course_id_dict)]
         )
         return HttpResponse()
     else:
@@ -710,7 +749,7 @@ def accounts_login(request):
     """
     if settings.FEATURES.get('AUTH_USE_CAS'):
         return redirect(reverse('cas-login'))
-    if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+    if settings.FEATURES['AUTH_USE_CERTIFICATES']:
         # SSL login doesn't require a view, so redirect
         # to branding and allow that to process the login.
         return redirect(reverse('root'))
@@ -733,8 +772,10 @@ def accounts_login(request):
 def login_user(request, error=""):
     """AJAX request to log in the user."""
     if 'email' not in request.POST or 'password' not in request.POST:
-        return HttpResponse(json.dumps({'success': False,
-                                        'value': _('There was an error receiving your login information. Please email us.')}))  # TODO: User error message
+        return JsonResponse({
+            "success": False,
+            "value": _('There was an error receiving your login information. Please email us.'),  # TODO: User error message
+        })  # TODO: this should be status code 400  # pylint: disable=fixme
 
     email = request.POST['email']
     password = request.POST['password']
@@ -751,21 +792,22 @@ def login_user(request, error=""):
         try:
             eamap = ExternalAuthMap.objects.get(user=user)
             if eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
-                return HttpResponse(json.dumps({'success': False, 'redirect': reverse('shib-login')}))
+                return JsonResponse({
+                    "success": False,
+                    "redirect": reverse('shib-login'),
+                })  # TODO: this should be status code 301  # pylint: disable=fixme
         except ExternalAuthMap.DoesNotExist:
             # This is actually the common case, logging in user without external linked login
             AUDIT_LOG.info("User %s w/o external auth attempting login", user)
 
-    # see if account has been locked out due to excessive login failres
+    # see if account has been locked out due to excessive login failures
     user_found_by_email_lookup = user
     if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
         if LoginFailures.is_user_locked_out(user_found_by_email_lookup):
-            return HttpResponse(
-                json.dumps({
-                    'success': False,
-                    'value': _('This account has been temporarily locked due to excessive login failures. Try again later.')
-                })
-            )
+            return JsonResponse({
+                "success": False,
+                "value": _('This account has been temporarily locked due to excessive login failures. Try again later.'),
+            })  # TODO: this should be status code 429  # pylint: disable=fixme
 
     # if the user doesn't exist, we want to set the username to an invalid
     # username so that authentication is guaranteed to fail and we can take
@@ -775,8 +817,10 @@ def login_user(request, error=""):
         user = authenticate(username=username, password=password, request=request)
     # this occurs when there are too many attempts from the same IP address
     except RateLimitException:
-        return HttpResponse(json.dumps({'success': False,
-                                        'value': _('Too many failed login attempts. Try again later.')}))
+        return JsonResponse({
+            "success": False,
+            "value": _('Too many failed login attempts. Try again later.'),
+        })  # TODO: this should be status code 429  # pylint: disable=fixme
     if user is None:
         # tick the failed login counters if the user exists in the database
         if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
@@ -786,8 +830,10 @@ def login_user(request, error=""):
         # doesn't exist, and doesn't have a corresponding password
         if username != "":
             AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
-        return HttpResponse(json.dumps({'success': False,
-                                        'value': _('Email or password is incorrect.')}))
+        return JsonResponse({
+            "success": False,
+            "value": _('Email or password is incorrect.'),
+        })  # TODO: this should be status code 400  # pylint: disable=fixme
 
     # successful login, clear failed login attempts counters, if applicable
     if LoginFailures.is_feature_enabled():
@@ -813,7 +859,10 @@ def login_user(request, error=""):
         redirect_url = try_change_enrollment(request)
 
         dog_stats_api.increment("common.student.successful_login")
-        response = HttpResponse(json.dumps({'success': True, 'redirect_url': redirect_url}))
+        response = JsonResponse({
+            "success": True,
+            "redirect_url": redirect_url,
+        })
 
         # set the login cookie for the edx marketing site
         # we want this cookie to be accessed via javascript
@@ -827,12 +876,11 @@ def login_user(request, error=""):
             expires_time = time.time() + max_age
             expires = cookie_date(expires_time)
 
-        response.set_cookie(settings.EDXMKTG_COOKIE_NAME,
-                            'true', max_age=max_age,
-                            expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
-                            path='/',
-                            secure=None,
-                            httponly=None)
+        response.set_cookie(
+            settings.EDXMKTG_COOKIE_NAME, 'true', max_age=max_age,
+            expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+            path='/', secure=None, httponly=None,
+        )
 
         return response
 
@@ -840,8 +888,10 @@ def login_user(request, error=""):
 
     reactivation_email_for_user(user)
     not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
-    return HttpResponse(json.dumps({'success': False,
-                                    'value': not_activated_msg}))
+    return JsonResponse({
+        "success": False,
+        "value": not_activated_msg,
+    })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 
 @ensure_csrf_cookie
@@ -859,10 +909,12 @@ def logout_user(request):
     else:
         target = '/'
     response = redirect(target)
-    response.delete_cookie(settings.EDXMKTG_COOKIE_NAME,
-                           path='/',
-                           domain=settings.SESSION_COOKIE_DOMAIN)
+    response.delete_cookie(
+        settings.EDXMKTG_COOKIE_NAME,
+        path='/', domain=settings.SESSION_COOKIE_DOMAIN,
+    )
     return response
+
 
 @require_GET
 @login_required
@@ -950,8 +1002,10 @@ def change_setting(request):
         up.location = request.POST['location']
     up.save()
 
-    return HttpResponse(json.dumps({'success': True,
-                                    'location': up.location, }))
+    return JsonResponse({
+        "success": True,
+        "location": up.location,
+    })
 
 
 def _do_create_account(post_vars):
@@ -1169,8 +1223,8 @@ def create_account(request, post_override=None):
                            '-' * 80 + '\n\n' + message)
                 send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
             else:
-                _res = user.email_user(subject, message, from_address)
-        except:
+                user.email_user(subject, message, from_address)
+        except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send activation email to user', exc_info=True)
             js['value'] = _('Could not send activation e-mail.')
             # What is the correct status code to use here? I think it's 500, because
@@ -1362,8 +1416,10 @@ def password_reset(request):
                   from_email=settings.DEFAULT_FROM_EMAIL,
                   request=request,
                   domain_override=request.get_host())
-    return HttpResponse(json.dumps({'success': True,
-                                        'value': render_to_string('registration/password_reset_done.html', {})}))
+    return JsonResponse({
+        'success': True,
+        'value': render_to_string('registration/password_reset_done.html', {}),
+    })
 
 
 def password_reset_confirm_wrapper(
@@ -1394,23 +1450,30 @@ def reactivation_email_for_user(user):
     try:
         reg = Registration.objects.get(user=user)
     except Registration.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': _('No inactive user with this e-mail exists')}))
+        return JsonResponse({
+            "success": False,
+            "error": _('No inactive user with this e-mail exists'),
+        })  # TODO: this should be status code 400  # pylint: disable=fixme
 
-    d = {'name': user.profile.name,
-         'key': reg.activation_key}
+    context = {
+        'name': user.profile.name,
+        'key': reg.activation_key,
+    }
 
-    subject = render_to_string('emails/activation_email_subject.txt', d)
+    subject = render_to_string('emails/activation_email_subject.txt', context)
     subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/activation_email.txt', d)
+    message = render_to_string('emails/activation_email.txt', context)
 
     try:
-        _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-    except:
+        user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    except Exception:  # pylint: disable=broad-except
         log.warning('Unable to send reactivation email', exc_info=True)
-        return HttpResponse(json.dumps({'success': False, 'error': _('Unable to send reactivation email')}))
+        return JsonResponse({
+            "success": False,
+            "error": _('Unable to send reactivation email')
+        })  # TODO: this should be status code 500  # pylint: disable=fixme
 
-    return HttpResponse(json.dumps({'success': True}))
+    return JsonResponse({"success": True})
 
 
 @ensure_csrf_cookie
@@ -1424,20 +1487,26 @@ def change_email_request(request):
     user = request.user
 
     if not user.check_password(request.POST['password']):
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': _('Invalid password')}))
+        return JsonResponse({
+            "success": False,
+            "error": _('Invalid password'),
+        })  # TODO: this should be status code 400  # pylint: disable=fixme
 
     new_email = request.POST['new_email']
     try:
         validate_email(new_email)
     except ValidationError:
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': _('Valid e-mail address required.')}))
+        return JsonResponse({
+            "success": False,
+            "error": _('Valid e-mail address required.'),
+        })  # TODO: this should be status code 400  # pylint: disable=fixme
 
     if User.objects.filter(email=new_email).count() != 0:
         ## CRITICAL TODO: Handle case sensitivity for e-mails
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': _('An account with this e-mail already exists.')}))
+        return JsonResponse({
+            "success": False,
+            "error": _('An account with this e-mail already exists.'),
+        })  # TODO: this should be status code 400  # pylint: disable=fixme
 
     pec_list = PendingEmailChange.objects.filter(user=request.user)
     if len(pec_list) == 0:
@@ -1452,8 +1521,10 @@ def change_email_request(request):
 
     if pec.new_email == user.email:
         pec.delete()
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': _('Old email is the same as the new email.')}))
+        return JsonResponse({
+            "success": False,
+            "error": _('Old email is the same as the new email.'),
+        })  # TODO: this should be status code 400  # pylint: disable=fixme
 
     context = {
         'key': pec.activation_key,
@@ -1471,9 +1542,9 @@ def change_email_request(request):
         settings.DEFAULT_FROM_EMAIL
     )
 
-    _res = send_mail(subject, message, from_address, [pec.new_email])
+    send_mail(subject, message, from_address, [pec.new_email])
 
-    return HttpResponse(json.dumps({'success': True}))
+    return JsonResponse({"success": True})
 
 
 @ensure_csrf_cookie
@@ -1555,14 +1626,17 @@ def change_name_request(request):
     pnc.new_name = request.POST['new_name']
     pnc.rationale = request.POST['rationale']
     if len(pnc.new_name) < 2:
-        return HttpResponse(json.dumps({'success': False, 'error': _('Name required')}))
+        return JsonResponse({
+            "success": False,
+            "error": _('Name required'),
+        })  # TODO: this should be status code 400  # pylint: disable=fixme
     pnc.save()
 
     # The following automatically accepts name change requests. Remove this to
     # go back to the old system where it gets queued up for admin approval.
     accept_name_change_by_id(pnc.id)
 
-    return HttpResponse(json.dumps({'success': True}))
+    return JsonResponse({"success": True})
 
 
 @ensure_csrf_cookie
@@ -1571,14 +1645,19 @@ def pending_name_changes(request):
     if not request.user.is_staff:
         raise Http404
 
-    changes = list(PendingNameChange.objects.all())
-    js = {'students': [{'new_name': c.new_name,
-                        'rationale': c.rationale,
-                        'old_name': UserProfile.objects.get(user=c.user).name,
-                        'email': c.user.email,
-                        'uid': c.user.id,
-                        'cid': c.id} for c in changes]}
-    return render_to_response('name_changes.html', js)
+    students = []
+    for change in PendingNameChange.objects.all():
+        profile = UserProfile.objects.get(user=change.user)
+        students.append({
+            "new_name": change.new_name,
+            "rationale": change.rationale,
+            "old_name": profile.name,
+            "email": change.user.email,
+            "uid": change.user.id,
+            "cid": change.id,
+        })
+
+    return render_to_response("name_changes.html", {"students": students})
 
 
 @ensure_csrf_cookie
@@ -1590,17 +1669,23 @@ def reject_name_change(request):
     try:
         pnc = PendingNameChange.objects.get(id=int(request.POST['id']))
     except PendingNameChange.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False, 'error': _('Invalid ID')}))
+        return JsonResponse({
+            "success": False,
+            "error": _('Invalid ID'),
+        })  # TODO: this should be status code 400  # pylint: disable=fixme
 
     pnc.delete()
-    return HttpResponse(json.dumps({'success': True}))
+    return JsonResponse({"success": True})
 
 
 def accept_name_change_by_id(id):
     try:
         pnc = PendingNameChange.objects.get(id=id)
     except PendingNameChange.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False, 'error': _('Invalid ID')}))
+        return JsonResponse({
+            "success": False,
+            "error": _('Invalid ID'),
+        })  # TODO: this should be status code 400  # pylint: disable=fixme
 
     u = pnc.user
     up = UserProfile.objects.get(user=u)
@@ -1616,7 +1701,7 @@ def accept_name_change_by_id(id):
     up.save()
     pnc.delete()
 
-    return HttpResponse(json.dumps({'success': True}))
+    return JsonResponse({"success": True})
 
 
 @ensure_csrf_cookie
@@ -1653,9 +1738,7 @@ def change_email_settings(request):
         log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(user.username, user.email, course_id))
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
-    return HttpResponse(json.dumps({'success': True}))
-
-from student.firebase_token_generator import create_token
+    return JsonResponse({"success": True})
 
 
 @login_required

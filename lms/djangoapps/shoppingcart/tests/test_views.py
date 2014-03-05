@@ -20,7 +20,7 @@ from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from shoppingcart.processors import render_purchase_form_html
-from mock import patch, Mock, sentinel
+from mock import patch, Mock
 from shoppingcart.views import initialize_report
 
 

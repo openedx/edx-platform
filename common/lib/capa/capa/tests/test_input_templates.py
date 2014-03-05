@@ -124,6 +124,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         self.context = {'id': '1',
                         'choices': choices,
                         'status': 'correct',
+                        'label': 'test',
                         'input_type': 'checkbox',
                         'name_array_suffix': '1',
                         'value': '3'}
@@ -336,6 +337,11 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             # Expect that we do NOT see the message yet
             self.assert_no_xpath(xml, "//div[@class='capa_alert']", self.context)
 
+    def test_label(self):
+        xml = self.render_to_xml(self.context)
+        xpath = "//fieldset[@aria-label='%s']" % self.context['label']
+        self.assert_has_xpath(xml, xpath, self.context)
+
 
 class TextlineTemplateTest(TemplateTestCase):
     """
@@ -347,6 +353,7 @@ class TextlineTemplateTest(TemplateTestCase):
     def setUp(self):
         self.context = {'id': '1',
                         'status': 'correct',
+                        'label': 'test',
                         'value': '3',
                         'preprocessor': None,
                         'trailing_text': None}
@@ -383,6 +390,11 @@ class TextlineTemplateTest(TemplateTestCase):
             # (used to by CSS to draw the green check / red x)
             self.assert_has_text(xml, "//p[@class='status']",
                                  status_mark, exact=False)
+
+    def test_label(self):
+        xml = self.render_to_xml(self.context)
+        xpath = "//input[@aria-label='%s']" % self.context['label']
+        self.assert_has_xpath(xml, xpath, self.context)
 
     def test_hidden(self):
         self.context['hidden'] = True
@@ -460,6 +472,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
             'id': 2,
             'value': 'PREFILLED_VALUE',
             'status': 'unsubmitted',
+            'label': 'test',
             'previewer': 'file.js',
             'reported_status': 'REPORTED_STATUS',
         }
@@ -651,7 +664,7 @@ class OptionInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'optioninput.html'
 
     def setUp(self):
-        self.context = {'id': 2, 'options': [], 'status': 'unsubmitted', 'value': 0}
+        self.context = {'id': 2, 'options': [], 'status': 'unsubmitted', 'label': 'test', 'value': 0}
         super(OptionInputTemplateTest, self).setUp()
 
     def test_select_options(self):
@@ -693,6 +706,11 @@ class OptionInputTemplateTest(TemplateTestCase):
 
             xpath = "//span[@class='{0}']".format(expected_css_class)
             self.assert_has_xpath(xml, xpath, self.context)
+
+    def test_label(self):
+        xml = self.render_to_xml(self.context)
+        xpath = "//select[@aria-label='%s']" % self.context['label']
+        self.assert_has_xpath(xml, xpath, self.context)
 
 
 class DragAndDropTemplateTest(TemplateTestCase):
@@ -769,6 +787,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
                         'choices': choices,
                         'status': 'correct',
                         'input_type': 'radio',
+                        'label': 'choicetext label',
                         'value': self.VALUE_DICT}
 
         super(ChoiceTextGroupTemplateTest, self).setUp()
@@ -908,3 +927,8 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             # Should NOT mark the whole problem
             xpath = "//div[@class='indicator_container']/span"
             self.assert_no_xpath(xml, xpath, self.context)
+
+    def test_label(self):
+        xml = self.render_to_xml(self.context)
+        xpath = "//fieldset[@aria-label='%s']" % self.context['label']
+        self.assert_has_xpath(xml, xpath, self.context)

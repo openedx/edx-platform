@@ -10,7 +10,7 @@ metadata:
        That is, each of the alternate responses presented to the student should be the result of a plausible mistake 
        that a student might make.
     
-       What Apple device competed with the portable CD player?
+       >>What Apple device competed with the portable CD player?<<
             ( ) The iPad
             ( ) Napster
             (x) The iPod
@@ -30,7 +30,7 @@ data: |
 
    <p>What Apple device competed with the portable CD player?</p>
        <multiplechoiceresponse>
-        <choicegroup type="MultipleChoice">
+        <choicegroup type="MultipleChoice" label="What Apple device competed with the portable CD player?">
            <choice correct="false" name="ipad">The iPad</choice>
            <choice correct="false" name="beatles">Napster</choice>
            <choice correct="true" name="ipod">The iPod</choice>

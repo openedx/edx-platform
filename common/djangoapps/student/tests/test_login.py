@@ -23,6 +23,7 @@ from external_auth.models import ExternalAuthMap
 
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
+
 class LoginTest(TestCase):
     '''
     Test student.views.login_user() view
@@ -202,9 +203,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         self.course = CourseFactory.create(org='Stanford', number='456', display_name='NO SHIB')
         self.shib_course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
         self.shib_course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        metadata = own_metadata(self.shib_course)
-        metadata['enrollment_domain'] = self.shib_course.enrollment_domain
-        self.store.update_metadata(self.shib_course.location.url(), metadata)
+        self.store.update_item(self.shib_course, '**replace_user**')
         self.user_w_map = UserFactory.create(email='withmap@stanford.edu')
         self.extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
                                        external_email='withmap@stanford.edu',
@@ -224,7 +223,11 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         """
         response = self.client.post(reverse('login'), {'email': self.user_w_map.email, 'password': ''})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, json.dumps({'success': False, 'redirect': reverse('shib-login')}))
+        obj = json.loads(response.content)
+        self.assertEqual(obj, {
+            'success': False,
+            'redirect': reverse('shib-login'),
+        })
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test__get_course_enrollment_domain(self):

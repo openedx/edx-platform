@@ -21,7 +21,7 @@ Before you add a Discussion component, it is generally a good idea to add an HTM
 Also see the following chapters:
 
 * :ref:`Discussions`
-* :ref:`Guidance for Discussion Moderators`ß
+* :ref:`Guidance for Discussion Moderators`
 
 .. _Create a Discussion Component:
 

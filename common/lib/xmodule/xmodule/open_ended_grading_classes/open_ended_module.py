@@ -149,14 +149,22 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         event_info['problem_id'] = self.location_string
         event_info['student_id'] = system.anonymous_student_id
         event_info['survey_responses'] = data
+        _ = self.system.service(self, "i18n").ugettext
 
         survey_responses = event_info['survey_responses']
         for tag in ['feedback', 'submission_id', 'grader_id', 'score']:
             if tag not in survey_responses:
                 # This is a student_facing_error
-                return {'success': False,
-                        'msg': "Could not find needed tag {0} in the survey responses.  Please try submitting again.".format(
-                            tag)}
+                return {
+                    'success': False,
+                    # Translators: 'tag' is one of 'feedback', 'submission_id',
+                    # 'grader_id', or 'score'. They are categories that a student
+                    # responds to when filling out a post-assessment survey
+                    # of his or her grade from an openended problem.
+                    'msg': _("Could not find needed tag {tag_name} in the "
+                             "survey responses. Please try submitting "
+                             "again.").format(tag_name=tag)
+                }
         try:
             submission_id = int(survey_responses['submission_id'])
             grader_id = int(survey_responses['grader_id'])
@@ -171,11 +179,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             )
             log.exception(error_message)
             # This is a student_facing_error
-            return {'success': False, 'msg': "There was an error saving your feedback.  Please contact course staff."}
+            return {
+                'success': False,
+                'msg': _(
+                    "There was an error saving your feedback. Please "
+                    "contact course staff."
+                )
+            }
 
         xqueue = system.get('xqueue')
         if xqueue is None:
-            return {'success': False, 'msg': "Couldn't submit feedback."}
+            return {'success': False, 'msg': _("Couldn't submit feedback.")}
         qinterface = xqueue['interface']
         qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
         anonymous_student_id = system.anonymous_student_id
@@ -208,10 +222,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # Convert error to a success value
         success = True
-        message = "Successfully saved your feedback."
+        message = _("Successfully saved your feedback.")
         if error:
             success = False
-            message = "Unable to save your feedback. Please try again later."
+            message = _("Unable to save your feedback. Please try again later.")
             log.error("Unable to send feedback to grader. location: {0}, error_message: {1}".format(
                 self.location_string, error_message
             ))
@@ -277,12 +291,14 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'key': queuekey,
             'time': qtime,
         }
-
+        _ = self.system.service(self, "i18n").ugettext
         success = True
-        message = "Successfully saved your submission."
+        message = _("Successfully saved your submission.")
         if error:
             success = False
-            message = 'Unable to submit your submission to grader. Please try again later.'
+            # Translators: the `grader` refers to the grading service open response problems
+            # are sent to, either to be machine-graded, peer-graded, or instructor-graded.
+            message = _('Unable to submit your submission to the grader. Please try again later.')
             log.error("Unable to submit to grader. location: {0}, error_message: {1}".format(
                 self.location_string, error_message
             ))
@@ -297,9 +313,12 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         @param system: Modulesystem
         @return: Boolean True (not useful currently)
         """
+        _ = self.system.service(self, "i18n").ugettext
         new_score_msg = self._parse_score_msg(score_msg, system)
         if not new_score_msg['valid']:
-            new_score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
+            # Translators: the `grader` refers to the grading service open response problems
+            # are sent to, either to be machine-graded, peer-graded, or instructor-graded.
+            new_score_msg['feedback'] = _('Invalid grader reply. Please contact the course staff.')
 
         # self.child_history is initialized as [].  record_latest_score() and record_latest_post_assessment()
         # operate on self.child_history[-1].  Thus we have to make sure child_history is not [].
@@ -387,7 +406,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         def format_feedback(feedback_type, value):
             feedback_type, value = encode_values(feedback_type, value)
-            feedback = """
+            feedback = u"""
             <div class="{feedback_type}">
             {value}
             </div>
@@ -405,10 +424,15 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         # that we can do proper escaping here (e.g. are the graders allowed to
         # include HTML?)
 
+        _ = self.system.service(self, "i18n").ugettext
         for tag in ['success', 'feedback', 'submission_id', 'grader_id']:
             if tag not in response_items:
                 # This is a student_facing_error
-                return format_feedback('errors', 'Error getting feedback from grader.')
+                return format_feedback(
+                    # Translators: the `grader` refers to the grading service open response problems
+                    # are sent to, either to be machine-graded, peer-graded, or instructor-graded.
+                    'errors', _('Error getting feedback from grader.')
+                )
 
         feedback_items = response_items['feedback']
         try:
@@ -417,12 +441,20 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             # This is a dev_facing_error
             log.exception("feedback_items from external open ended grader have invalid json {0}".format(feedback_items))
             # This is a student_facing_error
-            return format_feedback('errors', 'Error getting feedback from grader.')
+            return format_feedback(
+                # Translators: the `grader` refers to the grading service open response problems
+                # are sent to, either to be machine-graded, peer-graded, or instructor-graded.
+                'errors', _('Error getting feedback from grader.')
+            )
 
         if response_items['success']:
             if len(feedback) == 0:
                 # This is a student_facing_error
-                return format_feedback('errors', 'No feedback available from grader.')
+                return format_feedback(
+                    # Translators: the `grader` refers to the grading service open response problems
+                    # are sent to, either to be machine-graded, peer-graded, or instructor-graded.
+                    'errors', _('No feedback available from grader.')
+                )
 
             for tag in do_not_render:
                 if tag in feedback:
@@ -648,12 +680,14 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'check_for_score': self.check_for_score,
             'store_answer': self.store_answer,
         }
-
+        _ = self.system.service(self, "i18n").ugettext
         if dispatch not in handlers:
             # This is a dev_facing_error
             log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
             # This is a dev_facing_error
-            return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
+            return json.dumps(
+                {'error': _('Error handling action. Please try again.'), 'success': False}
+            )
 
         before = self.get_progress()
         d = handlers[dispatch](data, system)
@@ -733,6 +767,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         Input: Modulesystem object
         Output: Rendered HTML
         """
+        _ = self.system.service(self, "i18n").ugettext
         # set context variables and render template
         eta_string = None
         if self.child_state != self.INITIAL:
@@ -740,7 +775,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
             if self.child_state == self.ASSESSING:
-                eta_string = "Your response has been submitted.  Please check back later for your grade."
+                # Translators: this string appears once an openended response
+                # is submitted but before it has been graded
+                eta_string = _("Your response has been submitted. Please check back later for your grade.")
         else:
             post_assessment = ""
             correct = ""

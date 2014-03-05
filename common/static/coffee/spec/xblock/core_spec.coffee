@@ -2,9 +2,9 @@ describe "XBlock", ->
   beforeEach ->
     setFixtures """
       <div>
-        <div class='xblock' id='vA' data-runtime-version="A" data-init="initFnA" data-name="a-name"/>
+        <div class='xblock' id='vA' data-runtime-version="A" data-runtime-class="TestRuntime" data-init="initFnA" data-name="a-name"/>
         <div>
-          <div class='xblock' id='vZ' data-runtime-version="Z" data-init="initFnZ"/>
+          <div class='xblock' id='vZ' data-runtime-version="Z" data-runtime-class="TestRuntime" data-init="initFnZ"/>
         </div>
         <div class='xblock' id='missing-version' data-init='initFnA' data-name='no-version'/>
         <div class='xblock' id='missing-init' data-runtime-version="A" data-name='no-init'/>
@@ -13,8 +13,11 @@ describe "XBlock", ->
 
   describe "initializeBlock", ->
     beforeEach ->
-      XBlock.runtime.vA = jasmine.createSpy().andReturn('runtimeA')
-      XBlock.runtime.vZ = jasmine.createSpy().andReturn('runtimeZ')
+      window.TestRuntime = {}
+      @runtimeA = {name: 'runtimeA'}
+      @runtimeZ = {name: 'runtimeZ'}
+      TestRuntime.vA = jasmine.createSpy().andReturn(@runtimeA)
+      TestRuntime.vZ = jasmine.createSpy().andReturn(@runtimeZ)
 
       window.initFnA = jasmine.createSpy()
       window.initFnZ = jasmine.createSpy()
@@ -28,12 +31,12 @@ describe "XBlock", ->
       @missingInitBlock = XBlock.initializeBlock($('#missing-init')[0])
 
     it "loads the right runtime version", ->
-      expect(XBlock.runtime.vA).toHaveBeenCalledWith($('#vA')[0], @fakeChildren)
-      expect(XBlock.runtime.vZ).toHaveBeenCalledWith($('#vZ')[0], @fakeChildren)
+      expect(TestRuntime.vA).toHaveBeenCalledWith()
+      expect(TestRuntime.vZ).toHaveBeenCalledWith()
 
     it "loads the right init function", ->
-      expect(window.initFnA).toHaveBeenCalledWith('runtimeA', $('#vA')[0])
-      expect(window.initFnZ).toHaveBeenCalledWith('runtimeZ', $('#vZ')[0])
+      expect(window.initFnA).toHaveBeenCalledWith(@runtimeA, $('#vA')[0])
+      expect(window.initFnZ).toHaveBeenCalledWith(@runtimeZ, $('#vZ')[0])
 
     it "loads when missing versions", ->
       expect(@missingVersionBlock.element).toBe($('#missing-version'))

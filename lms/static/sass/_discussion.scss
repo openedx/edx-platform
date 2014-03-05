@@ -2529,7 +2529,7 @@ body.discussion {
 display:none;
 }
 
-.discussion-flag-abuse {
+.discussion-flag-abuse, .discussion-delete-comment {
   font-size: 12px;
   float:right;
   padding-right: 5px;
@@ -2542,7 +2542,7 @@ display:none;
     opacity: 1.0;
   }
 }
-    
+
 .notflagged .icon {
   display: block;
   color: #333;

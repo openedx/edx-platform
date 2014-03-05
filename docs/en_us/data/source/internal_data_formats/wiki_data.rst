@@ -1,121 +1,117 @@
+.. _Wiki_Data:
+
 ##############################
 Wiki Data
 ##############################
 
-The following sections detail how edX stores Wiki data internally, and is useful for developers and researchers who are examining database exports. 
+The following sections detail how edX stores wiki data internally, and is useful for developers and researchers who are examining database exports. 
 
-EdX currently uses an external application called Django Wiki for Wiki functionality within courses. 
+EdX currently uses an external application called django-wiki for wiki functionality within courses. 
 
+In the data package, wiki data is delivered in two SQL files: 
 
+* The wiki_article file is a container for each article that is added to the wiki. The full name of this file also includes the organization and course, and indicates a source of either prod (edX) or edge, in this format: edX-*organization*-*course*-wiki_article-*source*-analytics.sql. 
 
-****************
-wiki_article
-****************
+* The wiki_articlerevision file stores data about the articles, including data about changes and deletions. The full name of this file is in this format: edX-*organization*-*course*-wiki_articlerevision-*source*-analytics.sql.
 
-  .. list-table::
-     :widths: 15 15 15 15
-     :header-rows: 1
+***********************************
+Fields in the wiki_article file
+***********************************
 
-     * - Field
-       - Type
-       - Null
-       - Key
-     * - id
-       - int(11) 
-       - NO
-       - PRI
-     * - current_revision_id
-       - int(11)
-       - NO
-       - UNI
-     * - created
-       - datetime
-       - NO
-       -
-     * - modified
-       - datetime
-       - NO
-       -
-     * - owner_id
-       - int(11)
-       - YES
-       - MUL
-     * - group_id
-       - int(11)
-       - YES
-       - MUL
-     * - group_read
-       - tinyint(1)
-       - NO
-       - 
-     * - group_write
-       - tinyint(1)
-       - NO
-       - 
-     * - other_read
-       - tinyint(1)
-       - NO
-       - 
-     * - other_write
-       - tinyint(1)
-       - NO
-       - 
+The header row of the wiki_article SQL file, and a row of sample data, follow.
 
+.. code-block:: json
 
-`id`
+    id  current_revision_id created modified  owner_id  group_id  group_read  group_write 
+    other_read  other_write
+
+    1437  29819 2013-07-17 21:53:57 2014-01-26 14:48:02 NULL  NULL  1 1 1 1 
+
+The table that follows provides a reference to each field in this file. A description of each field follows the table.
+
++-----------------------+--------------------+--------------+--------------+
+| Field                 | Type               | Null         | Key          |
++=======================+====================+==============+==============+
+| id                    | int(11)            | NO           | PRI          |
++-----------------------+--------------------+--------------+--------------+
+| current_revision_id   | int(11)            | NO           | UNI          |
++-----------------------+--------------------+--------------+--------------+
+| created               | datetime           | NO           |              |
++-----------------------+--------------------+--------------+--------------+
+| modified              | datetime           | NO           |              |
++-----------------------+--------------------+--------------+--------------+
+| owner_id              | int(11)            | YES          | MUL          |
++-----------------------+--------------------+--------------+--------------+
+| group_id              | int(11)            | YES          | MUL          |
++-----------------------+--------------------+--------------+--------------+
+| group_read            | tinyint(1)         | NO           |              |
++-----------------------+--------------------+--------------+--------------+
+| group_write           | tinyint(1)         | NO           |              |
++-----------------------+--------------------+--------------+--------------+
+| other_read            | tinyint(1)         | NO           |              |
++-----------------------+--------------------+--------------+--------------+
+| other_write           | tinyint(1)         | NO           |              |
++-----------------------+--------------------+--------------+--------------+
+
+id
 ----
   The primary key. 
   
-
-`current_revision_id`
+current_revision_id
 ------------------------------
-   The ID of the revision that is displayed for this article.
+   The ID of the revision that displays for this article.
 
-
-`created`
+created
 ------------
     The date the article was created.
 
-
-`modified`
+modified
 ------------
     The date the article properties were last modified.
     
-`owner_id`
+owner_id
 ------------
     The owner of the article, usually the creator. The owner always has both read and write access.
     
-`group_id`
+group_id
 ------------
     As in a UNIX file system, permissions can be given to a user according to group membership. 
-    Groups are handled through the Django auth system.
+    Groups are handled through the Django authentication system.
     
-`group_read`
+group_read
 ------------
-    Whether the group has read access to the article.
+    Defines whether the group has read access to the article. 1 if so, 0 if not.
 
-`group_write`
+group_write
 --------------
-    Whether the group has write access to the article.
+    Defines whether the group has write access to the article. 1 if so, 0 if not.
 
-`other_read`
+other_read
 ------------
-    Whether others have read access to the article.
+    Defines whether others have read access to the article. 1 if so, 0 if not.
 
-`other_write`
+other_write
 ----------------------
-    Whether others have read access to the article.
+    Defines whether others have write access to the article. 1 if so, 0 if not.
 
+******************************************************
+Fields in the wiki_articlerevision file 
+******************************************************
 
+The header row of the wiki_articlerevision SQL file, and a row of sample data, follow.
 
+.. code-block:: json
 
+    id  revision_number user_message  automatic_log ip_address  user_id modified  created 
+    previous_revision_id  deleted locked  article_id  content title
+    
+    17553 1 Course page automatically created.    NULL  NULL  2013-07-17 21:53:57 2013-07-17 
+    21:53:57 NULL  0 0 1437  This is the wiki for edX's edX Demonstration Course.  DemoX
 
-**********************
-wiki_articlerevision
-**********************
+The table that follows provides a reference to the characteristics of each field in this file. Descriptions of the fields follow the table. 
 
-  .. list-table::
-     :widths: 15 15 15 15
+.. list-table::
+     :widths: 15 15 10 10
      :header-rows: 1
 
      * - Field
@@ -179,65 +175,59 @@ wiki_articlerevision
        - NO
        - 
      
-
-
-`id`
+id
 ----
-  The primary key. 
+   The primary key. 
 
-
-`revision_number`
+revision_number
 --------------------
-   The ID of the revision.
+    The ID of the revision.
 
-
-`user_message`
+user_message
 ----------------------
     The message the user added when saving the revision.
 
-
-`automatic_log`
+automatic_log
 ----------------------
+    Some changes to wiki pages are logged to make the revision history for an article available in the user interface.
 
-    
-`user_id`
+ip_address
+----------------------
+    The IP address of the device where the revision was made.
+
+user_id
 ------------
     The ID of the user who made the revision.
 
-
-`modified`
+modified
 ------------
     The date the article was last modified.
     
-
-`created`
+created
 ------------
     The date the article was created.
 
-
-`previous_revision_id`
+previous_revision_id
 ----------------------
     The ID of the revision previous to this one.
 
-`deleted`
+deleted
 ------------
-    Whether or not the revision was deleted.
+    Defines whether the revision was deleted.
 
-
-`locked`
+locked
 ------------
-    Whether or not the revision is locked.
+    Defines whether the revision is locked.
     
-`article_id`
+article_id
 --------------------
-   The ID of the revision that is displayed for this article.
+   The ID of the revision that displays data for this article.
 
-
-`content`
+content
 ------------
     The content of the article revision.
     
-`title`
+title
 ----------
    The title of the article revision.
 

@@ -4,6 +4,11 @@ Integrating XBlocks with edx-platform
 The edX LMS and Studio have several features that are extensions of the core XBlock
 libraries (https://xblock.readthedocs.org). These features are listed below.
 
+* `LMS`_
+* `Studio`_
+* `Testing`_
+* `Deploying your XBlock`_
+
 LMS
 ---
 
@@ -67,7 +72,7 @@ Class Features
 
 * studio_view (XBlock.view): The view used to render an editor in Studio.
 
-* non_editable_metadata_fields (property): A list of xblock.fields.Field objects that
+* non_editable_metadata_fields (property): A list of :class:`~xblock.fields.Field` objects that
   shouldn't be displayed in the default editing view for Studio.
 
 Restrictions
@@ -75,3 +80,59 @@ Restrictions
 
 * A block can't modify the value of any field with a scope where the ``user`` property
   is not ``UserScope.NONE``.
+
+
+Testing
+-------
+
+These instructions are temporary. Once XBlocks are fully supported by edx-platform
+(both the LMS and Studio), installation and testing will be much more straightforward.
+
+To enable an XBlock for testing in your devstack (https://github.com/edx/configuration/wiki/edX-Developer-Stack):
+
+#.  Install your block::
+
+        $ vagrant ssh
+        vagrant@precise64:~$ sudo -u edxapp /edx/bin/pip.edxapp install /path/to/your/block
+
+#.  Enable the block
+
+    #.  In ``edx-platform/lms/envs/common.py``, uncomment::
+
+        # from xmodule.x_module import prefer_xmodules
+        # XBLOCK_SELECT_FUNCTION = prefer_xmodules
+
+    #.  In ``edx-platform/cms/envs/common.py``, uncomment::
+
+        # from xmodule.x_module import prefer_xmodules
+        # XBLOCK_SELECT_FUNCTION = prefer_xmodules
+
+    #.  In ``edx-platform/cms/envs/common.py``, change::
+
+            'ALLOW_ALL_ADVANCED_COMPONENTS': False,
+
+        to::
+
+            'ALLOW_ALL_ADVANCED_COMPONENTS': True,
+
+#.  Add the block to your courses' advanced settings in Studio
+
+    #. Log in to Studio, and open your course
+    #. Settings -> Advanced Settings
+    #. Change the value for the key ``"advanced_modules"`` to ``["your-block"]``
+
+#.  Add your block into your course
+
+    #. Edit a unit
+    #. Advanced -> your-block
+
+Note the name ``your-block`` used in Studio must exactly match the key you used to add your
+block to your ``setup.py`` ``entry_points`` list.
+
+
+Deploying your XBlock
+---------------------
+
+To deploy your block to your own hosted version of edx-platform, you need to install it
+into the virtualenv that the platform is running out of, and add to the list of ``ADVANCED_COMPONENT_TYPES``
+in ``edx-platform/cms/djangoapps/contentstore/views/component.py``.

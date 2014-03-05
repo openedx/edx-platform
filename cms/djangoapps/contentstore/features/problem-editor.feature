@@ -95,6 +95,23 @@ Feature: CMS.Problem Editor
     And I delete "1" component
     Then I see no components
 
+  # This is a very specific scenario for a bug where editing a component in draft
+  # impacted the published version.
+  Scenario: Changes to draft problem do not impact published version
+    Given I have created a Blank Common Problem
+    When I publish the unit
+    And I click on "edit a draft"
+    And I change the display name to "draft"
+    And I click on "delete draft"
+    Then the problem display name is "Blank Common Problem"
+
+  Scenario: Problems can be made private after being made public
+    Given I have created a Blank Common Problem
+    When I publish the unit
+    And I click on "edit a draft"
+    And I click on "delete draft"
+    And I unpublish the unit
+    Then I can edit the problem
 
   # Disabled 11/13/2013 after failing in master
   # The screenshot showed that the LaTeX editor had the text "hi",

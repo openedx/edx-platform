@@ -75,11 +75,11 @@
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
         <input name="course_id" type="hidden" value="${course.id}">
-        <input name="enrollment_action" type="hidden" value="${_("enroll")}">
+        <input name="enrollment_action" type="hidden" value="enroll">
         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
       </fieldset>
       <div class="submit">
-        <input name="enroll" type="submit" value="${_("enroll")}">
+        <input name="enroll" type="submit" value="enroll">
       </div>
     </form>
   </div>

@@ -8,7 +8,7 @@ Settings for the LMS that runs alongside the CMS on AWS
 
 from ..dev import *
 
-FEATURES['AUTH_USE_MIT_CERTIFICATES'] = False
+FEATURES['AUTH_USE_CERTIFICATES'] = False
 
 SUBDOMAIN_BRANDING['edge'] = 'edge'
 SUBDOMAIN_BRANDING['preview.edge'] = 'edge'
@@ -30,15 +30,24 @@ modulestore_options = {
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': modulestore_options,
-    },
-    'draft': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': modulestore_options,
-    },
+        'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
+        'OPTIONS': {
+            'reference_type': 'Location',
+            'mappings': {},
+            'stores': {
+                'default': {
+                    'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+                    'OPTIONS': modulestore_options,
+                },
+                'draft': {
+                    'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+                    'OPTIONS': modulestore_options,
+                },
+            },
+        }
+    }
 }
 
 CONTENTSTORE = {

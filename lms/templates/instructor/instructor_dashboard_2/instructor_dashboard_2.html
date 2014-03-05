@@ -18,6 +18,7 @@
 ## 6. And tests go in lms/djangoapps/instructor/tests/
 
 <%block name="pagetitle">${_("Instructor Dashboard")}</%block>
+<%block name="nav_skip">#instructor-dashboard-content</%block>
 
 <%block name="headextra">
   <%static:css group='style-course-vendor'/>
@@ -58,7 +59,7 @@
   ## not checking access because if user can see this, they are at least course staff (with studio edit access)
   <div class="studio-edit-link"><a href="${studio_url}" target="_blank">${_('Edit Course In Studio')}</a></div>
 %endif
-<section class="instructor-dashboard-content-2">
+<section class="instructor-dashboard-content-2" id="instructor-dashboard-content">
 
   <h1>${_("Instructor Dashboard")}</h1>
   <hr />

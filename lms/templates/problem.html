@@ -9,11 +9,10 @@ from django.conf import settings
   ${ problem['name'] }
 </h2>
 
-<section class="problem-progress">
-</section>
+<div class="problem-progress"></div>
 
 % if problem_is_timed:
-  <section class="time_limit">
+  <div class="time_limit">
     <p>
       ${_("At {start_time}, you started this exam.").format(
           start_time=get_time_display(start_time, coerce_tz=settings.TIME_ZONE))}
@@ -23,13 +22,13 @@ from django.conf import settings
           end_time=get_time_display(end_time_to_display, coerce_tz=settings.TIME_ZONE))}
       </b>
     </p>
-  </section>
+  </div>
 % endif
 
-<section class="problem">
+<div class="problem">
   ${ problem['html'] }
 
-  <section class="action">
+  <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
 
     % if reset_button:
@@ -45,9 +44,9 @@ from django.conf import settings
     <button class="show"><span class="show-label">${_('Show Answer(s)')}</span> <span class="sr">${_("(for question(s) above - adjacent to each field)")}</span></button>
     % endif
     % if attempts_allowed :
-    <section class="submission_feedback">
+    <div class="submission_feedback">
       ${_("You have used {num_used} of {num_total} submissions").format(num_used=attempts_used, num_total=attempts_allowed)}
-    </section>
+    </div>
     % endif
-  </section>
-</section>
+  </div>
+</div>

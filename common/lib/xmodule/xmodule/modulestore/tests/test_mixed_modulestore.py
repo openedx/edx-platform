@@ -1,6 +1,6 @@
 # pylint: disable=E0611
 from nose.tools import assert_equals, assert_raises, assert_false, \
-    assert_true, assert_not_equals
+    assert_true, assert_not_equals, assert_in, assert_not_in
 # pylint: enable=E0611
 import pymongo
 from uuid import uuid4
@@ -13,6 +13,8 @@ from xmodule.modulestore.xml_importer import import_from_xml
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 from django.conf import settings
+import unittest
+import copy
 if not settings.configured:
     settings.configure()
 
@@ -37,6 +39,7 @@ OPTIONS = {
         XML_COURSEID2: 'xml',
         IMPORT_COURSEID: 'default'
     },
+    'reference_type': 'Location',
     'stores': {
         'xml': {
             'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
@@ -75,8 +78,11 @@ class TestMixedModuleStore(object):
             tz_aware=True,
         )
         cls.connection.drop_database(DB)
-        cls.fake_location = Location(['i4x', 'foo', 'bar', 'vertical', 'baz'])
-        cls.import_org, cls.import_course, cls.import_run = IMPORT_COURSEID.split('/')
+        cls.fake_location = Location('i4x', 'foo', 'bar', 'vertical', 'baz')
+        import_course_dict = Location.parse_course_id(IMPORT_COURSEID)
+        cls.import_org = import_course_dict['org']
+        cls.import_course = import_course_dict['course']
+        cls.import_run = import_course_dict['name']
         # NOTE: Creating a single db for all the tests to save time.  This
         # is ok only as long as none of the tests modify the db.
         # If (when!) that changes, need to either reload the db, or load
@@ -182,6 +188,7 @@ class TestMixedModuleStore(object):
             )
 
     def test_get_items(self):
+        # NOTE: use get_course if you just want the course. get_items only allows wildcarding of category and name
         modules = self.store.get_items(Location('i4x', None, None, 'course', None), IMPORT_COURSEID)
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, self.import_course)
@@ -190,21 +197,14 @@ class TestMixedModuleStore(object):
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, 'toy')
 
-        modules = self.store.get_items(Location('i4x', None, None, 'course', None), XML_COURSEID2)
+        modules = self.store.get_items(Location('i4x', 'edX', 'simple', 'course', None), XML_COURSEID2)
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, 'simple')
 
     def test_update_item(self):
+        # FIXME update
         with assert_raises(NotImplementedError):
-            self.store.update_item(self.fake_location, None)
-
-    def test_update_children(self):
-        with assert_raises(NotImplementedError):
-            self.store.update_children(self.fake_location, None)
-
-    def test_update_metadata(self):
-        with assert_raises(NotImplementedError):
-            self.store.update_metadata(self.fake_location, None)
+            self.store.update_item(self.fake_location, '**replace_user**')
 
     def test_delete_item(self):
         with assert_raises(NotImplementedError):
@@ -220,6 +220,18 @@ class TestMixedModuleStore(object):
         assert_true(IMPORT_COURSEID in course_ids)
         assert_true(XML_COURSEID1 in course_ids)
         assert_true(XML_COURSEID2 in course_ids)
+
+    def test_xml_get_courses(self):
+        """
+        Test that the xml modulestore only loaded the courses from the maps.
+        """
+        courses = self.store.modulestores['xml'].get_courses()
+        assert_equals(len(courses), 2)
+        course_ids = [course.location.course_id for course in courses]
+        assert_in(XML_COURSEID1, course_ids)
+        assert_in(XML_COURSEID2, course_ids)
+        # this course is in the directory from which we loaded courses but not in the map
+        assert_not_in("edX/toy/TT_2012_Fall", course_ids)
 
     def test_get_course(self):
         module = self.store.get_course(IMPORT_COURSEID)
@@ -250,3 +262,25 @@ class TestMixedModuleStore(object):
         assert_equals(Location(parents[0]).org, 'edX')
         assert_equals(Location(parents[0]).course, 'toy')
         assert_equals(Location(parents[0]).name, '2012_Fall')
+
+class TestMixedMSInit(unittest.TestCase):
+    """
+    Test initializing w/o a reference_type
+    """
+    def setUp(self):
+        unittest.TestCase.setUp(self)
+        options = copy.copy(OPTIONS)
+        del options['reference_type']
+        self.connection = pymongo.MongoClient(
+            host=HOST,
+            port=PORT,
+            tz_aware=True,
+        )
+        self.store = MixedModuleStore(**options)
+
+    def test_use_locations(self):
+        """
+        Test that use_locations defaulted correctly
+        """
+        self.assertTrue(self.store.use_locations)
+

@@ -1,12 +1,9 @@
 """Generates common contexts"""
-
-import re
 import logging
 
 from xmodule.course_module import CourseDescriptor
+from util.request import COURSE_REGEX
 
-
-COURSE_REGEX = re.compile(r'^.*?/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)')
 log = logging.getLogger(__name__)
 
 

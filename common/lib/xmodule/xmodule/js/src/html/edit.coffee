@@ -42,7 +42,7 @@ class @HTMLEditingDescriptor
       # Disable visual aid on borderless table.
       visual:false,
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
-      theme_advanced_buttons1 : "formatselect,bold,italic,underline,|,bullist,numlist,outdent,indent,|,blockquote,wrapAsCode,|,link,unlink",
+      theme_advanced_buttons1 : "formatselect,fontselect,bold,italic,underline,forecolor,|,bullist,numlist,outdent,indent,|,blockquote,wrapAsCode,|,link,unlink,|,image,",
       theme_advanced_toolbar_location : "top",
       theme_advanced_toolbar_align : "left",
       theme_advanced_statusbar_location : "none",

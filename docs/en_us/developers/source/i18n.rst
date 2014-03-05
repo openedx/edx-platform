@@ -14,6 +14,13 @@ See also:
 * `Django Translation guidelines <https://docs.djangoproject.com/en/dev/topics/i18n/translation/>`_
 * `Django Format localization <https://docs.djangoproject.com/en/dev/topics/i18n/formatting/>`_
 
+Presented in this document are the following sections:
+
+* `General internationalization rules`_
+* `Editing source files`_
+* `Coverage testing`_
+* `Style guidelines`_
+
 
 General internationalization rules
 **********************************
@@ -57,9 +64,17 @@ do:
    produce the best translation.  They have a "Translators:" marker. They must
    appear on the line preceding the text they describe.
 
-The code samples below show how to do each of these things.  Note that you have
-to take into account not just the programming language involved, but the type
-of file: Javascript embedded in an HTML Mako template is treated differently
+The code samples below show how to do each of these things for:
+
+* `Python source code`_
+* `Django template files`_
+* `Mako template files`_
+* `Javascript files`_
+* `Coffeescript files`_
+* `Other kinds of code`_
+
+Note that you have to take into account not just the programming language involved,
+but the type of file: Javascript embedded in an HTML Mako template is treated differently
 than Javascript in a pure .js file.
 
 Python source code
@@ -210,16 +225,20 @@ the strings, or checking the translations into Github, see use cases).
  
     $ rake i18n:generate
 
-4. Django should be ready to go. The next time you run Studio or LMS with a
-   browser set to Esperanto, the accented-English strings (from step 3, above)
-   should be displayed.  Be sure that your settings for ``USE_I18N`` and
-   ``USE_L10N`` are both set to True.  ``USE_I18N`` is set to False by default
-   in common.py, but is set to True in development settings files.
+4. Django should be ready to go. The next time you run Studio or LMS, append
+   ``?preview-lang=eo`` to the URL to turn on Esperanto as a dark language. The
+   accented-English strings (from step 3, above) should be displayed.
 
-5. With your browser set to Esperanto, review the pages affected by your code
-   and verify that you see fake translations. If you see plain English instead,
-   your code is not being properly translated. Review the steps in editing
-   source files (above).
+   If you experience issues, be sure that your settings for ``USE_I18N`` and
+   ``USE_L10N`` are both set to True.
+
+5. With Esperanto turned on as a dark language (see Step 4), review the pages
+   affected by your code and verify that you see fake translations. If you see
+   plain English instead, your code is not being properly translated. Review 
+   the steps in editing source files (above). 
+
+6. When you are done reviewing, append ``?clear-lang`` to the LMS or Studio URL
+   to reset your session to English.
 
 
 Coverage testing
@@ -502,15 +521,35 @@ defined::
     HELLO = _("Hello")
     GOODBYE = _("Goodbye")
 
-    _ = ugettext
-
     def get_greeting(hello):
         if hello:
-            return _(HELLO)
+            return ugettext(HELLO)
         else:
-            return _(GOODBYE)
+            return ugettext(GOODBYE)
 
-Here we define ``_()`` as a pass-through function, so the string will be
-found during extraction, but won't be translated too early.  Then we redefine
-``_()`` to be the real translation lookup function, and use it at runtime to
-get the localized string.
+Here we define ``_()`` as a pass-through function, so the string will be found
+during extraction, but won't be translated too early.  Then we use the real
+translation function at runtime to get the localized string.
+
+Multiline Strings
+=================
+
+Translator notes must directly precede the string literals to which they refer.
+For example, the translator note here will not be passed along to translators::
+
+    # Translators: you will not be able to see this note because
+    # I do not directly prepend the line with the translated string literal.
+    # See the line directly below this one does not contain part of the string?
+    long_translated_string = _(
+        "I am a long string, with many, many words. So many words that it is "
+        "advisable that I be split over this line."
+    )
+
+In such a case, make sure you format your code so that the string begins on
+a line directly below the translator note::
+
+    # Translators: you will be able to see this note.
+    # See how the line directly below this one contains the start of the string?
+    long_translated_string = _("I am a long string, with many, many words. "
+                               "So many words that it is advisable that I "
+                               "be split over this line.")

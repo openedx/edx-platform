@@ -16,7 +16,7 @@ from webob import Response
 from webob.multidict import MultiDict
 
 from xblock.core import XBlock
-from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String
+from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
 from xblock.fragment import Fragment
 from xblock.plugin import default_select
 from xblock.runtime import Runtime
@@ -222,6 +222,7 @@ class XModuleMixin(XBlockMixin):
             for child_loc in self.children:
                 try:
                     child = self.runtime.get_block(child_loc)
+                    child.runtime.export_fs = self.runtime.export_fs
                 except ItemNotFoundError:
                     log.exception(u'Unable to load item {loc}, skipping'.format(loc=child_loc))
                     continue
@@ -685,6 +686,21 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         """
         raise NotImplementedError('Modules must implement from_xml to be parsable from xml')
 
+    def add_xml_to_node(self, node):
+        """
+        Export this :class:`XModuleDescriptor` as XML, by setting attributes on the provided
+        `node`.
+        """
+        xml_string = self.export_to_xml(self.runtime.export_fs)
+        exported_node = etree.fromstring(xml_string)
+        node.tag = exported_node.tag
+        node.text = exported_node.text
+        node.tail = exported_node.tail
+        for key, value in exported_node.items():
+            node.set(key, value)
+
+        node.extend(list(exported_node))
+
     def export_to_xml(self, resource_fs):
         """
         Returns an xml string representing this module, and all modules
@@ -774,6 +790,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                 editor_type = "Float"
             elif isinstance(field, List):
                 editor_type = "List"
+            elif isinstance(field, Dict):
+                editor_type = "Dict"
             elif isinstance(field, RelativeTime):
                 editor_type = "RelativeTime"
             metadata_fields[field.name]['type'] = editor_type
@@ -926,6 +944,9 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
         """
         super(DescriptorSystem, self).__init__(**kwargs)
 
+        # This is used by XModules to write out separate files during xml export
+        self.export_fs = None
+
         self.load_item = load_item
         self.resources_fs = resources_fs
         self.error_tracker = error_tracker
@@ -996,6 +1017,11 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
     def publish(self, block, event):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock publish")
 
+    def add_block_as_child_node(self, block, node):
+        child = etree.SubElement(node, "unknown")
+        child.set('url_name', block.url_name)
+        block.add_xml_to_node(child)
+
 
 class XMLParsingSystem(DescriptorSystem):
     def __init__(self, process_xml, **kwargs):
@@ -1022,7 +1048,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
     """
     def __init__(
             self, static_url, track_function, get_module, render_template,
-            replace_urls, user=None, filestore=None,
+            replace_urls, descriptor_runtime, user=None, filestore=None,
             debug=False, hostname="", xqueue=None, publish=None, node_path="",
             anonymous_student_id='', course_id=None,
             open_ended_grading_interface=None, s3_interface=None,
@@ -1062,6 +1088,8 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
                          ajax results.
+
+        descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
 
         anonymous_student_id - Used for tracking modules with student id
 
@@ -1122,6 +1150,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         self.get_real_user = get_real_user
 
         self.get_user_role = get_user_role
+        self.descriptor_runtime = descriptor_runtime
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""
@@ -1146,7 +1175,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
 
     def get_block(self, block_id):
-        raise NotImplementedError("XModules must use get_module to load other modules")
+        return self.get_module(self.descriptor_runtime.get_block(block_id))
 
     def resource_url(self, resource):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")

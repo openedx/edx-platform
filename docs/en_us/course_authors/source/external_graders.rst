@@ -6,6 +6,7 @@ Using External Graders
 
 
 .. _External Grader Overview:
+
 *******************
 Overview
 *******************
@@ -65,11 +66,15 @@ In Pull mode, student submissions are collected in XQueue, where they remain unt
 
 The external grader polls the XQueue through a RESTful interface at a regular interval. When the external grader receives a submission, it runs the tests on it, then pushes the response back to XQueue through the RESTful interface. XQueue then delivers the response to the edX Learning Management System.
 
+For example code of an external grader that uses Pull mode, see the `Stanford-Online repository xqueue_pull_ref <https://github.com/Stanford-Online/xqueue_pull_ref>`_.
+
 ==================
 Push Mode
 ==================
 
 In Push mode, XQueue actively pushes student submissions to the external grader, which passively waits for the next submission to grade. When the external grader receives a submission, it runs the tests on it, then synchronously delivers the graded response back to the XQueue. XQueue then delivers the response to the edX Learning Management System.
+
+For example code of an external grader that uses Push mode, see the `edX repository xserver <https://github.com/edx/xserver>`_.
 
 
 ============================
@@ -100,6 +105,10 @@ The XQueue Interface
 **************************************
 
 The student submission sent from XQueue to the grader, and the response sent from the grader to XQueue, are JSON objects, as described below.
+
+.. note:: XQueue does not send the the student ID to the external grader. Your grader cannot access student IDs or associate student IDs with submissions.
+
+For the code for the XQueue interface, see the file `urls.py in the edX XQueue repository <https://github.com/edx/xqueue/blob/master/queue/urls.py>`_.
 
 ======================================================
 Inputs to the External Grader

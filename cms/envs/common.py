@@ -26,7 +26,9 @@ Longer TODO:
 
 import sys
 import lms.envs.common
-from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, enable_microsites
+from lms.envs.common import (
+    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, enable_microsites, ALL_LANGUAGES
+)
 from path import path
 
 from lms.lib.xblock.mixin import LmsBlockMixin
@@ -44,7 +46,7 @@ FEATURES = {
 
     'ENABLE_DISCUSSION_SERVICE': False,
 
-    'AUTH_USE_MIT_CERTIFICATES': False,
+    'AUTH_USE_CERTIFICATES': False,
 
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
@@ -73,6 +75,12 @@ FEATURES = {
 
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+
+    # Allow editing of short description in course settings in cms
+    'EDITABLE_SHORT_DESCRIPTION': True,
+
+    # Toggles embargo functionality
+    'EMBARGO': False,
 }
 ENABLE_JASMINE = False
 
@@ -91,6 +99,9 @@ sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
+
+# For geolocation ip database
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
 
 
 ############################# WEB CONFIGURATION #############################
@@ -178,6 +189,8 @@ MIDDLEWARE_CLASSES = (
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
 
+    'embargo.middleware.EmbargoMiddleware',
+
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
 
@@ -248,7 +261,7 @@ STATICFILES_DIRS = [
     LMS_ROOT / "static",
 
     # This is how you would use the textbook images locally
-    # ("book", ENV_ROOT / "book_images")
+    # ("book", ENV_ROOT / "book_images"),
 ]
 
 # Locale/Internationalization
@@ -276,6 +289,7 @@ PIPELINE_CSS = {
         'source_filenames': [
             'css/vendor/normalize.css',
             'css/vendor/font-awesome.css',
+            'css/vendor/html5-input-polyfills/number-polyfill.css',
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
@@ -452,8 +466,15 @@ INSTALLED_APPS = (
 
     # Dark-launching languages
     'dark_lang',
+
     # Student identity reverification
     'reverification',
+
+    # User preferences
+    'user_api',
+    'django_openid_auth',
+
+    'embargo',
 )
 
 
