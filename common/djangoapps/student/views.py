@@ -148,7 +148,11 @@ def embargo(_request):
 
     Explains to the user why they are not able to access a particular embargoed course.
     """
-    return render_to_response('static_templates/embargo.html')
+    if settings.FEATURES["USE_CUSTOM_THEME"]:
+        template="static_templates/theme-embargo.html"
+    else:
+        template="static_templates/embargo.html"
+    return render_to_response(template)
 
 
 def press(request):
