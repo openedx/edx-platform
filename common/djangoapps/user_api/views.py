@@ -28,7 +28,7 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (ApiKeyHeaderPermission,)
-    queryset = User.objects.all()
+    queryset = User.objects.all().prefetch_related("preferences")
     serializer_class = UserSerializer
     paginate_by = 10
     paginate_by_param = "page_size"

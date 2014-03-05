@@ -66,7 +66,11 @@ class ApiTestCase(TestCase):
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
-        self.assertItemsEqual(user.keys(), ["email", "id", "name", "username", "url"])
+        self.assertItemsEqual(user.keys(), ["email", "id", "name", "username",  "preferences", "url"])
+        self.assertItemsEqual(
+            user["preferences"].items(),
+            [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]
+        )
         self.assertSelfReferential(user)
 
     def assertPrefIsValid(self, pref):
@@ -221,6 +225,11 @@ class UserViewSetTest(UserApiTestCase):
                 "id": user.id,
                 "name": user.profile.name,
                 "username": user.username,
+                "preferences": dict([
+                    (user_pref.key, user_pref.value)
+                    for user_pref in self.prefs
+                    if user_pref.user == user
+                ]),
                 "url": uri
             }
         )
@@ -352,6 +361,11 @@ class UserPreferenceViewSetTest(UserApiTestCase):
                     "id": pref.user.id,
                     "name": pref.user.profile.name,
                     "username": pref.user.username,
+                    "preferences": dict([
+                        (user_pref.key, user_pref.value)
+                        for user_pref in self.prefs
+                        if user_pref.user == pref.user
+                    ]),
                     "url": self.get_uri_for_user(pref.user),
                 },
                 "key": pref.key,
