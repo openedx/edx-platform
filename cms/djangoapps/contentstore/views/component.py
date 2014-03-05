@@ -23,7 +23,6 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
-from xmodule.x_module import prefer_xmodules
 
 from lms.lib.xblock.runtime import unquote_slashes
 
@@ -311,19 +310,19 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        parent_xblocks = []
+        ancestor_xblocks = []
         parent = get_parent_xblock(xblock)
         while parent and parent.category != 'sequential':
-            parent_xblocks.append(parent)
+            ancestor_xblocks.append(parent)
             parent = get_parent_xblock(parent)
 
-        parent_xblocks.reverse()
+        ancestor_xblocks.reverse()
 
         return render_to_response('container.html', {
             'context_course': course,
             'xblock': xblock,
             'xblock_locator': locator,
-            'parent_xblocks': parent_xblocks,
+            'ancestor_xblocks': ancestor_xblocks,
         })
     else:
         return HttpResponseBadRequest("Only supports html requests")

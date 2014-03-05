@@ -151,6 +151,8 @@ class GetItem(ItemTest):
         self.assertIn('wrapper-xblock', html)
         self.assertRegexpMatches(
             html,
+            # The instance of the wrapper class will have an auto-generated ID (wrapperxxx). Allow anything
+            # for the 3 characters after wrapper.
             (r'"/container/MITx.999.Robot_Super_Course/branch/published/block/wrapper.{3}" class="action-button">\s*'
              '<span class="action-button-text">View</span>')
         )
