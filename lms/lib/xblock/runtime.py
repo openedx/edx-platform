@@ -133,10 +133,8 @@ class UserTagsService(object):
     A runtime class that provides an interface to the user service.  It handles filling in
     the current course id and current user.
     """
-    # Scopes
-    # (currently only allows per-course tags.  Can be expanded to support
-    # global tags (e.g. using the existing UserPreferences table))
-    COURSE = 'course'
+
+    COURSE_SCOPE = user_service.COURSE_SCOPE
 
     def __init__(self, runtime):
         self.runtime = runtime
@@ -153,7 +151,7 @@ class UserTagsService(object):
             scope: the current scope of the runtime
             key: the key for the value we want
         """
-        if scope != self.COURSE:
+        if scope != user_service.COURSE_SCOPE:
             raise ValueError("unexpected scope {0}".format(scope))
 
         return user_service.get_course_tag(self._get_current_user(),
@@ -167,7 +165,7 @@ class UserTagsService(object):
             key: the key that to the value to be set
             value: the value to set
         """
-        if scope != self.COURSE:
+        if scope != user_service.COURSE_SCOPE:
             raise ValueError("unexpected scope {0}".format(scope))
 
         return user_service.set_course_tag(self._get_current_user(),

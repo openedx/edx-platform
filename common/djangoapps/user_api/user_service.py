@@ -9,6 +9,10 @@ UserCourseTag model.
 
 from user_api.models import UserCourseTag
 
+# Scopes
+# (currently only allows per-course tags.  Can be expanded to support
+# global tags (e.g. using the existing UserPreferences table))
+COURSE_SCOPE = 'course'
 
 def get_course_tag(user, course_id, key):
     """

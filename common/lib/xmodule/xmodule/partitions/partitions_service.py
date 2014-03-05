@@ -88,7 +88,7 @@ class PartitionService(object):
         and persist the info.
         """
         key = self._key_for_partition(user_partition)
-        scope = self._user_tags_service.COURSE
+        scope = self._user_tags_service.COURSE_SCOPE
 
         group_id = self._user_tags_service.get_tag(scope, key)
         if group_id is not None:

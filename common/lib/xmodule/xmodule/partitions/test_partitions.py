@@ -3,6 +3,7 @@ Test the partitions and partitions service
 
 """
 
+from collections import defaultdict
 from unittest import TestCase
 from mock import Mock, MagicMock
 
@@ -188,32 +189,37 @@ class StaticPartitionService(PartitionService):
         return self._partitions
 
 
+class MemoryUserTagsService(object):
+    """
+    An implementation of a user_tags XBlock service that
+    uses an in-memory dictionary for storage
+    """
+    COURSE_SCOPE = 'course'
+
+    def __init__(self):
+        self._tags = defaultdict(dict)
+
+    def get_tag(self, scope, key):
+        """Sets the value of ``key`` to ``value``"""
+        print 'GETTING', scope, key, self._tags
+        return self._tags[scope].get(key)
+
+    def set_tag(self, scope, key, value):
+        """Gets the value of ``key``"""
+        self._tags[scope][key] = value
+        print 'SET', scope, key, value, self._tags
+
+
 class TestPartitionsService(TestCase):
     """
     Test getting a user's group out of a partition
-
     """
 
     def setUp(self):
         groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
         self.partition_id = 0
 
-        # construct the user_service
-        self.user_tags = dict()
-        self.user_tags_service = MagicMock()
-
-        def mock_set_tag(_scope, key, value):
-            """Sets the value of ``key`` to ``value``"""
-            self.user_tags[key] = value
-
-        def mock_get_tag(_scope, key):
-            """Gets the value of ``key``"""
-            if key in self.user_tags:
-                return self.user_tags[key]
-            return None
-
-        self.user_tags_service.set_tag = mock_set_tag
-        self.user_tags_service.get_tag = mock_get_tag
+        self.user_tags_service = MemoryUserTagsService()
 
         user_partition = UserPartition(self.partition_id, 'Test Partition', 'for testing purposes', groups)
         self.partitions_service = StaticPartitionService(
