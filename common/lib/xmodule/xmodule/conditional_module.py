@@ -63,10 +63,15 @@ class ConditionalModule(ConditionalFields, XModule):
 
     """
 
-    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     resource_string(__name__, 'js/src/conditional/display.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     ]}
+    js = {
+        'coffee': [
+            resource_string(__name__, 'js/src/javascript_loader.coffee'),
+            resource_string(__name__, 'js/src/conditional/display.coffee'),
+        ],
+        'js': [
+            resource_string(__name__, 'js/src/collapsible.js'),
+        ]
+    }
 
     js_module_name = "Conditional"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
