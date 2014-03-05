@@ -229,6 +229,11 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
 
+# XBlocks
+if ENV_TOKENS.get('XBLOCK_SELECT_FUNCTION') == 'prefer_xmodules':
+    from xmodule.x_module import prefer_xmodules
+    XBLOCK_SELECT_FUNCTION = prefer_xmodules
+
 # Event tracking
 TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
 
