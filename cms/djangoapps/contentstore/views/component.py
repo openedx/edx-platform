@@ -312,8 +312,10 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
 
         ancestor_xblocks = []
         parent = get_parent_xblock(xblock)
+        unit = None
         while parent and parent.category != 'sequential':
             ancestor_xblocks.append(parent)
+            unit = parent
             parent = get_parent_xblock(parent)
 
         ancestor_xblocks.reverse()
@@ -322,6 +324,7 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
             'context_course': course,
             'xblock': xblock,
             'xblock_locator': locator,
+            'unit': unit,
             'ancestor_xblocks': ancestor_xblocks,
         })
     else:
