@@ -115,7 +115,7 @@ class SplitTestModuleTest(XModuleXmlImportTest):
 
     @ddt.data(('100',), ('200',), ('300',), ('400',), ('500',), ('600',), ('700',), ('800',), ('900',), ('1000',))
     @ddt.unpack
-    def test_child_missing_tag_value(self, user_tag):
+    def test_child_persist_new_tag_value_when_tag_missing(self, user_tag):
         # If a user_tag has a missing value, a group should be saved/persisted for that user.
         # So, we check that we get the same url_name when we call on the url_name twice.
         # We run the test ten times so that, if our storage is failing, we'll be most likely to notice it.
