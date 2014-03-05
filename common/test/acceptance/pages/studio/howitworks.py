@@ -14,4 +14,4 @@ class HowitworksPage(PageObject):
     url = BASE_URL + "/howitworks"
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-howitworks')
+        return self.q(css='body.view-howitworks').present

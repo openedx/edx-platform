@@ -3,8 +3,8 @@ Unit page in Studio
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.query import SubQuery
-from bok_choy.promise import EmptyPromise, fulfill
+# from bok_choy.query import SubQuery
+from bok_choy.promise import EmptyPromise
 
 from . import BASE_URL
 from .container import ContainerPage

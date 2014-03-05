@@ -13,4 +13,4 @@ class ChecklistsPage(CoursePage):
     url_path = "checklists"
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-checklists')
+        return self.q(css='body.view-checklists').present

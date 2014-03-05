@@ -2,8 +2,7 @@
 Course Outline page in Studio.
 """
 from bok_choy.page_object import PageObject
-from bok_choy.query import SubQuery
-from bok_choy.promise import EmptyPromise, fulfill
+from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
 from .unit import UnitPage
@@ -22,9 +21,7 @@ class CourseOutlineContainer(object):
             child_class = self.CHILD_CLASS
         return child_class(
             self.browser,
-            self.q(css=child_class.BODY_SELECTOR).filter(
-                SubQuery(css=child_class.NAME_SELECTOR).filter(text=title)
-            )[0]['data-locator']
+            self.q(css=child_class.BODY_SELECTOR).filter()
         )
 
 
@@ -147,7 +144,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
     CHILD_CLASS = CourseOutlineSection
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-outline')
+        return self.q(css='body.view-outline').present
 
     def section(self, title):
         """

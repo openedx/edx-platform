@@ -10,4 +10,4 @@ class SignupPage(PageObject):
     url = BASE_URL + "/signup"
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-signup')
+        return self.q(css='body.view-signup').present
