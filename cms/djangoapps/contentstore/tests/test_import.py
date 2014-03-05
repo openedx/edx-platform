@@ -179,3 +179,24 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             u'i4x://testX/peergrading_copy/combinedopenended/SampleQuestion',
             peergrading_module.link_to_location
         )
+
+    def test_rewrite_reference_value_dict(self):
+        module_store = modulestore('direct')
+        target_location = Location(['i4x', 'testX', 'split_test_copy', 'course', 'copy_run'])
+        import_from_xml(
+            module_store,
+            'common/test/data/',
+            ['split_test_module'],
+            target_location_namespace=target_location
+        )
+        split_test_module = module_store.get_item(
+            Location(['i4x', 'testX', 'split_test_copy', 'split_test', 'split1'])
+        )
+        self.assertIsNotNone(split_test_module)
+        self.assertEqual(
+            {
+                "0": "i4x://testX/split_test_copy/vertical/sample_0",
+                "2": "i4x://testX/split_test_copy/vertical/sample_2",
+            },
+            split_test_module.group_id_to_child,
+        )
