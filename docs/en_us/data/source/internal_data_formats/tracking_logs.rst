@@ -1,14 +1,137 @@
 .. _Tracking Logs:
 
+
 ######################
 Tracking Logs
 ######################
 
-The following is an inventory of all LMS event types.
+This chapter provides reference information about the event data that is delivered in data packages. Events are initiated by interactions with the courseware and the Instructor Dashboard in the LMS, and are stored in JSON documents. In the data package, event data is delivered in a log file. 
 
-This inventory is comprised of a table of Common Fields that appear in all events, a table of Student Event Types which lists all interaction with the LMS outside of the Instructor Dashboard, and a table of Instructor Event Types of all interactions with the Instructor Dashboard in the LMS.
+The sections in this chapter provide:
 
-In the data package, events are delivered in a log file. 
+* A :ref:`sample_events`.
+* :ref:`common` that are included in the JSON document of every event type.
+* :ref:`Student_Event_Types` for interactions with the LMS outside of the Instructor Dashboard.
+* :ref:`Instructor_Event_Types` for interactions with the Instructor Dashboard in the LMS.
+
+.. _sample_events:
+
+*************************
+Sample Event
+*************************
+
+A sample event from an edX.log file follows. The JSON documents that include the event data are compressed before they are added to the log file, so they appear in this compact format.
+
+.. code-block:: json
+
+    {"agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) 
+    Chrome/30.0.1599.101 Safari/537.36", "context": {"course_id": "edx/AN101/2014_T1", 
+    "module": {"display_name": "Multiple Choice Questions"}, "org_id": "edx", "user_id": 
+    9999999}, "event": {"answers": {"i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_2_1": 
+    "yellow", "i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_4_1": ["choice_0", "choice_2"]}, 
+    "attempts": 1, "correct_map": {"i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_2_1": 
+    {"correctness": "incorrect", "hint": "", "hintmode": null, "msg": "", "npoints": null, 
+    "queuestate": null}, "i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_4_1": 
+    {"correctness": "correct", "hint": "", "hintmode": null, "msg": "", "npoints": null, 
+    "queuestate": null}}, "grade": 2, "max_grade": 3, "problem_id": "i4x://edx/AN101/problem/
+    a0effb954cca4759994f1ac9e9434bf4", "state": {"correct_map": {}, "done": null, "input_state": 
+    {"i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_2_1": {}, "i4x-edx-AN101-problem-
+    a0effb954cca4759994f1ac9e9434bf4_4_1": {}}, "seed": 1, "student_answers": {}}, "submission": 
+    {"i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_2_1": {"answer": "yellow", "correct": 
+    false, "input_type": "optioninput", "question": "What color is the open ocean on a sunny day?", 
+    "response_type": "optionresponse", "variant": ""}, "i4x-edx-AN101-problem-
+    a0effb954cca4759994f1ac9e9434bf4_4_1": {"answer": ["a piano", "a guitar"], "correct": true, 
+    "input_type": "checkboxgroup", "question": "Which of the following are musical instruments?", 
+    "response_type": "choiceresponse", "variant": ""}}, "success": "incorrect"}, "event_source": 
+    "server", "event_type": "problem_check", "host": "precise64", "ip": "NN.N.N.N", "page": "x_module", 
+    "time": 2014-03-03T16:19:05.584523+00:00", "username": "AAAAAAAAAA"}
+
+If you use a JSON formatter to "pretty print" this event, a version that is more readable is produced.
+
+.. code-block:: json
+
+ {
+    "agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36", 
+    "context": {
+        "course_id": "edx/AN101/2014_T1", 
+        "module": {
+            "display_name": "Multiple Choice Questions"
+        }, 
+        "org_id": "edx", 
+        "user_id": 9999999
+    }, 
+    "event": {
+        "answers": {
+            "i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_2_1": "yellow", 
+            "i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_4_1": [
+                "choice_0", 
+                "choice_2"
+            ]
+        }, 
+        "attempts": 1, 
+        "correct_map": {
+            "i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_2_1": {
+                "correctness": "incorrect", 
+                "hint": "", 
+                "hintmode": null, 
+                "msg": "", 
+                "npoints": null, 
+                "queuestate": null
+            }, 
+            "i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_4_1": {
+                "correctness": "correct", 
+                "hint": "", 
+                "hintmode": null, 
+                "msg": "", 
+                "npoints": null, 
+                "queuestate": null
+            }
+        }, 
+        "grade": 2, 
+        "max_grade": 3, 
+        "problem_id": "i4x://edx/AN101/problem/a0effb954cca4759994f1ac9e9434bf4", 
+        "state": {
+            "correct_map": {}, 
+            "done": null, 
+            "input_state": {
+                "i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_2_1": {}, 
+                "i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_4_1": {}
+            }, 
+            "seed": 1, 
+            "student_answers": {}
+        }, 
+        "submission": {
+            "i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_2_1": {
+                "answer": "yellow", 
+                "correct": false, 
+                "input_type": "optioninput", 
+                "question": "What color is the open ocean on a sunny day?", 
+                "response_type": "optionresponse", 
+                "variant": ""
+            },
+            "i4x-edx-AN101-problem-a0effb954cca4759994f1ac9e9434bf4_4_1": {
+                "answer": [
+                    "a piano", 
+                    "a guitar"
+                ], 
+                "correct": true, 
+                "input_type": "checkboxgroup", 
+                "question": "Which of the following are musical instruments?", 
+                "response_type": "choiceresponse", 
+                "variant": ""
+            }
+        }, 
+        "success": "incorrect"
+    }, 
+    "event_source": "server", 
+    "event_type": "problem_check", 
+    "host": "precise64", 
+    "ip": "NN.N.N.N", 
+    "page": "x_module", 
+    "time": "2014-03-03T16:19:05.584523+00:00", 
+    "username": "AAAAAAAAAA"
+ }
+
 
 .. _common:
 
@@ -19,17 +142,27 @@ Common Fields
 This section contains a table of the JSON fields that are common to the schema definitions of all events.
 
 +---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| Common Field              | Details                                                     | Type        | Values/Format                      |
+| Field                     | Details                                                     | Type        | Values/Format/Member Fields        |
 +===========================+=============================================================+=============+====================================+
 | ``agent``                 | Browser agent string of the user who triggered the event.   | string      |                                    |
++---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
+| ``context``               | For all event types, identifies the course that generated   | string/JSON | Contains these common member       |
+|                           | the event, the organization that lists the course, and the  |             | fields:                            |  
+|                           | individual who is performing the action.                    |             | ``course_id``                      |
+|                           | Also contains member fields that apply to specific event    |             | ``org_id``                         |
+|                           | types only: see the descriptions for each event type.       |             | ``user_id``                        |
+|                           |                                                             |             |                                    |
+|                           | **History**: Added 23 Oct 2013; ``user_id`` added           |             | These fields are blank if values   |
+|                           | 6 Nov 2013. Other fields may duplicate this data.           |             | cannot be determined.              |
 +---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
 | ``event``                 | Specifics of the triggered event.                           | string/JSON |                                    |
 +---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
 | ``event_source``          | Specifies whether the triggered event originated in the     | string      | 'browser', 'server', 'task'        |
 |                           | browser or on the server.                                   |             |                                    |
 +---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
-| ``event_type``            | The type of event triggered. Values depend on               | string      | See the individual descriptions    |
-|                           | ``event_source``                                            |             | that follow.                       |
+| ``event_type``            | The type of event triggered. Values depend on               | string      | For descriptions of member fields, |
+|                           | ``event_source``                                            |             | see the event type descriptions    |
+|                           |                                                             |             | that follow.                       |
 +---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
 | ``ip``                    | IP address of the user who triggered the event.             | string      |                                    |
 +---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
@@ -44,6 +177,7 @@ This section contains a table of the JSON fields that are common to the schema d
 |                           | in).                                                        |             |                                    |
 +---------------------------+-------------------------------------------------------------+-------------+------------------------------------+
 
+.. _Student_Event_Types:
 
 ****************************************
 Student Event Types
@@ -77,7 +211,9 @@ These event types are fired when a user selects a navigational control.
 
 * ``seq_prev`` is fired when a user navigates to the previous unit in a sequence. 
 
-**Component**: Sequence **Question:** what does a "sequence" correspond to in Studio? a subsection?
+**Component**: Sequence 
+
+.. **Question:** what does a "sequence" correspond to in Studio? a subsection?
 
 **Event Source**: Browser
 
@@ -183,7 +319,7 @@ The ``speed_change_video`` event is fired when a user selects a different playin
 
 .. types needed
 
-... additional missing video event types TBD
+.. additional missing video event types TBD
 
 .. _pdf:
 
@@ -233,50 +369,104 @@ Problem Interaction Event Types
 
 The server fires ``problem_check`` events when a problem is successfully checked.  
 
-**History**: Originally named ``save_problem_check``.
-
 **Component**: Capa Module
 
 **Event Source**: Server
 
+**History**: 
+
+* The ``submission`` dictionary was added to the ``event`` field, and  ``module`` was added to the ``context`` field, on 5 Mar 2014.
+
+* Prior to 15 Oct 2013, this event type was named ``save_problem_check``.
+
+* Prior to 15 Jul 2013, this event was fired twice for the same action.
+
+``context`` **Fields**: 
+
++---------------------+---------------+---------------------------------------------------------------------+
+| Field               | Type          | Details and Member Fields                                           |
++=====================+===============+=====================================================================+
+| ``module``          | dict          | Provides the specific problem component as part of the context.     |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               | ``display_name``  | string  | The **Display Name** given to the     |
+|                     |               |                   |         | problem component.                    |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               |                                                                     | 
++---------------------+---------------+---------------------------------------------------------------------+
+
 ``event`` **Fields**: 
 
 +---------------------+---------------+---------------------------------------------------------------------+
-| Field               | Type          | Details                                                             |
+| Field               | Type          | Details and Member Fields                                           |
 +=====================+===============+=====================================================================+
-| ``answers``         | dict          |                                                                     |
+| ``answers``         | dict          | The problem ID and the internal answer identifier in a name:value   |
+|                     |               | pair. For a component with multiple problems, every problem and     |
+|                     |               | answer are listed.                                                  |
 +---------------------+---------------+---------------------------------------------------------------------+
-| ``attempts``        | integer       |                                                                     |
+| ``attempts``        | integer       | The number of times the user attempted to answer the problem.       |
 +---------------------+---------------+---------------------------------------------------------------------+
-| ``correct_map``     | string / JSON | For each problem id value listed by ``answers``, provides:          |
-|                     |               +-----------------+----------+----------------------------------------+ 
-|                     |               | ``correctness`` | string   | 'correct', 'incorrect'                 |
-|                     |               +-----------------+----------+----------------------------------------+ 
-|                     |               | ``hint``        | string   | Gives optional hint. Nulls allowed.    |
-|                     |               +-----------------+----------+----------------------------------------+ 
-|                     |               | ``hintmode``    | string   | None, 'on_request', 'always'. Nulls    |
-|                     |               |                 |          | allowed.                               |
-|                     |               +-----------------+----------+----------------------------------------+ 
-|                     |               | ``msg``         | string   | Gives extra message response.          | 
-|                     |               +-----------------+----------+----------------------------------------+ 
-|                     |               | ``npoints``     | integer  | Points awarded for this                | 
-|                     |               |                 |          | ``answer_id``. Nulls allowed.          |
-|                     |               +-----------------+----------+----------------------------------------+
-|                     |               | ``queuestate``  | dict     | None when not queued, else             |
-|                     |               |                 |          | ``{key:'', time:''}`` where ``key``    |
-|                     |               |                 |          | is a secret string dump of a DateTime  |
-|                     |               |                 |          | object in the form '%Y%m%d%H%M%S'.     |
-|                     |               |                 |          | Nulls allowed.                         |
-|                     |               +-----------------+----------+----------------------------------------+
+| ``correct_map``     | string / JSON | For each problem ID value listed by ``answers``, provides:          |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               | ``correctness``   | string  | 'correct', 'incorrect'                |
+|                     |               +-------------------+---------+---------------------------------------+  
+|                     |               | ``hint``          | string  | Gives optional hint. Nulls allowed.   |
+|                     |               +-------------------+---------+---------------------------------------+  
+|                     |               | ``hintmode``      | string  | None, 'on_request', 'always'. Nulls   |
+|                     |               |                   |         | allowed.                              |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               | ``msg``           | string  | Gives extra message response.         | 
+|                     |               +-------------------+---------+---------------------------------------+  
+|                     |               | ``npoints``       | integer | Points awarded for this               | 
+|                     |               |                   |         | ``answer_id``. Nulls allowed.         |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               | ``queuestate``    | dict    | None when not queued, else            |
+|                     |               |                   |         | ``{key:'', time:''}`` where ``key``   |
+|                     |               |                   |         | is a secret string dump of a DateTime |
+|                     |               |                   |         | object in the form '%Y%m%d%H%M%S'.    |
+|                     |               |                   |         | Nulls allowed.                        |
+|                     |               +-------------------+---------+---------------------------------------+ 
 |                     |               |                                                                     |
 +---------------------+---------------+---------------------------------------------------------------------+
 | ``grade``           | integer       | Current grade value.                                                |
 +---------------------+---------------+---------------------------------------------------------------------+
 | ``max_grade``       | integer       | Maximum possible grade value.                                       |
 +---------------------+---------------+---------------------------------------------------------------------+
-| ``problem_id``      | string        | ID of the problem being checked.                                    |
+| ``problem_id``      | string        | ID of the problem that was checked.                                 |
 +---------------------+---------------+---------------------------------------------------------------------+
 | ``state``           | string / JSON | Current problem state.                                              |
++---------------------+---------------+---------------------------------------------------------------------+
+| ``submission``      | object        | Provides data about the response made. For components that include  |
+|                     |               | multiple problems, separate submission objects are provided for     |
+|                     |               | each one.                                                           |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               | ``answer``        | string  | The value that the student entered,   |
+|                     |               |                   |         | or the display name of the value      |
+|                     |               |                   |         | selected.                             |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               | ``correct``       | Boolean | 'true', 'false'                       |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               | ``input_type``    | string  | The type of value that the student    |
+|                     |               |                   |         | supplies for the ``response_type``.   | 
+|                     |               |                   |         | Based on the XML element names used   | 
+|                     |               |                   |         | in the Advanced Editor. Examples      | 
+|                     |               |                   |         | include 'checkboxgroup', 'radiogroup',| 
+|                     |               |                   |         | 'choicegroup', and 'textline'.        |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               | ``question``      | string  | Provides the text of the question.    |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               | ``response_type`` | string  | The type of problem. Based on the XML | 
+|                     |               |                   |         | element names used in the Advanced    | 
+|                     |               |                   |         | Editor. Examples include              |
+|                     |               |                   |         | 'choiceresponse', 'optionresponse',   |
+|                     |               |                   |         | and 'multiplechoiceresponse'.         |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               | ``variant``       | integer | For problems that use problem         |
+|                     |               |                   |         | randomization features such as answer |
+|                     |               |                   |         | pools or choice shuffling, contains   |
+|                     |               |                   |         | the unique ID of the variant that was |
+|                     |               |                   |         | presented to this user.               |
+|                     |               +-------------------+---------+---------------------------------------+ 
+|                     |               |                                                                     |
 +---------------------+---------------+---------------------------------------------------------------------+
 | ``success``         | string        | 'correct', 'incorrect'                                              |
 +---------------------+---------------+---------------------------------------------------------------------+
@@ -417,7 +607,7 @@ The server fires ``problem_rescore_fail`` events when a problem cannot be succes
 +---------------------+---------------+---------------------------------------------------------------------+
 | Field               | Type          | Details                                                             |
 +=====================+===============+=====================================================================+
-| ``old_state``       | string / JSON | Current problem state. **Question** is this really current?         |
+| ``old_state``       | string / JSON | The state of the problem before the reset was performed.            |
 +---------------------+---------------+---------------------------------------------------------------------+
 | ``problem_id``      | string        | ID of the problem being reset.                                      |
 +---------------------+---------------+---------------------------------------------------------------------+
@@ -439,7 +629,7 @@ The server fires ``problem_rescore_fail`` events when a problem cannot be succes
 +---------------------+---------------+---------------------------------------------------------------------+
 | Field               | Type          | Details                                                             |
 +=====================+===============+=====================================================================+
-| ``old_state``       | string / JSON | Current problem state. **Question** is this really current?         |
+| ``old_state``       | string / JSON | The state of the problem before the reset was requested.            |
 +---------------------+---------------+---------------------------------------------------------------------+
 | ``problem_id``      | string        | ID of the problem being reset.                                      |
 +---------------------+---------------+---------------------------------------------------------------------+
@@ -452,7 +642,9 @@ The server fires ``problem_rescore_fail`` events when a problem cannot be succes
 
 Server-side event which displays the answer to a problem. 
 
-**History**: The original name for this event type was ``showanswer``. **Question** is that correct?
+**History**: The original name for this event type was ``showanswer``. 
+
+.. **Question** is that correct?
 
 **Component**: Capa Module
 
@@ -625,6 +817,7 @@ The ``staff_grading_hide_question`` and ``staff_grading_show_question`` event ty
 | ``location``        | string        | The location of the question whose prompt is being shown or hidden. |
 +---------------------+---------------+---------------------------------------------------------------------+
 
+.. _Instructor_Event_Types:
 
 *************************
 Instructor Event Types
