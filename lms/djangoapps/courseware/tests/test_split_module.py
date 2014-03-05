@@ -18,17 +18,22 @@ from xmodule.partitions.partitions import Group, UserPartition
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-@ddt.ddt
-class TestVertSplitTestVert(ModuleStoreTestCase):
-    """
-    Tests related to xmodule/split_test_module
-    """
+class SplitTestBase(ModuleStoreTestCase):
+    __test__ = False
 
     def setUp(self):
-
-        self.partition = UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')])
+        self.partition = UserPartition(
+            0,
+            'first_partition',
+            'First Partition',
+            [
+                Group(0, 'alpha'),
+                Group(1, 'beta')
+            ]
+        )
 
         self.course = CourseFactory.create(
+            number=self.COURSE_NUMBER,
             user_partitions=[self.partition]
         )
 
@@ -42,6 +47,101 @@ class TestVertSplitTestVert(ModuleStoreTestCase):
             category="sequential",
             display_name="Split Test Tests",
         )
+
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+        self.client.login(username=self.student.username, password='test')
+
+    def _video(self, parent, group):
+        return ItemFactory.create(
+            parent_location=parent.location,
+            category="video",
+            display_name="Group {} Sees This Video".format(group),
+        )
+
+    def _problem(self, parent, group):
+        return ItemFactory.create(
+            parent_location=parent.location,
+            category="problem",
+            display_name="Group {} Sees This Problem".format(group),
+            data="<h1>No Problem Defined Yet!</h1>",
+        )
+
+    def _html(self, parent, group):
+        return ItemFactory.create(
+            parent_location=parent.location,
+            category="html",
+            display_name="Group {} Sees This HTML".format(group),
+            data="Some HTML for group {}".format(group),
+        )
+
+    def test_split_test_0(self):
+        self._check_split_test(0)
+
+    def test_split_test_1(self):
+        self._check_split_test(1)
+
+    def _check_split_test(self, user_tag):
+        tag_factory = UserCourseTagFactory(
+            user=self.student,
+            course_id=self.course.id,
+            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
+            value=str(user_tag)
+        )
+
+        resp = self.client.get(reverse('courseware_section',
+                                       kwargs={'course_id': self.course.id,
+                                               'chapter': self.chapter.url_name,
+                                               'section': self.sequential.url_name}
+        ))
+
+        content = resp.content
+        print content
+
+        # Assert we see the proper icon in the top display
+        self.assertIn('<a class="{} inactive progress-0"'.format(self.ICON_CLASSES[user_tag]), content)
+        # And proper tooltips
+        for tooltip in self.TOOLTIPS[user_tag]:
+            self.assertIn(tooltip, content)
+
+        for hidden in self.HIDDEN_CONTENT[user_tag]:
+            self.assertNotIn(hidden, content)
+
+        # Assert that we can see the data from the appropriate test condition
+        for visible in self.VISIBLE_CONTENT[user_tag]:
+            self.assertIn(visible, content)
+
+
+class TestVertSplitTestVert(SplitTestBase):
+    """
+    Tests related to xmodule/split_test_module
+    """
+    __test__ = True
+
+    COURSE_NUMBER='vert-split-vert'
+
+    ICON_CLASSES = [
+        'seq_problem',
+        'seq_video',
+    ]
+    TOOLTIPS = [
+        ['Group 0 Sees This Video', "Group 0 Sees This Problem"],
+        ['Group 1 Sees This Video', 'Group 1 Sees This HTML'],
+    ]
+    HIDDEN_CONTENT = [
+        ['Condition 0 vertical'],
+        ['Condition 1 vertical'],
+    ]
+
+    # Data is html encoded, because it's inactive inside the
+    # sequence until javascript is executed
+    VISIBLE_CONTENT = [
+        ['class=&#34;problems-wrapper'],
+        ['Some HTML for group 1']
+    ]
+
+    def setUp(self):
+        super(TestVertSplitTestVert, self).setUp()
 
         # vert <- split_test
         # split_test cond 0 = vert <- {video, problem}
@@ -68,23 +168,8 @@ class TestVertSplitTestVert(ModuleStoreTestCase):
             display_name="Condition 0 vertical",
             location=c0_url,
         )
-        video0 = ItemFactory.create(
-            parent_location=cond0vert.location,
-            category="video",
-            display_name="Group 0 Sees This Video",
-        )
-        problem0 = ItemFactory.create(
-            parent_location=cond0vert.location,
-            category="problem",
-            display_name="Group 0 Sees This Problem",
-            data="<h1>No Problem Defined Yet!</h1>",
-        )
-        self.cond0data = {
-            'button_class': '<a class="seq_problem inactive progress-0"',
-            'tooltips': ['Group 0 Sees This Video', "Group 0 Sees This Problem"],
-            'vertical_name': 'Condition 0 vertical',
-            'data': "",  # problems are json loaded so we won't see content
-        }
+        video0 = self._video(cond0vert, 0)
+        problem0 = self._problem(cond0vert, 0)
 
         cond1vert = ItemFactory.create(
             parent_location=split_test.location,
@@ -92,92 +177,48 @@ class TestVertSplitTestVert(ModuleStoreTestCase):
             display_name="Condition 1 vertical",
             location=c1_url,
         )
-        video1 = ItemFactory.create(
-            parent_location=cond1vert.location,
-            category="video",
-            display_name="Group 1 Sees This Video",
-        )
-        html1 = ItemFactory.create(
-            parent_location=cond1vert.location,
-            category="html",
-            display_name="Group 1 Sees This HTML",
-            data="Some HTML",
-        )
-        self.cond1data = {
-            'button_class': '<a class="seq_video inactive progress-0"',
-            'tooltips': ['Group 1 Sees This Video', 'Group 1 Sees This HTML'],
-            'vertical_name': 'Condition 1 vertical',
-            'data': 'Some HTML',
-        }
-
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        self.client.login(username=self.student.username, password='test')
-
-    @ddt.data(('0',), ('1',))
-    @ddt.unpack
-    def test_split_nested_verticals(self, user_tag):
-        tag_factory = UserCourseTagFactory(
-            user=self.student,
-            course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
-            value=user_tag
-        )
-        data = self.cond0data
-        if user_tag == '1':
-            data = self.cond1data
-
-        resp = self.client.get(reverse('courseware_section',
-                                       kwargs={'course_id': self.course.id,
-                                               'chapter': self.chapter.url_name,
-                                               'section': self.sequential.url_name}
-        ))
-
-        content = resp.content
-
-        # Assert we see the proper icon in the top display
-        self.assertIn(data['button_class'], content)
-        # And proper tooltips
-        for tooltip in data['tooltips']:
-            self.assertIn(tooltip, content)
-        self.assertNotIn(data['vertical_name'], content)
-        # Assert that we can see the data from the appropriate test condition
-        self.assertIn(data['data'], content)
+        video1 = self._video(cond1vert, 1)
+        html1 = self._html(cond1vert, 1)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-@ddt.ddt
-class TestSplitTestVert(ModuleStoreTestCase):
+class TestSplitTestVert(SplitTestBase):
     """
     Tests related to xmodule/split_test_module
     """
+    __test__ = True
+
+    COURSE_NUMBER = 'split-vert'
+
+    ICON_CLASSES = [
+        'seq_problem',
+        'seq_video',
+    ]
+    TOOLTIPS = [
+        ['Group 0 Sees This Video', "Group 0 Sees This Problem"],
+        ['Group 1 Sees This Video', 'Group 1 Sees This HTML'],
+    ]
+    HIDDEN_CONTENT = [
+        ['Condition 0 vertical'],
+        ['Condition 1 vertical'],
+    ]
+
+    # Data is html encoded, because it's inactive inside the
+    # sequence until javascript is executed
+    VISIBLE_CONTENT = [
+        ['class=&#34;problems-wrapper'],
+        ['Some HTML for group 1']
+    ]
 
     def setUp(self):
-
-        self.partition = UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')])
-
-        self.course = CourseFactory.create(
-            user_partitions=[self.partition]
-        )
-
-        self.chapter = ItemFactory.create(
-            parent_location=self.course.location,
-            category="chapter",
-            display_name="test chapter",
-        )
-        self.sequential = ItemFactory.create(
-            parent_location=self.chapter.location,
-            category="sequential",
-            display_name="Split Test Tests",
-        )
+        super(TestSplitTestVert, self).setUp()
 
         # split_test cond 0 = vert <- {video, problem}
         # split_test cond 1 = vert <- {video, html}
-        c0_url = self.course.location._replace(category="split_test", name="split_test_cond0")
-        c1_url = self.course.location._replace(category="split_test", name="split_test_cond1")
+        c0_url = self.course.location._replace(category="vertical", name="split_test_cond0")
+        c1_url = self.course.location._replace(category="vertical", name="split_test_cond1")
 
         split_test = ItemFactory.create(
-            parent_location=vert1.location,
+            parent_location=self.sequential.location,
             category="split_test",
             display_name="Split test",
             user_partition_id='0',
@@ -190,23 +231,8 @@ class TestSplitTestVert(ModuleStoreTestCase):
             display_name="Condition 0 vertical",
             location=c0_url,
         )
-        video0 = ItemFactory.create(
-            parent_location=cond0vert.location,
-            category="video",
-            display_name="Group 0 Sees This Video",
-        )
-        problem0 = ItemFactory.create(
-            parent_location=cond0vert.location,
-            category="problem",
-            display_name="Group 0 Sees This Problem",
-            data="<h1>No Problem Defined Yet!</h1>",
-        )
-        self.cond0data = {
-            'button_class': '<a class="seq_problem inactive progress-0"',
-            'tooltips': ['Group 0 Sees This Video', "Group 0 Sees This Problem"],
-            'vertical_name': 'Condition 0 vertical',
-            'data': "",  # problems are json loaded so we won't see content
-        }
+        video0 = self._video(cond0vert, 0)
+        problem0 = self._problem(cond0vert, 0)
 
         cond1vert = ItemFactory.create(
             parent_location=split_test.location,
@@ -214,54 +240,5 @@ class TestSplitTestVert(ModuleStoreTestCase):
             display_name="Condition 1 vertical",
             location=c1_url,
         )
-        video1 = ItemFactory.create(
-            parent_location=cond1vert.location,
-            category="video",
-            display_name="Group 1 Sees This Video",
-        )
-        html1 = ItemFactory.create(
-            parent_location=cond1vert.location,
-            category="html",
-            display_name="Group 1 Sees This HTML",
-            data="Some HTML",
-        )
-        self.cond1data = {
-            'button_class': '<a class="seq_video inactive progress-0"',
-            'tooltips': ['Group 1 Sees This Video', 'Group 1 Sees This HTML'],
-            'vertical_name': 'Condition 1 vertical',
-            'data': 'Some HTML',
-        }
-
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        self.client.login(username=self.student.username, password='test')
-
-    @ddt.data(('0',), ('1',))
-    @ddt.unpack
-    def test_split_nested_verticals(self, user_tag):
-        tag_factory = UserCourseTagFactory(
-            user=self.student,
-            course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
-            value=user_tag
-        )
-        data = self.cond0data
-        if user_tag == '1':
-            data = self.cond1data
-
-        resp = self.client.get(reverse('courseware_section',
-                                       kwargs={'course_id': self.course.id,
-                                               'chapter': self.chapter.url_name,
-                                               'section': self.sequential.url_name}
-        ))
-
-        content = resp.content
-
-        # Assert we see the proper icon in the top display
-        self.assertIn(data['button_class'], content)
-        # And proper tooltips
-        for tooltip in data['tooltips']:
-            self.assertIn(tooltip, content)
-        self.assertNotIn(data['vertical_name'], content)
-        # Assert that we can see the data from the appropriate test condition
-        self.assertIn(data['data'], content)
+        video1 = self._video(cond1vert, 1)
+        html1 = self._html(cond1vert, 1)
