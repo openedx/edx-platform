@@ -26,7 +26,7 @@ from xblock.runtime import Mixologist
 
 from lms.lib.xblock.runtime import unquote_slashes
 
-from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_modulestore
+from contentstore.utils import get_lms_link_for_item, compute_publish_state, PublishState, get_modulestore
 from contentstore.views.helpers import get_parent_xblock
 
 from models.settings.course_grading import CourseGradingModel
@@ -282,7 +282,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             ),
             'section': containing_section,
             'new_unit_category': 'vertical',
-            'unit_state': compute_unit_state(item),
+            'unit_state': compute_publish_state(item),
             'published_date': (
                 get_default_time_display(item.published_date)
                 if item.published_date is not None else None
