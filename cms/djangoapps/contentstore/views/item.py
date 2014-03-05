@@ -206,12 +206,10 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
         elif view_name == 'student_view' and component.has_children:
             # For non-leaf xblocks on the unit page, show the special rendering
             # which links to the new container page.
-            course_location = loc_mapper().translate_locator_to_location(locator, True)
-            course = store.get_item(course_location)
-            html = render_to_string('unit_container_xblock_component.html', {
-                'course': course,
+            html = render_to_string('container_xblock_component.html', {
                 'xblock': component,
-                'locator': locator
+                'locator': locator,
+                'reordering_enabled': True,
             })
             return JsonResponse({
                 'html': html,

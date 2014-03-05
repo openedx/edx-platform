@@ -334,11 +334,12 @@ p, ul, ol, dl {
       .navigation-link {
         @extend %cont-truncated;
         display: inline-block;
-        max-width: 150px;
+        max-width: 250px;
 
         &.navigation-current {
           @extend %ui-disabled;
           color: $gray;
+          max-width: 250px;
 
           &:before {
             color: $gray;

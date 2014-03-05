@@ -7,12 +7,12 @@ from contentstore.views.helpers import xblock_studio_url
 <section class="wrapper-xblock xblock-type-container level-element" data-locator="${locator}">
     <header class="xblock-header">
         <div class="header-details">
-            ${xblock.display_name}
+            ${xblock.display_name_with_default}
         </div>
         <div class="header-actions">
             <ul class="actions-list">
                 <li class="action-item action-view">
-                    <a href="${xblock_studio_url(xblock, course)}" class="action-button">
+                    <a href="${xblock_studio_url(xblock)}" class="action-button">
                         ## Translators: this is a verb describing the action of viewing more details
                         <span class="action-button-text">${_('View')}</span>
                         <i class="icon-arrow-right"></i>
@@ -21,5 +21,8 @@ from contentstore.views.helpers import xblock_studio_url
             </ul>
         </div>
     </header>
-    <span data-tooltip="${_("Drag to reorder")}" class="drag-handle"></span>
+    ## We currently support reordering only on the unit page.
+    % if reordering_enabled:
+        <span data-tooltip="${_("Drag to reorder")}" class="drag-handle"></span>
+    % endif
 </section>
