@@ -1,6 +1,17 @@
 @shard_2
-Feature: LMS.Video component
-  As a student, I want to view course videos in LMS.
+Feature: LMS Video component
+  As a student, I want to view course videos in LMS
+
+  # 0
+  Scenario: Video component stores position correctly when page is reloaded
+    Given the course has a Video component in Youtube mode
+    Then when I view the video it has rendered in Youtube mode
+    And I click video button "play"
+    Then I seek video to "10" seconds
+    And I click video button "pause"
+    And I reload the page
+    And I click video button "play"
+    Then I see video starts playing from "0:10" position
 
   # 1
   Scenario: Video component is fully rendered in the LMS in HTML5 mode
@@ -47,7 +58,7 @@ Feature: LMS.Video component
     And error message has correct text
 
   # 8
-  Scenario: Video component stores speed correctly when each video is in separate sequence.
+  Scenario: Video component stores speed correctly when each video is in separate sequence
     Given I am registered for the course "test_course"
     And it has a video "A" in "Youtube" mode in position "1" of sequential
     And a video "B" in "Youtube" mode in position "2" of sequential
@@ -67,3 +78,15 @@ Feature: LMS.Video component
     Then video "B" should start playing at speed "0.50"
     When I open video "C"
     Then video "C" should start playing at speed "1.0"
+
+  # 9
+  Scenario: Language menu in Video component works correctly
+    Given the course has a Video component in Youtube mode:
+      | transcripts           | sub         |
+      | {"zh": "OEoXaMPEzfM"} | OEoXaMPEzfM |
+    And I make sure captions are closed
+    And I see video menu "language" with correct items
+    And I select language with code "zh"
+    Then I see "好 各位同学" text in the captions
+    And I select language with code "en"
+    And I see "Hi, welcome to Edx." text in the captions

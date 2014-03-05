@@ -75,7 +75,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
         time.sleep(self.server.config.get('time_to_response', self.DEFAULT_DELAY_SEC))
 
         # Construct the response content
-        callback = self.get_params['callback'][0]
+        callback = self.get_params['callback']
         data = OrderedDict({
             'data': OrderedDict({
                 'id': youtube_id,

@@ -41,6 +41,7 @@ LOGGER = getLogger(__name__)
 LOGGER.info("Loading the lettuce acceptance testing terrain file...")
 
 MAX_VALID_BROWSER_ATTEMPTS = 20
+GLOBAL_SCRIPT_TIMEOUT = 20
 
 
 def get_saucelabs_username_and_key():
@@ -106,7 +107,7 @@ def initial_setup(server):
             # raise a WebDriverException
             try:
                 world.browser = Browser(browser_driver)
-                world.browser.driver.set_script_timeout(10)
+                world.browser.driver.set_script_timeout(GLOBAL_SCRIPT_TIMEOUT)
                 world.visit('/')
 
             except WebDriverException:
@@ -133,7 +134,7 @@ def initial_setup(server):
             **make_saucelabs_desired_capabilities()
         )
         world.absorb(30, 'IMPLICIT_WAIT')
-        world.browser.set_script_timeout(10)
+        world.browser.set_script_timeout(GLOBAL_SCRIPT_TIMEOUT)
 
     elif world.LETTUCE_SELENIUM_CLIENT == 'grid':
         world.browser = Browser(
@@ -142,7 +143,7 @@ def initial_setup(server):
             browser=settings.SELENIUM_GRID.get('BROWSER'),
         )
         world.absorb(30, 'IMPLICIT_WAIT')
-        world.browser.driver.set_script_timeout(10)
+        world.browser.driver.set_script_timeout(GLOBAL_SCRIPT_TIMEOUT)
 
     else:
         raise Exception("Unknown selenium client '{}'".format(world.LETTUCE_SELENIUM_CLIENT))

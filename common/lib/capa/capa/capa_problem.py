@@ -54,7 +54,7 @@ html_problem_semantics = [
     "script",
     "hintgroup",
     "openendedparam",
-    "openendedrubric"
+    "openendedrubric",
 ]
 
 log = logging.getLogger(__name__)

@@ -16,7 +16,7 @@
 .xmodule_VideoModule {
 
   // display mode
-  &.xmodule_display {
+  &.xblock-student_view {
 
     // full screen
     .video-controls .add-fullscreen {
@@ -39,7 +39,7 @@
                     display: block;
                     width: 45%;
                     max-width: auto;
-                    margin-left: 33%;
+                    margin-left: 25%;
                     padding: 0 13px;
                 }
 

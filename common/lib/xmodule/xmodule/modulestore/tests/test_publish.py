@@ -71,7 +71,7 @@ class TestPublish(unittest.TestCase):
                 mongo = self.old_mongo
             else:
                 mongo = self.draft_mongo
-            mongo.update_children(parent_location, parent.children)
+            mongo.update_item(parent, '**replace_user**')
 
     def _create_course(self):
         """
@@ -174,8 +174,8 @@ class TestPublish(unittest.TestCase):
         draft_vert.children.remove(other_child_loc.url())
         other_vert = self.draft_mongo.get_item(self.course_location.replace(category='vertical', name='Vert2'), 0)
         other_vert.children.append(other_child_loc.url())
-        self.draft_mongo.update_children(draft_vert.location, draft_vert.children)
-        self.draft_mongo.update_children(other_vert.location, other_vert.children)
+        self.draft_mongo.update_item(draft_vert, '**replace_user**')
+        self.draft_mongo.update_item(other_vert, '**replace_user**')
         # publish
         self._xmodule_recurse(
             draft_vert,

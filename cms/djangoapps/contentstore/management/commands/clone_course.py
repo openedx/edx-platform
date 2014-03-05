@@ -7,6 +7,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseDescriptor
 from student.roles import CourseInstructorRole, CourseStaffRole
+from xmodule.modulestore import Location
 
 
 #
@@ -27,8 +28,8 @@ class Command(BaseCommand):
         mstore = modulestore('direct')
         cstore = contentstore()
 
-        org, course_num, _ = dest_course_id.split("/")
-        mstore.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
+        course_id_dict = Location.parse_course_id(dest_course_id)
+        mstore.ignore_write_events_on_courses.append('{org}/{course}'.format(**course_id_dict))
 
         print("Cloning course {0} to {1}".format(source_course_id, dest_course_id))
 

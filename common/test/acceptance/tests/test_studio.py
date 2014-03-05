@@ -1,26 +1,29 @@
 """
 Acceptance tests for Studio.
 """
+from unittest import expectedFailure
+
 from bok_choy.web_app_test import WebAppTest
 
-from ..edxapp_pages.studio.asset_index import AssetIndexPage
-from ..edxapp_pages.studio.auto_auth import AutoAuthPage
-from ..edxapp_pages.studio.checklists import ChecklistsPage
-from ..edxapp_pages.studio.course_import import ImportPage
-from ..edxapp_pages.studio.course_info import CourseUpdatesPage
-from ..edxapp_pages.studio.edit_tabs import StaticPagesPage
-from ..edxapp_pages.studio.export import ExportPage
-from ..edxapp_pages.studio.howitworks import HowitworksPage
-from ..edxapp_pages.studio.index import DashboardPage
-from ..edxapp_pages.studio.login import LoginPage
-from ..edxapp_pages.studio.manage_users import CourseTeamPage
-from ..edxapp_pages.studio.overview import CourseOutlinePage
-from ..edxapp_pages.studio.settings import SettingsPage
-from ..edxapp_pages.studio.settings_advanced import AdvancedSettingsPage
-from ..edxapp_pages.studio.settings_graders import GradingPage
-from ..edxapp_pages.studio.signup import SignupPage
-from ..edxapp_pages.studio.textbooks import TextbooksPage
-from ..fixtures.course import CourseFixture
+from ..pages.studio.asset_index import AssetIndexPage
+from ..pages.studio.auto_auth import AutoAuthPage
+from ..pages.studio.checklists import ChecklistsPage
+from ..pages.studio.course_import import ImportPage
+from ..pages.studio.course_info import CourseUpdatesPage
+from ..pages.studio.edit_tabs import StaticPagesPage
+from ..pages.studio.export import ExportPage
+from ..pages.studio.howitworks import HowitworksPage
+from ..pages.studio.index import DashboardPage
+from ..pages.studio.login import LoginPage
+from ..pages.studio.manage_users import CourseTeamPage
+from ..pages.studio.overview import CourseOutlinePage
+from ..pages.studio.settings import SettingsPage
+from ..pages.studio.settings_advanced import AdvancedSettingsPage
+from ..pages.studio.settings_graders import GradingPage
+from ..pages.studio.signup import SignupPage
+from ..pages.studio.textbooks import TextbooksPage
+from ..pages.xblock.acid import AcidView
+from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
 from .helpers import UniqueCourseTest
 
@@ -107,3 +110,136 @@ class CoursePagesTest(UniqueCourseTest):
         # Verify that each page is available
         for page in self.pages:
             page.visit()
+
+
+class XBlockAcidBase(WebAppTest):
+    """
+    Base class for tests that verify that XBlock integration is working correctly
+    """
+    __test__ = False
+
+    def setUp(self):
+        """
+        Create a unique identifier for the course used in this test.
+        """
+        # Ensure that the superclass sets up
+        super(XBlockAcidBase, self).setUp()
+
+        # Define a unique course identifier
+        self.course_info = {
+            'org': 'test_org',
+            'number': 'course_' + self.unique_id[:5],
+            'run': 'test_' + self.unique_id,
+            'display_name': 'Test Course ' + self.unique_id
+        }
+
+        self.auth_page = AutoAuthPage(self.browser, staff=True)
+        self.outline = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        self.course_id = '{org}.{number}.{run}'.format(**self.course_info)
+
+        self.setup_fixtures()
+
+        self.auth_page.visit()
+
+    def test_acid_block_preview(self):
+        """
+        Verify that all expected acid block tests pass in studio preview
+        """
+
+        self.outline.visit()
+        unit = self.outline.section('Test Section').subsection('Test Subsection').toggle_expand().unit('Test Unit').go_to()
+
+        acid_block = AcidView(self.browser, unit.components[0].preview_selector)
+        self.assertTrue(acid_block.init_fn_passed)
+        self.assertTrue(acid_block.doc_ready_passed)
+        self.assertTrue(acid_block.child_tests_passed)
+        self.assertTrue(acid_block.scope_passed('user_state'))
+
+    def test_acid_block_editor(self):
+        """
+        Verify that all expected acid block tests pass in studio preview
+        """
+
+        self.outline.visit()
+        unit = self.outline.section('Test Section').subsection('Test Subsection').toggle_expand().unit('Test Unit').go_to()
+
+        unit.edit_draft()
+
+        acid_block = AcidView(self.browser, unit.components[0].edit().editor_selector)
+        self.assertTrue(acid_block.init_fn_passed)
+        self.assertTrue(acid_block.doc_ready_passed)
+        self.assertTrue(acid_block.child_tests_passed)
+        self.assertTrue(acid_block.scope_passed('content'))
+        self.assertTrue(acid_block.scope_passed('settings'))
+
+
+class XBlockAcidNoChildTest(XBlockAcidBase):
+    """
+    Tests of an AcidBlock with no children
+    """
+    __test__ = True
+
+    def setup_fixtures(self):
+
+        course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('acid', 'Acid Block')
+                    )
+                )
+            )
+        ).install()
+
+
+class XBlockAcidChildTest(XBlockAcidBase):
+    """
+    Tests of an AcidBlock with children
+    """
+    __test__ = True
+
+    def setup_fixtures(self):
+
+        course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('acid', 'Acid Block').add_children(
+                            XBlockFixtureDesc('acid', 'First Acid Child', metadata={'name': 'first'}),
+                            XBlockFixtureDesc('acid', 'Second Acid Child', metadata={'name': 'second'}),
+                            XBlockFixtureDesc('html', 'Html Child', data="<html>Contents</html>"),
+                        )
+                    )
+                )
+            )
+        ).install()
+
+    # This will fail until we fix support of children in pure XBlocks
+    @expectedFailure
+    def test_acid_block_preview(self):
+        super(XBlockAcidChildTest, self).test_acid_block_preview()
+
+    # This will fail until we fix support of children in pure XBlocks
+    @expectedFailure
+    def test_acid_block_editor(self):
+        super(XBlockAcidChildTest, self).test_acid_block_editor()

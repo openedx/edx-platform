@@ -13,6 +13,7 @@ Contents
 
    read_me
    change_log
+   accounts
    get_started
    create_new_course
    establish_grading_policy
@@ -28,6 +29,7 @@ Contents
    open_response_assessment
    google_hangouts
    tools
+   additional_tools
    set_content_releasedates
    view_course_content
    export_import_course
@@ -36,6 +38,12 @@ Contents
    ora_students
    discussions
    discussion_guidance_moderators
+   course_data
+   course_enrollment
+   course_staffing
+   beta_testing
+   course_student
+   course_grades
    glossary
 
 

@@ -33,7 +33,19 @@ BOK_CHOY_STUBS = {
 
     :xqueue => {
         :port => 8040,
-        :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_xqueue.log")
+        :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_xqueue.log"),
+        :config => 'register_submission_url=http://0.0.0.0:8041/test/register_submission'
+    },
+
+    :ora => {
+        :port => 8041,
+        :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_ora.log"),
+        :config => ''
+    },
+
+    :comments => {
+        :port => 4567,
+        :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_comments.log")
     }
 }
 
@@ -56,13 +68,13 @@ def start_servers()
     BOK_CHOY_STUBS.each do | service, info |
         Dir.chdir(BOK_CHOY_STUB_DIR) do
             singleton_process(
-                "python -m stubs.start #{service} #{info[:port]}",
+                "python -m stubs.start #{service} #{info[:port]} #{info[:config]}",
                 logfile=info[:log]
             )
         end
     end
-
 end
+
 
 # Wait until we get a successful response from the servers or time out
 def wait_for_test_servers()
@@ -121,7 +133,7 @@ def run_bok_choy(test_spec)
     # Construct the nosetests command, specifying where to save screenshots and XUnit XML reports
     cmd = [
         "SCREENSHOT_DIR='#{BOK_CHOY_LOG_DIR}'", "nosetests", test_spec,
-        "--with-xunit", "--xunit-file=#{BOK_CHOY_XUNIT_REPORT}"
+        "--with-xunit", "--xunit-file=#{BOK_CHOY_XUNIT_REPORT}", "--verbosity=2"
     ]
 
     # Configure parallel test execution, if specified
@@ -183,7 +195,7 @@ namespace :'test:bok_choy' do
         # Clear any test data already in Mongo or MySQL and invalidate the cache
         clear_mongo()
         BOK_CHOY_CACHE.flush()
-        sh(django_admin('lms', 'bok_choy', 'flush', '--noinput'))
+        sh(django_admin('lms', 'bok_choy', 'loaddata', 'common/test/db_fixtures/*.json'))
 
         # Ensure the test servers are available
         puts "Starting test servers...".green

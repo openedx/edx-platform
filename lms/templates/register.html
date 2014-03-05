@@ -16,14 +16,14 @@
 
 <%block name="pagetitle">${_("Register for {platform_name}").format(platform_name=platform_name)}</%block>
 
+<%block name="bodyclass">view-register</%block>
+
 <%block name="js_extra">
   <script type="text/javascript">
     $(function() {
 
-      var view_name = 'view-register';
-
       // adding js class for styling with accessibility in mind
-      $('body').addClass('js').addClass(view_name);
+      $('body').addClass('js');
 
       // new window/tab opening
       $('a[rel="external"], a[class="new-vp"]')
@@ -281,9 +281,9 @@
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
               <label for="tos-yes">${_('I agree to the {link_start1}Terms of Service{link_end} and {link_start2}Privacy Policy{link_end}').format(
-                link_start1='<a href="{url}" class="new-vp">'.format(url=marketing_link('TOS')),
+                link_start1='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=marketing_link('TOS')),
                 link_end='</a>',
-                link_start2='<a href="{url}#privacy" class="new-vp">'.format(url=marketing_link('TOS')),
+                link_start2='<a href="{url}#privacy" class="new-vp" tabindex="-1">'.format(url=marketing_link('TOS')),
                 )}</label>
             </div>
             % endif
@@ -299,7 +299,7 @@
                   honor_code_path = marketing_link('HONOR')
               %>
               <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
-                link_start='<a href="{url}" class="new-vp">'.format(url=honor_code_path),
+                link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=honor_code_path),
                 link_end='</a>')}</label>
             </div>
             % endif

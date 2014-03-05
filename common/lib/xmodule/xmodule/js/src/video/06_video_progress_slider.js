@@ -104,7 +104,8 @@ function () {
     // whole slider). Remember that endTime === null means the end time
     // is set to the end of video by default.
     function updateStartEndTimeRegion(params) {
-        var left, width, start, end, duration, rangeParams;
+        var isFlashMode = this.currentPlayerMode === 'flash',
+            left, width, start, end, duration, rangeParams;
 
         // We must have a duration in order to determine the area of range.
         // It also must be non-zero.
@@ -119,22 +120,16 @@ function () {
 
         if (start > duration) {
             start = 0;
-        } else {
-            if (this.currentPlayerMode === 'flash') {
-                start /= Number(this.speed);
-            }
+        } else if (isFlashMode) {
+            start /= Number(this.speed);
         }
 
         // If end is set to null, or it is greater than the duration of the
         // video, then we set it to the end of the video.
-        if (
-            end === null || end > duration
-        ) {
+        if (end === null || end > duration) {
             end = duration;
-        } else if (end !== null) {
-            if (this.currentPlayerMode === 'flash') {
-                end /= Number(this.speed);
-            }
+        } else if (isFlashMode) {
+            end /= Number(this.speed);
         }
 
         // Don't build a range if it takes up the whole slider.

@@ -96,14 +96,27 @@ class LocMapperStore(object):
             course_location.org, course_location.course,
             course_location.name if course_location.category == 'course' else None
         )
+        # create location id with lower case
+        location_id_lower = self._construct_lower_location_son(
+            course_location.org, course_location.course,
+            course_location.name if course_location.category == 'course' else None
+        )
 
-        self.location_map.insert({
-            '_id': location_id,
-            'course_id': package_id,
-            'draft_branch': draft_branch,
-            'prod_branch': prod_branch,
-            'block_map': block_map or {},
-        })
+        try:
+            self.location_map.insert({
+                '_id': location_id,
+                'lower_id': location_id_lower,
+                'course_id': package_id,
+                'lower_course_id': package_id.lower(),
+                'draft_branch': draft_branch,
+                'prod_branch': prod_branch,
+                'block_map': block_map or {},
+            })
+        except pymongo.errors.DuplicateKeyError:
+            # update old entry with 'lower_id' and 'lower_course_id'
+            location_update = {'lower_id': location_id_lower, 'lower_course_id': package_id.lower()}
+            self.location_map.update({'_id': location_id}, {'$set': location_update})
+
         return package_id
 
     def translate_location(self, old_style_course_id, location, published=True, add_entry_if_missing=True):
@@ -163,8 +176,14 @@ class LocMapperStore(object):
             else:
                 raise ItemNotFoundError(location)
         elif isinstance(block_id, dict):
-            # name is not unique, look through for the right category
-            if location.category in block_id:
+            # jump_to_id uses a None category.
+            if location.category is None:
+                if len(block_id) == 1:
+                    # unique match (most common case)
+                    block_id = block_id.values()[0]
+                else:
+                    raise InvalidLocationError()
+            elif location.category in block_id:
                 block_id = block_id[location.category]
             elif add_entry_if_missing:
                 block_id = self._add_to_block_map(location, location_id, entry['block_map'])
@@ -185,7 +204,7 @@ class LocMapperStore(object):
         self._cache_location_map_entry(old_style_course_id, location, published_usage, draft_usage)
         return result
 
-    def translate_locator_to_location(self, locator, get_course=False):
+    def translate_locator_to_location(self, locator, get_course=False, lower_only=False):
         """
         Returns an old style Location for the given Locator if there's an appropriate entry in the
         mapping collection. Note, it requires that the course was previously mapped (a side effect of
@@ -204,7 +223,7 @@ class LocMapperStore(object):
         :param locator: a BlockUsageLocator
         """
         if get_course:
-            cached_value = self._get_course_location_from_cache(locator.package_id)
+            cached_value = self._get_course_location_from_cache(locator.package_id, lower_only)
         else:
             cached_value = self._get_location_from_cache(locator)
         if cached_value:
@@ -212,7 +231,10 @@ class LocMapperStore(object):
 
         # This does not require that the course exist in any modulestore
         # only that it has a mapping entry.
-        maps = self.location_map.find({'course_id': locator.package_id})
+        if lower_only:
+            maps = self.location_map.find({'lower_course_id': locator.package_id.lower()})
+        else:
+            maps = self.location_map.find({'course_id': locator.package_id})
         # look for one which maps to this block block_id
         if maps.count() == 0:
             return None
@@ -237,11 +259,17 @@ class LocMapperStore(object):
                         category,
                         self.decode_key_from_mongo(old_name),
                         None)
+
+                    if lower_only:
+                        candidate_key = "lower_course_id"
+                    else:
+                        candidate_key = "course_id"
+
                     published_locator = BlockUsageLocator(
-                        candidate['course_id'], branch=candidate['prod_branch'], block_id=block_id
+                        candidate[candidate_key], branch=candidate['prod_branch'], block_id=block_id
                     )
                     draft_locator = BlockUsageLocator(
-                        candidate['course_id'], branch=candidate['draft_branch'], block_id=block_id
+                        candidate[candidate_key], branch=candidate['draft_branch'], block_id=block_id
                     )
                     self._cache_location_map_entry(old_course_id, location, published_locator, draft_locator)
 
@@ -253,7 +281,7 @@ class LocMapperStore(object):
                 return result
         return None
 
-    def translate_location_to_course_locator(self, old_style_course_id, location, published=True):
+    def translate_location_to_course_locator(self, old_style_course_id, location, published=True, lower_only=False):
         """
         Used when you only need the CourseLocator and not a full BlockUsageLocator. Probably only
         useful for get_items which wildcards name or category.
@@ -264,7 +292,7 @@ class LocMapperStore(object):
         if cached:
             return cached
 
-        location_id = self._interpret_location_course_id(old_style_course_id, location)
+        location_id = self._interpret_location_course_id(old_style_course_id, location, lower_only)
 
         maps = self.location_map.find(location_id)
         maps = list(maps)
@@ -304,7 +332,7 @@ class LocMapperStore(object):
         self.location_map.update(location_id, {'$set': {'block_map': block_map}})
         return block_id
 
-    def _interpret_location_course_id(self, course_id, location):
+    def _interpret_location_course_id(self, course_id, location, lower_only=False):
         """
         Take the old style course id (org/course/run) and return a dict w/ a SON for querying the mapping table.
         If the course_id is empty, it uses location, but this may result in an inadequate id.
@@ -316,9 +344,13 @@ class LocMapperStore(object):
         if course_id:
             # re doesn't allow ?P<_id.org> and ilk
             matched = re.match(r'([^/]+)/([^/]+)/([^/]+)', course_id)
+            if lower_only:
+                return {'lower_id': self._construct_lower_location_son(*matched.groups())}
             return {'_id': self._construct_location_son(*matched.groups())}
 
         if location.category == 'course':
+            if lower_only:
+                return {'lower_id': self._construct_lower_location_son(location.org, location.course, location.name)}
             return {'_id': self._construct_location_son(location.org, location.course, location.name)}
         else:
             return bson.son.SON([('_id.org', location.org), ('_id.course', location.course)])
@@ -345,6 +377,15 @@ class LocMapperStore(object):
             return bson.son.SON([('org', org), ('course', course), ('name', name)])
         else:
             return bson.son.SON([('org', org), ('course', course)])
+
+    def _construct_lower_location_son(self, org, course, name=None):
+        """
+        Construct the SON needed to represent the location with lower case
+        """
+        if name is not None:
+            name = name.lower()
+
+        return self._construct_location_son(org.lower(), course.lower(), name)
 
     def _block_id_is_guid(self, name):
         """
@@ -418,12 +459,17 @@ class LocMapperStore(object):
         """
         return self.cache.get(unicode(locator))
 
-    def _get_course_location_from_cache(self, locator_package_id):
+    def _get_course_location_from_cache(self, locator_package_id, lower_only=False):
         """
         See if the package_id is in the cache. If so, return the mapped location to the
         course root.
         """
-        return self.cache.get(u'courseId+{}'.format(locator_package_id))
+        if lower_only:
+            cache_key = u'courseIdLower+{}'.format(locator_package_id.lower())
+        else:
+            cache_key = u'courseId+{}'.format(locator_package_id)
+
+        return self.cache.get(cache_key)
 
     def _cache_course_locator(self, old_course_id, published_course_locator, draft_course_locator):
         """
@@ -442,6 +488,7 @@ class LocMapperStore(object):
         setmany = {}
         if location.category == 'course':
             setmany[u'courseId+{}'.format(published_usage.package_id)] = location
+            setmany[u'courseIdLower+{}'.format(published_usage.package_id.lower())] = location
         setmany[unicode(published_usage)] = location
         setmany[unicode(draft_usage)] = location
         setmany[u'{}+{}'.format(old_course_id, location.url())] = (published_usage, draft_usage)

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-03 13:36-0500\n"
-"PO-Revision-Date: 2014-02-03 18:37:12.464962\n"
+"POT-Creation-Date: 2014-02-25 10:17-0500\n"
+"PO-Revision-Date: 2014-02-25 15:18:19.594059\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -17,10 +17,13 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
-msgid "This link will open in a new browser window/tab"
-msgstr "Thïs lïnk wïll øpén ïn ä néw ßrøwsér wïndøw/täß Ⱡ'σяєм ιρѕυм #"
+#: cms/static/coffee/src/views/tabs.js
+#: cms/static/js/views/course_info_update.js
+#: common/static/coffee/src/discussion/utils.js
+msgid "OK"
+msgstr "ÖK Ⱡ'#"
 
+#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
@@ -29,9 +32,187 @@ msgstr "Thïs lïnk wïll øpén ïn ä néw ßrøwsér wïndøw/täß Ⱡ'σя�
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕ#"
 
+#: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
+msgid "This link will open in a new browser window/tab"
+msgstr "Thïs lïnk wïll öpén ïn ä néw ßröwsér wïndöw/täß Ⱡ'σяєм ιρѕυм #"
+
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+msgid "Show Annotations"
+msgstr "Shöw Ànnötätïöns Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+msgid "Hide Annotations"
+msgstr "Hïdé Ànnötätïöns Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+msgid "Expand Instructions"
+msgstr "Éxpänd Ìnstrüçtïöns Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+msgid "Collapse Instructions"
+msgstr "Çölläpsé Ìnstrüçtïöns Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+msgid "Commentary"
+msgstr "Çömméntärý Ⱡ#"
+
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+msgid "Reply to Annotation"
+msgstr "Réplý tö Ànnötätïön Ⱡ'σя#"
+
+#. Translators: %(earned)s is the number of points earned. %(total)s is the
+#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
+#. points will always be at least 1. We pluralize based on the total number of
+#. points (example: 0/1 point; 1/2 points);
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "(%(earned)s/%(possible)s point)"
+msgid_plural "(%(earned)s/%(possible)s points)"
+msgstr[0] "(%(earned)s/%(possible)s pöïnt) Ⱡ'#"
+msgstr[1] "(%(earned)s/%(possible)s pöïnts) Ⱡ'σ#"
+
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10). There will always be at least 1 point possible.;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "(%(num_points)s point possible)"
+msgid_plural "(%(num_points)s points possible)"
+msgstr[0] "(%(num_points)s pöïnt pössïßlé) Ⱡ'σя#"
+msgstr[1] "(%(num_points)s pöïnts pössïßlé) Ⱡ'σя#"
+
+#. Translators: the word Answer here refers to the answer to a problem the
+#. student must solve.;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Hide Answer(s)"
+msgstr "Hïdé Ànswér(s) Ⱡ'#"
+
+#. Translators: the word Answer here refers to the answer to a problem the
+#. student must solve.;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Show Answer(s)"
+msgstr "Shöw Ànswér(s) Ⱡ'#"
+
+#. Translators: the word unanswered here is about answering a problem the
+#. student must solve.;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "unanswered"
+msgstr "ünänswéréd Ⱡ#"
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Status: unsubmitted"
+msgstr "Stätüs: ünsüßmïttéd Ⱡ'σя#"
+
+#. Translators: A "rating" is a score a student gives to indicate how well
+#. they feel they were graded on this problem
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "You need to pick a rating before you can submit."
+msgstr "Ýöü nééd tö pïçk ä rätïng ßéföré ýöü çän süßmït. Ⱡ'σяєм ιρѕυм #"
+
+#. Translators: this message appears when transitioning between openended
+#. grading
+#. types (i.e. self assesment to peer assessment). Sometimes, if a student
+#. did not perform well at one step, they cannot move on to the next one.
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Your score did not meet the criteria to move to the next step."
+msgstr ""
+"Ýöür sçöré dïd nöt méét thé çrïtérïä tö mövé tö thé néxt stép. Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Submit"
+msgstr "Süßmït Ⱡ'σяєм ιρѕ#"
+
+#. Translators: one clicks this button after one has finished filling out the
+#. grading
+#. form for an openended assessment
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Submit assessment"
+msgstr "Süßmït ässéssmént Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"Your response has been submitted. Please check back later for your grade."
+msgstr ""
+"Ýöür réspönsé häs ßéén süßmïttéd. Pléäsé çhéçk ßäçk lätér för ýöür grädé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#. Translators: this button is clicked to submit a student's rating of
+#. an evaluator's assessment
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Submit post-assessment"
+msgstr "Süßmït pöst-ässéssmént Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Answer saved, but not yet submitted."
+msgstr "Ànswér sävéd, ßüt nöt ýét süßmïttéd. Ⱡ'σяєм ιρ#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"Please confirm that you wish to submit your work. You will not be able to "
+"make any changes after submitting."
+msgstr ""
+"Pléäsé çönfïrm thät ýöü wïsh tö süßmït ýöür wörk. Ýöü wïll nöt ßé äßlé tö "
+"mäké äný çhängés äftér süßmïttïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"You are trying to upload a file that is too large for our system.  Please "
+"choose a file under 2MB or paste a link to it into the answer box."
+msgstr ""
+"Ýöü äré trýïng tö üplöäd ä fïlé thät ïs töö lärgé för öür sýstém.  Pléäsé "
+"çhöösé ä fïlé ündér 2MB ör pästé ä lïnk tö ït ïntö thé änswér ßöx. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"Are you sure you want to remove your previous response to this question?"
+msgstr ""
+"Àré ýöü süré ýöü wänt tö rémövé ýöür prévïöüs réspönsé tö thïs qüéstïön? "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Moved to next step."
+msgstr "Mövéd tö néxt stép. Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"File uploads are required for this question, but are not supported in your "
+"browser. Try the newest version of Google Chrome. Alternatively, if you have"
+" uploaded the image to another website, you can paste a link to it into the "
+"answer box."
+msgstr ""
+"Fïlé üplöäds äré réqüïréd för thïs qüéstïön, ßüt äré nöt süppörtéd ïn ýöür "
+"ßröwsér. Trý thé néwést vérsïön öf Gööglé Çhrömé. Àltérnätïvélý, ïf ýöü hävé"
+" üplöädéd thé ïmägé tö änöthér wéßsïté, ýöü çän pästé ä lïnk tö ït ïntö thé "
+"änswér ßöx. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ тє#"
+
+#. Translators: "Show Question" is some text that, when clicked, shows a
+#. question's
+#. content that had been hidden
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Show Question"
+msgstr "Shöw Qüéstïön Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Hide Question"
+msgstr "Hïdé Qüéstïön Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/js/src/sequence/display.js
+msgid ""
+"Sequence error! Cannot navigate to tab %(tab_name)s in the current "
+"SequenceModule. Please contact the course staff."
+msgstr ""
+"Séqüénçé érrör! Çännöt nävïgäté tö täß %(tab_name)s ïn thé çürrént "
+"SéqüénçéMödülé. Pléäsé çöntäçt thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢ση#"
+
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
-msgstr "Vïdéø slïdér Ⱡ#"
+msgstr "Vïdéö slïdér Ⱡ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Pause"
@@ -43,50 +224,50 @@ msgstr "Pläý Ⱡ'σяєм#"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Fill browser"
-msgstr "Fïll ßrøwsér Ⱡ#"
+msgstr "Fïll ßröwsér Ⱡ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Exit full browser"
-msgstr "Éxït füll ßrøwsér Ⱡ'σ#"
+msgstr "Éxït füll ßröwsér Ⱡ'σ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
-msgstr "HD øn Ⱡ'σяєм ι#"
+msgstr "HD ön Ⱡ'σяєм ι#"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD off"
-msgstr "HD øff Ⱡ'σяєм ιρѕ#"
+msgstr "HD öff Ⱡ'σяєм ιρѕ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
-msgstr "Vïdéø pøsïtïøn Ⱡ'#"
+msgstr "Vïdéö pösïtïön Ⱡ'#"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
-msgstr "Vïdéø éndéd Ⱡ#"
+msgstr "Vïdéö éndéd Ⱡ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] "%(value)s høür Ⱡ'#"
-msgstr[1] "%(value)s høürs Ⱡ'#"
+msgstr[0] "%(value)s höür #"
+msgstr[1] "%(value)s höürs #"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] "%(value)s mïnüté Ⱡ'σ#"
-msgstr[1] "%(value)s mïnütés Ⱡ'σ#"
+msgstr[0] "%(value)s mïnüté Ⱡ#"
+msgstr[1] "%(value)s mïnütés Ⱡ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] "%(value)s séçønd Ⱡ'σ#"
-msgstr[1] "%(value)s séçønds Ⱡ'σ#"
+msgstr[0] "%(value)s séçönd Ⱡ#"
+msgstr[1] "%(value)s séçönds Ⱡ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Volume"
-msgstr "Vølümé Ⱡ'σяєм ιρѕ#"
+msgstr "Völümé Ⱡ'σяєм ιρѕ#"
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
@@ -96,12 +277,12 @@ msgstr "Mütéd Ⱡ'σяєм ι#"
 #. Translators: Volume level in range (0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Very low"
-msgstr "Vérý løw #"
+msgstr "Vérý löw #"
 
 #. Translators: Volume level in range (20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Low"
-msgstr "Løw Ⱡ'σя#"
+msgstr "Löw Ⱡ'σя#"
 
 #. Translators: Volume level in range (40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
@@ -111,12 +292,12 @@ msgstr "Àvérägé #"
 #. Translators: Volume level in range (60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Loud"
-msgstr "Løüd Ⱡ'σяєм#"
+msgstr "Löüd Ⱡ'σяєм#"
 
 #. Translators: Volume level in range (80,100)%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Very loud"
-msgstr "Vérý løüd #"
+msgstr "Vérý löüd #"
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
@@ -125,25 +306,246 @@ msgstr "Mäxïmüm #"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
-msgstr "Çäptïøn wïll ßé dïspläýéd whén  Ⱡ'σяєм ι#"
+msgstr "Çäptïön wïll ßé dïspläýéd whén  Ⱡ'σяєм ι#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on captions"
-msgstr "Türn øn çäptïøns Ⱡ'σ#"
+msgstr "Türn ön çäptïöns Ⱡ'σ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off captions"
-msgstr "Türn øff çäptïøns Ⱡ'σ#"
+msgstr "Türn öff çäptïöns Ⱡ'σ#"
+
+#: common/static/coffee/src/discussion/discussion_module_view.js
+#: common/static/coffee/src/discussion/discussion_module_view.js
+msgid "Hide Discussion"
+msgstr "Hïdé Dïsçüssïön Ⱡ'#"
+
+#: common/static/coffee/src/discussion/discussion_module_view.js
+msgid "Show Discussion"
+msgstr "Shöw Dïsçüssïön Ⱡ'#"
+
+#: common/static/coffee/src/discussion/discussion_module_view.js
+#: common/static/coffee/src/discussion/discussion_module_view.js
+#: common/static/coffee/src/discussion/utils.js
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/response_comment_view.js
+msgid "Sorry"
+msgstr "Sörrý Ⱡ'σяєм ι#"
+
+#: common/static/coffee/src/discussion/discussion_module_view.js
+msgid "We had some trouble loading the discussion. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé löädïng thé dïsçüssïön. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
+
+#: common/static/coffee/src/discussion/discussion_module_view.js
+msgid ""
+"We had some trouble loading the threads you requested. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé löädïng thé thréäds ýöü réqüéstéd. Pléäsé trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/static/coffee/src/discussion/utils.js
+msgid "Loading content"
+msgstr "Löädïng çöntént Ⱡ'#"
+
+#: common/static/coffee/src/discussion/utils.js
+msgid ""
+"We had some trouble processing your request. Please ensure you have copied "
+"any unsaved work and then reload the page."
+msgstr ""
+"Wé häd sömé tröüßlé pröçéssïng ýöür réqüést. Pléäsé énsüré ýöü hävé çöpïéd "
+"äný ünsävéd wörk änd thén rélöäd thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
+
+#: common/static/coffee/src/discussion/utils.js
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/coffee/src/discussion/views/new_post_view.js
+#: common/static/coffee/src/discussion/views/new_post_view.js
+#: common/static/coffee/src/discussion/views/new_post_view.js
+msgid "…"
+msgstr "… #"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "Close"
+msgstr "Çlösé Ⱡ'σяєм ι#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "Open"
+msgstr "Öpén Ⱡ'σяєм#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "remove vote"
+msgstr "rémövé vöté Ⱡ#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "vote"
+msgstr "vöté Ⱡ'σяєм#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"%(voteNum)s%(startSrSpan)s vote (click to remove your vote)%(endSrSpan)s"
+msgid_plural ""
+"%(voteNum)s%(startSrSpan)s votes (click to remove your vote)%(endSrSpan)s"
+msgstr[0] ""
+"%(voteNum)s%(startSrSpan)s vöté (çlïçk tö rémövé ýöür vöté)%(endSrSpan)s "
+"Ⱡ'σяєм ιρѕυ#"
+msgstr[1] ""
+"%(voteNum)s%(startSrSpan)s vötés (çlïçk tö rémövé ýöür vöté)%(endSrSpan)s "
+"Ⱡ'σяєм ιρѕυм#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "%(voteNum)s%(startSrSpan)s vote (click to vote)%(endSrSpan)s"
+msgid_plural "%(voteNum)s%(startSrSpan)s votes (click to vote)%(endSrSpan)s"
+msgstr[0] ""
+"%(voteNum)s%(startSrSpan)s vöté (çlïçk tö vöté)%(endSrSpan)s Ⱡ'σяєм #"
+msgstr[1] ""
+"%(voteNum)s%(startSrSpan)s vötés (çlïçk tö vöté)%(endSrSpan)s Ⱡ'σяєм ι#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Load more"
+msgstr "Löäd möré #"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Loading more threads"
+msgstr "Löädïng möré thréäds Ⱡ'σя#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "We had some trouble loading more threads. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé löädïng möré thréäds. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "%(unread_count)s new comment"
+msgid_plural "%(unread_count)s new comments"
+msgstr[0] "%(unread_count)s néw çömmént Ⱡ'#"
+msgstr[1] "%(unread_count)s néw çömménts Ⱡ'σ#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Loading thread list"
+msgstr "Löädïng thréäd lïst Ⱡ'σя#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+msgid "Click to remove report"
+msgstr "Çlïçk tö rémövé répört Ⱡ'σяє#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js
+msgid "Misuse Reported, %(start_sr_span)s click to remove report%(end_span)s"
+msgstr ""
+"Mïsüsé Répörtéd, %(start_sr_span)s çlïçk tö rémövé répört%(end_span)s Ⱡ'σяєм"
+" ιρѕυм #"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js
+msgid "Report Misuse"
+msgstr "Répört Mïsüsé Ⱡ'#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+msgid "Pinned"
+msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+msgid "Pin Thread"
+msgstr "Pïn Thréäd Ⱡ#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+msgid "Pinning is not currently available"
+msgstr "Pïnnïng ïs nöt çürréntlý äväïläßlé Ⱡ'σяєм ιρ#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "We had some trouble loading responses. Please reload the page."
+msgstr ""
+"Wé häd sömé tröüßlé löädïng réspönsés. Pléäsé rélöäd thé pägé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "We had some trouble loading more responses. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé löädïng möré réspönsés. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "%(numResponses)s response"
+msgid_plural "%(numResponses)s responses"
+msgstr[0] "%(numResponses)s réspönsé Ⱡ#"
+msgstr[1] "%(numResponses)s réspönsés Ⱡ'#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "Showing all responses"
+msgstr "Shöwïng äll réspönsés Ⱡ'σя#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "Showing first response"
+msgid_plural "Showing first %(numResponses)s responses"
+msgstr[0] "Shöwïng fïrst réspönsé Ⱡ'σяє#"
+msgstr[1] "Shöwïng fïrst %(numResponses)s réspönsés Ⱡ'σяєм#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "Load all responses"
+msgstr "Löäd äll réspönsés Ⱡ'σ#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "Load next %(numResponses)s responses"
+msgstr "Löäd néxt %(numResponses)s réspönsés Ⱡ'σяє#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "Are you sure you want to delete this post?"
+msgstr "Àré ýöü süré ýöü wänt tö délété thïs pöst? Ⱡ'σяєм ιρѕυ#"
+
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js
+msgid "anonymous"
+msgstr "änönýmöüs #"
+
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js
+msgid "staff"
+msgstr "stäff Ⱡ'σяєм ι#"
+
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js
+msgid "Community TA"
+msgstr "Çömmünïtý TÀ Ⱡ#"
+
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js
+msgid "Misuse Reported, click to remove report"
+msgstr "Mïsüsé Répörtéd, çlïçk tö rémövé répört Ⱡ'σяєм ιρѕ#"
+
+#: common/static/coffee/src/discussion/views/response_comment_view.js
+msgid "Are you sure you want to delete this comment?"
+msgstr "Àré ýöü süré ýöü wänt tö délété thïs çömmént? Ⱡ'σяєм ιρѕυм#"
+
+#: common/static/coffee/src/discussion/views/response_comment_view.js
+msgid "We had some trouble deleting this comment. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé délétïng thïs çömmént. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/static/coffee/src/discussion/views/thread_response_view.js
+msgid "Are you sure you want to delete this response?"
+msgstr "Àré ýöü süré ýöü wänt tö délété thïs réspönsé? Ⱡ'σяєм ιρѕυм #"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "%s ago"
-msgstr "%s ägø Ⱡ'σяєм ιρѕ#"
+msgstr "%s ägö Ⱡ'σяєм ιρѕ#"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "%s from now"
-msgstr "%s frøm nøw Ⱡ#"
+msgstr "%s fröm nöw Ⱡ#"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
@@ -151,7 +553,7 @@ msgstr "léss thän ä mïnüté Ⱡ'σ#"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr "äßøüt ä mïnüté Ⱡ'#"
+msgstr "äßöüt ä mïnüté Ⱡ'#"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
@@ -162,14 +564,14 @@ msgstr[1] "%d mïnütés Ⱡ#"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr "äßøüt än høür Ⱡ'#"
+msgstr "äßöüt än höür Ⱡ'#"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] "äßøüt %d høür Ⱡ'#"
-msgstr[1] "äßøüt %d høürs Ⱡ'#"
+msgstr[0] "äßöüt %d höür Ⱡ'#"
+msgstr[1] "äßöüt %d höürs Ⱡ'#"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
@@ -184,18 +586,18 @@ msgstr[1] "%d däýs #"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr "äßøüt ä mønth Ⱡ'#"
+msgstr "äßöüt ä mönth Ⱡ'#"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "%d mønth #"
-msgstr[1] "%d mønths #"
+msgstr[0] "%d mönth #"
+msgstr[1] "%d mönths #"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr "äßøüt ä ýéär Ⱡ#"
+msgstr "äßöüt ä ýéär Ⱡ#"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
@@ -215,15 +617,15 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"Thïs ïs thé lïst øf äväïläßlé %s. Ýøü mäý çhøøsé sømé ßý séléçtïng thém ïn "
-"thé ßøx ßéløw änd thén çlïçkïng thé \"Çhøøsé\" ärrøw ßétwéén thé twø ßøxés. "
+"Thïs ïs thé lïst öf äväïläßlé %s. Ýöü mäý çhöösé sömé ßý séléçtïng thém ïn "
+"thé ßöx ßélöw änd thén çlïçkïng thé \"Çhöösé\" ärröw ßétwéén thé twö ßöxés. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
-"Týpé ïntø thïs ßøx tø fïltér døwn thé lïst øf äväïläßlé %s. Ⱡ'σяєм ιρѕυм "
+"Týpé ïntö thïs ßöx tö fïltér döwn thé lïst öf äväïläßlé %s. Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
 
 #: lms/static/admin/js/SelectFilter2.js
@@ -232,25 +634,25 @@ msgstr "Fïltér Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Choose all"
-msgstr "Çhøøsé äll Ⱡ#"
+msgstr "Çhöösé äll Ⱡ#"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr "Çlïçk tø çhøøsé äll %s ät ønçé. Ⱡ'σяєм ι#"
+msgstr "Çlïçk tö çhöösé äll %s ät önçé. Ⱡ'σяєм ι#"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Choose"
-msgstr "Çhøøsé Ⱡ'σяєм ιρѕ#"
+msgstr "Çhöösé Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Remove"
-msgstr "Rémøvé Ⱡ'σяєм ιρѕ#"
+msgstr "Rémövé Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
 msgid "Chosen %s"
-msgstr "Çhøsén %s #"
+msgstr "Çhösén %s #"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
@@ -258,32 +660,32 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
-"Thïs ïs thé lïst øf çhøsén %s. Ýøü mäý rémøvé sømé ßý séléçtïng thém ïn thé "
-"ßøx ßéløw änd thén çlïçkïng thé \"Rémøvé\" ärrøw ßétwéén thé twø ßøxés. "
+"Thïs ïs thé lïst öf çhösén %s. Ýöü mäý rémövé sömé ßý séléçtïng thém ïn thé "
+"ßöx ßélöw änd thén çlïçkïng thé \"Rémövé\" ärröw ßétwéén thé twö ßöxés. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρ#"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Remove all"
-msgstr "Rémøvé äll Ⱡ#"
+msgstr "Rémövé äll Ⱡ#"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr "Çlïçk tø rémøvé äll çhøsén %s ät ønçé. Ⱡ'σяєм ιρѕ#"
+msgstr "Çlïçk tö rémövé äll çhösén %s ät önçé. Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "%(sel)s øf %(cnt)s séléçtéd Ⱡ'σяєм#"
-msgstr[1] "%(sel)s øf %(cnt)s séléçtéd Ⱡ'σяєм#"
+msgstr[0] "%(sel)s öf %(cnt)s séléçtéd Ⱡ'σя#"
+msgstr[1] "%(sel)s öf %(cnt)s séléçtéd Ⱡ'σя#"
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
-"Ýøü hävé ünsävéd çhängés øn ïndïvïdüäl édïtäßlé fïélds. Ìf ýøü rün än "
-"äçtïøn, ýøür ünsävéd çhängés wïll ßé løst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Ýöü hävé ünsävéd çhängés ön ïndïvïdüäl édïtäßlé fïélds. Ìf ýöü rün än "
+"äçtïön, ýöür ünsävéd çhängés wïll ßé löst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє#"
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
@@ -292,9 +694,9 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
-"Ýøü hävé séléçtéd än äçtïøn, ßüt ýøü hävén't sävéd ýøür çhängés tø "
-"ïndïvïdüäl fïélds ýét. Pléäsé çlïçk ØK tø sävé. Ýøü'll nééd tø ré-rün thé "
-"äçtïøn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
+"Ýöü hävé séléçtéd än äçtïön, ßüt ýöü hävén't sävéd ýöür çhängés tö "
+"ïndïvïdüäl fïélds ýét. Pléäsé çlïçk ÖK tö sävé. Ýöü'll nééd tö ré-rün thé "
+"äçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -302,16 +704,16 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Ýøü hävé séléçtéd än äçtïøn, änd ýøü hävén't mädé äný çhängés øn ïndïvïdüäl "
-"fïélds. Ýøü'ré prøßäßlý løøkïng før thé Gø ßüttøn räthér thän thé Sävé "
-"ßüttøn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
+"Ýöü hävé séléçtéd än äçtïön, änd ýöü hävén't mädé äný çhängés ön ïndïvïdüäl "
+"fïélds. Ýöü'ré prößäßlý löökïng för thé Gö ßüttön räthér thän thé Sävé "
+"ßüttön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
 
 #. Translators: the names of months, keep the pipe (|) separators.
 #: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
 msgid ""
 "January|February|March|April|May|June|July|August|September|October|November|December"
 msgstr ""
-"Jänüärý|Féßrüärý|Märçh|Àprïl|Mäý|Jüné|Jülý|Àügüst|Séptémßér|Øçtøßér|Nøvémßér|Déçémßér"
+"Jänüärý|Féßrüärý|Märçh|Àprïl|Mäý|Jüné|Jülý|Àügüst|Séptémßér|Öçtößér|Növémßér|Déçémßér"
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #. Translators: abbreviations for days of the week, keep the pipe (|)
@@ -323,7 +725,7 @@ msgstr "S|M|T|W|T|F|S Ⱡ'#"
 #: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
 #: lms/static/admin/js/collapse.min.js
 msgid "Show"
-msgstr "Shøw Ⱡ'σяєм#"
+msgstr "Shöw Ⱡ'σяєм#"
 
 #: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
 msgid "Hide"
@@ -333,20 +735,20 @@ msgstr "Hïdé Ⱡ'σяєм#"
 #: lms/static/admin/js/dateparse.js
 msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
 msgstr ""
-"Sündäý|Møndäý|Tüésdäý|Wédnésdäý|Thürsdäý|Frïdäý|Sätürdäý Ⱡ'σяєм ιρѕυм ∂σł#"
+"Sündäý|Möndäý|Tüésdäý|Wédnésdäý|Thürsdäý|Frïdäý|Sätürdäý Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Now"
-msgstr "Nøw Ⱡ'σя#"
+msgstr "Nöw Ⱡ'σя#"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Clock"
-msgstr "Çløçk Ⱡ'σяєм ι#"
+msgstr "Çlöçk Ⱡ'σяєм ι#"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Choose a time"
-msgstr "Çhøøsé ä tïmé Ⱡ'#"
+msgstr "Çhöösé ä tïmé Ⱡ'#"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Midnight"
@@ -358,12 +760,12 @@ msgstr "6 ä.m. Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Noon"
-msgstr "Nøøn Ⱡ'σяєм#"
+msgstr "Nöön Ⱡ'σяєм#"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Today"
-msgstr "Tødäý Ⱡ'σяєм ι#"
+msgstr "Tödäý Ⱡ'σяєм ι#"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Calendar"
@@ -375,14 +777,387 @@ msgstr "Ýéstérdäý #"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Tomorrow"
-msgstr "Tømørrøw #"
+msgstr "Tömörröw #"
+
+#: lms/static/coffee/src/calculator.js
+msgid "Open Calculator"
+msgstr "Öpén Çälçülätör Ⱡ'#"
+
+#: lms/static/coffee/src/calculator.js
+msgid "Close Calculator"
+msgstr "Çlösé Çälçülätör Ⱡ'σ#"
+
+#: lms/static/coffee/src/customwmd.js
+msgid "Preview"
+msgstr "Prévïéw #"
+
+#: lms/static/coffee/src/customwmd.js
+msgid "Post body"
+msgstr "Pöst ßödý #"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Loading..."
+msgstr "Löädïng... Ⱡ#"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error getting student list."
+msgstr "Érrör géttïng stüdént lïst. Ⱡ'σяєм#"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error retrieving grading configuration."
+msgstr "Érrör rétrïévïng grädïng çönfïgürätïön. Ⱡ'σяєм ιρѕ#"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating grades. Please try again."
+msgstr "Érrör générätïng grädés. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυ#"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "File Name (Newest First)"
+msgstr "Fïlé Nämé (Néwést Fïrst) Ⱡ'σяє#"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid ""
+"Links are generated on demand and expire within 5 minutes due to the "
+"sensitive nature of student grade information."
+msgstr ""
+"Lïnks äré générätéd ön démänd änd éxpïré wïthïn 5 mïnütés düé tö thé "
+"sénsïtïvé nätüré öf stüdént grädé ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Successfully enrolled and sent email to the following students:"
+msgstr ""
+"Süççéssfüllý énrölléd änd sént émäïl tö thé föllöwïng stüdénts: Ⱡ'σяєм ιρѕυм"
+" ∂σłσя#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Successfully enrolled the following students:"
+msgstr "Süççéssfüllý énrölléd thé föllöwïng stüdénts: Ⱡ'σяєм ιρѕυм#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid ""
+"Successfully sent enrollment emails to the following students. They will be "
+"allowed to enroll once they register:"
+msgstr ""
+"Süççéssfüllý sént énröllmént émäïls tö thé föllöwïng stüdénts. Théý wïll ßé "
+"ällöwéd tö énröll önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "These students will be allowed to enroll once they register:"
+msgstr ""
+"Thésé stüdénts wïll ßé ällöwéd tö énröll önçé théý régïstér: Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid ""
+"Successfully sent enrollment emails to the following students. They will be "
+"enrolled once they register:"
+msgstr ""
+"Süççéssfüllý sént énröllmént émäïls tö thé föllöwïng stüdénts. Théý wïll ßé "
+"énrölléd önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "These students will be enrolled once they register:"
+msgstr "Thésé stüdénts wïll ßé énrölléd önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid ""
+"Emails successfully sent. The following students are no longer enrolled in "
+"the course:"
+msgstr ""
+"Émäïls süççéssfüllý sént. Thé föllöwïng stüdénts äré nö löngér énrölléd ïn "
+"thé çöürsé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "The following students are no longer enrolled in the course:"
+msgstr ""
+"Thé föllöwïng stüdénts äré nö löngér énrölléd ïn thé çöürsé: Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid ""
+"These students were not affliliated with the course so could not be "
+"unenrolled:"
+msgstr ""
+"Thésé stüdénts wéré nöt äfflïlïätéd wïth thé çöürsé sö çöüld nöt ßé "
+"ünénrölléd: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "Your message must have a subject."
+msgstr "Ýöür méssägé müst hävé ä süßjéçt. Ⱡ'σяєм ι#"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "Your message cannot be blank."
+msgstr "Ýöür méssägé çännöt ßé ßlänk. Ⱡ'σяєм #"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "Your email was successfully queued for sending."
+msgstr "Ýöür émäïl wäs süççéssfüllý qüéüéd för séndïng. Ⱡ'σяєм ιρѕυм #"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "yourself"
+msgstr "ýöürsélf #"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "everyone who is staff or instructor on this course"
+msgstr "évérýöné whö ïs stäff ör ïnstrüçtör ön thïs çöürsé Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid ""
+"ALL (everyone who is enrolled in this course as student, staff, or "
+"instructor)"
+msgstr ""
+"ÀLL (évérýöné whö ïs énrölléd ïn thïs çöürsé äs stüdént, stäff, ör "
+"ïnstrüçtör) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid ""
+"Your email was successfully queued for sending. Please note that for large "
+"classes, it may take up to an hour (or more, if other courses are "
+"simultaneously sending email) to send all emails."
+msgstr ""
+"Ýöür émäïl wäs süççéssfüllý qüéüéd för séndïng. Pléäsé nöté thät för lärgé "
+"çlässés, ït mäý täké üp tö än höür (ör möré, ïf öthér çöürsés äré "
+"sïmültänéöüslý séndïng émäïl) tö sénd äll émäïls. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕ#"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "You are about to send an email titled \""
+msgstr "Ýöü äré äßöüt tö sénd än émäïl tïtléd \" Ⱡ'σяєм ιρѕ#"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "Error sending email."
+msgstr "Érrör séndïng émäïl. Ⱡ'σя#"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "There is no email history for this course."
+msgstr "Théré ïs nö émäïl hïstörý för thïs çöürsé. Ⱡ'σяєм ιρѕυ#"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid "There was an error obtaining email task history for this course."
+msgstr ""
+"Théré wäs än érrör ößtäïnïng émäïl täsk hïstörý för thïs çöürsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid "Please enter a student email address or username."
+msgstr "Pléäsé éntér ä stüdént émäïl äddréss ör üsérnämé. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting student progress url for '<%= student_id %>'. Check that the "
+"student identifier is spelled correctly."
+msgstr ""
+"Érrör géttïng stüdént prögréss ürl för '<%= student_id %>'. Çhéçk thät thé "
+"stüdént ïdéntïfïér ïs spélléd çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid "Please enter a problem urlname."
+msgstr "Pléäsé éntér ä prößlém ürlnämé. Ⱡ'σяєм ι#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Success! Problem attempts reset for problem '<%= problem_id %>' and student "
+"'<%= student_id %>'."
+msgstr ""
+"Süççéss! Prößlém ättémpts rését för prößlém '<%= problem_id %>' änd stüdént "
+"'<%= student_id %>'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+" '<%= student_id %>'. Check that the problem and student identifiers are "
+"spelled correctly."
+msgstr ""
+"Érrör réséttïng prößlém ättémpts för prößlém '<%= problem_id %>' änd stüdént"
+" '<%= student_id %>'. Çhéçk thät thé prößlém änd stüdént ïdéntïfïérs äré "
+"spélléd çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?"
+msgstr ""
+"Délété stüdént '<%= student_id %>'s stäté ön prößlém '<%= problem_id %>'? "
+"Ⱡ'σяєм ιρѕυм#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error deleting student '<%= student_id %>'s state on problem '<%= problem_id"
+" %>'. Check that the problem and student identifiers are spelled correctly."
+msgstr ""
+"Érrör délétïng stüdént '<%= student_id %>'s stäté ön prößlém '<%= problem_id"
+" %>'. Çhéçk thät thé prößlém änd stüdént ïdéntïfïérs äré spélléd çörréçtlý. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid "Module state successfully deleted."
+msgstr "Mödülé stäté süççéssfüllý délétéd. Ⱡ'σяєм ιρ#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Started rescore problem task for problem '<%= problem_id %>' and student "
+"'<%= student_id %>'. Click the 'Show Background Task History for Student' "
+"button to see the status of the task."
+msgstr ""
+"Stärtéd résçöré prößlém täsk för prößlém '<%= problem_id %>' änd stüdént "
+"'<%= student_id %>'. Çlïçk thé 'Shöw Bäçkgröünd Täsk Hïstörý för Stüdént' "
+"ßüttön tö séé thé stätüs öf thé täsk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to rescore problem '<%= problem_id %>' for student "
+"'<%= student_id %>'. Check that the problem and student identifiers are "
+"spelled correctly."
+msgstr ""
+"Érrör stärtïng ä täsk tö résçöré prößlém '<%= problem_id %>' för stüdént "
+"'<%= student_id %>'. Çhéçk thät thé prößlém änd stüdént ïdéntïfïérs äré "
+"spélléd çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting task history for problem '<%= problem_id %>' and student '<%= "
+"student_id %>'. Check that the problem and student identifiers are spelled "
+"correctly."
+msgstr ""
+"Érrör géttïng täsk hïstörý för prößlém '<%= problem_id %>' änd stüdént '<%= "
+"student_id %>'. Çhéçk thät thé prößlém änd stüdént ïdéntïfïérs äré spélléd "
+"çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
+msgstr ""
+"Rését ättémpts för äll stüdénts ön prößlém '<%= problem_id %>'? Ⱡ'σяєм ιρѕυм"
+" ∂#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Successfully started task to reset attempts for problem '<%= problem_id %>'."
+" Click the 'Show Background Task History for Problem' button to see the "
+"status of the task."
+msgstr ""
+"Süççéssfüllý stärtéd täsk tö rését ättémpts för prößlém '<%= problem_id %>'."
+" Çlïçk thé 'Shöw Bäçkgröünd Täsk Hïstörý för Prößlém' ßüttön tö séé thé "
+"stätüs öf thé täsk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to reset attempts for all students on problem '<%= "
+"problem_id %>'. Check that the problem identifier is spelled correctly."
+msgstr ""
+"Érrör stärtïng ä täsk tö rését ättémpts för äll stüdénts ön prößlém '<%= "
+"problem_id %>'. Çhéçk thät thé prößlém ïdéntïfïér ïs spélléd çörréçtlý. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid "Rescore problem '<%= problem_id %>' for all students?"
+msgstr "Résçöré prößlém '<%= problem_id %>' för äll stüdénts? Ⱡ'σяєм ιρѕ#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Successfully started task to rescore problem '<%= problem_id %>' for all "
+"students. Click the 'Show Background Task History for Problem' button to see"
+" the status of the task."
+msgstr ""
+"Süççéssfüllý stärtéd täsk tö résçöré prößlém '<%= problem_id %>' för äll "
+"stüdénts. Çlïçk thé 'Shöw Bäçkgröünd Täsk Hïstörý för Prößlém' ßüttön tö séé"
+" thé stätüs öf thé täsk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to rescore problem '<%= problem_id %>'. Check that the"
+" problem identifier is spelled correctly."
+msgstr ""
+"Érrör stärtïng ä täsk tö résçöré prößlém '<%= problem_id %>'. Çhéçk thät thé"
+" prößlém ïdéntïfïér ïs spélléd çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid "Error listing task history for this student and problem."
+msgstr ""
+"Érrör lïstïng täsk hïstörý för thïs stüdént änd prößlém. Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Grades saved.  Fetching the next submission to grade."
+msgstr ""
+"Grädés sävéd.  Fétçhïng thé néxt süßmïssïön tö grädé. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Problem Name"
+msgstr "Prößlém Nämé Ⱡ#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Graded"
+msgstr "Grädéd Ⱡ'σяєм ιρѕ#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Available to Grade"
+msgstr "Àväïläßlé tö Grädé Ⱡ'σ#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Required"
+msgstr "Réqüïréd #"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Progress"
+msgstr "Prögréss #"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Back to problem list"
+msgstr "Bäçk tö prößlém lïst Ⱡ'σя#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Try loading again"
+msgstr "Trý löädïng ägäïn Ⱡ'σ#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "<%= num %> available "
+msgstr "<%= num %> äväïläßlé  Ⱡ'#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "<%= num %> graded "
+msgstr "<%= num %> grädéd  Ⱡ#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "<%= num %> more needed to start ML"
+msgstr "<%= num %> möré néédéd tö stärt ML Ⱡ'σяєм#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Re-check for submissions"
+msgstr "Ré-çhéçk för süßmïssïöns Ⱡ'σяє#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "System got into invalid state: <%= state %>"
+msgstr "Sýstém göt ïntö ïnvälïd stäté: <%= state %> Ⱡ'σяєм ιρ#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "System got into invalid state for submission: "
+msgstr "Sýstém göt ïntö ïnvälïd stäté för süßmïssïön:  Ⱡ'σяєм ιρѕυм #"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "(Hide)"
+msgstr "(Hïdé) Ⱡ'σяєм ιρѕ#"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "(Show)"
+msgstr "(Shöw) Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid ""
 "<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>"
 msgstr ""
-"<p><b>Ìnsért Hýpérlïnk</b></p><p>http://éxämplé.çøm/ \"øptïønäl tïtlé\"</p> "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+"<p><b>Ìnsért Hýpérlïnk</b></p><p>http://éxämplé.çöm/ \"öptïönäl tïtlé\"</p> "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid ""
@@ -390,17 +1165,17 @@ msgid ""
 "url)</b></p><p>http://example.com/images/diagram.jpg \"optional "
 "title\"<br><br></p>"
 msgstr ""
-"<p><b>Ìnsért Ìmägé (üpløäd fïlé ør týpé "
-"ürl)</b></p><p>http://éxämplé.çøm/ïmägés/dïägräm.jpg \"øptïønäl "
-"tïtlé\"<br><br></p> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+"<p><b>Ìnsért Ìmägé (üplöäd fïlé ör týpé "
+"ürl)</b></p><p>http://éxämplé.çöm/ïmägés/dïägräm.jpg \"öptïönäl "
+"tïtlé\"<br><br></p> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
-msgstr "Märkdøwn Édïtïng Hélp Ⱡ'σя#"
+msgstr "Märkdöwn Édïtïng Hélp Ⱡ'σя#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
-msgstr "Bøld (Çtrl+B) Ⱡ'#"
+msgstr "Böld (Çtrl+B) Ⱡ'#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Italic (Ctrl+I)"
@@ -412,11 +1187,11 @@ msgstr "Hýpérlïnk (Çtrl+L) Ⱡ'σ#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote (Ctrl+Q)"
-msgstr "Bløçkqüøté (Çtrl+Q) Ⱡ'σя#"
+msgstr "Blöçkqüöté (Çtrl+Q) Ⱡ'σя#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Code Sample (Ctrl+K)"
-msgstr "Çødé Sämplé (Çtrl+K) Ⱡ'σя#"
+msgstr "Çödé Sämplé (Çtrl+K) Ⱡ'σя#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Image (Ctrl+G)"
@@ -424,7 +1199,7 @@ msgstr "Ìmägé (Çtrl+G) Ⱡ'#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Numbered List (Ctrl+O)"
-msgstr "Nümßéréd Lïst (Çtrl+Ø) Ⱡ'σяє#"
+msgstr "Nümßéréd Lïst (Çtrl+Ö) Ⱡ'σяє#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bulleted List (Ctrl+U)"
@@ -436,23 +1211,23 @@ msgstr "Héädïng (Çtrl+H) Ⱡ'σ#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Horizontal Rule (Ctrl+R)"
-msgstr "Hørïzøntäl Rülé (Çtrl+R) Ⱡ'σяє#"
+msgstr "Hörïzöntäl Rülé (Çtrl+R) Ⱡ'σяє#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Undo (Ctrl+Z)"
-msgstr "Ûndø (Çtrl+Z) Ⱡ'#"
+msgstr "Ûndö (Çtrl+Z) Ⱡ'#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Y)"
-msgstr "Rédø (Çtrl+Ý) Ⱡ'#"
+msgstr "Rédö (Çtrl+Ý) Ⱡ'#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Shift+Z)"
-msgstr "Rédø (Çtrl+Shïft+Z) Ⱡ'σя#"
+msgstr "Rédö (Çtrl+Shïft+Z) Ⱡ'σя#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "strong text"
-msgstr "strøng téxt Ⱡ#"
+msgstr "ströng téxt Ⱡ#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "emphasized text"
@@ -460,19 +1235,19 @@ msgstr "émphäsïzéd téxt Ⱡ'#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter image description here"
-msgstr "éntér ïmägé désçrïptïøn héré Ⱡ'σяєм #"
+msgstr "éntér ïmägé désçrïptïön héré Ⱡ'σяєм #"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter link description here"
-msgstr "éntér lïnk désçrïptïøn héré Ⱡ'σяєм#"
+msgstr "éntér lïnk désçrïptïön héré Ⱡ'σяєм#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote"
-msgstr "Bløçkqüøté Ⱡ#"
+msgstr "Blöçkqüöté Ⱡ#"
 
 #: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js
 msgid "enter code here"
-msgstr "éntér çødé héré Ⱡ'#"
+msgstr "éntér çödé héré Ⱡ'#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "List item"
@@ -482,9 +1257,75 @@ msgstr "Lïst ïtém #"
 msgid "Heading"
 msgstr "Héädïng #"
 
+#: cms/static/coffee/src/main.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+"Thïs mäý ßé häppénïng ßéçäüsé öf än érrör wïth öür sérvér ör ýöür ïntérnét "
+"çönnéçtïön. Trý réfréshïng thé pägé ör mäkïng süré ýöü äré önlïné. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
+
+#: cms/static/coffee/src/main.js
+msgid "Studio's having trouble saving your work"
+msgstr "Stüdïö's hävïng tröüßlé sävïng ýöür wörk Ⱡ'σяєм ιρѕυ#"
+
+#: cms/static/coffee/src/views/module_edit.js
+#, c-format
+msgid "<em>Editing:</em> %s"
+msgstr "<em>Édïtïng:</em> %s Ⱡ'σ#"
+
+#: cms/static/coffee/src/views/module_edit.js
+#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/js/models/section.js cms/static/js/views/asset.js
+#: cms/static/js/views/course_info_handout.js
+#: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
+#: cms/static/js/views/overview.js.c
+msgid "Saving&hellip;"
+msgstr "Sävïng&hellip; #"
+
+#: cms/static/coffee/src/views/tabs.js
+msgid "Delete Component Confirmation"
+msgstr "Délété Çömpönént Çönfïrmätïön Ⱡ'σяєм #"
+
+#: cms/static/coffee/src/views/tabs.js
+msgid ""
+"Are you sure you want to delete this component? This action cannot be "
+"undone."
+msgstr ""
+"Àré ýöü süré ýöü wänt tö délété thïs çömpönént? Thïs äçtïön çännöt ßé "
+"ündöné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/js/base.js cms/static/js/views/course_info_update.js
+msgid "Deleting&hellip;"
+msgstr "Délétïng&hellip; Ⱡ#"
+
+#: cms/static/coffee/src/views/unit.js
+msgid "Adding&hellip;"
+msgstr "Àddïng&hellip; #"
+
+#: cms/static/coffee/src/views/unit.js
+msgid "Duplicating&hellip;"
+msgstr "Düplïçätïng&hellip; Ⱡ'#"
+
+#: cms/static/coffee/src/views/unit.js
+msgid "Delete this component?"
+msgstr "Délété thïs çömpönént? Ⱡ'σяє#"
+
+#: cms/static/coffee/src/views/unit.js
+msgid "Deleting this component is permanent and cannot be undone."
+msgstr ""
+"Délétïng thïs çömpönént ïs pérmänént änd çännöt ßé ündöné. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: cms/static/coffee/src/views/unit.js
+msgid "Yes, delete this component"
+msgstr "Ýés, délété thïs çömpönént Ⱡ'σяєм#"
+
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
-msgstr "Thïs lïnk wïll øpén ïn ä mødäl wïndøw Ⱡ'σяєм ιρѕ#"
+msgstr "Thïs lïnk wïll öpén ïn ä mödäl wïndöw Ⱡ'σяєм ιρѕ#"
 
 #: cms/static/js/base.js
 msgid "Delete this "
@@ -498,21 +1339,17 @@ msgstr "Délétïng thïs  Ⱡ'#"
 msgid "Yes, delete this "
 msgstr "Ýés, délété thïs  Ⱡ'σ#"
 
-#: cms/static/js/base.js cms/static/js/views/course_info_update.js
-msgid "Deleting&hellip;"
-msgstr "Délétïng&hellip; Ⱡ'σ#"
-
 #: cms/static/js/index.js
 msgid "Please do not use any spaces in this field."
-msgstr "Pléäsé dø nøt üsé äný späçés ïn thïs fïéld. Ⱡ'σяєм ιρѕυм#"
+msgstr "Pléäsé dö nöt üsé äný späçés ïn thïs fïéld. Ⱡ'σяєм ιρѕυм#"
 
 #: cms/static/js/index.js
 msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than 65 characters."
 msgstr ""
-"Thé çømßïnéd léngth øf thé ørgänïzätïøn, çøürsé nümßér, änd çøürsé rün "
-"fïélds çännøt ßé møré thän 65 çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Thé çömßïnéd léngth öf thé örgänïzätïön, çöürsé nümßér, änd çöürsé rün "
+"fïélds çännöt ßé möré thän 65 çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє#"
 
 #: cms/static/js/index.js
@@ -521,71 +1358,64 @@ msgstr "Réqüïréd fïéld. Ⱡ'#"
 
 #: cms/static/js/sock.js
 msgid "Hide Studio Help"
-msgstr "Hïdé Stüdïø Hélp Ⱡ'σ#"
+msgstr "Hïdé Stüdïö Hélp Ⱡ'σ#"
 
 #: cms/static/js/sock.js
 msgid "Looking for Help with Studio?"
-msgstr "Løøkïng før Hélp wïth Stüdïø? Ⱡ'σяєм #"
+msgstr "Löökïng för Hélp wïth Stüdïö? Ⱡ'σяєм #"
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
-msgstr "Ýøü müst spéçïfý ä nämé Ⱡ'σяє#"
-
-#: cms/static/js/models/section.js cms/static/js/views/asset.js
-#: cms/static/js/views/course_info_handout.js
-#: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
-#: cms/static/js/views/overview.js.c
-msgid "Saving&hellip;"
-msgstr "Sävïng&hellip; Ⱡ'#"
+msgstr "Ýöü müst spéçïfý ä nämé Ⱡ'σяє#"
 
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
 "<%= fileExtensions %> to upload."
 msgstr ""
-"Ønlý <%= fileTypes %> fïlés çän ßé üpløädéd. Pléäsé séléçt ä fïlé éndïng ïn "
-"<%= fileExtensions %> tø üpløäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+"Önlý <%= fileTypes %> fïlés çän ßé üplöädéd. Pléäsé séléçt ä fïlé éndïng ïn "
+"<%= fileExtensions %> tö üplöäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: cms/static/js/models/uploads.js
 msgid "or"
-msgstr "ør Ⱡ'#"
+msgstr "ör Ⱡ'#"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
-msgstr "Thé çøürsé müst hävé än ässïgnéd stärt däté. Ⱡ'σяєм ιρѕυм#"
+msgstr "Thé çöürsé müst hävé än ässïgnéd stärt däté. Ⱡ'σяєм ιρѕυм#"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course end date cannot be before the course start date."
 msgstr ""
-"Thé çøürsé énd däté çännøt ßé ßéføré thé çøürsé stärt däté. Ⱡ'σяєм ιρѕυм "
+"Thé çöürsé énd däté çännöt ßé ßéföré thé çöürsé stärt däté. Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course start date cannot be before the enrollment start date."
 msgstr ""
-"Thé çøürsé stärt däté çännøt ßé ßéføré thé énrøllmént stärt däté. Ⱡ'σяєм "
+"Thé çöürsé stärt däté çännöt ßé ßéföré thé énröllmént stärt däté. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
-"Thé énrøllmént stärt däté çännøt ßé äftér thé énrøllmént énd däté. Ⱡ'σяєм "
+"Thé énröllmént stärt däté çännöt ßé äftér thé énröllmént énd däté. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment end date cannot be after the course end date."
 msgstr ""
-"Thé énrøllmént énd däté çännøt ßé äftér thé çøürsé énd däté. Ⱡ'σяєм ιρѕυм "
+"Thé énröllmént énd däté çännöt ßé äftér thé çöürsé énd däté. Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
-msgstr "Kéý shøüld ønlý çøntäïn léttérs, nümßérs, _, ør - Ⱡ'σяєм ιρѕυм ∂#"
+msgstr "Kéý shöüld önlý çöntäïn léttérs, nümßérs, _, ör - Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
 msgstr ""
-"Théré's älréädý änøthér ässïgnmént týpé wïth thïs nämé. Ⱡ'σяєм ιρѕυм ∂σł#"
+"Théré's älréädý änöthér ässïgnmént týpé wïth thïs nämé. Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer between 0 and 100."
@@ -597,20 +1427,19 @@ msgstr "Pléäsé éntér än ïntégér gréätér thän 0. Ⱡ'σяєм ιρѕ
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter non-negative integer."
-msgstr "Pléäsé éntér nøn-négätïvé ïntégér. Ⱡ'σяєм ιρ#"
+msgstr "Pléäsé éntér nön-négätïvé ïntégér. Ⱡ'σяєм ιρ#"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr ""
-"Çännøt drøp møré <% attrs.types %> thän wïll ässïgnéd. Ⱡ'σяєм ιρѕυм ∂σ#"
+msgstr "Çännöt dröp möré <% attrs.types %> thän wïll ässïgnéd. Ⱡ'σяєм ιρѕυ#"
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
-msgstr "Gräçé pérïød müst ßé spéçïfïéd ïn HH:MM førmät. Ⱡ'σяєм ιρѕυм #"
+msgstr "Gräçé pérïöd müst ßé spéçïfïéd ïn HH:MM förmät. Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
-msgstr "Délété Fïlé Çønfïrmätïøn Ⱡ'σяє#"
+msgstr "Délété Fïlé Çönfïrmätïön Ⱡ'σяє#"
 
 #: cms/static/js/views/asset.js
 msgid ""
@@ -618,9 +1447,9 @@ msgid ""
 "\n"
 "Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
 msgstr ""
-"Àré ýøü süré ýøü wïsh tø délété thïs ïtém. Ìt çännøt ßé révérséd!\n"
+"Àré ýöü süré ýöü wïsh tö délété thïs ïtém. Ìt çännöt ßé révérséd!\n"
 "\n"
-"Àlsø äný çøntént thät lïnks/référs tø thïs ïtém wïll nø løngér wørk (é.g. ßrøkén ïmägés änd/ør lïnks) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg #"
+"Àlsö äný çöntént thät lïnks/référs tö thïs ïtém wïll nö löngér wörk (é.g. ßrökén ïmägés änd/ör lïnks) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg #"
 
 #: cms/static/js/views/asset.js cms/static/js/views/show_textbook.js
 msgid "Delete"
@@ -628,7 +1457,7 @@ msgstr "Délété Ⱡ'σяєм ιρѕ#"
 
 #: cms/static/js/views/asset.js
 msgid "Your file has been deleted."
-msgstr "Ýøür fïlé häs ßéén délétéd. Ⱡ'σяєм#"
+msgstr "Ýöür fïlé häs ßéén délétéd. Ⱡ'σяєм#"
 
 #: cms/static/js/views/assets.js
 msgid "Name"
@@ -640,19 +1469,15 @@ msgstr "Däté Àddéd Ⱡ#"
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
-msgstr "Àré ýøü süré ýøü wänt tø délété thïs üpdäté? Ⱡ'σяєм ιρѕυм#"
+msgstr "Àré ýöü süré ýöü wänt tö délété thïs üpdäté? Ⱡ'σяєм ιρѕυм#"
 
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
-msgstr "Thïs äçtïøn çännøt ßé ündøné. Ⱡ'σяєм #"
-
-#: cms/static/js/views/course_info_update.js
-msgid "OK"
-msgstr "ØK Ⱡ'#"
+msgstr "Thïs äçtïön çännöt ßé ündöné. Ⱡ'σяєм #"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
-msgstr "Ûpløäd ä néw PDF tø “<%= name %>” Ⱡ'σяєм ι#"
+msgstr "Ûplöäd ä néw PDF tö “<%= name %>” Ⱡ'σяєм#"
 
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/overview_assignment_grader.js
@@ -661,23 +1486,23 @@ msgstr "Sävïng Ⱡ'σяєм ιρѕ#"
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
-msgstr "Théré wäs än érrør wïth thé üpløäd Ⱡ'σяєм ιρ#"
+msgstr "Théré wäs än érrör wïth thé üplöäd Ⱡ'σяєм ιρ#"
 
 #: cms/static/js/views/import.js
 msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
 msgstr ""
-"Fïlé førmät nøt süppørtéd. Pléäsé üpløäd ä fïlé wïth ä <code>tär.gz</code> "
-"éxténsïøn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+"Fïlé förmät nöt süppörtéd. Pléäsé üplöäd ä fïlé wïth ä <code>tär.gz</code> "
+"éxténsïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
-msgstr "Çølläpsé Àll Séçtïøns Ⱡ'σя#"
+msgstr "Çölläpsé Àll Séçtïöns Ⱡ'σя#"
 
 #: cms/static/js/views/overview.js
 msgid "Expand All Sections"
-msgstr "Éxpänd Àll Séçtïøns Ⱡ'σя#"
+msgstr "Éxpänd Àll Séçtïöns Ⱡ'σя#"
 
 #: cms/static/js/views/overview.js
 msgid "Release date:"
@@ -685,15 +1510,15 @@ msgstr "Réléäsé däté: Ⱡ'#"
 
 #: cms/static/js/views/overview.js
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr "{month}/{day}/{year} ät {hour}:{minute} ÛTÇ Ⱡ'σяєм ιρѕυм#"
+msgstr "{month}/{day}/{year} ät {hour}:{minute} ÛTÇ Ⱡ'σяєм#"
 
 #: cms/static/js/views/overview.js
 msgid "Edit section release date"
-msgstr "Édït séçtïøn réléäsé däté Ⱡ'σяєм#"
+msgstr "Édït séçtïön réléäsé däté Ⱡ'σяєм#"
 
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Not Graded"
-msgstr "Nøt Grädéd Ⱡ#"
+msgstr "Nöt Grädéd Ⱡ#"
 
 #: cms/static/js/views/paging.js
 msgid "ascending"
@@ -709,30 +1534,30 @@ msgid ""
 "%(total_span)s%(total)s total%(end_span)s, sorted by "
 "%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
 msgstr ""
-"Shøwïng %(current_span)s%(start)s-%(end)s%(end_span)s øüt øf "
-"%(total_span)s%(total)s tøtäl%(end_span)s, sørtéd ßý "
+"Shöwïng %(current_span)s%(start)s-%(end)s%(end_span)s öüt öf "
+"%(total_span)s%(total)s tötäl%(end_span)s, sörtéd ßý "
 "%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єł#"
+"∂σłσя ѕι#"
 
 #: cms/static/js/views/section_edit.js
 msgid "Your change could not be saved"
-msgstr "Ýøür çhängé çøüld nøt ßé sävéd Ⱡ'σяєм #"
+msgstr "Ýöür çhängé çöüld nöt ßé sävéd Ⱡ'σяєм #"
 
 #: cms/static/js/views/section_edit.js
 msgid "Return and resolve this issue"
-msgstr "Rétürn änd résølvé thïs ïssüé Ⱡ'σяєм #"
+msgstr "Rétürn änd résölvé thïs ïssüé Ⱡ'σяєм #"
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
-msgstr "Délété “<%= name %>”? Ⱡ'σя#"
+msgstr "Délété “<%= name %>”? Ⱡ'#"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in"
 " your courseware's navigation will also be removed."
 msgstr ""
-"Délétïng ä téxtßøøk çännøt ßé ündøné änd ønçé délétéd äný référénçé tø ït ïn"
-" ýøür çøürséwäré's nävïgätïøn wïll älsø ßé rémøvéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"Délétïng ä téxtßöök çännöt ßé ündöné änd önçé délétéd äný référénçé tö ït ïn"
+" ýöür çöürséwäré's nävïgätïön wïll älsö ßé rémövéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυ#"
 
 #: cms/static/js/views/show_textbook.js
@@ -741,27 +1566,27 @@ msgstr "Délétïng #"
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
-msgstr "Wé'ré sørrý, théré wäs än érrør Ⱡ'σяєм ι#"
+msgstr "Wé'ré sörrý, théré wäs än érrör Ⱡ'σяєм ι#"
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes"
-msgstr "Ýøü'vé mädé sømé çhängés Ⱡ'σяє#"
+msgstr "Ýöü'vé mädé sömé çhängés Ⱡ'σяє#"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes will not take effect until you save your progress."
 msgstr ""
-"Ýøür çhängés wïll nøt täké éfféçt üntïl ýøü sävé ýøür prøgréss. Ⱡ'σяєм ιρѕυм"
+"Ýöür çhängés wïll nöt täké éfféçt üntïl ýöü sävé ýöür prögréss. Ⱡ'σяєм ιρѕυм"
 " ∂σłσя#"
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes, but there are some errors"
-msgstr "Ýøü'vé mädé sømé çhängés, ßüt théré äré sømé érrørs Ⱡ'σяєм ιρѕυм ∂#"
+msgstr "Ýöü'vé mädé sömé çhängés, ßüt théré äré sömé érrörs Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/static/js/views/validation.js
 msgid ""
 "Please address the errors on this page first, and then save your progress."
 msgstr ""
-"Pléäsé äddréss thé érrørs øn thïs pägé fïrst, änd thén sävé ýøür prøgréss. "
+"Pléäsé äddréss thé érrörs ön thïs pägé fïrst, änd thén sävé ýöür prögréss. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: cms/static/js/views/validation.js
@@ -770,20 +1595,20 @@ msgstr "Sävé Çhängés Ⱡ#"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes have been saved."
-msgstr "Ýøür çhängés hävé ßéén sävéd. Ⱡ'σяєм #"
+msgstr "Ýöür çhängés hävé ßéén sävéd. Ⱡ'σяєм #"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
 "with key and value formatting, as validation is not implemented."
 msgstr ""
-"Ýøür çhängés wïll nøt täké éfféçt üntïl ýøü sävé ýøür prøgréss. Täké çäré "
-"wïth kéý änd välüé førmättïng, äs välïdätïøn ïs nøt ïmpléméntéd. Ⱡ'σяєм "
+"Ýöür çhängés wïll nöt täké éfféçt üntïl ýöü sävé ýöür prögréss. Täké çäré "
+"wïth kéý änd välüé förmättïng, äs välïdätïön ïs nöt ïmpléméntéd. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
 
 #: cms/static/js/views/settings/advanced.js
 msgid "Your policy changes have been saved."
-msgstr "Ýøür pølïçý çhängés hävé ßéén sävéd. Ⱡ'σяєм ιρ#"
+msgstr "Ýöür pölïçý çhängés hävé ßéén sävéd. Ⱡ'σяєм ιρ#"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -791,14 +1616,14 @@ msgid ""
 "currently in place yet. If you are having difficulties, please review your "
 "policy pairs."
 msgstr ""
-"Pléäsé nøté thät välïdätïøn øf ýøür pølïçý kéý änd välüé päïrs ïs nøt "
-"çürréntlý ïn pläçé ýét. Ìf ýøü äré hävïng dïffïçültïés, pléäsé révïéw ýøür "
-"pølïçý päïrs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
+"Pléäsé nöté thät välïdätïön öf ýöür pölïçý kéý änd välüé päïrs ïs nöt "
+"çürréntlý ïn pläçé ýét. Ìf ýöü äré hävïng dïffïçültïés, pléäsé révïéw ýöür "
+"pölïçý päïrs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
-msgstr "Ûpløäd ýøür çøürsé ïmägé. Ⱡ'σяєм#"
+msgstr "Ûplöäd ýöür çöürsé ïmägé. Ⱡ'σяєм#"
 
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
-msgstr "Fïlés müst ßé ïn JPÉG ør PNG førmät. Ⱡ'σяєм ιρ#"
+msgstr "Fïlés müst ßé ïn JPÉG ör PNG förmät. Ⱡ'σяєм ιρ#"

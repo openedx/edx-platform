@@ -854,6 +854,22 @@
     }
   }
 
+  // status - language
+  .status-language {
+
+    .icon {
+      @include font-size(17);
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: ($baseline/4);
+      color: $black;
+    }
+
+    .title .icon {
+      opacity: 0.75; // needed to overcome bad specificity elsewhere
+    }
+  }
+
   // status - verification
   .status-verification {
 

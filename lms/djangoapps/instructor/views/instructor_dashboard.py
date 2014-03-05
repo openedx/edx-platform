@@ -1,7 +1,6 @@
 """
 Instructor Dashboard Views
 """
-from functools import partial
 
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
@@ -14,7 +13,7 @@ from django.conf import settings
 
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -24,7 +23,6 @@ from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
-from lms.lib.xblock.runtime import handler_prefix
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
 
@@ -37,7 +35,7 @@ def instructor_dashboard_2(request, course_id):
     """Display the instructor dashboard for a course."""
 
     course = get_course_by_id(course_id, depth=None)
-    is_studio_course = (modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE)
+    is_studio_course = (modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE)
 
     access = {
         'admin': request.user.is_staff,
@@ -109,18 +107,18 @@ def _section_course_info(course_id, access):
     """ Provide data for the corresponding dashboard section """
     course = get_course_by_id(course_id, depth=None)
 
-    course_org, course_num, course_name = course_id.split('/')
+    course_id_dict = Location.parse_course_id(course_id)
 
     section_data = {
         'section_key': 'course_info',
         'section_display_name': _('Course Info'),
         'access': access,
         'course_id': course_id,
-        'course_org': course_org,
-        'course_num': course_num,
-        'course_name': course_name,
+        'course_org': course_id_dict['org'],
+        'course_num': course_id_dict['course'],
+        'course_name': course_id_dict['name'],
         'course_display_name': course.display_name,
-        'enrollment_count': CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count(),
+        'enrollment_count': CourseEnrollment.num_enrolled_in(course_id),
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
@@ -211,7 +209,7 @@ def _section_send_email(course_id, access, course):
         ScopeIds(None, None, None, 'i4x://dummy_org/dummy_course/html/dummy_name')
     )
     fragment = course.system.render(html_module, 'studio_view')
-    fragment = wrap_xblock(partial(handler_prefix, course_id), html_module, 'studio_view', fragment, None)
+    fragment = wrap_xblock('LmsRuntime', html_module, 'studio_view', fragment, None, extra_data={"course-id": course_id})
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',

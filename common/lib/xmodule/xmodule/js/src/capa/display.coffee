@@ -19,11 +19,11 @@ class @Problem
 
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^=input_#{problem_prefix}_]")
-    @$('section.action input:button').click @refreshAnswers
-    @$('section.action input.check').click @check_fd
-    @$('section.action input.reset').click @reset
-    @$('section.action button.show').click @show
-    @$('section.action input.save').click @save
+    @$('div.action input:button').click @refreshAnswers
+    @$('div.action input.check').click @check_fd
+    @$('div.action input.reset').click @reset
+    @$('div.action button.show').click @show
+    @$('div.action input.save').click @save
 
     @bindResetCorrectness()
 
@@ -39,17 +39,25 @@ class @Problem
   renderProgressState: =>
     detail = @el.data('progress_detail')
     status = @el.data('progress_status')
-    # i18n
-    progress = "(#{detail} points)"
+
+    # Render 'x/y point(s)' if student has attempted question
+    if status != 'none' and detail? and detail.indexOf('/') > 0
+        a = detail.split('/')
+        earned = parseFloat(a[0])
+        possible = parseFloat(a[1])
+        # This comment needs to be on one line to be properly scraped for the translators. Sry for length.
+        `// Translators: %(earned)s is the number of points earned. %(total)s is the total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of points will always be at least 1. We pluralize based on the total number of points (example: 0/1 point; 1/2 points)`
+        progress_template = ngettext('(%(earned)s/%(possible)s point)', '(%(earned)s/%(possible)s points)', possible)
+        progress = interpolate(progress_template, {'earned': earned, 'possible': possible}, true)
+
+    # Render 'x point(s) possible' if student has not yet attempted question
     if status == 'none' and detail? and detail.indexOf('/') > 0
         a = detail.split('/')
         possible = parseFloat(a[1])
-        if possible == 1
-            # i18n
-            progress = "(#{possible} point possible)"
-        else
-            # i18n
-            progress = "(#{possible} points possible)"
+        `// Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10). There will always be at least 1 point possible.`
+        progress_template = ngettext("(%(num_points)s point possible)", "(%(num_points)s points possible)", possible)
+        progress = interpolate(progress_template, {'num_points': possible}, true)
+
     @$('.problem-progress').html(progress)
 
   updateProgress: (response) =>
@@ -187,7 +195,7 @@ class @Problem
   ###
   check_fd: =>
     # If there are no file inputs in the problem, we can fall back on @check
-    if $('input:file').length == 0
+    if @el.find('input:file').length == 0
       @check()
       return
 

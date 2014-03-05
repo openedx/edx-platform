@@ -40,6 +40,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
     - xmodule_js/common_static/js/vendor/flot/jquery.flot.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
+    - xmodule_js/common_static/js/vendor/URI.min.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
     - xmodule_js/common_static/coffee/src/xblock
     - xmodule_js/src/capa/

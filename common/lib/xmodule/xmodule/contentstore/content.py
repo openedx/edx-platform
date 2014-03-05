@@ -112,25 +112,16 @@ class StaticContent(object):
         return Location(path.split('/'))
 
     @staticmethod
-    def get_id_from_path(path):
-        return get_id_from_location(get_location_from_path(path))
-
-    @staticmethod
-    def convert_legacy_static_url(path, course_namespace):
-        loc = StaticContent.compute_location(course_namespace.org, course_namespace.course, path)
-        return StaticContent.get_url_path_from_location(loc)
-
-    @staticmethod
     def convert_legacy_static_url_with_course_id(path, course_id):
         """
         Returns a path to a piece of static content when we are provided with a filepath and
         a course_id
         """
-        org, course_num, __ = course_id.split("/")
 
         # Generate url of urlparse.path component
         scheme, netloc, orig_path, params, query, fragment = urlparse(path)
-        loc = StaticContent.compute_location(org, course_num, orig_path)
+        course_id_dict = Location.parse_course_id(course_id)
+        loc = StaticContent.compute_location(course_id_dict['org'], course_id_dict['course'], orig_path)
         loc_url = StaticContent.get_url_path_from_location(loc)
 
         # Reconstruct with new path

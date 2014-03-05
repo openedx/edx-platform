@@ -119,11 +119,16 @@ def environments(system)
     end
 end
 
-$failed_tests = 0
+
+$failed_tests = []
 
 # Run sh on args. If TESTS_FAIL_FAST is set, then stop on the first shell failure.
 # Otherwise, a final task will be added that will fail if any tests have failed
-def test_sh(*args)
+def test_sh(name, *args)
+    puts("\n=======================================".green)
+    puts("Running #{name} tests".green)
+    puts("=======================================".green)
+
     sh(*args) do |ok, res|
         if ok
             return
@@ -132,15 +137,24 @@ def test_sh(*args)
         if ENV['TESTS_FAIL_FAST']
             fail("Test failed!")
         else
-            $failed_tests += 1
+            $failed_tests << name
         end
     end
+
+    puts("\n=======================================\n".green)
 end
 
 # Add a task after all other tasks that fails if any tests have failed
 if !ENV['TESTS_FAIL_FAST']
     task :fail_tests do
-        fail("#{$failed_tests} tests failed!") if $failed_tests > 0
+        if $failed_tests.length > 0
+            puts("=======================================".red)
+            puts("Tests failed in these test suites:".red)
+            $failed_tests.each do |test|
+                puts("* #{test}".red)
+            end
+            exit 1
+        end
     end
 
     Rake.application.top_level_tasks << :fail_tests

@@ -121,7 +121,7 @@ def press_the_button_with_label(_step, buttonname):
 
 @step(u'The "([^"]*)" button does( not)? appear')
 def action_button_present(_step, buttonname, doesnt_appear):
-    button_css = 'section.action input[value*="%s"]' % buttonname
+    button_css = 'div.action input[value*="%s"]' % buttonname
     if bool(doesnt_appear):
         assert world.is_css_not_present(button_css)
     else:
@@ -141,7 +141,7 @@ def see_score(_step, score):
     # The problem progress is changed by
     # cms/static/xmodule_js/src/capa/display.js
     # so give it some time to render on the page.
-    score_css = 'section.problem-progress'
+    score_css = 'div.problem-progress'
     expected_text = '({})'.format(score)
     world.wait_for(lambda _: world.css_has_text(score_css, expected_text))
 

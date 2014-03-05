@@ -11,7 +11,7 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
 
 from mock import patch
 
@@ -95,17 +95,16 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_course_name_only(self):
         # Munge course id - common
-        bad_id = self.course.id.split('/')[-1]
+        bad_id = Location.parse_course_id(self.course.id)['name']
 
         form_data = {'course_id': bad_id, 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation shouldn't work
         self.assertFalse(form.is_valid())
 
-        msg = u'Error encountered (Need more than 1 value to unpack)'
-        msg += u' --- Entered course id was: "{0}". '.format(bad_id)
-        msg += 'Please recheck that you have supplied a course id in the format: ORG/COURSE/RUN'
-        self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
+        error_msg = form._errors['course_id'][0]
+        self.assertIn(u'--- Entered course id was: "{0}". '.format(bad_id), error_msg)
+        self.assertIn(u'Please recheck that you have supplied a course id in the format: ORG/COURSE/RUN', error_msg)
 
         with self.assertRaisesRegexp(ValueError, "The CourseAuthorization could not be created because the data didn't validate."):
             form.save()
@@ -119,7 +118,7 @@ class CourseAuthorizationXMLFormTest(ModuleStoreTestCase):
     def test_xml_course_authorization(self):
         course_id = 'edX/toy/2012_Fall'
         # Assert this is an XML course
-        self.assertTrue(modulestore().get_modulestore_type(course_id) != MONGO_MODULESTORE_TYPE)
+        self.assertEqual(modulestore().get_modulestore_type(course_id), XML_MODULESTORE_TYPE)
 
         form_data = {'course_id': course_id, 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)

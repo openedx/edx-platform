@@ -4,6 +4,7 @@ Settings for bok choy tests
 
 import os
 from path import path
+from xmodule.x_module import prefer_xmodules
 
 
 CONFIG_ROOT = path(__file__).abspath().dirname()  #pylint: disable=E1120
@@ -58,6 +59,9 @@ LOG_OVERRIDES = [
 ]
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)
+
+# Enable XBlocks
+XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True

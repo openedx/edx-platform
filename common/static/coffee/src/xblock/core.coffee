@@ -1,18 +1,20 @@
 @XBlock =
-  runtime: {}
+  Runtime: {}
 
   initializeBlock: (element) ->
     $element = $(element)
     children = @initializeBlocks($element)
+    runtime = $element.data("runtime-class")
     version = $element.data("runtime-version")
     initFnName = $element.data("init")
-    if version? and initFnName?
-      runtime = @runtime["v#{version}"](element, children)
+    $element.prop('xblock_children', children)
+    if runtime? and version? and initFnName?
+      runtime = new window[runtime]["v#{version}"]
       initFn = window[initFnName]
       block = initFn(runtime, element) ? {}
     else
       elementTag = $('<div>').append($element.clone()).html();
-      console.log("Block #{elementTag} is missing data-runtime-version or data-init, and can't be initialized")
+      console.log("Block #{elementTag} is missing data-runtime, data-runtime-version or data-init, and can't be initialized")
       block = {}
 
     block.element = element

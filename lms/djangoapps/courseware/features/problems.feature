@@ -146,23 +146,23 @@ Feature: LMS.Answer problems
 
         Examples:
         | ProblemType       | Correctness   | Score               | Points Possible    |
-        | drop down         | correct       | 1/1 points          | 1 point possible   |
+        | drop down         | correct       | 1/1 point           | 1 point possible   |
         | drop down         | incorrect     | 1 point possible    | 1 point possible   |
-        | multiple choice   | correct       | 1/1 points          | 1 point possible   |
+        | multiple choice   | correct       | 1/1 point           | 1 point possible   |
         | multiple choice   | incorrect     | 1 point possible    | 1 point possible   |
-        | checkbox          | correct       | 1/1 points          | 1 point possible   |
+        | checkbox          | correct       | 1/1 point           | 1 point possible   |
         | checkbox          | incorrect     | 1 point possible    | 1 point possible   |
-        | radio             | correct       | 1/1 points          | 1 point possible   |
+        | radio             | correct       | 1/1 point           | 1 point possible   |
         | radio             | incorrect     | 1 point possible    | 1 point possible   |
-        | string            | correct       | 1/1 points          | 1 point possible   |
+        | string            | correct       | 1/1 point           | 1 point possible   |
         | string            | incorrect     | 1 point possible    | 1 point possible   |
-        | numerical         | correct       | 1/1 points          | 1 point possible   |
+        | numerical         | correct       | 1/1 point           | 1 point possible   |
         | numerical         | incorrect     | 1 point possible    | 1 point possible   |
-        | formula           | correct       | 1/1 points          | 1 point possible   |
+        | formula           | correct       | 1/1 point           | 1 point possible   |
         | formula           | incorrect     | 1 point possible    | 1 point possible   |
         | script            | correct       | 2/2 points          | 2 points possible  |
         | script            | incorrect     | 2 points possible   | 2 points possible  |
-        | image             | correct       | 1/1 points          | 1 point possible   |
+        | image             | correct       | 1/1 point           | 1 point possible   |
         | image             | incorrect     | 1 point possible    | 1 point possible   |
 
     Scenario: I can see my score on a problem to which I submit a blank answer

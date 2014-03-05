@@ -1,13 +1,13 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" >
-  <nav aria-label="${_('Section Navigation')}" class="sequence-nav">
+  <nav class="sequence-nav">
     <ul class="sequence-nav-buttons">
-      <li class="prev"><a href="#">${_('Previous')}</a></li>
+      <li class="prev"><a role="button" href="#">${_('Previous')}</a></li>
     </ul>
 
     <div class="sequence-list-wrapper">
-      <ol id="sequence-list">
+      <ol role="tablist" aria-label="${_('Section Navigation')}" id="sequence-list">
         % for idx, item in enumerate(items):
         ## TODO (vshnayder): add item.progress_detail either to the title or somewhere else.
         ## Make sure it gets updated after ajax calls.
@@ -17,9 +17,13 @@
         <a class="seq_${item['type']} inactive progress-${item['progress_status']}"
            data-id="${item['id']}"
            data-element="${idx+1}"
-           data-title="${item['title']}"
-           href="javascript:void(0);">
-            <p aria-hidden="false">${item['title']}<span class="sr">, ${item['type']}</span></p>
+           href="javascript:void(0);"
+           title="${item['title']|h}"
+           aria-controls="seq_contents_${idx}"
+           id="tab_${idx}"
+           tabindex="0"
+           role="tab">
+            <p aria-hidden="false">${item['title']}<span class="sr" aria-hidden="true">, ${item['type']}</span></p>
           </a>
         </li>
         % endfor
@@ -27,19 +31,24 @@
     </div>
 
     <ul class="sequence-nav-buttons">
-      <li class="next"><a href="#">${_("Next")}</a></li>
+      <li class="next"><a role="button" href="#">${_("Next")}</a></li>
     </ul>
   </nav>
 
-  % for item in items:
-  <div class="seq_contents tex2jax_ignore asciimath2jax_ignore">${item['content'] | h}</div>
+  % for idx, item in enumerate(items):
+  <div id="seq_contents_${idx}" 
+       aria-labelledby="tab_${idx}"
+       aria-hidden="true"
+       class="seq_contents tex2jax_ignore asciimath2jax_ignore">
+     ${item['content'] | h}
+  </div>
   % endfor
-  <div id="seq_content"></div>
+  <div id="seq_content" role="tabpanel"></div>
 
   <nav class="sequence-bottom">
     <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons">
-      <li class="prev"><a href="#">${_("Previous")}</a></li>
-      <li class="next"><a href="#">${_("Next")}</a></li>
+      <li class="prev"><a role="button" href="#">${_("Previous")}</a></li>
+      <li class="next"><a role="button" href="#">${_("Next")}</a></li>
     </ul>
   </nav>
 </div>

@@ -43,6 +43,43 @@
 
 // ====================
 
+// mixins - flex support
+@mixin ui-flexbox() {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+
+// extends - justify-content right for display:flex alignment in older browsers
+%ui-justify-right-flex {
+  -webkit-box-pack: end;
+  -moz-box-pack: end;
+  -ms-flex-pack: end;
+  -webkit-justify-content: end;
+  justify-content: flex-end;
+}
+
+// extends - justify-content left for display:flex alignment in older browsers
+%ui-justify-left-flex {
+  -webkit-box-pack: start;
+  -moz-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: start;
+  justify-content: flex-start;
+}
+
+// extends - align items center for display:flex alignment in older browsers
+%ui-align-center-flex {
+  -webkit-flex-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+// ====================
+
 // extends - UI - used for page/view-level wrappers (for centering/grids)
 %ui-wrapper {
   @include clearfix();

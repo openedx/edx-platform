@@ -20,6 +20,7 @@ from mock import patch, ANY
 
 log = logging.getLogger(__name__)
 
+CS_PREFIX = "http://localhost:4567/api/v1"
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @patch('lms.lib.comment_client.utils.requests.request')
@@ -93,7 +94,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         assert_true(mock_request.called)
         mock_request.assert_called_with(
             'post',
-            'http://localhost:4567/api/v1/i4x-MITx-999-course-Robot_Super_Course/threads',
+            '{prefix}/i4x-MITx-999-course-Robot_Super_Course/threads'.format(prefix=CS_PREFIX),
             data={
                 'body': u'this is a post',
                 'anonymous_to_peers': False, 'user_id': 1,
@@ -102,10 +103,189 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 'anonymous': False, 'course_id': u'MITx/999/Robot_Super_Course',
             },
             params={'request_id': ANY},
-            headers={'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+            headers=ANY,
             timeout=5
         )
         assert_equal(response.status_code, 200)
+
+    def test_delete_comment(self, mock_request):
+        mock_request.return_value.text = json.dumps({
+            "user_id": str(self.student.id),
+            "closed": False,
+        })
+        test_comment_id = "test_comment_id"
+        request = RequestFactory().post("dummy_url", {"id": test_comment_id})
+        request.user = self.student
+        request.view_name = "delete_comment"
+        response = views.delete_comment(request, course_id=self.course.id, comment_id=test_comment_id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(mock_request.called)
+        args = mock_request.call_args[0]
+        self.assertEqual(args[0], "delete")
+        self.assertTrue(args[1].endswith("/{}".format(test_comment_id)))
+
+    def _setup_mock_request(self, mock_request, include_depth=False):
+        """
+        Ensure that mock_request returns the data necessary to make views
+        function correctly
+        """
+        mock_request.return_value.status_code = 200
+        data = {
+            "user_id": str(self.student.id),
+            "closed": False,
+        }
+        if include_depth:
+            data["depth"] = 0
+        mock_request.return_value.text = json.dumps(data)
+
+    def _test_request_error(self, view_name, view_kwargs, data, mock_request):
+        """
+        Submit a request against the given view with the given data and ensure
+        that the result is a 400 error and that no data was posted using
+        mock_request
+        """
+        self._setup_mock_request(mock_request, include_depth=(view_name == "create_sub_comment"))
+
+        response = self.client.post(reverse(view_name, kwargs=view_kwargs), data=data)
+        self.assertEqual(response.status_code, 400)
+        for call in mock_request.call_args_list:
+            self.assertEqual(call[0][0].lower(), "get")
+
+    def test_create_thread_no_title(self, mock_request):
+        self._test_request_error(
+            "create_thread",
+            {"commentable_id": "dummy", "course_id": self.course_id},
+            {"body": "foo"},
+            mock_request
+        )
+
+    def test_create_thread_empty_title(self, mock_request):
+        self._test_request_error(
+            "create_thread",
+            {"commentable_id": "dummy", "course_id": self.course_id},
+            {"body": "foo", "title": " "},
+            mock_request
+        )
+
+    def test_create_thread_no_body(self, mock_request):
+        self._test_request_error(
+            "create_thread",
+            {"commentable_id": "dummy", "course_id": self.course_id},
+            {"title": "foo"},
+            mock_request
+        )
+
+    def test_create_thread_empty_body(self, mock_request):
+        self._test_request_error(
+            "create_thread",
+            {"commentable_id": "dummy", "course_id": self.course_id},
+            {"body": " ", "title": "foo"},
+            mock_request
+        )
+
+    def test_update_thread_no_title(self, mock_request):
+        self._test_request_error(
+            "update_thread",
+            {"thread_id": "dummy", "course_id": self.course_id},
+            {"body": "foo"},
+            mock_request
+        )
+
+    def test_update_thread_empty_title(self, mock_request):
+        self._test_request_error(
+            "update_thread",
+            {"thread_id": "dummy", "course_id": self.course_id},
+            {"body": "foo", "title": " "},
+            mock_request
+        )
+
+    def test_update_thread_no_body(self, mock_request):
+        self._test_request_error(
+            "update_thread",
+            {"thread_id": "dummy", "course_id": self.course_id},
+            {"title": "foo"},
+            mock_request
+        )
+
+    def test_update_thread_empty_body(self, mock_request):
+        self._test_request_error(
+            "update_thread",
+            {"thread_id": "dummy", "course_id": self.course_id},
+            {"body": " ", "title": "foo"},
+            mock_request
+        )
+
+    def test_create_comment_no_body(self, mock_request):
+        self._test_request_error(
+            "create_comment",
+            {"thread_id": "dummy", "course_id": self.course_id},
+            {},
+            mock_request
+        )
+
+    def test_create_comment_empty_body(self, mock_request):
+        self._test_request_error(
+            "create_comment",
+            {"thread_id": "dummy", "course_id": self.course_id},
+            {"body": " "},
+            mock_request
+        )
+
+    def test_create_sub_comment_no_body(self, mock_request):
+        self._test_request_error(
+            "create_sub_comment",
+            {"comment_id": "dummy", "course_id": self.course_id},
+            {},
+            mock_request
+        )
+
+    def test_create_sub_comment_empty_body(self, mock_request):
+        self._test_request_error(
+            "create_sub_comment",
+            {"comment_id": "dummy", "course_id": self.course_id},
+            {"body": " "},
+            mock_request
+        )
+
+    def test_update_comment_no_body(self, mock_request):
+        self._test_request_error(
+            "update_comment",
+            {"comment_id": "dummy", "course_id": self.course_id},
+            {},
+            mock_request
+        )
+
+    def test_update_comment_empty_body(self, mock_request):
+        self._test_request_error(
+            "update_comment",
+            {"comment_id": "dummy", "course_id": self.course_id},
+            {"body": " "},
+            mock_request
+        )
+
+    def test_update_comment_basic(self, mock_request):
+        self._setup_mock_request(mock_request)
+        comment_id = "test_comment_id"
+        updated_body = "updated body"
+
+        response = self.client.post(
+            reverse(
+                "update_comment",
+                kwargs={"course_id": self.course_id, "comment_id": comment_id}
+            ),
+            data={"body": updated_body}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        mock_request.assert_called_with(
+            "put",
+            "{prefix}/comments/{comment_id}".format(prefix=CS_PREFIX, comment_id=comment_id),
+            headers=ANY,
+            params=ANY,
+            timeout=ANY,
+            data={"body": updated_body}
+        )
 
     def test_flag_thread(self, mock_request):
         mock_request.return_value.status_code = 200
@@ -135,29 +315,29 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         call_list = [
             (
-                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
             (
-                ('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_flag'),
+                ('put', '{prefix}/threads/518d4237b023791dca00000d/abuse_flag'.format(prefix=CS_PREFIX)),
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
             (
-                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             )
@@ -195,29 +375,29 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         call_list = [
             (
-                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
             (
-                ('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_unflag'),
+                ('put', '{prefix}/threads/518d4237b023791dca00000d/abuse_unflag'.format(prefix=CS_PREFIX)),
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
             (
-                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             )
@@ -251,29 +431,29 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         call_list = [
             (
-                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                ('get', '{prefix}/comments/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
             (
-                ('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_flag'),
+                ('put', '{prefix}/comments/518d4237b023791dca00000d/abuse_flag'.format(prefix=CS_PREFIX)),
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
             (
-                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                ('get', '{prefix}/comments/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             )
@@ -307,29 +487,29 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         call_list = [
             (
-                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                ('get', '{prefix}/comments/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
             (
-                ('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_unflag'),
+                ('put', '{prefix}/comments/518d4237b023791dca00000d/abuse_unflag'.format(prefix=CS_PREFIX)),
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
             (
-                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                ('get', '{prefix}/comments/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             )

@@ -1,7 +1,6 @@
 import logging
 import urllib
 
-from functools import partial
 from collections import defaultdict
 
 from django.conf import settings
@@ -10,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from edxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
@@ -20,13 +19,12 @@ from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access
-from courseware.courses import (get_courses, get_course_with_access,
-                                get_courses_by_university, sort_by_announcement)
+from courseware.courses import get_courses, get_course_with_access, sort_by_announcement
 import courseware.tabs as tabs
 from courseware.masquerade import setup_masquerade
 from courseware.models import CoursePreference
 from courseware.model_data import FieldDataCache
-from .module_render import toc_for_course, get_module_for_descriptor, get_module
+from .module_render import toc_for_course, get_module_for_descriptor
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
@@ -235,13 +233,13 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
-    request.user = user	# keep just one instance of User
+    request.user = user  # keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
     staff_access = has_access(user, course, 'staff')
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
-        log.debug(u'User {0} tried to view course {1} but is not enrolled'.format(user, course.location.url()))
+        log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.url())
         return redirect(reverse('about_course', args=[course.id]))
 
     masq = setup_masquerade(request, staff_access)
@@ -572,6 +570,9 @@ def course_about(request, course_id):
                          CoursePreference.course_allows_nonregistered_access(course_id) and
                          not UserProfile.has_registered(request.user))
 
+    # see if we have already filled up all allowed enrollments
+    is_course_full = CourseEnrollment.is_course_full(course)
+
     return render_to_response('courseware/course_about.html',
                               {'course': course,
                                'regularly_registered': regularly_registered,
@@ -580,7 +581,8 @@ def course_about(request, course_id):
                                'registration_price': registration_price,
                                'in_cart': in_cart,
                                'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
-                               'show_courseware_link': show_courseware_link})
+                               'show_courseware_link': show_courseware_link,
+                               'is_course_full': is_course_full})
 
 
 @ensure_csrf_cookie

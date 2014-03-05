@@ -10,8 +10,8 @@ from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from edxmako.shortcuts import render_to_response
 
+from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
-from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
 

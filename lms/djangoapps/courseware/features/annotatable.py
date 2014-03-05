@@ -139,7 +139,7 @@ class AnnotatableSteps(object):
         self.active_problem = problem
 
     def active_problem_selector(self, subselector):
-        return 'section[data-problem-id="{}"] {}'.format(
+        return 'div[data-problem-id="{}"] {}'.format(
             world.scenario_dict['PROBLEMS'][self.active_problem].location.url(),
             subselector,
         )
@@ -156,7 +156,7 @@ class AnnotatableSteps(object):
         world.css_click(self.active_problem_selector('.check'))
 
     def check_feedback(self, step):
-        r"""I recieve feedback on that annotation problem$"""
+        r"""I receive feedback on that annotation problem$"""
         world.wait_for_visible(self.active_problem_selector('.tag-status.correct'))
         assert_equals(len(world.css_find(self.active_problem_selector('.tag-status.correct'))), 1)
         assert_equals(len(world.css_find(self.active_problem_selector('.show'))), 1)

@@ -13,7 +13,7 @@ data: |
       <problem>
         <p>A checkboxes problem presents checkbox buttons for student input. Students can select more than one option presented.</p>
         <choiceresponse>
-          <checkboxgroup direction="vertical">
+          <checkboxgroup direction="vertical" label="Select the answer that matches">
             <choice correct="true">correct</choice>
             <choice correct="false">incorrect</choice>
             <choice correct="true">correct</choice>

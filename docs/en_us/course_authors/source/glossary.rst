@@ -61,7 +61,7 @@ C
  
 **Chemical Equation Response Problem**
 
-  A problem that allows the student to enter chemical equations as answers. For more information, see :ref:`Chemical Equation Response`.
+  A problem that allows the student to enter chemical equations as answers. For more information, see :ref:`Chemical Equation`.
 
 
 .. _Circuit Schematic Builder Problem:

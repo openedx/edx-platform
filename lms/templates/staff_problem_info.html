@@ -16,14 +16,14 @@ ${block_content}
     % endif
 </div>
 %  endif
-<div><a href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a></div>
+<div aria-hidden="true"><a href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a></div>
 
 %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
       location.category == 'problem':
-<div><a href="#${element_id}_history" id="${element_id}_history_trig">${_("Submission history")}</a></div>
+<div aria-hidden="true"><a href="#${element_id}_history" id="${element_id}_history_trig">${_("Submission history")}</a></div>
 %  endif
 
-<section id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
+<section aria-hidden="true" id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
   <div class="inner-wrapper">
     <header>
       <h2>${_("{platform_name} Content Quality Assessment").format(platform_name=settings.PLATFORM_NAME)}</h2>
@@ -45,7 +45,7 @@ ${block_content}
   </div>
 </section>
 
-<section class="modal staff-modal" id="${element_id}_debug" style="width:80%; left:20%; height:80%; overflow:auto;" >
+<section aria-hidden="true" class="modal staff-modal" id="${element_id}_debug" style="width:80%; left:20%; height:80%; overflow:auto; display:none" >
   <div class="inner-wrapper" style="color:black">
     <header>
       <h2>${_('Staff Debug')}</h2>
@@ -53,7 +53,7 @@ ${block_content}
     <div class="staff_info" style="display:block">
 is_released = ${is_released}
 location = ${location | h}
-<table>
+<table summary="${_('Module Fields')}">
   <tr><th>${_('Module Fields')}</th></tr>
   %for name, field in fields:
   <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
@@ -73,7 +73,7 @@ category = ${category | h}
   </div>
 </section>
 
-<section class="modal history-modal" id="${element_id}_history" style="width:80%; left:20%; height:80%; overflow:auto;" >
+<section aria-hidden="true" class="modal history-modal" id="${element_id}_history" style="width:80%; left:20%; height:80%; overflow:auto;" >
   <div class="inner-wrapper" style="color:black">
     <header>
       <h2>${_("Submission History Viewer")}</h2>

@@ -1,0 +1,105 @@
+// studio - views - container
+// ==========================
+// The container view renders xblocks three levels deep: Page Level, Nesting Level, and Element Level.
+
+// For containers rendered at the element level, the container is rendered in a way that allows the user to navigate to a separate container page for that container making its children populate the nesting and element levels.
+
+// UI: container page view
+body.view-container {
+
+  .mast {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
+
+  .content-primary {
+    margin-right: flex-gutter();
+    width: flex-grid(9,12);
+  }
+
+  .content-supplementary {
+    width: flex-grid(3,12);
+
+    label {
+      @extend %t-title8;
+    }
+  }
+}
+
+// UI: xblock rendering
+body.view-container  .content-primary{
+
+  .wrapper-xblock {
+    @extend %wrap-xblock;
+
+    // CASE: page level xblock rendering
+    &.level-page {
+      margin: 0;
+
+      .xblock-header {
+        display: none;
+      }
+    }
+
+    // CASE: nesting level xblock rendering
+    &.level-nesting {
+      border: none;
+      padding-bottom: $baseline;
+      box-shadow: none;
+
+      &:hover {
+        @include transition(all $tmg-f2 linear 0s);
+        background-color: $gray-l7;
+        box-shadow: 0 0 1px $shadow-d2 inset;
+      }
+
+      .xblock-header {
+        @include ui-flexbox();
+        margin-bottom: ($baseline/2);
+        border-bottom: none;
+        background: none;
+      }
+    }
+
+    // CASE: element level xblock rendering
+    &.level-element {
+      margin: 0 ($baseline*2) $baseline ($baseline*2);
+      box-shadow: none;
+
+      &:hover {
+        @include transition(all $tmg-f2 linear 0s);
+        border-color: $blue;
+      }
+
+      .xblock-header {
+        margin-bottom: 0;
+        border-bottom: 1px solid $gray-l4;
+        background-color: $gray-l6;
+        font-weight: 300;
+      }
+
+      .xblock-render {
+        margin: $baseline;
+      }
+
+      // STATE: xBlock containers styled as rows.
+      &.xblock-type-container {
+
+        .xblock-header {
+          margin-bottom: 0;
+          border-bottom: 0;
+          border-radius: ($baseline/5);
+        }
+
+        .xblock-render {
+          display: none;
+        }
+      }
+    }
+  }
+}

@@ -14,8 +14,8 @@
 
 define(
 'video/01_initialize.js',
-['video/03_video_player.js', 'video/00_cookie_storage.js'],
-function (VideoPlayer, CookieStorage) {
+['video/03_video_player.js', 'video/00_video_storage.js'],
+function (VideoPlayer, VideoStorage) {
     /**
      * @function
      *
@@ -26,7 +26,7 @@ function (VideoPlayer, CookieStorage) {
      *     available via this object.
      * @param {DOM element} element Container of the entire Video DOM element.
      */
-    return function (state, element) {
+    var Initialize = function (state, element) {
         _makeFunctionsPublic(state);
 
         state.initialize(element)
@@ -56,7 +56,27 @@ function (VideoPlayer, CookieStorage) {
                         state.el.trigger('initialize', arguments);
                     });
             });
+    },
+
+    methodsDict = {
+        bindTo: bindTo,
+        fetchMetadata: fetchMetadata,
+        getCurrentLanguage: getCurrentLanguage,
+        getDuration: getDuration,
+        getVideoMetadata: getVideoMetadata,
+        initialize: initialize,
+        parseSpeed: parseSpeed,
+        parseVideoSources: parseVideoSources,
+        parseYoutubeStreams: parseYoutubeStreams,
+        saveState: saveState,
+        setSpeed: setSpeed,
+        trigger: trigger,
+        youtubeId: youtubeId
     };
+
+    Initialize.prototype = methodsDict;
+
+    return Initialize;
 
     // ***************************************************************
     // Private functions start here. Private functions start with underscore.
@@ -73,21 +93,6 @@ function (VideoPlayer, CookieStorage) {
      *     methods, modules) of the Video player.
      */
     function _makeFunctionsPublic(state) {
-        var methodsDict = {
-            bindTo: bindTo,
-            fetchMetadata: fetchMetadata,
-            getDuration: getDuration,
-            getVideoMetadata: getVideoMetadata,
-            initialize: initialize,
-            parseSpeed: parseSpeed,
-            parseVideoSources: parseVideoSources,
-            parseYoutubeStreams: parseYoutubeStreams,
-            setSpeed: setSpeed,
-            stopBuffering: stopBuffering,
-            trigger: trigger,
-            youtubeId: youtubeId
-        };
-
         bindTo(methodsDict, state, state);
     }
 
@@ -201,7 +206,7 @@ function (VideoPlayer, CookieStorage) {
             '0.75': state.config.sub,
             '1.0':  state.config.sub,
             '1.25': state.config.sub,
-            '1.5':  state.config.sub
+            '1.50':  state.config.sub
         };
 
         // We must have at least one non-YouTube video source available.
@@ -271,13 +276,13 @@ function (VideoPlayer, CookieStorage) {
         return dfd.promise();
     }
 
-    function _getConfiguration(data) {
+    function _getConfiguration(data, storage) {
             var isBoolean = function (value) {
                     var regExp = /^true$/i;
                     return regExp.test(value.toString());
                 },
                 // List of keys that will be extracted form the configuration.
-                extractKeys = ['speed'],
+                extractKeys = [],
                 // Compatibility keys used to change names of some parameters in
                 // the final configuration.
                 compatKeys = {
@@ -289,6 +294,24 @@ function (VideoPlayer, CookieStorage) {
                     'showCaptions': isBoolean,
                     'autoplay': isBoolean,
                     'autohideHtml5': isBoolean,
+                    'savedVideoPosition': function (value) {
+                        return storage.getItem('savedVideoPosition', true) ||
+                            Number(value) ||
+                            0;
+                    },
+                    'speed': function (value) {
+                        return storage.getItem('speed', true) || value;
+                     },
+                    'generalSpeed': function (value) {
+                        return storage.getItem('general_speed') ||
+                            value ||
+                            '1.0';
+                     },
+                    'transcriptLanguage': function (value) {
+                        return storage.getItem('language') ||
+                            value ||
+                            'en';
+                     },
                     'ytTestTimeout': function (value) {
                         value = parseInt(value, 10);
 
@@ -380,12 +403,7 @@ function (VideoPlayer, CookieStorage) {
             id = el.attr('id').replace(/video_/, ''),
             __dfd__ = $.Deferred(),
             isTouch = onTouchBasedDevice() || '',
-            storage = CookieStorage('video_player'),
-            speed = storage.getItem('video_speed_' + id) ||
-                el.data('speed') ||
-                storage.getItem('general_speed') ||
-                el.data('general-speed') ||
-                '1.0';
+            storage = VideoStorage('VideoState', id);
 
         if (isTouch) {
             el.addClass('is-touch');
@@ -399,7 +417,6 @@ function (VideoPlayer, CookieStorage) {
             id: id,
             isFullScreen: false,
             isTouch: isTouch,
-            speed: Number(speed).toFixed(2).replace(/\.00$/, '.0'),
             storage: storage
         });
 
@@ -411,7 +428,7 @@ function (VideoPlayer, CookieStorage) {
         // are "read only", so don't modify them. All variable content lives in
         // 'state' object.
         // jQuery .data() return object with keys in lower camelCase format.
-        this.config = $.extend({}, _getConfiguration(el.data()), {
+        this.config = $.extend({}, _getConfiguration(el.data(), storage), {
             element: element,
             fadeOutTimeout:     1400,
             captionsFreezeTime: 10000,
@@ -421,6 +438,11 @@ function (VideoPlayer, CookieStorage) {
         if (this.config.endTime < this.config.startTime) {
             this.config.endTime = null;
         }
+
+        this.lang = this.config.transcriptLanguage;
+        this.speed = Number(
+            this.config.speed || this.config.generalSpeed
+        ).toFixed(2).replace(/\.00$/, '.0');
 
         if (!(_parseYouTubeIDs(this))) {
 
@@ -617,17 +639,16 @@ function (VideoPlayer, CookieStorage) {
 
     function setSpeed(newSpeed, updateStorage) {
         // Possible speeds for each player type.
-        // flash =          [0.75, 1, 1.25, 1.5]
-        // html5 =          [0.75, 1, 1.25, 1.5]
-        // youtube html5 =  [0.25, 0.5, 1, 1.5, 2]
+        // HTML5 =          [0.75, 1, 1.25, 1.5]
+        // Youtube Flash =  [0.75, 1, 1.25, 1.5]
+        // Youtube HTML5 =  [0.25, 0.5, 1, 1.5, 2]
         var map = {
-                '0.25': '0.75',
-                '0.50': '0.75',
-                '0.75': '0.50',
-                '1.25': '1.50',
-                '2.0': '1.50'
-            },
-            useSession = true;
+                '0.25': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
+                '0.50': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
+                '0.75': '0.50', // HTML5 or Youtube Flash -> Youtube HTML5
+                '1.25': '1.50', // HTML5 or Youtube Flash -> Youtube HTML5
+                '2.0': '1.50'   // Youtube HTML5 -> HTML5 or Youtube Flash
+            };
 
         if (_.contains(this.speeds, newSpeed)) {
             this.speed = newSpeed;
@@ -637,8 +658,8 @@ function (VideoPlayer, CookieStorage) {
         }
 
         if (updateStorage) {
-            this.storage.setItem('video_speed_' + this.id, this.speed, useSession);
-            this.storage.setItem('general_speed', this.speed, useSession);
+            this.storage.setItem('speed', this.speed, true);
+            this.storage.setItem('general_speed', this.speed);
         }
     }
 
@@ -659,20 +680,35 @@ function (VideoPlayer, CookieStorage) {
         return xhr;
     }
 
-    function stopBuffering() {
-        var video;
+    function saveState(async, data) {
 
-        if (this.videoType === 'html5') {
-            // HTML5 player haven't default way to abort bufferization.
-            // In this case we simply resetting source and call load().
-            video = this.videoPlayer.player.video;
-            video.src = '';
-            video.load();
+        if (!($.isPlainObject(data))) {
+            data = {
+                saved_video_position: this.videoPlayer.currentTime
+            };
         }
+
+        if (data.speed) {
+            this.storage.setItem('speed', data.speed, true);
+        }
+
+        if (data.hasOwnProperty('saved_video_position')) {
+            this.storage.setItem('savedVideoPosition', data.saved_video_position, true);
+
+            data.saved_video_position = Time.formatFull(data.saved_video_position);
+        }
+
+        $.ajax({
+            url: this.config.saveStateUrl,
+            type: 'POST',
+            async: async ? true : false,
+            dataType: 'json',
+            data: data,
+        });
     }
 
     function youtubeId(speed) {
-        return this.videos[speed || this.speed];
+        return this.videos[speed || this.speed] || this.videos['1.0'];
     }
 
     function getDuration() {
@@ -681,6 +717,24 @@ function (VideoPlayer, CookieStorage) {
         } catch (err) {
             return this.metadata[this.youtubeId('1.0')].duration;
         }
+    }
+
+    function getCurrentLanguage() {
+        var keys = _.keys(this.config.transcriptLanguages);
+
+        if (keys.length) {
+            if (!_.contains(keys, this.lang)) {
+                if (_.contains(keys, 'en')) {
+                    this.lang = 'en';
+                } else {
+                    this.lang = keys.pop();
+                }
+            }
+        } else {
+            return null;
+        }
+
+        return this.lang;
     }
 
     /*

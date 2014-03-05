@@ -37,6 +37,10 @@ STATIC_ROOT = TEST_ROOT / "staticfiles"
 GITHUB_REPO_ROOT = TEST_ROOT / "data"
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 
+# For testing "push to lms"
+FEATURES['ENABLE_EXPORT_GIT'] = True
+GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
+
 # Makes the tests run much faster...
 SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 
@@ -146,6 +150,9 @@ CACHES = {
 
 }
 
+# Add external_auth to Installed apps for testing
+INSTALLED_APPS += ('external_auth', )
+
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
@@ -188,3 +195,6 @@ FEATURES['DISABLE_PASSWORD_RESET_EMAIL_TEST'] = True
 FEATURES['DISABLE_CME_REGISTRATION_TESTS'] = True
 
 FEATURES['DISABLE_RESET_EMAIL_TEST'] = True
+
+# Toggles embargo on for testing
+FEATURES['EMBARGO'] = True

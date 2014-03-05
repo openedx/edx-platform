@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from foldit.views import foldit_ops, verify_code
 from foldit.models import PuzzleComplete, Score
 from student.models import unique_id_for_user
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from datetime import datetime, timedelta
 from pytz import UTC

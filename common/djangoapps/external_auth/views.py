@@ -151,6 +151,7 @@ def _external_login_or_signup(request,
 
     log.info(u"External_Auth login_or_signup for %s : %s : %s : %s", external_domain, external_id, email, fullname)
     uses_shibboleth = settings.FEATURES.get('AUTH_USE_SHIB') and external_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
+    uses_certs = settings.FEATURES.get('AUTH_USE_CERTIFICATES')
     internal_user = eamap.user
     if internal_user is None:
         if uses_shibboleth:
@@ -193,6 +194,11 @@ def _external_login_or_signup(request,
             auth_backend = 'django.contrib.auth.backends.ModelBackend'
         user.backend = auth_backend
         AUDIT_LOG.info('Linked user "%s" logged in via Shibboleth', user.email)
+    elif uses_certs:
+        # Certificates are trusted, so just link the user and log the action
+        user = internal_user
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        AUDIT_LOG.info('Linked user "%s" logged in via SSL certificate', user.email)
     else:
         user = authenticate(username=uname, password=eamap.internal_password, request=request)
     if user is None:
@@ -253,7 +259,7 @@ def _signup(request, eamap, retfun=None):
     # save this for use by student.views.create_account
     request.session['ExternalAuthMap'] = eamap
 
-    if settings.FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP', ''):
+    if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP', ''):
         # do signin immediately, by calling create_account, instead of asking
         # student to fill in form.  MIT students already have information filed.
         username = eamap.external_email.split('@', 1)[0]
@@ -362,7 +368,7 @@ def ssl_login_shortcut(fn):
         call.
         """
 
-        if not settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        if not settings.FEATURES['AUTH_USE_CERTIFICATES']:
             return fn(*args, **kwargs)
         request = args[0]
 
@@ -394,7 +400,7 @@ def ssl_login_shortcut(fn):
 def ssl_login(request):
     """
     This is called by branding.views.index when
-    FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
+    FEATURES['AUTH_USE_CERTIFICATES'] = True
 
     Used for MIT user authentication.  This presumes the web server
     (nginx) has been configured to require specific client
@@ -408,7 +414,7 @@ def ssl_login(request):
     Else continues on with student.views.index, and no authentication.
     """
     # Just to make sure we're calling this only at MIT:
-    if not settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+    if not settings.FEATURES['AUTH_USE_CERTIFICATES']:
         return HttpResponseForbidden()
 
     cert = ssl_get_cert_from_request(request)

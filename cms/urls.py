@@ -36,6 +36,9 @@ urlpatterns = patterns('',  # nopep8
 
     url(r'^xmodule/', include('pipeline_js.urls')),
     url(r'^heartbeat$', include('heartbeat.urls')),
+
+    url(r'^user_api/', include('user_api.urls')),
+    url(r'^lang_pref/', include('lang_pref.urls')),
 )
 
 # User creation and updating views
@@ -48,6 +51,7 @@ urlpatterns += patterns(
     # ajax view that actually does the work
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
+    url(r'^embargo$', 'student.views.embargo', name="embargo"),
 )
 
 # restful api
@@ -76,6 +80,7 @@ urlpatterns += patterns(
     url(r'(?ix)^import/{}$'.format(parsers.URL_RE_SOURCE), 'import_handler'),
     url(r'(?ix)^import_status/{}/(?P<filename>.+)$'.format(parsers.URL_RE_SOURCE), 'import_status_handler'),
     url(r'(?ix)^export/{}$'.format(parsers.URL_RE_SOURCE), 'export_handler'),
+    url(r'(?ix)^xblock/{}/(?P<view_name>[^/]+)$'.format(parsers.URL_RE_SOURCE), 'xblock_view_handler'),
     url(r'(?ix)^xblock($|/){}$'.format(parsers.URL_RE_SOURCE), 'xblock_handler'),
     url(r'(?ix)^tabs/{}$'.format(parsers.URL_RE_SOURCE), 'tabs_handler'),
     url(r'(?ix)^settings/details/{}$'.format(parsers.URL_RE_SOURCE), 'settings_handler'),
@@ -95,6 +100,11 @@ urlpatterns += patterns('',
     # Serve catalog of localized strings to be rendered by Javascript
     url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
+
+
+if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
+    urlpatterns += (url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export_git/(?P<name>[^/]+)$',
+                        'contentstore.views.export_git', name='export_git'),)
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += patterns('',

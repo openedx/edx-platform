@@ -325,24 +325,27 @@
     }
   }
 
-  // uses similar styling as unit.scss, static-pages.scss
-  .action-item {
-    display: inline-block;
-    margin: ($baseline/4) 0 ($baseline/4) ($baseline/4);
+  // UI: assets - calls-to-action
+  .actions-list {
+    @extend %actions-header;
 
-    .action-button {
-      @include transition(all $tmg-f2 ease-in-out 0s);
-      display: block;
-      height: ($baseline*1.5);
-      width: ($baseline*1.5);
-      border-radius: 3px;
-      color: $gray-l3;
+    .action-item {
+      display: inline-block;
+      margin: ($baseline/4) 0 ($baseline/4) ($baseline/4);
 
-      &:hover {
-        background-color: $blue;
-        color: $gray-l6;
+      .action-button {
+        padding: 0;
+        display: block;
+        width: ($baseline*1.5);
+        height: ($baseline*1.5);
+        color: $gray-l3;
+        }
       }
-    }
+  }
+
+  // UI: assets - specific action styling
+  // TODO: this uses similar styling as unit.scss, static-pages.scss
+  .action-item {
 
     [class^="icon-"] {
       display: inline-block;

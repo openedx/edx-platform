@@ -3,6 +3,7 @@ Methods for exporting course data to XML
 """
 
 import logging
+import lxml.etree
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
@@ -57,11 +58,13 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     course = modulestore.get_course(course_id)
 
     fs = OSFS(root_dir)
-    export_fs = fs.makeopendir(course_dir)
+    export_fs = course.runtime.export_fs = fs.makeopendir(course_dir)
 
-    xml = course.export_to_xml(export_fs)
+    root = lxml.etree.Element('unknown')
+    course.add_xml_to_node(root)
+
     with export_fs.open('course.xml', 'w') as course_xml:
-        course_xml.write(xml)
+        lxml.etree.ElementTree(root).write(course_xml)
 
     # export the static assets
     policies_dir = export_fs.makeopendir('policies')
@@ -112,7 +115,9 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
                     sequential = modulestore.get_item(Location(parent_locs[0]))
                     index = sequential.children.index(draft_vertical.location.url())
                     draft_vertical.xml_attributes['index_in_children_list'] = str(index)
-                    draft_vertical.export_to_xml(draft_course_dir)
+                    draft_vertical.runtime.export_fs = draft_course_dir
+                    node = lxml.etree.Element('unknown')
+                    draft_vertical.add_xml_to_node(node)
 
 
 def export_extra_content(export_fs, modulestore, course_id, course_location, category_type, dirname, file_suffix=''):

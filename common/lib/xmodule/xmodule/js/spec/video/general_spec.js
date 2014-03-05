@@ -8,6 +8,8 @@
 
         afterEach(function () {
             $('source').remove();
+            window.VideoState = {};
+            window.VideoState.id = {};
         });
 
         describe('constructor', function () {
@@ -80,7 +82,7 @@
                             '0.75': sub,
                             '1.0': sub,
                             '1.25': sub,
-                            '1.5': sub
+                            '1.50': sub
                         });
                     });
 
@@ -97,7 +99,7 @@
                             '0.75': sub,
                             '1.0': sub,
                             '1.25': sub,
-                            '1.5': sub
+                            '1.50': sub
                         });
                     });
 
@@ -179,31 +181,6 @@
             });
         });
 
-        describe('youtubeId', function () {
-            beforeEach(function () {
-                loadFixtures('video.html');
-                $.cookie.andReturn('1.0');
-                state = new Video('#example');
-            });
-
-            describe('with speed', function () {
-                it('return the video id for given speed', function () {
-                    expect(state.youtubeId('0.50'))
-                        .toEqual('7tqY6eQzVhE');
-                    expect(state.youtubeId('1.0'))
-                        .toEqual('cogebirgzzM');
-                    expect(state.youtubeId('1.50'))
-                        .toEqual('abcdefghijkl');
-                });
-            });
-
-            describe('without speed', function () {
-                it('return the video id for current speed', function () {
-                    expect(state.youtubeId()).toEqual('abcdefghijkl');
-                });
-            });
-        });
-
         describe('YouTube video in FireFox will cue first', function () {
             var oldUserAgent;
 
@@ -227,10 +204,17 @@
                 expect(state.videoPlayer.skipOnEndedStartEndReset).toBe(true);
             });
 
+            it('when position is not 0: cue is called with stored position value', function () {
+                state.config.savedVideoPosition = 15;
+
+                state.videoPlayer.updatePlayTime(10);
+                expect(state.videoPlayer.player.cueVideoById).toHaveBeenCalledWith('cogebirgzzM', 15);
+            });
+
             it('Handling cue state', function () {
                 spyOn(state.videoPlayer, 'play');
 
-                state.videoPlayer.startTime = 10;
+                state.videoPlayer.seekToTimeOnCued = 10;
                 state.videoPlayer.onStateChange({data: 5});
 
                 expect(state.videoPlayer.player.seekTo).toHaveBeenCalledWith(10, true);
@@ -356,84 +340,6 @@
                 //
                 //     this.youtubeXhr = this.getVideoMetadata();
                 expect(numAjaxCalls).toBe(1);
-            });
-        });
-
-        describe('setSpeed', function () {
-
-            describe('YT', function () {
-                beforeEach(function () {
-                    loadFixtures('video.html');
-                    state = new Video('#example');
-                });
-
-                it('check mapping', function () {
-                    var map = {
-                        '0.75': '0.50',
-                        '1.25': '1.50'
-                    };
-
-                    $.each(map, function(key, expected) {
-                        state.setSpeed(key, true);
-                        expect(state.speed).toBe(expected);
-                    });
-                });
-            });
-            describe('HTML5', function () {
-                beforeEach(function () {
-                    loadFixtures('video_html5.html');
-                    state = new Video('#example');
-                });
-
-                describe('when new speed is available', function () {
-                    beforeEach(function () {
-                        state.setSpeed('0.75', true);
-                    });
-
-                    it('set new speed', function () {
-                        expect(state.speed).toEqual('0.75');
-                    });
-
-                    it('save setting for new speed', function () {
-
-                        expect(state.storage.getItem('general_speed')).toBe('0.75');
-                        expect(state.storage.getItem('video_speed_' + state.id)).toBe('0.75');
-                    });
-                });
-
-                describe('when new speed is not available', function () {
-                    beforeEach(function () {
-                        state.setSpeed('1.75');
-                    });
-
-                    it('set speed to 1.0x', function () {
-                        expect(state.speed).toEqual('1.0');
-                    });
-                });
-
-                it('check mapping', function () {
-                    var map = {
-                        '0.25': '0.75',
-                        '0.50': '0.75',
-                        '2.0': '1.50'
-                    };
-
-                    $.each(map, function(key, expected) {
-                        state.setSpeed(key, true);
-                        expect(state.speed).toBe(expected);
-                    });
-                });
-            });
-        });
-
-        describe('getDuration', function () {
-            beforeEach(function () {
-                loadFixtures('video.html');
-                state = new Video('#example');
-            });
-
-            it('return duration for current video', function () {
-                expect(state.getDuration()).toEqual(400);
             });
         });
 

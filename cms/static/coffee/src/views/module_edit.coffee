@@ -1,6 +1,6 @@
 define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         "js/views/feedback_notification", "js/views/metadata", "js/collections/metadata"
-        "js/utils/modal", "jquery.inputnumber", "xmodule", "coffee/src/main"],
+        "js/utils/modal", "jquery.inputnumber", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
 (Backbone, $, _, gettext, XBlock, NotificationView, MetadataView, MetadataCollection, ModalUtils) ->
   class ModuleEdit extends Backbone.View
     tagName: 'li'
@@ -18,37 +18,37 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
       @onDelete = @options.onDelete
       @render()
 
-    $component_editor: => @$el.find('.component-editor')
+    $componentEditor: => @$el.find('.component-editor')
+    $moduleEditor: => @$componentEditor().find('.module-editor')
 
     loadDisplay: ->
       XBlock.initializeBlock(@$el.find('.xblock-student_view'))
 
     loadEdit: ->
-      if not @module
-        @module = XBlock.initializeBlock(@$el.find('.xblock-studio_view'))
-        # At this point, metadata-edit.html will be loaded, and the metadata (as JSON) is available.
-        metadataEditor = @$el.find('.metadata_edit')
-        metadataData = metadataEditor.data('metadata')
-        models = [];
-        for key of metadataData
-          models.push(metadataData[key])
-        @metadataEditor = new MetadataView.Editor({
-            el: metadataEditor,
-            collection: new MetadataCollection(models)
-        })
+      @module = XBlock.initializeBlock(@$el.find('.xblock-studio_view'))
+      # At this point, metadata-edit.html will be loaded, and the metadata (as JSON) is available.
+      metadataEditor = @$el.find('.metadata_edit')
+      metadataData = metadataEditor.data('metadata')
+      models = [];
+      for key of metadataData
+        models.push(metadataData[key])
+      @metadataEditor = new MetadataView.Editor({
+          el: metadataEditor,
+          collection: new MetadataCollection(models)
+      })
 
-        @module.setMetadataEditor(@metadataEditor) if @module.setMetadataEditor
+      @module.setMetadataEditor(@metadataEditor) if @module.setMetadataEditor
 
-        # Need to update set "active" class on data editor if there is one.
-        # If we are only showing settings, hide the data editor controls and update settings accordingly.
-        if @hasDataEditor()
-          @selectMode(@editorMode)
-        else
-          @hideDataEditor()
+      # Need to update set "active" class on data editor if there is one.
+      # If we are only showing settings, hide the data editor controls and update settings accordingly.
+      if @hasDataEditor()
+        @selectMode(@editorMode)
+      else
+        @hideDataEditor()
 
-        title = interpolate(gettext('<em>Editing:</em> %s'),
-          [@metadataEditor.getDisplayName()])
-        @$el.find('.component-name').html(title)
+      title = interpolate(gettext('<em>Editing:</em> %s'),
+        [@metadataEditor.getDisplayName()])
+      @$el.find('.component-name').html(title)
 
     customMetadata: ->
         # Hack to support metadata fields that aren't part of the metadata editor (ie, LaTeX high level source).
@@ -56,7 +56,7 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         # build up an object to pass back to the server on the subsequent POST.
         # Note that these values will always be sent back on POST, even if they did not actually change.
         _metadata = {}
-        _metadata[$(el).data("metadata-name")] = el.value for el in $('[data-metadata-name]',  @$component_editor())
+        _metadata[$(el).data("metadata-name")] = el.value for el in $('[data-metadata-name]',  @$componentEditor())
         return _metadata
 
     changedMetadata: ->
@@ -73,12 +73,44 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
               @render()
       ).success(callback)
 
-    render: ->
+    loadView: (viewName, target, callback) ->
       if @model.id
-        @$el.load(@model.url(), =>
-          @loadDisplay()
-          @delegateEvents()
+        $.ajax(
+          url: "#{decodeURIComponent(@model.url())}/#{viewName}"
+          type: 'GET'
+          headers:
+            Accept: 'application/x-fragment+json'
+          success: (data) =>
+            $(target).html(data.html)
+
+            for value in data.resources
+              do (value) =>
+                hash = value[0]
+                if not window.loadedXBlockResources?
+                  window.loadedXBlockResources = []
+
+                if hash not in window.loadedXBlockResources
+                  resource = value[1]
+                  switch resource.mimetype
+                    when "text/css"
+                      switch resource.kind
+                        when "text" then $('head').append("<style type='text/css'>#{resource.data}</style>")
+                        when "url" then $('head').append("<link rel='stylesheet' href='#{resource.data}' type='text/css'>")
+                    when "application/javascript"
+                      switch resource.kind
+                        when "text" then $('head').append("<script>#{resource.data}</script>")
+                        when "url" then $.getScript(resource.data)
+                    when "text/html"
+                      switch resource.placement
+                        when "head" then $('head').append(resource.data)
+                  window.loadedXBlockResources.push(hash)
+            callback()
         )
+
+    render: -> @loadView('student_view', @$el, =>
+      @loadDisplay()
+      @delegateEvents()
+    )
 
     clickSaveButton: (event) =>
       event.preventDefault()
@@ -94,7 +126,6 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         title: gettext('Saving&hellip;')
       saving.show()
       @model.save(data).done( =>
-        @module = null
         @render()
         @$el.removeClass('editing')
         saving.hide()
@@ -103,15 +134,18 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
     clickCancelButton: (event) ->
       event.preventDefault()
       @$el.removeClass('editing')
-      @$component_editor().slideUp(150)
+      @$componentEditor().slideUp(150)
       ModalUtils.hideModalCover()
 
     clickEditButton: (event) ->
       event.preventDefault()
       @$el.addClass('editing')
       ModalUtils.showModalCover(true)
-      @$component_editor().slideDown(150)
-      @loadEdit()
+      @loadView('studio_view', @$moduleEditor(), =>
+        @$componentEditor().slideDown(150)
+        @loadEdit()
+        @delegateEvents()
+      )
 
     clickModeButton: (event) ->
       event.preventDefault()

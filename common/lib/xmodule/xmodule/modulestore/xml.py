@@ -20,7 +20,6 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 
-from xmodule.html_module import HtmlDescriptor
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore, IdReader, IdGenerator
@@ -59,7 +58,10 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         """
         self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
-        self.org, self.course, self.url_name = course_id.split('/')
+        course_id_dict = Location.parse_course_id(course_id)
+        self.org = course_id_dict['org']
+        self.course = course_id_dict['course']
+        self.url_name = course_id_dict['name']
         if id_reader is None:
             id_reader = LocationReader()
         id_generator = CourseLocationGenerator(self.org, self.course)
@@ -348,7 +350,10 @@ class XMLModuleStore(ModuleStoreReadBase):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, data_dir, default_class=None, course_dirs=None, load_error_modules=True, **kwargs):
+    def __init__(
+        self, data_dir, default_class=None, course_dirs=None, course_ids=None,
+        load_error_modules=True, i18n_service=None, **kwargs
+    ):
         """
         Initialize an XMLModuleStore from data_dir
 
@@ -357,8 +362,8 @@ class XMLModuleStore(ModuleStoreReadBase):
         default_class: dot-separated string defining the default descriptor
             class to use if none is specified in entry_points
 
-        course_dirs: If specified, the list of course_dirs to load. Otherwise,
-            load all course dirs
+        course_dirs or course_ids: If specified, the list of course_dirs or course_ids to load. Otherwise,
+            load all courses. Note, providing both
         """
         super(XMLModuleStore, self).__init__(**kwargs)
 
@@ -377,9 +382,12 @@ class XMLModuleStore(ModuleStoreReadBase):
             self.default_class = class_
 
         self.parent_trackers = defaultdict(ParentTracker)
+        self.reference_type = Location
 
         # All field data will be stored in an inheriting field data.
         self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
+
+        self.i18n_service = i18n_service
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -390,11 +398,12 @@ class XMLModuleStore(ModuleStoreReadBase):
             course_dirs = sorted([d for d in os.listdir(self.data_dir) if
                                   os.path.exists(self.data_dir / d / "course.xml")])
         for course_dir in course_dirs:
-            self.try_load_course(course_dir)
+            self.try_load_course(course_dir, course_ids)
 
-    def try_load_course(self, course_dir):
+    def try_load_course(self, course_dir, course_ids=None):
         '''
-        Load a course, keeping track of errors as we go along.
+        Load a course, keeping track of errors as we go along. If course_ids is not None,
+        then reject the course unless it's id is in course_ids.
         '''
         # Special-case code here, since we don't have a location for the
         # course before it loads.
@@ -403,20 +412,24 @@ class XMLModuleStore(ModuleStoreReadBase):
         errorlog = make_error_tracker()
         course_descriptor = None
         try:
-            course_descriptor = self.load_course(course_dir, errorlog.tracker)
+            course_descriptor = self.load_course(course_dir, course_ids, errorlog.tracker)
         except Exception as e:
-            msg = "ERROR: Failed to load course '{0}': {1}".format(course_dir.encode("utf-8"),
-                    unicode(e))
+            msg = "ERROR: Failed to load course '{0}': {1}".format(
+                course_dir.encode("utf-8"), unicode(e)
+            )
             log.exception(msg)
             errorlog.tracker(msg)
+            self.errored_courses[course_dir] = errorlog
 
-        if course_descriptor is not None and not isinstance(course_descriptor, ErrorDescriptor):
+        if course_descriptor is None:
+            pass
+        elif isinstance(course_descriptor, ErrorDescriptor):
+            # Didn't load course.  Instead, save the errors elsewhere.
+            self.errored_courses[course_dir] = errorlog
+        else:
             self.courses[course_dir] = course_descriptor
             self._location_errors[course_descriptor.scope_ids.usage_id] = errorlog
             self.parent_trackers[course_descriptor.id].make_known(course_descriptor.scope_ids.usage_id)
-        else:
-            # Didn't load course.  Instead, save the errors elsewhere.
-            self.errored_courses[course_dir] = errorlog
 
     def __unicode__(self):
         '''
@@ -444,7 +457,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             log.warning(msg + " " + str(err))
         return {}
 
-    def load_course(self, course_dir, tracker):
+    def load_course(self, course_dir, course_ids, tracker):
         """
         Load a course into this module store
         course_path: Course directory name
@@ -507,12 +520,18 @@ class XMLModuleStore(ModuleStoreReadBase):
                                      "(or 'name') set.  Set url_name.")
 
             course_id = CourseDescriptor.make_id(org, course, url_name)
+            if course_ids is not None and course_id not in course_ids:
+                return None
 
             def get_policy(usage_id):
                 """
                 Return the policy dictionary to be applied to the specified XBlock usage
                 """
                 return policy.get(policy_key(usage_id), {})
+
+            services = {}
+            if self.i18n_service:
+                services['i18n'] = self.i18n_service
 
             system = ImportSystem(
                 xmlstore=self,
@@ -526,6 +545,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 default_class=self.default_class,
                 select=self.xblock_select,
                 field_data=self.field_data,
+                services=services,
             )
 
             course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
@@ -566,6 +586,9 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         for filepath in glob.glob(path / '*'):
             if not os.path.isfile(filepath):
+                continue
+
+            if filepath.endswith('~'):  # skip *~ files
                 continue
 
             with open(filepath) as f:
@@ -640,7 +663,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         raise NotImplementedError("XMLModuleStores can't guarantee that definitions"
                                   " are unique. Use get_instance.")
 
-    def get_items(self, location, course_id=None, depth=0):
+    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         items = []
 
         def _add_get_items(self, location, modules):
@@ -672,33 +695,22 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return dict((k, self.errored_courses[k].errors) for k in self.errored_courses)
 
-    def update_item(self, location, data):
+    def get_orphans(self, course_location, _branch):
+        """
+        Get all of the xblocks in the given course which have no parents and are not of types which are
+        usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
+        use children to point to their dependents.
+        """
+        # here just to quell the abstractmethod. someone could write the impl if needed
+        raise NotImplementedError
+
+    def update_item(self, xblock, user, **kwargs):
         """
         Set the data in the item specified by the location to
         data
 
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
-        """
-        raise NotImplementedError("XMLModuleStores are read-only")
-
-    def update_children(self, location, children):
-        """
-        Set the children for the item specified by the location to
-        data
-
-        location: Something that can be passed to Location
-        children: A list of child item identifiers
-        """
-        raise NotImplementedError("XMLModuleStores are read-only")
-
-    def update_metadata(self, location, metadata):
-        """
-        Set the metadata for the item specified by the location to
-        metadata
-
-        location: Something that can be passed to Location
-        metadata: A nested dictionary of module metadata
         """
         raise NotImplementedError("XMLModuleStores are read-only")
 

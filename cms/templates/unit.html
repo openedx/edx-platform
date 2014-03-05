@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from xmodule.modulestore.django import loc_mapper
 %>
+<%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
 <%block name="title">${_("Individual Unit")}</%block>
 <%block name="bodyclass">is-signedin course unit view-unit</%block>
@@ -30,6 +31,10 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       $(this).prepend($emptyEditor);
   });
 });
+  </script>
+  
+  <script type="text/template" id="image-modal-tpl">
+    <%static:include path="js/imageModal.underscore" />
   </script>
 
 </%block>
@@ -207,5 +212,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       </div>
     </div>
   </div>
+  
+  
 
 </%block>

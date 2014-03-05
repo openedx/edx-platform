@@ -1,13 +1,6 @@
 from django.conf import settings
-from .mustache_helpers import mustache_helpers
-from functools import partial
 from mako.template import Template
 
-from .utils import extend_content, merge_dict, render_mustache
-import django_comment_client.settings as cc_settings
-
-import pystache_custom as pystache
-import urllib
 import os
 
 
@@ -30,4 +23,3 @@ def include_mustache_templates():
         for file_name in os.listdir(mustache_dir)
         if is_valid_file_name(file_name)
     )
-

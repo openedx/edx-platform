@@ -1,6 +1,4 @@
 (function ($, undefined) {
-    var oldAjaxWithPrefix = $.ajaxWithPrefix;
-
     // Stub YouTube API.
     window.YT = {
         Player: function () {
@@ -63,42 +61,6 @@
         ]
     };
 
-    // For our purposes, we need to make sure that the function
-    // $.ajaxWithPrefix does not fail when during tests a captions file is
-    // requested. It is originally defined in file:
-    //
-    //     common/static/coffee/src/ajax_prefix.js
-    //
-    // We will replace it with a function that does:
-    //
-    //     1.) Return a hard coded captions object if the file name contains
-    //         'Z5KLxerq05Y'.
-    //     2.) Behaves the same a as the original function in all other cases.
-    $.ajaxWithPrefix = function (url, settings) {
-        var data, success;
-
-        if (!settings) {
-            settings = url;
-            url = settings.url;
-            success = settings.success;
-            data = settings.data;
-        }
-
-        if (
-            url.match(/Z5KLxerq05Y/g) ||
-            url.match(/7tqY6eQzVhE/g) ||
-            url.match(/cogebirgzzM/g)
-        ) {
-            if ($.isFunction(success)) {
-                return success(jasmine.stubbedCaption);
-            } else if ($.isFunction(data)) {
-                return data(jasmine.stubbedCaption);
-            }
-        } else {
-            return oldAjaxWithPrefix.apply(this, arguments);
-        }
-    };
-
     // Time waitsFor() should wait for before failing a test.
     window.WAIT_TIMEOUT = 5000;
 
@@ -145,13 +107,16 @@
     jasmine.stubbedHtml5Speeds = ['0.75', '1.0', '1.25', '1.50'];
 
     jasmine.stubRequests = function () {
-        return spyOn($, 'ajax').andCallFake(function (settings) {
-            var match, status, callCallback;
+        var spy = $.ajax;
 
-            if (
-                match = settings.url
-                    .match(/youtube\.com\/.+\/videos\/(.+)\?v=2&alt=jsonc/)
-            ) {
+        if (!($.ajax.isSpy)) {
+            spy = spyOn($, 'ajax');
+        }
+        return spy.andCallFake(function (settings) {
+            var match = settings.url
+                    .match(/youtube\.com\/.+\/videos\/(.+)\?v=2&alt=jsonc/),
+                status, callCallback;
+            if (match) {
                 status = match[1].split('_');
                 if (status && status[0] === 'status') {
                     callCallback = function (callback) {
@@ -177,11 +142,10 @@
                         }
                     };
                 }
-            } else if (
-                match = settings.url
-                    .match(/static(\/.*)?\/subs\/(.+)\.srt\.sjson/)
-            ) {
+            } else if (settings.url == '/transcript/translation') {
                 return settings.success(jasmine.stubbedCaption);
+            } else if (settings.url == '/transcript/available_translations') {
+                return settings.success(['uk', 'de']);
             } else if (settings.url.match(/.+\/problem_get$/)) {
                 return settings.success({
                     html: readFixtures('problem_content.html')
@@ -207,18 +171,17 @@
     beforeEach(function () {
         this.addMatchers({
             toHaveAttrs: function (attrs) {
-                var element = this.actual,
-                    result = true;
+                var element;
 
                 if ($.isEmptyObject(attrs)) {
                     return false;
                 }
 
-                $.each(attrs, function (name, value) {
-                    return result = result && element.attr(name) === value;
-                });
+                element = this.actual;
 
-                return result;
+                return _.every(attrs, function (value, name) {
+                    return element.attr(name) === value;
+                });
             },
             toBeInRange: function (min, max) {
                 return min <= this.actual && this.actual <= max;
@@ -266,6 +229,7 @@
                 .data(params);
         }
 
+        jasmine.stubRequests();
         state = new Video('#example');
 
         state.resizer = (function () {

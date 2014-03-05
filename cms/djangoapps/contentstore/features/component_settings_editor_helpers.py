@@ -23,9 +23,9 @@ def create_component_instance(step, category, component_type=None, is_advanced=F
 
     component_button_css = 'span.large-{}-icon'.format(category.lower())
     if category == 'problem':
-        module_css = 'section.xmodule_CapaModule'
+        module_css = 'div.xmodule_CapaModule'
     else:
-        module_css = 'section.xmodule_{}Module'.format(category.title())
+        module_css = 'div.xmodule_{}Module'.format(category.title())
 
     # Count how many of that module is on the page. Later we will
     # assert that one more was added.
@@ -145,7 +145,7 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
 
     # Check if the web object is a list type
     # If so, we use a slightly different mechanism for determining its value
-    if setting.has_class('metadata-list-enum'):
+    if setting.has_class('metadata-list-enum') or setting.has_class('metadata-dict'):
         list_value = ', '.join(ele.value for ele in setting.find_by_css('.list-settings-item'))
         assert_equal(value, list_value)
     elif setting.has_class('metadata-videolist-enum'):

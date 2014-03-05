@@ -2,6 +2,7 @@
 {% load compressed %}{% load sekizai_tags i18n microsite %}{% load url from future %}{% load staticfiles %}
 <html lang="{{LANGUAGE_CODE}}">
 <head>
+  <meta charset="UTF-8">
   {% block title %}<title>{% platform_name %}</title>{% endblock %}
 
   <link rel="icon" type="image/x-icon" href="{% static "images/favicon.ico" %}" />
@@ -38,10 +39,10 @@
     {% include "navigation.html" %}
   {% endif %}
 
-  <section class="content-wrapper" id="content">
+  <div class="content-wrapper" id="content">
     {% block body %}{% endblock %}
     {% block bodyextra %}{% endblock %}
-  </section>
+  </div>
 
   {% if FEATURES.USE_CUSTOM_THEME %}
     {% include "theme-footer.html" %}

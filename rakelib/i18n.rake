@@ -1,15 +1,28 @@
 # --- Internationalization tasks
 
+I18N_REPORT_DIR = report_dir_path('i18n')
+I18N_XUNIT_REPORT = File.join(I18N_REPORT_DIR, 'nosetests.xml')
+
+directory I18N_REPORT_DIR
+
+
 namespace :i18n do
 
   desc "Extract localizable strings from sources"
-  task :extract => "i18n:validate:gettext" do
+  task :extract => ["i18n:validate:gettext", "assets:coffee"] do
     sh(File.join(REPO_ROOT, "i18n", "extract.py"))
   end
 
   desc "Compile localizable strings from sources, extracting strings first."
   task :generate => "i18n:extract" do
-    sh(File.join(REPO_ROOT, "i18n", "generate.py"))
+    cmd = File.join(REPO_ROOT, "i18n", "generate.py")
+    sh("#{cmd}")
+  end
+
+  desc "Compile localizable strings from sources, extracting strings first, and complain if files are missing."
+  task :generate_strict => "i18n:extract" do
+    cmd = File.join(REPO_ROOT, "i18n", "generate.py")
+    sh("#{cmd} --strict")
   end
 
   desc "Simulate international translation by generating dummy strings corresponding to source strings."
@@ -57,17 +70,16 @@ namespace :i18n do
   end
 
   desc "Run tests for the internationalization library"
-  task :test do
-    test = File.join(REPO_ROOT, "i18n", "tests")
+  task :test => [:install_python_prereqs, I18N_REPORT_DIR, :clean_reports_dir] do
     pythonpath_prefix = "PYTHONPATH=#{REPO_ROOT}/i18n:$PYTHONPATH"
-    sh("#{pythonpath_prefix} nosetests #{test}")
+    test_sh("i18n", "#{pythonpath_prefix} nosetests #{REPO_ROOT}/i18n/tests --with-xunit --xunit-file=#{I18N_XUNIT_REPORT}")
   end
 
   # Commands for automating the process of including translations in edx-platform.
   # Will eventually be run by jenkins.
   namespace :robot do
     desc "Pull source strings, generate po and mo files, and validate"
-    task :pull => ["i18n:transifex:pull", "i18n:extract", "i18n:dummy", "i18n:generate"] do
+    task :pull => ["i18n:transifex:pull", "i18n:extract", "i18n:dummy", "i18n:generate_strict"] do
       sh('git clean -fdX conf/locale')
       Rake::Task["i18n:test"].invoke
       sh('git add conf/locale')
@@ -79,3 +91,7 @@ namespace :i18n do
   end
 
 end
+
+
+# Add i18n tests to the main test command
+task :test => :'i18n:test'

@@ -1,7 +1,6 @@
 import re
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
-from xmodule.modulestore.inheritance import own_metadata
 
 import logging
 
@@ -47,8 +46,9 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
 
     """
 
-    org, course, run = source_course_id.split("/")
-    dest_org, dest_course, dest_run = dest_course_id.split("/")
+    course_id_dict = Location.parse_course_id(source_course_id)
+    course_id_dict['tag'] = 'i4x'
+    course_id_dict['category'] = 'course'
 
     def portable_asset_link_subtitution(match):
         quote = match.group('quote')
@@ -61,14 +61,12 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
         return quote + '/jump_to_id/' + rest + quote
 
     def generic_courseware_link_substitution(match):
-        quote = match.group('quote')
-        rest = match.group('rest')
-        dest_generic_courseware_lik_base = '/courses/{org}/{course}/{run}/'.format(
-            org=dest_org, course=dest_course, run=dest_run
-        )
-        return quote + dest_generic_courseware_lik_base + rest + quote
+        parts = Location.parse_course_id(dest_course_id)
+        parts['quote'] = match.group('quote')
+        parts['rest'] = match.group('rest')
+        return u'{quote}/courses/{org}/{course}/{name}/{rest}{quote}'.format(**parts)
 
-    course_location = Location(['i4x', org, course, 'course', run])
+    course_location = Location(course_id_dict)
 
     # NOTE: ultimately link updating is not a hard requirement, so if something blows up with
     # the regex subsitution, log the error and continue
@@ -79,24 +77,20 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
         logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", c4x_link_base, text, str(e))
 
     try:
-        jump_to_link_base = u'/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/'.format(
-            org=org, course=course, run=run
-        )
+        jump_to_link_base = u'/courses/{org}/{course}/{name}/jump_to/i4x://{org}/{course}/'.format(**course_id_dict)
         text = re.sub(_prefix_and_category_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
     except Exception, e:
         logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", jump_to_link_base, text, str(e))
 
     # Also, there commonly is a set of link URL's used in the format:
-    # /courses/<org>/<course>/<run> which will be broken if migrated to a different course_id
+    # /courses/<org>/<course>/<name> which will be broken if migrated to a different course_id
     # so let's rewrite those, but the target will also be non-portable,
     #
     # Note: we only need to do this if we are changing course-id's
     #
     if source_course_id != dest_course_id:
         try:
-            generic_courseware_link_base = u'/courses/{org}/{course}/{run}/'.format(
-                org=org, course=course, run=run
-            )
+            generic_courseware_link_base = u'/courses/{org}/{course}/{name}/'.format(**course_id_dict)
             text = re.sub(_prefix_only_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)
         except Exception, e:
             logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", generic_courseware_link_base, text, str(e))
@@ -125,13 +119,10 @@ def _clone_modules(modulestore, modules, source_location, dest_location):
 
         print "Cloning module {0} to {1}....".format(original_loc, module.location)
 
-        # NOTE: usage of the the internal module.xblock_kvs._data does not include any 'default' values for the fields
-        data = module.xblock_kvs._data
-        if isinstance(data, basestring):
-            data = rewrite_nonportable_content_links(
-                source_location.course_id, dest_location.course_id, data)
-
-        modulestore.update_item(module.location, data)
+        if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, basestring):
+            module.data = rewrite_nonportable_content_links(
+                source_location.course_id, dest_location.course_id, module.data
+            )
 
         # repoint children
         if module.has_children:
@@ -145,10 +136,9 @@ def _clone_modules(modulestore, modules, source_location, dest_location):
                 )
                 new_children.append(child_loc.url())
 
-            modulestore.update_children(module.location, new_children)
+            module.children = new_children
 
-        # save metadata
-        modulestore.update_metadata(module.location, own_metadata(module))
+        modulestore.update_item(module, '**replace_user**')
 
 
 def clone_course(modulestore, contentstore, source_location, dest_location, delete_original=False):

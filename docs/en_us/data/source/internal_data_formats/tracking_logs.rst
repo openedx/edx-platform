@@ -1,11 +1,12 @@
+.. _Tracking Logs:
+
 ===============
- Tracking Logs
+Tracking Logs
 ===============
 
 The following is an inventory of all LMS event types.
 
-This inventory is comprised of a table of Common Fields that appear in all events, a table of Student Event Types which lists all interaction with the LMS outside of the Instructor Dashboard,
-and a table of Instructor Event Types of all interaction with the Instructor Dashboard in the LMS.
+This inventory is comprised of a table of Common Fields that appear in all events, a table of Student Event Types which lists all interaction with the LMS outside of the Instructor Dashboard, and a table of Instructor Event Types of all interactions with the Instructor Dashboard in the LMS.
 
 Common Fields
 =============
@@ -44,7 +45,9 @@ Event Types
 ===========
 
 There are two tables of event types -- one for student events, and one for instructor events.
+
 Table columns describe what each event type represents, which component it originates from, what scripting language was used to fire the event, and what ``event`` fields are associated with it.
+
 The ``event_source`` field from the "Common Fields" table above distinguishes between events that originated in the browser (in javascript) and events that originated on the server (during the processing of a request).
 
 Event types with several different historical names are enumerated by forward slashes.
@@ -120,6 +123,22 @@ The Student Event Type table lists the event types logged for interaction with t
 |                                   |                               |                     |                 | ``currentTime``     | float         | Time the video was played at, in seconds.                           |
 |                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
 |                                   |                               |                     |                 | ``speed``           | string        | Video speed in use (i.e., 0.75, 1.0, 1.25, 1.50).                   |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``seek_video``                    | Fired when the playback bar   | Video               | Browser         | ``old_time``        |               | The time in the video that the user is coming from.                 |
+|                                   | or transcript is used to go   |                     |                 |                     |               |                                                                     |
+|                                   | to a different point in the   |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   | video file.                   |                     |                 | ``new_time``        |               | The time in the video that the user is going to.                    |
+|                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   |                               |                     |                 | ``type``            |               | The navigational method used to change position within the video.   |
++-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
+| ``speed_change_video``            | Fired when a user selects     | Video               | Browser         | ``current_time``    |               | The time in the video that the user chose to change the             |
+|                                   | a different playing speed     |                     |                 |                     |               | playing speed.                                                      |
+|                                   | for the video.                |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   | **History**: Prior to 12 Feb  |                     |                 | ``old_speed``       |               | The speed at which the video was playing.                           |
+|                                   | 2014, this event fired when   |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   | the user selected either the  |                     |                 | ``new_speed``       |               | The speed that the user selected for the video to play.             |
+|                                   | same speed or a different     |                     |                 |                     |               |                                                                     |
+|                                   | speed.                        |                     |                 |                     |               |                                                                     |
 +-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
 | ``book``                          | Fired when a user is reading  | PDF Viewer          | Browser         | ``type``            | string        | `'gotopage'`, `'prevpage'`, `'nextpage'`                            |
 |                                   | a PDF book.                   |                     |                 +---------------------+---------------+---------------------------------------------------------------------+

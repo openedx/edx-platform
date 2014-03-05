@@ -14,6 +14,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
       stringEntryTemplate = readFixtures('metadata-string-entry.underscore')
       optionEntryTemplate = readFixtures('metadata-option-entry.underscore')
       listEntryTemplate = readFixtures('metadata-list-entry.underscore')
+      dictEntryTemplate = readFixtures('metadata-dict-entry.underscore')
 
       beforeEach ->
           setFixtures($("<script>", {id: "metadata-editor-tpl", type: "text/template"}).text(editorTemplate))
@@ -21,6 +22,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           appendSetFixtures($("<script>", {id: "metadata-string-entry", type: "text/template"}).text(stringEntryTemplate))
           appendSetFixtures($("<script>", {id: "metadata-option-entry", type: "text/template"}).text(optionEntryTemplate))
           appendSetFixtures($("<script>", {id: "metadata-list-entry", type: "text/template"}).text(listEntryTemplate))
+          appendSetFixtures($("<script>", {id: "metadata-dict-entry", type: "text/template"}).text(dictEntryTemplate))
 
       genericEntry = {
           default_value: 'default value',
@@ -92,6 +94,24 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           value: "12:12:12"
       }
 
+      dictEntry = {
+          default_value: {
+            'en': 'English',
+            'ru': 'Русский'
+          },
+          display_name: "New Dict",
+          explicitly_set: false,
+          field_name: "dict",
+          help: "Specifies the name for this component.",
+          type: MetadataModel.DICT_TYPE,
+          value: {
+            'en': 'English',
+            'ru': 'Русский',
+            'ua': 'Українська',
+            'fr': 'Français'
+          }
+      }
+
 
       # Test for the editor that creates the individual views.
       describe "MetadataView.Editor creates editors for each field", ->
@@ -116,17 +136,18 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
                           value: null
                       },
                       listEntry,
-                      timeEntry
+                      timeEntry,
+                      dictEntry
                   ]
               )
 
           it "creates child views on initialize, and sorts them alphabetically", ->
               view = new MetadataView.Editor({collection: @model})
               childModels = view.collection.models
-              expect(childModels.length).toBe(7)
+              expect(childModels.length).toBe(8)
               # Be sure to check list view as well as other input types
               childViews = view.$el.find('.setting-input, .list-settings')
-              expect(childViews.length).toBe(7)
+              expect(childViews.length).toBe(8)
 
               verifyEntry = (index, display_name, type) ->
                   expect(childModels[index].get('display_name')).toBe(display_name)
@@ -135,10 +156,11 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               verifyEntry(0, 'Display Name', 'text')
               verifyEntry(1, 'Inputs', 'number')
               verifyEntry(2, 'List', '')
-              verifyEntry(3, 'Show Answer', 'select-one')
-              verifyEntry(4, 'Time', 'text')
-              verifyEntry(5, 'Unknown', 'text')
-              verifyEntry(6, 'Weight', 'number')
+              verifyEntry(3, 'New Dict', '')
+              verifyEntry(4, 'Show Answer', 'select-one')
+              verifyEntry(5, 'Time', 'text')
+              verifyEntry(6, 'Unknown', 'text')
+              verifyEntry(7, 'Weight', 'number')
 
           it "returns its display name", ->
               view = new MetadataView.Editor({collection: @model})
@@ -351,7 +373,9 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           assertCanUpdateView(@listView, ['a new item', 'another new item', 'a third'])
 
         it "has a clear method to revert to the model default", ->
+          @el.find('.create-setting').click()
           assertClear(@listView, ['a thing', 'another thing'])
+          expect(@el.find('.create-setting')).not.toHaveClass('is-disabled')
 
         it "has an update model method", ->
           assertUpdateModel(@listView, null, ['a new value'])
@@ -486,3 +510,99 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
 
           it "has an update model method", ->
               assertUpdateModel(@view, '12:12:12', '23:59:59')
+
+      describe "MetadataView.Dict allows the user to enter key-value pairs of strings", ->
+        beforeEach ->
+          dictModel = new MetadataModel($.extend(true, {}, dictEntry))
+          @dictView = new MetadataView.Dict({model: dictModel})
+          @el = @dictView.$el
+          main()
+
+        it "returns the initial value upon initialization", ->
+          assertValueInView(@dictView, {
+            'en': 'English',
+            'ru': 'Русский',
+            'ua': 'Українська',
+            'fr': 'Français'
+          })
+
+        it "updates its value correctly", ->
+          assertCanUpdateView(@dictView, {
+            'ru': 'Русский',
+            'ua': 'Українська',
+            'fr': 'Français'
+          })
+
+        it "has a clear method to revert to the model default", ->
+          @el.find('.create-setting').click()
+          assertClear(@dictView, {
+            'en': 'English',
+            'ru': 'Русский'
+          })
+          expect(@el.find('.create-setting')).not.toHaveClass('is-disabled')
+
+        it "has an update model method", ->
+          assertUpdateModel(@dictView, null, {'fr': 'Français'})
+
+        it "can add an entry", ->
+          expect(_.keys(@dictView.model.get('value')).length).toEqual(4)
+          @el.find('.create-setting').click()
+          expect(@el.find('input.input-key').length).toEqual(5)
+
+        it "can remove an entry", ->
+          expect(_.keys(@dictView.model.get('value')).length).toEqual(4)
+          @el.find('.remove-setting').first().click()
+          expect(_.keys(@dictView.model.get('value')).length).toEqual(3)
+
+        it "only allows one blank entry at a time", ->
+          expect(@el.find('input.input-key').length).toEqual(4)
+          @el.find('.create-setting').click()
+          @el.find('.create-setting').click()
+          expect(@el.find('input.input-key').length).toEqual(5)
+
+        it "only allows unique keys", ->
+          data = [
+            {
+              expectedValue: {'ru': 'Русский'},
+              initialValue: {'ru': 'Русский'},
+              testValue: {
+                'key': 'ru'
+                'value': ''
+              }
+            },
+            {
+              expectedValue: {'ru': 'Русский'},
+              initialValue: {'ru': 'Some value'},
+              testValue: {
+                'key': 'ru'
+                'value': 'Русский'
+              }
+            },
+            {
+              expectedValue: {'ru': 'Русский'},
+              initialValue: {'ru': 'Русский'},
+              testValue: {
+                'key': ''
+                'value': ''
+              }
+            }
+          ]
+
+          _.each data, ((d, index) ->
+            @dictView.setValueInEditor(d.initialValue)
+            @dictView.updateModel();
+            @el.find('.create-setting').click()
+            item = @el.find('.list-settings-item').last()
+            item.find('.input-key').val(d.testValue.key);
+            item.find('.input-value').val(d.testValue.value);
+
+            expect(@dictView.getValueFromEditor()).toEqual(d.expectedValue)
+          ).bind(@)
+
+        it "re-enables the add setting button after entering a new value", ->
+          expect(@el.find('input.input-key').length).toEqual(4)
+          @el.find('.create-setting').click()
+          expect(@el.find('.create-setting')).toHaveClass('is-disabled')
+          @el.find('input.input-key').last().val('third setting')
+          @el.find('input.input-key').last().trigger('input')
+          expect(@el.find('.create-setting')).not.toHaveClass('is-disabled')

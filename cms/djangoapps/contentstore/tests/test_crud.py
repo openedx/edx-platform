@@ -172,7 +172,7 @@ class TemplateTests(unittest.TestCase):
         )
         first_problem.max_attempts = 3
         first_problem.save()  # decache the above into the kvs
-        updated_problem = modulestore('split').update_item(first_problem, 'testbot')
+        updated_problem = modulestore('split').update_item(first_problem, '**replace_user**')
         self.assertIsNotNone(updated_problem.previous_version)
         self.assertEqual(updated_problem.previous_version, first_problem.update_version)
         self.assertNotEqual(updated_problem.update_version, first_problem.update_version)

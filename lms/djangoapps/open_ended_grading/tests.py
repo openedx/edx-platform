@@ -285,6 +285,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
             open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
             mixins=settings.XBLOCK_MIXINS,
             error_descriptor_class=ErrorDescriptor,
+            descriptor_runtime=None,
         )
         self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, field_data, ScopeIds(None, None, None, None))
         self.descriptor.xmodule_runtime = self.system

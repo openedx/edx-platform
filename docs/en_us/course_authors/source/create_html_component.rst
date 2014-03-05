@@ -81,9 +81,11 @@ To create an HTML component:
 
 2. In the list that appears, click **Text**.
 
+  .. note:  You can also create a :ref:`Zooming Image` or :ref:`Image Modal`.
+
    An empty component appears at the bottom of the unit.
 
-  .. image:: Images/HTMLComponent_Edit.gif
+  .. image:: Images/HTMLComponent_Edit.png
    :alt: Image of an empty HTML component
 
 3. In the empty component, click **Edit**.
@@ -268,24 +270,21 @@ To create an HTML component that contains LaTeX code:
    #. In the **Policy Value** field next to the **use_latex_compiler** policy key, change **false** to **true**.
    #. At the bottom of the page, click **Save Changes**.
 
-#. In the unit where you want to create the component, click **html** under **Add New Component**, and then click **E-text Written in LaTeX**.
+#. In the unit where you want to create the component, click **html** under **Add New Component**, and then click **E-text Written in LaTeX**. The new component is added to the unit.
 
-#. In the component that appears, click **upload** in the upper-right corner.
+#. Click **Edit** to open the new component. The component editor opens.
 
-   .. image:: Images/HTML_LaTeX.png
-    :alt: Image of the LaTeX component with the upload button circled
+  .. image:: Images/latex_component.png
+   :alt: Image of the HTML component editor with the Latex compiler.
 
-
-#. In the dialog box that opens, select a file, and then click **Open**.
-
-   The file loads in the LaTeX editor.
+4. In the componenent editor, click **Launch Latex Source Compiler**. The Latex editor opens.
 
    .. image:: Images/HTML_LaTeXEditor.gif
-    :alt: Image of the LaTex editor
+    :alt: Image of the HTML component editor with the Latex compiler.
 
-#. If you want to, make changes to the file.
+#. Write Latex code as needed. You can also upload a Latex file into the editor from your computer by clicking **Upload** in the bottom right corner.
 
-#. In the LaTeX editor, click **Save & Compile to edX XML** in the lower-left corner.
+#. When you have written or uploaded the Latex code you need, click **Save & Compile to edX XML** in the lower-left corner.
 
    The component editor closes, and the unit page opens. You can see the way your LaTeX content looks.
 
@@ -294,5 +293,5 @@ To create an HTML component that contains LaTeX code:
 
 #. On the unit page, click **Preview** to verify that your content looks the way you want it to in the LMS. 
 
-   * If you see errors, go back to the unit page. Click **Edit** to open the component again, and then click **Launch Latex Source Compiler** in the lower-left corner of the component editor to edit the LaTeX code.
+   If you see errors, go back to the unit page. Click **Edit** to open the component again, and then click **Launch Latex Source Compiler** in the lower-left corner of the component editor to edit the LaTeX code.
 

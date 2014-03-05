@@ -11,6 +11,7 @@
         afterEach(function () {
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
+            state.storage.clear();
         });
 
         describe('constructor', function () {

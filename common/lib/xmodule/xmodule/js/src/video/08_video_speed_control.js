@@ -117,6 +117,142 @@ function () {
         state.el.find('div.speeds').hide();
     }
 
+    // Get previous element in array or cyles back to the last if it is the
+    // first.
+    function _previousSpeedLink(speedLinks, index) {
+        return $(speedLinks.eq(index < 1 ? speedLinks.length - 1 : index - 1));
+    }
+
+    // Get next element in array or cyles back to the first if it is the last.
+    function _nextSpeedLink(speedLinks, index) {
+        return $(speedLinks.eq(index >= speedLinks.length - 1 ? 0 : index + 1));
+    }
+
+    function _speedLinksFocused(state) {
+        var speedLinks = state.videoSpeedControl.videoSpeedsEl
+                                                .find('a.speed_link');
+        return speedLinks.is(':focus');
+    }
+
+    function _openMenu(state) {
+        // When speed entries have focus, the menu stays open on
+        // mouseleave. A clickHandler is added to the window
+        // element to have clicks close the menu when they happen
+        // outside of it.
+        $(window).on('click.speedMenu', _clickHandler.bind(state));
+        state.videoSpeedControl.el.addClass('open');
+    }
+
+    function _closeMenu(state) {
+        // Remove the previously added clickHandler from window element.
+        $(window).off('click.speedMenu');
+        state.videoSpeedControl.el.removeClass('open');
+    }
+
+    // Various event handlers. They all return false to stop propagation and
+    // prevent default behavior.
+    function _clickHandler(event) {
+        var target = $(event.currentTarget);
+
+        this.videoSpeedControl.el.removeClass('open');
+        if (target.is('a.speed_link')) {
+            this.videoSpeedControl.changeVideoSpeed.call(this, event);
+        }
+
+        return false;
+    }
+
+    // We do not use _openMenu and _closeMenu in the following two handlers
+    // because we do not want to add an unnecessary clickHandler to the window
+    // element.
+    function _mouseEnterHandler(event) {
+        this.videoSpeedControl.el.addClass('open');
+
+        return false;
+    }
+
+    function _mouseLeaveHandler(event) {
+        // Only close the menu is no speed entry has focus.
+        if (!_speedLinksFocused(this)) {
+            this.videoSpeedControl.el.removeClass('open');
+        }
+                
+        return false;
+    }
+
+    function _keyDownHandler(event) {
+        var KEY = $.ui.keyCode,
+            keyCode = event.keyCode,
+            target = $(event.currentTarget),
+            speedButtonLink = this.videoSpeedControl.el.children('a'),
+            speedLinks = this.videoSpeedControl.videoSpeedsEl
+                                               .find('a.speed_link'),
+            index;
+
+        if (target.is('a.speed_link')) {
+
+            index = target.parent().index();
+
+            switch (keyCode) {
+                // Scroll up menu, wrapping at the top. Keep menu open.
+                case KEY.UP:
+                    _previousSpeedLink(speedLinks, index).focus();
+                    break;
+                // Scroll down  menu, wrapping at the bottom. Keep menu
+                // open.
+                case KEY.DOWN:
+                    _nextSpeedLink(speedLinks, index).focus();
+                    break;
+                // Close menu.
+                case KEY.TAB:
+                    _closeMenu(this);
+                    // Set focus to previous menu button in menu bar
+                    // (Play/Pause button)
+                    if (event.shiftKey) {
+                        this.videoControl.playPauseEl.focus();
+                    }
+                    // Set focus to next menu button in menu bar
+                    // (Volume button)
+                    else {
+                        this.videoVolumeControl.buttonEl.focus();
+                    }
+                    break;
+                // Close menu, give focus to speed control and change
+                // speed.
+                case KEY.ENTER:
+                case KEY.SPACE:
+                    _closeMenu(this);
+                    speedButtonLink.focus();
+                    this.videoSpeedControl.changeVideoSpeed.call(this, event);
+                    break;
+                // Close menu and give focus to speed control.
+                case KEY.ESCAPE:
+                    _closeMenu(this);
+                    speedButtonLink.focus();
+                    break;
+            }
+            return false;
+        }
+        else {
+            switch(keyCode) {
+                // Open menu and focus on last element of list above it.
+                case KEY.ENTER:
+                case KEY.SPACE:
+                case KEY.UP:
+                    _openMenu(this);
+                    speedLinks.last().focus();
+                    break;
+                // Close menu.
+                case KEY.ESCAPE:
+                    _closeMenu(this);
+                    break;
+            }
+            // We do not stop propagation and default behavior on a TAB
+            // keypress.
+            return event.keyCode === KEY.TAB;
+        }
+    }
+
     /**
      * @desc Bind any necessary function callbacks to DOM events (click,
      *     mousemove, etc.).
@@ -133,125 +269,21 @@ function () {
      * @returns {undefined}
      */
     function _bindHandlers(state) {
-        var speedLinks;
+        var speedButton = state.videoSpeedControl.el,
+            videoSpeeds = state.videoSpeedControl.videoSpeedsEl;
 
-        state.videoSpeedControl.videoSpeedsEl.find('a')
-            .on('click', state.videoSpeedControl.changeVideoSpeed);
+        // Attach various events handlers to the speed menu button.
+        speedButton.on({
+            'mouseenter': _mouseEnterHandler.bind(state),
+            'mouseleave': _mouseLeaveHandler.bind(state),
+            'click': _clickHandler.bind(state),
+            'keydown': _keyDownHandler.bind(state)
+        });
 
-        if (state.isTouch) {
-            state.videoSpeedControl.el.on('click', function (event) {
-                // So that you can't highlight this control via a drag
-                // operation, we disable the default browser actions on a
-                // click event.
-                event.preventDefault();
-
-                state.videoSpeedControl.el.toggleClass('open');
-            });
-        } else {
-            state.videoSpeedControl.el
-                .on('mouseenter', function () {
-                    state.videoSpeedControl.el.addClass('open');
-                })
-                .on('mouseleave', function () {
-                    state.videoSpeedControl.el.removeClass('open');
-                })
-                .on('click', function (event) {
-                    // So that you can't highlight this control via a drag
-                    // operation, we disable the default browser actions on a
-                    // click event.
-                    event.preventDefault();
-
-                    state.videoSpeedControl.el.removeClass('open');
-                });
-
-            // ******************************
-            // The tabbing will cycle through the elements in the following
-            // order:
-            // 1. Play control
-            // 2. Speed control
-            // 3. Fastest speed called firstSpeed
-            // 4. Intermediary speed called otherSpeed
-            // 5. Slowest speed called lastSpeed
-            // 6. Volume control
-            // This field will keep track of where the focus is coming from.
-            state.previousFocus = '';
-
-            // ******************************
-            // Attach 'focus', and 'blur' events to the speed control which
-            // either brings up the speed dialog with individual speed entries,
-            // or closes it.
-            state.videoSpeedControl.el.children('a')
-                .on('focus', function () {
-                    // If the focus is coming from the first speed entry
-                    // (tabbing backwards) or last speed entry (tabbing forward)
-                    // hide the speed entries dialog.
-                    if (state.previousFocus === 'firstSpeed' ||
-                        state.previousFocus === 'lastSpeed') {
-                         state.videoSpeedControl.el.removeClass('open');
-                    }
-                })
-                .on('blur', function () {
-                    // When the focus leaves this element, the speed entries
-                    // dialog will be shown.
-
-                    // If we are tabbing forward (previous focus is play
-                    // control), we open the dialog and set focus on the first
-                    // speed entry.
-                    if (state.previousFocus === 'playPause') {
-                        state.videoSpeedControl.el.addClass('open');
-                        state.videoSpeedControl.videoSpeedsEl
-                        .find('a.speed_link:first')
-                        .focus();
-                    }
-
-                    // If we are tabbing backwards (previous focus is volume
-                    // control), we open the dialog and set focus on the
-                    // last speed entry.
-                    if (state.previousFocus === 'volume') {
-                        state.videoSpeedControl.el.addClass('open');
-                        state.videoSpeedControl.videoSpeedsEl
-                        .find('a.speed_link:last')
-                        .focus();
-                    }
-
-                });
-
-            // ******************************
-            // Attach 'blur' event to elements which represent individual speed
-            // entries and use it to track the origin of the focus.
-            speedLinks = state.videoSpeedControl.videoSpeedsEl
-                .find('a.speed_link');
-
-            speedLinks.first().on('blur', function () {
-                // The previous focus is a speed entry (we are tabbing
-                // backwards), the dialog will close, set focus on the speed
-                // control and track the focus on first speed.
-                if (state.previousFocus === 'otherSpeed') {
-                    state.previousFocus = 'firstSpeed';
-                    state.videoSpeedControl.el.children('a').focus();
-                }
-            });
-
-            // Track the focus on intermediary speeds.
-            speedLinks
-                .filter(function (index) {
-                    return index === 1 || index === 2;
-                })
-                .on('blur', function () {
-                    state.previousFocus = 'otherSpeed';
-                });
-
-            speedLinks.last().on('blur', function () {
-                // The previous focus is a speed entry (we are tabbing forward),
-                // the dialog will close, set focus on the speed control and
-                // track the focus on last speed.
-                if (state.previousFocus === 'otherSpeed') {
-                    state.previousFocus = 'lastSpeed';
-                    state.videoSpeedControl.el.children('a').focus();
-                }
-            });
-
-        }
+        // Attach click and keydown event handlers to the individual speed
+        // entries.
+        videoSpeeds.on('click', 'a.speed_link', _clickHandler.bind(state))
+                   .on('keydown', 'a.speed_link', _keyDownHandler.bind(state));
     }
 
     // ***************************************************************
@@ -289,9 +321,6 @@ function () {
                 this.videoSpeedControl.currentSpeed
             );
         }
-        // When a speed entry has been selected, we want the speed control to
-        // regain focus.
-        parentEl.parent().siblings('a').focus();
     }
 
     function reRender(params) {
@@ -304,9 +333,9 @@ function () {
         $.each(this.videoSpeedControl.speeds, function (index, speed) {
             var link, listItem;
 
-            link = '<a class="speed_link" href="#">' + speed + 'x</a>';
+            link = '<a class="speed_link" href="#" role="menuitem">' + speed + 'x</a>';
 
-            listItem = $('<li data-speed="' + speed + '">' + link + '</li>');
+            listItem = $('<li data-speed="' + speed + '" role="presentation">' + link + '</li>');
 
             if (speed === params.currentSpeed) {
                 listItem.addClass('active');

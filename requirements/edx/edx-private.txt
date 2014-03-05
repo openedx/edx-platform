@@ -1,0 +1,1 @@
+-e git+ssh://git@github.com/jazkarta/edX-jsdraw.git@92e8e4a073a06b0afa0aa9d1314900d095483ab5#egg=edx-jsdraw
