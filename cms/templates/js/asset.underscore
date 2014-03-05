@@ -16,6 +16,9 @@
 <td class="embed-col">
     <input type="text" class="embeddable-xml-input" value="<%= portable_url %>" readonly>
 </td>
+<td class="embed-col">
+    <input type="text" class="embeddable-xml-input" value="<%= external_url %>" readonly>
+</td>
 <td class="actions-col">
     <ul class="actions-list">
         <li class="action-item action-delete">

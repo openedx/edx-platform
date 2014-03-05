@@ -5,6 +5,12 @@
   from django.core.urlresolvers import reverse
   import waffle
 %>
+
+<%
+  cert_name_short = settings.CERT_NAME_SHORT
+  cert_name_long = settings.CERT_NAME_LONG
+%>
+
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
@@ -403,11 +409,13 @@
     <div id="change_name_body">
       <form id="change_name_form">
         <div id="change_name_error" class="modal-form-error"> </div>
-        <p>${_("To uphold the credibility of {platform} certificates, all name changes will be logged and recorded.").format(platform=settings.PLATFORM_NAME)}</p>
+        ## Translators: note that {platform} {cert_name_short} will look something like: "edX certificate". Please do not change the order of these placeholders.
+        <p>${_("To uphold the credibility of your {platform} {cert_name_short}, all name changes will be logged and recorded.").format(platform=settings.PLATFORM_NAME, cert_name_short=cert_name_short)}</p>
         <br/>
         <fieldset>
           <div class="input-group">
-            <label>${_("Enter your desired full name, as it will appear on the {platform} certificates:").format(platform=settings.PLATFORM_NAME)}</label>
+            ## Translators: note that {platform} {cert_name_short} will look something like: "edX certificate". Please do not change the order of these placeholders.
+            <label>${_("Enter your desired full name, as it will appear on your {platform} {cert_name_short}:").format(platform=settings.PLATFORM_NAME, cert_name_short=cert_name_short)}</label>
             <input id="new_name_field" value="" type="text" />
             <label>${_("Reason for name change:")}</label>
             <textarea id="name_rationale_field" value=""></textarea>

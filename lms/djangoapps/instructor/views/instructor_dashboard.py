@@ -23,7 +23,7 @@ from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
-
+from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
 from .tools import get_units_with_due_date, title_or_url
 
@@ -31,7 +31,7 @@ from .tools import get_units_with_due_date, title_or_url
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):
-    """Display the instructor dashboard for a course."""
+    """ Display the instructor dashboard for a course. """
 
     course = get_course_by_id(course_id, depth=None)
     is_studio_course = (modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE)
@@ -63,6 +63,10 @@ def instructor_dashboard_2(request, course_id):
     if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
        is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
         sections.append(_section_send_email(course_id, access, course))
+
+    # Gate access to Metrics tab by featue flag and staff authorization
+    if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
+        sections.append(_section_metrics(course_id, access))
 
     studio_url = None
     if is_studio_course:
@@ -226,5 +230,17 @@ def _section_analytics(course_id, access):
         'access': access,
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_id}),
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_id}),
+    }
+    return section_data
+
+
+def _section_metrics(course_id, access):
+    """Provide data for the corresponding dashboard section """
+    section_data = {
+        'section_key': 'metrics',
+        'section_display_name': ('Metrics'),
+        'access': access,
+        'sub_section_display_name': get_section_display_name(course_id),
+        'section_has_problem': get_array_section_has_problem(course_id)
     }
     return section_data

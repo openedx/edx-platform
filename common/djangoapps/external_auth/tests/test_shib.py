@@ -103,9 +103,9 @@ class ShibSPTest(ModuleStoreTestCase):
         """Asserts that shibboleth login attempt is being logged"""
         method_name, args, _kwargs = audit_log_call
         self.assertEquals(method_name, 'info')
-        self.assertEquals(len(args), 2)
+        self.assertEquals(len(args), 1)
         self.assertIn(u'logged in via Shibboleth', args[0])
-        self.assertEquals(remote_user, args[1])
+        self.assertIn(remote_user, args[0])
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_shib_login(self):
@@ -166,9 +166,9 @@ class ShibSPTest(ModuleStoreTestCase):
                     self._assert_shib_login_is_logged(audit_log_calls[0], remote_user)
                     method_name, args, _kwargs = audit_log_calls[1]
                     self.assertEquals(method_name, 'info')
-                    self.assertEquals(len(args), 3)
+                    self.assertEquals(len(args), 1)
                     self.assertIn(u'Login success', args[0])
-                    self.assertEquals(remote_user, args[2])
+                    self.assertIn(remote_user, args[0])
                 elif idp == "https://idp.stanford.edu/" and remote_user == 'inactive@stanford.edu':
                     self.assertEqual(response.status_code, 403)
                     self.assertIn("Account not yet activated: please look for link in your email", response.content)
@@ -177,7 +177,7 @@ class ShibSPTest(ModuleStoreTestCase):
                     self._assert_shib_login_is_logged(audit_log_calls[0], remote_user)
                     method_name, args, _kwargs = audit_log_calls[1]
                     self.assertEquals(method_name, 'warning')
-                    self.assertEquals(len(args), 2)
+                    self.assertEquals(len(args), 1)
                     self.assertIn(u'is not active after external login', args[0])
                     # self.assertEquals(remote_user, args[1])
                 elif idp == "https://idp.stanford.edu/" and remote_user == 'womap@stanford.edu':
@@ -190,9 +190,9 @@ class ShibSPTest(ModuleStoreTestCase):
                     self._assert_shib_login_is_logged(audit_log_calls[0], remote_user)
                     method_name, args, _kwargs = audit_log_calls[1]
                     self.assertEquals(method_name, 'info')
-                    self.assertEquals(len(args), 3)
+                    self.assertEquals(len(args), 1)
                     self.assertIn(u'Login success', args[0])
-                    self.assertEquals(remote_user, args[2])
+                    self.assertIn(remote_user, args[0])
                 elif idp == "https://someother.idp.com/" and remote_user in \
                             ['withmap@stanford.edu', 'womap@stanford.edu', 'inactive@stanford.edu']:
                     self.assertEqual(response.status_code, 403)

@@ -458,6 +458,69 @@ section.instructor-dashboard-content-2 {
 }
 
 
+.instructor-dashboard-wrapper-2 section.idash-section#metrics {
+
+  .metrics-container {
+    position: relative;
+    width: 100%;
+    float: left;
+    clear: both;
+    margin-top: 25px;
+  }
+  .metrics-left {
+    position: relative;
+    width: 30%;
+    height: 640px;
+    float: left;
+    margin-right: 2.5%;
+  }
+  .metrics-left svg {
+	width: 100%;
+  }
+  .metrics-right {
+    position: relative;
+    width: 65%;
+    height: 295px;
+    float: left;
+    margin-left: 2.5%;
+    margin-bottom: 25px;
+  }
+  .metrics-right svg {
+	width: 100%;
+  }
+
+  .metrics-tooltip {
+    width: 250px;
+    background-color: lightgray;
+    padding: 3px;
+  }
+
+  .stacked-bar-graph-legend {
+    fill: white;
+  }
+
+  p.loading {
+    padding-top: 100px;
+    text-align: center;
+  }
+
+  p.nothing {
+    padding-top: 25px;
+  }
+
+  h3.attention {
+    padding: 10px;
+    border: 1px solid #999;
+    border-radius: 5px;
+    margin-top: 25px;
+  }
+
+  input#graph_reload {
+    display: none;
+  }
+}
+
+
 .profile-distribution-widget {
   margin-bottom: $baseline * 2;
 

@@ -173,9 +173,9 @@ def add_staff_debug_info(user, block, view, frag, context):  # pylint: disable=u
         histogram = None
         render_histogram = False
 
-    if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
+    if settings.FEATURES.get('ENABLE_LMS_MIGRATION') and hasattr(block.runtime, 'filestore'):
         [filepath, filename] = getattr(block, 'xml_attributes', {}).get('filename', ['', None])
-        osfs = block.system.filestore
+        osfs = block.runtime.filestore
         if filename is not None and osfs.exists(filename):
             # if original, unmangled filename exists then use it (github
             # doesn't like symlinks)

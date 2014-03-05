@@ -57,6 +57,8 @@ from collections import namedtuple
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
 
+from django_comment_common.models import Role
+
 from external_auth.models import ExternalAuthMap
 import external_auth.views
 
@@ -70,8 +72,9 @@ import track.views
 from dogapi import dog_stats_api
 
 from util.json_request import JsonResponse
+from util.bad_request_rate_limiter import BadRequestRateLimiter
 
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
@@ -83,7 +86,6 @@ AUDIT_LOG = logging.getLogger("audit")
 
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
-
 
 def csrf_token(context):
     """A csrf token that can be included in a form."""
@@ -348,7 +350,7 @@ def signin_user(request):
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action'),
-        'platform_name': MicrositeConfiguration.get_microsite_configuration_value(
+        'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
         ),
@@ -371,7 +373,7 @@ def register_user(request, extra_context=None):
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action'),
-        'platform_name': MicrositeConfiguration.get_microsite_configuration_value(
+        'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
         ),
@@ -414,11 +416,11 @@ def dashboard(request):
 
     # for microsites, we want to filter and only show enrollments for courses within
     # the microsites 'ORG'
-    course_org_filter = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')
+    course_org_filter = microsite.get_value('course_org_filter')
 
     # Let's filter out any courses in an "org" that has been declared to be
     # in a Microsite
-    org_filter_out_set = MicrositeConfiguration.get_all_microsite_orgs()
+    org_filter_out_set = microsite.get_all_orgs()
 
     # remove our current Microsite from the "filter out" list, if applicable
     if course_org_filter:
@@ -709,7 +711,10 @@ def login_user(request, error=""):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
-        AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.warning(u"Login failed - Unknown user email")
+        else:
+            AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
         user = None
 
     # check if the user has a linked shibboleth account, if so, redirect the user to shib-login
@@ -756,7 +761,11 @@ def login_user(request, error=""):
         # if we didn't find this username earlier, the account for this email
         # doesn't exist, and doesn't have a corresponding password
         if username != "":
-            AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
+            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                loggable_id = user_found_by_email_lookup.id if user_found_by_email_lookup else "<unknown>"
+                AUDIT_LOG.warning(u"Login failed - password for user.id: {0} is invalid".format(loggable_id))
+            else:
+                AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
         return JsonResponse({
             "success": False,
             "value": _('Email or password is incorrect.'),
@@ -810,7 +819,10 @@ def login_user(request, error=""):
 
         return response
 
-    AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.warning(u"Login failed - Account not active for user.id: {0}, resending activation".format(user.id))
+    else:
+        AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
     not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
@@ -1089,6 +1101,19 @@ def create_account(request, post_override=None):
             js['field'] = field_name
             return JsonResponse(js, status=400)
 
+        max_length = 75
+        if field_name == 'username':
+            max_length = 30
+
+        if field_name in ('email', 'username') and len(post_vars[field_name]) > max_length:
+            error_str = {
+                'username': _('Username cannot be more than {0} characters long').format(max_length),
+                'email': _('Email cannot be more than {0} characters long').format(max_length)
+            }
+            js['value'] = error_str[field_name]
+            js['field'] = field_name
+            return JsonResponse(js, status=400)
+
     try:
         validate_email(post_vars['email'])
     except ValidationError:
@@ -1135,7 +1160,7 @@ def create_account(request, post_override=None):
 
     # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
-        from_address = MicrositeConfiguration.get_microsite_configuration_value(
+        from_address = microsite.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
@@ -1220,6 +1245,7 @@ def auto_auth(request):
     * `full_name` for the user profile (the user's full name; defaults to the username)
     * `staff`: Set to "true" to make the user global staff.
     * `course_id`: Enroll the student in the course with `course_id`
+    * `roles`: Comma-separated list of roles to grant the student in the course with `course_id`
 
     If username, email, or password are not provided, use
     randomly generated credentials.
@@ -1235,6 +1261,7 @@ def auto_auth(request):
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
     course_id = request.GET.get('course_id', None)
+    role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object
     post_data = {
@@ -1277,14 +1304,19 @@ def auto_auth(request):
     if course_id is not None:
         CourseEnrollment.enroll(user, course_id)
 
+    # Apply the roles
+    for role_name in role_names:
+        role = Role.objects.get(name=role_name, course_id=course_id)
+        user.roles.add(role)
+
     # Log in as the user
     user = authenticate(username=username, password=password)
     login(request, user)
 
     # Provide the user with a valid CSRF token
     # then return a 200 response
-    success_msg = u"Logged in user {0} ({1}) with password {2}".format(
-        username, email, password
+    success_msg = u"Logged in user {0} ({1}) with password {2} and user_id {3}".format(
+        username, email, password, user.id
     )
     response = HttpResponse(success_msg)
     response.set_cookie('csrftoken', csrf(request)['csrf_token'])
@@ -1332,12 +1364,23 @@ def password_reset(request):
     if request.method != "POST":
         raise Http404
 
+    # Add some rate limiting here by re-using the RateLimitMixin as a helper class
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Rate limit exceeded in password_reset")
+        return HttpResponseForbidden()
+
     form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
         form.save(use_https=request.is_secure(),
                   from_email=settings.DEFAULT_FROM_EMAIL,
                   request=request,
                   domain_override=request.get_host())
+    else:
+        # bad user? tick the rate limiter counter
+        AUDIT_LOG.info("Bad password_reset user passed in.")
+        limiter.tick_bad_request_counter(request)
+
     return JsonResponse({
         'success': True,
         'value': render_to_string('registration/password_reset_done.html', {}),
@@ -1459,7 +1502,7 @@ def change_email_request(request):
 
     message = render_to_string('emails/email_change.txt', context)
 
-    from_address = MicrositeConfiguration.get_microsite_configuration_value(
+    from_address = microsite.get_value(
         'email_from_address',
         settings.DEFAULT_FROM_EMAIL
     )

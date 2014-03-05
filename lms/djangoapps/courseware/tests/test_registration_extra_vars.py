@@ -3,8 +3,6 @@
 Tests for extra registration variables
 """
 import json
-import uuid
-
 from django.conf import settings
 from django.test import TestCase
 from django.core.urlresolvers import reverse
@@ -18,11 +16,11 @@ class TestExtraRegistrationVariables(TestCase):
     def setUp(self):
         super(TestExtraRegistrationVariables, self).setUp()
         self.url = reverse('create_account')
-        username = 'foo_bar' + uuid.uuid4().hex
+
         self.url_params = {
-            'username': username,
-            'name': username,
-            'email': 'foo' + uuid.uuid4().hex + '@bar.com',
+            'username': 'username',
+            'name': 'name',
+            'email': 'foo_bar@bar.com',
             'password': 'password',
             'terms_of_service': 'true',
             'honor_code': 'true',

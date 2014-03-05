@@ -3,6 +3,16 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%
+  cert_name_short = course.cert_name_short
+  if cert_name_short == "":
+    cert_name_short = settings.CERT_NAME_SHORT
+  
+  cert_name_long = course.cert_name_long
+  if cert_name_long == "":
+    cert_name_long = settings.CERT_NAME_LONG
+%>
+
+<%
 if cert_status['status'] == 'generating':
     status_css_class = 'course-status-certrendering'
 elif cert_status['status'] == 'ready':
@@ -20,15 +30,15 @@ else:
       <p class="message-copy">${_("Your final grade:")}
       <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
       % if cert_status['status'] == 'notpassing' and enrollment.mode != 'audit':
-         ${_("Grade required for a certificate:")} <span class="grade-value">
+         ${_("Grade required for a {cert_name_short}:").format(cert_name_short=cert_name_short)} <span class="grade-value">
            ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
       % elif cert_status['status'] == 'restricted' and enrollment.mode == 'verified':
           <p class="message-copy">
-          ${_("Your verified certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}. If you would like a refund on your certificate, please contact our billing address {billing_email}").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL), billing_email='<a class="contact-link" href="mailto:{email}">{email}</a>'.format(email=settings.PAYMENT_SUPPORT_EMAIL))}
+          ${_("Your verified {cert_name_long} is being held pending confirmation that the issuance of your {cert_name_short} is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}. If you would like a refund on your {cert_name_long}, please contact our billing address {billing_email}").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL), billing_email='<a class="contact-link" href="mailto:{email}">{email}</a>'.format(email=settings.PAYMENT_SUPPORT_EMAIL), cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
           </p>
       % elif cert_status['status'] == 'restricted':
           <p class="message-copy">
-          ${_("Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}.").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL))}
+          ${_("Your {cert_name_long} is being held pending confirmation that the issuance of your {cert_name_short} is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}.").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL), cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
           </p>
       % endif
       </p>
@@ -38,23 +48,23 @@ else:
   <ul class="actions">
     % if cert_status['show_disabled_download_button']:
       <li class="action"><span class="disabled">
-          ${_("Your Certificate is Generating")}</span></li>
+          ${_("Your {cert_name_short} is Generating").format(cert_name_short=cert_name_short)}</span></li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'honor':
       <li class="action action-certificate">
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">
-         ${_("Download Your Certificate (PDF)")}</a></li>
+         ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short,)}</a></li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
       <li class="action">
-      <p>${_('Since we did not have a valid set of verification photos from you when certificates were generated, we could not grant you a verified certificate. An honor code certificate has been granted instead.')}</p>
+      <p>${_('Since we did not have a valid set of verification photos from you when your {cert_name_long} was generated, we could not grant you a verified {cert_name_short}. An honor code {cert_name_short} has been granted instead.').format(cert_name_short=cert_name_short, cert_name_long=cert_name_long)}</p>
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">
-         ${_("Download Your Certificate (PDF)")}</a></li>
+         ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}</a></li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'verified':
       <li class="action">
       <a class="btn" href="${cert_status['download_url']}"
-         title="${_('This link will open/download a PDF document of your verified certificate.')}">
-         ${_("Download Your ID Verified Certificate of Achievement (PDF)")}</a></li>
+         title="${_('This link will open/download a PDF document of your verified {cert_name_long}.').format(cert_name_long=cert_name_long)}">
+         ${_("Download Your ID Verified {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}</a></li>
     % endif
 
     % if cert_status['show_survey_button']:

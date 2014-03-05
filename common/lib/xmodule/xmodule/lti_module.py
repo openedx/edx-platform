@@ -116,7 +116,7 @@ class LTIModule(LTIFields, XModule):
             launch_presentation_return_url
             lti_message_type
             lti_version
-            role
+            roles
             *+ all custom parameters*
 
         These parameters should be encoded and signed by *OAuth1* together with

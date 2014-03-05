@@ -27,14 +27,14 @@ Longer TODO:
 import sys
 import lms.envs.common
 from lms.envs.common import (
-    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, enable_microsites, ALL_LANGUAGES
+    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES
 )
 from path import path
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.mixin import CmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin, only_xmodules
+from xmodule.x_module import XModuleMixin, prefer_xmodules
 from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
@@ -79,8 +79,14 @@ FEATURES = {
     # Allow editing of short description in course settings in cms
     'EDITABLE_SHORT_DESCRIPTION': True,
 
+    # Hide any Personally Identifiable Information from application logs
+    'SQUELCH_PII_IN_LOGS': False,
+
     # Toggles embargo functionality
     'EMBARGO': False,
+
+    # Turn on/off Microsites feature
+    'USE_MICROSITES': False,
 }
 ENABLE_JASMINE = False
 
@@ -96,7 +102,6 @@ GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
-sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
@@ -203,7 +208,13 @@ MIDDLEWARE_CLASSES = (
 
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
+
+    # use Django built in clickjacking protection
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+# Clickjacking protection can be enabled by setting this to 'DENY'
+X_FRAME_OPTIONS = 'ALLOW'
 
 ############# XBlock Configuration ##########
 
@@ -211,15 +222,10 @@ MIDDLEWARE_CLASSES = (
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin, XModuleMixin)
 
-# Only allow XModules in Studio
-XBLOCK_SELECT_FUNCTION = only_xmodules
-
-# Use the following lines to allow any xblock in Studio,
-# either by uncommenting them here, or adding them to your private.py
+# Allow any XBlock in Studio
 # You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
 # xblocks can be added via advanced settings
-# from xmodule.x_module import prefer_xmodules
-# XBLOCK_SELECT_FUNCTION = prefer_xmodules
+XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
@@ -460,6 +466,9 @@ INSTALLED_APPS = (
 
     # for course creator table
     'django.contrib.admin',
+
+    # XBlocks containing migrations
+    'mentoring',
 
     # for managing course modes
     'course_modes',

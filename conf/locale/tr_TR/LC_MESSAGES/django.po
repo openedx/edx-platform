@@ -61,9 +61,9 @@
 # hgsenel <hgsenel@gmail.com>, 2014
 # hgsenel <hgsenel@gmail.com>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# Translations template for PROJECT.
-# Copyright (C) 2014 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
+# edX translation file
+# Copyright (C) 2014 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
 # hgsenel <hgsenel@gmail.com>, 2014
@@ -71,8 +71,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-24 16:01-0500\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2014-03-02 15:08-0500\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: hgsenel <hgsenel@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
@@ -88,8 +88,14 @@ msgstr ""
 #. that a user has submitted or needs to grade
 #: cms/djangoapps/contentstore/utils.py lms/djangoapps/courseware/tabs.py
 msgid "Open Ended Panel"
-msgstr ""
+msgstr "Açıklı Uçlu Paneli"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Courseware" is the title of the page where you access a
+#. course's videos and problems.
+#. Translators: 'Courseware' refers to the tab in the courseware
+#. that leads to the content of a course
+#: cms/djangoapps/contentstore/views/tabs.py lms/djangoapps/courseware/tabs.py
 #: lms/templates/courseware/courseware-error.html
 msgid "Courseware"
 msgstr "Ders yazılımı"
@@ -174,7 +180,6 @@ msgid "Student"
 msgstr "Öğrenci"
 
 #: common/djangoapps/student/middleware.py
-#, python-brace-format
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {link_start}{support_email}{link_end}"
@@ -205,11 +210,11 @@ msgstr "Bu ders için kaydolmadınız "
 
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
-msgstr "Kayıt başarısız"
+msgstr "Kayıt işlemi başarısız"
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
-msgstr "Giriş bilgilerinizi alırken bir hata oluştu. Lütfen bize email atın"
+msgstr "Giriş bilgilerinizi alırken bir hata oluştu. Lütfen bize eposta atın."
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -266,17 +271,14 @@ msgid "Unexpected account status"
 msgstr "Beklenmedik hesap durumu"
 
 #: common/djangoapps/student/views.py
-#, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
 msgstr "Bu kullanıcı  '{username}' adı mevcut."
 
 #: common/djangoapps/student/views.py
-#, python-brace-format
 msgid "An account with the Email '{email}' already exists."
 msgstr "Bu e-postaya '{email}' ait bir hesap bulunmaktadır."
 
 #: common/djangoapps/student/views.py
-#, python-brace-format
 msgid "Error (401 {field}). E-mail us."
 msgstr "Hata (401 {field}). Lütfen bize e-posta atın."
 
@@ -339,6 +341,14 @@ msgstr "Bir şehir gerekiyor"
 #: common/djangoapps/student/views.py
 msgid "A country is required"
 msgstr "Bir ülke gerekiyor"
+
+#: common/djangoapps/student/views.py
+msgid "Username cannot be more than {0} characters long"
+msgstr "Kullanıcı adı {0} karakterden uzun olamaz"
+
+#: common/djangoapps/student/views.py
+msgid "Email cannot be more than {0} characters long"
+msgstr "Eposta {0} karakterden uzun olamaz"
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail is required."
@@ -746,52 +756,42 @@ msgid "December"
 msgstr "Aralık"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "Invalid Length ({0})"
 msgstr "Geçersiz Uzunluk ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must be {0} characters or more"
 msgstr "{0} sayıda karakter veya daha fazlası olmalı"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must be {0} characters or less"
 msgstr "{0} sayıda karakter veya daha azı olmalı"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "Must be more complex ({0})"
 msgstr "Daha fazla ({0}) kompleks olmalı"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more uppercase characters"
 msgstr " {0} veya daha fazla büyük harf içermeli"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more lowercase characters"
 msgstr " {0} veya daha fazla küçük harf içermeli"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more digits"
 msgstr " {0} veya daha fazla rakam içermeli"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more punctuation characters"
 msgstr " {0} veya daha fazla noktalama işareti içermeli"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more non ascii characters"
 msgstr " {0} veya daha fazla ASCII olmayan karakter içermeli"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more unique words"
 msgstr " {0} veya daha fazla özgün kelime içermeli"
 
@@ -828,7 +828,6 @@ msgstr ""
 "değiştirecektir."
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr "Tavsiye fonksiyonunda {hintfn} hata {err} "
 
@@ -837,7 +836,6 @@ msgid "(Source code line unavailable)"
 msgstr "(Kaynak kodu satırı bilinmiyor)"
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "See XML source line {sourcenum}."
 msgstr "XML kaynak satırına {sourcenum} bakınız."
 
@@ -846,23 +844,19 @@ msgid "There was a problem with the staff answer to this problem."
 msgstr "Bu probleme personelin verdiği yanıtta bir sorun vardı."
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Could not interpret '{student_answer}' as a number."
 msgstr " '{student_answer}' bir sayı olarak algılanamadı."
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "You may not use variables ({bad_variables}) in numerical problems."
 msgstr ""
 "Nümerik problemlerde,  ({bad_variables}) gibi değişkenler kullanabilirsiniz."
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "factorial function evaluated outside its domain:'{student_answer}'"
 msgstr "faktoryel fonksiyonu etki alanı dışında hesaplandı:'{student_answer}'"
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid math syntax: '{student_answer}'"
 msgstr "geçersiz matematik yazımı: '{student_answer}'"
 
@@ -887,7 +881,6 @@ msgid "CustomResponse: check function returned an invalid dictionary!"
 msgstr "ÖzelYanıt: kontrol fonksiyonu geçersiz sözlük döndü!"
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid ""
 "Unable to deliver your submission to grader (Reason: {error_msg}). Please "
 "try again later."
@@ -906,12 +899,10 @@ msgid "Invalid grader reply. Please contact the course staff."
 msgstr "Geçersiz notlandırı yanıtı. Lütfen ders personeliyle temasa geçiniz."
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid input: {bad_input} not permitted in answer."
 msgstr "Geçersiz giriş: yanıtta {bad_input} değerine izin verilmez."
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid ""
 "factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
@@ -920,19 +911,16 @@ msgstr ""
 " Sağlanan cevap: {bad_input}"
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula."
 msgstr "Geçersiz giriş: '{bad_input}' formül olarak okunamadı."
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula"
 msgstr "Geçersiz giriş: '{bad_input}' formül olarak okunamadı"
 
 #. Translators: 'SchematicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr "ŞematikTepkiyi değerlendirirlen hata. Hata şöyleydi: {error_msg}"
 
@@ -941,7 +929,6 @@ msgid "The Staff answer could not be interpreted as a number."
 msgstr "Personelin cevabı bir sayı olarak algılanamadı."
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Could not interpret '{given_answer}' as a number."
 msgstr "'{given_answer}' bir sayı olarak algılanamadı."
 
@@ -984,13 +971,11 @@ msgid "Problem must be reset before it can be checked again."
 msgstr "Daha sonra yeniden kontrol edilmeden önce problem sıfırlanmalıdır."
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr "Yüklemeler arasında en az {wait} saniye beklemelisiniz."
 
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
 msgid "Error: {msg}"
 msgstr "Hata: {msg}"
 
@@ -1104,7 +1089,6 @@ msgid "Scored rubric"
 msgstr "Kaydedilmiş rubrik"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-#, python-brace-format
 msgid ""
 "You have attempted this question {number_of_student_attempts} times. You are"
 " only allowed to attempt it {max_number_of_attempts} times."
@@ -1147,7 +1131,6 @@ msgstr "YZ-Değerlendirme"
 #. responds to when filling out a post-assessment survey
 #. of his or her grade from an openended problem.
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-#, python-brace-format
 msgid ""
 "Could not find needed tag {tag_name} in the survey responses. Please try "
 "submitting again."
@@ -1255,30 +1238,31 @@ msgid "Error saving your score.  Please notify course staff."
 msgstr "Skorunuzu kaydederken hata. Lütfen ders çalışanlarına bildiriniz."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-#, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{statuc_code}."
 msgstr ""
+"Youtube'dan  {youtube_id} için altyazı alınamadı. Durum kodu: {statuc_code}."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "Can't find any transcripts on the Youtube service."
-msgstr ""
+msgstr "Youtube hizmetinde hiç bir altyazı bulunamadı."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
-msgstr ""
+msgstr "Sadece SubRip (*.srt) türünde altyazı biçimini destekliyoruz."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-#, python-brace-format
 msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
 "is {error_message}"
 msgstr ""
+"Subrip altyazı dosyası okunurken yanlışlık tespit edildi. İç mesaj "
+"{error_message}"
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "Something wrong with SubRip transcripts file during parsing."
-msgstr ""
+msgstr "Subrip altyazı dosyası okunurken yanlışlık tespit edildi."
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
@@ -1309,10 +1293,43 @@ msgstr "Arama"
 msgid "Copyright"
 msgstr "Telif Hakkı"
 
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid ""
+"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
+"{grade:.0f}/{max_grade:.0f} {questions})"
+msgstr ""
+"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
+"{grade:.0f}/{max_grade:.0f} {questions})"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "students"
+msgstr "öğrenciler"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "questions"
+msgstr "sorular"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid ""
+"{num_students} student(s) opened Subsection {subsection_num}: "
+"{subsection_name}"
+msgstr ""
+"{num_students} sayıda öğrenci(ler) Altbölüm açtı {subsection_num}: "
+"{subsection_name}"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid ""
+"{problem_info_x} {problem_info_n} - {count_grade} {students} "
+"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
+msgstr ""
+"{problem_info_x} {problem_info_n} - {count_grade} {students} "
+"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
+
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
-#, python-brace-format
 msgid "This is the wiki for **{organization}**'s _{course_name}_."
 msgstr "**{organization}**'s _{course_name}_ için Wiki."
 
@@ -1332,35 +1349,48 @@ msgstr "Bir makale eklemek için dersin wikisini ziyaret et"
 #. that leads to the content of a course
 #: lms/djangoapps/courseware/tabs.py
 msgid "Course Content"
-msgstr ""
+msgstr "Ders İçeriği"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Staff grading" appears on a tab that allows
+#. staff to view openended problems that require staff grading
+#: lms/djangoapps/courseware/tabs.py
 #: lms/templates/instructor/staff_grading.html
+#, fuzzy
 msgid "Staff grading"
-msgstr "Eğitmen Notlandırılması"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"Personel Notlandırılması\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Eğitmen Notlandırılması"
 
-#: lms/templates/courseware/syllabus.html
+#: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
+#, fuzzy
 msgid "Syllabus"
-msgstr "Takvim"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"Ders Programı\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Takvim"
 
 #. Translators: "Peer grading" appears on a tab that allows
 #. students to view openended problems that require grading
 #: lms/djangoapps/courseware/tabs.py
 msgid "Peer grading"
-msgstr ""
+msgstr "Kişiyle Notlandırma"
 
 #. Translators: 'Instructor' appears on the tab that leads to
 #. the instructor dashboard, which is a portal where an instructor
 #. can get data and perform various actions on their course
 #: lms/djangoapps/courseware/tabs.py
 msgid "Instructor"
-msgstr ""
+msgstr "Eğitmen"
 
 #: lms/djangoapps/courseware/features/video.py lms/templates/video.html
 msgid "ERROR: No playable video sources found!"
 msgstr "HATA: Oynatılabilir video kaynağı bulunamadı!"
 
 #: lms/djangoapps/dashboard/git_import.py
-#, python-brace-format
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
 " GIT_REPO_DIR"
@@ -1393,12 +1423,10 @@ msgid "The underlying module store does not support import."
 msgstr "Alt taraftaki modül içe aktarmayı desteklemiyor."
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed in authenticating {0}, error {1}\n"
 msgstr "{0}'ın kimliğini denetlerken başarısız olundu, hata {1}\n"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed in authenticating {0}\n"
 msgstr "Kimlik denetimi {0} için başarısız oldu\n"
 
@@ -1428,7 +1456,6 @@ msgid "email must end in"
 msgstr "eposta şununla bitmeli"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed - email {0} already exists as external_id"
 msgstr "Başarısız - eposta {0} external_id olarak zaten mevcut"
 
@@ -1441,27 +1468,22 @@ msgid "email address required (not username)"
 msgstr "e-posta adresi gerekli (kullanıcı adı değil)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Oops, failed to create user {0}, IntegrityError"
 msgstr "Ups, {0} kullanıcısı oluşturulamadı, IntegrityError"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "User {0} created successfully!"
 msgstr "Kullanıcı {0} başarıyla oluşturuldu!"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Cannot find user with email address {0}"
 msgstr "Eposta adresi {0} olan kullanıcı bulunamadı"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Cannot find user with username {0} - {1}"
 msgstr "{0} - {1} kullanıcı adıyla olan kullanıcı bulunamadı"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Deleted user {0}"
 msgstr "Silinmiş kullanıcı {0}"
 
@@ -1536,7 +1558,6 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
-#, python-brace-format
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr "{0} veri dizininde zaten bulunuyor! (Yine de yeniden yükleniyor)"
@@ -1546,12 +1567,10 @@ msgid "Unable to clone or pull repository. Please check your url."
 msgstr "Havuzu klonlayamadık veya çekemedik. Lütfen url'nizi kontrol ediniz."
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed to clone repository to {0}"
 msgstr "Havuzu {0}'a klonlama başarısız oldu"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Loaded course {0} {1}<br/>Errors:"
 msgstr "Yüklenmiş ders  {0} {1}<br/>Hatalar:"
 
@@ -1581,7 +1600,6 @@ msgid "Information about all courses"
 msgstr "Bütün dersler hakkında bilgi"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
 msgstr "Hata - {0}<br/><pre>{1}</pre> numaralı ders getirilemedi"
 
@@ -1670,12 +1688,10 @@ msgid "Comment level too deep"
 msgstr "Yorum Seviyesi Çok Derin"
 
 #: lms/djangoapps/django_comment_client/base/views.py
-#, python-format
 msgid "allowed file types are '%(file_types)s'"
 msgstr "Kabul edilen dosya türleri '%(file_types)s'"
 
 #: lms/djangoapps/django_comment_client/base/views.py
-#, python-format
 msgid "maximum upload file size is %(file_size)sK"
 msgstr "Maksimum dosya yükleme boyutu %(file_size)sK dır."
 
@@ -1731,12 +1747,10 @@ msgstr ""
 "aşağıdaki tabloda indirmek için hazır olacak."
 
 #: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr "Öğrenci {0} için teslim tarihi {1}'den {2}'ye değiştirildi"
 
 #: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
 msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr "Öğrenci {0} için teslim tarihi {1}'dan {2}'ye sıfırlandı"
 
@@ -1774,7 +1788,6 @@ msgid "Unable to parse date: "
 msgstr "Tarih okunamadı:"
 
 #: lms/djangoapps/instructor/views/tools.py
-#, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr "url: {0} için modül bulunamadı"
 
@@ -1802,7 +1815,6 @@ msgid "Extended Due Date"
 msgstr "Ertelenmiş Son Gün"
 
 #: lms/djangoapps/instructor/views/tools.py
-#, python-brace-format
 msgid "Users with due date extensions for {0}"
 msgstr "{0} için ek süre almış kullanıcılar"
 
@@ -1811,7 +1823,6 @@ msgid "Unit"
 msgstr "Birim"
 
 #: lms/djangoapps/instructor/views/tools.py
-#, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "{0} {1} ({2}) için ek süreler"
 
@@ -1851,12 +1862,10 @@ msgid "No status information available"
 msgstr "Durum bilgisi bulunmamaktadır."
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "No task_output information found for instructor_task {0}"
 msgstr "instructor_task {0} için task_output bilgisi bulunamadı"
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "No parsable task_output information found for instructor_task {0}: {1}"
 msgstr ""
 "instructor_task {0} için okunabilir task_output bilgisi bulunamadı: {1}"
@@ -1870,7 +1879,6 @@ msgid "No message provided"
 msgstr "Hiç bir mesaj verilmedi"
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Invalid task_output information found for instructor_task {0}: {1}"
 msgstr "instructor_task {0} için geçersiz task_output bilgisi bulundu: {1}"
 
@@ -1879,7 +1887,6 @@ msgid "No progress status information available"
 msgstr "İlerleme durum bilgisi bulunamadı"
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "No parsable task_input information found for instructor_task {0}: {1}"
 msgstr ""
 "instructor_task {0} için okunabilir task_output bilgisi bulunamadı: {1}"
@@ -1887,41 +1894,35 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} and {succeeded} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Progress: {action} {succeeded} of {attempted} so far"
 msgstr "İlerleme: {attempted} adetten {succeeded}'ı {action} oldu"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Unable to find submission to be {action} for student '{student}'"
 msgstr "Öğrenci  '{student}' için {action} olması için teslim bulunamadı "
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem failed to be {action} for student '{student}'"
 msgstr "Öğrenci '{student}' için problemde {action} başarısız oldu"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem successfully {action} for student '{student}'"
 msgstr "Öğrenci '{student}' için problemde {action} başarılı oldu"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Unable to find any students with submissions to be {action}"
 msgstr "Teslimi {action} olan hiç bir öğrenci bulunamadı"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem failed to be {action} for any of {attempted} students"
 msgstr ""
 "{attempted} öğrenciden herhangi bir tanesinde problem {action} olamadı"
@@ -1929,67 +1930,57 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem successfully {action} for {attempted} students"
 msgstr "{attempted} öğrenci için problem başarıyla {action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem {action} for {succeeded} of {attempted} students"
 msgstr "{attempted} sayıda öğrencinin {succeeded}'i için problem {action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Unable to find any recipients to be {action}"
 msgstr "{action} olması için herhangi bir alıcı bulunamadı"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Message failed to be {action} for any of {attempted} recipients "
 msgstr "{attempted} sayıdaki alıcı için, mesaj {action} başarısız oldu."
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Message successfully {action} for {attempted} recipients"
 msgstr "{attempted} sayıdaki alıcı için, mesaj {action} başarılı oldu"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Message {action} for {succeeded} of {attempted} recipients"
 msgstr "{attempted} alıcıdan {succeeded}'i için mesaj {action} "
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Status: {action} {succeeded} of {attempted}"
 msgstr "Durum: {action} {attempted} içinden {succeeded}"
 
 #. Translators: {skipped} is a count.  This message is appended to task
 #. progress status messages.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid " (skipping {skipped})"
 msgstr "(atlıyor {skipped})"
 
 #. Translators: {total} is a count.  This message is appended to task progress
 #. status messages.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid " (out of {total})"
 msgstr "({total} içinde)"
 
 #: lms/djangoapps/linkedin/templates/linkedin_email.html
-#, python-format
 msgid ""
 "\n"
 "      Dear %(student_name)s,\n"
@@ -1999,7 +1990,6 @@ msgstr ""
 "Değerli %(student_name)s,"
 
 #: lms/djangoapps/linkedin/templates/linkedin_email.html
-#, python-format
 msgid ""
 " \n"
 "    Congratulations on earning your certificate in %(course_name)s!\n"
@@ -2018,7 +2008,6 @@ msgid "Add to profile"
 msgstr "Profiline ekle"
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
-#, python-brace-format
 msgid ""
 "Could not contact the external grading server. Please contact the "
 "development team at {email}."
@@ -2063,7 +2052,6 @@ msgstr ""
 "noktasına bildirin."
 
 #: lms/djangoapps/open_ended_grading/utils.py
-#, python-brace-format
 msgid "for course {0} and student {1}."
 msgstr "{0} dersi ve {1} öğrencisi için."
 
@@ -2126,7 +2114,6 @@ msgid "Trying to add a different currency into the cart"
 msgstr "Sepete farklı bir para birimi eklemeye çalışılıyor"
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid ""
 "Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
 " enrollments."
@@ -2139,17 +2126,14 @@ msgid "[Refund] User-Requested Refund"
 msgstr "[İade] Kullanıcının Talep Ettiği İade"
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr "{course_id} için mod {mode} bulunmuyor "
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid "Certificate of Achievement, {mode_name} for course {course}"
 msgstr "Başarı Sertifikası, {course} dersi için {mode_name}"
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid ""
 "Note - you have up to 2 weeks into the course to unenroll from the Verified "
 "Certificate option and receive a full refund. To receive your refund, "
@@ -2239,13 +2223,8 @@ msgstr "Üniversite"
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
 #: cms/templates/widgets/header.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-#, fuzzy
 msgid "Course"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Ders\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Kurs"
+msgstr "Ders"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Course Announce Date"
@@ -2326,13 +2305,11 @@ msgstr "Talep ettiğiniz ders bulunmamaktadır."
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
-#, python-brace-format
 msgid "The course {0} is already in your cart."
 msgstr "{0} dersi zaten alışveriş sepetinizde."
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
-#, python-brace-format
 msgid "You are already registered in course {0}."
 msgstr "{0} dersine zaten kayıtlısınız."
 
@@ -2345,13 +2322,11 @@ msgid "You do not have permission to view this page."
 msgstr "Bu sayfayı görmek için yetkiniz yok."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr "Ödeme işlemcisi gerekli bir parametreyi döndürmedi: {0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
 "Ödeme işlemcisi, {1} parametresi için kötü yazılmış {0} değer döndürdü."
@@ -2363,7 +2338,6 @@ msgstr ""
 "Ödeme işlemcisi, numarası sistemimizde olmayan bir sipariş kabul etti."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
@@ -2372,7 +2346,6 @@ msgstr ""
 "maliyetinden farklı."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "            <p class=\"error_msg\">\n"
@@ -2394,7 +2367,6 @@ msgstr ""
 "</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2410,10 +2382,10 @@ msgstr ""
 "Af edersiniz! Ödeme işlemcimiz tutarsız bilgi bulunan ödeme teyidi gönderdi!\n"
 "Ödemenin hesaplarınızdan alındığını teyit edemiyor ve siparişinizde ilerleme kaydedemiyoruz.\n"
 "Spesifik hata mesajı:  <span class=\"exception_msg\">{msg}</span>.\n"
-"Kredi kartınızdan ücret çekilmiş olabilir. Ödemeyle ilgili sorularınız için {email} adresinden bizimle temasa geçiniz."
+"Kredi kartınızdan ücret çekilmiş olabilir. Ödemeyle ilgili sorularınız için {email} adresinden bizimle temasa geçiniz.\n"
+"</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2425,12 +2397,12 @@ msgid ""
 msgstr ""
 "\n"
 "<p class=\"error_msg\">\n"
-"Af edersiniz! Bir hata nedeniyle ödemeniz sipariş toplamında farklı bir rakamla gerçekleşti!\n"
+"Afedersiniz! Bir hata nedeniyle ödemeniz sipariş toplamında farklı bir rakamla gerçekleşti!\n"
 "Spesifik hata mesaji: <span class=\"exception_msg\">{msg}</span>.\n"
-"Kredi kartınızdan büyük bir olasılıkla ücret çekildi. Ödeme konusunda {email} adresi üzerinden bizimle temasa geçin."
+"Kredi kartınızdan büyük bir olasılıkla ücret çekildi. Ödeme konusunda {email} adresi üzerinden bizimle temasa geçin.\n"
+"</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2611,7 +2583,6 @@ msgstr ""
 "seçerek deneyin"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "            There is a problem with our CyberSource merchant configuration.  Please let us know at {0}\n"
@@ -2761,7 +2732,6 @@ msgid "Your Password Reset is Complete"
 msgstr "Parolanızın sıfırlama işlemi tamamlandı."
 
 #: lms/templates/registration/password_reset_complete.html
-#, python-format
 msgid ""
 "\n"
 "      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
@@ -2771,7 +2741,6 @@ msgstr ""
 "Şifreniz yollandı. Buradan devam edebilir %(link_start)s    , ya da buradan %(link_end)s şimdi giriş yapabilirsiniz."
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "      Reset Your %(platform_name)s Password\n"
@@ -2781,7 +2750,6 @@ msgstr ""
 "%(platform_name)s şifreni yenile ⏎"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "          Reset Your %(platform_name)s Password\n"
@@ -2795,7 +2763,6 @@ msgid "Password Reset Form"
 msgstr "Şifre Sıfırlama Formu"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "                We're sorry, %(platform_name)s enrollment is not available in your region\n"
@@ -2823,7 +2790,6 @@ msgid ""
 msgstr "Üzgünüz, sistemimiz parolanızı yenilerken sorun yaşıyor gözüküyor"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
@@ -2838,9 +2804,10 @@ msgid ""
 "correctly. <br /> Required fields are noted by <strong "
 "class=\"indicator\">bold text and an asterisk (*)</strong>."
 msgstr ""
-"Lütfen şifrenizi iki kere giriniz. Böylece sizin doğru yazdığınızdan emin "
-"olalım. <br /> Doldurulması zorunlu olan alanlar strong class=\"indicator\">"
-" koyu teksle yazılmış ve bir yıldız(*) işareti ile gösterilmiştir</strong>."
+"Lütfen şifrenizi iki kere giriniz, böylece sizin doğru yazdığınızdan emin "
+"olalım. <br /> Doldurulması zorunlu olan alanlar <strong "
+"class=\"indicator\"> koyu harflerle yazılmış ve bir yıldız (*) işareti ile "
+"gösterilmiştir</strong>."
 
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
@@ -2865,7 +2832,6 @@ msgid "Your Password Reset Was Unsuccessful"
 msgstr "Şifre değiştirme işleminiz başarısız."
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
@@ -2890,14 +2856,13 @@ msgstr ""
 "Yardım?"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
 "          "
 msgstr ""
 "\n"
-"Lütfen  %(start_link) sıkça sorulan sorular  ve iletişim bilgileri %(end_link)s ni görmek için  yardım sayfamızı  ziyaret edin."
+"Lütfen  %(start_link)s sıkça sorulan sorular  ve iletişim bilgileri %(end_link)s ni görmek için  yardım sayfamızı  ziyaret edin."
 
 #: lms/templates/registration/password_reset_email.html
 msgid ""
@@ -2910,6 +2875,14 @@ msgstr ""
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
 msgstr "Lütfen aşağıdaki sayfaya gidip yeni bir şifre seçiniz."
+
+#: lms/templates/registration/password_reset_email.html
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet reset your password."
+msgstr ""
+"Bu değişikliği talep etmediyseniz, bu epostayı dikkate almayınız - "
+"Şifresinizi henüz sıfırlamadık."
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Thanks for using our site!"
@@ -2951,7 +2924,7 @@ msgstr "Yazıyı sil"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: cms/templates/component.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
@@ -2992,6 +2965,9 @@ msgid "You are deleting an article. Please confirm."
 msgstr "Bir yazıyı silmek üzeresiniz. Lütfen onaylayın."
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
+#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
@@ -3019,6 +2995,7 @@ msgstr "Önizleme"
 #: lms/templates/help_modal.html lms/templates/login_modal.html
 #: lms/templates/signup_modal.html
 #: lms/templates/modal/_modal-settings-language.html
+#: lms/templates/modal/accessible_confirm.html
 msgid "Close Modal"
 msgstr "Kip Kapat"
 
@@ -3035,6 +3012,7 @@ msgstr "Wiki Önizleme"
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html
 #: lms/templates/modal/_modal-settings-language.html
+#: lms/templates/modal/accessible_confirm.html
 msgid "modal open"
 msgstr "Kip açık"
 
@@ -3136,7 +3114,6 @@ msgid "Restoring to this revision will mark the article as deleted."
 msgstr "Değişikliklerinizi yenilemek bu yazıyı silmenize neden olacaktır."
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#, python-format
 msgid ""
 "\n"
 "  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
@@ -3164,9 +3141,9 @@ msgid ""
 "This wiki uses <strong>Markdown</strong> for styling. There are several "
 "useful guides online. See any of the links below for in-depth details:"
 msgstr ""
-"Bu wiki strong>Markdown</strong>  kullanıyor. Online olarak çeşitli yardımcı"
-" kılavuzlar bulabilirsin. Eğer bunlardan birini detaylı olarak bulmak "
-"istiyorsan linklerden birini gözden geçirebilirsin :"
+"Bu wiki <strong>Markdown</strong>  kullanıyor. Çevrimiçi olarak çeşitli "
+"yardımcı kılavuzlar bulunuyor. Eğer bunlardan birini ayrıntılı olarak bulmak"
+" istiyorsan linklerden birini gözden geçirebilirsin:"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Markdown: Basics"
@@ -3257,7 +3234,6 @@ msgid "Quotes"
 msgstr "Alıntılar"
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
 msgid ""
 "\n"
 "        Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
@@ -3304,8 +3280,8 @@ msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
 msgstr ""
-"Bu makale için aşağıdaki dosyalar bulunmaktadır. Refer etmek için altı "
-"çizili tagı makalede kopyalayın."
+"Bu makale için aşağıdaki dosyalar bulunmaktadır. Bir dosyayı atfetmek için "
+"altı çizili etiketi makaleden kopyalayın."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Markdown tag"
@@ -3351,8 +3327,16 @@ msgstr "Düzeltmeler"
 msgid "There are no attachments for this article."
 msgstr "Bu yazı için hiç bir ek yok."
 
+#: cms/djangoapps/contentstore/course_info_model.py
+#: cms/djangoapps/contentstore/course_info_model.py
+msgid "Invalid course update id."
+msgstr "Geçersiz ders güncelleme numarası."
+
+#: cms/djangoapps/contentstore/course_info_model.py
+msgid "Course update not found."
+msgstr "Ders güncellemesi bulunamadı."
+
 #: cms/djangoapps/contentstore/git_export_utils.py
-#, python-brace-format
 msgid ""
 "GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
 "configure a different path with GIT_REPO_EXPORT_DIR"
@@ -3447,7 +3431,6 @@ msgid "Upload completed"
 msgstr "Yükleme Tamamlandı"
 
 #: cms/djangoapps/contentstore/views/course.py
-#, python-brace-format
 msgid ""
 "Unable to create course '{name}'.\n"
 "\n"
@@ -3501,12 +3484,10 @@ msgid "Could not find the course.xml file in the package."
 msgstr "Paket içinde ders.xml dosyası bulunamadı."
 
 #: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "{0} ın kopyası"
 
 #: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "'{0}' ın tekrarı"
 
@@ -3527,12 +3508,10 @@ msgid "Insufficient permissions"
 msgstr "Yetersiz yetki"
 
 #: cms/djangoapps/contentstore/views/user.py
-#, python-brace-format
 msgid "Could not find user by email address '{email}'."
 msgstr "'{email}' email adresine sahip kullanıcı bulunamadı."
 
 #: cms/djangoapps/contentstore/views/user.py
-#, python-brace-format
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
 "{email} epostasına sahip kullanıcı kayıtlıdır fakat hesabını "
@@ -3624,6 +3603,7 @@ msgstr "Kaydet"
 #: lms/templates/discussion/_new_post.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_discussion.mustache
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 #: lms/templates/verify_student/face_upload.html
@@ -3687,6 +3667,12 @@ msgstr "Görüntü ismi"
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "Preferred Language"
 msgstr "Tercih Edilen Dil"
+
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/unit_container_xblock_component.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Görüntüle"
 
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
@@ -4059,11 +4045,11 @@ msgstr "Parola Sıfırla"
 
 #: lms/templates/dashboard.html
 msgid "Current Courses"
-msgstr "Mevcut Kurslar"
+msgstr "Mevcut Dersler"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't registered for any courses yet."
-msgstr "Herhangi bir kurs için kaydınız gözükmüyor"
+msgstr "Herhangi bir ders için kaydınız gözükmüyor"
 
 #: lms/templates/dashboard.html
 msgid "Find courses now!"
@@ -4091,7 +4077,7 @@ msgstr "Ayarları Kaydet"
 
 #: lms/templates/dashboard.html
 msgid "Password Reset Email Sent"
-msgstr "Parola yenileme emaili göderildi"
+msgstr "Parola Yenileme Epostası Gönderildi"
 
 #: lms/templates/dashboard.html
 msgid ""
@@ -4103,7 +4089,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 msgid "Change Email"
-msgstr "Email Değiştir"
+msgstr "Eposta Değiştir"
 
 #: lms/templates/dashboard.html
 msgid "Please enter your new email address:"
@@ -4125,20 +4111,27 @@ msgstr ""
 msgid "Change your name"
 msgstr "Adınıızı değiştirin"
 
+#. Translators: note that {platform} {cert_name_short} will look something
+#. like: "edX certificate". Please do not change the order of these
+#. placeholders.
 #: lms/templates/dashboard.html
-#: lms/templates/verify_student/_modal_editname.html
 msgid ""
-"To uphold the credibility of {platform} certificates, all name changes will "
-"be logged and recorded."
+"To uphold the credibility of your {platform} {cert_name_short}, all name "
+"changes will be logged and recorded."
 msgstr ""
-"{platform}'nun kredisini yüksek tutabilmek için, bütün isim değişiklikleri "
-"loglanacak ve kaydedilecektir."
+"{platform} {cert_name_short}'nızın tanınırlılığını üst düzeyde tutmak için, "
+"bütün isim değişiklikleri tutulacak ve kaydedilecektir."
 
+#. Translators: note that {platform} {cert_name_short} will look something
+#. like: "edX certificate". Please do not change the order of these
+#. placeholders.
 #: lms/templates/dashboard.html
 msgid ""
-"Enter your desired full name, as it will appear on the {platform} "
-"certificates:"
-msgstr " {platform} sertifikalarında gözükecek olaran tam isminizi girin:"
+"Enter your desired full name, as it will appear on your {platform} "
+"{cert_name_short}:"
+msgstr ""
+"{platform} {cert_name_short}'nızda gözükeceği gibi, arzu ettiğiniz tam "
+"isminizi giriniz:"
 
 #: lms/templates/dashboard.html
 #: lms/templates/verify_student/_modal_editname.html
@@ -4154,7 +4147,7 @@ msgid ""
 "<span id=\"track-info\"></span> {course_number}?  <span id=\"refund-"
 "info\"></span>"
 msgstr ""
-"<span id=\"track-info\"></span> {ders numarası}? <span id=\"refund-"
+"<span id=\"track-info\"></span> {course_number}? <span id=\"refund-"
 "info\"></span>"
 
 #: lms/templates/dashboard.html
@@ -4392,6 +4385,16 @@ msgstr "Öneri yapın"
 #: lms/templates/help_modal.html
 msgid "Ask a question"
 msgstr "Soru sor"
+
+#: lms/templates/help_modal.html
+msgid ""
+"Please note: The {platform_name} support team is English speaking. While we "
+"will do our best to address your inquiry in any language, our responses will"
+" be in English."
+msgstr ""
+"Lütfen dikkat:  {platform_name} destek takımı İngilizce bilmektedir. "
+"Herhangi bir dilde yazılan soruları anlamak için elimizden geleni yaparken, "
+"yanıtlarımız İngilizce olacaktır."
 
 #: lms/templates/help_modal.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
@@ -4761,7 +4764,7 @@ msgstr "Reddedildi"
 msgid "Pending name changes"
 msgstr "Bekleyen isim değişiklikleri"
 
-#: lms/templates/name_changes.html
+#: lms/templates/name_changes.html lms/templates/modal/accessible_confirm.html
 msgid "Confirm"
 msgstr "Onayla"
 
@@ -4851,9 +4854,8 @@ msgstr ""
 "parti siteye gönderdiğimize dikkat ediniz."
 
 #: lms/templates/provider_login.html
-#, python-format
 msgid "Return To %s"
-msgstr "%s e dön"
+msgstr "%s e Geri Dön"
 
 #: lms/templates/register-shib.html
 msgid "Preferences for {platform_name}"
@@ -5007,7 +5009,7 @@ msgstr "{platform_name} hesabınızı oluşturmak için aşağıda kaydolun"
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
-msgstr "Kayıt olmak için lütfen aşağıdaki alanları doldurun."
+msgstr "Kayıt olmak için lütfen aşağıdaki gerekli alanları tamamlayın."
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "cannot be changed later"
@@ -5126,7 +5128,7 @@ msgstr "Genel Kullanıcı Adı*"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. yourname (shown on forums)"
-msgstr "ör. isminiz (forumda gözükecek)"
+msgstr "ör. isminiz (forumlarda gözükecek)"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "Full Name *"
@@ -5402,7 +5404,7 @@ msgstr "İzleme geçmişi"
 
 #: lms/templates/tracking_log.html
 msgid "datetime"
-msgstr "Gün zamanı"
+msgstr "Günzaman"
 
 #: lms/templates/tracking_log.html
 msgid "ipaddr"
@@ -5826,7 +5828,7 @@ msgstr "Önde gelen üniversitelerin ücretsiz kurslarını görüntüle"
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from {university_name}."
-msgstr "{university_name} üniversitesinden bedava kursları görüntüle"
+msgstr "{university_name} üniversitesinden ücretsiz dersleri görüntüle"
 
 #: lms/templates/courseware/courseware-error.html
 msgid ""
@@ -6022,6 +6024,10 @@ msgid "Manage Groups"
 msgstr "Grupları yönet"
 
 #: lms/templates/courseware/instructor_dashboard.html
+msgid "Metrics"
+msgstr "Ölçümler"
+
+#: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
 msgstr "Not İndirmeler"
 
@@ -6196,6 +6202,8 @@ msgid "Pull enrollment from remote gradebook"
 msgstr "Kayıt bilgilerini uzaktaki not defterinden çek"
 
 #: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section:"
 msgstr "Altbölüm:"
 
@@ -6361,6 +6369,40 @@ msgid "Points Earned (Num Students)"
 msgstr "Kazanılan Puanlar (Öğrenci Sayısı)"
 
 #: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "There is no data available to display at this time."
+msgstr "Şu anda gösterilecek veri bulunmuyor."
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid ""
+"Loading the latest graphs for you; depending on your class size, this may "
+"take a few minutes."
+msgstr ""
+"En son grafikler yükleniyor; sınıfınızın büyüklüğüne göre, bu bir kaç dakika"
+" alabilir."
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Count of Students that Opened a Subsection"
+msgstr "Bir Altbölüm Açmış Öğrencilerin Sayısı"
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Loading..."
+msgstr "Yüklüyor..."
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade Distribution per Problem"
+msgstr "Her Problem için Not Dağılımı"
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "There are no problems in this section."
+msgstr "Bu bölümde problem bulunmamaktadır."
+
+#: lms/templates/courseware/instructor_dashboard.html
 msgid "Students answering correctly"
 msgstr "Doğru yanıtlayan öğrenciler"
 
@@ -6510,41 +6552,38 @@ msgid "Your final grade:"
 msgstr "Final notunuz:"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Grade required for a certificate:"
-msgstr "Sertifika için gerekli not:"
+msgid "Grade required for a {cert_name_short}:"
+msgstr "Bir {cert_name_short} için not gerekiyor:"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
-"Your verified certificate is being held pending confirmation that the "
-"issuance of your certificate is in compliance with strict U.S. embargoes on "
+"Your verified {cert_name_long} is being held pending confirmation that the "
+"issuance of your {cert_name_short} is in compliance with strict U.S. "
+"embargoes on Iran, Cuba, Syria and Sudan. If you think our system has "
+"mistakenly identified you as being connected with one of those countries, "
+"please let us know by contacting {email}. If you would like a refund on your"
+" {cert_name_long}, please contact our billing address {billing_email}"
+msgstr ""
+"Onaylanmış sertifikanızın {cert_name_long} verilişi, {cert_name_short} "
+"sertifikanızın A.B.D.'inin İran, Küba, Suriye ve Sudan için koyduğu "
+"amborgalara uyup uymadığının kontrol edilmesi için bekletiliyor. Eğer "
+"sistemimizin sizi yanlışlıkla söz konusu ülkelerle ilişkilendirdiğini "
+"düşünüyorsanız, {email} adresi üzerinden bizimle temasa geçiniz.  "
+"{cert_name_long} sertifikanızın ücretini geri almak isterseniz, ödeme "
+"adresimizle {billing_email} temasa geçiniz"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid ""
+"Your {cert_name_long} is being held pending confirmation that the issuance "
+"of your {cert_name_short} is in compliance with strict U.S. embargoes on "
 "Iran, Cuba, Syria and Sudan. If you think our system has mistakenly "
 "identified you as being connected with one of those countries, please let us"
-" know by contacting {email}. If you would like a refund on your certificate,"
-" please contact our billing address {billing_email}"
+" know by contacting {email}."
 msgstr ""
-"Onaylanmış sertifikanızın verilişinin, A.B.D.'inin İran, Küba, Suriye ve "
-"Sudan için koyduğu amborgalara uyup uymadığının kontrol edilmesi için "
-"bekletiliyor. Eğer sistemimizin yanlışlıkla sözkonusu ülkelerle sizi "
-"ilişkilendirdiğini düşünüyorsanız, {email} adresi üzerinden bizimle temasa "
-"geçiniz. Sertifikanızın ücretini geri almak isterseniz, ödeme adresimizle "
-"{billing_email} temasa geçiniz"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"Your certificate is being held pending confirmation that the issuance of "
-"your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, "
-"Syria and Sudan. If you think our system has mistakenly identified you as "
-"being connected with one of those countries, please let us know by "
-"contacting {email}."
-msgstr ""
-"sertifikanız A.B.D.'nin ambargo uyguladığı, İran, Küba, suriye ve Sudan'la "
-"ilgili duruma uygunluğu kontrol edilmek üzere askıdadır. Sistemimizin bu "
-"ülkelerle ilişkinizin yanlış değerlendirildiğini düşünüyorsanız, {email} "
-"adresi üzerinden bizimle temasa geçiniz."
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your Certificate is Generating"
-msgstr "Sertifikanız oluşturuluyor"
+msgid "Your {cert_name_short} is Generating"
+msgstr "{cert_name_short}'nız Oluşturuluyor"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -6553,32 +6592,31 @@ msgstr "Bu link PDF formatında açılacak/indirilecek"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download Your Certificate (PDF)"
-msgstr "Sertifikanızı İndiriniz (PDF)"
+msgid "Download Your {cert_name_short} (PDF)"
+msgstr "İndir {cert_name_short} (PDF)"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
-"Since we did not have a valid set of verification photos from you when "
-"certificates were generated, we could not grant you a verified certificate. "
-"An honor code certificate has been granted instead."
+"Since we did not have a valid set of verification photos from you when your "
+"{cert_name_long} was generated, we could not grant you a verified "
+"{cert_name_short}. An honor code {cert_name_short} has been granted instead."
 msgstr ""
-"Sertifikalar oluşturulurken, sizden geçerli sayıda doğrulama fotoğrafı "
-"almadığımızdan, size doğrulanmış bir sertifika veremiyoruz. Bunun yerine "
-"onur kodu sertifikası veriyoruz."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
-"This link will open/download a PDF document of your verified certificate."
+"This link will open/download a PDF document of your verified "
+"{cert_name_long}."
 msgstr ""
-"Bu link, kimlik denetimli sertifikanızı açma/indirme için kullanılacak."
+"Bu link kimlik onaylı {cert_name_long}'nızı PDF dokümanı olarak aç/indir "
+"için kullanılabilir."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download Your ID Verified Certificate of Achievement (PDF)"
-msgstr "Kimlik Onaylı Başarı Sertifikanızı (PDF) indirin"
+msgid "Download Your ID Verified {cert_name_short} (PDF)"
+msgstr "Kimlik Onaylı {cert_name_short} (PDF)'ınızı İndirin"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
-msgstr "Kurs geri bildirim anketini tamamla"
+msgstr "Ders geri bildirim anketini tamamla"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -6627,13 +6665,15 @@ msgstr "Bu dersi kimliği doğrulanmış öğrenci olarak al"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"You can still sign up for an ID verified certificate for this course. If you"
-" plan to complete the whole course, it is a great way to recognize your "
-"achievement. {a_start}Learn more about verified certificates{a_end}."
+"You can still sign up for an ID verified {cert_name_long} for this course. "
+"If you plan to complete the whole course, it is a great way to recognize "
+"your achievement. {link_start}Learn more about the verified "
+"{cert_name_long}{link_end}."
 msgstr ""
-"Hala bu derse kimlik onaylı sertifika için kaydolabilirsiniz. Bütün dersi "
-"tamamlamak istiyorsanız, başarınızın tanınması için güzel bir yol. "
-"{a_start}Kimlik onaylı sertifika hakkında daha fazla öğrenin{a_end}."
+"Hala bu derste kimlik onaylı {cert_name_long} için kayıt yaptırabilirsiniz. "
+"Bütün dersi bitirmeyi planlıyorsanız, başarınızı belgelemek için önemli "
+"olduğunu biliniz. {link_start}kimlik onaylı {cert_name_long} için daha fazla"
+" bilgi için{link_end}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified Track"
@@ -6646,6 +6686,21 @@ msgstr "Arşivlenmiş Kursları Görüntüle"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Course"
 msgstr "Kursa Gözat"
+
+#. Translators: The course's name will be added to the end of this sentence.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unregister from"
+msgstr "Kaydınızı şundan silmek konusunda emin misiniz "
+
+#. Translators: The course's name will be added to the end of this sentence.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"Are you sure you want to unregister from the verified {cert_name_long} track"
+" of"
+msgstr ""
+"Kimlik onaylı {cert_name_long} sertifika yolundan kaydınızı sildirmek "
+"istediğinize emin misiniz"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
@@ -6975,17 +7030,15 @@ msgid "Report Misuse"
 msgstr "Yanlış Kullanımı Rapor Edin"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "pin this thread"
-msgstr "Bu ipliği işaretle"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Pin Thread"
 msgstr "İşaret İpliği"
 
 #: lms/templates/discussion/_underscore_templates.html
-#, python-format
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
+msgid "Pinned"
+msgstr "İşaretli"
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid "(this post is about %(courseware_title_linked)s)"
 msgstr "(bu ileti %(courseware_title_linked)s) hakkında)"
 
@@ -7030,15 +7083,21 @@ msgstr "Cevap güncelle"
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Delete Comment"
-msgstr ""
+msgstr "Yorumu Sil"
 
 #: lms/templates/discussion/_underscore_templates.html
-#, python-format
 msgid "-posted %(time_ago)s by"
 msgstr "-%(time_ago)s yayınlandı, tarafından"
 
 #: lms/templates/discussion/_underscore_templates.html
-#, python-format
+msgid "Editing comment"
+msgstr "Yorum değiştiriliyor"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Update comment"
+msgstr "Yorumu güncelle"
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
 "unread comments)%(span_close)s"
@@ -7047,12 +7106,10 @@ msgstr ""
 "okunmamış yorumlar)%(span_close)s"
 
 #: lms/templates/discussion/_underscore_templates.html
-#, python-format
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
 msgstr "%(comments_count)s %(span_sr_open)s yorumlar %(span_close)s"
 
 #: lms/templates/discussion/_underscore_templates.html
-#, python-format
 msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
 msgstr "%(votes_up_count)s%(span_sr_open)s oylar %(span_close)s"
 
@@ -7117,13 +7174,11 @@ msgid ", "
 msgstr ","
 
 #: lms/templates/discussion/_user_profile.html
-#, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
 msgstr[0] "%s yorum başladı"
 
 #: lms/templates/discussion/_user_profile.html
-#, python-format
 msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s yorum"
@@ -7170,10 +7225,6 @@ msgstr "Tartışmayı gizle"
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "This thread has been pinned by course staff."
 msgstr "Bu iplik ders çalışanları tarafından işaretlendi."
-
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "Pinned"
-msgstr "İşaretli"
 
 #: lms/templates/discussion/mustache/_pagination.mustache
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -7425,7 +7476,7 @@ msgid ""
 "you cannot use this tool to make an assignment due earlier for a particular "
 "student."
 msgstr ""
-"Bu bölümde, spesifik ünitelerde bazı öğrencilere uzatma verme imkanına "
+"Bu bölümde, spesifik birimlerde bazı öğrencilere uzatma verme imkanına "
 "sahipsiniz. En son günün her zaman için son olduğunu ve bu araçla özel bir "
 "öğrenci için teslim tarihini öne çekemeyeceğinizi bilmelisiniz."
 
@@ -7676,6 +7727,14 @@ msgstr ""
 "işaretleyebilir, iplikleri kapayabilir veya yeniden açabilir, yanıtları "
 "destekleyebilir ve bütün kohortlardan gelen mesajları görebilir. İletileri, "
 "'Topluluk Öğretim Görevlisi' olarak işaretlenir."
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Reload Graphs"
+msgstr "Grafikleri Yeniden Yükle"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Count of Students Opened a Subsection"
+msgstr "Bir Altbölüm Açmış Öğrencilerin Sayısı"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -8085,7 +8144,7 @@ msgstr "Aktivasyon tamamlandı!"
 
 #: lms/templates/registration/activation_complete.html
 msgid "Account already active!"
-msgstr "Hesap aktif edilmiş!"
+msgstr "Hesap zaten aktif edilmiş!"
 
 #: lms/templates/registration/activation_complete.html
 msgid "You can now {link_start}log in{link_end}."
@@ -8101,9 +8160,9 @@ msgid ""
 "e-mail programs will sometimes split it into two lines. If you still have "
 "issues, e-mail us to let us know what happened at {email}."
 msgstr ""
-"Birşeyler ters gitti. URL in dogru olduğuna emin olun, e-mail programlari "
-"bazen satırları ikiye ayırabiliyor. Hala sorun yaşıyorsanız bize e-mail "
-"atarak bilgilendirin {email}."
+"Birşeyler ters gitti. URL in doğru olduğuna emin olun, e-mail programları "
+"bazen satırları ikiye ayırabiliyor. Hala sorun yaşıyorsanız e-mail atarak "
+"bizi bilgilendirin {email}."
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Or you can go back to the {link_start}home page{link_end}."
@@ -8422,6 +8481,20 @@ msgstr ""
 "kullanılmamaktadır ama Open edX kurulumlarındaki olası kullanımı için burada"
 " bırakılmıştır."
 
+#: lms/templates/static_templates/embargo.html
+msgid "This Course Unavailable In Your Country"
+msgstr "Bu Ders Ülkenizde Sunulmamaktadır"
+
+#: lms/templates/static_templates/embargo.html
+msgid ""
+"Our system indicates that you are trying to access an edX course from an IP "
+"address associated with a country currently subjected to U.S. economic and "
+"trade sanctions. Unfortunately, at this time edX must comply with export "
+"controls, and we cannot allow you to access this particular course. Feel "
+"free to browse our catalogue to find other courses you may be interested in "
+"taking."
+msgstr ""
+
 #: lms/templates/static_templates/honor.html
 #: lms/templates/static_templates/honor.html
 msgid "Honor Code"
@@ -8495,6 +8568,14 @@ msgstr "İsminizi Düzeltiniz"
 #: lms/templates/verify_student/face_upload.html
 msgid "The following error occurred while editing your name:"
 msgstr "İsminizi düzeltirken aşağıdaki hata oluştu:"
+
+#: lms/templates/verify_student/_modal_editname.html
+msgid ""
+"To uphold the credibility of {platform} certificates, all name changes will "
+"be logged and recorded."
+msgstr ""
+"{platform}'nun kredisini yüksek tutabilmek için, bütün isim değişiklikleri "
+"loglanacak ve kaydedilecektir."
 
 #: lms/templates/verify_student/_modal_editname.html
 msgid "Change my name"
@@ -9461,10 +9542,6 @@ msgid "You have decided to pay $ "
 msgstr "Şu kadar ücret ödemeyi kabul ettiniz $"
 
 #: lms/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Görüntüle"
-
-#: lms/templates/wiki/includes/article_menu.html
 #: lms/templates/wiki/includes/article_menu.html
 #: lms/templates/wiki/includes/article_menu.html
 #: lms/templates/wiki/includes/article_menu.html
@@ -9608,10 +9685,10 @@ msgstr "Başka Dosya Yükle"
 msgid "Content"
 msgstr "İçerik"
 
-#: cms/templates/asset_index.html cms/templates/course_info.html
-#: cms/templates/edit-tabs.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/overview.html
-#: cms/templates/textbooks.html
+#: cms/templates/asset_index.html cms/templates/container.html
+#: cms/templates/course_info.html cms/templates/edit-tabs.html
+#: cms/templates/index.html cms/templates/manage_users.html
+#: cms/templates/overview.html cms/templates/textbooks.html
 msgid "Page Actions"
 msgstr "Sayfa İşlemleri"
 
@@ -9629,8 +9706,30 @@ msgstr ""
 "dosyalar da bu listede görünecektir. Bu dosyalar arasında ders imgesi, kitap"
 " üniteleri ve Ders Bildirileri yan bölümünde görünenler bulunmaktadır. "
 
-#: cms/templates/asset_index.html cms/templates/overview.html
-#: cms/templates/settings_graders.html
+#: cms/templates/asset_index.html
+msgid "File URLs"
+msgstr "Dosya URL'leri"
+
+#: cms/templates/asset_index.html
+msgid ""
+"You use the Embed URL value to link to the file or image from a component, a"
+" course update, or a course handout."
+msgstr ""
+"Bir bileşendeki dosyaya veya imgeye, ders güncellemesine veya ders "
+"materyallerine link vermek için URL Göm kullanın."
+
+#: cms/templates/asset_index.html
+msgid ""
+"You use the External URL value to reference the file or image from outside "
+"of your course. Do not use the External URL as a link value within your "
+"course."
+msgstr ""
+"Dosyaya veya dersinizin dışındaki resme atıfta bulunmak için Dış URL "
+"kullanabilirsiniz. Dersinizin içindeki yerlere bağlantı değeri olarak Dış "
+"URL kullanmayınız."
+
+#: cms/templates/asset_index.html cms/templates/container.html
+#: cms/templates/overview.html cms/templates/settings_graders.html
 msgid "What can I do on this page?"
 msgstr "Bu sayfada ne yapabilirim?"
 
@@ -9643,14 +9742,6 @@ msgstr ""
 "Yeni dosyalar yükleyebilir veya görebilir, var olan dosyaları indirebilir "
 "veya silebilirsiniz. Hatta bir dosyayı kilitleyerek derse üye olmamış "
 "kişilerin bu dosyaya erişimlerini engelleyebilirsiniz."
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the URL listed for a file to create a link to that file in the Course "
-"Handouts sidebar or in the body of the course."
-msgstr ""
-"Ders Bildirileri yan bölümüne veya ders gövdesine bir bağlantı oluşturmak "
-"için dosya için listelenmiş URL'yi kullanın."
 
 #: cms/templates/asset_index.html
 msgid "Your file has been deleted."
@@ -9699,22 +9790,41 @@ msgstr ""
 msgid "Editor"
 msgstr "Editör"
 
-#: cms/templates/component.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr "Kopyasını Çıkar"
 
-#: cms/templates/component.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate this component"
 msgstr "Bu bileşenin kopyasını çıkarın"
 
-#: cms/templates/component.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Delete this component"
 msgstr "Bu bileşeni silin"
 
 #: cms/templates/component.html cms/templates/overview.html
 #: cms/templates/overview.html
+#: cms/templates/unit_container_xblock_component.html
 msgid "Drag to reorder"
 msgstr "Tekrar düzenlemek için sürükle"
+
+#: cms/templates/container.html cms/templates/ux/reference/container.html
+msgid "Container"
+msgstr "Taşıyıcı"
+
+#: cms/templates/container.html cms/templates/studio_vertical_wrapper.html
+msgid "No Actions"
+msgstr "Aksiyon Yok"
+
+#: cms/templates/container.html
+msgid ""
+"You can view course components that contain other components on this page. "
+"In the case of experiment blocks, this allows you to confirm that you have "
+"properly configured your experiment groups."
+msgstr ""
+"Bu sayfada diğer bileşenleri içeren ders bileşenlerini görebilirsiniz. Denet"
+" blokları durumunda, bu deney gruplarınızı uygun şekilde kurmanızı "
+"onaylamanızı sağlar."
 
 #: cms/templates/course_info.html cms/templates/course_info.html
 msgid "Course Updates"
@@ -9878,9 +9988,10 @@ msgid ""
 "having problems accessing things, please feel free to {link_start}contact "
 "Studio support{link_end} for further help."
 msgstr ""
-"Üzgünüz, aradığınız stüdyo sayfası bulunamamıştır. Stüdyo panaline dönüp "
-"tekrar deneyebilirsiniz. Eğer probleminiz devam ediyor ise  {link start} "
-"Stüdyo destek  {link_end} ile iletişime geçebilirsiniz."
+"Üzgünüz, aradığınız Stüdyo sayfası bulunamamıştır. Stüdyo paneline dönüp "
+"tekrar deneyebilirsiniz. Eğer probleminiz devam ediyor ise  "
+"{link_start}Stüdyo destekle iletişime geçle{link_end} daha fazla yardım "
+"alabilirsiniz."
 
 #: cms/templates/error.html cms/templates/error.html
 #: cms/templates/widgets/footer.html cms/templates/widgets/header.html
@@ -9944,7 +10055,7 @@ msgstr "Dersim {em_end} veri {em_start} ile dışarı aktarıldı."
 
 #: cms/templates/export.html
 msgid "Course Content (all Sections, Sub-sections, and Units)"
-msgstr "Ders İçeriği (Bütün Bölümler, Alt-Bölümler ve Üniteler)"
+msgstr "Ders İçeriği (Bütün Bölümler, Alt-Bölümler ve Birimler)"
 
 #: cms/templates/export.html
 msgid "Course Structure"
@@ -10009,7 +10120,7 @@ msgid ""
 "information, discussion forum data, course settings, and course team "
 "information, is not exported."
 msgstr ""
-"Sadece ders içeriği ve yapısı (bölümler, altbölümler ve ünitelerle birlikte)"
+"Sadece ders içeriği ve yapısı (bölümler, altbölümler ve birimlerle birlikte)"
 " dışa aktarılır. Diğer veriler, örneğin notlandırma bilgileri, tartışma "
 "forum verileri, ders ayarları ve ders takım bilgileri, dışarı "
 "aktarılmamaktadır."
@@ -10128,8 +10239,8 @@ msgid ""
 "Studio uses a simple hierarchy of <strong>sections</strong> and "
 "<strong>subsections</strong> to organize your content."
 msgstr ""
-"Stüdyo basit cbir hiyerarşi ile <strong> sınıflar <strong> ve  <strong> alt "
-"sınıflar <strong> dan oluşarak içerik oluşturmanıza yardımcı olur."
+"Stüdyo basit bir hiyerarşi ile <strong>bölümler</strong> ve  <strong>alt "
+"bölümler</strong> dan oluşarak içerik oluşturmanıza yardımcı olur."
 
 #: cms/templates/howitworks.html
 msgid "Change Your Mind Anytime"
@@ -10467,7 +10578,7 @@ msgid ""
 "information, discussion forum data, course settings, and course team "
 "information, remains the same as it was in the existing course."
 msgstr ""
-"Dersin içeriği ve yapısı (bölümler, alt bölümler ve üniteler) içe aktarılır."
+"Dersin içeriği ve yapısı (bölümler, alt bölümler ve birimler) içe aktarılır."
 " Öğrenci verisi, norlandırma bilgisi, tartışma forum verisi ve ders takım "
 "bilgisi gibi diğer veriler, var olan dersteki gibi değişmeden kalır."
 
@@ -10772,7 +10883,6 @@ msgid "contact edX Staff with further questions"
 msgstr "Daha fazla soru için edX çalışanlarıyla iletişime geçin"
 
 #: cms/templates/index.html
-#, python-format
 msgid "Thanks for signing up, %(name)s!"
 msgstr "Kayıt olduğun için teşekkürler  %(name)s!"
 
@@ -10781,7 +10891,6 @@ msgid "We need to verify your email address"
 msgstr "E-posta adresinizi doğrulamamız gerekiyor."
 
 #: cms/templates/index.html
-#, python-format
 msgid ""
 "Almost there! In order to complete your sign up we need you to verify your "
 "email address (%(email)s). An activation message and next steps should be "
@@ -10991,7 +11100,7 @@ msgstr "Yeni Alt-bölüm"
 
 #: cms/templates/overview.html cms/templates/widgets/units.html
 msgid "New Unit"
-msgstr "Yeni Ünite"
+msgstr "Yeni Birim"
 
 #: cms/templates/overview.html
 msgid "You haven't added any sections to your course outline yet."
@@ -11075,7 +11184,7 @@ msgid ""
 " Any units marked private will only be visible to admins."
 msgstr ""
 "Aşağıda belirlenen tarihte, bu bölüm - {name} - öğrencilere sunulacaktır. "
-"Özel olarak işaretlenen üniteler sadece yöneticiler tarafından "
+"Özel olarak işaretlenen birimler sadece yöneticiler tarafından "
 "görüntülenebilir. "
 
 #: cms/templates/overview.html
@@ -11116,7 +11225,7 @@ msgstr " Bulunduğunuz Yer"
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr "{a_start} Hizmet Şartlarını {a_start} kabul ediyorum"
+msgstr "{a_start} Hizmet Şartlarını {a_end} kabul ediyorum"
 
 #: cms/templates/register.html
 msgid "Create My Account &amp; Start Authoring Courses"
@@ -11328,7 +11437,6 @@ msgid "your course summary page"
 msgstr "Dersinizin özet sayfası"
 
 #: cms/templates/settings.html
-#, python-format
 msgid ""
 "Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
 msgstr ""
@@ -11562,6 +11670,11 @@ msgstr ""
 "her bir görevin öğrencinin notuna ne kadar katkıda bulunacağını "
 "belirleyebilirsiniz."
 
+#: cms/templates/studio_vertical_wrapper.html
+#: cms/templates/studio_vertical_wrapper.html
+msgid "Expand or Collapse"
+msgstr "Genişlet veya Daralt"
+
 #: cms/templates/textbooks.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
 msgid "Textbooks"
@@ -11608,7 +11721,7 @@ msgstr ""
 
 #: cms/templates/unit.html cms/templates/ux/reference/unit.html
 msgid "Individual Unit"
-msgstr "Tek Ünite"
+msgstr "Tek Birim"
 
 #: cms/templates/unit.html
 msgid "You are editing a draft."
@@ -11616,7 +11729,7 @@ msgstr "Bir taslak yazıyı düzenliyorsunuz."
 
 #: cms/templates/unit.html
 msgid "This unit was originally published on {date}."
-msgstr "Bu ünite orijinal olarak şu tarihte {date} yayınlandı."
+msgstr "Bu birim orijinal olarak şu tarihte {date} yayınlandı."
 
 #: cms/templates/unit.html
 msgid "View the Live Version"
@@ -11636,7 +11749,7 @@ msgstr "Gelişmiş"
 
 #: cms/templates/unit.html
 msgid "Unit Settings"
-msgstr "Ünite Ayarları"
+msgstr "Birim Ayarları"
 
 #: cms/templates/unit.html
 msgid "Visibility:"
@@ -11655,7 +11768,7 @@ msgid ""
 "This unit has been published. To make changes, you must {link_start}edit a "
 "draft{link_end}."
 msgstr ""
-"Ünite yayına koyuldu. Değişiklik yapmak için,  {link_start} taslağı düzenle "
+"Birim yayına koyuldu. Değişiklik yapmak için,  {link_start} taslağı düzenle "
 "gerekmektedir {link_end}."
 
 #: cms/templates/unit.html
@@ -11663,14 +11776,13 @@ msgid ""
 "This is a draft of the published unit. To update the live version, you must "
 "{link_start}replace it with this draft{link_end}."
 msgstr ""
-"Bu yayınlanan ünite için bir taslaktır. Görünür sürümünü güncellemek için  "
+"Bu yayınlanan birim için bir taslaktır. Görünür sürümünü güncellemek için  "
 "{link_start} yazıyı bu taslak ile değiştir {link_end} e tıklamanız "
 "gerekmektedir."
 
 #: cms/templates/unit.html
 msgid "This unit is scheduled to be released to <strong>students</strong>"
-msgstr ""
-"Bu ünite şu <strong> öğrencilere <strong> açılmak üzere ayarlanmıştır."
+msgstr "Bu birim şu <strong>öğrencilere</strong> açılmak üzere ayarlanmıştır."
 
 #: cms/templates/unit.html
 msgid "on {date}"
@@ -11686,11 +11798,11 @@ msgstr "Taslağı sil"
 
 #: cms/templates/unit.html
 msgid "Unit Location"
-msgstr "Ünite Yeri"
+msgstr "Birim Yeri"
 
 #: cms/templates/unit.html
 msgid "Unit Identifier:"
-msgstr "Ünite No:"
+msgstr "Birim No:"
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
@@ -11770,10 +11882,6 @@ msgid ""
 msgstr ""
 "Hesabınızı aktifleştirmek için gerekli komutlarla birlikte {email} adresine "
 "aktivasyon linklerini içeren bir mesaj gönderildi."
-
-#: cms/templates/ux/reference/container.html
-msgid "Container"
-msgstr "Taşıyıcı"
 
 #: cms/templates/widgets/footer.html
 msgid "All rights reserved."
@@ -11952,11 +12060,11 @@ msgstr "isim"
 
 #: cms/templates/widgets/units.html
 msgid "Delete this unit"
-msgstr "Bu üniteyi sil"
+msgstr "Bu birimi sil"
 
 #: cms/templates/widgets/units.html
 msgid "Delete unit"
-msgstr "Üniteyi sil"
+msgstr "Birimi sil"
 
 #: cms/templates/widgets/units.html
 msgid "Drag to sort"
@@ -11964,7 +12072,7 @@ msgstr "Sıralama için sürükle"
 
 #: cms/templates/widgets/units.html
 msgid "Drag to reorder unit"
-msgstr "Üniteleri yeniden düzenlemek için sürükle"
+msgstr "Birimin sırasını değiştirmek için sürükle"
 
 # empty
 msgid "This is a key string."
@@ -12050,12 +12158,10 @@ msgid "A slug may not begin with an underscore."
 msgstr "Bir URL bir altçizgi ile başlayamaz."
 
 #: wiki/forms.py
-#, python-format
 msgid "A deleted article with slug \"%s\" already exists."
 msgstr "\"%s\" URLsine sahip silinmiş bir makale zaten var."
 
 #: wiki/forms.py
-#, python-format
 msgid "A slug named \"%s\" already exists."
 msgstr "\"%s\" isminde URL zaten var."
 
@@ -12212,7 +12318,6 @@ msgid "others write access"
 msgstr "diğerlerinin yazma erişimi"
 
 #: wiki/models/article.py
-#, python-format
 msgid "Article without content (%(id)d)"
 msgstr "İçeriksiz makale (%(id)d)"
 
@@ -12316,7 +12421,6 @@ msgid "A non-root note must always have a slug."
 msgstr "Kök olmayan not her zaman URL'ye sahip olmalı."
 
 #: wiki/models/urlpath.py
-#, python-format
 msgid "There is already a root node on %s"
 msgstr "%s üzerinde zaten bir kök düğümü var"
 
@@ -12380,12 +12484,10 @@ msgid "attachment revisions"
 msgstr "ek revizyonları"
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "%s was successfully added."
 msgstr "%s başarıyla eklendi."
 
 #: wiki/plugins/attachments/views.py wiki/plugins/attachments/views.py
-#, python-format
 msgid "Your file could not be saved: %s"
 msgstr "Dosyanız kaydedilemedi: %s"
 
@@ -12398,7 +12500,6 @@ msgstr ""
 "kaydedilemedi."
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "%s uploaded and replaces old attachment."
 msgstr "%s yüklendi ve eski ek üzerine yazıldı"
 
@@ -12411,37 +12512,30 @@ msgstr ""
 "isimlendirildi. Farklı uzantılı dosyalara izin verilmemektedir."
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "Current revision changed for %s."
 msgstr "Güncel revizyon %s için değiştirildi."
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
 msgstr "\"%(art)s\" den  \"%(att)s\" lere referans eklendi."
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "The file %s was deleted."
 msgstr "%s dosyası silindi."
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "This article is no longer related to the file %s."
 msgstr "Bu makale artık %s dosyasıyla ilişkili değildir."
 
 #: wiki/plugins/attachments/wiki_plugin.py
-#, python-format
 msgid "A file was changed: %s"
 msgstr "Bir dosya değiştirildi: %s"
 
 #: wiki/plugins/attachments/wiki_plugin.py
-#, python-format
 msgid "A file was deleted: %s"
 msgstr "Bir dosya silindi: %s"
 
 #: wiki/plugins/images/forms.py
-#, python-format
 msgid ""
 "New image %s was successfully uploaded. You can use it by selecting it from "
 "the list of available images."
@@ -12462,7 +12556,6 @@ msgid "images"
 msgstr "imgeler"
 
 #: wiki/plugins/images/models.py
-#, python-format
 msgid "Image: %s"
 msgstr "İmge: %s"
 
@@ -12479,27 +12572,22 @@ msgid "image revisions"
 msgstr "imge revizyonları"
 
 #: wiki/plugins/images/models.py
-#, python-format
 msgid "Image Revsion: %d"
 msgstr "imge Revizyonu: %d"
 
 #: wiki/plugins/images/views.py
-#, python-format
 msgid "%s has been restored"
 msgstr "%s eski haline getirildi"
 
 #: wiki/plugins/images/views.py
-#, python-format
 msgid "%s has been marked as deleted"
 msgstr "%s silinmek üzere işaretlendi"
 
 #: wiki/plugins/images/views.py
-#, python-format
 msgid "%(file)s has been changed to revision #%(revision)d"
 msgstr "%(file)s #%(revision)d revizyonuna değiştirildi. "
 
 #: wiki/plugins/images/views.py
-#, python-format
 msgid "%(file)s has been saved."
 msgstr "%(file)s dosyası kaydedildi."
 
@@ -12508,7 +12596,6 @@ msgid "Images"
 msgstr "İmgeler"
 
 #: wiki/plugins/images/wiki_plugin.py
-#, python-format
 msgid "An image was added: %s"
 msgstr "Bir imge eklendi: %s"
 
@@ -12537,22 +12624,18 @@ msgid "Your notification settings were unchanged, so nothing saved."
 msgstr "Uyarı ayarlarınız değişmemişti, bu nedenle hiç bir şey kaydedilmedi."
 
 #: wiki/plugins/notifications/models.py
-#, python-format
 msgid "%(user)s subscribing to %(article)s (%(type)s)"
 msgstr "%(user)s  %(article)s (%(type)s) kayıt oluyor"
 
 #: wiki/plugins/notifications/models.py
-#, python-format
 msgid "Article deleted: %s"
 msgstr "Makale silindi: %s"
 
 #: wiki/plugins/notifications/models.py
-#, python-format
 msgid "Article modified: %s"
 msgstr "Değiştirilen makale: %s"
 
 #: wiki/plugins/notifications/models.py
-#, python-format
 msgid "New article created: %s"
 msgstr "Yeni makale oluşturuldu: %s"
 
@@ -12569,12 +12652,10 @@ msgid "You are now logged in! Have fun!"
 msgstr "Giriş yaptınız! Eğlenin!"
 
 #: wiki/views/article.py
-#, python-format
 msgid "New article '%s' created."
 msgstr "Yeni makale '%s' oluşturuldu."
 
 #: wiki/views/article.py
-#, python-format
 msgid "There was an error creating this article: %s"
 msgstr "Bu makaleyi oluştururken hata oldu: %s"
 
@@ -12593,7 +12674,6 @@ msgid ""
 msgstr "Bu makale bütün içeriğiyle birlikte tamamen yok oldu! Teşekkürler!"
 
 #: wiki/views/article.py
-#, python-format
 msgid ""
 "The article \"%s\" is now marked as deleted! Thanks for keeping the site "
 "free from unwanted material!"
@@ -12614,12 +12694,10 @@ msgid "Restoring article"
 msgstr "Makale eski haline getiriliyor"
 
 #: wiki/views/article.py
-#, python-format
 msgid "The article \"%s\" and its children are now restored."
 msgstr "\"%s\" makalesi ve çocukları şimdi gerei getirildi."
 
 #: wiki/views/article.py
-#, python-format
 msgid "The article %s is now set to display revision #%d"
 msgstr "%s makalesi revizyon #%d'yi göstermek üzere ayarlandı."
 
@@ -12628,12 +12706,10 @@ msgid "New title"
 msgstr "Yeni başlık"
 
 #: wiki/views/article.py
-#, python-format
 msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
 msgstr "Revizyon #%(r1)d ve Revizyon #%(r2)d birleştir"
 
 #: wiki/views/article.py
-#, python-format
 msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"

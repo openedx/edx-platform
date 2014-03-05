@@ -142,6 +142,13 @@ class XModuleMixin(XBlockMixin):
     )
 
     @property
+    def system(self):
+        """
+        Return the XBlock runtime (backwards compatibility alias provided for XModules).
+        """
+        return self.runtime
+
+    @property
     def course_id(self):
         return self.runtime.course_id
 
@@ -209,6 +216,31 @@ class XModuleMixin(XBlockMixin):
         # if caller wants kvs, caller's assuming it's up to date; so, decache it
         self.save()
         return self._field_data._kvs  # pylint: disable=protected-access
+
+    def get_content_titles(self):
+        """
+        Returns list of content titles for all of self's children.
+
+                         SEQUENCE
+                            |
+                         VERTICAL
+                        /        \
+                 SPLIT_TEST      DISCUSSION
+                /        \
+           VIDEO A      VIDEO B
+
+        Essentially, this function returns a list of display_names (e.g. content titles)
+        for all of the leaf nodes.  In the diagram above, calling get_content_titles on
+        SEQUENCE would return the display_names of `VIDEO A`, `VIDEO B`, and `DISCUSSION`.
+
+        This is most obviously useful for sequence_modules, which need this list to display
+        tooltips to users, though in theory this should work for any tree that needs
+        the display_names of all its leaf nodes.
+        """
+        if self.has_children:
+            return sum((child.get_content_titles() for child in self.get_children()), [])
+        else:
+            return [self.display_name_with_default]
 
     def get_children(self):
         """Returns a list of XBlock instances for the children of
@@ -400,7 +432,6 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         self.descriptor = descriptor
         super(XModule, self).__init__(*args, **kwargs)
         self._loaded_children = None
-        self.system = self.runtime
         self.runtime.xmodule_instance = self
 
     def __unicode__(self):
@@ -634,7 +665,6 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         XModuleDescriptor.__init__ takes the same arguments as xblock.core:XBlock.__init__
         """
         super(XModuleDescriptor, self).__init__(*args, **kwargs)
-        self.system = self.runtime
         # update_version is the version which last updated this xblock v prev being the penultimate updater
         # leaving off original_version since it complicates creation w/o any obv value yet and is computable
         # by following previous until None
@@ -891,8 +921,21 @@ class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
 # This function exists to give applications (LMS/CMS) a place to monkey-patch until
 # we can refactor modulestore to split out the FieldData half of its interface from
 # the Runtime part of its interface. This function matches the Runtime.handler_url interface
-def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):
-    raise NotImplementedError("Applications must monkey-patch this function before using handler-urls for studio_view")
+def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):  # pylint: disable=invalid-name, unused-argument
+    """
+    See :meth:`xblock.runtime.Runtime.handler_url`.
+    """
+    raise NotImplementedError("Applications must monkey-patch this function before using handler_url for studio_view")
+
+
+# This function exists to give applications (LMS/CMS) a place to monkey-patch until
+# we can refactor modulestore to split out the FieldData half of its interface from
+# the Runtime part of its interface. This function matches the Runtime.local_resource_url interface
+def descriptor_global_local_resource_url(block, uri):  # pylint: disable=invalid-name, unused-argument
+    """
+    See :meth:`xblock.runtime.Runtime.local_resource_url`.
+    """
+    raise NotImplementedError("Applications must monkey-patch this function before using local_resource_url for studio_view")
 
 
 class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
@@ -940,6 +983,8 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
 
         get_policy: a function that takes a usage id and returns a dict of
             policy to apply.
+
+        local_resource_url: an implementation of :meth:`xblock.runtime.Runtime.local_resource_url`
 
         """
         super(DescriptorSystem, self).__init__(**kwargs)
@@ -1008,13 +1053,30 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
             # global function that the application can override.
             return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
 
-    def resource_url(self, resource):
-        raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
-
     def local_resource_url(self, block, uri):
+        """
+        See :meth:`xblock.runtime.Runtime:local_resource_url` for documentation.
+        """
+        xmodule_runtime = getattr(block, 'xmodule_runtime', None)
+        if xmodule_runtime is not None:
+            return xmodule_runtime.local_resource_url(block, uri)
+        else:
+            # Currently, Modulestore is responsible for instantiating DescriptorSystems
+            # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
+            # that implements the correct local_resource_url. So, for now, instead, we will reference a
+            # global function that the application can override.
+            return descriptor_global_local_resource_url(block, uri)
+
+    def resource_url(self, resource):
+        """
+        See :meth:`xblock.runtime.Runtime:resource_url` for documentation.
+        """
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
     def publish(self, block, event):
+        """
+        See :meth:`xblock.runtime.Runtime:publish` for documentation.
+        """
         raise NotImplementedError("edX Platform doesn't currently implement XBlock publish")
 
     def add_block_as_child_node(self, block, node):
@@ -1178,9 +1240,6 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         return self.get_module(self.descriptor_runtime.get_block(block_id))
 
     def resource_url(self, resource):
-        raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
-
-    def local_resource_url(self, block, uri):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
     def publish(self, block, event):

@@ -18,10 +18,13 @@
         <div class="component-edit-modes">
             <div class="module-editor"/>
         </div>
+        ## Native XBlocks render their own save/cancel buttons
+        % if show_save_cancel:
         <div class="row module-actions">
             <a href="#" class="save-button action-primary action">${_("Save")}</a>
             <a href="#" class="cancel-button action-secondary action">${_("Cancel")}</a>
         </div> <!-- Module Actions-->
+        % endif
   </div>
 </div>
 <div class="wrapper wrapper-component-action-header">

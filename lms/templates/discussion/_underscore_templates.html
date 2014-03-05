@@ -62,13 +62,13 @@
 
 
       % if course and has_permission(user, 'openclose_thread', course.id):
-      <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="${_('pin this thread') | h}">
+      <div class="admin-pin discussion-pin notpinned" role="button" aria-pressed="false" tabindex="0">
       <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
 
       %else:
       ${"<% if (pinned) { %>"}
-      <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="${_('pin this thread') | h}">
-      <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
+      <div class="discussion-pin notpinned">
+      <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pinned")}</span></div>
       ${"<% }  %>"}
       % endif
 
@@ -154,7 +154,7 @@
     <h1>${_("Editing response")}</h1>
     <ul class="edit-post-form-errors"></ul>
     <div class="form-row">
-      <div class="edit-post-body" name="body">${"<%- body %>"}</div>
+      <div class="edit-post-body" name="body" data-id="${'<%- id %>'}">${"<%- body %>"}</div>
     </div>
     <input type="submit" id="edit-response-submit"class="post-update" value="${_("Update response") | h}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
@@ -168,6 +168,8 @@
       <i class="icon icon-flag"></i><span class="sr flag-label">${_("Report Misuse")}</span></div>
     <div style="display: none" class="discussion-delete-comment action-delete" data-tooltip="${_('Delete Comment') | h}" role="button" tabindex="0">
       <i class="icon icon-remove"></i><span class="sr">${_("Delete Comment")}</span></div>
+    <div class="discussion-edit-comment action-edit" data-tooltip="${_('Edit') | h}" role="button" tabindex="0">
+      <i class="icon icon-pencil"></i><span class="sr">${_("Edit")}</span></div>
       <% 
       js_block = u"""
         interpolate(
@@ -187,6 +189,18 @@
       ${_('anonymous')}
       ${"<% } %>"}
     </p>
+  </div>
+</script>
+
+<script aria-hidden="true" type="text/template" id="response-comment-edit-template">
+  <div class="edit-post-form">
+    <h1>${_("Editing comment")}</h1>
+    <ul class="edit-comment-form-errors"></ul>
+    <div class="form-row">
+      <div class="edit-comment-body" name="body" data-id="${'<%- id %>'}">${"<%- body %>"}</div>
+    </div>
+    <input type="submit" id="edit-comment-submit" class="post-update" value="${_("Update comment") | h}">
+    <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>
 

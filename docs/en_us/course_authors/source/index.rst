@@ -44,6 +44,7 @@ Contents
    beta_testing
    course_student
    course_grades
+   staff_debug_info
    glossary
 
 

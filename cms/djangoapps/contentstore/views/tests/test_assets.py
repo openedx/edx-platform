@@ -18,6 +18,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.django import loc_mapper
+from django.test.utils import override_settings
 
 
 class AssetsTestCase(CourseTestCase):
@@ -138,6 +139,7 @@ class AssetToJsonTestCase(AssetsTestCase):
     Unit test for transforming asset information into something
     we can send out to the client via JSON.
     """
+    @override_settings(LMS_BASE="lms_base_url")
     def test_basic(self):
         upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
 
@@ -149,6 +151,7 @@ class AssetToJsonTestCase(AssetsTestCase):
         self.assertEquals(output["display_name"], "my_file")
         self.assertEquals(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
         self.assertEquals(output["url"], "/i4x/foo/bar/asset/my_file_name.jpg")
+        self.assertEquals(output["external_url"], "lms_base_url/i4x/foo/bar/asset/my_file_name.jpg")
         self.assertEquals(output["portable_url"], "/static/my_file_name.jpg")
         self.assertEquals(output["thumbnail"], "/i4x/foo/bar/asset/my_file_name_thumb.jpg")
         self.assertEquals(output["id"], output["url"])

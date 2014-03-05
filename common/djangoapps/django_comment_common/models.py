@@ -18,7 +18,10 @@ FORUM_ROLE_STUDENT = ugettext_noop('Student')
 
 
 @receiver(post_save, sender=CourseEnrollment)
-def assign_default_role(sender, instance, **kwargs):
+def assign_default_role_on_enrollment(sender, instance, **kwargs):
+    """
+    Assign forum default role 'Student'
+    """
     # The code below would remove all forum Roles from a user when they unenroll
     # from a course. Concerns were raised that it should apply only to students,
     # or that even the history of student roles is important for research
@@ -33,8 +36,15 @@ def assign_default_role(sender, instance, **kwargs):
     #     return
 
     # We've enrolled the student, so make sure they have the Student role
-    role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
-    instance.user.roles.add(role)
+    assign_default_role(instance.course_id, instance.user)
+
+
+def assign_default_role(course_id, user):
+    """
+    Assign forum default role 'Student' to user
+    """
+    role, __ = Role.objects.get_or_create(course_id=course_id, name="Student")
+    user.roles.add(role)
 
 
 class Role(models.Model):

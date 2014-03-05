@@ -562,6 +562,7 @@ function (VideoPlayer) {
                 runs(function () {
                     var htmlStr;
 
+                    state.videoPlayer.goToStartTime = false;
                     state.videoPlayer.updatePlayTime(60);
 
                     htmlStr = $('.vidtime').html();
@@ -589,6 +590,7 @@ function (VideoPlayer) {
                 }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
+                    state.videoPlayer.goToStartTime = false;
                     state.videoPlayer.updatePlayTime(60);
 
                     expect(state.videoCaption.updatePlayTime)
@@ -606,6 +608,7 @@ function (VideoPlayer) {
                 }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
+                    state.videoPlayer.goToStartTime = false;
                     state.videoPlayer.updatePlayTime(60);
 
                     expect(state.videoProgressSlider.updatePlayTime)
@@ -677,35 +680,39 @@ function (VideoPlayer) {
 
         describe('updatePlayTime with invalid endTime', function () {
             beforeEach(function () {
-                state = jasmine.initializePlayer(
-                    {
-                        end: 100000
-                    }
-                );
+                state = {
+                    videoPlayer: {
+                        duration: function () {
+                            // The video will be 60 seconds long.
+                            return 60;
+                        },
+                        goToStartTime: true,
+                        startTime: undefined,
+                        endTime: undefined,
+                        player: {
+                            seekTo: function () {}
+                        }
+                    },
+                    config: {
+                        savedVideoPosition: 0,
+                        startTime: 0,
 
-                state.videoEl = $('video, iframe');
-
-                spyOn(state.videoPlayer, 'updatePlayTime').andCallThrough();
+                        // We are setting the end-time to 10000 seconds. The
+                        // video will be less than this, the code will reset
+                        // the end time to `null` - i.e. to the end of the video.
+                        // This is the expected behavior we will test for.
+                        endTime: 10000
+                    },
+                    currentPlayerMode: 'html5',
+                    trigger: function () {},
+                    browserIsFirefox: false
+                };
             });
 
             it('invalid endTime is reset to null', function () {
-                var duration;
+                VideoPlayer.prototype.updatePlayTime.call(state, 0);
 
-                state.videoPlayer.updatePlayTime.reset();
-                state.videoPlayer.play();
-
-                waitsFor(
-                    function () {
-                        return state.videoPlayer.isPlaying() &&
-                            state.videoPlayer.initialSeekToStartTime === false;
-                    },
-                    'updatePlayTime was invoked and duration is set',
-                    WAIT_TIMEOUT
-                );
-
-                runs(function () {
-                    expect(state.videoPlayer.endTime).toBe(null);
-                });
+                expect(state.videoPlayer.endTime).toBe(null);
             });
         });
 

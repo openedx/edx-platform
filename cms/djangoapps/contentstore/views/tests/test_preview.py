@@ -45,7 +45,7 @@ class GetPreviewHtmlTestCase(TestCase):
 
         # Must call get_preview_fragment directly, as going through xblock RESTful API will attempt
         # to use item.location as a Location.
-        html = get_preview_fragment(request, html).content
+        html = get_preview_fragment(request, html, {}).content
         # Verify student view html is returned, and there are no old locations in it.
         self.assertRegexpMatches(
             html,

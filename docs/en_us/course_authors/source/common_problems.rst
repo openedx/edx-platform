@@ -30,59 +30,6 @@ Types** tab, and then click the name of the problem. (Note that
 **Checkbox** doesn't appear in the list of common problem types. To
 create a checkbox problem, you'll click **Blank Common Problem**.)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-To add labels to these problems, enclose the text that you want to use as a label in two sets of angle brackets (<<>>)
-
-
-
-Just in case you want to see the XML, we've provided it
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .. _Checkbox:
 
 *******************
@@ -652,49 +599,49 @@ text that students enter.
 
 .. code-block:: xml
 
-<problem>
-  <p><b>Example Problem</b></p>
+  <problem>
+    <p><b>Example Problem</b></p>
 
-<p>What base is the decimal numeral system in?
-    <numericalresponse answer="10">
-        <formulaequationinput label="What base is the decimal numeral system in?"/>
+  <p>What base is the decimal numeral system in?
+      <numericalresponse answer="10">
+          <formulaequationinput label="What base is the decimal numeral system in?"/>
+      </numericalresponse>
+  </p>
+
+    <p>What is the value of the standard gravity constant <i>g</i>, measured in m/s<sup>2</sup>? Give your answer to at least two decimal places.
+    <numericalresponse answer="9.80665">
+      <responseparam type="tolerance" default="0.01" />
+      <formulaequationinput label="Give your answer to at least two decimal places"/>
     </numericalresponse>
-</p>
+  </p>
 
-  <p>What is the value of the standard gravity constant <i>g</i>, measured in m/s<sup>2</sup>? Give your answer to at least two decimal places.
-  <numericalresponse answer="9.80665">
-    <responseparam type="tolerance" default="0.01" />
-    <formulaequationinput label="Give your answer to at least two decimal places"/>
-  </numericalresponse>
-</p>
+  <!-- Use python script spacing. The following should not be indented! -->
+  <script type="loncapa/python">
+  computed_response = math.sqrt(math.fsum([math.pow(math.pi,2), math.pow(math.e,2)]))
+  </script>
 
-<!-- Use python script spacing. The following should not be indented! -->
-<script type="loncapa/python">
-computed_response = math.sqrt(math.fsum([math.pow(math.pi,2), math.pow(math.e,2)]))
-</script>
-
-<p>What is the distance in the plane between the points (pi, 0) and (0, e)? You can type math.
-    <numericalresponse answer="$computed_response">
-        <responseparam type="tolerance" default="0.0001" />
-        <formulaequationinput label="What is the distance in the plane between the points (pi, 0) and (0, e)?"/>
-    </numericalresponse>
-</p>
-<solution>
-  <div class="detailed-solution">
-    <p>Explanation</p>
-    <p>The decimal numerical system is base ten.</p>
-    <p>The standard gravity constant is defined to be precisely 9.80665 m/s<sup>2</sup>.
-    This is 9.80 to two decimal places. Entering 9.8 also works.</p>
-    <p>By the distance formula, the distance between two points in the plane is
-       the square root of the sum of the squares of the differences of each coordinate.
-      Even though an exact numerical value is checked in this case, the
-      easiest way to enter this answer is to type
-      <code>sqrt(pi^2+e^2)</code> into the editor.
-      Other answers like <code>sqrt((pi-0)^2+(0-e)^2)</code> also work.
-    </p>
-  </div>
-</solution>
-</problem>
+  <p>What is the distance in the plane between the points (pi, 0) and (0, e)? You can type math.
+      <numericalresponse answer="$computed_response">
+          <responseparam type="tolerance" default="0.0001" />
+          <formulaequationinput label="What is the distance in the plane between the points (pi, 0) and (0, e)?"/>
+      </numericalresponse>
+  </p>
+  <solution>
+    <div class="detailed-solution">
+      <p>Explanation</p>
+      <p>The decimal numerical system is base ten.</p>
+      <p>The standard gravity constant is defined to be precisely 9.80665 m/s<sup>2</sup>.
+      This is 9.80 to two decimal places. Entering 9.8 also works.</p>
+      <p>By the distance formula, the distance between two points in the plane is
+         the square root of the sum of the squares of the differences of each coordinate.
+        Even though an exact numerical value is checked in this case, the
+        easiest way to enter this answer is to type
+        <code>sqrt(pi^2+e^2)</code> into the editor.
+        Other answers like <code>sqrt((pi-0)^2+(0-e)^2)</code> also work.
+      </p>
+    </div>
+  </solution>
+  </problem>
 
 **Templates**
 

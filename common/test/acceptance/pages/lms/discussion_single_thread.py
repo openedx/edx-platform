@@ -53,10 +53,7 @@ class DiscussionSingleThreadPage(CoursePage):
 
     def has_add_response_button(self):
         """Returns true if the add response button is visible, false otherwise"""
-        return (
-            self.is_css_present(".add-response-btn") and
-            self.css_map(".add-response-btn", lambda el: el.visible)[0]
-        )
+        return self._is_element_visible(".add-response-btn")
 
     def click_add_response_button(self):
         """
@@ -67,4 +64,26 @@ class DiscussionSingleThreadPage(CoursePage):
         fulfill(EmptyPromise(
             lambda: self.is_css_present("#wmd-input-reply-body-{thread_id}:focus".format(thread_id=self.thread_id)),
             "Response field received focus"
+        ))
+
+    def _is_element_visible(self, selector):
+        return (
+            self.is_css_present(selector) and
+            self.css_map(selector, lambda el: el.visible)[0]
+        )
+
+    def is_comment_visible(self, comment_id):
+        """Returns true if the comment is viewable onscreen"""
+        return self._is_element_visible("#comment_{}".format(comment_id))
+
+    def is_comment_deletable(self, comment_id):
+        """Returns true if the delete comment button is present, false otherwise"""
+        return self._is_element_visible("#comment_{} div.action-delete".format(comment_id))
+
+    def delete_comment(self, comment_id):
+        with self.handle_alert():
+            self.css_click("#comment_{} div.action-delete".format(comment_id))
+        fulfill(EmptyPromise(
+            lambda: not self.is_comment_visible(comment_id),
+            "Deleted comment was removed"
         ))

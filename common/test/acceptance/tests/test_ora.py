@@ -3,7 +3,7 @@ Tests for ORA (Open Response Assessment) through the LMS UI.
 """
 
 import json
-from bok_choy.promise import fulfill, Promise
+from bok_choy.promise import fulfill, Promise, BrokenPromise
 from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.lms.course_info import CourseInfoPage
 from ..pages.lms.tab_nav import TabNavPage

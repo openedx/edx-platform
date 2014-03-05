@@ -32,6 +32,7 @@ codekit-config.json
 ### Internationalization artifacts
 *.mo
 *.po
+*.prob
 !django.po
 !django.mo
 !djangojs.po

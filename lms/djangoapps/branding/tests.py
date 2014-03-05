@@ -53,3 +53,22 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
     def test_anon_user_no_startdate_index(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
+
+    def test_allow_x_frame_options(self):
+        """
+        Check the x-frame-option response header
+        """
+
+        # check to see that the default setting is to ALLOW iframing
+        resp = self.client.get('/')
+        self.assertEquals(resp['X-Frame-Options'], 'ALLOW')
+
+    @override_settings(X_FRAME_OPTIONS='DENY')
+    def test_deny_x_frame_options(self):
+        """
+        Check the x-frame-option response header
+        """
+
+        # check to see that the override value is honored
+        resp = self.client.get('/')
+        self.assertEquals(resp['X-Frame-Options'], 'DENY')

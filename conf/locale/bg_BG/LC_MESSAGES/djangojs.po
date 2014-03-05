@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-24 16:00-0500\n"
+"POT-Creation-Date: 2014-03-02 15:08-0500\n"
 "PO-Revision-Date: 2014-02-05 17:03+0000\n"
 "Last-Translator: cpennington <cale@edx.org>\n"
 "Language-Team: Bulgarian (Bulgaria) (http://www.transifex.com/projects/p/edx-platform/language/bg_BG/)\n"
@@ -343,6 +343,10 @@ msgid ""
 msgstr ""
 
 #: common/static/coffee/src/discussion/utils.js
+msgid "We had some trouble processing your request. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
@@ -410,9 +414,11 @@ msgstr ""
 msgid "Click to remove report"
 msgstr ""
 
+#. Translators: The text between start_sr_span and end_span is not shown
+#. in most browsers but will be read by screen readers.
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported, %(start_sr_span)s click to remove report%(end_span)s"
+msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
@@ -422,16 +428,22 @@ msgstr ""
 msgid "Report Misuse"
 msgstr ""
 
+#. Translators: The text between start_sr_span and end_span is not shown
+#. in most browsers but will be read by screen readers.
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+msgid "Click to unpin"
+msgstr ""
+
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pinned"
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pin Thread"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinning is not currently available"
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
@@ -503,12 +515,10 @@ msgid "Are you sure you want to delete this response?"
 msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%s ago"
 msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%s from now"
 msgstr ""
 
@@ -521,7 +531,6 @@ msgid "about a minute"
 msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
@@ -532,7 +541,6 @@ msgid "about an hour"
 msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] ""
@@ -543,7 +551,6 @@ msgid "a day"
 msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] ""
@@ -554,7 +561,6 @@ msgid "about a month"
 msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] ""
@@ -565,26 +571,22 @@ msgid "about a year"
 msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] ""
 msgstr[1] ""
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Available %s"
 msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
 
@@ -597,7 +599,6 @@ msgid "Choose all"
 msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Click to choose all %s at once."
 msgstr ""
 
@@ -610,12 +611,10 @@ msgid "Remove"
 msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Chosen %s"
 msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -626,7 +625,6 @@ msgid "Remove all"
 msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Click to remove all chosen %s at once."
 msgstr ""
 
@@ -1135,6 +1133,15 @@ msgstr ""
 msgid "Heading"
 msgstr ""
 
+#: lms/templates/class_dashboard/all_section_metrics.js
+#: lms/templates/class_dashboard/all_section_metrics.js
+msgid "Unable to retrieve data, please try again later."
+msgstr ""
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "Number of Students"
+msgstr ""
+
 #: cms/static/coffee/src/main.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
@@ -1146,12 +1153,12 @@ msgid "Studio's having trouble saving your work"
 msgstr ""
 
 #: cms/static/coffee/src/views/module_edit.js
-#, c-format
 msgid "<em>Editing:</em> %s"
 msgstr ""
 
 #: cms/static/coffee/src/views/module_edit.js
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js

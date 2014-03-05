@@ -216,6 +216,7 @@ define([
     "js/spec/views/paging_spec",
 
     "js/spec/views/unit_spec"
+    "js/spec/views/xblock_spec"
 
     # these tests are run separate in the cms-squire suite, due to process
     # isolation issues with Squire.js

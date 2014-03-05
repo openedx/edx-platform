@@ -8,7 +8,6 @@ from bok_choy.promise import EmptyPromise, fulfill
 from .course_page import CoursePage
 from .unit import UnitPage
 
-
 class CourseOutlineContainer(object):
     """
     A mixin to a CourseOutline page object that adds the ability to load
@@ -18,11 +17,13 @@ class CourseOutlineContainer(object):
     """
     CHILD_CLASS = None
 
-    def child(self, title):
-        return self.CHILD_CLASS(
+    def child(self, title, child_class=None):
+        if not child_class:
+            child_class = self.CHILD_CLASS
+        return child_class(
             self.browser,
-            self.q(css=self.CHILD_CLASS.BODY_SELECTOR).filter(
-                SubQuery(css=self.CHILD_CLASS.NAME_SELECTOR).filter(text=title)
+            self.q(css=child_class.BODY_SELECTOR).filter(
+                SubQuery(css=child_class.NAME_SELECTOR).filter(text=title)
             )[0]['data-locator']
         )
 

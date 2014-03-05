@@ -50,7 +50,7 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
             )
 
           it "renders the module editor", ->
-            expect(@moduleEdit.render).toHaveBeenCalled()
+            expect(ModuleEdit.prototype.render).toHaveBeenCalled()
 
         describe "render", ->
           beforeEach ->
@@ -80,7 +80,7 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
               url: "/xblock/#{@moduleEdit.model.id}/student_view"
               type: "GET"
               headers:
-                Accept: 'application/x-fragment+json'
+                Accept: 'application/json'
               success: jasmine.any(Function)
             )
 
@@ -88,7 +88,7 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
               url: "/xblock/#{@moduleEdit.model.id}/studio_view"
               type: "GET"
               headers:
-                Accept: 'application/x-fragment+json'
+                Accept: 'application/json'
               success: jasmine.any(Function)
             )
             expect(@moduleEdit.loadDisplay).toHaveBeenCalled()
@@ -100,7 +100,7 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
               url: "/xblock/#{@moduleEdit.model.id}/studio_view"
               type: "GET"
               headers:
-                Accept: 'application/x-fragment+json'
+                Accept: 'application/json'
               success: jasmine.any(Function)
             )
             expect(@moduleEdit.loadEdit).not.toHaveBeenCalled()
@@ -123,7 +123,7 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
               url: "/xblock/#{@moduleEdit.model.id}/studio_view"
               type: "GET"
               headers:
-                Accept: 'application/x-fragment+json'
+                Accept: 'application/json'
               success: jasmine.any(Function)
             )
             expect(@moduleEdit.loadEdit).toHaveBeenCalled()

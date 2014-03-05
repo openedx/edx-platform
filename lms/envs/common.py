@@ -34,7 +34,7 @@ from .discussionsettings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin, only_xmodules
+from xmodule.x_module import XModuleMixin, prefer_xmodules
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -219,8 +219,19 @@ FEATURES = {
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
 
+    # Hide any Personally Identifiable Information from application logs
+    'SQUELCH_PII_IN_LOGS': False,
+
     # Toggle embargo functionality
     'EMBARGO': False,
+
+    # Whether the Wiki subsystem should be accessible via the direct /wiki/ paths. Setting this to True means
+    # that people can submit content and modify the Wiki in any arbitrary manner. We're leaving this as True in the
+    # defaults, so that we maintain current behavior
+    'ALLOW_WIKI_ROOT_ACCESS': True,
+
+    # Turn on/off Microsites feature
+    'USE_MICROSITES': False,
 }
 
 # Used for A/B testing
@@ -424,13 +435,8 @@ DOC_STORE_CONFIG = {
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
 
-# Only allow XModules in the LMS
-XBLOCK_SELECT_FUNCTION = only_xmodules
-
-# Use the following lines to allow any xblock in the LMS,
-# either by uncommenting them here, or adding them to your private.py
-# from xmodule.x_module import prefer_xmodules
-# XBLOCK_SELECT_FUNCTION = prefer_xmodules
+# Allow any XBlock in the LMS
+XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 #################### Python sandbox ############################################
 
@@ -685,7 +691,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
-    'microsite_configuration.middleware.MicrositeConfiguration',
+    'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -696,6 +702,10 @@ MIDDLEWARE_CLASSES = (
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
     'crum.CurrentRequestUserMiddleware',
+
+    # Adds user tags to tracking events
+    # Must go before TrackMiddleware, to get the context set up
+    'user_api.middleware.UserTagsEventContextMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
@@ -732,7 +742,12 @@ MIDDLEWARE_CLASSES = (
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
 
+    # use Django built in clickjacking protection
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+# Clickjacking protection can be enabled by setting this to 'DENY'
+X_FRAME_OPTIONS = 'ALLOW'
 
 ############################### Pipeline #######################################
 
@@ -1148,6 +1163,9 @@ INSTALLED_APPS = (
     'reverification',
 
     'embargo',
+
+    # XBlocks containing migrations
+    'mentoring',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1170,68 +1188,15 @@ MKTG_URL_LINK_MAP = {
 }
 
 
-############################### MICROSITES ################################
-def enable_microsites(microsite_config_dict, subdomain_branding, virtual_universities, microsites_root=ENV_ROOT / "microsites"):
-    """
-    Enable the use of microsites, which are websites that allow
-    for subdomains for the edX platform, e.g. foo.edx.org
-    """
-
-    if not microsite_config_dict:
-        return
-
-    FEATURES['USE_MICROSITES'] = True
-
-    for microsite_name in microsite_config_dict.keys():
-        # Calculate the location of the microsite's files
-        microsite_root = microsites_root / microsite_name
-        microsite_config = microsite_config_dict[microsite_name]
-
-        # pull in configuration information from each
-        # microsite root
-
-        if os.path.isdir(microsite_root):
-            # store the path on disk for later use
-            microsite_config['microsite_root'] = microsite_root
-
-            # get the domain that this should reside
-            domain = microsite_config['domain_prefix']
-
-            # get the virtual university that this should use
-            university = microsite_config['university']
-
-            # add to the existing maps in our settings
-            subdomain_branding[domain] = university
-            virtual_universities.append(university)
-
-            template_dir = microsite_root / 'templates'
-            microsite_config['template_dir'] = template_dir
-
-            microsite_config['microsite_name'] = microsite_name
-
-        else:
-            # not sure if we have application logging at this stage of
-            # startup
-            print '**** Error loading microsite {0}. Directory does not exist'.format(microsite_root)
-            # remove from our configuration as it is not valid
-            del microsite_config_dict[microsite_name]
-
-    # if we have microsites, then let's turn on SUBDOMAIN_BRANDING
-    # Note check size of the dict because some microsites might not be found on disk and
-    # we could be left with none
-    if microsite_config_dict:
-        FEATURES['SUBDOMAIN_BRANDING'] = True
-
-        TEMPLATE_DIRS.append(microsites_root)
-        MAKO_TEMPLATES['main'].append(microsites_root)
-
-        STATICFILES_DIRS.append(microsites_root)
-
-
 ################# Student Verification #################
 VERIFY_STUDENT = {
     "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
 }
+
+### This enables the Metrics tab for the Instructor dashboard ###########
+FEATURES['CLASS_DASHBOARD'] = False
+if FEATURES.get('CLASS_DASHBOARD'):
+    INSTALLED_APPS += ('class_dashboard',)
 
 ######################## CAS authentication ###########################
 
@@ -1261,6 +1226,10 @@ REGISTRATION_EXTRA_FIELDS = {
     'city': 'hidden',
     'country': 'hidden',
 }
+
+########################## CERTIFICATE NAME ########################
+CERT_NAME_SHORT = "Certificate"
+CERT_NAME_LONG = "Certificate of Achievement"
 
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE

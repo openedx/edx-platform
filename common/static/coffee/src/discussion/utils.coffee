@@ -157,11 +157,20 @@ class @DiscussionUtil
 
   @formErrorHandler: (errorsField) ->
     (xhr, textStatus, error) ->
-      response = JSON.parse(xhr.responseText)
-      if response.errors? and response.errors.length > 0
-        errorsField.empty()
-        for error in response.errors
-          errorsField.append($("<li>").addClass("new-post-form-error").html(error)).show()
+      makeErrorElem = (message) ->
+        $("<li>").addClass("new-post-form-error").html(message)
+      errorsField.empty().show()
+      if xhr.status == 400
+        response = JSON.parse(xhr.responseText)
+        if response.errors? and response.errors.length > 0
+          for error in response.errors
+            errorsField.append(makeErrorElem(error))
+      else
+        errorsField.append(
+          makeErrorElem(
+            gettext("We had some trouble processing your request. Please try again.")
+          )
+        )
 
   @clearFormErrors: (errorsField) ->
     errorsField.empty()

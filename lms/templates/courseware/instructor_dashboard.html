@@ -144,6 +144,9 @@ function goto( mode)
           %if settings.FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
              | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">${_("Analytics")}</a>
           %endif
+          %if settings.FEATURES.get('CLASS_DASHBOARD'):
+             | <a href="#" onclick="goto('Metrics');" class="${modeflag.get('Metrics')}">${_("Metrics")}</a>
+          %endif
 	  ]
     </h2>
 
@@ -666,6 +669,46 @@ function goto( mode)
       %endfor
       </table>
     </div>
+  %endif
+%endif
+
+%if modeflag.get('Metrics'):
+  %if not any (metrics_results.values()):
+    <p>${_("There is no data available to display at this time.")}</p>
+  %else:
+    <%namespace name="d3_stacked_bar_graph" file="/class_dashboard/d3_stacked_bar_graph.js"/>
+    <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
+
+    <script>
+      ${d3_stacked_bar_graph.body()}
+    </script>
+
+    <div id="metrics"></div>
+    
+    <h3 class="attention">${_("Loading the latest graphs for you; depending on your class size, this may take a few minutes.")}</h3>
+
+    %for i in range(0,len(metrics_results['section_display_name'])):
+        <div class="metrics-container" id="metrics_section_${i}">
+          <h2>${_("Section:")} ${metrics_results['section_display_name'][i]}</h2>
+          <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
+          <div class="metrics-left" id="metric_opened_${i}">
+            <h3>${_("Count of Students that Opened a Subsection")}</h3>
+            <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading...")}</p>
+          </div>
+          <div class="metrics-right" id="metric_grade_${i}">
+            <h3>${_("Grade Distribution per Problem")}</h3>
+            %if not metrics_results['section_has_problem'][i]:
+              <p>${_("There are no problems in this section.")}</p>
+            %else:
+              <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading...")}</p>
+            %endif
+          </div>
+        </div>
+    %endfor
+      <script>
+        ${all_section_metrics.body("metric_opened_","metric_grade_","metric_attempts_","metric_tooltip_",course.id)}
+      </script>
+
   %endif
 %endif
 
