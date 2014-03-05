@@ -202,7 +202,9 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
                 log.debug("unable to render studio_view for %r", component, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
-            store.save_xmodule(component)
+            # change not authored by requestor but by xblocks.
+            store.update_item(component, None)
+
         elif view_name == 'student_view' and component.has_children:
             # For non-leaf xblocks on the unit page, show the special rendering
             # which links to the new container page.
@@ -519,8 +521,8 @@ def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid
     if request.method == 'DELETE':
         if request.user.is_staff:
             items = modulestore().get_orphans(old_location, 'draft')
-            for item in items:
-                modulestore('draft').delete_item(item, delete_all_versions=True)
+            for itemloc in items:
+                modulestore('draft').delete_item(itemloc, delete_all_versions=True)
             return JsonResponse({'deleted': items})
         else:
             raise PermissionDenied()

@@ -661,11 +661,11 @@ class TestComponentHandler(TestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
 
-        patcher = patch('contentstore.views.component.modulestore')
-        self.modulestore = patcher.start()
+        patcher = patch('contentstore.views.component.get_modulestore')
+        self.get_modulestore = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.descriptor = self.modulestore.return_value.get_item.return_value
+        self.descriptor = self.get_modulestore.return_value.get_item.return_value
 
         self.usage_id = 'dummy_usage_id'
 

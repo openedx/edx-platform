@@ -200,13 +200,14 @@ class LocatorTest(TestCase):
         expected_id = 'mit.eecs.6002x'
         expected_branch = 'published'
         expected_block_ref = 'HW3'
-        testobj = BlockUsageLocator(package_id=testurn)
+        testobj = BlockUsageLocator(url=testurn)
         self.check_block_locn_fields(testobj, 'test_block constructor',
                                      package_id=expected_id,
                                      branch=expected_branch,
                                      block=expected_block_ref)
         self.assertEqual(str(testobj), testurn)
         self.assertEqual(testobj.url(), 'edx://' + testurn)
+        testobj = BlockUsageLocator(url=testurn, version_guid=ObjectId())
         agnostic = testobj.version_agnostic()
         self.assertIsNone(agnostic.version_guid)
         self.check_block_locn_fields(agnostic, 'test_block constructor',
@@ -225,7 +226,7 @@ class LocatorTest(TestCase):
             block='lab2',
             version_guid=ObjectId(test_id_loc)
         )
-        agnostic = testobj.version_agnostic()
+        agnostic = testobj.course_agnostic()
         self.check_block_locn_fields(
             agnostic, 'error parsing URL with version and block',
             block='lab2',

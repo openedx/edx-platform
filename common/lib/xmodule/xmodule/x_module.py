@@ -26,6 +26,7 @@ from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.exceptions import UndefinedContext
 
 
 log = logging.getLogger(__name__)
@@ -580,22 +581,6 @@ class ResourceTemplates(object):
                     return template
 
 
-def prefer_xmodules(identifier, entry_points):
-    """Prefer entry_points from the xmodule package"""
-    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
-    if from_xmodule:
-        return default_select(identifier, from_xmodule)
-    else:
-        return default_select(identifier, entry_points)
-
-
-def only_xmodules(identifier, entry_points):
-    """Only use entry_points that are supplied by the xmodule package"""
-    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
-
-    return default_select(identifier, from_xmodule)
-
-
 @XBlock.needs("i18n")
 class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     """
@@ -811,7 +796,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         Returns the XModule corresponding to this descriptor. Expects that the system
         already supports all of the attributes needed by xmodules
         """
-        assert self.xmodule_runtime is not None
+        if self.xmodule_runtime is None:
+            raise UndefinedContext()
         assert self.xmodule_runtime.error_descriptor_class is not None
         if self.xmodule_runtime.xmodule_instance is None:
             try:

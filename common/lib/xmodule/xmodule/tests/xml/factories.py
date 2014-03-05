@@ -9,7 +9,7 @@ from factory import Factory, lazy_attribute, post_generation, Sequence
 from lxml import etree
 
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import only_xmodules
+from xmodule.modulestore import only_xmodules
 
 
 class XmlImportData(object):

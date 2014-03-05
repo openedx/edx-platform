@@ -34,7 +34,8 @@ from .discussionsettings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin, only_xmodules
+from xmodule.x_module import XModuleMixin
+from xmodule.modulestore import only_xmodules
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -440,7 +441,7 @@ XBLOCK_SELECT_FUNCTION = only_xmodules
 
 # Use the following lines to allow any xblock in the LMS,
 # either by uncommenting them here, or adding them to your private.py
-# from xmodule.x_module import prefer_xmodules
+# from xmodule.modulestore import prefer_xmodules
 # XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 #################### Python sandbox ############################################

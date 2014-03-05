@@ -16,7 +16,7 @@ os.environ['SERVICE_VARIANT'] = 'bok_choy'
 os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()  #pylint: disable=E1120
 
 from .aws import *  # pylint: disable=W0401, W0614
-from xmodule.x_module import prefer_xmodules
+from xmodule.modulestore import prefer_xmodules
 
 
 ######################### Testing overrides ####################################
