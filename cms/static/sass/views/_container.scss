@@ -30,11 +30,22 @@ body.view-container {
     label {
       @extend %t-title8;
     }
+
+    .bit-publishing {
+      margin-bottom: $baseline;
+      border-top: 5px solid $blue;
+      background-color: $white;
+      padding: ($baseline*.75) ($baseline*.75) ($baseline) ($baseline*.75);
+
+      .copy {
+        @extend %t-copy-sub1;
+      }
+    }
   }
 }
 
 // UI: xblock rendering
-body.view-container  .content-primary{
+body.view-container  .content-primary {
 
   .wrapper-xblock {
     @extend %wrap-xblock;
