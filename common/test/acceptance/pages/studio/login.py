@@ -3,7 +3,7 @@ Login page for Studio.
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, fulfill_after
+from bok_choy.promise import EmptyPromise
 from . import BASE_URL
 
 
@@ -15,7 +15,7 @@ class LoginPage(PageObject):
     url = BASE_URL + "/signin"
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-signin')
+        return self.q(css='body.view-signin').present
 
     def login(self, email, password):
         """
