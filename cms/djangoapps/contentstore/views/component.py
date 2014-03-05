@@ -26,7 +26,7 @@ from xblock.runtime import Mixologist
 
 from lms.lib.xblock.runtime import unquote_slashes
 
-from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState
+from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_modulestore
 from contentstore.views.helpers import get_parent_xblock
 
 from models.settings.course_grading import CourseGradingModel
@@ -358,7 +358,7 @@ def component_handler(request, usage_id, handler, suffix=''):
 
     location = unquote_slashes(usage_id)
 
-    descriptor = modulestore().get_item(location)
+    descriptor = get_modulestore(location).get_item(location)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 
@@ -371,9 +371,6 @@ def component_handler(request, usage_id, handler, suffix=''):
 
     # unintentional update to handle any side effects of handle call; so, request user didn't author
     # the change
-    if getattr(descriptor, 'is_draft', False):
-        modulestore('draft').update_item(descriptor, None)
-    else:
-        modulestore('direct').update_item(descriptor, None)
+    get_modulestore(location).update_item(descriptor, None)
 
     return webob_to_django_response(resp)
