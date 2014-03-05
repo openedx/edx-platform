@@ -217,6 +217,31 @@ class XModuleMixin(XBlockMixin):
         self.save()
         return self._field_data._kvs  # pylint: disable=protected-access
 
+    def get_content_titles(self):
+        """
+        Returns list of content titles for all of self's children.
+
+                         SEQUENCE
+                            |
+                         VERTICAL
+                        /        \
+                 SPLIT_TEST      DISCUSSION
+                /        \
+           VIDEO A      VIDEO B
+
+        Essentially, this function returns a list of display_names (e.g. content titles)
+        for all of the leaf nodes.  In the diagram above, calling get_content_titles on
+        SEQUENCE would return the display_names of `VIDEO A`, `VIDEO B`, and `DISCUSSION`.
+
+        This is most obviously useful for sequence_modules, which need this list to display
+        tooltips to users, though in theory this should work for any tree that needs
+        the display_names of all its leaf nodes.
+        """
+        if self.has_children:
+            return sum((child.get_content_titles() for child in self.get_children()), [])
+        else:
+            return [self.display_name_with_default]
+
     def get_children(self):
         """Returns a list of XBlock instances for the children of
         this module"""
