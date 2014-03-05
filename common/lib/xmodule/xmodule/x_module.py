@@ -240,10 +240,7 @@ class XModuleMixin(XBlockMixin):
         if self.has_children:
             return sum((child.get_content_titles() for child in self.get_children()), [])
         else:
-            if self.display_name is None:
-                return []
-            else:
-                return [self.display_name]
+            return [self.display_name_with_default]
 
     def get_children(self):
         """Returns a list of XBlock instances for the children of

@@ -100,10 +100,7 @@ class SplitTestModule(SplitTestFields, XModule):
         split_test's .child property contains *only* the child that should actually
         be shown to the user, so we call get_content_titles() on only that child.
         """
-        if self.child.display_name is None:
-            return []
-        else:
-            return [self.child.display_name]
+        return self.child.get_content_titles()
 
     def get_child_descriptors(self):
         """

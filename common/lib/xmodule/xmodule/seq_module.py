@@ -88,15 +88,12 @@ class SequenceModule(SequenceFields, XModule):
             rendered_child = child.render('student_view', context)
             fragment.add_frag_resources(rendered_child)
 
-            for grand_child in child.get_children():
-                title = grand_child.display_name
-                if title:
-                    break
-            else:
-                title = child.display_name_with_default
+            titles = child.get_content_titles()
+            print titles
             childinfo = {
                 'content': rendered_child.content,
-                'title': "\n".join(item for item in child.get_content_titles()),
+                'title': "\n".join(titles),
+                'page_title': titles[0] if titles else '',
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
