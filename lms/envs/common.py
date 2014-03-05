@@ -1159,9 +1159,6 @@ INSTALLED_APPS = (
     'reverification',
 
     'embargo',
-
-    # XBlocks containing migrations
-    'mentoring',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1454,11 +1451,17 @@ ALL_LANGUAGES = (
 )
 
 
-### JSdraw (only installed in some instances)
+### Apps only installed in some instances
 
-try:
-    import edx_jsdraw
-except ImportError:
-    pass
-else:
-    INSTALLED_APPS += ('edx_jsdraw',)
+OPTIONAL_APPS = (
+    'edx_jsdraw',
+    'mentoring',
+)
+
+for app_name in OPTIONAL_APPS:
+    try:
+        __import__(app_name)
+    except ImportError:
+        pass
+    else:
+        INSTALLED_APPS += (app_name,)

@@ -467,9 +467,6 @@ INSTALLED_APPS = (
     # for course creator table
     'django.contrib.admin',
 
-    # XBlocks containing migrations
-    'mentoring',
-
     # for managing course modes
     'course_modes',
 
@@ -536,11 +533,17 @@ MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 
 
-### JSdraw (only installed in some instances)
+### Apps only installed in some instances
 
-try:
-    import edx_jsdraw
-except ImportError:
-    pass
-else:
-    INSTALLED_APPS += ('edx_jsdraw',)
+OPTIONAL_APPS = (
+    'edx_jsdraw',
+    'mentoring',
+)
+
+for app_name in OPTIONAL_APPS:
+    try:
+        __import__(app_name)
+    except ImportError:
+        pass
+    else:
+        INSTALLED_APPS += (app_name,)
