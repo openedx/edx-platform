@@ -1199,17 +1199,6 @@ VERIFY_STUDENT = {
 if FEATURES.get('CLASS_DASHBOARD'):
     INSTALLED_APPS += ('class_dashboard',)
 
-######################## CAS authentication ###########################
-
-if FEATURES.get('AUTH_USE_CAS'):
-    CAS_SERVER_URL = 'https://provide_your_cas_url_here'
-    AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.ModelBackend',
-        'django_cas.backends.CASBackend',
-    )
-    INSTALLED_APPS += ('django_cas',)
-    MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
-
 ###################### Registration ##################################
 
 # For each of the fields, give one of the following values:

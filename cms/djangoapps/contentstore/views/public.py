@@ -44,6 +44,10 @@ def login_page(request):
         # to course now that the user is authenticated via
         # the decorator.
         return redirect('/course')
+    if settings.FEATURES.get('AUTH_USE_CAS'):
+        # If CAS is enabled, redirect auth handling to there
+        return redirect(reverse('cas-login'))
+
     return render_to_response(
         'login.html',
         {

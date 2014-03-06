@@ -344,6 +344,9 @@ def signin_user(request):
         # branding and allow that to process the login if it
         # is enabled and the header is in the request.
         return redirect(reverse('root'))
+    if settings.FEATURES.get('AUTH_USE_CAS'):
+        # If CAS is enabled, redirect auth handling to there
+        return redirect(reverse('cas-login'))
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
