@@ -26,7 +26,7 @@ class UnitPage(PageObject):
 
     def is_browser_on_page(self):
         # Wait until all components have been loaded
-        number_of_leaf_xblocks = len(self.q(css='{} .xblock-student_view'.format(Component.BODY_SELECTOR)))
+        number_of_leaf_xblocks = len(self.q(css='{} .xblock-studio_preview_view'.format(Component.BODY_SELECTOR)))
         number_of_container_xblocks = len(self.q(css='{} .wrapper-xblock'.format(Component.BODY_SELECTOR)))
         return (
             self.is_css_present('body.view-unit') and
@@ -91,7 +91,7 @@ class Component(PageObject):
 
     @property
     def preview_selector(self):
-        return self._bounded_selector('.xblock-student_view')
+        return self._bounded_selector('.xblock-studio_preview_view')
 
     def edit(self):
         self.css_click(self._bounded_selector('.edit-button'))

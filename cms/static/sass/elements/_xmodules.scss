@@ -1,8 +1,8 @@
 // studio - elements - xmodules & xblocks
 // ====================
 
-// general - display mode (xblock-student_view or xmodule_display)
-.xmodule_display, .xblock-student_view {
+// general - display mode (xblock-student_view, xblock_studio_preview_view or xmodule_display)
+.xmodule_display, .xblock-student_view, .xblock_studio_preview_view {
 
   // font styling
   i, em {
@@ -16,7 +16,7 @@
 .xmodule_VideoModule {
 
   // display mode
-  &.xblock-student_view {
+  &.xblock-student_view, &.xblock_studio_preview_view {
 
     // full screen
     .video-controls .add-fullscreen {

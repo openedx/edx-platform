@@ -12,6 +12,7 @@ from xmodule.x_module import XModule, module_attr
 from lxml import etree
 
 from xblock.core import XBlock
+from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Integer, ReferenceValueDict
 from xblock.fragment import Fragment
 
@@ -41,7 +42,7 @@ class SplitTestFields(object):
 
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
-@XBlock.needs('partitions')
+@XBlock.wants('partitions')
 class SplitTestModule(SplitTestFields, XModule):
     """
     Show the user the appropriate child.  Uses the ExperimentState
@@ -61,7 +62,10 @@ class SplitTestModule(SplitTestFields, XModule):
 
         super(SplitTestModule, self).__init__(*args, **kwargs)
 
-        self.child_descriptor = self.get_child_descriptors()[0]
+        self.child_descriptor = None
+        child_descriptors = self.get_child_descriptors()
+        if len(child_descriptors) >= 1:
+            self.child_descriptor = child_descriptors[0]
         if self.child_descriptor is not None:
             self.child = self.system.get_module(self.child_descriptor)
         else:
@@ -106,7 +110,9 @@ class SplitTestModule(SplitTestFields, XModule):
         """
         For grading--return just the chosen child.
         """
-        group_id = self.runtime.service(self, 'partitions').get_user_group_for_partition(self.user_partition_id)
+        group_id = self.get_group_id()
+        if group_id is None:
+            return []
 
         # group_id_to_child comes from json, so it has to have string keys
         str_group_id = str(group_id)
@@ -125,6 +131,15 @@ class SplitTestModule(SplitTestFields, XModule):
             return []
 
         return [child_descriptor]
+
+    def get_group_id(self):
+        """
+        Returns the group ID, or none if none is available.
+        """
+        partitions_service = self.runtime.service(self, 'partitions')
+        if not partitions_service:
+            return None
+        return partitions_service.get_user_group_for_partition(self.user_partition_id)
 
     def _staff_view(self, context):
         """
@@ -153,6 +168,28 @@ class SplitTestModule(SplitTestFields, XModule):
         fragment.add_css('.split-test-child { display: none; }')
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_staff.js'))
         fragment.initialize_js('ABTestSelector')
+        return fragment
+
+    def studio_preview_view(self, context):
+        """
+        Renders the Studio preview by rendering each child so that they can all be seen and edited.
+        """
+        fragment = Fragment()
+        contents = []
+
+        for child in self.descriptor.get_children():
+            rendered_child = self.runtime.get_module(child).render('student_view', context)
+            fragment.add_frag_resources(rendered_child)
+
+            contents.append({
+                'id': child.id,
+                'content': rendered_child.content
+            })
+
+        fragment.add_content(self.system.render_template('vert_module.html', {
+            'items': contents
+        }))
+
         return fragment
 
     def student_view(self, context):
@@ -197,7 +234,7 @@ class SplitTestModule(SplitTestFields, XModule):
 
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
-@XBlock.needs('partitions')
+@XBlock.wants('partitions')
 class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
