@@ -123,7 +123,7 @@ class @HTMLEditingDescriptor
     # both the startContent must be sync'ed up and the dirty flag set to false.
     content = rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url)
     visualEditor.setContent(content)
-    visualEditor.startContent = content
+    visualEditor.startContent = visualEditor.getContent({format : 'raw'})
     @focusVisualEditor(visualEditor)
     @showingVisualEditor = true
 
@@ -133,8 +133,6 @@ class @HTMLEditingDescriptor
 
   focusVisualEditor: (visualEditor) =>
     visualEditor.focus()
-    # Need to mark editor as not dirty both when it is initially created and when we switch back to it.
-    visualEditor.isNotDirty = true
     if not @$mceToolbar?
       @$mceToolbar = $(@element).find('table.mceToolbar')
 
