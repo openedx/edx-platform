@@ -59,7 +59,8 @@ from xmodule.modulestore.locator import (
     BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree,
     LocalId, Locator
 )
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
+    DuplicateCourseError
 from xmodule.modulestore import inheritance, ModuleStoreWriteBase, Location, SPLIT_MONGO_MODULESTORE_TYPE
 
 from ..exceptions import ItemNotFoundError
@@ -675,26 +676,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             serial += 1
         return category + str(serial)
 
-    def _generate_package_id(self, id_root):
-        """
-        Generate a somewhat readable course id unique w/in this db using the id_root
-        :param course_blocks: the current list of blocks.
-        :param category:
-        """
-        existing_uses = self.db_connection.find_matching_course_indexes({"_id": {"$regex": id_root}})
-        if existing_uses.count() > 0:
-            max_found = 0
-            matcher = re.compile(id_root + r'(\d+)')
-            for entry in existing_uses:
-                serial = re.search(matcher, entry['_id'])
-                if serial is not None and serial.groups > 0:
-                    value = int(serial.group(1))
-                    if value > max_found:
-                        max_found = value
-            return id_root + str(max_found + 1)
-        else:
-            return id_root
-
     # DHM: Should I rewrite this to take a new xblock instance rather than to construct it? That is, require the
     # caller to use XModuleDescriptor.load_from_json thus reducing similar code and making the object creation and
     # validation behavior a responsibility of the model layer rather than the persistence layer.
@@ -830,7 +811,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         return self.get_item(item_loc)
 
     def create_course(
-        self, org, prettyid, user_id, id_root=None, fields=None,
+        self, course_id, org, prettyid, user_id, fields=None,
         master_branch='draft', versions_dict=None, root_category='course',
         root_block_id='course'
     ):
@@ -838,8 +819,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         Create a new entry in the active courses index which points to an existing or new structure. Returns
         the course root of the resulting entry (the location has the course id)
 
-        id_root: allows the caller to specify the package_id. It's a root in that, if it's already taken,
-        this method will append things to the root to make it unique. (defaults to org)
+        course_id: If it's already taken, this method will raise DuplicateCourseError
 
         fields: if scope.settings fields provided, will set the fields of the root course object in the
         new course. If both
@@ -865,6 +845,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         provide any fields overrides, see above). if not provided, will create a mostly empty course
         structure with just a category course root xblock.
         """
+        # check course_id's uniqueness
+        index = self.db_connection.get_course_index(course_id)
+        if index is not None:
+            raise DuplicateCourseError(course_id, index)
+
         partitioned_fields = self.partition_fields_by_scope(root_category, fields)
         block_fields = partitioned_fields.setdefault(Scope.settings, {})
         if Scope.children in partitioned_fields:
@@ -929,20 +914,15 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 self.db_connection.insert_structure(draft_structure)
                 versions_dict[master_branch] = new_id
 
-        # create the index entry
-        if id_root is None:
-            id_root = org
-        new_id = self._generate_package_id(id_root)
-
         index_entry = {
-            '_id': new_id,
+            '_id': course_id,
             'org': org,
             'prettyid': prettyid,
             'edited_by': user_id,
             'edited_on': datetime.datetime.now(UTC),
             'versions': versions_dict}
         self.db_connection.insert_course_index(index_entry)
-        return self.get_course(CourseLocator(package_id=new_id, branch=master_branch))
+        return self.get_course(CourseLocator(package_id=course_id, branch=master_branch))
 
     def update_item(self, descriptor, user_id, allow_not_found=False, force=False):
         """

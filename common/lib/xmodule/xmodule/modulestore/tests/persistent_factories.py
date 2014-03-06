@@ -33,15 +33,16 @@ class PersistentCourseFactory(SplitFactory):
 
     # pylint: disable=W0613
     @classmethod
-    def _create(cls, target_class, org='testX', prettyid='999', user_id='test_user',
-                master_branch='draft', id_root=None, **kwargs):
+    def _create(cls, target_class, course_id='testX.999', org='testX', prettyid='999', user_id='test_user',
+                master_branch='draft', **kwargs):
 
         modulestore = kwargs.pop('modulestore')
         root_block_id = kwargs.pop('root_block_id', 'course')
         # Write the data to the mongo datastore
         new_course = modulestore.create_course(
-            org, prettyid, user_id, fields=kwargs, id_root=id_root or prettyid,
-            master_branch=master_branch, root_block_id=root_block_id)
+            course_id, org, prettyid, user_id, fields=kwargs,
+            master_branch=master_branch, root_block_id=root_block_id
+        )
 
         return new_course
 

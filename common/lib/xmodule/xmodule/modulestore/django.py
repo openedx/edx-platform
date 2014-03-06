@@ -184,7 +184,7 @@ def editable_modulestore(name='default'):
 
     # At this point, we either have the ability to create
     # items in the store, or we do not.
-    if hasattr(store, 'create_xmodule'):
+    if hasattr(store, 'create_course'):
         return store
 
     else:
