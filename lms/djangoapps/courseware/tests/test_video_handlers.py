@@ -161,6 +161,8 @@ class TestVideoTranscriptTranslation(TestVideo):
         self.item_descriptor.render('student_view')
         self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
 
+    # Tests for `download` dispatch:
+
     def test_language_is_not_supported(self):
         request = Request.blank('/download?language=ru')
         response = self.item.transcript(request=request, dispatch='download')
@@ -176,6 +178,15 @@ class TestVideoTranscriptTranslation(TestVideo):
         request = Request.blank('/download?language=en')
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.body, 'Subs!')
+
+    def test_download_en_no_sub(self):
+        request = Request.blank('/download?language=en')
+        response = self.item.transcript(request=request, dispatch='download')
+        self.assertEqual(response.status, '404 Not Found')
+        with self.assertRaises(NotFoundError):
+            self.item.get_transcript()
+
+    # Tests for `translation` dispatch:
 
     def test_translation_fails(self):
         # No videoId

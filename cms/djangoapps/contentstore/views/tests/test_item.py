@@ -132,6 +132,31 @@ class GetItem(ItemTest):
         # Verify that the Studio element wrapper has been added
         self.assertIn('level-element', html)
 
+    def test_get_container_nested_container_fragment(self):
+        """
+        Test the case of the container page containing a link to another container page.
+        """
+        # Add a wrapper with child beneath a child vertical
+        root_locator = self._create_vertical()
+
+        resp = self.create_xblock(parent_locator=root_locator, category="wrapper")
+        self.assertEqual(resp.status_code, 200)
+        wrapper_locator = self.response_locator(resp)
+
+        resp = self.create_xblock(parent_locator=wrapper_locator, category='problem', boilerplate='multiplechoice.yaml')
+        self.assertEqual(resp.status_code, 200)
+
+        # Get the preview HTML and verify the View -> link is present.
+        html, __ = self._get_container_preview(root_locator)
+        self.assertIn('wrapper-xblock', html)
+        self.assertRegexpMatches(
+            html,
+            # The instance of the wrapper class will have an auto-generated ID (wrapperxxx). Allow anything
+            # for the 3 characters after wrapper.
+            (r'"/container/MITx.999.Robot_Super_Course/branch/published/block/wrapper.{3}" class="action-button">\s*'
+             '<span class="action-button-text">View</span>')
+        )
+
 
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
@@ -636,11 +661,11 @@ class TestComponentHandler(TestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
 
-        patcher = patch('contentstore.views.component.modulestore')
-        self.modulestore = patcher.start()
+        patcher = patch('contentstore.views.component.get_modulestore')
+        self.get_modulestore = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.descriptor = self.modulestore.return_value.get_item.return_value
+        self.descriptor = self.get_modulestore.return_value.get_item.return_value
 
         self.usage_id = 'dummy_usage_id'
 

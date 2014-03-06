@@ -30,6 +30,8 @@ Types** tab, and then click the name of the problem. (Note that
 **Checkbox** doesn't appear in the list of common problem types. To
 create a checkbox problem, you'll click **Blank Common Problem**.)
 
+.. note:: All problems must include labels for accessibility. The label generally includes the text of the main question in your problem. To add a label for a common problem, surround the text of the label with angle brackets pointed toward the text (>>*label text*<<).
+
 .. _Checkbox:
 
 *******************
@@ -53,7 +55,7 @@ Create a Checkbox Problem
 #. In the Problem component that appears, click **Edit**.
 #. In the component editor, replace the default text with the text of your 
    problem. Enter each answer option on its own line.
-#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (<<>>).
+#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (>><<).
 #. Select all the answer options, and then click the checkbox button. 
 
    .. image:: Images/ProbComponent_CheckboxIcon.gif
@@ -189,7 +191,7 @@ To create a dropdown problem, follow these steps.
 #. In the new Problem component that appears, click **Edit**.
 #. Replace the default text with the text for your problem. Enter each of the possible 
    answers on the same line, separated by commas.
-#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (<<>>).
+#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (>><<).
 #. Select all the answer options, and then click the dropdown button. 
       
    .. image:: Images/ProbCompButton_Dropdown.gif
@@ -310,7 +312,7 @@ Create a Multiple Choice Problem
 #. When the new Problem component appears, click **Edit**.
 #. In the component editor, replace the sample problem text with the text of your 
    problem. Enter each answer option on its own line.
-#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (<<>>).
+#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (>><<).
 #. Select all the answer options, and then click the multiple choice button. 
    
    .. image:: Images/ProbCompButton_MultChoice.gif
@@ -535,7 +537,7 @@ Create a Numerical Input Problem in the Simple Editor
    Input** on the **Common Problem Types** tab.
 #. When the new Problem component appears, click **Edit**.
 #. In the component editor, replace the sample problem text with your own text.
-#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (<<>>).
+#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (>><<).
 #. Select the text of the answer, and then click the numerical input button. 
 
    .. image:: Images/ProbCompButton_NumInput.gif
@@ -749,7 +751,7 @@ To create a text input problem, follow these steps.
    on the **Common Problem Types** tab.
 #. In the new Problem component that appears, click **Edit**.
 #. Replace the default text with the text for your problem.
-#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (<<>>).
+#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (>><<).
 #. Select the text of the answer, and then click the text input button. 
    
    .. image:: Images/ProbCompButton_TextInput.gif

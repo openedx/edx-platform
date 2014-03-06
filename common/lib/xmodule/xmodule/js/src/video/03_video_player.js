@@ -35,6 +35,8 @@ function (HTML5Video, Resizer) {
             play: play,
             setPlaybackRate: setPlaybackRate,
             update: update,
+            figureOutStartEndTime: figureOutStartEndTime,
+            figureOutStartingTime: figureOutStartingTime,
             updatePlayTime: updatePlayTime
         };
 
@@ -62,7 +64,7 @@ function (HTML5Video, Resizer) {
     //     via the 'state' object. Much easier to work this way - you don't
     //     have to do repeated jQuery element selects.
     function _initialize(state) {
-        var youTubeId, player, duration;
+        var youTubeId, player;
 
         // The function is called just once to apply pre-defined configurations
         // by student before video starts playing. Waits until the video's
@@ -134,22 +136,7 @@ function (HTML5Video, Resizer) {
 
                 _resize(state, videoWidth, videoHeight);
 
-                duration = state.videoPlayer.duration();
-
-                state.trigger(
-                    'videoControl.updateVcrVidTime',
-                    {
-                        time: 0,
-                        duration: duration
-                    }
-                );
-
-                state.trigger(
-                    'videoProgressSlider.updateStartEndTimeRegion',
-                    {
-                        duration: duration
-                    }
-                );
+                _updateVcrAndRegion(state);
             }, false);
 
         } else { // if (state.videoType === 'youtube') {
@@ -200,19 +187,31 @@ function (HTML5Video, Resizer) {
     }
 
     function _updateVcrAndRegion(state) {
-        var duration = state.videoPlayer.duration();
+        var duration = state.videoPlayer.duration(),
+            time;
 
+        time = state.videoPlayer.figureOutStartingTime(duration);
+
+        // Update the VCR.
         state.trigger(
             'videoControl.updateVcrVidTime',
             {
-                time: 0,
+                time: time,
                 duration: duration
             }
         );
 
+        // Update the time slider.
         state.trigger(
             'videoProgressSlider.updateStartEndTimeRegion',
             {
+                duration: duration
+            }
+        );
+        state.trigger(
+            'videoProgressSlider.updatePlayTime',
+            {
+                time: time,
                 duration: duration
             }
         );
@@ -642,62 +641,46 @@ function (HTML5Video, Resizer) {
         }
     }
 
-    function updatePlayTime(time) {
-        var videoPlayer = this.videoPlayer,
-            duration = this.videoPlayer.duration(),
-            savedVideoPosition = this.config.savedVideoPosition,
-            youTubeId, startTime, endTime;
+    function figureOutStartEndTime(duration) {
+        var videoPlayer = this.videoPlayer;
 
-        if (duration > 0 && videoPlayer.goToStartTime) {
-            videoPlayer.goToStartTime = false;
+        videoPlayer.startTime = this.config.startTime;
+        if (videoPlayer.startTime >= duration) {
+            videoPlayer.startTime = 0;
+        } else if (this.currentPlayerMode === 'flash') {
+            videoPlayer.startTime /= Number(this.speed);
+        }
 
-            videoPlayer.startTime = this.config.startTime;
-            if (videoPlayer.startTime >= duration) {
-                videoPlayer.startTime = 0;
-            } else if (this.currentPlayerMode === 'flash') {
-                videoPlayer.startTime /= Number(this.speed);
-            }
+        videoPlayer.endTime = this.config.endTime;
+        if (
+            videoPlayer.endTime <= videoPlayer.startTime ||
+            videoPlayer.endTime >= duration
+        ) {
+            videoPlayer.stopAtEndTime = false;
+            videoPlayer.endTime = null;
+        } else if (this.currentPlayerMode === 'flash') {
+            videoPlayer.endTime /= Number(this.speed);
+        }
+    }
 
-            videoPlayer.endTime = this.config.endTime;
+    function figureOutStartingTime(duration) {
+        var savedVideoPosition = this.config.savedVideoPosition,
+
+            // Default starting time is 0. This is the case when
+            // there is not start-time, no previously saved position,
+            // or one (or both) of those values is incorrect.
+            time = 0,
+
+            startTime, endTime;
+
+        this.videoPlayer.figureOutStartEndTime(duration);
+
+        startTime = this.videoPlayer.startTime;
+        endTime   = this.videoPlayer.endTime;
+
+        if (startTime > 0) {
             if (
-                videoPlayer.endTime <= videoPlayer.startTime ||
-                videoPlayer.endTime >= duration
-            ) {
-                videoPlayer.stopAtEndTime = false;
-                videoPlayer.endTime = null;
-            } else if (this.currentPlayerMode === 'flash') {
-                videoPlayer.endTime /= Number(this.speed);
-            }
-
-            this.trigger(
-                'videoProgressSlider.updateStartEndTimeRegion',
-                {
-                    duration: duration
-                }
-            );
-
-            startTime = videoPlayer.startTime;
-            endTime = videoPlayer.endTime;
-
-            if (startTime) {
-                if (
-                    startTime < savedVideoPosition &&
-                    (endTime > savedVideoPosition || endTime === null) &&
-
-                    // We do not want to jump to the end of the video.
-                    // We subtract 1 from the duration for a 1 second
-                    // safety net.
-                    savedVideoPosition < duration - 1
-                ) {
-                    time = savedVideoPosition;
-
-                    // When the video finishes playing, we will start from the
-                    // start-time, rather than from the remembered position
-                    this.config.savedVideoPosition = 0;
-                } else {
-                    time = startTime;
-                }
-            } else if (
+                startTime < savedVideoPosition &&
                 (endTime > savedVideoPosition || endTime === null) &&
 
                 // We do not want to jump to the end of the video.
@@ -706,13 +689,47 @@ function (HTML5Video, Resizer) {
                 savedVideoPosition < duration - 1
             ) {
                 time = savedVideoPosition;
-
-                // When the video finishes playing, we will start from the
-                // start-time, rather than from the remembered position
-                this.config.savedVideoPosition = 0;
             } else {
-                time = 0;
+                time = startTime;
             }
+        } else if (
+            savedVideoPosition > 0 &&
+            (endTime > savedVideoPosition || endTime === null) &&
+
+            // We do not want to jump to the end of the video.
+            // We subtract 1 from the duration for a 1 second
+            // safety net.
+            savedVideoPosition < duration - 1
+        ) {
+            time = savedVideoPosition;
+        }
+
+        return time;
+    }
+
+    function updatePlayTime(time) {
+        var videoPlayer = this.videoPlayer,
+            duration = this.videoPlayer.duration(),
+            youTubeId;
+
+        if (duration > 0 && videoPlayer.goToStartTime) {
+            videoPlayer.goToStartTime = false;
+
+            // The duration might have changed. Update the start-end time region to
+            // reflect this fact.
+            this.trigger(
+                'videoProgressSlider.updateStartEndTimeRegion',
+                {
+                    duration: duration
+                }
+            );
+
+            time = videoPlayer.figureOutStartingTime(duration);
+
+            // When the video finishes playing, we will start from the
+            // start-time, or from the beginning (rather than from the remembered
+            // position).
+            this.config.savedVideoPosition = 0;
 
             if (time > 0) {
                 // After a bug came up (BLD-708: "In Firefox YouTube video with

@@ -20,6 +20,10 @@ define [
         super()
         @savingNotification = new NotificationView.Mini
             title: gettext('Saving&hellip;')
+        @alert = new NotificationView.Error
+            title: "OpenAssessment Save Error",
+            closeIcon: false,
+            shown: false
 
       handlerUrl: (element, handlerName, suffix, query, thirdparty) ->
         uri = URI("/xblock").segment($(element).data('usage-id'))
@@ -41,11 +45,15 @@ define [
 
             # Starting to save, so show the "Saving..." notification
             if data.state == 'start'
-                @_hideEditor()
                 @savingNotification.show()
 
             # Finished saving, so hide the "Saving..." notification
             else if data.state == 'end'
+
+                # Hide the editor *after* we finish saving in case there are validation
+                # errors that the user needs to correct.
+                @_hideEditor()
+
                 $('.component.editing').removeClass('editing')
                 @savingNotification.hide()
 
@@ -54,7 +62,8 @@ define [
 
         else if name == 'error'
             if 'msg' of data
-                @_showAlert(data.msg)
+                @alert.options.message = data.msg
+                @alert.show()
 
       _hideEditor: () ->
           # This will close all open component editors, which works
@@ -64,9 +73,6 @@ define [
           el.find('.component-editor').slideUp(150)
           ModalUtils.hideModalCover()
 
-      _showAlert: (msg) ->
-        new NotificationView.Error({
-            title: "OpenAssessment Save Error",
-            message: msg,
-            closeIcon: false
-        }).show()
+          # Hide any alerts that are being shown
+          if @alert.options.shown
+              @alert.hide()

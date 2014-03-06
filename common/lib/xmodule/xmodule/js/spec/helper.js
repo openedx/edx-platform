@@ -253,8 +253,8 @@
         return state;
     };
 
-    jasmine.initializePlayerYouTube = function () {
+    jasmine.initializePlayerYouTube = function (params) {
         // "video.html" contains HTML template for a YouTube video.
-        return jasmine.initializePlayer('video.html');
+        return jasmine.initializePlayer('video.html', params);
     };
 }).call(this, window.jQuery);

@@ -367,7 +367,7 @@ class PaidCourseRegistration(OrderItem):
         item.mode = course_mode.slug
         item.qty = 1
         item.unit_cost = cost
-        item.line_desc = 'Registration for Course: {0}'.format(course.display_name_with_default)
+        item.line_desc = u'Registration for Course: {0}'.format(course.display_name_with_default)
         item.currency = currency
         order.currency = currency
         item.report_comments = item.csv_report_comments

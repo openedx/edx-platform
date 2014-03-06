@@ -31,7 +31,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.course.days_early_for_beta = 5
         self.course.enrollment_start = datetime.datetime.now(UTC) + datetime.timedelta(days=3)
-        self.store.save_xmodule(self.course)
+        self.store.update_item(self.course)
 
     @override_settings(FEATURES=FEATURES_WITH_STARTDATE)
     def test_none_user_index_access_with_startdate_fails(self):

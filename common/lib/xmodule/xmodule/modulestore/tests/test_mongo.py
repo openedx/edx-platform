@@ -56,6 +56,7 @@ class TestMongoModuleStore(object):
     def teardownClass(cls):
         if cls.connection:
             cls.connection.drop_database(DB)
+            cls.connection.close()
 
     @staticmethod
     def initdb():

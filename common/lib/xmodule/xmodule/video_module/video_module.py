@@ -342,7 +342,7 @@ class VideoModule(VideoFields, XModule):
 
             try:
                 transcript = self.translation(request.GET.get('videoId'))
-            except TranscriptException as ex:
+            except (TranscriptException, NotFoundError) as ex:
                 log.info(ex.message)
                 response = Response(status=404)
             else:
@@ -414,6 +414,9 @@ class VideoModule(VideoFields, XModule):
         Filenames naming:
             en: subs_videoid.srt.sjson
             non_en: uk_subs_videoid.srt.sjson
+
+        Raises:
+            NotFoundError if for 'en' subtitles no asset is uploaded.
         """
         if self.transcript_language == 'en':
             return asset(self.location, subs_id).data

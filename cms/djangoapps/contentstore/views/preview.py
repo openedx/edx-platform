@@ -179,6 +179,8 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         }
         if xblock.category == 'vertical':
             template = 'studio_vertical_wrapper.html'
+        elif xblock.location != context.get('root_xblock').location and xblock.has_children:
+            template = 'container_xblock_component.html'
         else:
             template = 'studio_xblock_wrapper.html'
         html = render_to_string(template, template_context)

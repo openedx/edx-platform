@@ -74,7 +74,34 @@ class TestInvalidScopes(TestCase):
             self.assertRaises(InvalidScopeError, self.kvs.set_many, {key: 'value'})
 
 
-class TestStudentModuleStorage(TestCase):
+class OtherUserFailureTestMixin(object):
+    """
+    Mixin class to add test cases for failures when a user trying to use the kvs is not
+    the one that instantiated the kvs.
+    Doing a mixin rather than modifying StorageTestBase (below) because some scopes don't fail in this case, because
+    they aren't bound to a particular user
+
+    assumes that this is mixed into a class that defines other_key_factory and existing_field_name
+    """
+    def test_other_user_kvs_get_failure(self):
+        """
+        Test for assert failure when a user who didn't create the kvs tries to get from it it
+        """
+        with self.assertRaises(AssertionError):
+            self.kvs.get(self.other_key_factory(self.existing_field_name))
+
+    def test_other_user_kvs_set_failure(self):
+        """
+        Test for assert failure when a user who didn't create the kvs tries to get from it it
+        """
+        with self.assertRaises(AssertionError):
+            self.kvs.set(self.other_key_factory(self.existing_field_name), "new_value")
+
+
+class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
+    """Tests for user_state storage via StudentModule"""
+    other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_state, 2, location('usage_id'))  # user_id=2, not 1
+    existing_field_name = "a_field"
 
     def setUp(self):
         student_module = StudentModuleFactory(state=json.dumps({'a_field': 'a_value', 'b_field': 'b_value'}))
@@ -291,21 +318,28 @@ class StorageTestBase(object):
 
 
 class TestContentStorage(StorageTestBase, TestCase):
+    """Tests for ContentStorage"""
     factory = UserStateSummaryFactory
     scope = Scope.user_state_summary
     key_factory = user_state_summary_key
     storage_class = XModuleUserStateSummaryField
 
 
-class TestStudentPrefsStorage(StorageTestBase, TestCase):
+class TestStudentPrefsStorage(OtherUserFailureTestMixin, StorageTestBase, TestCase):
+    """Tests for StudentPrefStorage"""
     factory = StudentPrefsFactory
     scope = Scope.preferences
     key_factory = prefs_key
     storage_class = XModuleStudentPrefsField
+    other_key_factory = partial(DjangoKeyValueStore.Key, Scope.preferences, 2, 'mock_problem')  # user_id=2, not 1
+    existing_field_name = "existing_field"
 
 
-class TestStudentInfoStorage(StorageTestBase, TestCase):
+class TestStudentInfoStorage(OtherUserFailureTestMixin, StorageTestBase, TestCase):
+    """Tests for StudentInfoStorage"""
     factory = StudentInfoFactory
     scope = Scope.user_info
     key_factory = user_info_key
     storage_class = XModuleStudentInfoField
+    other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_info, 2, 'mock_problem')  # user_id=2, not 1
+    existing_field_name = "existing_field"

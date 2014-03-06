@@ -16,6 +16,7 @@ from .common import *
 import os
 from path import path
 from warnings import filterwarnings
+from xmodule.modulestore import prefer_xmodules
 
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -158,7 +159,6 @@ filterwarnings('ignore', message='No request passed to the backend, unable to ra
 
 
 ################################# XBLOCK ######################################
-from xmodule.x_module import prefer_xmodules
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 

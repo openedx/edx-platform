@@ -16,7 +16,7 @@ from django.utils.translation import ugettext as _
 <%
 xblock_info = {
     'id': str(xblock_locator),
-    'display-name': xblock.display_name,
+    'display-name': xblock.display_name_with_default,
     'category': xblock.category,
 };
 %>
@@ -47,14 +47,16 @@ xblock_info = {
     <header class="mast has-actions has-navigation">
         <h1 class="page-header">
             <small class="navigation navigation-parents">
-                <%
-                parent_url = xblock_studio_url(parent_xblock, context_course)
-                %>
-                % if parent_url:
-                <a href="${parent_url}"
-                   class="navigation-link navigation-parent">${parent_xblock.display_name | h}</a>
-                % endif
-                <a href="#" class="navigation-link navigation-current">${xblock.display_name | h}</a>
+                % for ancestor in ancestor_xblocks:
+                    <%
+                    ancestor_url = xblock_studio_url(ancestor, context_course)
+                    %>
+                    % if ancestor_url:
+                    <a href="${ancestor_url}"
+                       class="navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
+                    % endif
+                % endfor
+                <a href="#" class="navigation-link navigation-current">${xblock.display_name_with_default | h}</a>
             </small>
         </h1>
 

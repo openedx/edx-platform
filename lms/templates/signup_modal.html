@@ -71,7 +71,7 @@
               <select id="signup_ed_level" name="level_of_education">
                   <option value="">--</option>
                   %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
-                      <option value="${code}">${ed_level}</option>
+                      <option value="${code}">${_(ed_level)}</option>
                   %endfor
               </select>
             </div>
@@ -85,7 +85,7 @@
               <select id="signup_gender" name="gender">
                   <option value="">--</option>
                   %for code, gender in UserProfile.GENDER_CHOICES:
-                      <option value="${code}">${gender}</option>
+                      <option value="${code}">${_(gender)}</option>
                   %endfor
               </select>
             </div>

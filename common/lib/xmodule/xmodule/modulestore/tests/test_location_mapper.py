@@ -12,11 +12,11 @@ from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from mock import Mock
 
 
-class TestLocationMapper(unittest.TestCase):
+class LocMapperSetupSansDjango(unittest.TestCase):
     """
-    Test the location to locator mapper
+    Create and destroy a loc mapper for each test
     """
-
+    loc_store = None
     def setUp(self):
         modulestore_options = {
             'host': 'localhost',
@@ -27,14 +27,19 @@ class TestLocationMapper(unittest.TestCase):
         cache_standin = TrivialCache()
         self.instrumented_cache = Mock(spec=cache_standin, wraps=cache_standin)
         # pylint: disable=W0142
-        TestLocationMapper.loc_store = LocMapperStore(self.instrumented_cache, **modulestore_options)
+        LocMapperSetupSansDjango.loc_store = LocMapperStore(self.instrumented_cache, **modulestore_options)
 
     def tearDown(self):
         dbref = TestLocationMapper.loc_store.db
         dbref.drop_collection(TestLocationMapper.loc_store.location_map)
         dbref.connection.close()
-        TestLocationMapper.loc_store = None
+        self.loc_store = None
 
+
+class TestLocationMapper(LocMapperSetupSansDjango):
+    """
+    Test the location to locator mapper
+    """
     def test_create_map(self):
         org = 'foo_org'
         course = 'bar_course'
@@ -125,7 +130,7 @@ class TestLocationMapper(unittest.TestCase):
         )
         test_problem_locn = Location('i4x', org, course, 'problem', 'abc123')
         # only one course matches
-        self.translate_n_check(test_problem_locn, old_style_course_id, new_style_package_id, 'problem2', 'published')
+
         # look for w/ only the Location (works b/c there's only one possible course match). Will force
         # cache as default translation for this problemid
         self.translate_n_check(test_problem_locn, None, new_style_package_id, 'problem2', 'published')
@@ -389,7 +394,7 @@ def loc_mapper():
     """
     Mocks the global location mapper.
     """
-    return TestLocationMapper.loc_store
+    return LocMapperSetupSansDjango.loc_store
 
 
 def render_to_template_mock(*_args):

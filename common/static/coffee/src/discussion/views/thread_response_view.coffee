@@ -20,6 +20,7 @@ if Backbone?
       @template(templateData)
 
     render: ->
+      @$el.addClass("response_" + @model.get("id"))
       @$el.html(@renderTemplate())
       @delegateEvents()
 

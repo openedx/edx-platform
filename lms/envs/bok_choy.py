@@ -4,7 +4,7 @@ Settings for bok choy tests
 
 import os
 from path import path
-from xmodule.x_module import prefer_xmodules
+from xmodule.modulestore import prefer_xmodules
 
 
 CONFIG_ROOT = path(__file__).abspath().dirname()  #pylint: disable=E1120

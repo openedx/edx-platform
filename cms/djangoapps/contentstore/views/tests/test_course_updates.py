@@ -230,7 +230,8 @@ class CourseUpdateTest(CourseTestCase):
 
     def test_post_course_update(self):
         """
-        Test that a user can successfully post on course updates of a course whose location in not in loc_mapper
+        Test that a user can successfully post on course updates and handouts of a course
+        whose location in not in loc_mapper
         """
         # create a course via the view handler
         course_location = Location(['i4x', 'Org_1', 'Course_1', 'course', 'Run_1'])
@@ -270,3 +271,19 @@ class CourseUpdateTest(CourseTestCase):
         updates_locator = loc_mapper().translate_location(course_location.course_id, updates_location)
         self.assertTrue(isinstance(updates_locator, BlockUsageLocator))
         self.assertEqual(updates_locator.block_id, block)
+
+        # check posting on handouts
+        block = u'handouts'
+        handouts_locator = BlockUsageLocator(
+            package_id=updates_locator.package_id, branch=updates_locator.branch, version_guid=version, block_id=block
+        )
+        course_handouts_url = handouts_locator.url_reverse('xblock')
+        content = u"Sample handout"
+        payload = {"data": content}
+        resp = self.client.ajax_post(course_handouts_url, payload)
+
+        # check that response status is 200 not 500
+        self.assertEqual(resp.status_code, 200)
+
+        payload = json.loads(resp.content)
+        self.assertHTMLEqual(payload['data'], content)

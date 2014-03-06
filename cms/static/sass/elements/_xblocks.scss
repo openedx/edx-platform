@@ -55,7 +55,7 @@
 }
 
 // UI: xblock is collapsible
-.wrapper-xblock.is-collapsible {
+.wrapper-xblock.is-collapsible, .wrapper-xblock.xblock-type-container {
 
   [class^="icon-"] {
   font-style: normal;

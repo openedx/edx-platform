@@ -538,10 +538,8 @@ function (VideoPlayer) {
 
         describe('updatePlayTime', function () {
             beforeEach(function () {
-                state = jasmine.initializePlayer();
-
+                state = jasmine.initializePlayerYouTube();
                 state.videoEl = $('video, iframe');
-
                 spyOn(state.videoCaption, 'updatePlayTime').andCallThrough();
                 spyOn(state.videoProgressSlider, 'updatePlayTime').andCallThrough();
             });
@@ -560,27 +558,10 @@ function (VideoPlayer) {
                 }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
-                    var htmlStr;
-
                     state.videoPlayer.goToStartTime = false;
                     state.videoPlayer.updatePlayTime(60);
 
-                    htmlStr = $('.vidtime').html();
-
-                    // We resort to this trickery because Firefox and Chrome
-                    // round the total time a bit differently.
-                    if (
-                        htmlStr.match('1:00 / 1:01') ||
-                        htmlStr.match('1:00 / 1:00')
-                    ) {
-                        expect(true).toBe(true);
-                    } else {
-                        expect(true).toBe(false);
-                    }
-
-                    // The below test has been replaced by above trickery:
-                    //
-                    //     expect($('.vidtime')).toHaveHtml('1:00 / 1:01');
+                    expect($('.vidtime')).toHaveHtml('1:00 / 1:00');
                 });
             });
 
@@ -691,7 +672,9 @@ function (VideoPlayer) {
                         endTime: undefined,
                         player: {
                             seekTo: function () {}
-                        }
+                        },
+                        figureOutStartEndTime: jasmine.createSpy(),
+                        figureOutStartingTime: jasmine.createSpy().andReturn(0)
                     },
                     config: {
                         savedVideoPosition: 0,
@@ -711,6 +694,11 @@ function (VideoPlayer) {
 
             it('invalid endTime is reset to null', function () {
                 VideoPlayer.prototype.updatePlayTime.call(state, 0);
+
+                expect(state.videoPlayer.figureOutStartingTime).toHaveBeenCalled();
+
+                VideoPlayer.prototype.figureOutStartEndTime.call(state, 60);
+                VideoPlayer.prototype.figureOutStartingTime.call(state, 60);
 
                 expect(state.videoPlayer.endTime).toBe(null);
             });

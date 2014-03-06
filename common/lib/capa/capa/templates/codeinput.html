@@ -1,11 +1,16 @@
+<%! from django.utils.translation import ugettext as _ %>
 <section id="textbox_${id}" class="textbox">
-  <textarea rows="${rows}" cols="${cols}" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}"
+  <textarea rows="${rows}" cols="${cols}" name="input_${id}" 
+            aria-label="${_("{programming_language} editor").format(programming_language=mode)}" 
+            aria-describedby="answer_${id}" 
+            id="input_${id}" 
+            tabindex="0"
        % if hidden:
       	    style="display:none;"
        % endif
   >${value|h}</textarea>
 
-  <div class="grader-status">
+  <div class="grader-status" tabindex="1">
     % if status == 'unsubmitted':
       <span class="unanswered" style="display:inline-block;" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: </span>Unanswered</span>
     % elif status == 'correct':
@@ -44,13 +49,16 @@
         tabSize: "${tabsize}",
         indentWithTabs: false,
         extraKeys: {
+            "Esc": function(cm) {
+                $('.grader-status').focus();
+                return false;
+            },
             "Tab": function(cm) {
                 cm.replaceSelection("${' '*tabsize}", "end");
             }
         },
         smartIndent: false
       });
-      $("#textbox_${id}").find('.CodeMirror-scroll').height(${int(13.5*eval(rows))});
     });
   </script>
 </section>

@@ -127,6 +127,12 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
 
             return _delete_item_at_location(old_location, delete_children, delete_all_versions, request.user)
         else:  # Since we have a package_id, we are updating an existing xblock.
+            if block == 'handouts' and old_location is None:
+                # update handouts location in loc_mapper
+                course_location = loc_mapper().translate_locator_to_location(locator, get_course=True)
+                old_location = course_location.replace(category='course_info', name=block)
+                locator = loc_mapper().translate_location(course_location.course_id, old_location)
+
             return _save_item(
                 request,
                 locator,
@@ -202,16 +208,16 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
                 log.debug("unable to render studio_view for %r", component, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
-            store.save_xmodule(component)
+            # change not authored by requestor but by xblocks.
+            store.update_item(component, None)
+
         elif view_name == 'student_view' and component.has_children:
             # For non-leaf xblocks on the unit page, show the special rendering
             # which links to the new container page.
-            course_location = loc_mapper().translate_locator_to_location(locator, True)
-            course = store.get_item(course_location)
-            html = render_to_string('unit_container_xblock_component.html', {
-                'course': course,
+            html = render_to_string('container_xblock_component.html', {
                 'xblock': component,
-                'locator': locator
+                'locator': locator,
+                'reordering_enabled': True,
             })
             return JsonResponse({
                 'html': html,
@@ -521,8 +527,8 @@ def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid
     if request.method == 'DELETE':
         if request.user.is_staff:
             items = modulestore().get_orphans(old_location, 'draft')
-            for item in items:
-                modulestore('draft').delete_item(item, delete_all_versions=True)
+            for itemloc in items:
+                modulestore('draft').delete_item(itemloc, delete_all_versions=True)
             return JsonResponse({'deleted': items})
         else:
             raise PermissionDenied()

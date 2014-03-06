@@ -1003,7 +1003,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
         vertical.location = mongo.draft.as_draft(vertical.location.replace(name='no_references'))
 
-        draft_store.save_xmodule(vertical)
+        draft_store.update_item(vertical, allow_not_found=True)
         orphan_vertical = draft_store.get_item(vertical.location)
         self.assertEqual(orphan_vertical.location.name, 'no_references')
 
@@ -1020,13 +1020,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # now create a new/different private (draft only) vertical
         vertical.location = mongo.draft.as_draft(Location(['i4x', 'edX', 'toy', 'vertical', 'a_private_vertical', None]))
-        draft_store.save_xmodule(vertical)
+        draft_store.update_item(vertical, allow_not_found=True)
         private_vertical = draft_store.get_item(vertical.location)
         vertical = None  # blank out b/c i destructively manipulated its location 2 lines above
 
         # add the new private to list of children
-        sequential = module_store.get_item(Location(['i4x', 'edX', 'toy',
-                                           'sequential', 'vertical_sequential', None]))
+        sequential = module_store.get_item(
+            Location('i4x', 'edX', 'toy', 'sequential', 'vertical_sequential', None)
+        )
         private_location_no_draft = private_vertical.location.replace(revision=None)
         sequential.children.append(private_location_no_draft.url())
         module_store.update_item(sequential, self.user.id)

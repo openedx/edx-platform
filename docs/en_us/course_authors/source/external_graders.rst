@@ -48,33 +48,11 @@ External Graders and XQueue
 
 The edX Platform communicates with your external grader through XQueue.  XQueue provides students' input to the grader; it then receives results from the grader and returns them to students.  
 
-The queue for your course must be set up in one of two modes:
+Student submissions are collected in XQueue, where they remain until the grader actively retrieves, or pulls, the next submission from the queue for grading.
 
-*  **Pull**
-
-*  **Push**
-
-In most situations, edX recommends that you use Pull mode. Pull mode will prevent your grader from being overloaded by submissions it is not ready to process.
-
-You determine which mode to use when you are building your course and your grader. You must communicate this decision to your edX Program Manager. The student experience is not affected by this decision.
-
-==================
-Pull Mode
-==================
-
-In Pull mode, student submissions are collected in XQueue, where they remain until the grader actively retrieves, or pulls, the next submission from the queue for grading.
-
-The external grader polls the XQueue through a RESTful interface at a regular interval. When the external grader receives a submission, it runs the tests on it, then pushes the response back to XQueue through the RESTful interface. XQueue then delivers the response to the edX Learning Management System.
+The external grader polls the XQueue through a RESTful interface at a regular interval. When the external grader pulls a submission, it runs the tests on it, then pushes the response back to XQueue through the RESTful interface. XQueue then delivers the response to the edX Learning Management System.
 
 For example code of an external grader that uses Pull mode, see the `Stanford-Online repository xqueue_pull_ref <https://github.com/Stanford-Online/xqueue_pull_ref>`_.
-
-==================
-Push Mode
-==================
-
-In Push mode, XQueue actively pushes student submissions to the external grader, which passively waits for the next submission to grade. When the external grader receives a submission, it runs the tests on it, then synchronously delivers the graded response back to the XQueue. XQueue then delivers the response to the edX Learning Management System.
-
-For example code of an external grader that uses Push mode, see the `edX repository xserver <https://github.com/edx/xserver>`_.
 
 
 ============================
@@ -84,7 +62,7 @@ External Grader Workflow
 The following steps show the complete process:
 
 #. The student either enters code or attaches a file for a problem, then clicks Check.
-#. XQueue either pushes the code to the external grader, or waits until the external grader pulls the code.
+#. The external grader pulls the code from XQueue.
 #. The external grader runs the tests that you created on the code.
 #. The external grader returns the grade for the submission, as well as any results in a string, to XQueue. 
 #. The XQueue delivers the results to the edX Learning Management System.
@@ -176,7 +154,7 @@ Keep in mind that student submissions will likely come in spikes, not in an even
 Security
 ==================
 
-Students are submitting code that executes directly on a server that you are responsible for. It is possible that a student will submit malicious code. Your system must protect against this and ensure that the external grader runs only code that is relevent to the course problems.  How you implement these protections depends on the programming language you are using and your deployment architecture.  You must ensure that malicious code won't damage your server.
+Students are submitting code that executes directly on a server that you are responsible for. It is possible that a student will submit malicious code. Your system must protect against this and ensure that the external grader runs only code that is relevant to the course problems.  How you implement these protections depends on the programming language you are using and your deployment architecture.  You must ensure that malicious code won't damage your server.
 
 .. _Reliability and Recovery:
 
@@ -186,7 +164,7 @@ Reliability and Recovery
 
 Once your course starts, many students will submit code at any possible time, and expect to see results quickly.  If your external grader is prone to failure or unexpected delays, the student experience will be poor.
 
-Therefore, you must ensure that your grader has high availability and can recover from errors. Prior to your course starting, you must have a plan to immediately notifiy the team reponsible for operating your grader, as well as edX operations, when the grader fails. In collaboration with edX, you should develop a procedure to quickly identify the cause of failure, which can be your grader or edX's XQueue.
+Therefore, you must ensure that your grader has high availability and can recover from errors. Prior to your course starting, you must have a plan to immediately notify the team responsible for operating your grader, as well as edX operations, when the grader fails. In collaboration with edX, you should develop a procedure to quickly identify the cause of failure, which can be your grader or edX's XQueue.
 
 Contact your edX Program Manager for more information.
 
