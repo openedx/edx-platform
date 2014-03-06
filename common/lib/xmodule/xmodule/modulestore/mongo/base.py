@@ -321,13 +321,13 @@ class MongoModuleStore(ModuleStoreWriteBase):
         '''
         TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
         '''
-
         # get all collections in the course, this query should not return any leaf nodes
         # note this is a bit ugly as when we add new categories of containers, we have to add it here
+
+        block_types_with_children = set(name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False))
         query = {'_id.org': location.org,
                  '_id.course': location.course,
-                 '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical', 'videosequence',
-                                          'wrapper', 'problemset', 'conditional', 'randomize']}
+                 '_id.category': {'$in': list(block_types_with_children)}
                  }
         # we just want the Location, children, and inheritable metadata
         record_filter = {'_id': 1, 'definition.children': 1}
