@@ -1032,13 +1032,13 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
         return result
 
     def render(self, block, view_name, context=None):
-        if view_name == 'student_view' and block.xmodule_runtime:
-            runtime = block.xmodule_runtime
+        if view_name == 'student_view':
+            assert block.xmodule_runtime is not None
             if isinstance(block, (XModule, XModuleDescriptor)):
                 to_render = block._xmodule
             else:
                 to_render = block
-            return runtime.render(to_render, view_name, context)
+            return block.xmodule_runtime.render(to_render, view_name, context)
         else:
             return super(DescriptorSystem, self).render(block, view_name, context)
 
