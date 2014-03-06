@@ -23,8 +23,8 @@ class @Sequence
   updatePageTitle: ->
     # update the page title to include the current section
     position_link = @link_for(@position)
-    if position_link and position_link.attr('title')
-        document.title = position_link.attr('title') + @base_page_title
+    if position_link and position_link.data('page-title')
+        document.title = position_link.data('page-title') + @base_page_title
 
   hookUpProgressEvent: ->
     $('.problems-wrapper').bind 'progressChanged', @updateProgress
@@ -98,10 +98,10 @@ class @Sequence
       # Added for aborting video bufferization, see ../video/10_main.js
       @el.trigger "sequence:change"
       @mark_active new_position
-      
+
       current_tab = @contents.eq(new_position - 1)
       @content_container.html(current_tab.text()).attr("aria-labelledby", current_tab.attr("aria-labelledby"))
-      
+
       XBlock.initializeBlocks(@content_container)
 
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
@@ -115,8 +115,8 @@ class @Sequence
       sequence_links.click @goto
       # Focus on the first available xblock.
       @content_container.find('.vert .xblock :first').focus()
-    @$("a.active").blur()  
-    
+    @$("a.active").blur()
+
   goto: (event) =>
     event.preventDefault()
     if $(event.target).hasClass 'seqnav' # Links from courseware <a class='seqnav' href='n'>...</a>

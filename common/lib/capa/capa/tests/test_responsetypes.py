@@ -998,6 +998,59 @@ class CodeResponseTest(ResponseTest):
             self.assertEquals(answers_converted['1_3_1'], ['answer1', 'answer2', 'answer3'])
             self.assertEquals(answers_converted['1_4_1'], [fp.name, fp.name])
 
+    def test_parse_score_msg_of_responder(self):
+        """
+        Test whether LoncapaProblem._parse_score_msg correcly parses valid HTML5 html.
+        """
+        valid_grader_msgs = [
+            u'<span>MESSAGE</span>',  # Valid XML
+            textwrap.dedent("""
+                <div class='matlabResponse'><div id='mwAudioPlaceHolder'>
+                <audio controls autobuffer autoplay src='data:audio/wav;base64='>Audio is not supported on this browser.</audio>
+                <div>Right click <a href=https://endpoint.mss-mathworks.com/media/filename.wav>here</a> and click \"Save As\" to download the file</div></div>
+                <div style='white-space:pre' class='commandWindowOutput'></div><ul></ul></div>
+            """).replace('\n', ''),  # Valid HTML5 real case Matlab response, invalid XML
+            '<aaa></bbb>'  # Invalid XML, but will be parsed by html5lib to <aaa/>
+        ]
+
+        invalid_grader_msgs = [
+            '<audio',  # invalid XML and HTML5
+        ]
+
+        answer_ids = sorted(self.problem.get_question_answers())
+
+        # CodeResponse requires internal CorrectMap state. Build it now in the queued state
+        old_cmap = CorrectMap()
+        for i, answer_id in enumerate(answer_ids):
+            queuekey = 1000 + i
+            queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now(UTC))
+            old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
+
+        for grader_msg in valid_grader_msgs:
+            correct_score_msg = json.dumps({'correct': True, 'score': 1, 'msg': grader_msg})
+            incorrect_score_msg = json.dumps({'correct': False, 'score': 0, 'msg': grader_msg})
+            xserver_msgs = {'correct': correct_score_msg, 'incorrect': incorrect_score_msg, }
+
+            for i, answer_id in enumerate(answer_ids):
+                self.problem.correct_map = CorrectMap()
+                self.problem.correct_map.update(old_cmap)
+                output = self.problem.update_score(xserver_msgs['correct'], queuekey=1000 + i)
+                self.assertEquals(output[answer_id]['msg'], grader_msg)
+
+        for grader_msg in invalid_grader_msgs:
+            correct_score_msg = json.dumps({'correct': True, 'score': 1, 'msg': grader_msg})
+            incorrect_score_msg = json.dumps({'correct': False, 'score': 0, 'msg': grader_msg})
+            xserver_msgs = {'correct': correct_score_msg, 'incorrect': incorrect_score_msg, }
+
+            for i, answer_id in enumerate(answer_ids):
+                self.problem.correct_map = CorrectMap()
+                self.problem.correct_map.update(old_cmap)
+
+                output = self.problem.update_score(xserver_msgs['correct'], queuekey=1000 + i)
+                self.assertEquals(output[answer_id]['msg'], u'Invalid grader reply. Please contact the course staff.')
+
+
+
 
 class ChoiceResponseTest(ResponseTest):
     from capa.tests.response_xml_factory import ChoiceResponseXMLFactory

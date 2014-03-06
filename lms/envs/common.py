@@ -34,8 +34,7 @@ from .discussionsettings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin
-from xmodule.modulestore import only_xmodules
+from xmodule.x_module import XModuleMixin, prefer_xmodules
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -233,9 +232,6 @@ FEATURES = {
 
     # Turn on/off Microsites feature
     'USE_MICROSITES': False,
-
-    # Turn on/off the Metrics tab for the Instructor dashboard
-    'CLASS_DASHBOARD': False,
 }
 
 # Used for A/B testing
@@ -439,13 +435,8 @@ DOC_STORE_CONFIG = {
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
 
-# Only allow XModules in the LMS
-XBLOCK_SELECT_FUNCTION = only_xmodules
-
-# Use the following lines to allow any xblock in the LMS,
-# either by uncommenting them here, or adding them to your private.py
-# from xmodule.modulestore import prefer_xmodules
-# XBLOCK_SELECT_FUNCTION = prefer_xmodules
+# Allow any XBlock in the LMS
+XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 #################### Python sandbox ############################################
 
@@ -712,6 +703,10 @@ MIDDLEWARE_CLASSES = (
     'contentserver.middleware.StaticContentServer',
     'crum.CurrentRequestUserMiddleware',
 
+    # Adds user tags to tracking events
+    # Must go before TrackMiddleware, to get the context set up
+    'user_api.middleware.UserTagsEventContextMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -842,7 +837,7 @@ PIPELINE_CSS = {
     },
     'style-course-vendor': {
         'source_filenames': [
-            'js/vendor/CodeMirror/codemirror-3.21.0.css',
+            'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
         ],
@@ -1168,6 +1163,9 @@ INSTALLED_APPS = (
     'reverification',
 
     'embargo',
+
+    # XBlocks containing migrations
+    'mentoring',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1195,7 +1193,8 @@ VERIFY_STUDENT = {
     "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
 }
 
-######## Metrics tab/Instructor Dashboard #############
+### This enables the Metrics tab for the Instructor dashboard ###########
+FEATURES['CLASS_DASHBOARD'] = False
 if FEATURES.get('CLASS_DASHBOARD'):
     INSTALLED_APPS += ('class_dashboard',)
 

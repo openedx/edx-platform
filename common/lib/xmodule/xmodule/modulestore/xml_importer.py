@@ -6,7 +6,7 @@ import json
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
-from xblock.fields import Scope, Reference, ReferenceList
+from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
@@ -547,15 +547,25 @@ def remap_namespace(module, target_location_namespace):
             ).url()
         return new_ref
 
-    for field in all_fields:
-        if isinstance(module.fields.get(field), Reference):
-            new_ref = convert_ref(getattr(module, field))
-            setattr(module, field, new_ref)
+    for field_name in all_fields:
+        field_object = module.fields.get(field_name)
+        if isinstance(field_object, Reference):
+            new_ref = convert_ref(getattr(module, field_name))
+            setattr(module, field_name, new_ref)
             module.save()
-        elif isinstance(module.fields.get(field), ReferenceList):
-            references = getattr(module, field)
+        elif isinstance(field_object, ReferenceList):
+            references = getattr(module, field_name)
             new_references = [convert_ref(reference) for reference in references]
-            setattr(module, field, new_references)
+            setattr(module, field_name, new_references)
+            module.save()
+        elif isinstance(field_object, ReferenceValueDict):
+            reference_dict = getattr(module, field_name)
+            new_reference_dict = {
+                key: convert_ref(reference)
+                for key, reference
+                in reference_dict.items()
+            }
+            setattr(module, field_name, new_reference_dict)
             module.save()
 
     return module

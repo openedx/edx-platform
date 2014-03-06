@@ -63,23 +63,30 @@ describe 'ResponseCommentShowView', ->
             @comment.unflagAbuse()
             expect(@comment.get 'abuse_flaggers').toEqual []
 
-    describe 'comment deletion', ->
+    describe '_delete', ->
 
-        it 'triggers the delete event when the delete icon is clicked', ->
+        it 'triggers on the correct events', ->
             DiscussionUtil.loadRoles []
             @comment.updateInfo {ability: {'can_delete': true}}
+            @view.render()
+            DiscussionViewSpecHelper.checkButtonEvents(@view, "_delete", ".action-delete")
+
+        it 'triggers the delete event', ->
             triggerTarget = jasmine.createSpy()
             @view.bind "comment:_delete", triggerTarget
-            @view.render()
-            @view.$el.find('.action-delete').click()
+            @view._delete()
+            expect(triggerTarget).toHaveBeenCalled()
 
-    describe 'comment edit', ->
+    describe 'edit', ->
 
-        it 'triggers comment:edit when the edit button is clicked', ->
+        it 'triggers on the correct events', ->
             DiscussionUtil.loadRoles []
             @comment.updateInfo {ability: {'can_edit': true}}
+            @view.render()
+            DiscussionViewSpecHelper.checkButtonEvents(@view, "edit", ".action-edit")
+
+        it 'triggers comment:edit when the edit button is clicked', ->
             triggerTarget = jasmine.createSpy()
             @view.bind "comment:edit", triggerTarget
-            @view.render()
-            @view.$el.find(".action-edit").click()
+            @view.edit()
             expect(triggerTarget).toHaveBeenCalled()
