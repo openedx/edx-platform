@@ -47,7 +47,7 @@ class SplitMigrator(object):
         original_course = self.direct_modulestore.get_item(course_location)
         new_course_root_locator = self.loc_mapper.translate_location(old_course_id, course_location)
         new_course = self.split_modulestore.create_course(
-            new_package_id, course_location.org, original_course.display_name,
+            new_package_id, course_location.org, 
             user.id,
             fields=self._get_json_fields_translate_children(original_course, old_course_id, True),
             root_block_id=new_course_root_locator.block_id,

@@ -1,6 +1,5 @@
 [{"_id" : "GreekHero", 
   "org" : "testx", 
-  "prettyid" : "test_course", 
   "versions" : {
     "draft" : { "$oid" : "1d00000000000000dddd0000" }
    },
@@ -9,7 +8,6 @@
 
  {"_id" : "wonderful", 
   "org" : "testx", 
-  "prettyid" : "another_course", 
   "versions" : {
     "draft" : { "$oid" : "1d00000000000000dddd2222" },
     "published" : { "$oid" : "1d00000000000000eeee0000" }
@@ -19,7 +17,6 @@
   
  {"_id" : "contender", 
   "org" : "guestx", 
-  "prettyid" : "test_course", 
   "versions" : {
         "draft" : { "$oid" : "1d00000000000000dddd5555" }},
   "edited_on" : {"$date" : 1364491313238},
