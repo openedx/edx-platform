@@ -120,23 +120,6 @@ class VideoDescriptorTest(unittest.TestCase):
             field_data=DictFieldData({}),
         )
 
-    def assert_field_data_equal(self, field_data, fields_dict):
-        """
-        Assert that parsed 'field_data' has the correct values. `fields_dict` is a map
-        of {metadata_field: value}.
-        """
-        for key, value in fields_dict.items():
-            self.assertEquals(field_data.get(key), value)
-
-    def assert_no_fields(self, field_data, fields_list):
-        """
-        Assert that parsed 'field_data' and VideoDescriptor have no provided fields. `fields_list` is a list
-        of [metadata_field].
-        """
-        for key in fields_list:
-            self.assertIsNone(field_data.get(key))
-            self.assertFalse(hasattr(VideoDescriptor, key))
-
     def test_get_context(self):
         """"test get_context"""
         correct_tabs = [
@@ -186,8 +169,8 @@ class VideoDescriptorTest(unittest.TestCase):
 
     def test_parse_video_xml_extra_attributes(self):
         """
-        Ensure that only right attributes are fetched even if some extra settings are
-        explicitly set in XML.
+        Ensure that '_parse_video_xml' ignores any attributes set in the xml which do not have
+        a corresponding VideoDescriptor field.
         """
         xml_data = '''
             <video display_name="Test Video"
@@ -206,7 +189,8 @@ class VideoDescriptorTest(unittest.TestCase):
             </video>
         '''
         output = VideoDescriptor._parse_video_xml(xml_data)
-        self.assert_field_data_equal(output, {
+        self.assertDictEqual(output, {
+            'display_name': "Test Video",
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
             'youtube_id_1_25': '1EeWXzPdhSA',
@@ -218,11 +202,13 @@ class VideoDescriptorTest(unittest.TestCase):
             'download_track': False,
             'download_video': False,
             'html5_sources': ['http://www.example.com/source.mp4'],
-            'transcripts': {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'},
+            'transcripts': {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
         })
 
-        # check that extra attributes are not in output
-        self.assert_no_fields(output, ['graceperiod', 'xqa_key'])
+        # check that extra attributes are not in output and VideoDescriptor has no such attributes
+        for key in ['graceperiod', 'xqa_key']:
+            self.assertIsNone(output.get(key))
+            self.assertFalse(hasattr(VideoDescriptor, key))
 
 
 class VideoDescriptorImportTestCase(unittest.TestCase):
@@ -396,8 +382,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
 
     def test_from_xml_extra_attributes(self):
         """
-        Ensure that attributes are set even if some extra settings (attributes not in VideoDescriptor) are
-        explicitly set in XML.
+        Check that the descriptor gets constructed correctly even if the xml has some extra attributes
+        which do not have corresponding VideoDescriptor fields.
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = '''
