@@ -183,16 +183,16 @@
     border-left: 1px solid $mediumGrey;
     border-right: 1px solid $mediumGrey;
 
-    .xblock-student_view {
+    .xblock-studio_preview_view {
       display: none;
     }
   }
 
-  .new .xblock-student_view {
+  .new .xblock-studio_preview_view {
     background: $yellow;
   }
 
-  .xblock-student_view {
+  .xblock-studio_preview_view {
     @include transition(background-color $tmg-s3 linear 0s);
     padding: 20px 20px 22px;
     font-size: 24px;
