@@ -233,6 +233,9 @@ FEATURES = {
 
     # Turn on/off Microsites feature
     'USE_MICROSITES': False,
+
+    # Turn on/off the Metrics tab for the Instructor dashboard
+    'CLASS_DASHBOARD': False,
 }
 
 # Used for A/B testing
@@ -1192,8 +1195,7 @@ VERIFY_STUDENT = {
     "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
 }
 
-### This enables the Metrics tab for the Instructor dashboard ###########
-FEATURES['CLASS_DASHBOARD'] = False
+######## Metrics tab/Instructor Dashboard #############
 if FEATURES.get('CLASS_DASHBOARD'):
     INSTALLED_APPS += ('class_dashboard',)
 
