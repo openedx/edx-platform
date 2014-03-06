@@ -18,25 +18,23 @@
 
         #fieldset_${id} {
             float: left;
-            margin: 0 auto;
+            margin-right: 20px;
             word-wrap: normal;
             height: 100%;
-            width:${fieldset_width}px;
-
-
         }
 
         #fieldset_message_${id} {
-            background: #99CCFF;
+            background: #5c9dd5;
+            opacity: 0.9;
             color: #FFFFFF;
-            font-family: arial;
+            font-size: 14px;
             float: right;
-            height: 250px;
-            margin: 5 auto;
+            height: 100%;
+            margin: 0 auto;
             padding: 10px;
             position: absolute;
-            right: 0;
-            width:${fieldset_message_width}px;
+            right: 10px;
+            width: 300px;
         }
 
         #fieldset_message_title_${id} {
@@ -44,7 +42,23 @@
             font-family: arial;
             font-size: 18pt;
         }
+
+        .fieldset_message_close {
+             color: #FFFFFF;
+             float: right;
+             width: 10px;
+             height: 10px;
+             margin-right: -6px;
+             margin-top: -10px;
+         }
     </style>
+    <script type="text/javascript">
+        $( function() {
+            $('.fieldset_message_close').click(function() {
+                    $(this).parent().hide();
+                });
+        });
+    </script>
     <div class="indicator_container">
     % if input_type == 'checkbox' or not value:
         % if status == 'unsubmitted' or show_correctness == 'never':
@@ -113,8 +127,8 @@
             id="fieldset_message_${id}"
             % endif
         >
+            <div class="fieldset_message_close">X</div>
             % if (not msg is UNDEFINED) and (len(msg) > 0):
-            <span id="fieldset_message_title_${id}">Feedback</span>
             ${msg}
             % endif
         </div>
