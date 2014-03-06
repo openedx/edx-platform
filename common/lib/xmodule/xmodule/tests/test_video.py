@@ -120,6 +120,23 @@ class VideoDescriptorTest(unittest.TestCase):
             field_data=DictFieldData({}),
         )
 
+    def assert_field_data_equal(self, field_data, fields_dict):
+        """
+        Assert that parsed 'field_data' has the correct values. `fields_dict` is a map
+        of {metadata_field: value}.
+        """
+        for key, value in fields_dict.items():
+            self.assertEquals(field_data.get(key), value)
+
+    def assert_no_fields(self, field_data, fields_list):
+        """
+        Assert that parsed 'field_data' and VideoDescriptor have no provided fields. `fields_list` is a list
+        of [metadata_field].
+        """
+        for key in fields_list:
+            self.assertIsNone(field_data.get(key))
+            self.assertFalse(hasattr(VideoDescriptor, key))
+
     def test_get_context(self):
         """"test get_context"""
         correct_tabs = [
@@ -166,6 +183,46 @@ class VideoDescriptorTest(unittest.TestCase):
         descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
         expected = "0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA"
         self.assertEqual(create_youtube_string(descriptor), expected)
+
+    def test_parse_video_xml_extra_attributes(self):
+        """
+        Ensure that only right attributes are fetched even if some extra settings are
+        explicitly set in XML.
+        """
+        xml_data = '''
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                   show_captions="false"
+                   download_track="false"
+                   start_time="00:00:01"
+                   end_time="00:01:00"
+                   download_video="false"
+                   graceperiod="1 day 12 hours 59 minutes 59 seconds"
+                   xqa_key="5HapHs6tHhu1iN1ZX5JGNYKRkXrXh7NC">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+              <transcript language="ua" src="ukrainian_translation.srt" />
+              <transcript language="ge" src="german_translation.srt" />
+            </video>
+        '''
+        output = VideoDescriptor._parse_video_xml(xml_data)
+        self.assert_field_data_equal(output, {
+            'youtube_id_0_75': 'izygArpw-Qo',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': 'rABDYkeK0x8',
+            'show_captions': False,
+            'start_time': "00:00:01",
+            'end_time': "00:01:00",
+            'track': 'http://www.example.com/track',
+            'download_track': False,
+            'download_video': False,
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'transcripts': {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'},
+        })
+
+        # check that extra attributes are not in output
+        self.assert_no_fields(output, ['graceperiod', 'xqa_key'])
 
 
 class VideoDescriptorImportTestCase(unittest.TestCase):
@@ -335,6 +392,45 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'html5_sources': [],
             'data': '',
             'transcripts': {},
+        })
+
+    def test_from_xml_extra_attributes(self):
+        """
+        Ensure that attributes are set even if some extra settings (attributes not in VideoDescriptor) are
+        explicitly set in XML.
+        """
+        module_system = DummySystem(load_error_modules=True)
+        xml_data = '''
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                   show_captions="false"
+                   download_track="false"
+                   start_time="00:00:01"
+                   end_time="00:01:00"
+                   download_video="false"
+                   graceperiod="1 day 12 hours 59 minutes 59 seconds"
+                   xqa_key="5HapHs6tHhu1iN1ZX5JGNYKRkXrXh7NC">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+              <transcript language="ua" src="ukrainian_translation.srt" />
+              <transcript language="ge" src="german_translation.srt" />
+            </video>
+        '''
+        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        self.assert_attributes_equal(output, {
+            'youtube_id_0_75': 'izygArpw-Qo',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': 'rABDYkeK0x8',
+            'show_captions': False,
+            'start_time': datetime.timedelta(seconds=1),
+            'end_time': datetime.timedelta(seconds=60),
+            'track': 'http://www.example.com/track',
+            'download_track': False,
+            'download_video': False,
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'data': '',
+            'transcripts': {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
         })
 
     def test_from_xml_double_quotes(self):
