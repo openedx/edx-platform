@@ -25,7 +25,7 @@ class @HTMLEditingDescriptor
     @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
       script_url : "#{baseUrl}/js/vendor/tiny_mce/tiny_mce.min.js",
       theme : "modern",
-      skin: 'studio',
+      skin: 'studio-tmce4',
       schema: "html5",
       # Necessary to preserve relative URLs to our images.
       convert_urls : false,
