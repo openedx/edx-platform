@@ -4,7 +4,7 @@ January 16, 2014
 
 You can now access the public edX roadmap_ for details about the currently planned product direction.
 
-.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
 
 
 *************

@@ -1,0 +1,75 @@
+###################################
+March 4, 2014
+###################################
+
+You can access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+
+
+Course staff documentation, *Building a Course with edX Studio*, is available online_. You can also download the guide as a PDF from the edX Studio user interface.
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+Recent changes to *Building a Course with edX Studio* include:
+
+* `Staff Debug Info <http://edx.readthedocs.org/projects/ca/en/latest/staff_debug_info.html>`_ 
+
+* Updates to `Add Files to a Course <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#add-files-to-a-course>`_
+
+Recent changes to *edX Data Formats* include:
+
+* `Tracking Logs <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/tracking_logs.html>`_ 
+
+
+
+
+*************
+edX Studio
+*************
+
+* A problem that caused escaped HTML characters to be displayed incorrectly on the Course Updates page is resolved. (STUD-154)
+
+* A problem that prevented course staff from posting in discussions when a course was deleted and recreated is resolved. (STUD-1140)
+
+* A problem that caused the first line of an HTML component to be partially cut off in the unit page is resolved. (STUD-1380)
+
+* The Files & Uploads page now includes an external URL for each asset.  See `Add Files to a Course <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#add-files-to-a-course>`_ for more information.
+
+
+
+
+***************************************
+edX Learning Management System
+***************************************
+
+* The edX registration form now validates that the Public Username field contains 30 or fewer characters, and that the E-mail field contains 75 or fewer characters. The user receives a message if the Public Username or E-mail values are too long. (LMS-1479)
+
+* If a video is configured to start at a time other than 00:00:00, the video player now correctly starts the video at the specified start time after the video player is reset for any reason. (BLD-659)
+
+
+
+===========================
+Accessibility Improvements
+===========================
+
+* The layout of Course Updates is improved to use semantic tagging and not just simple lists, making the page more accessible to screen readers. (LMS-1724)
+
+* A label is added to the checkbox problem template. 
+
+* Confirmation dialog boxes for Open Response Assessments are now screen-reader accessible.
+
+
+*************
+Analytics
+*************
+
+
+* Problem check events now include the problem name, answer value, response type, input type, and annotations for randomized problems. (AN-587, AN-594)
+
+
+*************
+Discussions
+*************
+
+* Tooltips for pinning threads are updated so students do not see the tooltip when they cannot pin a thread, and course staff see the appropriate tooltip text. (FOR-192)
