@@ -46,6 +46,7 @@ import re
 import shlex  # for splitting quoted strings
 import sys
 import pyparsing
+import html5lib
 
 from .registry import TagRegistry
 from chem import chemcalc
@@ -286,7 +287,18 @@ class InputTypeBase(object):
         context = self._get_render_context()
 
         html = self.capa_system.render_template(self.template, context)
-        return etree.XML(html)
+
+        try:
+            output = etree.XML(html)
+        except etree.XMLSyntaxError as ex:
+            # If `html` contains attrs with no values, like `controls` in <audio controls src='smth'/>,
+            # XML parser will raise exception, so wee fallback to html5parser, which will set empty "" values for such attrs.
+            try:
+                output = html5lib.parseFragment(html, treebuilder='lxml', namespaceHTMLElements=False)[0]
+            except IndexError:
+                raise ex
+
+        return output
 
     def get_user_visible_answer(self, internal_answer):
         """

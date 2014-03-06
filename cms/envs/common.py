@@ -34,8 +34,7 @@ from path import path
 from lms.lib.xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.mixin import CmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import only_xmodules
-from xmodule.x_module import XModuleMixin
+from xmodule.x_module import XModuleMixin, prefer_xmodules
 from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
@@ -223,15 +222,10 @@ X_FRAME_OPTIONS = 'ALLOW'
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin, XModuleMixin)
 
-# Only allow XModules in Studio
-XBLOCK_SELECT_FUNCTION = only_xmodules
-
-# Use the following lines to allow any xblock in Studio,
-# either by uncommenting them here, or adding them to your private.py
+# Allow any XBlock in Studio
 # You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
 # xblocks can be added via advanced settings
-# from xmodule.modulestore import prefer_xmodules
-# XBLOCK_SELECT_FUNCTION = prefer_xmodules
+XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
@@ -472,6 +466,9 @@ INSTALLED_APPS = (
 
     # for course creator table
     'django.contrib.admin',
+
+    # XBlocks containing migrations
+    'mentoring',
 
     # for managing course modes
     'course_modes',
