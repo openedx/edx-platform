@@ -18,6 +18,7 @@ class DataDownload
     @$section.data 'wrapper', @
     # gather elements
     @$list_studs_btn = @$section.find("input[name='list-profiles']'")
+    @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
     @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']'")
@@ -43,6 +44,13 @@ class DataDownload
 
     # this handler binds to both the download
     # and the csv button
+    @$list_studs_csv_btn.click (e) =>
+      url = @$list_studs_btn.data 'endpoint'
+      # handle csv special case
+      # redirect the document to the csv file.
+      url += '/csv'
+      location.href = url
+
     @$list_studs_btn.click (e) =>
       url = @$list_studs_btn.data 'endpoint'
 
