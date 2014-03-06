@@ -99,12 +99,12 @@ To enable an XBlock for testing in your devstack (https://github.com/edx/configu
 
     #.  In ``edx-platform/lms/envs/common.py``, uncomment::
 
-        # from xmodule.x_module import prefer_xmodules
+        # from xmodule.modulestore import prefer_xmodules
         # XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
     #.  In ``edx-platform/cms/envs/common.py``, uncomment::
 
-        # from xmodule.x_module import prefer_xmodules
+        # from xmodule.modulestore import prefer_xmodules
         # XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
     #.  In ``edx-platform/cms/envs/common.py``, change::
