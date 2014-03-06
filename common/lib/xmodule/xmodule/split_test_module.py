@@ -12,6 +12,7 @@ from xmodule.x_module import XModule, module_attr
 from lxml import etree
 
 from xblock.core import XBlock
+from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Integer, ReferenceValueDict
 from xblock.fragment import Fragment
 
@@ -61,7 +62,10 @@ class SplitTestModule(SplitTestFields, XModule):
 
         super(SplitTestModule, self).__init__(*args, **kwargs)
 
-        self.child_descriptor = self.get_child_descriptors()[0]
+        self.child_descriptor = None
+        child_descriptors = self.get_child_descriptors()
+        if len(child_descriptors) > 1:
+            child_descriptor = child_descriptors[0]
         if self.child_descriptor is not None:
             self.child = self.system.get_module(self.child_descriptor)
         else:
@@ -106,7 +110,9 @@ class SplitTestModule(SplitTestFields, XModule):
         """
         For grading--return just the chosen child.
         """
-        group_id = self.runtime.service(self, 'partitions').get_user_group_for_partition(self.user_partition_id)
+        group_id = self.get_group_id()
+        if not group_id:
+            return []
 
         # group_id_to_child comes from json, so it has to have string keys
         str_group_id = str(group_id)
@@ -125,6 +131,15 @@ class SplitTestModule(SplitTestFields, XModule):
             return []
 
         return [child_descriptor]
+
+    def get_group_id(self):
+        """
+        Returns the group ID, or none if none is available.
+        """
+        try:
+            return self.runtime.service(self, 'partitions').get_user_group_for_partition(self.user_partition_id)
+        except NoSuchServiceError:
+            return None
 
     def _staff_view(self, context):
         """
@@ -155,11 +170,35 @@ class SplitTestModule(SplitTestFields, XModule):
         fragment.initialize_js('ABTestSelector')
         return fragment
 
+    def studio_preview(self, context):
+        # Render each of the children one after the other
+        fragment = Fragment()
+        contents = []
+
+        for child in self.descriptor.get_children():
+            rendered_child = child.render('student_view', context)
+            fragment.add_frag_resources(rendered_child)
+
+            contents.append({
+                'id': child.id,
+                'content': rendered_child.content
+            })
+
+        fragment.add_content(self.system.render_template('vert_module.html', {
+            'items': contents
+        }))
+
+        return fragment
+
     def student_view(self, context):
         """
         Render the contents of the chosen condition for students, and all the
         conditions for staff.
         """
+        # When rendering in Studio, use the custom preview rendering
+        if context['runtime_type'] == 'studio':
+            return self.studio_preview(context)
+
         if self.child is None:
             # raise error instead?  In fact, could complain on descriptor load...
             return Fragment(content=u"<div>Nothing here.  Move along.</div>")
