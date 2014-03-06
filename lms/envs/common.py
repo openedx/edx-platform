@@ -26,6 +26,7 @@ Longer TODO:
 
 import sys
 import os
+import imp
 import json
 
 from path import path
@@ -34,7 +35,8 @@ from .discussionsettings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin, prefer_xmodules
+from xmodule.modulestore import prefer_xmodules
+from xmodule.x_module import XModuleMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -1163,9 +1165,6 @@ INSTALLED_APPS = (
     'reverification',
 
     'embargo',
-
-    # XBlocks containing migrations
-    'mentoring',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1447,11 +1446,22 @@ ALL_LANGUAGES = (
 )
 
 
-### JSdraw (only installed in some instances)
+### Apps only installed in some instances
 
-try:
-    import edx_jsdraw
-except ImportError:
-    pass
-else:
-    INSTALLED_APPS += ('edx_jsdraw',)
+OPTIONAL_APPS = (
+    'edx_jsdraw',
+    'mentoring',
+)
+
+for app_name in OPTIONAL_APPS:
+    # First attempt to only find the module rather than actually importing it,
+    # to avoid circular references - only try to import if it can't be found
+    # by find_module, which doesn't work with import hooks
+    try:
+        imp.find_module(app_name)
+    except ImportError:
+        try:
+            __import__(app_name)
+        except ImportError:
+            continue
+    INSTALLED_APPS += (app_name,)
