@@ -176,12 +176,6 @@ class SplitModuleCourseTests(SplitModuleTest):
             qualifiers={'edited_on': {"$lt": datetime.datetime(2013, 3, 28, 15)}})
         self.assertEqual(len(courses), 2)
 
-        courses = modulestore().get_courses(
-            branch='draft',
-            qualifiers={'org': 'testx', "prettyid": "test_course"})
-        self.assertEqual(len(courses), 1)
-        self.assertIsNotNone(self.findByIdInResult(courses, "head12345"))
-
     def test_get_course(self):
         '''
         Test the various calling forms for get_course
@@ -649,7 +643,7 @@ class TestItemCrud(SplitModuleTest):
         """
         # start transaction w/ simple creation
         user = random.getrandbits(32)
-        new_course = modulestore().create_course('test_org.test_transaction', 'test_org', 'test_transaction', user)
+        new_course = modulestore().create_course('test_org.test_transaction', 'test_org', user)
         new_course_locator = new_course.location.as_course_locator()
         index_history_info = modulestore().get_course_history_info(new_course.location)
         course_block_prev_version = new_course.previous_version
@@ -898,7 +892,7 @@ class TestItemCrud(SplitModuleTest):
         check_subtree(nodes[0])
 
     def create_course_for_deletion(self):
-        course = modulestore().create_course('nihilx.deletion', 'nihilx', 'deletion', 'deleting_user')
+        course = modulestore().create_course('nihilx.deletion', 'nihilx', 'deleting_user')
         root = BlockUsageLocator(
             package_id=course.location.package_id,
             block_id=course.location.block_id,
@@ -926,12 +920,11 @@ class TestCourseCreation(SplitModuleTest):
         """
         # Oddly getting differences of 200nsec
         pre_time = datetime.datetime.now(UTC) - datetime.timedelta(milliseconds=1)
-        new_course = modulestore().create_course('test_org.test_course', 'test_org', 'test_course', 'create_user')
+        new_course = modulestore().create_course('test_org.test_course', 'test_org', 'create_user')
         new_locator = new_course.location
         # check index entry
         index_info = modulestore().get_course_index_info(new_locator)
         self.assertEqual(index_info['org'], 'test_org')
-        self.assertEqual(index_info['prettyid'], 'test_course')
         self.assertGreaterEqual(index_info["edited_on"], pre_time)
         self.assertLessEqual(index_info["edited_on"], datetime.datetime.now(UTC))
         self.assertEqual(index_info['edited_by'], 'create_user')
@@ -960,7 +953,7 @@ class TestCourseCreation(SplitModuleTest):
         original_locator = CourseLocator(package_id="wonderful", branch='draft')
         original_index = modulestore().get_course_index_info(original_locator)
         new_draft = modulestore().create_course(
-            'best', 'leech', 'best_course', 'leech_master',
+            'best', 'leech', 'leech_master',
             versions_dict=original_index['versions'])
         new_draft_locator = new_draft.location
         self.assertRegexpMatches(new_draft_locator.package_id, 'best')
@@ -1024,7 +1017,7 @@ class TestCourseCreation(SplitModuleTest):
         fields['grading_policy']['GRADE_CUTOFFS'] = {'A': .9, 'B': .8, 'C': .65}
         fields['display_name'] = 'Derivative'
         new_draft = modulestore().create_course(
-            'counter', 'leech', 'derivative', 'leech_master',
+            'counter', 'leech', 'leech_master',
             versions_dict={'draft': original_index['versions']['draft']},
             fields=fields
         )
@@ -1057,11 +1050,9 @@ class TestCourseCreation(SplitModuleTest):
         self.assertEqual(course_info['org'], 'funkyU')
 
         course_info['org'] = 'moreFunky'
-        course_info['prettyid'] = 'Ancient Greek Demagods'
         modulestore().update_course_index(course_info)
         course_info = modulestore().get_course_index_info(locator)
         self.assertEqual(course_info['org'], 'moreFunky')
-        self.assertEqual(course_info['prettyid'], 'Ancient Greek Demagods')
 
         # an allowed but not necessarily recommended way to revert the draft version
         versions = course_info['versions']
@@ -1082,7 +1073,7 @@ class TestCourseCreation(SplitModuleTest):
         """
         user = random.getrandbits(32)
         new_course = modulestore().create_course(
-            'test_org.test_transaction', 'test_org', 'test_transaction', user,
+            'test_org.test_transaction', 'test_org', user,
             root_block_id='top', root_category='chapter'
         )
         self.assertEqual(new_course.location.block_id, 'top')

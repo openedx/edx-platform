@@ -105,7 +105,7 @@ def course_handler(request, tag=None, org=None, offering=None, branch=None, vers
         index entry.
     PUT
         json: update this course (index entry not xblock) such as repointing head, changing display name, org,
-        package_id, prettyid. Return same json as above.
+        package_id. Return same json as above.
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """

@@ -5,7 +5,6 @@ Representation:
 * course_index: a dictionary:
     ** '_id': package_id (e.g., myu.mydept.mycourse.myrun),
     ** 'org': the org's id. Only used for searching not identity,
-    ** 'prettyid': a vague to-be-determined field probably more useful to storing searchable tags,
     ** 'edited_by': user_id of user who created the original entry,
     ** 'edited_on': the datetime of the original creation,
     ** 'versions': versions_dict: {branch_id: structure_id, ...}
@@ -99,6 +98,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
     A Mongodb backed ModuleStore supporting versions, inheritance,
     and sharing.
     """
+
+    SCHEMA_VERSION = 1
     reference_type = Locator
     def __init__(self, doc_store_config, fs_root, render_template,
                  default_class=None,
@@ -474,7 +475,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         heads. This function is primarily for test verification but may serve some
         more general purpose.
         :param course_locator: must have a package_id set
-        :return {'org': , 'prettyid': ,
+        :return {'org': string,
             versions: {'draft': the head draft version id,
                 'published': the head published version id if any,
             },
@@ -633,7 +634,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 "edited_on": datetime.datetime.now(UTC),
                 "previous_version": None,
                 "original_version": new_id,
-            }
+            },
+            'schema_version': self.SCHEMA_VERSION,
         }
         self.db_connection.insert_definition(document)
         definition_locator = DefinitionLocator(new_id)
@@ -669,6 +671,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             old_definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
             # previous version id
             old_definition['edit_info']['previous_version'] = definition_locator.definition_id
+            old_definition['schema_version'] = self.SCHEMA_VERSION
             self.db_connection.insert_definition(old_definition)
             return DefinitionLocator(old_definition['_id']), True
         else:
@@ -825,7 +828,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         return self.get_item(item_loc)
 
     def create_course(
-        self, course_id, org, prettyid, user_id, fields=None,
+        self, course_id, org, user_id, fields=None,
         master_branch='draft', versions_dict=None, root_category='course',
         root_block_id='course'
     ):
@@ -884,7 +887,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     'edited_on': datetime.datetime.now(UTC),
                     'previous_version': None,
                     'original_version': definition_id,
-                }
+                },
+                'schema_version': self.SCHEMA_VERSION,
             }
             self.db_connection.insert_definition(definition_entry)
 
@@ -918,6 +922,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     definition['edit_info']['edited_by'] = user_id
                     definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
                     definition['_id'] = ObjectId()
+                    definition['schema_version'] = self.SCHEMA_VERSION
                     self.db_connection.insert_definition(definition)
                     root_block['definition'] = definition['_id']
                     root_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
@@ -931,10 +936,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         index_entry = {
             '_id': course_id,
             'org': org,
-            'prettyid': prettyid,
             'edited_by': user_id,
             'edited_on': datetime.datetime.now(UTC),
-            'versions': versions_dict}
+            'versions': versions_dict,
+            'schema_version': self.SCHEMA_VERSION,
+        }
         self.db_connection.insert_course_index(index_entry)
         return self.get_course(CourseLocator(package_id=course_id, branch=master_branch))
 
@@ -1430,6 +1436,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         new_structure['previous_version'] = structure['_id']
         new_structure['edited_by'] = user_id
         new_structure['edited_on'] = datetime.datetime.now(UTC)
+        new_structure['schema_version'] = self.SCHEMA_VERSION
         return new_structure
 
     def _find_local_root(self, element_to_find, possibility, tree):
@@ -1490,7 +1497,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             'original_version': new_id,
             'edited_by': user_id,
             'edited_on': datetime.datetime.now(UTC),
-            'blocks': blocks
+            'blocks': blocks,
+            'schema_version': self.SCHEMA_VERSION,
         }
 
     def _get_parents_from_structure(self, block_id, structure):
