@@ -218,7 +218,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
         :param fields: a dict of xblock field name - value pairs for the course module.
         :param metadata: the old way of setting fields by knowing which ones are scope.settings v scope.content
         :param definition_data: the complement to metadata which is also a subset of fields
-        :param id_root: the split-mongo course_id starting value (see split.create_course)
         :param pretty_id: a field split.create_course uses and may quit using
         :returns: course xblock
         """
@@ -226,13 +225,20 @@ class MixedModuleStore(ModuleStoreWriteBase):
         if not hasattr(store, 'create_course'):
             raise NotImplementedError(u"Cannot create a course on store %s" % store_name)
         if store.get_modulestore_type(course_id) == SPLIT_MONGO_MODULESTORE_TYPE:
-            id_root = kwargs.get('id_root', course_id)
-            org = kwargs.pop('org', course_id.org)
-            pretty_id = kwargs.pop('pretty_id', id_root)
+
+            try:
+                course_dict = Location.parse_course_id(course_id)
+                org = course_dict['org']
+                course_id = "{org}.{course}.{name}".format(**course_dict)
+            except ValueError:
+                org = None
+
+            org = kwargs.pop('org', org)
+            pretty_id = kwargs.pop('pretty_id', course_id)
             fields = kwargs.pop('fields', {})
             fields.update(kwargs.pop('metadata', {}))
             fields.update(kwargs.pop('definition_data', {}))
-            course = store.create_course(org, pretty_id, user_id, id_root=id_root, fields=fields, **kwargs)
+            course = store.create_course(course_id, org, pretty_id, user_id, fields=fields, **kwargs)
         else:  # assume mongo
             course = store.create_course(course_id, **kwargs)
 
