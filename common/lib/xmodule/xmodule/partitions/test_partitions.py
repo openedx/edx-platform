@@ -5,7 +5,7 @@ Test the partitions and partitions service
 
 from collections import defaultdict
 from unittest import TestCase
-from mock import Mock, MagicMock
+from mock import Mock
 
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.partitions.partitions_service import PartitionService

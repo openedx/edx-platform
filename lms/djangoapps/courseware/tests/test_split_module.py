@@ -1,25 +1,30 @@
 """
 Test for split test XModule
 """
-import ddt
-from mock import MagicMock, patch, Mock
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
-from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from xmodule.partitions.partitions import Group, UserPartition
-from xmodule.partitions.test_partitions import StaticPartitionService
 from user_api.tests.factories import UserCourseTagFactory
-from xmodule.partitions.partitions import Group, UserPartition
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class SplitTestBase(ModuleStoreTestCase):
+    """
+    Sets up a basic course and user for split test testing.
+    Also provides tests of rendered HTML for two user_tag conditions, 0 and 1.
+    """
     __test__ = False
+    COURSE_NUMBER = 'split-test-base'
+    ICON_CLASSES = None
+    TOOLTIPS = None
+    HIDDEN_CONTENT = None
+    VISIBLE_CONTENT = None
 
     def setUp(self):
         self.partition = UserPartition(
@@ -53,6 +58,10 @@ class SplitTestBase(ModuleStoreTestCase):
         self.client.login(username=self.student.username, password='test')
 
     def _video(self, parent, group):
+        """
+        Returns a video component with parent ``parent``
+        that is intended to be displayed to group ``group``.
+        """
         return ItemFactory.create(
             parent_location=parent.location,
             category="video",
@@ -60,6 +69,10 @@ class SplitTestBase(ModuleStoreTestCase):
         )
 
     def _problem(self, parent, group):
+        """
+        Returns a problem component with parent ``parent``
+        that is intended to be displayed to group ``group``.
+        """
         return ItemFactory.create(
             parent_location=parent.location,
             category="problem",
@@ -68,6 +81,10 @@ class SplitTestBase(ModuleStoreTestCase):
         )
 
     def _html(self, parent, group):
+        """
+        Returns an html component with parent ``parent``
+        that is intended to be displayed to group ``group``.
+        """
         return ItemFactory.create(
             parent_location=parent.location,
             category="html",
@@ -82,21 +99,23 @@ class SplitTestBase(ModuleStoreTestCase):
         self._check_split_test(1)
 
     def _check_split_test(self, user_tag):
-        tag_factory = UserCourseTagFactory(
+        """Checks that the right compentents are rendered for user with ``user_tag``"""
+        # This explicitly sets the user_tag for self.student to ``user_tag``
+        UserCourseTagFactory(
             user=self.student,
             course_id=self.course.id,
             key='xblock.partition_service.partition_{0}'.format(self.partition.id),
             value=str(user_tag)
         )
 
-        resp = self.client.get(reverse('courseware_section',
-                                       kwargs={'course_id': self.course.id,
-                                               'chapter': self.chapter.url_name,
-                                               'section': self.sequential.url_name}
+        resp = self.client.get(reverse(
+            'courseware_section',
+            kwargs={'course_id': self.course.id,
+                    'chapter': self.chapter.url_name,
+                    'section': self.sequential.url_name}
         ))
 
         content = resp.content
-        print content
 
         # Assert we see the proper icon in the top display
         self.assertIn('<a class="{} inactive progress-0"'.format(self.ICON_CLASSES[user_tag]), content)
@@ -118,7 +137,7 @@ class TestVertSplitTestVert(SplitTestBase):
     """
     __test__ = True
 
-    COURSE_NUMBER='vert-split-vert'
+    COURSE_NUMBER = 'vert-split-vert'
 
     ICON_CLASSES = [
         'seq_problem',
@@ -141,6 +160,8 @@ class TestVertSplitTestVert(SplitTestBase):
     ]
 
     def setUp(self):
+        # We define problem compenents that we need but don't explicitly call elsewhere.
+        # pylint: disable=unused-variable
         super(TestVertSplitTestVert, self).setUp()
 
         # vert <- split_test
@@ -151,6 +172,7 @@ class TestVertSplitTestVert(SplitTestBase):
             category="vertical",
             display_name="Split test vertical",
         )
+        # pylint: disable=protected-access
         c0_url = self.course.location._replace(category="vertical", name="split_test_cond0")
         c1_url = self.course.location._replace(category="vertical", name="split_test_cond1")
 
@@ -210,10 +232,13 @@ class TestSplitTestVert(SplitTestBase):
     ]
 
     def setUp(self):
+        # We define problem compenents that we need but don't explicitly call elsewhere.
+        # pylint: disable=unused-variable
         super(TestSplitTestVert, self).setUp()
 
         # split_test cond 0 = vert <- {video, problem}
         # split_test cond 1 = vert <- {video, html}
+        # pylint: disable=protected-access
         c0_url = self.course.location._replace(category="vertical", name="split_test_cond0")
         c1_url = self.course.location._replace(category="vertical", name="split_test_cond1")
 

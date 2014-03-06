@@ -40,7 +40,7 @@ class SplitTestFields(object):
     )
 
 
-@XBlock.needs('user_tags')
+@XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.needs('partitions')
 class SplitTestModule(SplitTestFields, XModule):
     """
@@ -196,7 +196,7 @@ class SplitTestModule(SplitTestFields, XModule):
         return progress
 
 
-@XBlock.needs('user_tags')
+@XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.needs('partitions')
 class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
     # the editing interface can be the same as for sequences -- just a container
@@ -223,4 +223,3 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
         makes it use module.get_child_descriptors().
         """
         return True
-
