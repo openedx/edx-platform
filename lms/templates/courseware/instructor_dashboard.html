@@ -1,3 +1,6 @@
+## NOTE: This is the template for the legacy instructor dashboard
+## We are no longer supporting this file or accepting changes into it.
+
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 
@@ -117,6 +120,13 @@ function goto( mode)
 <section class="container">
 <div class="instructor-dashboard-wrapper">
 
+  <div class="beta-button-wrapper"><a href="${ beta_dashboard_url }">${_("Back To Standard Dashboard")}</a></div>
+
+  %if studio_url:
+    ## not checking access because if user can see this, they are at least course staff (with studio edit access)
+    <div class="studio-edit-link"><a href="${studio_url}" target="_blank">${_('Edit Course In Studio')}</a></div>
+  %endif
+
   <section class="instructor-dashboard-content" id="instructor-dashboard-content">
     <div class="wrap-instructor-info studio-view beta-button-wrapper">
       %if studio_url:
@@ -128,6 +138,8 @@ function goto( mode)
     </div>
     
     <h1>${_("Instructor Dashboard")}</h1>
+
+    # TODO put in a banner
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
           %if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):

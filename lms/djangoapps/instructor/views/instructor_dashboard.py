@@ -79,7 +79,7 @@ def instructor_dashboard_2(request, course_id):
 
     context = {
         'course': course,
-        'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_id}),
+        'old_dashboard_url': reverse('instructor_dashboard_2', kwargs={'course_id': course_id}),
         'studio_url': studio_url,
         'sections': sections,
         'disable_buttons': disable_buttons,
