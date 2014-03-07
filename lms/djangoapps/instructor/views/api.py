@@ -283,6 +283,54 @@ def students_update_enrollment(request, course_id):
 @require_level('instructor')
 @common_exceptions_400
 @require_query_params(
+    emails="stringified list of emails",
+    action="add or remove",
+)
+def bulk_modify_access(request, course_id):
+    action = request.GET.get('action')
+    emails_raw = request.GET.get('emails')
+    emails = _split_input_list(emails_raw)
+    results = []
+    rolename = 'beta'
+    course = get_course_by_id(course_id)
+    for email in emails:
+        try:
+            user = User.objects.get(email=email)
+            if action == 'add':
+                allow_access(course, user, rolename)
+            elif action == 'remove':
+                revoke_access(course, user, rolename)
+            else:
+                return HttpResponseBadRequest(strip_tags(
+                    "Unrecognized action '{}'".format(action)
+                ))
+            results.append({
+                'email': email,
+                'error': False,
+            })
+
+        # catch and log any exceptions
+        # so that one error doesn't cause a 500.
+        except Exception as exc:  # pylint: disable=W0703
+            log.exception("Error while #{}ing student")
+            log.exception(exc)
+            results.append({
+                'email': email,
+                'error': True,
+            })
+
+    response_payload = {
+        'action': action,
+        'results': results,
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+@common_exceptions_400
+@require_query_params(
     unique_student_identifier="email or username of user to change access",
     rolename="'instructor', 'staff', or 'beta'",
     action="'allow' or 'revoke'"

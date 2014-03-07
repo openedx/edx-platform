@@ -26,7 +26,8 @@
   </div>
 </script>
 
-<div class="vert-left batch-enrollment">
+<div class="vert-left">
+<div class="batch-enrollment">
   <h2> ${_("Batch Enrollment")} </h2>
   <p>
     <label for="student-emails">${_("Enter student emails separated by new lines or commas.")} </label>
@@ -51,14 +52,40 @@
       <p> ${_("If email students is <em>checked</em> students will receive an email notification.")}</p>
     </div>
   </div>
+  
+  <div>
+    <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" data-action="enroll" >
+    <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" data-action="unenroll" >
+  </div>
+  <div class="request-response"></div>
+  <div class="request-response-error"></div>
+</div>
 
-  <div class="enroll-actions actions">
-    <input type="button" name="enroll" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" >
-    <input type="button" name="unenroll" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" >
+%if section_data['access']['instructor']:
+<div class="batch-beta-testers">
+  <h2> ${_("Add Beta Testers")} </h2>
+  <p> ${_("Enter student emails separated by new lines or commas.")} </p>
+  <textarea rows="6" cols="50" name="student-emails-for-beta" placeholder="${_("Student Emails")}" spellcheck="false"></textarea>
+  <br>
+  
+  <div>
+    <input type="checkbox" name="email-students" value="Notify-students-by-email">
+    <label for="email-students">${_("Notify students by email")}</label>
+    <div class="email-students-hint">
+      <p> ${_("If email students is <em>checked</em> students will receive an email notification.")}
+      </p>
+    </div>
+  </div>
+  
+  <div>
+    <input type="button" name="beta-testers" class="" value="${_("Add students as beta testers")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="add" >
+    <input type="button" name="beta-testers" class="" value="${_("Remove students as beta testers")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="remove" >
   </div>
 
   <div class="request-response"></div>
   <div class="request-response-error"></div>
+</div>
+%endif
 </div>
 
 <div class="vert-right member-lists-management">

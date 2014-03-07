@@ -160,50 +160,90 @@ class AuthListWidget extends MemberListWidget
       error: std_ajax_err => cb? gettext "Error changing user's permissions."
 
 
+class BetaTesterBulkAddition
+  constructor: (@$container) ->
+    # gather elements
+    @$emails_input           = @$container.find("textarea[name='student-emails-for-beta']")
+    @$btn_beta_testers       = @$container.find("input[name='beta-testers']")
+    # @$checkbox_emailstudents = @$container.find("input[name='email-students']")
+    @$task_response          = @$container.find(".request-response")
+    @$request_response_error = @$container.find(".request-response-error")
+
+    # click handlers
+    @$btn_beta_testers.click =>
+      # emailStudents = @$checkbox_emailstudents.is(':checked')
+      send_data = 
+        action: $(event.target).data('action')
+        emails: @$emails_input.val()
+        email_students: emailStudents
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_beta_testers.data 'endpoint'
+        data: send_data
+        success: (data) => @display_response data
+        # error: std_ajax_err => @fail_with_error "Error enrolling/unenrolling students."
+
+        # success: (data) => @display_response data
+
+  # fail_with_error: (msg) ->
+  #   console.warn msg
+  #   @$task_response.empty()
+  #   @$request_response_error.empty()
+  #   @$request_response_error.text msg
+
+  display_response: (data_from_server) ->
+    @$task_response.empty()
+    # @$request_response_error.empty()
+    errors = []
+    sucesses = []
+    for student_results in data_from_server.results
+      if student_results.error
+        errors.push student_results
+      else
+        sucesses.push student_results
+
+    console.log(sr.email for sr in sucesses)
+
+    render_list = (label, emails) =>
+      task_res_section = $ '<div/>', class: 'request-res-section'
+      task_res_section.append $ '<h3/>', text: label
+      email_list = $ '<ul/>'
+      task_res_section.append email_list
+
+      for email in emails
+        email_list.append $ '<li/>', text: email
+
+      @$task_response.append task_res_section
+
+    render_list gettext("these students were added as beta testers"), (sr.email for sr in sucesses)
+    render_list gettext("these students were not added as beta testers"), (sr.email for sr in errors)
+
 # Wrapper for the batch enrollment subsection.
 # This object handles buttons, success and failure reporting,
 # and server communication.
 class BatchEnrollment
   constructor: (@$container) ->
     # gather elements
-    @$emails_input           = @$container.find("textarea[name='student-emails']'")
-    @$btn_enroll             = @$container.find("input[name='enroll']'")
-    @$btn_unenroll           = @$container.find("input[name='unenroll']'")
-    @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']'")
-    @$checkbox_emailstudents = @$container.find("input[name='email-students']'")
+    @$emails_input           = @$container.find("textarea[name='student-emails']")
+    @$enrollment_button      = @$container.find(".enrollment-button")
+    @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']")
+    @$checkbox_emailstudents = @$container.find("input[name='email-students']")
     @$task_response          = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
 
-    # attach click handlers
-
-    @$btn_enroll.click =>
-      emailStudents = @$checkbox_emailstudents.is(':checked')
-
+    # attach click handler for enrollment buttons
+    @$enrollment_button.click =>
+      emailStudents: @$checkbox_emailstudents.is(':checked')
       send_data =
-        action: 'enroll'
+        action: $(event.target).data('action') # 'enroll' or 'unenroll'
         emails: @$emails_input.val()
         auto_enroll: @$checkbox_autoenroll.is(':checked')
         email_students: emailStudents
 
       $.ajax
         dataType: 'json'
-        url: @$btn_enroll.data 'endpoint'
-        data: send_data
-        success: (data) => @display_response data
-        error: std_ajax_err => @fail_with_error "Error enrolling/unenrolling students."
-
-    @$btn_unenroll.click =>
-      emailStudents = @$checkbox_emailstudents.is(':checked')
-
-      send_data =
-        action: 'unenroll'
-        emails: @$emails_input.val()
-        auto_enroll: @$checkbox_autoenroll.is(':checked')
-        email_students: emailStudents
-
-      $.ajax
-        dataType: 'json'
-        url: @$btn_unenroll.data 'endpoint'
+        url: $(event.target).data 'endpoint'
         data: send_data
         success: (data) => @display_response data
         error: std_ajax_err => @fail_with_error gettext "Error enrolling/unenrolling students."
@@ -475,6 +515,9 @@ class Membership
 
     # isolate # initialize BatchEnrollment subsection
     plantTimeout 0, => new BatchEnrollment @$section.find '.batch-enrollment'
+    
+    # initialize BetaTesterBulkAddition subsection
+    plantTimeout 0, => new BetaTesterBulkAddition @$section.find '.batch-beta-testers'
 
     # gather elements
     @$list_selector = @$section.find 'select#member-lists-selector'
