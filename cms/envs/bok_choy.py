@@ -16,8 +16,6 @@ os.environ['SERVICE_VARIANT'] = 'bok_choy'
 os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()  #pylint: disable=E1120
 
 from .aws import *  # pylint: disable=W0401, W0614
-from xmodule.modulestore import prefer_xmodules
-
 
 ######################### Testing overrides ####################################
 
@@ -48,9 +46,6 @@ for log_name, log_level in LOG_OVERRIDES:
 
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
-
-# Enable XBlocks
-XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True
