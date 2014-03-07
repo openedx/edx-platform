@@ -603,7 +603,7 @@ function goto( mode)
 
   %if analytics_results.get("StudentsEnrolled"):
     <p>
-      ${_("Students enrolled:")}
+      ${_("Students enrolled (historical count, includes those who have since unenrolled):")}
       ${analytics_results["StudentsEnrolled"]['data'][0]['students']}
       (${analytics_results["StudentsEnrolled"]['time']})
     </p>
