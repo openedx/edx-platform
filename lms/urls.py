@@ -269,15 +269,14 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.progress', name="student_progress"),
 
         # For the instructor
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
-            'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
+            'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/',
+            include('instructor.views.api_urls')),
 
-        # see ENABLE_INSTRUCTOR_BETA_DASHBOARD section for more urls
+        # see ENABLE_INSTRUCTOR_LEGACY_DASHBOARD section for legacy dash urls
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
-            'instructor.views.legacy.gradebook', name='gradebook'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
-            'instructor.views.legacy.grade_summary', name='grade_summary'),
+        # Open Ended grading views
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
             'open_ended_grading.views.staff_grading', name='staff_grading'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
@@ -364,13 +363,14 @@ if settings.COURSEWARE_ENABLED:
         )
 
 
-if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'):
     urlpatterns += (
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
-            'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
-
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/',
-            include('instructor.views.api_urls'))
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
+            'instructor.views.legacy.gradebook', name='gradebook'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
+            'instructor.views.legacy.grade_summary', name='grade_summary'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
+            'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard_2"),
     )
 
 if settings.FEATURES.get('CLASS_DASHBOARD'):

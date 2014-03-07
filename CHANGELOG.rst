@@ -9,6 +9,10 @@ Studio: Add drag-and-drop support to the container page. STUD-1309.
 
 Common: Add extensible third-party auth module.
 
+LMS: Switch default instructor dashboard to the new (formerly "beta")
+  instructor dashboard. Puts the old (now "legacy") dash behind a feature flag.
+  LMS-1296
+
 Blades: Handle situation if no response were sent from XQueue to LMS in Matlab
 problem after Run Code button press. BLD-994.
 
