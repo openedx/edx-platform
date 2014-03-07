@@ -52,7 +52,7 @@
     //Nav-Edit Modes
     .editor-tabs {
       list-style: none;
-      #{$right}: 0;
+      right: 0;
       top: ($baseline/4);
       position: absolute;
       padding: 12px ($baseline*0.75);

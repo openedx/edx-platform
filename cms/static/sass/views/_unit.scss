@@ -307,7 +307,7 @@ body.course.unit,
 // Edit Header (Component Name, Mode-Editor, Mode-Settings)
 .component-edit-header {
   @include box-sizing(border-box);
-  padding: 18px 0 18px $baseline;
+  padding: 18px $baseline;
   top: 0;
   right: 0;
   background-color: $blue;
@@ -332,7 +332,7 @@ body.course.unit,
   //Nav-Edit Modes
   .nav-edit-modes {
     list-style: none;
-    right: 0;
+    #{$right}: 0;
     top: 0;
     position: absolute;
     padding: 12px ($baseline*0.75);
