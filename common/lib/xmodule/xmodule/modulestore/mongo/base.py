@@ -60,7 +60,10 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
     """
     def __init__(self, data, children, metadata):
         super(MongoKeyValueStore, self).__init__()
-        self._data = data
+        if not isinstance(data, dict):
+            self._data = {'data': data}
+        else:
+            self._data = data
         self._children = children
         self._metadata = metadata
 
@@ -72,10 +75,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
         elif key.scope == Scope.settings:
             return self._metadata[key.field_name]
         elif key.scope == Scope.content:
-            if key.field_name == 'data' and not isinstance(self._data, dict):
-                return self._data
-            else:
-                return self._data[key.field_name]
+            return self._data[key.field_name]
         else:
             raise InvalidScopeError(key)
 
@@ -85,10 +85,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
         elif key.scope == Scope.settings:
             self._metadata[key.field_name] = value
         elif key.scope == Scope.content:
-            if key.field_name == 'data' and not isinstance(self._data, dict):
-                self._data = value
-            else:
-                self._data[key.field_name] = value
+            self._data[key.field_name] = value
         else:
             raise InvalidScopeError(key)
 
@@ -99,9 +96,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             if key.field_name in self._metadata:
                 del self._metadata[key.field_name]
         elif key.scope == Scope.content:
-            if key.field_name == 'data' and not isinstance(self._data, dict):
-                self._data = None
-            else:
+            if key.field_name in self._data:
                 del self._data[key.field_name]
         else:
             raise InvalidScopeError(key)
@@ -112,10 +107,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
         elif key.scope == Scope.settings:
             return key.field_name in self._metadata
         elif key.scope == Scope.content:
-            if key.field_name == 'data' and not isinstance(self._data, dict):
-                return True
-            else:
-                return key.field_name in self._data
+            return key.field_name in self._data
         else:
             return False
 
