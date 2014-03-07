@@ -240,11 +240,18 @@
                     'setParams',
                     'setMode'
                 ],
-                obj = {};
+                obj = {},
+                delta = {
+                    add: jasmine.createSpy().andReturn(obj),
+                    substract: jasmine.createSpy().andReturn(obj),
+                    reset: jasmine.createSpy().andReturn(obj)
+                };
 
             $.each(methods, function (index, method) {
                 obj[method] = jasmine.createSpy(method).andReturn(obj);
             });
+
+            obj.delta = delta;
 
             return obj;
         }());

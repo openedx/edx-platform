@@ -221,7 +221,7 @@ function (HTML5Video, Resizer) {
         state.resizer = new Resizer({
                 element: state.videoEl,
                 elementRatio: videoWidth/videoHeight,
-                container: state.videoEl.parent()
+                container: state.container
             })
             .callbacks.once(function() {
                 state.trigger('videoCaption.resize', null);
@@ -235,7 +235,11 @@ function (HTML5Video, Resizer) {
             });
         }
 
-        $(window).bind('resize', _.debounce(state.resizer.align, 100));
+        $(window).on('resize', _.debounce(function () {
+            state.trigger('videoControl.updateControlsHeight', null);
+            state.trigger('videoCaption.resize', null);
+            state.resizer.align();
+        }, 100));
     }
 
     // function _restartUsingFlash(state)
@@ -461,7 +465,7 @@ function (HTML5Video, Resizer) {
         this.videoPlayer.log(
             'pause_video',
             {
-                'currentTime': this.videoPlayer.currentTime
+                currentTime: this.videoPlayer.currentTime
             }
         );
 
@@ -482,7 +486,7 @@ function (HTML5Video, Resizer) {
         this.videoPlayer.log(
             'play_video',
             {
-                'currentTime': this.videoPlayer.currentTime
+                currentTime: this.videoPlayer.currentTime
             }
         );
 
@@ -863,8 +867,7 @@ function (HTML5Video, Resizer) {
 
         // Default parameters that always get logged.
         logInfo = {
-            'id':   this.id,
-            'code': this.youtubeId()
+            id:   this.id
         };
 
         // If extra parameters were passed to the log.

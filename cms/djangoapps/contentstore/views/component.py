@@ -306,7 +306,7 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
         try:
-            old_location, course, xblock, __ = _get_item_in_course(request, locator)
+            __, course, xblock, __ = _get_item_in_course(request, locator)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 

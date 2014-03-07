@@ -44,9 +44,10 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         self.module_system = get_test_system()
 
         def get_module(descriptor):
+            """Mocks module_system get_module function"""
             module_system = get_test_system()
             module_system.get_module = get_module
-            descriptor.bind_for_student(module_system, descriptor._field_data)
+            descriptor.bind_for_student(module_system, descriptor._field_data)  # pylint: disable=protected-access
             return descriptor
 
         self.module_system.get_module = get_module
@@ -67,8 +68,7 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         self.module_system._services['partitions'] = self.partitions_service  # pylint: disable=protected-access
 
         self.split_test_module = course_seq.get_children()[0]
-        self.split_test_module.bind_for_student(self.module_system, self.split_test_module._field_data)
-
+        self.split_test_module.bind_for_student(self.module_system, self.split_test_module._field_data)  # pylint: disable=protected-access
 
     @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))
     @ddt.unpack
@@ -83,7 +83,7 @@ class SplitTestModuleTest(XModuleXmlImportTest):
 
     @ddt.data(('0',), ('1',))
     @ddt.unpack
-    def test_child_old_tag_value(self, user_tag):
+    def test_child_old_tag_value(self, _user_tag):
         # If user_tag has a stale value, we should still get back a valid child url
         self.tags_service.set_tag(
             self.tags_service.COURSE_SCOPE,
@@ -109,13 +109,13 @@ class SplitTestModuleTest(XModuleXmlImportTest):
 
     @ddt.data(('0',), ('1',))
     @ddt.unpack
-    def test_child_missing_tag_value(self, user_tag):
+    def test_child_missing_tag_value(self, _user_tag):
         # If user_tag has a missing value, we should still get back a valid child url
         self.assertIn(self.split_test_module.child_descriptor.url_name, ['split_test_cond0', 'split_test_cond1'])
 
     @ddt.data(('100',), ('200',), ('300',), ('400',), ('500',), ('600',), ('700',), ('800',), ('900',), ('1000',))
     @ddt.unpack
-    def test_child_persist_new_tag_value_when_tag_missing(self, user_tag):
+    def test_child_persist_new_tag_value_when_tag_missing(self, _user_tag):
         # If a user_tag has a missing value, a group should be saved/persisted for that user.
         # So, we check that we get the same url_name when we call on the url_name twice.
         # We run the test ten times so that, if our storage is failing, we'll be most likely to notice it.

@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Add .txt and .srt options to the "download transcript" button. BLD-844.
+
+Blades: Fix bug when transcript cutting off view in full view mode. BLD-852.
+
 Blades: Show start time or starting position on slider and VCR. BLD-823.
 
 Common: Upgraded CodeMirror to 3.21.0 with an accessibility patch applied.

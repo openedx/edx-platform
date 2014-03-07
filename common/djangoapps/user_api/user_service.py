@@ -14,6 +14,7 @@ from user_api.models import UserCourseTag
 # global tags (e.g. using the existing UserPreferences table))
 COURSE_SCOPE = 'course'
 
+
 def get_course_tag(user, course_id, key):
     """
     Gets the value of the user's course tag for the specified key in the specified

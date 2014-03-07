@@ -100,11 +100,11 @@ Assign discussion administration roles
 
 You can designate a team of people to help you run course discussions. Different options for working with discussion posts are available to discussion administrators with these roles:
 
-* Forum moderators can edit and delete posts, review posts flagged for misuse, close and reopen threads, pin posts and endorse responses, and, if the course is cohorted, see posts from all cohorts. Responses and comments made by moderators are marked as "Staff".
+* Discussion moderators can edit and delete posts, review posts flagged for misuse, close and reopen threads, pin posts and endorse responses, and, if the course is cohorted, see posts from all cohorts. Responses and comments made by moderators are marked as "Staff".
 
-* Forum community TAs have the same options for working with discussions as moderators. Responses and comments made by community TAs are marked as "Community TA".
+* Discussion community TAs have the same options for working with discussions as moderators. Responses and comments made by community TAs are marked as "Community TA".
 
-* Forum admins have the same options for working with discussions as moderators. Admins can also assign these discussion management roles to more people while your course is running, or remove a role from a user whenever necessary. Responses and comments made by admins are marked as "Staff".
+* Discussion admins have the same options for working with discussions as moderators. Admins can also assign these discussion management roles to more people while your course is running, or remove a role from a user whenever necessary. Responses and comments made by admins are marked as "Staff".
 
 **Note**: Discussion responses and comments made by course staff and instructors are also marked as "Staff".
 
@@ -123,7 +123,7 @@ To assign a role:
 
 #. Click **Membership**.
 
-#. In the Administration List Management section, use the drop-down list to select Forum Admins, Forum Moderators, or Forum Community TAs.
+#. In the Administration List Management section, use the drop-down list to select Discussion Admins, Discussion Moderators, or Discussion Community TAs.
 
 #. Under the list of users who currently have that role, enter an email address and click **Add** for the role type.
 

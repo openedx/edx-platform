@@ -549,6 +549,17 @@
             });
         });
 
+        it('Controls height is actual on switch to fullscreen', function () {
+            spyOn($.fn, 'height').andCallFake(function (val) {
+                return _.isUndefined(val) ? 100: this;
+            });
+
+            state = jasmine.initializePlayer();
+            $(state.el).trigger('fullscreen');
+
+            expect(state.videoControl.height).toBe(150);
+        });
+
         describe('play', function () {
             beforeEach(function () {
                 state = jasmine.initializePlayer();

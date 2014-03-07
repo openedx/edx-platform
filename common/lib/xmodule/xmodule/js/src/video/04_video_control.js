@@ -40,6 +40,7 @@ function () {
             showPlayPlaceholder: showPlayPlaceholder,
             toggleFullScreen: toggleFullScreen,
             togglePlayback: togglePlayback,
+            updateControlsHeight: updateControlsHeight,
             updateVcrVidTime: updateVcrVidTime
         };
 
@@ -83,6 +84,8 @@ function () {
             'role': 'slider',
             'title': gettext('Video slider')
         });
+
+        state.videoControl.updateControlsHeight();
     }
 
     // function _bindHandlers(state)
@@ -91,6 +94,23 @@ function () {
     function _bindHandlers(state) {
         state.videoControl.playPauseEl.on('click', state.videoControl.togglePlayback);
         state.videoControl.fullScreenEl.on('click', state.videoControl.toggleFullScreen);
+        state.el.on('fullscreen', function (event, isFullScreen) {
+            var height = state.videoControl.updateControlsHeight();
+
+            if (isFullScreen) {
+                state.resizer
+                    .delta
+                    .substract(height, 'height')
+                    .setMode('both');
+
+            } else {
+                state.resizer
+                    .delta
+                    .reset()
+                    .setMode('width');
+            }
+        });
+
         $(document).on('keyup', state.videoControl.exitFullScreen);
 
         if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
@@ -110,12 +130,22 @@ function () {
                 });
         }
     }
+    function _getControlsHeight(control) {
+        return control.el.height() + 0.5 * control.sliderEl.height();
+    }
 
     // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
+
+    function updateControlsHeight () {
+        this.videoControl.height = _getControlsHeight(this.videoControl);
+
+        return this.videoControl.height;
+    }
+
     function show() {
         this.videoControl.el.removeClass('is-hidden');
         this.el.trigger('controls:show', arguments);
@@ -234,13 +264,6 @@ function () {
             this.videoControl.fullScreenState = this.isFullScreen = false;
             fullScreenClassNameEl.removeClass('video-fullscreen');
             text = gettext('Fill browser');
-
-            this.resizer
-                .setParams({
-                    container: this.videoEl.parent()
-                })
-                .setMode('width');
-
             win.scrollTop(this.scrollPos);
         } else {
             this.scrollPos = win.scrollTop();
@@ -248,13 +271,6 @@ function () {
             this.videoControl.fullScreenState = this.isFullScreen = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             text = gettext('Exit full browser');
-
-            this.resizer
-                .setParams({
-                    container: window
-                })
-                .setMode('both');
-
         }
 
         this.videoControl.fullScreenEl
@@ -262,6 +278,7 @@ function () {
             .text(text);
 
         this.trigger('videoCaption.resize', null);
+        this.el.trigger('fullscreen', [this.isFullScreen]);
     }
 
     function exitFullScreen(event) {

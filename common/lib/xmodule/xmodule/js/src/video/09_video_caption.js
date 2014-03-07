@@ -135,7 +135,6 @@ function () {
         var self = this,
             Caption = this.videoCaption;
 
-        $(window).bind('resize', Caption.resize);
         Caption.hideSubtitlesEl.on({
             'click': Caption.toggle
         });
@@ -226,14 +225,10 @@ function () {
      */
     function fetchCaption() {
         var self = this,
-            Caption = self.videoCaption;
-        // Check whether the captions file was specified. This is the point
-        // where we either stop with the caption panel (so that a white empty
-        // panel to the right of the video will not be shown), or carry on
-        // further.
-        if (!this.youtubeId('1.0')) {
-            return false;
-        }
+            Caption = self.videoCaption,
+            data = {
+                language: this.getCurrentLanguage()
+            };
 
         if (Caption.loaded) {
             Caption.hideCaptions(false);
@@ -245,15 +240,16 @@ function () {
             Caption.fetchXHR.abort();
         }
 
+        if (this.videoType === 'youtube') {
+            data.videoId = this.youtubeId();
+        }
+
         // Fetch the captions file. If no file was specified, or if an error
         // occurred, then we hide the captions panel, and the "CC" button
         Caption.fetchXHR = $.ajaxWithPrefix({
             url: self.config.transcriptTranslationUrl,
             notifyOnError: false,
-            data: {
-                videoId: this.youtubeId(),
-                language: this.getCurrentLanguage()
-            },
+            data: data,
             success: function (captions) {
                 Caption.captions = captions.text;
                 Caption.start = captions.start;
@@ -757,8 +753,12 @@ function () {
             });
         }
 
-        if (this.resizer && !this.isFullScreen) {
-            this.resizer.alignByWidthOnly();
+        if (this.resizer) {
+            if (this.isFullScreen) {
+                this.resizer.setMode('both');
+            } else {
+                this.resizer.alignByWidthOnly();
+            }
         }
 
         this.videoCaption.setSubtitlesHeight();
@@ -772,17 +772,8 @@ function () {
     }
 
     function captionHeight() {
-        var paddingTop;
-
         if (this.isFullScreen) {
-            paddingTop = parseInt(
-                this.videoCaption.subtitlesEl.css('padding-top'), 10
-            );
-
-            return $(window).height() -
-                this.videoControl.el.height() -
-                0.5 * this.videoControl.sliderEl.height() -
-                2 * paddingTop;
+            return this.container.height() - this.videoControl.height;
         } else {
             return this.container.height();
         }

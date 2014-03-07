@@ -181,6 +181,16 @@ PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'edX')
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
     TRACKING_IGNORE_URL_PATTERNS = ENV_TOKENS.get("TRACKING_IGNORE_URL_PATTERNS")
 
+# Django CAS external authentication settings
+CAS_EXTRA_LOGIN_PARAMS = ENV_TOKENS.get("CAS_EXTRA_LOGIN_PARAMS", None)
+if FEATURES.get('AUTH_USE_CAS'):
+    CAS_SERVER_URL = ENV_TOKENS.get("CAS_SERVER_URL", None)
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'django_cas.backends.CASBackend',
+    )
+    INSTALLED_APPS += ('django_cas',)
+    MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
 
 ################ SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
