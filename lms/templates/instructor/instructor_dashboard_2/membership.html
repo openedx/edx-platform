@@ -6,6 +6,7 @@
     <div class="header">
       <div class="title"> {{title}} </div>
     </div>
+    <div class="info"> {{info}} </div>
     <div class="member-list">
       <table>
         <thead>
@@ -18,7 +19,6 @@
         <tbody></tbody>
       </table>
     </div>
-    <div class="info"> {{info}} </div>
     <div class="bottom-bar">
       <input type="text" name="add-field" class="add-field" placeholder="{{add_placeholder}}">
       <input type="button" name="add" class="add" value="{{add_btn_label}}">
@@ -28,28 +28,31 @@
 
 <div class="vert-left batch-enrollment">
   <h2> ${_("Batch Enrollment")} </h2>
-  <p> ${_("Enter student emails separated by new lines or commas.")} </p>
-  <textarea rows="6" cols="50" name="student-emails" placeholder="${_("Student Emails")}" spellcheck="false"></textarea>
-  <br>
+  <p>
+    <label for="student-emails">${_("Enter student emails separated by new lines or commas.")} </label>
+    <textarea rows="6" name="student-emails" placeholder="${_("Student Emails")}" spellcheck="false"></textarea>
+  </p>
 
-  <input type="checkbox" name="auto-enroll" value="Auto-Enroll" style="margin-top: 1em;">
-  <label for="auto-enroll">${_("Auto Enroll")}</label>
-  <div class="auto-enroll-hint">
-    <p> ${_("If auto enroll is <em>checked</em>, students who have not yet registered for edX will be automatically enrolled.")}
-        ${_("If auto enroll is left <em>unchecked</em>, students who have not yet registered for edX will not be enrolled, but will be allowed to enroll.")}
-    </p>
-  </div>
-  
-  <div>
-    <input type="checkbox" name="email-students" value="Notify-students-by-email">
-    <label for="email-students">${_("Notify students by email")}</label>
-    <div class="email-students-hint">
-      <p> ${_("If email students is <em>checked</em> students will receive an email notification.")}
-      </p>
+  <div class="enroll-option">
+    <input type="checkbox" name="auto-enroll" value="Auto-Enroll" style="margin-top: 1em;">
+    <label for="auto-enroll">${_("Auto Enroll")}</label>
+    <div class="hint auto-enroll-hint">
+      <span class="hint-caret"></span>
+      <p> ${_("If auto enroll is <em>checked</em>, students who have not yet registered for edX will be automatically enrolled.")}
+          ${_("If auto enroll is left <em>unchecked</em>, students who have not yet registered for edX will not be enrolled, but will be allowed to enroll.")}</p>
     </div>
   </div>
-  
-  <div>
+
+  <div class="enroll-option">
+    <input type="checkbox" name="email-students" value="Notify-students-by-email">
+    <label for="email-students">${_("Notify students by email")}</label>
+    <div class="hint email-students-hint">
+      <span class="hint-caret"></span>
+      <p> ${_("If email students is <em>checked</em> students will receive an email notification.")}</p>
+    </div>
+  </div>
+
+  <div class="enroll-actions actions">
     <input type="button" name="enroll" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" >
     <input type="button" name="unenroll" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" >
   </div>
@@ -61,11 +64,16 @@
 <div class="vert-right member-lists-management">
   <h2> ${_("Administration List Management")} </h2>
 
-  <select id="member-lists-selector">
-    <option> ${_("Getting available lists...")} </option>
-  </select>
-
   <div class="request-response-error"></div>
+
+  <div class="wrapper-member-select">
+    <label for="member-lists-selector">Select an Administrator Group:</label>
+    <select id="member-lists-selector" class="member-lists-selector">
+      <option> ${_("Getting available lists...")} </option>
+    </select>
+
+  </div>
+
 
   %if not section_data['access']['instructor']:
     <p>

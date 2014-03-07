@@ -69,7 +69,7 @@ class AuthListWidget extends MemberListWidget
     super $container,
       title: $container.data 'display-name'
       info: $container.data 'info-text'
-      labels: ["username", "email", "revoke access"]
+      labels: ["Username", "Email", "Revoke access"]
       add_placeholder: "Enter email"
       add_btn_label: $container.data 'add-button-label'
       add_handler: (input) => @add_handler input
@@ -116,9 +116,9 @@ class AuthListWidget extends MemberListWidget
         # if there are members, show the list
 
         # create revoke button and insert it into the row
-        $revoke_btn = $ '<div/>',
+        $revoke_btn = $ '<div class="revoke"><i class="icon-remove-sign"></i> Revoke access</div>',
           class: 'revoke'
-          click: =>
+        $revoke_btn.click =>
             @modify_member_access member.email, 'revoke', (error) =>
               # abort on error
               return @show_errors error unless error is null
@@ -271,7 +271,7 @@ class BatchEnrollment
           allowed.push student_results
 
       # The instructor is trying to unenroll someone who is not enrolled or allowed to enroll; non-sensical action.
-      else if data_from_server.action is 'unenroll' and not (student_results.before.enrollment) and not (student_results.before.allowed) 
+      else if data_from_server.action is 'unenroll' and not (student_results.before.enrollment) and not (student_results.before.allowed)
         notunenrolled.push student_results
 
       else if not student_results.after.enrollment
