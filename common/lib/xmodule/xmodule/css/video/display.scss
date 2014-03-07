@@ -46,13 +46,15 @@ div.video {
     .video-sources,
     .video-tracks {
       display: inline-block;
+      vertical-align: top;
       margin: ($baseline*.75) ($baseline/2) 0 0;
 
-      a {
+      > a {
         @include transition(all 0.25s ease-in-out 0s);
         @include font-size(14);
-        display: inline-block;
-        border-radius: 3px 3px 3px 3px;
+        line-height : 14px;
+        float: left;
+        border-radius: 3px;
         background-color: $very-light-text;
         padding: ($baseline*.75);
         color: $lighter-base-font-color;
@@ -62,7 +64,14 @@ div.video {
           color: $very-light-text;
         }
       }
-
+    }
+    .video-tracks {
+      > a {
+        border-radius: 3px 0 0 3px;
+      }
+      > a.external-track {
+        border-radius: 3px;
+      }
     }
   }
 

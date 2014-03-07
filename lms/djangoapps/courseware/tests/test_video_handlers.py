@@ -110,7 +110,7 @@ class TestVideo(BaseTestXmodule):
         data = [
             {'speed': 2.0},
             {'saved_video_position': "00:00:10"},
-            {'transcript_language': json.dumps('uk')},
+            {'transcript_language': 'uk'},
         ]
         for sample in data:
             response = self.clients[self.users[0].username].post(
@@ -129,7 +129,7 @@ class TestVideo(BaseTestXmodule):
         self.assertEqual(self.item_descriptor.saved_video_position, timedelta(0, 10))
 
         self.assertEqual(self.item_descriptor.transcript_language, 'en')
-        self.item_descriptor.handle_ajax('save_user_state', {'transcript_language': json.dumps("uk")})
+        self.item_descriptor.handle_ajax('save_user_state', {'transcript_language': "uk"})
         self.assertEqual(self.item_descriptor.transcript_language, 'uk')
 
     def tearDown(self):
@@ -173,11 +173,20 @@ class TestVideoTranscriptTranslation(TestVideo):
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.status, '404 Not Found')
 
-    @patch('xmodule.video_module.VideoModule.get_transcript', return_value='Subs!')
-    def test_download_exist(self, __):
+    @patch('xmodule.video_module.VideoModule.get_transcript', return_value=('Subs!', 'srt', 'application/x-subrip'))
+    def test_download_srt_exist(self, __):
         request = Request.blank('/download?language=en')
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.body, 'Subs!')
+        self.assertEqual(response.headers['Content-Type'], 'application/x-subrip')
+
+    @patch('xmodule.video_module.VideoModule.get_transcript', return_value=('Subs!', 'txt', 'text/plain'))
+    def test_download_txt_exist(self, __):
+        self.item.transcript_format = 'txt'
+        request = Request.blank('/download?language=en')
+        response = self.item.transcript(request=request, dispatch='download')
+        self.assertEqual(response.body, 'Subs!')
+        self.assertEqual(response.headers['Content-Type'], 'text/plain')
 
     def test_download_en_no_sub(self):
         request = Request.blank('/download?language=en')
@@ -309,7 +318,7 @@ class TestVideoTranscriptsDownload(TestVideo):
         self.item_descriptor.render('student_view')
         self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
 
-    def test_good_transcript(self):
+    def test_good_srt_transcript(self):
         good_sjson = _create_file(content=textwrap.dedent("""\
                 {
                   "start": [
@@ -329,7 +338,7 @@ class TestVideoTranscriptsDownload(TestVideo):
 
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.sub = _get_subs_id(good_sjson.name)
-        text = self.item.get_transcript()
+        text, format, download = self.item.get_transcript()
         expected_text = textwrap.dedent("""\
             0
             00:00:00,270 --> 00:00:02,720
@@ -340,6 +349,33 @@ class TestVideoTranscriptsDownload(TestVideo):
             Let&#39;s start with what is on your screen right now.
 
             """)
+
+        self.assertEqual(text, expected_text)
+
+    def test_good_txt_transcript(self):
+        good_sjson = _create_file(content=textwrap.dedent("""\
+                {
+                  "start": [
+                    270,
+                    2720
+                  ],
+                  "end": [
+                    2720,
+                    5430
+                  ],
+                  "text": [
+                    "Hi, welcome to Edx.",
+                    "Let&#39;s start with what is on your screen right now."
+                  ]
+                }
+            """))
+
+        _upload_sjson_file(good_sjson, self.item.location)
+        self.item.sub = _get_subs_id(good_sjson.name)
+        text, format, mime_type = self.item.get_transcript(format="txt")
+        expected_text = textwrap.dedent("""\
+            Hi, welcome to Edx.
+            Let's start with what is on your screen right now.""")
 
         self.assertEqual(text, expected_text)
 

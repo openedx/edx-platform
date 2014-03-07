@@ -155,3 +155,24 @@ Feature: LMS Video component
     Then I see video aligned correctly with enabled transcript
     And I click video button "CC"
     Then I see video aligned correctly without enabled transcript
+
+  # 19
+  Scenario: Download Transcript button works correctly in Video component
+    Given I am registered for the course "test_course"
+    And it has a video "A" in "Youtube" mode in position "1" of sequential:
+      | sub         | download_track |
+      | OEoXaMPEzfM | true           |
+    And a video "B" in "Youtube" mode in position "2" of sequential:
+      | sub         | download_track |
+      | OEoXaMPEzfM | true           |
+    And a video "C" in "Youtube" mode in position "3" of sequential:
+      | track               | download_track |
+      | http://example.org/ | true           |
+    And I open the section with videos
+    And I can download transcript in "srt" format
+    And I select the transcript format "txt"
+    And I can download transcript in "txt" format
+    When I open video "B"
+    Then I can download transcript in "txt" format
+    When I open video "C"
+    Then menu "download_transcript" doesn't exist
