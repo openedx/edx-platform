@@ -18,7 +18,7 @@ function (Resizer) {
                     '</div>',
                 '</div>'
             ].join(''),
-            config, container, element, originalConsoleLog;
+            config, container, element;
 
         beforeEach(function () {
             setFixtures(html);
@@ -30,12 +30,7 @@ function (Resizer) {
                 element: element
             };
 
-            originalConsoleLog = window.console.log;
             spyOn(console, 'log');
-        });
-
-        afterEach(function () {
-            window.console.log = originalConsoleLog;
         });
 
         it('When Initialize without required parameters, log message is shown',
@@ -134,7 +129,7 @@ function (Resizer) {
                 expect(spiesList[0].calls.length).toEqual(1);
             });
 
-            it('All callbacks are removed', function () {
+            it('all callbacks are removed', function () {
                 $.each(spiesList, function (index, spy) {
                     resizer.callbacks.add(spy);
                 });
@@ -147,7 +142,7 @@ function (Resizer) {
                 });
             });
 
-            it('Specific callback is removed', function () {
+            it('specific callback is removed', function () {
                 $.each(spiesList, function (index, spy) {
                     resizer.callbacks.add(spy);
                 });
@@ -176,9 +171,86 @@ function (Resizer) {
                 });
 
             });
-
         });
 
+        describe('Delta', function () {
+            var resizer;
+
+            beforeEach(function () {
+                resizer = new Resizer(config);
+            });
+
+            it('adding delta align correctly by height', function () {
+                var delta = 100,
+                    expectedHeight = container.height() + delta,
+                    realHeight;
+
+                resizer
+                    .delta.add(delta, 'height')
+                    .setMode('height');
+
+                realHeight = element.height();
+
+                expect(realHeight).toBe(expectedHeight);
+            });
+
+            it('adding delta align correctly by width', function () {
+                var delta = 100,
+                    expectedWidth = container.width() + delta,
+                    realWidth;
+
+                resizer
+                    .delta.add(delta, 'width')
+                    .setMode('width');
+
+                realWidth = element.width();
+
+                expect(realWidth).toBe(expectedWidth);
+            });
+
+            it('substract delta align correctly by height', function () {
+                var delta = 100,
+                    expectedHeight = container.height() - delta,
+                    realHeight;
+
+                resizer
+                    .delta.substract(delta, 'height')
+                    .setMode('height');
+
+                realHeight = element.height();
+
+                expect(realHeight).toBe(expectedHeight);
+            });
+
+            it('substract delta align correctly by width', function () {
+                var delta = 100,
+                    expectedWidth = container.width() - delta,
+                    realWidth;
+
+                resizer
+                    .delta.substract(delta, 'width')
+                    .setMode('width');
+
+                realWidth = element.width();
+
+                expect(realWidth).toBe(expectedWidth);
+            });
+
+            it('reset delta', function () {
+                var delta = 100,
+                    expectedWidth = container.width(),
+                    realWidth;
+
+                resizer
+                    .delta.substract(delta, 'width')
+                    .delta.reset()
+                    .setMode('width');
+
+                realWidth = element.width();
+
+                expect(realWidth).toBe(expectedWidth);
+            });
+        });
     });
 });
 
