@@ -229,7 +229,7 @@ class AboutFields(object):
     )
     data = String(
         help="Html contents to display for this module",
-        default="",
+        default=u"",
         scope=Scope.content
     )
 
@@ -263,7 +263,7 @@ class StaticTabFields(object):
         default="Empty",
     )
     data = String(
-        default=textwrap.dedent("""\
+        default=textwrap.dedent(u"""\
             <p>This is where you can add additional pages to your courseware. Click the 'edit' button to begin editing.</p>
         """),
         scope=Scope.content,
@@ -300,7 +300,7 @@ class CourseInfoFields(object):
     )
     data = String(
         help="Html contents to display for this module",
-        default="<ol></ol>",
+        default=u"<ol></ol>",
         scope=Scope.content
     )
 
