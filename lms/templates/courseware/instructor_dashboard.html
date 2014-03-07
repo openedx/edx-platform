@@ -7,7 +7,7 @@
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
-<%block name="pagetitle">${_("Instructor Dashboard")}</%block>
+<%block name="pagetitle">${_("Legacy Instructor Dashboard")}</%block>
 <%block name="nav_skip">#instructor-dashboard-content</%block>
 
 <%block name="headextra">
@@ -139,7 +139,12 @@ function goto( mode)
     
     <h1>${_("Instructor Dashboard")}</h1>
 
-    # TODO put in a banner
+    <div class="wrapper-msg urgency-low warning">
+      <div class="msg""
+        <p>${_("You are using the legacy instructor dashboard, which will be going away in the near future. Please use the Standard Dashboard. If it is missing functionality, please let us know.")}
+        <a href="${ beta_dashboard_url }">${_("Return to the Standard Dashboard")}  <i class="icon-angle-right"></i></a></p>
+      </div>
+    </div>
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
           %if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
@@ -413,7 +418,7 @@ function goto( mode)
   %else:
   <p>${_("User requires forum administrator privileges to perform administration tasks.  See instructor.")}</p>
   %endif
-  
+
   <br />
   <h2>${_("Explanation of Roles:")}</h2>
   <p>${_("Forum Moderators: can edit or delete any post, remove misuse flags, close and re-open threads, endorse "
@@ -698,7 +703,7 @@ function goto( mode)
     </script>
 
     <div id="metrics"></div>
-    
+
     <h3 class="attention">${_("Loading the latest graphs for you; depending on your class size, this may take a few minutes.")}</h3>
 
     %for i in range(0,len(metrics_results['section_display_name'])):
