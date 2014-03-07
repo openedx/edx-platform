@@ -33,8 +33,6 @@ from path import path
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.mixin import CmsBlockMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin, prefer_xmodules
 from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
@@ -217,6 +215,11 @@ MIDDLEWARE_CLASSES = (
 X_FRAME_OPTIONS = 'ALLOW'
 
 ############# XBlock Configuration ##########
+
+# Import after sys.path fixup
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore import prefer_xmodules
+from xmodule.x_module import XModuleMixin
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington

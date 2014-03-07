@@ -33,8 +33,6 @@ from path import path
 from .discussionsettings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin, prefer_xmodules
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -430,6 +428,11 @@ DOC_STORE_CONFIG = {
 }
 
 ############# XBlock Configuration ##########
+
+# Import after sys.path fixup
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore import prefer_xmodules
+from xmodule.x_module import XModuleMixin
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
