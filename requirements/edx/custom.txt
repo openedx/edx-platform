@@ -1,0 +1,3 @@
+# Custom requirements to be customized by individual OpenEdX instances
+
+-e git+https://github.com/edx-solutions/xblock-mentoring.git@c520ab407804eddcb7a8ce2e33a3179e6f6cbeae#egg=xblock-mentoring
