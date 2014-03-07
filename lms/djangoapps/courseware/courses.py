@@ -193,11 +193,11 @@ def get_course_about_section(course, section_key):
                 key=section_key, url=course.location.url()))
             return None
     elif section_key == "title":
-        return course.display_name_with_default
+        return course.display_name_with_default.encode('utf-8')
     elif section_key == "university":
-        return course.display_org_with_default
+        return course.display_org_with_default.encode('utf-8')
     elif section_key == "number":
-        return course.display_number_with_default
+        return course.display_number_with_default.encode('utf-8')
 
     raise KeyError("Invalid about key " + str(section_key))
 
