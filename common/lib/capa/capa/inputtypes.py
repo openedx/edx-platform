@@ -627,7 +627,6 @@ class FileSubmission(InputTypeBase):
     template = "filesubmission.html"
     tags = ['filesubmission']
 
-
     @staticmethod
     def parse_files(files):
         """
@@ -684,21 +683,21 @@ class CodeInput(InputTypeBase):
         # non-codemirror editor.
     ]
 
-
     @classmethod
     def get_attributes(cls):
         """
         Convert options to a convenient format.
         """
-        return [Attribute('rows', '30'),
-                Attribute('cols', '80'),
-                Attribute('hidden', ''),
+        return [
+            Attribute('rows', '30'),
+            Attribute('cols', '80'),
+            Attribute('hidden', ''),
 
-                # For CodeMirror
-                Attribute('mode', 'python'),
-                Attribute('linenumbers', 'true'),
-                # Template expects tabsize to be an int it can do math with
-                Attribute('tabsize', 4, transform=int),
+            # For CodeMirror
+            Attribute('mode', 'python'),
+            Attribute('linenumbers', 'true'),
+            # Template expects tabsize to be an int it can do math with
+            Attribute('tabsize', 4, transform=int),
         ]
 
     def setup_code_response_rendering(self):
@@ -752,7 +751,6 @@ class MatlabInput(CodeInput):
     """
     template = "matlabinput.html"
     tags = ['matlabinput']
-
 
     def setup(self):
         """
@@ -1049,7 +1047,7 @@ class ChemicalEquationInput(InputTypeBase):
         Can set size of text field.
         """
         return [Attribute('size', '20'),
-                Attribute('label', ''),]
+                Attribute('label', ''), ]
 
     def _extra_context(self):
         """
