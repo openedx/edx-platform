@@ -300,7 +300,7 @@ class TestMongoKeyValueStore(object):
             assert_false(self.kvs.has(key))
 
     def test_read_non_dict_data(self):
-        self.kvs._data = 'xml_data'
+        self.kvs = MongoKeyValueStore('xml_data', self.children, self.metadata)
         assert_equals('xml_data', self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'data')))
 
     def _check_write(self, key, value):
@@ -313,7 +313,7 @@ class TestMongoKeyValueStore(object):
         yield (self._check_write, KeyValueStore.Key(Scope.settings, None, None, 'meta'), 'new_settings')
 
     def test_write_non_dict_data(self):
-        self.kvs._data = 'xml_data'
+        self.kvs = MongoKeyValueStore('xml_data', self.children, self.metadata)
         self._check_write(KeyValueStore.Key(Scope.content, None, None, 'data'), 'new_data')
 
     def test_write_invalid_scope(self):

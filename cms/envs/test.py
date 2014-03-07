@@ -16,7 +16,6 @@ from .common import *
 import os
 from path import path
 from warnings import filterwarnings
-from xmodule.modulestore import prefer_xmodules
 
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -156,10 +155,6 @@ INSTALLED_APPS += ('external_auth', )
 
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
-
-
-################################# XBLOCK ######################################
-XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 
 ################################# CELERY ######################################
