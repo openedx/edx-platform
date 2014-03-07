@@ -461,7 +461,7 @@ function (HTML5Video, Resizer) {
         this.videoPlayer.log(
             'pause_video',
             {
-                'currentTime': this.videoPlayer.currentTime
+                currentTime: this.videoPlayer.currentTime
             }
         );
 
@@ -482,7 +482,7 @@ function (HTML5Video, Resizer) {
         this.videoPlayer.log(
             'play_video',
             {
-                'currentTime': this.videoPlayer.currentTime
+                currentTime: this.videoPlayer.currentTime
             }
         );
 
@@ -863,8 +863,7 @@ function (HTML5Video, Resizer) {
 
         // Default parameters that always get logged.
         logInfo = {
-            'id':   this.id,
-            'code': this.youtubeId()
+            id:   this.id
         };
 
         // If extra parameters were passed to the log.

@@ -9,7 +9,6 @@ from django.conf import settings
 from cache_toolbox.core import del_cached_content
 from xmodule.contentstore.content import StaticContent
 import os
-from functools import partial
 from xmodule.contentstore.django import contentstore
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 LANGUAGES = settings.ALL_LANGUAGES
@@ -45,48 +44,6 @@ VIDEO_BUTTONS = {
 
 coursenum = 'test_course'
 sequence = {}
-
-@step('when I view the (.*) it does not have autoplay enabled$')
-def does_not_autoplay(_step, video_type):
-    assert(world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False')
-
-
-@step('the course has a Video component in (.*) mode(?:\:)?$')
-def view_video(_step, player_mode):
-
-    i_am_registered_for_the_course(_step, coursenum)
-
-    # Make sure we have a video
-    add_video_to_course(coursenum, player_mode.lower(), _step.hashes)
-    visit_scenario_item('SECTION')
-
-
-@step('a video "([^"]*)" in "([^"]*)" mode in position "([^"]*)" of sequential(?:\:)?$')
-def add_video(_step, player_id, player_mode, position):
-    sequence[player_id] = position
-    add_video_to_course(coursenum, player_mode.lower(), _step.hashes, display_name=player_id)
-
-
-@step('I open the section with videos$')
-def visit_video_section(_step):
-    visit_scenario_item('SECTION')
-
-
-@step('I select the "([^"]*)" speed on video "([^"]*)"$')
-def change_video_speed(_step, speed, player_id):
-      _navigate_to_an_item_in_a_sequence(sequence[player_id])
-      _change_video_speed(speed)
-
-
-@step('I open video "([^"]*)"$')
-def open_video(_step, player_id):
-    _navigate_to_an_item_in_a_sequence(sequence[player_id])
-
-
-@step('video "([^"]*)" should start playing at speed "([^"]*)"$')
-def check_video_speed(_step, player_id, speed):
-    speed_css = '.speeds p.active'
-    assert world.css_has_text(speed_css, '{0}x'.format(speed))
 
 
 def add_video_to_course(course, player_mode, hashes, display_name='Video'):
@@ -129,14 +86,103 @@ def add_video_to_course(course, player_mode, hashes, display_name='Video'):
 
     if 'transcripts' in kwargs['metadata']:
         kwargs['metadata']['transcripts'] = json.loads(kwargs['metadata']['transcripts'])
+        course_location = world.scenario_dict['COURSE'].location
 
         if 'sub' in kwargs['metadata']:
-            _upload_file(kwargs['metadata']['sub'], 'en', world.scenario_dict['COURSE'].location)
+            filename = _get_transcript_filename(kwargs['metadata']['sub'], 'en')
+            _upload_file(filename, course_location)
 
         for lang, videoId in kwargs['metadata']['transcripts'].items():
-            _upload_file(videoId, lang, world.scenario_dict['COURSE'].location)
+            filename = _get_transcript_filename(videoId, lang)
+            _upload_file(filename, course_location)
 
     world.scenario_dict['VIDEO'] = world.ItemFactory.create(**kwargs)
+
+
+def _get_transcript_filename(videoId, lang):
+    if lang == 'en':
+        return 'subs_{0}.srt.sjson'.format(videoId)
+    else:
+        return '{0}_subs_{1}.srt.sjson'.format(lang, videoId)
+
+
+def _upload_file(filename, location):
+    path = os.path.join(TEST_ROOT, 'uploads/', filename)
+    f = open(os.path.abspath(path))
+    mime_type = "application/json"
+
+    content_location = StaticContent.compute_location(
+        location.org, location.course, filename
+    )
+    content = StaticContent(content_location, filename, mime_type, f.read())
+    contentstore().save(content)
+    del_cached_content(content.location)
+
+
+def _navigate_to_an_item_in_a_sequence(number):
+    sequence_css = 'a[data-element="{0}"]'.format(number)
+    world.css_click(sequence_css)
+
+
+def _change_video_speed(speed):
+    world.browser.execute_script("$('.speeds').addClass('open')")
+    speed_css = 'li[data-speed="{0}"] a'.format(speed)
+    world.css_click(speed_css)
+
+
+def _open_menu(menu):
+    world.browser.execute_script("$('{selector}').parent().addClass('open')".format(
+        selector=VIDEO_MENUS[menu]
+    ))
+
+
+@step('when I view the (.*) it does not have autoplay enabled$')
+def does_not_autoplay(_step, video_type):
+    assert(world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False')
+
+
+@step('the course has a Video component in (.*) mode(?:\:)?$')
+def view_video(_step, player_mode):
+
+    i_am_registered_for_the_course(_step, coursenum)
+
+    # Make sure we have a video
+    add_video_to_course(coursenum, player_mode.lower(), _step.hashes)
+    visit_scenario_item('SECTION')
+
+
+@step('a video in "([^"]*)" mode(?:\:)?$')
+def add_video(_step, player_mode):
+    add_video_to_course(coursenum, player_mode.lower(), _step.hashes)
+    visit_scenario_item('SECTION')
+
+
+@step('a video "([^"]*)" in "([^"]*)" mode in position "([^"]*)" of sequential(?:\:)?$')
+def add_video_in_position(_step, player_id, player_mode, position):
+    sequence[player_id] = position
+    add_video_to_course(coursenum, player_mode.lower(), _step.hashes, display_name=player_id)
+
+
+@step('I open the section with videos$')
+def visit_video_section(_step):
+    visit_scenario_item('SECTION')
+
+
+@step('I select the "([^"]*)" speed on video "([^"]*)"$')
+def change_video_speed(_step, speed, player_id):
+      _navigate_to_an_item_in_a_sequence(sequence[player_id])
+      _change_video_speed(speed)
+
+
+@step('I open video "([^"]*)"$')
+def open_video(_step, player_id):
+    _navigate_to_an_item_in_a_sequence(sequence[player_id])
+
+
+@step('video "([^"]*)" should start playing at speed "([^"]*)"$')
+def check_video_speed(_step, player_id, speed):
+    speed_css = '.speeds p.active'
+    assert world.css_has_text(speed_css, '{0}x'.format(speed))
 
 
 @step('youtube server is up and response time is (.*) seconds$')
@@ -232,47 +278,6 @@ def click_button(_step, button):
     world.css_find(VIDEO_BUTTONS[button]).click()
 
 
-def _upload_file(videoId, lang, location):
-    if lang == 'en':
-        filename = 'subs_{0}.srt.sjson'.format(videoId)
-    else:
-        filename = '{0}_subs_{1}.srt.sjson'.format(lang, videoId)
-
-    path = os.path.join(TEST_ROOT, 'uploads/', filename)
-    f = open(os.path.abspath(path))
-    mime_type = "application/json"
-
-    content_location = StaticContent.compute_location(
-        location.org, location.course, filename
-    )
-
-    sc_partial = partial(StaticContent, content_location, filename, mime_type)
-    content = sc_partial(f.read())
-
-    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(
-        content,
-        tempfile_path=None
-    )
-    del_cached_content(thumbnail_location)
-
-    if thumbnail_content is not None:
-        content.thumbnail_location = thumbnail_location
-
-    contentstore().save(content)
-    del_cached_content(content.location)
-
-
-def _navigate_to_an_item_in_a_sequence(number):
-    sequence_css = 'a[data-element="{0}"]'.format(number)
-    world.css_click(sequence_css)
-
-
-def _change_video_speed(speed):
-    world.browser.execute_script("$('.speeds').addClass('open')")
-    speed_css = 'li[data-speed="{0}"] a'.format(speed)
-    world.css_click(speed_css)
-
-
 @step('I click video button "([^"]*)"$')
 def click_button_video(_step, button_type):
     world.wait_for_ajax_complete()
@@ -295,7 +300,12 @@ def seek_video_to_n_seconds(_step, seconds):
     world.browser.execute_script(jsCode)
 
 
-def _open_menu(menu):
-    world.browser.execute_script("$('{selector}').parent().addClass('open')".format(
-        selector=VIDEO_MENUS[menu]
-    ))
+@step('I have a "([^"]*)" transcript file in assets$')
+def upload_to_assets(_step, filename):
+    _upload_file(filename, world.scenario_dict['COURSE'].location)
+
+
+@step('button "([^"]*)" is hidden$')
+def is_hidden_button(_step, button):
+    assert not world.css_visible(VIDEO_BUTTONS[button])
+
