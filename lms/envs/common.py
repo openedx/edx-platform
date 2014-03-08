@@ -431,8 +431,7 @@ DOC_STORE_CONFIG = {
 
 # Import after sys.path fixup
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
-from xmodule.x_module import XModuleMixin
+from xmodule.x_module import XModuleMixin, prefer_xmodules
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
