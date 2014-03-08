@@ -431,7 +431,7 @@ class TextlineTemplateTest(TemplateTestCase):
                                         'script_src': 'test_script'}
         xml = self.render_to_xml(self.context)
 
-        xpath = "//div[@class='text-input-dynamath_data' and @data-preprocessor='test_class']"
+        xpath = "//div[@class='text-input-dynamath_data ' and @data-preprocessor='test_class']"
         self.assert_has_xpath(xml, xpath, self.context)
 
         xpath = "//div[@class='script_placeholder' and @data-src='test_script']"
