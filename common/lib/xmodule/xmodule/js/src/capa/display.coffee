@@ -444,7 +444,7 @@ class @Problem
         $p = $(element).find('p.status')
         `// Translators: the word unanswered here is about answering a problem the student must solve.`
         $p.text gettext("unanswered")
-        $p.parent().removeClass().addClass "unanswered"
+        $p.parent().removeClass("correct incorrect").addClass "unanswered"
 
   inputtypeSetupMethods:
 
