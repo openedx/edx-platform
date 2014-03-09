@@ -163,7 +163,7 @@ function goto( mode)
     <h2>${_("Grade Downloads")}</h2>
     % if disable_buttons:
 
-    <div class="msg msg-warning">
+    <div class="sr msg msg-warning">
 
       <div class="copy">
         <p>
@@ -178,14 +178,14 @@ function goto( mode)
       </div>
     </div>
     % endif
-
     <p>
-    <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}" class="${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
+    <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}" class="sr ${'is-disabled' if disable_buttons else ''}">${_("Gradebook")}</a>
     </p>
 
     <p>
     <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id))}" class="">${_("Grade summary")}</a>
     </p>
+    <div class="sr">
 
     <p>
     <input type="submit" name="action" onclick="this.value='Dump list of enrolled students'" value="${_("Dump list of enrolled students")}" class="${'is-disabled' if disable_buttons else ''}">
@@ -205,6 +205,7 @@ function goto( mode)
     <input type="submit" name="action" onclick="this.value='Download CSV of answer distributions'" value="${_("Download CSV of answer distributions")}" class="${'is-disabled' if disable_buttons else ''}">
     <input type="submit" name="action" onclick="this.value='Dump description of graded assignments configuration'" value="${_("Dump description of graded assignments configuration")}">
     </p>
+  </div>
     <hr width="40%" style="align:left">
 
   %if settings.FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
