@@ -10,7 +10,7 @@ import sys
 from django.core.management.base import BaseCommand
 from optparse import make_option
 
-
+from xmodule.modulestore.django import modulestore
 from courseware.courses import get_course
 from django.contrib.auth.models import User
 
@@ -89,8 +89,7 @@ coursemap = {
 
 def gendata(request):
     data = {}
-    for course_id, course_name in coursemap.iteritems():
-        course = get_course(course_id)
+    for course in modulestore().get_courses():
         data[course.id] = {}
         if course.id not in coursemap:
             continue
@@ -296,8 +295,7 @@ def fullstat(request = None):
         idx += 1
         usermap.setdefault(row['email'],[]).append(row)
 
-    for course_id, course_name in coursemap.iteritems():
-        course = get_course(course_id)
+    for course in modulestore().get_courses():
 
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course.id,
@@ -363,7 +361,7 @@ def fullstat(request = None):
             except:
                 pass
         datatable['data'] = data
-        return_csv(course.id,datatable, open("/var/www/edx/" + course.id.replace('/','_') + ".csv", "wb"))
+        return_csv(course.id,datatable, open("/var/www/edx/" + course.id.replace('/','_') + ".xls", "wb"))
 
     return True
 
@@ -380,11 +378,11 @@ def return_csv(func, datatable, file_pointer=None):
         return None
     else:
         response = file_pointer
-    writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-    encoded_row = [unicode(s).encode('utf-8') for s in datatable['header']]
+    writer = csv.writer(response, dialect='excel-tab', quotechar='"', quoting=csv.QUOTE_ALL)
+    encoded_row = [unicode(s).encode('cp1251') for s in datatable['header']]
     writer.writerow(encoded_row)
     for datarow in datatable['data']:
-        encoded_row = [unicode(s).encode('utf-8') for s in datarow]
+        encoded_row = [unicode(s).encode('cp1251') for s in datarow]
         writer.writerow(encoded_row)
     return response
 
