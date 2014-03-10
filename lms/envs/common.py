@@ -1722,7 +1722,6 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ORIGIN_REGEX_WHITELIST = ('^http?://(\w+\.)?devstack\.local$',)
 
 
-
 ###################### Registration ##################################
 
 # For each of the fields, give one of the following values:

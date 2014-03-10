@@ -104,6 +104,11 @@ CC_PROCESSOR = {
     }
 }
 
+########################### EDX API #################################
+
+FEATURES['API'] = True
+
+
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
