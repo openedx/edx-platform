@@ -1268,6 +1268,9 @@ INSTALLED_APPS = (
 
     # Monitoring functionality
     'monitoring',
+
+    # EDX API application
+    'api_manager',
 )
 
 ######################### MARKETING SITE ###############################
