@@ -874,7 +874,7 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 ############################### Pipeline #######################################
 
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
 
 from rooted_paths import rooted_glob
 
