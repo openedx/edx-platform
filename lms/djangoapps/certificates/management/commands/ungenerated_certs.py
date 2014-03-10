@@ -73,14 +73,13 @@ class Command(BaseCommand):
             for course_id in [course  # all courses in COURSE_LISTINGS
                               for sub in settings.COURSE_LISTINGS
                               for course in settings.COURSE_LISTINGS[sub]]:
-                course_loc = CourseDescriptor.id_to_location(course_id)
-                course = modulestore().get_instance(course_id, course_loc)
+                course = modulestore().get_course(course_id)
                 if course.has_ended():
                     ended_courses.append(course_id)
 
         for course_id in ended_courses:
             # prefetch all chapters/sequentials by saying depth=2
-            course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
+            course = modulestore().get_course(course_id, depth=2)
 
             print "Fetching enrolled students for {0}".format(course_id)
             enrolled_students = User.objects.filter(

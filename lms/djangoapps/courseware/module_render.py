@@ -33,9 +33,10 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.keys import CourseKey, UsageKey
 from xmodule.util.duedate import get_extended_due_date
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_debug_info, wrap_xblock
 from xmodule.lti_module import LTIModule
@@ -127,7 +128,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     return chapters
 
 
-def get_module(user, request, location, field_data_cache, course_id,
+def get_module(user, request, usage_key, field_data_cache,
                position=None, not_found_ok=False, wrap_xmodule_display=True,
                grade_bucket_type=None, depth=0,
                static_asset_path=''):
@@ -157,9 +158,8 @@ def get_module(user, request, location, field_data_cache, course_id,
     if possible.  If not possible, return None.
     """
     try:
-        location = Location(location)
-        descriptor = modulestore().get_instance(course_id, location, depth=depth)
-        return get_module_for_descriptor(user, request, descriptor, field_data_cache, course_id,
+        descriptor = modulestore().get_item(usage_key, depth=depth)
+        return get_module_for_descriptor(user, request, descriptor, field_data_cache, usage_key.course_key,
                                          position=position,
                                          wrap_xmodule_display=wrap_xmodule_display,
                                          grade_bucket_type=grade_bucket_type,
@@ -198,7 +198,7 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     See get_module() docstring for further details.
     """
     # allow course staff to masquerade as student
-    if has_access(user, descriptor, 'staff', course_id):
+    if has_access(user, 'staff', descriptor, course_id):
         setup_masquerade(request, True)
 
     track_function = make_track_function(request)
@@ -223,7 +223,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # Do not check access when it's a noauth request.
     if getattr(user, 'known', True):
         # Short circuit--if the user shouldn't have access, bail without doing any work
-        if not has_access(user, descriptor, 'load', course_id):
+        if not has_access(user, 'load', descriptor, course_id):
             return None
 
     student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
@@ -319,12 +319,10 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
         # Bin score into range and increment stats
         score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
-        course_id_dict = Location.parse_course_id(course_id)
 
         tags = [
-            u"org:{org}".format(**course_id_dict),
-            u"course:{course}".format(**course_id_dict),
-            u"run:{name}".format(**course_id_dict),
+            u"org:{}".format(course_id.org),
+            u"course:{}".format(course_id),
             u"score_bucket:{0}".format(score_bucket)
         ]
 
@@ -370,7 +368,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     ))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
-        if has_access(user, descriptor, 'staff', course_id):
+        if has_access(user, 'staff', descriptor, course_id):
             block_wrappers.append(partial(add_staff_debug_info, user))
 
     # These modules store data using the anonymous_student_id as a key.
@@ -385,7 +383,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     if is_pure_xblock or is_lti_module:
         anonymous_student_id = anonymous_id_for_user(user, course_id)
     else:
-        anonymous_student_id = anonymous_id_for_user(user, '')
+        anonymous_student_id = anonymous_id_for_user(user, None)
 
     system = LmsModuleSystem(
         track_function=track_function,
@@ -443,10 +441,10 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())
         )
 
-    system.set(u'user_is_staff', has_access(user, descriptor.location, u'staff', course_id))
+    system.set(u'user_is_staff', has_access(user, u'staff', descriptor.location, course_id))
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
-    if has_access(user, descriptor.location, 'staff', course_id):
+    if has_access(user, u'staff', descriptor.location, course_id):
         system.error_descriptor_class = ErrorDescriptor
     else:
         system.error_descriptor_class = NonStaffErrorDescriptor
@@ -460,15 +458,17 @@ def find_target_student_module(request, user_id, course_id, mod_id):
     """
     Retrieve target StudentModule
     """
+    course_id = CourseKey.from_string(course_id)
+    usage_key = UsageKey.from_string(mod_id)
     user = User.objects.get(id=user_id)
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
         user,
-        modulestore().get_instance(course_id, mod_id),
+        modulestore().get_item(usage_key),
         depth=0,
         select_for_update=True
     )
-    instance = get_module(user, request, mod_id, field_data_cache, course_id, grade_bucket_type='xqueue')
+    instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue')
     if instance is None:
         msg = "No module {0} for user {1}--access denied?".format(mod_id, user)
         log.debug(msg)
@@ -566,11 +566,20 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     """
     Invoke an XBlock handler, either authenticated or not.
 
+    Arguments:
+        request (HttpRequest): the current request
+        course_id (str): A string of the form org/course/run
+        usage_id (str): A string of the form i4x://org/course/category/name@revision
+        handler (str): The name of the handler to invoke
+        suffix (str): The suffix to pass to the handler when invoked
+        user (User): The currently logged in user
+
     """
-    location = unquote_slashes(usage_id)
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_id))
 
     # Check parameters and fail fast if there's a problem
-    if not Location.is_valid(location):
+    if not Location.is_valid(usage_key):
         raise Http404("Invalid location")
 
     # Check submitted files
@@ -580,12 +589,12 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         return HttpResponse(json.dumps({'success': error_msg}))
 
     try:
-        descriptor = modulestore().get_instance(course_id, location)
+        descriptor = modulestore().get_item(usage_key)
     except ItemNotFoundError:
         log.warn(
-            "Invalid location for course id {course_id}: {location}".format(
-                course_id=course_id,
-                location=location
+            "Invalid location for course id {course_id}: {usage_key}".format(
+                course_id=usage_key.course_key,
+                usage_key=usage_key
             )
         )
         raise Http404
@@ -602,11 +611,11 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         user,
         descriptor
     )
-    instance = get_module(user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
+    instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module %s for user %s -- access denied?", location, user)
+        log.debug("No module %s for user %s -- access denied?", usage_key, user)
         raise Http404
 
     req = django_to_webob_request(request)

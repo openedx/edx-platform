@@ -112,7 +112,7 @@ def inline_discussion(request, course_id, discussion_id):
     """
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, course_id, 'load_forum')
+    course = get_course_with_access(request.user, 'load_forum', course_id)
 
     threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
     cc_user = cc.User.from_django_user(request.user)
@@ -168,7 +168,7 @@ def forum_form_discussion(request, course_id):
     """
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, course_id, 'load_forum')
+    course = get_course_with_access(request.user, 'load_forum', course_id)
     with newrelic.agent.FunctionTrace(nr_transaction, "get_discussion_category_map"):
         category_map = utils.get_discussion_category_map(course)
 
@@ -212,11 +212,11 @@ def forum_form_discussion(request, course_id):
             'csrf': csrf(request)['csrf_token'],
             'course': course,
             #'recent_active_threads': recent_active_threads,
-            'staff_access': has_access(request.user, course, 'staff'),
+            'staff_access': has_access(request.user, 'staff', course),
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'thread_pages': query_params['num_pages'],
             'user_info': saxutils.escape(json.dumps(user_info), escapedict),
-            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, course, 'staff'),
+            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, 'staff', course),
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course_id': course.id,
             'category_map': category_map,
@@ -236,7 +236,7 @@ def forum_form_discussion(request, course_id):
 def single_thread(request, course_id, discussion_id, thread_id):
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, course_id, 'load_forum')
+    course = get_course_with_access(request.user, 'load_forum', course_id)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
@@ -268,7 +268,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         threads, query_params = get_threads(request, course_id)
         threads.append(thread.to_dict())
 
-        course = get_course_with_access(request.user, course_id, 'load_forum')
+        course = get_course_with_access(request.user, 'load_forum', course_id)
 
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context(threads, course)
@@ -313,7 +313,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'thread_pages': query_params['num_pages'],
             'is_course_cohorted': is_course_cohorted(course_id),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
-            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, course, 'staff'),
+            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, 'staff', course),
             'cohorts': cohorts,
             'user_cohort': get_cohort_id(request.user, course_id),
             'cohorted_commentables': cohorted_commentables
@@ -327,7 +327,7 @@ def user_profile(request, course_id, user_id):
     nr_transaction = newrelic.agent.current_transaction()
 
     #TODO: Allow sorting?
-    course = get_course_with_access(request.user, course_id, 'load_forum')
+    course = get_course_with_access(request.user, 'load_forum', course_id)
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)
 
@@ -372,7 +372,7 @@ def user_profile(request, course_id, user_id):
 def followed_threads(request, course_id, user_id):
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, course_id, 'load_forum')
+    course = get_course_with_access(request.user, 'load_forum', course_id)
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)
 

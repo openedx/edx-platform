@@ -13,7 +13,6 @@ from django.utils.translation import ugettext as _
 from .access import has_course_access
 import contentstore.git_export_utils as git_export_utils
 from edxmako.shortcuts import render_to_response
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -25,10 +24,11 @@ def export_git(request, org, course, name):
     """
     This method serves up the 'Export to Git' page
     """
-    location = Location('i4x', org, course, 'course', name)
-    if not has_course_access(request.user, location):
+    if not has_course_access(request.user, course.id):
         raise PermissionDenied()
-    course_module = modulestore().get_item(location)
+
+    usage_key = course.id.make_usage_key('course', name)
+    course_module = modulestore().get_item(usage_key)
     failed = False
 
     log.debug('export_git course_module=%s', course_module)

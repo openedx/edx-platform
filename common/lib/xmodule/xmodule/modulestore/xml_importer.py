@@ -6,6 +6,7 @@ import json
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
+from xmodule.modulestore.keys import UsageKey
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
@@ -17,8 +18,8 @@ log = logging.getLogger(__name__)
 
 
 def import_static_content(
-        modules, course_loc, course_data_path, static_content_store,
-        target_location_namespace, subpath='static', verbose=False):
+        course_data_path, static_content_store,
+        target_course_id, subpath='static', verbose=False):
 
     remap_dict = {}
 
@@ -63,12 +64,9 @@ def import_static_content(
             fullname_with_subpath = content_path.replace(static_dir, '')
             if fullname_with_subpath.startswith('/'):
                 fullname_with_subpath = fullname_with_subpath[1:]
-            content_loc = StaticContent.compute_location(
-                target_location_namespace.org, target_location_namespace.course,
-                fullname_with_subpath
-            )
+            asset_key = StaticContent.compute_location(target_course_id, fullname_with_subpath)
 
-            policy_ele = policy.get(content_loc.name, {})
+            policy_ele = policy.get(asset_key.path, {})
             displayname = policy_ele.get('displayname', filename)
             locked = policy_ele.get('locked', False)
             mime_type = policy_ele.get('contentType')
@@ -77,7 +75,7 @@ def import_static_content(
             if not mime_type or mime_type not in mimetypes_list:
                 mime_type = mimetypes.guess_type(filename)[0]   # Assign guessed mimetype
             content = StaticContent(
-                content_loc, displayname, mime_type, data,
+                asset_key, displayname, mime_type, data,
                 import_path=fullname_with_subpath, locked=locked
             )
 
@@ -97,7 +95,7 @@ def import_static_content(
 
             # store the remapping information which will be needed
             # to subsitute in the module data
-            remap_dict[fullname_with_subpath] = content_loc.name
+            remap_dict[fullname_with_subpath] = asset_key
 
     return remap_dict
 
@@ -106,7 +104,7 @@ def import_from_xml(
         store, data_dir, course_dirs=None,
         default_class='xmodule.raw_module.RawDescriptor',
         load_error_modules=True, static_content_store=None,
-        target_location_namespace=None, verbose=False, draft_store=None,
+        target_course_id=None, verbose=False, draft_store=None,
         do_import_static=True):
     """
     Import the specified xml data_dir into the "store" modulestore,
@@ -115,8 +113,7 @@ def import_from_xml(
     course_dirs: If specified, the list of course_dirs to load. Otherwise, load
     all course dirs
 
-    target_location_namespace is the namespace [passed as Location]
-    (i.e. {tag},{org},{course}) that all modules in the should be remapped to
+    target_course_id is the CourseKey that all modules in the should be remapped to
     after import off disk. We do this remapping as a post-processing step
     because there's logic in the importing which expects a 'url_name' as an
     identifier to where things are on disk
@@ -141,6 +138,12 @@ def import_from_xml(
         xblock_select=store.xblock_select,
     )
 
+    # If we're going to remap the course_id, then we can only do that with
+    # a single course
+
+    if target_course_id:
+        assert(len(xml_module_store.modules) == 1)
+
     # NOTE: the XmlModuleStore does not implement get_items()
     # which would be a preferable means to enumerate the entire collection
     # of course modules. It will be left as a TBD to implement that
@@ -148,21 +151,18 @@ def import_from_xml(
     course_items = []
     for course_id in xml_module_store.modules.keys():
 
-        if target_location_namespace is not None:
-            pseudo_course_id = u'{0.org}/{0.course}'.format(target_location_namespace)
+        if target_course_id is not None:
+            dest_course_id = target_course_id
         else:
-            course_id_components = Location.parse_course_id(course_id)
-            pseudo_course_id = u'{org}/{course}'.format(**course_id_components)
+            dest_course_id = course_id
 
         try:
             # turn off all write signalling while importing as this
             # is a high volume operation on stores that need it
-            if (hasattr(store, 'ignore_write_events_on_courses') and
-                    pseudo_course_id not in store.ignore_write_events_on_courses):
-                store.ignore_write_events_on_courses.append(pseudo_course_id)
+            if hasattr(store, 'ignore_write_events_on_courses'):
+                store.ignore_write_events_on_courses.add(dest_course_id)
 
             course_data_path = None
-            course_location = None
 
             if verbose:
                 log.debug("Scanning {0} for course module...".format(course_id))
@@ -173,13 +173,12 @@ def import_from_xml(
             for module in xml_module_store.modules[course_id].itervalues():
                 if module.scope_ids.block_type == 'course':
                     course_data_path = path(data_dir) / module.data_dir
-                    course_location = module.location
 
-                    log.debug('======> IMPORTING course to location {loc}'.format(
-                        loc=course_location
+                    log.debug('======> IMPORTING course {course_id}'.format(
+                        course_id=module.id,
                     ))
 
-                    module = remap_namespace(module, target_location_namespace)
+                    module = remap_namespace(module, target_course_id)
 
                     if not do_import_static:
                         # for old-style xblock where this was actually linked to kvs
@@ -210,8 +209,8 @@ def import_from_xml(
 
                     import_module(
                         module, store, course_data_path, static_content_store,
-                        course_location,
-                        target_location_namespace or course_location,
+                        course_id,
+                        dest_course_id,
                         do_import_static=do_import_static
                     )
 
@@ -219,16 +218,10 @@ def import_from_xml(
 
             # then import all the static content
             if static_content_store is not None and do_import_static:
-                if target_location_namespace is not None:
-                    _namespace_rename = target_location_namespace
-                else:
-                    _namespace_rename = course_location
-
                 # first pass to find everything in /static/
                 import_static_content(
-                    xml_module_store.modules[course_id], course_location,
                     course_data_path, static_content_store,
-                    _namespace_rename, subpath='static', verbose=verbose
+                    dest_course_id, subpath='static', verbose=verbose
                 )
 
             elif verbose and not do_import_static:
@@ -249,15 +242,9 @@ def import_from_xml(
 
             simport = 'static_import'
             if os.path.exists(course_data_path / simport):
-                if target_location_namespace is not None:
-                    _namespace_rename = target_location_namespace
-                else:
-                    _namespace_rename = course_location
-
                 import_static_content(
-                    xml_module_store.modules[course_id], course_location,
                     course_data_path, static_content_store,
-                    _namespace_rename, subpath=simport, verbose=verbose
+                    dest_course_id, subpath=simport, verbose=verbose
                 )
 
             # finally loop through all the modules
@@ -268,8 +255,8 @@ def import_from_xml(
                     continue
 
                 # remap module to the new namespace
-                if target_location_namespace is not None:
-                    module = remap_namespace(module, target_location_namespace)
+                if target_course_id is not None:
+                    module = remap_namespace(module, target_course_id)
 
                 if verbose:
                     log.debug('importing module location {loc}'.format(
@@ -278,8 +265,8 @@ def import_from_xml(
 
                 import_module(
                     module, store, course_data_path, static_content_store,
-                    course_location,
-                    target_location_namespace if target_location_namespace else course_location,
+                    course_id,
+                    dest_course_id,
                     do_import_static=do_import_static
                 )
 
@@ -291,25 +278,23 @@ def import_from_xml(
                     draft_store,
                     course_data_path,
                     static_content_store,
-                    course_location,
-                    target_location_namespace if target_location_namespace else course_location
+                    course_id,
+                    dest_course_id,
                 )
 
         finally:
             # turn back on all write signalling on stores that need it
             if (hasattr(store, 'ignore_write_events_on_courses') and
-                    pseudo_course_id in store.ignore_write_events_on_courses):
-                store.ignore_write_events_on_courses.remove(pseudo_course_id)
-                store.refresh_cached_metadata_inheritance_tree(
-                    target_location_namespace if target_location_namespace is not None else course_location
-                )
+                    dest_course_id in store.ignore_write_events_on_courses):
+                store.ignore_write_events_on_courses.remove(dest_course_id)
+                store.refresh_cached_metadata_inheritance_tree(dest_course_id)
 
     return xml_module_store, course_items
 
 
 def import_module(
         module, store, course_data_path, static_content_store,
-        source_course_location, dest_course_location, allow_not_found=False,
+        source_course_id, dest_course_id, allow_not_found=False,
         do_import_static=True):
 
     logging.debug('processing import of module {}...'.format(module.location.url()))
@@ -318,8 +303,9 @@ def import_module(
         # we want to convert all 'non-portable' links in the module_data
         # (if it is a string) to portable strings (e.g. /static/)
         module.data = rewrite_nonportable_content_links(
-            source_course_location.course_id,
-            dest_course_location.course_id, module.data
+            source_course_id,
+            dest_course_id,
+            module.data
         )
     # remove any export/import only xml_attributes
     # which are used to wire together draft imports
@@ -329,13 +315,17 @@ def import_module(
     if 'index_in_children_list' in getattr(module, 'xml_attributes', []):
         del module.xml_attributes['index_in_children_list']
 
+    # Move the module to a new course
+    new_usage_key = module.scope_ids.usage_id.map_into_course(dest_course_id)
+    module.scope_ids = module.scope_ids._replace(usage_id=new_usage_key)
+
     store.update_item(module, '**replace_user**', allow_not_found=allow_not_found)
 
 
 def import_course_draft(
         xml_module_store, store, draft_store, course_data_path,
-        static_content_store, source_location_namespace,
-        target_location_namespace):
+        static_content_store, source_course_id,
+        target_course_id):
     '''
     This will import all the content inside of the 'drafts' folder, if it exists
     NOTE: This is not a full course import, basically in our current
@@ -360,7 +350,7 @@ def import_course_draft(
     draft_course_dir = draft_dir.replace(data_dir, '', 1)
     system = ImportSystem(
         xmlstore=xml_module_store,
-        course_id=target_location_namespace.course_id,
+        course_id=target_course_id,
         course_dir=draft_course_dir,
         error_tracker=errorlog.tracker,
         parent_tracker=ParentTracker(),
@@ -429,14 +419,13 @@ def import_course_draft(
                     else:
                         drafts[index] = [descriptor]
 
-                except Exception, e:
-                    logging.exception('There was an error. {err}'.format(
-                        err=unicode(e)
-                    ))
+                except Exception:
+                    logging.exception('Error while parsing course xml.')
 
         # For each index_in_children_list key, there is a list of vertical descriptors.
         for key in sorted(drafts.iterkeys()):
             for descriptor in drafts[key]:
+                course_key = descriptor.location.course_key
                 try:
                     def _import_module(module):
                         module.location = module.location.replace(revision='draft')
@@ -449,14 +438,11 @@ def import_course_draft(
                             sequential_url = module.xml_attributes['parent_sequential_url']
                             index = int(module.xml_attributes['index_in_children_list'])
 
-                            seq_location = Location(sequential_url)
+                            seq_location = course_key.make_usage_key_from_deprecated_string(sequential_url)
 
                             # IMPORTANT: Be sure to update the sequential
                             # in the NEW namespace
-                            seq_location = seq_location.replace(
-                                org=target_location_namespace.org,
-                                course=target_location_namespace.course
-                            )
+                            seq_location = seq_location.map_into_course(target_course_id)
                             sequential = store.get_item(seq_location, depth=0)
 
                             if non_draft_location.url() not in sequential.children:
@@ -465,44 +451,28 @@ def import_course_draft(
 
                         import_module(
                             module, draft_store, course_data_path,
-                            static_content_store, source_location_namespace,
-                            target_location_namespace, allow_not_found=True
+                            static_content_store, source_course_id,
+                            target_course_id, allow_not_found=True
                         )
                         for child in module.get_children():
                             _import_module(child)
 
                     _import_module(descriptor)
 
-                except Exception, e:
-                    logging.exception('There was an error. {err}'.format(
-                        err=unicode(e)
-                    ))
+                except Exception:
+                    logging.exception('There while importing draft descriptor %s', descriptor)
 
 
-def remap_namespace(module, target_location_namespace):
-    if target_location_namespace is None:
+def remap_namespace(module, target_course_id):
+    if target_course_id is None:
         return module
 
     original_location = module.location
 
     # This looks a bit wonky as we need to also change the 'name' of the
     # imported course to be what the caller passed in
-    if module.location.category != 'course':
-        module.location = module.location.replace(
-            tag=target_location_namespace.tag,
-            org=target_location_namespace.org,
-            course=target_location_namespace.course
-        )
-    else:
-        #
-        # module is a course module
-        #
-        module.location = module.location.replace(
-            tag=target_location_namespace.tag,
-            org=target_location_namespace.org,
-            course=target_location_namespace.course,
-            name=target_location_namespace.name
-        )
+    module.location = module.location.map_into_course(target_course_id)
+    if module.location.definition_key.block_type == 'course':
         # There is more re-namespacing work we have to do when
         # importing course modules
 
@@ -510,14 +480,13 @@ def remap_namespace(module, target_location_namespace):
         for entry in module.pdf_textbooks:
             for chapter in entry.get('chapters', []):
                 if StaticContent.is_c4x_path(chapter.get('url', '')):
-                    chapter['url'] = StaticContent.renamespace_c4x_path(
-                        chapter['url'], target_location_namespace
-                    )
+                    asset_key = AssetKey.from_string(chapter['url'])
+                    chapter['url'] = unicode(asset_key.map_into_course(target_course_id))
 
         # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
         # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
         # values then remap it so that the wiki does not point to the old wiki.
-        if original_location.course_id != target_location_namespace.course_id:
+        if original_location.course_id != target_course_id:
             original_unique_wiki_slug = '{0}.{1}.{2}'.format(
                 original_location.org,
                 original_location.course,
@@ -525,9 +494,9 @@ def remap_namespace(module, target_location_namespace):
             )
             if module.wiki_slug == original_unique_wiki_slug or module.wiki_slug == original_location.course:
                 module.wiki_slug = '{0}.{1}.{2}'.format(
-                    target_location_namespace.org,
-                    target_location_namespace.course,
-                    target_location_namespace.name,
+                    target_course_id.org,
+                    target_course_id.course,
+                    target_course_id.name,
                 )
 
         module.save()
@@ -551,9 +520,9 @@ def remap_namespace(module, target_location_namespace):
                                  original_location.course == ref.course)
         if in_original_namespace:
             new_ref = ref.replace(
-                tag=target_location_namespace.tag,
-                org=target_location_namespace.org,
-                course=target_location_namespace.course
+                tag=target_course_id.tag,
+                org=target_course_id.org,
+                course=target_course_id.course
             ).url()
         return new_ref
 
@@ -638,7 +607,11 @@ def validate_category_hierarchy(
             parents.append(module)
 
     for parent in parents:
-        for child_loc in [Location(child) for child in parent.children]:
+        children = [
+            child if isinstance(child, UsageKey) else course_id.make_usage_key_from_deprecated_string(child)
+            for child in parent.children
+        ]
+        for child_loc in children:
             if child_loc.category != expected_child_category:
                 err_cnt += 1
                 print(
@@ -729,7 +702,7 @@ def perform_xlint(
         warn_cnt += _warn_cnt
 
     # first count all errors and warnings as part of the XMLModuleStore import
-    for err_log in module_store._location_errors.itervalues():
+    for err_log in module_store._course_errors.itervalues():
         for err_log_entry in err_log.errors:
             msg = err_log_entry[0]
             if msg.startswith('ERROR:'):
@@ -777,12 +750,7 @@ def perform_xlint(
         )
 
         # check for a presence of a course marketing video
-        location_elements = Location.parse_course_id(course_id)
-        location_elements['tag'] = 'i4x'
-        location_elements['category'] = 'about'
-        location_elements['name'] = 'video'
-        loc = Location(location_elements)
-        if loc not in module_store.modules[course_id]:
+        if not module_store.has_item(course_id.make_usage_key('about', 'video')):
             print(
                 "WARN: Missing course marketing video. It is recommended "
                 "that every course have a marketing video."

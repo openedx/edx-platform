@@ -42,7 +42,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.activate_user(self.instructor)
 
         def make_instructor(course):
-            CourseStaffRole(course.location).add_users(User.objects.get(email=self.instructor))
+            CourseStaffRole(course.id).add_users(User.objects.get(email=self.instructor))
 
         make_instructor(self.graded_course)
 

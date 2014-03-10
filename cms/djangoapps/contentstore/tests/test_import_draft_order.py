@@ -19,7 +19,7 @@ class DraftReorderTestCase(ModuleStoreTestCase):
         draft_store = modulestore('default')
         import_from_xml(store, 'common/test/data/', ['import_draft_order'], draft_store=draft_store)
         sequential = draft_store.get_item(
-            Location('i4x', 'test_org', 'import_draft_order', 'sequential', '0f4f7649b10141b0bdc9922dcf94515a', None)
+            Location('test_org', 'import_draft_order', 'sequential', '0f4f7649b10141b0bdc9922dcf94515a', None)
         )
         verticals = sequential.children
 
@@ -42,7 +42,7 @@ class DraftReorderTestCase(ModuleStoreTestCase):
 
         # Now also test that the verticals in a second sequential are correct.
         sequential = draft_store.get_item(
-            Location('i4x', 'test_org', 'import_draft_order', 'sequential', 'secondseq', None)
+            Location('test_org', 'import_draft_order', 'sequential', 'secondseq', None)
         )
         verticals = sequential.children
         # 'asecond' and 'zsecond' are drafts with 'index_in_children_list' 0 and 2, respectively.

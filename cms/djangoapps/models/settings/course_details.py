@@ -85,7 +85,7 @@ class CourseDetails(object):
         Update the about item with the new data blob. If data is None, then
         delete the about item.
         """
-        temploc = Location(course_old_location).replace(category='about', name=about_key)
+        temploc = course_old_location.replace(category='about', name=about_key)
         store = get_modulestore(temploc)
         if data is None:
             store.delete_item(temploc)

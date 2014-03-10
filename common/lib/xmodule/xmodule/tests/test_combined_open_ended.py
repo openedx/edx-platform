@@ -12,7 +12,7 @@ import unittest
 
 from datetime import datetime
 from lxml import etree
-from mock import Mock, MagicMock, ANY, patch
+from mock import Mock, MagicMock, patch
 from pytz import UTC
 from webob.multidict import MultiDict
 
@@ -20,7 +20,6 @@ from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
 from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
-from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
@@ -48,8 +47,7 @@ class OpenEndedChildTest(unittest.TestCase):
     """
     Test the open ended child class
     """
-    location = Location(["i4x", "edX", "sa_test", "selfassessment",
-                         "SampleQuestion"])
+    location = Location("edX", "sa_test", "2012_Fall", "selfassessment", "SampleQuestion")
 
     metadata = json.dumps({'attempts': '10'})
     prompt = etree.XML("<prompt>This is a question prompt</prompt>")
@@ -173,8 +171,7 @@ class OpenEndedModuleTest(unittest.TestCase):
     """
     Test the open ended module class
     """
-    location = Location(["i4x", "edX", "sa_test", "selfassessment",
-                         "SampleQuestion"])
+    location = Location("edX", "sa_test", "2012_Fall", "selfassessment", "SampleQuestion")
 
     metadata = json.dumps({'attempts': '10'})
     prompt = etree.XML("<prompt>This is a question prompt</prompt>")
@@ -446,8 +443,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     """
     Unit tests for the combined open ended xmodule
     """
-    location = Location(["i4x", "edX", "open_ended", "combinedopenended",
-                         "SampleQuestion"])
+    location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
     definition_template = """
                     <combinedopenended attempts="10000">
                     {rubric}
@@ -799,8 +795,7 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
 
     # location, definition_template, prompt, rubric, max_score, metadata, oeparam, task_xml1, task_xml2
     # All these variables are used to construct the xmodule descriptor.
-    location = Location(["i4x", "edX", "open_ended", "combinedopenended",
-                         "SampleQuestion"])
+    location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
     definition_template = """
                     <combinedopenended attempts="10000">
                     {rubric}
@@ -964,7 +959,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     """
     Test the student flow in the combined open ended xmodule
     """
-    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
+    problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
     answer = "blah blah"
     assessment = [0, 1]
     hint = "blah"
@@ -999,7 +994,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         return result
 
     def _module(self):
-        return self.get_module_from_location(self.problem_location, COURSE)
+        return self.get_module_from_location(self.problem_location)
 
     def test_open_ended_load_and_save(self):
         """
@@ -1212,7 +1207,7 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
     """
     Test if student is able to reset the problem
     """
-    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion1Attempt"])
+    problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion1Attempt")
     answer = "blah blah"
     assessment = [0, 1]
     hint = "blah"
@@ -1241,7 +1236,7 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         return result
 
     def _module(self):
-        return self.get_module_from_location(self.problem_location, COURSE)
+        return self.get_module_from_location(self.problem_location)
 
     def test_reset_fail(self):
         """
@@ -1283,7 +1278,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
     """
     Test if student is able to upload images properly.
     """
-    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestionImageUpload"])
+    problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestionImageUpload")
     answer_text = "Hello, this is my amazing answer."
     file_text = "Hello, this is my amazing file."
     file_name = "Student file 1"
@@ -1306,7 +1301,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         """
         Test to see if a student submission without a file attached fails.
         """
-        module = self.get_module_from_location(self.problem_location, COURSE)
+        module = self.get_module_from_location(self.problem_location)
 
         # Simulate a student saving an answer
         response = module.handle_ajax("save_answer", {"student_answer": self.answer_text})
@@ -1326,7 +1321,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         """
         Test to see if a student submission with a file is handled properly.
         """
-        module = self.get_module_from_location(self.problem_location, COURSE)
+        module = self.get_module_from_location(self.problem_location)
 
         # Simulate a student saving an answer with a file
         response = module.handle_ajax("save_answer", {
@@ -1344,7 +1339,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         """
         Students can submit links instead of files.  Check that the link is properly handled.
         """
-        module = self.get_module_from_location(self.problem_location, COURSE)
+        module = self.get_module_from_location(self.problem_location)
 
         # Simulate a student saving an answer with a link.
         response = module.handle_ajax("save_answer", {

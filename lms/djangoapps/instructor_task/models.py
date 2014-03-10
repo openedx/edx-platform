@@ -18,7 +18,6 @@ from uuid import uuid4
 import csv
 import json
 import hashlib
-import os
 import os.path
 import urllib
 
@@ -28,6 +27,8 @@ from boto.s3.key import Key
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models, transaction
+
+from xmodule_django.models import CourseKeyField
 
 
 # define custom states used by InstructorTask
@@ -58,7 +59,7 @@ class InstructorTask(models.Model):
     `updated` stores date that entry was last modified
     """
     task_type = models.CharField(max_length=50, db_index=True)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     task_key = models.CharField(max_length=255, db_index=True)
     task_input = models.CharField(max_length=255)
     task_id = models.CharField(max_length=255, db_index=True)  # max_length from celery_taskmeta
@@ -251,9 +252,9 @@ class S3ReportStore(ReportStore):
         )
 
     def key_for(self, course_id, filename):
-        """Return the S3 key we would use to store and retrive the data for the
+        """Return the S3 key we would use to store and retrieve the data for the
         given filename."""
-        hashed_course_id = hashlib.sha1(course_id)
+        hashed_course_id = hashlib.sha1(course_id.to_deprecated_string())
 
         key = Key(self.bucket)
         key.key = "{}/{}/{}".format(
@@ -360,7 +361,7 @@ class LocalFSReportStore(ReportStore):
 
     def path_to(self, course_id, filename):
         """Return the full path to a given file for a given course."""
-        return os.path.join(self.root_path, urllib.quote(course_id, safe=''), filename)
+        return os.path.join(self.root_path, urllib.quote(course_id.to_deprecated_string(), safe=''), filename)
 
     def store(self, course_id, filename, buff):
         """

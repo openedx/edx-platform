@@ -77,7 +77,7 @@ class ChooseModeView(View):
         # This is a bit redundant with logic in student.views.change_enrollement,
         # but I don't really have the time to refactor it more nicely and test.
         course = course_from_id(course_id)
-        if not has_access(user, course, 'enroll'):
+        if not has_access(user, 'enroll', course):
             error_msg = _("Enrollment is closed")
             return self.get(request, course_id, error=error_msg)
 

@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
 
+from xmodule_django.models import CourseKeyField
+
 
 class UserPreference(models.Model):
     """A user's preference, stored as generic text to be processed by client"""
@@ -44,7 +46,7 @@ class UserCourseTag(models.Model):
     """
     user = models.ForeignKey(User, db_index=True, related_name="+")
     key = models.CharField(max_length=255, db_index=True)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     value = models.TextField()
 
     class Meta:  # pylint: disable=missing-docstring

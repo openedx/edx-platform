@@ -63,7 +63,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Re-fetch the course from the database so that the object being dealt with has everything added to it.
         """
-        self.course = modulestore().get_instance(self.course.id, self.course.location)
+        self.course = modulestore().get_course(self.course.id)
 
     def problem_location(self, problem_url_name):
         """

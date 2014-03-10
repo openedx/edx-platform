@@ -42,9 +42,6 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Create dummy course with 'CourseFactory' and role (instructor/staff) groups with provided group_name_format
         """
-        course_locator = loc_mapper().translate_location(
-            course_location.course_id, course_location, False, True
-        )
         course = CourseFactory.create(
             org=course_location.org,
             number=course_location.course,
@@ -53,7 +50,7 @@ class TestCourseListing(ModuleStoreTestCase):
 
         for role in [CourseInstructorRole, CourseStaffRole]:
             # pylint: disable=protected-access
-            groupnames = role(course_locator)._group_names
+            groupnames = role(course.id)._group_names
             if group_name_format == 'group_name_with_course_name_only':
                 # Create role (instructor/staff) groups with course_name only: 'instructor_run'
                 group, _ = Group.objects.get_or_create(name=groupnames[2])
@@ -62,9 +59,9 @@ class TestCourseListing(ModuleStoreTestCase):
                 # Since "Group.objects.get_or_create(name=groupnames[1])" would have made group with lowercase name
                 # so manually create group name of old type
                 if role == CourseInstructorRole:
-                    group, _ = Group.objects.get_or_create(name=u'{}_{}'.format('instructor', course_location.course_id))
+                    group, _ = Group.objects.get_or_create(name=u'{}_{}'.format('instructor', course.id))
                 else:
-                    group, _ = Group.objects.get_or_create(name=u'{}_{}'.format('staff', course_location.course_id))
+                    group, _ = Group.objects.get_or_create(name=u'{}_{}'.format('staff', course.id))
             else:
                 # Create role (instructor/staff) groups with format: 'instructor_edx.course.run'
                 group, _ = Group.objects.get_or_create(name=groupnames[0])
@@ -148,9 +145,9 @@ class TestCourseListing(ModuleStoreTestCase):
 
     # Temporarily disabling this test because it caused the following failure intermittently in Jenkins.
     # Perhaps due to a test ordering or cleanup issue?
-    # 
+    #
     # 1) FAIL: test_course_listing_performance (contentstore.tests.test_course_listing.TestCourseListing)
-    # 
+    #
     #    Traceback (most recent call last):
     #     cms/djangoapps/contentstore/tests/test_course_listing.py line 176 in test_course_listing_performance
     #       self.assertEqual(len(courses_list), USER_COURSES_COUNT)

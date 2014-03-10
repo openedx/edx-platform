@@ -20,6 +20,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import editable_modulestore
 
 from external_auth.models import ExternalAuthMap
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
@@ -249,7 +250,10 @@ class UtilFnTest(TestCase):
         COURSE_ID = u'org/num/run'                                # pylint: disable=C0103
         COURSE_URL = u'/courses/{}/otherstuff'.format(COURSE_ID)  # pylint: disable=C0103
         NON_COURSE_URL = u'/blahblah'                             # pylint: disable=C0103
-        self.assertEqual(_parse_course_id_from_string(COURSE_URL), COURSE_ID)
+        self.assertEqual(
+            _parse_course_id_from_string(COURSE_URL),
+            SlashSeparatedCourseKey.from_string(COURSE_ID)
+        )
         self.assertIsNone(_parse_course_id_from_string(NON_COURSE_URL))
 
 

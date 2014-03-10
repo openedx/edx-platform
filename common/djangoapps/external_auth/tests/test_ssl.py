@@ -194,8 +194,10 @@ class SSLClientTest(TestCase):
         the user doesn't get presented with the registration page.
         """
         # Expect a NotImplementError from course page as we don't have anything else built
-        with self.assertRaisesRegexp(InsufficientSpecificationError,
-                                     'Must provide one of url, version_guid, package_id'):
+        with self.assertRaisesRegexp(
+                InsufficientSpecificationError,
+                'Must provide one of url, version_guid, org+offering'
+            ):
             self.client.get(
                 reverse('signup'), follow=True,
                 SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
@@ -203,8 +205,10 @@ class SSLClientTest(TestCase):
         self.assertIn(SESSION_KEY, self.client.session)
 
         # Now that we are logged in, make sure we don't see the registration page
-        with self.assertRaisesRegexp(InsufficientSpecificationError,
-                                     'Must provide one of url, version_guid, package_id'):
+        with self.assertRaisesRegexp(
+                InsufficientSpecificationError,
+                'Must provide one of url, version_guid, org+offering'
+            ):
             self.client.get(reverse('signup'), follow=True)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

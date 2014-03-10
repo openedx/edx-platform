@@ -22,7 +22,7 @@ from instructor_task.models import InstructorTask, PROGRESS
 from instructor_task.tests.test_base import (InstructorTaskTestCase,
                                              InstructorTaskCourseTestCase,
                                              InstructorTaskModuleTestCase,
-                                             TEST_COURSE_ID)
+                                             TEST_COURSE_KEY)
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
@@ -36,7 +36,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
             self._create_failure_entry()
             self._create_success_entry()
         progress_task_ids = [self._create_progress_entry().task_id for _ in range(1, 5)]
-        task_ids = [instructor_task.task_id for instructor_task in get_running_instructor_tasks(TEST_COURSE_ID)]
+        task_ids = [instructor_task.task_id for instructor_task in get_running_instructor_tasks(TEST_COURSE_KEY)]
         self.assertEquals(set(task_ids), set(progress_task_ids))
 
     def test_get_instructor_task_history(self):
@@ -47,21 +47,21 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
             expected_ids.append(self._create_success_entry().task_id)
             expected_ids.append(self._create_progress_entry().task_id)
         task_ids = [instructor_task.task_id for instructor_task
-                    in get_instructor_task_history(TEST_COURSE_ID, problem_url=self.problem_url)]
+                    in get_instructor_task_history(TEST_COURSE_KEY, usage_key=self.problem_url)]
         self.assertEquals(set(task_ids), set(expected_ids))
         # make the same call using explicit task_type:
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(
-                        TEST_COURSE_ID,
-                        problem_url=self.problem_url,
+                        TEST_COURSE_KEY,
+                        usage_key=self.problem_url,
                         task_type='rescore_problem'
                     )]
         self.assertEquals(set(task_ids), set(expected_ids))
         # make the same call using a non-existent task_type:
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(
-                        TEST_COURSE_ID,
-                        problem_url=self.problem_url,
+                        TEST_COURSE_KEY,
+                        usage_key=self.problem_url,
                         task_type='dummy_type'
                     )]
         self.assertEquals(set(task_ids), set())

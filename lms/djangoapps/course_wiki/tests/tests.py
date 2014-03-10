@@ -4,6 +4,7 @@ from django.test.utils import override_settings
 from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 
 from mock import patch
 
@@ -14,7 +15,7 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
     def setUp(self):
 
         # Load the toy course
-        self.toy = modulestore().get_course('edX/toy/2012_Fall')
+        self.toy = modulestore().get_course(CourseKey.from_string('edX/toy/2012_Fall'))
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -42,7 +43,7 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
 
         self.enroll(self.toy)
 
-        referer = reverse("progress", kwargs={'course_id': self.toy.id})
+        referer = reverse("progress", kwargs={'course_id': self.toy.id.to_deprecated_string()})
         destination = reverse("wiki:get", kwargs={'path': 'some/fake/wiki/page/'})
 
         redirected_to = referer.replace("progress", "wiki/some/fake/wiki/page/")
@@ -73,7 +74,7 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
 
         self.enroll(self.toy)
 
-        referer = reverse("progress", kwargs={'course_id': self.toy.id})
+        referer = reverse("progress", kwargs={'course_id': self.toy.id.to_deprecated_string()})
         destination = reverse("wiki:get", kwargs={'path': 'some/fake/wiki/page/'})
 
         resp = self.client.get(destination, HTTP_REFERER=referer)
@@ -85,8 +86,8 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
         The user must be enrolled in the course to see the page.
         """
 
-        course_wiki_home = reverse('course_wiki', kwargs={'course_id': course.id})
-        referer = reverse("progress", kwargs={'course_id': self.toy.id})
+        course_wiki_home = reverse('course_wiki', kwargs={'course_id': course.id.to_deprecated_string()})
+        referer = reverse("progress", kwargs={'course_id': self.toy.id.to_deprecated_string()})
 
         resp = self.client.get(course_wiki_home, follow=True, HTTP_REFERER=referer)
 
@@ -118,7 +119,7 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
         self.create_course_page(self.toy)
 
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
-        referer = reverse("courseware", kwargs={'course_id': self.toy.id})
+        referer = reverse("courseware", kwargs={'course_id': self.toy.id.to_deprecated_string()})
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
 
@@ -136,7 +137,7 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
 
         self.login(self.student, self.password)
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
-        referer = reverse("courseware", kwargs={'course_id': self.toy.id})
+        referer = reverse("courseware", kwargs={'course_id': self.toy.id.to_deprecated_string()})
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
 

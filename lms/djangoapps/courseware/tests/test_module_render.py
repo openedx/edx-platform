@@ -20,6 +20,7 @@ from xblock.fields import ScopeIds
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.x_module import XModuleDescriptor
@@ -40,8 +41,8 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     Tests of courseware.module_render
     """
     def setUp(self):
-        self.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        self.course_id = 'edX/toy/2012_Fall'
+        self.location = Location('edX', 'toy', 'chapter', 'Overview')
+        self.course_id = CourseKey.from_string('edX/toy/2012_Fall')
         self.toy_course = modulestore().get_course(self.course_id)
         self.mock_user = UserFactory()
         self.mock_user.id = 1
@@ -73,7 +74,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         mock_request = MagicMock()
         mock_request.user = self.mock_user
 
-        course = get_course_with_access(self.mock_user, self.course_id, 'load')
+        course = get_course_with_access(self.mock_user, 'load', self.course_id)
 
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course_id, self.mock_user, course, depth=2)
@@ -81,7 +82,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         module = render.get_module(
             self.mock_user,
             mock_request,
-            Location('i4x', 'edX', 'toy', 'html', 'toyjumpto'),
+            Location('edX', 'toy', 'html', 'toyjumpto'),
             field_data_cache,
             self.course_id
         )
@@ -163,8 +164,8 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
-        self.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        self.course_id = 'edX/toy/2012_Fall'
+        self.location = Location('edX', 'toy', 'chapter', 'Overview')
+        self.course_id = CourseKey.from_string('edX/toy/2012_Fall')
         self.toy_course = modulestore().get_course(self.course_id)
         self.mock_user = UserFactory()
         self.mock_user.id = 1
@@ -274,7 +275,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
             render.handle_xblock_callback(
                 request,
                 self.course_id,
-                quote_slashes(str(Location('i4x', 'edX', 'toy', 'chapter', 'bad_location'))),
+                quote_slashes(str(Location('edX', 'toy', 'chapter', 'bad_location'))),
                 'xmodule_handler',
                 'goto_position',
             )
@@ -310,7 +311,7 @@ class TestTOC(TestCase):
     def setUp(self):
 
         # Toy courses should be loaded
-        self.course_name = 'edX/toy/2012_Fall'
+        self.course_name = CourseKey.from_string('edX/toy/2012_Fall')
         self.toy_course = modulestore().get_course(self.course_name)
         self.portal_user = UserFactory()
 
@@ -645,7 +646,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @patch('courseware.module_render.has_access', Mock(return_value=True))
     def _get_anonymous_id(self, course_id, xblock_class):
-        location = Location('dummy_org', 'dummy_course', 'dummy_category', 'dummy_name')
+        location = Location('dummy_org', 'dummy_course', 'dummy_run', 'dummy_category', 'dummy_name')
         descriptor = Mock(
             spec=xblock_class,
             _field_data=Mock(spec=FieldData),
@@ -680,7 +681,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 # This value is set by observation, so that later changes to the student
                 # id computation don't break old data
                 '5afe5d9bb03796557ee2614f5c9611fb',
-                self._get_anonymous_id(course_id, descriptor_class)
+                self._get_anonymous_id(SlashSeparatedCourseKey.from_string(course_id), descriptor_class)
             )
 
     @data(*PER_COURSE_ANONYMIZED_DESCRIPTORS)
@@ -742,8 +743,8 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
 
         render.handle_xblock_callback(
             self.request,
-            self.course.id,
-            quote_slashes(str(descriptor.location)),
+            self.course.id.to_deprecated_string(),
+            quote_slashes(str(descriptor.location.to_deprecated_string())),
             'xmodule_handler',
             'problem_check',
         )

@@ -18,6 +18,7 @@ from xblock.fields import ScopeIds
 from xmodule import peer_grading_module
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule.tests import test_util_open_ended
@@ -52,7 +53,7 @@ def make_instructor(course, user_email):
     """
     Makes a given user an instructor in a course.
     """
-    CourseStaffRole(course.location).add_users(User.objects.get(email=user_email))
+    CourseStaffRole(course.id).add_users(User.objects.get(email=user_email))
 
 
 class StudentProblemListMockQuery(object):
@@ -270,7 +271,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        self.course_id = "edX/toy/2012_Fall"
+        self.course_id = CourseKey.from_string("edX/toy/2012_Fall")
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
         field_data = DictFieldData({'data': "<peergrading/>", 'location': location, 'category':'peergrading'})
@@ -447,7 +448,7 @@ class TestPanel(ModuleStoreTestCase):
 
     def setUp(self):
         # Toy courses should be loaded
-        self.course_name = 'edX/open_ended/2012_Fall'
+        self.course_name = CourseKey.from_string('edX/open_ended/2012_Fall')
         self.course = modulestore().get_course(self.course_name)
         self.user = factories.UserFactory()
 
@@ -485,7 +486,7 @@ class TestPeerGradingFound(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        self.course_name = 'edX/open_ended_nopath/2012_Fall'
+        self.course_name = CourseKey.from_string('edX/open_ended_nopath/2012_Fall')
         self.course = modulestore().get_course(self.course_name)
 
     def test_peer_grading_nopath(self):

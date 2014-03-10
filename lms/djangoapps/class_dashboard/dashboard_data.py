@@ -6,7 +6,6 @@ from courseware import models
 from django.db.models import Count
 from django.utils.translation import ugettext as _
 
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 
@@ -33,7 +32,7 @@ def get_problem_grade_distribution(course_id):
 
     # Loop through resultset building data for each problem
     for row in db_query:
-        curr_problem = row['module_state_key']
+        curr_problem = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
 
         # Build set of grade distributions for each problem that has student responses
         if curr_problem in prob_grade_distrib:
@@ -106,13 +105,14 @@ def get_problem_set_grade_distrib(course_id, problem_set):
 
     # Loop through resultset building data for each problem
     for row in db_query:
-        if row['module_state_key'] not in prob_grade_distrib:
-            prob_grade_distrib[row['module_state_key']] = {
+        row_loc = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
+        if row_loc not in prob_grade_distrib:
+            prob_grade_distrib[row_loc] = {
                 'max_grade': 0,
                 'grade_distrib': [],
             }
 
-        curr_grade_distrib = prob_grade_distrib[row['module_state_key']]
+        curr_grade_distrib = prob_grade_distrib[row_loc]
         curr_grade_distrib['grade_distrib'].append((row['grade'], row['count_grade']))
 
         if curr_grade_distrib['max_grade'] < row['max_grade']:
@@ -136,7 +136,7 @@ def get_d3_problem_grade_distrib(course_id):
     d3_data = []
 
     # Retrieve course object down to problems
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
+    course = modulestore().get_course(course_id, depth=4)
 
     # Iterate through sections, subsections, units, problems
     for section in course.get_children():
@@ -161,10 +161,10 @@ def get_d3_problem_grade_distrib(course_id):
                         label = "P{0}.{1}.{2}".format(c_subsection, c_unit, c_problem)
 
                         # Only problems in prob_grade_distrib have had a student submission.
-                        if child.location.url() in prob_grade_distrib:
+                        if child.location in prob_grade_distrib:
 
                             # Get max_grade, grade_distribution for this problem
-                            problem_info = prob_grade_distrib[child.location.url()]
+                            problem_info = prob_grade_distrib[child.location]
 
                             # Get problem_name for tooltip
                             problem_name = own_metadata(child).get('display_name', '')
@@ -222,7 +222,7 @@ def get_d3_sequential_open_distrib(course_id):
     d3_data = []
 
     # Retrieve course object down to subsection
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
+    course = modulestore().get_course(course_id, depth=2)
 
     # Iterate through sections, subsections
     for section in course.get_children():
@@ -288,7 +288,7 @@ def get_d3_section_grade_distrib(course_id, section):
     """
 
     # Retrieve course object down to problems
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
+    course = modulestore().get_course(course_id, depth=4)
 
     problem_set = []
     problem_info = {}
@@ -302,8 +302,8 @@ def get_d3_section_grade_distrib(course_id, section):
             for child in unit.get_children():
                 if (child.location.category == 'problem'):
                     c_problem += 1
-                    problem_set.append(child.location.url())
-                    problem_info[child.location.url()] = {
+                    problem_set.append(child.location)
+                    problem_info[child.location] = {
                         'id': child.location.url(),
                         'x_value': "P{0}.{1}.{2}".format(c_subsection, c_unit, c_problem),
                         'display_name': own_metadata(child).get('display_name', ''),
@@ -360,7 +360,7 @@ def get_section_display_name(course_id):
     The ith string in the array is the display name of the ith section in the course.
     """
 
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
+    course = modulestore().get_course(course_id, depth=4)
 
     section_display_name = [""] * len(course.get_children())
     i = 0
@@ -380,7 +380,7 @@ def get_array_section_has_problem(course_id):
     The ith value in the array is true if the ith section in the course contains problems and false otherwise.
     """
 
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
+    course = modulestore().get_course(course_id, depth=4)
 
     b_section_has_problem = [False] * len(course.get_children())
     i = 0

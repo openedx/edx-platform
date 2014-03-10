@@ -469,7 +469,7 @@ class Courses(SysadminDashboardView):
             course = self.def_ms.courses[os.path.abspath(gdir)]
             msg += _('Loaded course {0} {1}<br/>Errors:').format(
                 cdir, course.display_name)
-            errors = self.def_ms.get_item_errors(course.location)
+            errors = self.def_ms.get_course_errors(course.id)
             if not errors:
                 msg += u'None'
             else:
@@ -567,14 +567,13 @@ class Courses(SysadminDashboardView):
 
             elif course_found and not is_xml_course:
                 # delete course that is stored with mongodb backend
-                loc = course.location
                 content_store = contentstore()
                 commit = True
-                delete_course(self.def_ms, content_store, loc, commit)
+                delete_course(self.def_ms, content_store, course.id, commit)
                 # don't delete user permission groups, though
                 self.msg += \
-                    u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
-                        _('Deleted'), loc, course.id, course.display_name)
+                    u"<font color='red'>{0} {2} ({3})</font>".format(
+                        _('Deleted'), course.id, course.display_name)
             datatable = self.make_datatable()
 
         context = {
@@ -606,9 +605,9 @@ class Staffing(SysadminDashboardView):
             datum = [course.display_name, course.id]
             datum += [CourseEnrollment.objects.filter(
                 course_id=course.id).count()]
-            datum += [CourseStaffRole(course.location).users_with_role().count()]
+            datum += [CourseStaffRole(course.id).users_with_role().count()]
             datum += [','.join([x.username for x in CourseInstructorRole(
-                course.location).users_with_role()])]
+                course.id).users_with_role()])]
             data.append(datum)
 
         datatable = dict(header=[_('Course Name'), _('course_id'),
@@ -640,7 +639,7 @@ class Staffing(SysadminDashboardView):
 
             for (cdir, course) in courses.items():  # pylint: disable=unused-variable
                 for role in roles:
-                    for user in role(course.location).users_with_role():
+                    for user in role(course.id).users_with_role():
                         datum = [course.id, role, user.username, user.email,
                                  user.profile.name]
                         data.append(datum)
@@ -709,8 +708,8 @@ class GitLogs(TemplateView):
 
             # Allow only course team, instructors, and staff
             if not (request.user.is_staff or
-                    CourseInstructorRole(course.location).has_user(request.user) or
-                    CourseStaffRole(course.location).has_user(request.user)):
+                    CourseInstructorRole(course.id).has_user(request.user) or
+                    CourseStaffRole(course.id).has_user(request.user)):
                 raise Http404
             log.debug('course_id={0}'.format(course_id))
             cilset = CourseImportLog.objects.filter(

@@ -62,6 +62,7 @@ from .tools import (
     strip_if_string,
 )
 from xmodule.modulestore import Location
+from xmodule.modulestore.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
@@ -185,9 +186,9 @@ def require_level(level):
     def decorator(func):  # pylint: disable=C0111
         def wrapped(*args, **kwargs):  # pylint: disable=C0111
             request = args[0]
-            course = get_course_by_id(kwargs['course_id'])
+            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
 
-            if has_access(request.user, course, level):
+            if has_access(request.user, level, course):
                 return func(*args, **kwargs)
             else:
                 return HttpResponseForbidden()
@@ -375,7 +376,7 @@ def modify_access(request, course_id):
     action is one of ['allow', 'revoke']
     """
     course = get_course_with_access(
-        request.user, course_id, 'instructor', depth=None
+        request.user, 'instructor', course_id, depth=None
     )
 
     user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
@@ -435,7 +436,7 @@ def list_course_role_members(request, course_id):
     }
     """
     course = get_course_with_access(
-        request.user, course_id, 'instructor', depth=None
+        request.user, 'instructor', course_id, depth=None
     )
 
     rolename = request.GET.get('rolename')
@@ -469,7 +470,7 @@ def get_grading_config(request, course_id):
     Respond with json which contains a html formatted grade summary.
     """
     course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
+        request.user, 'staff', course_id, depth=None
     )
     grading_config_summary = analytics.basic.dump_grading_context(course)
 
@@ -647,7 +648,7 @@ def reset_student_attempts(request, course_id):
             mutually exclusive with all_students
     """
     course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
+        request.user, 'staff', course_id, depth=None
     )
 
     problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
@@ -670,7 +671,7 @@ def reset_student_attempts(request, course_id):
 
     # instructor authorization
     if all_students or delete_module:
-        if not has_access(request.user, course, 'instructor'):
+        if not has_access(request.user, 'instructor', course):
             return HttpResponseForbidden("Requires instructor access.")
 
     module_state_key = _msk_from_problem_urlname(course_id, problem_to_reset)
@@ -894,7 +895,7 @@ def list_forum_members(request, course_id):
     Takes query parameter `rolename`.
     """
     course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, course, 'instructor')
+    has_instructor_access = has_access(request.user, 'instructor', course)
     has_forum_admin = has_forum_access(
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
@@ -993,7 +994,7 @@ def update_forum_role_membership(request, course_id):
     - `action` is one of ['allow', 'revoke']
     """
     course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, course, 'instructor')
+    has_instructor_access = has_access(request.user, 'instructor', course)
     has_forum_admin = has_forum_access(
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
@@ -1018,7 +1019,7 @@ def update_forum_role_membership(request, course_id):
         ))
 
     user = get_student_from_identifier(unique_student_identifier)
-    target_is_instructor = has_access(user, course, 'instructor')
+    target_is_instructor = has_access(user, 'instructor', course)
     # cannot revoke instructor
     if target_is_instructor and action == 'revoke' and rolename == FORUM_ROLE_ADMINISTRATOR:
         return HttpResponseBadRequest("Cannot revoke instructor forum admin privelages.")
@@ -1194,13 +1195,4 @@ def _msk_from_problem_urlname(course_id, urlname):
     if urlname.endswith(".xml"):
         urlname = urlname[:-4]
 
-    # Combined open ended problems also have state that can be deleted.  However,
-    # appending "problem" will only allow capa problems to be reset.
-    # Get around this for combinedopenended problems.
-    if "combinedopenended" not in urlname:
-        urlname = "problem/" + urlname
-
-    parts = Location.parse_course_id(course_id)
-    parts['urlname'] = urlname
-    module_state_key = u"i4x://{org}/{course}/{urlname}".format(**parts)
-    return module_state_key
+    return course_id.make_usage_key('problem', urlname)

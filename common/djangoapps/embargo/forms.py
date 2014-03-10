@@ -10,6 +10,7 @@ from embargo.fixtures.country_codes import COUNTRY_CODES
 import socket
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 
 
 class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
@@ -20,7 +21,7 @@ class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protoc
 
     def clean_course_id(self):
         """Validate the course id"""
-        course_id = self.cleaned_data["course_id"]
+        course_id = CourseKey.from_string(self.cleaned_data["course_id"])
 
         # Try to get the course.  If this returns None, it's not a real course
         try:

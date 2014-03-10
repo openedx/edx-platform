@@ -12,7 +12,7 @@ from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 
 from ..utils import get_modulestore
 
@@ -51,7 +51,7 @@ def initialize_course_tabs(course, user):
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
-def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def tabs_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for static tabs.
 
@@ -65,11 +65,11 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
     Creating a tab, deleting a tab, or changing its contents is not supported through this method.
     Instead use the general xblock URL (see item.xblock_handler).
     """
-    locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, locator):
+    locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
+    old_location = loc_mapper().translate_locator_to_location(locator)
+    if not has_course_access(request.user, old_location.course_key):
         raise PermissionDenied()
 
-    old_location = loc_mapper().translate_locator_to_location(locator)
     store = get_modulestore(old_location)
     course_item = store.get_item(old_location)
 
@@ -80,7 +80,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             if 'tabs' in request.json:
                 def get_location_for_tab(tab):
                     """  Returns the location (old-style) for a tab. """
-                    return loc_mapper().translate_locator_to_location(BlockUsageLocator(tab))
+                    return loc_mapper().translate_locator_to_location(BlockUsageLocator.from_string(tab))
 
                 tabs = request.json['tabs']
 
@@ -140,9 +140,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             static_tabs.append(modulestore('direct').get_item(static_tab_loc))
 
         components = [
-            loc_mapper().translate_location(
-                course_item.location.course_id, static_tab.location, False, True
-            )
+            loc_mapper().translate_location(static_tab.location, False, True)
             for static_tab
             in static_tabs
         ]

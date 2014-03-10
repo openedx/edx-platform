@@ -45,7 +45,7 @@ def get_parent_xblock(xblock):
     Returns the xblock that is the parent of the specified xblock, or None if it has no parent.
     """
     locator = xblock.location
-    parent_locations = modulestore().get_parent_locations(locator, None)
+    parent_locations = modulestore().get_parent_locations(locator,)
 
     if len(parent_locations) == 0:
         return None
@@ -94,8 +94,5 @@ def xblock_studio_url(xblock, course=None):
         prefix = 'unit'     # only show the unit page for verticals directly beneath a subsection
     else:
         prefix = 'container'
-    course_id = None
-    if course:
-        course_id = course.location.course_id
-    locator = loc_mapper().translate_location(course_id, xblock.location, published=False)
+    locator = loc_mapper().translate_location(xblock.location)
     return locator.url_reverse(prefix)

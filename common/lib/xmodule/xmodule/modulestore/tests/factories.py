@@ -36,6 +36,7 @@ class CourseFactory(XModuleFactory):
     number = '999'
     display_name = 'Robot Super Course'
 
+    # pylint: disable=unused-argument
     @classmethod
     def _create(cls, target_class, **kwargs):
 
@@ -46,8 +47,10 @@ class CourseFactory(XModuleFactory):
         # because the factory provides a default 'number' arg, prefer the non-defaulted 'course' arg if any
         number = kwargs.pop('course', kwargs.pop('number', None))
         store = kwargs.pop('modulestore')
+        name = kwargs.get('name', Location.clean(kwargs.get('display_name')))
+        run = kwargs.get('run', name)
 
-        location = Location('i4x', org, number, 'course', Location.clean(kwargs.get('display_name')))
+        location = Location(org, number, run, 'course', name)
 
         # Write the data to the mongo datastore
         new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
@@ -86,7 +89,7 @@ class ItemFactory(XModuleFactory):
 
     @lazy_attribute
     def parent_location(self):
-        default_location = Location('i4x://MITx/999/course/Robot_Super_Course')
+        default_location = Location('MITx', '999', 'Robot_Super_Course', 'course', 'Robot_Super_Course', None)
         try:
             parent = self.parent
         # This error is raised if the caller hasn't provided either parent or parent_location
@@ -127,7 +130,7 @@ class ItemFactory(XModuleFactory):
 
         # catch any old style users before they get into trouble
         assert 'template' not in kwargs
-        parent_location = Location(kwargs.pop('parent_location', None))
+        parent_location = kwargs.pop('parent_location', None)
         data = kwargs.pop('data', None)
         category = kwargs.pop('category', None)
         display_name = kwargs.pop('display_name', None)

@@ -29,6 +29,7 @@ from edxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment, unenroll_done
 from util.query import use_read_replica_if_available
+from xmodule_django.models import CourseKeyField
 
 from verify_student.models import SoftwareSecurePhotoVerification
 
@@ -310,7 +311,7 @@ class PaidCourseRegistration(OrderItem):
     """
     This is an inventory item for paying for a course registration
     """
-    course_id = models.CharField(max_length=128, db_index=True)
+    course_id = CourseKeyField(max_length=128, db_index=True)
     mode = models.SlugField(default=CourseMode.DEFAULT_MODE_SLUG)
 
     @classmethod
@@ -385,8 +386,7 @@ class PaidCourseRegistration(OrderItem):
         would in fact be quite silly since there's a clear back door.
         """
         try:
-            course_loc = CourseDescriptor.id_to_location(self.course_id)
-            course_exists = modulestore().has_item(self.course_id, course_loc)
+            course_exists = modulestore().has_course(self.course_id)
         except ValueError:
             raise PurchasedCallbackException(
                 "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
@@ -429,7 +429,7 @@ class PaidCourseRegistrationAnnotation(models.Model):
     And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
     so this is to retrofit it.
     """
-    course_id = models.CharField(unique=True, max_length=128, db_index=True)
+    course_id = CourseKeyField(unique=True, max_length=128, db_index=True)
     annotation = models.TextField(null=True)
 
     def __unicode__(self):
@@ -440,7 +440,7 @@ class CertificateItem(OrderItem):
     """
     This is an inventory item for purchasing certificates
     """
-    course_id = models.CharField(max_length=128, db_index=True)
+    course_id = CourseKeyField(max_length=128, db_index=True)
     course_enrollment = models.ForeignKey(CourseEnrollment)
     mode = models.SlugField()
 
