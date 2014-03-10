@@ -13,9 +13,9 @@ from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import CourseLocator, Locator
 
 
-class CourseContextRequired(Exception):
+class CourseIdRequired(Exception):
     """
-    Raised when a course_context is required to determine permissions
+    Raised when a course_id is required to determine permissions
     """
     pass
 
@@ -144,7 +144,7 @@ class CourseRole(GroupBasedRole):
     """
     A named role in a particular course
     """
-    def __init__(self, role, location, course_context=None):
+    def __init__(self, role, location, course_id=None):
         """
         Location may be either a Location, a string, dict, or tuple which Location will accept
         in its constructor, or a CourseLocator. Handle all these giving some preference to
@@ -160,14 +160,14 @@ class CourseRole(GroupBasedRole):
         if isinstance(self.location, Location):
             try:
                 groupnames.append(u'{0}_{1}'.format(role, self.location.course_id))
-                course_context = self.location.course_id  # course_id is valid for translation
+                course_id = self.location.course_id  # course_id is valid for translation
             except InvalidLocationError:  # will occur on old locations where location is not of category course
-                if course_context is None:
-                    raise CourseContextRequired()
+                if course_id is None:
+                    raise CourseIdRequired()
                 else:
-                    groupnames.append(u'{0}_{1}'.format(role, course_context))
+                    groupnames.append(u'{0}_{1}'.format(role, course_id))
             try:
-                locator = loc_mapper().translate_location_to_course_locator(course_context, self.location)
+                locator = loc_mapper().translate_location_to_course_locator(course_id, self.location)
                 groupnames.append(u'{0}_{1}'.format(role, locator.package_id))
             except (InvalidLocationError, ItemNotFoundError):
                 # if it's never been mapped, the auth won't be via the Locator syntax

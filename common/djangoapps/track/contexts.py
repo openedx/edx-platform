@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 def course_context_from_url(url):
     """
-    Extracts the course_id from the given `url` and passes it on to
+    Extracts the course_context from the given `url` and passes it on to
     `course_context_from_course_id()`.
     """
     url = url or ''
