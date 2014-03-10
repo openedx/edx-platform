@@ -81,6 +81,6 @@ class RolesTestCase(TestCase):
             "Student doesn't have access to {}".format(unicode(vertical_locator))
         )
         self.assertTrue(
-            CourseStaffRole(vertical_location, course_context=self.course.course_id).has_user(self.student),
+            CourseStaffRole(vertical_location, course_id=self.course.course_id).has_user(self.student),
             "Student doesn't have access to {}".format(unicode(vertical_location.url()))
         )
