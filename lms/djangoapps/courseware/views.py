@@ -221,6 +221,7 @@ def save_child_position(seq_module, child_name):
     """
     child_name: url_name of the child
     """
+    print child_name
     for position, c in enumerate(seq_module.get_display_items(), start=1):
         if c.location.name == child_name:
             # Only save if position changed
@@ -939,7 +940,7 @@ def notification_image_for_tab(course_tab, user, course):
     return None
 
 
-def get_static_tab_contents(request, course, tab):
+def get_static_tab_contents(request, course, tab, wrap_xmodule_display=True):
     """
     Returns the contents for the given static tab
     """
@@ -951,7 +952,7 @@ def get_static_tab_contents(request, course, tab):
         course.id, request.user, modulestore().get_item(loc), depth=0
     )
     tab_module = get_module(
-        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path
+        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path, wrap_xmodule_display=wrap_xmodule_display
     )
 
     logging.debug('course_module = {0}'.format(tab_module))

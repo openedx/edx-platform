@@ -73,6 +73,12 @@ urlpatterns = ('',  # nopep8
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 )
 
+# OPEN EDX API
+if settings.FEATURES["API"]:
+    urlpatterns += (
+        url(r'^api/*', include('api_manager.urls')),
+    )
+
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (
     url(r'^verify_student/', include('verify_student.urls')),

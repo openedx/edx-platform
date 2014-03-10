@@ -1390,6 +1390,9 @@ INSTALLED_APPS = (
 
     # Country list
     'django_countries'
+    
+    # EDX API application
+    'api_manager',
 )
 
 ######################### MARKETING SITE ###############################
