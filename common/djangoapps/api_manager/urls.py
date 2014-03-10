@@ -16,4 +16,5 @@ urlpatterns = patterns('api_manager.system_views',
                        url(r'^users/*', include('api_manager.users_urls')),
                        url(r'^groups/*', include('api_manager.groups_urls')),
                        url(r'^sessions/*', include('api_manager.sessions_urls')),
+                       url(r'^courses/*', include('api_manager.courses_urls')),
                        )
