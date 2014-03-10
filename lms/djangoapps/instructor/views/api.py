@@ -187,7 +187,7 @@ def require_level(level):
             request = args[0]
             course = get_course_by_id(kwargs['course_id'])
 
-            if has_access(request.user, course, level):
+            if has_access(request.user, level, course):
                 return func(*args, **kwargs)
             else:
                 return HttpResponseForbidden()
@@ -670,7 +670,7 @@ def reset_student_attempts(request, course_id):
 
     # instructor authorization
     if all_students or delete_module:
-        if not has_access(request.user, course, 'instructor'):
+        if not has_access(request.user, 'instructor', course):
             return HttpResponseForbidden("Requires instructor access.")
 
     module_state_key = _msk_from_problem_urlname(course_id, problem_to_reset)
@@ -894,7 +894,7 @@ def list_forum_members(request, course_id):
     Takes query parameter `rolename`.
     """
     course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, course, 'instructor')
+    has_instructor_access = has_access(request.user, 'instructor', course)
     has_forum_admin = has_forum_access(
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
@@ -993,7 +993,7 @@ def update_forum_role_membership(request, course_id):
     - `action` is one of ['allow', 'revoke']
     """
     course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, course, 'instructor')
+    has_instructor_access = has_access(request.user, 'instructor', course)
     has_forum_admin = has_forum_access(
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
@@ -1018,7 +1018,7 @@ def update_forum_role_membership(request, course_id):
         ))
 
     user = get_student_from_identifier(unique_student_identifier)
-    target_is_instructor = has_access(user, course, 'instructor')
+    target_is_instructor = has_access(user, 'instructor', course)
     # cannot revoke instructor
     if target_is_instructor and action == 'revoke' and rolename == FORUM_ROLE_ADMINISTRATOR:
         return HttpResponseBadRequest("Cannot revoke instructor forum admin privelages.")

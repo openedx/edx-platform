@@ -15,8 +15,6 @@ import logging
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from courseware.access import has_access
-
 from .module_render import get_module
 from courseware.access import has_access
 from xmodule.modulestore import Location
@@ -27,7 +25,7 @@ from open_ended_grading import open_ended_notifications
 
 import waffle
 
-# We only need to scrape strings for i18n in this file, since ugettext is 
+# We only need to scrape strings for i18n in this file, since ugettext is
 # called on them in the template:
 # https://github.com/edx/edx-platform/blob/master/lms/templates/courseware/course_navigation.html#L29
 _ = lambda text: text
@@ -173,7 +171,7 @@ def _html_textbooks(tab, user, course, active_page, request):
 
 
 def _staff_grading(tab, user, course, active_page, request):
-    if has_access(user, course, 'staff'):
+    if has_access(user, 'staff', course):
         link = reverse('staff_grading', args=[course.id])
 
         # Translators: "Staff grading" appears on a tab that allows
@@ -355,7 +353,7 @@ def get_course_tabs(user, course, active_page, request):
         tabs.extend(gen(tab, user, course, active_page, request))
 
     # Instructor tab is special--automatically added if user is staff for the course
-    if has_access(user, course, 'staff'):
+    if has_access(user, 'staff', course):
         tabs.append(_instructor(course, active_page))
 
     return tabs
@@ -410,7 +408,7 @@ def get_default_tabs(user, course, active_page, request):
     if user.is_authenticated() and not course.hide_progress_tab:
         tabs.extend(_progress({'name': 'Progress'}, user, course, active_page, request))
 
-    if has_access(user, course, 'staff'):
+    if has_access(user, 'staff', course):
         tabs.append(_instructor(course, active_page))
 
     return tabs

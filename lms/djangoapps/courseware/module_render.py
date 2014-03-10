@@ -198,7 +198,7 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     See get_module() docstring for further details.
     """
     # allow course staff to masquerade as student
-    if has_access(user, descriptor, 'staff', course_id):
+    if has_access(user, 'staff', descriptor, course_id):
         setup_masquerade(request, True)
 
     track_function = make_track_function(request)
@@ -223,7 +223,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # Do not check access when it's a noauth request.
     if getattr(user, 'known', True):
         # Short circuit--if the user shouldn't have access, bail without doing any work
-        if not has_access(user, descriptor, 'load', course_id):
+        if not has_access(user, 'load', descriptor, course_id):
             return None
 
     student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
@@ -370,7 +370,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     ))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
-        if has_access(user, descriptor, 'staff', course_id):
+        if has_access(user, 'staff', descriptor, course_id):
             block_wrappers.append(partial(add_staff_debug_info, user))
 
     # These modules store data using the anonymous_student_id as a key.
@@ -443,10 +443,10 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())
         )
 
-    system.set(u'user_is_staff', has_access(user, descriptor.location, u'staff', course_id))
+    system.set(u'user_is_staff', has_access(user, u'staff', descriptor.location, course_id))
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
-    if has_access(user, descriptor.location, 'staff', course_id):
+    if has_access(user, u'staff', descriptor.location, course_id):
         system.error_descriptor_class = ErrorDescriptor
     else:
         system.error_descriptor_class = NonStaffErrorDescriptor

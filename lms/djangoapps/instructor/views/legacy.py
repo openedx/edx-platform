@@ -87,7 +87,7 @@ def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
-    instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
+    instructor_access = has_access(request.user, 'instructor', course)   # an instructor can manage staff lists
 
     forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
 
@@ -1028,7 +1028,7 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
         if alreadyexists:
             msg = '<font color="red">' + _('Error: user "{0}" already has rolename "{1}", cannot add').format(uname, rolename) + '</font>'
         else:
-            if (rolename == FORUM_ROLE_ADMINISTRATOR and not has_access(user, course, 'staff')):
+            if (rolename == FORUM_ROLE_ADMINISTRATOR and not has_access(user, 'staff', course)):
                 msg = '<font color="red">' + _('Error: user "{0}" should first be added as staff before adding as a forum administrator, cannot add').format(uname) + '</font>'
             else:
                 user.roles.add(role)
@@ -1284,7 +1284,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
     if overload:  	# delete all but staff
         todelete = CourseEnrollment.objects.filter(course_id=course_id)
         for ce in todelete:
-            if not has_access(ce.user, course, 'staff') and ce.user.email.lower() not in new_students_lc:
+            if not has_access(ce.user, 'staff', course) and ce.user.email.lower() not in new_students_lc:
                 status[ce.user.email] = 'deleted'
                 ce.deactivate()
             else:

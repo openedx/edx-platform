@@ -234,7 +234,7 @@ def index(request, course_id, chapter=None, section=None,
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user  # keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
-    staff_access = has_access(user, course, 'staff')
+    staff_access = has_access(user, 'staff', course)
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
@@ -450,7 +450,7 @@ def course_info(request, course_id):
     Assumes the course_id is in a valid format.
     """
     course = get_course_with_access(request.user, course_id, 'load')
-    staff_access = has_access(request.user, course, 'staff')
+    staff_access = has_access(request.user, 'staff', course)
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
     reverifications = fetch_reverify_banner_info(request, course_id)
 
@@ -488,7 +488,7 @@ def static_tab(request, course_id, tab_slug):
     if contents is None:
         raise Http404
 
-    staff_access = has_access(request.user, course, 'staff')
+    staff_access = has_access(request.user, 'staff', course)
     return render_to_response('courseware/static_tab.html',
                               {'course': course,
                                'tab': tab,
@@ -506,7 +506,7 @@ def syllabus(request, course_id):
     Assumes the course_id is in a valid format.
     """
     course = get_course_with_access(request.user, course_id, 'load')
-    staff_access = has_access(request.user, course, 'staff')
+    staff_access = has_access(request.user, 'staff', course)
 
     return render_to_response('courseware/syllabus.html', {'course': course,
                                             'staff_access': staff_access, })
@@ -537,12 +537,12 @@ def course_about(request, course_id):
     course = get_course_with_access(request.user, course_id, 'see_exists')
     registered = registered_for_course(course, request.user)
 
-    if has_access(request.user, course, 'load'):
+    if has_access(request.user, 'load', course):
         course_target = reverse('info', args=[course.id])
     else:
         course_target = reverse('about_course', args=[course.id])
 
-    show_courseware_link = (has_access(request.user, course, 'load') or
+    show_courseware_link = (has_access(request.user, 'load', course) or
                             settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
 
     # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
@@ -592,14 +592,14 @@ def mktg_course_about(request, course_id):
 
     registered = registered_for_course(course, request.user)
 
-    if has_access(request.user, course, 'load'):
+    if has_access(request.user, 'load', course):
         course_target = reverse('info', args=[course.id])
     else:
         course_target = reverse('about_course', args=[course.id])
 
-    allow_registration = has_access(request.user, course, 'enroll')
+    allow_registration = has_access(request.user, 'enroll', course)
 
-    show_courseware_link = (has_access(request.user, course, 'load') or
+    show_courseware_link = (has_access(request.user, 'load', course) or
                             settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
     course_modes = CourseMode.modes_for_course(course.id)
 
@@ -637,7 +637,7 @@ def _progress(request, course_id, student_id):
     Course staff are allowed to see the progress of students in their class.
     """
     course = get_course_with_access(request.user, course_id, 'load', depth=None)
-    staff_access = has_access(request.user, course, 'staff')
+    staff_access = has_access(request.user, 'staff', course)
 
     if student_id is None or student_id == request.user.id:
         # always allowed to see your own profile
@@ -702,7 +702,7 @@ def submission_history(request, course_id, student_username, location):
     """
 
     course = get_course_with_access(request.user, course_id, 'load')
-    staff_access = has_access(request.user, course, 'staff')
+    staff_access = has_access(request.user, 'staff', course)
 
     # Permission Denied if they don't have staff access and are trying to see
     # somebody else's submission history.

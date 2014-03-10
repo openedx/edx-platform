@@ -29,26 +29,48 @@ class AccessTestCase(TestCase):
         self.course_instructor = InstructorFactory(course=self.course)
 
     def test__has_access_to_location(self):
-        self.assertFalse(access._has_access_to_location(None, self.course, 'staff', None))
+        self.assertFalse(access._has_access_to_location(
+            None, 'staff', self.course, None
+        ))
 
-        self.assertFalse(access._has_access_to_location(self.anonymous_user, self.course, 'staff', None))
-        self.assertFalse(access._has_access_to_location(self.anonymous_user, self.course, 'instructor', None))
+        self.assertFalse(access._has_access_to_location(
+            self.anonymous_user, 'staff', self.course, None
+        ))
+        self.assertFalse(access._has_access_to_location(
+            self.anonymous_user, 'instructor', self.course, None
+        ))
 
-        self.assertTrue(access._has_access_to_location(self.global_staff, self.course, 'staff', None))
-        self.assertTrue(access._has_access_to_location(self.global_staff, self.course, 'instructor', None))
+        self.assertTrue(access._has_access_to_location(
+            self.global_staff, 'staff', self.course, None
+        ))
+        self.assertTrue(access._has_access_to_location(
+            self.global_staff, 'instructor', self.course, None
+        ))
 
         # A user has staff access if they are in the staff group
-        self.assertTrue(access._has_access_to_location(self.course_staff, self.course, 'staff', None))
-        self.assertFalse(access._has_access_to_location(self.course_staff, self.course, 'instructor', None))
+        self.assertTrue(access._has_access_to_location(
+            self.course_staff, 'staff', self.course, None
+        ))
+        self.assertFalse(access._has_access_to_location(
+            self.course_staff, 'instructor', self.course, None
+        ))
 
         # A user has staff and instructor access if they are in the instructor group
-        self.assertTrue(access._has_access_to_location(self.course_instructor, self.course, 'staff', None))
-        self.assertTrue(access._has_access_to_location(self.course_instructor, self.course, 'instructor', None))
+        self.assertTrue(access._has_access_to_location(
+            self.course_instructor, 'staff', self.course, None
+        ))
+        self.assertTrue(access._has_access_to_location(
+            self.course_instructor, 'instructor', self.course, None
+        ))
 
         # A user does not have staff or instructor access if they are
         # not in either the staff or the the instructor group
-        self.assertFalse(access._has_access_to_location(self.student, self.course, 'staff', None))
-        self.assertFalse(access._has_access_to_location(self.student, self.course, 'instructor', None))
+        self.assertFalse(access._has_access_to_location(
+            self.student, 'staff', self.course, None
+        ))
+        self.assertFalse(access._has_access_to_location(
+            self.student, 'instructor', self.course, None
+        ))
 
     def test__has_access_string(self):
         u = Mock(is_staff=True)
@@ -66,8 +88,9 @@ class AccessTestCase(TestCase):
         d.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)  # make sure the start time is in the past
 
         # Always returns true because DISABLE_START_DATES is set in test.py
-        self.assertTrue(access._has_access_descriptor(u, d, 'load'))
-        self.assertRaises(ValueError, access._has_access_descriptor, u, d, 'not_load_or_staff')
+        self.assertTrue(access._has_access_descriptor(u, 'load', d))
+        with self.assertRaises(ValueError):
+            access._has_access_descriptor(u, 'not_load_or_staff', d)
 
     def test__has_access_course_desc_can_enroll(self):
         u = Mock()
@@ -76,7 +99,7 @@ class AccessTestCase(TestCase):
         c = Mock(enrollment_start=yesterday, enrollment_end=tomorrow, enrollment_domain='')
 
         # User can enroll if it is between the start and end dates
-        self.assertTrue(access._has_access_course_desc(u, c, 'enroll'))
+        self.assertTrue(access._has_access_course_desc(u, 'enroll', c))
 
         # User can enroll if authenticated and specifically allowed for that course
         # even outside the open enrollment period
@@ -87,21 +110,21 @@ class AccessTestCase(TestCase):
 
         allowed = CourseEnrollmentAllowedFactory(email=u.email, course_id=c.id)
 
-        self.assertTrue(access._has_access_course_desc(u, c, 'enroll'))
+        self.assertTrue(access._has_access_course_desc(u, 'enroll', c))
 
         # Staff can always enroll even outside the open enrollment period
         u = Mock(email='test@edx.org', is_staff=True)
         u.is_authenticated.return_value = True
 
         c = Mock(enrollment_start=tomorrow, enrollment_end=tomorrow, id='edX/test/Whenever', enrollment_domain='')
-        self.assertTrue(access._has_access_course_desc(u, c, 'enroll'))
+        self.assertTrue(access._has_access_course_desc(u, 'enroll', c))
 
         # TODO:
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
 
     def test__user_passed_as_none(self):
         """Ensure has_access handles a user being passed as null"""
-        access.has_access(None, 'global', 'staff', None)
+        access.has_access(None, 'staff', 'global', None)
 
 class UserRoleTestCase(TestCase):
     """

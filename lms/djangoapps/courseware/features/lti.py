@@ -208,9 +208,9 @@ def i_am_registered_for_the_course(coursenum, metadata, user='Instructor'):
         normal_student = UserFactory()
         instructor = InstructorFactory(course=course_location)
 
-        assert not has_access(normal_student, course_descriptor, 'load')
-        assert has_access(user, course_descriptor, 'load')
-        assert has_access(instructor, course_descriptor, 'load')
+        assert not has_access(normal_student, 'load', course_descriptor)
+        assert has_access(user, 'load', course_descriptor)
+        assert has_access(instructor, 'load', course_descriptor)
     else:
         metadata.update({'start': datetime.datetime(1970, 1, 1, tzinfo=UTC)})
         create_course_for_lti(coursenum, metadata)
@@ -219,7 +219,7 @@ def i_am_registered_for_the_course(coursenum, metadata, user='Instructor'):
         user = InstructorFactory(course=course_location)
 
     # Enroll the user in the course and log them in
-    if has_access(user, course_descriptor, 'load'):
+    if has_access(user, 'load', course_descriptor):
         world.enroll_user(user, course_id(coursenum))
 
     world.log_in(username=user.username, password='test')

@@ -82,7 +82,7 @@ def get_course_with_access(user, course_id, action, depth=0):
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
     course = get_course_by_id(course_id, depth=depth)
-    if not has_access(user, course, action):
+    if not has_access(user, action, course, course_id):
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
         raise Http404("Course not found.")
@@ -294,7 +294,7 @@ def get_courses(user, domain=None):
     Returns a list of courses available, sorted by course.number
     '''
     courses = branding.get_visible_courses()
-    courses = [c for c in courses if has_access(user, c, 'see_exists')]
+    courses = [c for c in courses if has_access(user, 'see_exists', c)]
 
     courses = sorted(courses, key=lambda course: course.number)
 
