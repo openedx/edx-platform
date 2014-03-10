@@ -21,6 +21,7 @@
 # Translators:
 # jdpark7 <jdpark7@gmail.com>, 2013
 # jdpark7 <jdpark7@gmail.com>, 2013
+# sarina <sarina@edx.org>, 2014
 # SunahLim <whitetree70@snu.ac.kr>, 2013
 # SunahLim <whitetree70@snu.ac.kr>, 2013
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
@@ -50,7 +51,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-02 15:08-0500\n"
+"POT-Creation-Date: 2014-03-10 09:12-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: nedbat <ned@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/edx-platform/language/ko_KR/)\n"
@@ -148,6 +149,53 @@ msgstr ""
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Male"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Female"
+msgstr ""
+
+#. Translators: 'Other' refers to the student's gender
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py common/djangoapps/student/models.py
+msgid "Other"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Doctorate"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Master's or professional degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Bachelor's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Associate's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Secondary/high school"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Junior secondary/junior high/middle school"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Elementary/primary school"
+msgstr ""
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "None"
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -1308,6 +1356,20 @@ msgstr ""
 msgid "The underlying module store does not support import."
 msgstr ""
 
+#. Translators: This is an error message when they ask for a
+#. particular version of a git repository and that version isn't
+#. available from the remote source they specified
+#: lms/djangoapps/dashboard/git_import.py
+msgid "The specified remote branch is not available."
+msgstr ""
+
+#. Translators: Error message shown when they have asked for a git
+#. repository branch, a specific version within a repository, that
+#. doesn't exist, or there is a problem changing to it.
+#: lms/djangoapps/dashboard/git_import.py
+msgid "Unable to switch to specified branch. Please check your branch name."
+msgstr ""
+
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed in authenticating {0}, error {1}\n"
 msgstr ""
@@ -1437,12 +1499,21 @@ msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
 
+#. Translators: unable to download the course content from
+#. the source git repository. Clone occurs if this is brand
+#. new, and pull is when it is being updated from the
+#. source.
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Unable to clone or pull repository. Please check your url."
+msgid ""
+"Unable to clone or pull repository. Please check your url. Output was: {0!r}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed to clone repository to {0}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Successfully switched to branch: {branch_name}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
@@ -1514,7 +1585,9 @@ msgid "full_name"
 msgstr ""
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
-msgid "Import the specified git repository into the modulestore and directory"
+msgid ""
+"Import the specified git repository and optional branch into the modulestore"
+" and optionally specified directory."
 msgstr ""
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
@@ -3267,6 +3340,12 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/container_xblock_component.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr ""
+
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
 msgstr ""
@@ -3323,12 +3402,6 @@ msgstr ""
 #: cms/templates/register.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "Preferred Language"
-msgstr ""
-
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/unit_container_xblock_component.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "View"
 msgstr ""
 
 #: cms/templates/registration/activation_complete.html
@@ -4754,6 +4827,12 @@ msgstr "이미 계정이 있으십니까?"
 msgid "Login."
 msgstr "로그인"
 
+#. Translators: The 'Group' here refers to the group of users that has been
+#. sorted into group_id
+#: lms/templates/split_test_staff_view.html
+msgid "Group {group_id}"
+msgstr ""
+
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
 msgstr "담당직원 디버그 정보"
@@ -4927,8 +5006,16 @@ msgstr ""
 msgid "Administer Courses"
 msgstr ""
 
+#. Translators: Repo is short for git repository or source of
+#. courseware
 #: lms/templates/sysadmin_dashboard.html
-msgid "Repo location"
+msgid "Repo Location"
+msgstr ""
+
+#. Translators: Repo is short for git repository or source of
+#. courseware and branch is a specific version within that repository
+#: lms/templates/sysadmin_dashboard.html
+msgid "Repo Branch (optional)"
 msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html
@@ -4947,6 +5034,7 @@ msgstr ""
 msgid "Django PID"
 msgstr ""
 
+#. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
 msgid "Platform Version"
 msgstr ""
@@ -5106,8 +5194,12 @@ msgstr ""
 msgid "Download video"
 msgstr "비디오 다운로드"
 
-#: lms/templates/video.html
-msgid "Download timed transcript"
+#: lms/templates/video.html lms/templates/video.html
+msgid "Download transcript"
+msgstr ""
+
+#: lms/templates/video.html lms/templates/video.html
+msgid "{file_format}"
 msgstr ""
 
 #: lms/templates/word_cloud.html
@@ -5563,7 +5655,6 @@ msgid "Psychometrics"
 msgstr "심리 측정"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Forum Admin"
 msgstr "포럼 관리자"
 
@@ -5851,8 +5942,10 @@ msgid "No Analytics are available at this time."
 msgstr "현재 분석내용이 사용가능 하지 않습니다. "
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Students enrolled:"
-msgstr "등록한 학생들:"
+msgid ""
+"Students enrolled (historical count, includes those who have since "
+"unenrolled):"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students active in the last week:"
@@ -6780,6 +6873,18 @@ msgid "Grade Distribution"
 msgstr "성적 분포"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"The chart below displays the score distribution for each standard problem in"
+" your class, specified by the problem's url name."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"Scores are shown without weighting applied, so if your problem contains 2 "
+"questions, it will display as having a total of 2 points."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Loading problem list..."
 msgstr "문제 목록 로딩 ..."
 
@@ -6912,11 +7017,19 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Unique, new file links for the CSV reports are generated on each visit to "
-"this page. These unique links expire within 5 minutes, due to the sensitive "
-"nature of student grade information. Please note that the report filename "
-"contains a timestamp that represents when your file was generated; this "
-"timestamp is UTC, not your local timezone."
+"A new CSV report is generated each time you click the <b>Generate Grade "
+"Report</b> button above. A link to each report remains available on this "
+"page, identified by the UTC date and time of generation. Reports are not "
+"deleted, so you will always be able to access previously generated reports "
+"from this page."
+msgstr ""
+
+#. Translators: a table of URL links to report files appears after this
+#. sentence.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"<b>Note</b>: To keep student data secure, you cannot save or email these "
+"links for direct access. Copies of links expire within 5 minutes."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -7049,10 +7162,8 @@ msgstr "사용가능한 목록 얻기..."
 msgid ""
 "Staff cannot modify staff or beta tester lists. To modify these lists, "
 "contact your instructor and ask them to add you as an instructor for staff "
-"and beta lists, or a forum admin for forum management."
+"and beta lists, or a discussion admin for discussion management."
 msgstr ""
-"담당 직원은 직원이나 베타 테스터의 목록을 수정할 수 없습니다. 이 목록을 수정하려면, 교수자에게 연락하여 담당 직원과 베타 목록의 "
-"교수자로 당신을 추가하도록 하고, 포럼 관리를 위해서는 포럼 관리자로 추가하도록 요청합니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Staff"
@@ -7080,9 +7191,8 @@ msgstr "강사"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Instructors are the core administration of your course. Instructors can add "
-"and remove course staff, as well as administer forum access."
+"and remove course staff, as well as administer discussion access."
 msgstr ""
-"교수자가 강좌의 핵심 관리자입니다. 교수자들은 포럼 접속을 관리할 뿐만 아니라 강좌 담당 직원을 추가하거나 제거할 수 있습니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Instructor"
@@ -7105,25 +7215,30 @@ msgid "Beta Tester"
 msgstr "베타 테스터"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Admins"
-msgstr "포럼 관리자"
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid ""
-"Forum admins can edit or delete any post, clear misuse flags, close and re-"
-"open threads, endorse responses, and see posts from all cohorts. They CAN "
-"add/delete other moderators and their posts are marked as 'staff'."
+msgid "Discussion Admins"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Moderators"
-msgstr "포럼 진행자"
+msgid ""
+"Discussion admins can edit or delete any post, clear misuse flags, close and"
+" re-open threads, endorse responses, and see posts from all cohorts. They "
+"CAN add/delete other moderators and their posts are marked as 'staff'."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Discussion Admin"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Discussion Moderators"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Forum moderators can edit or delete any post, clear misuse flags, close and "
-"re-open threads, endorse responses, and see posts from all cohorts. They "
-"CANNOT add/delete other moderators and their posts are marked as 'staff'."
+"Discussion moderators can edit or delete any post, clear misuse flags, close"
+" and re-open threads, endorse responses, and see posts from all cohorts. "
+"They CANNOT add/delete other moderators and their posts are marked as "
+"'staff'."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7131,15 +7246,15 @@ msgid "Add Moderator"
 msgstr "진행자 추가"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Community TAs"
-msgstr "포럼 커뮤니티 조교들"
+msgid "Discussion Community TAs"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Community TA's are members of the community whom you deem particularly "
-"helpful on the forums. They can edit or delete any post, clear misuse flags,"
-" close and re-open threads, endorse responses, and see posts from all "
-"cohorts. Their posts are marked 'Community TA'."
+"helpful on the discussion boards. They can edit or delete any post, clear "
+"misuse flags, close and re-open threads, endorse responses, and see posts "
+"from all cohorts. Their posts are marked 'Community TA'."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -8547,7 +8662,7 @@ msgstr "사진을 다시 찍으세요."
 msgid ""
 "Make sure your full name on your edX account ({full_name}) matches your ID. "
 "We will also use this as the name on your certificate."
-msgstr "당신의 edX 계좌 ({성을 포함한 이름})의 이름과 ID의 이름이 일치해야합니다. 이 이름은 증명서에도 사용될 것입니다."
+msgstr "당신의 edX 계좌 ({full_name})의 이름과 ID의 이름이 일치해야합니다. 이 이름은 증명서에도 사용될 것입니다."
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid ""
@@ -9019,9 +9134,8 @@ msgstr ""
 msgid "Delete this component"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/overview.html
-#: cms/templates/overview.html
-#: cms/templates/unit_container_xblock_component.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/overview.html cms/templates/overview.html
 msgid "Drag to reorder"
 msgstr ""
 
