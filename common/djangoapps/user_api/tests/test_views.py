@@ -66,7 +66,7 @@ class ApiTestCase(TestCase):
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
-        self.assertItemsEqual(user.keys(), ["email", "id", "name", "username",  "preferences", "url"])
+        self.assertItemsEqual(user.keys(), ["email", "id", "name", "username", "preferences", "url"])
         self.assertItemsEqual(
             user["preferences"].items(),
             [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]
@@ -373,3 +373,59 @@ class UserPreferenceViewSetTest(UserApiTestCase):
                 "url": uri,
             }
         )
+
+
+class PreferenceUsersListViewTest(UserApiTestCase):
+    LIST_URI = "/user_api/v1/preferences/key0/users/"
+
+    def test_options(self):
+        self.assertAllowedMethods(self.LIST_URI, ["OPTIONS", "GET", "HEAD"])
+
+    def test_put_not_allowed(self):
+        self.assertHttpMethodNotAllowed(self.request_with_auth("put", self.LIST_URI))
+
+    def test_patch_not_allowed(self):
+        raise SkipTest("Django 1.4's test client does not support patch")
+
+    def test_delete_not_allowed(self):
+        self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.LIST_URI))
+
+    def test_unauthorized(self):
+        self.assertHttpForbidden(self.client.get(self.LIST_URI))
+
+    @override_settings(DEBUG=True)
+    @override_settings(EDX_API_KEY=None)
+    def test_debug_auth(self):
+        self.assertHttpOK(self.client.get(self.LIST_URI))
+
+    def test_get_basic(self):
+        result = self.get_json(self.LIST_URI)
+        self.assertEqual(result["count"], 2)
+        self.assertIsNone(result["next"])
+        self.assertIsNone(result["previous"])
+        users = result["results"]
+        self.assertEqual(len(users), 2)
+        for user in users:
+            self.assertUserIsValid(user)
+
+    def test_get_pagination(self):
+        first_page = self.get_json(self.LIST_URI, data={"page_size": 1})
+        self.assertEqual(first_page["count"], 2)
+        first_page_next_uri = first_page["next"]
+        self.assertIsNone(first_page["previous"])
+        first_page_users = first_page["results"]
+        self.assertEqual(len(first_page_users), 1)
+
+        second_page = self.get_json(first_page_next_uri)
+        self.assertEqual(second_page["count"], 2)
+        self.assertIsNone(second_page["next"])
+        second_page_prev_uri = second_page["previous"]
+        second_page_users = second_page["results"]
+        self.assertEqual(len(second_page_users), 1)
+
+        self.assertEqual(self.get_json(second_page_prev_uri), first_page)
+
+        for user in first_page_users + second_page_users:
+            self.assertUserIsValid(user)
+        all_user_uris = [user["url"] for user in first_page_users + second_page_users]
+        self.assertEqual(len(set(all_user_uris)), 2)

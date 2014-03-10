@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework import authentication
 from rest_framework import filters
+from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
 from user_api.serializers import UserSerializer, UserPreferenceSerializer
@@ -43,3 +44,14 @@ class UserPreferenceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserPreferenceSerializer
     paginate_by = 10
     paginate_by_param = "page_size"
+
+
+class PreferenceUsersListView(generics.ListAPIView):
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (ApiKeyHeaderPermission,)
+    serializer_class = UserSerializer
+    paginate_by = 10
+    paginate_by_param = "page_size"
+
+    def get_queryset(self):
+        return User.objects.filter(preferences__key=self.kwargs["pref_key"]).prefetch_related("preferences")
