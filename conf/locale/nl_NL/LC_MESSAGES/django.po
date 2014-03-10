@@ -42,7 +42,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-02 15:08-0500\n"
+"POT-Creation-Date: 2014-03-10 09:12-0400\n"
 "PO-Revision-Date: 2014-02-06 03:04+0000\n"
 "Last-Translator: nedbat <ned@edx.org>\n"
 "Language-Team: Dutch (Netherlands) (http://www.transifex.com/projects/p/edx-platform/language/nl_NL/)\n"
@@ -152,6 +152,53 @@ msgstr ""
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Male"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Female"
+msgstr ""
+
+#. Translators: 'Other' refers to the student's gender
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py common/djangoapps/student/models.py
+msgid "Other"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Doctorate"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Master's or professional degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Bachelor's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Associate's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Secondary/high school"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Junior secondary/junior high/middle school"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Elementary/primary school"
+msgstr ""
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "None"
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -1316,6 +1363,20 @@ msgstr ""
 msgid "The underlying module store does not support import."
 msgstr ""
 
+#. Translators: This is an error message when they ask for a
+#. particular version of a git repository and that version isn't
+#. available from the remote source they specified
+#: lms/djangoapps/dashboard/git_import.py
+msgid "The specified remote branch is not available."
+msgstr ""
+
+#. Translators: Error message shown when they have asked for a git
+#. repository branch, a specific version within a repository, that
+#. doesn't exist, or there is a problem changing to it.
+#: lms/djangoapps/dashboard/git_import.py
+msgid "Unable to switch to specified branch. Please check your branch name."
+msgstr ""
+
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed in authenticating {0}, error {1}\n"
 msgstr ""
@@ -1447,12 +1508,21 @@ msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
 
+#. Translators: unable to download the course content from
+#. the source git repository. Clone occurs if this is brand
+#. new, and pull is when it is being updated from the
+#. source.
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Unable to clone or pull repository. Please check your url."
+msgid ""
+"Unable to clone or pull repository. Please check your url. Output was: {0!r}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed to clone repository to {0}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Successfully switched to branch: {branch_name}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
@@ -1524,7 +1594,9 @@ msgid "full_name"
 msgstr ""
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
-msgid "Import the specified git repository into the modulestore and directory"
+msgid ""
+"Import the specified git repository and optional branch into the modulestore"
+" and optionally specified directory."
 msgstr ""
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
@@ -3287,6 +3359,12 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/container_xblock_component.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr ""
+
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
 msgstr ""
@@ -3343,12 +3421,6 @@ msgstr ""
 #: cms/templates/register.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "Preferred Language"
-msgstr ""
-
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/unit_container_xblock_component.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "View"
 msgstr ""
 
 #: cms/templates/registration/activation_complete.html
@@ -4721,6 +4793,12 @@ msgstr ""
 msgid "Login."
 msgstr ""
 
+#. Translators: The 'Group' here refers to the group of users that has been
+#. sorted into group_id
+#: lms/templates/split_test_staff_view.html
+msgid "Group {group_id}"
+msgstr ""
+
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
 msgstr ""
@@ -4894,8 +4972,16 @@ msgstr ""
 msgid "Administer Courses"
 msgstr ""
 
+#. Translators: Repo is short for git repository or source of
+#. courseware
 #: lms/templates/sysadmin_dashboard.html
-msgid "Repo location"
+msgid "Repo Location"
+msgstr ""
+
+#. Translators: Repo is short for git repository or source of
+#. courseware and branch is a specific version within that repository
+#: lms/templates/sysadmin_dashboard.html
+msgid "Repo Branch (optional)"
 msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html
@@ -4914,6 +5000,7 @@ msgstr ""
 msgid "Django PID"
 msgstr ""
 
+#. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
 msgid "Platform Version"
 msgstr ""
@@ -5067,8 +5154,12 @@ msgstr ""
 msgid "Download video"
 msgstr ""
 
-#: lms/templates/video.html
-msgid "Download timed transcript"
+#: lms/templates/video.html lms/templates/video.html
+msgid "Download transcript"
+msgstr ""
+
+#: lms/templates/video.html lms/templates/video.html
+msgid "{file_format}"
 msgstr ""
 
 #: lms/templates/word_cloud.html
@@ -5522,7 +5613,6 @@ msgid "Psychometrics"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Forum Admin"
 msgstr ""
 
@@ -5796,7 +5886,9 @@ msgid "No Analytics are available at this time."
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Students enrolled:"
+msgid ""
+"Students enrolled (historical count, includes those who have since "
+"unenrolled):"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6722,6 +6814,18 @@ msgid "Grade Distribution"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"The chart below displays the score distribution for each standard problem in"
+" your class, specified by the problem's url name."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"Scores are shown without weighting applied, so if your problem contains 2 "
+"questions, it will display as having a total of 2 points."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Loading problem list..."
 msgstr ""
 
@@ -6854,11 +6958,19 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Unique, new file links for the CSV reports are generated on each visit to "
-"this page. These unique links expire within 5 minutes, due to the sensitive "
-"nature of student grade information. Please note that the report filename "
-"contains a timestamp that represents when your file was generated; this "
-"timestamp is UTC, not your local timezone."
+"A new CSV report is generated each time you click the <b>Generate Grade "
+"Report</b> button above. A link to each report remains available on this "
+"page, identified by the UTC date and time of generation. Reports are not "
+"deleted, so you will always be able to access previously generated reports "
+"from this page."
+msgstr ""
+
+#. Translators: a table of URL links to report files appears after this
+#. sentence.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"<b>Note</b>: To keep student data secure, you cannot save or email these "
+"links for direct access. Copies of links expire within 5 minutes."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -6990,7 +7102,7 @@ msgstr ""
 msgid ""
 "Staff cannot modify staff or beta tester lists. To modify these lists, "
 "contact your instructor and ask them to add you as an instructor for staff "
-"and beta lists, or a forum admin for forum management."
+"and beta lists, or a discussion admin for discussion management."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7016,7 +7128,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Instructors are the core administration of your course. Instructors can add "
-"and remove course staff, as well as administer forum access."
+"and remove course staff, as well as administer discussion access."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7038,25 +7150,30 @@ msgid "Beta Tester"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Admins"
+msgid "Discussion Admins"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Forum admins can edit or delete any post, clear misuse flags, close and re-"
-"open threads, endorse responses, and see posts from all cohorts. They CAN "
-"add/delete other moderators and their posts are marked as 'staff'."
+"Discussion admins can edit or delete any post, clear misuse flags, close and"
+" re-open threads, endorse responses, and see posts from all cohorts. They "
+"CAN add/delete other moderators and their posts are marked as 'staff'."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Moderators"
+msgid "Discussion Admin"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Discussion Moderators"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Forum moderators can edit or delete any post, clear misuse flags, close and "
-"re-open threads, endorse responses, and see posts from all cohorts. They "
-"CANNOT add/delete other moderators and their posts are marked as 'staff'."
+"Discussion moderators can edit or delete any post, clear misuse flags, close"
+" and re-open threads, endorse responses, and see posts from all cohorts. "
+"They CANNOT add/delete other moderators and their posts are marked as "
+"'staff'."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7064,15 +7181,15 @@ msgid "Add Moderator"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Community TAs"
+msgid "Discussion Community TAs"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Community TA's are members of the community whom you deem particularly "
-"helpful on the forums. They can edit or delete any post, clear misuse flags,"
-" close and re-open threads, endorse responses, and see posts from all "
-"cohorts. Their posts are marked 'Community TA'."
+"helpful on the discussion boards. They can edit or delete any post, clear "
+"misuse flags, close and re-open threads, endorse responses, and see posts "
+"from all cohorts. Their posts are marked 'Community TA'."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -8930,9 +9047,8 @@ msgstr ""
 msgid "Delete this component"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/overview.html
-#: cms/templates/overview.html
-#: cms/templates/unit_container_xblock_component.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/overview.html cms/templates/overview.html
 msgid "Drag to reorder"
 msgstr ""
 

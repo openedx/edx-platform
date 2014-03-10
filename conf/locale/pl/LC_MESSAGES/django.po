@@ -22,6 +22,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# rodzajowo <a.dubrawska@gmail.com>, 2014
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
 # lazarus_zamenhof <lazarus.zamenhof@gmail.com>, 2014
@@ -54,7 +55,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-02 15:08-0500\n"
+"POT-Creation-Date: 2014-03-10 09:12-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: kmti <sekretariat@kmti.uz.zgora.pl>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/edx-platform/language/pl/)\n"
@@ -164,6 +165,53 @@ msgstr ""
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Male"
+msgstr "Mężczyzna"
+
+#: common/djangoapps/student/models.py
+msgid "Female"
+msgstr "Kobieta"
+
+#. Translators: 'Other' refers to the student's gender
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py common/djangoapps/student/models.py
+msgid "Other"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Doctorate"
+msgstr "Doktorat"
+
+#: common/djangoapps/student/models.py
+msgid "Master's or professional degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Bachelor's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Associate's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Secondary/high school"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Junior secondary/junior high/middle school"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Elementary/primary school"
+msgstr ""
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "None"
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -345,7 +393,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Invalid password"
-msgstr ""
+msgstr "Nieprawidłowe hasło"
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail address required."
@@ -404,7 +452,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "AM"
-msgstr ""
+msgstr "AM"
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
@@ -412,7 +460,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "PM"
-msgstr ""
+msgstr "PM"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Monday Februrary 10, 2014". It is used for the %A
@@ -420,7 +468,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Monday"
-msgstr ""
+msgstr "Poniedziałek"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Tuesday Februrary 11, 2014". It is used for the %A
@@ -428,7 +476,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Tuesday"
-msgstr ""
+msgstr "Wtorek"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Wednesday Februrary 12, 2014". It is used for the %A
@@ -436,7 +484,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Wednesday"
-msgstr ""
+msgstr "Środa"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Thursday Februrary 13, 2014". It is used for the %A
@@ -444,7 +492,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Thursday"
-msgstr ""
+msgstr "Czwartek"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Friday Februrary 14, 2014". It is used for the %A
@@ -452,7 +500,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Friday"
-msgstr ""
+msgstr "Piątek"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Saturday Februrary 15, 2014". It is used for the %A
@@ -460,7 +508,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Saturday"
-msgstr ""
+msgstr "Sobota"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Sunday Februrary 16, 2014". It is used for the %A
@@ -468,7 +516,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Sunday"
-msgstr ""
+msgstr "Niedziela"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Mon Feb 10, 2014". It is used for the %a
@@ -476,7 +524,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Mon"
-msgstr ""
+msgstr "pon."
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Tue Feb 11, 2014". It is used for the %a
@@ -484,7 +532,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Tue"
-msgstr ""
+msgstr "wt."
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Wed Feb 12, 2014". It is used for the %a
@@ -492,7 +540,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Wed"
-msgstr ""
+msgstr "śr."
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Thu Feb 13, 2014". It is used for the %a
@@ -500,7 +548,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Thu"
-msgstr ""
+msgstr "czw."
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Fri Feb 14, 2014". It is used for the %a
@@ -508,7 +556,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Fri"
-msgstr ""
+msgstr "pt."
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sat Feb 15, 2014". It is used for the %a
@@ -516,7 +564,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Sat"
-msgstr ""
+msgstr "sob."
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sun Feb 16, 2014". It is used for the %a
@@ -524,7 +572,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Sun"
-msgstr ""
+msgstr "niedz."
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jan 10, 2014". It is used for the %b
@@ -532,7 +580,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jan"
-msgstr ""
+msgstr "STY"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Feb 10, 2014". It is used for the %b
@@ -540,7 +588,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Feb"
-msgstr ""
+msgstr "LUT"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Mar 10, 2014". It is used for the %b
@@ -548,7 +596,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Mar"
-msgstr ""
+msgstr "MAR"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Apr 10, 2014". It is used for the %b
@@ -556,7 +604,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Apr"
-msgstr ""
+msgstr "KWI"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "May 10, 2014". It is used for the %b
@@ -564,7 +612,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "May"
-msgstr ""
+msgstr "MAJ"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jun 10, 2014". It is used for the %b
@@ -572,7 +620,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jun"
-msgstr ""
+msgstr "CZE"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jul 10, 2014". It is used for the %b
@@ -580,7 +628,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jul"
-msgstr ""
+msgstr "LIP"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Aug 10, 2014". It is used for the %b
@@ -588,7 +636,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Aug"
-msgstr ""
+msgstr "SIE"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Sep 10, 2014". It is used for the %b
@@ -596,7 +644,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Sep"
-msgstr ""
+msgstr "WRZ"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Oct 10, 2014". It is used for the %b
@@ -604,7 +652,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Oct"
-msgstr ""
+msgstr "PAŹ"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Nov 10, 2014". It is used for the %b
@@ -612,7 +660,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Nov"
-msgstr ""
+msgstr "LIS"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Dec 10, 2014". It is used for the %b
@@ -620,7 +668,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Dec"
-msgstr ""
+msgstr "GRU"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "January 10, 2014". It is used for the %B directive in
@@ -628,7 +676,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "January"
-msgstr ""
+msgstr "Styczeń"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "February 10, 2014". It is used for the %B directive in
@@ -636,7 +684,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "February"
-msgstr ""
+msgstr "Luty"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "March 10, 2014". It is used for the %B directive in
@@ -644,7 +692,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "March"
-msgstr ""
+msgstr "Marzec"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "April 10, 2014". It is used for the %B directive in
@@ -652,7 +700,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "April"
-msgstr ""
+msgstr "Kwiecień"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "May 10, 2014". It is used for the %B directive in
@@ -660,7 +708,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "May"
-msgstr ""
+msgstr "Maj"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "June 10, 2014". It is used for the %B directive in
@@ -668,7 +716,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "June"
-msgstr ""
+msgstr "Czerwiec"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "July 10, 2014". It is used for the %B directive in
@@ -676,7 +724,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "July"
-msgstr ""
+msgstr "Lipiec"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "August 10, 2014". It is used for the %B directive in
@@ -684,7 +732,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "August"
-msgstr ""
+msgstr "Sierpień"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "September 10, 2014". It is used for the %B directive in
@@ -692,7 +740,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "September"
-msgstr ""
+msgstr "Wrzesień"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "October 10, 2014". It is used for the %B directive in
@@ -700,7 +748,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "October"
-msgstr ""
+msgstr "Październik"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "November 10, 2014". It is used for the %B directive in
@@ -708,7 +756,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "November"
-msgstr ""
+msgstr "Listopad"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "December 10, 2014". It is used for the %B directive in
@@ -716,7 +764,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "December"
-msgstr ""
+msgstr "Grudzień"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Invalid Length ({0})"
@@ -1328,6 +1376,20 @@ msgstr ""
 msgid "The underlying module store does not support import."
 msgstr ""
 
+#. Translators: This is an error message when they ask for a
+#. particular version of a git repository and that version isn't
+#. available from the remote source they specified
+#: lms/djangoapps/dashboard/git_import.py
+msgid "The specified remote branch is not available."
+msgstr ""
+
+#. Translators: Error message shown when they have asked for a git
+#. repository branch, a specific version within a repository, that
+#. doesn't exist, or there is a problem changing to it.
+#: lms/djangoapps/dashboard/git_import.py
+msgid "Unable to switch to specified branch. Please check your branch name."
+msgstr ""
+
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed in authenticating {0}, error {1}\n"
 msgstr ""
@@ -1459,12 +1521,21 @@ msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
 
+#. Translators: unable to download the course content from
+#. the source git repository. Clone occurs if this is brand
+#. new, and pull is when it is being updated from the
+#. source.
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Unable to clone or pull repository. Please check your url."
+msgid ""
+"Unable to clone or pull repository. Please check your url. Output was: {0!r}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed to clone repository to {0}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Successfully switched to branch: {branch_name}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
@@ -1536,7 +1607,9 @@ msgid "full_name"
 msgstr ""
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
-msgid "Import the specified git repository into the modulestore and directory"
+msgid ""
+"Import the specified git repository and optional branch into the modulestore"
+" and optionally specified directory."
 msgstr ""
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
@@ -3299,6 +3372,12 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/container_xblock_component.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr ""
+
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
 msgstr ""
@@ -3355,13 +3434,7 @@ msgstr ""
 #: cms/templates/register.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "Preferred Language"
-msgstr ""
-
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/unit_container_xblock_component.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr ""
+msgstr "Preferowany język"
 
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
@@ -4352,7 +4425,7 @@ msgstr ""
 
 #: lms/templates/name_changes.html
 msgid "[Reject]"
-msgstr ""
+msgstr "[Reject]"
 
 #: lms/templates/navigation.html lms/templates/navigation.html
 msgid "Global Navigation"
@@ -4733,6 +4806,12 @@ msgstr ""
 msgid "Login."
 msgstr ""
 
+#. Translators: The 'Group' here refers to the group of users that has been
+#. sorted into group_id
+#: lms/templates/split_test_staff_view.html
+msgid "Group {group_id}"
+msgstr "Grupa {group_id}"
+
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
 msgstr ""
@@ -4906,8 +4985,16 @@ msgstr ""
 msgid "Administer Courses"
 msgstr ""
 
+#. Translators: Repo is short for git repository or source of
+#. courseware
 #: lms/templates/sysadmin_dashboard.html
-msgid "Repo location"
+msgid "Repo Location"
+msgstr ""
+
+#. Translators: Repo is short for git repository or source of
+#. courseware and branch is a specific version within that repository
+#: lms/templates/sysadmin_dashboard.html
+msgid "Repo Branch (optional)"
 msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html
@@ -4926,9 +5013,10 @@ msgstr ""
 msgid "Django PID"
 msgstr ""
 
+#. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
 msgid "Platform Version"
-msgstr ""
+msgstr "Wersja platformy"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -5079,9 +5167,13 @@ msgstr ""
 msgid "Download video"
 msgstr ""
 
-#: lms/templates/video.html
-msgid "Download timed transcript"
+#: lms/templates/video.html lms/templates/video.html
+msgid "Download transcript"
 msgstr ""
+
+#: lms/templates/video.html lms/templates/video.html
+msgid "{file_format}"
+msgstr "{file_format}"
 
 #: lms/templates/word_cloud.html
 msgid "Your words:"
@@ -5536,7 +5628,6 @@ msgid "Psychometrics"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Forum Admin"
 msgstr ""
 
@@ -5766,7 +5857,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "(Max 128 characters)"
-msgstr ""
+msgstr "(Maks. 128 znaków)"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
@@ -5791,7 +5882,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
-msgstr ""
+msgstr "UWAGA!"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -5810,7 +5901,9 @@ msgid "No Analytics are available at this time."
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Students enrolled:"
+msgid ""
+"Students enrolled (historical count, includes those who have since "
+"unenrolled):"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6506,7 +6599,7 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Add a comment"
-msgstr ""
+msgstr "Dodaj komentarz"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Add a comment..."
@@ -6738,6 +6831,18 @@ msgid "Grade Distribution"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"The chart below displays the score distribution for each standard problem in"
+" your class, specified by the problem's url name."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"Scores are shown without weighting applied, so if your problem contains 2 "
+"questions, it will display as having a total of 2 points."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Loading problem list..."
 msgstr ""
 
@@ -6759,7 +6864,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
-msgstr ""
+msgstr "Podstawowe informacje o kursie"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Name:"
@@ -6776,12 +6881,12 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Yes"
-msgstr ""
+msgstr "Tak"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "No"
-msgstr ""
+msgstr "Nie"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course ended?"
@@ -6870,11 +6975,19 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Unique, new file links for the CSV reports are generated on each visit to "
-"this page. These unique links expire within 5 minutes, due to the sensitive "
-"nature of student grade information. Please note that the report filename "
-"contains a timestamp that represents when your file was generated; this "
-"timestamp is UTC, not your local timezone."
+"A new CSV report is generated each time you click the <b>Generate Grade "
+"Report</b> button above. A link to each report remains available on this "
+"page, identified by the UTC date and time of generation. Reports are not "
+"deleted, so you will always be able to access previously generated reports "
+"from this page."
+msgstr ""
+
+#. Translators: a table of URL links to report files appears after this
+#. sentence.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"<b>Note</b>: To keep student data secure, you cannot save or email these "
+"links for direct access. Copies of links expire within 5 minutes."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -7006,7 +7119,7 @@ msgstr ""
 msgid ""
 "Staff cannot modify staff or beta tester lists. To modify these lists, "
 "contact your instructor and ask them to add you as an instructor for staff "
-"and beta lists, or a forum admin for forum management."
+"and beta lists, or a discussion admin for discussion management."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7032,7 +7145,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Instructors are the core administration of your course. Instructors can add "
-"and remove course staff, as well as administer forum access."
+"and remove course staff, as well as administer discussion access."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7054,25 +7167,30 @@ msgid "Beta Tester"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Admins"
+msgid "Discussion Admins"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Forum admins can edit or delete any post, clear misuse flags, close and re-"
-"open threads, endorse responses, and see posts from all cohorts. They CAN "
-"add/delete other moderators and their posts are marked as 'staff'."
+"Discussion admins can edit or delete any post, clear misuse flags, close and"
+" re-open threads, endorse responses, and see posts from all cohorts. They "
+"CAN add/delete other moderators and their posts are marked as 'staff'."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Moderators"
+msgid "Discussion Admin"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Discussion Moderators"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Forum moderators can edit or delete any post, clear misuse flags, close and "
-"re-open threads, endorse responses, and see posts from all cohorts. They "
-"CANNOT add/delete other moderators and their posts are marked as 'staff'."
+"Discussion moderators can edit or delete any post, clear misuse flags, close"
+" and re-open threads, endorse responses, and see posts from all cohorts. "
+"They CANNOT add/delete other moderators and their posts are marked as "
+"'staff'."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7080,15 +7198,15 @@ msgid "Add Moderator"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Community TAs"
+msgid "Discussion Community TAs"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Community TA's are members of the community whom you deem particularly "
-"helpful on the forums. They can edit or delete any post, clear misuse flags,"
-" close and re-open threads, endorse responses, and see posts from all "
-"cohorts. Their posts are marked 'Community TA'."
+"helpful on the discussion boards. They can edit or delete any post, clear "
+"misuse flags, close and re-open threads, endorse responses, and see posts "
+"from all cohorts. Their posts are marked 'Community TA'."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -7102,7 +7220,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
-msgstr ""
+msgstr "Wyślij e-mail"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
@@ -7228,11 +7346,11 @@ msgstr ""
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Please choose your preferred language"
-msgstr ""
+msgstr "Proszę wybrać preferowany język"
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Save Language Settings"
-msgstr ""
+msgstr "Zapisz ustawienia języka"
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid ""
@@ -7635,7 +7753,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/show_requirements.html
 msgid "Intro"
-msgstr ""
+msgstr "Wstęp"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_verification.html
@@ -7694,7 +7812,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Options"
-msgstr ""
+msgstr "Opcje"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Starts: {start_date}"
@@ -7702,7 +7820,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Go to Course"
-msgstr ""
+msgstr "Przejdź do kursu"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Go to your Dashboard"
@@ -7893,7 +8011,7 @@ msgstr ""
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid "Have questions?"
-msgstr ""
+msgstr "Masz pytania?"
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
@@ -7916,7 +8034,7 @@ msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Upgrading to:"
-msgstr ""
+msgstr "Aktualizacja do:"
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Re-verifying for:"
@@ -7945,7 +8063,7 @@ msgstr ""
 
 #: lms/templates/verify_student/_verification_support.html
 msgid "Technical Requirements"
-msgstr ""
+msgstr "Wymagania techniczne"
 
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
@@ -7967,7 +8085,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "No Webcam Detected"
-msgstr ""
+msgstr "Kamery nie wykryto"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -8946,9 +9064,8 @@ msgstr ""
 msgid "Delete this component"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/overview.html
-#: cms/templates/overview.html
-#: cms/templates/unit_container_xblock_component.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/overview.html cms/templates/overview.html
 msgid "Drag to reorder"
 msgstr ""
 
@@ -8989,7 +9106,7 @@ msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "New Page"
-msgstr ""
+msgstr "Nowa strona"
 
 #: cms/templates/edit-tabs.html
 msgid ""

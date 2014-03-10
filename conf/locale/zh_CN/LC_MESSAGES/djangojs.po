@@ -22,6 +22,7 @@
 # liuyang <liuyang2011@tsinghua.edu.cn>, 2013
 # vicapple22 <vicapple22@gmail.com>, 2013
 # xdsnet <xdsnet@gmail.com>, 2013
+# c0710204 <c0710204@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
@@ -43,7 +44,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-02 15:08-0500\n"
+"POT-Creation-Date: 2014-03-10 09:11-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: harry75369 <harry75369@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"

@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-02 15:08-0500\n"
+"POT-Creation-Date: 2014-03-10 09:11-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: cpennington <cale@edx.org>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/edx-platform/language/pl/)\n"
@@ -681,6 +681,7 @@ msgstr ""
 msgid ""
 "January|February|March|April|May|June|July|August|September|October|November|December"
 msgstr ""
+"Styczeń|Luty|Marzec|Kwiecień|Maj|Czerwiec|Lipiec|Sierpień|Wrzesień|Październik|Listopad|Grudzień"
 
 #. Translators: abbreviations for days of the week, keep the pipe (|)
 #. separators.
@@ -700,7 +701,7 @@ msgstr ""
 #. Translators: the names of days, keep the pipe (|) separators.
 #: lms/static/admin/js/dateparse.js
 msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr ""
+msgstr "Niedziela|Poniedziałek|Wtorek|Środa|Czwartek|Piątek|Sobota"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
