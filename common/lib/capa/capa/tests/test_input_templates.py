@@ -431,10 +431,19 @@ class TextlineTemplateTest(TemplateTestCase):
                                         'script_src': 'test_script'}
         xml = self.render_to_xml(self.context)
 
-        xpath = "//div[@class='text-input-dynamath_data' and @data-preprocessor='test_class']"
+        xpath = "//div[contains(@class, 'text-input-dynamath_data') and @data-preprocessor='test_class']"
         self.assert_has_xpath(xml, xpath, self.context)
 
         xpath = "//div[@class='script_placeholder' and @data-src='test_script']"
+        self.assert_has_xpath(xml, xpath, self.context)
+
+    def test_do_inline_and_preprocessor(self):
+        self.context['preprocessor'] = {'class_name': 'test_class',
+                                        'script_src': 'test_script'}
+        self.context['inline'] = True
+        xml = self.render_to_xml(self.context)
+
+        xpath = "//div[contains(@class, 'text-input-dynamath_data inline') and @data-preprocessor='test_class']"
         self.assert_has_xpath(xml, xpath, self.context)
 
     def test_do_inline(self):
