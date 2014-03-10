@@ -1926,6 +1926,9 @@ INSTALLED_APPS = (
     'teams',
 
     'xblock_django',
+    
+    # EDX API application
+    'api_manager',
 )
 
 ######################### CSRF #########################################
@@ -2092,7 +2095,8 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
         'cors_csrf.middleware.CorsCSRFMiddleware',
     ) + MIDDLEWARE_CLASSES
     CORS_ALLOW_CREDENTIALS = True
-    CORS_ORIGIN_WHITELIST = ()
+    CORS_ORIGIN_WHITELIST = ('devstack.local', 'apros.devstack.local')
+    CORS_ORIGIN_REGEX_WHITELIST = ('^http?://(\w+\.)?devstack\.local$',)
 
 ###################### Registration ##################################
 

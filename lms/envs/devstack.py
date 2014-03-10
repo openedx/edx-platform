@@ -96,6 +96,11 @@ CC_PROCESSOR = {
     }
 }
 
+########################### EDX API #################################
+
+FEATURES['API'] = True
+
+
 ########################### External REST APIs #################################
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
 OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
@@ -180,6 +185,11 @@ FEATURES['ENABLE_COSMETIC_DISPLAY_PRICE'] = True
 
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBackend' not in AUTHENTICATION_BACKENDS:
     AUTHENTICATION_BACKENDS = ['third_party_auth.dummy.DummyBackend'] + list(AUTHENTICATION_BACKENDS)
+
+########################### EDX API #################################
+
+FEATURES['API'] = True
+
 
 #####################################################################
 # See if the developer has any local overrides.
