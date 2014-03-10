@@ -50,8 +50,8 @@ class Command(BaseCommand):
             do_import_static=do_import_static
         )
 
-        for module in course_items:
-            course_id = module.location.course_id
+        for course in course_items:
+            course_id = course.id
             if not are_permissions_roles_seeded(course_id):
                 self.stdout.write('Seeding forum roles for course {0}'.format(course_id))
                 seed_permissions_roles(course_id)

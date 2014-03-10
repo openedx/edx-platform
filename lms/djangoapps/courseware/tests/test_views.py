@@ -24,6 +24,8 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.tests.factories import ItemFactory
 from student.tests.factories import UserFactory
 
 import courseware.views as views
@@ -42,31 +44,30 @@ class TestJumpTo(TestCase):
 
     def setUp(self):
         # Use toy course from XML
-        self.course_name = 'edX/toy/2012_Fall'
+        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
     def test_jumpto_invalid_location(self):
-        location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
+        location = self.course_key.make_usage_key(None, 'NoSuchPlace')
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
     def test_jumpto_from_chapter(self):
-        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
+        location = self.course_key.make_usage_key('chapter', 'Overview')
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_id(self):
-        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_key.to_deprecated_string(), 'Overview')
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_id_invalid_location(self):
-        location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
-        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
+        location = Location('edX', 'toy', 'NoSuchPlace', None, None, None)
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
@@ -80,7 +81,7 @@ class ViewsTestCase(TestCase):
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
         self.date = datetime(2013, 1, 22, tzinfo=UTC)
-        self.course_id = 'edX/toy/2012_Fall'
+        self.course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_id)
         self.enrollment.created = self.date
         self.enrollment.save()
@@ -96,22 +97,22 @@ class ViewsTestCase(TestCase):
         in_cart_span = '<span class="add-to-cart">'
         # don't mock this course due to shopping cart existence checking
         course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
-        request = self.request_factory.get(reverse('about_course', args=[course.id]))
+        request = self.request_factory.get(reverse('about_course', args=[course.id.to_deprecated_string()]))
         request.user = AnonymousUser()
-        response = views.course_about(request, course.id)
+        response = views.course_about(request, course.id.to_deprecated_string())
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
 
         # authenticated user with nothing in cart
         request.user = self.user
-        response = views.course_about(request, course.id)
+        response = views.course_about(request, course.id.to_deprecated_string())
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
 
         # now add the course to the cart
         cart = shoppingcart.models.Order.get_cart_for_user(self.user)
         shoppingcart.models.PaidCourseRegistration.add_to_order(cart, course.id)
-        response = views.course_about(request, course.id)
+        response = views.course_about(request, course.id.to_deprecated_string())
         self.assertEqual(response.status_code, 200)
         self.assertIn(in_cart_span, response.content)
 
@@ -150,11 +151,11 @@ class ViewsTestCase(TestCase):
         self.assertTrue(views.registered_for_course(mock_course, self.user))
 
     def test_jump_to_invalid(self):
+        # TODO add a test for invalid location
+        # TODO add a test for no data *
         request = self.request_factory.get(self.chapter_url)
-        self.assertRaisesRegexp(Http404, 'Invalid location', views.jump_to,
+        self.assertRaisesRegexp(Http404, 'Invalid course_key or usage_key', views.jump_to,
                                 request, 'bar', ())
-        self.assertRaisesRegexp(Http404, 'No data*', views.jump_to, request,
-                                'dummy', self.location)
 
     def test_no_end_on_about_page(self):
         # Toy course has no course end date or about/end_date blob
@@ -214,7 +215,7 @@ class ViewsTestCase(TestCase):
     def test_course_mktg_register(self):
         admin = AdminFactory()
         self.client.login(username=admin.username, password='test')
-        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id})
+        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id.to_deprecated_string()})
         response = self.client.get(url)
         self.assertIn('Register for', response.content)
         self.assertNotIn('and choose your student track', response.content)
@@ -228,7 +229,7 @@ class ViewsTestCase(TestCase):
                                          mode_display_name='Verified Certificate',
                                          course_id=self.course_id)
         self.client.login(username=admin.username, password='test')
-        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id})
+        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id.to_deprecated_string()})
         response = self.client.get(url)
         self.assertIn('Register for', response.content)
         self.assertIn('and choose your student track', response.content)
@@ -243,7 +244,7 @@ class ViewsTestCase(TestCase):
 
         # try it with an existing user and a malicious location
         url = reverse('submission_history', kwargs={
-            'course_id': self.course_id,
+            'course_id': self.course_id.to_deprecated_string(),
             'student_username': 'dummy',
             'location': '<script>alert("hello");</script>'
         })
@@ -252,7 +253,7 @@ class ViewsTestCase(TestCase):
 
         # try it with a malicious user and a non-existent location
         url = reverse('submission_history', kwargs={
-            'course_id': self.course_id,
+            'course_id': self.course_id.to_deprecated_string(),
             'student_username': '<script>alert("hello");</script>',
             'location': 'dummy'
         })
@@ -283,7 +284,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         vertical = ItemFactory(category='vertical', parent_location=section.location)
         ItemFactory(category='problem', parent_location=vertical.location)
 
-        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        course = modulestore().get_course(course.id)  # pylint: disable=no-member
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
         return course
 
@@ -356,7 +357,7 @@ class TestProgressDueDate(BaseDueDateTests):
 
     def get_text(self, course):
         """ Returns the HTML for the progress page """
-        return views.progress(self.request, course.id, self.user.id).content
+        return views.progress(self.request, course.id.to_deprecated_string(), self.user.id).content
 
 
 class TestAccordionDueDate(BaseDueDateTests):
@@ -368,7 +369,7 @@ class TestAccordionDueDate(BaseDueDateTests):
     def get_text(self, course):
         """ Returns the HTML for the accordion """
         return views.render_accordion(
-            self.request, course, course.get_children()[0].id, None, None
+            self.request, course, course.get_children()[0].scope_ids.usage_id.to_deprecated_string(), None, None
         )
 
 
@@ -392,14 +393,14 @@ class StartDateTests(ModuleStoreTestCase):
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
         course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
-        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        course = modulestore().get_course(course.id)  # pylint: disable=no-member
         return course
 
     def get_about_text(self, course_id):
         """
         Get the text of the /about page for the course.
         """
-        text = views.course_about(self.request, course_id).content
+        text = views.course_about(self.request, course_id.to_deprecated_string()).content
         return text
 
     @patch('util.date_utils.pgettext', fake_pgettext(translations={
@@ -421,7 +422,7 @@ class StartDateTests(ModuleStoreTestCase):
         "SHORT_DATE_FORMAT": "%Y-%b-%d",
     }))
     def test_format_localized_in_xml_course(self):
-        text = self.get_about_text('edX/toy/TT_2012_Fall')
+        text = self.get_about_text(SlashSeparatedCourseKey('edX', 'toy', 'TT_2012_Fall'))
         # The start date is set in common/test/data/two_toys/policies/TT_2012_Fall/policy.json
         self.assertIn("2015-JULY-17", text)
 
@@ -441,7 +442,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         MakoMiddleware().process_request(self.request)
 
         course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
-        self.course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
 
         self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
         self.section = ItemFactory(category='sequential', parent_location=self.chapter.location)
@@ -450,6 +451,6 @@ class ProgressPageTests(ModuleStoreTestCase):
     def test_pure_ungraded_xblock(self):
         ItemFactory(category='acid', parent_location=self.vertical.location)
 
-        resp = views.progress(self.request, self.course.id)
+        resp = views.progress(self.request, self.course.id.to_deprecated_string())
         self.assertEquals(resp.status_code, 200)
 

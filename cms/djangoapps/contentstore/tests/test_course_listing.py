@@ -19,6 +19,7 @@ from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 TOTAL_COURSES_COUNT = 500
 USER_COURSES_COUNT = 50
@@ -43,9 +44,6 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Create dummy course with 'CourseFactory' and role (instructor/staff) groups with provided group_name_format
         """
-        course_locator = loc_mapper().translate_location(
-            course_location.course_id, course_location, False, True
-        )
         course = CourseFactory.create(
             org=course_location.org,
             number=course_location.course,
@@ -54,7 +52,7 @@ class TestCourseListing(ModuleStoreTestCase):
 
         for role in [CourseInstructorRole, CourseStaffRole]:
             # pylint: disable=protected-access
-            groupnames = role(course_locator)._group_names
+            groupnames = role(course.id)._group_names
             if group_name_format == 'group_name_with_course_name_only':
                 # Create role (instructor/staff) groups with course_name only: 'instructor_run'
                 group, __ = Group.objects.get_or_create(name=groupnames[2])
@@ -63,9 +61,9 @@ class TestCourseListing(ModuleStoreTestCase):
                 # Since "Group.objects.get_or_create(name=groupnames[1])" would have made group with lowercase name
                 # so manually create group name of old type
                 if role == CourseInstructorRole:
-                    group, __ = Group.objects.get_or_create(name=u'{}_{}'.format('instructor', course_location.course_id))
+                    group, __ = Group.objects.get_or_create(name=u'{}_{}'.format('instructor', course.id))
                 else:
-                    group, __ = Group.objects.get_or_create(name=u'{}_{}'.format('staff', course_location.course_id))
+                    group, __ = Group.objects.get_or_create(name=u'{}_{}'.format('staff', course.id))
             else:
                 # Create role (instructor/staff) groups with format: 'instructor_edx.course.run'
                 group, __ = Group.objects.get_or_create(name=groupnames[0])
@@ -88,8 +86,8 @@ class TestCourseListing(ModuleStoreTestCase):
         request = self.factory.get('/course')
         request.user = self.user
 
-        course_location = Location(['i4x', 'Org1', 'Course1', 'course', 'Run1'])
-        self._create_course_with_access_groups(course_location, 'group_name_with_dots', self.user)
+        course_location = SlashSeparatedCourseKey('Org1', 'Course1', 'Run1')
+        self._create_course_with_access_groups(course_location, self.user)
 
         # get courses through iterating all courses
         courses_list = _accessible_courses_list(request)
@@ -154,8 +152,8 @@ class TestCourseListing(ModuleStoreTestCase):
         request = self.factory.get('/course')
         request.user = self.user
 
-        course_location = Location('i4x', 'Org', 'Course', 'course', 'Run')
-        self._create_course_with_access_groups(course_location, 'group_name_with_dots', self.user)
+        course_key = SlashSeparatedCourseKey('Org', 'Course', 'Run')
+        self._create_course_with_access_groups(course_key, self.user)
 
         # get courses through iterating all courses
         courses_list = _accessible_courses_list(request)
@@ -203,7 +201,7 @@ class TestCourseListing(ModuleStoreTestCase):
             org = 'Org{0}'.format(number)
             course = 'Course{0}'.format(number)
             run = 'Run{0}'.format(number)
-            course_location = Location(['i4x', org, course, 'course', run])
+            course_location = SlashSeparatedCourseKey(org, course, run)
             if number in user_course_ids:
                 self._create_course_with_access_groups(course_location, 'group_name_with_dots', self.user)
             else:
@@ -245,8 +243,8 @@ class TestCourseListing(ModuleStoreTestCase):
         request.user = self.user
         self.client.login(username=self.user.username, password='test')
 
-        course_location_caps = Location(['i4x', 'Org', 'COURSE', 'course', 'Run'])
-        self._create_course_with_access_groups(course_location_caps, 'group_name_with_dots', self.user)
+        course_location_caps = SlashSeparatedCourseKey('Org', 'COURSE', 'Run')
+        self._create_course_with_access_groups(course_location_caps, self.user)
 
         # get courses through iterating all courses
         courses_list = _accessible_courses_list(request)
@@ -259,8 +257,8 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(courses_list, courses_list_by_groups)
 
         # now create another course with same course_id but different name case
-        course_location_camel = Location(['i4x', 'Org', 'Course', 'course', 'Run'])
-        self._create_course_with_access_groups(course_location_camel, 'group_name_with_dots', self.user)
+        course_location_camel = SlashSeparatedCourseKey('Org', 'Course', 'Run')
+        self._create_course_with_access_groups(course_location_camel, self.user)
 
         # test that get courses through iterating all courses returns both courses
         courses_list = _accessible_courses_list(request)

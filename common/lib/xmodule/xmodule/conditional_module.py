@@ -9,7 +9,6 @@ from lxml import etree
 from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
-from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
 from xblock.fields import Scope, ReferenceList
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -144,7 +143,6 @@ class ConditionalModule(ConditionalFields, XModule):
 
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
-            'id': self.id,
             'ajax_url': self.system.ajax_url,
             'depends': ';'.join(self.required_html_ids)
         })
@@ -205,14 +203,9 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
     @staticmethod
     def parse_sources(xml_element):
         """ Parse xml_element 'sources' attr and return a list of location strings. """
-        result = []
         sources = xml_element.get('sources')
         if sources:
-            locations = [location.strip() for location in sources.split(';')]
-            for location in locations:
-                if Location.is_valid(location):  # Check valid location url.
-                    result.append(location)
-        return result
+            return [location.strip() for location in sources.split(';')]
 
     def get_required_module_descriptors(self):
         """Returns a list of XModuleDescriptor instances upon
@@ -221,7 +214,8 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         descriptors = []
         for location in self.sources_list:
             try:
-                descriptor = self.system.load_item(Location(location))
+                location = self.location.course_key.make_usage_key_from_deprecated_string(location)
+                descriptor = self.system.load_item(location)
                 descriptors.append(descriptor)
             except ItemNotFoundError:
                 msg = "Invalid module by location."
@@ -238,7 +232,8 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
             if child.tag == 'show':
                 locations = ConditionalDescriptor.parse_sources(child)
                 for location in locations:
-                    children.append(Location(location))
+                    location = system.course_id.make_usage_key_from_deprecated_string(location)
+                    children.append(location)
                     show_tag_list.append(location)
             else:
                 try:
@@ -251,22 +246,18 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         return {'show_tag_list': show_tag_list}, children
 
     def definition_to_xml(self, resource_fs):
-        def to_string(string_list):
-            """ Convert List of strings to a single string with "; " as the separator. """
-            return "; ".join(string_list)
-
         xml_object = etree.Element(self._tag_name)
         for child in self.get_children():
-            location = str(child.location)
-            if location not in self.show_tag_list:
+            if child.location not in self.show_tag_list:
                 self.runtime.add_block_as_child_node(child, xml_object)
 
         if self.show_tag_list:
             show_str = u'<{tag_name} sources="{sources}" />'.format(
-                tag_name='show', sources=to_string(self.show_tag_list))
+                tag_name='show', sources=';'.join(location.to_deprecated_string() for location in self.show_tag_list))
             xml_object.append(etree.fromstring(show_str))
 
         # Overwrite the original sources attribute with the value from sources_list, as
         # Locations may have been changed to Locators.
-        self.xml_attributes['sources'] = to_string(self.sources_list)
+        stringified_sources_list = map(lambda loc: loc.to_deprecated_string(), self.sources_list)
+        self.xml_attributes['sources'] = ';'.join(stringified_sources_list)
         return xml_object

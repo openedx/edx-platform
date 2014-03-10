@@ -53,7 +53,7 @@ class ChooseModeView(View):
 
         course = course_from_id(course_id)
         context = {
-            "course_id": course_id,
+            "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_id.to_deprecated_string()}),
             "modes": modes,
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
@@ -77,7 +77,7 @@ class ChooseModeView(View):
         # This is a bit redundant with logic in student.views.change_enrollement,
         # but I don't really have the time to refactor it more nicely and test.
         course = course_from_id(course_id)
-        if not has_access(user, course, 'enroll'):
+        if not has_access(user, 'enroll', course):
             error_msg = _("Enrollment is closed")
             return self.get(request, course_id, error=error_msg)
 

@@ -107,7 +107,7 @@ class BlockLocatorBase(Locator):
         if not isinstance(url, basestring):
             raise TypeError('%s is not an instance of basestring' % url)
 
-        parse = parse_url(url, tag_optional=True)
+        parse = parse_url(url)
         if not parse:
             raise InvalidKeyError(cls, url)
 
@@ -323,8 +323,8 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         """
         Requests CourseLocator to deserialize its part and then adds the local deserialization of block
         """
-        course_key = CourseLocator.from_string(serialized)
-        parsed_parts = parse_url(serialized, tag_optional=True)
+        course_key = CourseLocator._from_string(serialized)
+        parsed_parts = parse_url(serialized)
         block_id = parsed_parts.get('block_id')
         if block_id is None:
             raise InvalidKeyError(cls, serialized)

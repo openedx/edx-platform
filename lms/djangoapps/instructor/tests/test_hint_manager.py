@@ -26,8 +26,8 @@ class HintManagerTest(ModuleStoreTestCase):
         self.user = UserFactory.create(username='robot', email='robot@edx.org', password='test', is_staff=True)
         self.c = Client()
         self.c.login(username='robot', password='test')
-        self.problem_id = 'i4x://Me/19.002/crowdsource_hinter/crowdsource_hinter_001'
-        self.course_id = 'Me/19.002/test_course'
+        self.course_id = self.course.id
+        self.problem_id = self.course_id.make_usage_key('crowdsource_hinter', 'crowdsource_hinter_001')
         UserStateSummaryFactory.create(field_name='hints',
                               usage_id=self.problem_id,
                               value=json.dumps({'1.0': {'1': ['Hint 1', 2],
@@ -60,7 +60,7 @@ class HintManagerTest(ModuleStoreTestCase):
         """
         Makes sure that staff can access the hint management view.
         """
-        out = self.c.get('/courses/Me/19.002/test_course/hint_manager')
+        out = self.c.get(self.url)
         print out
         self.assertTrue('Hints Awaiting Moderation' in out.content)
 
@@ -115,7 +115,7 @@ class HintManagerTest(ModuleStoreTestCase):
         request = RequestFactory()
         post = request.post(self.url, {'field': 'hints',
                                        'op': 'delete hints',
-                                       1: [self.problem_id, '1.0', '1']})
+                                       1: [self.problem_id.to_deprecated_string(), '1.0', '1']})
         view.delete_hints(post, self.course_id, 'hints')
         problem_hints = XModuleUserStateSummaryField.objects.get(field_name='hints', usage_id=self.problem_id).value
         self.assertTrue('1' not in json.loads(problem_hints)['1.0'])
@@ -127,7 +127,7 @@ class HintManagerTest(ModuleStoreTestCase):
         request = RequestFactory()
         post = request.post(self.url, {'field': 'hints',
                                        'op': 'change votes',
-                                       1: [self.problem_id, '1.0', '1', 5]})
+                                       1: [self.problem_id.to_deprecated_string(), '1.0', '1', 5]})
         view.change_votes(post, self.course_id, 'hints')
         problem_hints = XModuleUserStateSummaryField.objects.get(field_name='hints', usage_id=self.problem_id).value
         # hints[answer][hint_pk (string)] = [hint text, vote count]
@@ -146,7 +146,7 @@ class HintManagerTest(ModuleStoreTestCase):
         request = RequestFactory()
         post = request.post(self.url, {'field': 'mod_queue',
                                        'op': 'add hint',
-                                       'problem': self.problem_id,
+                                       'problem': self.problem_id.to_deprecated_string(),
                                        'answer': '3.14',
                                        'hint': 'This is a new hint.'})
         post.user = 'fake user'
@@ -167,7 +167,7 @@ class HintManagerTest(ModuleStoreTestCase):
         request = RequestFactory()
         post = request.post(self.url, {'field': 'mod_queue',
                                        'op': 'add hint',
-                                       'problem': self.problem_id,
+                                       'problem': self.problem_id.to_deprecated_string(),
                                        'answer': 'fish',
                                        'hint': 'This is a new hint.'})
         post.user = 'fake user'
@@ -185,7 +185,7 @@ class HintManagerTest(ModuleStoreTestCase):
         request = RequestFactory()
         post = request.post(self.url, {'field': 'mod_queue',
                                        'op': 'approve',
-                                       1: [self.problem_id, '2.0', '2']})
+                                       1: [self.problem_id.to_deprecated_string(), '2.0', '2']})
         view.approve(post, self.course_id, 'mod_queue')
         problem_hints = XModuleUserStateSummaryField.objects.get(field_name='mod_queue', usage_id=self.problem_id).value
         self.assertTrue('2.0' not in json.loads(problem_hints) or len(json.loads(problem_hints)['2.0']) == 0)

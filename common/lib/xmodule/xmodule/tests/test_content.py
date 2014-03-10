@@ -1,7 +1,7 @@
 import unittest
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.content import ContentStore
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, AssetLocation
 
 
 class Content:
@@ -21,18 +21,21 @@ class ContentTest(unittest.TestCase):
         self.assertIsNone(content.thumbnail_location)
 
     def test_static_url_generation_from_courseid(self):
-        url = StaticContent.convert_legacy_static_url_with_course_id('images_course_image.jpg', 'foo/bar/bz')
+        course_key = SlashSeparatedCourseKey('foo', 'bar', 'bz')
+        url = StaticContent.convert_legacy_static_url_with_course_id('images_course_image.jpg', course_key)
         self.assertEqual(url, '/c4x/foo/bar/asset/images_course_image.jpg')
 
     def test_generate_thumbnail_image(self):
         contentStore = ContentStore()
-        content = Content(Location(u'c4x', u'mitX', u'800', u'asset', u'monsters__.jpg'), None)
+        content = Content(AssetLocation(u'c4x', u'mitX', u'800', u'asset', u'monsters__.jpg'), None)
         (thumbnail_content, thumbnail_file_location) = contentStore.generate_thumbnail(content)
         self.assertIsNone(thumbnail_content)
-        self.assertEqual(Location(u'c4x', u'mitX', u'800', u'thumbnail', u'monsters__.jpg'), thumbnail_file_location)
+        self.assertEqual(AssetLocation(u'c4x', u'mitX', u'800', u'thumbnail', u'monsters__.jpg'), thumbnail_file_location)
 
     def test_compute_location(self):
         # We had a bug that __ got converted into a single _. Make sure that substitution of INVALID_CHARS (like space)
         # still happen.
-        asset_location = StaticContent.compute_location('mitX', '400', 'subs__1eo_jXvZnE .srt.sjson')
-        self.assertEqual(Location(u'c4x', u'mitX', u'400', u'asset', u'subs__1eo_jXvZnE_.srt.sjson', None), asset_location)
+        asset_location = StaticContent.compute_location(
+            SlashSeparatedCourseKey('mitX', '400', 'ignore'), 'subs__1eo_jXvZnE .srt.sjson'
+        )
+        self.assertEqual(AssetLocation(u'mitX', u'400', u'ignore', u'asset', u'subs__1eo_jXvZnE_.srt.sjson', None), asset_location)

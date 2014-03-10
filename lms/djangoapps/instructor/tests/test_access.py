@@ -50,19 +50,19 @@ class TestInstructorAccessAllow(ModuleStoreTestCase):
     def test_allow(self):
         user = UserFactory()
         allow_access(self.course, user, 'staff')
-        self.assertTrue(CourseStaffRole(self.course.location).has_user(user))
+        self.assertTrue(CourseStaffRole(self.course.id).has_user(user))
 
     def test_allow_twice(self):
         user = UserFactory()
         allow_access(self.course, user, 'staff')
         allow_access(self.course, user, 'staff')
-        self.assertTrue(CourseStaffRole(self.course.location).has_user(user))
+        self.assertTrue(CourseStaffRole(self.course.id).has_user(user))
 
     def test_allow_beta(self):
         """ Test allow beta against list beta. """
         user = UserFactory()
         allow_access(self.course, user, 'beta')
-        self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(user))
+        self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(user))
 
     @raises(ValueError)
     def test_allow_badlevel(self):
@@ -91,17 +91,17 @@ class TestInstructorAccessRevoke(ModuleStoreTestCase):
     def test_revoke(self):
         user = self.staff[0]
         revoke_access(self.course, user, 'staff')
-        self.assertFalse(CourseStaffRole(self.course.location).has_user(user))
+        self.assertFalse(CourseStaffRole(self.course.id).has_user(user))
 
     def test_revoke_twice(self):
         user = self.staff[0]
         revoke_access(self.course, user, 'staff')
-        self.assertFalse(CourseStaffRole(self.course.location).has_user(user))
+        self.assertFalse(CourseStaffRole(self.course.id).has_user(user))
 
     def test_revoke_beta(self):
         user = self.beta_testers[0]
         revoke_access(self.course, user, 'beta')
-        self.assertFalse(CourseBetaTesterRole(self.course.location).has_user(user))
+        self.assertFalse(CourseBetaTesterRole(self.course.id).has_user(user))
 
     @raises(ValueError)
     def test_revoke_badrolename(self):

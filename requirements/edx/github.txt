@@ -15,9 +15,10 @@
 -e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 -e git+https://github.com/un33k/django-ipware.git@42cb1bb1dc680a60c6452e8bb2b843c2a0382c90#egg=django-ipware
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
+-e git+git@github.com:dianakhuang/factory_boy.git@44b956c9b0873cd439f3c184bdc44dd669255a31#egg=factory_boy
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@cfe5c37f98febd9a215d23cb206a25711056a142#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@a9ecbd7901591f70c86768d25433acd306a9eef7#egg=XBlock
 -e git+https://github.com/edx/codejail.git@e3d98f9455#egg=codejail
 -e git+https://github.com/edx/diff-cover.git@v0.2.9#egg=diff_cover
 -e git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool

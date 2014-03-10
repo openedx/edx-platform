@@ -11,7 +11,7 @@ class InstructorTaskFactory(DjangoModelFactory):
     FACTORY_FOR = InstructorTask
 
     task_type = 'rescore_problem'
-    course_id = "MITx/999/Robot_Super_Course"
+    course_id = SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course")
     task_input = json.dumps({})
     task_key = None
     task_id = None

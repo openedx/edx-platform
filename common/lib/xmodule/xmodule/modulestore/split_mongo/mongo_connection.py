@@ -2,6 +2,7 @@
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
 import pymongo
+from bson import son
 
 class MongoConnection(object):
     """
@@ -18,6 +19,7 @@ class MongoConnection(object):
                 host=host,
                 port=port,
                 tz_aware=tz_aware,
+                document_class=son.SON,
                 **kwargs
             ),
             db
@@ -67,7 +69,7 @@ class MongoConnection(object):
         """
         Get the course_index from the persistence mechanism whose id is the given key
         """
-        return self.course_index.find_one({'_id': key})
+        return self.course_index.find_one(son.SON([('org', key.org), ('offering', key.offering)]))
 
     def find_matching_course_indexes(self, query):
         """
@@ -86,13 +88,16 @@ class MongoConnection(object):
         """
         Update the db record for course_index
         """
-        self.course_index.update({'_id': course_index['_id']}, course_index)
+        self.course_index.update(
+            son.SON([('org', course_index['org']), ('offering', course_index['offering'])]),
+            course_index
+        )
 
     def delete_course_index(self, key):
         """
         Delete the course_index from the persistence mechanism whose id is the given key
         """
-        return self.course_index.remove({'_id': key})
+        return self.course_index.remove(son.SON([('org', key.org), ('offering', key.offering)]))
 
     def get_definition(self, key):
         """

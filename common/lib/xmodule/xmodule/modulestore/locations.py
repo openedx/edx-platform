@@ -198,7 +198,7 @@ class LocationBase(object):
     def from_deprecated_string(cls, serialized):
         match = URL_RE.match(serialized)
         if match is None:
-            raise InvalidKeyError(Location, location_url)
+            raise InvalidKeyError(Location, serialized)
         groups = match.groupdict()
         if 'tag' in groups:
             del groups['tag']

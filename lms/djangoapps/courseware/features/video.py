@@ -197,7 +197,7 @@ def add_vertical_to_course(course_num):
 
 
 def last_vertical_location(course_num):
-    return world.scenario_dict['LAST_VERTICAL'].location._replace(course=course_num)
+    return world.scenario_dict['LAST_VERTICAL'].location.replace(course=course_num)
 
 
 def upload_file(filename, location):
@@ -206,7 +206,7 @@ def upload_file(filename, location):
     mime_type = "application/json"
 
     content_location = StaticContent.compute_location(
-        location.org, location.course, filename
+        location.course_key, filename
     )
     content = StaticContent(content_location, filename, mime_type, f.read())
     contentstore().save(content)

@@ -64,6 +64,8 @@ from .tools import (
     strip_if_string,
 )
 from xmodule.modulestore import Location
+from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -187,9 +189,9 @@ def require_level(level):
     def decorator(func):  # pylint: disable=C0111
         def wrapped(*args, **kwargs):  # pylint: disable=C0111
             request = args[0]
-            course = get_course_by_id(kwargs['course_id'])
+            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
 
-            if has_access(request.user, course, level):
+            if has_access(request.user, level, course):
                 return func(*args, **kwargs)
             else:
                 return HttpResponseForbidden()
@@ -238,6 +240,7 @@ def students_update_enrollment(request, course_id):
         ]
     }
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
 
     action = request.GET.get('action')
     emails_raw = request.GET.get('emails')
@@ -248,7 +251,7 @@ def students_update_enrollment(request, course_id):
     email_params = {}
     if email_students:
         course = get_course_by_id(course_id)
-        email_params = get_email_params(course, auto_enroll)
+        email_params = get_email_params(request, course, auto_enroll)
 
     results = []
     for email in emails:
@@ -317,6 +320,7 @@ def bulk_beta_modify_access(request, course_id):
     - emails is string containing a list of emails separated by anything split_input_list can handle.
     - action is one of ['add', 'remove']
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     action = request.GET.get('action')
     emails_raw = request.GET.get('emails')
     emails = _split_input_list(emails_raw)
@@ -327,7 +331,7 @@ def bulk_beta_modify_access(request, course_id):
 
     email_params = {}
     if email_students:
-        email_params = get_email_params(course, auto_enroll=False)
+        email_params = get_email_params(request, course, auto_enroll=False)
 
     for email in emails:
         try:
@@ -392,8 +396,9 @@ def modify_access(request, course_id):
     rolename is one of ['instructor', 'staff', 'beta']
     action is one of ['allow', 'revoke']
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     course = get_course_with_access(
-        request.user, course_id, 'instructor', depth=None
+        request.user, 'instructor', course_id, depth=None
     )
     try:
         user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
@@ -473,8 +478,9 @@ def list_course_role_members(request, course_id):
         ]
     }
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     course = get_course_with_access(
-        request.user, course_id, 'instructor', depth=None
+        request.user, 'instructor', course_id, depth=None
     )
 
     rolename = request.GET.get('rolename')
@@ -492,7 +498,7 @@ def list_course_role_members(request, course_id):
         }
 
     response_payload = {
-        'course_id': course_id,
+        'course_id': course_id.to_deprecated_string(),
         rolename: map(extract_user_info, list_with_level(
             course, rolename
         )),
@@ -507,13 +513,14 @@ def get_grading_config(request, course_id):
     """
     Respond with json which contains a html formatted grade summary.
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
+        request.user, 'staff', course_id, depth=None
     )
     grading_config_summary = analytics.basic.dump_grading_context(course)
 
     response_payload = {
-        'course_id': course_id,
+        'course_id': course_id.to_deprecated_string(),
         'grading_config_summary': grading_config_summary,
     }
     return JsonResponse(response_payload)
@@ -531,6 +538,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     TO DO accept requests for different attribute sets.
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
+
     available_features = analytics.basic.AVAILABLE_FEATURES
     query_features = [
         'username', 'name', 'email', 'language', 'location', 'year_of_birth',
@@ -556,7 +565,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     if not csv:
         response_payload = {
-            'course_id': course_id,
+            'course_id': course_id.to_deprecated_string(),
             'students': student_data,
             'students_count': len(student_data),
             'queried_features': query_features,
@@ -579,6 +588,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     # TODO: the User.objects query and CSV generation here could be
     # centralized into analytics. Currently analytics has similar functionality
     # but not quite what's needed.
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
         response = HttpResponse(mimetype='text/csv')
@@ -598,7 +608,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     ).order_by('id')
     header = ['User ID', 'Anonymized user ID']
     rows = [[s.id, unique_id_for_user(s)] for s in students]
-    return csv_response(course_id.replace('/', '-') + '-anon-ids.csv', header, rows)
+    return csv_response(course_id.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', header, rows)
 
 
 @ensure_csrf_cookie
@@ -613,6 +623,7 @@ def get_distribution(request, course_id):
         empty response['feature_results'] object.
     A list of available will be available in the response['available_features']
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     feature = request.GET.get('feature')
     # alternate notations of None
     if feature in (None, 'null', ''):
@@ -628,7 +639,7 @@ def get_distribution(request, course_id):
         ))
 
     response_payload = {
-        'course_id': course_id,
+        'course_id': course_id.to_deprecated_string(),
         'queried_feature': feature,
         'available_features': available_features,
         'feature_display_names': analytics.distributions.DISPLAY_NAMES,
@@ -667,12 +678,13 @@ def get_student_progress_url(request, course_id):
         'progress_url': '/../...'
     }
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
 
-    progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
+    progress_url = reverse('student_progress', kwargs={'course_id': course_id.to_deprecated_string(), 'student_id': user.id})
 
     response_payload = {
-        'course_id': course_id,
+        'course_id': course_id.to_deprecated_string(),
         'progress_url': progress_url,
     }
     return JsonResponse(response_payload)
@@ -703,8 +715,9 @@ def reset_student_attempts(request, course_id):
             requires instructor access
             mutually exclusive with all_students
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
+        request.user, 'staff', course_id, depth=None
     )
 
     problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
@@ -727,7 +740,7 @@ def reset_student_attempts(request, course_id):
 
     # instructor authorization
     if all_students or delete_module:
-        if not has_access(request.user, course, 'instructor'):
+        if not has_access(request.user, 'instructor', course):
             return HttpResponseForbidden("Requires instructor access.")
 
     module_state_key = _msk_from_problem_urlname(course_id, problem_to_reset)
@@ -742,7 +755,7 @@ def reset_student_attempts(request, course_id):
             return HttpResponseBadRequest("Module does not exist.")
         response_payload['student'] = student_identifier
     elif all_students:
-        instructor_task.api.submit_reset_problem_attempts_for_all_students(request, course_id, module_state_key)
+        instructor_task.api.submit_reset_problem_attempts_for_all_students(request, course_id.to_deprecated_string(), module_state_key)
         response_payload['task'] = 'created'
         response_payload['student'] = 'All Students'
     else:
@@ -768,6 +781,7 @@ def rescore_problem(request, course_id):
 
     all_students and unique_student_identifier cannot both be present.
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))
     student_identifier = request.GET.get('unique_student_identifier', None)
     student = None
@@ -791,10 +805,10 @@ def rescore_problem(request, course_id):
 
     if student:
         response_payload['student'] = student_identifier
-        instructor_task.api.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
+        instructor_task.api.submit_rescore_problem_for_student(request, course_id.to_deprecated_string(), module_state_key, student)
         response_payload['task'] = 'created'
     elif all_students:
-        instructor_task.api.submit_rescore_problem_for_all_students(request, course_id, module_state_key)
+        instructor_task.api.submit_rescore_problem_for_all_students(request, course_id.to_deprecated_string(), module_state_key)
         response_payload['task'] = 'created'
     else:
         return HttpResponseBadRequest()
@@ -848,6 +862,7 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
     """
     List background email tasks.
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     task_type = 'bulk_course_email'
     # Specifying for the history of a single task type
     tasks = instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
@@ -871,6 +886,7 @@ def list_instructor_tasks(request, course_id):
         - `problem_urlname` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     problem_urlname = strip_if_string(request.GET.get('problem_urlname', False))
     student = request.GET.get('unique_student_identifier', None)
     if student is not None:
@@ -906,6 +922,7 @@ def list_report_downloads(_request, course_id):
     """
     List grade CSV files that are available for download for this course.
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     report_store = ReportStore.from_config()
 
     response_payload = {
@@ -924,8 +941,9 @@ def calculate_grades_csv(request, course_id):
     """
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
     try:
-        instructor_task.api.submit_calculate_grades_csv(request, course_id)
+        instructor_task.api.submit_calculate_grades_csv(request, course_key)
         success_status = _("Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
@@ -950,8 +968,9 @@ def list_forum_members(request, course_id):
 
     Takes query parameter `rolename`.
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, course, 'instructor')
+    has_instructor_access = has_access(request.user, 'instructor', course)
     has_forum_admin = has_forum_access(
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
@@ -990,7 +1009,7 @@ def list_forum_members(request, course_id):
         }
 
     response_payload = {
-        'course_id': course_id,
+        'course_id': course_id.to_deprecated_string(),
         rolename: map(extract_user_info, users),
     }
     return JsonResponse(response_payload)
@@ -1010,6 +1029,7 @@ def send_email(request, course_id):
     - 'subject' specifies email's subject
     - 'message' specifies email's content
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     send_to = request.POST.get("send_to")
     subject = request.POST.get("subject")
     message = request.POST.get("message")
@@ -1020,9 +1040,9 @@ def send_email(request, course_id):
     email = CourseEmail.create(course_id, request.user, send_to, subject, message)
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
+    instructor_task.api.submit_bulk_course_email(request, course_id.to_deprecated_string(), email.id)  # pylint: disable=E1101
 
-    response_payload = {'course_id': course_id}
+    response_payload = {'course_id': course_id.to_deprecated_string()}
     return JsonResponse(response_payload)
 
 
@@ -1049,8 +1069,9 @@ def update_forum_role_membership(request, course_id):
     - `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
     - `action` is one of ['allow', 'revoke']
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, course, 'instructor')
+    has_instructor_access = has_access(request.user, 'instructor', course)
     has_forum_admin = has_forum_access(
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
@@ -1075,7 +1096,7 @@ def update_forum_role_membership(request, course_id):
         ))
 
     user = get_student_from_identifier(unique_student_identifier)
-    target_is_instructor = has_access(user, course, 'instructor')
+    target_is_instructor = has_access(user, 'instructor', course)
     # cannot revoke instructor
     if target_is_instructor and action == 'revoke' and rolename == FORUM_ROLE_ADMINISTRATOR:
         return HttpResponseBadRequest("Cannot revoke instructor forum admin privelages.")
@@ -1086,7 +1107,7 @@ def update_forum_role_membership(request, course_id):
         return HttpResponseBadRequest("Role does not exist.")
 
     response_payload = {
-        'course_id': course_id,
+        'course_id': course_id.to_deprecated_string(),
         'action': action,
     }
     return JsonResponse(response_payload)
@@ -1105,6 +1126,7 @@ def proxy_legacy_analytics(request, course_id):
 
     `aname` is a query parameter specifying which analytic to query.
     """
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     analytics_name = request.GET.get('aname')
 
     # abort if misconfigured
@@ -1114,7 +1136,7 @@ def proxy_legacy_analytics(request, course_id):
     url = "{}get?aname={}&course_id={}&apikey={}".format(
         settings.ANALYTICS_SERVER_URL,
         analytics_name,
-        course_id,
+        course_id.to_deprecated_string(),
         settings.ANALYTICS_API_KEY,
     )
 
@@ -1163,7 +1185,7 @@ def change_due_date(request, course_id):
     """
     Grants a due date extension to a student for a particular unit.
     """
-    course = get_course_by_id(course_id)
+    course = get_course_by_id(SlashSeparatedCourseKey.from_string(course_id))
     student = get_student_from_identifier(request.GET.get('student'))
     unit = find_unit(course, request.GET.get('url'))
     due_date = parse_datetime(request.GET.get('due_datetime'))
@@ -1184,7 +1206,7 @@ def reset_due_date(request, course_id):
     """
     Rescinds a due date extension for a student on a particular unit.
     """
-    course = get_course_by_id(course_id)
+    course = get_course_by_id(SlashSeparatedCourseKey.from_string(course_id))
     student = get_student_from_identifier(request.GET.get('student'))
     unit = find_unit(course, request.GET.get('url'))
     set_due_date_extension(course, unit, student, None)
@@ -1204,7 +1226,7 @@ def show_unit_extensions(request, course_id):
     """
     Shows all of the students which have due date extensions for the given unit.
     """
-    course = get_course_by_id(course_id)
+    course = get_course_by_id(SlashSeparatedCourseKey.from_string(course_id))
     unit = find_unit(course, request.GET.get('url'))
     return JsonResponse(dump_module_extensions(course, unit))
 
@@ -1220,7 +1242,7 @@ def show_student_extensions(request, course_id):
     particular course.
     """
     student = get_student_from_identifier(request.GET.get('student'))
-    course = get_course_by_id(course_id)
+    course = get_course_by_id(SlashSeparatedCourseKey.from_string(course_id))
     return JsonResponse(dump_student_extensions(course, student))
 
 
@@ -1248,16 +1270,9 @@ def _msk_from_problem_urlname(course_id, urlname):
     Convert a 'problem urlname' (name that instructor's input into dashboard)
     to a module state key (db field)
     """
+    if not isinstance(course_id, CourseKey):
+        raise ValueError
     if urlname.endswith(".xml"):
         urlname = urlname[:-4]
 
-    # Combined open ended problems also have state that can be deleted.  However,
-    # prepending "problem" will only allow capa problems to be reset.
-    # Get around this for xblock problems.
-    if "/" not in urlname:
-        urlname = "problem/" + urlname
-
-    parts = Location.parse_course_id(course_id)
-    parts['urlname'] = urlname
-    module_state_key = u"i4x://{org}/{course}/{urlname}".format(**parts)
-    return module_state_key
+    return course_id.make_usage_key('problem', urlname)

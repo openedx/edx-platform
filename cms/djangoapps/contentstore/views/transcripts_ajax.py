@@ -163,9 +163,7 @@ def download_transcripts(request):
         raise Http404
 
     filename = 'subs_{0}.srt.sjson'.format(subs_id)
-    content_location = StaticContent.compute_location(
-        item.location.org, item.location.course, filename
-    )
+    content_location = StaticContent.compute_location(item.location.course_key, filename)
     try:
         sjson_transcripts = contentstore().find(content_location)
         log.debug("Downloading subs for %s id", subs_id)
@@ -227,9 +225,7 @@ def check_transcripts(request):
     transcripts_presence['status'] = 'Success'
 
     filename = 'subs_{0}.srt.sjson'.format(item.sub)
-    content_location = StaticContent.compute_location(
-        item.location.org, item.location.course, filename
-    )
+    content_location = StaticContent.compute_location(item.location.course_key, filename)
     try:
         local_transcripts = contentstore().find(content_location).data
         transcripts_presence['current_item_subs'] = item.sub
@@ -243,9 +239,7 @@ def check_transcripts(request):
 
         # youtube local
         filename = 'subs_{0}.srt.sjson'.format(youtube_id)
-        content_location = StaticContent.compute_location(
-            item.location.org, item.location.course, filename
-        )
+        content_location = StaticContent.compute_location(item.location.course_key, filename)
         try:
             local_transcripts = contentstore().find(content_location).data
             transcripts_presence['youtube_local'] = True
@@ -276,9 +270,7 @@ def check_transcripts(request):
     html5_subs = []
     for html5_id in videos['html5']:
         filename = 'subs_{0}.srt.sjson'.format(html5_id)
-        content_location = StaticContent.compute_location(
-            item.location.org, item.location.course, filename
-        )
+        content_location = StaticContent.compute_location(item.location.course_key, filename)
         try:
             html5_subs.append(contentstore().find(content_location).data)
             transcripts_presence['html5_local'].append(html5_id)
@@ -538,14 +530,14 @@ def _get_item(request, data):
 
     Returns the item.
     """
-    locator = BlockUsageLocator(data.get('locator'))
+    locator = BlockUsageLocator.from_string(data.get('locator'))
     old_location = loc_mapper().translate_locator_to_location(locator)
 
     # This is placed before has_course_access() to validate the location,
     # because has_course_access() raises InvalidLocationError if location is invalid.
     item = modulestore().get_item(old_location)
 
-    if not has_course_access(request.user, locator):
+    if not has_course_access(request.user, old_location.course_key):
         raise PermissionDenied()
 
     return item

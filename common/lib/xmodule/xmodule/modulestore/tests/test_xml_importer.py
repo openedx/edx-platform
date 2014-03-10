@@ -46,7 +46,7 @@ class RemapNamespaceTest(TestCase):
     def test_remap_namespace_native_xblock(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("i4x://import/org/run/stubxblock")
+        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
 
         # Explicitly set the content and settings fields
         self.xblock.test_content_field = "Explicitly set"
@@ -54,7 +54,7 @@ class RemapNamespaceTest(TestCase):
         self.xblock.save()
 
         # Remap the namespace
-        target_location_namespace = Location("i4x://course/org/run/stubxblock")
+        target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
         remap_namespace(self.xblock, target_location_namespace)
 
         # Check the XBlock's location
@@ -78,13 +78,13 @@ class RemapNamespaceTest(TestCase):
     def test_remap_namespace_native_xblock_default_values(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("i4x://import/org/run/stubxblock")
+        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
 
         # Do NOT set any values, so the fields should use the defaults
         self.xblock.save()
 
         # Remap the namespace
-        target_location_namespace = Location("i4x://course/org/run/stubxblock")
+        target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
         remap_namespace(self.xblock, target_location_namespace)
 
         # Check the values of the fields.
@@ -105,11 +105,11 @@ class RemapNamespaceTest(TestCase):
     def test_remap_namespace_native_xblock_inherited_values(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("i4x://import/org/run/stubxblock")
+        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
         self.xblock.save()
 
         # Remap the namespace
-        target_location_namespace = Location("i4x://course/org/run/stubxblock")
+        target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
         remap_namespace(self.xblock, target_location_namespace)
 
         # Inherited fields should NOT be explicitly set

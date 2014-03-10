@@ -119,7 +119,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_email_undefined_course(self):
         # Check that we fail when passing in a course that doesn't exist.
-        task_entry = self._create_input_entry(course_id="bogus/course/id")
+        task_entry = self._create_input_entry(course_id=SlashSeparatedCourseKey("bogus", "course", "id"))
         with self.assertRaises(ValueError):
             self._run_task_with_mock_celery(send_bulk_course_email, task_entry.id, task_entry.task_id)
 

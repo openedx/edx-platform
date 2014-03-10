@@ -67,7 +67,7 @@ from django.conf import settings
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               %>
 
-              <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id, chapter=chapter['url_name'], section=section['url_name']))}">
+              <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id.to_deprecated_string(), chapter=chapter['url_name'], section=section['url_name']))}">
                 ${ section['display_name'] }
                 %if total > 0 or earned > 0:
                   <span class="sr">
