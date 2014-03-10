@@ -1403,3 +1403,9 @@ body.unit .component {
     margin-top: ($baseline*1.5);
   }
 }
+
+body.unit .component.editing {
+  .xmodule_DiscussionModule, .xmodule_HtmlModule, .xblock {
+    margin-top: 0;
+  }
+}
