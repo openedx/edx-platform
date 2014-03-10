@@ -247,6 +247,9 @@ FEATURES = {
     # Turn off Advanced Security by default
     'ADVANCED_SECURITY': False,
 
+    # Turn on/off the Open edX API
+    'API': False,
+
     # Show a "Download your certificate" on the Progress page if the lowest
     # nonzero grade cutoff is met
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
@@ -1226,6 +1229,9 @@ INSTALLED_APPS = (
 
     # Monitoring functionality
     'monitoring',
+
+    # EDX API application
+    'api_manager',
 )
 
 ######################### MARKETING SITE ###############################
