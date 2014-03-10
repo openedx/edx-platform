@@ -102,6 +102,34 @@ function (VideoPlayer) {
                 });
             });
 
+            it('create Flash player', function () {
+                var player;
+
+                state = jasmine.initializePlayerYouTube();
+                state.videoEl = state.el.find('video, iframe').width(100);
+                player = state.videoPlayer.player;
+                player.getAvailablePlaybackRates.andReturn([1]);
+                state.currentPlayerMode = 'html5';
+                spyOn(window.YT, 'Player').andCallThrough();
+                state.videoPlayer.onReady();
+
+                expect(YT.Player).toHaveBeenCalledWith('id', {
+                    playerVars: {
+                        controls: 0,
+                        wmode: 'transparent',
+                        rel: 0,
+                        showinfo: 0,
+                        enablejsapi: 1,
+                        modestbranding: 1
+                    },
+                    videoId: 'abcdefghijkl',
+                    events: jasmine.any(Object)
+                });
+
+                expect(state.resizer.setElement).toHaveBeenCalled();
+                expect(state.resizer.align).toHaveBeenCalled();
+            });
+
             // We can't test the invocation of HTML5Video because it is not
             // available globally. It is defined within the scope of Require
             // JS.

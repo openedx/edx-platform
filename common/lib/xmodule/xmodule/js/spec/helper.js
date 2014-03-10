@@ -9,7 +9,7 @@
                     'getPlayerState', 'getVolume', 'setVolume',
                     'loadVideoById', 'getAvailablePlaybackRates', 'playVideo',
                     'pauseVideo', 'seekTo', 'getDuration', 'setPlaybackRate',
-                    'getPlaybackQuality'
+                    'getPlaybackQuality', 'destroy'
                 ]
             );
 
@@ -238,7 +238,8 @@
                     'alignByWidthOnly',
                     'alignByHeightOnly',
                     'setParams',
-                    'setMode'
+                    'setMode',
+                    'setElement'
                 ],
                 obj = {},
                 delta = {

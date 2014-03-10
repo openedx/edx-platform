@@ -51,8 +51,7 @@ function (Resizer) {
         it('`alignByHeightOnly` works correctly', function () {
             var resizer = new Resizer(config).alignByHeightOnly(),
                 expectedHeight = container.height(),
-                realHeight = element.height(),
-                realWidth;
+                realHeight = element.height();
 
             expect(realHeight).toBe(expectedHeight);
         });
@@ -90,6 +89,20 @@ function (Resizer) {
             realWidth = element.width();
 
             expect(realWidth).toBe(expectedWidth);
+        });
+
+        it('`setElement` works correctly', function () {
+            container.append('<div ' +
+                'id="Another-el" ' +
+                'style="width:100px; height: 150px;"' +
+            '>');
+
+            var newElement = $('#Another-el'),
+                expectedHeight = container.height();
+
+            new Resizer(config).setElement(newElement).alignByHeightOnly();
+            expect(element.height()).not.toBe(expectedHeight);
+            expect(newElement.height()).toBe(expectedHeight);
         });
 
         describe('Callbacks', function () {

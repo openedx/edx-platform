@@ -270,6 +270,8 @@ function (HTML5Video, Resizer) {
                     .onPlaybackQualityChange
             }
         });
+
+        state.resizer.setElement(state.el.find('iframe')).align();
     }
 
     // ***************************************************************

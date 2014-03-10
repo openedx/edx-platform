@@ -316,8 +316,6 @@
                 });
 
                 waitsFor(function () {
-                    c1 += 1;
-                    console.log('c1 = ', c1);
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -325,21 +323,11 @@
                 }, 'duration is set', WAIT_TIMEOUT);
 
                 runs(function () {
-                    console.log('oiooio');
-                    console.log(state.videoProgressSlider.slider);
-                    console.log('0000');
-
                     expect($('.video-controls').find('.vidtime'))
                         .toHaveText('0:00 / 1:00');
 
-                    console.log('1111');
-
                     expect(true).toBe(true);
-
-                    console.log('1111');
-
-                    // expect(state.videoProgressSlider.slider.slider('option', 'value')).toBe(0);
-
+                    expect(state.videoProgressSlider.slider.slider('option', 'value')).toBe(0);
                     state.storage.clear();
                 });
             });
@@ -367,7 +355,6 @@
                         .toHaveText('0:00 / 1:00');
 
                     expect(state.videoProgressSlider.slider.slider('option', 'value')).toBe(0);
-
                     state.storage.clear();
                 });
             });
@@ -396,7 +383,6 @@
                         .toHaveText('0:00 / 1:00');
 
                     expect(state.videoProgressSlider.slider.slider('option', 'value')).toBe(0);
-
                     state.storage.clear();
                 });
             });
@@ -427,7 +413,6 @@
                         .toHaveText('0:10 / 1:00');
 
                     expect(state.videoProgressSlider.slider.slider('option', 'value')).toBe(10);
-
                     state.storage.clear();
                 });
             });
