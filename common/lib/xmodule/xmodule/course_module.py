@@ -603,6 +603,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
             xml_object.append(textbook_xml_object)
 
+        if self.wiki_slug is not None:
+            wiki_xml_object = etree.Element('wiki')
+            wiki_xml_object.set('slug', self.wiki_slug)
+            xml_object.append(wiki_xml_object)
+
         return xml_object
 
     def has_ended(self):

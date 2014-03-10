@@ -514,11 +514,20 @@ def remap_namespace(module, target_location_namespace):
                         chapter['url'], target_location_namespace
                     )
 
-        # if there is a wiki_slug which is the same as the original location
-        # (aka default value), then remap that so the wiki doesn't point to
-        # the old Wiki.
-        if module.wiki_slug == original_location.course:
-            module.wiki_slug = target_location_namespace.course
+        # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
+        # If the wiki_slug is equal to either of these default values then remap that so that the wiki does not point
+        # to the old wiki.
+        original_unique_wiki_slug = '{0}.{1}.{2}'.format(
+            original_location.org,
+            original_location.course,
+            original_location.name
+        )
+        if module.wiki_slug == original_unique_wiki_slug or module.wiki_slug == original_location.course:
+            module.wiki_slug = '{0}.{1}.{2}'.format(
+                target_location_namespace.org,
+                target_location_namespace.course,
+                target_location_namespace.name,
+            )
 
         module.save()
 

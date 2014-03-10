@@ -1761,8 +1761,27 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/c4x/MITx/999/asset/Chapter1.pdf')
         self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/c4x/MITx/999/asset/Chapter2.pdf')
 
-        # check that URL slug got updated to new course slug
-        self.assertEquals(course_module.wiki_slug, '999')
+    def test_import_into_new_course_id_wiki_slug_renamespacing(self):
+        module_store = modulestore('direct')
+        target_location = Location('i4x', 'MITx', '999', 'course', '2013_Spring')
+        course_data = {
+            'org': target_location.org,
+            'number': target_location.course,
+            'display_name': 'Robot Super Course',
+            'run': target_location.name
+        }
+        target_course_id = '{0}/{1}/{2}'.format(target_location.org, target_location.course, target_location.name)
+        _create_course(self, course_data)
+
+        # Import a course with wiki_slug == location.course
+        import_from_xml(module_store, 'common/test/data/', ['toy'], target_location_namespace=target_location)
+        course_module = module_store.get_instance(target_location.course_id, target_location)
+        self.assertEquals(course_module.wiki_slug, 'MITx.999.2013_Spring')
+
+        # Now try importing a course with wiki_slug == '{0}{1}{2}'.format(location.org, location.course, location.name)
+        import_from_xml(module_store, 'common/test/data/', ['two_toys'], target_location_namespace=target_location)
+        course_module = module_store.get_instance(target_course_id, target_location)
+        self.assertEquals(course_module.wiki_slug, 'MITx.999.2013_Spring')
 
     def test_import_metadata_with_attempts_empty_string(self):
         module_store = modulestore('direct')
@@ -1914,6 +1933,14 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.get_html(new_location.url_reverse('course/', ''))
         _test_no_locations(self, resp)
         return resp
+
+    def test_wiki_slug(self):
+        """When creating a course a unique wiki_slug should be set."""
+
+        course_location = Location(['i4x', 'MITx', '999', 'course', '2013_Spring'])
+        _create_course(self, self.course_data)
+        course_module = modulestore('direct').get_item(course_location)
+        self.assertEquals(course_module.wiki_slug, 'MITx.999.2013_Spring')
 
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)

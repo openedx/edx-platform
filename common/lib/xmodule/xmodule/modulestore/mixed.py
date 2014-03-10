@@ -417,6 +417,17 @@ class MixedModuleStore(ModuleStoreWriteBase):
         for course in store.get_courses():
             loc_mapper().translate_location(course.location.course_id, course.location)
 
+    def get_courses_for_wiki(self, wiki_slug):
+        """
+        Return the list of courses which use this wiki_slug
+        :param wiki_slug: the course wiki root slug
+        :return: list of course locations
+        """
+        courses = []
+        for modulestore in self.modulestores.values():
+            courses.extend(modulestore.get_courses_for_wiki(wiki_slug))
+        return courses
+
 
 def _compare_stores(left, right):
     """
