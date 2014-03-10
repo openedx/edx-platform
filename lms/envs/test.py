@@ -77,7 +77,13 @@ FINANCIAL_REPORTS['ROOT_PATH'] += "-{}".format(os.getpid())
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
+# Toggles API on for testing
+FEATURES['API'] = True
+
 FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
+
+# Toggles API on for testing
+FEATURES['API'] = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True

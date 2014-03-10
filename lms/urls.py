@@ -141,6 +141,12 @@ if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
     )
 
+# OPEN EDX API
+if settings.FEATURES["API"]:
+    urlpatterns += (
+        url(r'^api/*', include('api_manager.urls')),
+    )
+
 if settings.FEATURES["ENABLE_OPENBADGES"]:
     urlpatterns += (
         url(r'^api/badges/v1/', include('badges.api.urls', app_name="badges", namespace="badges_api")),
