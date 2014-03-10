@@ -27,7 +27,7 @@ from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbi
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.http import require_POST, require_GET
 
 from ratelimitbackend.exceptions import RateLimitException
@@ -1003,6 +1003,9 @@ def _do_create_account(post_vars):
         profile.save()
     except Exception:
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+
+    UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
+
     return (user, profile, registration)
 
 
