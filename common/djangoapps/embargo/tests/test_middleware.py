@@ -32,8 +32,8 @@ class EmbargoMiddlewareTests(TestCase):
         self.embargo_course.save()
         self.regular_course = CourseFactory.create(org="Regular")
         self.regular_course.save()
-        self.embargoed_page = '/courses/' + self.embargo_course.id + '/info'
-        self.regular_page = '/courses/' + self.regular_course.id + '/info'
+        self.embargoed_page = '/courses/' + self.embargo_course.id.to_deprecated_string() + '/info'
+        self.regular_page = '/courses/' + self.regular_course.id.to_deprecated_string() + '/info'
         EmbargoedCourse(course_id=self.embargo_course.id, embargoed=True).save()
         EmbargoedState(
             embargoed_countries="cu, ir, Sy, SD",

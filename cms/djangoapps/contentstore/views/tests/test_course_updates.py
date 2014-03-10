@@ -28,12 +28,12 @@ class CourseUpdateTest(CourseTestCase):
             return json.loads(resp.content)
 
         course_locator = loc_mapper().translate_location(
-            self.course.location.course_id, self.course.location, False, True
+            self.course.location, False, True
         )
         resp = self.client.get_html(course_locator.url_reverse('course_info/'))
         self.assertContains(resp, 'Course Updates', status_code=200)
         update_locator = loc_mapper().translate_location(
-            self.course.location.course_id, self.course.location.replace(category='course_info', name='updates'),
+            self.course.location.replace(category='course_info', name='updates'),
             False, True
         )
 
@@ -135,9 +135,7 @@ class CourseUpdateTest(CourseTestCase):
         course_updates.data = update_data
         modulestore('direct').update_item(course_updates, self.user)
 
-        update_locator = loc_mapper().translate_location(
-            self.course.location.course_id, location, False, True
-        )
+        update_locator = loc_mapper().translate_location(location, False, True)
         # test getting all updates list
         course_update_url = update_locator.url_reverse('course_info_update/')
         resp = self.client.get_json(course_update_url)
@@ -213,9 +211,7 @@ class CourseUpdateTest(CourseTestCase):
         content = init_content + '</iframe>'
         payload = {'content': content, 'date': 'January 8, 2013'}
 
-        update_locator = loc_mapper().translate_location(
-            self.course.location.course_id, location, False, True
-        )
+        update_locator = loc_mapper().translate_location(location, False, True)
         course_update_url = update_locator.url_reverse('course_info_update/')
         resp = self.client.ajax_post(course_update_url, payload)
 
@@ -235,9 +231,7 @@ class CourseUpdateTest(CourseTestCase):
         """
         # create a course via the view handler
         course_location = Location(['i4x', 'Org_1', 'Course_1', 'course', 'Run_1'])
-        course_locator = loc_mapper().translate_location(
-            course_location.course_id, course_location, False, True
-        )
+        course_locator = loc_mapper().translate_location(course_location, False, True)
         self.client.ajax_post(
             course_locator.url_reverse('course'),
             {
@@ -248,12 +242,9 @@ class CourseUpdateTest(CourseTestCase):
             }
         )
 
-        branch = u'draft'
-        version = None
+        draft_branch = course_location.course_key.for_branch(u'draft')
         block = u'updates'
-        updates_locator = BlockUsageLocator(
-            package_id=course_location.course_id.replace('/', '.'), branch=branch, version_guid=version, block_id=block
-        )
+        updates_locator = BlockUsageLocator(course_key=draft_branch, block_id=block)
 
         content = u"Sample update"
         payload = {'content': content, 'date': 'January 8, 2013'}
@@ -268,14 +259,14 @@ class CourseUpdateTest(CourseTestCase):
 
         # now test that calling translate_location returns a locator whose block_id is 'updates'
         updates_location = course_location.replace(category='course_info', name=block)
-        updates_locator = loc_mapper().translate_location(course_location.course_id, updates_location)
+        updates_locator = loc_mapper().translate_location(updates_location)
         self.assertTrue(isinstance(updates_locator, BlockUsageLocator))
         self.assertEqual(updates_locator.block_id, block)
 
         # check posting on handouts
         block = u'handouts'
         handouts_locator = BlockUsageLocator(
-            package_id=updates_locator.package_id, branch=updates_locator.branch, version_guid=version, block_id=block
+            course_key=updates_locator.course_key.version_agnostic(), block_id=block
         )
         course_handouts_url = handouts_locator.url_reverse('xblock')
         content = u"Sample handout"

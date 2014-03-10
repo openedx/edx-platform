@@ -113,7 +113,7 @@ class SplitTestBase(ModuleStoreTestCase):
 
         resp = self.client.get(reverse(
             'courseware_section',
-            kwargs={'course_id': self.course.id,
+            kwargs={'course_id': self.course.id.to_deprecated_string(),
                     'chapter': self.chapter.url_name,
                     'section': self.sequential.url_name}
         ))
@@ -176,8 +176,8 @@ class TestVertSplitTestVert(SplitTestBase):
             display_name="Split test vertical",
         )
         # pylint: disable=protected-access
-        c0_url = self.course.location._replace(category="vertical", name="split_test_cond0")
-        c1_url = self.course.location._replace(category="vertical", name="split_test_cond1")
+        c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
+        c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
 
         split_test = ItemFactory.create(
             parent_location=vert1.location,
@@ -242,8 +242,8 @@ class TestSplitTestVert(SplitTestBase):
         # split_test cond 0 = vert <- {video, problem}
         # split_test cond 1 = vert <- {video, html}
         # pylint: disable=protected-access
-        c0_url = self.course.location._replace(category="vertical", name="split_test_cond0")
-        c1_url = self.course.location._replace(category="vertical", name="split_test_cond1")
+        c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
+        c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
 
         split_test = ItemFactory.create(
             parent_location=self.sequential.location,

@@ -10,27 +10,27 @@ _MODERATOR_ROLE_PERMISSIONS = ["edit_content", "delete_thread", "openclose_threa
 _ADMINISTRATOR_ROLE_PERMISSIONS = ["manage_moderator"]
 
 
-def _save_forum_role(course_id, name):
+def _save_forum_role(course_key, name):
     """
-    Save and Update 'course_id' for all roles which are already created to keep course_id same
-    as actual passed course id
+    Save and Update 'course_key' for all roles which are already created to keep course_id same
+    as actual passed course key
     """
-    role, created = Role.objects.get_or_create(name=name, course_id=course_id)
+    role, created = Role.objects.get_or_create(name=name, course_id=course_key)
     if created is False:
-        role.course_id = course_id
+        role.course_id = course_key
         role.save()
 
     return role
 
 
-def seed_permissions_roles(course_id):
+def seed_permissions_roles(course_key):
     """
     Create and assign permissions for forum roles
     """
-    administrator_role = _save_forum_role(course_id, "Administrator")
-    moderator_role = _save_forum_role(course_id, "Moderator")
-    community_ta_role = _save_forum_role(course_id, "Community TA")
-    student_role = _save_forum_role(course_id, "Student")
+    administrator_role = _save_forum_role(course_key, "Administrator")
+    moderator_role = _save_forum_role(course_key, "Moderator")
+    community_ta_role = _save_forum_role(course_key, "Community TA")
+    student_role = _save_forum_role(course_key, "Student")
 
     for per in _STUDENT_ROLE_PERMISSIONS:
         student_role.add_permission(per)

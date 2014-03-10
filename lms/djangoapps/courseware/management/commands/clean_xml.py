@@ -73,7 +73,7 @@ def import_with_checks(course_dir, verbose=True):
         return (False, None)
 
     course = courses[0]
-    errors = modulestore.get_item_errors(course.location)
+    errors = modulestore.get_course_errors(course.id)
     if len(errors) != 0:
         all_ok = False
         print '\n'

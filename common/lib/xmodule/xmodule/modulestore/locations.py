@@ -98,6 +98,36 @@ class LocationBase(object):
     """
     KEY_FIELDS = ('org', 'course', 'run', 'category', 'name', 'revision')
 
+    # TODO: These __eq__, __ne__, and __hash__ methods are terrible hacks.
+    # We still have some functions and tests that have only org/course, and our other hacks to
+    # try and make things not-break without `run` have failed.  We can probably fix that in a
+    # database migration but we'll do that in the future at some point.
+
+    def __eq__(self, other):
+        if type(self) != type(other):
+            return False
+        for field in self.KEY_FIELDS:
+            if field != 'run':
+                if getattr(self, field) != getattr(other, field):
+                    return False
+        return True
+
+    def __ne__(self, other):
+        eq_count = 0
+        if type(self) != type(other):
+            return True
+        for field in self.KEY_FIELDS:
+            if field != 'run':
+                if getattr(self, field) == getattr(other, field):
+                    eq_count += 1
+        if eq_count == len([field for field in self.KEY_FIELDS if field != 'run']):
+            return False
+        return True
+
+    def __hash__(self):
+        hashlist = [self.org, self.course, self.category, self.name, self.revision]
+        return hash('~'.join(item for item in hashlist if item))
+
     @classmethod
     def _check_location_part(cls, val, regexp):
         """
@@ -198,7 +228,7 @@ class LocationBase(object):
     def from_deprecated_string(cls, serialized):
         match = URL_RE.match(serialized)
         if match is None:
-            raise InvalidKeyError(Location, location_url)
+            raise InvalidKeyError(Location, serialized)
         groups = match.groupdict()
         if 'tag' in groups:
             del groups['tag']

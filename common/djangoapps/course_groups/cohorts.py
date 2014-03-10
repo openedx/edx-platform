@@ -55,7 +55,7 @@ def get_cohort_id(user, course_id):
 def is_commentable_cohorted(course_id, commentable_id):
     """
     Args:
-        course_id: string
+        course_id: CourseKey
         commentable_id: string
 
     Returns:
@@ -77,9 +77,9 @@ def is_commentable_cohorted(course_id, commentable_id):
         # inline discussions are cohorted by default
         ans = True
 
-    log.debug(u"is_commentable_cohorted({0}, {1}) = {2}".format(course_id,
-                                                               commentable_id,
-                                                               ans))
+    log.debug(u"is_commentable_cohorted({0}, {1}) = {2}".format(
+        course_id, commentable_id, ans
+    ))
     return ans
 
 

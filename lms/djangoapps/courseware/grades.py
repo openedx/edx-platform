@@ -23,6 +23,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
 from .models import StudentModule
 from .module_render import get_module_for_descriptor
+from opaque_keys import InvalidKeyError
 
 log = logging.getLogger("edx.courseware")
 
@@ -50,9 +51,9 @@ def yield_dynamic_descriptor_descendents(descriptor, module_creator):
         yield next_descriptor
 
 
-def answer_distributions(course_id):
+def answer_distributions(course_key):
     """
-    Given a course_id, return answer distributions in the form of a dictionary
+    Given a course_key, return answer distributions in the form of a dictionary
     mapping:
 
       (problem url_name, problem display_name, problem_id) -> {dict: answer -> count}
@@ -86,21 +87,16 @@ def answer_distributions(course_id):
         """
         For a given module_state_key, return the problem's url and display_name.
         Handle modulestore access and caching. This method ignores permissions.
-        May throw an ItemNotFoundError if there is no content that corresponds
-        to this module_state_key.
+
+        Raises:
+            InvalidKeyError: if the module_state_key does not parse
+            ItemNotFoundError: if there is no content that corresponds
+                to this module_state_key.
         """
         problem_store = modulestore()
         if module_state_key not in state_keys_to_problem_info:
-            problems = problem_store.get_items(module_state_key, course_id=course_id, depth=1)
-            if not problems:
-                # Likely means that the problem was deleted from the course
-                # after the student had answered. We log this suspicion where
-                # this exception is caught.
-                raise ItemNotFoundError(
-                    "Answer Distribution: Module {} not found for course {}"
-                    .format(module_state_key, course_id)
-                )
-            problem = problems[0]
+            location = course_key.make_usage_key_from_deprecated_string(module_state_key)
+            problem = problem_store.get_item(location)
             problem_info = (problem.url_name, problem.display_name_with_default)
             state_keys_to_problem_info[module_state_key] = problem_info
 
@@ -109,40 +105,39 @@ def answer_distributions(course_id):
     # Iterate through all problems submitted for this course in no particular
     # order, and build up our answer_counts dict that we will eventually return
     answer_counts = defaultdict(lambda: defaultdict(int))
-    for module in StudentModule.all_submitted_problems_read_only(course_id):
+    for module in StudentModule.all_submitted_problems_read_only(course_key):
         try:
             state_dict = json.loads(module.state) if module.state else {}
             raw_answers = state_dict.get("student_answers", {})
         except ValueError:
             log.error(
                 "Answer Distribution: Could not parse module state for " +
-                "StudentModule id={}, course={}".format(module.id, course_id)
+                "StudentModule id={}, course={}".format(module.id, course_key)
             )
             continue
 
-        # Each problem part has an ID that is derived from the
-        # module.module_state_key (with some suffix appended)
-        for problem_part_id, raw_answer in raw_answers.items():
-            # Convert whatever raw answers we have (numbers, unicode, None, etc.)
-            # to be unicode values. Note that if we get a string, it's always
-            # unicode and not str -- state comes from the json decoder, and that
-            # always returns unicode for strings.
-            answer = unicode(raw_answer)
+        try:
+            url, display_name = url_and_display_name(module.module_state_key)
+            # Each problem part has an ID that is derived from the
+            # module.module_state_key (with some suffix appended)
+            for problem_part_id, raw_answer in raw_answers.items():
+                # Convert whatever raw answers we have (numbers, unicode, None, etc.)
+                # to be unicode values. Note that if we get a string, it's always
+                # unicode and not str -- state comes from the json decoder, and that
+                # always returns unicode for strings.
+                answer = unicode(raw_answer)
+                answer_counts[(url, display_name, problem_part_id)][answer] += 1
 
-            try:
-                url, display_name = url_and_display_name(module.module_state_key)
-            except ItemNotFoundError:
-                msg = "Answer Distribution: Item {} referenced in StudentModule {} " + \
-                      "for user {} in course {} not found; " + \
-                      "This can happen if a student answered a question that " + \
-                      "was later deleted from the course. This answer will be " + \
-                      "omitted from the answer distribution CSV."
-                log.warning(
-                    msg.format(module.module_state_key, module.id, module.student_id, course_id)
-                )
-                continue
-
-            answer_counts[(url, display_name, problem_part_id)][answer] += 1
+        except ItemNotFoundError, InvalidKeyError:
+            msg = "Answer Distribution: Item {} referenced in StudentModule {} " + \
+                  "for user {} in course {} not found; " + \
+                  "This can happen if a student answered a question that " + \
+                  "was later deleted from the course. This answer will be " + \
+                  "omitted from the answer distribution CSV."
+            log.warning(
+                msg.format(module.module_state_key, module.id, module.student_id, course_key)
+            )
+            continue
 
     return answer_counts
 
@@ -183,7 +178,9 @@ def _grade(student, request, course, keep_raw_scores):
     # Dict of item_ids -> (earned, possible) point tuples. This *only* grabs
     # scores that were registered with the submissions API, which for the moment
     # means only openassessment (edx-ora2)
-    submissions_scores = sub_api.get_scores(course.id, anonymous_id_for_user(student, course.id))
+    submissions_scores = sub_api.get_scores(
+        course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id)
+    )
 
     totaled_scores = {}
     # This next complicated loop is just to collect the totaled_scores, which is
@@ -214,7 +211,7 @@ def _grade(student, request, course, keep_raw_scores):
                 with manual_transaction():
                     should_grade_section = StudentModule.objects.filter(
                         student=student,
-                        module_state_key__in=[
+                        module_id__in=[
                             descriptor.location for descriptor in section['xmoduledescriptors']
                         ]
                     ).exists()
@@ -350,7 +347,7 @@ def _progress_summary(student, request, course):
             # This student must not have access to the course.
             return None
 
-    submissions_scores = sub_api.get_scores(course.id, anonymous_id_for_user(student, course.id))
+    submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
 
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)
@@ -451,7 +448,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=
         student_module = StudentModule.objects.get(
             student=user,
             course_id=course_id,
-            module_state_key=problem_descriptor.location
+            module_id=problem_descriptor.location
         )
     except StudentModule.DoesNotExist:
         student_module = None

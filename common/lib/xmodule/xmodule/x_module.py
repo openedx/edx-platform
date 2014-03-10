@@ -18,14 +18,12 @@ from webob.multidict import MultiDict
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
 from xblock.fragment import Fragment
-from xblock.plugin import default_select
 from xblock.runtime import Runtime
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
-from xmodule.modulestore import Location
-from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.keys import OpaqueKeyReader, UsageKey
 from xmodule.exceptions import UndefinedContext
 from dogapi import dog_stats_api
 
@@ -168,16 +166,11 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def location(self):
-        try:
-            return Location(self.scope_ids.usage_id)
-        except InvalidLocationError:
-            if isinstance(self.scope_ids.usage_id, BlockUsageLocator):
-                return self.scope_ids.usage_id
-            else:
-                return BlockUsageLocator(self.scope_ids.usage_id)
+        return self.scope_ids.usage_id
 
     @location.setter
     def location(self, value):
+        assert isinstance(value, UsageKey)
         self.scope_ids = self.scope_ids._replace(
             def_id=value,
             usage_id=value,
@@ -185,12 +178,7 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def url_name(self):
-        if isinstance(self.location, Location):
-            return self.location.name
-        elif isinstance(self.location, BlockUsageLocator):
-            return self.location.block_id
-        else:
-            raise InsufficientSpecificationError()
+        return self.location.name
 
     @property
     def display_name_with_default(self):
@@ -255,11 +243,17 @@ class XModuleMixin(XBlockMixin):
         if not self.has_children:
             return []
 
+        course_key = self.location.course_key
+        usage_generator = getattr(
+            course_key, 'make_usage_key_from_deprecated_string',
+            lambda block_id: course_key.make_usage_key(None, block_id)
+        )
         if getattr(self, '_child_instances', None) is None:
             self._child_instances = []  # pylint: disable=attribute-defined-outside-init
             for child_loc in self.children:
+                child_i4x = usage_generator(child_loc)
                 try:
-                    child = self.runtime.get_block(child_loc)
+                    child = self.runtime.get_block(child_i4x)
                     child.runtime.export_fs = self.runtime.export_fs
                 except ItemNotFoundError:
                     log.exception(u'Unable to load item {loc}, skipping'.format(loc=child_loc))
@@ -1023,7 +1017,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         local_resource_url: an implementation of :meth:`xblock.runtime.Runtime.local_resource_url`
 
         """
-        super(DescriptorSystem, self).__init__(**kwargs)
+        super(DescriptorSystem, self).__init__(id_reader=OpaqueKeyReader(), **kwargs)
 
         # This is used by XModules to write out separate files during xml export
         self.export_fs = None
@@ -1217,7 +1211,7 @@ class ModuleSystem(MetricsMixin,ConfigurableFragmentWrapper, Runtime):  # pylint
 
         # Usage_store is unused, and field_data is often supplanted with an
         # explicit field_data during construct_xblock.
-        super(ModuleSystem, self).__init__(id_reader=None, field_data=field_data, **kwargs)
+        super(ModuleSystem, self).__init__(id_reader=OpaqueKeyReader(), field_data=field_data, **kwargs)
 
         self.STATIC_URL = static_url
         self.xqueue = xqueue

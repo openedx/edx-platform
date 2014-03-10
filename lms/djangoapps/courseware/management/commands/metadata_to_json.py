@@ -38,7 +38,7 @@ def import_course(course_dir, verbose=True):
         return None
 
     course = courses[0]
-    errors = modulestore.get_item_errors(course.location)
+    errors = modulestore.get_course_errors(course.id)
     if len(errors) != 0:
         sys.stderr.write('ERRORs during import: {0}\n'.format('\n'.join(map(str_of_err, errors))))
 

@@ -22,7 +22,7 @@ from instructor_task.models import InstructorTask, PROGRESS
 from instructor_task.tests.test_base import (InstructorTaskTestCase,
                                              InstructorTaskCourseTestCase,
                                              InstructorTaskModuleTestCase,
-                                             TEST_COURSE_ID)
+                                             TEST_COURSE_KEY)
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
@@ -36,7 +36,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
             self._create_failure_entry()
             self._create_success_entry()
         progress_task_ids = [self._create_progress_entry().task_id for _ in range(1, 5)]
-        task_ids = [instructor_task.task_id for instructor_task in get_running_instructor_tasks(TEST_COURSE_ID)]
+        task_ids = [instructor_task.task_id for instructor_task in get_running_instructor_tasks(TEST_COURSE_KEY)]
         self.assertEquals(set(task_ids), set(progress_task_ids))
 
     def test_get_instructor_task_history(self):
@@ -47,21 +47,21 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
             expected_ids.append(self._create_success_entry().task_id)
             expected_ids.append(self._create_progress_entry().task_id)
         task_ids = [instructor_task.task_id for instructor_task
-                    in get_instructor_task_history(TEST_COURSE_ID, problem_url=self.problem_url)]
+                    in get_instructor_task_history(TEST_COURSE_KEY, usage_key=self.problem_url)]
         self.assertEquals(set(task_ids), set(expected_ids))
         # make the same call using explicit task_type:
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(
-                        TEST_COURSE_ID,
-                        problem_url=self.problem_url,
+                        TEST_COURSE_KEY,
+                        usage_key=self.problem_url,
                         task_type='rescore_problem'
                     )]
         self.assertEquals(set(task_ids), set(expected_ids))
         # make the same call using a non-existent task_type:
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(
-                        TEST_COURSE_ID,
-                        problem_url=self.problem_url,
+                        TEST_COURSE_KEY,
+                        usage_key=self.problem_url,
                         task_type='dummy_type'
                     )]
         self.assertEquals(set(task_ids), set())
@@ -81,25 +81,25 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         course_id = self.course.id
         request = None
         with self.assertRaises(ItemNotFoundError):
-            submit_rescore_problem_for_student(request, course_id, problem_url, self.student)
+            submit_rescore_problem_for_student(request, problem_url, self.student)
         with self.assertRaises(ItemNotFoundError):
-            submit_rescore_problem_for_all_students(request, course_id, problem_url)
+            submit_rescore_problem_for_all_students(request, problem_url)
         with self.assertRaises(ItemNotFoundError):
-            submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
+            submit_reset_problem_attempts_for_all_students(request, problem_url)
         with self.assertRaises(ItemNotFoundError):
-            submit_delete_problem_state_for_all_students(request, course_id, problem_url)
+            submit_delete_problem_state_for_all_students(request, problem_url)
 
     def test_submit_nonrescorable_modules(self):
         # confirm that a rescore of an existent but unscorable module returns an exception
         # (Note that it is easier to test a scoreable but non-rescorable module in test_tasks,
         # where we are creating real modules.)
-        problem_url = self.problem_section.location.url()
+        problem_url = self.problem_section.location
         course_id = self.course.id
         request = None
         with self.assertRaises(NotImplementedError):
-            submit_rescore_problem_for_student(request, course_id, problem_url, self.student)
+            submit_rescore_problem_for_student(request, problem_url, self.student)
         with self.assertRaises(NotImplementedError):
-            submit_rescore_problem_for_all_students(request, course_id, problem_url)
+            submit_rescore_problem_for_all_students(request, problem_url)
 
     def _test_submit_with_long_url(self, task_function, student=None):
         problem_url_name = 'x' * 255
@@ -107,9 +107,9 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
         with self.assertRaises(ValueError):
             if student is not None:
-                task_function(self.create_task_request(self.instructor), self.course.id, location, student)
+                task_function(self.create_task_request(self.instructor), location, student)
             else:
-                task_function(self.create_task_request(self.instructor), self.course.id, location)
+                task_function(self.create_task_request(self.instructor), location)
 
     def test_submit_rescore_all_with_long_url(self):
         self._test_submit_with_long_url(submit_rescore_problem_for_all_students)
@@ -129,11 +129,9 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
         if student is not None:
-            instructor_task = task_function(self.create_task_request(self.instructor),
-                                            self.course.id, location, student)
+            instructor_task = task_function(self.create_task_request(self.instructor), location, student)
         else:
-            instructor_task = task_function(self.create_task_request(self.instructor),
-                                            self.course.id, location)
+            instructor_task = task_function(self.create_task_request(self.instructor), location)
 
         # test resubmitting, by updating the existing record:
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
@@ -142,9 +140,9 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
 
         with self.assertRaises(AlreadyRunningError):
             if student is not None:
-                task_function(self.create_task_request(self.instructor), self.course.id, location, student)
+                task_function(self.create_task_request(self.instructor), location, student)
             else:
-                task_function(self.create_task_request(self.instructor), self.course.id, location)
+                task_function(self.create_task_request(self.instructor), location)
 
     def test_submit_rescore_all(self):
         self._test_submit_task(submit_rescore_problem_for_all_students)

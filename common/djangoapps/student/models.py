@@ -27,7 +27,6 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
-from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
 import django.dispatch
 from django.core.exceptions import ObjectDoesNotExist
@@ -38,11 +37,12 @@ from track.views import server_track
 from eventtracking import tracker
 from importlib import import_module
 
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
+from xmodule_django.models import CourseKeyField
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ class AnonymousUserId(models.Model):
     """
     user = models.ForeignKey(User, db_index=True)
     anonymous_user_id = models.CharField(unique=True, max_length=32)
-    course_id = models.CharField(db_index=True, max_length=255)
+    course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
     unique_together = (user, course_id)
 
 
@@ -84,11 +84,12 @@ def anonymous_id_for_user(user, course_id):
     hasher = hashlib.md5()
     hasher.update(settings.SECRET_KEY)
     hasher.update(unicode(user.id))
-    hasher.update(course_id.encode('utf-8'))
+    if course_id:
+        hasher.update(course_id.to_deprecated_string())
     digest = hasher.hexdigest()
 
     try:
-        anonymous_user_id, created = AnonymousUserId.objects.get_or_create(
+        anonymous_user_id, __ = AnonymousUserId.objects.get_or_create(
             defaults={'anonymous_user_id': digest},
             user=user,
             course_id=course_id
@@ -267,7 +268,7 @@ def unique_id_for_user(user):
     """
     # Setting course_id to '' makes it not affect the generated hash,
     # and thus produce the old per-student anonymous id
-    return anonymous_id_for_user(user, '')
+    return anonymous_id_for_user(user, None)
 
 
 # TODO: Should be renamed to generic UserGroup, and possibly
@@ -572,7 +573,7 @@ class CourseEnrollment(models.Model):
     MODEL_TAGS = ['course_id', 'is_active', 'mode']
 
     user = models.ForeignKey(User)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     # If is_active is False, then the student is not considered to be enrolled
@@ -593,7 +594,7 @@ class CourseEnrollment(models.Model):
         ).format(self.user, self.course_id, self.created, self.is_active)
 
     @classmethod
-    def get_or_create_enrollment(cls, user, course_id):
+    def get_or_create_enrollment(cls, user, course_key):
         """
         Create an enrollment for a user in a class. By default *this enrollment
         is not active*. This is useful for when an enrollment needs to go
@@ -615,12 +616,15 @@ class CourseEnrollment(models.Model):
         # save it to the database so that it can have an ID that we can throw
         # into our CourseEnrollment object. Otherwise, we'll get an
         # IntegrityError for having a null user_id.
+        #assert(isinstance(course_key, CourseKey))
+        #course_id = course_key.to_deprecated_string()
+
         if user.id is None:
             user.save()
 
         enrollment, created = CourseEnrollment.objects.get_or_create(
             user=user,
-            course_id=course_id,
+            course_id=course_key,
         )
 
         # If we *did* just create a new enrollment, set some defaults
@@ -650,7 +654,7 @@ class CourseEnrollment(models.Model):
         """
         is_course_full = False
         if course.max_student_enrollments_allowed is not None:
-            is_course_full = cls.num_enrolled_in(course.location.course_id) >= course.max_student_enrollments_allowed
+            is_course_full = cls.num_enrolled_in(course.id) >= course.max_student_enrollments_allowed
         return is_course_full
 
     def update_enrollment(self, mode=None, is_active=None):
@@ -679,15 +683,13 @@ class CourseEnrollment(models.Model):
         if activation_changed or mode_changed:
             self.save()
         if activation_changed:
-            course_id_dict = Location.parse_course_id(self.course_id)
             if self.is_active:
                 self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
 
                 dog_stats_api.increment(
                     "common.student.enrollment",
-                    tags=[u"org:{org}".format(**course_id_dict),
-                          u"course:{course}".format(**course_id_dict),
-                          u"run:{name}".format(**course_id_dict),
+                    tags=[u"org:{}".format(self.course_id.org),
+                          u"offering:{}".format(self.course_id.offering),
                           u"mode:{}".format(self.mode)]
                 )
 
@@ -698,9 +700,8 @@ class CourseEnrollment(models.Model):
 
                 dog_stats_api.increment(
                     "common.student.unenrollment",
-                    tags=[u"org:{org}".format(**course_id_dict),
-                          u"course:{course}".format(**course_id_dict),
-                          u"run:{name}".format(**course_id_dict),
+                    tags=[u"org:{}".format(self.course_id.org),
+                          u"offering:{}".format(self.course_id.offering),
                           u"mode:{}".format(self.mode)]
                 )
 
@@ -711,9 +712,10 @@ class CourseEnrollment(models.Model):
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
+            assert(isinstance(self.course_id, SlashSeparatedCourseKey))
             data = {
                 'user_id': self.user.id,
-                'course_id': self.course_id,
+                'course_id': self.course_id.to_deprecated_string(),
                 'mode': self.mode,
             }
 
@@ -724,7 +726,7 @@ class CourseEnrollment(models.Model):
                 log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)
 
     @classmethod
-    def enroll(cls, user, course_id, mode="honor"):
+    def enroll(cls, user, course_key, mode="honor"):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -744,7 +746,7 @@ class CourseEnrollment(models.Model):
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
         """
-        enrollment = cls.get_or_create_enrollment(user, course_id)
+        enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
         return enrollment
 
@@ -824,7 +826,7 @@ class CourseEnrollment(models.Model):
             log.error(err_msg.format(email, course_id))
 
     @classmethod
-    def is_enrolled(cls, user, course_id):
+    def is_enrolled(cls, user, course_key):
         """
         Returns True if the user is enrolled in the course (the entry must exist
         and it must have `is_active=True`). Otherwise, returns False.
@@ -835,8 +837,10 @@ class CourseEnrollment(models.Model):
 
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
         """
+        # TODO: Is it worthwhile hardcoding in an assertion here?  Currently is_enrolled returns False
+        # when we're handed a string instead of a CourseKey, instead of triggering an error.
         try:
-            record = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            record = CourseEnrollment.objects.get(user=user, course_id=course_key)
             return record.is_active
         except cls.DoesNotExist:
             return False
@@ -854,13 +858,16 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id_partial` is a starting substring for a fully qualified
-               course_id (e.g. "edX/Test101/").
+        `course_id_partial` (CourseKey) is missing the run component
         """
+        assert isinstance(course_id_partial, SlashSeparatedCourseKey)
+        assert not course_id_partial.run  # None or empty string
+        course_key = SlashSeparatedCourseKey(course_id_partial.org, course_id_partial.course, '')
+        querystring = unicode(course_key.to_deprecated_string())
         try:
             return CourseEnrollment.objects.filter(
                 user=user,
-                course_id__startswith=course_id_partial,
+                course_id__startswith=querystring,
                 is_active=1
             ).exists()
         except cls.DoesNotExist:
@@ -944,7 +951,7 @@ class CourseEnrollmentAllowed(models.Model):
     even if the enrollment time window is past.
     """
     email = models.CharField(max_length=255, db_index=True)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     auto_enroll = models.BooleanField(default=0)
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)

@@ -52,7 +52,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         course = self.course
 
         # Run the Un-enroll students command
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         response = self.client.post(
             url,
             {
@@ -84,7 +84,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         course = self.course
 
         # Run the Enroll students command
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student1_1@test.com, student1_2@test.com', 'auto_enroll': 'on'})
 
         # Check the page output
@@ -129,7 +129,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         course = self.course
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student0@test.com', 'auto_enroll': 'on'})
         self.assertContains(response, '<td>student0@test.com</td>')
         self.assertContains(response, '<td>already enrolled</td>')
@@ -142,7 +142,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         course = self.course
 
         # Run the Enroll students command
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student2_1@test.com, student2_2@test.com'})
 
         # Check the page output
@@ -199,7 +199,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         # Create activated, but not enrolled, user
         UserFactory.create(username="student3_0", email="student3_0@test.com", first_name='Autoenrolled')
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student3_0@test.com, student3_1@test.com, student3_2@test.com', 'auto_enroll': 'on', 'email_students': 'on'})
 
         # Check the page output
@@ -254,7 +254,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         cea = CourseEnrollmentAllowed(email='student4_0@test.com', course_id=course.id)
         cea.save()
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         response = self.client.post(url, {'action': 'Unenroll multiple students', 'multiple_students': 'student4_0@test.com, student2@test.com, student3@test.com', 'email_students': 'on'})
 
         # Check the page output
@@ -301,7 +301,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         # Create activated, but not enrolled, user
         UserFactory.create(username="student5_0", email="student5_0@test.com", first_name="ShibTest", last_name="Enrolled")
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id.to_deprecated_string()})
         response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student5_0@test.com, student5_1@test.com', 'auto_enroll': 'on', 'email_students': 'on'})
 
         # Check the page output

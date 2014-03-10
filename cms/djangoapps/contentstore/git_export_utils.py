@@ -64,12 +64,9 @@ def cmd_log(cmd, cwd):
     return output
 
 
-def export_to_git(course_loc, repo, user='', rdir=None):
+def export_to_git(course_id, repo, user='', rdir=None):
     """Export a course to git."""
     # pylint: disable=R0915
-
-    if course_loc.startswith('i4x://'):
-        course_loc = course_loc[6:]
 
     if not GIT_REPO_EXPORT_DIR:
         raise GitExportError(GitExportError.NO_EXPORT_DIR)
@@ -129,15 +126,10 @@ def export_to_git(course_loc, repo, user='', rdir=None):
             raise GitExportError(GitExportError.CANNOT_PULL)
 
     # export course as xml before commiting and pushing
-    try:
-        location = CourseDescriptor.id_to_location(course_loc)
-    except ValueError:
-        raise GitExportError(GitExportError.BAD_COURSE)
-
     root_dir = os.path.dirname(rdirp)
     course_dir = os.path.splitext(os.path.basename(rdirp))[0]
     try:
-        export_to_xml(modulestore('direct'), contentstore(), location,
+        export_to_xml(modulestore('direct'), contentstore(), course_id,
                       root_dir, course_dir, modulestore())
     except (EnvironmentError, AttributeError):
         log.exception('Failed export to xml')

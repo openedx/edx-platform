@@ -14,7 +14,7 @@ from xmodule.modulestore.django import loc_mapper
 from ..utils import get_modulestore
 from .access import has_course_access
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 
 __all__ = ['checklists_handler']
 
@@ -23,7 +23,7 @@ __all__ = ['checklists_handler']
 @require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
-def checklists_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, checklist_index=None):
+def checklists_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None, checklist_index=None):
     """
     The restful handler for checklists.
 
@@ -33,11 +33,11 @@ def checklists_handler(request, tag=None, package_id=None, branch=None, version_
     POST or PUT
         json: updates the checked state for items within a particular checklist. checklist_index is required.
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location):
+    location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
+    old_location = loc_mapper().translate_locator_to_location(location)
+    if not has_course_access(request.user, old_location.course_key):
         raise PermissionDenied()
 
-    old_location = loc_mapper().translate_locator_to_location(location)
 
     modulestore = get_modulestore(old_location)
     course_module = modulestore.get_item(old_location)
@@ -123,7 +123,7 @@ def expand_checklist_action_url(course_module, checklist):
         if action_url in urlconf_map:
             url_prefix = urlconf_map[action_url]
             ctx_loc = course_module.location
-            location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
+            location = loc_mapper().translate_location(ctx_loc, False, True)
             item['action_url'] = location.url_reverse(url_prefix, '')
 
     return expanded_checklist

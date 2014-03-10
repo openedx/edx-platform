@@ -6,9 +6,6 @@ from factory.django import DjangoModelFactory
 # Imported to re-export
 # pylint: disable=unused-import
 from student.tests.factories import UserFactory  # Imported to re-export
-from student.tests.factories import GroupFactory  # Imported to re-export
-from student.tests.factories import CourseEnrollmentAllowedFactory  # Imported to re-export
-from student.tests.factories import RegistrationFactory  # Imported to re-export
 # pylint: enable=unused-import
 
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
@@ -23,10 +20,11 @@ from student.roles import (
     OrgInstructorRole,
 )
 
-from xmodule.modulestore import Location
+from xmodule.modulestore.keys import CourseKey
 
 
-location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
+course_id = CourseKey.from_string(u'edX/test_course/test')
+location = partial(course_id.make_usage_key, u'problem')
 
 
 class UserProfileFactory(StudentUserProfileFactory):
@@ -119,7 +117,7 @@ class StudentModuleFactory(DjangoModelFactory):
 
     module_type = "problem"
     student = factory.SubFactory(UserFactory)
-    course_id = "MITx/999/Robot_Super_Course"
+    course_id = CourseKey.from_string("MITx/999/Robot_Super_Course")
     state = None
     grade = None
     max_grade = None
@@ -131,7 +129,7 @@ class UserStateSummaryFactory(DjangoModelFactory):
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    usage_id = location('usage_id').url()
+    usage_id = location('usage_id')
 
 
 class StudentPrefsFactory(DjangoModelFactory):

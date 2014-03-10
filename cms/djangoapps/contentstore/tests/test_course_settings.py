@@ -13,6 +13,7 @@ from models.settings.course_details import (CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from contentstore.utils import get_modulestore, EXTRA_TAB_PANELS
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.keys import CourseKey
 
 
 from models.settings.course_metadata import CourseMetadata
@@ -417,7 +418,7 @@ class CourseGradingTest(CourseTestCase):
         # see if test makes sense
         self.assertGreater(len(sections), 0, "No sections found")
         section = sections[0]  # just take the first one
-        section_locator = loc_mapper().translate_location(self.course_location.course_id, section.location, False, True)
+        section_locator = loc_mapper().translate_location(section.location, False, True)
         return section_locator.url_reverse('xblock')
 
     def test_set_get_section_grader_ajax(self):
@@ -444,10 +445,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         CourseTestCase.setUp(self)
         self.fullcourse = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
         self.course_setting_url = self.course_locator.url_reverse('settings/advanced')
-        self.fullcourse_setting_url = loc_mapper().translate_location(
-            self.fullcourse.location.course_id,
-            self.fullcourse.location, False, True
-        ).url_reverse('settings/advanced')
+        self.fullcourse_setting_url = loc_mapper().translate_location(self.fullcourse.location, False, True).url_reverse('settings/advanced')
 
     def test_fetch_initial_fields(self):
         test_model = CourseMetadata.fetch(self.course)

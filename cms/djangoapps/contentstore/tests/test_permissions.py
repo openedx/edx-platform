@@ -47,13 +47,11 @@ class TestCourseAccess(ModuleStoreTestCase):
 
         # create a course via the view handler which has a different strategy for permissions than the factory
         self.course_location = Location(['i4x', 'myu', 'mydept.mycourse', 'course', 'myrun'])
-        self.course_locator = loc_mapper().translate_location(
-            self.course_location.course_id, self.course_location, False, True
-        )
+        self.course_locator = loc_mapper().translate_location(self.course_location, False, True)
         self.client.ajax_post(
             self.course_locator.url_reverse('course'),
             {
-                'org': self.course_location.org, 
+                'org': self.course_location.org,
                 'number': self.course_location.course,
                 'display_name': 'My favorite course',
                 'run': self.course_location.name,
@@ -91,7 +89,7 @@ class TestCourseAccess(ModuleStoreTestCase):
         # first check the course creator.has explicit access (don't use has_access as is_staff
         # will trump the actual test)
         self.assertTrue(
-            CourseInstructorRole(self.course_locator).has_user(self.user),
+            CourseInstructorRole(self.course_location.course_key).has_user(self.user),
             "Didn't add creator as instructor."
         )
         users = copy.copy(self.users)
@@ -101,7 +99,7 @@ class TestCourseAccess(ModuleStoreTestCase):
         for role in [CourseInstructorRole, CourseStaffRole]:
             user_by_role[role] = []
             # pylint: disable=protected-access
-            groupnames = role(self.course_locator)._group_names
+            groupnames = role(self.course_location.course_key)._group_names
             self.assertGreater(len(groupnames), 1, "Only 0 or 1 groupname for {}".format(role.ROLE))
             # NOTE: this loop breaks the roles.py abstraction by purposely assigning
             # users to one of each possible groupname in order to test that has_course_access
@@ -112,24 +110,21 @@ class TestCourseAccess(ModuleStoreTestCase):
                 user_by_role[role].append(user)
                 user.groups.add(group)
                 user.save()
-                self.assertTrue(has_course_access(user, self.course_locator), "{} does not have access".format(user))
-                self.assertTrue(has_course_access(user, self.course_location), "{} does not have access".format(user))
+                self.assertTrue(has_course_access(user, self.course_location.course_key), "{} does not have access".format(user))
 
         response = self.client.get_html(self.course_locator.url_reverse('course_team'))
         for role in [CourseInstructorRole, CourseStaffRole]:
             for user in user_by_role[role]:
                 self.assertContains(response, user.email)
-        
+
         # test copying course permissions
         copy_course_location = Location(['i4x', 'copyu', 'copydept.mycourse', 'course', 'myrun'])
-        copy_course_locator = loc_mapper().translate_location(
-            copy_course_location.course_id, copy_course_location, False, True
-        )
+        copy_course_locator = loc_mapper().translate_location(copy_course_location, False, True)
         for role in [CourseInstructorRole, CourseStaffRole]:
             auth.add_users(
                 self.user,
-                role(copy_course_locator),
-                *role(self.course_locator).users_with_role()
+                role(copy_course_location.course_key),
+                *role(self.course_location.course_key).users_with_role()
             )
         # verify access in copy course and verify that removal from source course w/ the various
         # groupnames works
@@ -141,7 +136,6 @@ class TestCourseAccess(ModuleStoreTestCase):
                 if hasattr(user, '_groups'):
                     del user._groups
 
-                self.assertTrue(has_course_access(user, copy_course_locator), "{} no copy access".format(user))
-                self.assertTrue(has_course_access(user, copy_course_location), "{} no copy access".format(user))
-                auth.remove_users(self.user, role(self.course_locator), user)
-                self.assertFalse(has_course_access(user, self.course_locator), "{} remove didn't work".format(user))
+                self.assertTrue(has_course_access(user, copy_course_location.course_key), "{} no copy access".format(user))
+                auth.remove_users(self.user, role(self.course_location.course_key), user)
+                self.assertFalse(has_course_access(user, self.course_location.course_key), "{} remove didn't work".format(user))
