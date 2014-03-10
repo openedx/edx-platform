@@ -1,4 +1,64 @@
+<%
+    fieldset_width = 775
+    fieldset_message_width = 0
+    if (not msg is UNDEFINED) and (len(msg) > 0):
+        fieldset_width = 480
+        fieldset_message_width = 295
+
+%>
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
+    <style>
+        #fieldset_container_${id} {
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
+            height: 100;
+            width: 100%;
+        }
+
+        #fieldset_${id} {
+            float: left;
+            margin-right: 20px;
+            word-wrap: normal;
+            height: 100%;
+        }
+
+        #fieldset_message_${id} {
+            background: #5c9dd5;
+            opacity: 0.9;
+            color: #FFFFFF;
+            font-size: 14px;
+            float: right;
+            height: 100%;
+            margin: 0 auto;
+            padding: 10px;
+            position: absolute;
+            right: 10px;
+            width: 300px;
+        }
+
+        #fieldset_message_title_${id} {
+            color: #FFFFFF;
+            font-family: arial;
+            font-size: 18pt;
+        }
+
+        .fieldset_message_close {
+             color: #FFFFFF;
+             float: right;
+             width: 10px;
+             height: 10px;
+             margin-right: -6px;
+             margin-top: -10px;
+         }
+    </style>
+    <script type="text/javascript">
+        $( function() {
+            $('.fieldset_message_close').click(function() {
+                    $(this).parent().hide();
+                });
+        });
+    </script>
     <div class="indicator_container">
     % if input_type == 'checkbox' or not value:
         % if status == 'unsubmitted' or show_correctness == 'never':
@@ -12,54 +72,67 @@
         % endif
     % endif
     </div>
+    <div id="fieldset_container_${id}">
+        <div id="fieldset_${id}">
+            <fieldset role="radiogroup" aria-label="${label}">
 
-    <fieldset role="radiogroup" aria-label="${label}">
+                % for choice_id, choice_description in choices:
+                <label for="input_${id}_${choice_id}"
+                    ## If the student has selected this choice...
+                    % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
+                    <%
+                        if status == 'correct':
+                            correctness = 'correct'
+                        elif status == 'incorrect':
+                            correctness = 'incorrect'
+                        else:
+                            correctness = None
+                    %>
+                    % if correctness and not show_correctness=='never':
+                    class="choicegroup_${correctness}"
+                    % endif
+                    % endif
+                    >
+                    <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" aria-role="radio" aria-describedby="answer_${id}" value="${choice_id}"
+                    ## If the student selected this choice...
+                    % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
+                    checked="true"
+                    % elif input_type != 'radio' and choice_id in value:
+                    checked="true"
+                    % endif
 
-        % for choice_id, choice_description in choices:
-        <label for="input_${id}_${choice_id}"
-            ## If the student has selected this choice...
-            % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
-            <%
-                if status == 'correct':
-                    correctness = 'correct'
-                elif status == 'incorrect':
-                    correctness = 'incorrect'
-                else:
-                    correctness = None
-            %>
-            % if correctness and not show_correctness=='never':
-            class="choicegroup_${correctness}"
-            % endif
-            % endif
-            >
-            <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" aria-role="radio" aria-describedby="answer_${id}" value="${choice_id}"
-            ## If the student selected this choice...
-            % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
-            checked="true"
-            % elif input_type != 'radio' and choice_id in value:
-            checked="true"
-            % endif
+                    /> ${choice_description}
 
-            /> ${choice_description}
-
-            % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
-            <%
-                if status == 'correct':
-                    correctness = 'correct'
-                elif status == 'incorrect':
-                    correctness = 'incorrect'
-                else:
-                    correctness = None
-            %>
-            % if correctness and not show_correctness=='never':
-            <span class="sr" aria-describedby="input_${id}_${choice_id}">Status: ${correctness}</span>
+                    % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
+                    <%
+                        if status == 'correct':
+                            correctness = 'correct'
+                        elif status == 'incorrect':
+                            correctness = 'incorrect'
+                        else:
+                            correctness = None
+                    %>
+                    % if correctness and not show_correctness=='never':
+                    <span class="sr" aria-describedby="input_${id}_${choice_id}">Status: ${correctness}</span>
+                    % endif
+                    % endif
+                </label>
+                % endfor
+                <span id="answer_${id}"></span>
+            </fieldset>
+        </div>
+        ## Message/hint display block -- empty/invisible unless msg is populated
+        <div
+            % if (not msg is UNDEFINED) and (len(msg) > 0):
+            id="fieldset_message_${id}"
             % endif
+        >
+            <div class="fieldset_message_close">X</div>
+            % if (not msg is UNDEFINED) and (len(msg) > 0):
+            ${msg}
             % endif
-        </label>
-        % endfor
-        <span id="answer_${id}"></span>
-    </fieldset>
-
+        </div>
+    </div>
     % if show_correctness == "never" and (value or status not in ['unsubmitted']):
     <div class="capa_alert">${submitted_message}</div>
     %endif
