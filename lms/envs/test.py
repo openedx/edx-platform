@@ -73,6 +73,9 @@ FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
+# Toggles API on for testing
+FEATURES['API'] = True
+
 FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 
 # Enable the milestones app in tests to be consistent with it being enabled in production
