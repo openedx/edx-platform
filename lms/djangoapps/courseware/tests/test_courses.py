@@ -8,8 +8,10 @@ from django.http import Http404
 from django.test.utils import override_settings
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import get_default_store_name_for_current_request
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.keys import CourseKey
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 
@@ -34,9 +36,9 @@ class CoursesTest(ModuleStoreTestCase):
         (such as unicode characters, and symbols such as = and ' ')
         """
         with self.assertRaises(Http404):
-            get_course_by_id('MITx/foobar/statistics=introduction')
-            get_course_by_id('MITx/foobar/business and management')
-            get_course_by_id('MITx/foobar/NiñøJoséMaríáßç')
+            get_course_by_id(CourseKey.from_string('MITx/foobar/statistics=introduction'))
+            get_course_by_id(CourseKey.from_string('MITx/foobar/business and management'))
+            get_course_by_id(CourseKey.from_string('MITx/foobar/NiñøJoséMaríáßç'))
 
     def test_get_course_invalid_chars(self):
         """
@@ -45,9 +47,9 @@ class CoursesTest(ModuleStoreTestCase):
         (such as unicode characters, and symbols such as = and ' ')
         """
         with self.assertRaises(ValueError):
-            get_course('MITx/foobar/statistics=introduction')
-            get_course('MITx/foobar/business and management')
-            get_course('MITx/foobar/NiñøJoséMaríáßç')
+            get_course(CourseKey.from_string('MITx/foobar/statistics=introduction'))
+            get_course(CourseKey.from_string('MITx/foobar/business and management'))
+            get_course(CourseKey.from_string('MITx/foobar/NiñøJoséMaríáßç'))
 
     @override_settings(
         MODULESTORE=TEST_DATA_MONGO_MODULESTORE, CMS_BASE=CMS_BASE_TEST

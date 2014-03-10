@@ -26,7 +26,7 @@ from student.roles import (
 from xmodule.modulestore import Location
 
 
-location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
+location = partial(Location, 'i4x', 'edX', 'test_course', 'run', 'problem')
 
 
 class UserProfileFactory(StudentUserProfileFactory):

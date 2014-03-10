@@ -30,7 +30,6 @@ from util.sandboxing import can_execute_unsafe_code
 import static_replace
 from .session_kv_store import SessionKeyValueStore
 from .helpers import render_from_lms
-from ..utils import get_course_for_item
 
 from contentstore.views.access import get_user_role
 
@@ -105,9 +104,9 @@ def _preview_module_system(request, descriptor):
 
     if isinstance(descriptor.location, Locator):
         course_location = loc_mapper().translate_locator_to_location(descriptor.location, get_course=True)
-        course_id = course_location.course_id
+        course_id = course_location.course_key
     else:
-        course_id = get_course_for_item(descriptor.location).location.course_id
+        course_id = descriptor.location.course_key
     display_name_only = (descriptor.category == 'static_tab')
 
     wrappers = [
@@ -140,7 +139,7 @@ def _preview_module_system(request, descriptor):
         error_descriptor_class=ErrorDescriptor,
         # get_user_role accepts a location or a CourseLocator.
         # If descriptor.location is a CourseLocator, course_id is unused.
-        get_user_role=lambda: get_user_role(request.user, descriptor.location, course_id),
+        get_user_role=lambda: get_user_role(request.user, course_id),
         descriptor_runtime=descriptor.runtime,
         services={
             "i18n": ModuleI18nService(),
@@ -170,7 +169,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     """
     # Only add the Studio wrapper when on the container page. The unit page will remain as is for now.
     if context.get('container_view', None) and view == 'student_view':
-        locator = loc_mapper().translate_location(xblock.course_id, xblock.location)
+        locator = loc_mapper().translate_location(xblock.location)
         template_context = {
             'xblock_context': context,
             'xblock': xblock,

@@ -11,6 +11,7 @@ from bulk_email.models import CourseEmailTemplate, COURSE_EMAIL_MESSAGE_BODY_TAG
 from courseware.courses import get_course_by_id
 from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
@@ -57,8 +58,8 @@ class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
 
     def clean_course_id(self):
         """Validate the course id"""
-        course_id = self.cleaned_data["course_id"]
         try:
+            course_id = CourseKey.from_string(self.cleaned_data["course_id"])
             # Just try to get the course descriptor.
             # If we can do that, it's a real course.
             get_course_by_id(course_id, depth=1)
@@ -72,7 +73,7 @@ class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
         is_studio_course = modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE
         if not is_studio_course:
             msg = "Course Email feature is only available for courses authored in Studio. "
-            msg += '"{0}" appears to be an XML backed course.'.format(course_id)
+            msg += '"{0}" appears to be an XML backed course.'.format(course_id.to_deprecated_string())
             raise forms.ValidationError(msg)
 
-        return course_id
+        return course_id.to_deprecated_string()

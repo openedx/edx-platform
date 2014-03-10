@@ -18,6 +18,7 @@ from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import _CONTENTSTORE
@@ -72,11 +73,11 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         content_store = contentstore()
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['test_import_course'], static_content_store=content_store, do_import_static=False, verbose=True)
-        course_location = CourseDescriptor.id_to_location('edX/test_import_course/2012_Fall')
-        course = module_store.get_item(course_location)
+        course_id = CourseKey.from_string('edX/test_import_course/2012_Fall')
+        course = module_store.get_course(course_id)
         self.assertIsNotNone(course)
 
-        return module_store, content_store, course, course_location
+        return module_store, content_store, course
 
     def test_unicode_chars_in_course_name_import(self):
         """
@@ -101,17 +102,19 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         '''
         Stuff in static_import should always be imported into contentstore
         '''
-        _, content_store, course, course_location = self.load_test_import_course()
+        _, content_store, course = self.load_test_import_course()
 
         # make sure we have ONE asset in our contentstore ("should_be_imported.html")
-        all_assets, count = content_store.get_all_content_for_course(course_location)
+        all_assets, count = content_store.get_all_content_for_course(course.location)
         print "len(all_assets)=%d" % len(all_assets)
         self.assertEqual(len(all_assets), 1)
         self.assertEqual(count, 1)
 
         content = None
         try:
-            location = StaticContent.get_location_from_path('/c4x/edX/test_import_course/asset/should_be_imported.html')
+            location = StaticContent.get_location_from_path(
+                '/c4x/edX/test_import_course/asset/should_be_imported.html'
+            )
             content = content_store.find(location)
         except NotFoundError:
             pass
@@ -131,11 +134,10 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
 
-        course_location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
-        module_store.get_item(course_location)
+        course = module_store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
 
         # make sure we have NO assets in our contentstore
-        all_assets, count = content_store.get_all_content_for_course(course_location)
+        all_assets, count = content_store.get_all_content_for_course(course.location)
         self.assertEqual(len(all_assets), 0)
         self.assertEqual(count, 0)
 
@@ -143,28 +145,28 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
 
-        handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course_info', 'handouts', None]))
+        handouts = module_store.get_item(Location('edX', 'toy', '2012_Fall','course_info', 'handouts'))
         self.assertIn('/static/', handouts.data)
 
-        handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'html', 'toyhtml', None]))
+        handouts = module_store.get_item(Location('edX', 'toy', '2012_Fall','html', 'toyhtml'))
         self.assertIn('/static/', handouts.data)
 
     def test_tab_name_imports_correctly(self):
-        _module_store, _content_store, course, _course_location = self.load_test_import_course()
+        _module_store, _content_store, course = self.load_test_import_course()
         print "course tabs = {0}".format(course.tabs)
         self.assertEqual(course.tabs[2]['name'], 'Syllabus')
 
     def test_rewrite_reference_list(self):
         module_store = modulestore('direct')
-        target_location = Location(['i4x', 'testX', 'conditional_copy', 'course', 'copy_run'])
+        target_course_id = CourseKey.from_string('testX/conditional_copy/copy_run')
         import_from_xml(
             module_store,
             'common/test/data/',
             ['conditional'],
-            target_location_namespace=target_location
+            target_course_id=target_course_id
         )
         conditional_module = module_store.get_item(
-            Location(['i4x', 'testX', 'conditional_copy', 'conditional', 'condone'])
+            Location('testX', 'conditional_copy', 'copy_run', 'conditional', 'condone')
         )
         self.assertIsNotNone(conditional_module)
         self.assertListEqual(
@@ -184,15 +186,15 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_rewrite_reference(self):
         module_store = modulestore('direct')
-        target_location = Location(['i4x', 'testX', 'peergrading_copy', 'course', 'copy_run'])
+        target_course_id = CourseKey.from_string('testX/peergrading_copy/copy_run')
         import_from_xml(
             module_store,
             'common/test/data/',
             ['open_ended'],
-            target_location_namespace=target_location
+            target_course_id=target_course_id
         )
         peergrading_module = module_store.get_item(
-            Location(['i4x', 'testX', 'peergrading_copy', 'peergrading', 'PeerGradingLinked'])
+            Location('testX', 'peergrading_copy', 'copy_run', 'peergrading', 'PeerGradingLinked')
         )
         self.assertIsNotNone(peergrading_module)
         self.assertEqual(
@@ -202,15 +204,15 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_rewrite_reference_value_dict(self):
         module_store = modulestore('direct')
-        target_location = Location(['i4x', 'testX', 'split_test_copy', 'course', 'copy_run'])
+        target_course_id = CourseKey.from_string('testX/peergrading_copy/copy_run')
         import_from_xml(
             module_store,
             'common/test/data/',
             ['split_test_module'],
-            target_location_namespace=target_location
+            target_course_id=target_course_id
         )
         split_test_module = module_store.get_item(
-            Location(['i4x', 'testX', 'split_test_copy', 'split_test', 'split1'])
+            Location('testX', 'split_test_copy', 'copy_run', 'split_test', 'split1'])
         )
         self.assertIsNotNone(split_test_module)
         self.assertEqual(

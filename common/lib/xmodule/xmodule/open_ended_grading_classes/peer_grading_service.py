@@ -87,6 +87,11 @@ class PeerGradingService(GradingService):
     def get_problem_list(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
         result = self.get(self.get_problem_list_url, params)
+
+        if 'problem_list' in result:
+            for problem in result['problem_list']:
+                problem['location'] = course_id.make_usage_key_from_deprecated_string(problem['location'])
+
         self._record_result('get_problem_list', result)
         dog_stats_api.histogram(
             self._metric_name('get_problem_list.result.length'),

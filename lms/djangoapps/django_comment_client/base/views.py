@@ -70,7 +70,7 @@ def create_thread(request, course_id, commentable_id):
     """
 
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
     post = request.POST
 
     if course.allow_anonymous:
@@ -168,7 +168,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
         return JsonError(_("Body can't be empty"))
     comment = cc.Comment(**extract(post, ['body']))
 
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
     if course.allow_anonymous:
         anonymous = post.get('anonymous', 'false').lower() == 'true'
     else:
@@ -368,7 +368,7 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     course = get_course_by_id(course_id)
     thread = cc.Thread.find(thread_id)
-    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
+    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, 'staff', course)
     thread.unFlagAbuse(user, thread, removeAll)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
@@ -397,7 +397,7 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     """
     user = cc.User.from_django_user(request.user)
     course = get_course_by_id(course_id)
-    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
+    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, 'staff', course)
     comment = cc.Comment.find(comment_id)
     comment.unFlagAbuse(user, comment, removeAll)
     return JsonResponse(utils.safe_content(comment.to_dict()))

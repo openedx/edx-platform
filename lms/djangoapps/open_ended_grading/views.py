@@ -66,7 +66,7 @@ def staff_grading(request, course_id):
     """
     Show the instructor grading interface.
     """
-    course = get_course_with_access(request.user, course_id, 'staff')
+    course = get_course_with_access(request.user, 'staff', course_id)
 
     ajax_url = _reverse_with_slash('staff_grading', course_id)
 
@@ -98,10 +98,9 @@ def find_peer_grading_module(course):
     items = [i for i in items if not getattr(i, "use_for_single_location", True)]
     # Loop through all potential peer grading modules, and find the first one that has a path to it.
     for item in items:
-        item_location = item.location
         # Generate a url for the first module and redirect the user to it.
         try:
-            problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
+            problem_url_parts = search.path_to_location(modulestore(), item.location)
         except NoPathToItem:
             # In the case of nopathtoitem, the peer grading module that was found is in an invalid state, and
             # can no longer be accessed.  Log an informational message, but this will not impact normal behavior.
@@ -121,7 +120,7 @@ def peer_grading(request, course_id):
     '''
 
     #Get the current course
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
 
     found_module, problem_url = find_peer_grading_module(course)
     if not found_module:
@@ -146,7 +145,7 @@ def student_problem_list(request, course_id):
     """
 
     # Load the course.  Don't catch any errors here, as we want them to be loud.
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
 
     # The anonymous student id is needed for communication with ORA.
     student_id = unique_id_for_user(request.user)
@@ -185,7 +184,7 @@ def flagged_problem_list(request, course_id):
     '''
     Show a student problem list
     '''
-    course = get_course_with_access(request.user, course_id, 'staff')
+    course = get_course_with_access(request.user, 'staff', course_id)
     student_id = unique_id_for_user(request.user)
 
     # call problem list service
@@ -238,7 +237,7 @@ def combined_notifications(request, course_id):
     """
     Gets combined notifications from the grading controller and displays them
     """
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
     user = request.user
     notifications = open_ended_notifications.combined_notifications(course, user)
     response = notifications['response']

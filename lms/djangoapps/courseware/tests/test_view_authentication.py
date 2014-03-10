@@ -137,12 +137,12 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         CourseEnrollmentFactory(user=self.enrolled_user, course_id=self.course.id)
         CourseEnrollmentFactory(user=self.enrolled_user, course_id=self.test_course.id)
 
-        self.staff_user = StaffFactory(course=self.course.location)
+        self.staff_user = StaffFactory(course=self.course.id)
         self.instructor_user = InstructorFactory(
-            course=self.course.location)
-        self.org_staff_user = OrgStaffFactory(course=self.course.location)
+            course=self.course.id)
+        self.org_staff_user = OrgStaffFactory(course=self.course.id)
         self.org_instructor_user = OrgInstructorFactory(
-            course=self.course.location)
+            course=self.course.id)
 
     def test_redirection_unenrolled(self):
         """
@@ -374,7 +374,7 @@ class TestBetatesterAccess(ModuleStoreTestCase):
         self.content = ItemFactory(parent=self.course)
 
         self.normal_student = UserFactory()
-        self.beta_tester = BetaTesterFactory(course=self.course.location)
+        self.beta_tester = BetaTesterFactory(course=self.course.id)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_beta_period(self):
@@ -384,10 +384,10 @@ class TestBetatesterAccess(ModuleStoreTestCase):
         self.assertFalse(self.course.has_started())
 
         # student user shouldn't see it
-        self.assertFalse(has_access(self.normal_student, self.course, 'load'))
+        self.assertFalse(has_access(self.normal_student, 'load', self.course))
 
         # now the student should see it
-        self.assertTrue(has_access(self.beta_tester, self.course, 'load'))
+        self.assertTrue(has_access(self.beta_tester, 'load', self.course))
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_content_beta_period(self):
@@ -395,7 +395,7 @@ class TestBetatesterAccess(ModuleStoreTestCase):
         Check that beta-test access works for content.
         """
         # student user shouldn't see it
-        self.assertFalse(has_access(self.normal_student, self.content, 'load', self.course.id))
+        self.assertFalse(has_access(self.normal_student, 'load', self.content, self.course.id))
 
         # now the student should see it
-        self.assertTrue(has_access(self.beta_tester, self.content, 'load', self.course.id))
+        self.assertTrue(has_access(self.beta_tester, 'load', self.content, self.course.id))

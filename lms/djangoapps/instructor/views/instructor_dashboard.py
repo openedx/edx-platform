@@ -38,8 +38,8 @@ def instructor_dashboard_2(request, course_id):
 
     access = {
         'admin': request.user.is_staff,
-        'instructor': has_access(request.user, course, 'instructor'),
-        'staff': has_access(request.user, course, 'staff'),
+        'instructor': has_access(request.user, 'instructor', course),
+        'staff': has_access(request.user, 'staff', course),
         'forum_admin': has_forum_access(
             request.user, course_id, FORUM_ROLE_ADMINISTRATOR
         ),
@@ -106,16 +106,13 @@ def _section_course_info(course_id, access):
     """ Provide data for the corresponding dashboard section """
     course = get_course_by_id(course_id, depth=None)
 
-    course_id_dict = Location.parse_course_id(course_id)
-
     section_data = {
         'section_key': 'course_info',
         'section_display_name': _('Course Info'),
         'access': access,
         'course_id': course_id,
-        'course_org': course_id_dict['org'],
-        'course_num': course_id_dict['course'],
-        'course_name': course_id_dict['name'],
+        'course_org': course_id.org,
+        'course_run': course_id.run,
         'course_display_name': course.display_name,
         'enrollment_count': CourseEnrollment.num_enrolled_in(course_id),
         'has_started': course.has_started(),
@@ -131,7 +128,7 @@ def _section_course_info(course_id, access):
     # section_data['offline_grades'] = offline_grades_available(course_id)
 
     try:
-        section_data['course_errors'] = [(escape(a), '') for (a, _unused) in modulestore().get_item_errors(course.location)]
+        section_data['course_errors'] = [(escape(a), '') for (a, _unused) in modulestore().get_course_errors(course.id)]
     except Exception:
         section_data['course_errors'] = [('Error fetching errors', '')]
 

@@ -17,6 +17,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.roles import CourseStaffRole
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -42,7 +43,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
         clear_existing_modulestores()
         courses = modulestore().get_courses()
 
-        self.course_id = "edX/toy/2012_Fall"
+        self.course_id = CourseKey.from_string("edX/toy/2012_Fall")
         self.toy = modulestore().get_course(self.course_id)
 
         # Create two accounts
@@ -54,7 +55,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        CourseStaffRole(self.toy.location).add_users(User.objects.get(email=self.instructor))
+        CourseStaffRole(self.toy.id).add_users(User.objects.get(email=self.instructor))
 
         self.logout()
         self.login(self.instructor, self.password)
@@ -100,10 +101,10 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
         username = 'u2'
         for rolename in FORUM_ROLES:
             response = self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
-            self.assertTrue(response.content.find('Added "{0}" to "{1}" forum role = "{2}"'.format(username, course.id, rolename)) >= 0)
+            self.assertContains(response, 'Added "{0}" to "{1}" forum role = "{2}"'.format(username, course.id, rolename))
             self.assertTrue(has_forum_access(username, course.id, rolename))
             response = self.client.post(url, {'action': action_name('Remove', rolename), FORUM_ADMIN_USER[rolename]: username})
-            self.assertTrue(response.content.find('Removed "{0}" from "{1}" forum role = "{2}"'.format(username, course.id, rolename)) >= 0)
+            self.assertContains(response, 'Removed "{0}" from "{1}" forum role = "{2}"'.format(username, course.id, rolename))
             self.assertFalse(has_forum_access(username, course.id, rolename))
 
     def test_add_and_read_forum_admin_users(self):

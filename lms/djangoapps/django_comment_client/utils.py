@@ -15,7 +15,7 @@ from edxmako import lookup_template
 import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import Location
+from xmodule.modulestore.keys import CourseKey
 from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
@@ -55,10 +55,7 @@ def has_forum_access(uname, course_id, rolename):
 
 
 def _get_discussion_modules(course):
-    all_modules = modulestore().get_items(
-        Location('i4x', course.location.org, course.location.course, 'discussion', None),
-        course_id=course.id
-    )
+    all_modules = modulestore().get_items(course.id, category='discussion')
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
@@ -347,7 +344,7 @@ def add_courseware_context(content_list, course):
             location = id_map[commentable_id]["location"].url()
             title = id_map[commentable_id]["title"]
 
-            url = reverse('jump_to', kwargs={"course_id": course.location.course_id,
+            url = reverse('jump_to', kwargs={"course_id": course.id,
                           "location": location})
 
             content.update({"courseware_url": url, "courseware_title": title})

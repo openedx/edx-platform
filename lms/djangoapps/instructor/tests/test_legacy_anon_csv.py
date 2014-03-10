@@ -20,6 +20,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.keys import CourseKey
 
 from mock import patch
 
@@ -33,7 +34,7 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
     # Note -- I copied this setUp from a similar test
     def setUp(self):
         clear_existing_modulestores()
-        self.toy = modulestore().get_course("edX/toy/2012_Fall")
+        self.toy = modulestore().get_course(CourseKey.from_string("edX/toy/2012_Fall"))
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -44,7 +45,7 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        CourseStaffRole(self.toy.location).add_users(User.objects.get(email=self.instructor))
+        CourseStaffRole(self.toy.id).add_users(User.objects.get(email=self.instructor))
 
         self.logout()
         self.login(self.instructor, self.password)

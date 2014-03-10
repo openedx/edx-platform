@@ -108,7 +108,6 @@ coverage==3.7
 ddt==0.7.1
 django-crum==0.5
 django_nose==1.1
-factory_boy==2.2.1
 freezegun==0.1.11
 mock==1.0.1
 nose-exclude

@@ -130,7 +130,7 @@ class LoginEnrollmentTestCase(TestCase):
         """
         resp = self.client.post(reverse('change_enrollment'), {
             'enrollment_action': 'enroll',
-            'course_id': course.id,
+            'course_id': course.id.to_deprecated_string(),
         })
         result = resp.status_code == 200
         if verify:

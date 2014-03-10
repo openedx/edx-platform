@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
+from xmodule.modulestore.keys import CourseKey
 
 from microsite_configuration import microsite
 
@@ -23,6 +24,7 @@ SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 class EmailEnrollmentState(object):
     """ Store the complete enrollment state of an email in a class """
     def __init__(self, course_id, email):
+        course_id = CourseKey.from_string(course_id)
         exists_user = User.objects.filter(email=email).exists()
         if exists_user:
             user = User.objects.get(email=email)
@@ -81,6 +83,8 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
     returns two EmailEnrollmentState's
         representing state before and after the action.
     """
+    # TODO eventually move some stuff so that this thing takes course_key as an arg instead of course_id
+    course_key = CourseKey.from_string(course_id)
 
     previous_state = EmailEnrollmentState(course_id, student_email)
 

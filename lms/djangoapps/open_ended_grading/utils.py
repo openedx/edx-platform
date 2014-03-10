@@ -56,14 +56,14 @@ def generate_problem_url(problem_url_parts, base_course_url):
     return problem_url
 
 
-def does_location_exist(course_id, location):
+def does_location_exist(usage_key):
     """
     Checks to see if a valid module exists at a given location (ie has not been deleted)
     course_id - string course id
     location - string location
     """
     try:
-        search.path_to_location(modulestore(), course_id, location)
+        search.path_to_location(modulestore(), usage_key)
         return True
     except ItemNotFoundError:
         # If the problem cannot be found at the location received from the grading controller server,
@@ -72,9 +72,10 @@ def does_location_exist(course_id, location):
     except NoPathToItem:
         # If the problem can be found, but there is no path to it, then we assume it is a draft.
         # Log a warning if the problem is not a draft (location does not end in "draft").
-        if not location.endswith("draft"):
+        # TODO: This is very wrong
+        if not usage_key.endswith("draft"):
             log.warn(("Got an unexpected NoPathToItem error in staff grading with a non-draft location {0}. "
-                      "Ensure that the location is valid.").format(location))
+                      "Ensure that the location is valid.").format(usage_key))
         return False
 
 

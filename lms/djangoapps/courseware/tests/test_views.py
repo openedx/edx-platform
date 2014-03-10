@@ -45,27 +45,27 @@ class TestJumpTo(TestCase):
         self.course_name = 'edX/toy/2012_Fall'
 
     def test_jumpto_invalid_location(self):
-        location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
+        location = Location('edX', 'toy', 'NoSuchPlace', None)
         jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
     def test_jumpto_from_chapter(self):
-        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        location = Location('edX', 'toy', 'chapter', 'Overview')
         jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_id(self):
-        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        location = Location('edX', 'toy', 'chapter', 'Overview')
         jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_id_invalid_location(self):
-        location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
+        location = Location('edX', 'toy', 'NoSuchPlace', None)
         jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
@@ -283,7 +283,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         vertical = ItemFactory(category='vertical', parent_location=section.location)
         ItemFactory(category='problem', parent_location=vertical.location)
 
-        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        course = modulestore().get_course(course.id)  # pylint: disable=no-member
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
         return course
 
@@ -392,7 +392,7 @@ class StartDateTests(ModuleStoreTestCase):
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
         course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
-        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        course = modulestore().get_course(course.id)  # pylint: disable=no-member
         return course
 
     def get_about_text(self, course_id):
@@ -441,7 +441,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         MakoMiddleware().process_request(self.request)
 
         course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
-        self.course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
 
         self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
         self.section = ItemFactory(category='sequential', parent_location=self.chapter.location)

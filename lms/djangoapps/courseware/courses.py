@@ -8,8 +8,7 @@ from django.http import Http404
 from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
@@ -49,15 +48,14 @@ def get_course(course_id, depth=0):
     None means infinite depth.  Default is to fetch no children.
     """
     try:
-        course_loc = CourseDescriptor.id_to_location(course_id)
-        return modulestore().get_instance(course_id, course_loc, depth=depth)
+        return modulestore().get_course(course_id, depth=depth)
     except (KeyError, ItemNotFoundError):
         raise ValueError(u"Course not found: {0}".format(course_id))
     except InvalidLocationError:
         raise ValueError(u"Invalid location: {0}".format(course_id))
 
 
-def get_course_by_id(course_id, depth=0):
+def get_course_by_id(course_key, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
 
@@ -66,15 +64,14 @@ def get_course_by_id(course_id, depth=0):
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
     try:
-        course_loc = CourseDescriptor.id_to_location(course_id)
-        return modulestore().get_instance(course_id, course_loc, depth=depth)
+        return modulestore().get_course(course_key, depth=depth)
     except (KeyError, ItemNotFoundError):
         raise Http404("Course not found.")
     except InvalidLocationError:
         raise Http404("Invalid location")
 
 
-def get_course_with_access(user, course_id, action, depth=0):
+def get_course_with_access(user, action, course_id, depth=0):
     """
     Given a course_id, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
@@ -85,30 +82,35 @@ def get_course_with_access(user, course_id, action, depth=0):
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
     course = get_course_by_id(course_id, depth=depth)
-    if not has_access(user, course, action):
+
+    if course is None:
+        raise Http404("Course not found.")
+
+    if not has_access(user, action, course, course_id):
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
         raise Http404("Course not found.")
+
     return course
 
 
-def get_opt_course_with_access(user, course_id, action):
+def get_opt_course_with_access(user, action, course_id):
     """
     Same as get_course_with_access, except that if course_id is None,
     return None without performing any access checks.
     """
     if course_id is None:
         return None
-    return get_course_with_access(user, course_id, action)
+    return get_course_with_access(user, action, course_id)
 
 
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
-    if course.static_asset_path or modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
+    if course.static_asset_path or modulestore().get_modulestore_type(course.id) == XML_MODULESTORE_TYPE:
         return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
     else:
-        loc = StaticContent.compute_location(course.location.org, course.location.course, course.course_image)
+        loc = StaticContent.compute_location(course.location.course_key, course.course_image)
         _path = StaticContent.get_url_path_from_location(loc)
         return _path
 
@@ -158,7 +160,7 @@ def get_course_about_section(course, section_key):
     # markup. This can change without effecting this interface when we find a
     # good format for defining so many snippets of text/html.
 
-# TODO: Remove number, instructors from this list
+    # TODO: Remove number, instructors from this list
     if section_key in ['short_description', 'description', 'key_dates', 'video',
                        'course_staff_short', 'course_staff_extended',
                        'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
@@ -223,14 +225,14 @@ def get_course_info_section(request, course, section_key):
     - updates
     - guest_updates
     """
-    loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
+    usage_key = course.id.make_usage_key('course_info', section_key)
 
     # Use an empty cache
     field_data_cache = FieldDataCache([], course.id, request.user)
     info_module = get_module(
         request.user,
         request,
-        loc,
+        usage_key,
         field_data_cache,
         course.id,
         wrap_xmodule_display=False,
@@ -279,7 +281,7 @@ def get_course_syllabus_section(course, section_key):
                 return replace_static_urls(
                     html_file.read().decode('utf-8'),
                     getattr(course, 'data_dir', None),
-                    course_id=course.location.course_id,
+                    course_id=course.id,
                     static_asset_path=course.static_asset_path,
                 )
         except ResourceNotFoundError:
@@ -312,7 +314,7 @@ def get_courses(user, domain=None):
     Returns a list of courses available, sorted by course.number
     '''
     courses = branding.get_visible_courses()
-    courses = [c for c in courses if has_access(user, c, 'see_exists')]
+    courses = [c for c in courses if has_access(user, 'see_exists', c)]
 
     courses = sorted(courses, key=lambda course: course.number)
 
@@ -338,6 +340,6 @@ def get_cms_course_link(course):
     assuming that the course is actually cms-backed.
     """
     locator = loc_mapper().translate_location(
-        course.location.course_id, course.location, False, True
+        course.location, False, True
     )
     return "//" + settings.CMS_BASE + locator.url_reverse('course/', '')

@@ -11,6 +11,7 @@ from wiki.models import reverse as wiki_reverse
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from student.models import CourseEnrollment
+from xmodule.modulestore.keys import CourseKey
 
 
 IN_COURSE_WIKI_REGEX = r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/(?P<wiki_path>.*|)$'
@@ -66,24 +67,24 @@ class Middleware(object):
 
         course_match = IN_COURSE_WIKI_COMPILED_REGEX.match(destination)
         if course_match:
-            course_id = course_match.group('course_id')
+            course_id = CourseKey.from_string(course_match.group('course_id'))
 
             # Authorization Check
             # Let's see if user is enrolled or the course allows for public access
-            course = get_course_with_access(request.user, course_id, 'load')
+            course = get_course_with_access(request.user, 'load', course_id)
             if not course.allow_public_wiki_access:
                 # if a user is not authenticated, redirect them to login
                 if not request.user.is_authenticated():
                     return redirect(reverse('accounts_login'))
 
                 is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
-                is_staff = has_access(request.user, course, 'staff')
+                is_staff = has_access(request.user, 'staff', course)
                 if not (is_enrolled or is_staff):
                     # if a user is logged in, but not authorized to see a page,
                     # we'll redirect them to the course about page
                     return redirect(reverse('about_course', args=[course_id]))
 
-            prepend_string = '/courses/' + course_id
+            prepend_string = '/courses/' + course_id.to_deprecated_string()
             wiki_reverse._transform_url = lambda url: prepend_string + url
 
         return None
@@ -121,12 +122,12 @@ class Middleware(object):
             # We are going to the wiki. Check if we came from a course
             course_match = re.match(r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/.*', referer_path)
             if course_match:
-                course_id = course_match.group('course_id')
+                course_id = CourseKey.from_string(course_match.group('course_id'))
 
                 # See if we are able to view the course. If we are, redirect to it
                 try:
-                    course = get_course_with_access(user, course_id, 'load')
-                    return "/courses/" + course.id + "/wiki/" + path_match.group('wiki_path')
+                    course = get_course_with_access(user, 'load', course_id)
+                    return "/courses/" + course.id.to_deprecated_string() + "/wiki/" + path_match.group('wiki_path')
                 except Http404:
                     # Even though we came from the course, we can't see it. So don't worry about it.
                     pass
@@ -136,10 +137,10 @@ class Middleware(object):
             # don't have permission to see the course!
             course_match = re.match(IN_COURSE_WIKI_REGEX, destination)
             if course_match:
-                course_id = course_match.group('course_id')
+                course_id = CourseKey.from_string(course_match.group('course_id'))
                 # See if we are able to view the course. If we aren't, redirect to regular wiki
                 try:
-                    course = get_course_with_access(user, course_id, 'load')
+                    course = get_course_with_access(user, 'load', course_id)
                     # Good, we can see the course. Carry on
                     return destination
                 except Http404:
@@ -160,11 +161,11 @@ def context_processor(request):
 
     match = re.match(IN_COURSE_WIKI_REGEX, request.path)
     if match:
-        course_id = match.group('course_id')
+        course_id = CourseKey.from_string(match.group('course_id'))
 
         try:
-            course = get_course_with_access(request.user, course_id, 'load')
-            staff_access = has_access(request.user, course, 'staff')
+            course = get_course_with_access(request.user, 'load', course_id)
+            staff_access = has_access(request.user, 'staff', course)
             return {'course': course,
                     'staff_access': staff_access}
         except Http404:

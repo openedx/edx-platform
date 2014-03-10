@@ -157,7 +157,7 @@ class TestRescoringTask(TestIntegrationTask):
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        descriptor = self.module_store.get_instance(self.course.id, location)
+        descriptor = self.module_store.get_item(location)
 
         # first store answers for each of the separate users:
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
@@ -288,8 +288,8 @@ class TestRescoringTask(TestIntegrationTask):
             """ % ('!=' if redefine else '=='))
         problem_xml = factory.build_xml(script=script, cfn="check_func", expect="42", num_responses=1)
         if redefine:
-            descriptor = self.module_store.get_instance(
-                self.course.id, InstructorTaskModuleTestCase.problem_location(problem_url_name)
+            descriptor = self.module_store.get_item(
+                InstructorTaskModuleTestCase.problem_location(problem_url_name)
             )
             descriptor.data = problem_xml
             self.module_store.update_item(descriptor, '**replace_user**')
@@ -311,7 +311,7 @@ class TestRescoringTask(TestIntegrationTask):
         problem_url_name = 'H1P1'
         self.define_randomized_custom_response_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        descriptor = self.module_store.get_instance(self.course.id, location)
+        descriptor = self.module_store.get_item(location)
         # run with more than one user
         userlist = ['u1', 'u2', 'u3', 'u4']
         for username in userlist:
@@ -386,7 +386,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        descriptor = self.module_store.get_instance(self.course.id, location)
+        descriptor = self.module_store.get_item(location)
         num_attempts = 3
         # first store answers for each of the separate users:
         for _ in range(num_attempts):
@@ -447,7 +447,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        descriptor = self.module_store.get_instance(self.course.id, location)
+        descriptor = self.module_store.get_item(location)
         # first store answers for each of the separate users:
         for username in self.userlist:
             self.submit_student_answer(username, problem_url_name, [OPTION_1, OPTION_1])

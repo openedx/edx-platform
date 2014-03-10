@@ -71,8 +71,7 @@ class Role(models.Model):
         self.permissions.add(Permission.objects.get_or_create(name=permission)[0])
 
     def has_permission(self, permission):
-        course_loc = CourseDescriptor.id_to_location(self.course_id)
-        course = modulestore().get_instance(self.course_id, course_loc)
+        course = modulestore().get_course(self.course_id)
         if self.name == FORUM_ROLE_STUDENT and \
            (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
            (not course.forum_posts_allowed):

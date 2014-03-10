@@ -18,6 +18,8 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from xmodule_django.models import CourseKeyField, LocationKeyField
+
 
 class StudentModule(models.Model):
     """
@@ -38,9 +40,9 @@ class StudentModule(models.Model):
     # but for abtests and the like, this can be set to a shared value
     # for many instances of the module.
     # Filename for homeworks, etc.
-    module_state_key = models.CharField(max_length=255, db_index=True, db_column='module_id')
+    module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
     student = models.ForeignKey(User, db_index=True)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
 
     class Meta:
         unique_together = (('student', 'module_state_key', 'course_id'),)
@@ -221,7 +223,7 @@ class OfflineComputedGrade(models.Model):
     Table of grades computed offline for a given user and course.
     """
     user = models.ForeignKey(User, db_index=True)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     updated = models.DateTimeField(auto_now=True, db_index=True)
@@ -244,10 +246,10 @@ class OfflineComputedGradeLog(models.Model):
         ordering = ["-created"]
         get_latest_by = "created"
 
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     seconds = models.IntegerField(default=0)  	# seconds elapsed for computation
     nstudents = models.IntegerField(default=0)
 
     def __unicode__(self):
-        return "[OCGLog] %s: %s" % (self.course_id, self.created)
+        return "[OCGLog] %s: %s" % (self.course_id.to_deprecated_string(), self.created)

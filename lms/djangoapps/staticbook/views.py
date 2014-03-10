@@ -17,8 +17,8 @@ def index(request, course_id, book_index, page=None):
     """
     Serve static image-based textbooks.
     """
-    course = get_course_with_access(request.user, course_id, 'load')
-    staff_access = has_access(request.user, course, 'staff')
+    course = get_course_with_access(request.user, 'load', course_id)
+    staff_access = has_access(request.user, 'staff', course)
 
     book_index = int(book_index)
     if book_index < 0 or book_index >= len(course.textbooks):
@@ -50,7 +50,7 @@ def remap_static_url(original_url, course):
     output_url = replace_static_urls(
         input_url,
         getattr(course, 'data_dir', None),
-        course_id=course.location.course_id,
+        course_id=course.id,
     )
     # strip off the quotes again...
     return output_url[1:-1]
@@ -72,8 +72,8 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
 
     page:  (optional) one-based page number to display within the PDF.  Defaults to first page.
     """
-    course = get_course_with_access(request.user, course_id, 'load')
-    staff_access = has_access(request.user, course, 'staff')
+    course = get_course_with_access(request.user, 'load', course_id)
+    staff_access = has_access(request.user, 'staff', course)
 
     book_index = int(book_index)
     if book_index < 0 or book_index >= len(course.pdf_textbooks):
@@ -114,8 +114,8 @@ def html_index(request, course_id, book_index, chapter=None):
         Defaults to first chapter.  Specifying this assumes that there are separate HTML files for
         each chapter in a textbook.
     """
-    course = get_course_with_access(request.user, course_id, 'load')
-    staff_access = has_access(request.user, course, 'staff')
+    course = get_course_with_access(request.user, 'load', course_id)
+    staff_access = has_access(request.user, 'staff', course)
     notes_enabled = notes_enabled_for_course(course)
 
     book_index = int(book_index)

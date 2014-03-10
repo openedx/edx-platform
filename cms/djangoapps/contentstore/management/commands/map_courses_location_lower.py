@@ -19,4 +19,4 @@ class Command(BaseCommand):
         courses = modulestore('direct').get_courses()
         for course in courses:
             # create/modify map_entry in 'loc_mapper' with 'lower_id' and 'lower_course_id'
-            loc_mapper().create_map_entry(course.location)
+            loc_mapper().create_map_entry(course.id)
