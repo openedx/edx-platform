@@ -154,6 +154,14 @@ urlpatterns += (
     url(r'^verify_student/', include('verify_student.urls')),
     url(r'^course_modes/', include('course_modes.urls')),
 )
+
+# OPEN EDX API
+if settings.FEATURES["API"]:
+    urlpatterns += (
+        url(r'^api/*', include('api_manager.urls')),
+    )
+
+
 if settings.FEATURES["ENABLE_OPENBADGES"]:
     urlpatterns += (
         url(r'^api/badges/v1/', include('badges.api.urls', app_name="badges", namespace="badges_api")),
