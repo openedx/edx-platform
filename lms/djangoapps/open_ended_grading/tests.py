@@ -52,7 +52,7 @@ def make_instructor(course, user_email):
     """
     Makes a given user an instructor in a course.
     """
-    CourseStaffRole(course.location).add_users(User.objects.get(email=user_email))
+    CourseStaffRole(course.id).add_users(User.objects.get(email=user_email))
 
 
 class StudentProblemListMockQuery(object):

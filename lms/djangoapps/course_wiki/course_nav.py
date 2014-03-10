@@ -69,10 +69,10 @@ class Middleware(object):
 
             # Authorization Check
             # Let's see if user is enrolled or the course allows for public access
-            course = get_course_with_access(request.user, course_id, 'load')
+            course = get_course_with_access(request.user, 'load', course_id)
             if not course.allow_public_wiki_access:
                 is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
-                is_staff = has_access(request.user, course, 'staff')
+                is_staff = has_access(request.user, 'staff', course)
                 if not (is_enrolled or is_staff):
                     raise PermissionDenied()
 
@@ -118,7 +118,7 @@ class Middleware(object):
 
                 # See if we are able to view the course. If we are, redirect to it
                 try:
-                    course = get_course_with_access(user, course_id, 'load')
+                    course = get_course_with_access(user, 'load', course_id)
                     return "/courses/" + course.id + "/wiki/" + path_match.group('wiki_path')
                 except Http404:
                     # Even though we came from the course, we can't see it. So don't worry about it.
@@ -132,7 +132,7 @@ class Middleware(object):
                 course_id = course_match.group('course_id')
                 # See if we are able to view the course. If we aren't, redirect to regular wiki
                 try:
-                    course = get_course_with_access(user, course_id, 'load')
+                    course = get_course_with_access(user, 'load', course_id)
                     # Good, we can see the course. Carry on
                     return destination
                 except Http404:
@@ -156,8 +156,8 @@ def context_processor(request):
         course_id = match.group('course_id')
 
         try:
-            course = get_course_with_access(request.user, course_id, 'load')
-            staff_access = has_access(request.user, course, 'staff')
+            course = get_course_with_access(request.user, 'load', course_id)
+            staff_access = has_access(request.user, 'staff', course)
             return {'course': course,
                     'staff_access': staff_access}
         except Http404:

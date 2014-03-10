@@ -606,9 +606,9 @@ class Staffing(SysadminDashboardView):
             datum = [course.display_name, course.id]
             datum += [CourseEnrollment.objects.filter(
                 course_id=course.id).count()]
-            datum += [CourseStaffRole(course.location).users_with_role().count()]
+            datum += [CourseStaffRole(course.id).users_with_role().count()]
             datum += [','.join([x.username for x in CourseInstructorRole(
-                course.location).users_with_role()])]
+                course.id).users_with_role()])]
             data.append(datum)
 
         datatable = dict(header=[_('Course Name'), _('course_id'),
@@ -640,7 +640,7 @@ class Staffing(SysadminDashboardView):
 
             for (cdir, course) in courses.items():  # pylint: disable=unused-variable
                 for role in roles:
-                    for user in role(course.location).users_with_role():
+                    for user in role(course.id).users_with_role():
                         datum = [course.id, role, user.username, user.email,
                                  user.profile.name]
                         data.append(datum)
@@ -709,8 +709,8 @@ class GitLogs(TemplateView):
 
             # Allow only course team, instructors, and staff
             if not (request.user.is_staff or
-                    CourseInstructorRole(course.location).has_user(request.user) or
-                    CourseStaffRole(course.location).has_user(request.user)):
+                    CourseInstructorRole(course.id).has_user(request.user) or
+                    CourseStaffRole(course.id).has_user(request.user)):
                 raise Http404
             log.debug('course_id={0}'.format(course_id))
             cilset = CourseImportLog.objects.filter(

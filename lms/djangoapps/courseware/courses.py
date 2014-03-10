@@ -71,7 +71,7 @@ def get_course_by_id(course_id, depth=0):
         raise Http404("Invalid location")
 
 
-def get_course_with_access(user, course_id, action, depth=0):
+def get_course_with_access(user, action, course_id, depth=0):
     """
     Given a course_id, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
@@ -82,21 +82,21 @@ def get_course_with_access(user, course_id, action, depth=0):
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
     course = get_course_by_id(course_id, depth=depth)
-    if not has_access(user, course, action):
+    if not has_access(user, action, course, course_id):
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
         raise Http404("Course not found.")
     return course
 
 
-def get_opt_course_with_access(user, course_id, action):
+def get_opt_course_with_access(user, action, course_id):
     """
     Same as get_course_with_access, except that if course_id is None,
     return None without performing any access checks.
     """
     if course_id is None:
         return None
-    return get_course_with_access(user, course_id, action)
+    return get_course_with_access(user, action, course_id)
 
 
 def course_image_url(course):
@@ -294,7 +294,7 @@ def get_courses(user, domain=None):
     Returns a list of courses available, sorted by course.number
     '''
     courses = branding.get_visible_courses()
-    courses = [c for c in courses if has_access(user, c, 'see_exists')]
+    courses = [c for c in courses if has_access(user, 'see_exists', c)]
 
     courses = sorted(courses, key=lambda course: course.number)
 

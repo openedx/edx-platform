@@ -13,9 +13,9 @@ from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import CourseLocator, Locator
 
 
-class CourseContextRequired(Exception):
+class CourseIdRequired(Exception):
     """
-    Raised when a course_context is required to determine permissions
+    Raised when a course_id is required to determine permissions
     """
     pass
 
@@ -144,46 +144,18 @@ class CourseRole(GroupBasedRole):
     """
     A named role in a particular course
     """
-    def __init__(self, role, location, course_context=None):
+    def __init__(self, role, course_id):
         """
         Location may be either a Location, a string, dict, or tuple which Location will accept
         in its constructor, or a CourseLocator. Handle all these giving some preference to
         the preferred naming.
         """
-        # TODO: figure out how to make the group name generation lazy so it doesn't force the
-        # loc mapping?
-        self.location = Locator.to_locator_or_location(location)
+        self.course_id = course_id
         self.role = role
         # direct copy from auth.authz.get_all_course_role_groupnames will refactor to one impl asap
         groupnames = []
 
-        if isinstance(self.location, Location):
-            try:
-                groupnames.append(u'{0}_{1}'.format(role, self.location.course_id))
-                course_context = self.location.course_id  # course_id is valid for translation
-            except InvalidLocationError:  # will occur on old locations where location is not of category course
-                if course_context is None:
-                    raise CourseContextRequired()
-                else:
-                    groupnames.append(u'{0}_{1}'.format(role, course_context))
-            try:
-                locator = loc_mapper().translate_location_to_course_locator(course_context, self.location)
-                groupnames.append(u'{0}_{1}'.format(role, locator.package_id))
-            except (InvalidLocationError, ItemNotFoundError):
-                # if it's never been mapped, the auth won't be via the Locator syntax
-                pass
-            # least preferred legacy role_course format
-            groupnames.append(u'{0}_{1}'.format(role, self.location.course))  # pylint: disable=E1101, E1103
-        elif isinstance(self.location, CourseLocator):
-            groupnames.append(u'{0}_{1}'.format(role, self.location.package_id))
-            # handle old Location syntax
-            old_location = loc_mapper().translate_locator_to_location(self.location, get_course=True)
-            if old_location:
-                # the slashified version of the course_id (myu/mycourse/myrun)
-                groupnames.append(u'{0}_{1}'.format(role, old_location.course_id))
-                # add the least desirable but sometimes occurring format.
-                groupnames.append(u'{0}_{1}'.format(role, old_location.course))  # pylint: disable=E1101, E1103
-
+        groupnames.append(u'{0}_{1}'.format(role, self.course_id))
         super(CourseRole, self).__init__(groupnames)
 
 
@@ -191,9 +163,9 @@ class OrgRole(GroupBasedRole):
     """
     A named role in a particular org
     """
-    def __init__(self, role, location):
-        location = Location(location)
-        super(OrgRole, self).__init__([u'{}_{}'.format(role, location.org)])
+    def __init__(self, role, course_id):
+        course = Location.parse_course_id(course_id)
+        super(OrgRole, self).__init__([u'{}_{}'.format(role, course['org'])])
 
 
 class CourseStaffRole(CourseRole):
@@ -207,6 +179,7 @@ class CourseStaffRole(CourseRole):
 class CourseInstructorRole(CourseRole):
     """A course Instructor"""
     ROLE = 'instructor'
+
     def __init__(self, *args, **kwargs):
         super(CourseInstructorRole, self).__init__(self.ROLE, *args, **kwargs)
 
@@ -214,6 +187,7 @@ class CourseInstructorRole(CourseRole):
 class CourseBetaTesterRole(CourseRole):
     """A course Beta Tester"""
     ROLE = 'beta_testers'
+
     def __init__(self, *args, **kwargs):
         super(CourseBetaTesterRole, self).__init__(self.ROLE, *args, **kwargs)
 
@@ -236,5 +210,6 @@ class CourseCreatorRole(GroupBasedRole):
     make this an org based role).
     """
     ROLE = "course_creator_group"
+
     def __init__(self, *args, **kwargs):
         super(CourseCreatorRole, self).__init__([self.ROLE], *args, **kwargs)

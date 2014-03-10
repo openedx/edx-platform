@@ -4,9 +4,9 @@ from student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole
 from student import auth
 
 
-def has_course_access(user, location, role=CourseStaffRole):
+def has_course_access(user, course_id, role=CourseStaffRole):
     """
-    Return True if user allowed to access this piece of data
+    Return True if user allowed to access this course_id
     Note that the CMS permissions model is with respect to courses
     There is a super-admin permissions if user.is_staff is set
     Also, since we're unifying the user database between LMS and CAS,
@@ -16,21 +16,17 @@ def has_course_access(user, location, role=CourseStaffRole):
     """
     if GlobalStaff().has_user(user):
         return True
-    if not isinstance(location, CourseLocator):
-        # this can be expensive if location is not category=='course'
-        location = get_course_location_for_item(location)
-    return auth.has_access(user, role(location))
+    return auth.has_access(user, role(course_id))
 
 
-def get_user_role(user, location, context=None):
+def get_user_role(user, course_id):
     """
     Return corresponding string if user has staff or instructor role in Studio.
     This will not return student role because its purpose for using in Studio.
 
-    :param location: a descriptor.location (which may be a Location or a CourseLocator)
-    :param context: a course_id. This is not used if location is a CourseLocator.
+    :param course_id: the course_id of the course we're interested in
     """
-    if auth.has_access(user, CourseInstructorRole(location, context)):
+    if auth.has_access(user, CourseInstructorRole(course_id)):
         return 'instructor'
     else:
         return 'staff'

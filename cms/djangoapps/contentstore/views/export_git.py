@@ -26,7 +26,7 @@ def export_git(request, org, course, name):
     This method serves up the 'Export to Git' page
     """
     location = Location('i4x', org, course, 'course', name)
-    if not has_course_access(request.user, location):
+    if not has_course_access(request.user, location.course_id):
         raise PermissionDenied()
     course_module = modulestore().get_item(location)
     failed = False

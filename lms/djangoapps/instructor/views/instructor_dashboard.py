@@ -38,8 +38,8 @@ def instructor_dashboard_2(request, course_id):
 
     access = {
         'admin': request.user.is_staff,
-        'instructor': has_access(request.user, course, 'instructor'),
-        'staff': has_access(request.user, course, 'staff'),
+        'instructor': has_access(request.user, 'instructor', course),
+        'staff': has_access(request.user, 'staff', course),
         'forum_admin': has_forum_access(
             request.user, course_id, FORUM_ROLE_ADMINISTRATOR
         ),

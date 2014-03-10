@@ -66,7 +66,7 @@ def staff_grading(request, course_id):
     """
     Show the instructor grading interface.
     """
-    course = get_course_with_access(request.user, course_id, 'staff')
+    course = get_course_with_access(request.user, 'staff', course_id)
 
     ajax_url = _reverse_with_slash('staff_grading', course_id)
 
@@ -121,7 +121,7 @@ def peer_grading(request, course_id):
     '''
 
     #Get the current course
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
 
     found_module, problem_url = find_peer_grading_module(course)
     if not found_module:
@@ -146,7 +146,7 @@ def student_problem_list(request, course_id):
     """
 
     # Load the course.  Don't catch any errors here, as we want them to be loud.
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
 
     # The anonymous student id is needed for communication with ORA.
     student_id = unique_id_for_user(request.user)
@@ -185,7 +185,7 @@ def flagged_problem_list(request, course_id):
     '''
     Show a student problem list
     '''
-    course = get_course_with_access(request.user, course_id, 'staff')
+    course = get_course_with_access(request.user, 'staff', course_id)
     student_id = unique_id_for_user(request.user)
 
     # call problem list service
@@ -239,7 +239,7 @@ def combined_notifications(request, course_id):
     """
     Gets combined notifications from the grading controller and displays them
     """
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
     user = request.user
     notifications = open_ended_notifications.combined_notifications(course, user)
     response = notifications['response']
