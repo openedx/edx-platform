@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-03 10:23-0500\n"
-"PO-Revision-Date: 2014-03-03 15:23:59.369070\n"
+"POT-Creation-Date: 2014-03-10 09:47-0400\n"
+"PO-Revision-Date: 2014-03-10 13:47:18.139427\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -151,6 +151,53 @@ msgstr ""
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
 msgstr "Dïsäßléd Àççöünt Ⱡ'σ#"
+
+#: common/djangoapps/student/models.py
+msgid "Male"
+msgstr "Mälé Ⱡ'σяєм#"
+
+#: common/djangoapps/student/models.py
+msgid "Female"
+msgstr "Fémälé Ⱡ'σяєм ιρѕ#"
+
+#. Translators: 'Other' refers to the student's gender
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py common/djangoapps/student/models.py
+msgid "Other"
+msgstr "Öthér Ⱡ'σяєм ι#"
+
+#: common/djangoapps/student/models.py
+msgid "Doctorate"
+msgstr "Döçtöräté #"
+
+#: common/djangoapps/student/models.py
+msgid "Master's or professional degree"
+msgstr "Mästér's ör pröféssïönäl dégréé Ⱡ'σяєм ι#"
+
+#: common/djangoapps/student/models.py
+msgid "Bachelor's degree"
+msgstr "Bäçhélör's dégréé Ⱡ'σ#"
+
+#: common/djangoapps/student/models.py
+msgid "Associate's degree"
+msgstr "Àssöçïäté's dégréé Ⱡ'σ#"
+
+#: common/djangoapps/student/models.py
+msgid "Secondary/high school"
+msgstr "Séçöndärý/hïgh sçhööl Ⱡ'σя#"
+
+#: common/djangoapps/student/models.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "Jünïör séçöndärý/jünïör hïgh/mïddlé sçhööl Ⱡ'σяєм ιρѕυ#"
+
+#: common/djangoapps/student/models.py
+msgid "Elementary/primary school"
+msgstr "Éléméntärý/prïmärý sçhööl Ⱡ'σяєм#"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "None"
+msgstr "Nöné Ⱡ'σяєм#"
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -1414,6 +1461,22 @@ msgstr "Ûnäßlé tö rün ïmpört çömmänd. Ⱡ'σяєм #"
 msgid "The underlying module store does not support import."
 msgstr "Thé ündérlýïng mödülé störé döés nöt süppört ïmpört. Ⱡ'σяєм ιρѕυм ∂σ#"
 
+#. Translators: This is an error message when they ask for a
+#. particular version of a git repository and that version isn't
+#. available from the remote source they specified
+#: lms/djangoapps/dashboard/git_import.py
+msgid "The specified remote branch is not available."
+msgstr "Thé spéçïfïéd rémöté ßränçh ïs nöt äväïläßlé. Ⱡ'σяєм ιρѕυм#"
+
+#. Translators: Error message shown when they have asked for a git
+#. repository branch, a specific version within a repository, that
+#. doesn't exist, or there is a problem changing to it.
+#: lms/djangoapps/dashboard/git_import.py
+msgid "Unable to switch to specified branch. Please check your branch name."
+msgstr ""
+"Ûnäßlé tö swïtçh tö spéçïfïéd ßränçh. Pléäsé çhéçk ýöür ßränçh nämé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕ#"
+
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed in authenticating {0}, error {1}\n"
 msgstr ""
@@ -1558,15 +1621,24 @@ msgstr ""
 "Thé çöürsé {0} älréädý éxïsts ïn thé dätä dïréçtörý! (rélöädïng änýwäý) "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
+#. Translators: unable to download the course content from
+#. the source git repository. Clone occurs if this is brand
+#. new, and pull is when it is being updated from the
+#. source.
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Unable to clone or pull repository. Please check your url."
+msgid ""
+"Unable to clone or pull repository. Please check your url. Output was: {0!r}"
 msgstr ""
-"Ûnäßlé tö çlöné ör püll répösïtörý. Pléäsé çhéçk ýöür ürl. Ⱡ'σяєм ιρѕυм "
-"∂σłσ#"
+"Ûnäßlé tö çlöné ör püll répösïtörý. Pléäsé çhéçk ýöür ürl. Öütpüt wäs: {0!r}"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed to clone repository to {0}"
 msgstr "Fäïléd tö çlöné répösïtörý tö {0} Ⱡ'σяєм ι#"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Successfully switched to branch: {branch_name}"
+msgstr "Süççéssfüllý swïtçhéd tö ßränçh: {branch_name} Ⱡ'σяєм ιρ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Loaded course {0} {1}<br/>Errors:"
@@ -1638,10 +1710,12 @@ msgid "full_name"
 msgstr "füll_nämé #"
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
-msgid "Import the specified git repository into the modulestore and directory"
+msgid ""
+"Import the specified git repository and optional branch into the modulestore"
+" and optionally specified directory."
 msgstr ""
-"Ìmpört thé spéçïfïéd gït répösïtörý ïntö thé mödüléstöré änd dïréçtörý "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+"Ìmpört thé spéçïfïéd gït répösïtörý änd öptïönäl ßränçh ïntö thé mödüléstöré"
+" änd öptïönällý spéçïfïéd dïréçtörý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Cannot find user with email address"
@@ -3692,6 +3766,12 @@ msgstr "Sävé Ⱡ'σяєм#"
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕ#"
 
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/container_xblock_component.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Vïéw Ⱡ'σяєм#"
+
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
 msgstr "Érrör: Ⱡ'σяєм ιρѕ#"
@@ -3749,12 +3829,6 @@ msgstr "Püßlïç Ûsérnämé Ⱡ'#"
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "Preferred Language"
 msgstr "Préférréd Längüägé Ⱡ'σ#"
-
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/unit_container_xblock_component.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Vïéw Ⱡ'σяєм#"
 
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
@@ -5314,6 +5388,12 @@ msgstr "Àlréädý hävé än äççöünt? Ⱡ'σяє#"
 msgid "Login."
 msgstr "Lögïn. Ⱡ'σяєм ιρѕ#"
 
+#. Translators: The 'Group' here refers to the group of users that has been
+#. sorted into group_id
+#: lms/templates/split_test_staff_view.html
+msgid "Group {group_id}"
+msgstr "Gröüp {group_id} #"
+
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
 msgstr "Stäff Déßüg Ìnfö Ⱡ'σ#"
@@ -5489,9 +5569,17 @@ msgstr "Döwnlöäd stäff änd ïnstrüçtör lïst (çsv fïlé) Ⱡ'σяєм 
 msgid "Administer Courses"
 msgstr "Àdmïnïstér Çöürsés Ⱡ'σ#"
 
+#. Translators: Repo is short for git repository or source of
+#. courseware
 #: lms/templates/sysadmin_dashboard.html
-msgid "Repo location"
-msgstr "Répö löçätïön Ⱡ'#"
+msgid "Repo Location"
+msgstr "Répö Löçätïön Ⱡ'#"
+
+#. Translators: Repo is short for git repository or source of
+#. courseware and branch is a specific version within that repository
+#: lms/templates/sysadmin_dashboard.html
+msgid "Repo Branch (optional)"
+msgstr "Répö Bränçh (öptïönäl) Ⱡ'σяє#"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
@@ -5509,6 +5597,7 @@ msgstr "Délété çöürsé fröm sïté Ⱡ'σяє#"
 msgid "Django PID"
 msgstr "Djängö PÌD Ⱡ#"
 
+#. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
 msgid "Platform Version"
 msgstr "Plätförm Vérsïön Ⱡ'σ#"
@@ -5680,9 +5769,13 @@ msgstr "Gö ßäçk tö stärt öf tränsçrïpt. Ⱡ'σяєм ι#"
 msgid "Download video"
 msgstr "Döwnlöäd vïdéö Ⱡ'#"
 
-#: lms/templates/video.html
-msgid "Download timed transcript"
-msgstr "Döwnlöäd tïméd tränsçrïpt Ⱡ'σяєм#"
+#: lms/templates/video.html lms/templates/video.html
+msgid "Download transcript"
+msgstr "Döwnlöäd tränsçrïpt Ⱡ'σя#"
+
+#: lms/templates/video.html lms/templates/video.html
+msgid "{file_format}"
+msgstr "{file_format} Ⱡ'σя#"
 
 #: lms/templates/word_cloud.html
 msgid "Your words:"
@@ -6164,7 +6257,6 @@ msgid "Psychometrics"
 msgstr "Psýçhömétrïçs Ⱡ'#"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Forum Admin"
 msgstr "Förüm Àdmïn Ⱡ#"
 
@@ -6497,8 +6589,12 @@ msgid "No Analytics are available at this time."
 msgstr "Nö Ànälýtïçs äré äväïläßlé ät thïs tïmé. Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Students enrolled:"
-msgstr "Stüdénts énrölléd: Ⱡ'σ#"
+msgid ""
+"Students enrolled (historical count, includes those who have since "
+"unenrolled):"
+msgstr ""
+"Stüdénts énrölléd (hïstörïçäl çöünt, ïnçlüdés thösé whö hävé sïnçé "
+"ünénrölléd): Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students active in the last week:"
@@ -7496,6 +7592,24 @@ msgid "Grade Distribution"
 msgstr "Grädé Dïstrïßütïön Ⱡ'σ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"The chart below displays the score distribution for each standard problem in"
+" your class, specified by the problem's url name."
+msgstr ""
+"Thé çhärt ßélöw dïspläýs thé sçöré dïstrïßütïön för éäçh ständärd prößlém ïn"
+" ýöür çläss, spéçïfïéd ßý thé prößlém's ürl nämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"Scores are shown without weighting applied, so if your problem contains 2 "
+"questions, it will display as having a total of 2 points."
+msgstr ""
+"Sçörés äré shöwn wïthöüt wéïghtïng äpplïéd, sö ïf ýöür prößlém çöntäïns 2 "
+"qüéstïöns, ït wïll dïspläý äs hävïng ä tötäl öf 2 pöïnts. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Loading problem list..."
 msgstr "Löädïng prößlém lïst... Ⱡ'σяє#"
 
@@ -7652,19 +7766,29 @@ msgstr "Répörts Àväïläßlé för Döwnlöäd Ⱡ'σяєм #"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Unique, new file links for the CSV reports are generated on each visit to "
-"this page. These unique links expire within 5 minutes, due to the sensitive "
-"nature of student grade information. Please note that the report filename "
-"contains a timestamp that represents when your file was generated; this "
-"timestamp is UTC, not your local timezone."
+"A new CSV report is generated each time you click the <b>Generate Grade "
+"Report</b> button above. A link to each report remains available on this "
+"page, identified by the UTC date and time of generation. Reports are not "
+"deleted, so you will always be able to access previously generated reports "
+"from this page."
 msgstr ""
-"Ûnïqüé, néw fïlé lïnks för thé ÇSV répörts äré générätéd ön éäçh vïsït tö "
-"thïs pägé. Thésé ünïqüé lïnks éxpïré wïthïn 5 mïnütés, düé tö thé sénsïtïvé "
-"nätüré öf stüdént grädé ïnförmätïön. Pléäsé nöté thät thé répört fïlénämé "
-"çöntäïns ä tïméstämp thät réprésénts whén ýöür fïlé wäs générätéd; thïs "
-"tïméstämp ïs ÛTÇ, nöt ýöür löçäl tïmézöné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσ#"
+"À néw ÇSV répört ïs générätéd éäçh tïmé ýöü çlïçk thé <b>Généräté Grädé "
+"Répört</b> ßüttön äßövé. À lïnk tö éäçh répört rémäïns äväïläßlé ön thïs "
+"pägé, ïdéntïfïéd ßý thé ÛTÇ däté änd tïmé öf générätïön. Répörts äré nöt "
+"délétéd, sö ýöü wïll älwäýs ßé äßlé tö äççéss prévïöüslý générätéd répörts "
+"fröm thïs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
+"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσ#"
+
+#. Translators: a table of URL links to report files appears after this
+#. sentence.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"<b>Note</b>: To keep student data secure, you cannot save or email these "
+"links for direct access. Copies of links expire within 5 minutes."
+msgstr ""
+"<b>Nöté</b>: Tö kéép stüdént dätä séçüré, ýöü çännöt sävé ör émäïl thésé "
+"lïnks för dïréçt äççéss. Çöpïés öf lïnks éxpïré wïthïn 5 mïnütés. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Individual due date extensions"
@@ -7820,12 +7944,12 @@ msgstr "Géttïng äväïläßlé lïsts... Ⱡ'σяєм#"
 msgid ""
 "Staff cannot modify staff or beta tester lists. To modify these lists, "
 "contact your instructor and ask them to add you as an instructor for staff "
-"and beta lists, or a forum admin for forum management."
+"and beta lists, or a discussion admin for discussion management."
 msgstr ""
 "Stäff çännöt mödïfý stäff ör ßétä téstér lïsts. Tö mödïfý thésé lïsts, "
 "çöntäçt ýöür ïnstrüçtör änd äsk thém tö ädd ýöü äs än ïnstrüçtör för stäff "
-"änd ßétä lïsts, ör ä förüm ädmïn för förüm mänägémént. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂#"
+"änd ßétä lïsts, ör ä dïsçüssïön ädmïn för dïsçüssïön mänägémént. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ є#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Staff"
@@ -7855,11 +7979,11 @@ msgstr "Ìnstrüçtörs Ⱡ#"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Instructors are the core administration of your course. Instructors can add "
-"and remove course staff, as well as administer forum access."
+"and remove course staff, as well as administer discussion access."
 msgstr ""
 "Ìnstrüçtörs äré thé çöré ädmïnïsträtïön öf ýöür çöürsé. Ìnstrüçtörs çän ädd "
-"änd rémövé çöürsé stäff, äs wéll äs ädmïnïstér förüm äççéss. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"änd rémövé çöürsé stäff, äs wéll äs ädmïnïstér dïsçüssïön äççéss. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Instructor"
@@ -7883,55 +8007,61 @@ msgid "Beta Tester"
 msgstr "Bétä Téstér Ⱡ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Admins"
-msgstr "Förüm Àdmïns Ⱡ#"
+msgid "Discussion Admins"
+msgstr "Dïsçüssïön Àdmïns Ⱡ'σ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Forum admins can edit or delete any post, clear misuse flags, close and re-"
-"open threads, endorse responses, and see posts from all cohorts. They CAN "
-"add/delete other moderators and their posts are marked as 'staff'."
+"Discussion admins can edit or delete any post, clear misuse flags, close and"
+" re-open threads, endorse responses, and see posts from all cohorts. They "
+"CAN add/delete other moderators and their posts are marked as 'staff'."
 msgstr ""
-"Förüm ädmïns çän édït ör délété äný pöst, çléär mïsüsé flägs, çlösé änd ré-"
-"öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll çöhörts. Théý ÇÀN "
-"ädd/délété öthér mödérätörs änd théïr pösts äré märkéd äs 'stäff'. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єι#"
+"Dïsçüssïön ädmïns çän édït ör délété äný pöst, çléär mïsüsé flägs, çlösé änd"
+" ré-öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll çöhörts. Théý "
+"ÇÀN ädd/délété öthér mödérätörs änd théïr pösts äré märkéd äs 'stäff'. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Moderators"
-msgstr "Förüm Mödérätörs Ⱡ'σ#"
+msgid "Discussion Admin"
+msgstr "Dïsçüssïön Àdmïn Ⱡ'σ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Discussion Moderators"
+msgstr "Dïsçüssïön Mödérätörs Ⱡ'σя#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Forum moderators can edit or delete any post, clear misuse flags, close and "
-"re-open threads, endorse responses, and see posts from all cohorts. They "
-"CANNOT add/delete other moderators and their posts are marked as 'staff'."
+"Discussion moderators can edit or delete any post, clear misuse flags, close"
+" and re-open threads, endorse responses, and see posts from all cohorts. "
+"They CANNOT add/delete other moderators and their posts are marked as "
+"'staff'."
 msgstr ""
-"Förüm mödérätörs çän édït ör délété äný pöst, çléär mïsüsé flägs, çlösé änd "
-"ré-öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll çöhörts. Théý "
-"ÇÀNNÖT ädd/délété öthér mödérätörs änd théïr pösts äré märkéd äs 'stäff'. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕм#"
+"Dïsçüssïön mödérätörs çän édït ör délété äný pöst, çléär mïsüsé flägs, çlösé"
+" änd ré-öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll çöhörts. "
+"Théý ÇÀNNÖT ädd/délété öthér mödérätörs änd théïr pösts äré märkéd äs "
+"'stäff'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
 msgstr "Àdd Mödérätör Ⱡ'#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Community TAs"
-msgstr "Förüm Çömmünïtý TÀs Ⱡ'σя#"
+msgid "Discussion Community TAs"
+msgstr "Dïsçüssïön Çömmünïtý TÀs Ⱡ'σяє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Community TA's are members of the community whom you deem particularly "
-"helpful on the forums. They can edit or delete any post, clear misuse flags,"
-" close and re-open threads, endorse responses, and see posts from all "
-"cohorts. Their posts are marked 'Community TA'."
+"helpful on the discussion boards. They can edit or delete any post, clear "
+"misuse flags, close and re-open threads, endorse responses, and see posts "
+"from all cohorts. Their posts are marked 'Community TA'."
 msgstr ""
 "Çömmünïtý TÀ's äré mémßérs öf thé çömmünïtý whöm ýöü déém pärtïçülärlý "
-"hélpfül ön thé förüms. Théý çän édït ör délété äný pöst, çléär mïsüsé flägs,"
-" çlösé änd ré-öpén thréäds, éndörsé réspönsés, änd séé pösts fröm äll "
-"çöhörts. Théïr pösts äré märkéd 'Çömmünïtý TÀ'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι#"
+"hélpfül ön thé dïsçüssïön ßöärds. Théý çän édït ör délété äný pöst, çléär "
+"mïsüsé flägs, çlösé änd ré-öpén thréäds, éndörsé réspönsés, änd séé pösts "
+"fröm äll çöhörts. Théïr pösts äré märkéd 'Çömmünïtý TÀ'. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂#"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
@@ -10099,9 +10229,8 @@ msgstr "Düplïçäté thïs çömpönént Ⱡ'σяє#"
 msgid "Delete this component"
 msgstr "Délété thïs çömpönént Ⱡ'σя#"
 
-#: cms/templates/component.html cms/templates/overview.html
-#: cms/templates/overview.html
-#: cms/templates/unit_container_xblock_component.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/overview.html cms/templates/overview.html
 msgid "Drag to reorder"
 msgstr "Dräg tö réördér Ⱡ'#"
 

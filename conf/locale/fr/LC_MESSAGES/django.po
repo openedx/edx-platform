@@ -89,6 +89,7 @@
 # Bertrand Marron <bertrand.marron@gmail.com>, 2013-2014
 # chrisc <christopher.castermane@student.uclouvain.be>, 2014
 # Encolpe Degoute <encolpe.degoute@free.fr>, 2013
+# francoisedocq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2013
 # Gilles_Langevin <langevin.net@gmail.com>, 2013
 # JRolland <julien.rolland33@gmail.com>, 2013
@@ -120,7 +121,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-02 15:08-0500\n"
+"POT-Creation-Date: 2014-03-10 09:12-0400\n"
 "PO-Revision-Date: 2014-03-03 14:01+0000\n"
 "Last-Translator: antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -238,6 +239,53 @@ msgstr ""
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
 msgstr "Compte désactivé"
+
+#: common/djangoapps/student/models.py
+msgid "Male"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Female"
+msgstr ""
+
+#. Translators: 'Other' refers to the student's gender
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py common/djangoapps/student/models.py
+msgid "Other"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Doctorate"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Master's or professional degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Bachelor's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Associate's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Secondary/high school"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Junior secondary/junior high/middle school"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Elementary/primary school"
+msgstr ""
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "None"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -1507,6 +1555,20 @@ msgstr "Impossible d'exécuter la commande d'importation."
 msgid "The underlying module store does not support import."
 msgstr "Le module de stockage sous-jacent ne supporte pas l'importation."
 
+#. Translators: This is an error message when they ask for a
+#. particular version of a git repository and that version isn't
+#. available from the remote source they specified
+#: lms/djangoapps/dashboard/git_import.py
+msgid "The specified remote branch is not available."
+msgstr ""
+
+#. Translators: Error message shown when they have asked for a git
+#. repository branch, a specific version within a repository, that
+#. doesn't exist, or there is a problem changing to it.
+#: lms/djangoapps/dashboard/git_import.py
+msgid "Unable to switch to specified branch. Please check your branch name."
+msgstr ""
+
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed in authenticating {0}, error {1}\n"
 msgstr "Échec dans l'authentification {0}, erreur {1}\n"
@@ -1647,15 +1709,22 @@ msgstr ""
 "Le cours {0} existe déjà dans le répertoire de données ! (rechargement "
 "malgré tout)"
 
+#. Translators: unable to download the course content from
+#. the source git repository. Clone occurs if this is brand
+#. new, and pull is when it is being updated from the
+#. source.
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Unable to clone or pull repository. Please check your url."
+msgid ""
+"Unable to clone or pull repository. Please check your url. Output was: {0!r}"
 msgstr ""
-"Impossible de cloner ou récupérer le répertoire. Veuillez vérifier votre "
-"url."
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed to clone repository to {0}"
 msgstr "Échec lors du clonage du répertoire vers {0}"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Successfully switched to branch: {branch_name}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Loaded course {0} {1}<br/>Errors:"
@@ -1733,9 +1802,10 @@ msgid "full_name"
 msgstr "nom complet"
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
-msgid "Import the specified git repository into the modulestore and directory"
+msgid ""
+"Import the specified git repository and optional branch into the modulestore"
+" and optionally specified directory."
 msgstr ""
-"Importer le répertoire git spécifié dans le module de stockage et dossier"
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Cannot find user with email address"
@@ -3751,6 +3821,12 @@ msgstr "Enregistrer"
 msgid "Cancel"
 msgstr "Annuler"
 
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/container_xblock_component.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Voir"
+
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
 msgstr "Erreur :"
@@ -3808,12 +3884,6 @@ msgstr "Nom d'utilisateur public"
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "Preferred Language"
 msgstr "Langue préférée"
-
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/unit_container_xblock_component.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Voir"
 
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
@@ -5091,7 +5161,7 @@ msgstr "Aide pour l'inscription"
 
 #: lms/templates/register-sidebar.html
 msgid "Already registered?"
-msgstr "Déjà enregistré ?"
+msgstr "Déjà inscrit ?"
 
 #: lms/templates/register-sidebar.html
 msgid "Click here to log in."
@@ -5344,6 +5414,12 @@ msgstr "Vous avez déjà un compte ?"
 msgid "Login."
 msgstr "Connexion"
 
+#. Translators: The 'Group' here refers to the group of users that has been
+#. sorted into group_id
+#: lms/templates/split_test_staff_view.html
+msgid "Group {group_id}"
+msgstr ""
+
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
 msgstr "Info de débogage pour l'équipe pédagogique"
@@ -5520,9 +5596,17 @@ msgstr ""
 msgid "Administer Courses"
 msgstr "Administrer les cours"
 
+#. Translators: Repo is short for git repository or source of
+#. courseware
 #: lms/templates/sysadmin_dashboard.html
-msgid "Repo location"
-msgstr "Emplacement du Repo"
+msgid "Repo Location"
+msgstr ""
+
+#. Translators: Repo is short for git repository or source of
+#. courseware and branch is a specific version within that repository
+#: lms/templates/sysadmin_dashboard.html
+msgid "Repo Branch (optional)"
+msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
@@ -5540,6 +5624,7 @@ msgstr "Supprimer le cours du site"
 msgid "Django PID"
 msgstr "PID Django"
 
+#. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
 msgid "Platform Version"
 msgstr "Version de la plateforme"
@@ -5708,9 +5793,13 @@ msgstr "Retourner au début du sous-titrage."
 msgid "Download video"
 msgstr "Télécharger la vidéo"
 
-#: lms/templates/video.html
-msgid "Download timed transcript"
-msgstr "Télécharger le sous-titrage"
+#: lms/templates/video.html lms/templates/video.html
+msgid "Download transcript"
+msgstr ""
+
+#: lms/templates/video.html lms/templates/video.html
+msgid "{file_format}"
+msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "Your words:"
@@ -5944,7 +6033,7 @@ msgstr "A propos de {course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html
 msgid "You are registered for this course"
-msgstr "Vous êtes enregistré dans ce cours"
+msgstr "Vous êtes inscrit à ce cours"
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
@@ -6189,7 +6278,6 @@ msgid "Psychometrics"
 msgstr "Psychométriques"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Forum Admin"
 msgstr "Forum Admin"
 
@@ -6516,8 +6604,10 @@ msgid "No Analytics are available at this time."
 msgstr "Aucune analyse disponible pour le moment."
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Students enrolled:"
-msgstr "Étudiants inscrits :"
+msgid ""
+"Students enrolled (historical count, includes those who have since "
+"unenrolled):"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students active in the last week:"
@@ -7507,6 +7597,18 @@ msgid "Grade Distribution"
 msgstr "Répartition des notes"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"The chart below displays the score distribution for each standard problem in"
+" your class, specified by the problem's url name."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"Scores are shown without weighting applied, so if your problem contains 2 "
+"questions, it will display as having a total of 2 points."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Loading problem list..."
 msgstr "Chargement de la liste des exercices..."
 
@@ -7530,7 +7632,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
-msgstr "Information de base du cours"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Name:"
@@ -7659,18 +7761,20 @@ msgstr "Rapports disponibles pour être téléchargés"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Unique, new file links for the CSV reports are generated on each visit to "
-"this page. These unique links expire within 5 minutes, due to the sensitive "
-"nature of student grade information. Please note that the report filename "
-"contains a timestamp that represents when your file was generated; this "
-"timestamp is UTC, not your local timezone."
+"A new CSV report is generated each time you click the <b>Generate Grade "
+"Report</b> button above. A link to each report remains available on this "
+"page, identified by the UTC date and time of generation. Reports are not "
+"deleted, so you will always be able to access previously generated reports "
+"from this page."
 msgstr ""
-"Les liens vers les fichiers de rapports CSV sont générés à chaque visite sur"
-" cette page. Ces liens uniques expirent dans les 5 minutes, du fait de la "
-"nature sensible des informations relatives aux notes des étudiants. Veuillez"
-" noter que le nom des rapports mentionne le moment où le fichier a été "
-"généré; cette mention est exprimée dans le fuseau horaire UTC et non dans "
-"votre fuseau horaire local."
+
+#. Translators: a table of URL links to report files appears after this
+#. sentence.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"<b>Note</b>: To keep student data secure, you cannot save or email these "
+"links for direct access. Copies of links expire within 5 minutes."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Individual due date extensions"
@@ -7826,13 +7930,8 @@ msgstr "Obtention des listes disponibles"
 msgid ""
 "Staff cannot modify staff or beta tester lists. To modify these lists, "
 "contact your instructor and ask them to add you as an instructor for staff "
-"and beta lists, or a forum admin for forum management."
+"and beta lists, or a discussion admin for discussion management."
 msgstr ""
-"L'équipe pédagogique ne peut pas modifier la liste de l'équipe pédagogique "
-"ou celle des bêta-testeurs. Pour modifier ces listes, veuillez contacter "
-"votre administrateur pour lui demander de vous ajouter en tant "
-"qu'administrateur de ces listes, ou un administrateur du forum pour la "
-"gestion du forum."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Staff"
@@ -7862,11 +7961,8 @@ msgstr "Enseignants"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Instructors are the core administration of your course. Instructors can add "
-"and remove course staff, as well as administer forum access."
+"and remove course staff, as well as administer discussion access."
 msgstr ""
-"Les enseignants forment le coeur de gestion de votre cours. Les enseignants "
-"peuvent ajouter et supprimer des membres de l'équipe de cours, tout comme "
-"administrer l'accès au forum."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Instructor"
@@ -7890,57 +7986,47 @@ msgid "Beta Tester"
 msgstr "Beta Testeur"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Admins"
-msgstr "Admins de forum"
+msgid "Discussion Admins"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Forum admins can edit or delete any post, clear misuse flags, close and re-"
-"open threads, endorse responses, and see posts from all cohorts. They CAN "
-"add/delete other moderators and their posts are marked as 'staff'."
+"Discussion admins can edit or delete any post, clear misuse flags, close and"
+" re-open threads, endorse responses, and see posts from all cohorts. They "
+"CAN add/delete other moderators and their posts are marked as 'staff'."
 msgstr ""
-"Les administrateurs du forum peuvent modifier ou supprimer un message, "
-"annuler un signalement d'abus, fermer ou rouvrir une discussion, approuver "
-"une réponse, et voir les messages de toutes les cohortes. Ils PEUVENT "
-"ajouter/supprimer d'autres modérateurs, et leurs messages sont affichés en "
-"tant que 'équipe pédagogique'."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Moderators"
-msgstr "Modérateurs du forum"
+msgid "Discussion Admin"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Discussion Moderators"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Forum moderators can edit or delete any post, clear misuse flags, close and "
-"re-open threads, endorse responses, and see posts from all cohorts. They "
-"CANNOT add/delete other moderators and their posts are marked as 'staff'."
+"Discussion moderators can edit or delete any post, clear misuse flags, close"
+" and re-open threads, endorse responses, and see posts from all cohorts. "
+"They CANNOT add/delete other moderators and their posts are marked as "
+"'staff'."
 msgstr ""
-"Les modérateurs du forum peuvent modifier ou supprimer un message, annuler "
-"un signalement d'abus, fermer ou rouvrir une discussion, approuver une "
-"réponse, et voir les messages de toutes les cohortes. Ils NE PEUVENT PAS "
-"ajouter/supprimer d'autres modérateurs, et leurs messages sont affichés en "
-"tant que 'équipe pédagogique'."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
 msgstr "Ajouter un Modérateur"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Community TAs"
-msgstr "Assistants professeurs communautaires du forum"
+msgid "Discussion Community TAs"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Community TA's are members of the community whom you deem particularly "
-"helpful on the forums. They can edit or delete any post, clear misuse flags,"
-" close and re-open threads, endorse responses, and see posts from all "
-"cohorts. Their posts are marked 'Community TA'."
+"helpful on the discussion boards. They can edit or delete any post, clear "
+"misuse flags, close and re-open threads, endorse responses, and see posts "
+"from all cohorts. Their posts are marked 'Community TA'."
 msgstr ""
-"Les community AS sont des membres de la communauté qui ont été "
-"particulièrement utiles sur les forums. Ils peuvent éditer ou supprimer "
-"n'importe quel message, effacer les indicateurs inappropriés, fermer et "
-"rouvrir des sujets, approuver des réponses, et voir les messages de tous les"
-" groupes. Leurs messages sont marqués comme 'Community TA'."
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
@@ -9983,7 +10069,7 @@ msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "File URLs"
-msgstr ""
+msgstr "URLs des documents"
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -10009,6 +10095,10 @@ msgid ""
 "can lock a file so that people who are not enrolled in your course cannot "
 "access that file."
 msgstr ""
+"Vous pouvez uploader de nouveaux fichiers ou voir, télécharger ou supprimer "
+"les fichiers déjà présents. Vous pouvez verrouiller l'accès à un fichier "
+"pour que les personnes qui ne sont pas inscrites à votre cours ne puissent "
+"pas y avoir accès."
 
 #: cms/templates/asset_index.html
 msgid "Your file has been deleted."
@@ -10034,19 +10124,25 @@ msgstr "Checklists Actuelles"
 
 #: cms/templates/checklists.html
 msgid "What are course checklists?"
-msgstr ""
+msgstr "Que sont les checklists de cours ?"
 
 #: cms/templates/checklists.html
 msgid ""
 "Course checklists are tools to help you understand and keep track of all the"
 " steps necessary to get your course ready for students."
 msgstr ""
+"Les checklists de cours sont des outils destinés à vous aider à comprendre "
+"et à assurer le suivi de toutes les étapes nécessaires pour rendre votre "
+"cours prêt à accueillir les étudiants."
 
 #: cms/templates/checklists.html
 msgid ""
 "Any changes you make to these checklists are saved automatically and are "
 "immediately visible to other course team members."
 msgstr ""
+"Tous les changements que vous faites dans ces checklists sont "
+"automatiquement sauvegardés et sont directement visibles pour les autres "
+"membres de l'équipe pédagogique du cours."
 
 #: cms/templates/component.html
 msgid "Editor"
@@ -10064,9 +10160,8 @@ msgstr "Dupliquer ce composant"
 msgid "Delete this component"
 msgstr "Supprimer ce composant"
 
-#: cms/templates/component.html cms/templates/overview.html
-#: cms/templates/overview.html
-#: cms/templates/unit_container_xblock_component.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/overview.html cms/templates/overview.html
 msgid "Drag to reorder"
 msgstr "Glissez pour modifier l'ordre"
 
@@ -10415,15 +10510,15 @@ msgstr ""
 
 #: cms/templates/export_git.html
 msgid "Export Failed"
-msgstr ""
+msgstr "Export échoué"
 
 #: cms/templates/export_git.html
 msgid "Export Succeeded"
-msgstr ""
+msgstr "Export réussi"
 
 #: cms/templates/export_git.html
 msgid "Your course:"
-msgstr ""
+msgstr "Votre cours :"
 
 #: cms/templates/export_git.html
 msgid "Course git url:"
@@ -11576,7 +11671,7 @@ msgstr "Premier jour de Cours"
 
 #: cms/templates/settings.html
 msgid "Course Start Time"
-msgstr "Heure de début de Cours"
+msgstr "Heure de début du Cours"
 
 #: cms/templates/settings.html
 msgid "Course End Date"
@@ -11588,7 +11683,7 @@ msgstr "Dernier jour d'activité de votre Cours"
 
 #: cms/templates/settings.html
 msgid "Course End Time"
-msgstr "Heure de fin de Cours"
+msgstr "Heure de fin du Cours"
 
 #: cms/templates/settings.html
 msgid "Enrollment Start Date"
@@ -11600,7 +11695,7 @@ msgstr "Premier jour d'inscription des étudiants"
 
 #: cms/templates/settings.html
 msgid "Enrollment Start Time"
-msgstr "Heure de début d'inscription des étudiants"
+msgstr "Heure de début d’inscription"
 
 #: cms/templates/settings.html
 msgid "Enrollment End Date"
@@ -11612,7 +11707,7 @@ msgstr "Dernier jour d'inscription des étudiants"
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
-msgstr "Heure de fin d'inscription"
+msgstr "Heure de fin d’inscription"
 
 #: cms/templates/settings.html
 msgid "These Dates Are Not Used When Promoting Your Course"
@@ -11645,13 +11740,15 @@ msgstr "Information pour les futurs étudiants"
 
 #: cms/templates/settings.html
 msgid "Course Short Description"
-msgstr ""
+msgstr "Description courte du cours :"
 
 #: cms/templates/settings.html
 msgid ""
 "Appears on the course catalog page when students roll over the course name. "
 "Limit to ~150 characters"
 msgstr ""
+"Apparait dans la page de catalogue des cours, quand l'étudiant survole le "
+"nom du cours. Limité à ~150 caractères. "
 
 #: cms/templates/settings.html
 msgid "Course Overview"
@@ -12212,7 +12309,7 @@ msgstr "Afficher les indices"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Label"
-msgstr ""
+msgstr "Label"
 
 #: cms/templates/widgets/sock.html
 msgid "Looking for Help with Studio?"

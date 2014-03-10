@@ -30,6 +30,7 @@
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # chrisc <christopher.castermane@student.uclouvain.be>, 2014
 # Encolpe Degoute <encolpe.degoute@free.fr>, 2013
+# francoisedocq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014
 # JRolland <julien.rolland33@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
@@ -39,9 +40,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-02 15:08-0500\n"
-"PO-Revision-Date: 2014-03-01 21:10+0000\n"
-"Last-Translator: cpennington <cale@edx.org>\n"
+"POT-Creation-Date: 2014-03-10 09:11-0400\n"
+"PO-Revision-Date: 2014-03-03 16:12+0000\n"
+"Last-Translator: francoisedocq\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1292,14 +1293,17 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
+"Cet incident vous affecte à cause d'une erreur sur notre serveur ou d'un "
+"problème de votre connexion internet. Essayez de rafraichir la page ou "
+"vérifiez que votre connexion est bien active."
 
 #: cms/static/coffee/src/main.js
 msgid "Studio's having trouble saving your work"
-msgstr ""
+msgstr "Studio a des problèmes pour sauvegarder votre travail"
 
 #: cms/static/coffee/src/views/module_edit.js
 msgid "<em>Editing:</em> %s"
-msgstr ""
+msgstr "<em>Edition:</em> %s"
 
 #: cms/static/coffee/src/views/module_edit.js
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
@@ -1313,13 +1317,15 @@ msgstr "Enregistrement&hellip;"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid "Delete Component Confirmation"
-msgstr ""
+msgstr "Confirmation de la suppression du composant"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid ""
 "Are you sure you want to delete this component? This action cannot be "
 "undone."
 msgstr ""
+"Êtes-vous sûr de vouloir supprimer ce composant ? Cette action ne peut être "
+"annulée."
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/course_info_update.js
@@ -1336,15 +1342,15 @@ msgstr ""
 
 #: cms/static/coffee/src/views/unit.js
 msgid "Delete this component?"
-msgstr ""
+msgstr "Supprimer ce composant ?"
 
 #: cms/static/coffee/src/views/unit.js
 msgid "Deleting this component is permanent and cannot be undone."
-msgstr ""
+msgstr "Supprimer ce composant est définitif et ne peut pas être annulé."
 
 #: cms/static/coffee/src/views/unit.js
 msgid "Yes, delete this component"
-msgstr ""
+msgstr "Oui, supprimer ce composant"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
@@ -1364,7 +1370,7 @@ msgstr "Oui, supprimer ceci"
 
 #: cms/static/js/index.js
 msgid "Please do not use any spaces in this field."
-msgstr ""
+msgstr "Merci de ne pas utiliser d'espace dans ce champ."
 
 #: cms/static/js/index.js
 msgid ""
