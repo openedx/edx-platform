@@ -72,7 +72,7 @@ class Middleware(object):
             course = get_course_with_access(request.user, course_id, 'load')
             if not course.allow_public_wiki_access:
                 is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
-                is_staff = has_access(request.user, course, 'staff')
+                is_staff = has_access(request.user, 'staff', course)
                 if not (is_enrolled or is_staff):
                     raise PermissionDenied()
 
@@ -157,7 +157,7 @@ def context_processor(request):
 
         try:
             course = get_course_with_access(request.user, course_id, 'load')
-            staff_access = has_access(request.user, course, 'staff')
+            staff_access = has_access(request.user, 'staff', course)
             return {'course': course,
                     'staff_access': staff_access}
         except Http404:

@@ -18,7 +18,7 @@ def index(request, course_id, book_index, page=None):
     Serve static image-based textbooks.
     """
     course = get_course_with_access(request.user, course_id, 'load')
-    staff_access = has_access(request.user, course, 'staff')
+    staff_access = has_access(request.user, 'staff', course)
 
     book_index = int(book_index)
     if book_index < 0 or book_index >= len(course.textbooks):
@@ -73,7 +73,7 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
     page:  (optional) one-based page number to display within the PDF.  Defaults to first page.
     """
     course = get_course_with_access(request.user, course_id, 'load')
-    staff_access = has_access(request.user, course, 'staff')
+    staff_access = has_access(request.user, 'staff', course)
 
     book_index = int(book_index)
     if book_index < 0 or book_index >= len(course.pdf_textbooks):
@@ -115,7 +115,7 @@ def html_index(request, course_id, book_index, chapter=None):
         each chapter in a textbook.
     """
     course = get_course_with_access(request.user, course_id, 'load')
-    staff_access = has_access(request.user, course, 'staff')
+    staff_access = has_access(request.user, 'staff', course)
     notes_enabled = notes_enabled_for_course(course)
 
     book_index = int(book_index)

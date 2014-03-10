@@ -384,10 +384,10 @@ class TestBetatesterAccess(ModuleStoreTestCase):
         self.assertFalse(self.course.has_started())
 
         # student user shouldn't see it
-        self.assertFalse(has_access(self.normal_student, self.course, 'load'))
+        self.assertFalse(has_access(self.normal_student, 'load', self.course))
 
         # now the student should see it
-        self.assertTrue(has_access(self.beta_tester, self.course, 'load'))
+        self.assertTrue(has_access(self.beta_tester, 'load', self.course))
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_content_beta_period(self):
@@ -395,7 +395,7 @@ class TestBetatesterAccess(ModuleStoreTestCase):
         Check that beta-test access works for content.
         """
         # student user shouldn't see it
-        self.assertFalse(has_access(self.normal_student, self.content, 'load', self.course.id))
+        self.assertFalse(has_access(self.normal_student, 'load', self.content, self.course.id))
 
         # now the student should see it
-        self.assertTrue(has_access(self.beta_tester, self.content, 'load', self.course.id))
+        self.assertTrue(has_access(self.beta_tester, 'load', self.content, self.course.id))

@@ -143,7 +143,7 @@ def combined_notifications(course, user):
     #Initialize controller query service using our mock system
     controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     student_id = unique_id_for_user(user)
-    user_is_staff = has_access(user, course, 'staff')
+    user_is_staff = has_access(user, 'staff', course)
     course_id = course.id
     notification_type = "combined"
 

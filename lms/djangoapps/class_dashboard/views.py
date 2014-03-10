@@ -20,7 +20,7 @@ def has_instructor_access_for_class(user, course_id):
     """
 
     course = get_course_with_access(user, course_id, 'staff', depth=None)
-    return has_access(user, course, 'staff')
+    return has_access(user, 'staff', course)
 
 
 def all_sequential_open_distrib(request, course_id):

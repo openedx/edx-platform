@@ -443,13 +443,13 @@ def dashboard(request):
     # Global staff can see what courses errored on their dashboard
     staff_access = False
     errored_courses = {}
-    if has_access(user, 'global', 'staff'):
+    if has_access(user, 'staff', 'global'):
         # Show any courses that errored on load
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
     show_courseware_links_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
-                                          if has_access(request.user, course, 'load'))
+                                          if has_access(request.user, 'load', course))
 
     course_modes = {course.id: complete_course_mode_info(course.id, enrollment) for course, enrollment in course_enrollment_pairs}
     cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in course_enrollment_pairs}
@@ -588,7 +588,7 @@ def change_enrollment(request):
                         .format(user.username, course_id))
             return HttpResponseBadRequest(_("Course id is invalid"))
 
-        if not has_access(user, course, 'enroll'):
+        if not has_access(user, 'enroll', course):
             return HttpResponseBadRequest(_("Enrollment is closed"))
 
         # see if we have already filled up all allowed enrollments
