@@ -173,7 +173,7 @@ def instructor_dashboard(request, course_id):
         # complete the url using information about the current course:
         parts = Location.parse_course_id(course_id)
         parts['url'] = urlname
-        return u"i4x://{org}/{name}/{url}".format(**parts)
+        return u"i4x://{org}/{course}/{url}".format(**parts)
 
     def get_student_from_identifier(unique_student_identifier):
         """Gets a student object using either an email address or username"""
