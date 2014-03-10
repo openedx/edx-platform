@@ -24,6 +24,7 @@ Longer TODO:
 # want to import all variables from base settings files
 # pylint: disable=W0401, W0611, W0614
 
+import imp
 import sys
 import lms.envs.common
 from lms.envs.common import (
@@ -33,8 +34,6 @@ from path import path
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.mixin import CmsBlockMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin, prefer_xmodules
 from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
@@ -217,6 +216,10 @@ MIDDLEWARE_CLASSES = (
 X_FRAME_OPTIONS = 'ALLOW'
 
 ############# XBlock Configuration ##########
+
+# Import after sys.path fixup
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin, prefer_xmodules
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
@@ -467,9 +470,6 @@ INSTALLED_APPS = (
     # for course creator table
     'django.contrib.admin',
 
-    # XBlocks containing migrations
-    'mentoring',
-
     # for managing course modes
     'course_modes',
 
@@ -536,11 +536,22 @@ MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 
 
-### JSdraw (only installed in some instances)
+### Apps only installed in some instances
 
-try:
-    import edx_jsdraw
-except ImportError:
-    pass
-else:
-    INSTALLED_APPS += ('edx_jsdraw',)
+OPTIONAL_APPS = (
+    'edx_jsdraw',
+    'mentoring',
+)
+
+for app_name in OPTIONAL_APPS:
+    # First attempt to only find the module rather than actually importing it,
+    # to avoid circular references - only try to import if it can't be found
+    # by find_module, which doesn't work with import hooks
+    try:
+        imp.find_module(app_name)
+    except ImportError:
+        try:
+            __import__(app_name)
+        except ImportError:
+            continue
+    INSTALLED_APPS += (app_name,)
