@@ -142,7 +142,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.addCleanup(self.store.close_all_connections)
 
         self.course_locations = {
-            course_id: generate_location(course_id)
+            course_id: course_id
             for course_id in [self.MONGO_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
         }
         self.fake_location = Location('i4x', 'foo', 'bar', 'vertical', 'baz')
@@ -350,7 +350,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         """
         self.initdb(default_ms)
         # create loc_map entry
-        loc_mapper().translate_location(self.MONGO_COURSEID, generate_location(self.MONGO_COURSEID))
+        loc_mapper().translate_location(self.MONGO_COURSEID, self.MONGO_COURSEID)
         orphan = self.store.create_item(self.MONGO_COURSEID, 'problem', block_id='orphan')
         self.assertEqual(
             orphan.location.version_agnostic().as_course_locator(),
@@ -413,13 +413,3 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
         doc_store_config=doc_store_config,
         **options
     )
-
-
-def generate_location(course_id):
-    """
-    Generate the locations for the given ids
-    """
-    course_dict = Location.parse_course_id(course_id)
-    course_dict['tag'] = 'i4x'
-    course_dict['category'] = 'course'
-    return Location(course_dict)

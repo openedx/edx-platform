@@ -290,17 +290,8 @@ class MixedModuleStore(ModuleStoreWriteBase):
         if not hasattr(store, 'create_course'):
             raise NotImplementedError(u"Cannot create a course on store %s" % store_name)
         if store.get_modulestore_type(course_id) == SPLIT_MONGO_MODULESTORE_TYPE:
-            id_root = kwargs.get('id_root')
-            try:
-                course_dict = Location.parse_course_id(course_id)
-                org = course_dict['org']
-                if id_root is None:
-                    id_root = "{org}.{course}.{name}".format(**course_dict)
-            except ValueError:
-                org = None
-                if id_root is None:
-                    id_root = course_id
-            org = kwargs.pop('org', org)
+            id_root = kwargs.get('id_root', course_id)
+            org = kwargs.pop('org', course_id.org)
             pretty_id = kwargs.pop('pretty_id', id_root)
             fields = kwargs.pop('fields', {})
             fields.update(kwargs.pop('metadata', {}))

@@ -557,9 +557,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         Get the course with the given courseid (org/course/run)
         """
-        id_components = Location.parse_course_id(course_id)
-        id_components['tag'] = 'i4x'
-        id_components['category'] = 'course'
+        id_components = Location('i4x', course_id.org, course_id.course, 'course', course_id.run)
         try:
             return self.get_item(Location(id_components))
         except ItemNotFoundError:
@@ -626,10 +624,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             if location.category != 'course':
                 raise ValueError(u"Course roots must be of category 'course': {}".format(unicode(location)))
         else:
-            course_dict = Location.parse_course_id(course_id)
-            course_dict['category'] = 'course'
-            course_dict['tag'] = 'i4x'
-            location = Location(course_dict)
+            location = Location('i4x', course_id.org, course_id.course, 'course', course_id.run)
         return self.create_and_save_xmodule(location, definition_data, metadata, runtime)
 
     def create_xmodule(self, location, definition_data=None, metadata=None, system=None, fields={}):

@@ -227,14 +227,12 @@ def add_repo(repo, rdir_in, branch=None):
 
     # extract course ID from output of import-command-run and make symlink
     # this is needed in order for custom course scripts to work
-    match = re.search('(?ms)===> IMPORTING course to location (\S+)',
+    match = re.search('(?ms)===> IMPORTING course (\S+) to location (\S+)',
                       ret_import)
     if match:
-        location = Location(match.group(1))
-        log.debug('location = {0}'.format(location))
-        course_id = location.course_id
+        course_id = match.group(1)
 
-        cdir = '{0}/{1}'.format(GIT_REPO_DIR, location.course)
+        cdir = '{0}/{1}'.format(GIT_REPO_DIR, course_id.get('course'))
         log.debug('Studio course dir = {0}'.format(cdir))
 
         if os.path.exists(cdir) and not os.path.islink(cdir):

@@ -113,8 +113,6 @@ def calculate_task_statistics(students, course, location, task_number, write_to_
         elif task_state == OpenEndedChild.POST_ASSESSMENT or task_state == OpenEndedChild.DONE:
             students_with_graded_submissions.append(student)
 
-    location = Location(location)
-
     print "----------------------------------"
     print "Time: {0}".format(time.strftime("%Y %b %d %H:%M:%S +0000", time.gmtime()))
     print "Course: {0}".format(course.id)

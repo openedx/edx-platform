@@ -44,10 +44,7 @@ class Command(BaseCommand):
                 "a location and a user identifier (email or ID)"
             )
 
-        try:
-            location = Location(args[0])
-        except InvalidLocationError:
-            raise CommandError("Invalid location string {}".format(args[0]))
+        location = args[0]
 
         try:
             user = user_from_str(args[1])
