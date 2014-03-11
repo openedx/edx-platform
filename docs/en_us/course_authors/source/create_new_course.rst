@@ -28,7 +28,8 @@ This chapter describes how to create and set up your course:
 
 Also see the chapters :ref:`Establish a Grading Policy`, :ref:`Organizing Your Course Content`, and :ref:`Guidelines for Creating Accessible Content`.
 
-
+.. _Edge: http://edge.edx.org
+.. _edX.org: http://edx.org
 
 .. _Create a New Course:
   
@@ -144,20 +145,43 @@ From the **Settings** menu, select **Schedule and Details**.
 .. image:: Images/schedule.png
   :alt: An image of the course schedule page.
 
-.. note:: 
-
-    The default **Course Start Date** is set far into the future, to **01/01/2030 GMT**. This is to ensure that your course does not start before you intend it to.  You must change the course start date to the date you want students to begin using the course.  
-
 Follow the on-screen text to enter the course and enrollment schedule.
 
 .. note::
 
     The Time fields on this page reflect the current time zone in your browser, depending on your geography. Course start times for students are shown as UTC.
 
-Students see the course start date on their dashboards:
+
+.. _The Course Start Date:
+
+==============================
+The Course Start Date
+==============================
+
+.. note:: 
+
+    The default **Course Start Date** is set far into the future, to **01/01/2030 GMT**. This is to ensure that your course does not start before you intend it to.  You must change the course start date to the date you want students to begin using the course. 
+
+Students see the course start date on their dashboards and on the course summary page.
+
+The following example shows the course start date on the course summary page:
+
+.. image:: Images/about-page-course-start.png
+ :alt: An image of the course summary page, with the start date circled.
+
+.. note:: For courses on edX.org_, you must communicate the course start date to your edX Program Manager, to ensure the date is accurate on the course summary page.
+
+In the dashboard, if the course has not yet started, students see the start date as in the following example:
+
+.. image:: Images/dashboard-course-to-start.png
+ :alt: An image of a course that has not started in the student dashboard, with the start date circled.
+
+If the course has started, students see the start date as in the following example:
 
 .. image:: Images/dashboard-course.png
  :alt: An image of a course listing in the student dashboard, with the start date circled.
+
+
 
 .. _Set the Advertised Start Date:
 
@@ -183,11 +207,31 @@ The start date shown on the student's dashboard is now the value of the advertis
 .. image:: Images/dashboard-course_adver_start.png
  :alt: An image of a course listing in the student dashboard, with the advertised start date circled.
 
-If you do not change the default course start date (01/01/2030), and the advertised_start policy value is null, then the student dashboard does not list a start date for the course.  Students just see that the course has not yet started:
+If you do not change the default course start date (01/01/2030), and the **advertised_start** policy value is ``null``, then the student dashboard does not list a start date for the course.  Students just see that the course has not yet started:
 
 .. image:: Images/dashboard-course_not_started.png
  :alt: Image of a course listing in the student dashboard, with no start date.
 
+
+.. _The Course End Date:
+
+==============================
+The Course End Date
+==============================
+
+When your course is completed, students see the course end date on their dashboards.
+
+.. note:: For courses on edX.org_, you must communicate the course end date to your edX Program Manager, to ensure the date is accurate on the course summary page.
+
+If grades and certificates are not yet issued, or if students enroll in an archived course after it has ended, the course appears in the dashboard as in the following example:
+
+.. image:: Images/dashboard-wrapping-course.png
+ :alt: Image of a course on the student dashboard that has ended, but not been graded
+
+If grades are complete and certificates are issued, students see the course, the end date, and the message as in the following example:
+
+.. image:: Images/dashboard-completed-course.png
+ :alt: Image of a course on the student dashboard that has ended, but not been graded
 
 .. _`Describe Your Course`:
 
@@ -195,11 +239,14 @@ If you do not change the default course start date (01/01/2030), and the adverti
 Describe Your Course
 ************************
 
-The description of your course appears on the Course Summary page that students see, and includes a course summary, prerequisites, staff information and FAQs.
+On Edge_, students that you explicitly invite see the description of your course on the course summary page.
 
-For courses on edX.org, the description is shown in the course catalog. 
+For example, the course description is circled in the following course summary page:
 
-On Edge, there is no course catalog and users will not find your course description. You must explicitly invite students to participate in your course for them to find the description.
+.. image:: Images/about-page-course-description.png
+ :alt: Image of a course summary with the description circled
+
+.. note:: For courses on edX.org_, you must communicate the course description to your edX Program Manager, to ensure the content is accurate on the course summary page.
 
 #. From the **Settings** menu, select **Schedule & Details**.
 #. Scroll down to the **Introducing Your Course** section, then locate the **Course Overview** field.
@@ -219,21 +266,40 @@ On Edge, there is no course catalog and users will not find your course descript
 Add a Course Image
 ************************
 
-The course image appears on the Course Summary page that students see.
+The course image that you add in Studio appears on the student dashboard. 
+
+On Edge_, the image also appears on the course summary page.
+
+In the following example, the course image that was added in Studio is circled in the student dashboard:
+
+.. image:: Images/dashboard-course-image.png
+ :alt: Image of the course image in the student dashboard
+
+On edX.org_, the course image you add in Studio does not appear on the course summary page automatically. You must work directly with your edX Program Manager to set up the course summary page.
 
 The course image should be a minimum of 660 pixels in width by 240 pixels in height, and in .JPG or .PNG format.
 
 #. From the **Settings** menu, select **Schedule & Details**.
 #. Scroll down to the **Course Image** section.
 #. To select an image from your computer, click **Upload Course Image**, then follow the prompts to find and upload your image.
-#. View your course summary page to test how the image will appear to students.
+#. View your dashboard to test how the image will appear to students.
 
 .. _`Add a Course Video`:
 
 *********************************
 Add a Course Introduction Video
 *********************************
-The course introduction video appears on the Course Summary page that students see. The course video should excite and entice potential students to register, and reveal some of the personality the instructors bring to the course. 
+
+On Edge_, the course introduction video appears on the course summary page that students see. 
+
+.. note:: On edX.org_, you work directly with your Program Manager to set up the course video in the summary page.
+
+In the following example, the course video is circled in the course summary page:
+
+.. image:: Images/about-page-course-video.png
+ :alt: Image of the course video in the course summary page
+
+The course video should excite and entice potential students to register, and reveal some of the personality the instructors bring to the course. 
 
 The video should answer these key questions:
 
@@ -256,7 +322,7 @@ To add a course introduction video:
     
 2. From the **Settings** menu, select **Schedule & Details**.
 #. Scroll down to the **Course Introduction Video** section.
-#. In the field below the video box, enter the YouTube video ID. When you add the code, the video automatically loads in the video box. Studio automatically saves your changes.
+#. In the field below the video box, enter the YouTube video ID (the code you copied in step 1). When you add the code, the video automatically loads in the video box. Studio automatically saves your changes.
 #. View your course summary page to test how the video will appear to students.
 
 .. _`Set Course Requirements`:

@@ -10,6 +10,8 @@ Change Log
 
    * - Date
      - Change
+   * - 03/10/14
+     - Added information about setting up your course summary page to :ref:`The Course Start Date`, :ref:`The Course End Date`, :ref:`Add a Course Image`, :ref:`Add a Course Video`, and :ref:`Describe Your Course`.
    * - 02/25/14
      - Updated :ref:`Add Files to a Course` section to include new External URL feature.
    * -

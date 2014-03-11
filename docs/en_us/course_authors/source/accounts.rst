@@ -34,7 +34,6 @@ When you want to explore edX courses, you can register on edX.org_, edX Edge_, o
 
 .. _Edge: http://edge.edx.org
 .. _edX.org: http://edx.org
-.. _Courses: https://www.edx.org/course-lis
 
 
 
