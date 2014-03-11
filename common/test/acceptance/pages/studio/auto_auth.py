@@ -68,6 +68,6 @@ class AutoAuthPage(PageObject):
         return True
 
     def get_user_id(self):
-        message = self.css_text('BODY')[0].strip()
+        message = self.q(css='BODY').text[0].strip()
         match = re.search(r' user_id ([^$]+)$', message)
         return match.groups()[0] if match else None

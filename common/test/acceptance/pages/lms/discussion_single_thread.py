@@ -1,5 +1,5 @@
 from bok_choy.page_object import unguarded
-from bok_choy.promise import EmptyPromise, fulfill
+from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
 
@@ -10,9 +10,9 @@ class DiscussionSingleThreadPage(CoursePage):
         self.thread_id = thread_id
 
     def is_browser_on_page(self):
-        return self.is_css_present(
+        return self.q(css=
             "body.discussion .discussion-article[data-id='{thread_id}']".format(thread_id=self.thread_id)
-        )
+        ).present
 
     @property
     @unguarded
@@ -24,7 +24,7 @@ class DiscussionSingleThreadPage(CoursePage):
         Returns the text of the first element matching the given selector, or
         None if no such element exists
         """
-        text_list = self.css_text(selector)
+        text_list = self.q(css=selector).text
         return text_list[0] if text_list else None
 
     def get_response_total_text(self):
@@ -33,7 +33,7 @@ class DiscussionSingleThreadPage(CoursePage):
 
     def get_num_displayed_responses(self):
         """Returns the number of responses actually rendered"""
-        return self.css_count(".discussion-response")
+        return len(self.q(css=".discussion-response").results)
 
     def get_shown_responses_text(self):
         """Returns the shown response count text, or None if not present"""
@@ -44,46 +44,52 @@ class DiscussionSingleThreadPage(CoursePage):
         return self._get_element_text(".load-response-button")
 
     def load_more_responses(self):
-        """Clicks the laod more responses button and waits for responses to load"""
-        self.css_click(".load-response-button")
-        fulfill(EmptyPromise(
-            lambda: not self.is_css_present(".loading"),
+        """Clicks the load more responses button and waits for responses to load"""
+        self.q(css=".load-response-button").first.click()
+
+        EmptyPromise(
+            lambda: not self.q(css=".loading").present,
             "Loading more responses completed"
-        ))
+        ).fulfill()
 
     def has_add_response_button(self):
         """Returns true if the add response button is visible, false otherwise"""
-        return self._is_element_visible(".add-response-btn")
+
+        EmptyPromise(lambda: self.q(css=".add-response-btn").present, 'response button not available').fulfill()
+
+
+
+        return self.q(css=".add-response-btn").present
 
     def click_add_response_button(self):
         """
         Clicks the add response button and ensures that the response text
         field receives focus
         """
-        self.css_click(".add-response-btn")
-        fulfill(EmptyPromise(
-            lambda: self.is_css_present("#wmd-input-reply-body-{thread_id}:focus".format(thread_id=self.thread_id)),
+        self.q(css=".add-response-btn").first.click()
+        EmptyPromise(
+            lambda: self.q(css="#wmd-input-reply-body-{thread_id}:focus".format(thread_id=self.thread_id)).present,
             "Response field received focus"
-        ))
+        ).fulfill()
 
     def _is_element_visible(self, selector):
         return (
-            self.is_css_present(selector) and
-            self.css_map(selector, lambda el: el.visible)[0]
+            self.q(css=selector).present and
+            self.q(css=selector).map(lambda el: el.is_displayed()).text[0]
         )
 
     def is_comment_visible(self, comment_id):
         """Returns true if the comment is viewable onscreen"""
-        return self._is_element_visible("#comment_{}".format(comment_id))
+        return self.q(css="#comment_{}".format(comment_id)).present
 
     def is_comment_deletable(self, comment_id):
         """Returns true if the delete comment button is present, false otherwise"""
-        return self._is_element_visible("#comment_{} div.action-delete".format(comment_id))
+        return self.q(css="#comment_{} div.action-delete".format(comment_id)).present
 
     def delete_comment(self, comment_id):
         with self.handle_alert():
-            self.css_click("#comment_{} div.action-delete".format(comment_id))
-        fulfill(EmptyPromise(
-            lambda: not self.is_comment_visible(comment_id),
+            self.q(css="#comment_{} div.action-delete".format(comment_id)).first.click()
+        EmptyPromise(
+            lambda: not self.q(css=comment_id),
             "Deleted comment was removed"
-        ))
+        ).fulfill()
