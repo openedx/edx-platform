@@ -1763,6 +1763,26 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_import_into_new_course_id_wiki_slug_renamespacing(self):
         module_store = modulestore('direct')
+
+        # If reimporting into the same course do not change the wiki_slug.
+        target_location = Location('i4x', 'edX', 'toy', 'course', '2012_Fall')
+        course_data = {
+            'org': target_location.org,
+            'number': target_location.course,
+            'display_name': 'Robot Super Course',
+            'run': target_location.name
+        }
+        _create_course(self, course_data)
+        course_module = module_store.get_instance(target_location.course_id, target_location)
+        course_module.wiki_slug = 'toy'
+        course_module.save()
+
+        # Import a course with wiki_slug == location.course
+        import_from_xml(module_store, 'common/test/data/', ['toy'], target_location_namespace=target_location)
+        course_module = module_store.get_instance(target_location.course_id, target_location)
+        self.assertEquals(course_module.wiki_slug, 'toy')
+
+        # But change the wiki_slug if it is a different course.
         target_location = Location('i4x', 'MITx', '999', 'course', '2013_Spring')
         course_data = {
             'org': target_location.org,
@@ -1770,7 +1790,6 @@ class ContentStoreTest(ModuleStoreTestCase):
             'display_name': 'Robot Super Course',
             'run': target_location.name
         }
-        target_course_id = '{0}/{1}/{2}'.format(target_location.org, target_location.course, target_location.name)
         _create_course(self, course_data)
 
         # Import a course with wiki_slug == location.course
@@ -1778,9 +1797,9 @@ class ContentStoreTest(ModuleStoreTestCase):
         course_module = module_store.get_instance(target_location.course_id, target_location)
         self.assertEquals(course_module.wiki_slug, 'MITx.999.2013_Spring')
 
-        # Now try importing a course with wiki_slug == '{0}{1}{2}'.format(location.org, location.course, location.name)
+        # Now try importing a course with wiki_slug == '{0}.{1}.{2}'.format(location.org, location.course, location.name)
         import_from_xml(module_store, 'common/test/data/', ['two_toys'], target_location_namespace=target_location)
-        course_module = module_store.get_instance(target_course_id, target_location)
+        course_module = module_store.get_instance(target_location.course_id, target_location)
         self.assertEquals(course_module.wiki_slug, 'MITx.999.2013_Spring')
 
     def test_import_metadata_with_attempts_empty_string(self):
