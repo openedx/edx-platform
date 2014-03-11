@@ -73,19 +73,19 @@ class @Sequence
     @$('.sequence-nav-buttons a').unbind('click')
 
     if @contents.length == 0
-      @$('.sequence-nav-buttons .prev a').addClass('disabled')
-      @$('.sequence-nav-buttons .next a').addClass('disabled')
+      @$('.sequence-nav-buttons .prev a').addClass('disabled').attr('aria-hidden', 'true')
+      @$('.sequence-nav-buttons .next a').addClass('disabled').attr('aria-hidden', 'true')
       return
 
     if @position == 1
-      @$('.sequence-nav-buttons .prev a').addClass('disabled')
+      @$('.sequence-nav-buttons .prev a').addClass('disabled').attr('aria-hidden', 'true')
     else
-      @$('.sequence-nav-buttons .prev a').removeClass('disabled').click(@previous)
+      @$('.sequence-nav-buttons .prev a').removeClass('disabled').attr('aria-hidden', 'false').click(@previous)
 
     if @position == @contents.length
-      @$('.sequence-nav-buttons .next a').addClass('disabled')
+      @$('.sequence-nav-buttons .next a').addClass('disabled').attr('aria-hidden', 'true')
     else
-      @$('.sequence-nav-buttons .next a').removeClass('disabled').click(@next)
+      @$('.sequence-nav-buttons .next a').removeClass('disabled').attr('aria-hidden', 'false').click(@next)
 
   render: (new_position) ->
     if @position != new_position
@@ -113,8 +113,6 @@ class @Sequence
 
       sequence_links = @content_container.find('a.seqnav')
       sequence_links.click @goto
-      # Focus on the first available xblock.
-      @content_container.find('.vert .xblock :first').focus()
     @$("a.active").blur()
 
   goto: (event) =>

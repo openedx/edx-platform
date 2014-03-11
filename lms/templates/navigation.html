@@ -36,33 +36,21 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
-
-% if course:
-  <header class="global slim" aria-label="${_('Global Navigation')}">
-% else:
-  <header class="global" aria-label="${_('Global Navigation')}">
-% endif
-  <nav>
-
-  <h1 class="logo">
-    <a href="${marketing_link('ROOT')}">
-      <%block name="navigation_logo">
-          <img src="${static.url(branding.get_logo_url())}" alt="
-          % if course:
-          ${course.display_org_with_default | h}: ${course.display_number_with_default | h} ${course.display_name_with_default | h} @
-          % endif
-          ${platform_name()}
-          " />
-      </%block>
-    </a>
-  </h1>
+  <header class="global ${"slim" if course else ""}" aria-label="${_('Global Navigation')}">
+    <nav>
+    <h1 class="logo">
+      <a href="${marketing_link('ROOT')}">
+        <%block name="navigation_logo">
+            <img src="${static.url(branding.get_logo_url())}" alt="${platform_name()}"/>
+        </%block>
+      </a>
+    </h1>
 
     % if course:
-      <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+    <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
     % endif
 
     % if user.is_authenticated():
-
     <ol class="left nav-global authenticated">
       <%block name="navigation_global_links_authenticated">
         % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
