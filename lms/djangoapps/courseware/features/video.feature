@@ -62,12 +62,12 @@ Feature: LMS Video component
     Given I am registered for the course "test_course"
     And it has a video "A" in "Youtube" mode in position "1" of sequential
     And a video "B" in "Youtube" mode in position "2" of sequential
-    And a video "C" in "Youtube" mode in position "3" of sequential
+    And a video "C" in "HTML5" mode in position "3" of sequential
     And I open the section with videos
     And I select the "2.0" speed on video "A"
     And I select the "0.50" speed on video "B"
     When I open video "C"
-    Then video "C" should start playing at speed "0.50"
+    Then video "C" should start playing at speed "0.75"
     When I open video "A"
     Then video "A" should start playing at speed "2.0"
     And I reload the page
@@ -81,8 +81,11 @@ Feature: LMS Video component
 
   # 10
   Scenario: Language menu works correctly in Video component
-    Given the course has a Video component in Youtube mode:
-      | transcripts           | sub         |
+    Given I am registered for the course "test_course"
+      And I have a "chinese_transcripts.srt" transcript file in assets
+      And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+      And it has a video in "Youtube" mode:
+      | transcripts                       | sub         |
       | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM |
     And I make sure captions are closed
     And I see video menu "language" with correct items
@@ -93,8 +96,10 @@ Feature: LMS Video component
 
   # 11
   Scenario: CC button works correctly w/o english transcript in HTML5 mode of Video component
-    Given the course has a Video component in HTML5 mode:
-      | transcripts           |
+    Given I am registered for the course "test_course"
+      And I have a "chinese_transcripts.srt" transcript file in assets
+      And it has a video in "HTML5" mode:
+      | transcripts                       |
       | {"zh": "chinese_transcripts.srt"} |
     And I make sure captions are opened
     Then I see "好 各位同学" text in the captions
@@ -111,14 +116,16 @@ Feature: LMS Video component
 
   # 13
   Scenario: CC button works correctly w/o english transcript in Youtube mode of Video component
-    Given the course has a Video component in Youtube mode:
-      | transcripts           |
+    Given I am registered for the course "test_course"
+    And I have a "chinese_transcripts.srt" transcript file in assets
+    And it has a video in "Youtube" mode:
+      | transcripts                       |
       | {"zh": "chinese_transcripts.srt"} |
     And I make sure captions are opened
     Then I see "好 各位同学" text in the captions
 
   # 14
-  Scenario: CC button works correctly if transcripts and sub fields are empty, but transcript file exists is assets (Youtube mode of Video component)
+  Scenario: CC button works correctly if transcripts and sub fields are empty, but transcript file exists in assets (Youtube mode of Video component)
     Given I am registered for the course "test_course"
     And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
     And it has a video in "Youtube" mode
@@ -132,7 +139,9 @@ Feature: LMS Video component
 
   # 16
   Scenario: Video is aligned correctly if transcript is visible in fullscreen mode
-    Given the course has a Video component in HTML5 mode:
+    Given I am registered for the course "test_course"
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+    And it has a video in "HTML5" mode:
       | sub         |
       | OEoXaMPEzfM |
     And I make sure captions are opened
@@ -147,7 +156,9 @@ Feature: LMS Video component
 
   # 18
   Scenario: Video is aligned correctly on transcript toggle in fullscreen mode
-    Given the course has a Video component in Youtube mode:
+    Given I am registered for the course "test_course"
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+    And it has a video in "Youtube" mode:
       | sub         |
       | OEoXaMPEzfM |
     And I make sure captions are opened
@@ -159,6 +170,7 @@ Feature: LMS Video component
   # 19
   Scenario: Download Transcript button works correctly in Video component
     Given I am registered for the course "test_course"
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
     And it has a video "A" in "Youtube" mode in position "1" of sequential:
       | sub         | download_track |
       | OEoXaMPEzfM | true           |
@@ -176,3 +188,18 @@ Feature: LMS Video component
     Then I can download transcript in "txt" format
     When I open video "C"
     Then menu "download_transcript" doesn't exist
+
+  # 20
+  Scenario: Youtube video has correct transcript if fields for other speeds are filled.
+    Given I am registered for the course "test_course"
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+    And I have a "subs_b7xgknqkQk8.srt.sjson" transcript file in assets
+    And it has a video in "Youtube" mode:
+      | sub         | youtube_id_1_5 |
+      | OEoXaMPEzfM | b7xgknqkQk8    |
+    And I make sure captions are opened
+    Then I see "Hi, welcome to Edx." text in the captions
+    And I select the "1.50" speed
+    And I reload the page
+    Then I see "Hi, welcome to Edx." text in the captions
+    And I see duration "1:00"

@@ -73,7 +73,7 @@ function (HTML5Video, Resizer) {
         state.videoPlayer.ready = _.once(function () {
             $(window).on('unload', state.saveState);
 
-            if (state.currentPlayerMode !== 'flash') {
+            if (!state.isFlashMode()) {
                 state.videoPlayer.setPlaybackRate(state.speed);
             }
             state.videoPlayer.player.setVolume(state.currentVolume);
@@ -100,7 +100,7 @@ function (HTML5Video, Resizer) {
             modestbranding: 1
         };
 
-        if (state.currentPlayerMode !== 'flash') {
+        if (!state.isFlashMode()) {
             state.videoPlayer.playerVars.html5 = 1;
         }
 
@@ -140,11 +140,8 @@ function (HTML5Video, Resizer) {
             }, false);
 
         } else { // if (state.videoType === 'youtube') {
-            if (state.currentPlayerMode === 'flash') {
-                youTubeId = state.youtubeId();
-            } else {
-                youTubeId = state.youtubeId('1.0');
-            }
+            youTubeId = state.youtubeId();
+
             state.videoPlayer.player = new YT.Player(state.id, {
                 playerVars: state.videoPlayer.playerVars,
                 videoId: youTubeId,
@@ -162,22 +159,7 @@ function (HTML5Video, Resizer) {
                     videoHeight = player.attr('height') || player.height();
 
                 _resize(state, videoWidth, videoHeight);
-
-                // After initialization, update the VCR with total time.
-                // At this point only the metadata duration is available (not
-                // very precise), but it is better than having 00:00:00 for
-                // total time.
-                if (state.youtubeMetadataReceived) {
-                    // Metadata was already received, and is available.
-                    _updateVcrAndRegion(state);
-                } else {
-                    // We wait for metadata to arrive, before we request the update
-                    // of the VCR video time, and of the start-end time region.
-                    // Metadata contains duration of the video.
-                    state.el.on('metadata_received', function () {
-                        _updateVcrAndRegion(state);
-                    });
-                }
+                _updateVcrAndRegion(state, true);
             });
         }
 
@@ -185,36 +167,53 @@ function (HTML5Video, Resizer) {
             dfd.resolve();
         }
     }
+    function _updateVcrAndRegion(state, isYoutube) {
+        var update = function (state) {
+            var duration = state.videoPlayer.duration(),
+                time;
 
-    function _updateVcrAndRegion(state) {
-        var duration = state.videoPlayer.duration(),
-            time;
+            time = state.videoPlayer.figureOutStartingTime(duration);
 
-        time = state.videoPlayer.figureOutStartingTime(duration);
+            // Update the VCR.
+            state.trigger(
+                'videoControl.updateVcrVidTime',
+                {
+                    time: time,
+                    duration: duration
+                }
+            );
 
-        // Update the VCR.
-        state.trigger(
-            'videoControl.updateVcrVidTime',
-            {
-                time: time,
-                duration: duration
-            }
-        );
+            // Update the time slider.
+            state.trigger(
+                'videoProgressSlider.updateStartEndTimeRegion',
+                {
+                    duration: duration
+                }
+            );
+            state.trigger(
+                'videoProgressSlider.updatePlayTime',
+                {
+                    time: time,
+                    duration: duration
+                }
+            );
+        };
 
-        // Update the time slider.
-        state.trigger(
-            'videoProgressSlider.updateStartEndTimeRegion',
-            {
-                duration: duration
-            }
-        );
-        state.trigger(
-            'videoProgressSlider.updatePlayTime',
-            {
-                time: time,
-                duration: duration
-            }
-        );
+        // After initialization, update the VCR with total time.
+        // At this point only the metadata duration is available (not
+        // very precise), but it is better than having 00:00:00 for
+        // total time.
+        if (state.youtubeMetadataReceived || !isYoutube) {
+            // Metadata was already received, and is available.
+            update(state);
+        } else {
+            // We wait for metadata to arrive, before we request the update
+            // of the VCR video time, and of the start-end time region.
+            // Metadata contains duration of the video.
+            state.el.on('metadata_received', function () {
+                update(state);
+            });
+        }
     }
 
     function _resize(state, videoWidth, videoHeight) {
@@ -271,6 +270,8 @@ function (HTML5Video, Resizer) {
             }
         });
 
+        _updateVcrAndRegion(state, true);
+        state.trigger('videoCaption.fetchCaption', null);
         state.resizer.setElement(state.el.find('iframe')).align();
     }
 
@@ -348,7 +349,7 @@ function (HTML5Video, Resizer) {
             // where in Firefox speed switching to 1.0 in HTML5 player mode is
             // handled incorrectly by YouTube API.
             methodName = 'cueVideoById';
-            youtubeId = this.youtubeId();
+            youtubeId = this.youtubeId(newSpeed);
 
             if (this.videoPlayer.isPlaying()) {
                 methodName = 'loadVideoById';
@@ -360,10 +361,9 @@ function (HTML5Video, Resizer) {
     }
 
     function onSpeedChange(newSpeed) {
-        var time = this.videoPlayer.currentTime,
-            isFlash = this.currentPlayerMode === 'flash';
+        var time = this.videoPlayer.currentTime;
 
-        if (isFlash) {
+        if (this.isFlashMode()) {
             this.videoPlayer.currentTime = Time.convert(
                 time,
                 parseFloat(this.speed),
@@ -618,6 +618,11 @@ function (HTML5Video, Resizer) {
             }
         }
 
+        if (this.isFlashMode()) {
+            this.setSpeed(this.speed);
+            this.trigger('videoSpeedControl.setSpeed', this.speed);
+        }
+
         if (this.currentPlayerMode === 'html5') {
             this.videoPlayer.player.setPlaybackRate(this.speed);
         }
@@ -666,7 +671,7 @@ function (HTML5Video, Resizer) {
         videoPlayer.startTime = this.config.startTime;
         if (videoPlayer.startTime >= duration) {
             videoPlayer.startTime = 0;
-        } else if (this.currentPlayerMode === 'flash') {
+        } else if (this.isFlashMode()) {
             videoPlayer.startTime /= Number(this.speed);
         }
 
@@ -677,7 +682,7 @@ function (HTML5Video, Resizer) {
         ) {
             videoPlayer.stopAtEndTime = false;
             videoPlayer.endTime = null;
-        } else if (this.currentPlayerMode === 'flash') {
+        } else if (this.isFlashMode()) {
             videoPlayer.endTime /= Number(this.speed);
         }
     }
@@ -762,11 +767,7 @@ function (HTML5Video, Resizer) {
                 // HTML5 video sources play fine from start-time in both Chrome
                 // and Firefox.
                 if (this.browserIsFirefox && this.videoType === 'youtube') {
-                    if (this.currentPlayerMode === 'flash') {
-                        youTubeId = this.youtubeId();
-                    } else {
-                        youTubeId = this.youtubeId('1.0');
-                    }
+                    youTubeId = this.youtubeId();
 
                     // When we will call cueVideoById() for some strange reason
                     // an ENDED event will be fired. It really does no damage
