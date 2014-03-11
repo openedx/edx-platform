@@ -1,4 +1,6 @@
+from abc import ABCMeta, abstractmethod
 from stevedore.extension import ExtensionManager
+
 
 class MissingNamespaceError(Exception):
     """
@@ -33,23 +35,33 @@ def separate_namespace(serialized):
     if namespace == serialized:
         raise MissingNamespaceError(serialized)
 
-    return namespace, rest
+    return (namespace, rest)
 
 
-class OpaqueKey(object)
+class OpaqueKey(object):
     """
     A base-class for implementing pluggable opaque keys. Individual key subclasses identify
     particular types of resources, without specifying the actual form of the key (or
     its serialization).
 
-    Subclasses must define two class properties:
-        KEY_TYPE: the name of the entry_point namespace defining the type of OpaqueKey.
-        CANONICAL_NAMESPACE: the key namespace of a particular instance of a key subtype.
-            There should be at least one entry_point that binds CANONICAL_NAMESPACE to
-            the key subtype, but additional bundings to other key namespaces is allowed
-            for backwards compatibility.
+    There are two levels of expected subclasses: Key type definitions, and key implementations
+
+    OpaqueKey
+        |
+    KeyType
+        |
+    KeyImplementation
+
+    The KeyType base class must define the class property KEY_TYPE, which identifies
+    which entry_point namespace the keys implementations should be registered with.
+
+    The KeyImplementation classes must define CANONICAL_NAMESPACE, which identifies
+    the key namespace for the particular key_implementation (when serializing).
+    KeyImplementations must be registered using the CANONICAL_NAMESPACE is their
+    entry_point name, but can also be registered with other names for backwards
+    compatibility.
     """
-    __metaclass__ = ABCMeta:
+    __metaclass__ = ABCMeta
 
     @classmethod
     @abstractmethod
@@ -95,12 +107,12 @@ class OpaqueKey(object)
         try:
             namespace, rest = separate_namespace(serialized)
         except MissingNamespaceError:
-            cls._from_string_fallback(serialized)
+            return cls._from_string_fallback(serialized)
 
         try:
-            return cls.drivers()[namespace]._from_string(rest)
-        except IndexError:
-            cls._from_string_fallback(serialized)
+            return cls.drivers()[namespace].plugin._from_string(rest)
+        except KeyError:
+            return cls._from_string_fallback(serialized)
 
     @classmethod
     def _from_string_fallback(cls, serialized):
@@ -114,7 +126,7 @@ class OpaqueKey(object)
         """
         for driver in cls.drivers():
             try:
-                return driver._from_string(serialized)
+                return driver.plugin._from_string(serialized)
             except InvalidKeyError:
                 pass
 
