@@ -3,9 +3,12 @@ Test for split test XModule
 """
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from mock import MagicMock
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.module_render import get_module_for_descriptor
+from courseware.model_data import FieldDataCache
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -267,3 +270,49 @@ class TestSplitTestVert(SplitTestBase):
         )
         video1 = self._video(cond1vert, 1)
         html1 = self._html(cond1vert, 1)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class SplitTestPosition(ModuleStoreTestCase):
+    """
+    Check that we can change positions in a course with partitions defined
+    """
+    def setUp(self):
+        self.partition = UserPartition(
+            0,
+            'first_partition',
+            'First Partition',
+            [
+                Group(0, 'alpha'),
+                Group(1, 'beta')
+            ]
+        )
+
+        self.course = CourseFactory.create(
+            user_partitions=[self.partition]
+        )
+
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location,
+            category="chapter",
+            display_name="test chapter",
+        )
+
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+        self.client.login(username=self.student.username, password='test')
+
+    def test_changing_position_works(self):
+        # Make a mock FieldDataCache for this course, so we can get the course module
+        mock_field_data_cache = FieldDataCache([self.course], self.course.id, self.student)
+        course = get_module_for_descriptor(
+            self.student,
+            MagicMock(name='request'),
+            self.course,
+            mock_field_data_cache,
+            self.course.id
+        )
+
+        # Now that we have the course, change the position and save, nothing should explode!
+        course.position = 2
+        course.save()

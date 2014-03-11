@@ -1,11 +1,11 @@
 """Defines ``Group`` and ``UserPartition`` models for partitioning"""
-
+from collections import namedtuple
 # We use ``id`` in this file as the IDs of our Groups and UserPartitions,
 # which Pylint disapproves of.
 # pylint: disable=invalid-name, redefined-builtin
 
 
-class Group(object):
+class Group(namedtuple("Group", "id name")):
     """
     An id and name for a group of students.  The id should be unique
     within the UserPartition this group appears in.
@@ -14,9 +14,9 @@ class Group(object):
     # for deserializing old versions.  (This will be serialized in courses)
     VERSION = 1
 
-    def __init__(self, id, name):
-        self.id = int(id)
-        self.name = name
+    def __new__(cls, id, name):
+        # pylint: disable=super-on-old-class
+        return super(Group, cls).__new__(cls, int(id), name)
 
     def to_json(self):
         """
@@ -25,6 +25,7 @@ class Group(object):
         Returns:
             a dictionary with keys for the properties of the group.
         """
+        # pylint: disable=no-member
         return {
             "id": self.id,
             "name": self.name,
@@ -53,7 +54,7 @@ class Group(object):
         return Group(value["id"], value["name"])
 
 
-class UserPartition(object):
+class UserPartition(namedtuple("UserPartition", "id name description groups")):
     """
     A named way to partition users into groups, primarily intended for running
     experiments.  It is expected that each user will be in at most one group in a
@@ -65,12 +66,9 @@ class UserPartition(object):
     """
     VERSION = 1
 
-    def __init__(self, id, name, description, groups):
-
-        self.id = int(id)
-        self.name = name
-        self.description = description
-        self.groups = groups
+    def __new__(cls, id, name, description, groups):
+        # pylint: disable=super-on-old-class
+        return super(UserPartition, cls).__new__(cls, int(id), name, description, groups)
 
     def to_json(self):
         """
@@ -79,6 +77,7 @@ class UserPartition(object):
         Returns:
             a dictionary with keys for the properties of the partition.
         """
+        # pylint: disable=no-member
         return {
             "id": self.id,
             "name": self.name,
