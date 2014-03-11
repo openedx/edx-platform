@@ -105,6 +105,7 @@ function (VideoPlayer) {
             it('create Flash player', function () {
                 var player;
 
+                spyOn($.fn, 'trigger');
                 state = jasmine.initializePlayerYouTube();
                 state.videoEl = state.el.find('video, iframe').width(100);
                 player = state.videoPlayer.player;
@@ -715,7 +716,8 @@ function (VideoPlayer) {
                     },
                     currentPlayerMode: 'html5',
                     trigger: function () {},
-                    browserIsFirefox: false
+                    browserIsFirefox: false,
+                    isFlashMode: jasmine.createSpy().andReturn(false)
                 };
             });
 
@@ -1015,7 +1017,8 @@ function (VideoPlayer) {
                         updatePlayTime: jasmine.createSpy(),
                         setPlaybackRate: jasmine.createSpy(),
                         player: jasmine.createSpyObj('player', ['setPlaybackRate'])
-                    }
+                    },
+                    isFlashMode: jasmine.createSpy().andReturn(false)
                 };
             });
 
@@ -1033,7 +1036,7 @@ function (VideoPlayer) {
                 });
 
                 it('convert the current time to the new speed', function () {
-                    state.currentPlayerMode = 'flash';
+                    state.isFlashMode.andReturn(true);
                     VideoPlayer.prototype.onSpeedChange.call(state, '0.75', false);
                     expect(state.videoPlayer.currentTime).toBe('120.000');
                 });
