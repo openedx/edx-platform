@@ -81,8 +81,11 @@ Feature: LMS Video component
 
   # 10
   Scenario: Language menu works correctly in Video component
-    Given the course has a Video component in Youtube mode:
-      | transcripts           | sub         |
+    Given I am registered for the course "test_course"
+      And I have a "chinese_transcripts.srt" transcript file in assets
+      And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+      And it has a video in "Youtube" mode:
+      | transcripts                       | sub         |
       | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM |
     And I make sure captions are closed
     And I see video menu "language" with correct items
@@ -93,7 +96,9 @@ Feature: LMS Video component
 
   # 11
   Scenario: CC button works correctly w/o english transcript in HTML5 mode of Video component
-    Given the course has a Video component in HTML5 mode:
+    Given I am registered for the course "test_course"
+      And I have a "chinese_transcripts.srt" transcript file in assets
+      And it has a video in "HTML5" mode:
       | transcripts                       |
       | {"zh": "chinese_transcripts.srt"} |
     And I make sure captions are opened
@@ -111,7 +116,9 @@ Feature: LMS Video component
 
   # 13
   Scenario: CC button works correctly w/o english transcript in Youtube mode of Video component
-    Given the course has a Video component in Youtube mode:
+    Given I am registered for the course "test_course"
+    And I have a "chinese_transcripts.srt" transcript file in assets
+    And it has a video in "Youtube" mode:
       | transcripts                       |
       | {"zh": "chinese_transcripts.srt"} |
     And I make sure captions are opened
@@ -132,7 +139,9 @@ Feature: LMS Video component
 
   # 16
   Scenario: Video is aligned correctly if transcript is visible in fullscreen mode
-    Given the course has a Video component in HTML5 mode:
+    Given I am registered for the course "test_course"
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+    And it has a video in "HTML5" mode:
       | sub         |
       | OEoXaMPEzfM |
     And I make sure captions are opened
@@ -147,7 +156,9 @@ Feature: LMS Video component
 
   # 18
   Scenario: Video is aligned correctly on transcript toggle in fullscreen mode
-    Given the course has a Video component in Youtube mode:
+    Given I am registered for the course "test_course"
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+    And it has a video in "Youtube" mode:
       | sub         |
       | OEoXaMPEzfM |
     And I make sure captions are opened
@@ -159,6 +170,7 @@ Feature: LMS Video component
   # 19
   Scenario: Download Transcript button works correctly in Video component
     Given I am registered for the course "test_course"
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
     And it has a video "A" in "Youtube" mode in position "1" of sequential:
       | sub         | download_track |
       | OEoXaMPEzfM | true           |
@@ -179,7 +191,10 @@ Feature: LMS Video component
 
   # 20
   Scenario: Youtube video has correct transcript if fields for other speeds are filled.
-    Given the course has a Video component in Youtube mode:
+    Given I am registered for the course "test_course"
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+    And I have a "subs_b7xgknqkQk8.srt.sjson" transcript file in assets
+    And it has a video in "Youtube" mode:
       | sub         | youtube_id_1_5 |
       | OEoXaMPEzfM | b7xgknqkQk8    |
     And I make sure captions are opened
