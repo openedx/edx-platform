@@ -16,7 +16,7 @@
 	font-style: italic;
 }
 
-.mce-container {
+.courseware .mce-container {
 	z-index:3000000000!important; /*To fix full-screen problems*/
 }
 
