@@ -155,7 +155,7 @@ function () {
         }
 
         this.el.on('speedchange', function () {
-            if (self.currentPlayerMode === 'flash') {
+            if (self.isFlashMode()) {
                 Caption.fetchCaption();
             }
         });
@@ -628,7 +628,7 @@ function () {
         if (this.videoCaption.loaded) {
             // Current mode === 'flash' can only be for YouTube videos. So, we
             // don't have to also check for videoType === 'youtube'.
-            if (this.currentPlayerMode === 'flash') {
+            if (this.isFlashMode()) {
                 // Total play time changes with speed change. Also there is
                 // a 250 ms delay we have to take into account.
                 time = Math.round(
@@ -670,7 +670,7 @@ function () {
 
         // Current mode === 'flash' can only be for YouTube videos. So, we
         // don't have to also check for videoType === 'youtube'.
-        if (this.currentPlayerMode === 'flash') {
+        if (this.isFlashMode()) {
             // Total play time changes with speed change. Also there is
             // a 250 ms delay we have to take into account.
             time = Math.round(

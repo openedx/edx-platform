@@ -65,6 +65,7 @@ function (VideoPlayer, VideoStorage) {
         getDuration: getDuration,
         getVideoMetadata: getVideoMetadata,
         initialize: initialize,
+        isFlashMode: isFlashMode,
         parseSpeed: parseSpeed,
         parseVideoSources: parseVideoSources,
         parseYoutubeStreams: parseYoutubeStreams,
@@ -550,7 +551,7 @@ function (VideoPlayer, VideoStorage) {
             _this.videos[speed] = video[1];
         });
 
-        return true;
+        return _.isString(this.videos['1.0']);
     }
 
     // function parseVideoSources(, mp4Source, webmSource, oggSource)
@@ -702,7 +703,11 @@ function (VideoPlayer, VideoStorage) {
     }
 
     function youtubeId(speed) {
-        return this.videos[speed || this.speed] || this.videos['1.0'];
+        var currentSpeed = this.isFlashMode() ? this.speed : '1.0';
+
+        return  this.videos[speed] ||
+                this.videos[currentSpeed] ||
+                this.videos['1.0'];
     }
 
     function getDuration() {
@@ -711,6 +716,10 @@ function (VideoPlayer, VideoStorage) {
         } catch (err) {
             return this.metadata[this.youtubeId('1.0')].duration;
         }
+    }
+
+    function isFlashMode() {
+        return this.currentPlayerMode === 'flash';
     }
 
     function getCurrentLanguage() {
