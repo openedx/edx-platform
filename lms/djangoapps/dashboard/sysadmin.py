@@ -567,14 +567,13 @@ class Courses(SysadminDashboardView):
 
             elif course_found and not is_xml_course:
                 # delete course that is stored with mongodb backend
-                loc = course.location
                 content_store = contentstore()
                 commit = True
-                delete_course(self.def_ms, content_store, loc, commit)
+                delete_course(self.def_ms, content_store, course.id, commit)
                 # don't delete user permission groups, though
                 self.msg += \
-                    u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
-                        _('Deleted'), loc, course.id, course.display_name)
+                    u"<font color='red'>{0} {2} ({3})</font>".format(
+                        _('Deleted'), course.id, course.display_name)
             datatable = self.make_datatable()
 
         context = {

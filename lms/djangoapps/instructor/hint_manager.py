@@ -89,10 +89,7 @@ def get_hints(request, course_id, field):
     # The course_id is of the form school/number/classname.
     # We want to use the course_id to find all matching usage_id's.
     # To do this, just take the school/number part - leave off the classname.
-    course_id_dict = Location.parse_course_id(course_id)
-    chopped_id = u'{org}/{course}'.format(**course_id_dict)
-    chopped_id = re.escape(chopped_id)
-    all_hints = XModuleUserStateSummaryField.objects.filter(field_name=field, usage_id__regex=chopped_id)
+    all_hints = XModuleUserStateSummaryField.objects.filter(field_name=field, usage_id__regex=re.escape(course_id))
     # big_out_dict[problem id] = [[answer, {pk: [hint, votes]}], sorted by answer]
     # big_out_dict maps a problem id to a list of [answer, hints] pairs, sorted in order of answer.
     big_out_dict = {}
@@ -101,8 +98,7 @@ def get_hints(request, course_id, field):
     id_to_name = {}
 
     for hints_by_problem in all_hints:
-        loc = Location(hints_by_problem.usage_id)
-        name = location_to_problem_name(course_id, loc)
+        name = location_to_problem_name(course_id, hints_by_problem.usage_id)
         if name is None:
             continue
         id_to_name[hints_by_problem.usage_id] = name
@@ -215,10 +211,9 @@ def add_hint(request, course_id, field):
 
     # Validate the answer.  This requires initializing the xmodules, which
     # is annoying.
-    loc = Location(problem_id)
-    descriptors = modulestore().get_items(loc, course_id=course_id)
+    descriptors = modulestore().get_items(problem_id, course_id=course_id)
     field_data_cache = model_data.FieldDataCache(descriptors, course_id, request.user)
-    hinter_module = module_render.get_module(request.user, request, loc, field_data_cache, course_id)
+    hinter_module = module_render.get_module(request.user, request, problem_id, field_data_cache, course_id)
     if not hinter_module.validate_answer(answer):
         # Invalid answer.  Don't add it to the database, or else the
         # hinter will crash when we encounter it.

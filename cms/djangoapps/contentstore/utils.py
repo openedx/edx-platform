@@ -9,7 +9,6 @@ from django.utils.translation import ugettext as _
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from django_comment_common.utils import unseed_permissions_roles
@@ -35,11 +34,9 @@ def delete_course_and_groups(course_id, commit=False):
     module_store = modulestore('direct')
     content_store = contentstore()
 
-    course_id_dict = Location.parse_course_id(course_id)
-    module_store.ignore_write_events_on_courses.append('{org}/{course}'.format(**course_id_dict))
+    module_store.ignore_write_events_on_courses.append(course_id)
 
-    loc = CourseDescriptor.id_to_location(course_id)
-    if delete_course(module_store, content_store, loc, commit):
+    if delete_course(module_store, content_store, course_id, commit):
 
         print 'removing User permissions from course....'
         # in the django layer, we need to remove all the user permissions groups associated with this course
@@ -50,7 +47,7 @@ def delete_course_and_groups(course_id, commit=False):
                 instructor_role = CourseInstructorRole(course_id)
                 instructor_role.remove_users(*instructor_role.users_with_role())
             except Exception as err:
-                log.error("Error in deleting course groups for {0}: {1}".format(loc, err))
+                log.error("Error in deleting course groups for {0}: {1}".format(course_id, err))
 
 
 def get_modulestore(category_or_location):
@@ -73,23 +70,20 @@ def get_course_location_for_item(location):
     Also we have to assert that this module maps to only one course item - it'll throw an
     assert if not
     '''
-    item_loc = Location(location)
-
     # check to see if item is already a course, if so we can skip this
-    if item_loc.category != 'course':
+    if location.category != 'course':
         # @hack! We need to find the course location however, we don't
         # know the 'name' parameter in this context, so we have
         # to assume there's only one item in this query even though we are not specifying a name
-        course_search_location = Location('i4x', item_loc.org, item_loc.course, 'course', None)
-        courses = modulestore().get_items(course_search_location)
+        courses = modulestore().get_items(location.course.id, qualifiers={'category': 'course'})
 
         # make sure we found exactly one match on this above course search
         found_cnt = len(courses)
         if found_cnt == 0:
-            raise Exception('Could not find course at {0}'.format(course_search_location))
+            raise Exception('Could not find course for {0}'.format(location.course.id))
 
         if found_cnt > 1:
-            raise Exception('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+            raise Exception('Found more than one course for {0}. There should only be one!!! Dump = {1}'.format(location.course.id, courses))
 
         location = courses[0].location
 
@@ -103,38 +97,30 @@ def get_course_for_item(location):
     Also we have to assert that this module maps to only one course item - it'll throw an
     assert if not
     '''
-    item_loc = Location(location)
-
     # @hack! We need to find the course location however, we don't
     # know the 'name' parameter in this context, so we have
     # to assume there's only one item in this query even though we are not specifying a name
-    course_search_location = Location('i4x', item_loc.org, item_loc.course, 'course', None)
-    courses = modulestore().get_items(course_search_location)
+    courses = modulestore().get_items(location.course.id, qualifiers={'category': 'course'})
 
     # make sure we found exactly one match on this above course search
     found_cnt = len(courses)
     if found_cnt == 0:
-        raise BaseException('Could not find course at {0}'.format(course_search_location))
+        raise BaseException('Could not find course for {0}'.format(location.course.id))
 
     if found_cnt > 1:
-        raise BaseException('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+        raise BaseException('Found more than one course for {0}. There should only be one!!! Dump = {1}'.format(location.course.id, courses))
 
     return courses[0]
 
 
-def get_lms_link_for_item(location, preview=False, course_id=None):
+def get_lms_link_for_item(location, course_id, preview=False):
     """
     Returns an LMS link to the course with a jump_to to the provided location.
 
     :param location: the location to jump to
+    :param course_id: the course_id within which the location lives.
     :param preview: True if the preview version of LMS should be returned. Default value is false.
-    :param course_id: the course_id within which the location lives. If not specified, the course_id is obtained
-           by calling Location(location).course_id; note that this only works for locations representing courses
-           instead of elements within courses.
     """
-    if course_id is None:
-        course_id = Location(location).course_id
-
     if settings.LMS_BASE is not None:
         if preview:
             lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
@@ -144,7 +130,7 @@ def get_lms_link_for_item(location, preview=False, course_id=None):
         lms_link = u"//{lms_base}/courses/{course_id}/jump_to/{location}".format(
             lms_base=lms_base,
             course_id=course_id,
-            location=Location(location)
+            location=location
         )
     else:
         lms_link = None
@@ -179,7 +165,7 @@ def get_lms_link_for_about_page(location):
     if about_base is not None:
         lms_link = u"//{about_base_url}/courses/{course_id}/about".format(
             about_base_url=about_base,
-            course_id=Location(location).course_id
+            course_id=location.course_id
         )
     else:
         lms_link = None

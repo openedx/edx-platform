@@ -157,7 +157,6 @@ def get_module(user, request, location, field_data_cache, course_id,
     if possible.  If not possible, return None.
     """
     try:
-        location = Location(location)
         descriptor = modulestore().get_instance(course_id, location, depth=depth)
         return get_module_for_descriptor(user, request, descriptor, field_data_cache, course_id,
                                          position=position,
@@ -319,12 +318,10 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
         # Bin score into range and increment stats
         score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
-        course_id_dict = Location.parse_course_id(course_id)
 
         tags = [
-            u"org:{org}".format(**course_id_dict),
-            u"course:{course}".format(**course_id_dict),
-            u"run:{name}".format(**course_id_dict),
+            u"org:{}".format(course_id.org),
+            u"course:{}".format(course_id),
             u"score_bucket:{0}".format(score_bucket)
         ]
 

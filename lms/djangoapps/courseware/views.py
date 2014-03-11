@@ -31,9 +31,8 @@ from student.models import UserTestGroup, CourseEnrollment
 from student.views import course_from_id, single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
 import shoppingcart
@@ -389,8 +388,8 @@ def jump_to_id(request, course_id, module_id):
     """
 
     items = modulestore().get_items(
-        Location('i4x', course_location.org, course_location.course, None, module_id),
-        course_id=course_id
+        course_id=course_id,
+        qualifiers={'name': module_id}
     )
 
     if len(items) == 0:
@@ -413,12 +412,6 @@ def jump_to(request, course_id, location):
     Otherwise, delegates to the index view to figure out whether this user
     has access, and what they should see.
     """
-    # Complain if the location isn't valid
-    try:
-        location = Location(location)
-    except InvalidLocationError:
-        raise Http404("Invalid location")
-
     # Complain if there's not data for this location
     try:
         (course_id, chapter, section, position) = path_to_location(modulestore(), course_id, location)

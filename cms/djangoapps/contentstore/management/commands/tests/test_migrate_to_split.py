@@ -65,8 +65,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
             str(self.course.location),
             str(self.user.email),
         )
-        locator = loc_mapper().translate_location(self.course.id, self.course.location)
-        course_from_split = modulestore('split').get_course(locator)
+        course_from_split = modulestore('split').get_course(self.course.id)
         self.assertIsNotNone(course_from_split)
 
     def test_user_id(self):
@@ -75,8 +74,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
             str(self.course.location),
             str(self.user.id),
         )
-        locator = loc_mapper().translate_location(self.course.id, self.course.location)
-        course_from_split = modulestore('split').get_course(locator)
+        course_from_split = modulestore('split').get_course(self.course.id)
         self.assertIsNotNone(course_from_split)
 
     def test_locator_string(self):

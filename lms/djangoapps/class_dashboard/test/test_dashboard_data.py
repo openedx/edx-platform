@@ -79,7 +79,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                     max_grade=1 if i < j else 0.5,
                     student=user,
                     course_id=self.course.id,
-                    module_state_key=Location(item.location).url(),
+                    module_state_key=str(item.location),
                     state=json.dumps({'attempts': self.attempts}),
                 )
 
@@ -87,7 +87,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                 StudentModuleFactory.create(
                     course_id=self.course.id,
                     module_type='sequential',
-                    module_state_key=Location(item.location).url(),
+                    module_state_key=str(item.location),
                 )
 
     def test_get_problem_grade_distribution(self):

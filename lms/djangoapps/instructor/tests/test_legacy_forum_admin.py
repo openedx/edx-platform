@@ -42,7 +42,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
         clear_existing_modulestores()
         courses = modulestore().get_courses()
 
-        self.course_id = "edX/toy/2012_Fall"
+        self.course_id = CourseKey.from_string("edX/toy/2012_Fall")
         self.toy = modulestore().get_course(self.course_id)
 
         # Create two accounts

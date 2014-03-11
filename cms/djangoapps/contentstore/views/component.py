@@ -337,7 +337,7 @@ def _get_item_in_course(request, locator):
 
     Verifies that the caller has permission to access this item.
     """
-    if not has_course_access(request.user, locator.course_id):
+    if not has_course_access(request.user, locator.package_id):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(locator)

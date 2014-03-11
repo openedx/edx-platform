@@ -164,8 +164,7 @@ class OrgRole(GroupBasedRole):
     A named role in a particular org
     """
     def __init__(self, role, course_id):
-        course = Location.parse_course_id(course_id)
-        super(OrgRole, self).__init__([u'{}_{}'.format(role, course['org'])])
+        super(OrgRole, self).__init__([u'{}_{}'.format(role, course_id.org)])
 
 
 class CourseStaffRole(CourseRole):

@@ -8,7 +8,7 @@ from django.http import Http404
 from django.conf import settings
 from .module_render import get_module
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
@@ -46,8 +46,7 @@ def get_course(course_id, depth=0):
     None means infinite depth.  Default is to fetch no children.
     """
     try:
-        course_loc = CourseDescriptor.id_to_location(course_id)
-        return modulestore().get_instance(course_id, course_loc, depth=depth)
+        return modulestore().get_course(course_id, depth=depth)
     except (KeyError, ItemNotFoundError):
         raise ValueError("Course not found: {}".format(course_id))
     except InvalidLocationError:
@@ -154,7 +153,7 @@ def get_course_about_section(course, section_key):
     # markup. This can change without effecting this interface when we find a
     # good format for defining so many snippets of text/html.
 
-# TODO: Remove number, instructors from this list
+    # TODO: Remove number, instructors from this list
     if section_key in ['short_description', 'description', 'key_dates', 'video',
                        'course_staff_short', 'course_staff_extended',
                        'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
@@ -212,14 +211,14 @@ def get_course_info_section(request, course, section_key):
     - updates
     - guest_updates
     """
-    loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
+    usage_key = course.id.make_usage_key('course_info', section_key)
 
     # Use an empty cache
     field_data_cache = FieldDataCache([], course.id, request.user)
     info_module = get_module(
         request.user,
         request,
-        loc,
+        usage_key,
         field_data_cache,
         course.id,
         wrap_xmodule_display=False,

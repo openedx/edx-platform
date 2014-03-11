@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import check_module_metadata_editability
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location
 
 
 class Command(BaseCommand):
@@ -10,14 +9,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1:
-            raise CommandError("check_course requires one argument: <location>")
+            raise CommandError("check_course requires one argument: <course_id>")
 
-        loc_str = args[0]
+        course_id = CourseKey.from_string(args[0])
 
-        loc = CourseDescriptor.id_to_location(loc_str)
         store = modulestore()
 
-        course = store.get_item(loc, depth=3)
+        course = store.get_course(course_id, depth=3)
 
         err_cnt = 0
 
@@ -56,14 +54,8 @@ class Command(BaseCommand):
 
         # now query all discussion items via get_items() and compare with the tree-traversal
         queried_discussion_items = store.get_items(
-            Location(
-                'i4x',
-                course.location.org,
-                course.location.course,
-                'discussion',
-                None,
-                None
-            )
+            course_id=course.id,
+            qualifiers={'category': 'discussion'}
         )
 
         for item in queried_discussion_items:

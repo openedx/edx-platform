@@ -11,7 +11,6 @@ import sys
 from lxml import etree
 from xmodule.x_module import XModule, XModuleDescriptor
 from xmodule.errortracker import exc_info_to_str
-from xmodule.modulestore import Location
 from xblock.fields import String, Scope, ScopeIds
 from xblock.field_data import DictFieldData
 
@@ -81,7 +80,6 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
 
     @classmethod
     def _construct(cls, system, contents, error_msg, location):
-        location = Location(location)
 
         if error_msg is None:
             # this string is not marked for translation because we don't have

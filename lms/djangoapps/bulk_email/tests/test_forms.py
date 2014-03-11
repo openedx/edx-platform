@@ -95,7 +95,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_course_name_only(self):
         # Munge course id - common
-        bad_id = Location.parse_course_id(self.course.id)['name']
+        bad_id = Location.parse_course_id(self.course.run)
 
         form_data = {'course_id': bad_id, 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)

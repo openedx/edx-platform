@@ -124,8 +124,7 @@ def _assets_json(request, location):
         asset_id = asset['_id']
         asset_location = StaticContent.compute_location(asset_id['org'], asset_id['course'], asset_id['name'])
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
-        _thumbnail_location = asset.get('thumbnail_location', None)
-        thumbnail_location = Location(_thumbnail_location) if _thumbnail_location is not None else None
+        thumbnail_location = asset.get('thumbnail_location', None)
 
         asset_locked = asset.get('locked', False)
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))

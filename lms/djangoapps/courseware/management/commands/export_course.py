@@ -79,7 +79,7 @@ def export_course_to_directory(course_id, root_dir):
         raise CommandError("Invalid course_id")
 
     course_name = course.location.course_id.replace('/', '-')
-    export_to_xml(store, None, course.location, root_dir, course_name)
+    export_to_xml(store, None, course.id, root_dir, course_name)
 
     course_dir = path(root_dir) / course_name
     return course_dir

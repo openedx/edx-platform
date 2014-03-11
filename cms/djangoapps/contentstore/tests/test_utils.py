@@ -63,21 +63,12 @@ class LMSLinksTestCase(TestCase):
     def lms_link_test(self):
         """ Tests get_lms_link_for_item. """
         location = Location('i4x', 'mitX', '101', 'vertical', 'contacting_us')
-        link = utils.get_lms_link_for_item(location, False, "mitX/101/test")
+        link = utils.get_lms_link_for_item(location, "mitX/101/test", False)
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
-        link = utils.get_lms_link_for_item(location, True, "mitX/101/test")
+        link = utils.get_lms_link_for_item(location, "mitX/101/test", True)
         self.assertEquals(
             link,
             "//preview/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"
-        )
-
-        # If no course_id is passed in, it is obtained from the location. This is the case for
-        # Studio dashboard.
-        location = Location('i4x', 'mitX', '101', 'course', 'test')
-        link = utils.get_lms_link_for_item(location)
-        self.assertEquals(
-            link,
-            "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test"
         )
 
 
