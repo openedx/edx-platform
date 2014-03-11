@@ -22,7 +22,7 @@ from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
-
+from xmodule.tests.xml import factories as xml
 
 class ItemTest(CourseTestCase):
     """ Base test class for create, save, and delete """
@@ -156,6 +156,19 @@ class GetItem(ItemTest):
             (r'"/container/MITx.999.Robot_Super_Course/branch/published/block/wrapper.{3}" class="action-button">\s*'
              '<span class="action-button-text">View</span>')
         )
+
+    def test_split_test(self):
+        root_locator = self._create_vertical()
+        resp = self.create_xblock(category='split_test', parent_locator=root_locator)
+        self.assertEqual(resp.status_code, 200)
+        split_test_locator = self.response_locator(resp)
+        resp = self.create_xblock(parent_locator=split_test_locator, category='html', boilerplate='announcement.yaml')
+        self.assertEqual(resp.status_code, 200)
+        resp = self.create_xblock(parent_locator=split_test_locator, category='html', boilerplate='zooming_image.yaml')
+        self.assertEqual(resp.status_code, 200)
+        html, __ = self._get_container_preview(split_test_locator)
+        self.assertIn('Announcement', html)
+        self.assertIn('Zooming', html)
 
 
 class DeleteItem(ItemTest):

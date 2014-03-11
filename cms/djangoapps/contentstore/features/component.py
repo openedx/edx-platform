@@ -48,7 +48,7 @@ def add_a_multi_step_component(step, is_advanced, category):
 def see_a_multi_step_component(step, category):
 
     # Wait for all components to finish rendering
-    selector = 'li.component div.xblock-student_view'
+    selector = 'li.component div.xblock-studio_preview_view'
     world.wait_for(lambda _: len(world.css_find(selector)) == len(step.hashes))
 
     for idx, step_hash in enumerate(step.hashes):
@@ -77,7 +77,7 @@ def see_a_problem_component(step, category):
     assert_true(world.is_css_present(component_css),
                 'No problem was added to the unit.')
 
-    problem_css = 'li.component div.xblock-student_view'
+    problem_css = 'li.component div.xblock-studio_preview_view'
     actual_text = world.css_text(problem_css)
     assert_in(category.upper(), actual_text)
 
