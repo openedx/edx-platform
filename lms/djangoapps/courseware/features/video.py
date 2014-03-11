@@ -95,8 +95,6 @@ def add_video_to_course(course, player_mode, hashes, display_name='Video'):
         'metadata': {},
     }
 
-    course_location =world.scenario_dict['COURSE'].location
-
     if hashes:
         kwargs['metadata'].update(hashes[0])
 
@@ -134,18 +132,6 @@ def add_video_to_course(course, player_mode, hashes, display_name='Video'):
             'youtube_id_1_5': '',
             'html5_sources': HTML5_SOURCES_INCORRECT
         })
-
-    if kwargs['metadata'].get('sub'):
-        filename = _get_sjson_filename(kwargs['metadata']['sub'], 'en')
-        _upload_file(filename, course_location)
-
-    if kwargs['metadata'].get('transcripts'):
-        for lang, filename in kwargs['metadata']['transcripts'].items():
-            _upload_file(filename, course_location)
-
-    if kwargs['metadata'].get('youtube_id_1_5'):
-        filename = _get_sjson_filename(kwargs['metadata']['youtube_id_1_5'], 'en')
-        _upload_file(filename, course_location)
 
     world.scenario_dict['VIDEO'] = world.ItemFactory.create(**kwargs)
 
