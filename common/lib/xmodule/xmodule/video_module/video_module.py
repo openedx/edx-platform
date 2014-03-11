@@ -765,7 +765,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 else:
                 # We export values with json.dumps (well, except for Strings, but
                 # for about a month we did it for Strings also).
-                    if hasattr(cls, attr) is False:
+                    if attr not in cls.fields:
                         # Don't set attributes which are not in VideoDescriptor
                         continue
                     value = deserialize_field(cls.fields[attr], value)
