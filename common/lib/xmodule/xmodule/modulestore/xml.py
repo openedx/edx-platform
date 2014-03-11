@@ -59,13 +59,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         """
         self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
-        course_id_dict = Location.parse_course_id(course_id)
-        self.org = course_id_dict['org']
-        self.course = course_id_dict['course']
-        self.url_name = course_id_dict['name']
         if id_reader is None:
             id_reader = LocationReader()
-        id_generator = CourseLocationGenerator(self.org, self.course)
+        id_generator = CourseLocationGenerator(course_id)
 
         # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
         self.course_id = course_id

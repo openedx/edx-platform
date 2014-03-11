@@ -257,7 +257,7 @@ def course_listing(request):
             course.display_name,
             # note, couldn't get django reverse to work; so, wrote workaround
             course_loc.url_reverse('course/', ''),
-            get_lms_link_for_item(course.location),
+            get_lms_link_for_item(course.location, course.location.course_id),
             course.display_org_with_default,
             course.display_number_with_default,
             course.location.name
@@ -283,7 +283,7 @@ def course_index(request, package_id, branch, version_guid, block):
     locator, course = _get_locator_and_course(
         package_id, branch, version_guid, block, request.user, depth=3
     )
-    lms_link = get_lms_link_for_item(course.location)
+    lms_link = get_lms_link_for_item(course.location, course.location.course_id)
     sections = course.get_children()
 
     return render_to_response('overview.html', {

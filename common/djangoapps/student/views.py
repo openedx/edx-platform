@@ -574,9 +574,10 @@ def change_enrollment(request):
     user = request.user
 
     action = request.POST.get("enrollment_action")
-    course_id = request.POST.get("course_id")
-    if course_id is None:
+    if 'course_id' not in request.POST:
         return HttpResponseBadRequest(_("Course id not specified"))
+
+    course_id = CourseKey.from_string(request.POST.get("course_id"))
 
     if not user.is_authenticated():
         return HttpResponseForbidden()
@@ -610,12 +611,10 @@ def change_enrollment(request):
 
         current_mode = available_modes[0]
 
-        course_id_dict = Location.parse_course_id(course_id)
         dog_stats_api.increment(
             "common.student.enrollment",
-            tags=[u"org:{org}".format(**course_id_dict),
-                  u"course:{course}".format(**course_id_dict),
-                  u"run:{name}".format(**course_id_dict)]
+            tags=[u"org:{}".format(course_id.org),
+                  u"course:{}".format(course_id),
         )
 
         CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
@@ -639,12 +638,10 @@ def change_enrollment(request):
         if not CourseEnrollment.is_enrolled(user, course_id):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
         CourseEnrollment.unenroll(user, course_id)
-        course_id_dict = Location.parse_course_id(course_id)
         dog_stats_api.increment(
             "common.student.unenrollment",
-            tags=[u"org:{org}".format(**course_id_dict),
-                  u"course:{course}".format(**course_id_dict),
-                  u"run:{name}".format(**course_id_dict)]
+            tags=[u"org:{}".format(course_id.org),
+                  u"course:{}".format(course_id)]
         )
         return HttpResponse()
     else:
@@ -657,9 +654,9 @@ def _parse_course_id_from_string(input_str):
     @param input_str:
     @return: the course_id if found, None if not
     """
-    m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
+    m_obj = re.match(r'^/courses/(?P<course_id>[^/]+)', input_str)
     if m_obj:
-        return m_obj.group('course_id')
+        return CourseKey.from_string(m_obj.group('course_id'))
     return None
 
 
