@@ -1,3 +1,22 @@
+/* 
+Grid Annotation Plugin v1.0
+Copyright (C) 2014 Daniel Cebrian Robles and Luis Duarte
+License: https://github.com/danielcebrian/share-annotator/blob/master/License.rst
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
 //The name of the plugin that the user will write in the html
 window.CatchAnnotation = ("CatchAnnotation" in window) ? CatchAnnotation : {};
 window.CatchSources = ("CatchSources" in window) ? CatchSources : {};
@@ -76,13 +95,10 @@ annotationMediaSelector:
         '<li class="ui-state-default" media="video">'+
             'Video'+
         '</li>'+
+        '<li class="ui-state-default" media="image">'+
+            'Image'+
+        '</li>'+
     '</ul>',
-//    '<div class="selButtonCatch">Text<span class="action">text</span></div>'+
-//    '<div class="selButtonCatch">Video<span class="action">video</span></div>',
-//        '<div class="selButtonCatch">Images<span class="action">image</span></div>'+
-//        '<div class="selButtonCatch">Audio<span class="action">audio</span></div>'+
-//        '<div class="selButtonCatch">Maps<span class="action">map</span></div>'+
-//        '<div class="selButtonCatch">3D studio<span class="action">3d</span></div>',
 
 //Main->ContainerRow
 annotationItem: 
@@ -162,7 +178,15 @@ annotationRow:
 
 //Main->ContainerRow->DetailRow
 annotationDetail:
+'{{#if mediatypeforgrid.text}}'+
     '<div class="annotationDetail">'+
+'{{/if}}'+
+'{{#if mediatypeforgrid.video}}'+
+    '<div class="annotationDetail videoAnnotationDetail">'+
+'{{/if}}'+
+'{{#if mediatypeforgrid.image}}'+
+    '<div class="annotationDetail imageAnnotationDetail">'+
+'{{/if}}'+
         '<div class="detailHeader">'+
             '<span class="closeDetailIcon">'+
                 '<img src="'+root+'closeIcon.png" alt="Hide Details" />'+
@@ -181,12 +205,29 @@ annotationDetail:
             '{{/if}}'+
         '</div>'+
 
+'{{#if mediatypeforgrid.text}}'+
         '<div class="quote">'+
             '<div style="text-align: center">'+
             '<div class="quoteItem">“</div><div class="quoteText">{{{ quote }}}</div><div class="quoteItem">”</div></div>'+
             '<span class="idAnnotation" style="display:none">{{{ id }}}</span>'+
             '<span class="uri" style="display:none">{{{uri}}}</span>'+
         '</div>'+
+'{{/if}}'+
+'{{#if mediatypeforgrid.video}}'+
+        '<div class="playMediaButton">'+
+            'Play segment {{{ rangeTime.start }}} - {{{ rangeTime.end }}}'+
+            '<span class="idAnnotation" style="display:none">{{{ id }}}</span>'+
+            '<span class="uri" style="display:none">{{{uri}}}</span>'+
+            '<span class="container" style="display:none">{{{target.container}}}</span>'+
+        '</div>'+
+'{{/if}}'+
+'{{#if mediatypeforgrid.image}}'+
+	'<div class="previewOpenSeaDragon">'+
+		'<img src="http://www.paraemigrantes.com/wp-content/themes/daily/images/default-thumb.gif">'+
+		'<span class="idAnnotation" style="display:none">{{{ id }}}</span>'+
+            	'<span class="uri" style="display:none">{{{uri}}}</span>'+
+	'</div>'+
+'{{/if}}'+
 
         '<div class="body">'+
             '{{{ text }}}'+
@@ -217,76 +258,7 @@ annotationDetail:
         '</div>'+
     '{{/if}}'+
 
-        '<div class="controlPanel">'+
-            //'<img class="privacy_button" src="'+root+'privacy_icon.png" width="36" height="36" alt="Privacy Settings" title="Privacy Settings">'+
-//            '<img class="groups_button" src="'+root+'groups_icon.png" width="36" height="36" alt="Groups Access" title="Groups Access">'+
-            //'<img class="share_button" src="'+root+'share_icon.png" width="36" height="36" alt="Share Annotation" title="Share Annotation"/>'+
-        '</div>'+
-    '</div>',
-    
-//Main->ContainerRow->DetailRow (Video)
-videoAnnotationDetail:
-    '<div class="annotationDetail videoAnnotationDetail">'+
-        '<div class="detailHeader">'+
-            '<span class="closeDetailIcon">'+
-                '<img src="'+root+'closeIcon.png" alt="Hide Details" />'+
-            '</span>'+
-            'On  {{ updated }} <!--<a href="index.php?r=user/user/view&id={{{user.id}}}">-->{{{ user.name }}}<!--</a>-->{{#if geolocation}}, wrote from {{/if}}'+
-            '{{#if geolocation}}'+
-                '<span class="geolocationIcon">'+
-                    '<img src="'+root+'geolocation_icon.png"width="25" height="25" alt="Location Map" title="Show Location Map" data-dropdown="myLocationMap"/>'+
-                    '<span class="idAnnotation" style="display:none">{{{ id }}}</span>'+
-                    '<span class="latitude" style="display:none">{{{ geolocation.latitude }}}</span>'+
-                    '<span class="longitude" style="display:none">{{{ geolocation.longitude }}}</span>'+
-                '</span>'+
-                '<div id="myLocationMap" data-dropdown-content class="f-dropdown content">'+
-                    '<div class="map"></div>'+
-                '</div>'+
-            '{{/if}}'+
-        '</div>'+
-
-        '<div class="playMediaButton">'+
-            'Play segment {{{ rangeTime.start }}} - {{{ rangeTime.end }}}'+
-            '<span class="idAnnotation" style="display:none">{{{ id }}}</span>'+
-            '<span class="uri" style="display:none">{{{uri}}}</span>'+
-            '<span class="container" style="display:none">{{{target.container}}}</span>'+
-        '</div>'+
-
-        '<div class="body">'+
-            '{{{ text }}}'+
-        '</div>'+
-
-        '<div class="controlReplies">'+
-            '<div class="newReply" style="text-decoration:underline">Reply</div>&nbsp;'+
-            '<div class="hideReplies" style="text-decoration:underline;display:{{#if hasReplies}}block{{else}}none{{/if}}">Show Replies</div>&nbsp;'+
-            '{{#if authToEditButton}}'+
-                '<div class="editAnnotation" style="text-decoration:underline">Edit</div>'+
-            '{{/if}}'+
-            '{{#if authToDeleteButton}}'+
-                '<div class="deleteAnnotation" style="text-decoration:underline">Delete</div>'+
-            '{{/if}}'+
-        '</div>'+
-        
-        '<div class="replies"></div>'+
-        
-        
-    '{{#if tags}}'+
-        '<div class="tags">'+
-            '<h3>Tags:</h3>'+
-            '{{#each tags}}'+
-                '<div class="tag">'+
-                    '{{this}}'+
-                '</div>'+
-            '{{/each}}'+
-        '</div>'+
-    '{{/if}}'+
-
-        '<div class="controlPanel">'+
-            //'<img class="privacy_button" src="'+root+'privacy_icon.png" width="36" height="36" alt="Privacy Settings" title="Privacy Settings">'+
-//            '<img class="groups_button" src="'+root+'groups_icon.png" width="36" height="36" alt="Groups Access" title="Groups Access">'+
-//            '<img class="reply_button" src="'+root+'groups_icon.png" width="36" height="36" alt="Reply" title="Reply" idAnnotation="{{{ id }}}">'+
-            //'<img class="share_button" src="'+root+'share_icon.png" width="36" height="36" alt="Share Annotation" title="Share Annotation"/>'+
-        '</div>'+
+        '<div class="controlPanel"></div>'+
     '</div>',
 };
 };
@@ -343,7 +315,6 @@ CatchAnnotation.prototype = {
             "annotationReply",//Main->ContainerRow->Reply
             "annotationRow", //Main->ContainerRow->Row
             "annotationDetail",//Main->ContainerRow->DetailRow
-            "videoAnnotationDetail"//Main->ContainerRow->DetailRow (Video)
         ];
         //annotator
         var wrapper = $('.annotator-wrapper').parent()[0],
@@ -400,7 +371,7 @@ CatchAnnotation.prototype = {
                     evenOrOdd: index % 2 ? "odd" : "even",
                     openOrClosed: "closed",
                     annotationRow: self.TEMPLATES.annotationRow(item),
-                    annotationDetail: (mediaType === "video") ? self.TEMPLATES.videoAnnotationDetail(item):self.TEMPLATES.annotationDetail(item),
+                    annotationDetail: self.TEMPLATES.annotationDetail(item),
                 });
                 index++;
                 annotationItems.push(html);
@@ -449,6 +420,7 @@ CatchAnnotation.prototype = {
             onSelectionButtonClick = this.__bind(this._onSelectionButtonClick,this),
             onPublicPrivateButtonClick = this.__bind(this._onPublicPrivateButtonClick,this),
             onQuoteMediaButton = this.__bind(this._onQuoteMediaButton,this),
+            onPreviewOpenSeaDragon = this.__bind(this._onPreviewOpenSeaDragon,this),
             onControlRepliesClick = this.__bind(this._onControlRepliesClick,this),
             onMoreButtonClick = this.__bind(this._onMoreButtonClick,this),
             onSearchButtonClick = this.__bind(this._onSearchButtonClick, this),
@@ -472,6 +444,12 @@ CatchAnnotation.prototype = {
             //PlaySelection button
             el.on("click",".annotationItem .annotationDetail .quote", onQuoteMediaButton);
         }
+        //IMAGE
+        if (this.options.media=='image') {
+            //PlaySelection button
+            el.on("click",".annotationItem .annotationDetail .previewOpenSeaDragon", onPreviewOpenSeaDragon);
+        }
+
         
         //controlReplies
         el.on("click",".annotationItem .controlReplies", onControlRepliesClick);
@@ -568,7 +546,6 @@ CatchAnnotation.prototype = {
         var moreBut = this.element.find('.annotationListButtons .moreButtonCatch');
         moreBut.html('More');
         
-        setTimeout();
     },
 
 //    
@@ -646,6 +623,23 @@ CatchAnnotation.prototype = {
             isNumber = (typeof rt!='undefined' && !isNaN(parseFloat(rt.start)) && isFinite(rt.start) && !isNaN(parseFloat(rt.end)) && isFinite(rt.end));
         return (isOpenVideojs && isVideo && isNumber);
     },
+    _isImage: function(an){
+		var wrapper = $('.annotator-wrapper').parent()[0],
+			annotator = window.annotator = $.data(wrapper, 'annotator'),
+			rp = an.rangePosition,
+			isOpenSeaDragon = (typeof annotator.osda != 'undefined'),
+			isContainer = (typeof an.target!='undefined' && typeof an.target.container!='undefined' ),
+			isImage = (typeof an.media!='undefined' && an.media=='image'),
+			isRP = (typeof rp!='undefined');
+		if (isOpenSeaDragon && isContainer && isImage && isRP){
+			var source = annotator.osda.viewer.source,
+				isSource = false,
+				tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
+				functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'',
+				compareUrl = tilesUrl!=''?tilesUrl:(''+functionUrl).replace(/\s+/g, ' ');
+			if(isContainer) return (an.target.src == compareUrl);
+		}else{return false}
+    },
     _isInList: function (an){
         var annotator = this.annotator,
             isInList = false,
@@ -677,7 +671,9 @@ CatchAnnotation.prototype = {
             return (p1 == "lt")? "<" : ">";
         });//Change to < and > tags
         item.plainText = item.plainText.replace(/<\/?[^>]+(>|$)/g, "").replace('&nbsp;',''); //remove all the html tags
-        
+	item.mediatypeforgrid = {};
+	item.mediatypeforgrid[item.media] = true;        
+
         //Flags
         if(!this.options.flags && typeof item.tags != 'undefined' && item.tags.length > 0){
             for(var len=item.tags.length, index = len-1; index >= 0; --index){
@@ -813,6 +809,48 @@ CatchAnnotation.prototype = {
                                 scrollTop: $(an.highlights[0]).offset().top},
                                 'slow');
                         }
+                    }
+                }
+            }
+        }
+    },
+    _onPreviewOpenSeaDragon: function(evt){
+        var preview = $(evt.target).hasClass('previewOpenSeaDragon')?$(evt.target):$(evt.target).parents('.previewOpenSeaDragon:first'),
+            id = preview.find('.idAnnotation').html(),
+            uri = preview.find('.uri').html();
+        if (typeof id=='undefined' || id==''){
+            this.refreshCatch();
+            this.checkTotAnnotations();
+            id = preview.find('.idAnnotation').html();
+            //clickPlaySelection(evt);
+        }
+        if(this.options.externalLink){
+            uri += (uri.indexOf('?') >= 0)?'&ovaId='+id:'?ovaId='+id;
+            location.href = uri;
+        }else{
+            var allannotations = this.annotator.plugins['Store'].annotations,
+                ovaId = id;
+            for (var item in allannotations) {
+                var an = allannotations[item];
+                if (typeof an.id!='undefined' && an.id == ovaId){//this is the annotation
+                    if(this._isImage(an)){
+                            $(an.highlights).parent().find('.annotator-hl').removeClass('api'); 
+                            //change the color
+                            $(an.highlights).addClass('api');
+			    //change zoom
+			    if (typeof this.annotator!='undefined' && typeof this.annotator.osda!='undefined'){
+			    	var currentBounds = this.annotator.osda.viewer.drawer.viewport.getBounds(),
+    					bounds = typeof an.bounds!='undefined'?an.bounds:{};
+				if (typeof bounds.x!='undefined') currentBounds.x = bounds.x;
+				if (typeof bounds.y!='undefined') currentBounds.y = bounds.y;
+				if (typeof bounds.width!='undefined') currentBounds.width = bounds.width;
+				if (typeof bounds.height!='undefined') currentBounds.height = bounds.height;
+			    	this.annotator.osda.viewer.drawer.viewport.fitBounds(currentBounds); 
+			    }
+                            //animate to the annotation
+                            $('html,body').animate({
+                                scrollTop: $(this.annotator.osda.viewer.element).offset().top},
+                                'slow');
                     }
                 }
             }
@@ -1095,11 +1133,10 @@ CatchAnnotation.prototype = {
                     annotation = item.data('annotation');
         var authorized = permissions.options.userAuthorize('delete', annotation,permissions.user);
         if(authorized){
-            //annotator.deleteAnnotation(annotation);
             if(confirm('Would you like to delete this reply?')){
               annotator.plugins['Store']._apiRequest('destroy', annotation, function(){});
               item.remove();
-          }
+            }
         }
     }
 }

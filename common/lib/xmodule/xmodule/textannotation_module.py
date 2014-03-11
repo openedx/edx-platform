@@ -1,11 +1,14 @@
 ''' Text annotation module '''
 
+import datetime
+from django.http import (HttpResponse)
 from lxml import etree
 from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
+from xmodule.firebase_token_generator import create_token
 
 import textwrap
 
@@ -30,7 +33,7 @@ class AnnotatableFields(object):
         scope=Scope.settings,
         default='Text Annotation',
     )
-    tags = String(
+    instructor_tags = String(
         display_name="Tags for Assignments",
         help="Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue",
         scope=Scope.settings,
@@ -43,6 +46,12 @@ class AnnotatableFields(object):
         default='None',
     )
     annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
+    diacritics = String(
+        display_name="Diacritic Marks",
+        help="Add diacritic marks to be added to a text using the comma-separated form, i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2",
+        scope=Scope.settings,
+        default='',
+    )
 
 
 class TextAnnotationModule(AnnotatableFields, XModule):
@@ -59,15 +68,9 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
-        self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
-
-    def _render_content(self):
-        """ Renders annotatable content with annotation spans and returns HTML. """
-        xmltree = etree.fromstring(self.content)
-        if 'display_name' in xmltree.attrib:
-            del xmltree.attrib['display_name']
-
-        return etree.tostring(xmltree, encoding='unicode')
+        self.user = ""
+        if self.runtime.get_real_user is not None:
+            self.user = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -78,17 +81,39 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             return etree.tostring(instructions, encoding='unicode')
         return None
 
+    def token(self, userId):
+        '''
+        Return a token for the backend of annotations.
+        It uses the course id to retrieve a variable that contains the secret
+        token found in inheritance.py. It also contains information of when
+        the token was issued. This will be stored with the user along with
+        the id for identification purposes in the backend.
+        '''
+        dtnow = datetime.datetime.now()
+        dtutcnow = datetime.datetime.utcnow()
+        delta = dtnow - dtutcnow
+        newhour, newmin = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60, 60)
+        newtime = "%s%+02d:%02d" % (dtnow.isoformat(), newhour, newmin)
+        if "annotation_token_secret" in dir(self):
+            secret = self.annotation_token_secret
+        else:
+            secret = "NoKeyFound"
+        custom_data = {"issuedAt": newtime, "consumerKey": secret, "userId": userId, "ttl": 86400}
+        newtoken = create_token(secret, custom_data)
+        return newtoken
+
     def get_html(self):
         """ Renders parameters to template. """
         context = {
             'display_name': self.display_name_with_default,
-            'tag': self.tags,
+            'tag': self.instructor_tags,
             'source': self.source,
             'instructions_html': self.instructions,
-            'content_html': self._render_content(),
-            'annotation_storage': self.annotation_storage_url
+            'content_html': self.content,
+            'annotation_storage': self.annotation_storage_url,
+            'token': self.token(self.user),
+            'diacritic_marks': self.diacritics,
         }
-
         return self.system.render_template('textannotation.html', context)
 
 

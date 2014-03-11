@@ -43,11 +43,10 @@
 		$(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
 	}
 	$('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
-	
 	//Grab uri of the course
-    var parts = window.location.href.split("/"), 
-    	uri = '',
-	courseid;
+	var parts = window.location.href.split("/"), 
+		uri = '',
+		courseid;
 	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
 	courseid = parts[4] + "/" + parts[5] + "/" + parts[6];
 	//Change uri in cms
@@ -57,6 +56,8 @@
 		uri = window.location.protocol;
 		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
 	}
+        var unit_id = $('#sequence-list').find('.active').attr("data-element");
+        uri += unit_id;
 	var pagination = 100,
 		is_staff = !('${user.is_staff}'=='False'),
         options = {
@@ -115,7 +116,7 @@
                   },
             },
             auth: {
-                tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
+                token: "${token}"
             },
             store: {
                 // The endpoint of the store on your server.
@@ -145,6 +146,9 @@
             },
             highlightTags:{
                 tag: "${tag}",
+            },
+            diacriticMarks:{
+                diacritics: "${diacritic_marks}"
             }
         },
         optionsVideoJS: {techOrder: ["html5","flash","youtube"]},
@@ -161,31 +165,36 @@
             }
         },
     };
-	
-
-	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
-	
-	//remove old instances
-    if (Annotator._instances.length !== 0) {
-      $('#textHolder').annotator("destroy");
+    tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
+    var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
+	var startova = function(){
+        //remove old instances
+        if (Annotator._instances.length !== 0) {
+        $('#textHolder').annotator("destroy");
+        }
+        delete ova;
+        //Load the plugin Video/Text Annotation
+        var ova = new OpenVideoAnnotation.Annotator($('#textHolder'),options);
+        
+        //Catch
+        var annotator = ova.annotator,
+		catchOptions = {
+		    media:'text',
+		    externalLink:false,
+		    imageUrlRoot:imgURLRoot,
+		    showMediaSelector: false,
+		    showPublicPrivate: true,
+            userId:'${user.email}',
+		    pagination:pagination,//Number of Annotations per load in the pagination,
+		    flags:is_staff
+		},
+		Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
     }
-    delete ova;
-    //Load the plugin Video/Text Annotation
-    var ova = new OpenVideoAnnotation.Annotator($('#textHolder'),options);
-    
-    
-    //Catch
-    var annotator = ova.annotator,
-        catchOptions = {
-            media:'text',
-            externalLink:false,
-            imageUrlRoot:imgURLRoot,
-            showMediaSelector: false,
-            showPublicPrivate: true,
-	    userId:'${user.email}',
-            pagination:pagination,//Number of Annotations per load in the pagination,
-            flags:is_staff
-        },
-        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+    if (typeof Annotator != 'undefined'){
+    	startova();
+    } else{
+        require(["ova"], function(ova){
+            startova();
+        });
+    }
 </script>

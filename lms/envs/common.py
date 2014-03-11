@@ -792,7 +792,10 @@ main_vendor_js = [
     'js/vendor/ova/tags-annotator.js',
     'js/vendor/ova/flagging-annotator.js',
     'js/vendor/ova/jquery-Watch.js',
+    'js/vendor/ova/diacritic-annotator.js',
     'js/vendor/ova/ova.js',
+    'js/vendor/ova/openseadragon.js',
+    'js/vendor/ova/OpenSeaDragonAnnotation.js',
     'js/vendor/ova/catch/js/catch.js',
     'js/vendor/ova/catch/js/handlebars-1.1.2.js',
     'js/vendor/URI.min.js',
@@ -818,6 +821,7 @@ PIPELINE_CSS = {
             'css/vendor/ova/share-annotator.css',
             'css/vendor/ova/richText-annotator.css',
             'css/vendor/ova/tags-annotator.css',
+            'css/vendor/ova/diacritic-annotator.css',
             'css/vendor/ova/flagging-annotator.css',
             'css/vendor/ova/ova.css',
             'js/vendor/ova/catch/css/main.css'

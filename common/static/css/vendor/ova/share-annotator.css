@@ -198,6 +198,6 @@
 
 
 /* Api */
-.annotator-wrapper .annotator-hl.api {
-	background:rgba(0, 190, 99, 0.3);
+.annotator-hl.api {
+	background:rgba(0, 190, 99, 0.3)!important;
 }
