@@ -12,7 +12,7 @@ from importlib import import_module
 from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError, VersionConflictError, \
-    DuplicateItemError
+    DuplicateItemError, DuplicateCourseError
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DefinitionLocator
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
@@ -652,7 +652,7 @@ class TestItemCrud(SplitModuleTest):
         """
         # start transaction w/ simple creation
         user = random.getrandbits(32)
-        new_course = modulestore().create_course('test_org', 'test_transaction', user)
+        new_course = modulestore().create_course('test_org.test_transaction', 'test_org', 'test_transaction', user)
         new_course_locator = new_course.location.as_course_locator()
         index_history_info = modulestore().get_course_history_info(new_course.location)
         course_block_prev_version = new_course.previous_version
@@ -901,7 +901,7 @@ class TestItemCrud(SplitModuleTest):
         check_subtree(nodes[0])
 
     def create_course_for_deletion(self):
-        course = modulestore().create_course('nihilx', 'deletion', 'deleting_user')
+        course = modulestore().create_course('nihilx.deletion', 'nihilx', 'deletion', 'deleting_user')
         root = BlockUsageLocator(
             package_id=course.location.package_id,
             block_id=course.location.block_id,
@@ -929,7 +929,7 @@ class TestCourseCreation(SplitModuleTest):
         """
         # Oddly getting differences of 200nsec
         pre_time = datetime.datetime.now(UTC) - datetime.timedelta(milliseconds=1)
-        new_course = modulestore().create_course('test_org', 'test_course', 'create_user')
+        new_course = modulestore().create_course('test_org.test_course', 'test_org', 'test_course', 'create_user')
         new_locator = new_course.location
         # check index entry
         index_info = modulestore().get_course_index_info(new_locator)
@@ -963,14 +963,14 @@ class TestCourseCreation(SplitModuleTest):
         original_locator = CourseLocator(package_id="wonderful", branch='draft')
         original_index = modulestore().get_course_index_info(original_locator)
         new_draft = modulestore().create_course(
-            'leech', 'best_course', 'leech_master', id_root='best',
+            'best', 'leech', 'best_course', 'leech_master',
             versions_dict=original_index['versions'])
         new_draft_locator = new_draft.location
-        self.assertRegexpMatches(new_draft_locator.package_id, r'best.*')
+        self.assertRegexpMatches(new_draft_locator.package_id, 'best')
         # the edited_by and other meta fields on the new course will be the original author not this one
         self.assertEqual(new_draft.edited_by, 'test@edx.org')
         self.assertLess(new_draft.edited_on, pre_time)
-        self.assertEqual(new_draft.location.version_guid, original_index['versions']['draft'])
+        self.assertEqual(new_draft_locator.version_guid, original_index['versions']['draft'])
         # however the edited_by and other meta fields on course_index will be this one
         new_index = modulestore().get_course_index_info(new_draft_locator)
         self.assertGreaterEqual(new_index["edited_on"], pre_time)
@@ -1028,16 +1028,16 @@ class TestCourseCreation(SplitModuleTest):
         fields['grading_policy']['GRADE_CUTOFFS'] = {'A': .9, 'B': .8, 'C': .65}
         fields['display_name'] = 'Derivative'
         new_draft = modulestore().create_course(
-            'leech', 'derivative', 'leech_master', id_root='counter',
+            'counter', 'leech', 'derivative', 'leech_master',
             versions_dict={'draft': original_index['versions']['draft']},
             fields=fields
         )
         new_draft_locator = new_draft.location
-        self.assertRegexpMatches(new_draft_locator.package_id, r'counter.*')
+        self.assertRegexpMatches(new_draft_locator.package_id, 'counter')
         # the edited_by and other meta fields on the new course will be the original author not this one
         self.assertEqual(new_draft.edited_by, 'leech_master')
         self.assertGreaterEqual(new_draft.edited_on, pre_time)
-        self.assertNotEqual(new_draft.location.version_guid, original_index['versions']['draft'])
+        self.assertNotEqual(new_draft_locator.version_guid, original_index['versions']['draft'])
         # however the edited_by and other meta fields on course_index will be this one
         new_index = modulestore().get_course_index_info(new_draft_locator)
         self.assertGreaterEqual(new_index["edited_on"], pre_time)
@@ -1086,7 +1086,7 @@ class TestCourseCreation(SplitModuleTest):
         """
         user = random.getrandbits(32)
         new_course = modulestore().create_course(
-            'test_org', 'test_transaction', user,
+            'test_org.test_transaction', 'test_org', 'test_transaction', user,
             root_block_id='top', root_category='chapter'
         )
         self.assertEqual(new_course.location.block_id, 'top')
@@ -1100,6 +1100,14 @@ class TestCourseCreation(SplitModuleTest):
         self.assertIn('top', db_structure['blocks'])
         self.assertEqual(db_structure['blocks']['top']['category'], 'chapter')
 
+    def test_create_id_dupe(self):
+        """
+        Test create_course rejects duplicate id
+        """
+        user = random.getrandbits(32)
+        courses = modulestore().get_courses()
+        with self.assertRaises(DuplicateCourseError):
+            modulestore().create_course(courses[0].location.package_id, 'org', 'pretty', user)
 
 
 class TestInheritance(SplitModuleTest):
