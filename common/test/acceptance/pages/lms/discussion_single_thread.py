@@ -67,10 +67,7 @@ class DiscussionSingleThreadPage(CoursePage):
         ))
 
     def _is_element_visible(self, selector):
-        return (
-            self.is_css_present(selector) and
-            self.css_map(selector, lambda el: el.visible)[0]
-        )
+        return any(self.css_map(selector, lambda el: el.visible))
 
     def is_response_editor_visible(self, response_id):
         """Returns true if the response editor is present, false otherwise"""
