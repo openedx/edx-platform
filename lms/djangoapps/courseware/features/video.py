@@ -5,6 +5,7 @@ from lettuce import world, step
 import json
 import os
 import requests
+import time
 from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -94,6 +95,21 @@ def add_video_to_course(course, player_mode, hashes, display_name='Video'):
         'metadata': {},
     }
 
+    course_location =world.scenario_dict['COURSE'].location
+
+    if hashes:
+        kwargs['metadata'].update(hashes[0])
+
+    conversions = {
+        'transcripts': json.loads,
+        'download_track': json.loads,
+        'download_video': json.loads,
+    }
+
+    for key in kwargs['metadata']:
+        if key in conversions:
+            kwargs['metadata'][key] = conversions[key](kwargs['metadata'][key])
+
     if player_mode == 'html5':
         kwargs['metadata'].update({
             'youtube_id_1_0': '',
@@ -119,27 +135,17 @@ def add_video_to_course(course, player_mode, hashes, display_name='Video'):
             'html5_sources': HTML5_SOURCES_INCORRECT
         })
 
-    if hashes:
-        kwargs['metadata'].update(hashes[0])
-    course_location =world.scenario_dict['COURSE'].location
-
-    conversions = {
-        'transcripts': json.loads,
-        'download_track': json.loads,
-        'download_video': json.loads,
-    }
-
-    for key in kwargs['metadata']:
-        if key in conversions:
-            kwargs['metadata'][key] = conversions[key](kwargs['metadata'][key])
-
-    if 'sub' in kwargs['metadata']:
+    if kwargs['metadata'].get('sub'):
         filename = _get_sjson_filename(kwargs['metadata']['sub'], 'en')
         _upload_file(filename, course_location)
 
-    if 'transcripts' in kwargs['metadata']:
+    if kwargs['metadata'].get('transcripts'):
         for lang, filename in kwargs['metadata']['transcripts'].items():
             _upload_file(filename, course_location)
+
+    if kwargs['metadata'].get('youtube_id_1_5'):
+        filename = _get_sjson_filename(kwargs['metadata']['youtube_id_1_5'], 'en')
+        _upload_file(filename, course_location)
 
     world.scenario_dict['VIDEO'] = world.ItemFactory.create(**kwargs)
 
@@ -208,6 +214,36 @@ def _set_window_dimensions(width, height):
     world.wait(0.2)
 
 
+def _duration():
+        """
+        Total duration of the video, in seconds.
+        """
+        elapsed_time, duration = _video_time()
+        return duration
+
+
+def _video_time():
+        """
+        Return a tuple `(elapsed_time, duration)`, each in seconds.
+        """
+        # The full time has the form "0:32 / 3:14"
+        full_time = world.css_text('div.vidtime')
+
+        # Split the time at the " / ", to get ["0:32", "3:14"]
+        elapsed_str, duration_str = full_time.split(' / ')
+
+        # Convert each string to seconds
+        return (_parse_time_str(elapsed_str), _parse_time_str(duration_str))
+
+
+def _parse_time_str(time_str):
+    """
+    Parse a string of the form 1:23 into seconds (int).
+    """
+    time_obj = time.strptime(time_str, '%M:%S')
+    return time_obj.tm_min * 60 + time_obj.tm_sec
+
+
 @step('when I view the (.*) it does not have autoplay enabled$')
 def does_not_autoplay(_step, video_type):
     assert(world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False')
@@ -237,8 +273,13 @@ def visit_video_section(_step):
     visit_scenario_item('SECTION')
 
 
+@step('I select the "([^"]*)" speed$')
+def change_video_speed(_step, speed):
+      _change_video_speed(speed)
+
+
 @step('I select the "([^"]*)" speed on video "([^"]*)"$')
-def change_video_speed(_step, speed, player_id):
+def change_video_speed_on_video(_step, speed, player_id):
       _navigate_to_an_item_in_a_sequence(sequence[player_id])
       _change_video_speed(speed)
 
@@ -351,6 +392,14 @@ def click_button(_step, button):
 def start_playing_video_from_n_seconds(_step, position):
     world.wait_for(
         func=lambda _: world.css_html('.vidtime')[:4] == position.strip(),
+        timeout=5
+    )
+
+
+@step('I see duration "([^"]*)"$')
+def i_see_duration(_step, position):
+    world.wait_for(
+        func=lambda _: _duration() == _parse_time_str(position),
         timeout=5
     )
 
