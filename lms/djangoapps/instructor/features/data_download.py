@@ -62,14 +62,14 @@ length=0"""
     assert_in(expected_config, world.css_text('#data-grade-config-text'))
 
 
-@step(u"I see a csv file in the grade reports table")
+@step(u"I see a grade report csv file in the reports table")
 def find_grade_report_csv_link(step):  # pylint: disable=unused-argument
     # Need to reload the page to see the grades download table
     reload_the_page(step)
-    world.wait_for_visible('#grade-downloads-table')
+    world.wait_for_visible('#report-downloads-table')
     # Find table and assert a .csv file is present
     expected_file_regexp = 'edx_999_Test_Course_grade_report_\d{4}-\d{2}-\d{2}-\d{4}\.csv'
     assert_regexp_matches(
-        world.css_html('#grade-downloads-table'), expected_file_regexp,
+        world.css_html('#report-downloads-table'), expected_file_regexp,
         msg="Expected grade report filename was not found."
     )

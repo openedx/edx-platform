@@ -31,7 +31,7 @@ class DataDownload
     @$grades_request_response       = @$grades.find '.request-response'
     @$grades_request_response_error = @$grades.find '.request-response-error'
 
-    @grade_downloads = new GradeDownloads(@$section)
+    @report_downloads = new ReportDownloads(@$section)
     @instructor_tasks = new (PendingInstructorTasks()) @$section
     @clear_display()
 
@@ -115,12 +115,12 @@ class DataDownload
     # Clear display of anything that was here before
     @clear_display()
     @instructor_tasks.task_poller.start()
-    @grade_downloads.downloads_poller.start()
+    @report_downloads.downloads_poller.start()
 
   # handler for when the section is closed
   onExit: ->
     @instructor_tasks.task_poller.stop()
-    @grade_downloads.downloads_poller.stop()
+    @report_downloads.downloads_poller.stop()
 
   clear_display: ->
     # Clear any generated tables, warning messages, etc.
@@ -134,35 +134,31 @@ class DataDownload
     $(".msg-error").css({"display":"none"})
 
 
-class GradeDownloads
-  ### Grade Downloads -- links expire quickly, so we refresh every 5 mins ####
+class ReportDownloads
+  ### Report Downloads -- links expire quickly, so we refresh every 5 mins ####
   constructor: (@$section) ->
 
-
-    @$grades                        = @$section.find '.grades-download-container'
-    @$grades_request_response       = @$grades.find '.request-response'
-    @$grades_request_response_error = @$grades.find '.request-response-error'
-    @$grade_downloads_table         = @$grades.find ".grade-downloads-table"
+    @$report_downloads_table = @$section.find ".report-downloads-table"
 
     POLL_INTERVAL = 1000 * 60 * 5 # 5 minutes in ms
     @downloads_poller = new window.InstructorDashboard.util.IntervalManager(
-      POLL_INTERVAL, => @reload_grade_downloads()
+      POLL_INTERVAL, => @reload_report_downloads()
     )
 
-  reload_grade_downloads: ->
-    endpoint = @$grade_downloads_table.data 'endpoint'
+  reload_report_downloads: ->
+    endpoint = @$report_downloads_table.data 'endpoint'
     $.ajax
       dataType: 'json'
       url: endpoint
       success: (data) =>
         if data.downloads.length
-          @create_grade_downloads_table data.downloads
+          @create_report_downloads_table data.downloads
         else
-          console.log "No grade CSVs ready for download"
-      error: std_ajax_err => console.error "Error finding grade download CSVs"
+          console.log "No reports ready for download"
+      error: std_ajax_err => console.error "Error finding report downloads"
 
-  create_grade_downloads_table: (grade_downloads_data) ->
-    @$grade_downloads_table.empty()
+  create_report_downloads_table: (report_downloads_data) ->
+    @$report_downloads_table.empty()
 
     options =
       enableCellNavigation: true
@@ -174,7 +170,7 @@ class GradeDownloads
       id: 'link'
       field: 'link'
       name: gettext('File Name (Newest First)')
-      toolTip: gettext("Links are generated on demand and expire within 5 minutes due to the sensitive nature of student grade information.")
+      toolTip: gettext("Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.")
       sortable: false
       minWidth: 150
       cssClass: "file-download-link"
@@ -183,8 +179,8 @@ class GradeDownloads
     ]
 
     $table_placeholder = $ '<div/>', class: 'slickgrid'
-    @$grade_downloads_table.append $table_placeholder
-    grid = new Slick.Grid($table_placeholder, grade_downloads_data, columns, options)
+    @$report_downloads_table.append $table_placeholder
+    grid = new Slick.Grid($table_placeholder, report_downloads_data, columns, options)
     grid.autosizeColumns()
 
 
