@@ -31,9 +31,8 @@ from student.models import UserTestGroup, CourseEnrollment
 from student.views import course_from_id, single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
 import shoppingcart
@@ -391,8 +390,8 @@ def jump_to_id(request, course_id, module_id):
     course_location = CourseDescriptor.id_to_location(course_id)
 
     items = modulestore().get_items(
-        Location('i4x', course_location.org, course_location.course, None, module_id),
-        course_id=course_id
+        course_id=course_id,
+        qualifiers={'name': module_id}
     )
 
     if len(items) == 0:
