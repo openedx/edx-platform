@@ -217,6 +217,7 @@ def namedtuple_to_son(namedtuple, prefix=''):
     return son
 
 
+# TODO check whether this still has purpose
 def location_to_query(location, wildcard=True):
     """
     Takes a Location and returns a SON object that will query for that location.
@@ -591,13 +592,59 @@ class MongoModuleStore(ModuleStoreWriteBase):
         module = self._load_items([item], depth)[0]
         return module
 
-    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
+    def get_instance(self, course_id, location, depth=0):
+        """
+        TODO (vshnayder): implement policy tracking in mongo.
+        For now, just delegate to get_item and ignore policy.
+
+        depth (int): An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of
+            calls to get_children() to cache. None indicates to cache all descendents.
+        """
+        return self.get_item(location, depth=depth)
+
+    def get_items(self, course_id, settings=None, content=None, **kwargs):
+        """
+        Returns:
+            list of XModuleDescriptor instances for the matching items within the course with
+            the given course_id
+
+        NOTE: don't use this to look for courses
+        as the course_id is required. Use get_courses.
+
+        Args:
+            course_id (CourseKey): the course identifier
+            settings (dict): fields to look for which have settings scope. Follows same syntax
+                and rules as kwargs below
+            content (dict): fields to look for which have content scope. Follows same syntax and
+                rules as kwargs below.
+            kwargs (key=value): what to look for within the course.
+                Common qualifiers are ``category`` or any field name. if the target field is a list,
+                then it searches for the given value in the list not list equivalence.
+                Substring matching pass a regex object.
+                For this modulestore, ``name`` is another commonly provided key (Location based stores)
+                This modulestore does not allow searching dates by comparison or edited_by, previous_version,
+                update_version info.
+        """
+        query = SON()
+        query['_id.tag'] = 'i4x'
+        query['_id.org'] = course_id.org
+        query['_id.course'] = course_id.course
+        if 'category' in kwargs:
+            query['_id.category'] = kwargs.pop('category')
+        if 'name' in kwargs:
+            query['_id.name'] = kwargs.pop('name')
+        for key, value in (settings or {}).iteritems():
+            query['metadata.' + key] = value
+        for key, value in (content or {}).iteritems():
+            query['definition.data.' + key] = value
         items = self.collection.find(
-            location_to_query(location),
-            sort=[('revision', pymongo.ASCENDING)],
+            query,
+            sort=[('_id.revision', pymongo.ASCENDING)],
         )
 
-        modules = self._load_items(list(items), depth)
+        modules = self._load_items(list(items))
         return modules
 
     def create_course(self, course_id, definition_data=None, metadata=None, runtime=None):
