@@ -87,9 +87,9 @@
   <![endif]-->
 
   <meta name="path_prefix" content="${EDX_ROOT_URL}">
-  <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
+  <meta name="google-site-verification" content="${settings.GOOGLE_SITE_VERIFICATION}" />
 
-  % if not course:
+  % if not course or settings.FEATURES["ENABLE_COURSEWARE_GOOGLE_ANALYTICS"]:
     <%include file="${google_analytics_file}" />
   % endif
 

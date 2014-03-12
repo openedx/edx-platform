@@ -2,6 +2,7 @@
 This test file will run through some LMS test scenarios regarding access and navigation of the LMS
 """
 import time
+import mock
 from django.conf import settings
 
 from django.core.urlresolvers import reverse
@@ -125,3 +126,89 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertRedirects(resp, reverse('courseware_chapter',
                                            kwargs={'course_id': self.course.id,
                                                    'chapter': 'factory_chapter'}))
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_GOOGLE_ANALYTICS': True})
+    def test_courseware_google_analytics(self):
+        """
+        Verifies that when we turn on the feature to get google analytics on courseware
+        we see the expected HTML
+        """
+
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
+        self.enroll(self.course, True)
+
+        # Now we directly navigate to a section in a chapter other than 'Overview'.
+        resp = self.client.get(reverse('courseware',
+                               kwargs={'course_id': self.course.id}), follow=True)
+
+        self.assertIn("_gaq.push(['_setAccount', 'add-your-GA-account-ID-here']);", resp.content)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_GOOGLE_ANALYTICS': False})
+    def test_courseware_google_analytics_disabled(self):
+        """
+        Verifies that when we turn off the feature to get google analytics on courseware
+        we do not see the associated HTML
+        """
+
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
+        self.enroll(self.course, True)
+
+        # Now we directly navigate to a section in a chapter other than 'Overview'.
+        resp = self.client.get(reverse('courseware',
+                               kwargs={'course_id': self.course.id}), follow=True)
+
+        self.assertNotIn("_gaq", resp.content)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSEWARE_GOOGLE_ANALYTICS': True})
+    @override_settings(GOOGLE_ANALYTICS_ACCOUNT_ID='dummy')
+    def test_courseware_google_analytics_custom_account(self):
+        """
+        Verifies that when we override the Google Analytics account Id, that it appears in
+        the Google Analytics rendering
+        """
+
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
+        self.enroll(self.course, True)
+
+        # Now we directly navigate to a section in a chapter other than 'Overview'.
+        resp = self.client.get(reverse('courseware',
+                               kwargs={'course_id': self.course.id}), follow=True)
+
+        self.assertIn("_gaq.push(['_setAccount', 'dummy']);", resp.content)
+
+    def test_courseware_custom_site_verification(self):
+        """
+        Verifies that when we override the Google Analytics account Id, that it appears in
+        the Google Analytics rendering
+        """
+
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
+        self.enroll(self.course, True)
+
+        # Now we directly navigate to a section in a chapter other than 'Overview'.
+        resp = self.client.get(reverse('courseware',
+                               kwargs={'course_id': self.course.id}), follow=True)
+
+        self.assertIn('<meta name="google-site-verification" content="add-your-Google-site-verification-here" />',
+                      resp.content)
+
+    @override_settings(GOOGLE_SITE_VERIFICATION='dummy')
+    def test_courseware_default_site_verification(self):
+        """
+        Verifies that when we override the Google Analytics account Id, that it appears in
+        the Google Analytics rendering
+        """
+
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
+        self.enroll(self.course, True)
+
+        # Now we directly navigate to a section in a chapter other than 'Overview'.
+        resp = self.client.get(reverse('courseware',
+                               kwargs={'course_id': self.course.id}), follow=True)
+
+        self.assertIn('<meta name="google-site-verification" content="dummy" />', resp.content)

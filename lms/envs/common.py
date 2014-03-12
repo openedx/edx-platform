@@ -223,6 +223,9 @@ FEATURES = {
     # Toggle embargo functionality
     'EMBARGO': False,
 
+    # Turn on Google Analytics for courseware
+    'ENABLE_COURSEWARE_GOOGLE_ANALYTICS': False,
+
     # Whether the Wiki subsystem should be accessible via the direct /wiki/ paths. Setting this to True means
     # that people can submit content and modify the Wiki in any arbitrary manner. We're leaving this as True in the
     # defaults, so that we maintain current behavior
@@ -1554,3 +1557,7 @@ THIRD_PARTY_AUTH = {}
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default
 ADVANCED_SECURITY_CONFIG = {}
+
+### configuration for Google Analytics and Google Web Master Tools
+GOOGLE_ANALYTICS_ACCOUNT_ID = 'add-your-GA-account-ID-here'
+GOOGLE_SITE_VERIFICATION = 'add-your-Google-site-verification-here'
