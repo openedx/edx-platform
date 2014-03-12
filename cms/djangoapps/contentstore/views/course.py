@@ -22,6 +22,7 @@ from edxmako.shortcuts import render_to_response
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
+from xmodule.modulestore.keys import CourseKey
 
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.keys import CourseKey

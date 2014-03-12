@@ -32,6 +32,7 @@ from student.views import course_from_id, single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
@@ -386,11 +387,9 @@ def jump_to_id(request, course_id, module_id):
     This entry point allows for a shorter version of a jump to where just the id of the element is
     passed in. This assumes that id is unique within the course_id namespace
     """
+    course_location = CourseDescriptor.id_to_location(course_id)
 
-    items = modulestore().get_items(
-        course_id=course_id,
-        qualifiers={'name': module_id}
-    )
+    items = modulestore().get_items(CourseKey.from_string(course_id), name=module_id)
 
     if len(items) == 0:
         raise Http404("Could not find id = {0} in course_id = {1}. Referer = {2}".
