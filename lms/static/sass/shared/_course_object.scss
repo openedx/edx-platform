@@ -5,11 +5,11 @@
 
     .university-column {
       width: flex-grid(4);
-      margin-right: flex-gutter();
+      #{$margin-right}t: flex-gutter();
       float: left;
 
       &:nth-child(3n+3) {
-        margin-right: 0;
+        #{$margin-right}: 0;
       }
     }
 
@@ -21,11 +21,11 @@
 
       .courses-listing-item {
         width: flex-grid(4);
-        margin-right: flex-gutter();
+        #{$margin-right}: flex-gutter();
         float: flip(left, right);
 
         &:nth-child(3n+3) {
-          margin-right: 0;
+          #{$margin-right}: 0;
         }
       }
     }
