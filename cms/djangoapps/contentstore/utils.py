@@ -37,8 +37,7 @@ def delete_course_and_groups(course_id, commit=False):
 
     module_store.ignore_write_events_on_courses.append(course_id)
 
-    loc = CourseDescriptor.id_to_location(course_id)
-    if delete_course(module_store, content_store, loc, commit):
+    if delete_course(module_store, content_store, course_id, commit):
 
         print 'removing User permissions from course....'
         # in the django layer, we need to remove all the user permissions groups associated with this course
@@ -49,7 +48,7 @@ def delete_course_and_groups(course_id, commit=False):
                 instructor_role = CourseInstructorRole(course_id)
                 instructor_role.remove_users(*instructor_role.users_with_role())
             except Exception as err:
-                log.error("Error in deleting course groups for {0}: {1}".format(loc, err))
+                log.error("Error in deleting course groups for {0}: {1}".format(course_id, err))
 
 
 def get_modulestore(category_or_location):

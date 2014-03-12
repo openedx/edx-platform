@@ -45,20 +45,19 @@ class EdxJSONEncoder(json.JSONEncoder):
             return super(EdxJSONEncoder, self).default(obj)
 
 
-def export_to_xml(modulestore, contentstore, course_location, root_dir, course_dir, draft_modulestore=None):
+def export_to_xml(modulestore, contentstore, course_id, root_dir, course_dir, draft_modulestore=None):
     """
     Export all modules from `modulestore` and content from `contentstore` as xml to `root_dir`.
 
     `modulestore`: A `ModuleStore` object that is the source of the modules to export
     `contentstore`: A `ContentStore` object that is the source of the content to export, can be None
-    `course_location`: The `Location` of the `CourseModuleDescriptor` to export
+    `course_id`: The `CourseKey` of the `CourseModuleDescriptor` to export
     `root_dir`: The directory to write the exported xml to
     `course_dir`: The name of the directory inside `root_dir` to write the course content to
     `draft_modulestore`: An optional `DraftModuleStore` that contains draft content, which will be exported
         alongside the public content in the course.
     """
 
-    course_id = course_location.course_id
     course = modulestore.get_course(course_id)
 
     fs = OSFS(root_dir)
@@ -74,22 +73,22 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     policies_dir = export_fs.makeopendir('policies')
     if contentstore:
         contentstore.export_all_for_course(
-            course_location,
+            course_id,
             root_dir + '/' + course_dir + '/static/',
             root_dir + '/' + course_dir + '/policies/assets.json',
         )
 
     # export the static tabs
-    export_extra_content(export_fs, modulestore, course_id, course_location, 'static_tab', 'tabs', '.html')
+    export_extra_content(export_fs, modulestore, course_id, 'static_tab', 'tabs', '.html')
 
     # export the custom tags
-    export_extra_content(export_fs, modulestore, course_id, course_location, 'custom_tag_template', 'custom_tags')
+    export_extra_content(export_fs, modulestore, course_id, 'custom_tag_template', 'custom_tags')
 
     # export the course updates
-    export_extra_content(export_fs, modulestore, course_id, course_location, 'course_info', 'info', '.html')
+    export_extra_content(export_fs, modulestore, course_id, 'course_info', 'info', '.html')
 
     # export the 'about' data (e.g. overview, etc.)
-    export_extra_content(export_fs, modulestore, course_id, course_location, 'about', 'about', '.html')
+    export_extra_content(export_fs, modulestore, course_id, 'about', 'about', '.html')
 
     # export the grading policy
     course_run_policy_dir = policies_dir.makeopendir(course.location.name)
@@ -106,8 +105,10 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     # should we change the application, then this assumption will no longer
     # be valid
     if draft_modulestore is not None:
-        draft_verticals = draft_modulestore.get_items([None, course_location.org, course_location.course,
-                                                       'vertical', None, 'draft'])
+        draft_verticals = draft_modulestore.get_items(course_id, qualifiers={
+            'category': 'vertical',
+            'version': 'draft'
+        })
         if len(draft_verticals) > 0:
             draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
             for draft_vertical in draft_verticals:
@@ -138,9 +139,8 @@ def _export_field_content(xblock_item, item_dir):
                     field_content_file.write(dumps(module_data.get(field_name, {}), cls=EdxJSONEncoder))
 
 
-def export_extra_content(export_fs, modulestore, course_id, course_location, category_type, dirname, file_suffix=''):
-    query_loc = Location('i4x', course_location.org, course_location.course, category_type, None)
-    items = modulestore.get_items(query_loc, course_id)
+def export_extra_content(export_fs, modulestore, course_id, category_type, dirname, file_suffix=''):
+    items = modulestore.get_items(course_id, qualifiers={'category': category_type})
 
     if len(items) > 0:
         item_dir = export_fs.makeopendir(dirname)

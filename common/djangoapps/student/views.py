@@ -610,8 +610,10 @@ def change_enrollment(request):
 
         dog_stats_api.increment(
             "common.student.enrollment",
-            tags=[u"org:{}".format(course_id.org),
-                  u"course:{}".format(course_id),
+            tags=[
+                u"org:{}".format(course_id.org),
+                u"course:{}".format(course_id),
+            ]
         )
 
         CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
