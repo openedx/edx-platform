@@ -18,6 +18,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
 from bson.objectid import ObjectId
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 
 
 class SplitModuleTest(unittest.TestCase):
@@ -1625,6 +1626,26 @@ class TestPublish(SplitModuleTest):
                 dest_cursor += 1
         self.assertEqual(dest_cursor, len(dest_children))
 
+class TestSchema(SplitModuleTest):
+    """
+    Test the db schema (and possibly eventually migrations?)
+    """
+    def test_schema(self):
+        """
+        Test that the schema is set in each document
+        """
+        db_connection = modulestore().db_connection
+        for collection in [db_connection.course_index, db_connection.structures, db_connection.definitions]:
+            self.assertEqual(
+                collection.find({'schema_version': {'$exists': False}}).count(),
+                0,
+                "{0.name} has records without schema_version".format(collection)
+            )
+            self.assertEqual(
+                collection.find({'schema_version': {'$ne': SplitMongoModuleStore.SCHEMA_VERSION}}).count(),
+                0,
+                "{0.name} has records with wrong schema_version".format(collection)
+            )
 
 #===========================================
 def modulestore():
