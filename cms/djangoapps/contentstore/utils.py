@@ -195,6 +195,11 @@ def course_image_url(course):
 
 
 class PublishState(object):
+    """
+    The publish state for a given xblock-- either 'draft', 'private', or 'public'.
+
+    Currently in CMS, an xblock can only be in 'draft' or 'private' if it is at or below the Unit level.
+    """
     draft = 'draft'
     private = 'private'
     public = 'public'

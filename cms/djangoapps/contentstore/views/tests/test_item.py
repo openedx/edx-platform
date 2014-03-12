@@ -154,7 +154,7 @@ class GetItem(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID (wrapperxxx). Allow anything
             # for the 3 characters after wrapper.
-            (r'"/container/MITx.999.Robot_Super_Course/branch/published/block/wrapper.{3}" class="action-button">\s*'
+            (r'"/container/MITx.999.Robot_Super_Course/branch/draft/block/wrapper.{3}" class="action-button">\s*'
              '<span class="action-button-text">View</span>')
         )
 
@@ -656,7 +656,6 @@ class TestEditItem(ItemTest):
         published = self.get_item_from_modulestore(self.problem_locator, False)
         draft = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertNotEqual(draft.data, published.data)
-
 
     def test_publish_states_of_nested_xblocks(self):
         """ Test publishing of a unit page containing a nested xblock  """

@@ -28,9 +28,9 @@ class ContainerViewTestCase(CourseTestCase):
     def test_container_html(self):
         self._test_html_content(
             self.child_vertical,
-            expected_section_tag='<section class="wrapper-xblock level-page" data-locator="MITx.999.Robot_Super_Course/branch/published/block/Child_Vertical"/>',
+            expected_section_tag='<section class="wrapper-xblock level-page" data-locator="MITx.999.Robot_Super_Course/branch/draft/block/Child_Vertical"/>',
             expected_breadcrumbs=(
-                r'<a href="/unit/MITx.999.Robot_Super_Course/branch/published/block/Unit"\s*'
+                r'<a href="/unit/MITx.999.Robot_Super_Course/branch/draft/block/Unit"\s*'
                 r'class="navigation-link navigation-parent">Unit</a>\s*'
                 r'<a href="#" class="navigation-link navigation-current">Child Vertical</a>'),
         )
@@ -46,11 +46,11 @@ class ContainerViewTestCase(CourseTestCase):
                            category="html", display_name="Child HTML")
         self._test_html_content(
             xblock_with_child,
-            expected_section_tag='<section class="wrapper-xblock level-page" data-locator="MITx.999.Robot_Super_Course/branch/published/block/Wrapper"/>',
+            expected_section_tag='<section class="wrapper-xblock level-page" data-locator="MITx.999.Robot_Super_Course/branch/draft/block/Wrapper"/>',
             expected_breadcrumbs=(
-                r'<a href="/unit/MITx.999.Robot_Super_Course/branch/published/block/Unit"\s*'
+                r'<a href="/unit/MITx.999.Robot_Super_Course/branch/draft/block/Unit"\s*'
                 r'class="navigation-link navigation-parent">Unit</a>\s*'
-                r'<a href="/container/MITx.999.Robot_Super_Course/branch/published/block/Child_Vertical"\s*'
+                r'<a href="/container/MITx.999.Robot_Super_Course/branch/draft/block/Child_Vertical"\s*'
                 r'class="navigation-link navigation-parent">Child Vertical</a>\s*'
                 r'<a href="#" class="navigation-link navigation-current">Wrapper</a>'),
         )
@@ -67,3 +67,6 @@ class ContainerViewTestCase(CourseTestCase):
         self.assertIn(expected_section_tag, html)
         # Verify the navigation link at the top of the page is correct.
         self.assertRegexpMatches(html, expected_breadcrumbs)
+        # Verify the link that allows users to change publish status.
+        expected_unit_link = 'This container will publish as part of the unit <a href="/unit/MITx.999.Robot_Super_Course/branch/draft/block/Unit">Unit</a>.'
+        self.assertIn(expected_unit_link, html)

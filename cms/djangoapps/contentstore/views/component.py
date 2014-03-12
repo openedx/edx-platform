@@ -107,8 +107,8 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
         can_view_live = False
         subsection_units = item.get_children()
         for unit in subsection_units:
-            state = compute_unit_state(unit)
-            if state == UnitState.public or state == UnitState.draft:
+            state = compute_publish_state(unit)
+            if state == PublishState.public or state == PublishState.draft:
                 can_view_live = True
                 break
 
@@ -312,10 +312,8 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
 
         ancestor_xblocks = []
         parent = get_parent_xblock(xblock)
-        unit = None
         while parent and parent.category != 'sequential':
             ancestor_xblocks.append(parent)
-            unit = parent
             parent = get_parent_xblock(parent)
 
         ancestor_xblocks.reverse()
@@ -324,7 +322,7 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
             'context_course': course,
             'xblock': xblock,
             'xblock_locator': locator,
-            'unit': unit,
+            'unit': None if not ancestor_xblocks else ancestor_xblocks[0],
             'ancestor_xblocks': ancestor_xblocks,
         })
     else:
