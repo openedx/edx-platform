@@ -8,7 +8,7 @@ from django.http import Http404
 from django.conf import settings
 from .module_render import get_module
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
@@ -213,14 +213,14 @@ def get_course_info_section(request, course, section_key):
     - updates
     - guest_updates
     """
-    loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
+    usage_key = course.id.make_usage_key('course_info', section_key)
 
     # Use an empty cache
     field_data_cache = FieldDataCache([], course.id, request.user)
     info_module = get_module(
         request.user,
         request,
-        loc,
+        usage_key,
         field_data_cache,
         course.id,
         wrap_xmodule_display=False,

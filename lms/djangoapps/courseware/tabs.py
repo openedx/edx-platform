@@ -17,7 +17,6 @@ from django.core.urlresolvers import reverse
 
 from .module_render import get_module
 from courseware.access import has_access
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from courseware.model_data import FieldDataCache
 
@@ -430,11 +429,21 @@ def get_static_tab_by_slug(course, tab_slug):
 
 
 def get_static_tab_contents(request, course, tab):
-    loc = Location(course.location.tag, course.location.org, course.location.course, 'static_tab', tab['url_slug'])
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(course.id,
-        request.user, modulestore().get_instance(course.id, loc), depth=0)
-    tab_module = get_module(request.user, request, loc, field_data_cache, course.id,
-                            static_asset_path=course.static_asset_path)
+    usage_key = course.id.make_usage_key('static_tab', tab['url_slug'])
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id,
+        request.user,
+        modulestore().get_instance(course.id, usage_key),
+        depth=0
+    )
+    tab_module = get_module(
+        request.user,
+        request,
+        usage_key,
+        field_data_cache,
+        course.id,
+        static_asset_path=course.static_asset_path
+    )
 
     logging.debug('course_module = {0}'.format(tab_module))
 
