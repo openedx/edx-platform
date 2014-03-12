@@ -17,8 +17,8 @@ log = logging.getLogger(__name__)
 
 
 def import_static_content(
-        modules, course_loc, course_data_path, static_content_store,
-        target_location_namespace, subpath='static', verbose=False):
+        course_data_path, static_content_store,
+        target_course_id, subpath='static', verbose=False):
 
     remap_dict = {}
 
@@ -63,12 +63,9 @@ def import_static_content(
             fullname_with_subpath = content_path.replace(static_dir, '')
             if fullname_with_subpath.startswith('/'):
                 fullname_with_subpath = fullname_with_subpath[1:]
-            content_loc = StaticContent.compute_location(
-                target_location_namespace.org, target_location_namespace.course,
-                fullname_with_subpath
-            )
+            asset_key = target_course_id.make_asset_key(fullname_with_subpath)
 
-            policy_ele = policy.get(content_loc.name, {})
+            policy_ele = policy.get(asset_key.path, {})
             displayname = policy_ele.get('displayname', filename)
             locked = policy_ele.get('locked', False)
             mime_type = policy_ele.get('contentType')
@@ -77,7 +74,7 @@ def import_static_content(
             if not mime_type or mime_type not in mimetypes_list:
                 mime_type = mimetypes.guess_type(filename)[0]   # Assign guessed mimetype
             content = StaticContent(
-                content_loc, displayname, mime_type, data,
+                asset_key, displayname, mime_type, data,
                 import_path=fullname_with_subpath, locked=locked
             )
 
@@ -97,7 +94,7 @@ def import_static_content(
 
             # store the remapping information which will be needed
             # to subsitute in the module data
-            remap_dict[fullname_with_subpath] = content_loc.name
+            remap_dict[fullname_with_subpath] = asset_key
 
     return remap_dict
 
@@ -223,7 +220,6 @@ def import_from_xml(
             if static_content_store is not None and do_import_static:
                 # first pass to find everything in /static/
                 import_static_content(
-                    xml_module_store.modules[course_id], course_id,
                     course_data_path, static_content_store,
                     dest_course_id, subpath='static', verbose=verbose
                 )
@@ -247,7 +243,6 @@ def import_from_xml(
             simport = 'static_import'
             if os.path.exists(course_data_path / simport):
                 import_static_content(
-                    xml_module_store.modules[course_id], course_id,
                     course_data_path, static_content_store,
                     dest_course_id, subpath=simport, verbose=verbose
                 )
@@ -463,30 +458,16 @@ def import_course_draft(
                     logging.exception('There while importing draft descriptor %s', descriptor)
 
 
-def remap_namespace(module, target_location_namespace):
-    if target_location_namespace is None:
+def remap_namespace(module, target_course_id):
+    if target_course_id is None:
         return module
 
     original_location = module.location
 
     # This looks a bit wonky as we need to also change the 'name' of the
     # imported course to be what the caller passed in
-    if module.location.category != 'course':
-        module.location = module.location.replace(
-            tag=target_location_namespace.tag,
-            org=target_location_namespace.org,
-            course=target_location_namespace.course
-        )
-    else:
-        #
-        # module is a course module
-        #
-        module.location = module.location.replace(
-            tag=target_location_namespace.tag,
-            org=target_location_namespace.org,
-            course=target_location_namespace.course,
-            name=target_location_namespace.name
-        )
+    module.location = module.location.map_into_course(target_course_id)
+    if module.location.definition_key.block_type == 'course':
         # There is more re-namespacing work we have to do when
         # importing course modules
 
@@ -494,14 +475,13 @@ def remap_namespace(module, target_location_namespace):
         for entry in module.pdf_textbooks:
             for chapter in entry.get('chapters', []):
                 if StaticContent.is_c4x_path(chapter.get('url', '')):
-                    chapter['url'] = StaticContent.renamespace_c4x_path(
-                        chapter['url'], target_location_namespace
-                    )
+                    asset_key = AssetKey.from_string(chapter['url'])
+                    chapter['url'] = unicode(asset_key.map_into_course(target_course_id))
 
         # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
         # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
         # values then remap it so that the wiki does not point to the old wiki.
-        if original_location.course_id != target_location_namespace.course_id:
+        if original_location.course_id != target_course_id:
             original_unique_wiki_slug = '{0}.{1}.{2}'.format(
                 original_location.org,
                 original_location.course,
@@ -509,9 +489,9 @@ def remap_namespace(module, target_location_namespace):
             )
             if module.wiki_slug == original_unique_wiki_slug or module.wiki_slug == original_location.course:
                 module.wiki_slug = '{0}.{1}.{2}'.format(
-                    target_location_namespace.org,
-                    target_location_namespace.course,
-                    target_location_namespace.name,
+                    target_course_id.org,
+                    target_course_id.course,
+                    target_course_id.name,
                 )
 
         module.save()
@@ -535,9 +515,9 @@ def remap_namespace(module, target_location_namespace):
                                  original_location.course == ref.course)
         if in_original_namespace:
             new_ref = ref.replace(
-                tag=target_location_namespace.tag,
-                org=target_location_namespace.org,
-                course=target_location_namespace.course
+                tag=target_course_id.tag,
+                org=target_course_id.org,
+                course=target_course_id.course
             ).url()
         return new_ref
 

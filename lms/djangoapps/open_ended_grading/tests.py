@@ -270,7 +270,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        self.course_id = "edX/toy/2012_Fall"
+        self.course_id = CourseKey.from_string("edX/toy/2012_Fall")
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
         field_data = DictFieldData({'data': "<peergrading/>", 'location': location, 'category':'peergrading'})
@@ -447,7 +447,7 @@ class TestPanel(ModuleStoreTestCase):
 
     def setUp(self):
         # Toy courses should be loaded
-        self.course_name = 'edX/open_ended/2012_Fall'
+        self.course_name = CourseKey.from_string('edX/open_ended/2012_Fall')
         self.course = modulestore().get_course(self.course_name)
         self.user = factories.UserFactory()
 
@@ -485,7 +485,7 @@ class TestPeerGradingFound(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        self.course_name = 'edX/open_ended_nopath/2012_Fall'
+        self.course_name = CourseKey.from_string('edX/open_ended_nopath/2012_Fall')
         self.course = modulestore().get_course(self.course_name)
 
     def test_peer_grading_nopath(self):

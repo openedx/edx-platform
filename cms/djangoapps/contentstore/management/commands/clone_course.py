@@ -33,13 +33,10 @@ class Command(BaseCommand):
 
         print("Cloning course {0} to {1}".format(source_course_id, dest_course_id))
 
-        source_location = CourseDescriptor.id_to_location(source_course_id)
-        dest_location = CourseDescriptor.id_to_location(dest_course_id)
-
         if clone_course(mstore, cstore, source_course_id, dest_course_id):
             # be sure to recompute metadata inheritance after all those updates
             # DO NOT MERGE: need to figure out how to handle the metadata inheritance refresh
-            mstore.refresh_cached_metadata_inheritance_tree(dest_location)
+            mstore.refresh_cached_metadata_inheritance_tree(dest_course_id)
 
             print("copying User permissions...")
             # purposely avoids auth.add_user b/c it doesn't have a caller to authorize

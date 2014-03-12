@@ -89,7 +89,7 @@ class TestCohorts(django.test.TestCase):
         """
         Make sure get_cohort() does the right thing when the course is cohorted
         """
-        course = modulestore().get_course("edX/toy/2012_Fall")
+        course = modulestore().get_course(CourseKey.from_string("edX/toy/2012_Fall"))
         self.assertEqual(course.id, "edX/toy/2012_Fall")
         self.assertFalse(course.is_cohorted)
 
@@ -120,7 +120,7 @@ class TestCohorts(django.test.TestCase):
         """
         Make sure get_cohort() does the right thing when the course is auto_cohorted
         """
-        course = modulestore().get_course("edX/toy/2012_Fall")
+        course = modulestore().get_course(CourseKey.from_string("edX/toy/2012_Fall"))
         self.assertEqual(course.id, "edX/toy/2012_Fall")
         self.assertFalse(course.is_cohorted)
 
@@ -168,7 +168,7 @@ class TestCohorts(django.test.TestCase):
         """
         Make sure get_cohort() randomizes properly.
         """
-        course = modulestore().get_course("edX/toy/2012_Fall")
+        course = modulestore().get_course(CourseKey.from_string("edX/toy/2012_Fall"))
         self.assertEqual(course.id, "edX/toy/2012_Fall")
         self.assertFalse(course.is_cohorted)
 
@@ -213,7 +213,7 @@ class TestCohorts(django.test.TestCase):
         self.assertEqual(cohorts, ['TestCohort', 'TestCohort2'])
 
     def test_is_commentable_cohorted(self):
-        course = modulestore().get_course("edX/toy/2012_Fall")
+        course = modulestore().get_course(CourseKey.from_string("edX/toy/2012_Fall"))
         self.assertFalse(course.is_cohorted)
 
         def to_id(name):

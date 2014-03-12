@@ -287,7 +287,7 @@ class TestMongoModuleStore(object):
         assert_equals(len(course_locations), 0)
 
         # set toy course to share the wiki with simple course
-        toy_course = self.store.get_course('edX/toy/2012_Fall')
+        toy_course = self.store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
         toy_course.wiki_slug = 'simple'
         self.store.update_item(toy_course)
 
@@ -302,7 +302,7 @@ class TestMongoModuleStore(object):
             assert_in(Location('i4x', 'edX', course_number, 'course', '2012_Fall'), course_locations)
 
         # configure simple course to use unique wiki_slug.
-        simple_course = self.store.get_course('edX/simple/2012_Fall')
+        simple_course = self.store.get_course(CourseKey.from_string('edX/simple/2012_Fall'))
         simple_course.wiki_slug = 'edX.simple.2012_Fall'
         self.store.update_item(simple_course)
         # it should be retrievable with its new wiki_slug

@@ -14,7 +14,7 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
     def setUp(self):
 
         # Load the toy course
-        self.toy = modulestore().get_course('edX/toy/2012_Fall')
+        self.toy = modulestore().get_course(CourseKey.from_string('edX/toy/2012_Fall'))
 
         # Create two accounts
         self.student = 'view@test.com'
