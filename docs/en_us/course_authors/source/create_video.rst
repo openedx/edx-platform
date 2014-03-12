@@ -93,6 +93,10 @@ We strongly recommend that you associate a timed transcript with your video. Tra
 
 In addition to your .srt file, you can provide other transcripts with your video. For example, you can provide downloadable transcripts in a text format such as .txt or .pdf, and you can provide transcripts in different languages. For more information, see :ref:`Additional Transcripts`. 
 
+If you provide transcripts for students to download, a **Download transcript** button appears under the video. Students can then select either **SubRip (.srt) file** or **Text (.txt) file** to download the .srt or .txt transcript.
+
+.. image:: Images/transcript-download.png
+
 .. note:: Some past courses have used .sjson files for video transcripts. If transcripts in your course uses this format, see :ref:`Steps for sjson files`. We don't recommend that you use .sjson files.
 
 
