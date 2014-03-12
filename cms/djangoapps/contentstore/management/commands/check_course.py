@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import check_module_metadata_editability
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location
 
 
 class Command(BaseCommand):
@@ -55,14 +54,8 @@ class Command(BaseCommand):
 
         # now query all discussion items via get_items() and compare with the tree-traversal
         queried_discussion_items = store.get_items(
-            Location(
-                'i4x',
-                course.location.org,
-                course.location.course,
-                'discussion',
-                None,
-                None
-            )
+            course_id=course.id,
+            qualifiers={'category': 'discussion'}
         )
 
         for item in queried_discussion_items:
