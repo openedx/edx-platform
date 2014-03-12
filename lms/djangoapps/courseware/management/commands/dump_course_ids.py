@@ -11,6 +11,9 @@ from xmodule.modulestore.django import modulestore
 class Command(BaseCommand):
     """
     Simple command to dump the course_ids available to the lms.
+
+    Output is UTF-8 encoded by default.
+
     """
     help = dedent(__doc__).strip()
     option_list = BaseCommand.option_list + (
@@ -21,7 +24,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        output = []
+        results = []
 
         try:
             name = options['modulestore']
@@ -31,6 +34,8 @@ class Command(BaseCommand):
 
         for course in store.get_courses():
             course_id = course.location.course_id
-            output.append(course_id)
+            results.append(course_id)
 
-        return '\n'.join(output) + '\n'
+        output = '\n'.join(results) + '\n'
+
+        return output.encode('utf-8')
