@@ -86,6 +86,7 @@ locales:
 dummy_locales:
     - eo
     - fake2
+    - en@rtl
 
 # Directories we don't search for strings.
 ignore_dirs:
