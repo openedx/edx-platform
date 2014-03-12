@@ -689,8 +689,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, data_dir, ['course_info_updates'],
                         static_content_store=content_store, verbose=True)
 
-        course_location = CourseDescriptor.id_to_location('edX/course_info_updates/2014_T1')
-        course = module_store.get_item(course_location)
+        course_id = CourseKey.from_string('edX/course_info_updates/2014_T1')
+        course = module_store.get_item(course_id)
 
         self.assertIsNotNone(course)
 
@@ -719,7 +719,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # with same content as in course 'info' directory
         root_dir = path(mkdtemp_clean())
         print 'Exporting to tempdir = {0}'.format(root_dir)
-        export_to_xml(module_store, content_store, course_location, root_dir, 'test_export')
+        export_to_xml(module_store, content_store, course_id, root_dir, 'test_export')
 
         # check that exported course has files 'updates.html' and 'updates.items.json'
         filesystem = OSFS(root_dir / 'test_export/info')
@@ -1156,7 +1156,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         import_from_xml(module_store, 'common/test/data/', ['toy'])
-        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+        course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         # create a new video module and add it as a child to a vertical
         # this re-creates a bug whereby since the video template doesn't have
@@ -1174,7 +1174,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
         # export out to a tempdir
-        export_to_xml(module_store, content_store, location, root_dir, 'test_export', draft_modulestore=draft_store)
+        export_to_xml(module_store, content_store, course_id, root_dir, 'test_export', draft_modulestore=draft_store)
 
         shutil.rmtree(root_dir)
 
@@ -1187,7 +1187,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         import_from_xml(module_store, 'common/test/data/', ['word_cloud'])
-        location = CourseDescriptor.id_to_location('HarvardX/ER22x/2013_Spring')
+        course_id = CourseKey.from_string('HarvardX/ER22x/2013_Spring')
 
         verticals = module_store.get_items(Location('i4x', 'HarvardX', 'ER22x', 'vertical', None, None))
 
@@ -1202,7 +1202,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
         # export out to a tempdir
-        export_to_xml(module_store, content_store, location, root_dir, 'test_export', draft_modulestore=draft_store)
+        export_to_xml(module_store, content_store, course_id, root_dir, 'test_export', draft_modulestore=draft_store)
 
         shutil.rmtree(root_dir)
 
@@ -1216,7 +1216,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         import_from_xml(module_store, 'common/test/data/', ['toy'])
-        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+        course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         verticals = module_store.get_items(Location('i4x', 'edX', 'toy', 'vertical', None, None))
 
@@ -1231,7 +1231,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # Export the course
         root_dir = path(mkdtemp_clean())
-        export_to_xml(module_store, content_store, location, root_dir, 'test_roundtrip', draft_modulestore=draft_store)
+        export_to_xml(module_store, content_store, course_id, root_dir, 'test_roundtrip', draft_modulestore=draft_store)
 
         # Reimport and get the video back
         import_from_xml(module_store, root_dir)
@@ -1249,11 +1249,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+        course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         # Export the course
         root_dir = path(mkdtemp_clean())
-        export_to_xml(module_store, content_store, location, root_dir, 'test_roundtrip')
+        export_to_xml(module_store, content_store, course_id, root_dir, 'test_roundtrip')
 
         # Reimport and get the video back
         import_from_xml(module_store, root_dir)
