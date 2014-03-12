@@ -83,8 +83,8 @@ class DiscussionSingleThreadPage(CoursePage):
         return self.q(css="#comment_{}".format(comment_id)).present
 
     def is_comment_deletable(self, comment_id):
-        """Returns true if the delete comment button is present, false otherwise"""
-        return self.q(css="#comment_{} div.action-delete".format(comment_id)).present
+        """Returns true if the delete comment button is present and visible, false otherwise"""
+        return self.q(css="#comment_{} div.action-delete".format(comment_id)).visible
 
     def delete_comment(self, comment_id):
         with self.handle_alert():
