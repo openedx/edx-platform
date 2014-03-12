@@ -152,7 +152,7 @@ def instructor_dashboard(request, course_id):
             writer.writerow(encoded_row)
         return response
 
-    def get_module_url(urlname):
+    def get_module_url(urlname, block_type='problem'):
         """
         Construct full URL for a module from its urlname.
 
@@ -166,14 +166,7 @@ def instructor_dashboard(request, course_id):
         if urlname[-4:] == ".xml":
             urlname = urlname[:-4]
 
-        # implement default
-        if '/' not in urlname:
-            urlname = "problem/" + urlname
-
-        # complete the url using information about the current course:
-        parts = Location.parse_course_id(course_id)
-        parts['url'] = urlname
-        return u"i4x://{org}/{course}/{url}".format(**parts)
+        return course_id.make_usage_key(block_type, urlname)
 
     def get_student_from_identifier(unique_student_identifier):
         """Gets a student object using either an email address or username"""

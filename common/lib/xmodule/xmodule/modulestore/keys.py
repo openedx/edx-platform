@@ -20,6 +20,16 @@ class CourseKey(OpaqueKey):
         """
         raise NotImplementedError()
 
+    @abstractmethod
+    def make_usage_key(self, block_type, block_id):
+        """
+        Return a usage key, given the given the specified block_type and block_id.
+
+        This function should not actually create any new ids, but should simply
+        return one that already exists.
+        """
+        raise NotImplementedError()
+
 
 class DefinitionKey(OpaqueKey):
     """
