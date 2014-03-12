@@ -89,10 +89,7 @@ def get_hints(request, course_id, field):
     # The course_id is of the form school/number/classname.
     # We want to use the course_id to find all matching usage_id's.
     # To do this, just take the school/number part - leave off the classname.
-    course_id_dict = Location.parse_course_id(course_id)
-    chopped_id = u'{org}/{course}'.format(**course_id_dict)
-    chopped_id = re.escape(chopped_id)
-    all_hints = XModuleUserStateSummaryField.objects.filter(field_name=field, usage_id__regex=chopped_id)
+    all_hints = XModuleUserStateSummaryField.objects.filter(field_name=field, usage_id__regex=re.escape(course_id))
     # big_out_dict[problem id] = [[answer, {pk: [hint, votes]}], sorted by answer]
     # big_out_dict maps a problem id to a list of [answer, hints] pairs, sorted in order of answer.
     big_out_dict = {}
