@@ -121,7 +121,7 @@
 
 </head>
 
-<body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE} ${dir_rtl}">
+<body class="${dir_rtl} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
   <div class="window-wrap" dir="${dir_rtl}">
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
 

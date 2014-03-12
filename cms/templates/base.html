@@ -39,14 +39,9 @@
     <%block name="header_extras"></%block>
   </head>
 
-<<<<<<< HEAD
-
-  <body class="rtl <%block name='bodyclass'></%block> hide-wip lang_${LANGUAGE_CODE}">
+  <body class="${dir_rtl} <%block name='bodyclass'></%block> hide-wip lang_${LANGUAGE_CODE}">
   <%block name="view_notes"></%block>
 
-=======
-  <body class="<%block name='bodyclass'></%block> hide-wip lang_${LANGUAGE_CODE} ${dir_rtl}">
->>>>>>> adding django bidi language switcher to base templates for lms and studio, and a few extra css fixes
     <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
     <script type="text/javascript">
