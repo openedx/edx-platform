@@ -49,6 +49,13 @@ class UsageKey(OpaqueKey):
         raise NotImplementedError()
 
     @abstractmethod
+    def definition_key(self):
+        """
+        Return the :class:`DefinitionKey` for the XBlock containing this usage.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
     def map_into_course(self, course_key):
         """
         Return a new :class:`UsageKey` representing this usage inside the
