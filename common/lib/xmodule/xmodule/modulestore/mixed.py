@@ -282,7 +282,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
         :param fields: a dict of xblock field name - value pairs for the course module.
         :param metadata: the old way of setting fields by knowing which ones are scope.settings v scope.content
         :param definition_data: the complement to metadata which is also a subset of fields
-        :param pretty_id: a field split.create_course uses and may quit using
         :returns: course xblock
         """
         store = self.modulestores[store_name]
@@ -297,11 +296,10 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 org = None
 
             org = kwargs.pop('org', org)
-            pretty_id = kwargs.pop('pretty_id', course_id)
             fields = kwargs.pop('fields', {})
             fields.update(kwargs.pop('metadata', {}))
             fields.update(kwargs.pop('definition_data', {}))
-            course = store.create_course(course_id, org, pretty_id, user_id, fields=fields, **kwargs)
+            course = store.create_course(course_id, org, user_id, fields=fields, **kwargs)
         else:  # assume mongo
             course = store.create_course(course_id, **kwargs)
 

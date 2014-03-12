@@ -358,8 +358,7 @@ class CourseLocator(Locator):
         Generate a discussion group id based on course
 
         To make compatible with old Location object functionality. I don't believe this behavior fits at this
-        place, but I have no way to override. If this is really needed, it should probably use the pretty_id to seed
-        the name although that's mutable. We should also clearly define the purpose and restrictions of this
+        place, but I have no way to override. We should clearly define the purpose and restrictions of this
         (e.g., I'm assuming periods are fine).
         """
         return self.package_id
