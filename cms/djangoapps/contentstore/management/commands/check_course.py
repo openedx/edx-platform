@@ -10,14 +10,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1:
-            raise CommandError("check_course requires one argument: <location>")
+            raise CommandError("check_course requires one argument: <course_id>")
 
-        loc_str = args[0]
+        course_id = CourseKey(args[0])
 
-        loc = CourseDescriptor.id_to_location(loc_str)
         store = modulestore()
 
-        course = store.get_item(loc, depth=3)
+        course = store.get_course(course_id, depth=3)
 
         err_cnt = 0
 
