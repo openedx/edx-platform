@@ -431,6 +431,9 @@ def pin_thread(request, course_id, thread_id):
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
 
+@require_POST
+@login_required
+@permitted
 def un_pin_thread(request, course_id, thread_id):
     """
     given a course id and thread id, remove pin from this thread
