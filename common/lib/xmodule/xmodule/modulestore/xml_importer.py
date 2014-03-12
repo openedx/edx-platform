@@ -515,19 +515,20 @@ def remap_namespace(module, target_location_namespace):
                     )
 
         # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
-        # If the wiki_slug is equal to either of these default values then remap that so that the wiki does not point
-        # to the old wiki.
-        original_unique_wiki_slug = '{0}.{1}.{2}'.format(
-            original_location.org,
-            original_location.course,
-            original_location.name
-        )
-        if module.wiki_slug == original_unique_wiki_slug or module.wiki_slug == original_location.course:
-            module.wiki_slug = '{0}.{1}.{2}'.format(
-                target_location_namespace.org,
-                target_location_namespace.course,
-                target_location_namespace.name,
+        # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
+        # values then remap it so that the wiki does not point to the old wiki.
+        if original_location.course_id != target_location_namespace.course_id:
+            original_unique_wiki_slug = '{0}.{1}.{2}'.format(
+                original_location.org,
+                original_location.course,
+                original_location.name
             )
+            if module.wiki_slug == original_unique_wiki_slug or module.wiki_slug == original_location.course:
+                module.wiki_slug = '{0}.{1}.{2}'.format(
+                    target_location_namespace.org,
+                    target_location_namespace.course,
+                    target_location_namespace.name,
+                )
 
         module.save()
 
