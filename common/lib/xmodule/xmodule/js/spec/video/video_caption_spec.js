@@ -55,11 +55,7 @@
                     });
 
                     waitsFor(function () {
-                        if (state.videoCaption.loaded === true) {
-                            return true;
-                        }
-
-                        return false;
+                        return state.videoCaption.loaded;
                     }, 'Expect captions to be loaded.', WAIT_TIMEOUT);
 
                     runs(function () {
@@ -77,17 +73,15 @@
                     });
                 });
 
-                it('fetch the caption in Youtube mode', function () {
+                it('fetch the caption in Flash mode', function () {
                     runs(function () {
                         state = jasmine.initializePlayerYouTube();
+                        spyOn(state, 'isFlashMode').andReturn(true);
+                        state.videoCaption.fetchCaption();
                     });
 
                     waitsFor(function () {
-                        if (state.videoCaption.loaded === true) {
-                            return true;
-                        }
-
-                        return false;
+                        return state.videoCaption.loaded;
                     }, 'Expect captions to be loaded.', WAIT_TIMEOUT);
 
                     runs(function () {
@@ -102,6 +96,31 @@
                             .toEqual({
                                 language: 'en',
                                 videoId: 'abcdefghijkl'
+                            });
+                    });
+                });
+
+                it('fetch the caption in Youtube mode', function () {
+                    runs(function () {
+                        state = jasmine.initializePlayerYouTube();
+                    });
+
+                    waitsFor(function () {
+                        return state.videoCaption.loaded;
+                    }, 'Expect captions to be loaded.', WAIT_TIMEOUT);
+
+                    runs(function () {
+                        expect($.ajaxWithPrefix).toHaveBeenCalledWith({
+                            url: '/transcript/translation',
+                            notifyOnError: false,
+                            data: jasmine.any(Object),
+                            success: jasmine.any(Function),
+                            error: jasmine.any(Function)
+                        });
+                        expect($.ajaxWithPrefix.mostRecentCall.args[0].data)
+                            .toEqual({
+                                language: 'en',
+                                videoId: 'cogebirgzzM'
                             });
                     });
                 });
