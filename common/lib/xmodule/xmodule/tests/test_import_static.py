@@ -15,7 +15,7 @@ class IgnoredFilesTestCase(unittest.TestCase):
         loc = Location("edX", "tilde", "Fall_2012")
         content_store = Mock()
         content_store.generate_thumbnail.return_value = ("content", "location")
-        import_static_content(Mock(), Mock(), course_dir, content_store, loc)
+        import_static_content(course_dir, content_store, loc)
         saved_static_content = [call[0][0] for call in content_store.save.call_args_list]
         name_val = {sc.name: sc.data for sc in saved_static_content}
         self.assertIn("example.txt", name_val)

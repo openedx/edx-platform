@@ -136,12 +136,12 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_rewrite_reference_list(self):
         module_store = modulestore('direct')
-        target_location = Location(['i4x', 'testX', 'conditional_copy', 'course', 'copy_run'])
+        target_course_id = CourseKey.from_string('testX/conditional_copy/copy_run')
         import_from_xml(
             module_store,
             'common/test/data/',
             ['conditional'],
-            target_location_namespace=target_location
+            target_course_id=target_course_id
         )
         conditional_module = module_store.get_item(
             Location(['i4x', 'testX', 'conditional_copy', 'conditional', 'condone'])
@@ -164,12 +164,12 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_rewrite_reference(self):
         module_store = modulestore('direct')
-        target_location = Location(['i4x', 'testX', 'peergrading_copy', 'course', 'copy_run'])
+        target_course_id = CourseKey.from_string('testX/peergrading_copy/copy_run')
         import_from_xml(
             module_store,
             'common/test/data/',
             ['open_ended'],
-            target_location_namespace=target_location
+            target_course_id=target_course_id
         )
         peergrading_module = module_store.get_item(
             Location(['i4x', 'testX', 'peergrading_copy', 'peergrading', 'PeerGradingLinked'])
@@ -182,12 +182,12 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_rewrite_reference_value_dict(self):
         module_store = modulestore('direct')
-        target_location = Location(['i4x', 'testX', 'split_test_copy', 'course', 'copy_run'])
+        target_course_id = CourseKey.from_string('testX/peergrading_copy/copy_run')
         import_from_xml(
             module_store,
             'common/test/data/',
             ['split_test_module'],
-            target_location_namespace=target_location
+            target_course_id=target_course_id
         )
         split_test_module = module_store.get_item(
             Location(['i4x', 'testX', 'split_test_copy', 'split_test', 'split1'])

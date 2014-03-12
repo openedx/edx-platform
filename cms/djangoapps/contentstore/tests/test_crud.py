@@ -65,7 +65,7 @@ class TemplateTests(unittest.TestCase):
             parent_location=test_course.location)
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         # refetch parent which should now point to child
-        test_course = modulestore('split').get_course(test_chapter.location)
+        test_course = modulestore('split').get_course(test_course.id)
         self.assertIn(test_chapter.location.block_id, test_course.children)
 
     def test_temporary_xblocks(self):

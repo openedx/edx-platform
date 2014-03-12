@@ -208,14 +208,9 @@ def _accessible_courses_list_from_groups(request):
         course_ids.add(course_id.replace('/', '.').lower())
 
     for course_id in course_ids:
-        # get course_location with lowercase id
-        course_location = loc_mapper().translate_locator_to_location(
-            CourseLocator(package_id=course_id), get_course=True, lower_only=True
-        )
-        if course_location is None:
+        course = modulestore('direct').get_course(CourseKey.from_string(course_id))
+        if course is None:
             raise ItemNotFoundError(course_id)
-
-        course = modulestore('direct').get_course(course_location.course_id)
         courses_list.append(course)
 
     return courses_list

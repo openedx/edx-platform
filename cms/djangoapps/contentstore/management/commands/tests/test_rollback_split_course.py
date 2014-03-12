@@ -93,18 +93,17 @@ class TestRollbackSplitCourse(ModuleStoreTestCase):
             loc_mapper=loc_mapper(),
         )
         migrator.migrate_mongo_course(self.old_course.location, self.user)
-        locator = loc_mapper().translate_location(self.old_course.id, self.old_course.location)
-        self.course = modulestore('split').get_course(locator)
+        self.course = modulestore('split').get_course(self.old_course.id)
 
     @patch("sys.stdout", new_callable=StringIO)
     def test_happy_path(self, mock_stdout):
-        locator = self.course.location
+        course_id = self.course.id
         call_command(
             "rollback_split_course",
-            str(locator),
+            str(course_id),
         )
         with self.assertRaises(ItemNotFoundError):
-            modulestore('split').get_course(locator)
+            modulestore('split').get_course(course_id)
 
         self.assertIn("Course rolled back successfully", mock_stdout.getvalue())
 

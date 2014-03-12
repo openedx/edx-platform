@@ -30,6 +30,16 @@ class CourseKey(OpaqueKey):
         """
         raise NotImplementedError()
 
+    @abstractmethod
+    def make_asset_key(self, path):
+        """
+        Return an asset key, given the given the specified path.
+
+        This function should not actually create any new ids, but should simply
+        return one that already exists.
+        """
+        raise NotImplementedError()
+
 
 class DefinitionKey(OpaqueKey):
     """
@@ -45,23 +55,16 @@ class DefinitionKey(OpaqueKey):
         raise NotImplementedError()
 
 
-class UsageKey(OpaqueKey):
+class CourseObjectMixin(object):
     """
-    An :class:`opaque_keys.OpaqueKey` identifying an XBlock usage.
+    An abstract :class:`opaque_keys.OpaqueKey` mixin
+    for keys that belong to courses.
     """
-    KEY_TYPE = 'usage_key'
 
     @abstractmethod
     def course_key(self):
         """
         Return the :class:`CourseKey` for the course containing this usage.
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
-    def definition_key(self):
-        """
-        Return the :class:`DefinitionKey` for the XBlock containing this usage.
         """
         raise NotImplementedError()
 
@@ -73,3 +76,30 @@ class UsageKey(OpaqueKey):
         """
         raise NotImplementedError()
 
+
+class AssetKey(CourseObjectMixin, OpaqueKey):
+    """
+    An :class:`opaque_keys.OpaqueKey` identifying a course asset.
+    """
+    KEY_TYPE = 'asset_key'
+
+    @abstractmethod
+    def path(self):
+        """
+        Return the path for this asset.
+        """
+        raise NotImplementedError()
+
+
+class UsageKey(CourseObjectMixin, OpaqueKey):
+    """
+    An :class:`opaque_keys.OpaqueKey` identifying an XBlock usage.
+    """
+    KEY_TYPE = 'usage_key'
+
+    @abstractmethod
+    def definition_key(self):
+        """
+        Return the :class:`DefinitionKey` for the XBlock containing this usage.
+        """
+        raise NotImplementedError()

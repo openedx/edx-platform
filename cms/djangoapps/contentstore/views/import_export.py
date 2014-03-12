@@ -65,14 +65,14 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
     if not has_course_access(request.user, location.course_id):
         raise PermissionDenied()
 
-    old_location = loc_mapper().translate_locator_to_location(location)
+    course_id = CourseKey.from_string(package_id)
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
             raise NotImplementedError('coming soon')
         else:
             data_root = path(settings.GITHUB_REPO_ROOT)
-            course_subdir = "{0}-{1}-{2}".format(old_location.org, old_location.course, old_location.name)
+            course_subdir = "{0}-{1}".format(course_id.org, course_id.run)
             course_dir = data_root / course_subdir
 
             filename = request.FILES['course-data'].name
@@ -222,7 +222,7 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
                         [course_subdir],
                         load_error_modules=False,
                         static_content_store=contentstore(),
-                        target_location_namespace=old_location,
+                        target_course_id=course_id,
                         draft_store=modulestore()
                     )
 
@@ -251,7 +251,7 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
 
                 return JsonResponse({'Status': 'OK'})
     elif request.method == 'GET':  # assume html
-        course_module = modulestore().get_item(old_location)
+        course_module = modulestore().get_course(course_id)
         return render_to_response('import.html', {
             'context_course': course_module,
             'successful_import_redirect_url': location.url_reverse("course"),

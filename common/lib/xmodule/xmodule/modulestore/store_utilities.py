@@ -93,30 +93,16 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     return text
 
 
-def _clone_modules(modulestore, modules, source_location, dest_location):
+def _clone_modules(modulestore, modules, source_course_id, dest_course_id):
     for module in modules:
-        original_loc = Location(module.location)
-
-        if original_loc.category != 'course':
-            module.location = module.location._replace(
-                tag=dest_location.tag,
-                org=dest_location.org,
-                course=dest_location.course
-            )
-        else:
-            # on the course module we also have to update the module name
-            module.location = module.location._replace(
-                tag=dest_location.tag,
-                org=dest_location.org,
-                course=dest_location.course,
-                name=dest_location.name
-            )
+        original_loc = module.location
+        module.location = module.location.map_into_course(dest_course_id)
 
         print "Cloning module {0} to {1}....".format(original_loc, module.location)
 
         if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, basestring):
             module.data = rewrite_nonportable_content_links(
-                source_location.course_id, dest_location.course_id, module.data
+                source_course_id, dest_course_id, module.data
             )
 
         # repoint children
@@ -124,11 +110,7 @@ def _clone_modules(modulestore, modules, source_location, dest_location):
             new_children = []
             for child_loc_url in module.children:
                 child_loc = Location(child_loc_url)
-                child_loc = child_loc._replace(
-                    tag=dest_location.tag,
-                    org=dest_location.org,
-                    course=dest_location.course
-                )
+                child_loc = child_loc.map_into_course(dest_course_id)
                 new_children.append(child_loc.url())
 
             module.children = new_children
@@ -136,14 +118,14 @@ def _clone_modules(modulestore, modules, source_location, dest_location):
         modulestore.update_item(module, '**replace_user**')
 
 
-def clone_course(modulestore, contentstore, source_location, dest_location, delete_original=False):
+def clone_course(modulestore, contentstore, source_course_id, dest_course_id, delete_original=False):
     # check to see if the dest_location exists as an empty course
     # we need an empty course because the app layers manage the permissions and users
-    if not modulestore.has_item(dest_location.course_id, dest_location):
-        raise Exception("An empty course at {0} must have already been created. Aborting...".format(dest_location))
+    if not modulestore.has_item(dest_course_id, qualifiers={'category': 'course'}):
+        raise Exception("An empty course at {0} must have already been created. Aborting...".format(dest_course_id))
 
     # verify that the dest_location really is an empty course, which means only one with an optional 'overview'
-    dest_modules = modulestore.get_items([dest_location.tag, dest_location.org, dest_location.course, None, None, None])
+    dest_modules = modulestore.get_items(dest_course_id)
 
     basically_empty = True
     for module in dest_modules:
@@ -158,45 +140,40 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
         raise Exception("Course at destination {0} is not an empty course. You can only clone into an empty course. Aborting...".format(dest_location))
 
     # check to see if the source course is actually there
-    if not modulestore.has_item(source_location.course_id, source_location):
-        raise Exception("Cannot find a course at {0}. Aborting".format(source_location))
+    if not modulestore.has_item(source_course_id, qualifiers={'category': 'course'}):
+        raise Exception("Cannot find a course at {0}. Aborting".format(source_course_id))
 
     # Get all modules under this namespace which is (tag, org, course) tuple
 
-    modules = modulestore.get_items([source_location.tag, source_location.org, source_location.course, None, None, None])
-    _clone_modules(modulestore, modules, source_location, dest_location)
+    modules = modulestore.get_items(source_course_id, qualifiers={'version': None})
+    _clone_modules(modulestore, modules, source_course_id, dest_course_id)
 
-    modules = modulestore.get_items([source_location.tag, source_location.org, source_location.course, None, None, 'draft'])
-    _clone_modules(modulestore, modules, source_location, dest_location)
+    modules = modulestore.get_items(source_course_id, qualifiers={'version': 'draft'})
+    _clone_modules(modulestore, modules, source_course_id, dest_course_id)
 
     # now iterate through all of the assets and clone them
     # first the thumbnails
-    thumbs = contentstore.get_all_content_thumbnails_for_course(source_location)
-    for thumb in thumbs:
-        thumb_loc = Location(thumb["_id"])
-        content = contentstore.find(thumb_loc)
-        content.location = content.location._replace(org=dest_location.org,
-                                                     course=dest_location.course)
+    thumb_keys = contentstore.get_all_content_thumbnails_for_course(source_course_id)
+    for thumb_key in thumb_keys:
+        content = contentstore.find(thumb_key)
+        content.location = content.location.map_into_course(dest_course_id)
 
-        print "Cloning thumbnail {0} to {1}".format(thumb_loc, content.location)
+        print "Cloning thumbnail {0} to {1}".format(thumb_key, content.location)
 
         contentstore.save(content)
 
     # now iterate through all of the assets, also updating the thumbnail pointer
 
-    assets, __ = contentstore.get_all_content_for_course(source_location)
-    for asset in assets:
-        asset_loc = Location(asset["_id"])
-        content = contentstore.find(asset_loc)
-        content.location = content.location._replace(org=dest_location.org,
-                                                     course=dest_location.course)
+    asset_keys, __ = contentstore.get_all_content_for_course(source_course_id)
+    for asset_key in asset_keys:
+        content = contentstore.find(asset_key)
+        content.location = content.location.map_into_course(dest_course_id)
 
         # be sure to update the pointer to the thumbnail
         if content.thumbnail_location is not None:
-            content.thumbnail_location = content.thumbnail_location._replace(org=dest_location.org,
-                                                                             course=dest_location.course)
+            content.thumbnail_location = content.thumbnail_location.map_into_course(dest_course_id)
 
-        print "Cloning asset {0} to {1}".format(asset_loc, content.location)
+        print "Cloning asset {0} to {1}".format(asset_key, content.location)
 
         contentstore.save(content)
 

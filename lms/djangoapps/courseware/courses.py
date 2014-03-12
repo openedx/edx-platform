@@ -46,8 +46,7 @@ def get_course(course_id, depth=0):
     None means infinite depth.  Default is to fetch no children.
     """
     try:
-        course_loc = CourseDescriptor.id_to_location(course_id)
-        return modulestore().get_instance(course_id, course_loc, depth=depth)
+        return modulestore().get_course(course_id, depth=depth)
     except (KeyError, ItemNotFoundError):
         raise ValueError("Course not found: {}".format(course_id))
     except InvalidLocationError:

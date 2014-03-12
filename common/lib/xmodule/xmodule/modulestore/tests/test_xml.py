@@ -91,7 +91,7 @@ class TestXMLModuleStore(unittest.TestCase):
         self.assertEqual(len(course_locations), 0)
 
         # now set toy course to share the wiki with simple course
-        toy_course = store.get_course('edX/toy/2012_Fall')
+        toy_course = store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
         toy_course.wiki_slug = 'simple'
 
         course_locations = store.get_courses_for_wiki('toy')

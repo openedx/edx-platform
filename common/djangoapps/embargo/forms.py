@@ -20,7 +20,7 @@ class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protoc
 
     def clean_course_id(self):
         """Validate the course id"""
-        course_id = self.cleaned_data["course_id"]
+        course_id = CourseKey.from_string(self.cleaned_data["course_id"])
 
         # Try to get the course.  If this returns None, it's not a real course
         try:

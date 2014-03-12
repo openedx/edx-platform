@@ -37,7 +37,7 @@ class Command(BaseCommand):
         task_number = options['task_number']
 
         if len(args) == 2:
-            course_id = args[0]
+            course_id = CourseKey.from_string(args[0])
             location = args[1]
         else:
             print self.help

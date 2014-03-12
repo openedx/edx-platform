@@ -41,7 +41,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     def setUp(self):
         self.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        self.course_id = 'edX/toy/2012_Fall'
+        self.course_id = CourseKey.from_string('edX/toy/2012_Fall')
         self.toy_course = modulestore().get_course(self.course_id)
         self.mock_user = UserFactory()
         self.mock_user.id = 1
@@ -164,7 +164,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def setUp(self):
         self.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        self.course_id = 'edX/toy/2012_Fall'
+        self.course_id = CourseKey.from_string('edX/toy/2012_Fall')
         self.toy_course = modulestore().get_course(self.course_id)
         self.mock_user = UserFactory()
         self.mock_user.id = 1
@@ -310,7 +310,7 @@ class TestTOC(TestCase):
     def setUp(self):
 
         # Toy courses should be loaded
-        self.course_name = 'edX/toy/2012_Fall'
+        self.course_name = CourseKey.from_string('edX/toy/2012_Fall')
         self.toy_course = modulestore().get_course(self.course_name)
         self.portal_user = UserFactory()
 
