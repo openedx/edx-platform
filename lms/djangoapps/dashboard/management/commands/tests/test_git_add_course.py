@@ -162,7 +162,7 @@ class TestGitAddCourse(ModuleStoreTestCase):
 
         # Delete to test branching back to master
         delete_course(def_ms, contentstore(),
-                      def_ms.get_course(self.TEST_BRANCH_COURSE).location,
+                      def_ms.get_course(self.TEST_BRANCH_COURSE).id,
                       True)
         self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
         git_import.add_repo(self.TEST_REPO,
