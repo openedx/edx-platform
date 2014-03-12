@@ -371,32 +371,31 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             raise ItemNotFoundError(usage_key)
         return items[0]
 
-    def get_items(self, locator, course_id=None, depth=0, qualifiers=None):
+    def get_items(self, course_locator, settings=None, content=None, **kwargs):
         """
-        Get all of the modules in the given course matching the qualifiers. The
-        qualifiers should only be fields in the structures collection (sorry).
-        There will be a separate search method for searching through
-        definitions.
+        Returns:
+            list of XModuleDescriptor instances for the matching items within the course with
+            the given course_id
 
-        Common qualifiers are category, definition (provide definition id),
-        display_name, anyfieldname, children (return
-        block if its children includes the one given value). If you want
-        substring matching use {$regex: /acme.*corp/i} type syntax.
+        NOTE: don't use this to look for courses
+        as the course_id is required. Use get_courses.
 
-        Although these
-        look like mongo queries, it is all done in memory; so, you cannot
-        try arbitrary queries.
-
-        :param locator: CourseLocator or BlockUsageLocator restricting search scope
-        :param course_id: ignored. Only included for API compatibility.
-        :param depth: ignored. Only included for API compatibility.
-        :param qualifiers: a dict restricting which elements should match
-
+        Args:
+            course_id (CourseKey): the course identifier
+            settings (dict): fields to look for which have settings scope. Follows same syntax
+                and rules as kwargs below
+            content (dict): fields to look for which have content scope. Follows same syntax and
+                rules as kwargs below.
+            kwargs (key=value): what to look for within the course.
+                Common qualifiers are ``category`` or any field name. if the target field is a list,
+                then it searches for the given value in the list not list equivalence.
+                Substring matching pass a regex object.
+                For some modulestores, ``name`` is another commonly provided key (Location based stores)
+                For some modulestores,
+                you can search by ``edited_by``, ``edited_on`` providing either a datetime for == (probably
+                useless) or a tuple (">"|"<" datetime) for after or before, etc.
         """
-        # TODO extend to only search a subdag of the course?
-        if qualifiers is None:
-            qualifiers = {}
-        course = self._lookup_course(locator)
+        course = self._lookup_course(course_locator)
         items = []
         for block_id, value in course['structure']['blocks'].iteritems():
             if self._block_matches(value, qualifiers):
