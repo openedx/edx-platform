@@ -9,7 +9,6 @@ from django.utils.translation import ugettext as _
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from django_comment_common.utils import unseed_permissions_roles
@@ -76,16 +75,15 @@ def get_course_location_for_item(location):
         # @hack! We need to find the course location however, we don't
         # know the 'name' parameter in this context, so we have
         # to assume there's only one item in this query even though we are not specifying a name
-        course_search_location = Location('i4x', location.org, location.course, 'course', None)
-        courses = modulestore().get_items(course_search_location)
+        courses = modulestore().get_items(location.course.id, qualifiers={'category': 'course'})
 
         # make sure we found exactly one match on this above course search
         found_cnt = len(courses)
         if found_cnt == 0:
-            raise Exception('Could not find course at {0}'.format(course_search_location))
+            raise Exception('Could not find course for {0}'.format(location.course.id))
 
         if found_cnt > 1:
-            raise Exception('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+            raise Exception('Found more than one course for {0}. There should only be one!!! Dump = {1}'.format(location.course.id, courses))
 
         location = courses[0].location
 
@@ -102,16 +100,15 @@ def get_course_for_item(location):
     # @hack! We need to find the course location however, we don't
     # know the 'name' parameter in this context, so we have
     # to assume there's only one item in this query even though we are not specifying a name
-    course_search_location = Location('i4x', location.org, location.course, 'course', None)
-    courses = modulestore().get_items(course_search_location)
+    courses = modulestore().get_items(location.course.id, qualifiers={'category': 'course'})
 
     # make sure we found exactly one match on this above course search
     found_cnt = len(courses)
     if found_cnt == 0:
-        raise BaseException('Could not find course at {0}'.format(course_search_location))
+        raise BaseException('Could not find course for {0}'.format(location.course.id))
 
     if found_cnt > 1:
-        raise BaseException('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+        raise BaseException('Found more than one course for {0}. There should only be one!!! Dump = {1}'.format(location.course.id, courses))
 
     return courses[0]
 
@@ -133,7 +130,7 @@ def get_lms_link_for_item(location, course_id, preview=False):
         lms_link = u"//{lms_base}/courses/{course_id}/jump_to/{location}".format(
             lms_base=lms_base,
             course_id=course_id,
-            location=Location(location)
+            location=location
         )
     else:
         lms_link = None

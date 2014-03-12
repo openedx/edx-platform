@@ -24,7 +24,6 @@ from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.locator import BlockUsageLocator
-from xmodule.modulestore import Location
 from xmodule.video_module import manage_video_subtitles_save
 
 from util.json_request import expect_json, JsonResponse
@@ -457,7 +456,7 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
     if source_item.has_children:
         dest_module.children = []
         for child in source_item.children:
-            dupe = _duplicate_item(dest_location, Location(child), user=user)
+            dupe = _duplicate_item(dest_location, child, user=user)
             dest_module.children.append(dupe.url())
         get_modulestore(dest_location).update_item(dest_module, user.id if user else None)
 
