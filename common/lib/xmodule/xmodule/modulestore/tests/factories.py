@@ -56,6 +56,8 @@ class CourseFactory(XModuleFactory):
         for k, v in kwargs.iteritems():
             setattr(new_course, k, v)
 
+        # Save the attributes we just set
+        new_course.save()
         # Update the data in the mongo datastore
         store.update_item(new_course)
         return new_course
@@ -156,6 +158,7 @@ class ItemFactory(XModuleFactory):
 
         for attr, val in kwargs.items():
             setattr(module, attr, val)
+        # Save the attributes we just set
         module.save()
 
         store.update_item(module)
