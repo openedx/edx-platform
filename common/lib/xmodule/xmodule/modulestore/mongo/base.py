@@ -623,7 +623,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
                 Substring matching pass a regex object.
-                For this modulestore, ``name`` is another commonly provided key (Location based stores)
+                For this modulestore, ``name`` and ``revision`` are commonly provided keys (Location based stores)
                 This modulestore does not allow searching dates by comparison or edited_by, previous_version,
                 update_version info.
         """
@@ -631,14 +631,18 @@ class MongoModuleStore(ModuleStoreWriteBase):
         query['_id.tag'] = 'i4x'
         query['_id.org'] = course_id.org
         query['_id.course'] = course_id.course
-        if 'category' in kwargs:
-            query['_id.category'] = kwargs.pop('category')
-        if 'name' in kwargs:
-            query['_id.name'] = kwargs.pop('name')
+        for field in ['category', 'name', 'revision']:
+            if field in kwargs:
+                query['_id.' + field] = kwargs.pop(field)
+
         for key, value in (settings or {}).iteritems():
             query['metadata.' + key] = value
         for key, value in (content or {}).iteritems():
             query['definition.data.' + key] = value
+        if 'children' in kwargs:
+            query['definition.children'] = kwargs.pop('children')
+
+        query.update(kwargs)
         items = self.collection.find(
             query,
             sort=[('_id.revision', pymongo.ASCENDING)],
