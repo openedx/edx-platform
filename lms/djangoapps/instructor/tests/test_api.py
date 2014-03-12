@@ -188,7 +188,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Ensure that a staff member can't access instructor endpoints.
         """
-        staff_member = StaffFactory(course=self.course.location)
+        staff_member = StaffFactory(course=self.course.id)
         CourseEnrollment.enroll(staff_member, self.course.id)
         self.client.login(username=staff_member.username, password='test')
         # Try to promote to forums admin - not working

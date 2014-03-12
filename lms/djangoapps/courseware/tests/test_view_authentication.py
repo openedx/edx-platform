@@ -137,10 +137,10 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         CourseEnrollmentFactory(user=self.enrolled_user, course_id=self.course.id)
         CourseEnrollmentFactory(user=self.enrolled_user, course_id=self.test_course.id)
 
-        self.staff_user = StaffFactory(course=self.course.location)
+        self.staff_user = StaffFactory(course=self.course.id)
         self.instructor_user = InstructorFactory(
             course=self.course.id)
-        self.org_staff_user = OrgStaffFactory(course=self.course.location)
+        self.org_staff_user = OrgStaffFactory(course=self.course.id)
         self.org_instructor_user = OrgInstructorFactory(
             course=self.course.id)
 
@@ -374,7 +374,7 @@ class TestBetatesterAccess(ModuleStoreTestCase):
         self.content = ItemFactory(parent=self.course)
 
         self.normal_student = UserFactory()
-        self.beta_tester = BetaTesterFactory(course=self.course.location)
+        self.beta_tester = BetaTesterFactory(course=self.course.id)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_beta_period(self):

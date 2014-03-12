@@ -31,7 +31,7 @@ def list_with_level(course, level):
     There could be other levels specific to the course.
     If there is no Group for that course-level, returns an empty list
     """
-    return ROLES[level](course.location).users_with_role()
+    return ROLES[level](course.id).users_with_role()
 
 
 def allow_access(course, user, level):
