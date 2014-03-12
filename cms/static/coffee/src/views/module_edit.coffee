@@ -22,7 +22,7 @@ define ["jquery", "underscore", "gettext", "xblock/runtime.v1",
     $moduleEditor: => @$componentEditor().find('.module-editor')
 
     loadDisplay: ->
-      XBlock.initializeBlock(@$el.find('.xblock-student_view'))
+      XBlock.initializeBlock(@$el.find('.xblock-studio_preview_view'))
 
     loadEdit: ->
       @module = XBlock.initializeBlock(@$el.find('.xblock-studio_view'))

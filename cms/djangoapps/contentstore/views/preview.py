@@ -135,7 +135,7 @@ def _preview_module_system(request, descriptor):
         course_id=course_id,
         anonymous_student_id='student',
 
-        # Set up functions to modify the fragment produced by student_view
+        # Set up functions to modify the fragment produced by studio_preview_view
         wrappers=wrappers,
         error_descriptor_class=ErrorDescriptor,
         # get_user_role accepts a location or a CourseLocator.
@@ -169,7 +169,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     Wraps the results of rendering an XBlock view in a div which adds a header and Studio action buttons.
     """
     # Only add the Studio wrapper when on the container page. The unit page will remain as is for now.
-    if context.get('container_view', None) and view == 'student_view':
+    if context.get('container_view', None) and view == 'studio_preview_view':
         locator = loc_mapper().translate_location(xblock.course_id, xblock.location)
         template_context = {
             'xblock_context': context,
@@ -190,14 +190,14 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
 
 def get_preview_fragment(request, descriptor, context):
     """
-    Returns the HTML returned by the XModule's student_view,
+    Returns the HTML returned by the XModule's studio_preview_view,
     specified by the descriptor and idx.
     """
     module = _load_preview_module(request, descriptor)
 
     try:
-        fragment = module.render("student_view", context)
+        fragment = module.render("studio_preview_view", context)
     except Exception as exc:                          # pylint: disable=W0703
-        log.warning("Unable to render student_view for %r", module, exc_info=True)
+        log.warning("Unable to render studio_preview_view for %r", module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
     return fragment
