@@ -163,13 +163,10 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def location(self):
-        try:
-            return Location(self.scope_ids.usage_id)
-        except InvalidLocationError:
-            if isinstance(self.scope_ids.usage_id, BlockUsageLocator):
-                return self.scope_ids.usage_id
-            else:
-                return BlockUsageLocator(self.scope_ids.usage_id)
+        if isinstance(self.scope_ids.usage_id, BlockUsageLocator):
+            return self.scope_ids.usage_id
+        else:
+            return BlockUsageLocator(self.scope_ids.usage_id)
 
     @location.setter
     def location(self, value):

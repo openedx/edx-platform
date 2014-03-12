@@ -9,7 +9,6 @@ from lxml import etree
 from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
-from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
 from xblock.fields import Scope, ReferenceList
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -216,7 +215,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         descriptors = []
         for location in self.sources_list:
             try:
-                descriptor = self.system.load_item(Location(location))
+                descriptor = self.system.load_item(location)
                 descriptors.append(descriptor)
             except ItemNotFoundError:
                 msg = "Invalid module by location."
@@ -233,7 +232,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
             if child.tag == 'show':
                 locations = ConditionalDescriptor.parse_sources(child)
                 for location in locations:
-                    children.append(Location(location))
+                    children.append(location)
                     show_tag_list.append(location)
             else:
                 try:
