@@ -32,8 +32,3 @@ class SettingsIntegrationTest(testutil.TestCase):
         auth_settings.apply_settings({'LinkedIn': {'SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY': 'linkedin_key'}}, settings)
         self.assertEqual([provider.LinkedInOauth2], provider.Registry.enabled())
         self.assertEqual('linkedin_key', settings.SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY)
-
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_ATUH': True})
-    def test_can_enable_mozilla_persona(self):
-        auth_settings.apply_settings({'Mozilla Persona': {}}, settings)
-        self.assertEqual([provider.MozillaPersona], provider.Registry.enabled())

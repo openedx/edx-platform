@@ -50,9 +50,9 @@ class SettingsUnitTest(testutil.TestCase):
 
     def test_apply_settings_prepends_auth_backends(self):
         self.assertEqual(_ORIGINAL_AUTHENTICATION_BACKENDS, self.settings.AUTHENTICATION_BACKENDS)
-        settings.apply_settings({provider.GoogleOauth2.NAME: {}, provider.MozillaPersona.NAME: {}}, self.settings)
+        settings.apply_settings({provider.GoogleOauth2.NAME: {}, provider.LinkedInOauth2.NAME: {}}, self.settings)
         self.assertEqual((
-            provider.GoogleOauth2.AUTHENTICATION_BACKEND, provider.MozillaPersona.AUTHENTICATION_BACKEND) +
+            provider.GoogleOauth2.AUTHENTICATION_BACKEND, provider.LinkedInOauth2.AUTHENTICATION_BACKEND) +
             _ORIGINAL_AUTHENTICATION_BACKENDS,
             self.settings.AUTHENTICATION_BACKENDS)
 

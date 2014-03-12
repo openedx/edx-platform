@@ -54,13 +54,6 @@ class LinkedInOauth2(BaseProvider):
     }
 
 
-class MozillaPersona(BaseProvider):
-    """Provider for Mozilla's Persona auth system."""
-
-    AUTHENTICATION_BACKEND = 'social.backends.persona.PersonaAuth'
-    NAME = 'Mozilla Persona'
-
-
 class Registry(object):
     """Singleton registry of third-party auth providers.
 

@@ -68,4 +68,4 @@ class RegistryTest(testutil.TestCase):
 
     def test_get_returns_none_if_provider_not_enabled(self):
         provider.Registry.configure_once([])
-        self.assertIsNone(provider.Registry.get(provider.MozillaPersona.NAME))
+        self.assertIsNone(provider.Registry.get(provider.LinkedInOauth2.NAME))
