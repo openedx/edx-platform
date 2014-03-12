@@ -162,7 +162,7 @@ def add_course_author(user, course):
     """
     global_admin = AdminFactory()
     for role in (CourseStaffRole, CourseInstructorRole):
-        auth.add_users(global_admin, role(course.location), user)
+        auth.add_users(global_admin, role(course.id), user)
 
 
 def create_a_course():

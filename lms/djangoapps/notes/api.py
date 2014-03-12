@@ -108,7 +108,7 @@ def _get_course(request, course_id):
     '''
     Helper function to load and return a user's course.
     '''
-    return get_course_with_access(request.user, course_id, 'load')
+    return get_course_with_access(request.user, 'load', course_id)
 
 #----------------------------------------------------------------------#
 # API actions exposed via the resource map.

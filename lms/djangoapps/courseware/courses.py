@@ -71,7 +71,7 @@ def get_course_by_id(course_id, depth=0):
         raise Http404("Invalid location")
 
 
-def get_course_with_access(user, course_id, action, depth=0):
+def get_course_with_access(user, action, course_id, depth=0):
     """
     Given a course_id, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
@@ -89,14 +89,14 @@ def get_course_with_access(user, course_id, action, depth=0):
     return course
 
 
-def get_opt_course_with_access(user, course_id, action):
+def get_opt_course_with_access(user, action, course_id):
     """
     Same as get_course_with_access, except that if course_id is None,
     return None without performing any access checks.
     """
     if course_id is None:
         return None
-    return get_course_with_access(user, course_id, action)
+    return get_course_with_access(user, action, course_id)
 
 
 def course_image_url(course):

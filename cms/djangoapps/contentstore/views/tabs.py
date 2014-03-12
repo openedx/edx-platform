@@ -66,7 +66,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
     Instead use the general xblock URL (see item.xblock_handler).
     """
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, locator):
+    if not has_course_access(request.user, locator.course_id):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(locator)

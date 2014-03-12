@@ -103,7 +103,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
     """
     if package_id is not None:
         locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-        if not has_course_access(request.user, locator):
+        if not has_course_access(request.user, locator.course_id):
             raise PermissionDenied()
         old_location = loc_mapper().translate_locator_to_location(locator)
 
@@ -184,7 +184,7 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
             the second is the resource description
     """
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, locator):
+    if not has_course_access(request.user, locator.course_id):
         raise PermissionDenied()
     old_location = loc_mapper().translate_locator_to_location(locator)
 
@@ -385,7 +385,7 @@ def _create_item(request):
 
     display_name = request.json.get('display_name')
 
-    if not has_course_access(request.user, parent_location):
+    if not has_course_access(request.user, parent_location.course_id):
         raise PermissionDenied()
 
     parent = get_modulestore(category).get_item(parent_location)
@@ -520,7 +520,7 @@ def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid
     # DHM: when split becomes back-end, move or conditionalize this conversion
     old_location = loc_mapper().translate_locator_to_location(location)
     if request.method == 'GET':
-        if has_course_access(request.user, old_location):
+        if has_course_access(request.user, old_location.course_id):
             return JsonResponse(modulestore().get_orphans(old_location, 'draft'))
         else:
             raise PermissionDenied()

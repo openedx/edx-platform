@@ -45,9 +45,9 @@ def delete_course_and_groups(course_id, commit=False):
         # in the django layer, we need to remove all the user permissions groups associated with this course
         if commit:
             try:
-                staff_role = CourseStaffRole(loc)
+                staff_role = CourseStaffRole(course_id)
                 staff_role.remove_users(*staff_role.users_with_role())
-                instructor_role = CourseInstructorRole(loc)
+                instructor_role = CourseInstructorRole(course_id)
                 instructor_role.remove_users(*instructor_role.users_with_role())
             except Exception as err:
                 log.error("Error in deleting course groups for {0}: {1}".format(loc, err))

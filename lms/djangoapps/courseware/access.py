@@ -124,7 +124,7 @@ def _has_access_course_desc(user, action, course):
             can_load() and
             (
                 CourseEnrollment.is_enrolled(user, course.id) or
-                _has_staff_access_to_descriptor(user, course)
+                _has_staff_access_to_descriptor(user, course, course.id)
             )
         )
 
@@ -167,7 +167,7 @@ def _has_access_course_desc(user, action, course):
                 return True
 
         # otherwise, need staff access
-        return _has_staff_access_to_descriptor(user, course)
+        return _has_staff_access_to_descriptor(user, course, course.id)
 
     def see_exists():
         """
@@ -187,7 +187,7 @@ def _has_access_course_desc(user, action, course):
             if course.ispublic:
                 debug("Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic")
                 return True
-            return _has_staff_access_to_descriptor(user, course)
+            return _has_staff_access_to_descriptor(user, course, course.id)
 
         return can_enroll() or can_load()
 
@@ -196,9 +196,9 @@ def _has_access_course_desc(user, action, course):
         'load_forum': can_load_forum,
         'enroll': can_enroll,
         'see_exists': see_exists,
-        'staff': lambda: _has_staff_access_to_descriptor(user, course),
-        'instructor': lambda: _has_instructor_access_to_descriptor(user, course),
-        }
+        'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
+        'instructor': lambda: _has_instructor_access_to_descriptor(user, course, course.id),
+    }
 
     return _dispatch(checkers, action, user, course)
 
@@ -217,7 +217,7 @@ def _has_access_error_desc(user, action, descriptor, course_id):
     checkers = {
         'load': check_for_staff,
         'staff': check_for_staff
-        }
+    }
 
     return _dispatch(checkers, action, user, descriptor)
 
@@ -299,7 +299,7 @@ def _has_access_location(user, action, location, course_id):
     """
     checkers = {
         'staff': lambda: _has_staff_access_to_location(user, location, course_id)
-        }
+    }
 
     return _dispatch(checkers, action, user, location)
 
@@ -376,7 +376,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor, course_id=None):
         # bail early if no beta testing is set up
         return descriptor.start
 
-    if CourseBetaTesterRole(descriptor.location, course_id=course_id).has_user(user):
+    if CourseBetaTesterRole(course_id).has_user(user):
         debug("Adjust start time: user in beta role for %s", descriptor)
         delta = timedelta(descriptor.days_early_for_beta)
         effective = descriptor.start - delta
@@ -425,8 +425,8 @@ def _has_access_to_location(user, access_level, location, course_id):
         return False
 
     staff_access = (
-        CourseStaffRole(location, course_id).has_user(user) or
-        OrgStaffRole(location, course_id).has_user(user)
+        CourseStaffRole(course_id).has_user(user) or
+        OrgStaffRole(course_id).has_user(user)
     )
 
     if staff_access and access_level == 'staff':
@@ -434,8 +434,8 @@ def _has_access_to_location(user, access_level, location, course_id):
         return True
 
     instructor_access = (
-        CourseInstructorRole(location, course_id).has_user(user) or
-        OrgInstructorRole(location).has_user(user)
+        CourseInstructorRole(course_id).has_user(user) or
+        OrgInstructorRole(course_id).has_user(user)
     )
 
     if instructor_access and access_level in ('staff', 'instructor'):
@@ -452,7 +452,7 @@ def _has_staff_access_to_course_id(user, course_id):
     return _has_staff_access_to_location(user, loc, course_id)
 
 
-def _has_instructor_access_to_descriptor(user, descriptor, course_id=None):
+def _has_instructor_access_to_descriptor(user, descriptor, course_id):
     """Helper method that checks whether the user has staff access to
     the course of the location.
 
@@ -461,7 +461,7 @@ def _has_instructor_access_to_descriptor(user, descriptor, course_id=None):
     return _has_instructor_access_to_location(user, descriptor.location, course_id)
 
 
-def _has_staff_access_to_descriptor(user, descriptor, course_id=None):
+def _has_staff_access_to_descriptor(user, descriptor, course_id):
     """Helper method that checks whether the user has staff access to
     the course of the location.
 

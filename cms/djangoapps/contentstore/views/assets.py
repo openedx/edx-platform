@@ -57,7 +57,7 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
         json: delete an asset
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location):
+    if not has_course_access(request.user, location.course_id):
         raise PermissionDenied()
 
     response_format = request.REQUEST.get('format', 'html')

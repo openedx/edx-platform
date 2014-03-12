@@ -42,9 +42,9 @@ class Command(BaseCommand):
 
             print("copying User permissions...")
             # purposely avoids auth.add_user b/c it doesn't have a caller to authorize
-            CourseInstructorRole(dest_location).add_users(
-                *CourseInstructorRole(source_location).users_with_role()
+            CourseInstructorRole(dest_course_id).add_users(
+                *CourseInstructorRole(source_course_id).users_with_role()
             )
-            CourseStaffRole(dest_location).add_users(
-                *CourseStaffRole(source_location).users_with_role()
+            CourseStaffRole(dest_course_id).add_users(
+                *CourseStaffRole(source_course_id).users_with_role()
             )

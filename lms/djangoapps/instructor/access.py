@@ -63,7 +63,7 @@ def _change_access(course, user, level, action):
     """
 
     try:
-        role = ROLES[level](course.location)
+        role = ROLES[level](course.id)
     except KeyError:
         raise ValueError("unrecognized level '{}'".format(level))
 

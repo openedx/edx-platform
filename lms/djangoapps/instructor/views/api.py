@@ -298,7 +298,7 @@ def modify_access(request, course_id):
     action is one of ['allow', 'revoke']
     """
     course = get_course_with_access(
-        request.user, course_id, 'instructor', depth=None
+        request.user, 'instructor', course_id, depth=None
     )
 
     email = strip_if_string(request.GET.get('email'))
@@ -360,7 +360,7 @@ def list_course_role_members(request, course_id):
     }
     """
     course = get_course_with_access(
-        request.user, course_id, 'instructor', depth=None
+        request.user, 'instructor', course_id, depth=None
     )
 
     rolename = request.GET.get('rolename')
@@ -394,7 +394,7 @@ def get_grading_config(request, course_id):
     Respond with json which contains a html formatted grade summary.
     """
     course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
+        request.user, 'staff', course_id, depth=None
     )
     grading_config_summary = analytics.basic.dump_grading_context(course)
 
@@ -572,7 +572,7 @@ def reset_student_attempts(request, course_id):
             mutually exclusive with all_students
     """
     course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
+        request.user, 'staff', course_id, depth=None
     )
 
     problem_to_reset = strip_if_string(request.GET.get('problem_to_reset'))

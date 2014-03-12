@@ -67,7 +67,7 @@ class OpenEndedPostTest(ModuleStoreTestCase):
         )
 
     def test_post_submission_for_student_on_initial(self):
-        course = get_course_with_access(self.student_on_initial, self.course_id, 'load')
+        course = get_course_with_access(self.student_on_initial, 'load', self.course_id)
 
         dry_run_result = post_submission_for_student(self.student_on_initial, course, self.problem_location, self.open_ended_task_number, dry_run=True)
         self.assertFalse(dry_run_result)
@@ -76,7 +76,7 @@ class OpenEndedPostTest(ModuleStoreTestCase):
         self.assertFalse(result)
 
     def test_post_submission_for_student_on_accessing(self):
-        course = get_course_with_access(self.student_on_accessing, self.course_id, 'load')
+        course = get_course_with_access(self.student_on_accessing, 'load', self.course_id)
 
         dry_run_result = post_submission_for_student(self.student_on_accessing, course, self.problem_location, self.open_ended_task_number, dry_run=True)
         self.assertFalse(dry_run_result)
@@ -102,7 +102,7 @@ class OpenEndedPostTest(ModuleStoreTestCase):
             self.assertGreaterEqual(body_arg_student_info['submission_time'], submission_time)
 
     def test_post_submission_for_student_on_post_assessment(self):
-        course = get_course_with_access(self.student_on_post_assessment, self.course_id, 'load')
+        course = get_course_with_access(self.student_on_post_assessment, 'load', self.course_id)
 
         dry_run_result = post_submission_for_student(self.student_on_post_assessment, course, self.problem_location, self.open_ended_task_number, dry_run=True)
         self.assertFalse(dry_run_result)
@@ -111,7 +111,7 @@ class OpenEndedPostTest(ModuleStoreTestCase):
         self.assertFalse(result)
 
     def test_post_submission_for_student_invalid_task(self):
-        course = get_course_with_access(self.student_on_accessing, self.course_id, 'load')
+        course = get_course_with_access(self.student_on_accessing, 'load', self.course_id)
 
         result = post_submission_for_student(self.student_on_accessing, course, self.problem_location, self.self_assessment_task_number, dry_run=False)
         self.assertFalse(result)
@@ -165,7 +165,7 @@ class OpenEndedStatsTest(ModuleStoreTestCase):
         self.students = [self.student_on_initial, self.student_on_accessing, self.student_on_post_assessment]
 
     def test_calculate_task_statistics(self):
-        course = get_course_with_access(self.student_on_accessing, self.course_id, 'load')
+        course = get_course_with_access(self.student_on_accessing, 'load', self.course_id)
         stats = calculate_task_statistics(self.students, course, self.problem_location, self.task_number, write_to_file=False)
         self.assertEqual(stats[OpenEndedChild.INITIAL], 1)
         self.assertEqual(stats[OpenEndedChild.ASSESSING], 1)

@@ -73,7 +73,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         mock_request = MagicMock()
         mock_request.user = self.mock_user
 
-        course = get_course_with_access(self.mock_user, self.course_id, 'load')
+        course = get_course_with_access(self.mock_user, 'load', self.course_id)
 
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course_id, self.mock_user, course, depth=2)

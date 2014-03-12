@@ -36,7 +36,7 @@ def make_populated_course(step):  # pylint: disable=unused-argument
         world.bulk_email_instructor
     except AttributeError:
         # Make & register an instructor for the course
-        world.bulk_email_instructor = InstructorFactory(course=course.location)
+        world.bulk_email_instructor = InstructorFactory(course=world.bulk_email_course_id)
         world.enroll_user(world.bulk_email_instructor, world.bulk_email_course_id)
 
         # Make & register a staff member
