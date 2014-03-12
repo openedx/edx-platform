@@ -18,6 +18,7 @@ locales:
     - es_EC  # Spanish (Ecuador)
     - es_ES  # Spanish (Spain)
     - es_MX  # Spanish (Mexico)
+    - es_PE  # Spanish (Peru)
     - es_US  # Spanish (United States)
     - et_EE  # Estonian (Estonia)
     - fa  # Persian
@@ -27,6 +28,7 @@ locales:
     - gl  # Galician
     - he  # Hebrew
     - hi  # Hindi
+    - hu  # Hungarian
     - hy_AM  # Armenian (Armenia)
     - id  # Indonesian
     - it_IT  # Italian (Italy)
@@ -35,7 +37,9 @@ locales:
     - ko_KR  # Korean (Korea)
     - lt_LT  # Lithuanian (Lithuania)
     - ml  # Malayalam
+    - mn  # Mongolian
     - nb  # Norwegian Bokmål
+    - ne  # Nepali
     - nl_NL  # Dutch (Netherlands)
     - pl  # Polish
     - pt_BR  # Portuguese (Brazil)
