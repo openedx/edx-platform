@@ -68,5 +68,5 @@ class ContainerViewTestCase(CourseTestCase):
         # Verify the navigation link at the top of the page is correct.
         self.assertRegexpMatches(html, expected_breadcrumbs)
         # Verify the link that allows users to change publish status.
-        expected_unit_link = 'This container will publish as part of the unit <a href="/unit/MITx.999.Robot_Super_Course/branch/draft/block/Unit">Unit</a>.'
+        expected_unit_link = 'This content is published with unit <a href="/unit/MITx.999.Robot_Super_Course/branch/draft/block/Unit">Unit</a>.'
         self.assertIn(expected_unit_link, html)
