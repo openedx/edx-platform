@@ -54,40 +54,34 @@ class DataDownload
     @$list_studs_btn.click (e) =>
       url = @$list_studs_btn.data 'endpoint'
 
-      # handle csv special case
-      if $(e.target).data 'csv'
-        # redirect the document to the csv file.
-        url += '/csv'
-        location.href = url
-      else
-        # Dynamically generate slickgrid table for displaying student profile information
-        @clear_display()
-        @$download_display_table.text gettext('Loading...')
+      # Dynamically generate slickgrid table for displaying student profile information
+      @clear_display()
+      @$download_display_table.text gettext('Loading...')
 
-        # fetch user list
-        $.ajax
-          dataType: 'json'
-          url: url
-          error: std_ajax_err =>
-            @clear_display()
-            @$download_request_response_error.text gettext("Error getting student list.")
-          success: (data) =>
-            @clear_display()
+      # fetch user list
+      $.ajax
+        dataType: 'json'
+        url: url
+        error: std_ajax_err =>
+          @clear_display()
+          @$download_request_response_error.text gettext("Error getting student list.")
+        success: (data) =>
+          @clear_display()
 
-            # display on a SlickGrid
-            options =
-              enableCellNavigation: true
-              enableColumnReorder: false
-              forceFitColumns: true
-              rowHeight: 35
+          # display on a SlickGrid
+          options =
+            enableCellNavigation: true
+            enableColumnReorder: false
+            forceFitColumns: true
+            rowHeight: 35
 
-            columns = ({id: feature, field: feature, name: feature} for feature in data.queried_features)
-            grid_data = data.students
+          columns = ({id: feature, field: feature, name: feature} for feature in data.queried_features)
+          grid_data = data.students
 
-            $table_placeholder = $ '<div/>', class: 'slickgrid'
-            @$download_display_table.append $table_placeholder
-            grid = new Slick.Grid($table_placeholder, grid_data, columns, options)
-            # grid.autosizeColumns()
+          $table_placeholder = $ '<div/>', class: 'slickgrid'
+          @$download_display_table.append $table_placeholder
+          grid = new Slick.Grid($table_placeholder, grid_data, columns, options)
+          # grid.autosizeColumns()
 
     @$grade_config_btn.click (e) =>
       url = @$grade_config_btn.data 'endpoint'

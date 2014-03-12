@@ -9,6 +9,7 @@ acceptance tests.
 from lettuce import world, step
 from nose.tools import assert_in, assert_regexp_matches  # pylint: disable=E0611
 from terrain.steps import reload_the_page
+from splinter.request_handler.request_handler import RequestHandler
 
 
 @step(u'I see a table of student profiles')
@@ -37,6 +38,11 @@ def find_student_profile_table(step):  # pylint: disable=unused-argument
         ]
     for datum in expected_data:
         assert_in(datum, world.css_text('#data-student-profiles-table'))
+
+
+@step(u"I do not see a button to 'List enrolled students' profile information'")
+def no_student_profile_table(step):  # pylint: disable=unused-argument
+    world.is_css_not_present('input[name="list-profiles"]')
 
 
 @step(u"I see the grading configuration for the course")
