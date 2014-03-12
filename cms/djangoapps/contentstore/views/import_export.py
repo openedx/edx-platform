@@ -309,20 +309,19 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
     if not has_course_access(request.user, location.course_id):
         raise PermissionDenied()
 
-    old_location = loc_mapper().translate_locator_to_location(location)
-    course_module = modulestore().get_item(old_location)
+    course_module = modulestore().get_course(location.course_id)
 
     # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
     requested_format = request.REQUEST.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
     export_url = location.url_reverse('export') + '?_accept=application/x-tgz'
     if 'application/x-tgz' in requested_format:
-        name = old_location.name
+        name = course_module.url_name
         export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
         root_dir = path(mkdtemp())
 
         try:
-            export_to_xml(modulestore('direct'), contentstore(), old_location, root_dir, name, modulestore())
+            export_to_xml(modulestore('direct'), contentstore(), course_module.id, root_dir, name, modulestore())
 
             logging.debug('tar file being generated at {0}'.format(export_file.name))
             with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
