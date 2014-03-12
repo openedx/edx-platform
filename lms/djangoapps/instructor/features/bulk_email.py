@@ -40,7 +40,7 @@ def make_populated_course(step):  # pylint: disable=unused-argument
         world.enroll_user(world.bulk_email_instructor, world.bulk_email_course_id)
 
         # Make & register a staff member
-        world.bulk_email_staff = StaffFactory(course=course.location)
+        world.bulk_email_staff = StaffFactory(course=course.id)
         world.enroll_user(world.bulk_email_staff, world.bulk_email_course_id)
 
     # Make & register a student
