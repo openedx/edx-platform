@@ -62,7 +62,7 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
         json: import a course via the .tar.gz file specified in request.FILES
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location):
+    if not has_course_access(request.user, location.course_id):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(location)
@@ -232,8 +232,8 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
                     session_status[key] = 3
                     request.session.modified = True
 
-                    auth.add_users(request.user, CourseInstructorRole(new_location), request.user)
-                    auth.add_users(request.user, CourseStaffRole(new_location), request.user)
+                    auth.add_users(request.user, CourseInstructorRole(new_location.course_id), request.user)
+                    auth.add_users(request.user, CourseStaffRole(new_location.course_id), request.user)
                     logging.debug('created all course groups at {0}'.format(new_location))
 
                 # Send errors to client with stage at which error occurred.
@@ -275,7 +275,7 @@ def import_status_handler(request, tag=None, package_id=None, branch=None, versi
 
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location):
+    if not has_course_access(request.user, location.course_id):
         raise PermissionDenied()
 
     try:
@@ -306,7 +306,7 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
     which describes the error.
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location):
+    if not has_course_access(request.user, location.course_id):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(location)

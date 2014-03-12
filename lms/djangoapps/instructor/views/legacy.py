@@ -85,7 +85,7 @@ def split_by_comma_and_whitespace(a_str):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(request.user, 'staff', course_id, depth=None)
 
     instructor_access = has_access(request.user, 'instructor', course)   # an instructor can manage staff lists
 
@@ -518,7 +518,7 @@ def instructor_dashboard(request, course_id):
     # Admin
 
     elif 'List course staff' in action:
-        role = CourseStaffRole(course.location)
+        role = CourseStaffRole(course.id)
         datatable = _role_members_table(role, _("List of Staff"), course_id)
         track.views.server_track(request, "list-staff", {}, page="idashboard")
 
@@ -529,22 +529,22 @@ def instructor_dashboard(request, course_id):
 
     elif action == 'Add course staff':
         uname = request.POST['staffuser']
-        role = CourseStaffRole(course.location)
+        role = CourseStaffRole(course.id)
         msg += add_user_to_role(request, uname, role, 'staff', 'staff')
 
     elif action == 'Add instructor' and request.user.is_staff:
         uname = request.POST['instructor']
-        role = CourseInstructorRole(course.location)
+        role = CourseInstructorRole(course.id)
         msg += add_user_to_role(request, uname, role, 'instructor', 'instructor')
 
     elif action == 'Remove course staff':
         uname = request.POST['staffuser']
-        role = CourseStaffRole(course.location)
+        role = CourseStaffRole(course.id)
         msg += remove_user_from_role(request, uname, role, 'staff', 'staff')
 
     elif action == 'Remove instructor' and request.user.is_staff:
         uname = request.POST['instructor']
-        role = CourseInstructorRole(course.location)
+        role = CourseInstructorRole(course.id)
         msg += remove_user_from_role(request, uname, role, 'instructor', 'instructor')
 
     #----------------------------------------
@@ -607,21 +607,21 @@ def instructor_dashboard(request, course_id):
     # Group management
 
     elif 'List beta testers' in action:
-        role = CourseBetaTesterRole(course.location)
+        role = CourseBetaTesterRole(course.id)
         datatable = _role_members_table(role, _("List of Beta Testers"), course_id)
         track.views.server_track(request, "list-beta-testers", {}, page="idashboard")
 
     elif action == 'Add beta testers':
         users = request.POST['betausers']
         log.debug("users: {0!r}".format(users))
-        role = CourseBetaTesterRole(course.location)
+        role = CourseBetaTesterRole(course.id)
         for username_or_email in split_by_comma_and_whitespace(users):
             msg += "<p>{0}</p>".format(
                 add_user_to_role(request, username_or_email, role, 'beta testers', 'beta-tester'))
 
     elif action == 'Remove beta testers':
         users = request.POST['betausers']
-        role = CourseBetaTesterRole(course.location)
+        role = CourseBetaTesterRole(course.id)
         for username_or_email in split_by_comma_and_whitespace(users):
             msg += "<p>{0}</p>".format(
                 remove_user_from_role(request, username_or_email, role, 'beta testers', 'beta-tester'))
@@ -1224,7 +1224,7 @@ def gradebook(request, course_id):
     - only displayed to course staff
     - shows students who are enrolled.
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(request.user, 'staff', course_id, depth=None)
 
     enrolled_students = User.objects.filter(
         courseenrollment__course_id=course_id,
@@ -1255,7 +1255,7 @@ def gradebook(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def grade_summary(request, course_id):
     """Display the grade summary for a course."""
-    course = get_course_with_access(request.user, course_id, 'staff')
+    course = get_course_with_access(request.user, 'staff', course_id)
 
     # For now, just a static page
     context = {'course': course,
@@ -1537,7 +1537,7 @@ def get_answers_distribution(request, course_id):
     'header': a header row
     'data': a list of rows
     """
-    course = get_course_with_access(request.user, course_id, 'staff')
+    course = get_course_with_access(request.user, 'staff', course_id)
 
     dist = grades.answer_distributions(course.id)
 

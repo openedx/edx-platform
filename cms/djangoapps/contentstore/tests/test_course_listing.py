@@ -53,7 +53,7 @@ class TestCourseListing(ModuleStoreTestCase):
 
         for role in [CourseInstructorRole, CourseStaffRole]:
             # pylint: disable=protected-access
-            groupnames = role(course_locator)._group_names
+            groupnames = role(course.id)._group_names
             if group_name_format == 'group_name_with_course_name_only':
                 # Create role (instructor/staff) groups with course_name only: 'instructor_run'
                 group, _ = Group.objects.get_or_create(name=groupnames[2])
@@ -148,9 +148,9 @@ class TestCourseListing(ModuleStoreTestCase):
 
     # Temporarily disabling this test because it caused the following failure intermittently in Jenkins.
     # Perhaps due to a test ordering or cleanup issue?
-    # 
+    #
     # 1) FAIL: test_course_listing_performance (contentstore.tests.test_course_listing.TestCourseListing)
-    # 
+    #
     #    Traceback (most recent call last):
     #     cms/djangoapps/contentstore/tests/test_course_listing.py line 176 in test_course_listing_performance
     #       self.assertEqual(len(courses_list), USER_COURSES_COUNT)

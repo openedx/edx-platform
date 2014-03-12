@@ -107,8 +107,8 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
     if to_option == SEND_TO_MYSELF:
         recipient_qset = User.objects.filter(id=user_id)
     else:
-        staff_qset = CourseStaffRole(course_location).users_with_role()
-        instructor_qset = CourseInstructorRole(course_location).users_with_role()
+        staff_qset = CourseStaffRole(course_id).users_with_role()
+        instructor_qset = CourseInstructorRole(course_id).users_with_role()
         recipient_qset = staff_qset | instructor_qset
         if to_option == SEND_TO_ALL:
             # We also require students to have activated their accounts to

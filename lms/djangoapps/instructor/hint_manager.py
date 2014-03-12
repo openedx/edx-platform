@@ -29,7 +29,7 @@ def hint_manager(request, course_id):
     The URL landing function for all calls to the hint manager, both POST and GET.
     """
     try:
-        get_course_with_access(request.user, course_id, 'staff', depth=None)
+        get_course_with_access(request.user, 'staff', course_id, depth=None)
     except Http404:
         out = 'Sorry, but students are not allowed to access the hint manager!'
         return HttpResponse(out)

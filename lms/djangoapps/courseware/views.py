@@ -233,7 +233,7 @@ def index(request, course_id, chapter=None, section=None,
     """
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user  # keep just one instance of User
-    course = get_course_with_access(user, course_id, 'load', depth=2)
+    course = get_course_with_access(user, 'load', course_id, depth=2)
     staff_access = has_access(user, 'staff', course)
     registered = registered_for_course(course, user)
     if not registered:
@@ -449,7 +449,7 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
     staff_access = has_access(request.user, 'staff', course)
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
     reverifications = fetch_reverify_banner_info(request, course_id)
@@ -474,7 +474,7 @@ def static_tab(request, course_id, tab_slug):
 
     Assumes the course_id is in a valid format.
     """
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
 
     tab = tabs.get_static_tab_by_slug(course, tab_slug)
     if tab is None:
@@ -505,7 +505,7 @@ def syllabus(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
     staff_access = has_access(request.user, 'staff', course)
 
     return render_to_response('courseware/syllabus.html', {'course': course,
@@ -534,7 +534,7 @@ def course_about(request, course_id):
     ):
         raise Http404
 
-    course = get_course_with_access(request.user, course_id, 'see_exists')
+    course = get_course_with_access(request.user, 'see_exists', course_id)
     registered = registered_for_course(course, request.user)
 
     if has_access(request.user, 'load', course):
@@ -582,7 +582,7 @@ def mktg_course_about(request, course_id):
     """
 
     try:
-        course = get_course_with_access(request.user, course_id, 'see_exists')
+        course = get_course_with_access(request.user, 'see_exists', course_id)
     except (ValueError, Http404) as e:
         # if a course does not exist yet, display a coming
         # soon button
@@ -636,7 +636,7 @@ def _progress(request, course_id, student_id):
 
     Course staff are allowed to see the progress of students in their class.
     """
-    course = get_course_with_access(request.user, course_id, 'load', depth=None)
+    course = get_course_with_access(request.user, 'load', course_id, depth=None)
     staff_access = has_access(request.user, 'staff', course)
 
     if student_id is None or student_id == request.user.id:
@@ -701,7 +701,7 @@ def submission_history(request, course_id, student_username, location):
     StudentModuleHistory records.
     """
 
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
     staff_access = has_access(request.user, 'staff', course)
 
     # Permission Denied if they don't have staff access and are trying to see

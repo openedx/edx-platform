@@ -364,7 +364,7 @@ class TestSysadmin(SysadminBaseTestCase):
 
         def_ms = modulestore()
         course = def_ms.get_course('MITx/edx4edx/edx4edx')
-        CourseStaffRole(course.location).add_users(self.user)
+        CourseStaffRole(course.id).add_users(self.user)
 
         response = self.client.post(reverse('sysadmin_staffing'),
                                     {'action': 'get_staff_csv', })
@@ -511,9 +511,9 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         # Add user as staff in course team
         def_ms = modulestore()
         course = def_ms.get_course('MITx/edx4edx/edx4edx')
-        CourseStaffRole(course.location).add_users(self.user)
+        CourseStaffRole(course.id).add_users(self.user)
 
-        self.assertTrue(CourseStaffRole(course.location).has_user(self.user))
+        self.assertTrue(CourseStaffRole(course.id).has_user(self.user))
         logged_in = self.client.login(username=self.user.username,
                                       password='foo')
         self.assertTrue(logged_in)

@@ -70,7 +70,7 @@ def create_thread(request, course_id, commentable_id):
     """
 
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
     post = request.POST
 
     if course.allow_anonymous:
@@ -168,7 +168,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
         return JsonError(_("Body can't be empty"))
     comment = cc.Comment(**extract(post, ['body']))
 
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, 'load', course_id)
     if course.allow_anonymous:
         anonymous = post.get('anonymous', 'false').lower() == 'true'
     else:

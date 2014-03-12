@@ -554,7 +554,7 @@ def _get_item(request, data):
     # because has_course_access() raises InvalidLocationError if location is invalid.
     item = modulestore().get_item(old_location)
 
-    if not has_course_access(request.user, locator):
+    if not has_course_access(request.user, locator.course_id):
         raise PermissionDenied()
 
     return item

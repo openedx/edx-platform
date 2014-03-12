@@ -140,7 +140,7 @@ def _preview_module_system(request, descriptor):
         error_descriptor_class=ErrorDescriptor,
         # get_user_role accepts a location or a CourseLocator.
         # If descriptor.location is a CourseLocator, course_id is unused.
-        get_user_role=lambda: get_user_role(request.user, descriptor.location, course_id),
+        get_user_role=lambda: get_user_role(request.user, course_id),
         descriptor_runtime=descriptor.runtime,
         services={
             "i18n": ModuleI18nService(),

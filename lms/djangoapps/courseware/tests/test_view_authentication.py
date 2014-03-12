@@ -139,10 +139,10 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.staff_user = StaffFactory(course=self.course.location)
         self.instructor_user = InstructorFactory(
-            course=self.course.location)
+            course=self.course.id)
         self.org_staff_user = OrgStaffFactory(course=self.course.location)
         self.org_instructor_user = OrgInstructorFactory(
-            course=self.course.location)
+            course=self.course.id)
 
     def test_redirection_unenrolled(self):
         """
