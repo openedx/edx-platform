@@ -938,5 +938,4 @@ def provider_xrds(request):
 
 def course_from_id(course_id):
     """Return the CourseDescriptor corresponding to this course_id"""
-    course_loc = CourseDescriptor.id_to_location(course_id)
-    return modulestore().get_instance(course_id, course_loc)
+    return modulestore().get_course(course_id)

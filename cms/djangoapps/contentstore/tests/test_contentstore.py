@@ -777,21 +777,21 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store = modulestore('draft')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        source_course_id = 'edX/toy/2012_Fall'
-        dest_course_id = 'MITx/999/2013_Spring'
-        source_location = CourseDescriptor.id_to_location(source_course_id)
-        dest_location = CourseDescriptor.id_to_location(dest_course_id)
+        source_course_id = CourseId.from_string('edX/toy/2012_Fall')
+        dest_course_id = CourseId.from_string('MITx/999/2013_Spring')
 
         # get a vertical (and components in it) to put into 'draft'
         # this is to assert that draft content is also cloned over
-        vertical = module_store.get_instance(source_course_id, Location([
-            source_location.tag, source_location.org, source_location.course, 'vertical', 'vertical_test', None]), depth=1)
+        vertical = module_store.get_instance(
+            source_course_id.make_usage_key('vertical', 'vertical_test'),
+            depth=1
+        )
 
         draft_store.convert_to_draft(vertical.location)
         for child in vertical.get_children():
             draft_store.convert_to_draft(child.location)
 
-        items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None, 'draft']))
+        items = module_store.get_items(source_course_id, qualifiers={'version': 'draft'})
         self.assertGreater(len(items), 0)
 
         _create_course(self, course_data)
@@ -799,34 +799,28 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         # now do the actual cloning
-        clone_course(module_store, content_store, source_location, dest_location)
+        clone_course(module_store, content_store, source_course_id, dest_location)
 
         # first assert that all draft content got cloned as well
-        items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None, 'draft']))
+        items = module_store.get_items(source_course_id, qualifiers={'version': 'draft'})
         self.assertGreater(len(items), 0)
-        clone_items = module_store.get_items(Location([dest_location.tag, dest_location.org, dest_location.course, None, None, 'draft']))
+        clone_items = module_store.get_items(dest_course_id, qualifiers={'version': 'draft'})
         self.assertGreater(len(clone_items), 0)
         self.assertEqual(len(items), len(clone_items))
 
         # now loop through all the units in the course and verify that the clone can render them, which
         # means the objects are at least present
-        items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None]))
+        items = module_store.get_items(source_course_id, qualifiers={'version': None})
         self.assertGreater(len(items), 0)
-        clone_items = module_store.get_items(Location([dest_location.tag, dest_location.org, dest_location.course, None, None]))
+        clone_items = module_store.get_items(dest_course_id, qualifiers={'version': None})
         self.assertGreater(len(clone_items), 0)
 
         for descriptor in items:
             source_item = module_store.get_instance(source_course_id, descriptor.location)
-            if descriptor.location.category == 'course':
-                new_loc = descriptor.location.replace(org=dest_location.org, course=dest_location.course, name='2013_Spring')
-            else:
-                new_loc = descriptor.location.replace(org=dest_location.org, course=dest_location.course)
-            print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
+            new_loc = descriptor.location.map_into_course(dest_course_id)
+            print "Checking {0} should now also be at {1}".format(descriptor.location, new_loc)
             lookup_item = module_store.get_item(new_loc)
 
-            # we want to assert equality between the objects, but we know the locations
-            # differ, so just make them equal for testing purposes
-            source_item.location = new_loc
             if hasattr(source_item, 'data') and hasattr(lookup_item, 'data'):
                 self.assertEqual(source_item.data, lookup_item.data)
 
@@ -838,14 +832,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             self.assertEqual(source_item.has_children, lookup_item.has_children)
             if source_item.has_children:
                 expected_children = []
-                for child_loc_url in source_item.children:
-                    child_loc = Location(child_loc_url)
-                    child_loc = child_loc.replace(
-                        tag=dest_location.tag,
-                        org=dest_location.org,
-                        course=dest_location.course
-                    )
-                    expected_children.append(child_loc.url())
+                for child_loc in source_item.children:
+                    child_loc = child_loc.map_into_course(dest_course_id)
+                    expected_children.append(child_loc)
                 self.assertEqual(expected_children, lookup_item.children)
 
     def test_portable_link_rewrites_during_clone_course(self):
@@ -861,35 +850,29 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        source_course_id = 'edX/toy/2012_Fall'
-        dest_course_id = 'MITx/999/2013_Spring'
-        source_location = CourseDescriptor.id_to_location(source_course_id)
-        dest_location = CourseDescriptor.id_to_location(dest_course_id)
+        source_course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        dest_course_id = CourseKey.from_string('MITx/999/2013_Spring')
 
         # let's force a non-portable link in the clone source
         # as a final check, make sure that any non-portable links are rewritten during cloning
-        html_module_location = Location([
-            source_location.tag, source_location.org, source_location.course, 'html', 'nonportable'])
-        html_module = module_store.get_instance(source_location.course_id, html_module_location)
+        html_module = module_store.get_instance(source_course_id.make_usage_key('html', 'nonportable'))
 
         self.assertIsInstance(html_module.data, basestring)
         new_data = html_module.data = html_module.data.replace('/static/', '/c4x/{0}/{1}/asset/'.format(
-            source_location.org, source_location.course))
+            source_course_id.org, source_course_id.run))
         module_store.update_item(html_module, self.user.id)
 
-        html_module = module_store.get_instance(source_location.course_id, html_module_location)
+        html_module = module_store.get_instance(html_module.location)
         self.assertEqual(new_data, html_module.data)
 
         # create the destination course
         _create_course(self, course_data)
 
         # do the actual cloning
-        clone_course(module_store, content_store, source_location, dest_location)
+        clone_course(module_store, content_store, source_course_id, dest_course_id)
 
         # make sure that any non-portable links are rewritten during cloning
-        html_module_location = Location([
-            dest_location.tag, dest_location.org, dest_location.course, 'html', 'nonportable'])
-        html_module = module_store.get_instance(dest_location.course_id, html_module_location)
+        html_module = module_store.get_instance(dest_course_id.make_usage_key('html', 'nonportable'))
 
         self.assertIn('/static/foo.jpg', html_module.data)
 
@@ -1293,13 +1276,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_prefetch_children(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
-        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+        course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         wrapper = MongoCollectionFindWrapper(module_store.collection.find)
         module_store.collection.find = wrapper.find
         print module_store.metadata_inheritance_cache_subsystem
         print module_store.request_cache
-        course = module_store.get_item(location, depth=2)
+        course = module_store.get_course(course_id, depth=2)
 
         # make sure we haven't done too many round trips to DB
         # note we say 3 round trips here for 1) the course, and 2 & 3) for the chapters and sequentials
@@ -1324,8 +1307,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['toy'])
         course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
-        stub_location = Location(['i4x', 'edX', 'toy', 'sequential', 'vertical_sequential'])
-
         root_dir = path(mkdtemp_clean())
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
@@ -1344,7 +1325,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # Verify reimported course
 
-        items = module_store.get_items(stub_location)
+        items = module_store.get_items(
+            course_id,
+            qualifiers={'category': 'sequential', 'name': 'vertical_sequential'}
+        )
         self.assertEqual(len(items), 1)
 
     def _check_verticals(self, items, course_id):
