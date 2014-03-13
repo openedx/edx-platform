@@ -384,7 +384,7 @@ def _create_item(request):
 
     display_name = request.json.get('display_name')
 
-    if not has_course_access(request.user, parent_location.course_id):
+    if not has_course_access(request.user, parent_locator.package_id):
         raise PermissionDenied()
 
     parent = get_modulestore(category).get_item(parent_location)

@@ -34,7 +34,7 @@ def checklists_handler(request, tag=None, package_id=None, branch=None, version_
         json: updates the checked state for items within a particular checklist. checklist_index is required.
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location.course_id):
+    if not has_course_access(request.user, location.package_id):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(location)
