@@ -88,17 +88,17 @@ class MixedModuleStore(ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(usage_key.course_id)
         return store.get_item(usage_key, depth)
 
-    def get_items(self, course_id, settings=None, content=None, **kwargs):
+    def get_items(self, course_key, settings=None, content=None, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
-            the given course_id
+            the given course_key
 
         NOTE: don't use this to look for courses
-        as the course_id is required. Use get_courses.
+        as the course_key is required. Use get_courses.
 
         Args:
-            course_id (CourseKey): the course identifier
+            course_key (CourseKey): the course identifier
             settings (dict): fields to look for which have settings scope. Follows same syntax
                 and rules as kwargs below
             content (dict): fields to look for which have content scope. Follows same syntax and
@@ -112,8 +112,8 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 you can search by ``edited_by``, ``edited_on`` providing either a datetime for == (probably
                 useless) or a tuple (">"|"<" datetime) for after or before, etc.
         """
-        if course_id is None:
-            raise Exception("Must pass in a course_id when calling get_items()")
+        if (course_key is None) or (not isinstance(CourseKey)):
+            raise Exception("Must pass in a course_key when calling get_items()")
 
         store = self._get_modulestore_for_courseid(course_id)
         return store.get_items(course_id, **kwargs)

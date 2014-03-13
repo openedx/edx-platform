@@ -89,7 +89,7 @@ def answer_distributions(course_id):
         """
         problem_store = modulestore()
         if module_state_key not in state_keys_to_problem_info:
-            problems = problem_store.get_items(module_state_key, course_id=course_id, depth=1)
+            problems = problem_store.get_items(module_state_key, course_id=course_id)
             if not problems:
                 # Likely means that the problem was deleted from the course
                 # after the student had answered. We log this suspicion where

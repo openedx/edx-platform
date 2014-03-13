@@ -15,6 +15,7 @@ from edxmako import lookup_template
 import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
@@ -54,10 +55,7 @@ def has_forum_access(uname, course_id, rolename):
 
 
 def _get_discussion_modules(course):
-    all_modules = modulestore().get_items(
-        course_id=course.id,
-        qualifiers={'category': 'discussion'}
-    )
+    all_modules = modulestore().get_items(CourseKey.from_string(course.id), category='discussion')
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
