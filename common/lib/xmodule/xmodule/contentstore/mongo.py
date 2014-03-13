@@ -181,7 +181,7 @@ class MongoContentStore(ContentStore):
         count = items.count()
         return list(items), count
 
-    def set_attr(self, location, attr, value=True):
+    def set_attr(self, asset_key, attr, value=True):
         """
         Add/set the given attr on the asset at the given location. Does not allow overwriting gridFS built in
         attrs such as _id, md5, uploadDate, length. Value can be any type which pymongo accepts.
@@ -191,11 +191,11 @@ class MongoContentStore(ContentStore):
         Raises NotFoundError if no such item exists
         Raises AttributeError is attr is one of the build in attrs.
 
-        :param location: a c4x asset location
+        :param location: an AssetKey
         :param attr: which attribute to set
         :param value: the value to set it to (any type pymongo accepts such as datetime, number, string)
         """
-        self.set_attrs(location, {attr: value})
+        self.set_attrs(asset_key, {attr: value})
 
     def get_attr(self, location, attr, default=None):
         """
