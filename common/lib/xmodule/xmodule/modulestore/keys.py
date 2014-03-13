@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, abstractproperty
 
 from opaque_keys import OpaqueKey
 
@@ -6,14 +6,14 @@ from opaque_keys import OpaqueKey
 class CourseKey(OpaqueKey):
     KEY_TYPE = 'course_key'
 
-    @abstractmethod
+    @abstractproperty
     def org(self):
         """
         The organization that this course belongs to.
         """
         raise NotImplementedError()
 
-    @abstractmethod
+    @abstractproperty
     def run(self):
         """
         The run identifier for this course.
@@ -61,7 +61,7 @@ class CourseObjectMixin(object):
     for keys that belong to courses.
     """
 
-    @abstractmethod
+    @abstractproperty
     def course_key(self):
         """
         Return the :class:`CourseKey` for the course containing this usage.
@@ -83,7 +83,7 @@ class AssetKey(CourseObjectMixin, OpaqueKey):
     """
     KEY_TYPE = 'asset_key'
 
-    @abstractmethod
+    @abstractproperty
     def path(self):
         """
         Return the path for this asset.
@@ -97,7 +97,7 @@ class UsageKey(CourseObjectMixin, OpaqueKey):
     """
     KEY_TYPE = 'usage_key'
 
-    @abstractmethod
+    @abstractproperty
     def definition_key(self):
         """
         Return the :class:`DefinitionKey` for the XBlock containing this usage.
