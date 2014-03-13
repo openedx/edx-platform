@@ -112,11 +112,11 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 you can search by ``edited_by``, ``edited_on`` providing either a datetime for == (probably
                 useless) or a tuple (">"|"<" datetime) for after or before, etc.
         """
-        if (course_key is None) or (not isinstance(CourseKey)):
+        if (course_key is None) or (not isinstance(course_key, CourseKey)):
             raise Exception("Must pass in a course_key when calling get_items()")
 
         store = self._get_modulestore_for_courseid(course_id)
-        return store.get_items(course_id, **kwargs)
+        return store.get_items(course_key, **kwargs)
 
     def _get_course_id_from_course_location(self, course_location):
         """

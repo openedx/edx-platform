@@ -145,7 +145,7 @@ class ModuleStoreRead(object):
             return any(self._value_matches(ele, criteria)
                 for ele in target)
         elif isinstance(criteria, re._pattern_type):
-            return criteria.match(target) is not None
+            return criteria.search(target) is not None
         elif callable(criteria):
             return criteria(target)
         else:

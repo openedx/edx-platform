@@ -9,6 +9,7 @@ manipulate storage but use existing api's.
 from xmodule.modulestore import Location
 from xmodule.modulestore.locator import CourseLocator
 from xmodule.modulestore.mongo import draft
+from xmodule.modulestore.keys import CourseKey
 
 
 class SplitMigrator(object):
@@ -67,10 +68,8 @@ class SplitMigrator(object):
 
         # iterate over published course elements. Wildcarding rather than descending b/c some elements are orphaned (e.g.,
         # course about pages, conditionals)
-        for module in self.direct_modulestore.get_items(
-            old_course_loc.replace(category=None, name=None, revision=None),
-            old_course_id
-        ):
+        course_key = CourseKey.from_string(old_course_loc.replace(category=None, name=None, revision=None).course_id)
+        for module in self.direct_modulestore.get_items(course_key):
             # don't copy the course again. No drafts should get here but check
             if module.location != old_course_loc and not getattr(module, 'is_draft', False):
                 # create split_xblock using split.create_item
@@ -104,10 +103,8 @@ class SplitMigrator(object):
         # to prevent race conditions of grandchilden being added before their parents and thus having no parent to
         # add to
         awaiting_adoption = {}
-        for module in self.draft_modulestore.get_items(
-            old_course_loc.replace(category=None, name=None, revision=draft.DRAFT),
-            old_course_id
-        ):
+        course_key = CourseKey.from_string(old_course_loc.replace(category=None, name=None, revision=draft.DRAFT).course_id)
+        for module in self.draft_modulestore.get_items(course_key):
             if getattr(module, 'is_draft', False):
                 new_locator = self.loc_mapper.translate_location(
                     module.location, False, add_entry_if_missing=True

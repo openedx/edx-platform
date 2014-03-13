@@ -530,15 +530,17 @@ class MongoModuleStore(ModuleStoreWriteBase):
         Returns a list of course descriptors.
         '''
         course_filter = Location(category="course")
-        return [
-            course
-            for course
-            in self.get_items(CourseKey.from_string(course.id))
-            if not (
-                course.location.org == 'edx' and
-                course.location.course == 'templates'
-            )
-        ]
+        return self._load_items(
+             [
+                course
+                for course
+                in self._find_one(course_filter)
+                if not (  #TODO kill this
+                    course.location.org == 'edx' and
+                    course.location.course == 'templates'
+                )
+            ]
+        )
 
     def _find_one(self, location):
         '''Look for a given location in the collection.  If revision is not
@@ -804,7 +806,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # @hack! We need to find the course location however, we don't
         # know the 'name' parameter in this context, so we have
         # to assume there's only one item in this query even though we are not specifying a name
-        from nose.tools import set_trace; set_trace()
         course_search_location = Location('i4x', location.org, location.course, 'course', None)
         courses = self.get_items(CourseKey.from_string(course_search_location.course_id))
 
