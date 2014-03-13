@@ -314,24 +314,18 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             result.extend(self._load_items(envelope, [root], 0, lazy=True))
         return result
 
-    def get_course(self, course_locator):
+    def get_course(self, course_id, depth=None):
         '''
         Gets the course descriptor for the course identified by the locator
         which may or may not be a blockLocator.
 
         raises InsufficientSpecificationError
         '''
-        course_entry = self._lookup_course(course_locator)
+        assert(isinstance(course_id, CourseLocator))
+        course_entry = self._lookup_course(course_id)
         root = course_entry['structure']['root']
         result = self._load_items(course_entry, [root], 0, lazy=True)
         return result[0]
-
-    def get_course_for_item(self, location):
-        '''
-        Provided for backward compatibility. Is equivalent to calling get_course
-        :param location:
-        '''
-        return self.get_course(location)
 
     def has_item(self, usage_key):
         """
