@@ -1,9 +1,8 @@
 <%inherit file="../../base.html" />
 <%!
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
 %>
-<%block name="title">${_("Container")}</%block>
+<%block name="title">Container</%block>
 <%block name="bodyclass">is-signedin course uploads view-container</%block>
 
 <%namespace name='static' file='../../static_content.html'/>
@@ -427,8 +426,8 @@ from django.utils.translation import ugettext as _
             </article>
             <aside class="content-supplementary" role="complimentary">
                 <div class="bit-publishing">
-                    <h3 class="title-3">${_("Publishing Status")}</h3>
-                    <p class="copy">${_('This content is published with unit <a href="">Unit 1</a>. To make changes to the content of this container, place <a href="">Unit 1</a> in draft mode.')}</p>
+                    <h3 class="title-3">Publishing Status</h3>
+                    <p class="copy">This content is published with unit <a href="">Unit 1</a>. To make changes to the content of this container, place <a href="">Unit 1</a> in draft mode.</p>
                 </div>
                 <div class="bit">
                     <h3 class="title-3">Container Reference Page</h3>
