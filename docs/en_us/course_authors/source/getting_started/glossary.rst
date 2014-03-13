@@ -377,6 +377,14 @@ N
 P
 ****
 
+.. _Pages_g:
+ 
+**Pages**
+
+  Pages that supplement the courseware for a course. Each page appears in your course's navigation bar. 
+
+  See :ref:`Add Pages` for more information.
+
 .. _Preview Mode:
  
 **Preview Mode**
@@ -463,16 +471,6 @@ S
 **Simple Editor**
 
   The graphical user interface in a Problem component that contains formatting buttons and is available for some problem types. For more information, see :ref:`Studio UI`.
-
-
-
-.. _Static Pages_g:
- 
-**Static Pages**
-
-  Pages that supplement the courseware for a course. Each static page appears in your course's navigation bar. 
-
-  See :ref:`Add Static Pages` for more information.
 
 
 
