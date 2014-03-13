@@ -108,7 +108,7 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
         subsection_units = item.get_children()
         for unit in subsection_units:
             state = compute_publish_state(unit)
-            if state == PublishState.public or state == PublishState.draft:
+            if state in (PublishState.public, PublishState.draft):
                 can_view_live = True
                 break
 
