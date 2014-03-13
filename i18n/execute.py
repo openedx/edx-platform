@@ -1,8 +1,11 @@
-import os, subprocess, logging
+import os
+import subprocess
+import logging
 
 from i18n.config import BASE_DIR
 
 LOG = logging.getLogger(__name__)
+
 
 def execute(command, working_directory=BASE_DIR, stderr=subprocess.STDOUT):
     """

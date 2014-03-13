@@ -16,6 +16,7 @@ from i18n.converter import Converter
 
 log = logging.getLogger(__name__)
 
+
 def validate_po_files(root, report_empty=False):
     """
     Validate all of the po files found in the root directory.

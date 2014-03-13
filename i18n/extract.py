@@ -35,6 +35,7 @@ EDX_MARKER = "edX translation file"
 LOG = logging.getLogger(__name__)
 DEVNULL = open(os.devnull, 'wb')
 
+
 def base(path1, *paths):
     """Return a relative path from BASE_DIR to path1 / paths[0] / ... """
     return BASE_DIR.relpathto(path1.joinpath(*paths))
@@ -143,19 +144,23 @@ def fix_header(po):
     fixes = (
         ('SOME DESCRIPTIVE TITLE', EDX_MARKER),
         ('Translations template for PROJECT.', EDX_MARKER),
-        ('YEAR', '%s' % datetime.utcnow().year),
+        ('YEAR', str(datetime.utcnow().year)),
         ('ORGANIZATION', 'edX'),
         ("THE PACKAGE'S COPYRIGHT HOLDER", "EdX"),
-        ('This file is distributed under the same license as the PROJECT project.',
-         'This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.'),
-        ('This file is distributed under the same license as the PACKAGE package.',
-         'This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.'),
-        ('FIRST AUTHOR <EMAIL@ADDRESS>',
-         'EdX Team <info@edx.org>')
-        )
+        (
+            'This file is distributed under the same license as the PROJECT project.',
+            'This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.'
+        ),
+        (
+            'This file is distributed under the same license as the PACKAGE package.',
+            'This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.'
+        ),
+        ('FIRST AUTHOR <EMAIL@ADDRESS>', 'EdX Team <info@edx.org>'),
+    )
     for src, dest in fixes:
         header = header.replace(src, dest)
     po.header = header
+
 
 def fix_metadata(po):
     """
@@ -179,11 +184,12 @@ def fix_metadata(po):
         'PO-Revision-Date': datetime.utcnow(),
         'Report-Msgid-Bugs-To': 'openedx-translation@googlegroups.com',
         'Project-Id-Version': '0.1a',
-        'Language' : 'en',
-        'Last-Translator' : '',
+        'Language': 'en',
+        'Last-Translator': '',
         'Language-Team': 'openedx-translation <openedx-translation@googlegroups.com>',
     }
     po.metadata.update(fixes)
+
 
 def strip_key_strings(po):
     """
@@ -194,12 +200,14 @@ def strip_key_strings(po):
     del po[:]
     po += newlist
 
+
 def is_key_string(string):
     """
     returns True if string is a key string.
     Key strings begin with underscore.
     """
     return len(string) > 1 and string[0] == '_'
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

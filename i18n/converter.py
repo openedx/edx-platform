@@ -1,6 +1,7 @@
 import re
 import itertools
 
+
 class Converter(object):
     """Converter is an abstract class that transforms strings.
        It hides embedded tags (HTML or Python sequences) from transformation
@@ -20,7 +21,8 @@ class Converter(object):
     # matches tags like these:
     #   HTML:   <B>, </B>, <BR/>, <textformat leading="10">
     #   Python: %(date)s, %(name)s
-    tag_pattern = re.compile(r'''
+    tag_pattern = re.compile(
+        r'''
         (<[^>]+>)           |       # <tag>
         ({[^}]+})           |       # {tag}
         (%\([\w]+\)\w)      |       # %(tag)s
@@ -28,7 +30,7 @@ class Converter(object):
         (&\#\d+;)           |       # &#1234;
         (&\#x[0-9a-f]+;)            # &#xABCD;
         ''',
-        re.IGNORECASE|re.VERBOSE
+        re.IGNORECASE | re.VERBOSE
     )
 
     def convert(self, string):
@@ -55,7 +57,7 @@ class Converter(object):
         tags = [''.join(tag) for tag in tags]
         (new, nfound) = self.tag_pattern.subn(count, string)
         if len(tags) != nfound:
-            raise Exception('tags dont match:'+string)
+            raise Exception('tags dont match:' + string)
         return (new, tags)
 
     def retag_string(self, string, tags):
@@ -64,7 +66,6 @@ class Converter(object):
             p = '<%s>' % i
             string = re.sub(p, tag, string, 1)
         return string
-
 
     # ------------------------------
     # Customize this in subclasses of Converter
