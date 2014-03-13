@@ -152,18 +152,17 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
         return courses.values()
 
-    def get_course(self, course_id):
+    def get_course(self, course_id, depth=None):
         """
         returns the course module associated with the course_id. If no such course exists,
         it returns None
 
         :param course_id: must be either a string course_id or a CourseLocator
         """
-        store = self._get_modulestore_for_courseid(
-            course_id.package_id if hasattr(course_id, 'package_id') else course_id
-        )
+        assert(isinstance(course_id, CourseKey))
+        store = self._get_modulestore_for_courseid(course_id)
         try:
-            return store.get_course(course_id)
+            return store.get_course(course_id, depth=depth)
         except ItemNotFoundError:
             return None
 

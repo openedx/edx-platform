@@ -553,13 +553,14 @@ class MongoModuleStore(ModuleStoreWriteBase):
             raise ItemNotFoundError(location)
         return item
 
-    def get_course(self, course_id):
+    def get_course(self, course_id, depth=None):
         """
         Get the course with the given courseid (org/course/run)
         """
+        assert(isinstance(course_id, SlashSeparatedCourseKey))
         id_components = Location('i4x', course_id.org, course_id.course, 'course', course_id.run)
         try:
-            return self.get_item(Location(id_components))
+            return self.get_item(Location(id_components), depth=depth)
         except ItemNotFoundError:
             return None
 

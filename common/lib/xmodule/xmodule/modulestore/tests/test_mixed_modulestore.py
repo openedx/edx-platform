@@ -224,25 +224,19 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         Update should fail for r/o dbs and succeed for r/w ones
         """
         self.initdb(default_ms)
-        course_id = self.XML_COURSEID1
-        course = self.store.get_course(course_id)
+        course = self.store.get_course(self.XML_COURSEID1)
         # if following raised, then the test is really a noop, change it
         self.assertFalse(course.show_calculator, "Default changed making test meaningless")
         course.show_calculator = True
         with self.assertRaises(NotImplementedError):
             self.store.update_item(course, None)
         # now do it for a r/w db
-        # get_course api's are inconsistent: one takes Locators the other an old style course id
-        if hasattr(self.course_locations[self.MONGO_COURSEID], 'as_course_locator'):
-            locn = self.course_locations[self.MONGO_COURSEID]
-        else:
-            locn = self.MONGO_COURSEID
-        course = self.store.get_course(locn)
+        course = self.store.get_course(self.MONGO_COURSEID)
         # if following raised, then the test is really a noop, change it
         self.assertFalse(course.show_calculator, "Default changed making test meaningless")
         course.show_calculator = True
         self.store.update_item(course, None)
-        course = self.store.get_course(locn)
+        course = self.store.get_course(self.MONGO_COURSEID)
         self.assertTrue(course.show_calculator)
 
     @ddt.data('direct', 'split')
@@ -298,15 +292,11 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
     @ddt.data('direct', 'split')
     def test_get_course(self, default_ms):
         self.initdb(default_ms)
-        for course_locn in self.course_locations.itervalues():
-            if hasattr(course_locn, 'as_course_locator'):
-                locn = course_locn.as_course_locator()
-            else:
-                locn = course_locn.course_id
+        for course_id in self.course_ids:
             # NOTE: use get_course if you just want the course. get_items is expensive
-            course = self.store.get_course(locn)
+            course = self.store.get_course(course_id)
             self.assertIsNotNone(course)
-            self.assertEqual(course.location, course_locn)
+            self.assertEqual(course.id, course_id)
 
     @ddt.data('direct', 'split')
     def test_get_parent_locations(self, default_ms):
