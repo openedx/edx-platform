@@ -297,9 +297,9 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
         if publish == 'make_private':
             _xmodule_recurse(existing_item, lambda i: modulestore().unpublish(i.location))
         elif publish == 'create_draft':
-            # This clones the existing item location to a draft location (the draft is
+            # This recursively clones the existing item location to a draft location (the draft is
             # implicit, because modulestore is a Draft modulestore)
-            modulestore().convert_to_draft(item_location)
+            _xmodule_recurse(existing_item, lambda i: modulestore().convert_to_draft(i.location))
 
     if data:
         # TODO Allow any scope.content fields not just "data" (exactly like the get below this)

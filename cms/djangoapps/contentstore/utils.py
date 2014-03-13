@@ -194,30 +194,35 @@ def course_image_url(course):
     return path
 
 
-class UnitState(object):
+class PublishState(object):
+    """
+    The publish state for a given xblock-- either 'draft', 'private', or 'public'.
+
+    Currently in CMS, an xblock can only be in 'draft' or 'private' if it is at or below the Unit level.
+    """
     draft = 'draft'
     private = 'private'
     public = 'public'
 
 
-def compute_unit_state(unit):
+def compute_publish_state(xblock):
     """
-    Returns whether this unit is 'draft', 'public', or 'private'.
+    Returns whether this xblock is 'draft', 'public', or 'private'.
 
     'draft' content is in the process of being edited, but still has a previous
         version visible in the LMS
     'public' content is locked and visible in the LMS
-    'private' content is editabled and not visible in the LMS
+    'private' content is editable and not visible in the LMS
     """
 
-    if getattr(unit, 'is_draft', False):
+    if getattr(xblock, 'is_draft', False):
         try:
-            modulestore('direct').get_item(unit.location)
-            return UnitState.draft
+            modulestore('direct').get_item(xblock.location)
+            return PublishState.draft
         except ItemNotFoundError:
-            return UnitState.private
+            return PublishState.private
     else:
-        return UnitState.public
+        return PublishState.public
 
 
 def add_extra_panel_tab(tab_type, course):

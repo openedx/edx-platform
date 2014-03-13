@@ -15,6 +15,7 @@ from django.test.client import RequestFactory
 from contentstore.views.component import component_handler
 
 from contentstore.tests.utils import CourseTestCase
+from contentstore.utils import compute_publish_state, PublishState
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.django import modulestore
@@ -153,7 +154,7 @@ class GetItem(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID (wrapperxxx). Allow anything
             # for the 3 characters after wrapper.
-            (r'"/container/MITx.999.Robot_Super_Course/branch/published/block/wrapper.{3}" class="action-button">\s*'
+            (r'"/container/MITx.999.Robot_Super_Course/branch/draft/block/wrapper.{3}" class="action-button">\s*'
              '<span class="action-button-text">View</span>')
         )
 
@@ -663,6 +664,7 @@ class TestEditItem(ItemTest):
         self.assertEqual(resp.status_code, 200)
 
         # Activate the editing view
+        view_url = '/xblock/{locator}/studio_view'.format(locator=self.problem_locator)
         resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
 
@@ -670,6 +672,49 @@ class TestEditItem(ItemTest):
         published = self.get_item_from_modulestore(self.problem_locator, False)
         draft = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertNotEqual(draft.data, published.data)
+
+    def test_publish_states_of_nested_xblocks(self):
+        """ Test publishing of a unit page containing a nested xblock  """
+
+        resp = self.create_xblock(parent_locator=self.seq_locator, display_name='Test Unit', category='vertical')
+        unit_locator = self.response_locator(resp)
+        resp = self.create_xblock(parent_locator=unit_locator, category='wrapper')
+        wrapper_locator = self.response_locator(resp)
+        resp = self.create_xblock(parent_locator=wrapper_locator, category='html')
+        html_locator = self.response_locator(resp)
+
+        # The unit and its children should be private initially
+        unit_update_url = '/xblock/' + unit_locator
+        unit = self.get_item_from_modulestore(unit_locator, True)
+        html = self.get_item_from_modulestore(html_locator, True)
+        self.assertEqual(compute_publish_state(unit), PublishState.private)
+        self.assertEqual(compute_publish_state(html), PublishState.private)
+
+        # Make the unit public and verify that the problem is also made public
+        resp = self.client.ajax_post(
+            unit_update_url,
+            data={'publish': 'make_public'}
+        )
+        self.assertEqual(resp.status_code, 200)
+        unit = self.get_item_from_modulestore(unit_locator, True)
+        html = self.get_item_from_modulestore(html_locator, True)
+        self.assertEqual(compute_publish_state(unit), PublishState.public)
+        self.assertEqual(compute_publish_state(html), PublishState.public)
+
+        # Make a draft for the unit and verify that the problem also has a draft
+        resp = self.client.ajax_post(
+            unit_update_url,
+            data={
+                'id': unit_locator,
+                'metadata': {},
+                'publish': 'create_draft'
+            }
+        )
+        self.assertEqual(resp.status_code, 200)
+        unit = self.get_item_from_modulestore(unit_locator, True)
+        html = self.get_item_from_modulestore(html_locator, True)
+        self.assertEqual(compute_publish_state(unit), PublishState.draft)
+        self.assertEqual(compute_publish_state(html), PublishState.draft)
 
 
 @ddt.ddt

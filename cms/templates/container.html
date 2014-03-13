@@ -79,6 +79,15 @@ xblock_info = {
                 <section class="wrapper-xblock level-page" data-locator="${xblock_locator}"/>
             </article>
             <aside class="content-supplementary" role="complimentary">
+                <div class="bit-publishing">
+                    <h3 class="title-3">${_("Publishing Status")}</h3>
+                    <p class="copy">${_('This content is published with unit {unit_name}.').format(
+                        unit_name=u'<a href="{unit_address}">{unit_display_name}</a>'.format(
+                            unit_address=xblock_studio_url(unit),
+                            unit_display_name=unit.display_name_with_default,
+                        )
+                    )}</p>
+                </div>
                 <div class="bit">
                     <h3 class="title-3">${_("What can I do on this page?")}</h3>
                     <ul class="list-details">
