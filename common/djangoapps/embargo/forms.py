@@ -10,6 +10,7 @@ from embargo.fixtures.country_codes import COUNTRY_CODES
 import socket
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 
 
 class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protocol

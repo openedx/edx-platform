@@ -20,6 +20,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.keys import CourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

@@ -18,6 +18,7 @@ from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import (studio_store_config,
     ModuleStoreTestCase)
 from xmodule.modulestore.xml_importer import import_from_xml

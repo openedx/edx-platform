@@ -17,6 +17,7 @@ from django.test.utils import override_settings
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import dashboard.git_import as git_import

@@ -12,6 +12,7 @@ from xmodule.modulestore.django import create_modulestore_instance, loc_mapper
 from xmodule.modulestore import Location, SPLIT_MONGO_MODULESTORE_TYPE, XML_MODULESTORE_TYPE
 from xmodule.modulestore.locator import CourseLocator, Locator
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.keys import CourseKey
 from uuid import uuid4
 from xmodule.modulestore.mongo.base import MongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
@@ -79,17 +80,13 @@ class MixedModuleStore(ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(usage_key.course_key)
         return store.has_item(usage_key)
 
-    def get_item(self, location, depth=0):
+    def get_item(self, usage_key, depth=0):
         """
         This method is explicitly not implemented as we need a course_id to disambiguate
         We should be able to fix this when the data-model rearchitecting is done
         """
-        # Although we shouldn't have both get_item and get_instance imho
-        raise NotImplementedError
-
-    def get_instance(self, course_id, location, depth=0):
-        store = self._get_modulestore_for_courseid(course_id)
-        return store.get_instance(course_id, location, depth)
+        store = self._get_modulestore_for_courseid(usage_key.course_id)
+        return store.get_item(usage_key, depth)
 
     def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         """

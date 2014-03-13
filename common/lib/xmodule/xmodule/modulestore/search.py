@@ -106,7 +106,7 @@ def path_to_location(modulestore, usage_key):
         for path_index in range(2, n - 1):
             category = path[path_index].definition_key.block_type
             if category == 'sequential' or category == 'videosequence':
-                section_desc = modulestore.get_instance(course_id, path[path_index])
+                section_desc = modulestore.get_item(path[path_index])
                 child_locs = [c.location for c in section_desc.get_children()]
                 # positions are 1-indexed, and should be strings to be consistent with
                 # url parsing.

@@ -7,6 +7,7 @@ import mock
 from django.http import Http404
 from django.test.utils import override_settings
 from xmodule.modulestore.django import get_default_store_name_for_current_request
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tests.xml import factories as xml

@@ -433,7 +433,7 @@ def get_static_tab_contents(request, course, tab):
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course.id,
         request.user,
-        modulestore().get_instance(course.id, usage_key),
+        modulestore().get_item(usage_key),
         depth=0
     )
     tab_module = get_module(

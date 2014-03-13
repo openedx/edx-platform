@@ -9,6 +9,7 @@ from optparse import make_option
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 
 from courseware.courses import get_course
@@ -38,7 +39,7 @@ class Command(BaseCommand):
 
         if len(args) == 2:
             course_id = CourseKey.from_string(args[0])
-            location = args[1]
+            usage_key = UsageKey.from_string(args[1])
         else:
             print self.help
             return
@@ -49,16 +50,16 @@ class Command(BaseCommand):
             print err
             return
 
-        descriptor = modulestore().get_instance(course.id, location, depth=0)
+        descriptor = modulestore().get_item(usage_key, depth=0)
         if descriptor is None:
-            print "Location {0} not found in course".format(location)
+            print "Location {0} not found in course".format(usage_key)
             return
 
         try:
             enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
             print "Total students enrolled in {0}: {1}".format(course_id, enrolled_students.count())
 
-            calculate_task_statistics(enrolled_students, course, location, task_number)
+            calculate_task_statistics(enrolled_students, course, usage_key, task_number)
 
         except KeyboardInterrupt:
             print "\nOperation Cancelled"
