@@ -240,10 +240,10 @@ def _update_asset(request, location, asset_id):
             return JsonResponse({"error": err.message}, status=400)
 
     if request.method == 'DELETE':
-        loc = get_asset_location(asset_id)
+        asset_key = AssetKey.from_string(asset_id)
         # Make sure the item to delete actually exists.
         try:
-            content = contentstore().find(loc)
+            content = contentstore().find(asset_key)
         except NotFoundError:
             return JsonResponse(status=404)
 
@@ -277,11 +277,10 @@ def _update_asset(request, location, asset_id):
                 modified_asset = json.loads(request.body)
             except ValueError:
                 return HttpResponseBadRequest()
-            asset_id = modified_asset['url']
-            asset_location = get_asset_location(asset_id)
-            contentstore().set_attr(asset_location, 'locked', modified_asset['locked'])
+            asset_id = AssetKey.from_string(modified_asset['url'])
+            contentstore().set_attr(asset_key, 'locked', modified_asset['locked'])
             # Delete the asset from the cache so we check the lock status the next time it is requested.
-            del_cached_content(asset_location)
+            del_cached_content(asset_key)
             return JsonResponse(modified_asset, status=201)
 
 

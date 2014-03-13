@@ -47,18 +47,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client = Client()
         self.contentstore = contentstore()
 
-        # A locked asset
-        self.loc_locked = Location('c4x', 'edX', 'toy', 'asset', 'sample_static.txt')
-        self.url_locked = StaticContent.get_url_path_from_location(self.loc_locked)
-
-        # An unlocked asset
-        self.loc_unlocked = Location('c4x', 'edX', 'toy', 'asset', 'another_static.txt')
-        self.url_unlocked = StaticContent.get_url_path_from_location(self.loc_unlocked)
+        course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         import_from_xml(modulestore('direct'), 'common/test/data/', ['toy'],
                 static_content_store=self.contentstore, verbose=True)
 
-        self.contentstore.set_attr(self.loc_locked, 'locked', True)
+        # A locked asset
+        self.locked_asset = course_id.get_asset_key('sample_static.txt')
+        self.url_locked = StaticContent.get_url_path_from_location(self.locked_asset)
+
+        # An unlocked asset
+        self.unlocked_asset = course_id.get_asset_key('another_static.txt')
+        self.url_unlocked = StaticContent.get_url_path_from_location(self.unlocked_asset)
+
+        self.contentstore.set_attr(self.locked_asset, 'locked', True)
 
         # Create user
         self.usr = 'testuser'
