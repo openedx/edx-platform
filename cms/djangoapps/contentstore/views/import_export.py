@@ -63,7 +63,7 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
         json: import a course via the .tar.gz file specified in request.FILES
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location.course_id):
+    if not has_course_access(request.user, location.package_id):
         raise PermissionDenied()
 
     course_id = CourseKey.from_string(package_id)
@@ -276,7 +276,7 @@ def import_status_handler(request, tag=None, package_id=None, branch=None, versi
 
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location.course_id):
+    if not has_course_access(request.user, location.package_id):
         raise PermissionDenied()
 
     try:
@@ -307,7 +307,7 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
     which describes the error.
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_course_access(request.user, location.course_id):
+    if not has_course_access(request.user, location.package_id):
         raise PermissionDenied()
 
     course_module = modulestore().get_course(location.course_id)
