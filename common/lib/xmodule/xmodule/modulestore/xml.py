@@ -31,6 +31,7 @@ from . import ModuleStoreReadBase, Location, XML_MODULESTORE_TYPE
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata, inheriting_field_data
+import collections
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
@@ -683,21 +684,48 @@ class XMLModuleStore(ModuleStoreReadBase):
         except KeyError:
             raise ItemNotFoundError(usage_key)
 
-    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
+    def get_items(self, course_id, settings=None, content=None, **kwargs):
+        """
+        Returns:
+            list of XModuleDescriptor instances for the matching items within the course with
+            the given course_id
+
+        NOTE: don't use this to look for courses
+        as the course_id is required. Use get_courses.
+
+        Args:
+            course_id (CourseKey): the course identifier
+            settings (dict): fields to look for which have settings scope. Follows same syntax
+                and rules as kwargs below
+            content (dict): fields to look for which have content scope. Follows same syntax and
+                rules as kwargs below.
+            kwargs (key=value): what to look for within the course.
+                Common qualifiers are ``category`` or any field name. if the target field is a list,
+                then it searches for the given value in the list not list equivalence.
+                Substring matching pass a regex object.
+                For this modulestore, ``name`` is another commonly provided key (Location based stores)
+                (but not revision!)
+                For this modulestore,
+                you can search dates by providing either a datetime for == (probably
+                useless) or a tuple (">"|"<" datetime) for after or before, etc.
+        """
         items = []
 
-        def _add_get_items(self, location, modules):
-            for mod_loc, module in modules.iteritems():
-                # Locations match if each value in `location` is None or if the value from `location`
-                # matches the value from `mod_loc`
-                if all(goal is None or goal == value for goal, value in zip(location, mod_loc)):
-                    items.append(module)
+        category = kwargs.pop('category', None)
+        name = kwargs.pop('name', None)
+        def _block_matches_all(mod_loc, module):
+            if category and mod_loc.category != category:
+                return False
+            if name and mod_loc.name != name:
+                return False
+            return all(
+                self._block_matches(module, fields or {})
+                for fields in [settings, content, kwargs]
+            )
 
-        if course_id is None:
-            for _, modules in self.modules.iteritems():
-                _add_get_items(self, location, modules)
-        else:
-            _add_get_items(self, location, self.modules[course_id])
+        for mod_loc, module in self.modules[course_id].iteritems():
+            if _block_matches_all(mod_loc, module):
+                items.append(mod_loc)
 
         return items
 

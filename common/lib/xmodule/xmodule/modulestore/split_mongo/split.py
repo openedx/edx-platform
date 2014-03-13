@@ -397,8 +397,31 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         course = self._lookup_course(course_locator)
         items = []
+        def _block_matches_all(block_json):
+            """
+            Check that the block matches all the criteria
+            """
+            # do the checks which don't require loading any additional data
+            if (
+                self._block_matches(block_json, kwargs) and
+                self._block_matches(block_json.get('fields', {}), settings or {})
+            ):
+                if content:
+                    definition_block = self.db_connection.get_definition(block_json['definition'])
+                    return self._block_matches(definition_block.get('fields', {}), content)
+                else:
+                    return True
+
+        if 'name' in kwargs:
+            # odd case where we don't search just confirm
+            block_id = kwargs.pop('name')
+            block = course['structure']['blocks'].get(block_id)
+            if self._block_matches_all(block):
+                return self._load_items(course, [block_id], lazy=True)
+            else:
+                return []
         for block_id, value in course['structure']['blocks'].iteritems():
-            if self._block_matches(value, qualifiers):
+            if self._block_matches_all(value):
                 items.append(block_id)
 
         if len(items) > 0:
@@ -1371,38 +1394,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         self.db_connection.update_structure(original_structure)
         # clear cache again b/c inheritance may be wrong over orphans
         self._clear_cache(original_structure['_id'])
-
-    def _block_matches(self, value, qualifiers):
-        '''
-        Return True or False depending on whether the value (block contents)
-        matches the qualifiers as per get_items
-        :param value:
-        :param qualifiers:
-        '''
-        for key, criteria in qualifiers.iteritems():
-            if key in value:
-                target = value[key]
-                if not self._value_matches(target, criteria):
-                    return False
-            elif criteria is not None:
-                return False
-        return True
-
-    def _value_matches(self, target, criteria):
-        ''' helper for _block_matches '''
-        if isinstance(target, list):
-            return any(self._value_matches(ele, criteria)
-                for ele in target)
-        elif isinstance(criteria, dict):
-            if '$regex' in criteria:
-                return re.search(criteria['$regex'], target) is not None
-            elif not isinstance(target, dict):
-                return False
-            else:
-                return (isinstance(target, dict) and
-                        self._block_matches(target, criteria))
-        else:
-            return criteria == target
 
     def _get_index_if_valid(self, locator, force=False, continue_version=False):
         """
