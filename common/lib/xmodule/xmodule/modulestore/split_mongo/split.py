@@ -333,21 +333,21 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         '''
         return self.get_course(location)
 
-    def has_item(self, package_id, block_location):
+    def has_item(self, usage_key):
         """
         Returns True if location exists in its course. Returns false if
         the course or the block w/in the course do not exist for the given version.
         raises InsufficientSpecificationError if the locator does not id a block
         """
-        if block_location.block_id is None:
-            raise InsufficientSpecificationError(block_location)
+        if usage_key.block_id is None:
+            raise InsufficientSpecificationError(usage_key)
         try:
-            course_structure = self._lookup_course(block_location)['structure']
+            course_structure = self._lookup_course(usage_key)['structure']
         except ItemNotFoundError:
             # this error only occurs if the course does not exist
             return False
 
-        return self._get_block_from_structure(course_structure, block_location.block_id) is not None
+        return self._get_block_from_structure(course_structure, usage_key.block_id) is not None
 
     def get_item(self, location, depth=0):
         """

@@ -112,7 +112,7 @@ class SplitMigrator(object):
                 new_locator = self.loc_mapper.translate_location(
                     old_course_id, module.location, False, add_entry_if_missing=True
                 )
-                if self.split_modulestore.has_item(new_package_id, new_locator):
+                if self.split_modulestore.has_item(new_locator):
                     # was in 'direct' so draft is a new version
                     split_module = self.split_modulestore.get_item(new_locator)
                     # need to remove any no-longer-explicitly-set values and add/update any now set values.
