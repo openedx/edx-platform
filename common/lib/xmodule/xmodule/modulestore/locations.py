@@ -2,7 +2,8 @@
 
 from xmodule.modulestore.keys import CourseKey
 
-class CourseLocation(CourseKey):
+class SlashSeparatedId(CourseKey):
+    """Course key for old style org/course/run course identifiers"""
     def __init__(org, course, run):
         self.org = org
         self.course = course
