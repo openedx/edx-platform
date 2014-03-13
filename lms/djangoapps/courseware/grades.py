@@ -14,6 +14,7 @@ from dogapi import dog_stats_api
 
 from courseware import courses
 from courseware.model_data import FieldDataCache
+from submissions import api as sub_api
 from xmodule import graders
 from xmodule.graders import Score
 from xmodule.modulestore.django import modulestore
@@ -178,6 +179,11 @@ def _grade(student, request, course, keep_raw_scores):
     grading_context = course.grading_context
     raw_scores = []
 
+    # Dict of item_ids -> (earned, possible) point tuples. This *only* grabs
+    # scores that were registered with the submissions API, which for the moment
+    # means only openassessment (edx-tim).
+    submissions_scores = sub_api.get_scores(course.id, student.id)
+
     totaled_scores = {}
     # This next complicated loop is just to collect the totaled_scores, which is
     # passed to the grader
@@ -194,7 +200,15 @@ def _grade(student, request, course, keep_raw_scores):
                 descriptor.always_recalculate_grades for descriptor in section['xmoduledescriptors']
             )
 
-            # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
+            # If there are no problems that always have to be regraded, check to
+            # see if any of our locations are in the scores from the submissions
+            # API. If scores exist, we have to calculate grades for this section.
+            if not should_grade_section:
+                should_grade_section = any(
+                    descriptor.location.url() in submissions_scores
+                    for descriptor in section['xmoduledescriptors']
+                )
+
             if not should_grade_section:
                 with manual_transaction():
                     should_grade_section = StudentModule.objects.filter(
@@ -204,6 +218,8 @@ def _grade(student, request, course, keep_raw_scores):
                         ]
                     ).exists()
 
+            # If we haven't seen a single problem in the section, we don't have
+            # to grade it at all! We can assume 0%
             if should_grade_section:
                 scores = []
 
@@ -217,7 +233,9 @@ def _grade(student, request, course, keep_raw_scores):
 
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
 
-                    (correct, total) = get_score(course.id, student, module_descriptor, create_module)
+                    (correct, total) = get_score(
+                        course.id, student, module_descriptor, create_module, scores_cache=submissions_scores
+                    )
                     if correct is None and total is None:
                         continue
 
@@ -331,6 +349,8 @@ def _progress_summary(student, request, course):
             # This student must not have access to the course.
             return None
 
+    submissions_scores = sub_api.get_scores(course.id, student.id)
+
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)
     for chapter_module in course_module.get_display_items():
@@ -353,7 +373,9 @@ def _progress_summary(student, request, course):
 
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_module, module_creator):
                     course_id = course.id
-                    (correct, total) = get_score(course_id, student, module_descriptor, module_creator)
+                    (correct, total) = get_score(
+                        course_id, student, module_descriptor, module_creator, scores_cache=submissions_scores
+                    )
                     if correct is None and total is None:
                         continue
 
@@ -383,7 +405,7 @@ def _progress_summary(student, request, course):
 
     return chapters
 
-def get_score(course_id, user, problem_descriptor, module_creator):
+def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=None):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
     e.g. (5,7) if you got 5 out of 7 points.
@@ -395,10 +417,17 @@ def get_score(course_id, user, problem_descriptor, module_creator):
     problem_descriptor: an XModuleDescriptor
     module_creator: a function that takes a descriptor, and returns the corresponding XModule for this user.
            Can return None if user doesn't have access, or if something else went wrong.
-    cache: A FieldDataCache
+    scores_cache: A dict of location names to (earned, possible) point tuples.
+           If an entry is found in this cache, it takes precedence.
     """
+    scores_cache = scores_cache or {}
+
     if not user.is_authenticated():
         return (None, None)
+
+    location_url = problem_descriptor.location.url()
+    if location_url in scores_cache:
+        return scores_cache[location_url]
 
     # some problems have state that is updated independently of interaction
     # with the LMS, so they need to always be scored. (E.g. foldit.)
