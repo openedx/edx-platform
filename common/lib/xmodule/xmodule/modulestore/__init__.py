@@ -348,15 +348,16 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_item_errors(self, location):
+    def get_course_errors(self, course_id):
         """
         Return a list of (msg, exception-or-None) errors that the modulestore
-        encountered when loading the item at location.
-
-        location : something that can be passed to Location
+        encountered when loading the course at course_id.
 
         Raises the same exceptions as get_item if the location isn't found or
         isn't fully specified.
+
+        Args:
+            course_id (:class:`.CourseKey`): The course to check for errors
         """
         pass
 
@@ -486,38 +487,23 @@ class ModuleStoreReadBase(ModuleStoreRead):
         '''
         Set up the error-tracking logic.
         '''
-        self._location_errors = {}  # location -> ErrorLog
+        self._course_errors = defaultdict(make_error_tracker)  # location -> ErrorLog
         self.metadata_inheritance_cache_subsystem = metadata_inheritance_cache_subsystem
         self.modulestore_update_signal = modulestore_update_signal
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
         self.xblock_select = xblock_select
 
-    def _get_errorlog(self, location):
+    def get_course_errors(self, course_id):
         """
-        If we already have an errorlog for this location, return it.  Otherwise,
-        create one.
-        """
-        location = Location(location)
-        if location not in self._location_errors:
-            self._location_errors[location] = make_error_tracker()
-        return self._location_errors[location]
-
-    def get_item_errors(self, location):
-        """
-        Return list of errors for this location, if any.  Raise the same
-        errors as get_item if location isn't present.
-
-        NOTE: For now, the only items that track errors are CourseDescriptors in
-        the xml datastore.  This will return an empty list for all other items
-        and datastores.
+        Return list of errors for this :class:`.CourseKey`, if any.  Raise the same
+        errors as get_item if course_id isn't present.
         """
         # check that item is present and raise the promised exceptions if needed
         # TODO (vshnayder): post-launch, make errors properties of items
         # self.get_item(location)
-
-        errorlog = self._get_errorlog(location)
-        return errorlog.errors
+        assert(isinstance(course_id, CourseKey))
+        return self._course_errors[course_id].errors
 
     def get_errored_courses(self):
         """

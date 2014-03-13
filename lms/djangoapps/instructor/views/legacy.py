@@ -216,7 +216,7 @@ def instructor_dashboard(request, course_id):
                 modulestore().try_load_course(data_dir)
                 msg += "<br/><p>Course reloaded from {0}</p>".format(data_dir)
                 track.views.server_track(request, "reload", {"directory": data_dir}, page="idashboard")
-                course_errors = modulestore().get_item_errors(course.location)
+                course_errors = modulestore().get_course_errors(course.id)
                 msg += '<ul>'
                 for cmsg, cerr in course_errors:
                     msg += "<li>{0}: <pre>{1}</pre>".format(cmsg, escape(cerr))
@@ -903,7 +903,7 @@ def instructor_dashboard(request, course_id):
 
         'problems': problems,		# psychometrics
         'plots': plots,			# psychometrics
-        'course_errors': modulestore().get_item_errors(course.location),
+        'course_errors': modulestore().get_course_errors(course.id),
         'instructor_tasks': instructor_tasks,
         'offline_grade_log': offline_grades_available(course_id),
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),

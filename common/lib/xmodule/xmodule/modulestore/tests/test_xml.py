@@ -58,8 +58,7 @@ class TestXMLModuleStore(unittest.TestCase):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'], load_error_modules=False)
 
         # Look up the errors during load. There should be none.
-        location = CourseDescriptor.id_to_location("edX/toy/2012_Fall")
-        errors = modulestore.get_item_errors(location)
+        errors = modulestore.get_course_errors(CourseKey.from_string("edX/toy/2012_Fall"))
         assert errors == []
 
     @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)
