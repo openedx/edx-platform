@@ -6,6 +6,7 @@ import os
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseDescriptor
 

@@ -56,19 +56,19 @@ class DraftModuleStore(MongoModuleStore):
     their children) to published modules.
     """
 
-    def get_item(self, location, depth=0):
+    def get_item(self, usage_key, depth=0):
         """
-        Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the item with the most
+        Returns an XModuleDescriptor instance for the item at usage_key.
+        If usage_key.revision is None, returns the item with the most
         recent revision
 
-        If any segment of the location is None except revision, raises
+        If any segment of the usage_key is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
 
-        If no object is found at that location, raises
+        If no object is found at that usage_key, raises
             xmodule.modulestore.exceptions.ItemNotFoundError
 
-        location: Something that can be passed to Location
+        usage_key: A :class:`.UsageKey` instance
 
         depth (int): An argument that some module stores may use to prefetch
             descendents of the queried modules for more efficient results later
@@ -77,20 +77,9 @@ class DraftModuleStore(MongoModuleStore):
         """
 
         try:
-            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(location), depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(usage_key), depth=depth))
         except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_item(location, depth=depth))
-
-    def get_instance(self, course_id, location, depth=0):
-        """
-        Get an instance of this location, with policy for course_id applied.
-        TODO (vshnayder): this may want to live outside the modulestore eventually
-        """
-
-        try:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location), depth=depth))
-        except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(usage_key, depth=depth))
 
     def create_xmodule(self, location, definition_data=None, metadata=None, system=None, fields={}):
         """

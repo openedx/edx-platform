@@ -305,7 +305,7 @@ def index(request, course_id, chapter=None, section=None,
 
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
             # which will prefetch the children more efficiently than doing a recursive load
-            section_descriptor = modulestore().get_instance(course.id, section_descriptor.location, depth=None)
+            section_descriptor = modulestore().get_item(section_descriptor.location, depth=None)
 
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
@@ -413,8 +413,9 @@ def jump_to(request, course_id, location):
     has access, and what they should see.
     """
     # Complain if there's not data for this location
+    raise Exception("NEED TO CREATE USAGE KEY")
     try:
-        (course_id, chapter, section, position) = path_to_location(modulestore(), course_id, location)
+        (course_id, chapter, section, position) = path_to_location(modulestore(), location)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(location))
     except NoPathToItem:

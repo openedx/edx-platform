@@ -198,7 +198,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         def inner_get_module(descriptor):
             if isinstance(descriptor, Location):
                 location = descriptor
-                descriptor = self.modulestore.get_instance(course.id, location, depth=None)
+                descriptor = self.modulestore.get_item(location, depth=None)
             descriptor.xmodule_runtime = get_test_system()
             descriptor.xmodule_runtime.get_module = inner_get_module
             return descriptor

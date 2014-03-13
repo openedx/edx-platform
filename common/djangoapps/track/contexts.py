@@ -2,6 +2,7 @@
 import logging
 
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.keys import CourseKey
 from util.request import COURSE_REGEX
 
 log = logging.getLogger(__name__)
