@@ -308,8 +308,9 @@ class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):
         """)
         self.clear_subs_content(youtube_subs)
 
-        # Check transcripts_utils.TranscriptsGenerationException not thrown
-        transcripts_utils.generate_subs_from_source(youtube_subs, 'srt', srt_filedata, self.course)
+        # Check transcripts_utils.TranscriptsGenerationException not thrown.
+        # Also checks that uppercase file extensions are supported.
+        transcripts_utils.generate_subs_from_source(youtube_subs, 'SRT', srt_filedata, self.course)
 
         # Check assets status after importing subtitles.
         for subs_id in youtube_subs.values():

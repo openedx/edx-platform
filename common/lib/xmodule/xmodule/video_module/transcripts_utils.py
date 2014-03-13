@@ -213,7 +213,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, langua
     :returns: True, if all subs are generated and saved successfully.
     """
     _ = item.runtime.service(item, "i18n").ugettext
-    if subs_type != 'srt':
+    if subs_type.lower() != 'srt':
         raise TranscriptsGenerationException(_("We support only SubRip (*.srt) transcripts format."))
     try:
         srt_subs_obj = SubRipFile.from_string(subs_filedata)
