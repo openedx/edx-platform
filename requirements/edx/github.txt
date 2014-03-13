@@ -26,3 +26,4 @@
 -e git+https://github.com/edx/bok-choy.git@62de7b576a08f36cde5b030c52bccb1a2f3f8df1#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@9965a53c269666a30bb4e2b3f6037c138aef2a55#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@459aff7b63db8f2c5decd1755706c1a64fb4ebb1#egg=acid-xblock
+-e git+https://github.com/edx/edx-ora2.git@87fd72f9927cd37e553d7f68cfaf80d6c574eb55#egg=edx-ora2

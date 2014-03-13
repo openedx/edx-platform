@@ -143,7 +143,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.check_components_on_page(
             ADVANCED_COMPONENT_TYPES,
             ['Word cloud', 'Annotation', 'Text Annotation', 'Video Annotation',
-             'Open Response Assessment', 'Peer Grading Interface'],
+             'Open Response Assessment', 'Peer Grading Interface', 'openassessment'],
         )
 
     def test_advanced_components_require_two_clicks(self):
