@@ -388,8 +388,6 @@ def jump_to_id(request, course_id, module_id):
     passed in. This assumes that id is unique within the course_id namespace
     """
 
-    course_location = CourseDescriptor.id_to_location(course_id)
-
     items = modulestore().get_items(
         Location('i4x', course_location.org, course_location.course, None, module_id),
         course_id=course_id

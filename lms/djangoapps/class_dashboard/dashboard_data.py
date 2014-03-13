@@ -136,7 +136,7 @@ def get_d3_problem_grade_distrib(course_id):
     d3_data = []
 
     # Retrieve course object down to problems
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
+    course = modulestore().get_course(course_id, depth=4)
 
     # Iterate through sections, subsections, units, problems
     for section in course.get_children():
@@ -222,7 +222,7 @@ def get_d3_sequential_open_distrib(course_id):
     d3_data = []
 
     # Retrieve course object down to subsection
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
+    course = modulestore().get_course(course_id, depth=2)
 
     # Iterate through sections, subsections
     for section in course.get_children():
@@ -288,7 +288,7 @@ def get_d3_section_grade_distrib(course_id, section):
     """
 
     # Retrieve course object down to problems
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
+    course = modulestore().get_course(course_id, depth=4)
 
     problem_set = []
     problem_info = {}
@@ -360,7 +360,7 @@ def get_section_display_name(course_id):
     The ith string in the array is the display name of the ith section in the course.
     """
 
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
+    course = modulestore().get_course(course_id, depth=4)
 
     section_display_name = [""] * len(course.get_children())
     i = 0
@@ -380,7 +380,7 @@ def get_array_section_has_problem(course_id):
     The ith value in the array is true if the ith section in the course contains problems and false otherwise.
     """
 
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
+    course = modulestore().get_course(course_id, depth=4)
 
     b_section_has_problem = [False] * len(course.get_children())
     i = 0

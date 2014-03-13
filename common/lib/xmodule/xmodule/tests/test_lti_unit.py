@@ -269,7 +269,6 @@ class LTIModuleTest(LogicTest):
             self.assertEqual(real_lis_result_sourcedid, expected_sourcedId)
 
 
-    @patch('xmodule.course_module.CourseDescriptor.id_to_location')
     def test_client_key_secret(self, test):
         """
         LTI module gets client key and secret provided.
@@ -285,7 +284,6 @@ class LTIModuleTest(LogicTest):
         expected = ('test_client', 'test_secret')
         self.assertEqual(expected, (key, secret))
 
-    @patch('xmodule.course_module.CourseDescriptor.id_to_location')
     def test_client_key_secret_not_provided(self, test):
         """
         LTI module attempts to get client key and secret provided in cms.
@@ -305,7 +303,6 @@ class LTIModuleTest(LogicTest):
         expected = ('','')
         self.assertEqual(expected, key_secret)
 
-    @patch('xmodule.course_module.CourseDescriptor.id_to_location')
     def test_bad_client_key_secret(self, test):
         """
         LTI module attempts to get client key and secret provided in cms.
