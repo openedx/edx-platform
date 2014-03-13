@@ -157,6 +157,22 @@ class GetItem(ItemTest):
              '<span class="action-button-text">View</span>')
         )
 
+    def test_split_test(self):
+        """
+        Test that a split_test module renders all of its children in Studio.
+        """
+        root_locator = self._create_vertical()
+        resp = self.create_xblock(category='split_test', parent_locator=root_locator)
+        self.assertEqual(resp.status_code, 200)
+        split_test_locator = self.response_locator(resp)
+        resp = self.create_xblock(parent_locator=split_test_locator, category='html', boilerplate='announcement.yaml')
+        self.assertEqual(resp.status_code, 200)
+        resp = self.create_xblock(parent_locator=split_test_locator, category='html', boilerplate='zooming_image.yaml')
+        self.assertEqual(resp.status_code, 200)
+        html, __ = self._get_container_preview(split_test_locator)
+        self.assertIn('Announcement', html)
+        self.assertIn('Zooming', html)
+
 
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
