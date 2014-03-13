@@ -121,7 +121,7 @@ def _clone_modules(modulestore, modules, source_course_id, dest_course_id):
 def clone_course(modulestore, contentstore, source_course_id, dest_course_id, delete_original=False):
     # check to see if the dest_location exists as an empty course
     # we need an empty course because the app layers manage the permissions and users
-    if not modulestore.has_item(dest_course_id, qualifiers={'category': 'course'}):
+    if not modulestore.has_course(dest_course_id):
         raise Exception("An empty course at {0} must have already been created. Aborting...".format(dest_course_id))
 
     # verify that the dest_location really is an empty course, which means only one with an optional 'overview'
@@ -140,7 +140,7 @@ def clone_course(modulestore, contentstore, source_course_id, dest_course_id, de
         raise Exception("Course at destination {0} is not an empty course. You can only clone into an empty course. Aborting...".format(dest_location))
 
     # check to see if the source course is actually there
-    if not modulestore.has_item(source_course_id, qualifiers={'category': 'course'}):
+    if not modulestore.has_course(source_course_id):
         raise Exception("Cannot find a course at {0}. Aborting".format(source_course_id))
 
     # Get all modules under this namespace which is (tag, org, course) tuple
@@ -214,7 +214,7 @@ def delete_course(modulestore, contentstore, source_location, commit=False):
     """
 
     # check to see if the source course is actually there
-    if not modulestore.has_item(source_location.course_id, source_location):
+    if not modulestore.has_course(source_location.course_id):
         raise Exception("Cannot find a course at {0}. Aborting".format(source_location))
 
     # first delete all of the thumbnails

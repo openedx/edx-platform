@@ -295,9 +295,9 @@ class ModuleStoreRead(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def has_item(self, course_id, location):
+    def has_item(self, usage_key):
         """
-        Returns True if location exists in this ModuleStore.
+        Returns True if usage_key exists in this ModuleStore.
         """
         pass
 

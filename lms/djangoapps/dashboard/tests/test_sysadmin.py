@@ -363,13 +363,8 @@ class TestSysadmin(SysadminBaseTestCase):
         self._add_edx4edx()
 
         def_ms = modulestore()
-<<<<<<< HEAD
-        course = def_ms.get_course('MITx/edx4edx/edx4edx')
-        CourseStaffRole(course.id).add_users(self.user)
-=======
         course = def_ms.get_course(CourseKey.from_string('MITx/edx4edx/edx4edx'))
-        CourseStaffRole(course.location).add_users(self.user)
->>>>>>> Move more course_id/location conversions over
+        CourseStaffRole(course.id).add_users(self.user)
 
         response = self.client.post(reverse('sysadmin_staffing'),
                                     {'action': 'get_staff_csv', })

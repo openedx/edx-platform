@@ -562,13 +562,12 @@ class MongoModuleStore(ModuleStoreWriteBase):
         except ItemNotFoundError:
             return None
 
-    def has_item(self, course_id, location):
+    def has_item(self, usage_key):
         """
         Returns True if location exists in this ModuleStore.
         """
-        location = Location.ensure_fully_specified(location)
         try:
-            self._find_one(location)
+            self._find_one(usage_key)
             return True
         except ItemNotFoundError:
             return False

@@ -69,15 +69,15 @@ class MixedModuleStore(ModuleStoreWriteBase):
         mapping = self.mappings.get(course_id, 'default')
         return self.modulestores[mapping]
 
-    def has_item(self, course_id, reference):
+    def has_item(self, usage_key):
         """
         Does the course include the xblock who's id is reference?
 
         :param course_id: a course_id or package_id (slashed or dotted)
         :param reference: a Location or BlockUsageLocator
         """
-        store = self._get_modulestore_for_courseid(course_id)
-        return store.has_item(course_id, reference)
+        store = self._get_modulestore_for_courseid(usage_key.course_key)
+        return store.has_item(usage_key)
 
     def get_item(self, location, depth=0):
         """
