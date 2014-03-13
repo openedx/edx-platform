@@ -404,7 +404,7 @@ class ImportTestCase(BaseCourseTestCase):
         course_id = course.id
 
         print("course errors:")
-        for (msg, err) in modulestore.get_item_errors(course.location):
+        for (msg, err) in modulestore.get_course_errors(course.id):
             print(msg)
             print(err)
 
@@ -444,7 +444,7 @@ class ImportTestCase(BaseCourseTestCase):
         expect = "Invalid characters"
         errors = [(msg.encode("utf-8"), err.encode("utf-8"))
                     for msg, err in
-                    modulestore.get_item_errors(course.location)]
+                    modulestore.get_course_errors(course.id)]
 
         self.assertTrue(any(expect in msg or expect in err
             for msg, err in errors))
