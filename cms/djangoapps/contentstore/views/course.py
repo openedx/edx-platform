@@ -23,14 +23,16 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
 
-from xmodule.modulestore.exceptions import (
-    ItemNotFoundError, InvalidLocationError)
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore import Location
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
-    get_lms_link_for_item, add_extra_panel_tab, remove_extra_panel_tab,
-    get_modulestore)
+    get_lms_link_for_item,
+    add_extra_panel_tab,
+    remove_extra_panel_tab,
+    get_modulestore
+)
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 
 from models.settings.course_grading import CourseGradingModel
@@ -41,16 +43,20 @@ from util.string_utils import _has_non_ascii_characters
 from .access import has_course_access
 from .tabs import initialize_course_tabs
 from .component import (
-    OPEN_ENDED_COMPONENT_TYPES, NOTE_COMPONENT_TYPES,
-    ADVANCED_COMPONENT_POLICY_KEY)
+    OPEN_ENDED_COMPONENT_TYPES,
+    NOTE_COMPONENT_TYPES,
+    ADVANCED_COMPONENT_POLICY_KEY
+)
 
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 
 from student.models import CourseEnrollment
+from student.roles import CourseRole
 
 from xmodule.html_module import AboutDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
+from xmodule.modulestore.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff
@@ -320,7 +326,7 @@ def create_new_course(request):
             )
 
     try:
-        dest_location = Location(u'i4x', org, number, u'course', run)
+        course_key = SlashSeparatedCourseKey(org, number, run)
     except InvalidLocationError as error:
         return JsonResponse({
             "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(
@@ -329,9 +335,10 @@ def create_new_course(request):
     # see if the course already exists
     existing_course = None
     try:
-        existing_course = modulestore('direct').get_item(dest_location)
-    except ItemNotFoundError:
+        existing_course = modulestore('direct').get_course(course_key)
+    except InsufficientSpecificationError:
         pass
+
     if existing_course is not None:
         return JsonResponse({
             'ErrMsg': _(
@@ -350,19 +357,33 @@ def create_new_course(request):
             ),
         })
 
-    # dhm: this query breaks the abstraction, but I'll fix it when I do my suspended refactoring of this
-    # file for new locators. get_items should accept a query rather than requiring it be a legal location
-    course_search_location = bson.son.SON({
-        '_id.tag': 'i4x',
-        # cannot pass regex to Location constructor; thus this hack
-        # pylint: disable=E1101
-        '_id.org': re.compile(u'^{}$'.format(dest_location.org), re.IGNORECASE | re.UNICODE),
-        # pylint: disable=E1101
-        '_id.course': re.compile(u'^{}$'.format(dest_location.course), re.IGNORECASE | re.UNICODE),
-        '_id.category': 'course',
-    })
-    courses = modulestore().collection.find(course_search_location, fields=('_id'))
-    if courses.count() > 0:
+    # instantiate the CourseDescriptor and then persist it
+    # note: no system to pass
+    if display_name is None:
+        metadata = {}
+    else:
+        metadata = {'display_name': display_name}
+
+    # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
+    # existing xml courses this cannot be changed in CourseDescriptor.
+    ## TODO get rid of defining wiki slug in this org/course/name specific way
+    wiki_slug = "{0}.{1}.{2}".format(org, course, name)
+    definition_data = {'wiki_slug': wiki_slug}
+
+    # Create the course then fetch it from the modulestore
+    try:
+        # Check if role permissions group for a course named like this already exists
+        # Important because role groups are case insensitive
+        if CourseRole.course_group_already_exists(course_key):
+            raise InvalidLocationError()
+
+        # Creating the course raises InvalidLocationError if an existing course with this org/name is found
+        modulestore('direct').create_course(
+            course_key,
+            definition_data=definition_data,
+            metadata=metadata
+        )
+    except InvalidLocationError:
         return JsonResponse({
             'ErrMsg': _(
                 'There is already a course defined with the same '
@@ -376,36 +397,7 @@ def create_new_course(request):
                 'course number so that it is unique.'),
         })
 
-    # instantiate the CourseDescriptor and then persist it
-    # note: no system to pass
-    if display_name is None:
-        metadata = {}
-    else:
-        metadata = {'display_name': display_name}
-
-    # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for existing xml courses this
-    # cannot be changed in CourseDescriptor.
-    wiki_slug = "{0}.{1}.{2}".format(dest_location.org, dest_location.course, dest_location.name)
-    definition_data = {'wiki_slug': wiki_slug}
-
-    modulestore('direct').create_and_save_xmodule(
-        dest_location,
-        definition_data=definition_data,
-        metadata=metadata
-    )
-    new_course = modulestore('direct').get_item(dest_location)
-
-    # clone a default 'about' overview module as well
-    dest_about_location = dest_location.replace(
-        category='about',
-        name='overview'
-    )
-    overview_template = AboutDescriptor.get_template('overview.yaml')
-    modulestore('direct').create_and_save_xmodule(
-        dest_about_location,
-        system=new_course.system,
-        definition_data=overview_template.get('data')
-    )
+    new_course = modulestore('direct').get_course(course_key)
 
     initialize_course_tabs(new_course, request.user)
 

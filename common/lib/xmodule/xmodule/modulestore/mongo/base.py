@@ -26,12 +26,13 @@ from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
+from xmodule.html_module import AboutDescriptor
 from xblock.runtime import KvsFieldData
-from xblock.exceptions import InvalidScopeError
+from xblock.exceptions import InvalidScopeError, InvalidLocationError
 from xblock.fields import Scope, ScopeIds
 
 from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xmodule.modulestore.xml import LocationReader
 from xblock.core import XBlock
@@ -616,6 +617,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
     def create_course(self, course_id, definition_data=None, metadata=None, runtime=None):
         """
         Create a course with the given course_id.
+        Raises InvalidLocationError if an existing course with this org/name is found.
         """
         if isinstance(course_id, Location):
             location = course_id
@@ -623,7 +625,37 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 raise ValueError(u"Course roots must be of category 'course': {}".format(unicode(location)))
         else:
             location = Location('i4x', course_id.org, course_id.course, 'course', course_id.run)
-        return self.create_and_save_xmodule(location, definition_data, metadata, runtime)
+
+        # Check if a course with this org/run has been defined before
+        # dhm: this query breaks the abstraction, but I'll fix it when I do my suspended refactoring of this
+        # file for new locators. get_items should accept a query rather than requiring it be a legal location
+        course_search_location = bson.son.SON({
+            '_id.tag': 'i4x',
+            # cannot pass regex to Location constructor; thus this hack
+            # pylint: disable=E1101
+            '_id.org': course_id.org,
+            # pylint: disable=E1101
+            '_id.course': course_id.course,
+            '_id.category': 'course',
+        })
+        courses = modulestore().collection.find(course_search_location, fields=('_id'))
+        if courses.count() > 0:
+            raise InvalidLocationError()
+        course = self.create_and_save_xmodule(location, definition_data, metadata, runtime)
+
+        # clone a default 'about' overview module as well
+        about_location = location.replace(
+            category='about',
+            name='overview'
+        )
+        overview_template = AboutDescriptor.get_template('overview.yaml')
+        self.create_and_save_xmodule(
+            about_location,
+            system=course.system,
+            definition_data=overview_template.get('data')
+        )
+
+        return course
 
     def create_xmodule(self, location, definition_data=None, metadata=None, system=None, fields={}):
         """
