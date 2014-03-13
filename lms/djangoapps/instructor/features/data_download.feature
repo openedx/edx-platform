@@ -7,11 +7,21 @@ Feature: LMS.Instructor Dash Data Download
     ### todos when more time can be spent on instructor dashboard
     #Scenario: Download profile information as a CSV
     #Scenario: Download student anonymized IDs as a CSV
+    ## Need to figure out how to assert csvs will download without actually downloading them
 
     Scenario: List enrolled students' profile information
        Given I am "<Role>" for a course
        When I click "List enrolled students' profile information"
        Then I see a table of student profiles
+       Examples:
+       | Role          |
+       | instructor    |
+       | staff         |
+
+    Scenario: List enrolled students' profile information for a large course
+       Given I am "<Role>" for a very large course
+       When I visit the "Data Download" tab
+       Then I do not see a button to 'List enrolled students' profile information'
        Examples:
        | Role          |
        | instructor    |

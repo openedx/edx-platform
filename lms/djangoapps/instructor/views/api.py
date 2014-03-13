@@ -23,10 +23,12 @@ from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
 from django.contrib.auth.models import User
 from django_comment_client.utils import has_forum_access
-from django_comment_common.models import (Role,
-                                          FORUM_ROLE_ADMINISTRATOR,
-                                          FORUM_ROLE_MODERATOR,
-                                          FORUM_ROLE_COMMUNITY_TA)
+from django_comment_common.models import (
+    Role,
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+)
 
 from courseware.models import StudentModule
 from student.models import unique_id_for_user
