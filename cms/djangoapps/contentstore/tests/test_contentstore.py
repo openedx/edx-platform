@@ -29,10 +29,12 @@ from xmodule.modulestore import Location, mongo
 from xmodule.modulestore.store_utilities import clone_course
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.keys import CourseKey
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
 
@@ -782,7 +784,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # get a vertical (and components in it) to put into 'draft'
         # this is to assert that draft content is also cloned over
-        vertical = module_store.get_instance(
+        vertical = module_store.get_item(
             source_course_id.make_usage_key('vertical', 'vertical_test'),
             depth=1
         )
@@ -816,7 +818,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertGreater(len(clone_items), 0)
 
         for descriptor in items:
-            source_item = module_store.get_instance(source_course_id, descriptor.location)
+            source_item = module_store.get_item(descriptor.location)
             new_loc = descriptor.location.map_into_course(dest_course_id)
             print "Checking {0} should now also be at {1}".format(descriptor.location, new_loc)
             lookup_item = module_store.get_item(new_loc)
@@ -855,14 +857,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # let's force a non-portable link in the clone source
         # as a final check, make sure that any non-portable links are rewritten during cloning
-        html_module = module_store.get_instance(source_course_id.make_usage_key('html', 'nonportable'))
+        html_module = module_store.get_item(source_course_id.make_usage_key('html', 'nonportable'))
 
         self.assertIsInstance(html_module.data, basestring)
         new_data = html_module.data = html_module.data.replace('/static/', '/c4x/{0}/{1}/asset/'.format(
             source_course_id.org, source_course_id.run))
         module_store.update_item(html_module, self.user.id)
 
-        html_module = module_store.get_instance(html_module.location)
+        html_module = module_store.get_item(html_module.location)
         self.assertEqual(new_data, html_module.data)
 
         # create the destination course
@@ -872,7 +874,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         clone_course(module_store, content_store, source_course_id, dest_course_id)
 
         # make sure that any non-portable links are rewritten during cloning
-        html_module = module_store.get_instance(dest_course_id.make_usage_key('html', 'nonportable'))
+        html_module = module_store.get_item(dest_course_id.make_usage_key('html', 'nonportable'))
 
         self.assertIn('/static/foo.jpg', html_module.data)
 
@@ -887,7 +889,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertRaises(InvalidVersionError, draft_store.create_and_save_xmodule, location)
         direct_store.create_and_save_xmodule(location)
         self.assertRaises(InvalidVersionError, draft_store.convert_to_draft, location)
-        chapter = draft_store.get_instance(course.id, location)
+        chapter = draft_store.get_item(location)
         chapter.data = 'chapter data'
 
         with self.assertRaises(InvalidVersionError):
@@ -908,12 +910,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # first check a static asset link
         html_module_location = Location(['i4x', 'edX', 'toy', 'html', 'nonportable'])
-        html_module = module_store.get_instance('edX/toy/2012_Fall', html_module_location)
+        html_module = module_store.get_item(html_module_location)
         self.assertIn('/static/foo.jpg', html_module.data)
 
         # then check a intra courseware link
         html_module_location = Location(['i4x', 'edX', 'toy', 'html', 'nonportable_link'])
-        html_module = module_store.get_instance('edX/toy/2012_Fall', html_module_location)
+        html_module = module_store.get_item(html_module_location)
         self.assertIn('/jump_to_id/nonportable_link', html_module.data)
 
     def test_delete_course(self):
@@ -1241,15 +1243,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, root_dir)
 
         # get the sample HTML with styling information
-        html_module = module_store.get_instance(
-            'edX/toy/2012_Fall',
+        html_module = module_store.get_item(
             Location('i4x', 'edX', 'toy', 'html', 'with_styling')
         )
         self.assertIn('<p style="font:italic bold 72px/30px Georgia, serif; color: red; ">', html_module.data)
 
         # get the sample HTML with just a simple <img> tag information
-        html_module = module_store.get_instance(
-            'edX/toy/2012_Fall',
+        html_module = module_store.get_item(
             Location('i4x', 'edX', 'toy', 'html', 'just_img')
         )
         self.assertIn('<img src="/static/foo_bar.jpg" />', html_module.data)
@@ -1747,12 +1747,12 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # Import a course with wiki_slug == location.course
         import_from_xml(module_store, 'common/test/data/', ['toy'], target_course_id=target_location)
-        course_module = module_store.get_instance(target_location.course_id, target_location)
+        course_module = module_store.get_item(target_location)
         self.assertEquals(course_module.wiki_slug, 'MITx.999.2013_Spring')
 
         # Now try importing a course with wiki_slug == '{0}{1}{2}'.format(location.org, location.course, location.name)
         import_from_xml(module_store, 'common/test/data/', ['two_toys'], target_course_id=target_location)
-        course_module = module_store.get_instance(target_course_id, target_location)
+        course_module = module_store.get_item(target_location)
         self.assertEquals(course_module.wiki_slug, 'MITx.999.2013_Spring')
 
     def test_import_metadata_with_attempts_empty_string(self):

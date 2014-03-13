@@ -36,6 +36,7 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.keys import CourseKey
 from xmodule.util.duedate import get_extended_due_date
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_debug_info, wrap_xblock
 from xmodule.lti_module import LTIModule
@@ -127,7 +128,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     return chapters
 
 
-def get_module(user, request, location, field_data_cache, course_id,
+def get_module(user, request, usage_key, field_data_cache,
                position=None, not_found_ok=False, wrap_xmodule_display=True,
                grade_bucket_type=None, depth=0,
                static_asset_path=''):
@@ -157,8 +158,8 @@ def get_module(user, request, location, field_data_cache, course_id,
     if possible.  If not possible, return None.
     """
     try:
-        descriptor = modulestore().get_instance(course_id, location, depth=depth)
-        return get_module_for_descriptor(user, request, descriptor, field_data_cache, course_id,
+        descriptor = modulestore().get_instance(usage_key, depth=depth)
+        return get_module_for_descriptor(user, request, descriptor, field_data_cache, usage_key.course_key,
                                          position=position,
                                          wrap_xmodule_display=wrap_xmodule_display,
                                          grade_bucket_type=grade_bucket_type,
@@ -457,15 +458,17 @@ def find_target_student_module(request, user_id, course_id, mod_id):
     """
     Retrieve target StudentModule
     """
+    course_id = CourseKey.from_string(course_id)
+    usage_key = UsageKey.from_string(mod_id)
     user = User.objects.get(id=user_id)
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
         user,
-        modulestore().get_instance(course_id, mod_id),
+        modulestore().get_item(usage_key),
         depth=0,
         select_for_update=True
     )
-    instance = get_module(user, request, mod_id, field_data_cache, course_id, grade_bucket_type='xqueue')
+    instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue')
     if instance is None:
         msg = "No module {0} for user {1}--access denied?".format(mod_id, user)
         log.debug(msg)
@@ -564,10 +567,10 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     Invoke an XBlock handler, either authenticated or not.
 
     """
-    location = unquote_slashes(usage_id)
+    usage_key = UsageKey.from_string(usage_id)
 
     # Check parameters and fail fast if there's a problem
-    if not Location.is_valid(location):
+    if not Location.is_valid(usage_key):
         raise Http404("Invalid location")
 
     # Check submitted files
@@ -577,12 +580,12 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         return HttpResponse(json.dumps({'success': error_msg}))
 
     try:
-        descriptor = modulestore().get_instance(course_id, location)
+        descriptor = modulestore().get_item(usage_key)
     except ItemNotFoundError:
         log.warn(
-            "Invalid location for course id {course_id}: {location}".format(
-                course_id=course_id,
-                location=location
+            "Invalid location for course id {course_id}: {usage_key}".format(
+                course_id=usage_key.course_key,
+                usage_key=usage_key
             )
         )
         raise Http404
@@ -599,11 +602,11 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         user,
         descriptor
     )
-    instance = get_module(user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
+    instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module %s for user %s -- access denied?", location, user)
+        log.debug("No module %s for user %s -- access denied?", usage_key, user)
         raise Http404
 
     req = django_to_webob_request(request)

@@ -25,6 +25,7 @@ from dashboard.git_import import GitImportError
 from external_auth.models import ExternalAuthMap
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml import XMLModuleStore
 

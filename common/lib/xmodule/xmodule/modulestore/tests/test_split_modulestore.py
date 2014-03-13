@@ -347,7 +347,7 @@ class SplitModuleItemTests(SplitModuleTest):
         block = modulestore().get_item(locator)
         self.assertIsInstance(block, CourseDescriptor)
         # get_instance just redirects to get_item, ignores package_id
-        self.assertIsInstance(modulestore().get_instance("package_id", locator), CourseDescriptor)
+        self.assertIsInstance(modulestore().get_item(locator), CourseDescriptor)
 
         def verify_greek_hero(block):
             self.assertEqual(block.location.package_id, "GreekHero")
@@ -364,8 +364,6 @@ class SplitModuleItemTests(SplitModuleTest):
 
         locator = BlockUsageLocator(package_id='GreekHero', block_id='head12345', branch='draft')
         verify_greek_hero(modulestore().get_item(locator))
-        # get_instance just redirects to get_item, ignores package_id
-        verify_greek_hero(modulestore().get_instance("package_id", locator))
 
         # try to look up other branches
         self.assertRaises(ItemNotFoundError,

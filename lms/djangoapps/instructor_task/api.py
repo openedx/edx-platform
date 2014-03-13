@@ -112,7 +112,7 @@ def submit_rescore_problem_for_all_students(request, course_id, problem_url):
     return submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
 
-def submit_reset_problem_attempts_for_all_students(request, course_id, problem_url):
+def submit_reset_problem_attempts_for_all_students(request, usage_key):
     """
     Request to have attempts reset for a problem as a background task.
 
@@ -134,7 +134,7 @@ def submit_reset_problem_attempts_for_all_students(request, course_id, problem_u
     # check arguments:  make sure that the problem_url is defined
     # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
     # an exception will be raised.  Let it pass up to the caller.
-    modulestore().get_instance(course_id, problem_url)
+    modulestore().get_item(usage_key)
 
     task_type = 'reset_problem_attempts'
     task_class = reset_problem_attempts

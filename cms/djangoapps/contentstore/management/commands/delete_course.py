@@ -4,6 +4,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from .prompt import query_yes_no
 from contentstore.utils import delete_course_and_groups
+from xmodule.modulestore.keys import CourseKey
 
 
 #

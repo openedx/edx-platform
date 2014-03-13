@@ -27,6 +27,7 @@ from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.keys import CourseKey
 from xmodule.exceptions import SerializationError
 
 from xmodule.modulestore.locator import BlockUsageLocator
@@ -326,13 +327,13 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
             logging.debug('tar file being generated at {0}'.format(export_file.name))
             with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
                 tar_file.add(root_dir / name, arcname=name)
-        except SerializationError, e:
+        except SerializationError as e:
             logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
             unit = None
             failed_item = None
             parent = None
             try:
-                failed_item = modulestore().get_instance(course_module.location.course_id, e.location)
+                failed_item = modulestore().get_item(e.location)
                 parent_locs = modulestore().get_parent_locations(failed_item.location, course_module.location.course_id)
 
                 if len(parent_locs) > 0:

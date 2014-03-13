@@ -187,23 +187,16 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
     @ddt.data('direct', 'split')
     def test_get_item(self, default_ms):
         self.initdb(default_ms)
-        with self.assertRaises(NotImplementedError):
-            self.store.get_item(self.fake_location)
-
-    @ddt.data('direct', 'split')
-    def test_get_instance(self, default_ms):
-        self.initdb(default_ms)
         for course_id, course_locn in self.course_locations.iteritems():
-            self.assertIsNotNone(self.store.get_instance(course_id, course_locn))
+            self.assertIsNotNone(self.store.get_item(course_locn))
 
         # try negative cases
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_instance(
-                self.XML_COURSEID1,
+            self.store.get_item(
                 self.course_locations[self.XML_COURSEID1].replace(name='not_findable', category='problem')
             )
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_instance(self.MONGO_COURSEID, self.fake_location)
+            self.store.get_item(self.fake_location)
 
     @ddt.data('direct', 'split')
     def test_get_items(self, default_ms):
@@ -251,7 +244,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.store.delete_item(self.import_chapter_location, '**replace_user**')
         # verify it's gone
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_instance(self.MONGO_COURSEID, self.import_chapter_location)
+            self.store.get_item(self.import_chapter_location)
 
     @ddt.data('direct', 'split')
     def test_get_courses(self, default_ms):

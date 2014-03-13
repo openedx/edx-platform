@@ -6,7 +6,7 @@ that are stored in a database an accessible using their Location as an identifie
 import logging
 import re
 
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 import collections
 
 from abc import ABCMeta, abstractmethod
@@ -14,6 +14,7 @@ from xblock.plugin import default_select
 
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
+from xmodule.modulestore.keys import CourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
 
@@ -302,7 +303,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_item(self, location, depth=0):
+    def get_item(self, usage_key, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
 
@@ -312,20 +313,12 @@ class ModuleStoreRead(object):
         If no object is found at that location, raises
             xmodule.modulestore.exceptions.ItemNotFoundError
 
-        location: Something that can be passed to Location
+        usage_key: A :class:`.UsageKey` subclass instance
 
         depth (int): An argument that some module stores may use to prefetch
             descendents of the queried modules for more efficient results later
             in the request. The depth is counted in the number of calls to
             get_children() to cache. None indicates to cache all descendents
-        """
-        pass
-
-    @abstractmethod
-    def get_instance(self, course_id, location, depth=0):
-        """
-        Get an instance of this location, with policy for course_id applied.
-        TODO (vshnayder): this may want to live outside the modulestore eventually
         """
         pass
 

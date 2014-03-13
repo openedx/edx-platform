@@ -98,10 +98,9 @@ def find_peer_grading_module(course):
     items = [i for i in items if not getattr(i, "use_for_single_location", True)]
     # Loop through all potential peer grading modules, and find the first one that has a path to it.
     for item in items:
-        item_location = item.location
         # Generate a url for the first module and redirect the user to it.
         try:
-            problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
+            problem_url_parts = search.path_to_location(modulestore(), item.location)
         except NoPathToItem:
             # In the case of nopathtoitem, the peer grading module that was found is in an invalid state, and
             # can no longer be accessed.  Log an informational message, but this will not impact normal behavior.

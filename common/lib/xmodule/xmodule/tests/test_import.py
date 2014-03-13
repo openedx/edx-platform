@@ -387,8 +387,8 @@ class ImportTestCase(BaseCourseTestCase):
         two_toy_id = "edX/toy/TT_2012_Fall"
 
         location = Location(["i4x", "edX", "toy", "video", "Welcome"])
-        toy_video = modulestore.get_instance(toy_id, location)
-        two_toy_video = modulestore.get_instance(two_toy_id, location)
+        toy_video = modulestore.get_item(location)
+        two_toy_video = modulestore.get_item(location)
         self.assertEqual(toy_video.youtube_id_1_0, "p2Q6BrNhdh8")
         self.assertEqual(two_toy_video.youtube_id_1_0, "p2Q6BrNhdh9")
 
@@ -416,13 +416,13 @@ class ImportTestCase(BaseCourseTestCase):
 
         print("Ch2 location: ", ch2.location)
 
-        also_ch2 = modulestore.get_instance(course_id, ch2.location)
+        also_ch2 = modulestore.get_item(ch2.location)
         self.assertEquals(ch2, also_ch2)
 
         print("making sure html loaded")
         cloc = course.location
         loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
-        html = modulestore.get_instance(course_id, loc)
+        html = modulestore.get_item(loc)
         self.assertEquals(html.display_name, "Toy lab")
 
     def test_unicode(self):
@@ -490,14 +490,14 @@ class ImportTestCase(BaseCourseTestCase):
             location.tag, location.org, location.course,
             'conditional', 'condone'
         )
-        module = modulestore.get_instance(course.id, conditional_location)
+        module = modulestore.get_item(conditional_location)
         self.assertEqual(len(module.children), 1)
 
         poll_location = Location(
             location.tag, location.org, location.course,
             'poll_question', 'first_poll'
         )
-        module = modulestore.get_instance(course.id, poll_location)
+        module = modulestore.get_item(poll_location)
         self.assertEqual(len(module.get_children()), 0)
         self.assertEqual(module.voted, False)
         self.assertEqual(module.poll_answer, '')
@@ -529,7 +529,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         sa_id = "edX/gst_test/2012_Fall"
         location = Location(["i4x", "edX", "gst_test", "graphical_slider_tool", "sample_gst"])
-        gst_sample = modulestore.get_instance(sa_id, location)
+        gst_sample = modulestore.get_item(location)
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
@@ -550,7 +550,7 @@ class ImportTestCase(BaseCourseTestCase):
             location.tag, location.org, location.course,
             'word_cloud', 'cloud1'
         )
-        module = modulestore.get_instance(course.id, location)
+        module = modulestore.get_item(location)
         self.assertEqual(len(module.get_children()), 0)
         self.assertEqual(module.num_inputs, 5)
         self.assertEqual(module.num_top_words, 250)

@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.xml_importer import check_module_metadata_editability
 from xmodule.course_module import CourseDescriptor
 

@@ -283,7 +283,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         vertical = ItemFactory(category='vertical', parent_location=section.location)
         ItemFactory(category='problem', parent_location=vertical.location)
 
-        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        course = modulestore().get_course(course.id)  # pylint: disable=no-member
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
         return course
 
@@ -392,7 +392,7 @@ class StartDateTests(ModuleStoreTestCase):
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
         course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
-        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        course = modulestore().get_course(course.id)  # pylint: disable=no-member
         return course
 
     def get_about_text(self, course_id):

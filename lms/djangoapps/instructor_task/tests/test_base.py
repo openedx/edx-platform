@@ -208,7 +208,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
                         'num_responses': 2}
         problem_xml = factory.build_xml(**factory_args)
         location = InstructorTaskTestCase.problem_location(problem_url_name)
-        item = self.module_store.get_instance(self.course.id, location)
+        item = self.module_store.get_instance(location)
         item.data = problem_xml
         self.module_store.update_item(item, '**replace_user**')
 

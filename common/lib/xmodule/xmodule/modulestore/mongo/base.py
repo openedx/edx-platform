@@ -28,7 +28,7 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.html_module import AboutDescriptor
 from xblock.runtime import KvsFieldData
-from xblock.exceptions import InvalidScopeError, InvalidLocationError
+from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds
 
 from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
@@ -575,7 +575,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         except ItemNotFoundError:
             return False
 
-    def get_item(self, location, depth=0):
+    def get_item(self, usage_key, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
 
@@ -584,28 +584,15 @@ class MongoModuleStore(ModuleStoreWriteBase):
         If no object is found at that location, raises
             xmodule.modulestore.exceptions.ItemNotFoundError
 
-        location: a Location object
+        usage_key: a :class:`.UsageKey` instance
         depth (int): An argument that some module stores may use to prefetch
             descendents of the queried modules for more efficient results later
             in the request. The depth is counted in the number of
             calls to get_children() to cache. None indicates to cache all descendents.
         """
-        location = Location.ensure_fully_specified(location)
-        item = self._find_one(location)
+        item = self._find_one(usage_key)
         module = self._load_items([item], depth)[0]
         return module
-
-    def get_instance(self, course_id, location, depth=0):
-        """
-        TODO (vshnayder): implement policy tracking in mongo.
-        For now, just delegate to get_item and ignore policy.
-
-        depth (int): An argument that some module stores may use to prefetch
-            descendents of the queried modules for more efficient results later
-            in the request. The depth is counted in the number of
-            calls to get_children() to cache. None indicates to cache all descendents.
-        """
-        return self.get_item(location, depth=depth)
 
     def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         items = self.collection.find(

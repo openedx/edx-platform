@@ -205,7 +205,7 @@ class ModuleStoreTestCase(TestCase):
         """
         store = editable_modulestore()
         store.update_item(course, '**replace_user**')
-        updated_course = store.get_instance(course.id, course.location)
+        updated_course = store.get_course(course.id)
         return updated_course
 
     @staticmethod

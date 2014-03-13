@@ -10,6 +10,7 @@ from mock import patch
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
+from xmodule.modulestore.keys import CourseKey
 
 from .test_modulestore import check_path_to_location
 from xmodule.tests import DATA_DIR

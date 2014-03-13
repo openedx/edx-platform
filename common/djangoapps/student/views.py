@@ -50,6 +50,7 @@ from dark_lang.models import DarkLangConfig
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
 
 from collections import namedtuple

@@ -219,9 +219,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         # TODO (vshnayder): we are somewhat architecturally confused in the loading code:
         # load_item should actually be get_instance, because it expects the course-specific
         # policy to be loaded.  For now, just add the course_id here...
-        def load_item(location):
+        def load_item(usage_key):
             """Return the XBlock for the specified location"""
-            return xmlstore.get_instance(course_id, Location(location))
+            return xmlstore.get_item(usage_key)
 
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
 
@@ -670,34 +670,13 @@ class XMLModuleStore(ModuleStoreReadBase):
                             Exception: %s", filepath, unicode(e))
                     system.error_tracker("ERROR: " + unicode(e))
 
-    def get_instance(self, course_id, location, depth=0):
-        """
-        Returns an XBlock instance for the item at
-        location, with the policy for course_id.  (In case two xml
-        dirs have different content at the same location, return the
-        one for this course_id.)
-
-        If any segment of the location is None except revision, raises
-            xmodule.modulestore.exceptions.InsufficientSpecificationError
-
-        If no object is found at that location, raises
-            xmodule.modulestore.exceptions.ItemNotFoundError
-
-        location: Something that can be passed to Location
-        """
-        location = Location(location)
-        try:
-            return self.modules[course_id][location]
-        except KeyError:
-            raise ItemNotFoundError(location)
-
     def has_item(self, usage_key):
         """
         Returns True if location exists in this ModuleStore.
         """
         return usage_key in self.modules[usage_key.course_key]
 
-    def get_item(self, location, depth=0):
+    def get_item(self, usage_key, depth=0):
         """
         Returns an XBlock instance for the item at location.
 
@@ -709,8 +688,10 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         location: Something that can be passed to Location
         """
-        raise NotImplementedError("XMLModuleStores can't guarantee that definitions"
-                                  " are unique. Use get_instance.")
+        try:
+            return self.modules[usage_key.course_id][usage_key]
+        except KeyError:
+            raise ItemNotFoundError(usage_key)
 
     def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         items = []
