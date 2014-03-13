@@ -469,7 +469,7 @@ class Courses(SysadminDashboardView):
             course = self.def_ms.courses[os.path.abspath(gdir)]
             msg += _('Loaded course {0} {1}<br/>Errors:').format(
                 cdir, course.display_name)
-            errors = self.def_ms.get_item_errors(course.location)
+            errors = self.def_ms.get_course_errors(course.id)
             if not errors:
                 msg += u'None'
             else:
