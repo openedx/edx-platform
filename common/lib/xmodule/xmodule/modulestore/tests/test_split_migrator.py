@@ -21,6 +21,7 @@ from xmodule.modulestore.mongo.base import MongoModuleStore
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore.mongo import draft
 from xmodule.modulestore.tests import test_location_mapper
+from xmodule.modulestore.keys import CourseKey
 
 
 class TestMigration(unittest.TestCase):
@@ -225,7 +226,7 @@ class TestMigration(unittest.TestCase):
         # grab the detached items to compare they should be in both published and draft
         for category in ['conditional', 'about', 'course_info', 'static_tab']:
             location = self.course_location.replace(name=None, category=category)
-            for conditional in presplit.get_items(location):
+            for conditional in presplit.get_items(CourseKey.from_string(location.course_id)):
                 locator = self.loc_mapper.translate_location(
                     conditional.location,
                     published,

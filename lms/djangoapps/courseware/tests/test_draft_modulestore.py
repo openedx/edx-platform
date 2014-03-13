@@ -14,7 +14,7 @@ class TestDraftModuleStore(TestCase):
         store = modulestore()
 
         # fix was to allow get_items() to take the course_id parameter
-        store.get_items(CourseKey.from_string('abc'), kwargs={'category': 'vertical'})
+        store.get_items(CourseKey.from_string('abc'), category='vertical')
 
         # test success is just getting through the above statement.
         # The bug was that 'course_id' argument was

@@ -444,11 +444,11 @@ class SplitModuleItemTests(SplitModuleTest):
         # get all modules
         matches = modulestore().get_items(locator)
         self.assertEqual(len(matches), 6)
-        matches = modulestore().get_items(locator, kwargs={})
+        matches = modulestore().get_items(locator)
         self.assertEqual(len(matches), 6)
-        matches = modulestore().get_items(locator, kwargs={'category': 'chapter'})
+        matches = modulestore().get_items(locator, category='chapter'})
         self.assertEqual(len(matches), 3)
-        matches = modulestore().get_items(locator, kwargs={'category': 'garbage'})
+        matches = modulestore().get_items(locator, category='garbage'})
         self.assertEqual(len(matches), 0)
         matches = modulestore().get_items(
             locator,
