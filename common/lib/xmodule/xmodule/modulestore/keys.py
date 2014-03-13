@@ -14,9 +14,11 @@ class CourseKey(OpaqueKey):
         raise NotImplementedError()
 
     @abstractproperty
-    def run(self):
+    def offering(self):
         """
-        The run identifier for this course.
+        The offering identifier for this course.
+
+        This is complement of the org; in old-style IDs, "course/run"
         """
         raise NotImplementedError()
 

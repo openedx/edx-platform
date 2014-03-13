@@ -28,12 +28,11 @@ INVALID_HTML_CHARS = re.compile(r"[^\w-]", re.UNICODE)
 
 class SlashSeparatedCourseKey(CourseKey):
     """Course key for old style org/course/run course identifiers"""
-    def __init__(self, org, course, run):
+    def __init__(org, course, run):
         self._org = org
         self._course = course
         self._run = run
-
-    # three local attributes: catalog name, run
+        self._offering = '/'.join([course, run])
 
     @classmethod
     def _from_string(cls, serialized):
@@ -49,8 +48,8 @@ class SlashSeparatedCourseKey(CourseKey):
         return self._org
 
     @property
-    def run(self):
-        return '/'.join([self._course, self._run])
+    def offering(self):
+        return self._offering
 
     def make_asset_key(self, path):
         return Location('c4x', self._org, self._course, 'asset', path)
@@ -78,13 +77,13 @@ def _check_location_part(val, regexp):
 
 
 class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category name revision')):
-    '''
+    """
     Encodes a location.
 
     Locations representations of URLs of the
     form {tag}://{org}/{course}/{category}/{name}[@{revision}], situated in the course
     {org}/{course}/{run}.
-    '''
+    """
     __slots__ = ()
 
     @staticmethod

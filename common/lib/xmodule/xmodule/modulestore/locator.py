@@ -12,6 +12,7 @@ from bson.errors import InvalidId
 
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, OverSpecificationError
 
+from .keys import CourseKey
 from .parsers import parse_url, parse_package_id, parse_block_ref
 from .parsers import BRANCH_PREFIX, BLOCK_PREFIX, VERSION_PREFIX
 import re
@@ -145,7 +146,7 @@ class Locator(object):
             raise ValueError('"%s" is not a valid version_guid' % value)
 
 
-class CourseLocator(Locator):
+class CourseLocator(Locator, CourseKey):
     """
     Examples of valid CourseLocator specifications:
      CourseLocator(version_guid=ObjectId('519665f6223ebd6980884f2b'))
@@ -168,6 +169,8 @@ class CourseLocator(Locator):
     version_guid = None
     package_id = None
     branch = None
+    org = None
+    offering = None
 
     def __init__(self, url=None, version_guid=None, package_id=None, branch=None):
         """
@@ -297,6 +300,7 @@ class CourseLocator(Locator):
             parse, 'version_guid', lambda (new_guid): self.set_version_guid(self.as_object_id(new_guid))
         )
         self._set_value(parse, 'package_id', self.set_package_id)
+        self._parse_package_id()
         self._set_value(parse, 'branch', self.set_branch)
 
     def init_from_version_guid(self, version_guid):
@@ -356,6 +360,23 @@ class CourseLocator(Locator):
         """
         return self.package_id
 
+    def org(self):
+        return self.org
+
+    def offering(self):
+        return self.offering
+
+    def make_usage_key(self, block_type, block_id):
+        return BlockUsageLocator(
+            package_id=self.package_id,
+            version_guid=self.version_guid,
+            branch=self.branch,
+            block_id=block_id
+        )
+
+    def make_asset_key(self, path):
+        raise NotImplementedError()
+
     def _set_value(self, parse, key, setter):
         """
         Helper method that gets a value out of the dict returned by parse,
@@ -366,8 +387,20 @@ class CourseLocator(Locator):
         if value:
             setter(value)
 
+    ORG_SEPARATOR = '+'
+    def _parse_package_id(self):
+        """
+        Parses package_id ("org+offering") into org and offering.
+        Org cannot have a "+" sign within it but offering can.
+        """
+        if self.package_id is not None:
+            # TODO can do this by regular expression
+            plus_loc = self.package_id.find(Location.ORG_SEPARATOR)
+            self.org = self.package_id[:plus_loc]
+            self.offering = self.package_id[plus_loc+1:]
 
-class BlockUsageLocator(CourseLocator):
+
+class BlockUsageLocator(CourseLocator, UsageKey):  # TODO implement UsageKey methods
     """
     Encodes a location.
 
