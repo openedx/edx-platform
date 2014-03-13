@@ -1,8 +1,10 @@
 """ Contains Locations ___ """
 
+import urllib
 from xmodule.modulestore.keys import CourseKey
 
-class SlashSeparatedId(CourseKey):
+
+class SlashSeparatedCourseKey(CourseKey):
     """Course key for old style org/course/run course identifiers"""
     def __init__(org, course, run):
         self.org = org
@@ -14,7 +16,7 @@ class SlashSeparatedId(CourseKey):
     @classmethod
     def _from_string(cls, serialized):
         # Turns encoded slashes into actual slashes
-        serialized = django.utils.http.unquote(serialized)
+        serialized = urllib.unquote(serialized)
         return cls(* serialized.split('/'))
 
     def _to_string(self):
