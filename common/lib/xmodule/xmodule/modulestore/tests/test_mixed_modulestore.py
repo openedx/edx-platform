@@ -10,6 +10,7 @@ from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE, SPLIT_MONGO_MO
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDjango, loc_mapper
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
@@ -207,7 +208,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             else:
                 locn = course_locn.replace(org=None, course=None, name=None)
             # NOTE: use get_course if you just want the course. get_items is expensive
-            modules = self.store.get_items(locn, course_id, qualifiers={'category': 'course'})
+            modules = self.store.get_items(CourseKey.from_string(course_id), category='course')
             self.assertEqual(len(modules), 1)
             self.assertEqual(modules[0].location, course_locn)
 

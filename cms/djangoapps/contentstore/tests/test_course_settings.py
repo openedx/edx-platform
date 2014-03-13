@@ -13,6 +13,7 @@ from models.settings.course_details import (CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from contentstore.utils import get_modulestore, EXTRA_TAB_PANELS
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.keys import CourseKey
 
 
 from models.settings.course_metadata import CourseMetadata

@@ -32,6 +32,7 @@ from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds
 
 from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xblock.core import XBlock
@@ -533,7 +534,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         return [
             course
             for course
-            in self.get_items(course_filter)
+            in self.get_items(CourseKey.from_string(course.id))
             if not (
                 course.location.org == 'edx' and
                 course.location.course == 'templates'
@@ -804,8 +805,9 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # @hack! We need to find the course location however, we don't
         # know the 'name' parameter in this context, so we have
         # to assume there's only one item in this query even though we are not specifying a name
+        from nose.tools import set_trace; set_trace()
         course_search_location = Location('i4x', location.org, location.course, 'course', None)
-        courses = self.get_items(course_search_location, depth=depth)
+        courses = self.get_items(CourseKey.from_string(course_search_location.course_id))
 
         # make sure we found exactly one match on this above course search
         found_cnt = len(courses)
