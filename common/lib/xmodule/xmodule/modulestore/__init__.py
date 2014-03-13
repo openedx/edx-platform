@@ -20,6 +20,8 @@ from opaque_keys import InvalidKeyError
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
+from xblock.fields import Field
+import datetime
 
 log = logging.getLogger('edx.modulestore')
 
@@ -92,6 +94,62 @@ class ModuleStoreRead(object):
             get_children() to cache. None indicates to cache all descendents
         """
         pass
+
+    def _block_matches(self, fields_or_xblock, qualifiers):
+        '''
+        Return True or False depending on whether the field value (block contents)
+        matches the qualifiers as per get_items. Note, only finds directly set not
+        inherited nor default value matches.
+        For substring matching pass a regex object.
+        for arbitrary function comparison such as date time comparison, pass
+        the function as in start=lambda x: x < datetime.datetime(2014, 1, 1, 0, tzinfo=pytz.UTC)
+
+        Args:
+            fields (dict): either the json blob (from the db or get_explicitly_set_fields)
+                or the xblock.fields() value
+             qualifiers (dict): field: searchvalue pairs.
+        '''
+        if isinstance(fields_or_xblock, XBlock):
+            fields = fields_or_xblock.fields
+            xblock = fields_or_xblock
+            is_xblock = True
+        else:
+            fields = fields_or_xblock
+            is_xblock = False
+
+        def _is_set_on(key):
+            """
+            Is this key set in fields? (return tuple of boolean and value)
+            """
+            if key not in fields:
+                return False, None
+            value = fields[key]
+            if is_xblock:
+                return value.is_set_on(fields_or_xblock), getattr(xblock, key)
+            else:
+                return True, value
+
+        for key, criteria in qualifiers.iteritems():
+            is_set, value = _is_set_on(key)
+            if not is_set:
+                return False
+            if not self._value_matches(value, criteria):
+                return False
+            elif criteria is not None:
+                return False
+        return True
+
+    def _value_matches(self, target, criteria):
+        ''' helper for _block_matches '''
+        if isinstance(target, list):
+            return any(self._value_matches(ele, criteria)
+                for ele in target)
+        elif isinstance(criteria, re._pattern_type):
+            return criteria.match(target) is not None
+        elif callable(criteria):
+            return criteria(target)
+        else:
+            return criteria == target
 
     @abstractmethod
     def get_courses(self):
