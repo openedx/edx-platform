@@ -158,6 +158,11 @@ class CourseRole(GroupBasedRole):
         groupnames.append(u'{0}_{1}'.format(role, self.course_id))
         super(CourseRole, self).__init__(groupnames)
 
+    @classmethod
+    def course_group_already_exists(self, course_key):
+        # Case insensitive search -- looking for a Group that ends with the course's id
+        return Group.objects.filter(name__iendswith=course_key)
+
 
 class OrgRole(GroupBasedRole):
     """
