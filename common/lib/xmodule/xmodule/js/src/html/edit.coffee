@@ -45,8 +45,8 @@ class @HTMLEditingDescriptor
       plugins: "textcolor, link, image",
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
       # Can have a single toolbar by just specifying "toolbar". Splitting for now so all are visible.
-      toolbar1 : "formatselect fontselect bold italic underline forecolor",
-      toolbar2 : "bullist numlist outdent indent | blockquote wrapAsCode | link unlink | image",
+      toolbar1 : "formatselect | fontselect | bold italic underline forecolor | bullist numlist outdent indent",
+      toolbar2 : "link unlink image | blockquote wrapAsCode ",
       # TODO: i18n
       block_formats : "Paragraph=p;Preformatted=pre;Heading 1=h1;Heading 2=h2;Heading 3=h3",
       width: '100%',
@@ -79,15 +79,18 @@ class @HTMLEditingDescriptor
     })
 
     @visualEditor = ed
-    
-    ed.onExecCommand.add(@onExecCommandHandler)
+
+    ed.on('change', @changeHandler)
 
   # Intended to run after the "image" plugin is used so that static urls are set
   # correctly in the Visual editor immediately after command use.
-  onExecCommandHandler: (ed, cmd, ui, val) =>
-      if cmd == 'mceInsertContent' and val.match(/^<img/)
-        content = rewriteStaticLinks(ed.getContent(), '/static/', @base_asset_url)
-        ed.setContent(content)
+  changeHandler: (e) =>
+    # The fact that we have to listen to all change events and act on an event actually fired
+    # from undo (which is where the "level" comes from) is extremely ugly. However, plugins
+    # don't fire any events in TinyMCE version 4 that I can hook into (in particular, not ExecCommand).
+    if e.level and e.level.content and e.level.content.match(/<img src="\/static\//)
+      content = rewriteStaticLinks(e.target.getContent(), '/static/', @base_asset_url)
+      e.target.setContent(content)
 
   onSwitchEditor: (e) =>
     e.preventDefault();
