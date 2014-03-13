@@ -70,7 +70,7 @@ class AuthListWidget extends MemberListWidget
       title: $container.data 'display-name'
       info: $container.data 'info-text'
       labels: ["Username", "Email", "Revoke access"]
-      add_placeholder: "Enter email"
+      add_placeholder: "Enter username or email"
       add_btn_label: $container.data 'add-button-label'
       add_handler: (input) => @add_handler input
 
@@ -98,7 +98,7 @@ class AuthListWidget extends MemberListWidget
         @clear_input()
         @reload_list()
     else
-      @show_errors "Enter an email."
+      @show_errors gettext "Please enter a username or email."
 
   # reload the list of members
   reload_list: ->
@@ -140,22 +140,24 @@ class AuthListWidget extends MemberListWidget
       url: @list_endpoint
       data: rolename: @rolename
       success: (data) => cb? null, data[@rolename]
-      error: std_ajax_err => cb? "Error fetching list for role '#{@rolename}'"
+      error: std_ajax_err => 
+        `// Translators: A rolename appears this sentence.`
+        cb? gettext("Error fetching list for role") + " '#{@rolename}'"
 
   # send ajax request to modify access
   # (add or remove them from the list)
   # `action` can be 'allow' or 'revoke'
   # `cb` is called with cb(error, data)
-  modify_member_access: (email, action, cb) ->
+  modify_member_access: (unique_student_identifier, action, cb) ->
     $.ajax
       dataType: 'json'
       url: @modify_endpoint
       data:
-        email: email
+        unique_student_identifier: unique_student_identifier
         rolename: @rolename
         action: action
       success: (data) => cb? null, data
-      error: std_ajax_err => cb? "Error changing user's permissions."
+      error: std_ajax_err => cb? gettext "Error changing user's permissions."
 
 
 # Wrapper for the batch enrollment subsection.
@@ -204,7 +206,7 @@ class BatchEnrollment
         url: @$btn_unenroll.data 'endpoint'
         data: send_data
         success: (data) => @display_response data
-        error: std_ajax_err => @fail_with_error "Error enrolling/unenrolling students."
+        error: std_ajax_err => @fail_with_error gettext "Error enrolling/unenrolling students."
 
 
   fail_with_error: (msg) ->
@@ -310,37 +312,45 @@ class BatchEnrollment
       render_list gettext("Successfully enrolled and sent email to the following students:"), (sr.email for sr in enrolled)
 
     if enrolled.length and not emailStudents
+      `// Translators: A list of students appears after this sentence.`
       render_list gettext("Successfully enrolled the following students:"), (sr.email for sr in enrolled)
 
     # Student hasn't registered so we allow them to enroll
     if allowed.length and emailStudents
+      `// Translators: A list of students appears after this sentence.`
       render_list gettext("Successfully sent enrollment emails to the following students. They will be allowed to enroll once they register:"),
         (sr.email for sr in allowed)
 
     # Student hasn't registered so we allow them to enroll
     if allowed.length and not emailStudents
+      `// Translators: A list of students appears after this sentence.`
       render_list gettext("These students will be allowed to enroll once they register:"),
         (sr.email for sr in allowed)
 
     # Student hasn't registered so we allow them to enroll with autoenroll
     if autoenrolled.length and emailStudents
+      `// Translators: A list of students appears after this sentence.`
       render_list gettext("Successfully sent enrollment emails to the following students. They will be enrolled once they register:"),
         (sr.email for sr in autoenrolled)
 
     # Student hasn't registered so we allow them to enroll with autoenroll
     if autoenrolled.length and not emailStudents
+      `// Translators: A list of students appears after this sentence.`
       render_list gettext("These students will be enrolled once they register:"),
         (sr.email for sr in autoenrolled)
 
     if notenrolled.length and emailStudents
+      `// Translators: A list of students appears after this sentence.`
       render_list gettext("Emails successfully sent. The following students are no longer enrolled in the course:"),
         (sr.email for sr in notenrolled)
 
     if notenrolled.length and not emailStudents
+      `// Translators: A list of students appears after this sentence.`
       render_list gettext("The following students are no longer enrolled in the course:"),
         (sr.email for sr in notenrolled)
 
     if notunenrolled.length
+      `// Translators: A list of students appears after this sentence.`
       render_list gettext("These students were not affliliated with the course so could not be unenrolled:"),
         (sr.email for sr in notunenrolled)
 
@@ -451,7 +461,7 @@ class AuthList
         rolename: @rolename
         action: action
       success: (data) -> cb?(data)
-      error: std_ajax_err => @$request_response_error.text "Error changing user's permissions."
+      error: std_ajax_err => @$request_response_error.text gettext "Error changing user's permissions."
 
 
 # Membership Section
