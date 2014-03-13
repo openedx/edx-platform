@@ -71,11 +71,11 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         content_store = contentstore()
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['test_import_course'], static_content_store=content_store, do_import_static=False, verbose=True)
-        course_location = CourseDescriptor.id_to_location('edX/test_import_course/2012_Fall')
-        course = module_store.get_item(course_location)
+        course_id = CourseKey.from_string('edX/test_import_course/2012_Fall')
+        course = module_store.get_course(course_id)
         self.assertIsNotNone(course)
 
-        return module_store, content_store, course, course_location
+        return module_store, content_store, course
 
     def test_static_import(self):
         '''
@@ -111,8 +111,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
 
-        course_location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
-        module_store.get_item(course_location)
+        module_store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
 
         # make sure we have NO assets in our contentstore
         all_assets, count = content_store.get_all_content_for_course(course_location)

@@ -62,8 +62,7 @@ def get_course_by_id(course_id, depth=0):
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
     try:
-        course_loc = CourseDescriptor.id_to_location(course_id)
-        return modulestore().get_instance(course_id, course_loc, depth=depth)
+        return modulestore().get_course(course_id, depth=depth)
     except (KeyError, ItemNotFoundError):
         raise Http404("Course not found.")
     except InvalidLocationError:

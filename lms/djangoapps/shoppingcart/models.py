@@ -385,8 +385,7 @@ class PaidCourseRegistration(OrderItem):
         would in fact be quite silly since there's a clear back door.
         """
         try:
-            course_loc = CourseDescriptor.id_to_location(self.course_id)
-            course_exists = modulestore().has_item(self.course_id, course_loc)
+            course_exists = modulestore().has_course(self.course_id)
         except ValueError:
             raise PurchasedCallbackException(
                 "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))

@@ -35,16 +35,16 @@ def course_context_from_course_id(course_id):
 
     """
 
-    course_id = course_id or ''
+    assert(isinstance(course_id, CourseKey))
+
     context = {
-        'course_id': course_id,
+        'course_id': course_id._to_string(),
         'org_id': ''
     }
 
     if course_id:
         try:
-            location = CourseDescriptor.id_to_location(course_id)
-            context['org_id'] = location.org
+            context['org_id'] = course_id.org
         except ValueError:
             log.warning(
                 'Unable to parse course_id "{course_id}"'.format(
