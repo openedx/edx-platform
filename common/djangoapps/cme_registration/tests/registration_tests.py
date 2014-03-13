@@ -233,7 +233,7 @@ class TestCmeRegistration(TestCase):
         return_vars = setup_sub_affiliation_field(self.post_vars)
         self.assertEquals(return_vars['sub_affiliation'], 'Dummy_Value2')
 
-        self.post_vars['affiliation'] = 'Lucile Packard Children\'s Hospital'
+        self.post_vars['affiliation'] = 'Lucile Packard Children\'s Hospital Stanford'
         self.post_vars['PCHA_affiliation'] = 'Dummy_Value1'
         self.post_vars['UHA_affiliation'] = 'Dummy_Value2'
 
