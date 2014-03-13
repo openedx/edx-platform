@@ -228,7 +228,7 @@ class TestMongoModuleStore(object):
         course_content, __ = TestMongoModuleStore.content_store.get_all_content_for_course(location)
         assert len(course_content) > 0
         # a bit overkill, could just do for content[0]
-        for content in course_content:
+        for content_key in course_content:
             assert not content.get('locked', False)
             assert not TestMongoModuleStore.content_store.get_attr(content['_id'], 'locked', False)
             attrs = TestMongoModuleStore.content_store.get_attrs(content['_id'])
