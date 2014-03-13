@@ -81,10 +81,10 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         '''
         Stuff in static_import should always be imported into contentstore
         '''
-        _, content_store, course, course_location = self.load_test_import_course()
+        _, content_store, course = self.load_test_import_course()
 
         # make sure we have ONE asset in our contentstore ("should_be_imported.html")
-        all_assets, count = content_store.get_all_content_for_course(course_location)
+        all_assets, count = content_store.get_all_content_for_course(course.location)
         print "len(all_assets)=%d" % len(all_assets)
         self.assertEqual(len(all_assets), 1)
         self.assertEqual(count, 1)
@@ -111,10 +111,10 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
 
-        module_store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
+        course = module_store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
 
         # make sure we have NO assets in our contentstore
-        all_assets, count = content_store.get_all_content_for_course(course_location)
+        all_assets, count = content_store.get_all_content_for_course(course.location)
         self.assertEqual(len(all_assets), 0)
         self.assertEqual(count, 0)
 
@@ -129,7 +129,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertIn('/static/', handouts.data)
 
     def test_tab_name_imports_correctly(self):
-        _module_store, _content_store, course, _course_location = self.load_test_import_course()
+        _module_store, _content_store, course = self.load_test_import_course()
         print "course tabs = {0}".format(course.tabs)
         self.assertEqual(course.tabs[2]['name'], 'Syllabus')
 
