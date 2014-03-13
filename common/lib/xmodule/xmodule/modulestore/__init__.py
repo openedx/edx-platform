@@ -368,7 +368,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_course(self, course_id):
+    def get_course(self, course_id, depth=None):
         '''
         Look for a specific course id.  Returns the course descriptor, or None if not found.
         '''
@@ -496,8 +496,9 @@ class ModuleStoreReadBase(ModuleStoreRead):
         """
         return {}
 
-    def get_course(self, course_id):
+    def get_course(self, course_id, depth=None):
         """Default impl--linear search through course list"""
+        assert(isinstance(course_id, CourseKey))
         for c in self.get_courses():
             if c.id == course_id:
                 return c
