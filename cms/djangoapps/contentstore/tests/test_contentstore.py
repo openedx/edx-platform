@@ -800,7 +800,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         # now do the actual cloning
-        clone_course(module_store, content_store, source_course_id, dest_location)
+        clone_course(module_store, content_store, source_course_id, dest_course_id)
 
         # first assert that all draft content got cloned as well
         items = module_store.get_items(source_course_id, qualifiers={'version': 'draft'})
