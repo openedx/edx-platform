@@ -79,7 +79,7 @@ def _get_locator_and_course(package_id, branch, version_guid, block_id, user, de
     """
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block_id)
     course_location = loc_mapper().translate_locator_to_location(locator)
-    if not has_course_access(user, course_location.course_id):
+    if not has_course_access(user, locator.package_id):
         raise PermissionDenied()
     course_module = modulestore().get_item(course_location, depth=depth)
     return locator, course_module
@@ -118,7 +118,7 @@ def course_handler(request, tag=None, package_id=None, branch=None, version_guid
         elif not has_course_access(
             request.user,
             BlockUsageLocator(package_id=package_id, branch=branch,
-                              version_guid=version_guid, block_id=block).course_id
+                              version_guid=version_guid, block_id=block).package_id
         ):
             raise PermissionDenied()
         elif request.method == 'PUT':
@@ -492,7 +492,7 @@ def course_info_update_handler(request, tag=None, package_id=None, branch=None, 
         provided_id = None
 
     # check that logged in user has permissions to this item (GET shouldn't require this level?)
-    if not has_course_access(request.user, updates_location.course_id):
+    if not has_course_access(request.user, package_id):
         raise PermissionDenied()
 
     if request.method == 'GET':
