@@ -268,6 +268,14 @@ if FEATURES.get('AUTH_USE_CAS'):
     )
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+    CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
+    if CAS_ATTRIBUTE_CALLBACK:
+        import importlib
+        CAS_USER_DETAILS_RESOLVER = getattr(
+            importlib.import_module(CAS_ATTRIBUTE_CALLBACK['module']),
+            CAS_ATTRIBUTE_CALLBACK['function']
+        )
+
 
 HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = ENV_TOKENS.get('HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS',{})
 
