@@ -15,7 +15,6 @@ from xmodule.modulestore.exceptions import InsufficientSpecificationError, OverS
 from .parsers import parse_url, parse_package_id, parse_block_ref
 from .parsers import BRANCH_PREFIX, BLOCK_PREFIX, VERSION_PREFIX
 import re
-from xmodule.modulestore import Location
 
 log = logging.getLogger(__name__)
 
@@ -109,14 +108,8 @@ class Locator(object):
 
         :param location: can be a Location, Locator, string, tuple, list, or dict.
         """
-        if isinstance(location, (Location, Locator)):
-            return location
         if isinstance(location, basestring):
             return Locator.parse_url(location)
-        if isinstance(location, (list, tuple)):
-            return Location(location)
-        if isinstance(location, dict) and 'name' in location:
-            return Location(location)
         if isinstance(location, dict):
             return BlockUsageLocator(**location)
         raise ValueError(location)
@@ -134,9 +127,7 @@ class Locator(object):
         if parsed is None:
             raise ValueError(parsed)
         parsed = parsed.group(1)
-        if parsed in ['i4x', 'c4x']:
-            return Location(url)
-        elif parsed == 'edx':
+        if parsed == 'edx':
             return BlockUsageLocator(url)
         elif parsed == 'defx':
             return DefinitionLocator(url)

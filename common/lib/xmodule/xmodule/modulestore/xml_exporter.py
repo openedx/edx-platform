@@ -5,7 +5,7 @@ Methods for exporting course data to XML
 import logging
 import lxml.etree
 from xblock.fields import Scope
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import Location
 from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
 from json import dumps
