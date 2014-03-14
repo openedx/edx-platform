@@ -21,7 +21,6 @@ from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
-from xmodule.modulestore.xml import LocationReader
 
 
 MODULE_DIR = path(__file__).dirname()
@@ -96,7 +95,6 @@ def get_test_descriptor_system():
         render_template=mock_render_template,
         mixins=(InheritanceMixin, XModuleMixin),
         field_data=DictFieldData({}),
-        id_reader=LocationReader(),
     )
 
 

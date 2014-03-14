@@ -8,7 +8,7 @@ from mock import Mock, patch
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 import xmodule.course_module
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LocationReader
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from django.utils.timezone import UTC
 
 
@@ -45,7 +45,6 @@ class DummySystem(ImportSystem):
             parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
             field_data=KvsFieldData(DictKeyValueStore()),
-            id_reader=LocationReader(),
         )
 
 

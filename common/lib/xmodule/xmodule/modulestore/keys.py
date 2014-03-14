@@ -1,6 +1,7 @@
 from abc import abstractmethod, abstractproperty
 
 from opaque_keys import OpaqueKey
+from xblock.runtime import IdReader
 
 
 class CourseKey(OpaqueKey):
@@ -105,3 +106,14 @@ class UsageKey(CourseObjectMixin, OpaqueKey):
         Return the :class:`DefinitionKey` for the XBlock containing this usage.
         """
         raise NotImplementedError()
+
+
+class OpaqueKeyReader(IdReader):
+    """
+    IdReader for :class:`DefinitionKey` and :class:`UsageKey`s.
+    """
+    def get_definition_id(self, usage_id):
+        return usage_id.definition_key
+
+    def get_block_type(self, def_id):
+        return def_id.block_type
