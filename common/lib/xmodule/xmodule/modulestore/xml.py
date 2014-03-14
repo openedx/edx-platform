@@ -21,6 +21,7 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
@@ -353,13 +354,14 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         Initialize an XMLModuleStore from data_dir
 
-        data_dir: path to data directory containing the course directories
+        Args:
+            data_dir (str): path to data directory containing the course directories
 
-        default_class: dot-separated string defining the default descriptor
-            class to use if none is specified in entry_points
+            default_class (str): dot-separated string defining the default descriptor
+                class to use if none is specified in entry_points
 
-        course_dirs or course_ids: If specified, the list of course_dirs or course_ids to load. Otherwise,
-            load all courses. Note, providing both
+            course_dirs or course_ids (list of str): If specified, the list of course_dirs or course_ids to load. Otherwise,
+                load all courses. Note, providing both
         """
         super(XMLModuleStore, self).__init__(**kwargs)
 
@@ -369,8 +371,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
 
         if course_ids is not None:
-            for course_id in course_ids:
-                assert(isinstance(course_id, CourseKey))
+            course_ids = [CourseKey.from_string(course_id) for course_id in course_ids]
 
         self.load_error_modules = load_error_modules
 
@@ -519,7 +520,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                     raise ValueError("Can't load a course without a 'url_name' "
                                      "(or 'name') set.  Set url_name.")
 
-            course_id = CourseDescriptor.make_id(org, course, url_name)
+            course_id = SlashSeparatedCourseKey(org, course, url_name)
             if course_ids is not None and course_id not in course_ids:
                 return None
 
@@ -692,7 +693,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         location: Something that can be passed to Location
         """
         try:
-            return self.modules[usage_key.course_id][usage_key]
+            return self.modules[usage_key.course_key][usage_key]
         except KeyError:
             raise ItemNotFoundError(usage_key)
 
