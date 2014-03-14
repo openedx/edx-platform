@@ -1610,15 +1610,14 @@ def import_users(request, post_override=None):
             message = render_to_string('emails/activation_email_batch.txt', d)
 
             # dont send email if we are doing load testing or random user generation for some reason
-            if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
-                try:
-                    _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-                except:
-                    log.exception('Unable to send activation email to user')
-                    js['success'] = False
-                    js['log'] += u'Error in row %s:Could not send activation e-mail.' % (idx)
-                    transaction.rollback()
-		    continue
+            try:
+                _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+            except:
+                log.exception('Unable to send activation email to user')
+                js['success'] = False
+                js['log'] += u'Error in row %s:Could not send activation e-mail.' % (idx)
+                transaction.rollback()
+            continue
 
         transaction.commit()
         js['passwords'][row['email']] = password

@@ -306,13 +306,15 @@ def fullstat(request = None):
         assignments = []
         
         enrolled_students = User.objects.filter(
-            courseenrollment__course_id=course_id,
+            courseenrollment__course_id=course.id,
         ).prefetch_related("groups").order_by('username')
 
 
         gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=True, use_offline=False)
         courseware_summary = grades.progress_summary(enrolled_students[0], request, course);
 
+	if courseware_summary is None:
+		continue
 
         assignments += [score.section for score in gradeset['raw_scores']]
         
@@ -339,17 +341,17 @@ def fullstat(request = None):
                 datarow += [user.email]
                 
                 #Raw statistic by problems
-                statprob = edxdata[course_id][user.email]["prob_info"]
+                statprob = edxdata[course.id][user.email]["prob_info"]
                 
                 #By subsection
-                statsec = edxdata[course_id][user.email]["sec_info"]
+                statsec = edxdata[course.id][user.email]["sec_info"]
 
-                if edxdata[course_id][user.email]["0.7"]:
+                if edxdata[course.id][user.email]["0.7"]:
                     datarow += [u"Да"]
                 else:
                     datarow += [u"Нет"]
                 
-                if edxdata[course_id][user.email]["1.0"]:
+                if edxdata[course.id][user.email]["1.0"]:
                     datarow += [u"Да"]
                 else:
                     datarow += [u"Нет"]
@@ -361,7 +363,8 @@ def fullstat(request = None):
             except:
                 pass
         datatable['data'] = data
-        return_csv(course.id,datatable, open("/var/www/edx/" + course.id.replace('/','_') + ".xls", "wb"))
+        return_csv(course.id,datatable, open("/var/www/edx/" + course.id.replace('/','_') + ".xls", "wb"), encoding="cp1251", dialect="excel-tab")
+        return_csv(course.id,datatable, open("/var/www/edx/" + course.id.replace('/','_') + ".csv", "wb"))
 
     return True
 
@@ -372,17 +375,17 @@ def UnicodeDictReader(utf8_data, **kwargs):
         yield dict([(key, unicode(value, 'utf-8')) for key, value in row.iteritems()])  
 
 
-def return_csv(func, datatable, file_pointer=None):
+def return_csv(func, datatable, file_pointer=None, encoding="utf-8", dialect="excel"):
     """Outputs a CSV file from the contents of a datatable."""
     if file_pointer is None:
         return None
     else:
         response = file_pointer
-    writer = csv.writer(response, dialect='excel-tab', quotechar='"', quoting=csv.QUOTE_ALL)
-    encoded_row = [unicode(s).encode('cp1251') for s in datatable['header']]
+    writer = csv.writer(response, dialect=dialect, quotechar='"', quoting=csv.QUOTE_ALL)
+    encoded_row = [unicode(s).encode(encoding) for s in datatable['header']]
     writer.writerow(encoded_row)
     for datarow in datatable['data']:
-        encoded_row = [unicode(s).encode('cp1251') for s in datarow]
+        encoded_row = [unicode(s).encode(encoding) for s in datarow]
         writer.writerow(encoded_row)
     return response
 
