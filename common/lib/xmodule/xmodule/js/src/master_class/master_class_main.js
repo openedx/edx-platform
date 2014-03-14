@@ -134,7 +134,7 @@ define('MasterClassMain', ['logme'], function (logme) {
             a=document.createElement('a');
             a.textContent='download';
             a.download="emails.csv";
-            a.href='data:text/csv;charset=utf-8,'+csv;
+            a.href=encodeURI('data:text/csv;charset=utf-8,'+csv);
             a.click();
              }
         );
