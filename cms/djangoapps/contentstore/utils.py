@@ -122,21 +122,21 @@ def get_lms_link_for_item(location, course_id, preview=False):
     :param course_id: the course_id within which the location lives.
     :param preview: True if the preview version of LMS should be returned. Default value is false.
     """
-    if settings.LMS_BASE is not None:
-        if preview:
-            lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
-        else:
-            lms_base = settings.LMS_BASE
+    assert(isinstance(course_id, SlashSeparatedCourseKey))
 
-        lms_link = u"//{lms_base}/courses/{course_id}/jump_to/{location}".format(
-            lms_base=lms_base,
-            course_id=course_id,
-            location=location
-        )
+    if settings.LMS_BASE is None:
+        return None
+
+    if preview:
+        lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
     else:
-        lms_link = None
+        lms_base = settings.LMS_BASE
 
-    return lms_link
+    lms_link = u"//{lms_base}/courses/{course_id}/jump_to/{location}".format(
+        lms_base=lms_base,
+        course_id=course_id.to_deprecated_string(),
+        location=location.to_deprecated_string(),
+    )
 
 
 def get_lms_link_for_about_page(course_id):

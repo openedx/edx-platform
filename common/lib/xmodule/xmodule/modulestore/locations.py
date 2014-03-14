@@ -183,6 +183,9 @@ class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category
         """
         Return a string containing the URL for this location
         """
+        return self.to_deprecated_string()
+
+    def to_deprecated_string(self):
         url = u"{0.tag}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
         if self.revision:
             url += u"@{rev}".format(rev=self.revision)  # pylint: disable=E1101
