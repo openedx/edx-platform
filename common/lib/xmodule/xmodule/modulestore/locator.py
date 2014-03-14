@@ -387,17 +387,17 @@ class CourseLocator(Locator, CourseKey):
         if value:
             setter(value)
 
-    ORG_SEPARATOR = '+'
     def _parse_package_id(self):
         """
         Parses package_id ("org+offering") into org and offering.
         Org cannot have a "+" sign within it but offering can.
         """
         if self.package_id is not None:
-            # TODO can do this by regular expression
-            plus_loc = self.package_id.find(Location.ORG_SEPARATOR)
-            self.org = self.package_id[:plus_loc]
-            self.offering = self.package_id[plus_loc+1:]
+            org, _, offering = self.package_id.partition(self.ORG_SEPARATOR)
+            if offering == '':
+                raise ValueError('Package id "{}" missing org separator "{}"'.format(self.package_id, self.ORG_SEPARATOR))
+            self.org = org
+            self.offering = offering
 
 
 class BlockUsageLocator(CourseLocator, UsageKey):  # TODO implement UsageKey methods
