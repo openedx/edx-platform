@@ -86,8 +86,10 @@ def perform_request(method, url, data_or_params=None, *args, **kwargs):
     else:
         if kwargs.get("raw", False):
             return response.text
-        else:
+        try:
             return json.loads(response.text)
+        except (ValueError, TypeError):
+            return response.text
 
 
 class CommentClientError(Exception):
