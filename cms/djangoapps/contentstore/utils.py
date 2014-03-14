@@ -11,6 +11,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from django_comment_common.utils import unseed_permissions_roles
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.course_module import CourseDescriptor
@@ -121,56 +122,57 @@ def get_lms_link_for_item(location, course_id, preview=False):
     :param course_id: the course_id within which the location lives.
     :param preview: True if the preview version of LMS should be returned. Default value is false.
     """
-    if settings.LMS_BASE is not None:
-        if preview:
-            lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
-        else:
-            lms_base = settings.LMS_BASE
+    assert(isinstance(course_id, SlashSeparatedCourseKey))
 
-        lms_link = u"//{lms_base}/courses/{course_id}/jump_to/{location}".format(
-            lms_base=lms_base,
-            course_id=course_id,
-            location=location
-        )
+    if settings.LMS_BASE is None:
+        return None
+
+    if preview:
+        lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
     else:
-        lms_link = None
+        lms_base = settings.LMS_BASE
 
-    return lms_link
+    return u"//{lms_base}/courses/{course_id}/jump_to/{location}".format(
+        lms_base=lms_base,
+        course_id=course_id.to_deprecated_string(),
+        location=location.to_deprecated_string(),
+    )
 
 
-def get_lms_link_for_about_page(location):
+def get_lms_link_for_about_page(course_id):
     """
     Returns the url to the course about page from the location tuple.
     """
+
+    assert(isinstance(course_id, SlashSeparatedCourseKey))
+
     if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         if not hasattr(settings, 'MKTG_URLS'):
             log.exception("ENABLE_MKTG_SITE is True, but MKTG_URLS is not defined.")
-            about_base = None
-        else:
-            marketing_urls = settings.MKTG_URLS
-            if marketing_urls.get('ROOT', None) is None:
-                log.exception('There is no ROOT defined in MKTG_URLS')
-                about_base = None
-            else:
-                # Root will be "https://www.edx.org". The complete URL will still not be exactly correct,
-                # but redirects exist from www.edx.org to get to the Drupal course about page URL.
-                about_base = marketing_urls.get('ROOT')
-                # Strip off https:// (or http://) to be consistent with the formatting of LMS_BASE.
-                about_base = re.sub(r"^https?://", "", about_base)
+            return None
+
+        marketing_urls = settings.MKTG_URLS
+
+        # Root will be "https://www.edx.org". The complete URL will still not be exactly correct,
+        # but redirects exist from www.edx.org to get to the Drupal course about page URL.
+        about_base = marketing_urls.get('ROOT')
+
+        if about_base is None:
+            log.exception('There is no ROOT defined in MKTG_URLS')
+            return None
+
+        # Strip off https:// (or http://) to be consistent with the formatting of LMS_BASE.
+        about_base = re.sub(r"^https?://", "", about_base)
+
     elif settings.LMS_BASE is not None:
         about_base = settings.LMS_BASE
     else:
-        about_base = None
+        return None
 
-    if about_base is not None:
-        lms_link = u"//{about_base_url}/courses/{course_id}/about".format(
-            about_base_url=about_base,
-            course_id=location.course_id
-        )
-    else:
-        lms_link = None
-
-    return lms_link
+    return u"//{about_base_url}/courses/{course_id}/about".format(
+        about_base_url=about_base,
+        course_id=course_id.to_deprecated_string()
+    )
 
 
 def course_image_url(course):
