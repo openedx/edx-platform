@@ -28,7 +28,6 @@ INVALID_HTML_CHARS = re.compile(r"[^\w-]", re.UNICODE)
 
 class SlashSeparatedCourseKey(CourseKey):
     """Course key for old style org/course/run course identifiers"""
-    ORG_SEPARATOR = '+'
     def __init__(org, course, run):
         self._org = org
         self._course = course
