@@ -47,7 +47,7 @@ class CommandsTestBase(TestCase):
         # Add a course with a unicode name, if the modulestore
         # supports adding modules.
         if hasattr(store, 'create_xmodule'):
-            CourseFactory.create(org=u'édX',
+            CourseFactory.create(org=u'ëḋẌ',
                                  course=u'śíḿṕĺé',
                                  display_name=u'2012_Fáĺĺ',
                                  modulestore=store)
