@@ -167,14 +167,6 @@ class TestLocations(TestCase):
         loc = Location("tag://org/course/cat/name:more_name@rev")
         self.assertEquals(loc.html_id(), "tag-org-course-cat-name_more_name-rev")
 
-    def test_course_id(self):
-        loc = Location('i4x', 'mitX', '103', 'course', 'test2')
-        self.assertEquals('mitX/103/test2', loc.course_id)
-
-        loc = Location('i4x', 'mitX', '103', '_not_a_course', 'test2')
-        with self.assertRaises(InvalidLocationError):
-            loc.course_id  # pylint: disable=pointless-statement
-
     def test_replacement(self):
         # pylint: disable=protected-access
 

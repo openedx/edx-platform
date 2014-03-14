@@ -136,54 +136,54 @@ class CourseGroupTest(TestCase):
         self.global_admin = AdminFactory()
         self.creator = User.objects.create_user('testcreator', 'testcreator+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
-        self.location = Location('i4x', 'mitX', '101', 'course', 'test')
+        self.course_id = CourseKey.from_string('mitX/101/test')
 
     def test_add_user_to_course_group(self):
         """
         Tests adding user to course group (happy path).
         """
         # Create groups for a new course (and assign instructor role to the creator).
-        self.assertFalse(has_access(self.creator, CourseInstructorRole(self.location.course_id)))
-        add_users(self.global_admin, CourseInstructorRole(self.location.course_id), self.creator)
-        add_users(self.global_admin, CourseStaffRole(self.location.course_id), self.creator)
-        self.assertTrue(has_access(self.creator, CourseInstructorRole(self.location.course_id)))
+        self.assertFalse(has_access(self.creator, CourseInstructorRole(self.course_id)))
+        add_users(self.global_admin, CourseInstructorRole(self.course_id), self.creator)
+        add_users(self.global_admin, CourseStaffRole(self.course_id), self.creator)
+        self.assertTrue(has_access(self.creator, CourseInstructorRole(self.course_id)))
 
         # Add another user to the staff role.
-        self.assertFalse(has_access(self.staff, CourseStaffRole(self.location.course_id)))
-        add_users(self.creator, CourseStaffRole(self.location.course_id), self.staff)
-        self.assertTrue(has_access(self.staff, CourseStaffRole(self.location.course_id)))
+        self.assertFalse(has_access(self.staff, CourseStaffRole(self.course_id)))
+        add_users(self.creator, CourseStaffRole(self.course_id), self.staff)
+        self.assertTrue(has_access(self.staff, CourseStaffRole(self.course_id)))
 
     def test_add_user_to_course_group_permission_denied(self):
         """
         Verifies PermissionDenied if caller of add_user_to_course_group is not instructor role.
         """
-        add_users(self.global_admin, CourseInstructorRole(self.location.course_id), self.creator)
-        add_users(self.global_admin, CourseStaffRole(self.location.course_id), self.creator)
+        add_users(self.global_admin, CourseInstructorRole(self.course_id), self.creator)
+        add_users(self.global_admin, CourseStaffRole(self.course_id), self.creator)
         with self.assertRaises(PermissionDenied):
-            add_users(self.staff, CourseStaffRole(self.location.course_id), self.staff)
+            add_users(self.staff, CourseStaffRole(self.course_id), self.staff)
 
     def test_remove_user_from_course_group(self):
         """
         Tests removing user from course group (happy path).
         """
-        add_users(self.global_admin, CourseInstructorRole(self.location.course_id), self.creator)
-        add_users(self.global_admin, CourseStaffRole(self.location.course_id), self.creator)
+        add_users(self.global_admin, CourseInstructorRole(self.course_id), self.creator)
+        add_users(self.global_admin, CourseStaffRole(self.course_id), self.creator)
 
-        add_users(self.creator, CourseStaffRole(self.location.course_id), self.staff)
-        self.assertTrue(has_access(self.staff, CourseStaffRole(self.location.course_id)))
+        add_users(self.creator, CourseStaffRole(self.course_id), self.staff)
+        self.assertTrue(has_access(self.staff, CourseStaffRole(self.course_id)))
 
-        remove_users(self.creator, CourseStaffRole(self.location.course_id), self.staff)
-        self.assertFalse(has_access(self.staff, CourseStaffRole(self.location.course_id)))
+        remove_users(self.creator, CourseStaffRole(self.course_id), self.staff)
+        self.assertFalse(has_access(self.staff, CourseStaffRole(self.course_id)))
 
-        remove_users(self.creator, CourseInstructorRole(self.location.course_id), self.creator)
-        self.assertFalse(has_access(self.creator, CourseInstructorRole(self.location.course_id)))
+        remove_users(self.creator, CourseInstructorRole(self.course_id), self.creator)
+        self.assertFalse(has_access(self.creator, CourseInstructorRole(self.course_id)))
 
     def test_remove_user_from_course_group_permission_denied(self):
         """
         Verifies PermissionDenied if caller of remove_user_from_course_group is not instructor role.
         """
-        add_users(self.global_admin, CourseInstructorRole(self.location.course_id), self.creator)
+        add_users(self.global_admin, CourseInstructorRole(self.course_id), self.creator)
         another_staff = User.objects.create_user('another', 'teststaff+anothercourses@edx.org', 'foo')
-        add_users(self.global_admin, CourseStaffRole(self.location.course_id), self.creator, self.staff, another_staff)
+        add_users(self.global_admin, CourseStaffRole(self.course_id), self.creator, self.staff, another_staff)
         with self.assertRaises(PermissionDenied):
-            remove_users(self.staff, CourseStaffRole(self.location.course_id), another_staff)
+            remove_users(self.staff, CourseStaffRole(self.course_id), another_staff)

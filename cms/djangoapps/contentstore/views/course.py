@@ -429,7 +429,7 @@ def _users_assign_default_role(course_location):
     """
     enrollments = CourseEnrollment.objects.filter(course_id=course_location.course_id)
     for enrollment in enrollments:
-        assign_default_role(course_location.course_id, enrollment.user)
+        assign_default_role(course_location.course_key, enrollment.user)
 
 
 # pylint: disable=unused-argument

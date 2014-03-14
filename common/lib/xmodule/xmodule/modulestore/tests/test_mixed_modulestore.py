@@ -129,7 +129,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             self.course_locations[self.MONGO_COURSEID] = course.location.version_agnostic()
             self.import_chapter_location = chapter.location.version_agnostic()
         else:
-            self.assertEqual(course.location.course_id, course_id)
+            self.assertEqual(course.id, course_id)
             self.assertEqual(chapter.location, self.import_chapter_location)
 
     def initdb(self, default):
@@ -268,7 +268,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.initdb('direct')
         courses = self.store.modulestores['xml'].get_courses()
         self.assertEqual(len(courses), 2)
-        course_ids = [course.location.course_id for course in courses]
+        course_ids = [course.id for course in courses]
         self.assertIn(self.XML_COURSEID1, course_ids)
         self.assertIn(self.XML_COURSEID2, course_ids)
         # this course is in the directory from which we loaded courses but not in the map

@@ -346,7 +346,7 @@ def add_courseware_context(content_list, course):
             location = id_map[commentable_id]["location"].url()
             title = id_map[commentable_id]["title"]
 
-            url = reverse('jump_to', kwargs={"course_id": course.location.course_id,
+            url = reverse('jump_to', kwargs={"course_id": course.id,
                           "location": location})
 
             content.update({"courseware_url": url, "courseware_title": title})
