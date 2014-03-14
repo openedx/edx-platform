@@ -50,7 +50,7 @@ class Basetranscripts(CourseTestCase):
         """Create initial data."""
         super(Basetranscripts, self).setUp()
         self.unicode_locator = unicode(loc_mapper().translate_location(
-            self.course.location.course_id, self.course.location, False, True
+            self.course.id, self.course.location, False, True
         ))
 
         # Add video module

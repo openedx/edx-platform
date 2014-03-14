@@ -119,7 +119,7 @@ class LocMapperStore(object):
 
         return package_id
 
-    def translate_location(self, old_style_course_id, location, published=True,
+    def translate_location(self, location, published=True,
                            add_entry_if_missing=True, passed_block_id=None):
         """
         Translate the given module location to a Locator. If the mapping has the run id in it, then you
@@ -338,12 +338,10 @@ class LocMapperStore(object):
         self.location_map.update(location_id, {'$set': {'block_map': block_map}})
         return block_id
 
-    def _interpret_location_course_id(self, course_id, location, lower_only=False):
+    def _interpret_location_course_id(self, location, lower_only=False):
         """
-        Take the old style course id (org/course/run) and return a dict w/ a SON for querying the mapping table.
-        If the course_id is empty, it uses location, but this may result in an inadequate id.
+        Take a Location and return a SON for querying the mapping table.
 
-        :param course_id: old style 'org/course/run' id from Location.course_id where Location.category = 'course'
         :param location: a Location object which may be to a module or a course. Provides partial info
         if course_id is omitted.
         """

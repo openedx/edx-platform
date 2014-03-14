@@ -42,7 +42,7 @@ class TestOrphan(CourseTestCase):
         """
         Test that old mongo finds the orphans
         """
-        locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
+        locator = loc_mapper().translate_location(self.course.id, self.course.location, False, True)
         orphan_url = locator.url_reverse('orphan/', '')
 
         orphans = json.loads(
@@ -63,7 +63,7 @@ class TestOrphan(CourseTestCase):
         """
         Test that old mongo deletes the orphans
         """
-        locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
+        locator = loc_mapper().translate_location(self.course.id, self.course.location, False, True)
         orphan_url = locator.url_reverse('orphan/', '')
         self.client.delete(orphan_url)
         orphans = json.loads(
@@ -76,8 +76,8 @@ class TestOrphan(CourseTestCase):
         Test that auth restricts get and delete appropriately
         """
         test_user_client, test_user = self.createNonStaffAuthedUserClient()
-        CourseEnrollment.enroll(test_user, self.course.location.course_id)
-        locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
+        CourseEnrollment.enroll(test_user, self.course.id)
+        locator = loc_mapper().translate_location(self.course.id, self.course.location, False, True)
         orphan_url = locator.url_reverse('orphan/', '')
         response = test_user_client.get(orphan_url)
         self.assertEqual(response.status_code, 403)

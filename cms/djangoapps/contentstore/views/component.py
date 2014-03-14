@@ -83,7 +83,7 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        preview_link = get_lms_link_for_item(old_location, course_id=course.location.course_id, preview=True)
+        preview_link = get_lms_link_for_item(old_location, course_id=course.id, preview=True)
 
         # make sure that location references a 'sequential', otherwise return
         # BadRequest
@@ -113,7 +113,7 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
                 break
 
         course_locator = loc_mapper().translate_location(
-            course.location.course_id, course.location, False, True
+            course.id, course.location, False, True
         )
 
         return render_to_response(
@@ -230,7 +230,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         xblocks = item.get_children()
         locators = [
             loc_mapper().translate_location(
-                course.location.course_id, xblock.location, False, True
+                course.id, xblock.location, False, True
             )
             for xblock in xblocks
         ]
@@ -344,7 +344,7 @@ def _get_item_in_course(request, locator):
     course_location = loc_mapper().translate_locator_to_location(locator, True)
     course = modulestore().get_item(course_location)
     item = modulestore().get_item(old_location, depth=1)
-    lms_link = get_lms_link_for_item(old_location, course_id=course.location.course_id)
+    lms_link = get_lms_link_for_item(old_location, course_id=course.id)
 
     return old_location, course, item, lms_link
 

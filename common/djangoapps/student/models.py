@@ -451,7 +451,7 @@ class CourseEnrollment(models.Model):
         """
         is_course_full = False
         if course.max_student_enrollments_allowed is not None:
-            is_course_full = cls.num_enrolled_in(course.location.course_id) >= course.max_student_enrollments_allowed
+            is_course_full = cls.num_enrolled_in(course.id) >= course.max_student_enrollments_allowed
         return is_course_full
 
     def update_enrollment(self, mode=None, is_active=None):

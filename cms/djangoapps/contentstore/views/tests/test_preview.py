@@ -32,7 +32,7 @@ class GetPreviewHtmlTestCase(TestCase):
         )
 
         locator = loc_mapper().translate_location(
-            course.location.course_id, html.location, True, True
+            course.id, html.location, True, True
         )
 
         # Change the stored location to a locator.
