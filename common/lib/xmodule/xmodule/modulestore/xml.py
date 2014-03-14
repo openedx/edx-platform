@@ -25,7 +25,7 @@ from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
-from xblock.runtime import DictKeyValueStore, IdReader, IdGenerator
+from xblock.runtime import DictKeyValueStore, IdGenerator
 
 from . import ModuleStoreReadBase, Location, XML_MODULESTORE_TYPE
 
@@ -52,7 +52,7 @@ def clean_out_mako_templating(xml_string):
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     def __init__(self, xmlstore, course_id, course_dir,
                  error_tracker, parent_tracker,
-                 load_error_modules=True, id_reader=None, **kwargs):
+                 load_error_modules=True, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -61,8 +61,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         """
         self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
-        if id_reader is None:
-            id_reader = LocationReader()
         id_generator = CourseLocationGenerator(course_id)
 
         # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
@@ -242,18 +240,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     def add_node_as_child(self, block, node, id_generator):
         child_block = self.process_xml(etree.tostring(node))
         block.children.append(child_block.scope_ids.usage_id)
-
-
-class LocationReader(IdReader):
-    """
-    IdReader for definition and usage ids that are Locations
-    """
-    def get_definition_id(self, usage_id):
-        return usage_id.definition_key
-
-    def get_block_type(self, def_id):
-        location = def_id
-        return location.category
 
 
 class CourseLocationGenerator(IdGenerator):

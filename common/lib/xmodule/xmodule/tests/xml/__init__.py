@@ -7,7 +7,7 @@ from unittest import TestCase
 
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.modulestore.xml import create_block_from_xml, LocationReader, CourseLocationGenerator
+from xmodule.modulestore.xml import create_block_from_xml, CourseLocationGenerator
 from xmodule.modulestore import Location
 from xmodule.modulestore.keys import CourseKey
 
@@ -37,7 +37,6 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
             select=xml_import_data.xblock_select,
             render_template=lambda template, context: pprint.pformat((template, context)),
             field_data=KvsFieldData(DictKeyValueStore()),
-            id_reader=LocationReader(),
         )
 
     def process_xml(self, xml):  # pylint: disable=method-hidden
