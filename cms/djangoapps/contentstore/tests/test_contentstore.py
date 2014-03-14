@@ -131,7 +131,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # just pick one vertical
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
-        locator = loc_mapper().translate_location(course.location.course_id, descriptor.location, True, True)
+        locator = loc_mapper().translate_location(course.id, descriptor.location, True, True)
         resp = self.client.get_html(locator.url_reverse('unit'))
         self.assertEqual(resp.status_code, 200)
         _test_no_locations(self, resp)
@@ -159,7 +159,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
         location = descriptor.location.replace(name='.' + descriptor.location.name)
         locator = loc_mapper().translate_location(
-            course_items[0].location.course_id, location, add_entry_if_missing=True)
+            course_items[0].id, location, add_entry_if_missing=True)
 
         resp = self.client.get_html(locator.url_reverse('unit'))
         self.assertEqual(resp.status_code, 400)
@@ -169,7 +169,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         _, course_items = import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
 
         items = modulestore().get_items(Location('i4x', 'edX', test_course_name, 'vertical', None, None))
-        self._check_verticals(items, course_items[0].location.course_id)
+        self._check_verticals(items, course_items[0].id)
 
     def _lock_an_asset(self, content_store, course_id):
         """
@@ -446,7 +446,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """ Returns the locator for a given tab. """
         tab_location = 'i4x://edX/999/static_tab/{0}'.format(tab['url_slug'])
         return loc_mapper().translate_location(
-            course.location.course_id, Location(tab_location), True, True
+            course.id, Location(tab_location), True, True
         )
 
     def _create_static_tabs(self):
@@ -502,7 +502,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # also try a custom response which will trigger the 'is this course in whitelist' logic
         locator = loc_mapper().translate_location(
-            course_items[0].location.course_id, location, True, True
+            course_items[0].id, location, True, True
         )
         resp = self.client.get_json(locator.url_reverse('xblock', view_name))
         self.assertEqual(resp.status_code, 200)
@@ -512,10 +512,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_delete(self):
         direct_store = modulestore('direct')
-        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        course_location = Location('i4x', 'edX', '999', 'course', 'Robot_Super_Course', None)
+        course = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
 
-        chapterloc = ItemFactory.create(parent_location=course_location, display_name="Chapter").location
+        chapterloc = ItemFactory.create(parent_location=course.location, display_name="Chapter").location
         ItemFactory.create(parent_location=chapterloc, category='sequential', display_name="Sequential")
 
         sequential = direct_store.get_item(Location('i4x', 'edX', '999', 'sequential', 'Sequential', None))
@@ -524,7 +523,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # make sure the parent points to the child object which is to be deleted
         self.assertTrue(sequential.location.url() in chapter.children)
 
-        location = loc_mapper().translate_location(course_location.course_id, sequential.location, True, True)
+        location = loc_mapper().translate_location(course.id, sequential.location, True, True)
         self.client.delete(location.url_reverse('xblock'), {'recurse': True, 'all_versions': True})
 
         found = False

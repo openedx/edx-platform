@@ -31,7 +31,7 @@ class ItemTest(CourseTestCase):
         super(ItemTest, self).setUp()
 
         self.course_locator = loc_mapper().translate_location(
-            self.course.location.course_id, self.course.location, False, True
+            self.course.id, self.course.location, False, True
         )
         self.unicode_locator = unicode(self.course_locator)
 
@@ -310,10 +310,10 @@ class TestDuplicateItem(ItemTest):
                 )
                 for i in xrange(len(original_item.children)):
                     source_locator = loc_mapper().translate_location(
-                        self.course.location.course_id, Location(original_item.children[i]), False, True
+                        self.course.id, Location(original_item.children[i]), False, True
                     )
                     duplicate_locator = loc_mapper().translate_location(
-                        self.course.location.course_id, Location(duplicated_item.children[i]), False, True
+                        self.course.id, Location(duplicated_item.children[i]), False, True
                     )
                     if not check_equality(source_locator, duplicate_locator):
                         return False

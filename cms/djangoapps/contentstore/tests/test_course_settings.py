@@ -445,7 +445,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.fullcourse = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
         self.course_setting_url = self.course_locator.url_reverse('settings/advanced')
         self.fullcourse_setting_url = loc_mapper().translate_location(
-            self.fullcourse.location.course_id,
+            self.fullcourse.id,
             self.fullcourse.location, False, True
         ).url_reverse('settings/advanced')
 
