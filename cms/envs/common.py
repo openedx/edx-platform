@@ -86,6 +86,9 @@ FEATURES = {
 
     # Turn on/off Microsites feature
     'USE_MICROSITES': False,
+
+    # Allow creating courses with non-ascii characters in the course id
+    'ALLOW_UNICODE_COURSE_ID': False,
 }
 ENABLE_JASMINE = False
 
