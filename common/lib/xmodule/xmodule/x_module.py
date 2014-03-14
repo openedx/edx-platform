@@ -23,7 +23,6 @@ from xblock.runtime import Runtime
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
-from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.exceptions import UndefinedContext
@@ -174,12 +173,7 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def url_name(self):
-        if isinstance(self.location, Location):
-            return self.location.name
-        elif isinstance(self.location, BlockUsageLocator):
-            return self.location.block_id
-        else:
-            raise InsufficientSpecificationError()
+        return self.location.name
 
     @property
     def display_name_with_default(self):

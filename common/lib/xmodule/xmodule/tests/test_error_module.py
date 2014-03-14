@@ -6,6 +6,7 @@ from xmodule.tests import get_test_system
 from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import CourseLocationGenerator
+from xmodule.modulestore.keys import CourseKey
 from xmodule.x_module import XModuleDescriptor, XModule
 from mock import MagicMock, Mock, patch
 from xblock.runtime import Runtime, IdReader

@@ -69,6 +69,9 @@ setup(
         ],
         'course_key': [
             'slashes = xmodule.modulestore.locations:SlashSeparatedCourseKey',
+        ],
+        'usage_key': [
+            'location = xmodule.modulestore.locations:Location',
         ]
     },
 )
