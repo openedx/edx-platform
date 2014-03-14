@@ -130,11 +130,11 @@ define('MasterClassMain', ['logme'], function (logme) {
 
                     return;
                 }
-            var csv = ConvertToCSV([response.data.header]) + ConvertToCSV(response.data.data);
+            var csv = ConvertToCSV([response.data.header]) + '\r\n' + ConvertToCSV(response.data.data);
             a=document.createElement('a');
             a.textContent='download';
             a.download="emails.csv";
-            a.href='data:text/csv;charset=utf-8,'+escape(csv);
+            a.href='data:text/csv;charset=utf-8,'+csv;
             a.click();
              }
         );
