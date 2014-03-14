@@ -249,7 +249,7 @@ class LocationReader(IdReader):
     IdReader for definition and usage ids that are Locations
     """
     def get_definition_id(self, usage_id):
-        return usage_id
+        return usage_id.definition_key
 
     def get_block_type(self, def_id):
         location = def_id

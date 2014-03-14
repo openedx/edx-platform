@@ -30,7 +30,7 @@ class Command(BaseCommand):
             raise CommandError("Unknown modulestore {}".format(name))
 
         for course in store.get_courses():
-            course_id = course.location.course_id
+            course_id = course.id
             output.append(course_id)
 
         return '\n'.join(output) + '\n'

@@ -100,7 +100,7 @@ def get_opt_course_with_access(user, action, course_id):
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
-    if course.static_asset_path or modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
+    if course.static_asset_path or modulestore().get_modulestore_type(course.id) == XML_MODULESTORE_TYPE:
         return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
     else:
         loc = StaticContent.compute_location(course.location.org, course.location.course, course.course_image)
@@ -260,7 +260,7 @@ def get_course_syllabus_section(course, section_key):
                 return replace_static_urls(
                     html_file.read().decode('utf-8'),
                     getattr(course, 'data_dir', None),
-                    course_id=course.location.course_id,
+                    course_id=course.id,
                     static_asset_path=course.static_asset_path,
                 )
         except ResourceNotFoundError:

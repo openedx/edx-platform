@@ -233,8 +233,8 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
                     session_status[key] = 3
                     request.session.modified = True
 
-                    auth.add_users(request.user, CourseInstructorRole(new_location.course_id), request.user)
-                    auth.add_users(request.user, CourseStaffRole(new_location.course_id), request.user)
+                    auth.add_users(request.user, CourseInstructorRole(new_location.course_key), request.user)
+                    auth.add_users(request.user, CourseStaffRole(new_location.course_key), request.user)
                     logging.debug('created all course groups at {0}'.format(new_location))
 
                 # Send errors to client with stage at which error occurred.
@@ -310,7 +310,7 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
     if not has_course_access(request.user, location.package_id):
         raise PermissionDenied()
 
-    course_module = modulestore().get_course(location.course_id)
+    course_module = modulestore().get_course(location.course_key)
 
     # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
     requested_format = request.REQUEST.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))

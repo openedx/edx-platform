@@ -37,7 +37,7 @@ class SplitMigrator(object):
         whatever translate_location_to_locator returns
         """
         new_package_id = self.loc_mapper.create_map_entry(course_location, package_id=new_package_id)
-        old_course_id = course_location.course_id
+        old_course_id = course_location.course_key
         # the only difference in data between the old and split_mongo xblocks are the locations;
         # so, any field which holds a location must change to a Locator; otherwise, the persistence
         # layer and kvs's know how to store it.

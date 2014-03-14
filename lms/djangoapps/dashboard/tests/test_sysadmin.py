@@ -322,7 +322,7 @@ class TestSysadmin(SysadminBaseTestCase):
         course = def_ms.courses.get('{0}/edx4edx_lite'.format(
             os.path.abspath(settings.DATA_DIR)), None)
         self.assertIsNotNone(course)
-        self.assertIn(self.TEST_BRANCH_COURSE, course.location.course_id)
+        self.assertIn(self.TEST_BRANCH_COURSE, course.id)
         self._rm_edx4edx()
 
         # Try and delete a non-existent course

@@ -11,10 +11,16 @@ from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, OverSpecificationError
+from xmodule.modulestore.keys import CourseKey, UsageKey
 
-from .keys import CourseKey
-from .parsers import parse_url, parse_package_id, parse_block_ref
-from .parsers import BRANCH_PREFIX, BLOCK_PREFIX, VERSION_PREFIX
+from xmodule.modulestore.parsers import (
+    parse_url,
+    parse_package_id,
+    parse_block_ref,
+    BRANCH_PREFIX,
+    BLOCK_PREFIX,
+    VERSION_PREFIX
+)
 import re
 
 log = logging.getLogger(__name__)

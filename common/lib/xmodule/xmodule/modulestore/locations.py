@@ -28,7 +28,7 @@ INVALID_HTML_CHARS = re.compile(r"[^\w-]", re.UNICODE)
 
 class SlashSeparatedCourseKey(CourseKey):
     """Course key for old style org/course/run course identifiers"""
-    def __init__(org, course, run):
+    def __init__(self, org, course, run):
         self._org = org
         self._course = course
         self._run = run
@@ -47,8 +47,16 @@ class SlashSeparatedCourseKey(CourseKey):
         return self._org
 
     @property
+    def course(self):
+        return self._course
+
+    @property
+    def run(self):
+        return self._run
+
+    @property
     def offering(self):
-        return '/'.join([course, run])
+        return '/'.join([self._course, self._run])
 
     def make_asset_key(self, path):
         return Location('c4x', self._org, self._course, 'asset', path)

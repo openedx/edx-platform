@@ -246,7 +246,7 @@ class CourseUpdateTest(CourseTestCase):
         version = None
         block = u'updates'
         updates_locator = BlockUsageLocator(
-            package_id=course_location.course_id.replace('/', '.'), branch=branch, version_guid=version, block_id=block
+            package_id=course_location.course_key, branch=branch, version_guid=version, block_id=block
         )
 
         content = u"Sample update"

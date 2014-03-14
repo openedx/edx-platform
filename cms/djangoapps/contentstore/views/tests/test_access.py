@@ -28,18 +28,18 @@ class RolesTest(TestCase):
         """
         Verifies if user is instructor.
         """
-        add_users(self.global_admin, CourseInstructorRole(self.location.course_id), self.instructor)
+        add_users(self.global_admin, CourseInstructorRole(self.location.course_key), self.instructor)
         self.assertEqual(
             'instructor',
-            get_user_role(self.instructor, self.location.course_id)
+            get_user_role(self.instructor, self.location.course_key)
         )
 
     def test_get_user_role_staff(self):
         """
         Verifies if user is staff.
         """
-        add_users(self.global_admin, CourseStaffRole(self.location.course_id), self.staff)
+        add_users(self.global_admin, CourseStaffRole(self.location.course_key), self.staff)
         self.assertEqual(
             'staff',
-            get_user_role(self.staff, self.location.course_id)
+            get_user_role(self.staff, self.location.course_key)
         )
