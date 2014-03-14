@@ -33,7 +33,7 @@ Create a Discussion Component
 
 
 To create a new HTML component in an existing Unit, ensure the Unit is Private.  
-For more information on Public and Private Units, see LINK.
+For more information on Public and Private Units, see :ref:`Public and Private Units`.
 
 #. Under **Add New Component**, click the **discussion** icon.
 
@@ -53,7 +53,7 @@ For more information on Public and Private Units, see LINK.
    .. image:: Images/DiscussionComponentEditor.png
     :alt: Image of the discussion component editor
 
-#. Follow the guidelines in the editor to fill in the **Discussion Category**, **Display Name**, and **Subcategory**. 
+#. Follow the guidelines in the editor to fill in the **Category**, **Display Name**, and **Subcategory**. 
   
 #. Click **Save**.
 

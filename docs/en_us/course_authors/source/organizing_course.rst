@@ -112,7 +112,7 @@ For more information about viewing drafts or the current version of your course,
 Units
 ******
 
-Subsections are divided into units. A unit, in turn, contains one or more components.
+Subsections are divided into units. A unit, in turn, contains one or more components, such as HTML content, problems, and videos. 
 
 In the LMS, each unit in the subsection appears as a link on the course ribbon at the top of the page. The following image shows a subsection that has eight units:
 

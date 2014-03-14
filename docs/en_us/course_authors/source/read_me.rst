@@ -2,7 +2,7 @@
 Read Me
 *******
 
-The edX *Building a course with Studio* documentation is created
+The edX *Building a Course with edX Studio* documentation is created
 using RST_ files and Sphinx_. You, the user community, can help update and revise
 this documentation project on GitHub::
 

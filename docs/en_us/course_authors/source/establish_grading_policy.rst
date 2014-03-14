@@ -109,7 +109,7 @@ You configure the following fields for each assignment type:
   
   The general category of the assignment. This name will be visible to students.
  
-  .. note:: All assignments of a particular type are automatically worth the same amount. Thus, a homework assignment that contains 10 problems is worth the same percentage of a student's grade as a homework assignment that contains 20 problems. 
+  .. note:: All assignments of a particular type count the same toward the weight of that category. As a result, a homework assignment that contains 10 problems is worth the same percentage of a student's grade as a homework assignment that contains 20 problems. 
   
   
 * **Abbreviation:** 
@@ -144,7 +144,7 @@ You configure the following fields for each assignment type:
 Set the Assignment Type for Graded Subsections
 **********************************************
 After you configure assignment types, as you are organizing your course, 
-you set the assignment type for Subsections that contain problems that are to be graded.
+you set the assignment type for subsections that contain problems that are to be graded. Courses are organized to include sections and subsections. Each subsection that contains problems to be graded can include only one assignment type. See :ref:`subsections` for more information.
 
 .. note:: You can designate a Subsection as one, and only one, of the assignment types you configured. You can also set a due date.
   

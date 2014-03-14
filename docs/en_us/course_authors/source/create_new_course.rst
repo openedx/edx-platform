@@ -401,7 +401,7 @@ The current sort order is shown at the top of the file list, and the active sort
 Find Files
 ==================
 
-The **Files & Uploads** page lists up to 50 files.  If your course has more than 50 files, additional files are listed in other pages.
+The **Files & Uploads** page lists up to 50 files.  If your course has more than 50 files, additional files are listed on other pages.
 
 The range of the files listed on the page, and the total number of files, are shown at the top of the page.
 
@@ -438,7 +438,8 @@ To delete a file, click the **x** icon next to the file.  You are prompted to co
 ****************
 Add Static Pages
 ****************
-You can add static pages to your course. Each static page appears in your courses navigation bar. 
+You can add static pages to your course. Each static page appears in your course's navigation bar. 
+
 For example, the following navigation bar includes a
 **Syllabus** and **Projects** static pages.
 
@@ -493,9 +494,9 @@ To add a course update:
 
 #. From the **Content** menu, select **Updates**. 
 #. Click **New Update**.
-#. Enter your update as as HTML.
+#. Enter your update in the HTML editor that opens.
 
-  .. note::  You must enter the update in HTML. For a template that includes placeholders, see :ref:`Appendix A`.
+  .. note::  You must enter the update in HTML. See :ref:`Appendix A`.
 
 4. Click **Save**.
 
@@ -504,12 +505,12 @@ To add a course update:
 **********************
 Add Course Handouts
 **********************
-You can add course handouts that are visible to students on the **Course Info** page.
+You can add course handouts that are visible to students on the **Course Info** page. To add an uploaded file to the course handouts, you will need its URL.
 
 .. note::  You must :ref:`Add Files to a Course` before you can add them as course handouts.
 
 #. From the **Content** menu, select **Updates**. 
-#. In the **Course Handouts** page, click **Edit**.
+#. In the **Course Handouts** panel, click **Edit**.
 #. Edit the HTML to add links to the files you uploaded. See :ref:`Add a Link in an HTML Component` for more information.
 #. Click **Save**.
 
@@ -518,7 +519,7 @@ You can add course handouts that are visible to students on the **Course Info** 
 ****************
 Add Textbooks
 ****************
-You can add textbooks for your course as PDF files.  
+You can add PDF textbooks for your course.  
 
 .. note::  Do not use image files (for example, .PNG files) as textbooks for your course, as they are not accessible to screen readers. Review the :ref:`Best Practices for Accessible PDFs` for more information.
 
@@ -542,5 +543,5 @@ To add a textbook:
 3. Enter the **Textbook Name**.
 #. Enter the first **Chapter Name**.
 #. To upload a PDF file from your computer, click **Upload PDF**.  Follow the prompts to upload your file.
-#. To add addition chapters, click **+Add a Chapter** and repeat steps 3 and 4.
+#. To add more chapters, click **+Add a Chapter** and repeat steps 3 and 4.
 #. Click **Save**.
