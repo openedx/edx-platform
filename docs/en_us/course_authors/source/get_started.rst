@@ -59,7 +59,7 @@ EdX then evaluates your request. When course creation permissions are granted, y
 Create Your First Course
 ***************************
 
-When you receive notice that you can create courses, log into Studio_.
+When you receive notice that you can create courses, log in to Studio_.
 
 You see the following page:
 
