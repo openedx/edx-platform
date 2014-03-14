@@ -259,9 +259,8 @@ class CourseLocationGenerator(IdGenerator):
     IdGenerator for Location-based definition ids and usage ids
     based within a course
     """
-    def __init__(self, org, course):
-        self.org = org
-        self.course = course
+    def __init__(self, course_id):
+        self.course_id = course_id
         self.autogen_ids = itertools.count(0)
 
     def create_usage(self, def_id):
@@ -271,8 +270,7 @@ class CourseLocationGenerator(IdGenerator):
         assert block_type is not None
         if slug is None:
             slug = 'autogen_{}_{}'.format(block_type, self.autogen_ids.next())
-        location = Location('i4x', self.org, self.course, block_type, slug)
-        return location
+        return self.course_id.make_usage_key(block_type, slug)
 
 
 def create_block_from_xml(xml_data, system, id_generator):
