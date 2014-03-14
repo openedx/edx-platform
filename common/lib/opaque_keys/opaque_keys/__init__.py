@@ -17,27 +17,6 @@ class InvalidKeyError(Exception):
     pass
 
 
-def separate_namespace(serialized):
-    """
-    Return the namespace from a serialized :class:`OpaqueKey`, and
-    the rest of the key.
-
-    Args:
-        serialized (unicode): A serialized :class:`OpaqueKey`.
-
-    Raises:
-        MissingNamespace: Raised when no namespace can be
-            extracted from `serialized`.
-    """
-    namespace, _, rest = serialized.partition(':')
-
-    # No ':' found by partition, so it returns the input string
-    if namespace == serialized:
-        raise MissingNamespaceError(serialized)
-
-    return (namespace, rest)
-
-
 class OpaqueKey(object):
     """
     A base-class for implementing pluggable opaque keys. Individual key subclasses identify
@@ -62,6 +41,8 @@ class OpaqueKey(object):
     compatibility.
     """
     __metaclass__ = ABCMeta
+
+    NAMESPACE_SEPARATOR = u':'
 
     @classmethod
     @abstractmethod
@@ -89,6 +70,27 @@ class OpaqueKey(object):
         raise NotImplementedError()
 
     @classmethod
+    def _separate_namespace(cls, serialized):
+        """
+        Return the namespace from a serialized :class:`OpaqueKey`, and
+        the rest of the key.
+
+        Args:
+            serialized (unicode): A serialized :class:`OpaqueKey`.
+
+        Raises:
+            MissingNamespace: Raised when no namespace can be
+                extracted from `serialized`.
+        """
+        namespace, _, rest = serialized.partition(cls.NAMESPACE_SEPARATOR)
+
+        # No ':' found by partition, so it returns the input string
+        if namespace == serialized:
+            raise MissingNamespaceError(serialized)
+
+        return (namespace, rest)
+
+    @classmethod
     def drivers(cls):
         return ExtensionManager(
             cls.KEY_TYPE,
@@ -105,7 +107,7 @@ class OpaqueKey(object):
             serialized: A stringified form of a :class:`OpaqueKey`
         """
         try:
-            namespace, rest = separate_namespace(serialized)
+            namespace, rest = cls._separate_namespace(serialized)
         except MissingNamespaceError:
             return cls._from_string_fallback(serialized)
 
@@ -133,4 +135,4 @@ class OpaqueKey(object):
         raise InvalidKeyError(serialized)
 
     def __unicode__(self):
-        return u"{}:{}".format(self.CANONICAL_NAMESPACE, self._to_string())
+        return self.NAMESPACE_SEPARATOR.join([self.CANONICAL_NAMESPACE, self._to_string()])
