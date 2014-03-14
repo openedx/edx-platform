@@ -31,9 +31,7 @@ class GetPreviewHtmlTestCase(TestCase):
             data={'data': "<html>foobar</html>"}
         )
 
-        locator = loc_mapper().translate_location(
-            course.id, html.location, True, True
-        )
+        locator = loc_mapper().translate_location(html.location, True, True)
 
         # Change the stored location to a locator.
         html.location = locator

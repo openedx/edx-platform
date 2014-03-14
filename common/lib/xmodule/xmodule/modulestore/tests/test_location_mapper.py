@@ -85,9 +85,8 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         Request translation, check package_id, block_id, and branch
         """
         prob_locator = loc_mapper().translate_location(
-            old_style_course_id,
             location,
-            published= (branch=='published'),
+            published=(branch == 'published'),
             add_entry_if_missing=add_entry
         )
         self.assertEqual(prob_locator.package_id, new_style_package_id)
@@ -95,9 +94,9 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         self.assertEqual(prob_locator.branch, branch)
 
         course_locator = loc_mapper().translate_location_to_course_locator(
-           old_style_course_id,
-           location,
-           published=(branch == 'published'),
+            old_style_course_id,
+            location,
+            published=(branch == 'published'),
         )
         self.assertEqual(course_locator.package_id, new_style_package_id)
         self.assertEqual(course_locator.branch, branch)
@@ -112,7 +111,6 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         old_style_course_id = '{}/{}/{}'.format(org, course, 'baz_run')
         with self.assertRaises(ItemNotFoundError):
             _ = loc_mapper().translate_location(
-                old_style_course_id,
                 Location('i4x', org, course, 'problem', 'abc123'),
                 add_entry_if_missing=False
             )
@@ -137,7 +135,6 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         # look for non-existent problem
         with self.assertRaises(ItemNotFoundError):
             loc_mapper().translate_location(
-                None,
                 Location('i4x', org, course, 'problem', '1def23'),
                 add_entry_if_missing=False
             )
@@ -169,7 +166,6 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         self.translate_n_check(test_problem_locn, test_delta_old_id, test_delta_new_id, 'problem3', 'published')
         # look for default translation of uncached Location (not unique; so, just verify it returns something)
         prob_locator = loc_mapper().translate_location(
-            None,
             Location('i4x', org, course, 'problem', 'def456'),
             add_entry_if_missing=False
         )
@@ -229,7 +225,6 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         )
         # look for w/ only the Location: causes caching and not unique; so, can't check which course
         prob_locator = loc_mapper().translate_location(
-            None,
             new_prob_locn,
             add_entry_if_missing=True
         )
@@ -361,7 +356,6 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         old_style_course_id = '{}/{}/{}'.format(org, course, name)
         location = Location('i4x', org, course, 'course', name)
         prob_locator = loc_mapper().translate_location(
-            old_style_course_id,
             location,
             add_entry_if_missing=True
         )
@@ -385,7 +379,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         # and a non-existent one w/o add
         eponymous_block = course_location.replace(category='problem')
         with self.assertRaises(ItemNotFoundError):
-            chapter_xlate = loc_mapper().translate_location(None, eponymous_block, add_entry_if_missing=False)
+            chapter_xlate = loc_mapper().translate_location(eponymous_block, add_entry_if_missing=False)
 
 
 #==================================

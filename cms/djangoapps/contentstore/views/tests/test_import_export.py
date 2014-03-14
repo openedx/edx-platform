@@ -33,9 +33,7 @@ class ImportTestCase(CourseTestCase):
     """
     def setUp(self):
         super(ImportTestCase, self).setUp()
-        self.new_location = loc_mapper().translate_location(
-            self.course.id, self.course.location, False, True
-        )
+        self.new_location = loc_mapper().translate_location(self.course.location, False, True)
         self.url = self.new_location.url_reverse('import/', '')
         self.content_dir = path(tempfile.mkdtemp())
 
@@ -211,7 +209,7 @@ class ExportTestCase(CourseTestCase):
         Sets up the test course.
         """
         super(ExportTestCase, self).setUp()
-        location = loc_mapper().translate_location(self.course.id, self.course.location, False, True)
+        location = loc_mapper().translate_location(self.course.location, False, True)
         self.url = location.url_reverse('export/', '')
 
     def test_export_html(self):

@@ -8,7 +8,7 @@ import bson.son
 
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 import urllib
 
 
@@ -87,20 +87,12 @@ class LocMapperStore(object):
         Location block names and the values are the BlockUsageLocator.block_id.
         """
         if package_id is None:
-            if course_location.category == 'course':
-                package_id = u"{0.org}.{0.course}.{0.name}".format(course_location)
-            else:
-                package_id = u"{0.org}.{0.course}".format(course_location)
+            package_id = u"{0.org}.{0.course}.{0.name}".format(course_location.course_key)
+
         # very like _interpret_location_id but w/o the _id
-        location_id = self._construct_location_son(
-            course_location.org, course_location.course,
-            course_location.name if course_location.category == 'course' else None
-        )
+        location_id = self._construct_location_son(course_location.course_key)
         # create location id with lower case
-        location_id_lower = self._construct_lower_location_son(
-            course_location.org, course_location.course,
-            course_location.name if course_location.category == 'course' else None
-        )
+        location_id_lower = self._construct_lower_location_son(course_location.course_key, True)
 
         try:
             self.location_map.insert({
@@ -144,11 +136,9 @@ class LocMapperStore(object):
         NOTE: unlike old mongo, draft branches contain the whole course; so, it applies to all category
         of locations including course.
         """
-        location_id = self._interpret_location_course_id(old_style_course_id, location)
-        if old_style_course_id is None:
-            old_style_course_id = self._generate_location_course_id(location_id)
+        location_id = self._interpret_location_course_id(location)
 
-        cached_value = self._get_locator_from_cache(old_style_course_id, location, published)
+        cached_value = self._get_locator_from_cache(location, published)
         if cached_value:
             return cached_value
 
@@ -342,54 +332,26 @@ class LocMapperStore(object):
         """
         Take a Location and return a SON for querying the mapping table.
 
-        :param location: a Location object which may be to a module or a course. Provides partial info
-        if course_id is omitted.
+        :param location: a Location object which may be to a module or a course.
         """
-        if course_id:
-            # re doesn't allow ?P<_id.org> and ilk
-            matched = re.match(r'([^/]+)/([^/]+)/([^/]+)', course_id)
-            if lower_only:
-                return {'lower_id': self._construct_lower_location_son(*matched.groups())}
-            return {'_id': self._construct_location_son(*matched.groups())}
-
-        if location.category == 'course':
-            if lower_only:
-                return {'lower_id': self._construct_lower_location_son(location.org, location.course, location.name)}
-            return {'_id': self._construct_location_son(location.org, location.course, location.name)}
-        else:
-            return bson.son.SON([('_id.org', location.org), ('_id.course', location.course)])
+        return bson.son.SON([('_id', self._construct_location_son(location.course_key, lower_only))])
 
     def _generate_location_course_id(self, entry_id):
         """
         Generate a Location course_id for the given entry's id.
         """
-        # strip id envelope if any
-        entry_id = entry_id.get('_id', entry_id)
-        if entry_id.get('name', False):
-            return u'{0[org]}/{0[course]}/{0[name]}'.format(entry_id)
-        elif entry_id.get('_id.org', False):
-            # the odd format one
-            return u'{0[_id.org]}/{0[_id.course]}'.format(entry_id)
-        else:
-            return u'{0[org]}/{0[course]}'.format(entry_id)
+        return SlashSeparatedCourseKey(**entry_id['_id'])
 
-    def _construct_location_son(self, org, course, name=None):
+    def _construct_location_son(self, course_id, lower_only=False):
         """
         Construct the SON needed to repr the location for either a query or an insertion
         """
-        if name:
-            return bson.son.SON([('org', org), ('course', course), ('name', name)])
-        else:
-            return bson.son.SON([('org', org), ('course', course)])
-
-    def _construct_lower_location_son(self, org, course, name=None):
-        """
-        Construct the SON needed to represent the location with lower case
-        """
-        if name is not None:
-            name = name.lower()
-
-        return self._construct_location_son(org.lower(), course.lower(), name)
+        assert(isinstance(course_id, SlashSeparatedCourseKey))
+        return bson.son.SON([
+            ('org', course_id.org),
+            ('course', course_id.course),
+            ('name', course_id.name.lower() if lower_only else course_id.name)
+        ])
 
     def _block_id_is_guid(self, name):
         """
@@ -432,11 +394,11 @@ class LocMapperStore(object):
         """
         return urllib.unquote(fieldname)
 
-    def _get_locator_from_cache(self, old_course_id, location, published):
+    def _get_locator_from_cache(self, location, published):
         """
         See if the location x published pair is in the cache. If so, return the mapped locator.
         """
-        entry = self.cache.get(u'{}+{}'.format(old_course_id, location.url()))
+        entry = self.cache.get(u'{}+{}'.format(location.course_key, location)
         if entry is not None:
             if published:
                 return entry[0]

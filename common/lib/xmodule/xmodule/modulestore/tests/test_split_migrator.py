@@ -215,7 +215,9 @@ class TestMigration(unittest.TestCase):
         # descend via children to do comparison
         old_root = presplit.get_item(self.course_location, depth=None)
         new_root_locator = self.loc_mapper.translate_location(
-            self.course_location.course_id, self.course_location, published, add_entry_if_missing=False
+            self.course_location,
+            published,
+            add_entry_if_missing=False
         )
         new_root = self.split_mongo.get_course(new_root_locator)
         self.compare_dags(presplit, old_root, new_root, published)
@@ -225,8 +227,9 @@ class TestMigration(unittest.TestCase):
             location = self.course_location.replace(name=None, category=category)
             for conditional in presplit.get_items(location):
                 locator = self.loc_mapper.translate_location(
-                    self.course_location.course_id,
-                    conditional.location, published, add_entry_if_missing=False
+                    conditional.location,
+                    published,
+                    add_entry_if_missing=False
                 )
                 self.compare_dags(presplit, conditional, self.split_mongo.get_item(locator), published)
 

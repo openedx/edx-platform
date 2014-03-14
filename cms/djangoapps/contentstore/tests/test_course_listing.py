@@ -42,9 +42,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Create dummy course with 'CourseFactory' and role (instructor/staff) groups with provided group_name_format
         """
-        course_locator = loc_mapper().translate_location(
-            course_location.course_id, course_location, False, True
-        )
+        course_locator = loc_mapper().translate_location(course_location, False, True)
         course = CourseFactory.create(
             org=course_location.org,
             number=course_location.course,

@@ -92,9 +92,7 @@ class CourseTestCase(ModuleStoreTestCase):
             display_name='Robot Super Course',
         )
         self.course_location = self.course.location
-        self.course_locator = loc_mapper().translate_location(
-            self.course.id, self.course.location, False, True
-        )
+        self.course_locator = loc_mapper().translate_location(self.course.location, False, True)
 
     def createNonStaffAuthedUserClient(self):
         """

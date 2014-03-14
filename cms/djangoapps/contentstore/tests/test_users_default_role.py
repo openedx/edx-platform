@@ -34,9 +34,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         """
         Create course at provided location
         """
-        course_locator = loc_mapper().translate_location(
-            course_location.course_id, course_location, False, True
-        )
+        course_locator = loc_mapper().translate_location(course_location, False, True)
         resp = self.client.ajax_post(
             course_locator.url_reverse('course'),
             {

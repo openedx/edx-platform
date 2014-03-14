@@ -47,9 +47,7 @@ class TestCourseAccess(ModuleStoreTestCase):
 
         # create a course via the view handler which has a different strategy for permissions than the factory
         self.course_location = Location(['i4x', 'myu', 'mydept.mycourse', 'course', 'myrun'])
-        self.course_locator = loc_mapper().translate_location(
-            self.course_location.course_id, self.course_location, False, True
-        )
+        self.course_locator = loc_mapper().translate_location(self.course_location, False, True)
         self.client.ajax_post(
             self.course_locator.url_reverse('course'),
             {
@@ -121,9 +119,7 @@ class TestCourseAccess(ModuleStoreTestCase):
 
         # test copying course permissions
         copy_course_location = Location(['i4x', 'copyu', 'copydept.mycourse', 'course', 'myrun'])
-        copy_course_locator = loc_mapper().translate_location(
-            copy_course_location.course_id, copy_course_location, False, True
-        )
+        copy_course_locator = loc_mapper().translate_location(copy_course_location, False, True)
         for role in [CourseInstructorRole, CourseStaffRole]:
             auth.add_users(
                 self.user,

@@ -344,7 +344,7 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
                 # if we have a nested exception, then we'll show the more generic error message
                 pass
 
-            unit_locator = loc_mapper().translate_location(old_location.course_id, parent.location, False, True)
+            unit_locator = loc_mapper().translate_location(parent.location, False, True)
 
             return render_to_response('export.html', {
                 'context_course': course_module,

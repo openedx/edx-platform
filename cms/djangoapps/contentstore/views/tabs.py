@@ -140,9 +140,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             static_tabs.append(modulestore('direct').get_item(static_tab_loc))
 
         components = [
-            loc_mapper().translate_location(
-                course_item.id, static_tab.location, False, True
-            )
+            loc_mapper().translate_location(static_tab.location, False, True)
             for static_tab
             in static_tabs
         ]
