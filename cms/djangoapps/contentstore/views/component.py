@@ -112,9 +112,7 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
                 can_view_live = True
                 break
 
-        course_locator = loc_mapper().translate_location(
-            course.id, course.location, False, True
-        )
+        course_locator = loc_mapper().translate_location(course.location, False, True)
 
         return render_to_response(
             'edit_subsection.html',
@@ -229,9 +227,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
 
         xblocks = item.get_children()
         locators = [
-            loc_mapper().translate_location(
-                course.id, xblock.location, False, True
-            )
+            loc_mapper().translate_location(xblock.location, False, True)
             for xblock in xblocks
         ]
 

@@ -51,9 +51,7 @@ class RolesTestCase(TestCase):
         """
         Test that giving a user a course role enables access appropriately
         """
-        course_locator = loc_mapper().translate_location(
-            self.course.course_id, self.course, add_entry_if_missing=True
-        )
+        course_locator = loc_mapper().translate_location(self.course, add_entry_if_missing=True)
         self.assertFalse(
             CourseStaffRole(self.course.course_id).has_user(self.student),
             "Student has premature access to {}".format(unicode(course_locator))

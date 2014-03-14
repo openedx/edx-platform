@@ -28,12 +28,12 @@ class CourseUpdateTest(CourseTestCase):
             return json.loads(resp.content)
 
         course_locator = loc_mapper().translate_location(
-            self.course.id, self.course.location, False, True
+            self.course.location, False, True
         )
         resp = self.client.get_html(course_locator.url_reverse('course_info/'))
         self.assertContains(resp, 'Course Updates', status_code=200)
         update_locator = loc_mapper().translate_location(
-            self.course.id, self.course.location.replace(category='course_info', name='updates'),
+            self.course.location.replace(category='course_info', name='updates'),
             False, True
         )
 
@@ -135,9 +135,7 @@ class CourseUpdateTest(CourseTestCase):
         course_updates.data = update_data
         modulestore('direct').update_item(course_updates, self.user)
 
-        update_locator = loc_mapper().translate_location(
-            self.course.id, location, False, True
-        )
+        update_locator = loc_mapper().translate_location(location, False, True)
         # test getting all updates list
         course_update_url = update_locator.url_reverse('course_info_update/')
         resp = self.client.get_json(course_update_url)
@@ -213,9 +211,7 @@ class CourseUpdateTest(CourseTestCase):
         content = init_content + '</iframe>'
         payload = {'content': content, 'date': 'January 8, 2013'}
 
-        update_locator = loc_mapper().translate_location(
-            self.course.id, location, False, True
-        )
+        update_locator = loc_mapper().translate_location(location, False, True)
         course_update_url = update_locator.url_reverse('course_info_update/')
         resp = self.client.ajax_post(course_update_url, payload)
 
@@ -235,9 +231,7 @@ class CourseUpdateTest(CourseTestCase):
         """
         # create a course via the view handler
         course_location = Location(['i4x', 'Org_1', 'Course_1', 'course', 'Run_1'])
-        course_locator = loc_mapper().translate_location(
-            course_location.course_id, course_location, False, True
-        )
+        course_locator = loc_mapper().translate_location(course_location, False, True)
         self.client.ajax_post(
             course_locator.url_reverse('course'),
             {
@@ -268,7 +262,7 @@ class CourseUpdateTest(CourseTestCase):
 
         # now test that calling translate_location returns a locator whose block_id is 'updates'
         updates_location = course_location.replace(category='course_info', name=block)
-        updates_locator = loc_mapper().translate_location(course_location.course_id, updates_location)
+        updates_locator = loc_mapper().translate_location(updates_location)
         self.assertTrue(isinstance(updates_locator, BlockUsageLocator))
         self.assertEqual(updates_locator.block_id, block)
 

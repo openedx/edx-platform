@@ -151,7 +151,9 @@ def _xmodule_json(xmodule, course_id):
     Returns a JSON overview of an XModule
     """
     locator = loc_mapper().translate_location(
-        course_id, xmodule.location, published=False, add_entry_if_missing=True
+        xmodule.location,
+        published=False,
+        add_entry_if_missing=True,
     )
     is_container = xmodule.has_children
     result = {
@@ -252,7 +254,9 @@ def course_listing(request):
         """
         # published = false b/c studio manipulates draft versions not b/c the course isn't pub'd
         course_loc = loc_mapper().translate_location(
-            course.id, course.location, published=False, add_entry_if_missing=True
+            course.location,
+            published=False,
+            add_entry_if_missing=True,
         )
         return (
             course.display_name,
@@ -388,7 +392,7 @@ def create_new_course(request):
 
     initialize_course_tabs(new_course, request.user)
 
-    new_location = loc_mapper().translate_location(new_course.id, new_course.location, False, True)
+    new_location = loc_mapper().translate_location(new_course.location, False, True)
     # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
     # however, we can assume that b/c this user had authority to create the course, the user can add themselves
     CourseInstructorRole(new_course.id).add_users(request.user)
@@ -428,14 +432,10 @@ def course_info_handler(request, tag=None, package_id=None, branch=None, version
     )
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         handouts_old_location = course_module.location.replace(category='course_info', name='handouts')
-        handouts_locator = loc_mapper().translate_location(
-            course_module.id, handouts_old_location, False, True
-        )
+        handouts_locator = loc_mapper().translate_location(handouts_old_location, False, True)
 
         update_location = course_module.location.replace(category='course_info', name='updates')
-        update_locator = loc_mapper().translate_location(
-            course_module.id, update_location, False, True
-        )
+        update_locator = loc_mapper().translate_location(update_location, False, True)
 
         return render_to_response(
             'course_info.html',

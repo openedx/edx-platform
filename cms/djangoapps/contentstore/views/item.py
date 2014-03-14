@@ -130,7 +130,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 # update handouts location in loc_mapper
                 course_location = loc_mapper().translate_locator_to_location(locator, get_course=True)
                 old_location = course_location.replace(category='course_info', name=block)
-                locator = loc_mapper().translate_location(course_location.course_id, old_location)
+                locator = loc_mapper().translate_location(old_location)
 
             return _save_item(
                 request,
@@ -159,7 +159,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 request.user,
             )
             course_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(parent_locator), get_course=True)
-            dest_locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
+            dest_locator = loc_mapper().translate_location(dest_location, False, True)
             return JsonResponse({"locator": unicode(dest_locator)})
         else:
             return _create_item(request)
@@ -418,7 +418,7 @@ def _create_item(request):
         get_modulestore(parent.location).update_item(parent, request.user.id)
 
     course_location = loc_mapper().translate_locator_to_location(parent_locator, get_course=True)
-    locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
+    locator = loc_mapper().translate_location(dest_location, False, True)
     return JsonResponse({"locator": unicode(locator)})
 
 

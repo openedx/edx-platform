@@ -358,7 +358,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 raise InsufficientSpecificationError('No location mapper configured')
             else:
                 usage_key = self.loc_mapper.translate_location(
-                    None, location, location.revision is None,
+                    location,
+                    location.revision is None,
                     add_entry_if_missing=False
                 )
         assert isinstance(usage_key, BlockUsageLocator)

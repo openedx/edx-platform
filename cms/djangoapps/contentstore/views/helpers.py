@@ -97,5 +97,5 @@ def xblock_studio_url(xblock, course=None):
     course_id = None
     if course:
         course_id = course.id
-    locator = loc_mapper().translate_location(course_id, xblock.location)
+    locator = loc_mapper().translate_location(xblock.location)
     return locator.url_reverse(prefix)

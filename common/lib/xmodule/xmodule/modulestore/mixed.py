@@ -138,7 +138,8 @@ class MixedModuleStore(ModuleStoreWriteBase):
                         try:
                             # if there's no existing mapping, then the course can't have been in split
                             course_locator = loc_mapper().translate_location(
-                                course.location.course_id, course.location, add_entry_if_missing=False
+                                course.location,
+                                add_entry_if_missing=False
                             )
                             if unicode(course_locator) not in courses:
                                 courses[course_location] = course
@@ -402,7 +403,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         if store.reference_type != Location:
             raise ValueError(u"Cannot create maps from %s" % store.reference_type)
         for course in store.get_courses():
-            loc_mapper().translate_location(course.location.course_id, course.location)
+            loc_mapper().translate_location(course.location)
 
     def get_courses_for_wiki(self, wiki_slug):
         """

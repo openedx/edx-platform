@@ -45,7 +45,7 @@ class SplitMigrator(object):
 
         # create the course: set fields to explicitly_set for each scope, id_root = new_package_id, master_branch = 'production'
         original_course = self.direct_modulestore.get_item(course_location)
-        new_course_root_locator = self.loc_mapper.translate_location(old_course_id, course_location)
+        new_course_root_locator = self.loc_mapper.translate_location(course_location)
         new_course = self.split_modulestore.create_course(
             course_location.org, original_course.display_name,
             user.id, id_root=new_package_id,
@@ -76,7 +76,7 @@ class SplitMigrator(object):
                 # create split_xblock using split.create_item
                 # where block_id is computed by translate_location_to_locator
                 new_locator = self.loc_mapper.translate_location(
-                    old_course_id, module.location, True, add_entry_if_missing=True
+                    module.location, True, add_entry_if_missing=True
                 )
                 _new_module = self.split_modulestore.create_item(
                     course_version_locator, module.category, user.id,
@@ -110,7 +110,7 @@ class SplitMigrator(object):
         ):
             if getattr(module, 'is_draft', False):
                 new_locator = self.loc_mapper.translate_location(
-                    old_course_id, module.location, False, add_entry_if_missing=True
+                    module.location, False, add_entry_if_missing=True
                 )
                 if self.split_modulestore.has_item(new_locator):
                     # was in 'direct' so draft is a new version
@@ -138,7 +138,7 @@ class SplitMigrator(object):
             for parent_loc in self.draft_modulestore.get_parent_locations(draft_location, old_course_id):
                 old_parent = self.draft_modulestore.get_item(parent_loc)
                 new_parent = self.split_modulestore.get_item(
-                    self.loc_mapper.translate_location(old_course_id, old_parent.location, False)
+                    self.loc_mapper.translate_location(old_parent.location, False)
                 )
                 # this only occurs if the parent was also awaiting adoption
                 if new_block_id in new_parent.children:
@@ -149,7 +149,7 @@ class SplitMigrator(object):
                 for old_child_loc in old_parent.children:
                     if old_child_loc == draft_location:
                         break
-                    sibling_loc = self.loc_mapper.translate_location(old_course_id, Location(old_child_loc), False)
+                    sibling_loc = self.loc_mapper.translate_location(Location(old_child_loc), False)
                     # sibling may move cursor
                     for idx in range(new_parent_cursor, len(new_parent.children)):
                         if new_parent.children[idx] == sibling_loc.block_id:
@@ -168,7 +168,7 @@ class SplitMigrator(object):
         if 'children' in fields:
             fields['children'] = [
                 self.loc_mapper.translate_location(
-                    old_course_id, Location(child), published, add_entry_if_missing=True
+                    Location(child), published, add_entry_if_missing=True
                 ).block_id
                 for child in fields['children']]
         return fields

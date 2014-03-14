@@ -123,7 +123,7 @@ def expand_checklist_action_url(course_module, checklist):
         if action_url in urlconf_map:
             url_prefix = urlconf_map[action_url]
             ctx_loc = course_module.location
-            location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
+            location = loc_mapper().translate_location(ctx_loc, False, True)
             item['action_url'] = location.url_reverse(url_prefix, '')
 
     return expanded_checklist
