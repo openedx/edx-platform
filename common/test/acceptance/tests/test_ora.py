@@ -3,7 +3,12 @@ Tests for ORA (Open Response Assessment) through the LMS UI.
 """
 
 import json
+<<<<<<< HEAD
 from bok_choy.promise import fulfill, Promise
+=======
+from bok_choy.promise import Promise, BrokenPromise
+from ..pages.lms.peer_confirm import PeerConfirmPage
+>>>>>>> 98bb29b... Converted ORA acceptance tests to bok-choy(v0.3.0)
 from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.lms.course_info import CourseInfoPage
 from ..pages.lms.tab_nav import TabNavPage
@@ -11,7 +16,7 @@ from ..pages.lms.course_nav import CourseNavPage
 from ..pages.lms.open_response import OpenResponsePage
 from ..pages.lms.peer_grade import PeerGradePage
 from ..pages.lms.peer_calibrate import PeerCalibratePage
-from ..pages.lms.peer_confirm import PeerConfirmPage
+
 from ..pages.lms.progress import ProgressPage
 from ..fixtures.course import XBlockFixtureDesc, CourseFixture
 from ..fixtures.xqueue import XQueueResponseFixture
@@ -123,12 +128,11 @@ class OpenResponseTest(UniqueCourseTest):
         # Because the check function involves fairly complicated actions
         # (navigating through several screens), we give it more time to complete
         # than the default.
-        feedback_promise = Promise(
+        return Promise(
             self._check_feedback_func(assessment_type),
             'Got feedback for {0} problem'.format(assessment_type),
             timeout=600, try_interval=5
-        )
-        return fulfill(feedback_promise)
+        ).fulfill()
 
     def _check_feedback_func(self, assessment_type):
         """
@@ -155,11 +159,11 @@ class OpenResponseTest(UniqueCourseTest):
 
             # Unsuccessful if the rubric hasn't loaded
             except BrokenPromise:
-                return (False, None)
+                return False, None
 
             # Successful if `feedback` is a non-empty list
             else:
-                return (bool(feedback), feedback)
+                return bool(feedback), feedback
 
         return _inner_check
 
@@ -183,9 +187,11 @@ class SelfAssessmentTest(OpenResponseTest):
 
         # Fill in the rubric and expect that we get feedback
         rubric = self.open_response.rubric
+
         self.assertEqual(rubric.categories, ["Writing Applications", "Language Conventions"])
         rubric.set_scores([0, 1])
-        rubric.submit()
+        rubric.submit('self')
+
         self.assertEqual(rubric.feedback, ['incorrect', 'correct'])
 
         # Verify the progress page
@@ -306,7 +312,7 @@ class PeerAssessmentTest(OpenResponseTest):
         """
         Given I am viewing a peer-assessment problem
         And the instructor has submitted enough example essays
-        When I submit submit acceptable scores for enough calibration essays
+        When I submit acceptable scores for enough calibration essays
         Then I am able to peer-grade other students' essays.
 
         Given I have submitted an essay for peer-assessment
@@ -339,7 +345,7 @@ class PeerAssessmentTest(OpenResponseTest):
         rubric = self.peer_calibrate.rubric
         self.assertEqual(rubric.categories, ["Writing Applications", "Language Conventions"])
         rubric.set_scores([0, 1])
-        rubric.submit()
+        rubric.submit('peer')
         self.peer_calibrate.continue_to_grading()
 
         # Grade a peer

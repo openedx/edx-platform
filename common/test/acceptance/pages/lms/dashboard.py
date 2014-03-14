@@ -4,6 +4,7 @@ Student dashboard page.
 """
 
 from bok_choy.page_object import PageObject
+from bok_choy.promise import Promise, EmptyPromise
 from . import BASE_URL
 
 
@@ -16,11 +17,11 @@ class DashboardPage(PageObject):
     url = BASE_URL + "/dashboard"
 
     def is_browser_on_page(self):
-        return self.is_css_present('section.my-courses')
+        return self.q(css='section.my-courses').present
 
     @property
     def current_courses_text(self):
-        text_items = self.css_text('section#my-courses')
+        text_items = self.q(css='section#my-courses').text
         if len(text_items) > 0:
             return text_items[0]
         else:
@@ -36,7 +37,7 @@ class DashboardPage(PageObject):
             _, course_name = el.text.split(' ', 1)
             return course_name
 
-        return self.css_map('section.info > hgroup > h3 > a', _get_course_name)
+        return self.q(css='section.info > hgroup > h3 > a').map(_get_course_name).results
 
     def view_course(self, course_id):
         """
@@ -55,7 +56,8 @@ class DashboardPage(PageObject):
         Return a CSS selector for the link to the course with `course_id`.
         """
         # Get the link hrefs for all courses
-        all_links = self.css_map('a.enter-course', lambda el: el['href'])
+        #all_links = self.css_map('a.enter-course', lambda el: el['href'])
+        all_links = self.q(css='a.enter-course').map(lambda el: el['href'])
 
         # Search for the first link that matches the course id
         link_index = None
@@ -73,6 +75,14 @@ class DashboardPage(PageObject):
         """
         Change the language on the dashboard to the language corresponding with `code`.
         """
-        self.css_click(".edit-language")
-        self.select_option("language", code)
-        self.css_click("#submit-lang")
+        self.q(css=".edit-language").first.click()
+        self.q(css='select[name="language"] option[value="{}"]'.format(code)).first.click()
+        self.q(css="#submit-lang").first.click()
+
+        self._changed_lang_promise(code).fulfill()
+
+    def _changed_lang_promise(self, code):
+        def _check_func():
+            return self.q(css='select[name="language"] option[value="{}"]'.format(code)).selected
+        return EmptyPromise(_check_func, "language changed")
+
