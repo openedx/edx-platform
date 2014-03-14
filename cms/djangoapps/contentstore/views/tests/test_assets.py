@@ -27,7 +27,7 @@ class AssetsTestCase(CourseTestCase):
     """
     def setUp(self):
         super(AssetsTestCase, self).setUp()
-        location = loc_mapper().translate_location(self.course.id, self.course.location, False, True)
+        location = loc_mapper().translate_location(self.course.location, False, True)
         self.url = location.url_reverse('assets/', '')
 
     def upload_asset(self, name="asset-1"):
@@ -56,7 +56,7 @@ class BasicAssetsTestCase(AssetsTestCase):
             verbose=True
         )
         course = course_items[0]
-        location = loc_mapper().translate_location(course.id, course.location, False, True)
+        location = loc_mapper().translate_location(course.location, False, True)
         url = location.url_reverse('assets/', '')
 
         # Test valid contentType for pdf asset (textbook.pdf)
@@ -122,7 +122,7 @@ class UploadTestCase(AssetsTestCase):
     """
     def setUp(self):
         super(UploadTestCase, self).setUp()
-        location = loc_mapper().translate_location(self.course.id, self.course.location, False, True)
+        location = loc_mapper().translate_location(self.course.location, False, True)
         self.url = location.url_reverse('assets/', '')
 
     def test_happy_path(self):
@@ -180,7 +180,7 @@ class LockAssetTestCase(AssetsTestCase):
             """ Helper method for posting asset update. """
             upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
             asset_location = Location(['c4x', 'edX', 'toy', 'asset', 'sample_static.txt'])
-            location = loc_mapper().translate_location(course.id, course.location, False, True)
+            location = loc_mapper().translate_location(course.location, False, True)
             url = location.url_reverse('assets/', '')
 
             resp = self.client.post(

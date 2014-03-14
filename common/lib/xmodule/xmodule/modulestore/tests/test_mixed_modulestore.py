@@ -154,7 +154,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         )
         # get Locators and set up the loc mapper if app is Locator based
         if default == 'split':
-            self.fake_location = loc_mapper().translate_location('foo/bar/2012_Fall', self.fake_location)
+            self.fake_location = loc_mapper().translate_location(self.fake_location)
 
         self._create_course(default, self.MONGO_COURSEID)
 
@@ -333,7 +333,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         """
         self.initdb(default_ms)
         # create loc_map entry
-        loc_mapper().translate_location(self.MONGO_COURSEID, self.MONGO_COURSEID)
+        loc_mapper().translate_location(self.MONGO_COURSEID)
         orphan = self.store.create_item(self.MONGO_COURSEID, 'problem', block_id='orphan')
         self.assertEqual(
             orphan.location.version_agnostic().as_course_locator(),

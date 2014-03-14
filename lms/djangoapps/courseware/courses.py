@@ -318,6 +318,6 @@ def get_cms_course_link(course):
     assuming that the course is actually cms-backed.
     """
     locator = loc_mapper().translate_location(
-        course.location.course_id, course.location, False, True
+        course.location, False, True
     )
     return "//" + settings.CMS_BASE + locator.url_reverse('course/', '')

@@ -30,9 +30,7 @@ class ItemTest(CourseTestCase):
     def setUp(self):
         super(ItemTest, self).setUp()
 
-        self.course_locator = loc_mapper().translate_location(
-            self.course.id, self.course.location, False, True
-        )
+        self.course_locator = loc_mapper().translate_location(self.course.location, False, True)
         self.unicode_locator = unicode(self.course_locator)
 
     def get_old_id(self, locator):
@@ -309,12 +307,8 @@ class TestDuplicateItem(ItemTest):
                     "Duplicated item differs in number of children"
                 )
                 for i in xrange(len(original_item.children)):
-                    source_locator = loc_mapper().translate_location(
-                        self.course.id, Location(original_item.children[i]), False, True
-                    )
-                    duplicate_locator = loc_mapper().translate_location(
-                        self.course.id, Location(duplicated_item.children[i]), False, True
-                    )
+                    source_locator = loc_mapper().translate_location(Location(original_item.children[i]), False, True)
+                    duplicate_locator = loc_mapper().translate_location(Location(duplicated_item.children[i]), False, True)
                     if not check_equality(source_locator, duplicate_locator):
                         return False
                 duplicated_item.children = original_item.children

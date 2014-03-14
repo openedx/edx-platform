@@ -14,7 +14,7 @@ class ChecklistTestCase(CourseTestCase):
         """ Creates the test course. """
         super(ChecklistTestCase, self).setUp()
         self.course = CourseFactory.create(org='mitX', number='333', display_name='Checklists Course')
-        self.location = loc_mapper().translate_location(self.course.id, self.course.location, False, True)
+        self.location = loc_mapper().translate_location(self.course.location, False, True)
         self.checklists_url = self.location.url_reverse('checklists/', '')
 
     def get_persisted_checklists(self):

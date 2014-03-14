@@ -66,7 +66,7 @@ class TestRollbackSplitCourseNoSplitMongo(ModuleStoreTestCase):
         self.old_course = CourseFactory()
 
     def test_nonexistent_locator(self):
-        locator = loc_mapper().translate_location(self.old_course.id, self.old_course.location)
+        locator = loc_mapper().translate_location(self.old_course.location)
         errstring = "No course found with locator"
         with self.assertRaisesRegexp(CommandError, errstring):
             Command().handle(str(locator))
