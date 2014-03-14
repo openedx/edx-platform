@@ -28,11 +28,11 @@ INVALID_HTML_CHARS = re.compile(r"[^\w-]", re.UNICODE)
 
 class SlashSeparatedCourseKey(CourseKey):
     """Course key for old style org/course/run course identifiers"""
+    ORG_SEPARATOR = '+'
     def __init__(org, course, run):
         self._org = org
         self._course = course
         self._run = run
-        self._offering = '/'.join([course, run])
 
     @classmethod
     def _from_string(cls, serialized):
@@ -49,7 +49,7 @@ class SlashSeparatedCourseKey(CourseKey):
 
     @property
     def offering(self):
-        return self._offering
+        return '/'.join([course, run])
 
     def make_asset_key(self, path):
         return Location('c4x', self._org, self._course, 'asset', path)
