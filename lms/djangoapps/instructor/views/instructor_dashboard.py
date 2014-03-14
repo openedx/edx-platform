@@ -146,7 +146,7 @@ def _section_membership(course_id, access):
         'access': access,
         'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
         'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
-        'modify_beta_testers_button_url': reverse('bulk_modify_access', kwargs={'course_id': course_id}),
+        'modify_beta_testers_button_url': reverse('bulk_beta_modify_access', kwargs={'course_id': course_id}),
         'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': course_id}),
         'modify_access_url': reverse('modify_access', kwargs={'course_id': course_id}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': course_id}),

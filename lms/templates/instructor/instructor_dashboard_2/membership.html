@@ -30,29 +30,29 @@
 <div class="batch-enrollment">
   <h2> ${_("Batch Enrollment")} </h2>
   <p>
-    <label for="student-emails">${_("Enter student emails separated by new lines or commas.")} </label>
-    <textarea rows="6" name="student-emails" placeholder="${_("Student Emails")}" spellcheck="false"></textarea>
+    <label for="student-emails">${_("Enter email addresses separated by new lines or commas.")} </label>
+    <textarea rows="6" name="student-emails" placeholder="${_("Email Addresses")}" spellcheck="false"></textarea>
   </p>
 
   <div class="enroll-option">
-    <input type="checkbox" name="auto-enroll" value="Auto-Enroll" style="margin-top: 1em;">
+    <input type="checkbox" name="auto-enroll" value="Auto-Enroll">
     <label for="auto-enroll">${_("Auto Enroll")}</label>
     <div class="hint auto-enroll-hint">
       <span class="hint-caret"></span>
-      <p> ${_("If auto enroll is <em>checked</em>, students who have not yet registered for edX will be automatically enrolled.")}
-          ${_("If auto enroll is left <em>unchecked</em>, students who have not yet registered for edX will not be enrolled, but will be allowed to enroll.")}</p>
+      <p> ${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
+          ${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}</p>
     </div>
   </div>
 
   <div class="enroll-option">
     <input type="checkbox" name="email-students" value="Notify-students-by-email">
-    <label for="email-students">${_("Notify students by email")}</label>
+    <label for="email-students">${_("Notify users by email")}</label>
     <div class="hint email-students-hint">
       <span class="hint-caret"></span>
-      <p> ${_("If email students is <em>checked</em> students will receive an email notification.")}</p>
+      <p> ${_("If this option is <em>checked</em>, users will receive an email notification.")}</p>
     </div>
   </div>
-  
+
   <div>
     <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" data-action="enroll" >
     <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" data-action="unenroll" >
@@ -63,23 +63,28 @@
 
 %if section_data['access']['instructor']:
 <div class="batch-beta-testers">
-  <h2> ${_("Add Beta Testers")} </h2>
-  <p> ${_("Enter student emails separated by new lines or commas.")} </p>
-  <textarea rows="6" cols="50" name="student-emails-for-beta" placeholder="${_("Student Emails")}" spellcheck="false"></textarea>
-  <br>
-  
-  <div>
+  <h2> ${_("Batch Beta Testers")} </h2>
+  <p>
+    <label for="student-emails-for-beta">
+      ${_("Enter email addresses separated by new lines or commas.")}<br/>
+      ${_("Note: Users must have an activated {platform_name} account before they can be enrolled as a beta tester.").format(platform_name=settings.PLATFORM_NAME)}
+    </label>
+
+  <textarea rows="6" cols="50" name="student-emails-for-beta" placeholder="${_("Email addresses")}" spellcheck="false"></textarea>
+  </p>
+
+  <div class="enroll-option">
     <input type="checkbox" name="email-students" value="Notify-students-by-email">
-    <label for="email-students">${_("Notify students by email")}</label>
-    <div class="email-students-hint">
-      <p> ${_("If email students is <em>checked</em> students will receive an email notification.")}
-      </p>
+    <label for="email-students-beta">${_("Notify users by email")}</label>
+    <div class="hint email-students-beta-hint">
+      <span class="hint-caret"></span>
+      <p> ${_("If this option is <em>checked</em>, users will receive an email notification.")}</p>
     </div>
   </div>
-  
+
   <div>
-    <input type="button" name="beta-testers" class="" value="${_("Add students as beta testers")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="add" >
-    <input type="button" name="beta-testers" class="" value="${_("Remove students as beta testers")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="remove" >
+    <input type="button" name="beta-testers" class="enrollment-button" value="${_("Add beta tester(s)")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="add" >
+    <input type="button" name="beta-testers" class="enrollment-button" value="${_("Remove beta tester(s)")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="remove" >
   </div>
 
   <div class="request-response"></div>
