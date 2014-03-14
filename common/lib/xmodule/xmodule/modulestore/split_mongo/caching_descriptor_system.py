@@ -4,30 +4,13 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore.locator import BlockUsageLocator, LocalId
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from xblock.runtime import KvsFieldData, IdReader
+from xblock.runtime import KvsFieldData
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
 from xblock.fields import ScopeIds
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
 
 log = logging.getLogger(__name__)
-
-
-class SplitMongoIdReader(IdReader):
-    """
-    An :class:`~xblock.runtime.IdReader` associated with a particular
-    :class:`.CachingDescriptorSystem`.
-    """
-    def __init__(self, system):
-        self.system = system
-
-    def get_definition_id(self, usage_id):
-        usage = self.system.load_item(usage_id)
-        return usage.definition_locator
-
-    def get_block_type(self, def_id):
-        definition = self.system.modulestore.db_connection.get_definition(def_id)
-        return definition['category']
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem):
@@ -52,7 +35,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             underlying modulestore
         """
         super(CachingDescriptorSystem, self).__init__(
-            id_reader=SplitMongoIdReader(self),
             field_data=None,
             load_item=self._load_item,
             **kwargs

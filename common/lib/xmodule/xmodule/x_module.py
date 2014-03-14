@@ -961,7 +961,7 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
         local_resource_url: an implementation of :meth:`xblock.runtime.Runtime.local_resource_url`
 
         """
-        super(DescriptorSystem, self).__init__(**kwargs)
+        super(DescriptorSystem, self).__init__(id_reader=OpaqueKeyReader(), **kwargs)
 
         # This is used by XModules to write out separate files during xml export
         self.export_fs = None
@@ -1153,7 +1153,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
 
         # Usage_store is unused, and field_data is often supplanted with an
         # explicit field_data during construct_xblock.
-        super(ModuleSystem, self).__init__(id_reader=None, field_data=field_data, **kwargs)
+        super(ModuleSystem, self).__init__(id_reader=OpaqueKeyReader(), field_data=field_data, **kwargs)
 
         self.STATIC_URL = static_url
         self.xqueue = xqueue
