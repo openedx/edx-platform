@@ -13,18 +13,18 @@ class CourseInfoPage(CoursePage):
     url_path = "info"
 
     def is_browser_on_page(self):
-        return self.is_css_present('section.updates')
+        return self.q(css='section.updates').present
 
     @property
     def num_updates(self):
         """
         Return the number of updates on the page.
         """
-        return self.css_count('section.updates section article')
+        return len(self.q(css='section.updates section article').results)
 
     @property
     def handout_links(self):
         """
         Return a list of handout assets links.
         """
-        return self.css_map('section.handouts ol li a', lambda el: el['href'])
+        return self.q(css='section.handouts ol li a').map(lambda el: el.get_attribute('href')).results
