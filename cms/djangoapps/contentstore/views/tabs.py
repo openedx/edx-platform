@@ -141,7 +141,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
 
         components = [
             loc_mapper().translate_location(
-                course_item.location.course_id, static_tab.location, False, True
+                course_item.id, static_tab.location, False, True
             )
             for static_tab
             in static_tabs

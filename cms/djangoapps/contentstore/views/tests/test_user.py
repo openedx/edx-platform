@@ -24,7 +24,7 @@ class UsersTestCase(CourseTestCase):
         self.inactive_user.is_staff = False
         self.inactive_user.save()
 
-        self.location = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
+        self.location = loc_mapper().translate_location(self.course.id, self.course.location, False, True)
 
         self.index_url = self.location.url_reverse('course_team', '')
         self.detail_url = self.location.url_reverse('course_team', self.ext_user.email)

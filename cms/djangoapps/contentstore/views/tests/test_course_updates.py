@@ -28,12 +28,12 @@ class CourseUpdateTest(CourseTestCase):
             return json.loads(resp.content)
 
         course_locator = loc_mapper().translate_location(
-            self.course.location.course_id, self.course.location, False, True
+            self.course.id, self.course.location, False, True
         )
         resp = self.client.get_html(course_locator.url_reverse('course_info/'))
         self.assertContains(resp, 'Course Updates', status_code=200)
         update_locator = loc_mapper().translate_location(
-            self.course.location.course_id, self.course.location.replace(category='course_info', name='updates'),
+            self.course.id, self.course.location.replace(category='course_info', name='updates'),
             False, True
         )
 
@@ -136,7 +136,7 @@ class CourseUpdateTest(CourseTestCase):
         modulestore('direct').update_item(course_updates, self.user)
 
         update_locator = loc_mapper().translate_location(
-            self.course.location.course_id, location, False, True
+            self.course.id, location, False, True
         )
         # test getting all updates list
         course_update_url = update_locator.url_reverse('course_info_update/')
@@ -214,7 +214,7 @@ class CourseUpdateTest(CourseTestCase):
         payload = {'content': content, 'date': 'January 8, 2013'}
 
         update_locator = loc_mapper().translate_location(
-            self.course.location.course_id, location, False, True
+            self.course.id, location, False, True
         )
         course_update_url = update_locator.url_reverse('course_info_update/')
         resp = self.client.ajax_post(course_update_url, payload)

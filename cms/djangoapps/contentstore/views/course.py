@@ -143,7 +143,7 @@ def _course_json(request, package_id, branch, version_guid, block):
     __, course = _get_locator_and_course(
         package_id, branch, version_guid, block, request.user, depth=None
     )
-    return _xmodule_json(course, course.location.course_id)
+    return _xmodule_json(course, course.id)
 
 
 def _xmodule_json(xmodule, course_id):
@@ -252,13 +252,13 @@ def course_listing(request):
         """
         # published = false b/c studio manipulates draft versions not b/c the course isn't pub'd
         course_loc = loc_mapper().translate_location(
-            course.location.course_id, course.location, published=False, add_entry_if_missing=True
+            course.id, course.location, published=False, add_entry_if_missing=True
         )
         return (
             course.display_name,
             # note, couldn't get django reverse to work; so, wrote workaround
             course_loc.url_reverse('course/', ''),
-            get_lms_link_for_item(course.location, course.location.course_id),
+            get_lms_link_for_item(course.location, course.id),
             course.display_org_with_default,
             course.display_number_with_default,
             course.location.name
@@ -283,7 +283,7 @@ def course_index(request, package_id, branch, version_guid, block):
     locator, course = _get_locator_and_course(
         package_id, branch, version_guid, block, request.user, depth=3
     )
-    lms_link = get_lms_link_for_item(course.location, course.location.course_id)
+    lms_link = get_lms_link_for_item(course.location, course.id)
     sections = course.get_children()
 
     return render_to_response('overview.html', {
@@ -388,18 +388,18 @@ def create_new_course(request):
 
     initialize_course_tabs(new_course, request.user)
 
-    new_location = loc_mapper().translate_location(new_course.location.course_id, new_course.location, False, True)
+    new_location = loc_mapper().translate_location(new_course.id, new_course.location, False, True)
     # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
     # however, we can assume that b/c this user had authority to create the course, the user can add themselves
-    CourseInstructorRole(new_course.location.course_id).add_users(request.user)
-    auth.add_users(request.user, CourseStaffRole(new_course.location.course_id), request.user)
+    CourseInstructorRole(new_course.id).add_users(request.user)
+    auth.add_users(request.user, CourseStaffRole(new_course.id), request.user)
 
     # seed the forums
-    seed_permissions_roles(new_course.location.course_id)
+    seed_permissions_roles(new_course.id)
 
     # auto-enroll the course creator in the course so that "View Live" will
     # work.
-    CourseEnrollment.enroll(request.user, new_course.location.course_id)
+    CourseEnrollment.enroll(request.user, new_course.id)
     _users_assign_default_role(new_course.location)
 
     return JsonResponse({'url': new_location.url_reverse("course/", "")})
@@ -429,12 +429,12 @@ def course_info_handler(request, tag=None, package_id=None, branch=None, version
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         handouts_old_location = course_module.location.replace(category='course_info', name='handouts')
         handouts_locator = loc_mapper().translate_location(
-            course_module.location.course_id, handouts_old_location, False, True
+            course_module.id, handouts_old_location, False, True
         )
 
         update_location = course_module.location.replace(category='course_info', name='updates')
         update_locator = loc_mapper().translate_location(
-            course_module.location.course_id, update_location, False, True
+            course_module.id, update_location, False, True
         )
 
         return render_to_response(

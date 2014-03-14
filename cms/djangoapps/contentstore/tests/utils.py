@@ -93,7 +93,7 @@ class CourseTestCase(ModuleStoreTestCase):
         )
         self.course_location = self.course.location
         self.course_locator = loc_mapper().translate_location(
-            self.course.location.course_id, self.course.location, False, True
+            self.course.id, self.course.location, False, True
         )
 
     def createNonStaffAuthedUserClient(self):
