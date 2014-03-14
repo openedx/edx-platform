@@ -162,7 +162,8 @@ class CourseLocator(Locator, CourseKey):
     the persistence layer may raise exceptions if the given version != the current such version
     of the course.
     """
-
+    # Token separating org from offering 
+    ORG_SEPARATOR = '+'
     # Default values
     version_guid = None
     package_id = None
