@@ -1,0 +1,3 @@
+tinymce.PluginManager.requireLangPack("codemirror");
+tinymce.PluginManager.add("codemirror",function(a,c){function b(){a.focus();a.selection.collapse(!0);a.selection.setContent('<span class="CmCaReT" style="display:none">&#0;</span>');var b=a.windowManager.open({title:"HTML source code",url:c+"/source.html",width:800,height:550,resizable:!0,maximizable:!0,buttons:[{text:"Ok",subtype:"primary",onclick:function(){document.querySelectorAll(".mce-container-body>iframe")[0].contentWindow.submit();b.close()}},{text:"Cancel",onclick:"close"}]})}a.addButton("code",
+{title:"Source code",icon:"code",onclick:b});a.addMenuItem("code",{icon:"code",text:"Source code",context:"tools",onclick:b})});
