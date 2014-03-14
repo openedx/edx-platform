@@ -58,7 +58,7 @@ div.video {
         padding: ($baseline*.75);
         color: $lighter-base-font-color;
 
-        &:hover {
+        &:hover, &:focus {
           background-color: $action-primary-active-bg;
           color: $very-light-text;
         }
@@ -166,7 +166,7 @@ div.video {
       color: #ccc;
       position: relative;
 
-      &:hover {
+      &:hover, &:focus {
         ul, div {
           opacity: 1;
         }
@@ -188,7 +188,7 @@ div.video {
         border-style: solid;
         border-color: #000;
 
-        &:hover {
+        &:hover, &:focus {
           background-color: #444;
           color: #fff;
           text-decoration: none;
@@ -370,7 +370,7 @@ div.video {
                 text-overflow: ellipsis;
                 white-space: nowrap;
 
-                &:hover {
+                &:hover, &:focus {
                   background-color: #666;
                   color: #aaa;
                   outline-offset: -4px;
@@ -617,7 +617,7 @@ div.video {
         outline-offset: -1px;
       }
 
-      &:hover {
+      &:hover, &:focus {
         text-decoration: underline;
       }
 

@@ -65,7 +65,7 @@ div.calc-main {
         -webkit-appearance: none;
         width: flex-grid(.5) + flex-gutter();
 
-        &:hover {
+        &:hover, &:focus {
           color: #333;
         }
       }

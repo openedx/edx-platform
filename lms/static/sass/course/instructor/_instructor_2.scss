@@ -467,7 +467,7 @@ section.instructor-dashboard-content-2 {
         color: $lighter-base-font-color;
         cursor: pointer;
 
-        &:hover {
+        &:hover, &:focus {
           color: $alert-color;
         }
       }
