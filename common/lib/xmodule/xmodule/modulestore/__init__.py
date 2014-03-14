@@ -253,19 +253,6 @@ class Location(_LocationBase):
     def __repr__(self):
         return "Location%s" % repr(tuple(self))
 
-    @property
-    def course_id(self):
-        """
-        Return the ID of the Course that this item belongs to by looking
-        at the location URL hierachy.
-
-        Throws an InvalidLocationError is this location does not represent a course.
-        """
-        if self.category != 'course':
-            raise InvalidLocationError(u'Cannot call course_id for {0} because it is not of category course'.format(self))
-
-        return "/".join([self.org, self.course, self.name])
-
     def _replace(self, **kwargs):
         """
         Return a new :class:`Location` with values replaced
