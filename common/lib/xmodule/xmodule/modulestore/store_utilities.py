@@ -214,7 +214,7 @@ def delete_course(modulestore, contentstore, source_location, commit=False):
     """
 
     # check to see if the source course is actually there
-    if not modulestore.has_course(source_location.course_id):
+    if not modulestore.has_course(source_location.course_key):
         raise Exception("Cannot find a course at {0}. Aborting".format(source_location))
 
     # first delete all of the thumbnails

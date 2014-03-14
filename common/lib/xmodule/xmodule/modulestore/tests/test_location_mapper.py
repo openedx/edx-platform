@@ -221,7 +221,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         new_usage_id = 'problem{}'.format(new_prob_name[:3])
         self.translate_n_check(new_prob_locn, old_style_course_id, new_style_package_id, new_usage_id, 'published', True)
         self.translate_n_check(
-            new_prob_locn, delta_course_locn.course_id, delta_new_package_id, new_usage_id, 'published', True
+            new_prob_locn, delta_course_locn.course_key, delta_new_package_id, new_usage_id, 'published', True
         )
         # look for w/ only the Location: causes caching and not unique; so, can't check which course
         prob_locator = loc_mapper().translate_location(
@@ -244,7 +244,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         again_usage_id = 'problem{}'.format(again_prob_name[:3])
         self.translate_n_check(again_prob_locn, old_style_course_id, new_style_package_id, again_usage_id, 'published', True)
         self.translate_n_check(
-            again_prob_locn, delta_course_locn.course_id, delta_new_package_id, again_usage_id, 'published', True
+            again_prob_locn, delta_course_locn.course_key, delta_new_package_id, again_usage_id, 'published', True
         )
         self.translate_n_check(again_prob_locn, None, delta_new_package_id, again_usage_id, 'published', True)
 

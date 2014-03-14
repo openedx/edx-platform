@@ -105,7 +105,7 @@ def _preview_module_system(request, descriptor):
 
     if isinstance(descriptor.location, Locator):
         course_location = loc_mapper().translate_locator_to_location(descriptor.location, get_course=True)
-        course_id = course_location.course_id
+        course_id = course_location.course_key
     else:
         course_id = get_course_for_item(descriptor.location).id
     display_name_only = (descriptor.category == 'static_tab')

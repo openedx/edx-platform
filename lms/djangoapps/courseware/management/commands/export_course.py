@@ -78,7 +78,7 @@ def export_course_to_directory(course_id, root_dir):
     if course is None:
         raise CommandError("Invalid course_id")
 
-    course_name = course.location.course_id.replace('/', '-')
+    course_name = course.id.replace('/', '-')
     export_to_xml(store, None, course.id, root_dir, course_name)
 
     course_dir = path(root_dir) / course_name

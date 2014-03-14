@@ -398,7 +398,7 @@ class LocMapperStore(object):
         """
         See if the location x published pair is in the cache. If so, return the mapped locator.
         """
-        entry = self.cache.get(u'{}+{}'.format(location.course_key, location)
+        entry = self.cache.get(u'{}+{}'.format(location.course_key, location))
         if entry is not None:
             if published:
                 return entry[0]

@@ -94,8 +94,5 @@ def xblock_studio_url(xblock, course=None):
         prefix = 'unit'     # only show the unit page for verticals directly beneath a subsection
     else:
         prefix = 'container'
-    course_id = None
-    if course:
-        course_id = course.id
     locator = loc_mapper().translate_location(xblock.location)
     return locator.url_reverse(prefix)

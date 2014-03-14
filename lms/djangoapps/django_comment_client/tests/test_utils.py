@@ -121,7 +121,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
                 reverse(
                     "jump_to",
                     kwargs={
-                        "course_id": self.course.location.course_id,
+                        "course_id": self.course.id,
                         "location": discussion.location
                     }
                 )

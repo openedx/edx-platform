@@ -42,7 +42,6 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Create dummy course with 'CourseFactory' and role (instructor/staff) groups with provided group_name_format
         """
-        course_locator = loc_mapper().translate_location(course_location, False, True)
         course = CourseFactory.create(
             org=course_location.org,
             number=course_location.course,
@@ -60,9 +59,9 @@ class TestCourseListing(ModuleStoreTestCase):
                 # Since "Group.objects.get_or_create(name=groupnames[1])" would have made group with lowercase name
                 # so manually create group name of old type
                 if role == CourseInstructorRole:
-                    group, _ = Group.objects.get_or_create(name=u'{}_{}'.format('instructor', course_location.course_id))
+                    group, _ = Group.objects.get_or_create(name=u'{}_{}'.format('instructor', course.id))
                 else:
-                    group, _ = Group.objects.get_or_create(name=u'{}_{}'.format('staff', course_location.course_id))
+                    group, _ = Group.objects.get_or_create(name=u'{}_{}'.format('staff', course.id))
             else:
                 # Create role (instructor/staff) groups with format: 'instructor_edx.course.run'
                 group, _ = Group.objects.get_or_create(name=groupnames[0])
