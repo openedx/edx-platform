@@ -42,7 +42,7 @@ class SlashSeparatedCourseKey(CourseKey):
 
     def _to_string(self):
         # Turns slashes into encoded slashes
-        return "/".join([self._org, self._course, self._run])
+        return self.to_deprecated_string()
 
     @property
     def org(self):
@@ -57,6 +57,9 @@ class SlashSeparatedCourseKey(CourseKey):
 
     def make_usage_key(self, block_type, name):
         return Location('i4x', self._org, self._course, block_type, name)
+
+    def to_deprecated_string(self):
+        return '/'.join([self._org, self._course, self._run])
 
 
 def _check_location_part(val, regexp):
