@@ -60,7 +60,7 @@ class ConditionalFactory(object):
             source_descriptor = NonStaffErrorDescriptor.from_xml(
                 'some random xml data',
                 system,
-                id_generator=CourseLocationGenerator(source_location.org, source_location.course),
+                id_generator=CourseLocationGenerator(CourseKey.from_string('edX/conditional_test/test_run')),
                 error_msg='random error message'
             )
         else:

@@ -20,6 +20,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
+from xmodule.modulestore.keys import CourseKey
 
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
@@ -366,6 +367,10 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.modules = defaultdict(dict)  # course_id -> dict(location -> XBlock)
         self.courses = {}  # course_dir -> XBlock for the course
         self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
+
+        if course_ids is not None:
+            for course_id in course_ids:
+                assert(isinstance(course_id, CourseKey))
 
         self.load_error_modules = load_error_modules
 
