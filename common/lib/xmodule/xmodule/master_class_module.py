@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Word cloud is ungraded xblock used by students to
 generate and view word cloud.
 
@@ -13,8 +14,10 @@ from pkg_resources import resource_string
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
+from django.contrib.auth.models import User
 
 from xblock.fields import Scope, Dict, Boolean, List, Integer, String
+
 
 log = logging.getLogger(__name__)
 
@@ -127,6 +130,7 @@ class MasterClassModule(MasterClassFields, XModule):
         Returns:
             json string
         """
+                    
         if dispatch == 'submit':
             if self.submitted:
                 return json.dumps({
@@ -161,6 +165,25 @@ class MasterClassModule(MasterClassFields, XModule):
                     'status': 'fail',
                     'error': 'Unknown Command!'
                 })
+        elif dispatch == 'csv':
+            if self.runtime.user_is_staff:
+                header = [u'Email', u'ФИО']
+                datatable = {'header': header, 'students': []}
+                data = []
+                for email in self.passed_registrations:
+                    datarow = []
+                    user = User.objects.get(email=email)
+                    datarow += [user.email, user.profile.name]
+                    data += [datarow]
+                datatable['data'] = data
+
+                return json.dumps({'status': 'success', 'data': datatable})
+            else:
+                return json.dumps({
+                    'status': 'fail',
+                    'error': 'Unknown Command!'
+                })
+
         else:
             return json.dumps({
                 'status': 'fail',

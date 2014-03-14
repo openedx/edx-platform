@@ -72,6 +72,9 @@ define('MasterClassMain', ['logme'], function (logme) {
         $(el).find('input.save').on('click', function () {
             _this.submitAnswer();
         });
+        $(el).find('input.email-send').on('click', function () {
+            _this.submitEmail();
+        });
     }; // End-of: var MasterClassMain = function (el) {
 
     /**
@@ -108,6 +111,37 @@ define('MasterClassMain', ['logme'], function (logme) {
 
     }; // End-of: MasterClassMain.prototype.submitAnswer = function () {
 
+
+    MasterClassMain.prototype.submitEmail = function () {
+        var _this = this,
+            data = {'master_class': '0'};
+
+        // Populate the data to be sent to the server with user's words.
+        
+
+
+        // Send the data to the server as an AJAX request. Attach a callback that will
+        // be fired on server's response.
+        $.postWithPrefix(
+            _this.ajax_url + '/' + 'csv', $.param(data),
+            function (response) {
+                if (response.status !== 'success') {
+                    logme('ERROR: ' + response.error);
+
+                    return;
+                }
+            var csv = ConvertToCSV([response.data.header]) + ConvertToCSV(response.data.data);
+            a=document.createElement('a');
+            a.textContent='download';
+            a.download="emails.csv";
+            a.href='data:text/csv;charset=utf-8,'+escape(csv);
+            a.click();
+             }
+        );
+
+    }; // End-of: MasterClassMain.prototype.submitAnswer = function () {
+
+
      MasterClassMain.prototype.submitRegister = function (caller) {
         var _this = this,
             data = {'emails': []};
@@ -130,6 +164,24 @@ define('MasterClassMain', ['logme'], function (logme) {
             }
         );
     };
+
+    function ConvertToCSV(objArray) {
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+            for (var index in array[i]) {
+                if (line != '') line += ','
+
+                line += array[i][index];
+            }
+
+            str += line + '\r\n';
+        }
+
+        return str;
+    }
 
     /**
      * @function showMasterClass
