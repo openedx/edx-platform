@@ -106,6 +106,9 @@ class OpaqueKey(object):
         Args:
             serialized: A stringified form of a :class:`OpaqueKey`
         """
+        if serialized is None:
+            raise InvalidKeyError(serialized)
+
         try:
             namespace, rest = cls._separate_namespace(serialized)
         except MissingNamespaceError:

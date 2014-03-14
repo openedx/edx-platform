@@ -2,6 +2,7 @@
 
 import urllib
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore import Location
 
 
 class SlashSeparatedCourseKey(CourseKey):
