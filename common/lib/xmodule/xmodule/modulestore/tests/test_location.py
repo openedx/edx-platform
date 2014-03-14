@@ -127,13 +127,13 @@ class TestLocations(TestCase):
 
     def test_equality(self):
         self.assertEquals(
-            Location('tag', 'org', 'course', 'category', 'name'),
-            Location('tag', 'org', 'course', 'category', 'name')
+            Location('tag', 'org', 'course', 'run', 'category', 'name'),
+            Location('tag', 'org', 'course', 'run', 'category', 'name')
         )
 
         self.assertNotEquals(
-            Location('tag', 'org', 'course', 'category', 'name1'),
-            Location('tag', 'org', 'course', 'category', 'name')
+            Location('tag', 'org', 'course', 'run', 'category', 'name1'),
+            Location('tag', 'org', 'course', 'run', 'category', 'name')
         )
 
     @ddt.data(
