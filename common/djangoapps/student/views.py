@@ -1160,11 +1160,16 @@ def create_account(request, post_override=None):
         'key': registration.activation_key,
     }
 
-    # composes activation email
-    subject = render_to_string('emails/activation_email_subject.txt', context)
-    # Email subject *must not* contain newlines
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/activation_email.txt', context)
+    if settings.FEATURES["USE_CUSTOM_THEME"]:
+        # composes activation email
+        subject = render_to_string('custome_emails/activation_email_subject.txt', context)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('custome_emails/activation_email.txt', context)
+    else:
+        subject = render_to_string('emails/activation_email_subject.txt', context)
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('emails/activation_email.txt', context)
 
     # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
@@ -1433,9 +1438,14 @@ def reactivation_email_for_user(user):
         'key': reg.activation_key,
     }
 
-    subject = render_to_string('emails/activation_email_subject.txt', context)
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/activation_email.txt', context)
+    if settings.FEATURES["USE_CUSTOM_THEME"]:
+        subject = render_to_string('custome_emails/activation_email_subject.txt', context)
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('custome_emails/activation_email.txt', context)
+    else:
+        subject = render_to_string('emails/activation_email_subject.txt', context)
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('emails/activation_email.txt', context)
 
     try:
         user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
@@ -1505,10 +1515,14 @@ def change_email_request(request):
         'new_email': pec.new_email
     }
 
-    subject = render_to_string('emails/email_change_subject.txt', context)
-    subject = ''.join(subject.splitlines())
-
-    message = render_to_string('emails/email_change.txt', context)
+    if settings.FEATURES["USE_CUSTOM_THEME"]:
+        subject = render_to_string('custome_emails/email_change_subject.txt', context)
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('custome_emails/email_change.txt', context)
+    else:
+        subject = render_to_string('emails/email_change_subject.txt', context)
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('emails/email_change.txt', context)
 
     from_address = microsite.get_value(
         'email_from_address',
@@ -1545,9 +1559,15 @@ def confirm_email_change(request, key):
             transaction.rollback()
             return response
 
-        subject = render_to_string('emails/email_change_subject.txt', address_context)
-        subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/confirm_email_change.txt', address_context)
+
+        if settings.FEATURES["USE_CUSTOM_THEME"]:
+            subject = render_to_string('custome_emails/email_change_subject.txt', address_context)
+            subject = ''.join(subject.splitlines())
+            message = render_to_string('custome_emails/confirm_email_change.txt', address_context)
+        else:        
+            subject = render_to_string('emails/email_change_subject.txt', address_context)
+            subject = ''.join(subject.splitlines())
+            message = render_to_string('emails/confirm_email_change.txt', address_context)
         up = UserProfile.objects.get(user=user)
         meta = up.get_meta()
         if 'old_emails' not in meta:
