@@ -21,7 +21,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-10 09:11-0400\n"
+"POT-Creation-Date: 2014-03-15 15:04-0400\n"
 "PO-Revision-Date: 2014-03-06 05:20+0000\n"
 "Last-Translator: anantvima <anant.vima@anu.edu.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -814,20 +814,38 @@ msgstr "फ़ाइल नाम (सबसे नया सबसे पहल
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
-"sensitive nature of student grade information."
+"sensitive nature of student information."
 msgstr ""
-"छात्र ग्रेड जानकारी की संवेदनशील प्रकृति के कारण लिंक्स मांग पर ही उत्पन्न "
-"होते है और 5 मिनट के अंदर-अंदर समाप्त हो जाते हैं।"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Please enter a username or email."
+msgstr ""
+
+#. Translators: A rolename appears this sentence.;
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error fetching list for role"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error changing user's permissions."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error enrolling/unenrolling students."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following students:"
 msgstr ""
 "नीचे दिए गए छात्रों का सफ़लतापूर्वक दाखिला हो गया और इनको ई-मेल भेज दी गई:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following students:"
 msgstr "निम्नलिखित छात्रों का सफ़लतापूर्वक नामांकन किया गया:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
@@ -836,10 +854,12 @@ msgstr ""
 "निम्नलिखित छात्रों को सफ़लतापूर्वक नामांकन का ई-मेल भेज दिया गया है। एक बार "
 "रजिस्टर करने पर उन्हें नामांकन करने की अनुमति होगी:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be allowed to enroll once they register:"
 msgstr "रजिस्टर होने के बाद इन छात्रों को नामांकन करने की अनुमति होगी:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
@@ -848,10 +868,12 @@ msgstr ""
 "निम्नलिखित छात्रों को सफ़लतापूर्वक नामांकन का ई-मेल भेज दिया गया है। एक बार "
 "रजिस्टर करने पर उनका नामांकन कर लिया जाएगा।"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be enrolled once they register:"
 msgstr "रजिस्टर होने के बाद इन छात्रों का नामांकन हो जाएगा:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Emails successfully sent. The following students are no longer enrolled in "
@@ -860,10 +882,12 @@ msgstr ""
 "ई-मेलें सफ़लतापूर्वक भेज दी गईं। निम्नलिखित छात्रों का नाम अब पाठ्यक्रम से "
 "हटा दिया गया है:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following students are no longer enrolled in the course:"
 msgstr "निम्नलिखित छात्रों का नाम अब पाठ्यक्रम से हटा दिया गया है:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These students were not affliliated with the course so could not be "

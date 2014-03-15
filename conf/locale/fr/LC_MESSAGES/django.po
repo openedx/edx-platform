@@ -121,7 +121,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-10 09:12-0400\n"
+"POT-Creation-Date: 2014-03-15 15:05-0400\n"
 "PO-Revision-Date: 2014-03-03 14:01+0000\n"
 "Last-Translator: antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -252,11 +252,11 @@ msgstr ""
 #. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py common/djangoapps/student/models.py
 msgid "Other"
-msgstr ""
+msgstr "Autre"
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
-msgstr ""
+msgstr "Doctorat"
 
 #: common/djangoapps/student/models.py
 msgid "Master's or professional degree"
@@ -285,7 +285,7 @@ msgstr ""
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
 msgid "None"
-msgstr ""
+msgstr "Aucun"
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -3117,7 +3117,7 @@ msgstr "Dernière modification :"
 
 #: lms/templates/wiki/article.html
 msgid "See all children"
-msgstr "Voir tous les articles enfants"
+msgstr "Voir tous les articles"
 
 #: lms/templates/wiki/article.html
 msgid "This article was last modified:"
@@ -3214,10 +3214,12 @@ msgstr "Aperçu"
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/help_modal.html lms/templates/login_modal.html
 #: lms/templates/signup_modal.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "Close Modal"
-msgstr "Fermer la fenêtre contextuelle"
+msgid "Close"
+msgstr "Fermer"
 
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"
@@ -3232,14 +3234,8 @@ msgstr "Aperçu du wiki"
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-#, fuzzy
-msgid "modal open"
+msgid "window open"
 msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"ouverture modale\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"ouverture modale "
 
 #: lms/templates/wiki/edit.html
 msgid "Back to editor"
@@ -7330,12 +7326,6 @@ msgid "(this post is about %(courseware_title_linked)s)"
 msgstr "(ce message concerne %(courseware_title_linked)s)"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "Close"
-msgstr "Fermer"
-
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr "Éditer le message"
 
@@ -7676,18 +7666,9 @@ msgstr "Avertissements du cours"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays a list of all students enrolled in this "
-"course, along with profile information such as email address and username. "
-"The data can also be downloaded as a CSV file."
+"The following button generates a CSV file of all students enrolled in this "
+"course, along with profile information such as email address and username."
 msgstr ""
-"Le bouton suivant permet d'afficher la liste de tous les étudiants inscrits "
-"à ce cours, accompagnée des informations sur leur profil telles que "
-"l'adresse email et le nom d'utilisateur. Les données peuvent également être "
-"téléchargées sous forme de fichier CSV."
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "List enrolled students' profile information"
-msgstr "Lister les informations de profil des étudiants inscrits"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download profile information as a CSV"
@@ -7695,15 +7676,21 @@ msgstr "Télécharger les informations de profil au format CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Displays the grading configuration for the course. The grading configuration"
-" is the breakdown of graded subsections of the course (such as exams and "
-"problem sets), and can be changed on the 'Grading' page (under 'Settings') "
-"in Studio."
+"For smaller courses, profile information for enrolled students can be listed"
+" directly on this page:"
 msgstr ""
-"Afficher la configuration de notation du cours. La configuration de notation"
-" montre la répartition des sous-sections notées du cours (tels que les "
-"examens, problèmes et exercices) et peut être modifiée dans le Studio à la "
-"page \"Notation\" (sous le menu \"Paramètres\")."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "List enrolled students' profile information"
+msgstr "Lister les informations de profil des étudiants inscrits"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"The following button displays the grading configuration for the course. The "
+"grading configuration is the breakdown of graded subsections of the course "
+"(such as exams and problem sets), and can be changed on the 'Grading' page "
+"(under 'Settings') in Studio."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Grading Configuration"
@@ -7719,8 +7706,8 @@ msgid "Get Student Anonymized IDs CSV"
 msgstr "Obtenir le CSV des IDs anonymes des étudiants"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Grade Reports"
-msgstr "Rapport de notes"
+msgid "Reports"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7761,11 +7748,24 @@ msgstr "Rapports disponibles pour être téléchargés"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"A new CSV report is generated each time you click the <b>Generate Grade "
-"Report</b> button above. A link to each report remains available on this "
-"page, identified by the UTC date and time of generation. Reports are not "
-"deleted, so you will always be able to access previously generated reports "
-"from this page."
+"Grade reports listed below are generated each time the <b>Generate Grade "
+"Report</b> button is clicked. A link to each grade report remains available "
+"on this page, identified by the UTC date and time of generation. Grade "
+"reports are not deleted, so you will always be able to access previously "
+"generated reports from this page."
+msgstr ""
+
+#. Translators: "these rules" in this sentence references a detailed
+#. description of the grading reports that will appear in a table that
+#. contains
+#. a mix of different types of reports.  This sentence intends to indicate
+#. that
+#. the description of the grading report does not apply to the other reports
+#. that may appear in the table.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Other reports may appear in the table for which these rules will not "
+"necessarily apply."
 msgstr ""
 
 #. Translators: a table of URL links to report files appears after this
@@ -7952,7 +7952,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
-msgstr "Ajouter une équipe"
+msgstr "Ajouter à l‘équipe"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Instructors"
@@ -8200,6 +8200,18 @@ msgid ""
 msgstr ""
 "Vous ne trouvez pas votre langue préférée ? {link_start}Proposez-vous comme "
 "traducteur volontaire !{link_end}"
+
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
+#: lms/templates/modal/accessible_confirm.html
+msgid "Close Modal"
+msgstr "Fermer la fenêtre contextuelle"
+
+#. Translators: this text gives status on if the modal interface (a menu or
+#. piece of UI that takes the full focus of the screen) is open or not
+#: lms/templates/modal/accessible_confirm.html
+msgid "modal open"
+msgstr "ouverture modale "
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
@@ -10165,12 +10177,20 @@ msgstr "Supprimer ce composant"
 msgid "Drag to reorder"
 msgstr "Glissez pour modifier l'ordre"
 
-#: cms/templates/container.html cms/templates/ux/reference/container.html
+#: cms/templates/container.html
 msgid "Container"
 msgstr ""
 
 #: cms/templates/container.html cms/templates/studio_vertical_wrapper.html
 msgid "No Actions"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "Publishing Status"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "This content is published with unit {unit_name}."
 msgstr ""
 
 #: cms/templates/container.html
@@ -11695,7 +11715,7 @@ msgstr "Premier jour d'inscription des étudiants"
 
 #: cms/templates/settings.html
 msgid "Enrollment Start Time"
-msgstr "Heure de début d’inscription"
+msgstr "Heure de début des inscriptions"
 
 #: cms/templates/settings.html
 msgid "Enrollment End Date"

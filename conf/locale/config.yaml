@@ -15,6 +15,7 @@ locales:
     - en@lolcat  # LOLCAT English
     - en@pirate  # Pirate English
     - es_419  # Spanish (Latin America)
+    - es_AR  # Spanish (Argentina)
     - es_EC  # Spanish (Ecuador)
     - es_ES  # Spanish (Spain)
     - es_MX  # Spanish (Mexico)

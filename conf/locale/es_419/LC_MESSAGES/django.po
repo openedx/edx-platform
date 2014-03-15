@@ -17,6 +17,7 @@
 # Luis Ruiz <luislicardo1307@gmail.com>, 2013
 # Natalia_m, 2013
 # Natalia_m, 2013-2014
+# sarina <sarina@edx.org>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
@@ -73,6 +74,7 @@
 # Luis Ruiz <luislicardo1307@gmail.com>, 2013
 # Natalia_m, 2013
 # ovnicraft <ovnicraft@gmail.com>, 2013
+# sarina <sarina@edx.org>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -92,7 +94,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-10 09:12-0400\n"
+"POT-Creation-Date: 2014-03-15 15:05-0400\n"
 "PO-Revision-Date: 2014-03-01 15:39+0000\n"
 "Last-Translator: ovnicraft <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -3132,26 +3134,20 @@ msgstr "Guardar cambios"
 msgid "Preview"
 msgstr "Vista previa"
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a control to allow users to exit out of this modal
 #. interface (a menu or piece of UI that takes the full focus of the screen)
-#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/forgot_password_modal.html
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/help_modal.html lms/templates/login_modal.html
 #: lms/templates/signup_modal.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-#, fuzzy
-msgid "Close Modal"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Cerrar dialogo\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Cerrar diálogo"
+msgid "Close"
+msgstr "Cerrar"
 
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"
@@ -3166,9 +3162,8 @@ msgstr "Vista previa de la Wiki"
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "modal open"
-msgstr "dialogo abierto"
+msgid "window open"
+msgstr ""
 
 #: lms/templates/wiki/edit.html
 msgid "Back to editor"
@@ -3273,7 +3268,7 @@ msgid ""
 "  "
 msgstr ""
 "\n"
-"  Debe <a href=\"%(login_url)s\"><Iniciar sesión</a> o <a href=\"%(signup_url)s\">registrarse</a> para usar esta función.\n"
+"  Debe <a href=\"%(login_url)s\">Iniciar sesión</a> o <a href=\"%(signup_url)s\">registrarse</a> para usar esta función.\n"
 "  "
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
@@ -7269,12 +7264,6 @@ msgid "(this post is about %(courseware_title_linked)s)"
 msgstr "(esta publicación es sobre %(courseware_title_linked)s)"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "Close"
-msgstr "Cerrar"
-
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr "Editando entrada"
 
@@ -7618,18 +7607,9 @@ msgstr "Advertencias del curso"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays a list of all students enrolled in this "
-"course, along with profile information such as email address and username. "
-"The data can also be downloaded as a CSV file."
+"The following button generates a CSV file of all students enrolled in this "
+"course, along with profile information such as email address and username."
 msgstr ""
-"El siguiente botón muestra la lista de estudiantes inscritos en el curso, "
-"junto con la información de perfil como nombre de usuario y dirección de "
-"correo electrónico. Los datos pueden también ser descargados como archivo "
-"CSV."
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "List enrolled students' profile information"
-msgstr "Listar la información de perfil de los estudiantes inscritos"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download profile information as a CSV"
@@ -7637,15 +7617,21 @@ msgstr "Descargar la informaicón de perfíl como archivo CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Displays the grading configuration for the course. The grading configuration"
-" is the breakdown of graded subsections of the course (such as exams and "
-"problem sets), and can be changed on the 'Grading' page (under 'Settings') "
-"in Studio."
+"For smaller courses, profile information for enrolled students can be listed"
+" directly on this page:"
 msgstr ""
-"Muestra la configuración de calificaciones para el curso. La configuración "
-"de calificaciones es la explicación de las subsecciones calificables del "
-"curso, (tales como exámenes y conjuntos de problemas), y puede ser cambiada "
-"en la página de 'Calificaciones' en el menú 'Configuración' en Studio."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "List enrolled students' profile information"
+msgstr "Listar la información de perfil de los estudiantes inscritos"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"The following button displays the grading configuration for the course. The "
+"grading configuration is the breakdown of graded subsections of the course "
+"(such as exams and problem sets), and can be changed on the 'Grading' page "
+"(under 'Settings') in Studio."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Grading Configuration"
@@ -7664,8 +7650,8 @@ msgstr ""
 " anónima."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Grade Reports"
-msgstr "Reportes de calificaciones"
+msgid "Reports"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7707,11 +7693,24 @@ msgstr "Reportes disponibles para descargar"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"A new CSV report is generated each time you click the <b>Generate Grade "
-"Report</b> button above. A link to each report remains available on this "
-"page, identified by the UTC date and time of generation. Reports are not "
-"deleted, so you will always be able to access previously generated reports "
-"from this page."
+"Grade reports listed below are generated each time the <b>Generate Grade "
+"Report</b> button is clicked. A link to each grade report remains available "
+"on this page, identified by the UTC date and time of generation. Grade "
+"reports are not deleted, so you will always be able to access previously "
+"generated reports from this page."
+msgstr ""
+
+#. Translators: "these rules" in this sentence references a detailed
+#. description of the grading reports that will appear in a table that
+#. contains
+#. a mix of different types of reports.  This sentence intends to indicate
+#. that
+#. the description of the grading report does not apply to the other reports
+#. that may appear in the table.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Other reports may appear in the table for which these rules will not "
+"necessarily apply."
 msgstr ""
 
 #. Translators: a table of URL links to report files appears after this
@@ -8145,6 +8144,18 @@ msgid ""
 msgstr ""
 "¿No está disponible el idioma de su preferencia? {link_start}Hágase "
 "traductor voluntario!{link_end}"
+
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
+#: lms/templates/modal/accessible_confirm.html
+msgid "Close Modal"
+msgstr "Cerrar diálogo"
+
+#. Translators: this text gives status on if the modal interface (a menu or
+#. piece of UI that takes the full focus of the screen) is open or not
+#: lms/templates/modal/accessible_confirm.html
+msgid "modal open"
+msgstr "dialogo abierto"
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
@@ -8797,7 +8808,6 @@ msgstr ""
 #: lms/templates/static_templates/server-error.html
 msgid "There has been a 500 error on the <em>{platform_name}</em> servers"
 msgstr ""
-"Se ha producido un error 500 en los Servidores de <em>{PLATFORM_NAME}</em>"
 
 #: lms/templates/static_templates/server-error.html
 msgid ""
@@ -8810,7 +8820,6 @@ msgstr ""
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the <em>{platform_name}</em> servers are overloaded"
 msgstr ""
-"Actualmente los servidores de <em>{PLATFORM_NAME}</em> están sobrecargados"
 
 #: lms/templates/university_profile/edge.html
 #: lms/templates/university_profile/edge.html
@@ -10106,13 +10115,21 @@ msgstr "Borrar este componente"
 msgid "Drag to reorder"
 msgstr "Arrastre para reorganizar"
 
-#: cms/templates/container.html cms/templates/ux/reference/container.html
+#: cms/templates/container.html
 msgid "Container"
 msgstr "Contenedor"
 
 #: cms/templates/container.html cms/templates/studio_vertical_wrapper.html
 msgid "No Actions"
 msgstr "No hay acciones"
+
+#: cms/templates/container.html
+msgid "Publishing Status"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "This content is published with unit {unit_name}."
+msgstr ""
 
 #: cms/templates/container.html
 msgid ""
@@ -11548,7 +11565,7 @@ msgstr "Ubicación"
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr "Acepto los {link_start}Terminos del Servicio{link_end}"
+msgstr ""
 
 #: cms/templates/register.html
 msgid "Create My Account &amp; Start Authoring Courses"
@@ -11728,12 +11745,6 @@ msgid ""
 " Manager\">PM</abbr> or Conrad Warre <a rel=\"email\" class=\"action action-"
 "email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
 msgstr ""
-"Estas fechas afectan <strong>el momento en que su curso puede ser "
-"visto</strong> pero no son las fechas que se mostrarán en la página de "
-"resumen del curso. Para ingresar las fechas de inicio y las fechas de "
-"registro que se mostrarán en la página de resumen del curso, siga las "
-"instrucciones dadas por su <abbr title=\"Program Manager\">Administrador de "
-"Programa</abbr>."
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
@@ -12167,15 +12178,13 @@ msgstr "Tu cuenta para edX Studio"
 
 #: cms/templates/emails/course_creator_admin_subject.txt
 msgid "{email} has requested Studio course creator privileges on edge"
-msgstr "{Email} ha solicitado privilegios de creador de cursos Studio en edge"
+msgstr ""
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
 msgid ""
 "User '{user}' with e-mail {email} has requested Studio course creator "
 "privileges on edge."
 msgstr ""
-"El usuario '{Usuario}' con el correo electrónico {email} ha solicitado "
-"privilegios de creador de cursos de Studio en edge."
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
 msgid "To grant or deny this request, use the course creator admin table."

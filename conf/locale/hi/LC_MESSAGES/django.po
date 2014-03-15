@@ -58,7 +58,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-10 09:12-0400\n"
+"POT-Creation-Date: 2014-03-15 15:05-0400\n"
 "PO-Revision-Date: 2014-02-27 00:20+0000\n"
 "Last-Translator: anantvima <anant.vima@anu.edu.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -3080,21 +3080,20 @@ msgstr "परिवर्तन सहेजें"
 msgid "Preview"
 msgstr "पूर्वावलोकन"
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a control to allow users to exit out of this modal
 #. interface (a menu or piece of UI that takes the full focus of the screen)
-#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/forgot_password_modal.html
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/help_modal.html lms/templates/login_modal.html
 #: lms/templates/signup_modal.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "Close Modal"
-msgstr "मोडल बंद करें"
+msgid "Close"
+msgstr "बंद करे"
 
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"
@@ -3109,14 +3108,8 @@ msgstr "विकी पूर्वावलोकन "
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-#, fuzzy
-msgid "modal open"
+msgid "window open"
 msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"मोडल खोलें \n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"मोडल खुला है"
 
 #: lms/templates/wiki/edit.html
 msgid "Back to editor"
@@ -7162,12 +7155,6 @@ msgid "(this post is about %(courseware_title_linked)s)"
 msgstr "(यह पोस्ट %(courseware_title_linked)s के बारे में है)"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "Close"
-msgstr "बंद करे"
-
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr "पोस्ट में संशोधन हो रहा है"
 
@@ -7506,18 +7493,9 @@ msgstr "पाठ्यक्रम चेतावनियां"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays a list of all students enrolled in this "
-"course, along with profile information such as email address and username. "
-"The data can also be downloaded as a CSV file."
+"The following button generates a CSV file of all students enrolled in this "
+"course, along with profile information such as email address and username."
 msgstr ""
-"नीचे दिया गया बटन इस पाठ्यक्रम में दाखिल सभी छात्रों की एक सूची प्रदर्शित "
-"करता है, और साथ साथ प्रोफाइल जानकारी जैसे ई-मेल पता और उपयोगकर्ता नाम भी "
-"दिखाता है। इसके साथ ही में डाटा एक CSV फ़ाइल के रूप में भी डाउनलोड किया जा "
-"सकता है।"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "List enrolled students' profile information"
-msgstr "दाखिल छात्रों की प्रोफाइल जानकारी की सूची "
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download profile information as a CSV"
@@ -7525,15 +7503,21 @@ msgstr "एक CSV के रूप में प्रोफ़ाइल जा
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Displays the grading configuration for the course. The grading configuration"
-" is the breakdown of graded subsections of the course (such as exams and "
-"problem sets), and can be changed on the 'Grading' page (under 'Settings') "
-"in Studio."
+"For smaller courses, profile information for enrolled students can be listed"
+" directly on this page:"
 msgstr ""
-"यह पाठ्यक्रम की ग्रेडिंग कॉनफ़िगरेशन को दिखाता है। ग्रेडिंग कॉनफ़िगरेशन "
-"पाठ्यक्रम के भिन्न-भिन्न भागों (जैसे कि परीक्षाएं और समस्या सेट) का जोड़ "
-"होता है और इसको स्टूडियो में ग्रेडिंग पेज (सेटिंग्स के नीचे) बदला जा सकता "
-"है।"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "List enrolled students' profile information"
+msgstr "दाखिल छात्रों की प्रोफाइल जानकारी की सूची "
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"The following button displays the grading configuration for the course. The "
+"grading configuration is the breakdown of graded subsections of the course "
+"(such as exams and problem sets), and can be changed on the 'Grading' page "
+"(under 'Settings') in Studio."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Grading Configuration"
@@ -7548,8 +7532,8 @@ msgid "Get Student Anonymized IDs CSV"
 msgstr "छात्रों के बेनाम IDs CSV पाएं"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Grade Reports"
-msgstr "ग्रेड रिपोर्ट्स"
+msgid "Reports"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7590,11 +7574,24 @@ msgstr "रिपोर्ट्स डाउनलोड करने के �
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"A new CSV report is generated each time you click the <b>Generate Grade "
-"Report</b> button above. A link to each report remains available on this "
-"page, identified by the UTC date and time of generation. Reports are not "
-"deleted, so you will always be able to access previously generated reports "
-"from this page."
+"Grade reports listed below are generated each time the <b>Generate Grade "
+"Report</b> button is clicked. A link to each grade report remains available "
+"on this page, identified by the UTC date and time of generation. Grade "
+"reports are not deleted, so you will always be able to access previously "
+"generated reports from this page."
+msgstr ""
+
+#. Translators: "these rules" in this sentence references a detailed
+#. description of the grading reports that will appear in a table that
+#. contains
+#. a mix of different types of reports.  This sentence intends to indicate
+#. that
+#. the description of the grading report does not apply to the other reports
+#. that may appear in the table.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Other reports may appear in the table for which these rules will not "
+"necessarily apply."
 msgstr ""
 
 #. Translators: a table of URL links to report files appears after this
@@ -8019,6 +8016,18 @@ msgid ""
 msgstr ""
 "अपनी पसंदीदा भाषा नहीं दिख रही? एक {link_start}स्वयंसेवी अनुवादक "
 "बनें!{link_end}"
+
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
+#: lms/templates/modal/accessible_confirm.html
+msgid "Close Modal"
+msgstr "मोडल बंद करें"
+
+#. Translators: this text gives status on if the modal interface (a menu or
+#. piece of UI that takes the full focus of the screen) is open or not
+#: lms/templates/modal/accessible_confirm.html
+msgid "modal open"
+msgstr "मोडल खुला है"
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
@@ -9934,12 +9943,20 @@ msgstr ""
 msgid "Drag to reorder"
 msgstr ""
 
-#: cms/templates/container.html cms/templates/ux/reference/container.html
+#: cms/templates/container.html
 msgid "Container"
 msgstr ""
 
 #: cms/templates/container.html cms/templates/studio_vertical_wrapper.html
 msgid "No Actions"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "Publishing Status"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "This content is published with unit {unit_name}."
 msgstr ""
 
 #: cms/templates/container.html

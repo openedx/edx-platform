@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-10 10:07-0400\n"
-"PO-Revision-Date: 2014-03-10 14:07:45.074652\n"
+"POT-Creation-Date: 2014-03-15 15:36-0400\n"
+"PO-Revision-Date: 2014-03-15 19:36:44.314680\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3140,10 +3140,12 @@ msgstr "Prévïéw #"
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/help_modal.html lms/templates/login_modal.html
 #: lms/templates/signup_modal.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "Close Modal"
-msgstr "Çlösé Mödäl Ⱡ#"
+msgid "Close"
+msgstr "Çlösé Ⱡ'σяєм ι#"
 
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"
@@ -3158,9 +3160,8 @@ msgstr "Wïkï Prévïéw Ⱡ#"
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "modal open"
-msgstr "mödäl öpén Ⱡ#"
+msgid "window open"
+msgstr "wïndöw öpén Ⱡ#"
 
 #: lms/templates/wiki/edit.html
 msgid "Back to editor"
@@ -7321,12 +7322,6 @@ msgid "(this post is about %(courseware_title_linked)s)"
 msgstr "(thïs pöst ïs äßöüt %(courseware_title_linked)s) Ⱡ'σяє#"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "Close"
-msgstr "Çlösé Ⱡ'σяєм ι#"
-
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr "Édïtïng pöst Ⱡ#"
 
@@ -7678,18 +7673,12 @@ msgstr "Çöürsé Wärnïngs Ⱡ'#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays a list of all students enrolled in this "
-"course, along with profile information such as email address and username. "
-"The data can also be downloaded as a CSV file."
+"The following button generates a CSV file of all students enrolled in this "
+"course, along with profile information such as email address and username."
 msgstr ""
-"Thé föllöwïng ßüttön dïspläýs ä lïst öf äll stüdénts énrölléd ïn thïs "
+"Thé föllöwïng ßüttön générätés ä ÇSV fïlé öf äll stüdénts énrölléd ïn thïs "
 "çöürsé, älöng wïth pröfïlé ïnförmätïön süçh äs émäïl äddréss änd üsérnämé. "
-"Thé dätä çän älsö ßé döwnlöädéd äs ä ÇSV fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "List enrolled students' profile information"
-msgstr "Lïst énrölléd stüdénts' pröfïlé ïnförmätïön Ⱡ'σяєм ιρѕυм#"
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download profile information as a CSV"
@@ -7697,16 +7686,28 @@ msgstr "Döwnlöäd pröfïlé ïnförmätïön äs ä ÇSV Ⱡ'σяєм ιρѕ#
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Displays the grading configuration for the course. The grading configuration"
-" is the breakdown of graded subsections of the course (such as exams and "
-"problem sets), and can be changed on the 'Grading' page (under 'Settings') "
-"in Studio."
+"For smaller courses, profile information for enrolled students can be listed"
+" directly on this page:"
 msgstr ""
-"Dïspläýs thé grädïng çönfïgürätïön för thé çöürsé. Thé grädïng çönfïgürätïön"
-" ïs thé ßréäkdöwn öf grädéd süßséçtïöns öf thé çöürsé (süçh äs éxäms änd "
-"prößlém séts), änd çän ßé çhängéd ön thé 'Grädïng' pägé (ündér 'Séttïngs') "
-"ïn Stüdïö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ"
-" єιυѕмσ∂ т#"
+"För smällér çöürsés, pröfïlé ïnförmätïön för énrölléd stüdénts çän ßé lïstéd"
+" dïréçtlý ön thïs pägé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "List enrolled students' profile information"
+msgstr "Lïst énrölléd stüdénts' pröfïlé ïnförmätïön Ⱡ'σяєм ιρѕυм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"The following button displays the grading configuration for the course. The "
+"grading configuration is the breakdown of graded subsections of the course "
+"(such as exams and problem sets), and can be changed on the 'Grading' page "
+"(under 'Settings') in Studio."
+msgstr ""
+"Thé föllöwïng ßüttön dïspläýs thé grädïng çönfïgürätïön för thé çöürsé. Thé "
+"grädïng çönfïgürätïön ïs thé ßréäkdöwn öf grädéd süßséçtïöns öf thé çöürsé "
+"(süçh äs éxäms änd prößlém séts), änd çän ßé çhängéd ön thé 'Grädïng' pägé "
+"(ündér 'Séttïngs') ïn Stüdïö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Grading Configuration"
@@ -7723,8 +7724,8 @@ msgid "Get Student Anonymized IDs CSV"
 msgstr "Gét Stüdént Ànönýmïzéd ÌDs ÇSV Ⱡ'σяєм #"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Grade Reports"
-msgstr "Grädé Répörts Ⱡ'#"
+msgid "Reports"
+msgstr "Répörts #"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7766,18 +7767,33 @@ msgstr "Répörts Àväïläßlé för Döwnlöäd Ⱡ'σяєм #"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"A new CSV report is generated each time you click the <b>Generate Grade "
-"Report</b> button above. A link to each report remains available on this "
-"page, identified by the UTC date and time of generation. Reports are not "
-"deleted, so you will always be able to access previously generated reports "
-"from this page."
+"Grade reports listed below are generated each time the <b>Generate Grade "
+"Report</b> button is clicked. A link to each grade report remains available "
+"on this page, identified by the UTC date and time of generation. Grade "
+"reports are not deleted, so you will always be able to access previously "
+"generated reports from this page."
 msgstr ""
-"À néw ÇSV répört ïs générätéd éäçh tïmé ýöü çlïçk thé <b>Généräté Grädé "
-"Répört</b> ßüttön äßövé. À lïnk tö éäçh répört rémäïns äväïläßlé ön thïs "
-"pägé, ïdéntïfïéd ßý thé ÛTÇ däté änd tïmé öf générätïön. Répörts äré nöt "
-"délétéd, sö ýöü wïll älwäýs ßé äßlé tö äççéss prévïöüslý générätéd répörts "
-"fröm thïs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
-"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσ#"
+"Grädé répörts lïstéd ßélöw äré générätéd éäçh tïmé thé <b>Généräté Grädé "
+"Répört</b> ßüttön ïs çlïçkéd. À lïnk tö éäçh grädé répört rémäïns äväïläßlé "
+"ön thïs pägé, ïdéntïfïéd ßý thé ÛTÇ däté änd tïmé öf générätïön. Grädé "
+"répörts äré nöt délétéd, sö ýöü wïll älwäýs ßé äßlé tö äççéss prévïöüslý "
+"générätéd répörts fröm thïs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт #"
+
+#. Translators: "these rules" in this sentence references a detailed
+#. description of the grading reports that will appear in a table that
+#. contains
+#. a mix of different types of reports.  This sentence intends to indicate
+#. that
+#. the description of the grading report does not apply to the other reports
+#. that may appear in the table.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Other reports may appear in the table for which these rules will not "
+"necessarily apply."
+msgstr ""
+"Öthér répörts mäý äppéär ïn thé täßlé för whïçh thésé rülés wïll nöt "
+"néçéssärïlý äpplý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #. Translators: a table of URL links to report files appears after this
 #. sentence.
@@ -8236,6 +8252,18 @@ msgid ""
 msgstr ""
 "Dön't séé ýöür préférréd längüägé? {link_start}Völüntéér tö ßéçömé ä "
 "tränslätör!{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
+#: lms/templates/modal/accessible_confirm.html
+msgid "Close Modal"
+msgstr "Çlösé Mödäl Ⱡ#"
+
+#. Translators: this text gives status on if the modal interface (a menu or
+#. piece of UI that takes the full focus of the screen) is open or not
+#: lms/templates/modal/accessible_confirm.html
+msgid "modal open"
+msgstr "mödäl öpén Ⱡ#"
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
@@ -10234,13 +10262,21 @@ msgstr "Délété thïs çömpönént Ⱡ'σя#"
 msgid "Drag to reorder"
 msgstr "Dräg tö réördér Ⱡ'#"
 
-#: cms/templates/container.html cms/templates/ux/reference/container.html
+#: cms/templates/container.html
 msgid "Container"
 msgstr "Çöntäïnér #"
 
 #: cms/templates/container.html cms/templates/studio_vertical_wrapper.html
 msgid "No Actions"
 msgstr "Nö Àçtïöns Ⱡ#"
+
+#: cms/templates/container.html
+msgid "Publishing Status"
+msgstr "Püßlïshïng Stätüs Ⱡ'σ#"
+
+#: cms/templates/container.html
+msgid "This content is published with unit {unit_name}."
+msgstr "Thïs çöntént ïs püßlïshéd wïth ünït {unit_name}. Ⱡ'σяєм ιρѕυ#"
 
 #: cms/templates/container.html
 msgid ""
