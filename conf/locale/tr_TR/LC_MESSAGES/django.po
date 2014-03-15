@@ -8,8 +8,8 @@
 # brscvs <brscvs@gmail.com>, 2013
 # burakozalp <realburq@gmail.com>, 2013
 # burakozalp <realburq@gmail.com>, 2013
-# hgsenel <hgsenel@gmail.com>, 2014
-# hgsenel <hgsenel@gmail.com>, 2014
+# Hakan Senel <hgsenel@gmail.com>, 2014
+# Hakan Senel <hgsenel@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
@@ -18,8 +18,8 @@
 # Translators:
 # brscvs <brscvs@gmail.com>, 2013
 # burakozalp <realburq@gmail.com>, 2013
-# hgsenel <hgsenel@gmail.com>, 2014
-# hgsenel <hgsenel@gmail.com>, 2014
+# Hakan Senel <hgsenel@gmail.com>, 2014
+# Hakan Senel <hgsenel@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)
 # Copyright (C) 2014 edX
@@ -30,8 +30,8 @@
 # brscvs <brscvs@gmail.com>, 2013
 # burakozalp <realburq@gmail.com>, 2013
 # burakozalp <realburq@gmail.com>, 2013
-# hgsenel <hgsenel@gmail.com>, 2014
-# hgsenel <hgsenel@gmail.com>, 2014
+# Hakan Senel <hgsenel@gmail.com>, 2014
+# Hakan Senel <hgsenel@gmail.com>, 2014
 # Kerim Kaan Dönmez <ben@kerimkaan.com>, 2013
 # Kerim Kaan Dönmez <ben@kerimkaan.com>, 2013
 # Murat Bişkin <murat@muratbiskin.com.tr>, 2013
@@ -45,8 +45,8 @@
 # Translators:
 # brscvs <brscvs@gmail.com>, 2013
 # burakozalp <realburq@gmail.com>, 2013
-# hgsenel <hgsenel@gmail.com>, 2014
-# hgsenel <hgsenel@gmail.com>, 2014
+# Hakan Senel <hgsenel@gmail.com>, 2014
+# Hakan Senel <hgsenel@gmail.com>, 2014
 # Kerim Kaan Dönmez <ben@kerimkaan.com>, 2013
 # Murat Bişkin <murat@muratbiskin.com.tr>, 2013
 # onurbektas <mustafaonurbektas@gmail.com>, 2013
@@ -58,23 +58,23 @@
 # Translators:
 # burakozalp <realburq@gmail.com>, 2013
 # burakozalp <realburq@gmail.com>, 2013
-# hgsenel <hgsenel@gmail.com>, 2014
-# hgsenel <hgsenel@gmail.com>, 2014
+# Hakan Senel <hgsenel@gmail.com>, 2014
+# Hakan Senel <hgsenel@gmail.com>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# hgsenel <hgsenel@gmail.com>, 2014
+# Hakan Senel <hgsenel@gmail.com>, 2014
 # Murat Bişkin <murat@muratbiskin.com.tr>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-10 09:12-0400\n"
+"POT-Creation-Date: 2014-03-15 15:05-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
-"Last-Translator: hgsenel <hgsenel@gmail.com>\n"
+"Last-Translator: Hakan Senel <hgsenel@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -219,7 +219,7 @@ msgstr "Lisans Derecesi"
 
 #: common/djangoapps/student/models.py
 msgid "Associate's degree"
-msgstr ""
+msgstr "Öğretim üyesinin derecesi"
 
 #: common/djangoapps/student/models.py
 msgid "Secondary/high school"
@@ -1474,7 +1474,7 @@ msgstr "Alt taraftaki modül içe aktarmayı desteklemiyor."
 #. available from the remote source they specified
 #: lms/djangoapps/dashboard/git_import.py
 msgid "The specified remote branch is not available."
-msgstr ""
+msgstr "Belirlenen uzak şubeye ulaşılamıyor."
 
 #. Translators: Error message shown when they have asked for a git
 #. repository branch, a specific version within a repository, that
@@ -1482,6 +1482,7 @@ msgstr ""
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr ""
+"Belirlenen dala geçiş başarısız oldu. Dal ismini lütfen kontrol ediniz."
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed in authenticating {0}, error {1}\n"
@@ -1631,6 +1632,8 @@ msgstr "{0} veri dizininde zaten bulunuyor! (Yine de yeniden yükleniyor)"
 msgid ""
 "Unable to clone or pull repository. Please check your url. Output was: {0!r}"
 msgstr ""
+"Depoyu klonlarken veya çekerken hata oluştu. Url'yi lütfen kontrol ediniz. "
+"Çıktı şöyleydi: {0!r}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed to clone repository to {0}"
@@ -1713,6 +1716,8 @@ msgid ""
 "Import the specified git repository and optional branch into the modulestore"
 " and optionally specified directory."
 msgstr ""
+"Belirlenen git deposunu ve opsiyonel dalı modül mağazasına ve opsiyonel "
+"olarak belirlenmiş dizine aktarma."
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Cannot find user with email address"
@@ -3055,38 +3060,33 @@ msgstr "Değişikleri kaydet"
 msgid "Preview"
 msgstr "Önizleme"
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a control to allow users to exit out of this modal
 #. interface (a menu or piece of UI that takes the full focus of the screen)
-#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/forgot_password_modal.html
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/help_modal.html lms/templates/login_modal.html
 #: lms/templates/signup_modal.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "Close Modal"
-msgstr "Kip Kapat"
+msgid "Close"
+msgstr "Kapa"
 
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"
 msgstr "Wiki Önizleme"
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this text gives status on if the modal interface (a menu or
 #. piece of UI that takes the full focus of the screen) is open or not
-#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "modal open"
-msgstr "Kip açık"
+msgid "window open"
+msgstr "pencere açık"
 
 #: lms/templates/wiki/edit.html
 msgid "Back to editor"
@@ -5429,13 +5429,13 @@ msgstr "Dersleri Yönetin"
 #. courseware
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Location"
-msgstr ""
+msgstr "Depo yeri"
 
 #. Translators: Repo is short for git repository or source of
 #. courseware and branch is a specific version within that repository
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Branch (optional)"
-msgstr ""
+msgstr "Depo dalı (opsiyonel)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
@@ -7144,12 +7144,6 @@ msgid "(this post is about %(courseware_title_linked)s)"
 msgstr "(bu ileti %(courseware_title_linked)s) hakkında)"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "Close"
-msgstr "Kapa"
-
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr "İleti Düzenleniyor"
 
@@ -7410,12 +7404,16 @@ msgid ""
 "The chart below displays the score distribution for each standard problem in"
 " your class, specified by the problem's url name."
 msgstr ""
+"Aşağıdaki çizelge, problemlerin url ismiyle belirlenmiş olan, dersinizdeki "
+"her bir standart problem için skor dağılımını göstermektedir."
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid ""
 "Scores are shown without weighting applied, so if your problem contains 2 "
 "questions, it will display as having a total of 2 points."
 msgstr ""
+"Aşağıdaki skorlar ağırlıklı olarak hesaplanmamıştır, işte bu nedenle eğer "
+"probleminiz iki ayrı sorudan oluşuyorsa, 2 puan ayrı ayrı gösterilecektir."
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Loading problem list..."
@@ -7483,17 +7481,9 @@ msgstr "Ders Uyarıları"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays a list of all students enrolled in this "
-"course, along with profile information such as email address and username. "
-"The data can also be downloaded as a CSV file."
+"The following button generates a CSV file of all students enrolled in this "
+"course, along with profile information such as email address and username."
 msgstr ""
-"Aşağıdaki buton bu derse kayıtlı bütün öğrencilerin listesini, e-posta "
-"adresi ve kullanıcı adı gibi profil bilgileriyle birlikte göstermektedir. bu"
-" veri CSV dosyası olarak indirilebilir."
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "List enrolled students' profile information"
-msgstr "Kayıtlı öğrencilerin profil bilgisini listele"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download profile information as a CSV"
@@ -7501,15 +7491,23 @@ msgstr "Profil bilgilerini CSV dosyası olarak indir"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Displays the grading configuration for the course. The grading configuration"
-" is the breakdown of graded subsections of the course (such as exams and "
-"problem sets), and can be changed on the 'Grading' page (under 'Settings') "
-"in Studio."
+"For smaller courses, profile information for enrolled students can be listed"
+" directly on this page:"
 msgstr ""
-"Bu dersin notlandırma ayarlarını gösteriyor. Notlandırma ayarları dersin "
-"notlandırılmış alt bölümlerinin açılmasıdır (örneğin sınavlar ve problem "
-"setleri), ve Stüdyo'da 'Notlandırma' sayfasından ('Ayarlar' altında) "
-"değiştirilebilir."
+"Daha küçük dersler için, kayıtlı öğrencilerin bilgileri bu sayfada doğrudan "
+"listelenir:"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "List enrolled students' profile information"
+msgstr "Kayıtlı öğrencilerin profil bilgisini listele"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"The following button displays the grading configuration for the course. The "
+"grading configuration is the breakdown of graded subsections of the course "
+"(such as exams and problem sets), and can be changed on the 'Grading' page "
+"(under 'Settings') in Studio."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Grading Configuration"
@@ -7525,8 +7523,8 @@ msgid "Get Student Anonymized IDs CSV"
 msgstr "Anonim Öğrenci Numaralarını CSV Olarak Getir"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Grade Reports"
-msgstr "Not Raporları"
+msgid "Reports"
+msgstr "Raporlar"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7566,11 +7564,29 @@ msgstr "İndirme için Hazır Raporlar"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"A new CSV report is generated each time you click the <b>Generate Grade "
-"Report</b> button above. A link to each report remains available on this "
-"page, identified by the UTC date and time of generation. Reports are not "
-"deleted, so you will always be able to access previously generated reports "
-"from this page."
+"Grade reports listed below are generated each time the <b>Generate Grade "
+"Report</b> button is clicked. A link to each grade report remains available "
+"on this page, identified by the UTC date and time of generation. Grade "
+"reports are not deleted, so you will always be able to access previously "
+"generated reports from this page."
+msgstr ""
+"Aşağıda listelenen not raporları <b>Not Raporu Oluştur</b> butonuna "
+"tıklandığı zaman oluşturulur. Her not raporuna olan bağlantı, oluşturulduğu "
+"UTC tarihi ve zamanıyla belirlenmiş şekilde sayfada sunulur. Not raporları "
+"silinmez ve böylece eskiden oluşturulmuş raporlara bu sayfa üzerinde "
+"erişebilirsiniz."
+
+#. Translators: "these rules" in this sentence references a detailed
+#. description of the grading reports that will appear in a table that
+#. contains
+#. a mix of different types of reports.  This sentence intends to indicate
+#. that
+#. the description of the grading report does not apply to the other reports
+#. that may appear in the table.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Other reports may appear in the table for which these rules will not "
+"necessarily apply."
 msgstr ""
 
 #. Translators: a table of URL links to report files appears after this
@@ -7580,6 +7596,9 @@ msgid ""
 "<b>Note</b>: To keep student data secure, you cannot save or email these "
 "links for direct access. Copies of links expire within 5 minutes."
 msgstr ""
+"<b>Not:</b>: Öğrenci verilerini güvenli şekilde tutmak için, dorudan erişim "
+"için bu linkleri kaydedemez ve e-posta ile gönderemezsiniz. Linklerin "
+"kopyaları 5 dakika içinde zaman aşımına uğrayacaktır."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Individual due date extensions"
@@ -7733,6 +7752,10 @@ msgid ""
 "contact your instructor and ask them to add you as an instructor for staff "
 "and beta lists, or a discussion admin for discussion management."
 msgstr ""
+"Personel görevli veya beta sınayıcılarının listelerini değiştiremez. Bu "
+"listeleri değiştirmek için, eğitmeninizle temasa geçiniz ve sizi personel "
+"veya beta sınayıcı listelerine eklemesini ve forum yöneticisi olarak "
+"belirlemesini isteyiniz. "
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Staff"
@@ -7764,6 +7787,8 @@ msgid ""
 "Instructors are the core administration of your course. Instructors can add "
 "and remove course staff, as well as administer discussion access."
 msgstr ""
+"Eğitmenler dersin çekirdek yöneticileridir. Eğitmenler ders personelini "
+"ekleyebilir veya çıkarabilir, hatta forum erişimini yönetebilirler."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Instructor"
@@ -7796,6 +7821,10 @@ msgid ""
 " re-open threads, endorse responses, and see posts from all cohorts. They "
 "CAN add/delete other moderators and their posts are marked as 'staff'."
 msgstr ""
+"Forum yöneticileri herhangi bir iletiyi değiştirebilir veya silebilir, "
+"yanlış kullanım diye işaretleyebilir, iplikleri kapatabilir veya yenilerini "
+"açabilir ve diğer kohortlardan gelen iletileri görebilir. Moderatörler "
+"EKLEYEBİLİR/SİLEBİLİR ve iletileri 'personel' olarak etiketlidir."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Admin"
@@ -7812,6 +7841,11 @@ msgid ""
 "They CANNOT add/delete other moderators and their posts are marked as "
 "'staff'."
 msgstr ""
+"Forum moderatörleri herhangi bir iletiyi değiştirebilir veya silebilir, "
+"yanlış kullanım diye işaretleyebilir, yeni iplikler açabilir, cevapları "
+"destekleyebilir ve bütün kohortlardan gelen iletileri görebilir. Başka "
+"moderatörleri ekleme/silme YAPAMAZ ve iletileri 'personel' olarak "
+"etiketlidir."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
@@ -7819,7 +7853,7 @@ msgstr "Moderatör Ekle"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Community TAs"
-msgstr ""
+msgstr "Tartışma Topluluk Öğretim Görevlileri"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -7828,6 +7862,11 @@ msgid ""
 "misuse flags, close and re-open threads, endorse responses, and see posts "
 "from all cohorts. Their posts are marked 'Community TA'."
 msgstr ""
+"Topluluk Öğretim Görevlileri özellikle forumlarda yararlı olan kişilerdir. "
+"Bir iletiyi değiştirebilir veya silebilir, yanlış kullanımları "
+"işaretleyebilir, iplikleri kapayabilir veya yeniden açabilir, yanıtları "
+"destekleyebilir ve bütün kohortlardan gelen mesajları görebilir. İletileri, "
+"'Topluluk Öğretim Görevlisi' olarak işaretlenir."
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
@@ -7998,6 +8037,18 @@ msgid ""
 msgstr ""
 "Tercih ettiğiniz dili göremediniz mi? {link_start}Gönüllü çevirmen "
 "olunuz!{link_end}"
+
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
+#: lms/templates/modal/accessible_confirm.html
+msgid "Close Modal"
+msgstr "Kip Kapat"
+
+#. Translators: this text gives status on if the modal interface (a menu or
+#. piece of UI that takes the full focus of the screen) is open or not
+#: lms/templates/modal/accessible_confirm.html
+msgid "modal open"
+msgstr "Kip açık"
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
@@ -9912,13 +9963,21 @@ msgstr "Bu bileşeni silin"
 msgid "Drag to reorder"
 msgstr "Tekrar düzenlemek için sürükle"
 
-#: cms/templates/container.html cms/templates/ux/reference/container.html
+#: cms/templates/container.html
 msgid "Container"
 msgstr "Taşıyıcı"
 
 #: cms/templates/container.html cms/templates/studio_vertical_wrapper.html
 msgid "No Actions"
 msgstr "Aksiyon Yok"
+
+#: cms/templates/container.html
+msgid "Publishing Status"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "This content is published with unit {unit_name}."
+msgstr ""
 
 #: cms/templates/container.html
 msgid ""

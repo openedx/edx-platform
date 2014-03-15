@@ -11,6 +11,7 @@
 # brunojm <brunojm@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
+# marcelosoaressouza <marcelo@juntadados.org>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # brk0_0, 2013
@@ -34,7 +35,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-10 09:11-0400\n"
+"POT-Creation-Date: 2014-03-15 15:04-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: RenataBarboza\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
@@ -205,12 +206,12 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Show Question"
-msgstr ""
+msgstr "Mostrar pergunta"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Hide Question"
-msgstr ""
+msgstr "Ocultar pergunta"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
@@ -524,7 +525,7 @@ msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
-msgstr ""
+msgstr "Você tem certeza que deseja excluir este comentário?"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "We had some trouble deleting this comment. Please try again."
@@ -786,7 +787,25 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
-"sensitive nature of student grade information."
+"sensitive nature of student information."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Please enter a username or email."
+msgstr ""
+
+#. Translators: A rolename appears this sentence.;
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error fetching list for role"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error changing user's permissions."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error enrolling/unenrolling students."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -794,40 +813,48 @@ msgid "Successfully enrolled and sent email to the following students:"
 msgstr ""
 "Matriculados com sucesso, um e-mail foi enviado aos seguintes estudantes:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following students:"
 msgstr ""
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
 "allowed to enroll once they register:"
 msgstr ""
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be allowed to enroll once they register:"
 msgstr ""
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
 "enrolled once they register:"
 msgstr ""
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be enrolled once they register:"
 msgstr ""
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Emails successfully sent. The following students are no longer enrolled in "
 "the course:"
 msgstr ""
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following students are no longer enrolled in the course:"
 msgstr ""
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These students were not affliliated with the course so could not be "
@@ -1029,7 +1056,7 @@ msgstr "Tente carregar novamente"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> available "
-msgstr ""
+msgstr "<%= num %> disponível"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> graded "
@@ -1054,11 +1081,11 @@ msgstr ""
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Hide)"
-msgstr ""
+msgstr "(Ocultar)"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Show)"
-msgstr ""
+msgstr "(Mostrar)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid ""
@@ -1172,7 +1199,7 @@ msgstr ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
-msgstr ""
+msgstr "Número de alunos"
 
 #: cms/static/coffee/src/main.js
 msgid ""

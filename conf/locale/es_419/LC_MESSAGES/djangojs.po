@@ -39,7 +39,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-10 09:11-0400\n"
+"POT-Creation-Date: 2014-03-15 15:04-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: ferabra <ferabra@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -838,10 +838,26 @@ msgstr "Nombre de archivo (Más nuevo arriba)"
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
-"sensitive nature of student grade information."
+"sensitive nature of student information."
 msgstr ""
-"Los vínculos se generan a pedido y expiran en los siguientes 5 minutos dado "
-"a la naturaleza sensible de la información de calificaciones de estudiantes."
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Please enter a username or email."
+msgstr ""
+
+#. Translators: A rolename appears this sentence.;
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error fetching list for role"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error changing user's permissions."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error enrolling/unenrolling students."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following students:"
@@ -849,10 +865,12 @@ msgstr ""
 "Se registró exitósamente y se le envió el correo electrónico a los "
 "siguientes estudiantes:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following students:"
 msgstr "Se registró exitósamente a los siguientes estudiantes:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
@@ -861,10 +879,12 @@ msgstr ""
 "Se envió el correo electrónico a los siguientes estudiantes. Podrán "
 "inscribirse una vez se hayan registrado:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be allowed to enroll once they register:"
 msgstr "Estos estudiantes podrán inscribirse una vez que se hayan registrado:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
@@ -873,10 +893,12 @@ msgstr ""
 "Se le envió el correo electrónico a los siguientes estudiantes. Podrán "
 "inscribirse una vez que se hayan registrado:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be enrolled once they register:"
 msgstr "Estos estudiantes quedarán inscritos una vez que se hayan registrado:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Emails successfully sent. The following students are no longer enrolled in "
@@ -885,10 +907,12 @@ msgstr ""
 "Los correos electrónicos fueron enviados exitósamente. Los siguientes "
 "estudiantes ya no están inscritos en el curso:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following students are no longer enrolled in the course:"
 msgstr "Los siguientes estudiantes ya no están inscritos en el curso:"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These students were not affliliated with the course so could not be "

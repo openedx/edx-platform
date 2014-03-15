@@ -4,6 +4,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# aissam <ais.salhy@gmail.com>, 2014
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # chrisc <christopher.castermane@student.uclouvain.be>, 2014
 # Encolpe Degoute <encolpe.degoute@free.fr>, 2013
@@ -40,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-10 09:11-0400\n"
+"POT-Creation-Date: 2014-03-15 15:04-0400\n"
 "PO-Revision-Date: 2014-03-03 16:12+0000\n"
 "Last-Translator: francoisedocq\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -838,19 +839,37 @@ msgstr "Nom du fichier (le plus récent en premier)"
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
-"sensitive nature of student grade information."
+"sensitive nature of student information."
 msgstr ""
-"Les liens sont générés sur demande et expirent dans les 5 minutes à cause de"
-" la nature sensible des informations concernant les notes des étudiants."
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Please enter a username or email."
+msgstr ""
+
+#. Translators: A rolename appears this sentence.;
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error fetching list for role"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error changing user's permissions."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error enrolling/unenrolling students."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following students:"
 msgstr "Les étudiants suivants ont été inscrits et ont reçu un email :"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following students:"
 msgstr "Les étudiants suivants ont été inscrits avec succès :"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
@@ -859,12 +878,14 @@ msgstr ""
 "E-mails d'inscription envoyés avec succès aux étudiants suivants. Ils seront"
 " autorisés à s'inscrire dès qu'il se seront enregistrés :"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be allowed to enroll once they register:"
 msgstr ""
 "Ces étudiants seront autorisés à s'inscrire une fois qu'il se seront "
 "enregistrés  sur la plateforme :"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
@@ -873,12 +894,14 @@ msgstr ""
 "E-mails d'inscription envoyés avec succès aux étudiants suivants. Ils seront"
 " inscrits dès qu'il se seront enregistrés sur la plateforme :"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be enrolled once they register:"
 msgstr ""
 "Les étudiants suivants seront inscrits dès leur enregistrement sur la plate-"
 "forme :"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Emails successfully sent. The following students are no longer enrolled in "
@@ -887,10 +910,12 @@ msgstr ""
 "Les e-mails ont été envoyés avec succès. Les étudiants suivants ont été "
 "désinscrits du cours :"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following students are no longer enrolled in the course:"
 msgstr "Les étudiants suivants ne sont plus inscrits au cours :"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These students were not affliliated with the course so could not be "

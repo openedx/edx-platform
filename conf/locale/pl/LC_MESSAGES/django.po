@@ -6,6 +6,7 @@
 # Translators:
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
+# Cairath, 2014
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
 # ajafo <transifex@ajafo.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
@@ -26,6 +27,7 @@
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
 # lazarus_zamenhof <lazarus.zamenhof@gmail.com>, 2014
+# Cairath, 2014
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
 # ajafo <transifex@ajafo.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
@@ -36,6 +38,7 @@
 # Translators:
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
+# Cairath, 2014
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -51,13 +54,14 @@
 # 
 # Translators:
 # kmti <sekretariat@kmti.uz.zgora.pl>, 2014
+# Cairath, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-10 09:12-0400\n"
-"PO-Revision-Date: 2014-02-24 17:06+0000\n"
-"Last-Translator: kmti <sekretariat@kmti.uz.zgora.pl>\n"
+"POT-Creation-Date: 2014-03-15 15:05-0400\n"
+"PO-Revision-Date: 2014-03-14 16:10+0000\n"
+"Last-Translator: Cairath\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/edx-platform/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -293,7 +297,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Error (401 {field}). E-mail us."
-msgstr ""
+msgstr "Błąd (401 {field}). Wyślij do nas e-mail"
 
 #: common/djangoapps/student/views.py
 msgid "To enroll, you must follow the honor code."
@@ -301,7 +305,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "You must accept the terms of service."
-msgstr ""
+msgstr "Musisz zaakceptować warunki korzystania z serwisu"
 
 #: common/djangoapps/student/views.py
 msgid "Username must be minimum of two characters long"
@@ -377,7 +381,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Could not send activation e-mail."
-msgstr ""
+msgstr "Nie można wysłać e-maila aktywacyjnego"
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
@@ -1257,15 +1261,12 @@ msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: lms/templates/discussion/_thread_list_template.html
 msgid "Search"
-msgstr ""
+msgstr "Szukaj"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-#: lms/templates/static_templates/copyright.html
-#: lms/templates/static_templates/copyright.html
 msgid "Copyright"
-msgstr ""
+msgstr "Copyright"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid ""
@@ -2788,7 +2789,7 @@ msgstr ""
 
 #: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
 msgid "Save changes"
-msgstr ""
+msgstr "Zapisz zmiany"
 
 #: lms/templates/wiki/edit.html cms/templates/unit.html
 msgid "Preview"
@@ -2805,9 +2806,11 @@ msgstr ""
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/help_modal.html lms/templates/login_modal.html
 #: lms/templates/signup_modal.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "Close Modal"
+msgid "Close"
 msgstr ""
 
 #: lms/templates/wiki/edit.html
@@ -2823,8 +2826,7 @@ msgstr ""
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "modal open"
+msgid "window open"
 msgstr ""
 
 #: lms/templates/wiki/edit.html
@@ -3053,7 +3055,7 @@ msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload file"
-msgstr ""
+msgstr "Prześlij plik"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Search files and articles"
@@ -3462,11 +3464,9 @@ msgstr ""
 msgid "Privacy Policy"
 msgstr ""
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/navigation.html lms/templates/static_templates/help.html
-#: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
+#: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
-msgstr ""
+msgstr "Pomoc"
 
 #: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
 msgid "Visual"
@@ -3511,7 +3511,7 @@ msgstr ""
 #: common/templates/course_modes/choose.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "):"
-msgstr ""
+msgstr "):"
 
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay? What if I don't meet all the requirements?"
@@ -3631,7 +3631,7 @@ msgstr ""
 #: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
-msgstr ""
+msgstr "Instrukcje"
 
 #: lms/templates/annotatable.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -3653,7 +3653,7 @@ msgstr ""
 
 #: lms/templates/contact.html
 msgid "Faq"
-msgstr ""
+msgstr "Faq"
 
 #: lms/templates/contact.html lms/templates/footer.html
 msgid "Press"
@@ -3663,7 +3663,7 @@ msgstr ""
 #: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
-msgstr ""
+msgstr "Kontakt"
 
 #: lms/templates/contact.html
 msgid "Class Feedback"
@@ -3709,7 +3709,7 @@ msgstr ""
 
 #: lms/templates/contact.html
 msgid "Media"
-msgstr ""
+msgstr "Media"
 
 #: lms/templates/contact.html
 msgid ""
@@ -3719,7 +3719,7 @@ msgstr ""
 
 #: lms/templates/contact.html
 msgid "Universities"
-msgstr ""
+msgstr "Uniwersytety"
 
 #: lms/templates/contact.html
 msgid ""
@@ -3776,7 +3776,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
-msgstr ""
+msgstr "Ustawienia poczty e-mail dla {course_number}"
 
 #: lms/templates/dashboard.html
 msgid "Receive course emails"
@@ -3891,11 +3891,11 @@ msgstr ""
 
 #: lms/templates/enroll_students.html
 msgid "Course: "
-msgstr ""
+msgstr "Kurs:"
 
 #: lms/templates/enroll_students.html
 msgid "Add new students"
-msgstr ""
+msgstr "Dodaj nowych studentów"
 
 #: lms/templates/enroll_students.html
 msgid "Existing students:"
@@ -3951,7 +3951,7 @@ msgstr ""
 
 #: lms/templates/folditbasic.html
 msgid "Level"
-msgstr ""
+msgstr "Poziom"
 
 #: lms/templates/folditbasic.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -3972,17 +3972,17 @@ msgstr ""
 
 #: lms/templates/footer.html
 msgid "About"
-msgstr ""
+msgstr "O nas"
 
 #: lms/templates/footer.html lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
-msgstr ""
+msgstr "Oferty pracy"
 
 #: lms/templates/footer.html lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
-msgstr ""
+msgstr "FAQ"
 
 #: lms/templates/footer.html
 msgid "{platform_name} Logo"
@@ -4089,7 +4089,7 @@ msgstr ""
 #: lms/templates/provider_login.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/register.html
 msgid "E-mail"
-msgstr ""
+msgstr "E-mail"
 
 #: lms/templates/help_modal.html
 msgid "Briefly describe your issue"
@@ -4230,7 +4230,7 @@ msgstr ""
 
 #: lms/templates/login-sidebar.html
 msgid "Helpful Information"
-msgstr ""
+msgstr "Przydatne informacje"
 
 #: lms/templates/login-sidebar.html lms/templates/login-sidebar.html
 msgid "Login via OpenID"
@@ -4244,7 +4244,7 @@ msgstr ""
 
 #: lms/templates/login-sidebar.html
 msgid "Not Enrolled?"
-msgstr ""
+msgstr "Nie zarejestrowany? "
 
 #: lms/templates/login-sidebar.html
 msgid "Sign up for {platform_name} today!"
@@ -4304,15 +4304,15 @@ msgstr ""
 #: lms/templates/login.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/register.html
 msgid "example: username@domain.com"
-msgstr ""
+msgstr "Przykład: username@domain.com"
 
 #: lms/templates/login.html
 msgid "Account Preferences"
-msgstr ""
+msgstr "Ustawienia konta"
 
 #: lms/templates/login.html lms/templates/login_modal.html
 msgid "Remember me"
-msgstr ""
+msgstr "Zapamiętaj"
 
 #: lms/templates/login_modal.html lms/templates/provider_login.html
 #: lms/templates/university_profile/edge.html
@@ -4321,7 +4321,7 @@ msgstr ""
 
 #: lms/templates/login_modal.html
 msgid "Not enrolled?"
-msgstr ""
+msgstr "Nie zarejestrowany? "
 
 #: lms/templates/login_modal.html
 msgid "Sign up."
@@ -4409,7 +4409,7 @@ msgstr ""
 #: lms/templates/name_changes.html lms/templates/name_changes.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Error"
-msgstr ""
+msgstr "Błąd"
 
 #: lms/templates/name_changes.html
 msgid "Rejected"
@@ -4455,7 +4455,7 @@ msgstr ""
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 msgid "Courses"
-msgstr ""
+msgstr "Kursy"
 
 #: lms/templates/navigation.html
 msgid "Schools"
@@ -4545,7 +4545,7 @@ msgstr ""
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/register.html
 msgid "example: JaneDoe"
-msgstr ""
+msgstr "Przykład: JanNowak"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/register.html
@@ -4558,7 +4558,7 @@ msgstr ""
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr ""
+msgstr "Akceptuję {link_start}warunki korzystania z serwisu{link_end}"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "I agree to the {link_start}Honor Code{link_end}"
@@ -4651,7 +4651,7 @@ msgstr ""
 
 #: lms/templates/register.html lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
-msgstr ""
+msgstr "Przykład:  Jan Nowak"
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "Needed for any certificates you may earn"
@@ -4679,7 +4679,7 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "example: New York"
-msgstr ""
+msgstr "Przykład: Zielona Góra"
 
 #: lms/templates/register.html
 msgid "Country"
@@ -4691,16 +4691,16 @@ msgstr ""
 
 #: lms/templates/register.html lms/templates/signup_modal.html
 msgid "Gender"
-msgstr ""
+msgstr "Płeć"
 
 #: lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Year of Birth"
-msgstr ""
+msgstr "Rok urodzenia"
 
 #: lms/templates/register.html
 msgid "Mailing Address"
-msgstr ""
+msgstr "Adres do korespondencji"
 
 #: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
@@ -4744,19 +4744,19 @@ msgstr ""
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "E-mail *"
-msgstr ""
+msgstr "E-mail *"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. yourname@domain.com"
-msgstr ""
+msgstr "na przykład yourname@domain.com"
 
 #: lms/templates/signup_modal.html
 msgid "Password *"
-msgstr ""
+msgstr "Hasło *"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "Public Username *"
-msgstr ""
+msgstr "Nazwa użytkownika *"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. yourname (shown on forums)"
@@ -4764,7 +4764,7 @@ msgstr ""
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "Full Name *"
-msgstr ""
+msgstr "Imię i nazwisko *"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. Your Name (for certificates)"
@@ -4780,11 +4780,11 @@ msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Year of birth"
-msgstr ""
+msgstr "Rok urodzenia"
 
 #: lms/templates/signup_modal.html
 msgid "Mailing address"
-msgstr ""
+msgstr "Adres do korespondencji"
 
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
@@ -4792,7 +4792,7 @@ msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Terms of Service{link_end}*"
-msgstr ""
+msgstr "Akceptuję {link_start}warunki korzystania z serwuis{link_end}*"
 
 #: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Honor Code{link_end}*"
@@ -4858,7 +4858,7 @@ msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "XML attributes"
-msgstr ""
+msgstr "Atrybuty XML"
 
 #: lms/templates/staff_problem_info.html
 msgid "Submission History Viewer"
@@ -4888,19 +4888,19 @@ msgstr ""
 
 #: lms/templates/static_pdfbook.html lms/templates/static_pdfbook.html
 msgid "Zoom Out"
-msgstr ""
+msgstr "Pomniejsz"
 
 #: lms/templates/static_pdfbook.html lms/templates/static_pdfbook.html
 msgid "Zoom In"
-msgstr ""
+msgstr "Powiększ"
 
 #: lms/templates/static_pdfbook.html
 msgid "Zoom"
-msgstr ""
+msgstr "Powiększenie"
 
 #: lms/templates/static_pdfbook.html
 msgid "Automatic Zoom"
-msgstr ""
+msgstr "Automatyczne powiększenie"
 
 #: lms/templates/static_pdfbook.html
 msgid "Actual Size"
@@ -4920,7 +4920,7 @@ msgstr ""
 
 #: lms/templates/static_pdfbook.html lms/templates/staticbook.html
 msgid "Next page"
-msgstr ""
+msgstr "Następna strona"
 
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -5352,7 +5352,7 @@ msgstr ""
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Show cohorts"
-msgstr ""
+msgstr "Pokaż kohorty"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Cohorts in the course"
@@ -5360,7 +5360,7 @@ msgstr ""
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Add cohort"
-msgstr ""
+msgstr "Dodaj kohortę"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Add users by username or email.  One per line or comma-separated."
@@ -5434,7 +5434,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Prerequisites"
-msgstr ""
+msgstr "Wymagania wstępne"
 
 #: lms/templates/courseware/course_about.html
 msgid "Additional Resources"
@@ -5451,11 +5451,11 @@ msgstr ""
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from leading universities."
-msgstr ""
+msgstr "Przeglądaj darmowe kursy z wiodących uniwersytetów."
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from {university_name}."
-msgstr ""
+msgstr "Przeglądaj darmowe kursy z {university_name}."
 
 #: lms/templates/courseware/courseware-error.html
 msgid ""
@@ -5828,7 +5828,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send to:"
-msgstr ""
+msgstr "Wyślij do:"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -6253,7 +6253,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
-msgstr ""
+msgstr "Ustawienia poczty e-mail"
 
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
@@ -6430,14 +6430,9 @@ msgstr ""
 msgid "new post title"
 msgstr ""
 
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 #: wiki/forms.py wiki/forms.py wiki/forms.py
 msgid "Title"
-msgstr ""
+msgstr "Tytuł"
 
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
@@ -6577,12 +6572,6 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "(this post is about %(courseware_title_linked)s)"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "Close"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -6908,13 +6897,8 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays a list of all students enrolled in this "
-"course, along with profile information such as email address and username. "
-"The data can also be downloaded as a CSV file."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "List enrolled students' profile information"
+"The following button generates a CSV file of all students enrolled in this "
+"course, along with profile information such as email address and username."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -6923,10 +6907,20 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Displays the grading configuration for the course. The grading configuration"
-" is the breakdown of graded subsections of the course (such as exams and "
-"problem sets), and can be changed on the 'Grading' page (under 'Settings') "
-"in Studio."
+"For smaller courses, profile information for enrolled students can be listed"
+" directly on this page:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "List enrolled students' profile information"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"The following button displays the grading configuration for the course. The "
+"grading configuration is the breakdown of graded subsections of the course "
+"(such as exams and problem sets), and can be changed on the 'Grading' page "
+"(under 'Settings') in Studio."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -6942,7 +6936,7 @@ msgid "Get Student Anonymized IDs CSV"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Grade Reports"
+msgid "Reports"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -6975,11 +6969,24 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"A new CSV report is generated each time you click the <b>Generate Grade "
-"Report</b> button above. A link to each report remains available on this "
-"page, identified by the UTC date and time of generation. Reports are not "
-"deleted, so you will always be able to access previously generated reports "
-"from this page."
+"Grade reports listed below are generated each time the <b>Generate Grade "
+"Report</b> button is clicked. A link to each grade report remains available "
+"on this page, identified by the UTC date and time of generation. Grade "
+"reports are not deleted, so you will always be able to access previously "
+"generated reports from this page."
+msgstr ""
+
+#. Translators: "these rules" in this sentence references a detailed
+#. description of the grading reports that will appear in a table that
+#. contains
+#. a mix of different types of reports.  This sentence intends to indicate
+#. that
+#. the description of the grading report does not apply to the other reports
+#. that may appear in the table.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Other reports may appear in the table for which these rules will not "
+"necessarily apply."
 msgstr ""
 
 #. Translators: a table of URL links to report files appears after this
@@ -7358,6 +7365,18 @@ msgid ""
 "translator!{link_end}"
 msgstr ""
 
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
+#: lms/templates/modal/accessible_confirm.html
+msgid "Close Modal"
+msgstr ""
+
+#. Translators: this text gives status on if the modal interface (a menu or
+#. piece of UI that takes the full focus of the screen) is open or not
+#: lms/templates/modal/accessible_confirm.html
+msgid "modal open"
+msgstr ""
+
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
 msgstr ""
@@ -7698,7 +7717,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Qty"
-msgstr ""
+msgstr "Ilość"
 
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
@@ -7716,7 +7735,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "#:"
-msgstr ""
+msgstr "#:"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Receipt (Order"
@@ -9069,12 +9088,20 @@ msgstr ""
 msgid "Drag to reorder"
 msgstr ""
 
-#: cms/templates/container.html cms/templates/ux/reference/container.html
+#: cms/templates/container.html
 msgid "Container"
 msgstr ""
 
 #: cms/templates/container.html cms/templates/studio_vertical_wrapper.html
 msgid "No Actions"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "Publishing Status"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "This content is published with unit {unit_name}."
 msgstr ""
 
 #: cms/templates/container.html
@@ -11213,7 +11240,7 @@ msgstr ""
 
 #: wiki/forms.py
 msgid "Permission settings for the article were updated."
-msgstr ""
+msgstr "Ustawienia uprawnień dla tego artykułu zostały zaktualizowane."
 
 #: wiki/forms.py
 msgid "Your permission settings were unchanged, so nothing saved."
