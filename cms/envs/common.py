@@ -322,7 +322,7 @@ EMBARGO_SITE_REDIRECT_URL = None
 
 ############################### Pipeline #######################################
 
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
 
 from rooted_paths import rooted_glob
 
