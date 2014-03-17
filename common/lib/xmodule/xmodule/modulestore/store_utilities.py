@@ -67,7 +67,7 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     # NOTE: ultimately link updating is not a hard requirement, so if something blows up with
     # the regex subsitution, log the error and continue
     try:
-        c4x_link_base = u'{0}/'.format(StaticContent.get_base_url_path_for_course_assets(source_course_id))
+        c4x_link_base = StaticContent.get_base_url_path_for_course_assets(source_course_id)
         text = re.sub(_prefix_only_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
     except Exception as e:
         logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", c4x_link_base, text, str(e))
