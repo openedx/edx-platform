@@ -8,11 +8,11 @@
 
 <%block name="bodyclass">courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
-    % if section_title: 
+    % if section_title:
 ${page_title_breadcrumbs(section_title, course_name())}
     % else:
 ${page_title_breadcrumbs(course_name())}
-    %endif 
+    %endif
 </title></%block>
 
 <%block name="headextra">
@@ -49,6 +49,14 @@ ${page_title_breadcrumbs(course_name())}
   % endif
 
   <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
+  <!-- TODO: Make this load on a condition. If a student doesn't have
+        access to youtube.com (this setting stored on back-end for each student)
+        then any subsequent page loads should not load this script.
+
+        When this script loads for the first time, if there is no answer from
+        youtube.com or there is some kind of error, the back-end should be notified
+        and a setting for the student should be stored.
+  -->
   <script type="text/javascript">
     document.write('\x3Cscript type="text/javascript" src="' +
         document.location.protocol + '//www.youtube.com/iframe_api">\x3C/script>');
