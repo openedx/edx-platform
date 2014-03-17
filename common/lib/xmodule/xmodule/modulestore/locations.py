@@ -65,13 +65,28 @@ class SlashSeparatedCourseKey(CourseKey):
         return '/'.join([self._course, self._run])
 
     def make_asset_key(self, path):
-        return Location('c4x', self._org, self._course, 'asset', path)
+        return Location('c4x', self._org, self._course, self._run, 'asset', path)
 
     def make_usage_key(self, block_type, name):
-        return Location('i4x', self._org, self._course, block_type, name)
+        return Location('i4x', self._org, self._course, self._run, block_type, name)
 
     def to_deprecated_string(self):
         return '/'.join([self._org, self._course, self._run])
+
+    def make_usage_key_from_deprecated_string(self, location_url):
+        """
+        Temporary mechanism for creating a UsageKey given a CourseKey and a serialized Location. NOTE:
+        this prejudicially takes the tag, org, and course from the url not self.
+
+        Raises:
+            InvalidKeyError: if the url does not parse
+        """
+        match = URL_RE.match(location_url)
+        if match is None:
+            log.debug(u"location %r doesn't match URL", location_url)
+            raise InvalidKeyError(location_url)
+        groups = match.groupdict()
+        return cls(run=self._run, **groups)
 
 
 def _check_location_part(val, regexp):
@@ -174,17 +189,6 @@ class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category
         _check_location_part(name, INVALID_CHARS_NAME)
 
         return super(_cls, Location).__new__(_cls, tag, org, course, run, category, name, revision)
-
-    @classmethod
-    def from_deprecated_strings(cls, course_id, location):
-        course_id = SlashSeparatedCourseKey._from_string(course_id)
-
-        match = URL_RE.match(location)
-        if match is None:
-            log.debug(u"location %r doesn't match URL", location)
-            raise InvalidKeyError(location)
-        groups = match.groupdict()
-        return cls(run=course_id.run, **groups)
 
     def url(self):
         """
