@@ -818,6 +818,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 
+    # Reverse proxy
+    'x_forwarded_for.middleware.XForwardedForMiddleware',
+
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
@@ -1321,7 +1324,10 @@ INSTALLED_APPS = (
     'monitoring',
 
     # Course action state
-    'course_action_state'
+    'course_action_state',
+
+    # Reverse proxy
+    'x_forwarded_for',
 )
 
 ######################### MARKETING SITE ###############################
