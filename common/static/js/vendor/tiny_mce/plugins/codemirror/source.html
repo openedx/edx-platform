@@ -126,6 +126,9 @@ function start()
 
 	CodeMirror.defineInitHook(function(inst) 
 	{
+        // EDX: added to switch static links.
+        editor.fire("ShowCodeMirror", inst);
+
 		// Move cursor to correct position:
 		inst.focus();
 		var cursor = inst.getSearchCursor(String.fromCharCode(chr), false);
@@ -194,6 +197,10 @@ function submit()
 	}
 
 	// Submit HTML to TinyMCE:
+
+    // EDX: added to switch static links.
+    editor.fire('SaveCodeMirror', codemirror);
+
 	editor.setContent(codemirror.getValue().replace(cc, '<span id="CmCaReT"></span>'));
 	editor.isNotDirty = !isDirty;
 	if (isDirty) {
