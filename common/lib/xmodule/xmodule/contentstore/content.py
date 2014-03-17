@@ -8,7 +8,7 @@ import logging
 import StringIO
 from urlparse import urlparse, urlunparse
 
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 from .django import contentstore
 from PIL import Image
 
@@ -83,9 +83,12 @@ class StaticContent(object):
             return None
 
     @staticmethod
-    def get_base_url_path_for_course_assets(loc):
-        if loc is not None:
-            return u"/c4x/{org}/{course}/asset".format(**loc.dict())
+    def get_base_url_path_for_course_assets(course_key):
+        if course_key is None:
+            return None
+
+        assert(isinstance(course_key, SlashSeparatedCourseKey))
+        return u"/c4x/{org}/{course}/asset/".format(org=course_key.org, course=course_key.course)
 
     @staticmethod
     def get_id_from_location(location):

@@ -458,7 +458,7 @@ def course_info_handler(request, tag=None, package_id=None, branch=None, version
                 'context_course': course_module,
                 'updates_url': update_locator.url_reverse('course_info_update/'),
                 'handouts_locator': handouts_locator,
-                'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.location) + '/'
+                'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id)
             }
         )
     else:
