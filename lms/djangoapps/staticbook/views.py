@@ -80,6 +80,9 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
         raise Http404("Invalid book index value: {0}".format(book_index))
     textbook = course.pdf_textbooks[book_index]
 
+    if request.GET.get('viewer','') == 'true':
+        return render_to_response('pdf_viewer.html')
+
     if 'url' in textbook:
         textbook['url'] = remap_static_url(textbook['url'], course)
     # then remap all the chapter URLs as well, if they are provided.
@@ -98,7 +101,6 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
             'staff_access': staff_access,
         },
     )
-
 
 @login_required
 def html_index(request, course_id, book_index, chapter=None):
