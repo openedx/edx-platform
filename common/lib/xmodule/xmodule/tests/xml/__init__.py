@@ -51,7 +51,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
 
     def load_item(self, location):  # pylint: disable=method-hidden
         """Return the descriptor loaded for `location`"""
-        return self._descriptors[Location(location).url()]
+        return self._descriptors[unicode(location)]
 
 
 class XModuleXmlImportTest(TestCase):
