@@ -74,12 +74,11 @@ class RubricPage(PageObject):
                     ">li.rubric-list-item:nth-of-type({0}) input.score-selection".format(scores[score_index] + 1)
                 )
 
+                EmptyPromise(lambda: self._select_score_radio_button(input_css), "Score selection failed.").fulfill()
 
-                self.q(css=input_css).first.click()
-
-                # SHOULD be something much better but i found no other way
-                if self.q(css=input_css).selected is False:
-                    self.q(css=input_css).first.click()
+    def _select_score_radio_button(self, radio_button_css):
+        self.q(css=radio_button_css).first.click()
+        return self.q(css=radio_button_css).selected
 
     @property
     def feedback(self):

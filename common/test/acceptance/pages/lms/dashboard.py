@@ -46,7 +46,7 @@ class DashboardPage(PageObject):
         link_css = self._link_css(course_id)
 
         if link_css is not None:
-            self.css_click(link_css)
+            self.q(css=link_css).first.click()
         else:
             msg = "No links found for course {0}".format(course_id)
             self.warning(msg)
@@ -56,8 +56,7 @@ class DashboardPage(PageObject):
         Return a CSS selector for the link to the course with `course_id`.
         """
         # Get the link hrefs for all courses
-        #all_links = self.css_map('a.enter-course', lambda el: el['href'])
-        all_links = self.q(css='a.enter-course').map(lambda el: el['href'])
+        all_links = self.q(css='a.enter-course').map(lambda el: el.get_attribute('href')).results
 
         # Search for the first link that matches the course id
         link_index = None

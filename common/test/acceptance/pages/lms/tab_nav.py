@@ -29,7 +29,7 @@ class TabNavPage(PageObject):
         tab_css = self._tab_css(tab_name)
 
         if tab_css is not None:
-            self.q(css=tab_css).click()
+            self.q(css=tab_css).first.click()
         else:
             self.warning("No tabs found for '{0}'".format(tab_name))
 
