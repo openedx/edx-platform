@@ -252,7 +252,7 @@ class CourseLocationGenerator(IdGenerator):
         self.autogen_ids = itertools.count(0)
 
     def create_usage(self, def_id):
-        return Location(def_id)
+        return def_id
 
     def create_definition(self, block_type, slug=None):
         assert block_type is not None
