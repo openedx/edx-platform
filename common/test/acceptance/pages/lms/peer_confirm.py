@@ -19,7 +19,7 @@ class PeerConfirmPage(PageObject):
             is_present = self.q(css='section.calibration-interstitial-page').present
             return is_present, is_present
 
-        return Promise(_is_correct_page, 'correct page not found :(').fulfill()
+        return Promise(_is_correct_page, 'On the confirmation page for peer calibration and grading.').fulfill()
 
     def start(self, is_calibrating=False):
         """
