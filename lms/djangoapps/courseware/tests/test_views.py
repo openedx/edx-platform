@@ -447,7 +447,6 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.section = ItemFactory(category='sequential', parent_location=self.chapter.location)
         self.vertical = ItemFactory(category='vertical', parent_location=self.section.location)
 
-    @unittest.expectedFailure
     def test_pure_ungraded_xblock(self):
         ItemFactory(category='acid', parent_location=self.vertical.location)
 
