@@ -32,6 +32,7 @@ from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds
 
 from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xblock.core import XBlock
@@ -217,6 +218,7 @@ def namedtuple_to_son(namedtuple, prefix=''):
     return son
 
 
+# TODO check whether this still has purpose
 def location_to_query(location, wildcard=True):
     """
     Takes a Location and returns a SON object that will query for that location.
@@ -529,15 +531,17 @@ class MongoModuleStore(ModuleStoreWriteBase):
         Returns a list of course descriptors.
         '''
         course_filter = Location(category="course")
-        return [
-            course
-            for course
-            in self.get_items(course_filter)
-            if not (
-                course.location.org == 'edx' and
-                course.location.course == 'templates'
-            )
-        ]
+        return self._load_items(
+             [
+                course
+                for course
+                in self._find_one(course_filter)
+                if not (  #TODO kill this
+                    course.location.org == 'edx' and
+                    course.location.course == 'templates'
+                )
+            ]
+        )
 
     def _find_one(self, location):
         '''Look for a given location in the collection.  If revision is not
@@ -592,13 +596,63 @@ class MongoModuleStore(ModuleStoreWriteBase):
         module = self._load_items([item], depth)[0]
         return module
 
-    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
+    def get_instance(self, course_id, location, depth=0):
+        """
+        TODO (vshnayder): implement policy tracking in mongo.
+        For now, just delegate to get_item and ignore policy.
+
+        depth (int): An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of
+            calls to get_children() to cache. None indicates to cache all descendents.
+        """
+        return self.get_item(location, depth=depth)
+
+    def get_items(self, course_id, settings=None, content=None, **kwargs):
+        """
+        Returns:
+            list of XModuleDescriptor instances for the matching items within the course with
+            the given course_id
+
+        NOTE: don't use this to look for courses
+        as the course_id is required. Use get_courses.
+
+        Args:
+            course_id (CourseKey): the course identifier
+            settings (dict): fields to look for which have settings scope. Follows same syntax
+                and rules as kwargs below
+            content (dict): fields to look for which have content scope. Follows same syntax and
+                rules as kwargs below.
+            kwargs (key=value): what to look for within the course.
+                Common qualifiers are ``category`` or any field name. if the target field is a list,
+                then it searches for the given value in the list not list equivalence.
+                Substring matching pass a regex object.
+                For this modulestore, ``name`` and ``revision`` are commonly provided keys (Location based stores)
+                This modulestore does not allow searching dates by comparison or edited_by, previous_version,
+                update_version info.
+        """
+        query = SON()
+        query['_id.tag'] = 'i4x'
+        query['_id.org'] = course_id.org
+        query['_id.course'] = course_id.course
+        for field in ['category', 'name', 'revision']:
+            if field in kwargs:
+                query['_id.' + field] = kwargs.pop(field)
+
+        for key, value in (settings or {}).iteritems():
+            query['metadata.' + key] = value
+        for key, value in (content or {}).iteritems():
+            query['definition.data.' + key] = value
+        if 'children' in kwargs:
+            query['definition.children'] = kwargs.pop('children')
+
+        query.update(kwargs)
         items = self.collection.find(
-            location_to_query(location),
-            sort=[('revision', pymongo.ASCENDING)],
+            query,
+            sort=[('_id.revision', pymongo.ASCENDING)],
         )
 
-        modules = self._load_items(list(items), depth)
+        modules = self._load_items(list(items))
         return modules
 
     def create_course(self, course_id, definition_data=None, metadata=None, runtime=None):
@@ -754,7 +808,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # know the 'name' parameter in this context, so we have
         # to assume there's only one item in this query even though we are not specifying a name
         course_search_location = Location('i4x', location.org, location.course, 'course', None)
-        courses = self.get_items(course_search_location, depth=depth)
+        courses = self.get_items(CourseKey.from_string(course_search_location.course_id))
 
         # make sure we found exactly one match on this above course search
         found_cnt = len(courses)

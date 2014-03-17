@@ -6,6 +6,7 @@ import json
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
+from xmodule.modulestore.keys import CourseKey
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
@@ -740,10 +741,7 @@ def perform_xlint(
         )
 
         # check for a presence of a course marketing video
-        if not module_store.get_items(course_id, qualifiers={
-            'category': 'about',
-            'name': 'video'
-        }):
+        if not module_store.get_items(CourseKey.from_string(course_id), category='about', name='video'):
             print(
                 "WARN: Missing course marketing video. It is recommended "
                 "that every course have a marketing video."

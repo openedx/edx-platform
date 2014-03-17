@@ -3,6 +3,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.xml_importer import check_module_metadata_editability
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.keys import CourseKey
 
 
 class Command(BaseCommand):
@@ -12,11 +13,11 @@ class Command(BaseCommand):
         if len(args) != 1:
             raise CommandError("check_course requires one argument: <course_id>")
 
-        course_id = CourseKey.from_string(args[0])
+        course_key = CourseKey.from_string(args[0])
 
         store = modulestore()
 
-        course = store.get_course(course_id, depth=3)
+        course = store.get_course(course_key)
 
         err_cnt = 0
 
@@ -54,10 +55,7 @@ class Command(BaseCommand):
         discussion_items = _get_discussion_items(course)
 
         # now query all discussion items via get_items() and compare with the tree-traversal
-        queried_discussion_items = store.get_items(
-            course_id=course.id,
-            qualifiers={'category': 'discussion'}
-        )
+        queried_discussion_items = store.get_items(course_key=course_key, category='discussion',)
 
         for item in queried_discussion_items:
             if item.location.url() not in discussion_items:

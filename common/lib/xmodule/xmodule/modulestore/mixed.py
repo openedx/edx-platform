@@ -88,26 +88,35 @@ class MixedModuleStore(ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(usage_key.course_id)
         return store.get_item(usage_key, depth)
 
-    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
+    def get_items(self, course_key, settings=None, content=None, **kwargs):
         """
-        Returns a list of XModuleDescriptor instances for the items
-        that match location. Any element of location that is None is treated
-        as a wildcard that matches any value. NOTE: don't use this to look for courses
-        as the course_id is required. Use get_courses.
+        Returns:
+            list of XModuleDescriptor instances for the matching items within the course with
+            the given course_key
 
-        location: either a Location possibly w/ None as wildcards for category or name or
-        a Locator with at least a package_id and branch but possibly no block_id.
+        NOTE: don't use this to look for courses
+        as the course_key is required. Use get_courses.
 
-        depth: An argument that some module stores may use to prefetch
-            descendants of the queried modules for more efficient results later
-            in the request. The depth is counted in the number of calls to
-            get_children() to cache. None indicates to cache all descendants
+        Args:
+            course_key (CourseKey): the course identifier
+            settings (dict): fields to look for which have settings scope. Follows same syntax
+                and rules as kwargs below
+            content (dict): fields to look for which have content scope. Follows same syntax and
+                rules as kwargs below.
+            kwargs (key=value): what to look for within the course.
+                Common qualifiers are ``category`` or any field name. if the target field is a list,
+                then it searches for the given value in the list not list equivalence.
+                Substring matching pass a regex object.
+                For some modulestores, ``name`` is another commonly provided key (Location based stores)
+                For some modulestores,
+                you can search by ``edited_by``, ``edited_on`` providing either a datetime for == (probably
+                useless) or a tuple (">"|"<" datetime) for after or before, etc.
         """
-        if not (course_id or hasattr(location, 'package_id')):
-            raise Exception("Must pass in a course_id when calling get_items()")
+        if (course_key is None) or (not isinstance(course_key, CourseKey)):
+            raise Exception("Must pass in a course_key when calling get_items()")
 
-        store = self._get_modulestore_for_courseid(course_id or getattr(location, 'package_id'))
-        return store.get_items(location, course_id, depth, qualifiers)
+        store = self._get_modulestore_for_courseid(course_id)
+        return store.get_items(course_key, **kwargs)
 
     def _get_course_id_from_course_location(self, course_location):
         """
