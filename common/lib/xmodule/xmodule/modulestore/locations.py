@@ -202,7 +202,8 @@ class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category
         Return a string with a version of the location that is safe for use in
         html id attributes
         """
-        id_string = u"-".join(v for v in self.list() if v is not None)
+        id_fields = [self.tag, self.org, self.course, self.category, self.name, self.revision]
+        id_string = u"-".join([v for v in id_fields if v is not None])
         return Location.clean_for_html(id_string)
 
     def course_key(self):
