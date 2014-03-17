@@ -6,11 +6,9 @@ You can access the public edX roadmap_ for details about the currently planned p
 
 .. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
 
-Course staff documentation, *Building a Course with edX Studio*, is available online_. You can also download the guide as a PDF from the edX Studio user interface.
+Course staff documentation, `Building and Running an edX Course <ttp://edx.readthedocs.org/projects/ca/en/latest/>`_, is available online. You can also download the guide as a PDF from the edX Studio user interface.
 
-.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
-
-Recent changes to *Building a Course with edX Studio* include a reorganization of all content into the following sections:
+Recent changes to *Building and Running an edX Course* include a reorganization of all content into the following sections:
 
 * `Getting Started <http://edx.readthedocs.org/projects/ca/en/latest/getting_started/index.html#getting-started-index>`_
 
