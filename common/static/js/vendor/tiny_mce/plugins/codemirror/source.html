@@ -45,20 +45,21 @@ function inArray(key, arr)
 			styleActiveLine: true
 		},
 		jsFiles: [// Default JS files
-			'lib/codemirror.js',
-			'addon/edit/matchbrackets.js',
-			'mode/xml/xml.js',
-			'mode/javascript/javascript.js',
-			'mode/css/css.js',
-			'mode/htmlmixed/htmlmixed.js',
-			'addon/dialog/dialog.js',
-			'addon/search/searchcursor.js',
-			'addon/search/search.js',
-			'addon/selection/active-line.js'
+// MODIFIED FOR EDX VENDOR FILE LOCATIONS.
+			'codemirror.js',
+//			'addon/edit/matchbrackets.js',
+			'xml.js',
+			'javascript.js',
+			'addons/css.js',
+			'addons/htmlmixed.js',
+			'addons/dialog/dialog.js',
+			'addons/searchcursor.js',
+			'addons/search.js'
+//			'addon/selection/active-line.js'
 		],
-		cssFiles: [// Default CSS files
-			'lib/codemirror.css',
-			'addon/dialog/dialog.css'
+		cssFiles: [
+			'codemirror.css',
+			'addons/dialog/dialog.css'
 		]
 	};
 

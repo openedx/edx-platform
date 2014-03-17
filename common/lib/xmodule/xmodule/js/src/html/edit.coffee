@@ -32,28 +32,31 @@ class @HTMLEditingDescriptor
       # TODO: we should share this CSS with studio (and LMS)
       content_css : "#{baseUrl}/css/tiny-mce.css",
       formats : {
-        # Disable h4, h5, and h6 styles as we don't have CSS for them.
-        # TODO: this doesn't seem to be working with the upgrade.
+      # Disable h4, h5, and h6 styles as we don't have CSS for them.
+      # TODO: this doesn't seem to be working with the upgrade.
         h4: {},
         h5: {},
         h6: {},
-        # tinyMCE does block level for code by default
+      # tinyMCE does block level for code by default
         code: {inline: 'code'}
       },
       # Disable visual aid on borderless table.
-      visual:false,
-      plugins: "textcolor, link, image",
+      visual: false,
+      plugins: "textcolor, link, image, codemirror",
+      codemirror: {
+        path: "#{baseUrl}/js/vendor/CodeMirror"
+      },
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
       # Can have a single toolbar by just specifying "toolbar". Splitting for now so all are visible.
-      toolbar1 : "formatselect | fontselect | bold italic underline forecolor | bullist numlist outdent indent",
-      toolbar2 : "link unlink image | blockquote wrapAsCode ",
+      toolbar1: "formatselect | fontselect | bold italic underline forecolor | bullist numlist outdent indent",
+      toolbar2: "link unlink image | blockquote wrapAsCode code",
       # TODO: i18n
-      block_formats : "Paragraph=p;Preformatted=pre;Heading 1=h1;Heading 2=h2;Heading 3=h3",
+      block_formats: "Paragraph=p;Preformatted=pre;Heading 1=h1;Heading 2=h2;Heading 3=h3",
       width: '100%',
       height: '400px',
       menubar: false,
       statusbar: false,
-      setup : @setupTinyMCE,
+      setup: @setupTinyMCE,
       # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
       # The tinyMCE callback passes in the editor as a paramter.
       init_instance_callback: @initInstanceCallback
