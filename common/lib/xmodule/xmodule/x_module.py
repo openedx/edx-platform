@@ -25,6 +25,7 @@ from xmodule.fields import RelativeTime
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.keys import OpaqueKeyReader
 from xmodule.exceptions import UndefinedContext
 
 
