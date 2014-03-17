@@ -830,7 +830,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # See http://www.mongodb.org/display/DOCS/Updating for
         # atomic update syntax
         result = self.collection.update(
-            {'_id': namedtuple_to_son(Location(location))},
+            {'_id': namedtuple_to_son(location)},
             {'$set': update},
             multi=False,
             upsert=True,
