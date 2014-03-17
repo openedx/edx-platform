@@ -4,8 +4,8 @@ Feature: LMS Video component
 
   # 1
   Scenario: Video component stores position correctly when page is reloaded
-    Given the course has a Video component in Youtube mode
-    Then when I view the video it has rendered in Youtube mode
+    Given the course has a Video component in "Youtube" mode
+    When the video has rendered in "Youtube" mode
     And I click video button "play"
     Then I seek video to "10" seconds
     And I click video button "pause"
@@ -15,13 +15,13 @@ Feature: LMS Video component
 
   # 2
   Scenario: Video component is fully rendered in the LMS in HTML5 mode
-    Given the course has a Video component in HTML5 mode
-    Then when I view the video it has rendered in HTML5 mode
+    Given the course has a Video component in "HTML5" mode
+    When the video has rendered in "HTML5" mode
     And all sources are correct
 
   # 3
   # Firefox doesn't have HTML5 (only mp4 - fix here)
-  # Disabled because does_not_autoplay fails with the 
+  # Disabled because does_not_autoplay fails with the
   # selenium upgrade from 2.34.0 to 2.39.0. See TE-368
 #  @skip_firefox
 #  Scenario: Autoplay is disabled in LMS for a Video component
@@ -32,30 +32,30 @@ Feature: LMS Video component
   # Youtube testing
   Scenario: Video component is fully rendered in the LMS in Youtube mode with HTML5 sources
     Given youtube server is up and response time is 0.4 seconds
-    And the course has a Video component in Youtube_HTML5 mode
-    Then when I view the video it has rendered in Youtube mode
+    And the course has a Video component in "Youtube_HTML5" mode
+    When the video has rendered in "Youtube" mode
 
   # 5
   Scenario: Video component is not rendered in the LMS in Youtube mode with HTML5 sources
     Given youtube server is up and response time is 2 seconds
-    And the course has a Video component in Youtube_HTML5 mode
-    Then when I view the video it has rendered in HTML5 mode
+    And the course has a Video component in "Youtube_HTML5" mode
+    When the video has rendered in "HTML5" mode
 
   # 6
   Scenario: Video component is rendered in the LMS in Youtube mode without HTML5 sources
     Given youtube server is up and response time is 2 seconds
-    And the course has a Video component in Youtube mode
-    Then when I view the video it has rendered in Youtube mode
+    And the course has a Video component in "Youtube" mode
+    When the video has rendered in "Youtube" mode
 
   # 7
   Scenario: Video component is rendered in the LMS in Youtube mode with HTML5 sources that doesn't supported by browser
     Given youtube server is up and response time is 2 seconds
-    And the course has a Video component in Youtube_HTML5_Unsupported_Video mode
-    Then when I view the video it has rendered in Youtube mode
+    And the course has a Video component in "Youtube_HTML5_Unsupported_Video" mode
+    When the video has rendered in "Youtube" mode
 
   # 8
   Scenario: Video component is rendered in the LMS in HTML5 mode with HTML5 sources that doesn't supported by browser
-    Given the course has a Video component in HTML5_Unsupported_Video mode
+    Given the course has a Video component in "HTML5_Unsupported_Video" mode
     Then error message is shown
     And error message has correct text
 
@@ -136,7 +136,7 @@ Feature: LMS Video component
 
   # 15
   Scenario: CC button is hidden if no translations
-    Given the course has a Video component in Youtube mode
+    Given the course has a Video component in "Youtube" mode
     Then button "CC" is hidden
 
   # 16
@@ -152,7 +152,7 @@ Feature: LMS Video component
 
   # 17
   Scenario: Video is aligned correctly if transcript is hidden in fullscreen mode
-    Given the course has a Video component in Youtube mode
+    Given the course has a Video component in "Youtube" mode
     And I click video button "fullscreen"
     Then I see video aligned correctly without enabled transcript
 
@@ -251,3 +251,30 @@ Feature: LMS Video component
       | {"zh": "chinese_transcripts.srt"} | true           |
     And I see "好 各位同学" text in the captions
     Then I can download transcript in "srt" format that has text "好 各位同学"
+
+  # 25
+  Scenario: Verify that each video in each sub-section includes a transcript for non-Youtube countries.
+    Given youtube server is up and response time is 2 seconds
+    And I am registered for the course "test_course"
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+    And I have a "subs_b7xgknqkQk8.srt.sjson" transcript file in assets
+    And I have a "chinese_transcripts.srt" transcript file in assets
+    And it has videos "A, B" in "Youtube_HTML5" mode in position "1" of sequential:
+      | sub         |
+      | OEoXaMPEzfM |
+      | b7xgknqkQk8 |
+    And a video "C" in "Youtube_HTML5" mode in position "2" of sequential:
+      | transcripts                       |
+      | {"zh": "chinese_transcripts.srt"} |
+    And a video "D" in "Youtube_HTML5" mode in position "3" of sequential
+    And I open the section with videos
+    Then videos have rendered in "HTML5" mode
+    And I see "Hi, welcome to Edx." text in the captions
+    And I see "Equal transcripts" text in the captions
+    When I open video "C"
+    Then the video has rendered in "HTML5" mode
+    And I make sure captions are opened
+    And I see "好 各位同学" text in the captions
+    When I open video "D"
+    Then the video has rendered in "HTML5" mode
+    And the video does not show the captions
