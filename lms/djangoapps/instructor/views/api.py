@@ -16,23 +16,26 @@ from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.utils.html import strip_tags
 from util.json_request import JsonResponse
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
 from django.contrib.auth.models import User
 from django_comment_client.utils import has_forum_access
-from django_comment_common.models import (Role,
-                                          FORUM_ROLE_ADMINISTRATOR,
-                                          FORUM_ROLE_MODERATOR,
-                                          FORUM_ROLE_COMMUNITY_TA)
+from django_comment_common.models import (
+    Role,
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+)
 
 from courseware.models import StudentModule
 from student.models import unique_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.views import get_task_completion_info
-from instructor_task.models import GradesStore
+from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import enroll_email, unenroll_email, get_email_params
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
@@ -248,7 +251,9 @@ def students_update_enrollment(request, course_id):
             elif action == 'unenroll':
                 before, after = unenroll_email(course_id, email, email_students, email_params)
             else:
-                return HttpResponseBadRequest("Unrecognized action '{}'".format(action))
+                return HttpResponseBadRequest(strip_tags(
+                    "Unrecognized action '{}'".format(action)
+                ))
 
             results.append({
                 'email': email,
@@ -278,7 +283,7 @@ def students_update_enrollment(request, course_id):
 @require_level('instructor')
 @common_exceptions_400
 @require_query_params(
-    email="user email",
+    unique_student_identifier="email or username of user to change access",
     rolename="'instructor', 'staff', or 'beta'",
     action="'allow' or 'revoke'"
 )
@@ -290,7 +295,7 @@ def modify_access(request, course_id):
     NOTE: instructors cannot remove their own instructor access.
 
     Query parameters:
-    email is the target users email
+    unique_student_identifer is the target user's username or email
     rolename is one of ['instructor', 'staff', 'beta']
     action is one of ['allow', 'revoke']
     """
@@ -298,16 +303,14 @@ def modify_access(request, course_id):
         request.user, course_id, 'instructor', depth=None
     )
 
-    email = strip_if_string(request.GET.get('email'))
+    user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
     rolename = request.GET.get('rolename')
     action = request.GET.get('action')
 
     if not rolename in ['instructor', 'staff', 'beta']:
-        return HttpResponseBadRequest(
+        return HttpResponseBadRequest(strip_tags(
             "unknown rolename '{}'".format(rolename)
-        )
-
-    user = User.objects.get(email=email)
+        ))
 
     # disallow instructors from removing their own instructor access.
     if rolename == 'instructor' and user == request.user and action != 'allow':
@@ -320,10 +323,12 @@ def modify_access(request, course_id):
     elif action == 'revoke':
         revoke_access(course, user, rolename)
     else:
-        return HttpResponseBadRequest("unrecognized action '{}'".format(action))
+        return HttpResponseBadRequest(strip_tags(
+            "unrecognized action '{}'".format(action)
+        ))
 
     response_payload = {
-        'email': email,
+        'unique_student_identifier': user.username,
         'rolename': rolename,
         'action': action,
         'success': 'yes',
@@ -486,9 +491,9 @@ def get_distribution(request, course_id):
     available_features = analytics.distributions.AVAILABLE_PROFILE_FEATURES
     # allow None so that requests for no feature can list available features
     if not feature in available_features + (None,):
-        return HttpResponseBadRequest(
+        return HttpResponseBadRequest(strip_tags(
             "feature '{}' not available.".format(feature)
-        )
+        ))
 
     response_payload = {
         'course_id': course_id,
@@ -765,16 +770,16 @@ def list_instructor_tasks(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def list_grade_downloads(_request, course_id):
+def list_report_downloads(_request, course_id):
     """
     List grade CSV files that are available for download for this course.
     """
-    grades_store = GradesStore.from_config()
+    report_store = ReportStore.from_config()
 
     response_payload = {
         'downloads': [
             dict(name=name, url=url, link='<a href="{}">{}</a>'.format(url, name))
-            for name, url in grades_store.links_for(course_id)
+            for name, url in report_store.links_for(course_id)
         ]
     }
     return JsonResponse(response_payload)
@@ -833,7 +838,9 @@ def list_forum_members(request, course_id):
 
     # filter out unsupported for roles
     if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest("Unrecognized rolename '{}'.".format(rolename))
+        return HttpResponseBadRequest(strip_tags(
+            "Unrecognized rolename '{}'.".format(rolename)
+        ))
 
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)
@@ -931,7 +938,9 @@ def update_forum_role_membership(request, course_id):
         return HttpResponseBadRequest("Operation requires instructor access.")
 
     if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest("Unrecognized rolename '{}'.".format(rolename))
+        return HttpResponseBadRequest(strip_tags(
+            "Unrecognized rolename '{}'.".format(rolename)
+        ))
 
     user = User.objects.get(email=email)
     target_is_instructor = has_access(user, course, 'instructor')

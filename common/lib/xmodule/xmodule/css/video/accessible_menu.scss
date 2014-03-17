@@ -1,0 +1,133 @@
+$gray: rgb(127, 127, 127);
+$blue: rgb(0, 159, 230);
+$gray-d1: shade($gray,20%);
+$gray-l2: tint($gray,40%);
+$gray-l3: tint($gray,60%);
+$blue-s1: saturate($blue,15%);
+
+%use-font-awesome {
+  font-family: FontAwesome;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  speak: none;
+}
+
+.a11y-menu-container {
+  position: relative;
+
+  &.open {
+    .a11y-menu-list {
+      display: block;
+    }
+  }
+
+  .a11y-menu-list {
+    top: 100%;
+    margin: 0;
+    padding: 0;
+    display: none;
+    position: absolute;
+    z-index: 10;
+    list-style: none;
+    background-color: $white;
+    border: 1px solid #eee;
+
+    li {
+      margin: 0;
+      padding: 0;
+      border-bottom: 1px solid #eee;
+      color: $white;
+      cursor: pointer;
+
+      a {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: $gray-l2;
+        font-size: 14px;
+        line-height: 23px;
+
+        &:hover {
+          color: $gray-d1;
+        }
+      }
+
+      &.active{
+        a {
+          color: $blue;
+        }
+      }
+
+      &:last-child {
+        box-shadow: none;
+        border-bottom: 0;
+        margin-top: 0;
+      }
+    }
+  }
+}
+
+
+// Video track button specific styles
+
+.video-tracks {
+  .a11y-menu-container {
+    display: inline-block;
+    vertical-align: top;
+    border-left: 1px solid #eee;
+
+    &.open {
+      > a {
+        background-color: $action-primary-active-bg;
+        color: $very-light-text;
+
+        &:after {
+          color: $very-light-text;
+        }
+      }
+
+    }
+
+    > a {
+      @include transition(all 0.25s ease-in-out 0s);
+      @include font-size(12);
+      display: block;
+      border-radius: 0 3px 3px 0;
+      background-color: $very-light-text;
+      padding: ($baseline*.75 $baseline*1.25 $baseline*.75 $baseline*.75);
+      color: $gray-l2;
+      min-width: 1.5em;
+      line-height: 14px;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:after {
+        @extend %use-font-awesome;
+        content: "\f0d7";
+        position: absolute;
+        right: ($baseline*.5);
+        top: 33%;
+        color: $lighter-base-font-color;
+      }
+    }
+
+    .a11y-menu-list {
+      right: 0;
+
+      li {
+        font-size: em(14);
+
+        a {
+          border: 0;
+          display: block;
+          padding: lh(.5);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}

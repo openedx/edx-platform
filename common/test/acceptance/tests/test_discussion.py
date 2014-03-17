@@ -159,17 +159,11 @@ class DiscussionCommentEditTest(UniqueCourseTest):
             [Comment(id="comment_other_author", user_id="other"), Comment(id="comment_self_author", user_id=self.user_id)])
         view.push()
 
-    #def edit_comment(self, page, comment_id):
-        #page.start_comment_edit(comment_id)
-        #page.set_comment_editor_value(comment_id, "edited body")
-        #page.submit_comment_edit(comment_id)
-
     def edit_comment(self, page, comment_id):
         page.start_comment_edit(comment_id)
         new_comment = "edited body"
         page.set_comment_editor_value(comment_id, new_comment)
         page.submit_comment_edit(comment_id, new_comment)
-
 
     def test_edit_comment_as_student(self):
         self.setup_user()

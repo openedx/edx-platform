@@ -3,7 +3,7 @@
 
 from lettuce import world, step
 from selenium.webdriver.common.keys import Keys
-from common import type_in_codemirror
+from common import type_in_codemirror, get_codemirror_value
 from nose.tools import assert_in  # pylint: disable=E0611
 
 
@@ -74,7 +74,7 @@ def change_date(_step, new_date):
 @step(u'I should see the date "([^"]*)"$')
 def check_date(_step, date):
     date_css = 'span.date-display'
-    assert date == world.css_html(date_css)
+    assert_in(date, world.css_html(date_css))
 
 
 @step(u'I modify the handout to "([^"]*)"$')
@@ -87,7 +87,7 @@ def edit_handouts(_step, text):
 @step(u'I see the handout "([^"]*)"$')
 def check_handout(_step, handout):
     handout_css = 'div.handouts-content'
-    assert handout in world.css_html(handout_css)
+    assert_in(handout, world.css_html(handout_css))
 
 
 @step(u'I see the handout error text')
@@ -127,6 +127,6 @@ def change_text(text):
 
 def verify_text_in_editor_and_update(button_css, before, after):
     world.css_click(button_css)
-    text = world.css_find(".cm-string").html
-    assert before in text
+    text = get_codemirror_value()
+    assert_in(before, text)
     change_text(after)

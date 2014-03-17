@@ -28,7 +28,8 @@ This chapter describes how to create and set up your course:
 
 Also see the chapters :ref:`Establish a Grading Policy`, :ref:`Organizing Your Course Content`, and :ref:`Guidelines for Creating Accessible Content`.
 
-
+.. _Edge: http://edge.edx.org
+.. _edX.org: http://edx.org
 
 .. _Create a New Course:
   
@@ -144,20 +145,43 @@ From the **Settings** menu, select **Schedule and Details**.
 .. image:: Images/schedule.png
   :alt: An image of the course schedule page.
 
-.. note:: 
-
-    The default **Course Start Date** is set far into the future, to **01/01/2030 GMT**. This is to ensure that your course does not start before you intend it to.  You must change the course start date to the date you want students to begin using the course.  
-
 Follow the on-screen text to enter the course and enrollment schedule.
 
 .. note::
 
     The Time fields on this page reflect the current time zone in your browser, depending on your geography. Course start times for students are shown as UTC.
 
-Students see the course start date on their dashboards:
+
+.. _The Course Start Date:
+
+==============================
+The Course Start Date
+==============================
+
+.. note:: 
+
+    The default **Course Start Date** is set far into the future, to **01/01/2030 GMT**. This is to ensure that your course does not start before you intend it to.  You must change the course start date to the date you want students to begin using the course. 
+
+Students see the course start date on their dashboards and on the course summary page.
+
+The following example shows the course start date on the course summary page:
+
+.. image:: Images/about-page-course-start.png
+ :alt: An image of the course summary page, with the start date circled.
+
+.. note:: For courses on edX.org_, you must communicate the course start date to your edX Program Manager, to ensure the date is accurate on the course summary page.
+
+In the dashboard, if the course has not yet started, students see the start date as in the following example:
+
+.. image:: Images/dashboard-course-to-start.png
+ :alt: An image of a course that has not started in the student dashboard, with the start date circled.
+
+If the course has started, students see the start date as in the following example:
 
 .. image:: Images/dashboard-course.png
  :alt: An image of a course listing in the student dashboard, with the start date circled.
+
+
 
 .. _Set the Advertised Start Date:
 
@@ -183,11 +207,31 @@ The start date shown on the student's dashboard is now the value of the advertis
 .. image:: Images/dashboard-course_adver_start.png
  :alt: An image of a course listing in the student dashboard, with the advertised start date circled.
 
-If you do not change the default course start date (01/01/2030), and the advertised_start policy value is null, then the student dashboard does not list a start date for the course.  Students just see that the course has not yet started:
+If you do not change the default course start date (01/01/2030), and the **advertised_start** policy value is ``null``, then the student dashboard does not list a start date for the course.  Students just see that the course has not yet started:
 
 .. image:: Images/dashboard-course_not_started.png
  :alt: Image of a course listing in the student dashboard, with no start date.
 
+
+.. _The Course End Date:
+
+==============================
+The Course End Date
+==============================
+
+When your course is completed, students see the course end date on their dashboards.
+
+.. note:: For courses on edX.org_, you must communicate the course end date to your edX Program Manager, to ensure the date is accurate on the course summary page.
+
+If grades and certificates are not yet issued, or if students enroll in an archived course after it has ended, the course appears in the dashboard as in the following example:
+
+.. image:: Images/dashboard-wrapping-course.png
+ :alt: Image of a course on the student dashboard that has ended, but not been graded
+
+If grades are complete and certificates are issued, students see the course, the end date, and the message as in the following example:
+
+.. image:: Images/dashboard-completed-course.png
+ :alt: Image of a course on the student dashboard that has ended, but not been graded
 
 .. _`Describe Your Course`:
 
@@ -195,11 +239,14 @@ If you do not change the default course start date (01/01/2030), and the adverti
 Describe Your Course
 ************************
 
-The description of your course appears on the Course Summary page that students see, and includes a course summary, prerequisites, staff information and FAQs.
+On Edge_, students that you explicitly invite see the description of your course on the course summary page.
 
-For courses on edX.org, the description is shown in the course catalog. 
+For example, the course description is circled in the following course summary page:
 
-On Edge, there is no course catalog and users will not find your course description. You must explicitly invite students to participate in your course for them to find the description.
+.. image:: Images/about-page-course-description.png
+ :alt: Image of a course summary with the description circled
+
+.. note:: For courses on edX.org_, you must communicate the course description to your edX Program Manager, to ensure the content is accurate on the course summary page.
 
 #. From the **Settings** menu, select **Schedule & Details**.
 #. Scroll down to the **Introducing Your Course** section, then locate the **Course Overview** field.
@@ -219,21 +266,40 @@ On Edge, there is no course catalog and users will not find your course descript
 Add a Course Image
 ************************
 
-The course image appears on the Course Summary page that students see.
+The course image that you add in Studio appears on the student dashboard. 
+
+On Edge_, the image also appears on the course summary page.
+
+In the following example, the course image that was added in Studio is circled in the student dashboard:
+
+.. image:: Images/dashboard-course-image.png
+ :alt: Image of the course image in the student dashboard
+
+On edX.org_, the course image you add in Studio does not appear on the course summary page automatically. You must work directly with your edX Program Manager to set up the course summary page.
 
 The course image should be a minimum of 660 pixels in width by 240 pixels in height, and in .JPG or .PNG format.
 
 #. From the **Settings** menu, select **Schedule & Details**.
 #. Scroll down to the **Course Image** section.
 #. To select an image from your computer, click **Upload Course Image**, then follow the prompts to find and upload your image.
-#. View your course summary page to test how the image will appear to students.
+#. View your dashboard to test how the image will appear to students.
 
 .. _`Add a Course Video`:
 
 *********************************
 Add a Course Introduction Video
 *********************************
-The course introduction video appears on the Course Summary page that students see. The course video should excite and entice potential students to register, and reveal some of the personality the instructors bring to the course. 
+
+On Edge_, the course introduction video appears on the course summary page that students see. 
+
+.. note:: On edX.org_, you work directly with your Program Manager to set up the course video in the summary page.
+
+In the following example, the course video is circled in the course summary page:
+
+.. image:: Images/about-page-course-video.png
+ :alt: Image of the course video in the course summary page
+
+The course video should excite and entice potential students to register, and reveal some of the personality the instructors bring to the course. 
 
 The video should answer these key questions:
 
@@ -256,7 +322,7 @@ To add a course introduction video:
     
 2. From the **Settings** menu, select **Schedule & Details**.
 #. Scroll down to the **Course Introduction Video** section.
-#. In the field below the video box, enter the YouTube video ID. When you add the code, the video automatically loads in the video box. Studio automatically saves your changes.
+#. In the field below the video box, enter the YouTube video ID (the code you copied in step 1). When you add the code, the video automatically loads in the video box. Studio automatically saves your changes.
 #. View your course summary page to test how the video will appear to students.
 
 .. _`Set Course Requirements`:
@@ -267,7 +333,7 @@ Set Course Requirements
 The estimated Effort per Week appears on the Course Summary page that students see.
 
 #. From the **Settings** menu, select **Schedule & Details**.
-#. Scroll down to the **Requirments** section.
+#. Scroll down to the **Requirements** section.
 #. In the **Hours of Effort per Week** field, enter the number of hours you expect students to work on this course each week.
 #. View your course summary page to test how the video will appear to students.
 
@@ -278,23 +344,41 @@ Add Files to a Course
 **********************
 
 You can add files that you want students to access in the course. After you add a file,
-you must link to it from a course component, update, or in the course handouts. A file 
+you must link to it from a component, a course update, or in the course handouts. A file 
 is only visible to students if you create a link to it.
  
 .. note:: Because the file name becomes part of the URL, students can see the name of the file when they open it. Avoid using file names such as AnswerKey.pdf.
   
 .. warning:: If you upload a file with the same name as an existing course file, the original file is overwritten without warning.
 
-To add a file:
+To add files:
  
 #. From the **Content** menu, select **Files & Uploads**.
 #. Click **Upload New File**.
 #. In the **Upload New File** dialog box, click **Choose File**.
-#. In the **Open** dialog box, locate the file that you want, and then click **Open**.
-#. To add another file, click **Load Another File**. 
+#. In the **Open** dialog box, select one more files that you want to upload, then click **Open**.
+#. To add more file, click **Load Another File** and repeat the previous step.
 #. To close the dialog box, click the **x** in the top right corner. 
 
 When you close the dialog box, the new files appear on the **Files & Uploads** page.
+
+==================
+File URLs
+==================
+
+In the Files & Uploads page, each file has has an **Embed URL** and an **External URL**:
+
+
+.. image:: Images/files_uploads_urls.png
+ :alt: Image of the Files and Uploads page, with Embed URL and External URL columns circled
+
+* You use the **Embed URL** to link to the file or image from a component, a course update, or a course handout. 
+
+* You use the **External URL** to reference the file or image from outside of your course. The external URL does not work if you lock the file unless the person accessing the URL is enrolled in the course.
+
+  .. warning:: You cannot use the External URL as the reference to a file or image from within your course.
+
+You can double click a value in the **Embed URL** or **External URL** column to select the value, then copy it.
 
 
 ==================
@@ -317,7 +401,7 @@ The current sort order is shown at the top of the file list, and the active sort
 Find Files
 ==================
 
-The **Files & Uploads** page lists up to 50 files.  If your course has more than 50 files, additional files are listed in other pages.
+The **Files & Uploads** page lists up to 50 files.  If your course has more than 50 files, additional files are listed on other pages.
 
 The range of the files listed on the page, and the total number of files, are shown at the top of the page.
 
@@ -332,14 +416,6 @@ You can navigate through the pages listing files in two ways:
     :alt: Pagination in the Files & Uploads page
 
   
-==================
-Get the File URL
-==================
-To link to the file from a course component, update, or the course handout list, you must get the file URL.
-
-In the **Files & Uploads** page, locate the file. The **URL** column shows the value to use in links.
-
-You can double click a value in the **URL** column to select the value, then copy it.
  
 ==================
 Lock a file
@@ -347,6 +423,8 @@ Lock a file
 By default, anyone can access a file you upload if they know the URL, even people not enrolled in your class.
 
 To ensure that those not in your class cannot view the file, click the lock icon.
+
+.. note:: The external URL does not work if you lock the file.
  
 ==================
 Delete a file
@@ -360,7 +438,8 @@ To delete a file, click the **x** icon next to the file.  You are prompted to co
 ****************
 Add Static Pages
 ****************
-You can add static pages to your course. Each static page appears in your courses navigation bar. 
+You can add static pages to your course. Each static page appears in your course's navigation bar. 
+
 For example, the following navigation bar includes a
 **Syllabus** and **Projects** static pages.
 
@@ -415,9 +494,9 @@ To add a course update:
 
 #. From the **Content** menu, select **Updates**. 
 #. Click **New Update**.
-#. Enter your update as as HTML.
+#. Enter your update in the HTML editor that opens.
 
-  .. note::  You must enter the update in HTML. For a template that includes placeholders, see :ref:`Appendix A`.
+  .. note::  You must enter the update in HTML. See :ref:`Appendix A`.
 
 4. Click **Save**.
 
@@ -426,12 +505,12 @@ To add a course update:
 **********************
 Add Course Handouts
 **********************
-You can add course handouts that are visible to students on the **Course Info** page.
+You can add course handouts that are visible to students on the **Course Info** page. To add an uploaded file to the course handouts, you will need its URL.
 
 .. note::  You must :ref:`Add Files to a Course` before you can add them as course handouts.
 
 #. From the **Content** menu, select **Updates**. 
-#. In the **Course Handouts** page, click **Edit**.
+#. In the **Course Handouts** panel, click **Edit**.
 #. Edit the HTML to add links to the files you uploaded. See :ref:`Add a Link in an HTML Component` for more information.
 #. Click **Save**.
 
@@ -440,7 +519,7 @@ You can add course handouts that are visible to students on the **Course Info** 
 ****************
 Add Textbooks
 ****************
-You can add textbooks for your course as PDF files.  
+You can add PDF textbooks for your course.  
 
 .. note::  Do not use image files (for example, .PNG files) as textbooks for your course, as they are not accessible to screen readers. Review the :ref:`Best Practices for Accessible PDFs` for more information.
 
@@ -464,5 +543,5 @@ To add a textbook:
 3. Enter the **Textbook Name**.
 #. Enter the first **Chapter Name**.
 #. To upload a PDF file from your computer, click **Upload PDF**.  Follow the prompts to upload your file.
-#. To add addition chapters, click **+Add a Chapter** and repeat steps 3 and 4.
+#. To add more chapters, click **+Add a Chapter** and repeat steps 3 and 4.
 #. Click **Save**.

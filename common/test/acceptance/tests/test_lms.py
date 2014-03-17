@@ -5,15 +5,10 @@ E2E tests for the LMS.
 
 from unittest import skip, expectedFailure
 
-from bok_choy.web_app_test import WebAppTest
-from bok_choy.promise import EmptyPromise, fulfill_before, fulfill, Promise
-
 from .helpers import UniqueCourseTest, load_data_str
 from ..pages.studio.auto_auth import AutoAuthPage
-from ..pages.lms.login import LoginPage
 from ..pages.lms.find_courses import FindCoursesPage
 from ..pages.lms.course_about import CourseAboutPage
-from ..pages.lms.register import RegisterPage
 from ..pages.lms.course_info import CourseInfoPage
 from ..pages.lms.tab_nav import TabNavPage
 from ..pages.lms.course_nav import CourseNavPage
@@ -69,35 +64,11 @@ class RegistrationTest(UniqueCourseTest):
         course_names = dashboard.available_courses
         self.assertIn(self.course_info['display_name'], course_names)
 
-    def assert_course_available(self, course_id):
-        # Occassionally this does not show up immediately,
-        # so we wait and try reloading the page
-        def _check_course_available():
-            available = self.find_courses_page.course_id_list
-            if course_id in available:
-                return True
-            else:
-                self.find_courses_page.visit()
-                return False
-
-        return fulfill(EmptyPromise(
-            _check_course_available,
-            "Found course {course_id} in the list of available courses".format(course_id=course_id),
-            try_limit=3, try_interval=2
-        ))
-
 
 class LanguageTest(UniqueCourseTest):
     """
     Tests that the change language functionality on the dashboard works
     """
-
-    @property
-    def _changed_lang_promise(self):
-        def _check_func():
-            text = self.dashboard_page.current_courses_text
-            return (len(text) > 0, text)
-        return Promise(_check_func, "language changed")
 
     def setUp(self):
         """
@@ -116,18 +87,19 @@ class LanguageTest(UniqueCourseTest):
         self.password = "testpass"
         self.email = "test@example.com"
 
-    @skip("Flakey in its present form; re-enable when fixed")
+    #@skip("Flakey in its present form; re-enable when fixed")
     def test_change_lang(self):
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.dashboard_page.visit()
         # Change language to Dummy Esperanto
         self.dashboard_page.change_language(self.test_new_lang)
 
-        changed_text = fulfill(self._changed_lang_promise)
+        changed_text = self.dashboard_page.current_courses_text
+
         # We should see the dummy-language text on the page
         self.assertIn(self.current_courses_text, changed_text)
 
-    @skip("Flakey in its present form; re-enable when fixed")
+    #@skip("Flakey in its present form; re-enable when fixed")
     def test_language_persists(self):
         auto_auth_page = AutoAuthPage(self.browser, username=self.username, password=self.password, email=self.email, course_id=self.course_id)
         auto_auth_page.visit()
@@ -137,14 +109,15 @@ class LanguageTest(UniqueCourseTest):
         self.dashboard_page.change_language(self.test_new_lang)
 
         # destroy session
-        self.browser._cookie_manager.delete()
+        self.browser.delete_all_cookies()
 
         # log back in
         auto_auth_page.visit()
 
         self.dashboard_page.visit()
 
-        changed_text = fulfill(self._changed_lang_promise)
+        changed_text = self.dashboard_page.current_courses_text
+
         # We should see the dummy-language text on the page
         self.assertIn(self.current_courses_text, changed_text)
 
@@ -173,7 +146,7 @@ class HighLevelTabTest(UniqueCourseTest):
         )
 
         course_fix.add_update(
-            CourseUpdateDesc(date='January 29, 2014', content='Test course update')
+            CourseUpdateDesc(date='January 29, 2014', content='Test course update1')
         )
 
         course_fix.add_handout('demoPDF.pdf')
@@ -200,6 +173,7 @@ class HighLevelTabTest(UniqueCourseTest):
         """
         Navigate to the course info page.
         """
+
         # Navigate to the course info page from the progress page
         self.progress_page.visit()
         self.tab_nav.go_to_tab('Course Info')
@@ -251,6 +225,7 @@ class HighLevelTabTest(UniqueCourseTest):
             'Test Section': ['Test Subsection'],
             'Test Section 2': ['Test Subsection 2', 'Test Subsection 3']
         }
+
         actual_sections = self.course_nav.sections
         for section, subsections in EXPECTED_SECTIONS.iteritems():
             self.assertIn(section, actual_sections)
@@ -321,22 +296,23 @@ class VideoTest(UniqueCourseTest):
         # Now we should be playing
         self.assertTrue(self.video.is_playing)
 
+        # Commented the below EmptyPromise, will move to its page once this test is working and stable
+        # Also there is should be no Promise check in any test as this should be done in Page Object
+
         # Wait for the video to load the duration
-        video_duration_loaded = EmptyPromise(
-            lambda: self.video.duration > 0,
-            'video has duration', timeout=20
-        )
+        # EmptyPromise(
+        #     lambda: self.video.duration > 0,
+        #     'video has duration', timeout=20
+        # ).fulfill()
 
-        with fulfill_before(video_duration_loaded):
+        # Pause the video
+        self.video.pause()
 
-            # Pause the video
-            self.video.pause()
-
-            # Expect that the elapsed time and duration are reasonable
-            # Again, we can't expect the video to actually play because of
-            # latency through the ssh tunnel
-            self.assertGreaterEqual(self.video.elapsed_time, 0)
-            self.assertGreaterEqual(self.video.duration, self.video.elapsed_time)
+        # Expect that the elapsed time and duration are reasonable
+        # Again, we can't expect the video to actually play because of
+        # latency through the ssh tunnel
+        self.assertGreaterEqual(self.video.elapsed_time, 0)
+        self.assertGreaterEqual(self.video.duration, self.video.elapsed_time)
 
 
 class XBlockAcidBase(UniqueCourseTest):
@@ -359,6 +335,19 @@ class XBlockAcidBase(UniqueCourseTest):
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.tab_nav = TabNavPage(self.browser)
 
+
+    def validate_acid_block_view(self, acid_block):
+        """
+        Verify that the LMS view for the Acid Block is correct
+        """
+        self.assertTrue(acid_block.init_fn_passed)
+        self.assertTrue(acid_block.resource_url_passed)
+        self.assertTrue(acid_block.scope_passed('user_state'))
+        self.assertTrue(acid_block.scope_passed('user_state_summary'))
+        self.assertTrue(acid_block.scope_passed('preferences'))
+        self.assertTrue(acid_block.scope_passed('user_info'))
+
+
     def test_acid_block(self):
         """
         Verify that all expected acid block tests pass in the lms.
@@ -368,13 +357,7 @@ class XBlockAcidBase(UniqueCourseTest):
         self.tab_nav.go_to_tab('Courseware')
 
         acid_block = AcidView(self.browser, '.xblock-student_view[data-block-type=acid]')
-        self.assertTrue(acid_block.init_fn_passed)
-        self.assertTrue(acid_block.child_tests_passed)
-        self.assertTrue(acid_block.resource_url_passed)
-        self.assertTrue(acid_block.scope_passed('user_state'))
-        self.assertTrue(acid_block.scope_passed('user_state_summary'))
-        self.assertTrue(acid_block.scope_passed('preferences'))
-        self.assertTrue(acid_block.scope_passed('user_info'))
+        self.validate_acid_block_view(acid_block)
 
 
 class XBlockAcidNoChildTest(XBlockAcidBase):
@@ -420,7 +403,7 @@ class XBlockAcidChildTest(XBlockAcidBase):
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
-                        XBlockFixtureDesc('acid', 'Acid Block').add_children(
+                        XBlockFixtureDesc('acid_parent', 'Acid Parent Block').add_children(
                             XBlockFixtureDesc('acid', 'First Acid Child', metadata={'name': 'first'}),
                             XBlockFixtureDesc('acid', 'Second Acid Child', metadata={'name': 'second'}),
                             XBlockFixtureDesc('html', 'Html Child', data="<html>Contents</html>"),
@@ -429,6 +412,10 @@ class XBlockAcidChildTest(XBlockAcidBase):
                 )
             )
         ).install()
+
+    def validate_acid_block_view(self, acid_block):
+        super(XBlockAcidChildTest, self).validate_acid_block_view()
+        self.assertTrue(acid_block.child_tests_passed)
 
     # This will fail until we fix support of children in pure XBlocks
     @expectedFailure

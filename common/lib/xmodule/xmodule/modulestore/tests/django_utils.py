@@ -33,7 +33,6 @@ def mixed_store_config(data_dir, mappings):
             'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
             'OPTIONS': {
                 'mappings': mappings,
-                'reference_type': 'Location',
                 'stores': {
                     'default': mongo_config['default'],
                     'xml': xml_config['default']
@@ -210,22 +209,34 @@ class ModuleStoreTestCase(TestCase):
         return updated_course
 
     @staticmethod
-    def drop_mongo_collections():
+    def drop_mongo_collections(store_name='default'):
         """
         If using a Mongo-backed modulestore & contentstore, drop the collections.
         """
 
         # This will return the mongo-backed modulestore
         # even if we're using a mixed modulestore
-        store = editable_modulestore()
+        store = editable_modulestore(store_name)
         if hasattr(store, 'collection'):
+            connection = store.collection.database.connection
             store.collection.drop()
+            connection.close()
+        elif hasattr(store, 'close_all_connections'):
+            store.close_all_connections()
+        elif hasattr(store, 'db'):
+            connection = store.db.connection
+            connection.drop_database(store.db.name)
+            connection.close()
+
         if contentstore().fs_files:
             db = contentstore().fs_files.database
             db.connection.drop_database(db)
+            db.connection.close()
+
         location_mapper = loc_mapper()
         if location_mapper.db:
             location_mapper.location_map.drop()
+            location_mapper.db.connection.close()
 
     @classmethod
     def setUpClass(cls):

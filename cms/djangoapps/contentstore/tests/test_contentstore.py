@@ -1003,7 +1003,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
         vertical.location = mongo.draft.as_draft(vertical.location.replace(name='no_references'))
 
-        draft_store.save_xmodule(vertical)
+        draft_store.update_item(vertical, allow_not_found=True)
         orphan_vertical = draft_store.get_item(vertical.location)
         self.assertEqual(orphan_vertical.location.name, 'no_references')
 
@@ -1020,13 +1020,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # now create a new/different private (draft only) vertical
         vertical.location = mongo.draft.as_draft(Location(['i4x', 'edX', 'toy', 'vertical', 'a_private_vertical', None]))
-        draft_store.save_xmodule(vertical)
+        draft_store.update_item(vertical, allow_not_found=True)
         private_vertical = draft_store.get_item(vertical.location)
         vertical = None  # blank out b/c i destructively manipulated its location 2 lines above
 
         # add the new private to list of children
-        sequential = module_store.get_item(Location(['i4x', 'edX', 'toy',
-                                           'sequential', 'vertical_sequential', None]))
+        sequential = module_store.get_item(
+            Location('i4x', 'edX', 'toy', 'sequential', 'vertical_sequential', None)
+        )
         private_location_no_draft = private_vertical.location.replace(revision=None)
         sequential.children.append(private_location_no_draft.url())
         module_store.update_item(sequential, self.user.id)
@@ -1760,8 +1761,46 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/c4x/MITx/999/asset/Chapter1.pdf')
         self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/c4x/MITx/999/asset/Chapter2.pdf')
 
-        # check that URL slug got updated to new course slug
-        self.assertEquals(course_module.wiki_slug, '999')
+    def test_import_into_new_course_id_wiki_slug_renamespacing(self):
+        module_store = modulestore('direct')
+
+        # If reimporting into the same course do not change the wiki_slug.
+        target_location = Location('i4x', 'edX', 'toy', 'course', '2012_Fall')
+        course_data = {
+            'org': target_location.org,
+            'number': target_location.course,
+            'display_name': 'Robot Super Course',
+            'run': target_location.name
+        }
+        _create_course(self, course_data)
+        course_module = module_store.get_instance(target_location.course_id, target_location)
+        course_module.wiki_slug = 'toy'
+        course_module.save()
+
+        # Import a course with wiki_slug == location.course
+        import_from_xml(module_store, 'common/test/data/', ['toy'], target_location_namespace=target_location)
+        course_module = module_store.get_instance(target_location.course_id, target_location)
+        self.assertEquals(course_module.wiki_slug, 'toy')
+
+        # But change the wiki_slug if it is a different course.
+        target_location = Location('i4x', 'MITx', '999', 'course', '2013_Spring')
+        course_data = {
+            'org': target_location.org,
+            'number': target_location.course,
+            'display_name': 'Robot Super Course',
+            'run': target_location.name
+        }
+        _create_course(self, course_data)
+
+        # Import a course with wiki_slug == location.course
+        import_from_xml(module_store, 'common/test/data/', ['toy'], target_location_namespace=target_location)
+        course_module = module_store.get_instance(target_location.course_id, target_location)
+        self.assertEquals(course_module.wiki_slug, 'MITx.999.2013_Spring')
+
+        # Now try importing a course with wiki_slug == '{0}.{1}.{2}'.format(location.org, location.course, location.name)
+        import_from_xml(module_store, 'common/test/data/', ['two_toys'], target_location_namespace=target_location)
+        course_module = module_store.get_instance(target_location.course_id, target_location)
+        self.assertEquals(course_module.wiki_slug, 'MITx.999.2013_Spring')
 
     def test_import_metadata_with_attempts_empty_string(self):
         module_store = modulestore('direct')
@@ -1913,6 +1952,14 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.get_html(new_location.url_reverse('course/', ''))
         _test_no_locations(self, resp)
         return resp
+
+    def test_wiki_slug(self):
+        """When creating a course a unique wiki_slug should be set."""
+
+        course_location = Location(['i4x', 'MITx', '999', 'course', '2013_Spring'])
+        _create_course(self, self.course_data)
+        course_module = modulestore('direct').get_item(course_location)
+        self.assertEquals(course_module.wiki_slug, 'MITx.999.2013_Spring')
 
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)

@@ -790,3 +790,12 @@ class XMLModuleStore(ModuleStoreReadBase):
         "split" for new-style split MongoDB backed courses.
         """
         return XML_MODULESTORE_TYPE
+
+    def get_courses_for_wiki(self, wiki_slug):
+        """
+        Return the list of courses which use this wiki_slug
+        :param wiki_slug: the course wiki root slug
+        :return: list of course locations
+        """
+        courses = self.get_courses()
+        return [course.location for course in courses if (course.wiki_slug == wiki_slug)]

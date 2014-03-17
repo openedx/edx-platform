@@ -23,13 +23,17 @@ class CapaModule(CapaMixin, XModule):
     """
     icon_class = 'problem'
 
-    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     ],
-          'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
-                 resource_string(__name__, 'js/src/capa/schematic.js')
-                 ]}
+    js = {
+        'coffee': [
+            resource_string(__name__, 'js/src/capa/display.coffee'),
+            resource_string(__name__, 'js/src/javascript_loader.coffee'),
+        ],
+        'js': [
+            resource_string(__name__, 'js/src/collapsible.js'),
+            resource_string(__name__, 'js/src/capa/imageinput.js'),
+            resource_string(__name__, 'js/src/capa/schematic.js'),
+        ]
+    }
 
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}

@@ -16,7 +16,7 @@ from django.template import Context
 from django.http import HttpResponse
 import logging
 
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 from edxmako import lookup_template
 import edxmako.middleware
@@ -37,7 +37,7 @@ def marketing_link(name):
     # link_map maps URLs from the marketing site to the old equivalent on
     # the Django site
     link_map = settings.MKTG_URL_LINK_MAP
-    enable_mktg_site = MicrositeConfiguration.get_microsite_configuration_value(
+    enable_mktg_site = microsite.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
@@ -80,7 +80,7 @@ def marketing_link_context_processor(request):
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
 
     # see if there is an override template defined in the microsite
-    template_name = MicrositeConfiguration.get_microsite_template_path(template_name)
+    template_name = microsite.get_template_path(template_name)
 
     context_instance = Context(dictionary)
     # add dictionary to context_instance
@@ -111,7 +111,7 @@ def render_to_response(template_name, dictionary=None, context_instance=None, na
     """
 
     # see if there is an override template defined in the microsite
-    template_name = MicrositeConfiguration.get_microsite_template_path(template_name)
+    template_name = microsite.get_template_path(template_name)
 
     dictionary = dictionary or {}
     return HttpResponse(render_to_string(template_name, dictionary, context_instance, namespace), **kwargs)

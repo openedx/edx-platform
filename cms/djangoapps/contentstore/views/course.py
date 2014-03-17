@@ -55,7 +55,7 @@ from contentstore import utils
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff
 from student import auth
 
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
            'settings_handler',
@@ -376,8 +376,15 @@ def create_new_course(request):
         metadata = {}
     else:
         metadata = {'display_name': display_name}
+
+    # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for existing xml courses this
+    # cannot be changed in CourseDescriptor.
+    wiki_slug = "{0}.{1}.{2}".format(dest_location.org, dest_location.course, dest_location.name)
+    definition_data = {'wiki_slug': wiki_slug}
+
     modulestore('direct').create_and_save_xmodule(
         dest_location,
+        definition_data=definition_data,
         metadata=metadata
     )
     new_course = modulestore('direct').get_item(dest_location)
@@ -535,7 +542,7 @@ def settings_handler(request, tag=None, package_id=None, branch=None, version_gu
 
         # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
         # course about page should be editable in Studio
-        about_page_editable = not MicrositeConfiguration.get_microsite_configuration_value_for_org(
+        about_page_editable = not microsite.get_value_for_org(
             course_module.location.org,
             'ENABLE_MKTG_SITE',
             settings.FEATURES.get('ENABLE_MKTG_SITE', False)

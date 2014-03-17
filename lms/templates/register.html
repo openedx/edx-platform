@@ -1,5 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from microsite_configuration.middleware import MicrositeConfiguration %>
+<%! from microsite_configuration import microsite %>
 
 <%inherit file="main.html" />
 
@@ -210,7 +210,7 @@
               <select id="education-level" name="level_of_education" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['level_of_education'] == 'required' else ''}>
                 <option value="">--</option>
                 %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
-                <option value="${code}">${ed_level}</option>
+                <option value="${code}">${_(ed_level)}</option>
                 %endfor
               </select>
             </div>
@@ -223,7 +223,7 @@
               <select id="gender" name="gender" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['gender'] == 'required' else ''}>
                 <option value="">--</option>
                 %for code, gender in UserProfile.GENDER_CHOICES:
-                <option value="${code}">${gender}</option>
+                <option value="${code}">${_(gender)}</option>
                 %endfor
               </select>
             </div>
@@ -314,7 +314,7 @@
 
 <%
   # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
-  sidebar_file = MicrositeConfiguration.get_microsite_template_path('register-sidebar.html')
+  sidebar_file = microsite.get_template_path('register-sidebar.html')
 %>
 
     <%include file="${sidebar_file}" />

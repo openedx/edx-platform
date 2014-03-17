@@ -8,10 +8,11 @@ from xmodule.modulestore.django import modulestore, loc_mapper, clear_existing_m
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, LocalId
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore import inheritance
 from xblock.core import XBlock
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TemplateTests(unittest.TestCase):
@@ -20,7 +21,9 @@ class TemplateTests(unittest.TestCase):
     """
 
     def setUp(self):
-        clear_existing_modulestores()
+        clear_existing_modulestores()  # redundant w/ cleanup but someone was getting errors
+        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections, 'split')
+        self.addCleanup(clear_existing_modulestores)
 
     def test_get_templates(self):
         found = templates.all_templates()
@@ -53,8 +56,10 @@ class TemplateTests(unittest.TestCase):
         self.assertIsNotNone(HtmlDescriptor.get_template('announcement.yaml'))
 
     def test_factories(self):
-        test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='tempcourse',
-            display_name='fun test course', user_id='testbot')
+        test_course = persistent_factories.PersistentCourseFactory.create(
+            course_id='testx.tempcourse', org='testx', prettyid='tempcourse',
+            display_name='fun test course', user_id='testbot'
+        )
         self.assertIsInstance(test_course, CourseDescriptor)
         self.assertEqual(test_course.display_name, 'fun test course')
         index_info = modulestore('split').get_course_index_info(test_course.location)
@@ -68,12 +73,20 @@ class TemplateTests(unittest.TestCase):
         test_course = modulestore('split').get_course(test_chapter.location)
         self.assertIn(test_chapter.location.block_id, test_course.children)
 
+        with self.assertRaises(DuplicateCourseError):
+            persistent_factories.PersistentCourseFactory.create(
+                course_id='testx.tempcourse', org='testx', prettyid='tempcourse',
+                display_name='fun test course', user_id='testbot'
+            )
+
     def test_temporary_xblocks(self):
         """
         Test using load_from_json to create non persisted xblocks
         """
-        test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='tempcourse',
-            display_name='fun test course', user_id='testbot')
+        test_course = persistent_factories.PersistentCourseFactory.create(
+            course_id='testx.tempcourse', org='testx', prettyid='tempcourse',
+            display_name='fun test course', user_id='testbot'
+        )
 
         test_chapter = self.load_from_json({'category': 'chapter',
             'fields': {'display_name': 'chapter n'}},
@@ -98,7 +111,7 @@ class TemplateTests(unittest.TestCase):
         try saving temporary xblocks
         """
         test_course = persistent_factories.PersistentCourseFactory.create(
-            org='testx', prettyid='tempcourse',
+            course_id='testx.tempcourse', org='testx', prettyid='tempcourse',
             display_name='fun test course', user_id='testbot')
         test_chapter = self.load_from_json({'category': 'chapter',
             'fields': {'display_name': 'chapter n'}},
@@ -135,7 +148,7 @@ class TemplateTests(unittest.TestCase):
 
     def test_delete_course(self):
         test_course = persistent_factories.PersistentCourseFactory.create(
-            org='testx',
+            course_id='edu.harvard.history.doomed', org='testx',
             prettyid='edu.harvard.history.doomed',
             display_name='doomed test course',
             user_id='testbot')
@@ -159,7 +172,7 @@ class TemplateTests(unittest.TestCase):
         Test get_block_generations
         """
         test_course = persistent_factories.PersistentCourseFactory.create(
-            org='testx',
+            course_id='edu.harvard.history.hist101', org='testx',
             prettyid='edu.harvard.history.hist101',
             display_name='history test course',
             user_id='testbot')

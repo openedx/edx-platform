@@ -7,7 +7,7 @@ experiencing mysterious problems with embargoing, please check that your
 reverse proxy is setting any of the well known client IP address headers (ex.,
 HTTP_X_FORWARDED_FOR).
 """
-
+import logging
 import pygeoip
 
 from django.core.exceptions import MiddlewareNotUsed
@@ -17,6 +17,8 @@ from ipware.ip import get_ip
 from util.request import course_id_from_url
 
 from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
+
+log = logging.getLogger(__name__)
 
 
 class EmbargoMiddleware(object):
@@ -45,10 +47,15 @@ class EmbargoMiddleware(object):
 
             # if blacklisted, immediately fail
             if ip_addr in IPFilter.current().blacklist_ips:
+                log.info("Embargo: Restricting IP address %s to course %s because IP is blacklisted.", ip_addr, course_id)
                 return redirect('embargo')
 
             country_code_from_ip = pygeoip.GeoIP(settings.GEOIP_PATH).country_code_by_addr(ip_addr)
             is_embargoed = country_code_from_ip in EmbargoedState.current().embargoed_countries_list
             # Fail if country is embargoed and the ip address isn't explicitly whitelisted
             if is_embargoed and ip_addr not in IPFilter.current().whitelist_ips:
+                log.info(
+                    "Embargo: Restricting IP address %s to course %s because IP is from country %s.",
+                    ip_addr, course_id, country_code_from_ip
+                )
                 return redirect('embargo')

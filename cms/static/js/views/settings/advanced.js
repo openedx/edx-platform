@@ -47,9 +47,11 @@ var AdvancedView = ValidatingView.extend({
 
         var self = this;
         var oldValue = $(textarea).val();
-        CodeMirror.fromTextArea(textarea, {
-            mode: "application/json", lineNumbers: false, lineWrapping: false,
-            onChange: function(instance, changeobj) {
+        var cm = CodeMirror.fromTextArea(textarea, {
+            mode: "application/json", 
+            lineNumbers: false, 
+            lineWrapping: false});
+        cm.on('change', function(instance, changeobj) {
                 instance.save();
                 // this event's being called even when there's no change :-(
                 if (instance.getValue() !== oldValue) {
@@ -58,11 +60,11 @@ var AdvancedView = ValidatingView.extend({
                                              _.bind(self.saveView, self),
                                              _.bind(self.revertView, self));
                 }
-            },
-            onFocus : function(mirror) {
+            });
+        cm.on('focus', function(mirror) {
               $(textarea).parent().children('label').addClass("is-focused");
-            },
-            onBlur: function (mirror) {
+            });
+        cm.on('blur', function (mirror) {
                 $(textarea).parent().children('label').removeClass("is-focused");
                 var key = $(mirror.getWrapperElement()).closest('.field-group').children('.key').attr('id');
                 var stringValue = $.trim(mirror.getValue());
@@ -91,8 +93,7 @@ var AdvancedView = ValidatingView.extend({
                 if (JSONValue !== undefined) {
                     self.model.set(key, JSONValue);
                 }
-            }
-        });
+            });
     },
     saveView : function() {
         // TODO one last verification scan:

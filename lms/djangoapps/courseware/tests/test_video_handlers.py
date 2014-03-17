@@ -110,7 +110,7 @@ class TestVideo(BaseTestXmodule):
         data = [
             {'speed': 2.0},
             {'saved_video_position': "00:00:10"},
-            {'transcript_language': json.dumps('uk')},
+            {'transcript_language': 'uk'},
         ]
         for sample in data:
             response = self.clients[self.users[0].username].post(
@@ -129,7 +129,7 @@ class TestVideo(BaseTestXmodule):
         self.assertEqual(self.item_descriptor.saved_video_position, timedelta(0, 10))
 
         self.assertEqual(self.item_descriptor.transcript_language, 'en')
-        self.item_descriptor.handle_ajax('save_user_state', {'transcript_language': json.dumps("uk")})
+        self.item_descriptor.handle_ajax('save_user_state', {'transcript_language': "uk"})
         self.assertEqual(self.item_descriptor.transcript_language, 'uk')
 
     def tearDown(self):
@@ -161,6 +161,8 @@ class TestVideoTranscriptTranslation(TestVideo):
         self.item_descriptor.render('student_view')
         self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
 
+    # Tests for `download` dispatch:
+
     def test_language_is_not_supported(self):
         request = Request.blank('/download?language=ru')
         response = self.item.transcript(request=request, dispatch='download')
@@ -171,24 +173,47 @@ class TestVideoTranscriptTranslation(TestVideo):
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.status, '404 Not Found')
 
-    @patch('xmodule.video_module.VideoModule.get_transcript', return_value='Subs!')
-    def test_download_exist(self, __):
+    @patch('xmodule.video_module.VideoModule.get_transcript', return_value=('Subs!', 'srt', 'application/x-subrip'))
+    def test_download_srt_exist(self, __):
         request = Request.blank('/download?language=en')
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.body, 'Subs!')
+        self.assertEqual(response.headers['Content-Type'], 'application/x-subrip')
+
+    @patch('xmodule.video_module.VideoModule.get_transcript', return_value=('Subs!', 'txt', 'text/plain'))
+    def test_download_txt_exist(self, __):
+        self.item.transcript_format = 'txt'
+        request = Request.blank('/download?language=en')
+        response = self.item.transcript(request=request, dispatch='download')
+        self.assertEqual(response.body, 'Subs!')
+        self.assertEqual(response.headers['Content-Type'], 'text/plain')
+
+    def test_download_en_no_sub(self):
+        request = Request.blank('/download?language=en')
+        response = self.item.transcript(request=request, dispatch='download')
+        self.assertEqual(response.status, '404 Not Found')
+        with self.assertRaises(NotFoundError):
+            self.item.get_transcript()
+
+    # Tests for `translation` dispatch:
 
     def test_translation_fails(self):
-        # No videoId
-        request = Request.blank('/translation?language=ru')
+        # No language
+        request = Request.blank('/translation')
         response = self.item.transcript(request=request, dispatch='translation')
         self.assertEqual(response.status, '400 Bad Request')
+
+        # No videoId - HTML5 video with language that is not in available languages
+        request = Request.blank('/translation?language=ru')
+        response = self.item.transcript(request=request, dispatch='translation')
+        self.assertEqual(response.status, '404 Not Found')
 
         # Language is not in available languages
         request = Request.blank('/translation?language=ru&videoId=12345')
         response = self.item.transcript(request=request, dispatch='translation')
         self.assertEqual(response.status, '404 Not Found')
 
-    def test_translaton_en_success(self):
+    def test_translaton_en_youtube_success(self):
         subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
         good_sjson = _create_file(json.dumps(subs))
         _upload_sjson_file(good_sjson, self.item_descriptor.location)
@@ -199,25 +224,7 @@ class TestVideoTranscriptTranslation(TestVideo):
         response = self.item.transcript(request=request, dispatch='translation')
         self.assertDictEqual(json.loads(response.body), subs)
 
-    def test_translaton_non_en_non_youtube_success(self):
-        subs = {
-            u'end': [100],
-            u'start': [12],
-            u'text': [
-            u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
-            ]
-        }
-        self.non_en_file.seek(0)
-        _upload_file(self.non_en_file, self.item_descriptor.location, os.path.split(self.non_en_file.name)[1])
-        subs_id = _get_subs_id(self.non_en_file.name)
-
-        # manually clean youtube_id_1_0, as it has default value
-        self.item.youtube_id_1_0 = ""
-        request = Request.blank('/translation?language=uk&videoId={}'.format(subs_id))
-        response = self.item.transcript(request=request, dispatch='translation')
-        self.assertDictEqual(json.loads(response.body), subs)
-
-    def test_translation_non_en_youtube(self):
+    def test_translation_non_en_youtube_success(self):
         subs = {
             u'end': [100],
             u'start': [12],
@@ -259,6 +266,34 @@ class TestVideoTranscriptTranslation(TestVideo):
         }
         self.assertDictEqual(json.loads(response.body), calculated_1_5)
 
+    def test_translaton_en_html5_success(self):
+        subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
+        good_sjson = _create_file(json.dumps(subs))
+        _upload_sjson_file(good_sjson, self.item_descriptor.location)
+        subs_id = _get_subs_id(good_sjson.name)
+
+        self.item.sub = subs_id
+        request = Request.blank('/translation?language=en')
+        response = self.item.transcript(request=request, dispatch='translation')
+        self.assertDictEqual(json.loads(response.body), subs)
+
+    def test_translaton_non_en_html5_success(self):
+        subs = {
+            u'end': [100],
+            u'start': [12],
+            u'text': [
+            u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+            ]
+        }
+        self.non_en_file.seek(0)
+        _upload_file(self.non_en_file, self.item_descriptor.location, os.path.split(self.non_en_file.name)[1])
+
+        # manually clean youtube_id_1_0, as it has default value
+        self.item.youtube_id_1_0 = ""
+        request = Request.blank('/translation?language=uk')
+        response = self.item.transcript(request=request, dispatch='translation')
+        self.assertDictEqual(json.loads(response.body), subs)
+
 
 class TestVideoTranscriptsDownload(TestVideo):
     """
@@ -283,7 +318,7 @@ class TestVideoTranscriptsDownload(TestVideo):
         self.item_descriptor.render('student_view')
         self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
 
-    def test_good_transcript(self):
+    def test_good_srt_transcript(self):
         good_sjson = _create_file(content=textwrap.dedent("""\
                 {
                   "start": [
@@ -303,7 +338,7 @@ class TestVideoTranscriptsDownload(TestVideo):
 
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.sub = _get_subs_id(good_sjson.name)
-        text = self.item.get_transcript()
+        text, format, download = self.item.get_transcript()
         expected_text = textwrap.dedent("""\
             0
             00:00:00,270 --> 00:00:02,720
@@ -314,6 +349,33 @@ class TestVideoTranscriptsDownload(TestVideo):
             Let&#39;s start with what is on your screen right now.
 
             """)
+
+        self.assertEqual(text, expected_text)
+
+    def test_good_txt_transcript(self):
+        good_sjson = _create_file(content=textwrap.dedent("""\
+                {
+                  "start": [
+                    270,
+                    2720
+                  ],
+                  "end": [
+                    2720,
+                    5430
+                  ],
+                  "text": [
+                    "Hi, welcome to Edx.",
+                    "Let&#39;s start with what is on your screen right now."
+                  ]
+                }
+            """))
+
+        _upload_sjson_file(good_sjson, self.item.location)
+        self.item.sub = _get_subs_id(good_sjson.name)
+        text, format, mime_type = self.item.get_transcript(format="txt")
+        expected_text = textwrap.dedent("""\
+            Hi, welcome to Edx.
+            Let's start with what is on your screen right now.""")
 
         self.assertEqual(text, expected_text)
 

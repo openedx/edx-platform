@@ -9,7 +9,7 @@
                     'getPlayerState', 'getVolume', 'setVolume',
                     'loadVideoById', 'getAvailablePlaybackRates', 'playVideo',
                     'pauseVideo', 'seekTo', 'getDuration', 'setPlaybackRate',
-                    'getPlaybackQuality'
+                    'getPlaybackQuality', 'destroy'
                 ]
             );
 
@@ -238,13 +238,21 @@
                     'alignByWidthOnly',
                     'alignByHeightOnly',
                     'setParams',
-                    'setMode'
+                    'setMode',
+                    'setElement'
                 ],
-                obj = {};
+                obj = {},
+                delta = {
+                    add: jasmine.createSpy().andReturn(obj),
+                    substract: jasmine.createSpy().andReturn(obj),
+                    reset: jasmine.createSpy().andReturn(obj)
+                };
 
             $.each(methods, function (index, method) {
                 obj[method] = jasmine.createSpy(method).andReturn(obj);
             });
+
+            obj.delta = delta;
 
             return obj;
         }());
@@ -253,8 +261,8 @@
         return state;
     };
 
-    jasmine.initializePlayerYouTube = function () {
+    jasmine.initializePlayerYouTube = function (params) {
         // "video.html" contains HTML template for a YouTube video.
-        return jasmine.initializePlayer('video.html');
+        return jasmine.initializePlayer('video.html', params);
     };
 }).call(this, window.jQuery);

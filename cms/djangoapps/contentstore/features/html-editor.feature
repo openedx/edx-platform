@@ -19,3 +19,9 @@ Feature: CMS.HTML Editor
     Given I have created an E-text Written in LaTeX
     When I edit and select Settings
     Then Edit High Level Source is visible
+
+  Scenario: TinyMCE image plugin sets urls correctly
+    Given I have created a Blank HTML Page
+    When I edit the page and select the Visual Editor
+    And I add an image with a static link via the Image Plugin Icon
+    Then the image static link is rewritten to translate the path

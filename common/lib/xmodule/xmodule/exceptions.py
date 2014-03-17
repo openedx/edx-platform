@@ -31,3 +31,10 @@ class SerializationError(Exception):
     def __init__(self, location, msg):
         super(SerializationError, self).__init__(msg)
         self.location = location
+
+
+class UndefinedContext(Exception):
+    """
+    Tried to access an xmodule field which needs a different context (runtime) to have a value.
+    """
+    pass

@@ -35,6 +35,8 @@ function (HTML5Video, Resizer) {
             play: play,
             setPlaybackRate: setPlaybackRate,
             update: update,
+            figureOutStartEndTime: figureOutStartEndTime,
+            figureOutStartingTime: figureOutStartingTime,
             updatePlayTime: updatePlayTime
         };
 
@@ -62,7 +64,7 @@ function (HTML5Video, Resizer) {
     //     via the 'state' object. Much easier to work this way - you don't
     //     have to do repeated jQuery element selects.
     function _initialize(state) {
-        var youTubeId, player, duration;
+        var youTubeId, player;
 
         // The function is called just once to apply pre-defined configurations
         // by student before video starts playing. Waits until the video's
@@ -71,7 +73,7 @@ function (HTML5Video, Resizer) {
         state.videoPlayer.ready = _.once(function () {
             $(window).on('unload', state.saveState);
 
-            if (state.currentPlayerMode !== 'flash') {
+            if (!state.isFlashMode()) {
                 state.videoPlayer.setPlaybackRate(state.speed);
             }
             state.videoPlayer.player.setVolume(state.currentVolume);
@@ -98,7 +100,7 @@ function (HTML5Video, Resizer) {
             modestbranding: 1
         };
 
-        if (state.currentPlayerMode !== 'flash') {
+        if (!state.isFlashMode()) {
             state.videoPlayer.playerVars.html5 = 1;
         }
 
@@ -134,30 +136,12 @@ function (HTML5Video, Resizer) {
 
                 _resize(state, videoWidth, videoHeight);
 
-                duration = state.videoPlayer.duration();
-
-                state.trigger(
-                    'videoControl.updateVcrVidTime',
-                    {
-                        time: 0,
-                        duration: duration
-                    }
-                );
-
-                state.trigger(
-                    'videoProgressSlider.updateStartEndTimeRegion',
-                    {
-                        duration: duration
-                    }
-                );
+                _updateVcrAndRegion(state);
             }, false);
 
         } else { // if (state.videoType === 'youtube') {
-            if (state.currentPlayerMode === 'flash') {
-                youTubeId = state.youtubeId();
-            } else {
-                youTubeId = state.youtubeId('1.0');
-            }
+            youTubeId = state.youtubeId();
+
             state.videoPlayer.player = new YT.Player(state.id, {
                 playerVars: state.videoPlayer.playerVars,
                 videoId: youTubeId,
@@ -175,22 +159,7 @@ function (HTML5Video, Resizer) {
                     videoHeight = player.attr('height') || player.height();
 
                 _resize(state, videoWidth, videoHeight);
-
-                // After initialization, update the VCR with total time.
-                // At this point only the metadata duration is available (not
-                // very precise), but it is better than having 00:00:00 for
-                // total time.
-                if (state.youtubeMetadataReceived) {
-                    // Metadata was already received, and is available.
-                    _updateVcrAndRegion(state);
-                } else {
-                    // We wait for metadata to arrive, before we request the update
-                    // of the VCR video time, and of the start-end time region.
-                    // Metadata contains duration of the video.
-                    state.el.on('metadata_received', function () {
-                        _updateVcrAndRegion(state);
-                    });
-                }
+                _updateVcrAndRegion(state, true);
             });
         }
 
@@ -198,31 +167,60 @@ function (HTML5Video, Resizer) {
             dfd.resolve();
         }
     }
+    function _updateVcrAndRegion(state, isYoutube) {
+        var update = function (state) {
+            var duration = state.videoPlayer.duration(),
+                time;
 
-    function _updateVcrAndRegion(state) {
-        var duration = state.videoPlayer.duration();
+            time = state.videoPlayer.figureOutStartingTime(duration);
 
-        state.trigger(
-            'videoControl.updateVcrVidTime',
-            {
-                time: 0,
-                duration: duration
-            }
-        );
+            // Update the VCR.
+            state.trigger(
+                'videoControl.updateVcrVidTime',
+                {
+                    time: time,
+                    duration: duration
+                }
+            );
 
-        state.trigger(
-            'videoProgressSlider.updateStartEndTimeRegion',
-            {
-                duration: duration
-            }
-        );
+            // Update the time slider.
+            state.trigger(
+                'videoProgressSlider.updateStartEndTimeRegion',
+                {
+                    duration: duration
+                }
+            );
+            state.trigger(
+                'videoProgressSlider.updatePlayTime',
+                {
+                    time: time,
+                    duration: duration
+                }
+            );
+        };
+
+        // After initialization, update the VCR with total time.
+        // At this point only the metadata duration is available (not
+        // very precise), but it is better than having 00:00:00 for
+        // total time.
+        if (state.youtubeMetadataReceived || !isYoutube) {
+            // Metadata was already received, and is available.
+            update(state);
+        } else {
+            // We wait for metadata to arrive, before we request the update
+            // of the VCR video time, and of the start-end time region.
+            // Metadata contains duration of the video.
+            state.el.on('metadata_received', function () {
+                update(state);
+            });
+        }
     }
 
     function _resize(state, videoWidth, videoHeight) {
         state.resizer = new Resizer({
                 element: state.videoEl,
                 elementRatio: videoWidth/videoHeight,
-                container: state.videoEl.parent()
+                container: state.container
             })
             .callbacks.once(function() {
                 state.trigger('videoCaption.resize', null);
@@ -236,7 +234,11 @@ function (HTML5Video, Resizer) {
             });
         }
 
-        $(window).bind('resize', _.debounce(state.resizer.align, 100));
+        $(window).on('resize', _.debounce(function () {
+            state.trigger('videoControl.updateControlsHeight', null);
+            state.trigger('videoCaption.resize', null);
+            state.resizer.align();
+        }, 100));
     }
 
     // function _restartUsingFlash(state)
@@ -267,6 +269,10 @@ function (HTML5Video, Resizer) {
                     .onPlaybackQualityChange
             }
         });
+
+        _updateVcrAndRegion(state, true);
+        state.trigger('videoCaption.fetchCaption', null);
+        state.resizer.setElement(state.el.find('iframe')).align();
     }
 
     // ***************************************************************
@@ -343,7 +349,7 @@ function (HTML5Video, Resizer) {
             // where in Firefox speed switching to 1.0 in HTML5 player mode is
             // handled incorrectly by YouTube API.
             methodName = 'cueVideoById';
-            youtubeId = this.youtubeId();
+            youtubeId = this.youtubeId(newSpeed);
 
             if (this.videoPlayer.isPlaying()) {
                 methodName = 'loadVideoById';
@@ -355,10 +361,9 @@ function (HTML5Video, Resizer) {
     }
 
     function onSpeedChange(newSpeed) {
-        var time = this.videoPlayer.currentTime,
-            isFlash = this.currentPlayerMode === 'flash';
+        var time = this.videoPlayer.currentTime;
 
-        if (isFlash) {
+        if (this.isFlashMode()) {
             this.videoPlayer.currentTime = Time.convert(
                 time,
                 parseFloat(this.speed),
@@ -462,7 +467,7 @@ function (HTML5Video, Resizer) {
         this.videoPlayer.log(
             'pause_video',
             {
-                'currentTime': this.videoPlayer.currentTime
+                currentTime: this.videoPlayer.currentTime
             }
         );
 
@@ -483,7 +488,7 @@ function (HTML5Video, Resizer) {
         this.videoPlayer.log(
             'play_video',
             {
-                'currentTime': this.videoPlayer.currentTime
+                currentTime: this.videoPlayer.currentTime
             }
         );
 
@@ -553,8 +558,19 @@ function (HTML5Video, Resizer) {
             }
         );
 
+        // Because of a recent change in the YouTube API (not documented), sometimes
+        // HTML5 mode loads after Flash mode has been loaded. In this case we have
+        // multiple speeds available but the variable `this.currentPlayerMode` is
+        // set to "flash". This is impossible because in Flash mode we can have
+        // only one speed available. Therefore we must execute the following code
+        // block if we have multiple speeds or if `this.currentPlayerMode` is set to
+        // "html5". If any of the two conditions are true, we then set the variable
+        // `this.currentPlayerMode` to "html5".
+        //
+        // For more information, please see the PR that introduced this change:
+        //     https://github.com/edx/edx-platform/pull/2841
         if (
-            this.currentPlayerMode === 'html5' &&
+            (this.currentPlayerMode === 'html5' || availablePlaybackRates.length > 1) &&
             this.videoType === 'youtube'
         ) {
             if (availablePlaybackRates.length === 1 && !this.isTouch) {
@@ -568,6 +584,8 @@ function (HTML5Video, Resizer) {
 
                 _restartUsingFlash(this);
             } else if (availablePlaybackRates.length > 1) {
+                this.currentPlayerMode = 'html5';
+
                 // We need to synchronize available frame rates with the ones
                 // that the user specified.
 
@@ -598,6 +616,11 @@ function (HTML5Video, Resizer) {
                 this.setSpeed(this.speed);
                 this.trigger('videoSpeedControl.setSpeed', this.speed);
             }
+        }
+
+        if (this.isFlashMode()) {
+            this.setSpeed(this.speed);
+            this.trigger('videoSpeedControl.setSpeed', this.speed);
         }
 
         if (this.currentPlayerMode === 'html5') {
@@ -642,62 +665,46 @@ function (HTML5Video, Resizer) {
         }
     }
 
-    function updatePlayTime(time) {
-        var videoPlayer = this.videoPlayer,
-            duration = this.videoPlayer.duration(),
-            savedVideoPosition = this.config.savedVideoPosition,
-            youTubeId, startTime, endTime;
+    function figureOutStartEndTime(duration) {
+        var videoPlayer = this.videoPlayer;
 
-        if (duration > 0 && videoPlayer.goToStartTime) {
-            videoPlayer.goToStartTime = false;
+        videoPlayer.startTime = this.config.startTime;
+        if (videoPlayer.startTime >= duration) {
+            videoPlayer.startTime = 0;
+        } else if (this.isFlashMode()) {
+            videoPlayer.startTime /= Number(this.speed);
+        }
 
-            videoPlayer.startTime = this.config.startTime;
-            if (videoPlayer.startTime >= duration) {
-                videoPlayer.startTime = 0;
-            } else if (this.currentPlayerMode === 'flash') {
-                videoPlayer.startTime /= Number(this.speed);
-            }
+        videoPlayer.endTime = this.config.endTime;
+        if (
+            videoPlayer.endTime <= videoPlayer.startTime ||
+            videoPlayer.endTime >= duration
+        ) {
+            videoPlayer.stopAtEndTime = false;
+            videoPlayer.endTime = null;
+        } else if (this.isFlashMode()) {
+            videoPlayer.endTime /= Number(this.speed);
+        }
+    }
 
-            videoPlayer.endTime = this.config.endTime;
+    function figureOutStartingTime(duration) {
+        var savedVideoPosition = this.config.savedVideoPosition,
+
+            // Default starting time is 0. This is the case when
+            // there is not start-time, no previously saved position,
+            // or one (or both) of those values is incorrect.
+            time = 0,
+
+            startTime, endTime;
+
+        this.videoPlayer.figureOutStartEndTime(duration);
+
+        startTime = this.videoPlayer.startTime;
+        endTime   = this.videoPlayer.endTime;
+
+        if (startTime > 0) {
             if (
-                videoPlayer.endTime <= videoPlayer.startTime ||
-                videoPlayer.endTime >= duration
-            ) {
-                videoPlayer.stopAtEndTime = false;
-                videoPlayer.endTime = null;
-            } else if (this.currentPlayerMode === 'flash') {
-                videoPlayer.endTime /= Number(this.speed);
-            }
-
-            this.trigger(
-                'videoProgressSlider.updateStartEndTimeRegion',
-                {
-                    duration: duration
-                }
-            );
-
-            startTime = videoPlayer.startTime;
-            endTime = videoPlayer.endTime;
-
-            if (startTime) {
-                if (
-                    startTime < savedVideoPosition &&
-                    (endTime > savedVideoPosition || endTime === null) &&
-
-                    // We do not want to jump to the end of the video.
-                    // We subtract 1 from the duration for a 1 second
-                    // safety net.
-                    savedVideoPosition < duration - 1
-                ) {
-                    time = savedVideoPosition;
-
-                    // When the video finishes playing, we will start from the
-                    // start-time, rather than from the remembered position
-                    this.config.savedVideoPosition = 0;
-                } else {
-                    time = startTime;
-                }
-            } else if (
+                startTime < savedVideoPosition &&
                 (endTime > savedVideoPosition || endTime === null) &&
 
                 // We do not want to jump to the end of the video.
@@ -706,13 +713,47 @@ function (HTML5Video, Resizer) {
                 savedVideoPosition < duration - 1
             ) {
                 time = savedVideoPosition;
-
-                // When the video finishes playing, we will start from the
-                // start-time, rather than from the remembered position
-                this.config.savedVideoPosition = 0;
             } else {
-                time = 0;
+                time = startTime;
             }
+        } else if (
+            savedVideoPosition > 0 &&
+            (endTime > savedVideoPosition || endTime === null) &&
+
+            // We do not want to jump to the end of the video.
+            // We subtract 1 from the duration for a 1 second
+            // safety net.
+            savedVideoPosition < duration - 1
+        ) {
+            time = savedVideoPosition;
+        }
+
+        return time;
+    }
+
+    function updatePlayTime(time) {
+        var videoPlayer = this.videoPlayer,
+            duration = this.videoPlayer.duration(),
+            youTubeId;
+
+        if (duration > 0 && videoPlayer.goToStartTime) {
+            videoPlayer.goToStartTime = false;
+
+            // The duration might have changed. Update the start-end time region to
+            // reflect this fact.
+            this.trigger(
+                'videoProgressSlider.updateStartEndTimeRegion',
+                {
+                    duration: duration
+                }
+            );
+
+            time = videoPlayer.figureOutStartingTime(duration);
+
+            // When the video finishes playing, we will start from the
+            // start-time, or from the beginning (rather than from the remembered
+            // position).
+            this.config.savedVideoPosition = 0;
 
             if (time > 0) {
                 // After a bug came up (BLD-708: "In Firefox YouTube video with
@@ -726,11 +767,7 @@ function (HTML5Video, Resizer) {
                 // HTML5 video sources play fine from start-time in both Chrome
                 // and Firefox.
                 if (this.browserIsFirefox && this.videoType === 'youtube') {
-                    if (this.currentPlayerMode === 'flash') {
-                        youTubeId = this.youtubeId();
-                    } else {
-                        youTubeId = this.youtubeId('1.0');
-                    }
+                    youTubeId = this.youtubeId();
 
                     // When we will call cueVideoById() for some strange reason
                     // an ENDED event will be fired. It really does no damage
@@ -846,8 +883,7 @@ function (HTML5Video, Resizer) {
 
         // Default parameters that always get logged.
         logInfo = {
-            'id':   this.id,
-            'code': this.youtubeId()
+            id:   this.id
         };
 
         // If extra parameters were passed to the log.

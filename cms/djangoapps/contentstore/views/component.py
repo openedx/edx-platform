@@ -23,11 +23,10 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
-from xmodule.x_module import prefer_xmodules
 
 from lms.lib.xblock.runtime import unquote_slashes
 
-from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState
+from contentstore.utils import get_lms_link_for_item, compute_publish_state, PublishState, get_modulestore
 from contentstore.views.helpers import get_parent_xblock
 
 from models.settings.course_grading import CourseGradingModel
@@ -108,8 +107,8 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
         can_view_live = False
         subsection_units = item.get_children()
         for unit in subsection_units:
-            state = compute_unit_state(unit)
-            if state == UnitState.public or state == UnitState.draft:
+            state = compute_publish_state(unit)
+            if state in (PublishState.public, PublishState.draft):
                 can_view_live = True
                 break
 
@@ -283,7 +282,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             ),
             'section': containing_section,
             'new_unit_category': 'vertical',
-            'unit_state': compute_unit_state(item),
+            'unit_state': compute_publish_state(item),
             'published_date': (
                 get_default_time_display(item.published_date)
                 if item.published_date is not None else None
@@ -307,16 +306,24 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
         try:
-            old_location, course, xblock, __ = _get_item_in_course(request, locator)
+            __, course, xblock, __ = _get_item_in_course(request, locator)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
-        parent_xblock = get_parent_xblock(xblock)
+
+        ancestor_xblocks = []
+        parent = get_parent_xblock(xblock)
+        while parent and parent.category != 'sequential':
+            ancestor_xblocks.append(parent)
+            parent = get_parent_xblock(parent)
+
+        ancestor_xblocks.reverse()
 
         return render_to_response('container.html', {
             'context_course': course,
             'xblock': xblock,
             'xblock_locator': locator,
-            'parent_xblock': parent_xblock,
+            'unit': None if not ancestor_xblocks else ancestor_xblocks[0],
+            'ancestor_xblocks': ancestor_xblocks,
         })
     else:
         return HttpResponseBadRequest("Only supports html requests")
@@ -359,7 +366,7 @@ def component_handler(request, usage_id, handler, suffix=''):
 
     location = unquote_slashes(usage_id)
 
-    descriptor = modulestore().get_item(location)
+    descriptor = get_modulestore(location).get_item(location)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 
@@ -370,6 +377,8 @@ def component_handler(request, usage_id, handler, suffix=''):
         log.info("XBlock %s attempted to access missing handler %r", descriptor, handler, exc_info=True)
         raise Http404
 
-    modulestore().save_xmodule(descriptor)
+    # unintentional update to handle any side effects of handle call; so, request user didn't author
+    # the change
+    get_modulestore(location).update_item(descriptor, None)
 
     return webob_to_django_response(resp)

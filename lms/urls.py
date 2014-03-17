@@ -375,6 +375,19 @@ if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA
             include('instructor.views.api_urls'))
     )
 
+if settings.FEATURES.get('CLASS_DASHBOARD'):
+    urlpatterns += (
+        # Json request data for metrics for entire course
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/all_sequential_open_distrib$',
+            'class_dashboard.views.all_sequential_open_distrib', name="all_sequential_open_distrib"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/all_problem_grade_distribution$',
+            'class_dashboard.views.all_problem_grade_distribution', name="all_problem_grade_distribution"),
+
+        # Json request data for metrics for particular section
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/problem_grade_distribution/(?P<section>\d+)$',
+            'class_dashboard.views.section_problem_grade_distrib', name="section_problem_grade_distrib"),
+    )
+
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     ## Jasmine and admin
     urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
@@ -473,6 +486,12 @@ if settings.FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
 if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
+    )
+
+# Third-party auth.
+if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    urlpatterns += (
+        url(r'', include('third_party_auth.urls')),
     )
 
 urlpatterns = patterns(*urlpatterns)

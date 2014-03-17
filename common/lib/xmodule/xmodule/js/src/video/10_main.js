@@ -42,6 +42,7 @@ require(
 [
     'video/01_initialize.js',
     'video/025_focus_grabber.js',
+    'video/035_video_accessible_menu.js',
     'video/04_video_control.js',
     'video/05_video_quality_control.js',
     'video/06_video_progress_slider.js',
@@ -52,6 +53,7 @@ require(
 function (
     Initialize,
     FocusGrabber,
+    VideoAccessibleMenu,
     VideoControl,
     VideoQualityControl,
     VideoProgressSlider,
@@ -87,6 +89,7 @@ function (
 
         state.modules = [
             FocusGrabber,
+            VideoAccessibleMenu,
             VideoControl,
             VideoQualityControl,
             VideoProgressSlider,

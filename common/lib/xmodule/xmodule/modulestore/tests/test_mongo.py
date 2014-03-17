@@ -37,6 +37,9 @@ RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
 
 class TestMongoModuleStore(object):
     '''Tests!'''
+    # Explicitly list the courses to load (don't want the big one)
+    courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
+
     @classmethod
     def setupClass(cls):
         cls.connection = pymongo.MongoClient(
@@ -56,6 +59,7 @@ class TestMongoModuleStore(object):
     def teardownClass(cls):
         if cls.connection:
             cls.connection.drop_database(DB)
+            cls.connection.close()
 
     @staticmethod
     def initdb():
@@ -73,9 +77,7 @@ class TestMongoModuleStore(object):
         # Also test draft store imports
         #
         draft_store = DraftModuleStore(doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
-        # Explicitly list the courses to load (don't want the big one)
-        courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
-        import_from_xml(store, DATA_DIR, courses, draft_store=draft_store, static_content_store=content_store)
+        import_from_xml(store, DATA_DIR, TestMongoModuleStore.courses, draft_store=draft_store, static_content_store=content_store)
 
         # also test a course with no importing of static content
         import_from_xml(
@@ -272,6 +274,42 @@ class TestMongoModuleStore(object):
             {'displayname': 'hello'}
         )
 
+    def test_get_courses_for_wiki(self):
+        """
+        Test the get_courses_for_wiki method
+        """
+        for course_number in self.courses:
+            course_locations = self.store.get_courses_for_wiki(course_number)
+            assert_equals(len(course_locations), 1)
+            assert_equals(Location('i4x', 'edX', course_number, 'course', '2012_Fall'), course_locations[0])
+
+        course_locations = self.store.get_courses_for_wiki('no_such_wiki')
+        assert_equals(len(course_locations), 0)
+
+        # set toy course to share the wiki with simple course
+        toy_course = self.store.get_course('edX/toy/2012_Fall')
+        toy_course.wiki_slug = 'simple'
+        self.store.update_item(toy_course)
+
+        # now toy_course should not be retrievable with old wiki_slug
+        course_locations = self.store.get_courses_for_wiki('toy')
+        assert_equals(len(course_locations), 0)
+
+        # but there should be two courses with wiki_slug 'simple'
+        course_locations = self.store.get_courses_for_wiki('simple')
+        assert_equals(len(course_locations), 2)
+        for course_number in ['toy', 'simple']:
+            assert_in(Location('i4x', 'edX', course_number, 'course', '2012_Fall'), course_locations)
+
+        # configure simple course to use unique wiki_slug.
+        simple_course = self.store.get_course('edX/simple/2012_Fall')
+        simple_course.wiki_slug = 'edX.simple.2012_Fall'
+        self.store.update_item(simple_course)
+        # it should be retrievable with its new wiki_slug
+        course_locations = self.store.get_courses_for_wiki('edX.simple.2012_Fall')
+        assert_equals(len(course_locations), 1)
+        assert_in(Location('i4x', 'edX', 'simple', 'course', '2012_Fall'), course_locations)
+
 
 class TestMongoKeyValueStore(object):
     """
@@ -299,7 +337,7 @@ class TestMongoKeyValueStore(object):
             assert_false(self.kvs.has(key))
 
     def test_read_non_dict_data(self):
-        self.kvs._data = 'xml_data'
+        self.kvs = MongoKeyValueStore('xml_data', self.children, self.metadata)
         assert_equals('xml_data', self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'data')))
 
     def _check_write(self, key, value):
@@ -312,7 +350,7 @@ class TestMongoKeyValueStore(object):
         yield (self._check_write, KeyValueStore.Key(Scope.settings, None, None, 'meta'), 'new_settings')
 
     def test_write_non_dict_data(self):
-        self.kvs._data = 'xml_data'
+        self.kvs = MongoKeyValueStore('xml_data', self.children, self.metadata)
         self._check_write(KeyValueStore.Key(Scope.content, None, None, 'data'), 'new_data')
 
     def test_write_invalid_scope(self):

@@ -93,6 +93,10 @@ We strongly recommend that you associate a timed transcript with your video. Tra
 
 In addition to your .srt file, you can provide other transcripts with your video. For example, you can provide downloadable transcripts in a text format such as .txt or .pdf, and you can provide transcripts in different languages. For more information, see :ref:`Additional Transcripts`. 
 
+If you provide transcripts for students to download, a **Download transcript** button appears under the video. Students can then select either **SubRip (.srt) file** or **Text (.txt) file** to download the .srt or .txt transcript.
+
+.. image:: Images/transcript-download.png
+
 .. note:: Some past courses have used .sjson files for video transcripts. If transcripts in your course uses this format, see :ref:`Steps for sjson files`. We don't recommend that you use .sjson files.
 
 
@@ -184,7 +188,7 @@ The following options appear on the **Advanced** tab in the Video component.
 
 * **Display Name**: The name that you want your students to see. This is the same as the **Display Name** field on the **Basic** tab.
 
-* **Download Transcript**: The URL for the transcript file for the video. This file is usually an .srt file, but can also be a .txt or .pdf file. (For more information aobut .txt and .pdf files, see :ref:`Additional Transcripts`.) The URL can be an external URL, such as **http://example.org/transcript.srt**, or the URL for a file that you've uploaded to your **Files & Uploads** page, such as **/static/example.srt**.
+* **Download Transcript**: The URL for the transcript file for the video. This file is usually an .srt file, but can also be a .txt or .pdf file. (For more information about .txt and .pdf files, see :ref:`Additional Transcripts`.) The URL can be an external URL, such as **http://example.org/transcript.srt**, or the URL for a file that you've uploaded to your **Files & Uploads** page, such as **/static/example.srt**.
 
   This setting is related to **Transcript Download Allowed**. 
 
@@ -282,6 +286,6 @@ If your course uses .sjson files, you'll upload the .sjson file for the video to
       https://s3.amazonaws.com/edx-course-videos/edx-edx101/EDXSPCPJSP13-G030300.mp4
 
 #. Click the **Advanced** tab.
-#. In the **HTML5 Transcript** field, enter the file name of your video. Do not include "subs\_" or ".sjson". For the example in step 2, you would only enter **Lecture1a**.
+#. In the **Transcript (primary)** field, enter the file name of your video. Do not include `subs_` or `.sjson`. For the example in step 2, you would only enter **Lecture1a**.
 #. Set the other options that you want.
 #. Click **Save**.

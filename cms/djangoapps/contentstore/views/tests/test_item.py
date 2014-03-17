@@ -15,6 +15,7 @@ from django.test.client import RequestFactory
 from contentstore.views.component import component_handler
 
 from contentstore.tests.utils import CourseTestCase
+from contentstore.utils import compute_publish_state, PublishState
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.django import modulestore
@@ -131,6 +132,47 @@ class GetItem(ItemTest):
 
         # Verify that the Studio element wrapper has been added
         self.assertIn('level-element', html)
+
+    def test_get_container_nested_container_fragment(self):
+        """
+        Test the case of the container page containing a link to another container page.
+        """
+        # Add a wrapper with child beneath a child vertical
+        root_locator = self._create_vertical()
+
+        resp = self.create_xblock(parent_locator=root_locator, category="wrapper")
+        self.assertEqual(resp.status_code, 200)
+        wrapper_locator = self.response_locator(resp)
+
+        resp = self.create_xblock(parent_locator=wrapper_locator, category='problem', boilerplate='multiplechoice.yaml')
+        self.assertEqual(resp.status_code, 200)
+
+        # Get the preview HTML and verify the View -> link is present.
+        html, __ = self._get_container_preview(root_locator)
+        self.assertIn('wrapper-xblock', html)
+        self.assertRegexpMatches(
+            html,
+            # The instance of the wrapper class will have an auto-generated ID (wrapperxxx). Allow anything
+            # for the 3 characters after wrapper.
+            (r'"/container/MITx.999.Robot_Super_Course/branch/draft/block/wrapper.{3}" class="action-button">\s*'
+             '<span class="action-button-text">View</span>')
+        )
+
+    def test_split_test(self):
+        """
+        Test that a split_test module renders all of its children in Studio.
+        """
+        root_locator = self._create_vertical()
+        resp = self.create_xblock(category='split_test', parent_locator=root_locator)
+        self.assertEqual(resp.status_code, 200)
+        split_test_locator = self.response_locator(resp)
+        resp = self.create_xblock(parent_locator=split_test_locator, category='html', boilerplate='announcement.yaml')
+        self.assertEqual(resp.status_code, 200)
+        resp = self.create_xblock(parent_locator=split_test_locator, category='html', boilerplate='zooming_image.yaml')
+        self.assertEqual(resp.status_code, 200)
+        html, __ = self._get_container_preview(split_test_locator)
+        self.assertIn('Announcement', html)
+        self.assertIn('Zooming', html)
 
 
 class DeleteItem(ItemTest):
@@ -622,6 +664,7 @@ class TestEditItem(ItemTest):
         self.assertEqual(resp.status_code, 200)
 
         # Activate the editing view
+        view_url = '/xblock/{locator}/studio_view'.format(locator=self.problem_locator)
         resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
 
@@ -630,17 +673,60 @@ class TestEditItem(ItemTest):
         draft = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertNotEqual(draft.data, published.data)
 
+    def test_publish_states_of_nested_xblocks(self):
+        """ Test publishing of a unit page containing a nested xblock  """
+
+        resp = self.create_xblock(parent_locator=self.seq_locator, display_name='Test Unit', category='vertical')
+        unit_locator = self.response_locator(resp)
+        resp = self.create_xblock(parent_locator=unit_locator, category='wrapper')
+        wrapper_locator = self.response_locator(resp)
+        resp = self.create_xblock(parent_locator=wrapper_locator, category='html')
+        html_locator = self.response_locator(resp)
+
+        # The unit and its children should be private initially
+        unit_update_url = '/xblock/' + unit_locator
+        unit = self.get_item_from_modulestore(unit_locator, True)
+        html = self.get_item_from_modulestore(html_locator, True)
+        self.assertEqual(compute_publish_state(unit), PublishState.private)
+        self.assertEqual(compute_publish_state(html), PublishState.private)
+
+        # Make the unit public and verify that the problem is also made public
+        resp = self.client.ajax_post(
+            unit_update_url,
+            data={'publish': 'make_public'}
+        )
+        self.assertEqual(resp.status_code, 200)
+        unit = self.get_item_from_modulestore(unit_locator, True)
+        html = self.get_item_from_modulestore(html_locator, True)
+        self.assertEqual(compute_publish_state(unit), PublishState.public)
+        self.assertEqual(compute_publish_state(html), PublishState.public)
+
+        # Make a draft for the unit and verify that the problem also has a draft
+        resp = self.client.ajax_post(
+            unit_update_url,
+            data={
+                'id': unit_locator,
+                'metadata': {},
+                'publish': 'create_draft'
+            }
+        )
+        self.assertEqual(resp.status_code, 200)
+        unit = self.get_item_from_modulestore(unit_locator, True)
+        html = self.get_item_from_modulestore(html_locator, True)
+        self.assertEqual(compute_publish_state(unit), PublishState.draft)
+        self.assertEqual(compute_publish_state(html), PublishState.draft)
+
 
 @ddt.ddt
 class TestComponentHandler(TestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
 
-        patcher = patch('contentstore.views.component.modulestore')
-        self.modulestore = patcher.start()
+        patcher = patch('contentstore.views.component.get_modulestore')
+        self.get_modulestore = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.descriptor = self.modulestore.return_value.get_item.return_value
+        self.descriptor = self.get_modulestore.return_value.get_item.return_value
 
         self.usage_id = 'dummy_usage_id'
 

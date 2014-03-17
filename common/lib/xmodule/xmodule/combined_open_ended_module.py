@@ -395,12 +395,13 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     icon_class = 'problem'
 
     js = {
-            'coffee':
-            [
-                resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
-                resource_string(__name__, 'js/src/collapsible.coffee'),
-                resource_string(__name__, 'js/src/javascript_loader.coffee'),
-            ]
+        'coffee': [
+            resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
+            resource_string(__name__, 'js/src/javascript_loader.coffee'),
+        ],
+        'js': [
+            resource_string(__name__, 'js/src/collapsible.js'),
+        ]
     }
     js_module_name = "CombinedOpenEnded"
 

@@ -9,6 +9,7 @@ acceptance tests.
 from lettuce import world, step
 from nose.tools import assert_in, assert_regexp_matches  # pylint: disable=E0611
 from terrain.steps import reload_the_page
+from splinter.request_handler.request_handler import RequestHandler
 
 
 @step(u'I see a table of student profiles')
@@ -39,6 +40,11 @@ def find_student_profile_table(step):  # pylint: disable=unused-argument
         assert_in(datum, world.css_text('#data-student-profiles-table'))
 
 
+@step(u"I do not see a button to 'List enrolled students' profile information'")
+def no_student_profile_table(step):  # pylint: disable=unused-argument
+    world.is_css_not_present('input[name="list-profiles"]')
+
+
 @step(u"I see the grading configuration for the course")
 def find_grading_config(step):  # pylint: disable=unused-argument
     # Find the grading configuration display
@@ -62,14 +68,14 @@ length=0"""
     assert_in(expected_config, world.css_text('#data-grade-config-text'))
 
 
-@step(u"I see a csv file in the grade reports table")
+@step(u"I see a grade report csv file in the reports table")
 def find_grade_report_csv_link(step):  # pylint: disable=unused-argument
     # Need to reload the page to see the grades download table
     reload_the_page(step)
-    world.wait_for_visible('#grade-downloads-table')
+    world.wait_for_visible('#report-downloads-table')
     # Find table and assert a .csv file is present
     expected_file_regexp = 'edx_999_Test_Course_grade_report_\d{4}-\d{2}-\d{2}-\d{4}\.csv'
     assert_regexp_matches(
-        world.css_html('#grade-downloads-table'), expected_file_regexp,
+        world.css_html('#report-downloads-table'), expected_file_regexp,
         msg="Expected grade report filename was not found."
     )

@@ -5,6 +5,7 @@
 # 
 # Translators:
 # hayk <hayk.saribekyan@gmail.com>, 2014
+# evoyan <karine.evoyan@luys.am>, 2014
 # NarekDshkhunyan <ndshkhunyan@gmail.com>, 2014
 # NarekDshkhunyan <ndshkhunyan@gmail.com>, 2014
 # pgayane <pgayane@gmail.com>, 2014
@@ -36,17 +37,17 @@
 # 
 # Translators:
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# Translations template for PROJECT.
-# Copyright (C) 2014 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
+# edX translation file
+# Copyright (C) 2014 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-24 16:01-0500\n"
-"PO-Revision-Date: 2014-02-06 03:04+0000\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2014-03-15 15:05-0400\n"
+"PO-Revision-Date: 2014-03-06 20:50+0000\n"
 "Last-Translator: nedbat <ned@edx.org>\n"
 "Language-Team: Armenian (Armenia) (http://www.transifex.com/projects/p/edx-platform/language/hy_AM/)\n"
 "MIME-Version: 1.0\n"
@@ -116,7 +117,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/views.py common/djangoapps/student/views.py
 msgid "Enrollment is closed"
-msgstr ""
+msgstr "Գրանցումն ավարտված է"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment mode not supported"
@@ -148,7 +149,6 @@ msgid "Student"
 msgstr ""
 
 #: common/djangoapps/student/middleware.py
-#, python-brace-format
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {link_start}{support_email}{link_end}"
@@ -158,50 +158,102 @@ msgstr ""
 msgid "Disabled Account"
 msgstr ""
 
+#: common/djangoapps/student/models.py
+msgid "Male"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Female"
+msgstr ""
+
+#. Translators: 'Other' refers to the student's gender
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py common/djangoapps/student/models.py
+msgid "Other"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Doctorate"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Master's or professional degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Bachelor's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Associate's degree"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Secondary/high school"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Junior secondary/junior high/middle school"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Elementary/primary school"
+msgstr ""
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models.py
+msgid "None"
+msgstr ""
+
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
-msgstr ""
+msgstr "Դասընթացի համարը նշված չէ"
 
 #: common/djangoapps/student/views.py
 msgid "Course id is invalid"
-msgstr ""
+msgstr "Դասընթացի համար սխալ է "
 
 #: common/djangoapps/student/views.py
-#: lms/templates/courseware/course_about.html
 msgid "Course is full"
-msgstr ""
+msgstr "Դասընթացը լիքն է:"
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
-msgstr ""
+msgstr "Դուք գրանցված չեք այս դասընթացի համար"
 
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
-msgstr ""
+msgstr "Գրացման գործողությունը սխալ է "
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
+"Սխալ է տեղի ունեցել Ձեր մուտքի տվյալները ստանալիս։ Խնդրում ենք մեզ "
+"էլեկտրոնային նամակ գրել։"
 
 #: common/djangoapps/student/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
 msgstr ""
+"Այս օգտագործողը ժամանակավորապես կասեցված է չափից շատ անհաջող մուտքի փորձերի "
+"համար: Փորձե՛ք ավելի ուշ:"
 
 #: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
-msgstr ""
+msgstr "Անհաջող մուտքի չափազանց շատ  փորձեր։ Կրկին փորձեք ավելի ուշ։"
 
-#: common/djangoapps/student/views.py lms/templates/provider_login.html
+#: common/djangoapps/student/views.py
 msgid "Email or password is incorrect."
-msgstr ""
+msgstr "Էլեկտրոնային հասցեն կամ գաղտնաբառը սխալ է։"
 
 #: common/djangoapps/student/views.py
 msgid ""
 "This account has not been activated. We have sent another activation "
 "message. Please check your e-mail for the activation instructions."
 msgstr ""
+"Այս հաշիվը ակտիվացված չէ։ Խնդրում ենք ստուգել Ձեր էլետրոնային հասցեն նոր "
+"ակտիվացման նամակի և հրահանգների համար։"
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
@@ -228,131 +280,140 @@ msgid "Unexpected account status"
 msgstr ""
 
 #: common/djangoapps/student/views.py
-#, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
-msgstr ""
+msgstr "'{username}' օգտագործողի անունն արդեն գոյություն ունի։ "
 
 #: common/djangoapps/student/views.py
-#, python-brace-format
 msgid "An account with the Email '{email}' already exists."
-msgstr ""
+msgstr "՛{email}' էլեկտրոնային հասցեով հաշիվ արդեն գոյություն ունի։"
 
 #: common/djangoapps/student/views.py
-#, python-brace-format
 msgid "Error (401 {field}). E-mail us."
-msgstr ""
+msgstr "Սխալ (401 {field}). Խնդրում ենք մեզ էլեկտրոնային նամակ ուղարկել։"
 
 #: common/djangoapps/student/views.py
 msgid "To enroll, you must follow the honor code."
-msgstr ""
+msgstr "Ընդունվելու համար անհրաժեշտ է պահպանել պատվո նորմերը:"
 
 #: common/djangoapps/student/views.py
 msgid "You must accept the terms of service."
-msgstr ""
+msgstr "Դուք պետք է ընդունեք ծառայության պայմանները։"
 
 #: common/djangoapps/student/views.py
 msgid "Username must be minimum of two characters long"
-msgstr ""
+msgstr "Օգտագործողի անունը պետք է լինի ամենաքիչը երկու նիշ:"
 
 #: common/djangoapps/student/views.py
 msgid "A properly formatted e-mail is required"
-msgstr ""
+msgstr "Անհրաժեշտ է պատշաճ ձևավորված էլեկտրոնային հասցե:"
 
 #: common/djangoapps/student/views.py
 msgid "Your legal name must be a minimum of two characters long"
-msgstr ""
+msgstr "Ձեր օրինական անունը պետք է պարունակի ամենաքիչը երկու նիշ:"
 
 #: common/djangoapps/student/views.py
 msgid "A valid password is required"
-msgstr ""
+msgstr "Անհրաժեշտ է թույլատրելի գաղտնաբառ:"
 
 #: common/djangoapps/student/views.py
 msgid "Accepting Terms of Service is required"
-msgstr ""
+msgstr "՛Ընդունել ծառայությունների կանոններ՛-ը պարտադիր է"
 
 #: common/djangoapps/student/views.py
 msgid "Agreeing to the Honor Code is required"
-msgstr ""
+msgstr "'Պատվի կոդ'-ին համաձայնվելը պարտադիր է"
 
 #: common/djangoapps/student/views.py
 msgid "A level of education is required"
-msgstr ""
+msgstr "Կրթություն մակարդակը պարտադիր է"
 
 #: common/djangoapps/student/views.py
 msgid "Your gender is required"
-msgstr ""
+msgstr "Ձեր սեռը պարտադիր է"
 
 #: common/djangoapps/student/views.py
 msgid "Your year of birth is required"
-msgstr ""
+msgstr "Ձեր ծննդյան տարին պարտադիր է"
 
 #: common/djangoapps/student/views.py
 msgid "Your mailing address is required"
-msgstr ""
+msgstr "Ձեր էլեկտրոնային հասցեն պարտադիր է"
 
 #: common/djangoapps/student/views.py
 msgid "A description of your goals is required"
-msgstr ""
+msgstr "Ձեր նպատակների նկարագիրը պարտադիր է"
 
 #: common/djangoapps/student/views.py
 msgid "A city is required"
-msgstr ""
+msgstr "Քաղաքը պարտադիր է"
 
 #: common/djangoapps/student/views.py
 msgid "A country is required"
+msgstr "Երկիրը պարտադիր է"
+
+#: common/djangoapps/student/views.py
+msgid "Username cannot be more than {0} characters long"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Email cannot be more than {0} characters long"
 msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail is required."
-msgstr ""
+msgstr "Պահանջվում է գործող էլեկտրոնային հասցե։"
 
 #: common/djangoapps/student/views.py
 msgid "Username should only consist of A-Z and 0-9, with no spaces."
 msgstr ""
+"Օգտագործողի անունը պետք է բաղկացած լինի A-Z տառերից, 0-9 թվանշաններից և "
+"չպարունակի բացակներ։"
 
 #: common/djangoapps/student/views.py
 msgid "Password: "
-msgstr ""
+msgstr "Գաղտնաբառ:"
 
 #: common/djangoapps/student/views.py
 msgid "Could not send activation e-mail."
-msgstr ""
+msgstr "Չստացվեց ուղարկել ակտիվացման նամակը։"
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr ""
+"Անհայտ սխալ։ Խնդրում ենք մեզ էլետրոնային նամակ ուղարկել` նշելով, թե սխալն "
+"ինչպես պատահեց։"
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
-msgstr ""
+msgstr "Այս էլետրոնային հասցեով ոչ ակտիվ օգտագործող գոյություն չունի։"
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send reactivation email"
-msgstr ""
+msgstr "Հնարավոր չէ ակտիվացման էլեկտրոնային նամակը կրկին ուղարկել։"
 
 #: common/djangoapps/student/views.py
 msgid "Invalid password"
-msgstr ""
+msgstr "Գաղտնաբառը սխալ է։"
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail address required."
-msgstr ""
+msgstr "Պահանջվում է գործող էլեկտրոնային հասցե։"
 
 #: common/djangoapps/student/views.py
 msgid "An account with this e-mail already exists."
-msgstr "Այս էլ. հասցեով օգտագործող արդեն գրանցված է"
+msgstr "Այս էլ. հասցեյով օգտագործող արդեն գրանցված է"
 
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
-msgstr ""
+msgstr "Հին և նոր էլեկտրոնային հասցեները համընկնում են։"
 
 #: common/djangoapps/student/views.py
 msgid "Name required"
-msgstr ""
+msgstr "Անունը պարտադիր է։"
 
 #: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Invalid ID"
-msgstr ""
+msgstr "Սխալ համար՝ ID:"
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -391,7 +452,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "AM"
-msgstr ""
+msgstr "Առավոտվա"
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
@@ -399,7 +460,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "PM"
-msgstr ""
+msgstr "երեկոյան"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Monday Februrary 10, 2014". It is used for the %A
@@ -407,7 +468,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Monday"
-msgstr ""
+msgstr "Երկուշաբթի"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Tuesday Februrary 11, 2014". It is used for the %A
@@ -415,7 +476,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Tuesday"
-msgstr ""
+msgstr "Երեքշաբթի"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Wednesday Februrary 12, 2014". It is used for the %A
@@ -423,7 +484,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Wednesday"
-msgstr ""
+msgstr "Չորեքշաբթի"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Thursday Februrary 13, 2014". It is used for the %A
@@ -431,7 +492,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Thursday"
-msgstr ""
+msgstr "Հինգշաբթի"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Friday Februrary 14, 2014". It is used for the %A
@@ -439,7 +500,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Friday"
-msgstr ""
+msgstr "Ուրբաթ"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Saturday Februrary 15, 2014". It is used for the %A
@@ -447,7 +508,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Saturday"
-msgstr ""
+msgstr "Շաբաթ"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Sunday Februrary 16, 2014". It is used for the %A
@@ -455,7 +516,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Sunday"
-msgstr ""
+msgstr "Կիրակի"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Mon Feb 10, 2014". It is used for the %a
@@ -463,7 +524,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Mon"
-msgstr ""
+msgstr "Երկ"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Tue Feb 11, 2014". It is used for the %a
@@ -471,7 +532,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Tue"
-msgstr ""
+msgstr "Երք"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Wed Feb 12, 2014". It is used for the %a
@@ -479,7 +540,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Wed"
-msgstr ""
+msgstr "Չոր"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Thu Feb 13, 2014". It is used for the %a
@@ -487,7 +548,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Thu"
-msgstr ""
+msgstr "Հնգ"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Fri Feb 14, 2014". It is used for the %a
@@ -495,7 +556,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Fri"
-msgstr ""
+msgstr "Ուրբ"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sat Feb 15, 2014". It is used for the %a
@@ -503,7 +564,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Sat"
-msgstr ""
+msgstr "Շաբ"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sun Feb 16, 2014". It is used for the %a
@@ -511,7 +572,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Sun"
-msgstr ""
+msgstr "Կիր"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jan 10, 2014". It is used for the %b
@@ -519,7 +580,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jan"
-msgstr ""
+msgstr "Հունվ"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Feb 10, 2014". It is used for the %b
@@ -527,7 +588,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Feb"
-msgstr ""
+msgstr "Փետ"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Mar 10, 2014". It is used for the %b
@@ -535,7 +596,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Mar"
-msgstr ""
+msgstr "Մարտ"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Apr 10, 2014". It is used for the %b
@@ -543,7 +604,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Apr"
-msgstr ""
+msgstr "Ապր"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "May 10, 2014". It is used for the %b
@@ -551,7 +612,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "May"
-msgstr ""
+msgstr "Մայիս"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jun 10, 2014". It is used for the %b
@@ -559,7 +620,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jun"
-msgstr ""
+msgstr "Հուն"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jul 10, 2014". It is used for the %b
@@ -567,7 +628,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jul"
-msgstr ""
+msgstr "Հուլ"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Aug 10, 2014". It is used for the %b
@@ -575,7 +636,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Aug"
-msgstr ""
+msgstr "Օգստ"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Sep 10, 2014". It is used for the %b
@@ -583,7 +644,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Sep"
-msgstr ""
+msgstr "Սեպտ"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Oct 10, 2014". It is used for the %b
@@ -591,7 +652,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Oct"
-msgstr ""
+msgstr "Հոկտ"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Nov 10, 2014". It is used for the %b
@@ -599,7 +660,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Nov"
-msgstr ""
+msgstr "Նոյ"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Dec 10, 2014". It is used for the %b
@@ -607,7 +668,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Dec"
-msgstr ""
+msgstr "Դեկ"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "January 10, 2014". It is used for the %B directive in
@@ -615,7 +676,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "January"
-msgstr ""
+msgstr "Հունվար"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "February 10, 2014". It is used for the %B directive in
@@ -623,7 +684,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "February"
-msgstr ""
+msgstr "Փետրվար"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "March 10, 2014". It is used for the %B directive in
@@ -631,7 +692,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "March"
-msgstr ""
+msgstr "Մարտ"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "April 10, 2014". It is used for the %B directive in
@@ -639,7 +700,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "April"
-msgstr ""
+msgstr "Ապրիլ"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "May 10, 2014". It is used for the %B directive in
@@ -647,7 +708,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "May"
-msgstr ""
+msgstr "Մայիս"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "June 10, 2014". It is used for the %B directive in
@@ -655,7 +716,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "June"
-msgstr ""
+msgstr "Հունիս"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "July 10, 2014". It is used for the %B directive in
@@ -663,7 +724,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "July"
-msgstr ""
+msgstr "Հուլիս"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "August 10, 2014". It is used for the %B directive in
@@ -671,7 +732,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "August"
-msgstr ""
+msgstr "Օգոստոս"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "September 10, 2014". It is used for the %B directive in
@@ -679,7 +740,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "September"
-msgstr ""
+msgstr "Սեպտեմբեր"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "October 10, 2014". It is used for the %B directive in
@@ -687,7 +748,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "October"
-msgstr ""
+msgstr "Հոկտեմբեր"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "November 10, 2014". It is used for the %B directive in
@@ -695,7 +756,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "November"
-msgstr ""
+msgstr "Նոյեմբեր"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "December 10, 2014". It is used for the %B directive in
@@ -703,61 +764,51 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "December"
-msgstr ""
+msgstr "Դեկտեմբեր"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "Invalid Length ({0})"
-msgstr ""
+msgstr "Սխալ երկարություն ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must be {0} characters or more"
-msgstr ""
+msgstr "պետք է լինի {0} նիշ կամ ավել"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must be {0} characters or less"
-msgstr ""
+msgstr "պետք է լինի {0} նիշ կամ պակաս"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "Must be more complex ({0})"
-msgstr ""
+msgstr "Պետք է ավելի բարդ լինի ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more uppercase characters"
-msgstr ""
+msgstr "պետք է պարունակի {0} կամ ավել մեծատառ նիշեր"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more lowercase characters"
-msgstr ""
+msgstr "պետք է պարունակի {0} կամ ավել փոքրատառ նիշեր"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more digits"
-msgstr ""
+msgstr "պետք է պարունակի {0} կամ ավել թվանշաններ"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more punctuation characters"
-msgstr ""
+msgstr "պետք է պարունակի {0} կամ ավելի կետադրական նշաններ"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more non ascii characters"
-msgstr ""
+msgstr "պետք է պարունակի {0} կամ ավել ascii նիշեր"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more unique words"
-msgstr ""
+msgstr "պետք է պարունակի {0} կամ ավել չկրկնվող բառեր"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Too similar to a restricted dictionary word."
-msgstr ""
+msgstr "Արգելված բառարանային բառին շատ նման է:"
 
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
@@ -782,7 +833,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr ""
 
@@ -791,7 +841,6 @@ msgid "(Source code line unavailable)"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "See XML source line {sourcenum}."
 msgstr ""
 
@@ -800,22 +849,18 @@ msgid "There was a problem with the staff answer to this problem."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Could not interpret '{student_answer}' as a number."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "You may not use variables ({bad_variables}) in numerical problems."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "factorial function evaluated outside its domain:'{student_answer}'"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid math syntax: '{student_answer}'"
 msgstr ""
 
@@ -831,14 +876,13 @@ msgstr ""
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "There was a problem with the staff answer to this problem: empty boundary."
-msgstr ""
+msgstr "Սխալ` անձնակազմի պատասխանի ժամանակ. դատարկ սահման:"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "CustomResponse: check function returned an invalid dictionary!"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid ""
 "Unable to deliver your submission to grader (Reason: {error_msg}). Please "
 "try again later."
@@ -855,31 +899,26 @@ msgid "Invalid grader reply. Please contact the course staff."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid input: {bad_input} not permitted in answer."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid ""
 "factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula"
 msgstr ""
 
 #. Translators: 'SchematicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr ""
 
@@ -888,7 +927,6 @@ msgid "The Staff answer could not be interpreted as a number."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Could not interpret '{given_answer}' as a number."
 msgstr ""
 
@@ -929,13 +967,11 @@ msgid "Problem must be reset before it can be checked again."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr ""
 
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
 msgid "Error: {msg}"
 msgstr ""
 
@@ -980,58 +1016,58 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
-msgstr ""
+msgstr "Ընդհանուր"
 
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
 #. does not yet have an announced start date.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "TBD"
-msgstr ""
+msgstr "Չորոշված"
 
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Self"
-msgstr ""
+msgstr "Ինքն է"
 
 #. Translators: "AI" is used to denote an openended response that is machine-
 #. graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "AI"
-msgstr ""
+msgstr "Արհեստական ինտելեկտ"
 
 #. Translators: "Peer" is used to denote an openended response that is peer-
 #. graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Peer"
-msgstr ""
+msgstr "Դասընկեր"
 
 #. Translators: "Not started" is used to communicate to a student that their
 #. response
 #. has not yet been graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Not started."
-msgstr ""
+msgstr "Չսկսված:"
 
 #. Translators: "Being scored." is used to communicate to a student that their
 #. response
 #. are in the process of being scored
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Being scored."
-msgstr ""
+msgstr "Գնահատման փուլում"
 
 #. Translators: "Scoring finished" is used to communicate to a student that
 #. their response
 #. have been scored, but the full scoring process is not yet complete
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Scoring finished."
-msgstr ""
+msgstr "Գնահատումն ավարտված է:"
 
 #. Translators: "Complete" is used to communicate to a student that their
 #. openended response has been fully scored
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Complete."
-msgstr ""
+msgstr "Ավարտված:"
 
 #. Translators: "Scored rubric" appears to a user as part of a longer
 #. string that looks something like: "Scored rubric from grader 1".
@@ -1040,74 +1076,78 @@ msgstr ""
 #. returned from one of the graders of their openended response problem.
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Scored rubric"
-msgstr ""
+msgstr "Գնահատված բաժին"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-#, python-brace-format
 msgid ""
 "You have attempted this question {number_of_student_attempts} times. You are"
 " only allowed to attempt it {max_number_of_attempts} times."
 msgstr ""
+"Դուք փորձել եք այս հարցը {number_of_student_attempts} անգամ. Դուք "
+"թույլատրված եք փորձել այն միայն {max_number_of_attempts} անգամ:"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "The problem state got out-of-sync. Please try reloading the page."
-msgstr ""
+msgstr "Խնդրի ընթացիկ կարգավիճակը թարմ չէ: Խնդրում ենք փորձել վերաբեռնել էջը:"
 
 #. Translators: "Self-Assessment" refers to the self-assessed mode of
 #. openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
 msgid "Self-Assessment"
-msgstr ""
+msgstr "Ինքնագնահատում"
 
 #. Translators: "Peer-Assessment" refers to the peer-assessed mode of
 #. openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
 msgid "Peer-Assessment"
-msgstr ""
+msgstr "Դասընկերների գնահատում"
 
 #. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
 #. of openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
 msgid "Instructor-Assessment"
-msgstr ""
+msgstr "Դասախոսի գնահատում"
 
 #. Translators: "AI-Assessment" refers to the machine-graded mode of openended
 #. evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
 msgid "AI-Assessment"
-msgstr ""
+msgstr "Համակարգչային գնահատում"
 
 #. Translators: 'tag' is one of 'feedback', 'submission_id',
 #. 'grader_id', or 'score'. They are categories that a student
 #. responds to when filling out a post-assessment survey
 #. of his or her grade from an openended problem.
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-#, python-brace-format
 msgid ""
 "Could not find needed tag {tag_name} in the survey responses. Please try "
 "submitting again."
 msgstr ""
+"Չի հաջողվում գտնել անհրաժեշտ {tag_name} պիտակը հարցման պատասխանների մեջ: "
+"Խնդրում ենք նորից փորձել:"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "There was an error saving your feedback. Please contact course staff."
 msgstr ""
+"Սխալ` Ձեր պատասխանի գրանցման ժամանակ: Խնդրում ենք կապնվել դասընթացի "
+"անձնակազմի հետ:"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Couldn't submit feedback."
-msgstr ""
+msgstr "Չի հաջողվում գրանցել պատասխանը:"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Successfully saved your feedback."
-msgstr ""
+msgstr "Ձեր պատասխանը հաջողությամբ գրանցվեց:"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Unable to save your feedback. Please try again later."
-msgstr ""
+msgstr "Անհնար է գրանցել Ձեր պատասխանը: Խնդրում ենք փորձել ավելի ուշ:"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Successfully saved your submission."
-msgstr ""
+msgstr "Ձեր պատասխանը հաջողությամբ պահպանվեց:"
 
 #. Translators: the `grader` refers to the grading service open response
 #. problems
@@ -1117,6 +1157,7 @@ msgstr ""
 msgid ""
 "Unable to submit your submission to the grader. Please try again later."
 msgstr ""
+"Անհնար է փոխանցել Ձեր պատասխանը ստուգողին: Խնդրում ենք փորձել ավելի ուշ:"
 
 #. Translators: the `grader` refers to the grading service open response
 #. problems
@@ -1125,7 +1166,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Error getting feedback from grader."
-msgstr ""
+msgstr "Սխալ` ստուգողից պատասխանը ստանալու ժամանակ:"
 
 #. Translators: the `grader` refers to the grading service open response
 #. problems
@@ -1133,7 +1174,7 @@ msgstr ""
 #. graded.
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "No feedback available from grader."
-msgstr ""
+msgstr "Ստուգողից որևէ պատասխան առկա չէ:"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Error handling action. Please try again."
@@ -1182,7 +1223,6 @@ msgid "Error saving your score.  Please notify course staff."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-#, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{statuc_code}."
@@ -1197,7 +1237,6 @@ msgid "We support only SubRip (*.srt) transcripts format."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-#, python-brace-format
 msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
 "is {error_message}"
@@ -1213,46 +1252,70 @@ msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
-msgstr ""
+msgstr "Կողմնորոշում"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "About these documents"
-msgstr ""
+msgstr "Այս փաստաթղթերի մասին"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Index"
-msgstr ""
+msgstr "Ցանկ"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: lms/templates/discussion/_thread_list_template.html
 msgid "Search"
-msgstr ""
+msgstr "Փնտրել"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-#: lms/templates/static_templates/copyright.html
-#: lms/templates/static_templates/copyright.html
 msgid "Copyright"
+msgstr "Հեղինակային իրավունք"
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid ""
+"{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: "
+"{grade:.0f}/{max_grade:.0f} {questions})"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "students"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "questions"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid ""
+"{num_students} student(s) opened Subsection {subsection_num}: "
+"{subsection_name}"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid ""
+"{problem_info_x} {problem_info_n} - {count_grade} {students} "
+"({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})"
 msgstr ""
 
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
-#, python-brace-format
 msgid "This is the wiki for **{organization}**'s _{course_name}_."
-msgstr ""
+msgstr "Սա **{organization}**'ի _{course_name}_ wiki-ն է:"
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Course page automatically created."
-msgstr ""
+msgstr "Դասընթացի էջն ավտոմատ ստեղծվել է:"
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Welcome to the edX Wiki"
-msgstr ""
+msgstr "Բարի գալուստ edX Wiki"
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
-msgstr ""
+msgstr "Այցելե՛ք դասընթացի wiki հոդված ավելացնելու համար"
 
 #. Translators: 'Course Content' refers to the tab in the courseware
 #. that leads to the content of a course
@@ -1290,7 +1353,6 @@ msgid "ERROR: No playable video sources found!"
 msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
-#, python-brace-format
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
 " GIT_REPO_DIR"
@@ -1318,13 +1380,25 @@ msgstr ""
 msgid "The underlying module store does not support import."
 msgstr ""
 
+#. Translators: This is an error message when they ask for a
+#. particular version of a git repository and that version isn't
+#. available from the remote source they specified
+#: lms/djangoapps/dashboard/git_import.py
+msgid "The specified remote branch is not available."
+msgstr ""
+
+#. Translators: Error message shown when they have asked for a git
+#. repository branch, a specific version within a repository, that
+#. doesn't exist, or there is a problem changing to it.
+#: lms/djangoapps/dashboard/git_import.py
+msgid "Unable to switch to specified branch. Please check your branch name."
+msgstr ""
+
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed in authenticating {0}, error {1}\n"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed in authenticating {0}\n"
 msgstr ""
 
@@ -1354,7 +1428,6 @@ msgid "email must end in"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed - email {0} already exists as external_id"
 msgstr ""
 
@@ -1367,27 +1440,22 @@ msgid "email address required (not username)"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Oops, failed to create user {0}, IntegrityError"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "User {0} created successfully!"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Cannot find user with email address {0}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Cannot find user with username {0} - {1}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Deleted user {0}"
 msgstr ""
 
@@ -1453,22 +1521,28 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
-#, python-brace-format
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
 
+#. Translators: unable to download the course content from
+#. the source git repository. Clone occurs if this is brand
+#. new, and pull is when it is being updated from the
+#. source.
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Unable to clone or pull repository. Please check your url."
+msgid ""
+"Unable to clone or pull repository. Please check your url. Output was: {0!r}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed to clone repository to {0}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
+msgid "Successfully switched to branch: {branch_name}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py
 msgid "Loaded course {0} {1}<br/>Errors:"
 msgstr ""
 
@@ -1498,7 +1572,6 @@ msgid "Information about all courses"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
 msgstr ""
 
@@ -1538,7 +1611,9 @@ msgid "full_name"
 msgstr ""
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
-msgid "Import the specified git repository into the modulestore and directory"
+msgid ""
+"Import the specified git repository and optional branch into the modulestore"
+" and optionally specified directory."
 msgstr ""
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
@@ -1572,14 +1647,14 @@ msgstr ""
 #: lms/djangoapps/django_comment_client/base/views.py
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
-msgstr ""
+msgstr "Վերնագիրը դատարկ լինել չի կարող"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 #: lms/djangoapps/django_comment_client/base/views.py
 #: lms/djangoapps/django_comment_client/base/views.py
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Body can't be empty"
-msgstr ""
+msgstr "Մարմինը դատարկ լինել չի կարող"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 #: lms/djangoapps/django_comment_client/base/views.py
@@ -1587,19 +1662,19 @@ msgid "Comment level too deep"
 msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
-#, python-format
 msgid "allowed file types are '%(file_types)s'"
-msgstr ""
+msgstr "Ֆայլերի թույլատրելի տիպերն են '%(file_types)s'"
 
 #: lms/djangoapps/django_comment_client/base/views.py
-#, python-format
 msgid "maximum upload file size is %(file_size)sK"
-msgstr ""
+msgstr "Ներբեռնվող ֆայլի առավելագույն չափը %(file_size)sK է"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid ""
 "Error uploading file. Please contact the site administrator. Thank you."
 msgstr ""
+"Ֆայլի ներբեռնման սխալ։ Խնդրում ենք կապվել կայքի ադմինիստրատորի հետ։ "
+"Շնորհակալություն։"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Good"
@@ -1613,7 +1688,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
-msgstr ""
+msgstr "Օգտագործողը գոյություն չունի"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
@@ -1642,31 +1717,28 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
 msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
-msgstr ""
+msgstr "Անդամակցություն"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Student Admin"
-msgstr ""
+msgstr "Ուսանող ադմինիստրատոր"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Extensions"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Data Download"
-msgstr ""
+msgstr "Տվյալների ներբեռնում"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/dashboard.html
@@ -1676,16 +1748,14 @@ msgid "Email"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
-msgstr ""
+msgstr "Հաշվարկներ"
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unable to parse date: "
 msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
-#, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr ""
 
@@ -1708,7 +1778,6 @@ msgid "Extended Due Date"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
-#, python-brace-format
 msgid "Users with due date extensions for {0}"
 msgstr ""
 
@@ -1717,7 +1786,6 @@ msgid "Unit"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
-#, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr ""
 
@@ -1733,13 +1801,12 @@ msgstr ""
 msgid "reset"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
-#: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
+#: lms/templates/wiki/plugins/attachments/index.html
 msgid "deleted"
-msgstr ""
+msgstr "ջնջված է"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -1757,12 +1824,10 @@ msgid "No status information available"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "No task_output information found for instructor_task {0}"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "No parsable task_output information found for instructor_task {0}: {1}"
 msgstr ""
 
@@ -1775,7 +1840,6 @@ msgid "No message provided"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Invalid task_output information found for instructor_task {0}: {1}"
 msgstr ""
 
@@ -1784,115 +1848,98 @@ msgid "No progress status information available"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "No parsable task_input information found for instructor_task {0}: {1}"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} and {succeeded} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Progress: {action} {succeeded} of {attempted} so far"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Unable to find submission to be {action} for student '{student}'"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem failed to be {action} for student '{student}'"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem successfully {action} for student '{student}'"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Unable to find any students with submissions to be {action}"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem failed to be {action} for any of {attempted} students"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem successfully {action} for {attempted} students"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem {action} for {succeeded} of {attempted} students"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Unable to find any recipients to be {action}"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Message failed to be {action} for any of {attempted} recipients "
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Message successfully {action} for {attempted} recipients"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Message {action} for {succeeded} of {attempted} recipients"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Status: {action} {succeeded} of {attempted}"
 msgstr ""
 
 #. Translators: {skipped} is a count.  This message is appended to task
 #. progress status messages.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid " (skipping {skipped})"
 msgstr ""
 
 #. Translators: {total} is a count.  This message is appended to task progress
 #. status messages.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid " (out of {total})"
 msgstr ""
 
 #: lms/djangoapps/linkedin/templates/linkedin_email.html
-#, python-format
 msgid ""
 "\n"
 "      Dear %(student_name)s,\n"
@@ -1900,7 +1947,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/linkedin/templates/linkedin_email.html
-#, python-format
 msgid ""
 " \n"
 "    Congratulations on earning your certificate in %(course_name)s!\n"
@@ -1915,7 +1961,6 @@ msgid "Add to profile"
 msgstr ""
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
-#, python-brace-format
 msgid ""
 "Could not contact the external grading server. Please contact the "
 "development team at {email}."
@@ -1954,7 +1999,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
-#, python-brace-format
 msgid "for course {0} and student {1}."
 msgstr ""
 
@@ -2009,7 +2053,6 @@ msgid "Trying to add a different currency into the cart"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid ""
 "Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
 " enrollments."
@@ -2020,17 +2063,14 @@ msgid "[Refund] User-Requested Refund"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid "Certificate of Achievement, {mode_name} for course {course}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid ""
 "Note - you have up to 2 weeks into the course to unenroll from the Verified "
 "Certificate option and receive a full refund. To receive your refund, "
@@ -2197,13 +2237,11 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
-#, python-brace-format
 msgid "The course {0} is already in your cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
-#, python-brace-format
 msgid "You are already registered in course {0}."
 msgstr ""
 
@@ -2216,13 +2254,11 @@ msgid "You do not have permission to view this page."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
 
@@ -2232,14 +2268,12 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "            <p class=\"error_msg\">\n"
@@ -2253,7 +2287,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2266,7 +2299,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2278,7 +2310,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -2414,7 +2445,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "            There is a problem with our CyberSource merchant configuration.  Please let us know at {0}\n"
@@ -2545,69 +2575,76 @@ msgstr ""
 #: lms/templates/registration/password_reset_complete.html
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
-msgstr ""
+msgstr "Ձեր գաղտնաբառի վերականգնումն ավարտված է"
 
 #: lms/templates/registration/password_reset_complete.html
-#, python-format
 msgid ""
 "\n"
 "      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
 "      "
 msgstr ""
+"\n"
+"Ձեր գաղտնաբառը հաստատված է։ Դուք հիմա կարող եք %(link_start)sմուտք գործել%(link_end)s։"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "      Reset Your %(platform_name)s Password\n"
 "  "
 msgstr ""
+"\n"
+"Փոխե՛ք Ձեր %(platform_name)s գաղտնաբառը"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "          Reset Your %(platform_name)s Password\n"
 "          "
 msgstr ""
+"\n"
+"Փոխե՛ք Ձեր %(platform_name)s գաղտնաբառը"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Form"
 msgstr ""
+"Գաղտնաբառը փոխելու ձևանմուշ\n"
+"Գաղտնաբառի փոփոխման կարգ"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "                We're sorry, %(platform_name)s enrollment is not available in your region\n"
 "            "
 msgstr ""
+"\n"
+"Ներողություն, %(platform_name)s-ին հնարավոր չէ գրանցվել Ձեր տարածաշրջանից"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The following errors occurred while processing your registration: "
-msgstr ""
+msgstr "Հետևյալ սխալները տեղի ունեցան Ձեր գրանցման մշակման ընթացքում"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "You must complete all fields."
-msgstr ""
+msgstr "Դուք պետք է լրացնեք բոլոր դաշտերը:"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The two password fields didn't match."
-msgstr ""
+msgstr "Գաղտնաբառի երկու դաշտերը չեն համընկնում"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
 "We're sorry, our systems seem to be having trouble processing your password "
 "reset"
-msgstr ""
+msgstr "Ներեցեք, մեր համակարգը չի կարողանում վերագործարկել Ձեր գաղտնաբառը"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
 "            "
 msgstr ""
+"\n"
+"Այս խնդրի մասին տեղյակ է պահվել: Խնդրում ենք քիչ անց կրկին փորձել: Խնդրում ենք նաև %(start_link)s կապ հաստատել մեզ հետ %(end_link)s ծագած ցանկացած հարցի վերաբերյալ:"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -2617,47 +2654,43 @@ msgid ""
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-shib.html lms/templates/register.html
 msgid "Required Information"
-msgstr ""
+msgstr "Պահանջվող տեղեկություն"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password"
-msgstr ""
+msgstr "Ձեր նոր գաղտնաբառը"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password Again"
-msgstr ""
+msgstr "Կրկին Ձեր նոր գաղտնաբառը"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Change My Password"
-msgstr ""
+msgstr "Փոխել իմ գաղտնաբառը"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your Password Reset Was Unsuccessful"
-msgstr ""
+msgstr "Չստացվեց վերագործարկել Ձեր գաղտնաբառը"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
 "        "
 msgstr ""
+"\n"
+"Գաղտնաբառի վերագործարկման հղումն անվավեր էր. հնարավոր է` հղումն արդեն օգտագործվել է: Խնդրում ենք վերադառնալ %(start_link)sմուտքի էջ%(end_link)s և կրկին փորձել վերագործարկել գաղտնաբառը:"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Help"
-msgstr ""
+msgstr "Գաղտնաբառի վերագործարկման օգնություն"
 
 #: lms/templates/registration/password_reset_confirm.html
-#: cms/templates/login.html lms/templates/login-sidebar.html
-#: lms/templates/register-sidebar.html
 msgid "Need Help?"
-msgstr ""
+msgstr "Օգնությո՞ւն է պետք"
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
 msgid ""
 "\n"
 "              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
@@ -2669,101 +2702,105 @@ msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
 " user account at edx.org."
 msgstr ""
+"Դուք ստացել եք այս նամակը, քանի որ Ձեր հաշվի գաղտնաբառը վերականգնելու "
+"հարցում եք կատարել edx.org կայքում։"
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
+msgstr "Խնդրում ենք այցելել հետևյալ կայքէջը և ընտրել նոր գաղտնաբառ։"
+
+#: lms/templates/registration/password_reset_email.html
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet reset your password."
 msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Thanks for using our site!"
-msgstr ""
+msgstr "Շնորհակալություն մեր կայքից օգտվելու համար։"
 
 #: lms/templates/registration/password_reset_email.html
 msgid "The edX Team"
-msgstr ""
+msgstr "edX թիմ"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
-msgstr ""
+msgstr "Վերջին փոփոխություն։"
 
 #: lms/templates/wiki/article.html
 msgid "See all children"
-msgstr ""
+msgstr "Տեսնել բոլոր ենթահոդվածները"
 
 #: lms/templates/wiki/article.html
 msgid "This article was last modified:"
-msgstr ""
+msgstr "Հոդվածը վերջին անգամ փոփոխվել է։ "
 
 #: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
 msgid "Add new article"
-msgstr ""
+msgstr "Ավելացնել նոր հոդված"
 
 #: lms/templates/wiki/create.html
 msgid "Create article"
-msgstr ""
+msgstr "Ստեղծել հոդված"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
 #: lms/templates/wiki/delete.html.py
 msgid "Go back"
-msgstr ""
+msgstr "Վերադառնալ"
 
 #: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
 #: lms/templates/wiki/edit.html
 msgid "Delete article"
-msgstr ""
+msgstr "Ջնջել հոդվածը"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: cms/templates/component.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Delete"
-msgstr ""
+msgstr "Ջնջել"
 
 #: lms/templates/wiki/delete.html
 msgid "You cannot delete a root article."
-msgstr ""
+msgstr "Հիմնական հոդված հնարավոր չէ ջնջել։"
 
 #: lms/templates/wiki/delete.html
 msgid ""
 "You cannot delete this article because you do not have permission to delete "
 "articles with children. Try to remove the children manually one-by-one."
 msgstr ""
+"Դուք չեք կարող ջնջել այս հոդվածը, քանի որ թույլտվություն չունեք ջնջել "
+"ենթահոդվածներ ունեցող հոդվածները։ Փորձե՛ք ջնջել ենթահոդվածները մեկառմեկ։"
 
 #: lms/templates/wiki/delete.html
 msgid ""
 "You are deleting an article. This means that its children will be deleted as"
 " well. If you choose to purge, children will also be purged!"
 msgstr ""
+"Դուք հոդված եք ջնջում, ինչը նշանակում է, որ իր ենթահոդվածները նույնպես "
+"կջնջվեն։"
 
 #: lms/templates/wiki/delete.html
 msgid "Articles that will be deleted"
-msgstr ""
+msgstr "Ջնջվող հոդվածներ։"
 
 #: lms/templates/wiki/delete.html
 msgid "...and more!"
-msgstr ""
+msgstr "...և այլն։"
 
 #: lms/templates/wiki/delete.html
 msgid "You are deleting an article. Please confirm."
-msgstr ""
+msgstr "Դուք հոդված եք ջնջում։ Խնդրում ենք հաստատել։"
 
-#: lms/templates/wiki/edit.html cms/templates/component.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-#: lms/templates/wiki/includes/article_menu.html
+#: lms/templates/wiki/edit.html
 msgid "Edit"
-msgstr ""
+msgstr "Խմբագրել"
 
 #: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
 msgid "Save changes"
-msgstr ""
+msgstr "Պահել փոփոխությունները"
 
-#: lms/templates/wiki/edit.html cms/templates/unit.html
+#: lms/templates/wiki/edit.html
 msgid "Preview"
-msgstr ""
+msgstr "Նախադիտում"
 
 #. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a control to allow users to exit out of this modal
@@ -2776,8 +2813,11 @@ msgstr ""
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/help_modal.html lms/templates/login_modal.html
 #: lms/templates/signup_modal.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/modal/_modal-settings-language.html
-msgid "Close Modal"
+msgid "Close"
 msgstr ""
 
 #: lms/templates/wiki/edit.html
@@ -2793,16 +2833,16 @@ msgstr ""
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html
 #: lms/templates/modal/_modal-settings-language.html
-msgid "modal open"
+msgid "window open"
 msgstr ""
 
 #: lms/templates/wiki/edit.html
 msgid "Back to editor"
-msgstr ""
+msgstr "Վերադառնալ խմբագրիչ"
 
 #: lms/templates/wiki/history.html
 msgid "History"
-msgstr ""
+msgstr "Պատմություն"
 
 #: lms/templates/wiki/history.html
 msgid ""
@@ -2811,30 +2851,34 @@ msgid ""
 " can change to a particular revision or merge an old revision with the "
 "current one."
 msgstr ""
+"Սեղմե՛ք տարբերակի վրա փոփոխված տողերի ցուցակը տեսնելու համար։ Սեղմե՛ք "
+"<<Նախադիտում>> կոճակը հոդվածը այս փուլում տեսնելու համար։ Այս էջի ներքևում "
+"Դուք կարող եք անցնել որոշակի տարբերակի կամ միավորել հին տարբերակը ընթացիկի "
+"հետ։"
 
 #: lms/templates/wiki/history.html
 msgid "(no log message)"
-msgstr ""
+msgstr "(հիշված հաղորդագրություններ չկան)"
 
 #: lms/templates/wiki/history.html
 msgid "Preview this revision"
-msgstr ""
+msgstr "Նախապես վերանայել փոփոխությունը"
 
 #: lms/templates/wiki/history.html
 msgid "Auto log:"
-msgstr ""
+msgstr "Ավտոմատ գրանցամատյան"
 
 #: lms/templates/wiki/history.html
 msgid "Change"
-msgstr ""
+msgstr "Փոխել"
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Merge selected with current..."
-msgstr ""
+msgstr "Միացնել ընտրվածն ընթացիկի հետ..."
 
 #: lms/templates/wiki/history.html
 msgid "Switch to selected version"
-msgstr ""
+msgstr "Անցնել ընտրված տարբերակին"
 
 #: lms/templates/wiki/history.html
 msgid "Wiki Revision Preview"
@@ -2842,11 +2886,11 @@ msgstr ""
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Back to history view"
-msgstr ""
+msgstr "Վերադառնալ պատմության էջին"
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Switch to this version"
-msgstr ""
+msgstr "Անցնել այս տարբերակին"
 
 #: lms/templates/wiki/history.html
 msgid "Merge Revision"
@@ -2854,29 +2898,31 @@ msgstr ""
 
 #: lms/templates/wiki/history.html
 msgid "Merge with current"
-msgstr ""
+msgstr "Միավորել ընթացիկի հետ"
 
 #: lms/templates/wiki/history.html
 msgid ""
 "When you merge a revision with the current, all data will be retained from "
 "both versions and merged at its approximate location from each revision."
 msgstr ""
+"Տարբերակը ընթացիկի հետ միավորելիս երկու տարբերակների բոլոր տվյալները "
+"կպահպանվեն` միավորվելով տարբերակներում իրենց մոտավոր տեղում։"
 
 #: lms/templates/wiki/history.html
 msgid "After this, it's important to do a manual review."
-msgstr ""
+msgstr "Սրանից հետո կարևոր է անձամբ վերանայել"
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Create new merged version"
-msgstr ""
+msgstr "Ստեղծել նոր միավորված տարբերակ"
 
 #: lms/templates/wiki/preview_inline.html
 msgid "Previewing revision:"
-msgstr ""
+msgstr "Տարբերակների նախադիտում"
 
 #: lms/templates/wiki/preview_inline.html
 msgid "Previewing a merge between two revisions:"
-msgstr ""
+msgstr "Երկու տարբերակների միացման նախադիտում"
 
 #: lms/templates/wiki/preview_inline.html
 msgid "This revision has been deleted."
@@ -2887,16 +2933,18 @@ msgid "Restoring to this revision will mark the article as deleted."
 msgstr ""
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#, python-format
 msgid ""
 "\n"
 "  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
 "  "
 msgstr ""
+"\n"
+"Դուք պետք է <a href=\"%(login_url)s\">մուտք գործեք</a> կամ <a href=\"%(signup_url)s\">գրանցվեք</a> այս գործողությունը կատարելու համար։"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in or sign up to use this function."
 msgstr ""
+"Դուք պետք է մուտք գործեք կամ գրանցվեք այս գործողությունը կատարելու համար։"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Wiki Cheatsheet"
@@ -2941,7 +2989,7 @@ msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Math Expression"
-msgstr ""
+msgstr "Մաթեմատիկական արտահայտություն"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Useful examples:"
@@ -2949,11 +2997,11 @@ msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Wikipedia"
-msgstr ""
+msgstr "Վիքիպեդիա"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "edX Wiki"
-msgstr ""
+msgstr "edX վիքի"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Huge Header"
@@ -2998,7 +3046,6 @@ msgid "Quotes"
 msgstr ""
 
 #: lms/templates/wiki/includes/editor_widget.html
-#, python-format
 msgid ""
 "\n"
 "        Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
@@ -3006,88 +3053,99 @@ msgid ""
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: wiki/plugins/attachments/wiki_plugin.py
 msgid "Attachments"
-msgstr ""
+msgstr "Կցորդներ"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload new file"
-msgstr ""
+msgstr "Վերբեռնել նոր ֆայլ"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Search and add file"
-msgstr ""
+msgstr "Փնտրել և ավելացնել ֆայլ"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload File"
-msgstr ""
+msgstr "Վերբեռնել ֆայլը"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload file"
-msgstr ""
+msgstr "Վերբեռնել ֆայլ"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Search files and articles"
-msgstr ""
+msgstr "Փնտրել ֆայլեր և հոդվածներ"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid ""
 "You can reuse files from other articles. These files are subject to updates "
 "on other articles which may or may not be a good thing."
 msgstr ""
+"Դուք կարող եք օգտագործել ուրիշ հոդվածների ֆայլեր։ Այս ֆայլերը ենթակա են "
+"փոփոխման ուրիշ հոդվածներում, ինչը գուցե նախատեսված չէ։"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
 msgstr ""
+"Հետևյալ ֆայլերը հասանելի են այս հոդվածի համար։ Պատճենե՛ք markdown պիտակը  "
+"հոդվածի տեքստից ֆայլին անմիջապես հղում անելու համար։"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Markdown tag"
-msgstr ""
+msgstr "Markdown պիտակ"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Uploaded by"
-msgstr ""
+msgstr "Վերբեռնել է"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Size"
-msgstr ""
+msgstr "Չափ"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "File History"
-msgstr ""
+msgstr "Ֆայլերի պատմություն"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Detach"
-msgstr ""
+msgstr "Անջատել"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Replace"
-msgstr ""
+msgstr "Փոխարինել"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Restore"
-msgstr ""
+msgstr "Վերականգնել"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "anonymous (IP logged)"
-msgstr ""
+msgstr "անանուն (IP-ն գրանցված է)"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "File history"
-msgstr ""
+msgstr "Ֆայլերի պատմություն"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "revisions"
-msgstr ""
+msgstr "տարբերակներ - փոփոխություններ"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "There are no attachments for this article."
+msgstr "Այս հոդվածը կցորդներ չունի"
+
+#: cms/djangoapps/contentstore/course_info_model.py
+#: cms/djangoapps/contentstore/course_info_model.py
+msgid "Invalid course update id."
+msgstr ""
+
+#: cms/djangoapps/contentstore/course_info_model.py
+msgid "Course update not found."
 msgstr ""
 
 #: cms/djangoapps/contentstore/git_export_utils.py
-#, python-brace-format
 msgid ""
 "GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
 "configure a different path with GIT_REPO_EXPORT_DIR"
@@ -3115,51 +3173,59 @@ msgstr ""
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to determine branch, repo in detached HEAD mode"
 msgstr ""
+"Անկարող է որոշել տարբերակը, կոդի պահոցը անջատ HEAD վիճակում է` repo in "
+"detached HEAD mode"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to update or clone git repository."
-msgstr ""
+msgstr "Անկարող է թարմացնել կամ պատճենել git պահոցը:"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to export course to xml."
-msgstr ""
+msgstr "Անկարող է արտահանել դասընթացը xml:"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to configure git username and password"
-msgstr ""
+msgstr "Անկարող է կարգավորել git-ի օգտագործողի անունը և գաղտնաբառը:"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to commit changes. This is usually because there are no changes to be"
 " committed"
 msgstr ""
+"Անկարող է հաստատել փոփոխությունները: Սովորաբար, պատճառն այն է, որ "
+"փոփոխություններ չկան:"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to push changes.  This is usually because the remote repository "
 "cannot be contacted"
 msgstr ""
+"Անկարող է ուղարկել փոփոխությունները: Սովորաբար, պատճառն այն է, որ հնարավոր "
+"չէ կապնվել առցանց պահոցի հետ: "
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Bad course location provided"
-msgstr ""
+msgstr "Դասընթացի վատ հասցե է տրամադրված: "
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Missing branch on fresh clone"
-msgstr ""
+msgstr "Նոր պատճենի մեջ առկա է բացակա տարբերակ:"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Command was: {0!r}. Working directory was: {1!r}"
-msgstr ""
+msgstr "Հրահանգն էր`{0!r} : Ընթացիկ թղթապանակն էր` {1!r}:"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Command output was: {0!r}"
-msgstr ""
+msgstr "Հրահանգի արդյունքն էր` {0!r}:"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Directory already exists, doing a git reset and pull instead of git clone."
 msgstr ""
+"Թղթապանակն արդեն գոյություն ունի: git կլոնի փոխարեն կատարվում է git-ի reset "
+"և pull: "
 
 #: cms/djangoapps/contentstore/utils.py
 msgid "My Notes"
@@ -3170,13 +3236,15 @@ msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
 ". Course directory must already be a git repository. Usage:  git_export <course_loc> <git_url>"
 msgstr ""
+"Վերցրե՛ք նշված դասընթացը և փորձե՛ք արտահանել այն git պահոց:\n"
+"\n"
+"Դասընթացի թղթապանակն արդեն պետք է լինի git պահոցում: Գործածություն` git_export <course_loc> <git_url> "
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
 msgstr "Ներբեռնումն ավարտված է"
 
 #: cms/djangoapps/contentstore/views/course.py
-#, python-brace-format
 msgid ""
 "Unable to create course '{name}'.\n"
 "\n"
@@ -3214,7 +3282,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
-msgstr ""
+msgstr "Դասընթացը հաջողությամբ արտահանվել է git պահոց: "
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
@@ -3229,12 +3297,10 @@ msgid "Could not find the course.xml file in the package."
 msgstr "Փաթեթում course.xml ֆայլը չի գտնվել:"
 
 #: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Համընկնում է {0} հետ"
 
 #: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr " '{0}'-ի կրկնօրինակն է:"
 
@@ -3255,12 +3321,10 @@ msgid "Insufficient permissions"
 msgstr "Ոչ բավարար թույլտվություններ:"
 
 #: cms/djangoapps/contentstore/views/user.py
-#, python-brace-format
 msgid "Could not find user by email address '{email}'."
 msgstr "'{email}' հասցեով օգտագործող չի գտնվել:"
 
 #: cms/djangoapps/contentstore/views/user.py
-#, python-brace-format
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr "Օգտագործող {email} գրանցվել է, բայց դեռ չի ակտիվացրել իր հասցեն:"
 
@@ -3350,10 +3414,17 @@ msgstr ""
 #: lms/templates/discussion/_new_post.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_discussion.mustache
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 #: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
+msgstr ""
+
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/container_xblock_component.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "View"
 msgstr ""
 
 #: cms/templates/html_error.html lms/templates/module-error.html
@@ -3796,17 +3867,22 @@ msgstr ""
 msgid "Change your name"
 msgstr ""
 
+#. Translators: note that {platform} {cert_name_short} will look something
+#. like: "edX certificate". Please do not change the order of these
+#. placeholders.
 #: lms/templates/dashboard.html
-#: lms/templates/verify_student/_modal_editname.html
 msgid ""
-"To uphold the credibility of {platform} certificates, all name changes will "
-"be logged and recorded."
+"To uphold the credibility of your {platform} {cert_name_short}, all name "
+"changes will be logged and recorded."
 msgstr ""
 
+#. Translators: note that {platform} {cert_name_short} will look something
+#. like: "edX certificate". Please do not change the order of these
+#. placeholders.
 #: lms/templates/dashboard.html
 msgid ""
-"Enter your desired full name, as it will appear on the {platform} "
-"certificates:"
+"Enter your desired full name, as it will appear on your {platform} "
+"{cert_name_short}:"
 msgstr ""
 
 #: lms/templates/dashboard.html
@@ -4043,6 +4119,13 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Ask a question"
+msgstr ""
+
+#: lms/templates/help_modal.html
+msgid ""
+"Please note: The {platform_name} support team is English speaking. While we "
+"will do our best to address your inquiry in any language, our responses will"
+" be in English."
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -4385,7 +4468,7 @@ msgstr ""
 msgid "Pending name changes"
 msgstr ""
 
-#: lms/templates/name_changes.html
+#: lms/templates/name_changes.html lms/templates/modal/accessible_confirm.html
 msgid "Confirm"
 msgstr ""
 
@@ -4470,7 +4553,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/provider_login.html
-#, python-format
 msgid "Return To %s"
 msgstr ""
 
@@ -4773,6 +4855,12 @@ msgstr ""
 msgid "Login."
 msgstr ""
 
+#. Translators: The 'Group' here refers to the group of users that has been
+#. sorted into group_id
+#: lms/templates/split_test_staff_view.html
+msgid "Group {group_id}"
+msgstr ""
+
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
 msgstr ""
@@ -4946,8 +5034,16 @@ msgstr ""
 msgid "Administer Courses"
 msgstr ""
 
+#. Translators: Repo is short for git repository or source of
+#. courseware
 #: lms/templates/sysadmin_dashboard.html
-msgid "Repo location"
+msgid "Repo Location"
+msgstr ""
+
+#. Translators: Repo is short for git repository or source of
+#. courseware and branch is a specific version within that repository
+#: lms/templates/sysadmin_dashboard.html
+msgid "Repo Branch (optional)"
 msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html
@@ -4966,6 +5062,7 @@ msgstr ""
 msgid "Django PID"
 msgstr ""
 
+#. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
 msgid "Platform Version"
 msgstr ""
@@ -5119,8 +5216,12 @@ msgstr ""
 msgid "Download video"
 msgstr ""
 
-#: lms/templates/video.html
-msgid "Download timed transcript"
+#: lms/templates/video.html lms/templates/video.html
+msgid "Download transcript"
+msgstr ""
+
+#: lms/templates/video.html lms/templates/video.html
+msgid "{file_format}"
 msgstr ""
 
 #: lms/templates/word_cloud.html
@@ -5574,7 +5675,6 @@ msgid "Psychometrics"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Forum Admin"
 msgstr ""
 
@@ -5588,6 +5688,10 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Manage Groups"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Metrics"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
@@ -5730,6 +5834,8 @@ msgid "Pull enrollment from remote gradebook"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section:"
 msgstr ""
 
@@ -5842,7 +5948,9 @@ msgid "No Analytics are available at this time."
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Students enrolled:"
+msgid ""
+"Students enrolled (historical count, includes those who have since "
+"unenrolled):"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
@@ -5877,6 +5985,38 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Points Earned (Num Students)"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "There is no data available to display at this time."
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid ""
+"Loading the latest graphs for you; depending on your class size, this may "
+"take a few minutes."
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Count of Students that Opened a Subsection"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Loading..."
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade Distribution per Problem"
+msgstr ""
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "There are no problems in this section."
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6023,30 +6163,30 @@ msgid "Your final grade:"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Grade required for a certificate:"
+msgid "Grade required for a {cert_name_short}:"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
-"Your verified certificate is being held pending confirmation that the "
-"issuance of your certificate is in compliance with strict U.S. embargoes on "
+"Your verified {cert_name_long} is being held pending confirmation that the "
+"issuance of your {cert_name_short} is in compliance with strict U.S. "
+"embargoes on Iran, Cuba, Syria and Sudan. If you think our system has "
+"mistakenly identified you as being connected with one of those countries, "
+"please let us know by contacting {email}. If you would like a refund on your"
+" {cert_name_long}, please contact our billing address {billing_email}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid ""
+"Your {cert_name_long} is being held pending confirmation that the issuance "
+"of your {cert_name_short} is in compliance with strict U.S. embargoes on "
 "Iran, Cuba, Syria and Sudan. If you think our system has mistakenly "
 "identified you as being connected with one of those countries, please let us"
-" know by contacting {email}. If you would like a refund on your certificate,"
-" please contact our billing address {billing_email}"
+" know by contacting {email}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"Your certificate is being held pending confirmation that the issuance of "
-"your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, "
-"Syria and Sudan. If you think our system has mistakenly identified you as "
-"being connected with one of those countries, please let us know by "
-"contacting {email}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your Certificate is Generating"
+msgid "Your {cert_name_short} is Generating"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -6056,23 +6196,24 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download Your Certificate (PDF)"
+msgid "Download Your {cert_name_short} (PDF)"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
-"Since we did not have a valid set of verification photos from you when "
-"certificates were generated, we could not grant you a verified certificate. "
-"An honor code certificate has been granted instead."
+"Since we did not have a valid set of verification photos from you when your "
+"{cert_name_long} was generated, we could not grant you a verified "
+"{cert_name_short}. An honor code {cert_name_short} has been granted instead."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
-"This link will open/download a PDF document of your verified certificate."
+"This link will open/download a PDF document of your verified "
+"{cert_name_long}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download Your ID Verified Certificate of Achievement (PDF)"
+msgid "Download Your ID Verified {cert_name_short} (PDF)"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -6126,9 +6267,10 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"You can still sign up for an ID verified certificate for this course. If you"
-" plan to complete the whole course, it is a great way to recognize your "
-"achievement. {a_start}Learn more about verified certificates{a_end}."
+"You can still sign up for an ID verified {cert_name_long} for this course. "
+"If you plan to complete the whole course, it is a great way to recognize "
+"your achievement. {link_start}Learn more about the verified "
+"{cert_name_long}{link_end}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -6141,6 +6283,19 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Course"
+msgstr ""
+
+#. Translators: The course's name will be added to the end of this sentence.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unregister from"
+msgstr ""
+
+#. Translators: The course's name will be added to the end of this sentence.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"Are you sure you want to unregister from the verified {cert_name_long} track"
+" of"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -6459,24 +6614,16 @@ msgid "Report Misuse"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "pin this thread"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Pin Thread"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-#, python-format
-msgid "(this post is about %(courseware_title_linked)s)"
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
+msgid "Pinned"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "Close"
+msgid "(this post is about %(courseware_title_linked)s)"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -6517,24 +6664,28 @@ msgid "Delete Comment"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-#, python-format
 msgid "-posted %(time_ago)s by"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-#, python-format
+msgid "Editing comment"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Update comment"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
 "unread comments)%(span_close)s"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-#, python-format
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-#, python-format
 msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
 msgstr ""
 
@@ -6597,14 +6748,12 @@ msgid ", "
 msgstr ""
 
 #: lms/templates/discussion/_user_profile.html
-#, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
 msgstr[0] ""
 msgstr[1] ""
 
 #: lms/templates/discussion/_user_profile.html
-#, python-format
 msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] ""
@@ -6651,10 +6800,6 @@ msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "This thread has been pinned by course staff."
-msgstr ""
-
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "Pinned"
 msgstr ""
 
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -6725,6 +6870,18 @@ msgid "Grade Distribution"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"The chart below displays the score distribution for each standard problem in"
+" your class, specified by the problem's url name."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"Scores are shown without weighting applied, so if your problem contains 2 "
+"questions, it will display as having a total of 2 points."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Loading problem list..."
 msgstr ""
 
@@ -6790,13 +6947,8 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays a list of all students enrolled in this "
-"course, along with profile information such as email address and username. "
-"The data can also be downloaded as a CSV file."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "List enrolled students' profile information"
+"The following button generates a CSV file of all students enrolled in this "
+"course, along with profile information such as email address and username."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -6805,10 +6957,20 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Displays the grading configuration for the course. The grading configuration"
-" is the breakdown of graded subsections of the course (such as exams and "
-"problem sets), and can be changed on the 'Grading' page (under 'Settings') "
-"in Studio."
+"For smaller courses, profile information for enrolled students can be listed"
+" directly on this page:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "List enrolled students' profile information"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"The following button displays the grading configuration for the course. The "
+"grading configuration is the breakdown of graded subsections of the course "
+"(such as exams and problem sets), and can be changed on the 'Grading' page "
+"(under 'Settings') in Studio."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -6824,7 +6986,7 @@ msgid "Get Student Anonymized IDs CSV"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Grade Reports"
+msgid "Reports"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -6857,11 +7019,32 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Unique, new file links for the CSV reports are generated on each visit to "
-"this page. These unique links expire within 5 minutes, due to the sensitive "
-"nature of student grade information. Please note that the report filename "
-"contains a timestamp that represents when your file was generated; this "
-"timestamp is UTC, not your local timezone."
+"Grade reports listed below are generated each time the <b>Generate Grade "
+"Report</b> button is clicked. A link to each grade report remains available "
+"on this page, identified by the UTC date and time of generation. Grade "
+"reports are not deleted, so you will always be able to access previously "
+"generated reports from this page."
+msgstr ""
+
+#. Translators: "these rules" in this sentence references a detailed
+#. description of the grading reports that will appear in a table that
+#. contains
+#. a mix of different types of reports.  This sentence intends to indicate
+#. that
+#. the description of the grading report does not apply to the other reports
+#. that may appear in the table.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Other reports may appear in the table for which these rules will not "
+"necessarily apply."
+msgstr ""
+
+#. Translators: a table of URL links to report files appears after this
+#. sentence.
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"<b>Note</b>: To keep student data secure, you cannot save or email these "
+"links for direct access. Copies of links expire within 5 minutes."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -6993,7 +7176,7 @@ msgstr ""
 msgid ""
 "Staff cannot modify staff or beta tester lists. To modify these lists, "
 "contact your instructor and ask them to add you as an instructor for staff "
-"and beta lists, or a forum admin for forum management."
+"and beta lists, or a discussion admin for discussion management."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7019,7 +7202,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Instructors are the core administration of your course. Instructors can add "
-"and remove course staff, as well as administer forum access."
+"and remove course staff, as well as administer discussion access."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7041,25 +7224,30 @@ msgid "Beta Tester"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Admins"
+msgid "Discussion Admins"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Forum admins can edit or delete any post, clear misuse flags, close and re-"
-"open threads, endorse responses, and see posts from all cohorts. They CAN "
-"add/delete other moderators and their posts are marked as 'staff'."
+"Discussion admins can edit or delete any post, clear misuse flags, close and"
+" re-open threads, endorse responses, and see posts from all cohorts. They "
+"CAN add/delete other moderators and their posts are marked as 'staff'."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Moderators"
+msgid "Discussion Admin"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Discussion Moderators"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"Forum moderators can edit or delete any post, clear misuse flags, close and "
-"re-open threads, endorse responses, and see posts from all cohorts. They "
-"CANNOT add/delete other moderators and their posts are marked as 'staff'."
+"Discussion moderators can edit or delete any post, clear misuse flags, close"
+" and re-open threads, endorse responses, and see posts from all cohorts. "
+"They CANNOT add/delete other moderators and their posts are marked as "
+"'staff'."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7067,15 +7255,23 @@ msgid "Add Moderator"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Forum Community TAs"
+msgid "Discussion Community TAs"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Community TA's are members of the community whom you deem particularly "
-"helpful on the forums. They can edit or delete any post, clear misuse flags,"
-" close and re-open threads, endorse responses, and see posts from all "
-"cohorts. Their posts are marked 'Community TA'."
+"helpful on the discussion boards. They can edit or delete any post, clear "
+"misuse flags, close and re-open threads, endorse responses, and see posts "
+"from all cohorts. Their posts are marked 'Community TA'."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Reload Graphs"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Count of Students Opened a Subsection"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -7217,6 +7413,18 @@ msgstr ""
 msgid ""
 "Don't see your preferred language? {link_start}Volunteer to become a "
 "translator!{link_end}"
+msgstr ""
+
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
+#: lms/templates/modal/accessible_confirm.html
+msgid "Close Modal"
+msgstr ""
+
+#. Translators: this text gives status on if the modal interface (a menu or
+#. piece of UI that takes the full focus of the screen) is open or not
+#: lms/templates/modal/accessible_confirm.html
+msgid "modal open"
 msgstr ""
 
 #: lms/templates/open_ended_problems/combined_notifications.html
@@ -7754,6 +7962,20 @@ msgid ""
 "here for possible use by installations of Open edX."
 msgstr ""
 
+#: lms/templates/static_templates/embargo.html
+msgid "This Course Unavailable In Your Country"
+msgstr ""
+
+#: lms/templates/static_templates/embargo.html
+msgid ""
+"Our system indicates that you are trying to access an edX course from an IP "
+"address associated with a country currently subjected to U.S. economic and "
+"trade sanctions. Unfortunately, at this time edX must comply with export "
+"controls, and we cannot allow you to access this particular course. Feel "
+"free to browse our catalogue to find other courses you may be interested in "
+"taking."
+msgstr ""
+
 #: lms/templates/static_templates/honor.html
 #: lms/templates/static_templates/honor.html
 msgid "Honor Code"
@@ -7820,6 +8042,12 @@ msgstr ""
 #: lms/templates/verify_student/_modal_editname.html
 #: lms/templates/verify_student/face_upload.html
 msgid "The following error occurred while editing your name:"
+msgstr ""
+
+#: lms/templates/verify_student/_modal_editname.html
+msgid ""
+"To uphold the credibility of {platform} certificates, all name changes will "
+"be logged and recorded."
 msgstr ""
 
 #: lms/templates/verify_student/_modal_editname.html
@@ -8674,10 +8902,6 @@ msgid "You have decided to pay $ "
 msgstr ""
 
 #: lms/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr ""
-
-#: lms/templates/wiki/includes/article_menu.html
 #: lms/templates/wiki/includes/article_menu.html
 #: lms/templates/wiki/includes/article_menu.html
 #: lms/templates/wiki/includes/article_menu.html
@@ -8808,10 +9032,10 @@ msgstr ""
 msgid "Content"
 msgstr ""
 
-#: cms/templates/asset_index.html cms/templates/course_info.html
-#: cms/templates/edit-tabs.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/overview.html
-#: cms/templates/textbooks.html
+#: cms/templates/asset_index.html cms/templates/container.html
+#: cms/templates/course_info.html cms/templates/edit-tabs.html
+#: cms/templates/index.html cms/templates/manage_users.html
+#: cms/templates/overview.html cms/templates/textbooks.html
 msgid "Page Actions"
 msgstr ""
 
@@ -8826,8 +9050,25 @@ msgid ""
 "textbook chapters, and files that appear on your Course Handouts sidebar."
 msgstr ""
 
-#: cms/templates/asset_index.html cms/templates/overview.html
-#: cms/templates/settings_graders.html
+#: cms/templates/asset_index.html
+msgid "File URLs"
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid ""
+"You use the Embed URL value to link to the file or image from a component, a"
+" course update, or a course handout."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid ""
+"You use the External URL value to reference the file or image from outside "
+"of your course. Do not use the External URL as a link value within your "
+"course."
+msgstr ""
+
+#: cms/templates/asset_index.html cms/templates/container.html
+#: cms/templates/overview.html cms/templates/settings_graders.html
 msgid "What can I do on this page?"
 msgstr ""
 
@@ -8836,12 +9077,6 @@ msgid ""
 "You can upload new files or view, download, or delete existing files. You "
 "can lock a file so that people who are not enrolled in your course cannot "
 "access that file."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid ""
-"Use the URL listed for a file to create a link to that file in the Course "
-"Handouts sidebar or in the body of the course."
 msgstr ""
 
 #: cms/templates/asset_index.html
@@ -8886,21 +9121,44 @@ msgstr ""
 msgid "Editor"
 msgstr ""
 
-#: cms/templates/component.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr ""
 
-#: cms/templates/component.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate this component"
 msgstr ""
 
-#: cms/templates/component.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Delete this component"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/overview.html
-#: cms/templates/overview.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/overview.html cms/templates/overview.html
 msgid "Drag to reorder"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "Container"
+msgstr ""
+
+#: cms/templates/container.html cms/templates/studio_vertical_wrapper.html
+msgid "No Actions"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "Publishing Status"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "This content is published with unit {unit_name}."
+msgstr ""
+
+#: cms/templates/container.html
+msgid ""
+"You can view course components that contain other components on this page. "
+"In the case of experiment blocks, this allows you to confirm that you have "
+"properly configured your experiment groups."
 msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
@@ -9825,7 +10083,6 @@ msgid "contact edX Staff with further questions"
 msgstr ""
 
 #: cms/templates/index.html
-#, python-format
 msgid "Thanks for signing up, %(name)s!"
 msgstr ""
 
@@ -9834,7 +10091,6 @@ msgid "We need to verify your email address"
 msgstr ""
 
 #: cms/templates/index.html
-#, python-format
 msgid ""
 "Almost there! In order to complete your sign up we need you to verify your "
 "email address (%(email)s). An activation message and next steps should be "
@@ -10322,7 +10578,6 @@ msgid "your course summary page"
 msgstr ""
 
 #: cms/templates/settings.html
-#, python-format
 msgid ""
 "Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
 msgstr ""
@@ -10523,6 +10778,11 @@ msgid ""
 "worth."
 msgstr ""
 
+#: cms/templates/studio_vertical_wrapper.html
+#: cms/templates/studio_vertical_wrapper.html
+msgid "Expand or Collapse"
+msgstr ""
+
 #: cms/templates/textbooks.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
 msgid "Textbooks"
@@ -10700,10 +10960,6 @@ msgstr ""
 msgid ""
 "An activation link has been sent to {email}, along with instructions for "
 "activating your account."
-msgstr ""
-
-#: cms/templates/ux/reference/container.html
-msgid "Container"
 msgstr ""
 
 #: cms/templates/widgets/footer.html
@@ -10967,12 +11223,10 @@ msgid "A slug may not begin with an underscore."
 msgstr ""
 
 #: wiki/forms.py
-#, python-format
 msgid "A deleted article with slug \"%s\" already exists."
 msgstr ""
 
 #: wiki/forms.py
-#, python-format
 msgid "A slug named \"%s\" already exists."
 msgstr ""
 
@@ -11118,7 +11372,6 @@ msgid "others write access"
 msgstr ""
 
 #: wiki/models/article.py
-#, python-format
 msgid "Article without content (%(id)d)"
 msgstr ""
 
@@ -11219,7 +11472,6 @@ msgid "A non-root note must always have a slug."
 msgstr ""
 
 #: wiki/models/urlpath.py
-#, python-format
 msgid "There is already a root node on %s"
 msgstr ""
 
@@ -11278,12 +11530,10 @@ msgid "attachment revisions"
 msgstr ""
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "%s was successfully added."
 msgstr ""
 
 #: wiki/plugins/attachments/views.py wiki/plugins/attachments/views.py
-#, python-format
 msgid "Your file could not be saved: %s"
 msgstr ""
 
@@ -11294,7 +11544,6 @@ msgid ""
 msgstr ""
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "%s uploaded and replaces old attachment."
 msgstr ""
 
@@ -11305,37 +11554,30 @@ msgid ""
 msgstr ""
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "Current revision changed for %s."
 msgstr ""
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
 msgstr ""
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "The file %s was deleted."
 msgstr ""
 
 #: wiki/plugins/attachments/views.py
-#, python-format
 msgid "This article is no longer related to the file %s."
 msgstr ""
 
 #: wiki/plugins/attachments/wiki_plugin.py
-#, python-format
 msgid "A file was changed: %s"
 msgstr ""
 
 #: wiki/plugins/attachments/wiki_plugin.py
-#, python-format
 msgid "A file was deleted: %s"
 msgstr ""
 
 #: wiki/plugins/images/forms.py
-#, python-format
 msgid ""
 "New image %s was successfully uploaded. You can use it by selecting it from "
 "the list of available images."
@@ -11354,7 +11596,6 @@ msgid "images"
 msgstr ""
 
 #: wiki/plugins/images/models.py
-#, python-format
 msgid "Image: %s"
 msgstr ""
 
@@ -11371,27 +11612,22 @@ msgid "image revisions"
 msgstr ""
 
 #: wiki/plugins/images/models.py
-#, python-format
 msgid "Image Revsion: %d"
 msgstr ""
 
 #: wiki/plugins/images/views.py
-#, python-format
 msgid "%s has been restored"
 msgstr ""
 
 #: wiki/plugins/images/views.py
-#, python-format
 msgid "%s has been marked as deleted"
 msgstr ""
 
 #: wiki/plugins/images/views.py
-#, python-format
 msgid "%(file)s has been changed to revision #%(revision)d"
 msgstr ""
 
 #: wiki/plugins/images/views.py
-#, python-format
 msgid "%(file)s has been saved."
 msgstr ""
 
@@ -11400,7 +11636,6 @@ msgid "Images"
 msgstr ""
 
 #: wiki/plugins/images/wiki_plugin.py
-#, python-format
 msgid "An image was added: %s"
 msgstr ""
 
@@ -11429,22 +11664,18 @@ msgid "Your notification settings were unchanged, so nothing saved."
 msgstr ""
 
 #: wiki/plugins/notifications/models.py
-#, python-format
 msgid "%(user)s subscribing to %(article)s (%(type)s)"
 msgstr ""
 
 #: wiki/plugins/notifications/models.py
-#, python-format
 msgid "Article deleted: %s"
 msgstr ""
 
 #: wiki/plugins/notifications/models.py
-#, python-format
 msgid "Article modified: %s"
 msgstr ""
 
 #: wiki/plugins/notifications/models.py
-#, python-format
 msgid "New article created: %s"
 msgstr ""
 
@@ -11461,12 +11692,10 @@ msgid "You are now logged in! Have fun!"
 msgstr ""
 
 #: wiki/views/article.py
-#, python-format
 msgid "New article '%s' created."
 msgstr ""
 
 #: wiki/views/article.py
-#, python-format
 msgid "There was an error creating this article: %s"
 msgstr ""
 
@@ -11485,7 +11714,6 @@ msgid ""
 msgstr ""
 
 #: wiki/views/article.py
-#, python-format
 msgid ""
 "The article \"%s\" is now marked as deleted! Thanks for keeping the site "
 "free from unwanted material!"
@@ -11504,12 +11732,10 @@ msgid "Restoring article"
 msgstr ""
 
 #: wiki/views/article.py
-#, python-format
 msgid "The article \"%s\" and its children are now restored."
 msgstr ""
 
 #: wiki/views/article.py
-#, python-format
 msgid "The article %s is now set to display revision #%d"
 msgstr ""
 
@@ -11518,12 +11744,10 @@ msgid "New title"
 msgstr ""
 
 #: wiki/views/article.py
-#, python-format
 msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
 msgstr ""
 
 #: wiki/views/article.py
-#, python-format
 msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"

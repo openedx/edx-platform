@@ -34,7 +34,6 @@ When you want to explore edX courses, you can register on edX.org_, edX Edge_, o
 
 .. _Edge: http://edge.edx.org
 .. _edX.org: http://edx.org
-.. _Courses: https://www.edx.org/course-lis
 
 
 
@@ -96,7 +95,7 @@ edX101 and the edX Demo Course
 
 EdX has provided edX101_ and the `edX Demo course <https://www.edx.org/course/edx/edx-edxdemo101-edx-demo-1038>`_ to help familiarize you with taking and creating edX courses.
 
-* edX101_, available on Edge_, is both an example of a course you can build with Studio, and a self-paced walk through of planning, building, and running your own online course.
+* edX101_, available on Edge_, is an example of a course built with Studio. It is a self-paced walk through of planning, building, and running your own online course.
 
 * The `edX Demo course <https://www.edx.org/course/edx/edx-edxdemo101-edx-demo-1038>`_, available on edX.org_, allows new students to explore and learn how to take an edX course. We recommend that you become familiar with the student’s experience of an edX course before you begin building your first course.
 
