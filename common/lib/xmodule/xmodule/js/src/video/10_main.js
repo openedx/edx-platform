@@ -1,12 +1,3 @@
-/*jslint
-    browser: true, white: false, indent: 4, maxlen: 120
-*/
-
-/*properties
-    RequireJS, Video, clearYoutubeXhr, data, each, find, jQuery, modules, off,
-    push, require, saveState, videoPlayer, youtubeXhr
-*/
-
 (function (require, $) {
     'use strict';
 
