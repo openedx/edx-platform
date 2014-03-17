@@ -3,12 +3,8 @@ Tests for ORA (Open Response Assessment) through the LMS UI.
 """
 
 import json
-<<<<<<< HEAD
-from bok_choy.promise import fulfill, Promise
-=======
 from bok_choy.promise import Promise, BrokenPromise
 from ..pages.lms.peer_confirm import PeerConfirmPage
->>>>>>> 98bb29b... Converted ORA acceptance tests to bok-choy(v0.3.0)
 from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.lms.course_info import CourseInfoPage
 from ..pages.lms.tab_nav import TabNavPage

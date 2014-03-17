@@ -3,11 +3,7 @@ PageObjects related to the AcidBlock
 """
 
 from bok_choy.page_object import PageObject
-<<<<<<< HEAD
 from bok_choy.promise import EmptyPromise, BrokenPromise
-=======
->>>>>>> 98bb29b... Converted ORA acceptance tests to bok-choy(v0.3.0)
-
 
 class AcidView(PageObject):
     """

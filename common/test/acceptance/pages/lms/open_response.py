@@ -130,14 +130,9 @@ class OpenResponsePage(PageObject):
         """
         Submit a response for grading.
         """
-<<<<<<< HEAD
-        with self.handle_alert():
-            self.css_click('input.submit-button')
-=======
         self.q(css='input.submit-button').first.click()
         # modal dialog confirmation
         self.q(css='button.ok-button').first.click()
->>>>>>> 98bb29b... Converted ORA acceptance tests to bok-choy(v0.3.0)
 
         # Ensure that the submission completes
         self._wait_for_submitted(self.assessment_type)
