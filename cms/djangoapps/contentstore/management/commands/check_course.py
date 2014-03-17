@@ -1,8 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.xml_importer import check_module_metadata_editability
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.keys import CourseKey
 
 
@@ -17,7 +15,7 @@ class Command(BaseCommand):
 
         store = modulestore()
 
-        course = store.get_course(course_key)
+        course = store.get_course(course_key, depth=3)
 
         err_cnt = 0
 

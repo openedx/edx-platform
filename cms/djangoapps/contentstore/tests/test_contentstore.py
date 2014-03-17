@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #pylint: disable=E1101
 
-import json
 import mock
 import shutil
 
@@ -31,12 +30,10 @@ from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.store_utilities import clone_course
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.keys import CourseKey
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
 
@@ -60,6 +57,7 @@ from contentstore.utils import delete_course_and_groups
 from xmodule.modulestore.django import loc_mapper
 from student.roles import CourseCreatorRole
 from student import auth
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -124,7 +122,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(store, 'common/test/data/', ['simple'])
 
         course_id = 'edX/simple/2012_Fall'
-        course = store.get_item(CourseKey.from_string(course_id), category='course', revision=None,)
+        course = store.get_course(CourseKey.from_string(course_id))
 
         course.advanced_modules = component_types
 
@@ -154,7 +152,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_malformed_edit_unit_request(self):
         store = modulestore('direct')
-        _, course_items = import_from_xml(store, 'common/test/data/', ['simple'])
+        import_from_xml(store, 'common/test/data/', ['simple'])
 
         # just pick one vertical
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
@@ -496,7 +494,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def _test_preview(self, location, view_name):
         """ Preview test case. """
         direct_store = modulestore('direct')
-        _, course_items = import_from_xml(direct_store, 'common/test/data/', ['toy'])
+        import_from_xml(direct_store, 'common/test/data/', ['toy'])
 
         # also try a custom response which will trigger the 'is this course in whitelist' logic
         locator = loc_mapper().translate_location(location, True, True)
@@ -696,7 +694,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertIsNotNone(course_updates)
 
-         # check that course which is imported has files 'updates.html' and 'updates.items.json'
+        # check that course which is imported has files 'updates.html' and 'updates.items.json'
         filesystem = OSFS(data_dir + 'course_info_updates/info')
         self.assertTrue(filesystem.exists('updates.html'))
         self.assertTrue(filesystem.exists('updates.items.json'))
@@ -768,15 +766,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',
-            'run': '2013_Spring'
+            'run': '2013_Spring',
         }
 
         module_store = modulestore('direct')
         draft_store = modulestore('draft')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        source_course_id = CourseId.from_string('edX/toy/2012_Fall')
-        dest_course_id = CourseId.from_string('MITx/999/2013_Spring')
+        source_course_id = SlashSeparatedCourseKey.from_string('edX/toy/2012_Fall')
+        dest_course_id = _get_course_id(course_data)
 
         # get a vertical (and components in it) to put into 'draft'
         # this is to assert that draft content is also cloned over
@@ -792,7 +790,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         items = module_store.get_items(source_course_id, qualifiers={'version': 'draft'})
         self.assertGreater(len(items), 0)
 
-        _create_course(self, course_data)
+        _create_course(self, dest_course_id, course_data)
 
         content_store = contentstore()
 
@@ -849,7 +847,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
         source_course_id = CourseKey.from_string('edX/toy/2012_Fall')
-        dest_course_id = CourseKey.from_string('MITx/999/2013_Spring')
+        dest_course_id = _get_course_id(course_data)
 
         # let's force a non-portable link in the clone source
         # as a final check, make sure that any non-portable links are rewritten during cloning
@@ -864,7 +862,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(new_data, html_module.data)
 
         # create the destination course
-        _create_course(self, course_data)
+        _create_course(self, dest_course_id, course_data)
 
         # do the actual cloning
         clone_course(module_store, content_store, source_course_id, dest_course_id)
@@ -1391,9 +1389,10 @@ class ContentStoreTest(ModuleStoreTestCase):
         test_course_data.update(self.course_data)
         if number_suffix:
             test_course_data['number'] = '{0}_{1}'.format(test_course_data['number'], number_suffix)
-        _create_course(self, test_course_data)
+        course_key = _get_course_id(test_course_data)
+        _create_course(self, course_key, test_course_data)
         # Verify that the creator is now registered in the course.
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, _get_course_id(test_course_data)))
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_key))
         return test_course_data
 
     def assert_create_course_failed(self, error_message):
@@ -1724,14 +1723,8 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_import_into_new_course_id(self):
         module_store = modulestore('direct')
-        target_course_id = CourseKey.from_string('MITx/999/2013_Spring')
-
-        _create_course(self, {
-            'org': 'MITx',
-            'number': '999',
-            'run': '2013_Spring',
-            'display_name': 'Robot Super Course'
-        })
+        target_course_id = _get_course_id(self.course_data)
+        _create_course(self, target_course_id, self.course_data)
 
         import_from_xml(module_store, 'common/test/data/', ['toy'], target_course_id=target_course_id)
 
@@ -1947,9 +1940,9 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_wiki_slug(self):
         """When creating a course a unique wiki_slug should be set."""
 
-        course_location = Location(['i4x', 'MITx', '999', 'course', '2013_Spring'])
-        _create_course(self, self.course_data)
-        course_module = modulestore('direct').get_item(course_location)
+        course_key = _get_course_id(self.course_data)
+        _create_course(self, course_key, self.course_data)
+        course_module = modulestore('direct').get_course(course_key)
         self.assertEquals(course_module.wiki_slug, 'MITx.999.2013_Spring')
 
 
@@ -2040,12 +2033,13 @@ class EntryPageTestCase(TestCase):
         self._test_page("/logout", 302)
 
 
-def _create_course(test, course_data):
+def _create_course(test, course_key, course_data):
     """
     Creates a course via an AJAX request and verifies the URL returned in the response.
     """
-    course_id = _get_course_id(course_data)
-    new_location = loc_mapper().translate_location(CourseDescriptor.id_to_location(course_id), False, True)
+    new_location = loc_mapper().translate_location(
+        CourseKey.make_usage_key(course_key, 'course', course_key.run), False, True
+    )
 
     response = test.client.ajax_post('/course', course_data)
     test.assertEqual(response.status_code, 200)
@@ -2062,9 +2056,9 @@ def _course_factory_create_course():
     return loc_mapper().translate_location(course.location, False, True)
 
 
-def _get_course_id(test_course_data):
+def _get_course_id(course_data):
     """Returns the course ID (org/number/run)."""
-    return u"{org}/{number}/{run}".format(**test_course_data)
+    return SlashSeparatedCourseKey(course_data['org'], course_data['number'], course_data['run'])
 
 
 def _test_no_locations(test, resp, status_code=200, html=True):

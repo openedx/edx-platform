@@ -29,8 +29,7 @@ class SelfAssessmentTest(unittest.TestCase):
         'hintprompt': 'Consider this...',
     }
 
-    location = Location(["i4x", "edX", "sa_test", "selfassessment",
-                         "SampleQuestion"])
+    location = Location("i4x", "edX", "sa_test", "run", "selfassessment", "SampleQuestion", None)
 
     descriptor = Mock()
 

@@ -1,7 +1,6 @@
 """ Contains Locations ___ """
 
 import logging
-import urllib
 import re
 from collections import namedtuple
 from opaque_keys import InvalidKeyError
@@ -65,13 +64,28 @@ class SlashSeparatedCourseKey(CourseKey):
         return '/'.join([self._course, self._run])
 
     def make_asset_key(self, path):
-        return Location('c4x', self._org, self._course, 'asset', path)
+        return Location('c4x', self._org, self._course, self._run, 'asset', path, None)
 
     def make_usage_key(self, block_type, name):
-        return Location('i4x', self._org, self._course, block_type, name)
+        return Location('i4x', self._org, self._course, self._run, block_type, name, None)
 
     def to_deprecated_string(self):
         return '/'.join([self._org, self._course, self._run])
+
+    def make_usage_key_from_deprecated_string(self, location_url):
+        """
+        Temporary mechanism for creating a UsageKey given a CourseKey and a serialized Location. NOTE:
+        this prejudicially takes the tag, org, and course from the url not self.
+
+        Raises:
+            InvalidKeyError: if the url does not parse
+        """
+        match = URL_RE.match(location_url)
+        if match is None:
+            log.debug(u"location %r doesn't match URL", location_url)
+            raise InvalidKeyError(location_url)
+        groups = match.groupdict()
+        return cls(run=self._run, **groups)
 
 
 def _check_location_part(val, regexp):
@@ -95,7 +109,7 @@ def _check_location_part(val, regexp):
         raise InvalidKeyError("Invalid characters in {!r}.".format(val))
 
 
-class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category name revision')):
+class Location(UsageKey, namedtuple('Location', 'tag org course run category name revision')):
     """
     Encodes a location.
 
@@ -156,8 +170,7 @@ class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category
             return False
         return True
 
-    def __new__(_cls, tag=None, org=None, course=None, run=None, category=None,
-                name=None, revision=None):
+    def __new__(_cls, tag, org, course, run, category, name, revision):
         """
         Create a new Location that is a clone of the specifed one.
 
@@ -174,17 +187,6 @@ class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category
         _check_location_part(name, INVALID_CHARS_NAME)
 
         return super(_cls, Location).__new__(_cls, tag, org, course, run, category, name, revision)
-
-    @classmethod
-    def from_deprecated_strings(cls, course_id, location):
-        course_id = SlashSeparatedCourseKey._from_string(course_id)
-
-        match = URL_RE.match(location)
-        if match is None:
-            log.debug(u"location %r doesn't match URL", location)
-            raise InvalidKeyError(location)
-        groups = match.groupdict()
-        return cls(run=course_id.run, **groups)
 
     def url(self):
         """
@@ -234,5 +236,6 @@ class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category
         id_string = u"-".join([v for v in id_fields if v is not None])
         return Location.clean_for_html(id_string)
 
+    @property
     def course_key(self):
         return SlashSeparatedCourseKey(self.org, self.course, self.run)

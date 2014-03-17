@@ -25,9 +25,8 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
     Test peer grading xmodule at the unit level.  More detailed tests are difficult, as the module relies on an
     external grading service.
     """
-    problem_location = Location(["i4x", "edX", "open_ended", "peergrading",
-                                 "PeerGradingSample"])
-    coe_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
+    problem_location = Location("i4x", "edX", "run", "open_ended", "peergrading", "PeerGradingSample", None)
+    coe_location = Location("i4x", "edX", "run", "open_ended", "combinedopenended", "SampleQuestion", None)
     calibrated_dict = {'location': "blah"}
     coe_dict = {'location': coe_location.url()}
     save_dict = MultiDict({
@@ -244,9 +243,7 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
     Test peer grading xmodule at the unit level.  More detailed tests are difficult, as the module relies on an
     external grading service.
     """
-    problem_location = Location(
-        ["i4x", "edX", "open_ended", "peergrading", "PeerGradingScored"]
-    )
+    problem_location = Location("i4x", "edX", "open_ended", "run", "peergrading", "PeerGradingScored", None)
 
     def get_module_system(self, descriptor):
         test_system = get_test_system()
@@ -286,10 +283,8 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
     """
     Test peer grading that is linked to an open ended module.
     """
-    problem_location = Location(["i4x", "edX", "open_ended", "peergrading",
-                                 "PeerGradingLinked"])
-    coe_location = Location(["i4x", "edX", "open_ended", "combinedopenended",
-                             "SampleQuestion"])
+    problem_location = Location("i4x", "edX", "run", "open_ended", "peergrading", "PeerGradingLinked", None)
+    coe_location = Location("i4x", "edX", "run", "open_ended", "combinedopenended", "SampleQuestion", None)
 
     def get_module_system(self, descriptor):
         test_system = get_test_system()
