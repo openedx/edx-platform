@@ -1,11 +1,14 @@
 """ Contains Locations ___ """
 
+import logging
 import urllib
 import re
 from collections import namedtuple
+from opaque_keys import InvalidKeyError
 
-from xmodule.modulestore.exceptions import InvalidLocationError
 from xmodule.modulestore.keys import CourseKey, UsageKey
+
+log = logging.getLogger(__name__)
 
 URL_RE = re.compile("""
     (?P<tag>[^:]+)://?
@@ -80,10 +83,16 @@ def _check_location_part(val, regexp):
         regexp (re.RegexObject): The regular expression specifying invalid characters
 
     Raises:
-        InvalidLocationError: Raised if any invalid character is found in `val`
+        InvalidKeyError: Raised if any invalid character is found in `val`
     """
-    if val is not None and regexp.search(val) is not None:
-        raise InvalidLocationError("Invalid characters in {!r}.".format(val))
+    if val is None:
+        return
+
+    if not isinstance(val, basestring):
+        raise InvalidKeyError("{!r} is not a string".format(val))
+
+    if regexp.search(val) is not None:
+        raise InvalidKeyError("Invalid characters in {!r}.".format(val))
 
 
 class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category name revision')):
@@ -143,22 +152,9 @@ class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category
         '''
         try:
             Location(value)
-        except InvalidLocationError:
+        except InvalidKeyError:
             return False
         return True
-
-    @staticmethod
-    def ensure_fully_specified(location):
-        '''Make sure location is valid, and fully specified.  Raises
-        InvalidLocationError or InsufficientSpecificationError if not.
-
-        returns a Location object corresponding to location.
-        '''
-        loc = Location(location)
-        for key, val in loc.dict().iteritems():
-            if key != 'revision' and val is None:
-                raise InsufficientSpecificationError(location)
-        return loc
 
     def __new__(_cls, tag=None, org=None, course=None, run=None, category=None,
                 name=None, revision=None):
@@ -201,6 +197,33 @@ class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category
         if self.revision:
             url += u"@{rev}".format(rev=self.revision)  # pylint: disable=E1101
         return url
+
+    def _to_string(self):
+        output = u"/".join(
+            unicode(val)
+            for val in (self.org, self.course, self.run, self.category, self.name)
+        )
+        if self.revision:
+            output += u'@{}'.format(self.revision)
+        return output
+
+    @classmethod
+    def _from_string(cls, serialized):
+
+        pattern = """
+            (?P<org>[^/]+)/
+            (?P<course>[^/]+)/
+            (?P<run>[^/]+)/
+            (?P<category>[^/]+)/
+            (?P<name>[^@]+)
+            (@(?P<revision>[^/]+))?
+        """
+
+        match = re.match(pattern, serialized)
+        if not match:
+            raise InvalidKeyError(serialized)
+
+        return cls(**match.groupdict())
 
     def html_id(self):
         """

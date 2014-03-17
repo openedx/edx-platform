@@ -113,7 +113,7 @@ class VideoDescriptorTest(unittest.TestCase):
 
     def setUp(self):
         system = get_test_descriptor_system()
-        location = Location('i4x://org/course/video/name')
+        location = Location('i4x', 'org', 'course', 'run', 'video' 'name')
         self.descriptor = system.construct_xblock_from_class(
             VideoDescriptor,
             scope_ids=ScopeIds(None, None, location, location),
@@ -142,7 +142,7 @@ class VideoDescriptorTest(unittest.TestCase):
         back out to XML.
         """
         system = DummySystem(load_error_modules=True)
-        location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
+        location = Location("i4x", "edX", 'course', 'run', "video", 'SampleProblem1')
         field_data = DictFieldData({'location': location})
         descriptor = VideoDescriptor(system, field_data, Mock())
         descriptor.youtube_id_0_75 = 'izygArpw-Qo'
@@ -158,7 +158,7 @@ class VideoDescriptorTest(unittest.TestCase):
         in the output string.
         """
         system = DummySystem(load_error_modules=True)
-        location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
+        location = Location("i4x", "edX", 'course', 'run', "video", "SampleProblem1")
         field_data = DictFieldData({'location': location})
         descriptor = VideoDescriptor(system, field_data, Mock())
         descriptor.youtube_id_0_75 = 'izygArpw-Qo'
@@ -197,8 +197,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
               <transcript language="ge" src="german_translation.srt" />
             </video>
         '''
-        location = Location(["i4x", "edX", "video", "default",
-                             "SampleProblem1"])
+        location = Location("i4x", "edX", 'course', 'run', "video", "SampleProblem1")
         field_data = DictFieldData({
             'data': sample_xml,
             'location': location
@@ -493,6 +492,9 @@ class VideoExportTestCase(unittest.TestCase):
     Make sure that VideoDescriptor can export itself to XML
     correctly.
     """
+    def setUp(self):
+        self.location = Location("i4x", "edX", 'course', 'run', "video", "SampleProblem1")
+
     def assertXmlEqual(self, expected, xml):
         for attr in ['tag', 'attrib', 'text', 'tail']:
             self.assertEqual(getattr(expected, attr), getattr(xml, attr))
@@ -502,8 +504,7 @@ class VideoExportTestCase(unittest.TestCase):
     def test_export_to_xml(self):
         """Test that we write the correct XML on export."""
         module_system = DummySystem(load_error_modules=True)
-        location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
-        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, location, location))
+        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, self.location, self.location))
 
         desc.youtube_id_0_75 = 'izygArpw-Qo'
         desc.youtube_id_1_0 = 'p2Q6BrNhdh8'
@@ -533,8 +534,7 @@ class VideoExportTestCase(unittest.TestCase):
     def test_export_to_xml_empty_end_time(self):
         """Test that we write the correct XML on export."""
         module_system = DummySystem(load_error_modules=True)
-        location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
-        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, location, location))
+        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, self.location, self.location))
 
         desc.youtube_id_0_75 = 'izygArpw-Qo'
         desc.youtube_id_1_0 = 'p2Q6BrNhdh8'
@@ -562,8 +562,7 @@ class VideoExportTestCase(unittest.TestCase):
     def test_export_to_xml_empty_parameters(self):
         """Test XML export with defaults."""
         module_system = DummySystem(load_error_modules=True)
-        location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
-        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, location, location))
+        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, self.location, self.location))
 
         xml = desc.definition_to_xml(None)
         expected = '<video url_name="SampleProblem1"/>\n'
