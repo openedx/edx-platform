@@ -270,7 +270,7 @@ def index(request, course_id, chapter=None, section=None,
 
             # TODO: Need to retrieve this setting from database. If not set, default is `True`.
             # This setting is unique for each user.
-            'youtube_is_ok': True,
+            'youtube_is_ok': course.youtube_availability,
 
             # TODO: Get the AJAX url.
             'ajax_url': 'localhost:8001',
