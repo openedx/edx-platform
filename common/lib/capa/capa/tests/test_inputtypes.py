@@ -435,6 +435,7 @@ class MatlabTest(unittest.TestCase):
             'tabsize': int(self.tabsize),
             'button_enabled': True,
             'queue_len': '3',
+            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
         }
 
         self.assertEqual(context, expected)
@@ -465,6 +466,7 @@ class MatlabTest(unittest.TestCase):
             'tabsize': int(self.tabsize),
             'button_enabled': True,
             'queue_len': '3',
+            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
         }
 
         self.assertEqual(context, expected)
@@ -495,6 +497,7 @@ class MatlabTest(unittest.TestCase):
                 'tabsize': int(self.tabsize),
                 'button_enabled': False,
                 'queue_len': '0',
+                'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
             }
 
             self.assertEqual(context, expected)
@@ -524,6 +527,7 @@ class MatlabTest(unittest.TestCase):
             'tabsize': int(self.tabsize),
             'button_enabled': True,
             'queue_len': '1',
+            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
         }
 
         self.assertEqual(context, expected)
@@ -589,11 +593,7 @@ class MatlabTest(unittest.TestCase):
         output = self.the_input.get_html()
         self.assertEqual(
             etree.tostring(output),
-            """<div>{\'status\': \'queued\', \'button_enabled\': True, \'rows\': \'10\', \'queue_len\': \'3\'\
-, \'mode\': \'\', \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\', \'linenumbers\': \'true\'\
-, \'queue_msg\': \'\', \'value\': \'print "good evening"\', \'msg\': u\'Submitted\
-. As soon as a response is returned, this message will be replaced by that feedback.\', \'hidden\': \'\'\
-, \'id\': \'prob_1_2\', \'tabsize\': 4}</div>"""
+            """<div>{\'status\': \'queued\', \'button_enabled\': True, \'rows\': \'10\', \'queue_len\': \'3\', \'mode\': \'\', \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\', \'linenumbers\': \'true\', \'queue_msg\': \'\', \'value\': \'print "good evening"\', \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\', \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/addons/octave.js\', \'hidden\': \'\', \'id\': \'prob_1_2\', \'tabsize\': 4}</div>"""
         )
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
