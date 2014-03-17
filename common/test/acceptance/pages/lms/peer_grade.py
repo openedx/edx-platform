@@ -22,7 +22,7 @@ class PeerGradePage(PageObject):
             )
             return is_present, is_present
 
-        return Promise(_is_correct_page, 'Correct Page not found :(').fulfill()
+        return Promise(_is_correct_page, 'On the peer grading page.').fulfill()
 
     @property
     def problem_list(self):

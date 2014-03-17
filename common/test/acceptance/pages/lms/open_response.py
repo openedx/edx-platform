@@ -46,7 +46,7 @@ class OpenResponsePage(PageObject):
         Return an HTML string representing the essay prompt.
         """
         prompt_css = "section.open-ended-child>div.prompt"
-        prompts = self.q(css=prompt_css).map(lambda el: el.get_attribute('innerHTML').strip())
+        prompts = self.q(css=prompt_css).map(lambda el: el.get_attribute('innerHTML').strip()).results
 
         if len(prompts) == 0:
             self.warning("Could not find essay prompt on page.")
