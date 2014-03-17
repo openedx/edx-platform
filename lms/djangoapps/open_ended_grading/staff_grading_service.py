@@ -287,9 +287,11 @@ def get_problem_list(request, course_id):
         else:
             problem_list = []
             # Make an error messages to reflect that we could not find anything to grade.
-            response['error'] = ("Cannot find any open response problems in this course.  "
-                                 "Have you submitted answers to any open response assessment questions?  "
-                                 "If not, please do so and return to this page.")
+            response['error'] = _(
+                u'Cannot find any open response problems in this course. '
+                u'Have you submitted answers to any open response assessment questions? '
+                u'If not, please do so and return to this page.'
+            )
         valid_problem_list = []
         for i in xrange(0,len(problem_list)):
             # Needed to ensure that the 'location' key can be accessed.
