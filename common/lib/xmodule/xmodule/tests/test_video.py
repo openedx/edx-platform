@@ -233,8 +233,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
                    end_time="00:01:00">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
-              <transcript language="ua" src="ukrainian_translation.srt" />
-              <transcript language="ge" src="german_translation.srt" />
+              <transcript language="uk" src="ukrainian_translation.srt" />
+              <transcript language="de" src="german_translation.srt" />
             </video>
         '''
         output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
@@ -251,7 +251,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'download_video': False,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': '',
-            'transcripts': {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'},
+            'transcripts': {'uk': 'ukrainian_translation.srt', 'de': 'german_translation.srt'},
         })
 
     def test_from_xml_missing_attributes(self):
