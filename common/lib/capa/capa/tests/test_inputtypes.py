@@ -453,7 +453,7 @@ class MatlabTest(unittest.TestCase):
             'tabsize': int(self.tabsize),
             'button_enabled': True,
             'queue_len': '3',
-            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
+            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
         }
 
         self.assertEqual(context, expected)
@@ -486,7 +486,7 @@ class MatlabTest(unittest.TestCase):
             'tabsize': int(self.tabsize),
             'button_enabled': True,
             'queue_len': '3',
-            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
+            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
         }
 
         self.assertEqual(context, expected)
@@ -519,7 +519,7 @@ class MatlabTest(unittest.TestCase):
                 'tabsize': int(self.tabsize),
                 'button_enabled': False,
                 'queue_len': '0',
-                'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
+                'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
             }
 
             self.assertEqual(context, expected)
@@ -551,7 +551,7 @@ class MatlabTest(unittest.TestCase):
             'tabsize': int(self.tabsize),
             'button_enabled': True,
             'queue_len': '1',
-            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
+            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
         }
 
         self.assertEqual(context, expected)
@@ -617,7 +617,7 @@ class MatlabTest(unittest.TestCase):
         output = self.the_input.get_html()
         self.assertEqual(
             etree.tostring(output),
-            """<div>{\'status\': \'queued\', \'button_enabled\': True, \'linenumbers\': \'true\', \'rows\': \'10\', \'queue_len\': \'3\', \'mode\': \'\', \'cols\': \'80\', \'value\': \'print "good evening"\', \'status_class\': \'processing\', \'queue_msg\': \'\', \'STATIC_URL\': \'/dummy-static/\', \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\', \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/addons/octave.js\', \'hidden\': \'\', \'status_display\': u\'queued\', \'id\': \'prob_1_2\', \'tabsize\': 4}</div>"""
+            """<div>{\'status\': \'queued\', \'button_enabled\': True, \'linenumbers\': \'true\', \'rows\': \'10\', \'queue_len\': \'3\', \'mode\': \'\', \'cols\': \'80\', \'value\': \'print "good evening"\', \'status_class\': \'processing\', \'queue_msg\': \'\', \'STATIC_URL\': \'/dummy-static/\', \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\', \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\', \'hidden\': \'\', \'status_display\': u\'queued\', \'id\': \'prob_1_2\', \'tabsize\': 4}</div>"""
         )
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
@@ -693,6 +693,7 @@ class SchematicTest(unittest.TestCase):
             'width': width,
             'height': height,
             'parts': parts,
+            'setup_script': '/dummy-static/js/capa/schematicinput.js',
             'analyses': analyses,
             'submit_analyses': submit_analyses,
         }
