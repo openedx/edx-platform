@@ -329,6 +329,7 @@ edx_d3CreateStackedBarGraph = function(parameters, svg, divTooltip) {
       .attr("height", function(d) {
         return graph.scale.y(d.y0) - graph.scale.y(d.y1);
       })
+      .attr("id", function(d) { return d.module_url })
       .style("fill", function(d) { return graph.scale.stackColor(d.color); })
       .style("stroke", "white")
       .style("stroke-width", "0.5px");
