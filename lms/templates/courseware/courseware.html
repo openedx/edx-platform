@@ -1,3 +1,4 @@
+<%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from microsite_configuration import page_title_breadcrumbs %>
 <%inherit file="/main.html" />
@@ -59,11 +60,7 @@ ${page_title_breadcrumbs(course_name())}
   -->
   <script type="text/javascript">
     (function () {
-        % if youtube_is_ok:
-            var youtubeIsOk = true;
-        % else
-            var youtubeIsOk = false;
-        %endif
+        var youtubeIsOk = <% json.loads(youtube_is_ok) %>
 
         // Only try to load the YouTube API if the user was able to do so
         // last time.
