@@ -27,7 +27,7 @@ ul.email_list {
 input[type="checkbox"] {
     display:none;
 }
-input[type="checkbox"] + label span {
+input[type="checkbox"].register-button + label span {
     display:inline-block;
     width:10px;
     height:10px;
@@ -36,6 +36,18 @@ input[type="checkbox"] + label span {
     background:url(/static/images/vote-plus-icon.png) left top no-repeat;
     cursor:pointer;
 }
-input[type="checkbox"]:checked + label span {
+input[type="checkbox"].register-button:checked + label span {
     background:url(/static/images/vote-plus-icon.png) -10px top no-repeat;
+}
+input[type="checkbox"].unregister-button + label span {
+    display:inline-block;
+    width:10px;
+    height:10px;
+    margin:-1px 4px 0 0;
+    vertical-align:middle;
+    background:url(/static/images/vote-minus-icon.png) left top no-repeat;
+    cursor:pointer;
+}
+input[type="checkbox"].unregister-button:checked + label span {
+    background:url(/static/images/vote-minus-icon.png) -10px top no-repeat;
 }

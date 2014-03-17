@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2014-02-03 14:54+0400\n"
-"PO-Revision-Date: 2014-01-30 13:52+0300\n"
+"PO-Revision-Date: 2014-02-12 15:32+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -924,11 +924,11 @@ msgstr "Отображаемое имя:"
 
 #: cms/templates/edit_subsection.html:26
 msgid "Units:"
-msgstr "Количество часов:"
+msgstr "Блоки:"
 
 #: cms/templates/edit_subsection.html:35
 msgid "Subsection Settings"
-msgstr "Настройки:"
+msgstr "Настройки подраздела"
 
 #: cms/templates/edit_subsection.html:40 cms/templates/overview.html:292
 msgid "Release Day"
@@ -2062,9 +2062,8 @@ msgid "New Section Name"
 msgstr "Новое название раздела"
 
 #: cms/templates/overview.html:76
-#, fuzzy
 msgid "Add a new section name"
-msgstr "Новое название раздела"
+msgstr "Добавить новое название раздела"
 
 #: cms/templates/overview.html:85 cms/templates/overview.html:197
 msgid "Delete this section"
@@ -2091,9 +2090,8 @@ msgid "New Section"
 msgstr "Новый раздел"
 
 #: cms/templates/overview.html:187
-#, fuzzy
 msgid "This section is not scheduled for release"
-msgstr "Этот раздел еще не реализован."
+msgstr "Этот раздел еще не запланирован для опубликования"
 
 #: cms/templates/overview.html:188
 msgid "Schedule"
@@ -2104,9 +2102,8 @@ msgid "Delete section"
 msgstr "Удалить этот раздел"
 
 #: cms/templates/overview.html:200
-#, fuzzy
 msgid "Drag to reorder section"
-msgstr "Для изменения порядка - перетащите"
+msgstr "Перетащите для изменения порядка разделов"
 
 #: cms/templates/overview.html:221
 msgid "Expand/collapse this subsection"
@@ -2428,11 +2425,12 @@ msgid "Manual Policy Definition"
 msgstr "Ручное определение политики"
 
 #: cms/templates/settings_advanced.html:67
-#, fuzzy
 msgid ""
 "Manually Edit Course Policy Values (JSON Key / Value pairs, use &quot; not "
 "&apos;)"
-msgstr "Вручную отредактировать значения курса (JSON пары ключ/значение)"
+msgstr ""
+"Вручную отредактировать значения курса (JSON пары ключ/значение, используйте "
+"&quot;, а не &apos;)"
 
 #: cms/templates/settings_advanced.html:70
 msgid ""
@@ -2443,9 +2441,8 @@ msgstr ""
 "знакомы с их назначением."
 
 #: cms/templates/settings_advanced.html:81
-#, fuzzy
 msgid "What do advanced settings do?"
-msgstr "Расширенные настройки"
+msgstr "Зачем нужны расширенные настройки?"
 
 #: cms/templates/settings_advanced.html:82
 msgid ""
@@ -2458,15 +2455,14 @@ msgstr ""
 "значением соответствующей настройки курса."
 
 #: cms/templates/settings_advanced.html:84
-#, fuzzy
 msgid ""
 "Any policies you modify here override all other information you've defined "
 "elsewhere in Studio. Do not edit policies unless you are familiar with both "
 "their purpose and syntax."
 msgstr ""
 "Любые изменения, которые вы внесете сюда, заменят любую другую информацию, "
-"которая определена в Студии. Имейте это в виду. Будьте осторожны и не "
-"редактируйте информацию, с которой вы не знакомы (с целью или синтаксисом)"
+"которая была задана где-либо в Студии. Будьте осторожны и не редактируйте "
+"информацию, с которой вы не знакомы (с целью или синтаксисом)"
 
 #: cms/templates/settings_advanced.html:99
 #: cms/templates/settings_graders.html:148
@@ -3857,9 +3853,8 @@ msgid "Display name for this module"
 msgstr "Отображаемое имя для этого объекта"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py:39
-#, fuzzy
 msgid "Annotation"
-msgstr "Скрыть аннотации"
+msgstr "Аннотации"
 
 #: common/lib/xmodule/xmodule/capa_module.py:83
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py:195
@@ -4491,7 +4486,6 @@ msgid "Getting Started With Studio"
 msgstr "Нужна помощь со студией?"
 
 #: common/lib/xmodule/xmodule/course_module.py:231
-#, fuzzy
 msgid "Add Course Team Members"
 msgstr "Добавить нового члена команды"
 
@@ -4502,9 +4496,8 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py:235
-#, fuzzy
 msgid "Edit Course Team"
-msgstr "Команда курса"
+msgstr "Редактировать Команду курса"
 
 #: common/lib/xmodule/xmodule/course_module.py:237
 msgid "Set Important Dates for Your Course"
@@ -4517,9 +4510,8 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py:241
-#, fuzzy
 msgid "Edit Course Details &amp; Schedule"
-msgstr "Детали &amp; Расписание"
+msgstr "Редактировать курс  &amp; Расписание"
 
 #: common/lib/xmodule/xmodule/course_module.py:243
 msgid "Draft Your Course's Grading Policy"
@@ -4532,9 +4524,8 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py:247
-#, fuzzy
 msgid "Edit Grading Settings"
-msgstr "Настройки оценивания"
+msgstr "Редактировать настройки оценивания"
 
 #: common/lib/xmodule/xmodule/course_module.py:249
 msgid "Explore the Other Studio Checklists"
@@ -5850,14 +5841,12 @@ msgid "# staff"
 msgstr "Персонал"
 
 #: lms/djangoapps/dashboard/sysadmin.py:598
-#, fuzzy
 msgid "instructors"
-msgstr "Инструктор"
+msgstr "Инструкторы"
 
 #: lms/djangoapps/dashboard/sysadmin.py:599
-#, fuzzy
 msgid "Enrollment information for all courses"
-msgstr "Информация о регистрациях"
+msgstr "Информация о регистрациях на все курсы"
 
 #: lms/djangoapps/dashboard/sysadmin.py:630
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py:355
@@ -6126,7 +6115,6 @@ msgid "Student state for problem {problem}"
 msgstr "Удалить состояние студента для задания %s"
 
 #: lms/djangoapps/instructor/views/legacy.py:610
-#, fuzzy
 msgid "List of Beta Testers"
 msgstr "Список бета-тестеров"
 
@@ -7034,12 +7022,11 @@ msgstr ""
 "Вам следует нажать на кнопку \"Далее\", а не \"Сохранить\"."
 
 #: lms/static/admin/js/calendar.js:27 lms/static/admin/js/dateparse.js:33
-#, fuzzy
 msgid ""
 "January|February|March|April|May|June|July|August|September|October|November|"
 "December"
 msgstr ""
-"Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь "
+"Январь|Февраль|Март|Апрель|Май|Июнь|Июль|Август|Сентябрь|Октябрь|Ноябрь|"
 "Декабрь"
 
 #: lms/static/admin/js/calendar.js:29
@@ -7057,9 +7044,8 @@ msgid "Hide"
 msgstr "Спрятать"
 
 #: lms/static/admin/js/dateparse.js:35
-#, fuzzy
 msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr "Воскресенье Понедельник Вторник Среда Четверг Пятница Суббота"
+msgstr "Воскресенье|Понедельник|Вторник|Среда|Четверг|Пятница|Суббота"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:49
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:85

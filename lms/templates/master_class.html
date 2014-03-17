@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-<%! from django.utils.translation import ugettext as _ %>
+<%! 
+from django.utils.translation import ugettext as _ 
+from util.date_utils import get_time_display
+%>
 
 <section
     id="master_class_${element_id}"
@@ -7,6 +10,13 @@
     data-ajax-url="${ajax_url}"
 >
     <h2 class="problem-header">${display_name}</h2>
+<%
+    formatted_string = get_time_display(due)
+    due_date = (u'{date}').format(date=formatted_string)
+    %>
+    
+    <h4>Дата окончания регистрации: ${due_date}</h4>
+        <p>
 
     <section class="input_class_section">
         <input

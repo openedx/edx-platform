@@ -111,10 +111,8 @@ div.gradebook-wrapper {
 		position: absolute;
 		top: 0;
 		left: 0;
-		cursor: move;
 		@include transition(none);
-		@include user-select(none);
-
+		
 		td,
 		th {
 			text-align: center;
@@ -242,10 +240,8 @@ div.grades {
 	}
 
 div	.grade-table {
-		cursor: move;
 		@include transition(none);
-		@include user-select(none);
-
+		
 		td,
 		th {
 			text-align: center;
@@ -339,4 +335,12 @@ div	.grade-table {
 		a {
 			color: #333;
 		}
+	}
+	.paginate_disabled_previous,
+	.paginate_disabled_next {
+		display: none;
+	}
+	.paginate_enabled_previous,
+	.paginate_enabled_next {
+		cursor: pointer;
 	}

@@ -121,6 +121,8 @@ header.global.slim {
   h1.logo {
     margin: 0 10px 0 13px;
     padding-right: 20px;
+    padding-bottom: 0;
+    border: 0;
 
     &:before {
       @extend %faded-vertical-divider;

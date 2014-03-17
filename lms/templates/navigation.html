@@ -51,7 +51,7 @@ site_status_msg = get_site_status_msg(course_id)
     </a>
   </h1>
 
-    % if course:
+    % if course and style != 'full':
       <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
     % else:
     <span class="logo">Департамент образования города Москвы<br>

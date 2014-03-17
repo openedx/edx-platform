@@ -9,12 +9,15 @@ If student have answered - words he entered and cloud.
 
 import json
 import logging
+import datetime
 
 from pkg_resources import resource_string
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 from django.contrib.auth.models import User
+
+from django.utils.timezone import UTC
 
 from xblock.fields import Scope, Dict, Boolean, List, Integer, String
 
@@ -100,10 +103,14 @@ class MasterClassModule(MasterClassFields, XModule):
             additional_data['all_registrations'] = self.all_registrations
             additional_data['passed_registrations'] = self.passed_registrations
             additional_data['is_staff'] = self.runtime.user_is_staff
+
+        if self.submitted and self.runtime.user.email not in self.all_registrations and self.runtime.user.email not in self.passed_registrations:
+            self.submitted = False
         if self.submitted:
             data = {
                 'status': 'success',
                 'submitted': True,
+                'is_closed': self.is_past_due(),
                 'total_places': self.total_places,
                 'total_register': total_register,
                 'message': message
@@ -114,6 +121,7 @@ class MasterClassModule(MasterClassFields, XModule):
             data = {
                 'status': 'success',
                 'submitted': False,
+                'is_closed': self.is_past_due(),
                 'total_places': self.total_places,
                 'total_register': total_register,
             }
@@ -130,8 +138,13 @@ class MasterClassModule(MasterClassFields, XModule):
         Returns:
             json string
         """
-                    
+        
         if dispatch == 'submit':
+            if self.is_past_due():
+                return json.dumps({
+                    'status': 'fail',
+                    'error': 'Registration is closed due to date.'
+                })
             if self.submitted:
                 return json.dumps({
                     'status': 'fail',
@@ -165,6 +178,33 @@ class MasterClassModule(MasterClassFields, XModule):
                     'status': 'fail',
                     'error': 'Unknown Command!'
                 })
+        elif dispatch == 'unregister':
+            logging.error(data)
+            if self.runtime.user_is_staff:
+                for email in data.getall('emails[]'):
+                    if (self.passed_registrations.count(email) > 0):
+                        self.passed_registrations.remove(email)
+                        self.all_registrations.append(email)
+                return self.get_state()
+            else:
+                return json.dumps({
+                    'status': 'fail',
+                    'error': 'Unknown Command!'
+                })
+        elif dispatch == 'remove':
+            logging.error(data)
+            if self.runtime.user_is_staff:
+                for email in data.getall('emails[]'):
+                    if (self.passed_registrations.count(email) > 0):
+                        self.passed_registrations.remove(email)
+                    if (self.all_registrations.count(email) > 0):
+                        self.all_registrations.remove(email)
+                return self.get_state()
+            else:
+                return json.dumps({
+                    'status': 'fail',
+                    'error': 'Unknown Command!'
+                })
         elif dispatch == 'csv':
             if self.runtime.user_is_staff:
                 header = [u'Email', u'ФИО']
@@ -190,6 +230,13 @@ class MasterClassModule(MasterClassFields, XModule):
                 'error': 'Unknown Command!'
             })
 
+    def is_past_due(self):
+        """
+        Is it now past this problem's due date, including grace period?
+        """
+        return (self.due is not None and
+                datetime.datetime.now(UTC()) > self.due)
+
     def get_html(self):
         """Template rendering."""
         logging.info(type(self.location))
@@ -199,6 +246,7 @@ class MasterClassModule(MasterClassFields, XModule):
         logging.info(self.runtime)
         context = {
             'display_name': self.display_name,
+            'due': self.due,
             'element_id': self.location.html_id(),
             'element_class': self.location.category,
             'ajax_url': self.system.ajax_url,

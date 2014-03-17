@@ -8,13 +8,11 @@
  *
  *  @exports MasterClassMain
  *
- *  @requires logme
- *
  *  @external $, RequireJS
  */
 
 (function (requirejs, require, define) {
-define('MasterClassMain', ['logme'], function (logme) {
+define('MasterClassMain', [], function (logme) {
 
     /**
      * @function MasterClassMain
@@ -50,7 +48,7 @@ define('MasterClassMain', ['logme'], function (logme) {
             _this.ajax_url + '/' + 'get_state', null,
             function (response) {
                 if (response.status !== 'success') {
-                    logme('ERROR: ' + response.error);
+                    console.log('ERROR: ' + response.error);
 
                     return;
                 }
@@ -100,7 +98,7 @@ define('MasterClassMain', ['logme'], function (logme) {
             _this.ajax_url + '/' + 'submit', $.param(data),
             function (response) {
                 if (response.status !== 'success') {
-                    logme('ERROR: ' + response.error);
+                    console.log('ERROR: ' + response.error);
 
                     return;
                 }
@@ -126,7 +124,7 @@ define('MasterClassMain', ['logme'], function (logme) {
             _this.ajax_url + '/' + 'csv', $.param(data),
             function (response) {
                 if (response.status !== 'success') {
-                    logme('ERROR: ' + response.error);
+                    console.log('ERROR: ' + response.error);
 
                     return;
                 }
@@ -155,7 +153,53 @@ define('MasterClassMain', ['logme'], function (logme) {
             _this.ajax_url + '/' + 'register', $.param(data),
             function (response) {
                 if (response.status !== 'success') {
-                    logme('ERROR: ' + response.error);
+                    console.log('ERROR: ' + response.error);
+
+                    return;
+                }
+
+                _this.showMasterClass(response);
+            }
+        );
+    };
+
+     MasterClassMain.prototype.submitRemove = function (caller) {
+        var _this = this,
+            data = {'emails': []};
+
+        // Populate the data to be sent to the server with user's words.
+        data.emails.push($(caller).val());
+
+        // Send the data to the server as an AJAX request. Attach a callback that will
+        // be fired on server's response.
+        $.postWithPrefix(
+            _this.ajax_url + '/' + 'remove', $.param(data),
+            function (response) {
+                if (response.status !== 'success') {
+                    console.log('ERROR: ' + response.error);
+
+                    return;
+                }
+
+                _this.showMasterClass(response);
+            }
+        );
+    };
+
+     MasterClassMain.prototype.submitUnregister = function (caller) {
+        var _this = this,
+            data = {'emails': []};
+
+        // Populate the data to be sent to the server with user's words.
+        data.emails.push($(caller).val());
+
+        // Send the data to the server as an AJAX request. Attach a callback that will
+        // be fired on server's response.
+        $.postWithPrefix(
+            _this.ajax_url + '/' + 'unregister', $.param(data),
+            function (response) {
+                if (response.status !== 'success') {
+                    console.log('ERROR: ' + response.error);
 
                     return;
                 }
@@ -195,7 +239,7 @@ define('MasterClassMain', ['logme'], function (logme) {
     MasterClassMain.prototype.showMasterClass = function (response) {
         var _this = this;
 
-        if (response.submitted) {
+        if (response.submitted || response.is_closed) {
             this.masterClassEl.find('.input_class_section').hide();
         }
         _this.drawMasterClass(response);
@@ -231,6 +275,11 @@ define('MasterClassMain', ['logme'], function (logme) {
         cloudSectionEl
             .addClass('active');
         cloudSectionEl.find('.message').html(gettext(response.message));
+
+        if (!response.submitted && response.is_closed) {
+            cloudSectionEl.find('.message').html("Регистрация на мастер класс закрыта.");
+        }
+
         cloudSectionEl
             .find('.total_places').html(response.total_places);
         cloudSectionEl
@@ -249,7 +298,7 @@ define('MasterClassMain', ['logme'], function (logme) {
                     var li = $('<li/>')
                         .addClass('ui-menu-item')
                         .appendTo(all_registrations);
-                    $('<input/>').addClass('add-button').attr('type', 'checkbox').attr('id', 'email_' + key).attr('value', value).appendTo(li);
+                    $('<input/>').addClass('register-button').attr('type', 'checkbox').attr('id', 'email_' + key).attr('value', value).appendTo(li);
                     $('<label/>').attr('for', 'email_' + key).html("<span></span>").appendTo(li);
                     $('<a/>')
                         .addClass('ui-all')
@@ -261,15 +310,32 @@ define('MasterClassMain', ['logme'], function (logme) {
                     var li = $('<li/>')
                         .addClass('ui-menu-item')
                         .appendTo(passed_registrations);
+                    $('<input/>').addClass('unregister-button').attr('type', 'checkbox').attr('id', 'email_' + key).attr('value', value).appendTo(li);
+                    $('<label/>').attr('for', 'email_' + key).html("<span></span>").appendTo(li);
                     $('<a/>')
                         .addClass('ui-all')
                         .text(value)
                         .appendTo(li);
                 });
             var _this = this
-            $(all_registrations).find('input.add-button').each( function(index, elem) {
+            $(all_registrations).find('input.register-button').each( function(index, elem) {
             $(elem).on('click', function () {
                 _this.submitRegister(this);
+                });
+            });
+            $(passed_registrations).find('input.unregister-button').each( function(index, elem) {
+            $(elem).on('click', function () {
+                _this.submitUnregister(this);
+                });
+            });
+            $(all_registrations).find('input.remove-button').each( function(index, elem) {
+            $(elem).on('click', function () {
+                _this.submitRemove(this);
+                });
+            });
+            $(passed_registrations).find('input.remove-button').each( function(index, elem) {
+            $(elem).on('click', function () {
+                _this.submitRemove(this);
                 });
             });
         }

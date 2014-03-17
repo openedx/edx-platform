@@ -545,6 +545,7 @@ def course_about(request, course_id):
 
     return render_to_response('courseware/course_about.html',
                               {'course': course,
+                               'style': 'full',
                                'registered': registered,
                                'course_target': course_target,
                                'registration_price': registration_price,
