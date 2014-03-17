@@ -232,7 +232,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
             render_template=render_template,
             error_tracker=error_tracker,
             process_xml=process_xml,
-            id_reader=id_reader,
             **kwargs
         )
 
