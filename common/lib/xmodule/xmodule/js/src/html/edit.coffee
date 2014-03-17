@@ -65,20 +65,14 @@ class @HTMLEditingDescriptor
 
     @visualEditor = ed
 
-    ed.on('change', @changeHandler)
+    ed.on('SaveImage', @imageAdded)
     ed.on('ShowCodeMirror', @showCodeEditor)
     ed.on('SaveCodeMirror', @saveCodeEditor)
 
-  # Intended to run after the "image" plugin is used so that static urls are set
-  # correctly in the Visual editor immediately after command use.
-  changeHandler: (e) =>
-    # The fact that we have to listen to all change events and act on an event actually fired
-    # from undo (which is where the "level" comes from) is extremely ugly. However, plugins
-    # don't fire any events in TinyMCE version 4 that I can hook into (in particular, not ExecCommand).
-    debugger
-    if e.level and e.level.content and e.level.content.match(/<img src="\/static\//)
-      content = rewriteStaticLinks(e.target.getContent(), '/static/', @base_asset_url)
-      e.target.setContent(content)
+  imageAdded: (e) =>
+    # Intended to run after the "image" plugin is used so that static urls are set
+    # correctly in the Visual editor immediately after command use.
+    @rewriteLinksFromStatic(e.target)
 
   showCodeEditor: (codeEditor) =>
     # Called with the CodeMirror Editor is displayed to convert links to show satic prefix.
@@ -91,8 +85,11 @@ class @HTMLEditingDescriptor
     codeEditor.setValue(content)
 
   initInstanceCallback: (visualEditor) =>
-    visualEditor.setContent(rewriteStaticLinks(visualEditor.getContent({no_events: 1}), '/static/', @base_asset_url))
+    @rewriteLinksFromStatic(visualEditor)
     @focusVisualEditor(visualEditor)
+
+  rewriteLinksFromStatic: (visualEditor) =>
+    visualEditor.setContent(rewriteStaticLinks(visualEditor.getContent({no_events: 1}), '/static/', @base_asset_url))
 
   focusVisualEditor: (visualEditor) =>
     visualEditor.focus()
