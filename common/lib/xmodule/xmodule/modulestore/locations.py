@@ -28,6 +28,9 @@ INVALID_HTML_CHARS = re.compile(r"[^\w-]", re.UNICODE)
 
 class SlashSeparatedCourseKey(CourseKey):
     """Course key for old style org/course/run course identifiers"""
+
+    CANONICAL_NAMESPACE = 'slashes'
+
     def __init__(self, org, course, run):
         self._org = org
         self._course = course
@@ -91,6 +94,8 @@ class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category
     form {tag}://{org}/{course}/{category}/{name}[@{revision}], situated in the course
     {org}/{course}/{run}.
     """
+    CANONICAL_NAMESPACE = 'location'
+
     __slots__ = ()
 
     @staticmethod
