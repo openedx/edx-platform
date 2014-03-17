@@ -2,6 +2,7 @@
 // ====================
 
 // right to left mixins and variables
+// thanks to https://gist.github.com/Integralist/7269907
 @function flip($value_ltr, $value_rtl) {
   @if $rtl { @return $value_rtl; }
   @else { @return $value_ltr; }
