@@ -60,6 +60,11 @@ ${page_title_breadcrumbs(course_name())}
   -->
   <script type="text/javascript">
     (function () {
+        // TODO:
+        //     Moving things to Video module. Later on will remove everything
+        //     after `return`. For now this anonymous function is a noop function.
+        return;
+
         var youtubeIsOk = <% json.loads(youtube_is_ok) %>
 
         // Only try to load the YouTube API if the user was able to do so
