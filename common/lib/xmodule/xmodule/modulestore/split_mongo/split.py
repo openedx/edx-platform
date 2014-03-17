@@ -5,7 +5,6 @@ Representation:
 * course_index: a dictionary:
     ** '_id': package_id (e.g., myu.mydept.mycourse.myrun),
     ** 'org': the org's id. Only used for searching not identity,
-    ** 'prettyid': a vague to-be-determined field probably more useful to storing searchable tags,
     ** 'edited_by': user_id of user who created the original entry,
     ** 'edited_on': the datetime of the original creation,
     ** 'versions': versions_dict: {branch_id: structure_id, ...}
@@ -99,6 +98,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
     A Mongodb backed ModuleStore supporting versions, inheritance,
     and sharing.
     """
+
+    SCHEMA_VERSION = 1
     reference_type = Locator
     def __init__(self, doc_store_config, fs_root, render_template,
                  default_class=None,
@@ -468,7 +469,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         heads. This function is primarily for test verification but may serve some
         more general purpose.
         :param course_locator: must have a package_id set
-        :return {'org': , 'prettyid': ,
+        :return {'org': string,
             versions: {'draft': the head draft version id,
                 'published': the head published version id if any,
             },
@@ -618,7 +619,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 "edited_on": datetime.datetime.now(UTC),
                 "previous_version": None,
                 "original_version": new_id,
-            }
+            },
+            'schema_version': self.SCHEMA_VERSION,
         }
         self.db_connection.insert_definition(document)
         definition_locator = DefinitionLocator(new_id)
@@ -654,6 +656,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             old_definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
             # previous version id
             old_definition['edit_info']['previous_version'] = definition_locator.definition_id
+            old_definition['schema_version'] = self.SCHEMA_VERSION
             self.db_connection.insert_definition(old_definition)
             return DefinitionLocator(old_definition['_id']), True
         else:
@@ -811,7 +814,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         return self.get_item(item_loc)
 
     def create_course(
-        self, course_id, org, prettyid, user_id, fields=None,
+        self, course_id, org, user_id, fields=None,
         master_branch='draft', versions_dict=None, root_category='course',
         root_block_id='course'
     ):
@@ -870,7 +873,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     'edited_on': datetime.datetime.now(UTC),
                     'previous_version': None,
                     'original_version': definition_id,
-                }
+                },
+                'schema_version': self.SCHEMA_VERSION,
             }
             self.db_connection.insert_definition(definition_entry)
 
@@ -904,6 +908,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     definition['edit_info']['edited_by'] = user_id
                     definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
                     definition['_id'] = ObjectId()
+                    definition['schema_version'] = self.SCHEMA_VERSION
                     self.db_connection.insert_definition(definition)
                     root_block['definition'] = definition['_id']
                     root_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
@@ -917,10 +922,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         index_entry = {
             '_id': course_id,
             'org': org,
-            'prettyid': prettyid,
             'edited_by': user_id,
             'edited_on': datetime.datetime.now(UTC),
-            'versions': versions_dict}
+            'versions': versions_dict,
+            'schema_version': self.SCHEMA_VERSION,
+        }
         self.db_connection.insert_course_index(index_entry)
         return self.get_course(CourseLocator(package_id=course_id, branch=master_branch))
 
@@ -947,7 +953,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # check children
         original_entry = self._get_block_from_structure(original_structure, descriptor.location.block_id)
         is_updated = is_updated or (
-            descriptor.has_children and original_entry['fields']['children'] != descriptor.children
+            descriptor.has_children and original_entry['fields'].get('children', []) != descriptor.children
         )
         # check metadata
         if not is_updated:
@@ -985,6 +991,40 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         else:
             # nothing changed, just return the one sent in
             return descriptor
+
+    def create_xblock(self, runtime, category, fields=None, block_id=None, definition_id=None, parent_xblock=None):
+        """
+        This method instantiates the correct subclass of XModuleDescriptor based
+        on the contents of json_data. It does not persist it and can create one which
+        has no usage id.
+
+        parent_xblock is used to compute inherited metadata as well as to append the new xblock.
+
+        json_data:
+        - 'category': the xmodule category
+        - 'fields': a dict of locally set fields (not inherited) in json format not pythonic typed format!
+        - 'definition': the object id of the existing definition
+        """
+        xblock_class = runtime.load_block_type(category)
+        json_data = {
+            'category': category,
+            'fields': fields or {},
+        }
+        if definition_id is not None:
+            json_data['definition'] = definition_id
+        if parent_xblock is not None:
+            json_data['_inherited_settings'] = parent_xblock.xblock_kvs.inherited_settings.copy()
+            if fields is not None:
+                for field_name in inheritance.InheritanceMixin.fields:
+                    if field_name in fields:
+                        json_data['_inherited_settings'][field_name] = fields[field_name]
+
+        new_block = runtime.xblock_from_json(xblock_class, block_id, json_data)
+        if parent_xblock is not None:
+            parent_xblock.children.append(new_block.scope_ids.usage_id)
+            # decache pending children field settings
+            parent_xblock.save()
+        return new_block
 
     def persist_xblock_dag(self, xblock, user_id, force=False):
         """
@@ -1044,8 +1084,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             # generate an id
             is_new = True
             is_updated = True
-            block_id = self._generate_block_id(structure_blocks, xblock.category)
-            encoded_block_id = block_id
+            block_id = getattr(xblock.scope_ids.usage_id.block_id, 'block_id', None)
+            if block_id is None:
+                block_id = self._generate_block_id(structure_blocks, xblock.category)
+            encoded_block_id = LocMapperStore.encode_key_for_mongo(block_id)
             xblock.scope_ids.usage_id.block_id = block_id
         else:
             is_new = False
@@ -1448,6 +1490,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         new_structure['previous_version'] = structure['_id']
         new_structure['edited_by'] = user_id
         new_structure['edited_on'] = datetime.datetime.now(UTC)
+        new_structure['schema_version'] = self.SCHEMA_VERSION
         return new_structure
 
     def _find_local_root(self, element_to_find, possibility, tree):
@@ -1508,7 +1551,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             'original_version': new_id,
             'edited_by': user_id,
             'edited_on': datetime.datetime.now(UTC),
-            'blocks': blocks
+            'blocks': blocks,
+            'schema_version': self.SCHEMA_VERSION,
         }
 
     def _get_parents_from_structure(self, block_id, structure):

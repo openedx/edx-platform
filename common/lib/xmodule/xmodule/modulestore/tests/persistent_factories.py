@@ -24,7 +24,6 @@ class PersistentCourseFactory(SplitFactory):
     keywords: any xblock field plus (note, the below are filtered out; so, if they
     become legitimate xblock fields, they won't be settable via this factory)
     * org: defaults to textX
-    * prettyid: defaults to 999
     * master_branch: (optional) defaults to 'draft'
     * user_id: (optional) defaults to 'test_user'
     * display_name (xblock field): will default to 'Robot Super Course' unless provided
@@ -33,14 +32,14 @@ class PersistentCourseFactory(SplitFactory):
 
     # pylint: disable=W0613
     @classmethod
-    def _create(cls, target_class, course_id='testX.999', org='testX', prettyid='999', user_id='test_user',
+    def _create(cls, target_class, course_id='testX.999', org='testX', user_id='test_user',
                 master_branch='draft', **kwargs):
 
         modulestore = kwargs.pop('modulestore')
         root_block_id = kwargs.pop('root_block_id', 'course')
         # Write the data to the mongo datastore
         new_course = modulestore.create_course(
-            course_id, org, prettyid, user_id, fields=kwargs,
+            course_id, org, user_id, fields=kwargs,
             master_branch=master_branch, root_block_id=root_block_id
         )
 
