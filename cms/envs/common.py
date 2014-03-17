@@ -212,6 +212,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'method_override.middleware.MethodOverrideMiddleware',
 
+    # Reverse proxy
+    'x_forwarded_for.middleware.XForwardedForMiddleware',
+
     # Instead of AuthenticationMiddleware, we use a cache-backed version
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'student.middleware.UserStandingMiddleware',
@@ -571,6 +574,9 @@ INSTALLED_APPS = (
 
     # Additional problem types
     'edx_jsme',    # Molecular Structure
+
+    # Reverse proxy
+    'x_forwarded_for',
 )
 
 
