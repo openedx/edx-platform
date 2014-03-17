@@ -1,0 +1,50 @@
+###################################
+March 18, 2014
+###################################
+
+You can access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+
+Course staff documentation, *Building a Course with edX Studio*, is available online_. You can also download the guide as a PDF from the edX Studio user interface.
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+Recent changes to *Building a Course with edX Studio* include a reorganization of all content into the following sections:
+
+* `Getting Started <http://edx.readthedocs.org/projects/ca/en/latest/getting_started/index.html#getting-started-index>`_
+
+* `Building a Course <http://edx.readthedocs.org/projects/ca/en/latest/building_course/index.html#building-a-course-index>`_
+
+* `Creating Course Content <http://edx.readthedocs.org/projects/ca/en/latest/creating_content/index.html#creating-course-content-index>`_
+
+* `Working with Problems <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/index.html#working-with-problems-index>`_
+
+* `Releasing Your Course <http://edx.readthedocs.org/projects/ca/en/latest/releasing_course/index.html#releasing-your-course-index>`_
+
+* `Running Your Course <http://edx.readthedocs.org/projects/ca/en/latest/running_course/index.html#running-your-course-index>`_
+
+* `Information for Your Students <http://edx.readthedocs.org/projects/ca/en/latest/students/index.html#information-for-your-students-index>`_
+
+Recent changes to *edX Data Formats* include:
+
+* `Student Info and Progress Data <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/sql_schema.html#student-info>`_ 
+
+*************
+edX Studio
+*************
+
+* 
+
+
+***************************************
+edX Learning Management System
+***************************************
+
+* 
+
+===========================
+Accessibility Improvements
+===========================
+
+* 
