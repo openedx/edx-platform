@@ -13,7 +13,7 @@ videojs.Youtube = videojs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
     videojs.MediaTechController.call(this, player, options, ready);
-    
+
     // No event is triggering this for YouTube
     this.features['progressEvents'] = false;
     this.features['timeupdateEvents'] = false;
@@ -41,17 +41,17 @@ videojs.Youtube = videojs.MediaTechController.extend({
     this.qualityButton = document.createElement('div');
     this.qualityButton.setAttribute('class', 'vjs-quality-button vjs-menu-button vjs-control');
     this.qualityButton.setAttribute('tabindex', 0);
-    
+
     var qualityContent = document.createElement('div');
     this.qualityButton.appendChild(qualityContent);
-    
+
     this.qualityTitle = document.createElement('span');
     qualityContent.appendChild(this.qualityTitle);
-    
+
     var qualityMenu = document.createElement('div');
     qualityMenu.setAttribute('class', 'vjs-menu');
     this.qualityButton.appendChild(qualityMenu);
-    
+
     this.qualityMenuContent = document.createElement('ul');
     this.qualityMenuContent.setAttribute('class', 'vjs-menu-content');
     qualityMenu.appendChild(this.qualityMenuContent);
@@ -91,7 +91,7 @@ videojs.Youtube = videojs.MediaTechController.extend({
       if (!self.player_.userActive()) {
         self.player_.userActive(true);
       }
-      
+
       e.stopPropagation();
       e.preventDefault();
     });
@@ -169,6 +169,8 @@ videojs.Youtube = videojs.MediaTechController.extend({
       videojs.Youtube.loadingQueue.push(this);
 
       // Load the YouTube API if it is the first YouTube video
+      // TODO: Load the API only if user has youtube.com available.
+      // Check the setting on back-end if this is so.
       if(!videojs.Youtube.apiLoading){
         var tag = document.createElement('script');
         tag.src = '//www.youtube.com/iframe_api';
@@ -177,13 +179,13 @@ videojs.Youtube = videojs.MediaTechController.extend({
         videojs.Youtube.apiLoading = true;
       }
     }
-    
+
     this.on('dispose', function() {
       // Get rid of the created DOM elements
       this.el_.parentNode.removeChild(this.el_);
       this.iframeblocker.parentNode.removeChild(this.iframeblocker);
       this.qualityButton.parentNode.removeChild(this.qualityButton);
-      
+
       this.player_.loadingSpinner.hide();
       this.player_.bigPlayButton.hide();
     });
@@ -192,22 +194,22 @@ videojs.Youtube = videojs.MediaTechController.extend({
 
 videojs.Youtube.prototype.parseSrc = function(src){
   this.srcVal = src;
-  
+
   if (src) {
     // Regex to parse the video ID
     var regId = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     var match = src.match(regId);
-    
+
     if (match && match[2].length == 11){
       this.videoId = match[2];
     } else {
       this.videoId = null;
     }
-    
+
     // Regex to parse the playlist ID
     var regPlaylist = /[?&]list=([^#\&\?]+)/;
     match = src.match(regPlaylist);
-    
+
     if (match != null && match.length > 1) {
       this.playlistId = match[1];
     } else {
@@ -261,7 +263,7 @@ videojs.Youtube.prototype.play = function(){
       // Display the spinner until the video is playing by YouTube
       this.player_.trigger('waiting');
     }
-    
+
     if (this.isReady_){
       this.ytplayer.playVideo();
     } else {
@@ -396,12 +398,12 @@ videojs.Youtube.prototype.onReady = function(){
 
 videojs.Youtube.prototype.updateQualities = function(){
   var qualities = this.ytplayer.getAvailableQualityLevels();
-  
+
   if (qualities.length == 0) {
     this.qualityButton.style.display = 'none';
   } else {
     this.qualityButton.style.display = '';
-    
+
     while (this.qualityMenuContent.hasChildNodes()) {
       this.qualityMenuContent.removeChild(this.qualityMenuContent.lastChild);
     }
@@ -414,21 +416,21 @@ videojs.Youtube.prototype.updateQualities = function(){
 
       el.setAttribute('data-val', qualities[i]);
       if (qualities[i] == this.quality) el.classList.add('vjs-selected');
-      
+
       var self = this;
-      
+
       el.addEventListener('click', function() {
         var quality = this.getAttribute('data-val');
         self.ytplayer.setPlaybackQuality(quality);
-        
+
         setInnerText(self.qualityTitle, videojs.Youtube.parseQualityName(quality));
-        
+
         var selected = self.qualityMenuContent.querySelector('.vjs-selected');
         if (selected) selected.classList.remove('vjs-selected');
-        
+
         this.classList.add('vjs-selected');
       });
-      
+
       this.qualityMenuContent.appendChild(el);
     }
   }
@@ -469,7 +471,7 @@ videojs.Youtube.prototype.onStateChange = function(state){
 
       case YT.PlayerState.BUFFERING:
         this.player_.trigger('timeupdate');
-        
+
         // Make sure to not display the spinner for mobile
         if (!this.player_.options()['ytcontrols']) {
           this.player_.trigger('waiting');
@@ -528,14 +530,14 @@ videojs.Youtube.parseQualityName = function(name) {
     case 'hd1080':
       return '1080p';
   }
-  
+
   return name;
 };
 
 videojs.Youtube.prototype.onPlaybackQualityChange = function(quality){
   this.quality = quality;
   setInnerText(this.qualityTitle, videojs.Youtube.parseQualityName(quality));
-  
+
   switch(quality){
     case 'medium':
       this.player_.videoWidth = 480;
@@ -566,7 +568,7 @@ videojs.Youtube.prototype.onPlaybackQualityChange = function(quality){
       this.player_.videoWidth = 320;
       this.player_.videoHeight = 240;
       break;
-      
+
     case 'tiny':
       this.player_.videoWidth = 144;
       this.player_.videoHeight = 108;
@@ -602,4 +604,3 @@ function setInnerText(element, text) {
   setInnerText(style, css);
   document.getElementsByTagName("head")[0].appendChild(style);
 })();
-
