@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #pylint: disable=E1101
 
 import json
@@ -1423,6 +1424,15 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, _get_course_id(test_course_data)))
         return test_course_data
 
+    def assert_create_course_failed(self, error_message):
+        """
+        Checks that the course not created.
+        """
+        resp = self.client.ajax_post('/course', self.course_data)
+        self.assertEqual(resp.status_code, 400)
+        data = parse_json(resp)
+        self.assertEqual(data['error'], error_message)
+
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
@@ -1561,6 +1571,21 @@ class ContentStoreTest(ModuleStoreTestCase):
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             auth.add_users(self.user, CourseCreatorRole(), self.user)
             self.assert_created_course()
+
+    def test_create_course_with_unicode_in_id_disabled(self):
+        """
+        Test new course creation with feature setting: ALLOW_UNICODE_COURSE_ID disabled.
+        """
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ALLOW_UNICODE_COURSE_ID': False}):
+            error_message = "Special characters not allowed in organization, course number, and course run."
+            self.course_data['org'] = u'Юникода'
+            self.assert_create_course_failed(error_message)
+
+            self.course_data['number'] = u'échantillon'
+            self.assert_create_course_failed(error_message)
+
+            self.course_data['run'] = u'όνομα'
+            self.assert_create_course_failed(error_message)
 
     def assert_course_permission_denied(self):
         """
@@ -2073,7 +2098,7 @@ def _course_factory_create_course():
 
 def _get_course_id(test_course_data):
     """Returns the course ID (org/number/run)."""
-    return "{org}/{number}/{run}".format(**test_course_data)
+    return u"{org}/{number}/{run}".format(**test_course_data)
 
 
 def _test_no_locations(test, resp, status_code=200, html=True):
