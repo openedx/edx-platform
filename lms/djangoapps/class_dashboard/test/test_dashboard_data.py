@@ -3,10 +3,11 @@ Tests for class dashboard (Metrics tab in instructor dashboard)
 """
 
 import json
+from mock import patch
 
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
-
+from django.test.client import RequestFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
@@ -18,7 +19,8 @@ from xmodule.modulestore import Location
 from class_dashboard.dashboard_data import (get_problem_grade_distribution, get_sequential_open_distrib,
                                             get_problem_set_grade_distrib, get_d3_problem_grade_distrib,
                                             get_d3_sequential_open_distrib, get_d3_section_grade_distrib,
-                                            get_section_display_name, get_array_section_has_problem
+                                            get_section_display_name, get_array_section_has_problem,
+                                            get_students_opened_subsection, get_students_problem_grades,
                                             )
 from class_dashboard.views import has_instructor_access_for_class
 
@@ -33,6 +35,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def setUp(self):
 
+        self.request_factory = RequestFactory()
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password='test')
         self.attempts = 3
@@ -45,27 +48,27 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
             category="chapter",
             display_name=u"test factory section omega \u03a9",
         )
-        sub_section = ItemFactory.create(
+        self.sub_section = ItemFactory.create(
             parent_location=section.location,
             category="sequential",
             display_name=u"test subsection omega \u03a9",
         )
 
         unit = ItemFactory.create(
-            parent_location=sub_section.location,
+            parent_location=self.sub_section.location,
             category="vertical",
             metadata={'graded': True, 'format': 'Homework'},
             display_name=u"test unit omega \u03a9",
         )
 
-        self.users = [UserFactory.create() for _ in xrange(USER_COUNT)]
+        self.users = [UserFactory.create(username="metric" + str(__)) for __ in xrange(USER_COUNT)]
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
         for i in xrange(USER_COUNT - 1):
             category = "problem"
-            item = ItemFactory.create(
+            self.item = ItemFactory.create(
                 parent_location=unit.location,
                 category=category,
                 data=StringResponseXMLFactory().build_xml(answer='foo'),
@@ -79,7 +82,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                     max_grade=1 if i < j else 0.5,
                     student=user,
                     course_id=self.course.id,
-                    module_state_key=Location(item.location).url(),
+                    module_state_key=Location(self.item.location).url(),
                     state=json.dumps({'attempts': self.attempts}),
                 )
 
@@ -87,7 +90,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                 StudentModuleFactory.create(
                     course_id=self.course.id,
                     module_type='sequential',
-                    module_state_key=Location(item.location).url(),
+                    module_state_key=Location(self.item.location).url(),
                 )
 
     def test_get_problem_grade_distribution(self):
@@ -150,6 +153,95 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
             for problem in stack_data['stackData']:
                 sum_values += problem['value']
             self.assertEquals(USER_COUNT, sum_values)
+
+    def test_get_students_problem_grades(self):
+
+        attributes = '?module_id=' + self.item.location.url()
+        request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
+
+        response = get_students_problem_grades(request)
+        response_content = json.loads(response.content)['results']
+        response_max_exceeded = json.loads(response.content)['max_exceeded']
+
+        self.assertEquals(USER_COUNT, len(response_content))
+        self.assertEquals(False, response_max_exceeded)
+        for item in response_content:
+            if item['grade'] == 0:
+                self.assertEquals(0, item['percent'])
+            else:
+                self.assertEquals(100, item['percent'])
+
+    def test_get_students_problem_grades_max(self):
+
+        with patch('class_dashboard.dashboard_data.MAX_SCREEN_LIST_LENGTH', 2):
+            attributes = '?module_id=' + self.item.location.url()
+            request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
+
+            response = get_students_problem_grades(request)
+            response_results = json.loads(response.content)['results']
+            response_max_exceeded = json.loads(response.content)['max_exceeded']
+
+            # Only 2 students in the list and response_max_exceeded is True
+            self.assertEquals(2, len(response_results))
+            self.assertEquals(True, response_max_exceeded)
+
+    def test_get_students_problem_grades_csv(self):
+
+        tooltip = 'P1.2.1 Q1 - 3382 Students (100%: 1/1 questions)'
+        attributes = '?module_id=' + self.item.location.url() + '&tooltip=' + tooltip + '&csv=true'
+        request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
+
+        response = get_students_problem_grades(request)
+        # Check header and a row for each student in csv response
+        self.assertContains(response, '"Name","Username","Grade","Percent"')
+        self.assertContains(response, '"metric0","0.0","0.0"')
+        self.assertContains(response, '"metric1","0.0","0.0"')
+        self.assertContains(response, '"metric2","0.0","0.0"')
+        self.assertContains(response, '"metric3","0.0","0.0"')
+        self.assertContains(response, '"metric4","0.0","0.0"')
+        self.assertContains(response, '"metric5","0.0","0.0"')
+        self.assertContains(response, '"metric6","0.0","0.0"')
+        self.assertContains(response, '"metric7","0.0","0.0"')
+        self.assertContains(response, '"metric8","0.0","0.0"')
+        self.assertContains(response, '"metric9","0.0","0.0"')
+        self.assertContains(response, '"metric10","1.0","100.0"')
+
+    def test_get_students_opened_subsection(self):
+
+        attributes = '?module_id=' + self.item.location.url()
+        request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
+
+        response = get_students_opened_subsection(request)
+        response_results = json.loads(response.content)['results']
+        response_max_exceeded = json.loads(response.content)['max_exceeded']
+        self.assertEquals(USER_COUNT, len(response_results))
+        self.assertEquals(False, response_max_exceeded)
+
+    def test_get_students_opened_subsection_max(self):
+
+        with patch('class_dashboard.dashboard_data.MAX_SCREEN_LIST_LENGTH', 2):
+
+            attributes = '?module_id=' + self.item.location.url()
+            request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
+
+            response = get_students_opened_subsection(request)
+            response_results = json.loads(response.content)['results']
+            response_max_exceeded = json.loads(response.content)['max_exceeded']
+
+            # Only 2 students in the list and response_max_exceeded is True
+            self.assertEquals(2, len(response_results))
+            self.assertEquals(True, response_max_exceeded)
+
+    def test_get_students_opened_subsection_csv(self):
+
+        tooltip = '4162 student(s) opened Subsection 5: Relational Algebra Exercises'
+        attributes = '?module_id=' + self.item.location.url() + '&tooltip=' + tooltip + '&csv=true'
+        request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
+
+        response = get_students_opened_subsection(request)
+        self.assertContains(response, '"Name","Username"')
+        # Check response contains 1 line for each user +1 for the header
+        self.assertEquals(USER_COUNT + 1, len(response.content.splitlines()))
 
     def test_get_section_display_name(self):
 
