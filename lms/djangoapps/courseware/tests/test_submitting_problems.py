@@ -498,6 +498,24 @@ class TestCourseGrader(TestSubmittingProblems):
             self.check_grade_percent(1.0)
             self.assertEqual(self.get_grade_summary()['grade'], 'A')
 
+    def test_submissions_api_anonymous_student_id(self):
+        """
+        Check that the submissions API is sent an anonymous student ID.
+        """
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.submit_question_answer('p2', {'2_1': 'Correct'})
+        self.submit_question_answer('p3', {'2_1': 'Incorrect'})
+
+        with patch('submissions.api.get_scores') as mock_get_scores:
+            mock_get_scores.return_value = {
+                self.problem_location('p3'): (1, 1)
+            }
+            self.get_grade_summary()
+
+            # Verify that the submissions API was sent an anonymized student ID
+            mock_get_scores.assert_called_with(self.course.id, '99ac6730dc5f900d69fd735975243b31')
+
     def test_weighted_homework(self):
         """
         Test that the homework section has proper weight.
