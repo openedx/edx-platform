@@ -1,4 +1,4 @@
-define ["jasmine", "js/spec/create_sinon", "squire"],
+define ["jasmine", "js/spec_helpers/create_sinon", "squire"],
 (jasmine, create_sinon, Squire) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')

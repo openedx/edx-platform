@@ -1,7 +1,7 @@
 define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js/models/course",
     "js/collections/textbook", "js/views/show_textbook", "js/views/edit_textbook", "js/views/list_textbooks",
     "js/views/edit_chapter", "js/views/feedback_prompt", "js/views/feedback_notification",
-    "js/spec/create_sinon", "jasmine-stealth"],
+    "js/spec_helpers/create_sinon", "jasmine-stealth"],
 (Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTexbook, EditChapter, Prompt, Notification, create_sinon) ->
     feedbackTpl = readFixtures('system-feedback.underscore')
 

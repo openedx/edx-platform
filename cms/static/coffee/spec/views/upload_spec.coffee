@@ -1,4 +1,4 @@
-define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec/create_sinon"], (FileUpload, UploadDialog, Chapter, create_sinon) ->
+define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec_helpers/create_sinon"], (FileUpload, UploadDialog, Chapter, create_sinon) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')
 

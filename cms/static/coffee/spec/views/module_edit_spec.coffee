@@ -6,7 +6,8 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
             id: "stub-id"
 
         setFixtures """
-        <li class="component" id="stub-id">
+        <ul>
+        <li class="component" id="stub-id" data-locator="stub-id">
           <div class="component-editor">
             <div class="module-editor">
               ${editor}
@@ -23,6 +24,8 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
             <div id="stub-module-content"/>
           </section>
         </li>
+        </ul>
+        <div class="edit-xblock-modal"/>
         """
         spyOn($, 'ajax').andReturn(@moduleData)
 
@@ -55,10 +58,12 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
         describe "render", ->
           beforeEach ->
             spyOn(@moduleEdit, 'loadDisplay')
-            spyOn(@moduleEdit, 'loadEdit')
             spyOn(@moduleEdit, 'delegateEvents')
             spyOn($.fn, 'append')
             spyOn($, 'getScript').andReturn($.Deferred().resolve().promise())
+
+            window.MockXBlock = (runtime, element) ->
+              return { }
 
             window.loadedXBlockResources = undefined
 
@@ -74,6 +79,9 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
                 ['hash6', {placement: 'not-head', mimetype: 'text/html', data: 'not-head-html'}],
               ]
             )
+
+          afterEach ->
+            window.MockXBlock = null
 
           it "loads the module preview via ajax on the view element", ->
             expect($.ajax).toHaveBeenCalledWith(
@@ -92,10 +100,13 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
               success: jasmine.any(Function)
             )
             expect(@moduleEdit.loadDisplay).toHaveBeenCalled()
-            expect(@moduleEdit.loadEdit).not.toHaveBeenCalled()
             expect(@moduleEdit.delegateEvents).toHaveBeenCalled()
 
           it "loads the editing view via ajax on demand", ->
+            editorTemplate = readFixtures('edit-xblock-modal.underscore');
+            feedbackTemplate = readFixtures('system-feedback.underscore')
+            appendSetFixtures($("<script>", { id: "edit-xblock-modal-tpl", type: "text/template", html: editorTemplate }));
+            appendSetFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template" , html: feedbackTemplate }));
             expect($.ajax).not.toHaveBeenCalledWith(
               url: "/xblock/#{@moduleEdit.model.id}/studio_view"
               type: "GET"
@@ -103,12 +114,13 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
                 Accept: 'application/json'
               success: jasmine.any(Function)
             )
-            expect(@moduleEdit.loadEdit).not.toHaveBeenCalled()
 
             @moduleEdit.clickEditButton({'preventDefault': jasmine.createSpy('event.preventDefault')})
 
+            mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore')
+
             $.ajax.mostRecentCall.args[0].success(
-              html: '<div>Response html</div>'
+              html: mockXBlockEditorHtml
               resources: [
                 ['hash1', {kind: 'text', mimetype: 'text/css', data: 'inline-css'}],
                 ['hash2', {kind: 'url', mimetype: 'text/css', data: 'css-url'}],
@@ -126,7 +138,6 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
                 Accept: 'application/json'
               success: jasmine.any(Function)
             )
-            expect(@moduleEdit.loadEdit).toHaveBeenCalled()
             expect(@moduleEdit.delegateEvents).toHaveBeenCalled()
 
           it "loads inline css from fragments", ->

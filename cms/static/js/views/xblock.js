@@ -9,27 +9,49 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                 this.view = this.options.view;
             },
 
-            render: function() {
+            render: function(options) {
                 var self = this,
-                    view = this.view;
+                    view = this.view,
+                    xblockInfo = this.model,
+                    xblockUrl = xblockInfo.url();
                 return $.ajax({
-                    url: decodeURIComponent(this.model.url()) + "/" + view,
+                    url: decodeURIComponent(xblockUrl) + "/" + view,
                     type: 'GET',
-                    headers: {
-                        Accept: 'application/json'
-                    },
+                    headers: { Accept: 'application/json' },
                     success: function(fragment) {
-                        var wrapper = self.$el,
-                            xblock;
-                        self.renderXBlockFragment(fragment, wrapper).done(function() {
-                            xblock = self.$('.xblock').first();
-                            XBlock.initializeBlock(xblock);
-                            self.delegateEvents();
-                        });
+                        self.handleXBlockFragment(fragment, options);
                     }
                 });
             },
 
+            handleXBlockFragment: function(fragment, options) {
+                var wrapper = this.$el,
+                    xblockElement,
+                    success = options ? options.success : null,
+                    xblock;
+                this.renderXBlockFragment(fragment, wrapper);
+                xblockElement = this.$('.xblock').first();
+                xblock = XBlock.initializeBlock(xblockElement);
+                this.xblock = xblock;
+                this.xblockReady(xblock);
+                if (success) {
+                    success(xblock);
+                }
+            },
+
+            /**
+             * This method is called upon successful rendering of an xblock.
+             */
+            xblockReady: function(xblock) {
+                // Do nothing
+            },
+
+            /**
+             * Returns true if the specified xblock has children.
+             */
+            hasChildXBlocks: function() {
+                return this.$('.wrapper-xblock').length > 0;
+            },
 
             /**
              * Renders an xblock fragment into the specified element. The fragment has two attributes:

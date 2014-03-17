@@ -134,6 +134,12 @@ body.course.feature-upload {
           }
         }
 
+        .message-status.error {
+          border-color: $red-d2;
+          background: $red-l1;
+          color: $white;
+        }
+
         .actions {
           padding: ($baseline*0.75) $baseline ($baseline/2) $baseline;
 

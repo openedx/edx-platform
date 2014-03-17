@@ -633,10 +633,11 @@ body.course.unit,.view-unit {
 
     //component-setting-entry
     .field.comp-setting-entry {
-      background-color: $white;
-      padding: $baseline;
-      border-bottom: 1px solid $gray-l2;
       opacity: 0.7;
+      margin: 0 $baseline;
+      border-top: 1px solid $gray-l4;
+      background-color: $white;
+      padding: $baseline ($baseline/2);
 
       &:last-child {
         //margin-bottom: 0;
@@ -1085,6 +1086,7 @@ body.unit {
 
   .delete-draft {
     display: inline-block;
+    vertical-align: top;
   }
 
   .delete-button,
@@ -1353,6 +1355,7 @@ body.unit .xblock-type-container {
     margin-bottom: 0;
     border-bottom: 0;
     border-radius: ($baseline/5);
+    padding: ($baseline/2);
 
     .xblock-details {
       font-size: .9em;

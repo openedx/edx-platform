@@ -1,4 +1,4 @@
-define ["js/views/overview", "js/views/feedback_notification", "js/spec/create_sinon", "js/base", "date", "jquery.timepicker"],
+define ["js/views/overview", "js/views/feedback_notification", "js/spec_helpers/create_sinon", "js/base", "date", "jquery.timepicker"],
 (Overview, Notification, create_sinon) ->
 
     describe "Course Overview", ->

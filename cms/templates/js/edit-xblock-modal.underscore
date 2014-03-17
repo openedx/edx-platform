@@ -1,0 +1,30 @@
+<div
+ class="wrapper wrapper-modal-window wrapper-modal-window-edit-xblock"
+ aria-describedby="modal-window-description"
+ aria-labelledby="modal-window-title"
+ aria-hidden=""
+ role="dialog">
+    <div class="modal-window confirm modal-editor modal-lg modal-type-<%= xblockInfo.get('category') %>">
+        <div class="edit-xblock-modal" action="#">
+            <div class="modal-header">
+                <h2 class="title modal-window-title"></h2>
+                <ul class="editor-modes action-list action-modes">
+                </ul>
+            </div>
+            <div class="modal-content">
+                <div class="xblock-editor" data-locator="<%= xblockInfo.get('id') %>"></div>
+            </div>
+            <div class="modal-actions">
+                <h3 class="sr"><%= gettext("Actions") %></h3>
+                <ul>
+                <li class="action-item">
+                    <a href="#" class="button action-primary action-save"><%= gettext("Save") %></a>
+                </li>
+                <li class="action-item">
+                    <a href="#" class="button action-secondary action-cancel"><%= gettext("Cancel") %></a>
+                </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

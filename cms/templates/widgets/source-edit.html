@@ -3,8 +3,8 @@
   hlskey = hashlib.md5(module.location.url()).hexdigest()
 %>
 
-  <section id="hls-modal-${hlskey}" class="upload-modal modal" style="width:90%!important; left:5%!important; margin-left:0px!important; height:90%; overflow:auto; background:#ECF7D3;" >
-  <a href="#" class="close-button"><span class="close-icon"></span></a>
+  <section id="hls-modal-${hlskey}" class="upload-modal modal" style="overflow:scroll; background:#ddd; padding: 10px 0;box-shadow: 0 0 5px 0 #555;" >
+  <a href="#" class="close-button" style="background: #eee; float: right;padding: 5px 10px; margin: 0 10px 0 0; border: 0;"><span class="close-icon"></span></a>
   <div id="hls-div">
     <header>
       <h2>High Level Source Editing</h2>
@@ -33,7 +33,7 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
   hlsmodal = $('#hls-modal-${hlskey}');
 
   hlstrig.leanModal({
-      top: 40,
+      top: 0,
       overlay: 0.8,
       closeButton: ".close-button"
   });
@@ -46,7 +46,10 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
   $('#hls-trig-${hlskey}').click(function() {
 
       ## this ought to be done using css instead
-      hlsmodal.attr('style', function(i,s) { return s + ' margin-left:0px !important; left:5%' });
+ //     hlsmodal.attr('style', function(i,s) { return s + ' margin-left:0px !important; left:5%' });
+      var editorH = $( window ).height() - 100;
+      var editorW = $( window ).innerWidth() - 70;
+      hlsmodal.attr('style', function(i,s) { return s + 'margin: 2% 0 0 10% !important; left:0; height:' + editorH + 'px;'});
 
       ## setup file input
       ## need to insert this only after hls triggered, because otherwise it
@@ -104,6 +107,7 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
   hlsmodal.find('.hls-compile').click(function() {
       var el = $('#hls-modal-${hlskey}');
       compile_hls(el);
+      $(el).css('display', 'none')
   });
 
   // connect to server using POST (requires cross-domain-access)
@@ -123,7 +127,7 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
               if (xml.length == 0) {
                   alert('Conversion failed!  error:' + data.message);
               } else {
-                  el.closest('.component').find('.CodeMirror-wrap')[0].CodeMirror.setValue(xml);
+                  el.closest('.xblock-studio_view').find('.CodeMirror-wrap')[0].CodeMirror.setValue(xml);
                   save_hls(el);
               }
           },
@@ -149,7 +153,7 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
   function set_raw_edit_box(data, key) {
       // get the codemirror editor for the raw-edit-box
       // it's a CodeMirror-wrap class element
-      $('#hls-modal-' + key).closest('.component').find('.CodeMirror-wrap')[0].CodeMirror.setValue(data);
+      $('#hls-modal-' + key).closest('.xblock-studio_view').find('.CodeMirror-wrap')[0].CodeMirror.setValue(data);
   }
 
   // save button
@@ -160,7 +164,7 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
 
   function save_hls(el) {
       el.find('.hls-data').val(el.data('editor').getValue());
-      el.closest('.component').find('.save-button').click();
+      el.closest('.xblock-studio_view').find('.save-button').click();
   }
 }); // end require()
   </script>

@@ -1,0 +1,297 @@
+// studio - elements - modal-window
+// ========================
+
+// start with the view/body
+[class*="view-"] {
+  overflow: auto;
+
+  // modal-window backdrop covers the window
+  .wrapper-modal-window {
+    @extend %ui-depth4;
+    @include transition(all $tmg-f2 ease-in-out);
+    position: absolute;
+    top: 0;
+    overflow: scroll;
+    background: $black-t2;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+
+    &:before {
+      content: '';
+      display: inline-block;
+      height: 100%;
+      vertical-align: middle;
+      margin-right: -0.25em; /* Adjusts for spacing */
+    }
+
+    // basic modal content
+    .modal-window  {
+      @include box-sizing(border-box);
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 50%;
+      box-shadow: 0px 0px 7px $shadow-d1;
+      border-radius: ($baseline/5);
+      background-color: $gray-l4;
+      padding: 7px;
+      text-align: left;
+
+      .modal-content {
+        box-shadow: 0 0 3px $shadow-d1;
+        background-color: $white;
+        padding: 5%;
+      }
+
+      .title {
+        @extend %t-title5;
+        margin-bottom: ($baseline/2);
+        font-weight: 600;
+        color: $black;
+      }
+
+      .message {
+        @extend %t-copy-sub1;
+        margin: $baseline 0;
+        color: $gray;
+
+        &.error {
+          border: 0;
+          border-top: 3px solid $red-d2;
+          background-color: $red;
+          color: $white;
+        }
+
+        &.success {
+          border: 0;
+          border-top: 3px solid $green-d2;
+          background-color: $green;
+          color: $white;
+        }
+      }
+
+      .modal-chin,
+      .modal-actions {
+        padding: ($baseline*0.75) 2% ($baseline/2) 2%;
+
+        .action-item {
+          @extend %t-action3;
+          display: inline-block;
+          margin-right: ($baseline*0.75);
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        .action-primary {
+          @include blue-button();
+          @include font-size(14); // needed due to bad button mixins for now
+          border-color: $blue-d1;
+          color: $white;
+        }
+
+        a {
+          color: $blue;
+
+          &:hover {
+            color: $blue-s2;
+          }
+        }
+      }
+    }
+
+
+    // small modals - editors and dialogs
+    .modal-sm {
+      width: 30%;
+      min-width: ($baseline*15);
+
+      .modal-content {
+        padding: 5% 4%;
+      }
+    }
+
+    // medium modals - forms and interactives
+    .modal-med {
+      width: 40%;
+      min-width: ($baseline*18);
+
+      .modal-content {
+        padding: 4%;
+      }
+    }
+
+    // large modals - component editors and interactives
+    .modal-lg {
+      -webkit-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+      top: ($baseline*2);
+      width: 65%;
+      height: auto;
+      min-width: ($baseline*30);
+
+      &.modal-editor {
+
+        .modal-header {
+          margin: ($baseline/4) ($baseline/2);
+
+          .title {
+            width: 48%;
+            display: inline-block;
+          }
+
+          .editor-modes {
+            width: 49%;
+            display: inline-block;
+            text-align: right;
+
+            .action-item {
+              display: inline-block;
+              margin-left: ($baseline/2);
+
+              .editor-button,
+              .settings-button {
+                @extend %btn-secondary-gray;
+                @extend %t-copy-sub1;
+                border: 0;
+                padding: ($baseline/4) ($baseline/2);
+                text-transform: uppercase;
+
+                &:hover {
+                }
+
+                &.is-set {
+                  background-color: $gray-d1;
+                  color: $white;
+                }
+              }
+            }
+          }
+        }
+
+        .modal-content {
+          padding: 0;
+        }
+      }
+    }
+  }
+
+
+  // specific modal overrides
+
+  // component editor
+  .modal-window {
+    .wrapper-comp-settings {
+
+      .list-input {
+
+        &.settings-list {
+          height: ($baseline*21.25);
+          max-height: none;
+        }
+      }
+    }
+  }
+
+
+  // special overrides for video module editor/hidden tab editors
+  .wrapper-modal-window .modal-type-video {
+
+    .modal-content {
+      box-shadow: none;
+    }
+
+    .xmodule_edit.xmodule_VideoDescriptor .editor-with-tabs {
+
+      .edit-header {
+        border: 0;
+        background-color: $gray-l4;
+        padding: ($baseline/2);
+
+        .component-name {
+          @extend %t-title5;
+          display: inline-block;
+          vertical-align: middle;
+          width: 48%;
+          margin-left: ($baseline/2);
+          font-weight: 600;
+          color: $black;
+
+          em {
+            color: inherit;
+            display: inline;
+          }
+        }
+
+        .editor-tabs {
+          display: inline-block;
+          width: 48%;
+          position: relative;
+          top: auto;
+          right: auto;
+          padding: 0;
+          text-align: right;
+
+          .inner_tab_wrap {
+            padding: 0;
+
+            a.tab {
+              @extend %btn-secondary-gray;
+              @extend %t-copy-sub1;
+              background-image: none;
+              box-shadow: none;
+              border: 0;
+              padding: ($baseline/4) ($baseline/2);
+              text-transform: uppercase;
+              font-weight: normal;
+
+              &.current {
+                background-color: $gray-d1;
+                color: $white;
+              }
+            }
+          }
+        }
+      }
+
+      .tabs-wrapper {
+        box-shadow: 0 0 3px $shadow-d1;
+
+        .component-tab {
+          border-top: 1px solid $gray-l3;
+        }
+      }
+    }
+  }
+
+
+  // modal-window set-up
+  .wrapper-modal-window {
+    visibility: hidden;
+    pointer-events: none;
+    display: none;
+
+    .modal-window {
+      opacity: 0;
+    }
+  }
+
+  // modal-window showing/hiding
+  &.modal-window-is-shown {
+    overflow: hidden;
+
+    .wrapper-modal-window.is-shown {
+      visibility: visible;
+      pointer-events: auto;
+      display: block;
+
+      .modal-window {
+        opacity: 1.0;
+      }
+    }
+  }
+}

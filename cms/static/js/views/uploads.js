@@ -1,6 +1,6 @@
-define(["js/views/baseview", "underscore", "jquery", "jquery.form"],
-function(BaseView, _, $) {
-var UploadDialog = BaseView.extend({
+define(["js/views/modals/base_modal", "underscore", "jquery", "jquery.form"],
+function(BaseModal, _, $) {
+var UploadDialog = BaseModal.extend({
     options: {
         shown: true,
         successMessageTimeout: 2000 // 2 seconds
@@ -51,13 +51,13 @@ var UploadDialog = BaseView.extend({
     show: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.options.shown = true;
-        $("body").addClass('dialog-is-shown');
+        $("body").addClass('modal-window-is-shown');
         return this.render();
     },
     hide: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.options.shown = false;
-        $("body").removeClass('dialog-is-shown');
+        $("body").removeClass('modal-window-is-shown');
         return this.render();
     },
     hideAndRemove: function(e) {

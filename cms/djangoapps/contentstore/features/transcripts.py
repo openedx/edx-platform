@@ -209,23 +209,31 @@ def check_text_in_the_captions(_step, text):
 
 @step('I see value "([^"]*)" in the field "([^"]*)"$')
 def check_transcripts_field(_step, values, field_name):
-    world.click_link_by_text('Advanced')
+    editor_tabs = world.browser.find_by_css('.editor-tabs a')
+    basic_tab = editor_tabs[0]
+    advanced_tab = editor_tabs[1]
+    advanced_tab.click()
     field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
     values_list = [i.strip() == world.css_value(field_id) for i in values.split('|')]
     assert any(values_list)
-    world.click_link_by_text('Basic')
+    basic_tab.click()
 
 
 @step('I save changes$')
 def save_changes(_step):
-    save_css = 'a.save-button'
+    save_css = 'a.action-save'
     world.css_click(save_css)
     world.wait_for_ajax_complete()
 
 
 @step('I open tab "([^"]*)"$')
 def open_tab(_step, tab_name):
-    world.click_link_by_text(tab_name.strip())
+    editor_tabs = world.browser.find_by_css('.editor-tabs a')
+    expected_tab_text = tab_name.strip().upper()
+    matching_tabs = [tab for tab in editor_tabs if tab.text == expected_tab_text]
+    assert len(matching_tabs) == 1
+    tab = matching_tabs[0]
+    tab.click()
     world.wait_for_ajax_complete()
 
 

@@ -1,4 +1,4 @@
-define([ "jquery", "js/spec/create_sinon", "URI", "js/views/xblock", "js/models/xblock_info",
+define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/xblock", "js/models/xblock_info",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
     function ($, create_sinon, URI, XBlockView, XBlockInfo) {
 

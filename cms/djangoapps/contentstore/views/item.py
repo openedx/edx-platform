@@ -34,6 +34,7 @@ from ..utils import get_modulestore
 
 from .access import has_course_access
 from .helpers import _xmodule_recurse
+from contentstore.utils import compute_publish_state, PublishState
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
@@ -224,11 +225,12 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
             })
         elif view_name in ('student_view', 'container_preview'):
             is_container_view = (view_name == 'container_preview')
+            component_publish_state = compute_publish_state(component)
+            is_read_only_view = component_publish_state == PublishState.public
 
             # Only show the new style HTML for the container view, i.e. for non-verticals
             # Note: this special case logic can be removed once the unit page is replaced
             # with the new container view.
-            is_read_only_view = is_container_view
             context = {
                 'runtime_type': 'studio',
                 'container_view': is_container_view,

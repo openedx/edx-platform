@@ -7,7 +7,7 @@
   from xmodule.modulestore.django import loc_mapper
 %>
 <%block name="title">${_("Course Outline")}</%block>
-<%block name="bodyclass">is-signedin course view-outline feature-edit-dialog</%block>
+<%block name="bodyclass">is-signedin course view-outline</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
@@ -277,14 +277,14 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
   <footer></footer>
 
   <div
-    class="wrapper wrapper-dialog wrapper-dialog-edit-sectionrelease edit-section-publish-settings"
+    class="wrapper wrapper-modal-window wrapper-dialog-edit-sectionrelease edit-section-publish-settings"
     aria-describedby="dialog-edit-sectionrelease-description"
     aria-labelledby="dialog-edit-sectionrelease-title"
     aria-hidden=""
     role="dialog">
-    <div class="dialog confirm">
+    <div class="modal-window modal-med confirm">
       <form class="edit-sectionrelease-dialog" action="#">
-        <div class="form-content">
+        <div class="modal-content">
           <h2 class="title dialog-edit-sectionrelease-title">${_("Section Release Date")}</h2>
           <p id="dialog-edit-sectionrelease-description" class="message">${_('On the date set below, this section - {name} - will be released to students. Any units marked private will only be visible to admins.').format(name='<strong class="section-name"></strong>')}</p>
           <ul class="list-input picker datepair">
@@ -298,7 +298,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
             </li>
           </ul>
         </div>
-        <div class="actions">
+        <div class="actions modal-actions">
           <h3 class="sr">${_("Form Actions")}</h3>
           <ul>
             <li class="action-item">

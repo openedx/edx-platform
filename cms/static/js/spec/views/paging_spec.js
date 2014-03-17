@@ -1,4 +1,4 @@
-define([ "jquery", "js/spec/create_sinon", "URI",
+define([ "jquery", "js/spec_helpers/create_sinon", "URI",
     "js/views/paging", "js/views/paging_header", "js/views/paging_footer",
     "js/models/asset", "js/collections/asset" ],
     function ($, create_sinon, URI, PagingView, PagingHeader, PagingFooter, AssetModel, AssetCollection) {

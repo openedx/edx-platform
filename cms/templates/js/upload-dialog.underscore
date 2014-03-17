@@ -1,16 +1,16 @@
   <div id="dialog-assetupload"
-    class="wrapper wrapper-dialog wrapper-dialog-assetupload <% if(shown) { print('is-shown') } %>"
+    class="wrapper wrapper-modal-window wrapper-modal-window-assetupload <% if(shown) { print('is-shown') } %>"
     aria-describedby="dialog-assetupload-description"
     aria-labelledby="dialog-assetupload-title"
     aria-hidden="<%= !shown %>"
     role="dialog">
-    <div class="dialog confirm">
+    <div class="modal-window modal-sm confirm">
 
 <form class="upload-dialog" method="POST" action="<%= url %>" enctype="multipart/form-data">
-  <div class="form-content">
+  <div class="modal-content">
   <h2 class="title"><%= title %></h2>
   <% if(error) {%>
-    <div id="upload_error" class="message message-status message-status error is-shown" name="upload_error">
+    <div id="upload_error" class="message message-status error is-shown" name="upload_error">
       <p><%= error.message %></p>
     </div>
   <% } %>
@@ -30,7 +30,7 @@
     <% } %>
 
     <% if(finished) { %>
-      <div id="upload_confirm" class="message message-status message-status confirm is-shown" name="upload_confirm">
+      <div id="upload_confirm" class="message message-status message-status confirm success is-shown" name="upload_confirm">
         <p><%= gettext("Success!") %></p>
       </div>
     <% } %>
@@ -38,7 +38,7 @@
     </div>
   </div>
 
-  <div class="actions">
+  <div class="actions modal-actions">
     <h3 class="sr"><%= gettext('Form Actions') %></h3>
   <ul>
   <li class="action-item">

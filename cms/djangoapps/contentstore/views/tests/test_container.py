@@ -3,6 +3,7 @@ Unit tests for the container view.
 """
 
 from contentstore.tests.utils import CourseTestCase
+from contentstore.utils import compute_publish_state, PublishState
 from contentstore.views.helpers import xblock_studio_url
 from xmodule.modulestore.tests.factories import ItemFactory
 
@@ -26,13 +27,19 @@ class ContainerViewTestCase(CourseTestCase):
                                         category="video", display_name="My Video")
 
     def test_container_html(self):
+        branch_name = "MITx.999.Robot_Super_Course/branch/draft/block"
         self._test_html_content(
             self.child_vertical,
-            expected_section_tag='<section class="wrapper-xblock level-page" data-locator="MITx.999.Robot_Super_Course/branch/draft/block/Child_Vertical"/>',
+            branch_name=branch_name,
+            expected_section_tag=(
+                '<section class="wrapper-xblock level-page is-hidden" '
+                'data-locator="{branch_name}/Child_Vertical">'.format(branch_name=branch_name)
+            ),
             expected_breadcrumbs=(
-                r'<a href="/unit/MITx.999.Robot_Super_Course/branch/draft/block/Unit"\s*'
+                r'<a href="/unit/{branch_name}/Unit"\s*'
                 r'class="navigation-link navigation-parent">Unit</a>\s*'
-                r'<a href="#" class="navigation-link navigation-current">Child Vertical</a>'),
+                r'<a href="#" class="navigation-link navigation-current">Child Vertical</a>'
+            ).format(branch_name=branch_name)
         )
 
     def test_container_on_container_html(self):
@@ -44,23 +51,30 @@ class ContainerViewTestCase(CourseTestCase):
                                                category="wrapper", display_name="Wrapper")
         ItemFactory.create(parent_location=xblock_with_child.location,
                            category="html", display_name="Child HTML")
+        branch_name = "MITx.999.Robot_Super_Course/branch/draft/block"
         self._test_html_content(
             xblock_with_child,
-            expected_section_tag='<section class="wrapper-xblock level-page" data-locator="MITx.999.Robot_Super_Course/branch/draft/block/Wrapper"/>',
+            branch_name=branch_name,
+            expected_section_tag=(
+                '<section class="wrapper-xblock level-page is-hidden" '
+                'data-locator="{branch_name}/Wrapper">'.format(branch_name=branch_name)
+            ),
             expected_breadcrumbs=(
-                r'<a href="/unit/MITx.999.Robot_Super_Course/branch/draft/block/Unit"\s*'
+                r'<a href="/unit/{branch_name}/Unit"\s*'
                 r'class="navigation-link navigation-parent">Unit</a>\s*'
-                r'<a href="/container/MITx.999.Robot_Super_Course/branch/draft/block/Child_Vertical"\s*'
+                r'<a href="/container/{branch_name}/Child_Vertical"\s*'
                 r'class="navigation-link navigation-parent">Child Vertical</a>\s*'
-                r'<a href="#" class="navigation-link navigation-current">Wrapper</a>'),
+                r'<a href="#" class="navigation-link navigation-current">Wrapper</a>'
+            ).format(branch_name=branch_name)
         )
 
-    def _test_html_content(self, xblock, expected_section_tag, expected_breadcrumbs):
+    def _test_html_content(self, xblock, branch_name, expected_section_tag, expected_breadcrumbs):
         """
         Get the HTML for a container page and verify the section tag is correct
         and the breadcrumbs trail is correct.
         """
         url = xblock_studio_url(xblock, self.course)
+        publish_state = compute_publish_state(xblock)
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, 200)
         html = resp.content
@@ -68,5 +82,12 @@ class ContainerViewTestCase(CourseTestCase):
         # Verify the navigation link at the top of the page is correct.
         self.assertRegexpMatches(html, expected_breadcrumbs)
         # Verify the link that allows users to change publish status.
-        expected_unit_link = 'This content is published with unit <a href="/unit/MITx.999.Robot_Super_Course/branch/draft/block/Unit">Unit</a>.'
+        expected_message = None
+        if publish_state == PublishState.public:
+            expected_message = 'you need to edit unit <a href="/unit/{branch_name}/Unit">Unit</a> as a draft.'
+        else:
+            expected_message = 'your changes will be published with unit <a href="/unit/{branch_name}/Unit">Unit</a>.'
+        expected_unit_link = expected_message.format(
+            branch_name=branch_name
+        )
         self.assertIn(expected_unit_link, html)

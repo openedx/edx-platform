@@ -1,9 +1,9 @@
 <%! from django.utils.translation import ugettext as _ %>
 % if xblock.location != xblock_context['root_xblock'].location:
   % if xblock.has_children:
-<section class="wrapper-xblock level-nesting" data-locator="${locator}">
+<section class="wrapper-xblock level-nesting" data-locator="${locator}" data-display-name="${xblock.display_name_with_default | h}" data-category="${xblock.category | h}">
   % else:
-<section class="wrapper-xblock level-element" data-locator="${locator}">
+<section class="wrapper-xblock level-element" data-locator="${locator}" data-display-name="${xblock.display_name_with_default | h}" data-category="${xblock.category | h}">
   % endif
 % endif
     <header class="xblock-header">
@@ -17,18 +17,6 @@
                     <a href="#" class="edit-button action-button">
                         <i class="icon-edit"></i>
                         <span class="action-button-text">${_("Edit")}</span>
-                    </a>
-                </li>
-                <li class="action-item action-duplicate">
-                    <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
-                    <i class="icon-copy"></i>
-                    <span class="sr">${_("Duplicate this component")}</span>
-                    </a>
-                </li>
-                <li class="action-item action-delete">
-                    <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
-                    <i class="icon-trash"></i>
-                    <span class="sr">${_("Delete this component")}</span>
                     </a>
                 </li>
                 % endif
