@@ -1,7 +1,6 @@
 """ Contains Locations ___ """
 
 import logging
-import urllib
 import re
 from collections import namedtuple
 from opaque_keys import InvalidKeyError
