@@ -119,6 +119,9 @@ def enrich_varname(varname):
     # add hbar for QM
     greek.append('hbar')
 
+    # add infinity
+    greek.append('infty')
+
     if varname in greek:
         return ur"\{letter}".format(letter=varname)
     else:

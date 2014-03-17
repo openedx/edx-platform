@@ -10,6 +10,36 @@ Change Log
 
    * - Date
      - Change
+   * - 03/17/14
+     - Reorganized this document into major sections: 
+
+       * :ref:`Getting Started Index`
+
+       * :ref:`Building a Course Index`
+
+       * :ref:`Creating Course Content Index`
+
+       * :ref:`Working with Problems Index`
+
+       * :ref:`Releasing Your Course Index`
+
+       * :ref:`Running Your Course Index`
+
+       * :ref:`Information for Your Students Index`
+
+   * - 03/10/14
+     - Added information about setting up your course summary page to 
+
+       * :ref:`The Course Start Date`
+
+       * :ref:`The Course End Date`
+
+       * :ref:`Add a Course Image`
+
+       * :ref:`Add a Course Video`
+
+       * :ref:`Describe Your Course`
+
    * - 02/25/14
      - Updated :ref:`Add Files to a Course` section to include new External URL feature.
    * -

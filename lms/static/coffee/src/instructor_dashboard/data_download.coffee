@@ -18,6 +18,7 @@ class DataDownload
     @$section.data 'wrapper', @
     # gather elements
     @$list_studs_btn = @$section.find("input[name='list-profiles']'")
+    @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
     @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']'")
@@ -31,7 +32,7 @@ class DataDownload
     @$grades_request_response       = @$grades.find '.request-response'
     @$grades_request_response_error = @$grades.find '.request-response-error'
 
-    @grade_downloads = new GradeDownloads(@$section)
+    @report_downloads = new ReportDownloads(@$section)
     @instructor_tasks = new (PendingInstructorTasks()) @$section
     @clear_display()
 
@@ -43,43 +44,44 @@ class DataDownload
 
     # this handler binds to both the download
     # and the csv button
+    @$list_studs_csv_btn.click (e) =>
+      url = @$list_studs_btn.data 'endpoint'
+      # handle csv special case
+      # redirect the document to the csv file.
+      url += '/csv'
+      location.href = url
+
     @$list_studs_btn.click (e) =>
       url = @$list_studs_btn.data 'endpoint'
 
-      # handle csv special case
-      if $(e.target).data 'csv'
-        # redirect the document to the csv file.
-        url += '/csv'
-        location.href = url
-      else
-        # Dynamically generate slickgrid table for displaying student profile information
-        @clear_display()
-        @$download_display_table.text gettext('Loading...')
+      # Dynamically generate slickgrid table for displaying student profile information
+      @clear_display()
+      @$download_display_table.text gettext('Loading...')
 
-        # fetch user list
-        $.ajax
-          dataType: 'json'
-          url: url
-          error: std_ajax_err =>
-            @clear_display()
-            @$download_request_response_error.text gettext("Error getting student list.")
-          success: (data) =>
-            @clear_display()
+      # fetch user list
+      $.ajax
+        dataType: 'json'
+        url: url
+        error: std_ajax_err =>
+          @clear_display()
+          @$download_request_response_error.text gettext("Error getting student list.")
+        success: (data) =>
+          @clear_display()
 
-            # display on a SlickGrid
-            options =
-              enableCellNavigation: true
-              enableColumnReorder: false
-              forceFitColumns: true
-              rowHeight: 35
+          # display on a SlickGrid
+          options =
+            enableCellNavigation: true
+            enableColumnReorder: false
+            forceFitColumns: true
+            rowHeight: 35
 
-            columns = ({id: feature, field: feature, name: feature} for feature in data.queried_features)
-            grid_data = data.students
+          columns = ({id: feature, field: feature, name: feature} for feature in data.queried_features)
+          grid_data = data.students
 
-            $table_placeholder = $ '<div/>', class: 'slickgrid'
-            @$download_display_table.append $table_placeholder
-            grid = new Slick.Grid($table_placeholder, grid_data, columns, options)
-            # grid.autosizeColumns()
+          $table_placeholder = $ '<div/>', class: 'slickgrid'
+          @$download_display_table.append $table_placeholder
+          grid = new Slick.Grid($table_placeholder, grid_data, columns, options)
+          # grid.autosizeColumns()
 
     @$grade_config_btn.click (e) =>
       url = @$grade_config_btn.data 'endpoint'
@@ -115,12 +117,12 @@ class DataDownload
     # Clear display of anything that was here before
     @clear_display()
     @instructor_tasks.task_poller.start()
-    @grade_downloads.downloads_poller.start()
+    @report_downloads.downloads_poller.start()
 
   # handler for when the section is closed
   onExit: ->
     @instructor_tasks.task_poller.stop()
-    @grade_downloads.downloads_poller.stop()
+    @report_downloads.downloads_poller.stop()
 
   clear_display: ->
     # Clear any generated tables, warning messages, etc.
@@ -134,35 +136,31 @@ class DataDownload
     $(".msg-error").css({"display":"none"})
 
 
-class GradeDownloads
-  ### Grade Downloads -- links expire quickly, so we refresh every 5 mins ####
+class ReportDownloads
+  ### Report Downloads -- links expire quickly, so we refresh every 5 mins ####
   constructor: (@$section) ->
 
-
-    @$grades                        = @$section.find '.grades-download-container'
-    @$grades_request_response       = @$grades.find '.request-response'
-    @$grades_request_response_error = @$grades.find '.request-response-error'
-    @$grade_downloads_table         = @$grades.find ".grade-downloads-table"
+    @$report_downloads_table = @$section.find ".report-downloads-table"
 
     POLL_INTERVAL = 1000 * 60 * 5 # 5 minutes in ms
     @downloads_poller = new window.InstructorDashboard.util.IntervalManager(
-      POLL_INTERVAL, => @reload_grade_downloads()
+      POLL_INTERVAL, => @reload_report_downloads()
     )
 
-  reload_grade_downloads: ->
-    endpoint = @$grade_downloads_table.data 'endpoint'
+  reload_report_downloads: ->
+    endpoint = @$report_downloads_table.data 'endpoint'
     $.ajax
       dataType: 'json'
       url: endpoint
       success: (data) =>
         if data.downloads.length
-          @create_grade_downloads_table data.downloads
+          @create_report_downloads_table data.downloads
         else
-          console.log "No grade CSVs ready for download"
-      error: std_ajax_err => console.error "Error finding grade download CSVs"
+          console.log "No reports ready for download"
+      error: std_ajax_err => console.error "Error finding report downloads"
 
-  create_grade_downloads_table: (grade_downloads_data) ->
-    @$grade_downloads_table.empty()
+  create_report_downloads_table: (report_downloads_data) ->
+    @$report_downloads_table.empty()
 
     options =
       enableCellNavigation: true
@@ -174,7 +172,7 @@ class GradeDownloads
       id: 'link'
       field: 'link'
       name: gettext('File Name (Newest First)')
-      toolTip: gettext("Links are generated on demand and expire within 5 minutes due to the sensitive nature of student grade information.")
+      toolTip: gettext("Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.")
       sortable: false
       minWidth: 150
       cssClass: "file-download-link"
@@ -183,8 +181,8 @@ class GradeDownloads
     ]
 
     $table_placeholder = $ '<div/>', class: 'slickgrid'
-    @$grade_downloads_table.append $table_placeholder
-    grid = new Slick.Grid($table_placeholder, grade_downloads_data, columns, options)
+    @$report_downloads_table.append $table_placeholder
+    grid = new Slick.Grid($table_placeholder, report_downloads_data, columns, options)
     grid.autosizeColumns()
 
 

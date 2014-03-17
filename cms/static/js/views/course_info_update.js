@@ -64,7 +64,7 @@ define(["js/views/baseview", "underscore", "codemirror", "js/models/course_updat
 
             // Variable stored for unit test.
             this.$modalCover = ModalUtils.showModalCover(false, function() {
-                self.closeEditor(true)
+                // Binding empty function to prevent default hideModal.
             });
 
             $('.date').datepicker('destroy');

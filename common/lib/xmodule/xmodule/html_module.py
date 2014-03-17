@@ -42,12 +42,12 @@ class HtmlModule(HtmlFields, XModule):
     js = {
         'coffee': [
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
-            resource_string(__name__, 'js/src/collapsible.coffee'),
-            resource_string(__name__, 'js/src/html/display.coffee')
+            resource_string(__name__, 'js/src/html/display.coffee'),
         ],
         'js': [
+            resource_string(__name__, 'js/src/collapsible.js'),
             resource_string(__name__, 'js/src/html/imageModal.js'),
-            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.pkgd.js')
+            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.pkgd.js'),
         ]
     }
     js_module_name = "HTMLModule"

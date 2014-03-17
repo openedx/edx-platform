@@ -111,8 +111,8 @@ section.instructor-dashboard-content-2 {
   // }
 
   .request-response-error {
-    margin-top: 1em;
-    margin-bottom: 1em;
+    margin: 0;
+    padding-bottom: ($baseline);
     color: $error-red;
   }
 
@@ -280,67 +280,23 @@ section.instructor-dashboard-content-2 {
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
   $half_width: $baseline * 20;
 
-  .vert-left {
-    float: left;
-    width: $half_width;
+  .vert-left,
+  .vert-right {
+    display: inline-block;
+    vertical-align: top;
+    width: 48%;
+    margin-right: 2%;
   }
 
   .vert-right {
-    float: right;
-    width: $half_width;
-  }
-
-  select {
-    margin-bottom: 1em;
-  }
-
-  .revoke-link {
-    color: $danger-red;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-
-  label[for="auto-enroll"]:hover + .auto-enroll-hint {
-    display: block;
-  }
-
-  .auto-enroll-hint {
-    position: absolute;
-    display: none;
-    padding: $baseline;
-    width: $half_width;
-    border: 1px solid $light-gray;
-    background-color: $white;
-
-    span.emph {
-      font-weight: bold;
-    }
-  }
-  
-  label[for="email-students"]:hover + .email-students-hint {
-    display: block;
-  }
-
-  .email-students-hint {
-    position: absolute;
-    display: none;
-    padding: $baseline;
-    width: $half_width;
-    border: 1px solid $light-gray;
-    background-color: $white;
-
-    span.emph {
-      font-weight: bold;
-    }
+    margin-right: 0;
   }
 
   .batch-enrollment {
     textarea {
       margin-top: 0.2em;
-      margin-bottom: 1em;
-      width: 500px;
-
-      height: 100px;
+      height: auto;
+      width: 90%;
     }
 
     input {
@@ -366,28 +322,155 @@ section.instructor-dashboard-content-2 {
     }
   }
 
-  .auth-list-container {
-    display: none;
-    margin-bottom: 1.5em;
+  .enroll-option {
+    margin-bottom: ($baseline/2);
+    position: relative;
 
-    &.active {
-      display: block;
+      label {
+        border-bottom: 1px dotted $base-font-color;
+      }
+
+    .hint {
+      @extend %t-copy-sub2;
+      display: none;
+      position: absolute;
+      top: 15px;
+      right: 0;
+      padding: ($baseline/2);
+      width: 50%;
+      background-color: $light-gray;
+
+      .hint-caret {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: -15px;
+        border-top: 8px solid $light-gray;
+        border-right: 8px solid $light-gray;
+        border-bottom: 8px solid transparent;
+        border-left: 8px solid transparent;
+      }
+    }
+  }
+
+  label[for="auto-enroll"]:hover + .auto-enroll-hint {
+    display: block;
+  }
+
+
+  label[for="email-students"]:hover + .email-students-hint {
+    display: block;
+  }
+
+  .enroll-actions {
+    margin-top: $baseline;
+  }
+
+  .member-lists-management {
+
+    .wrapper-member-select {
+      background-color: $light-gray;
+      padding: ($baseline/2);
     }
 
-    .revoke {
-      width: 10px;
-      height: 10px;
-      background: url('../images/moderator-delete-icon.png') left center no-repeat;
-      opacity: 0.7;
-      &:hover, &:focus  { opacity: 0.8; }
-      &:active { opacity: 0.9; }
+    .member-lists-selector {
+      display: block;
+      margin: ($baseline/4) 0;
+      padding: ($baseline/4);
+    }
 
-      // @include idashbutton($danger-red);
-      // line-height: 0.6em;
-      // margin-top: 5px;
-      // padding: 6px 9px;
-      // font-size: 9pt;
-      // border-radius: 10px;
+    .auth-list-container {
+      display: none;
+      margin-bottom: ($baseline*1.5);
+
+      &.active {
+        display: block;
+      }
+
+      .member-list-widget {
+
+        .header {
+          @include box-sizing(border-box);
+          @include border-top-radius(3);
+          position: relative;
+          padding: ($baseline/2);
+          background-color: #efefef;
+          border: 1px solid $light-gray;
+          display: none; // hiding to prefer dropdown as header
+        }
+
+        .title {
+          @include font-size(16);
+        }
+
+        .label {
+          @extend %t-copy-sub1;
+          color: $lighter-base-font-color;
+        }
+
+        .info {
+          @include box-sizing(border-box);
+          padding: ($baseline/2);
+
+          border: 1px solid $light-gray;
+          color: $lighter-base-font-color;
+          line-height: 1.3em;
+          font-size: .85em;
+        }
+
+        .member-list {
+          @include box-sizing(border-box);
+
+          table {
+            width: 100%;
+          }
+
+          thead {
+            background-color: $light-gray;
+          }
+
+          tr {
+            border-bottom: 1px solid $light-gray;
+          }
+
+          td {
+            @extend %t-copy-sub1;
+            vertical-align: middle;
+            word-wrap: break-word;
+            padding: ($baseline/2) ($baseline/4);
+            border-left:  1px solid $light-gray;
+            border-right: 1px solid $light-gray;
+          }
+        }
+
+        .bottom-bar {
+          @include box-sizing(border-box);
+          @include border-bottom-radius(3);
+          position: relative;
+          padding: ($baseline/2);
+          margin-top: -1px;
+          border: 1px solid $light-gray;
+          background-color: #efefef;
+          box-shadow: inset #bbb 0px 1px 1px 0px;
+        }
+
+        // .add-field
+
+        input[type="button"].add {
+          @include idashbutton($blue);
+          position: absolute;
+          right: $baseline;
+        }
+      }
+
+      .revoke {
+        color: $lighter-base-font-color;
+        cursor: pointer;
+
+        &:hover {
+          color: $alert-color;
+        }
+      }
     }
   }
 }
@@ -444,7 +527,7 @@ section.instructor-dashboard-content-2 {
   }
 
   .grades-download-container {
-    .grade-downloads-table {
+    .report-downloads-table {
       .slickgrid {
         height: 300px;
         padding: 5px;
@@ -553,102 +636,6 @@ section.instructor-dashboard-content-2 {
 
   .display-text {
     line-height: 2em;
-  }
-}
-
-.member-list-widget {
-  $width: 20 * $baseline;
-  $height: 25 * $baseline;
-  $header-height: 3 * $baseline;
-  $bottom-bar-height: 3 * $baseline;
-  $content-height: $height - $header-height - $bottom-bar-height;
-  $border-radius: 3px;
-
-  width: $width;
-  height: $height;
-
-  .header {
-    @include box-sizing(border-box);
-    @include border-top-radius($border-radius);
-
-    position: relative;
-    padding: $baseline;
-    width: $width;
-    height: $header-height;
-
-    background-color: #efefef;
-    border: 1px solid $light-gray;
-  }
-
-  .title {
-    @include font-size(16);
-  }
-
-  .label {
-    color: $lighter-base-font-color;
-    font-size: $body-font-size * 4/5;
-  }
-
-  .info {
-    @include box-sizing(border-box);
-    max-height: $content-height;
-    padding: $baseline;
-
-    border: 1px solid $light-gray;
-    color: $lighter-base-font-color;
-    line-height: 1.3em;
-    font-size: .85em;
-  }
-
-  .member-list {
-    @include box-sizing(border-box);
-    overflow: auto;
-    padding-top: 0;
-    width: $width;
-    max-height: $content-height;
-
-    table {
-      width: 100%;
-    }
-
-    tr {
-      border-bottom: 1px solid $light-gray;
-    }
-
-    td {
-      table-layout: fixed;
-      vertical-align: middle;
-      word-wrap: break-word;
-      padding-left: 15px;
-      border-left:  1px solid $light-gray;
-      border-right: 1px solid $light-gray;
-
-      font-size: 3/4 *$body-font-size;
-    }
-  }
-
-  .bottom-bar {
-    @include box-sizing(border-box);
-    @include border-bottom-radius($border-radius);
-
-    position: relative;
-    width: $width;
-    height: $bottom-bar-height;
-    padding: $baseline / 2;
-
-    // border-top: none;
-    margin-top: -1px;
-    border: 1px solid $light-gray;
-    background-color: #efefef;
-    box-shadow: inset #bbb 0px 1px 1px 0px;
-  }
-
-  // .add-field
-
-  input[type="button"].add {
-    @include idashbutton($blue);
-    position: absolute;
-    right: $baseline;
   }
 }
 

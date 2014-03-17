@@ -184,6 +184,25 @@ function (VideoPlayer) {
             });
         });
 
+        describe('onReady YouTube', function () {
+            beforeEach(function () {
+                state = jasmine.initializePlayerYouTube();
+
+                state.videoEl = $('video, iframe');
+            });
+
+            it('multiple speeds and flash mode, change back to html5 mode', function () {
+                var playbackRates = state.videoPlayer.player.getAvailablePlaybackRates();
+
+                state.currentPlayerMode = 'flash';
+
+                state.videoPlayer.onReady();
+
+                expect(playbackRates.length).toBe(4);
+                expect(state.currentPlayerMode).toBe('html5');
+            });
+        });
+
         describe('onStateChange', function () {
             describe('when the video is unstarted', function () {
                 beforeEach(function () {

@@ -15,7 +15,6 @@ div.video {
   border-radius: 5px;
 
   &:focus, &:active, &:hover {
-    outline: 0;
     border: 0;
   }
 
@@ -193,7 +192,6 @@ div.video {
           background-color: #444;
           color: #fff;
           text-decoration: none;
-          outline: 0;
         }
 
         &:active,
@@ -254,7 +252,6 @@ div.video {
 
           &:focus, &:hover {
             background-color: lighten($pink, 10%);
-            outline: 0;
           }
         }
       }
@@ -549,7 +546,6 @@ div.video {
             background-color: #F44;
             color: #0ff;
             text-decoration: none;
-            outline: 0;
           }
         }
 
@@ -610,7 +606,6 @@ div.video {
       margin-bottom: 8px;
       padding: 0;
       line-height: lh();
-      outline: 0;
 
       &.current {
         color: #333;

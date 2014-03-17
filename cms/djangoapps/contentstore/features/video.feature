@@ -53,7 +53,7 @@ Feature: CMS Video Component
     And I see caption line with data-index "0" has class "focused"
 
   # 8
-  Scenario: When start end end times are specified, a range on slider is shown
+  Scenario: When start and end times are specified, a range on slider is shown
     Given I have created a Video component with subtitles
     And Make sure captions are closed
     And I edit the component

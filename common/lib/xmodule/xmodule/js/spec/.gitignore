@@ -5,3 +5,4 @@
 
 # Tests for Time are written in pure JavaScript.
 !time_spec.js
+!collapsible_spec.js

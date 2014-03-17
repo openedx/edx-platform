@@ -484,6 +484,31 @@ class @Problem
 
       return display
 
+    cminput: (container) =>
+      element = $(container).find("textarea")
+      tabsize = element.data("tabsize")
+      mode = element.data("mode")
+      linenumbers = element.data("linenums")
+      spaces = Array(parseInt(tabsize) + 1).join(" ")
+      CodeMirror.fromTextArea element[0], {
+          lineNumbers: linenumbers
+          indentUnit: tabsize
+          tabSize: tabsize
+          mode: mode
+          matchBrackets: true
+          lineWrapping: true
+          indentWithTabs: false
+          smartIndent: false
+          extraKeys: {
+            "Esc": (cm) ->
+              $(".grader-status").focus()
+              return false
+            "Tab": (cm) ->
+              cm.replaceSelection(spaces, "end")
+              return false
+          }
+        }
+
   inputtypeShowAnswerMethods:
     choicegroup: (element, display, answers) =>
       element = $(element)

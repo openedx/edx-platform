@@ -301,6 +301,16 @@ class XModuleMixin(XBlockMixin):
         """
         return self.icon_class
 
+    def has_dynamic_children(self):
+        """
+        Returns True if this descriptor has dynamic children for a given
+        student when the module is created.
+
+        Returns False if the children of this descriptor are the same
+        children that the module will return for any student.
+        """
+        return False
+
     # Functions used in the LMS
 
     def get_score(self):
@@ -656,16 +666,6 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         # definition_locator is only used by mongostores which separate definitions from blocks
         self.edited_by = self.edited_on = self.previous_version = self.update_version = self.definition_locator = None
         self.xmodule_runtime = None
-
-    def has_dynamic_children(self):
-        """
-        Returns True if this descriptor has dynamic children for a given
-        student when the module is created.
-
-        Returns False if the children of this descriptor are the same
-        children that the module will return for any student.
-        """
-        return False
 
     @classmethod
     def _translate(cls, key):

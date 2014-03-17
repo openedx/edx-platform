@@ -2,16 +2,17 @@
 #pylint: disable=C0111
 
 from lettuce import world, step
-import json
 import os
-import requests
+import json
 import time
+import requests
 from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from cache_toolbox.core import del_cached_content
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 LANGUAGES = settings.ALL_LANGUAGES
 
@@ -54,7 +55,7 @@ class ReuqestHandlerWithSessionId(object):
         """
         kwargs = dict()
 
-        session_id = [{i['name']:i['value']} for i in  world.browser.cookies.all() if i['name']==u'sessionid']
+        session_id = [{i['name']:i['value']} for i in world.browser.cookies.all() if i['name'] == u'sessionid']
         if session_id:
             kwargs.update({
                 'cookies': session_id[0]
@@ -118,7 +119,7 @@ def add_video_to_course(course, player_mode, hashes, display_name='Video'):
         })
     if player_mode == 'youtube_html5':
         kwargs['metadata'].update({
-            'html5_sources': HTML5_SOURCES
+            'html5_sources': HTML5_SOURCES,
         })
     if player_mode == 'youtube_html5_unsupported_video':
         kwargs['metadata'].update({
@@ -165,7 +166,6 @@ def _change_video_speed(speed):
     world.browser.execute_script("$('.speeds').addClass('open')")
     speed_css = 'li[data-speed="{0}"] a'.format(speed)
     world.css_click(speed_css)
-
 
 def _open_menu(menu):
     world.browser.execute_script("$('{selector}').parent().addClass('open')".format(
@@ -333,11 +333,11 @@ def set_captions_visibility_state(_step, captions_state):
 def i_see_menu(_step, menu):
     _open_menu(menu)
     menu_items = world.css_find(VIDEO_MENUS[menu] + ' li')
-    Video = world.scenario_dict['VIDEO']
-    transcripts = dict(Video.transcripts)
-    if Video.sub:
+    video = world.scenario_dict['VIDEO']
+    transcripts = dict(video.transcripts)
+    if video.sub:
         transcripts.update({
-            'en': Video.sub
+            'en': video.sub
         })
 
     languages = {i[0]: i[1] for i in LANGUAGES}
@@ -359,9 +359,8 @@ def select_language(_step, code):
     selector = VIDEO_MENUS["language"] + ' li[data-lang-code={code}]'.format(
         code=code
     )
-    item = world.css_find(selector)
 
-    item.click()
+    world.css_click(selector)
 
     assert world.css_has_class(selector, 'active')
     assert len(world.css_find(VIDEO_MENUS["language"] + ' li.active')) == 1
@@ -406,6 +405,7 @@ def upload_to_assets(_step, filename):
 def is_hidden_button(_step, button):
     assert not world.css_visible(VIDEO_BUTTONS[button])
 
+
 @step('menu "([^"]*)" doesn\'t exist$')
 def is_hidden_menu(_step, menu):
     assert world.is_css_not_present(VIDEO_MENUS[menu])
@@ -435,27 +435,21 @@ def video_alignment(_step, transcript_visibility):
     assert all([width, height])
 
 
-@step('I can download transcript in "([^"]*)" format$')
-def i_can_download_transcript(_step, format):
+@step('I can download transcript in "([^"]*)" format and has text "([^"]*)"$')
+def i_can_download_transcript(_step, format, text):
     button = world.css_find('.video-tracks .a11y-menu-button').first
     assert button.text.strip() == '.' + format
 
     formats = {
-        'srt': {
-            'content': '0\n00:00:00,270',
-            'mime_type': 'application/x-subrip'
-        },
-        'txt': {
-            'content': 'Hi, welcome to Edx.',
-            'mime_type': 'text/plain'
-        },
+        'srt': 'application/x-subrip',
+        'txt': 'text/plain',
     }
 
     url = world.css_find(VIDEO_BUTTONS['download_transcript'])[0]['href']
     request = ReuqestHandlerWithSessionId()
     assert request.get(url).is_success()
-    assert request.check_header('content-type', formats[format]['mime_type'])
-    assert request.content.startswith(formats[format]['content'])
+    assert request.check_header('content-type', formats[format])
+    assert (text.encode('utf-8') in request.content)
 
 
 @step('I select the transcript format "([^"]*)"$')

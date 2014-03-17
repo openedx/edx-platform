@@ -189,29 +189,29 @@ class InstructorTask(models.Model):
         return json.dumps({'message': 'Task revoked before running'})
 
 
-class GradesStore(object):
+class ReportStore(object):
     """
-    Simple abstraction layer that can fetch and store CSV files for grades
-    download. Should probably refactor later to create a GradesFile object that
+    Simple abstraction layer that can fetch and store CSV files for reports
+    download. Should probably refactor later to create a ReportFile object that
     can simply be appended to for the sake of memory efficiency, rather than
     passing in the whole dataset. Doing that for now just because it's simpler.
     """
     @classmethod
     def from_config(cls):
         """
-        Return one of the GradesStore subclasses depending on django
+        Return one of the ReportStore subclasses depending on django
         configuration. Look at subclasses for expected configuration.
         """
         storage_type = settings.GRADES_DOWNLOAD.get("STORAGE_TYPE")
         if storage_type.lower() == "s3":
-            return S3GradesStore.from_config()
+            return S3ReportStore.from_config()
         elif storage_type.lower() == "localfs":
-            return LocalFSGradesStore.from_config()
+            return LocalFSReportStore.from_config()
 
 
-class S3GradesStore(GradesStore):
+class S3ReportStore(ReportStore):
     """
-    Grades store backed by S3. The directory structure we use to store things
+    Reports store backed by S3. The directory structure we use to store things
     is::
 
         `{bucket}/{root_path}/{sha1 hash of course_id}/filename`
@@ -233,11 +233,11 @@ class S3GradesStore(GradesStore):
     @classmethod
     def from_config(cls):
         """
-        The expected configuration for an `S3GradesStore` is to have a
+        The expected configuration for an `S3ReportStore` is to have a
         `GRADES_DOWNLOAD` dict in settings with the following fields::
 
             STORAGE_TYPE : "s3"
-            BUCKET : Your bucket name, e.g. "grades-bucket"
+            BUCKET : Your bucket name, e.g. "reports-bucket"
             ROOT_PATH : The path you want to store all course files under. Do not
                         use a leading or trailing slash. e.g. "staging" or
                         "staging/2013", not "/staging", or "/staging/"
@@ -325,10 +325,10 @@ class S3GradesStore(GradesStore):
         )
 
 
-class LocalFSGradesStore(GradesStore):
+class LocalFSReportStore(ReportStore):
     """
-    LocalFS implementation of a GradesStore. This is meant for debugging
-    purposes and is *absolutely not for production use*. Use S3GradesStore for
+    LocalFS implementation of a ReportStore. This is meant for debugging
+    purposes and is *absolutely not for production use*. Use S3ReportStore for
     that. We use this in tests and for local development. When it generates
     links, it will make file:/// style links. That means you actually have to
     copy them and open them in a separate browser window, for security reasons.
@@ -350,11 +350,11 @@ class LocalFSGradesStore(GradesStore):
         Generate an instance of this object from Django settings. It assumes
         that there is a dict in settings named GRADES_DOWNLOAD and that it has
         a ROOT_PATH that maps to an absolute file path that the web app has
-        write permissions to. `LocalFSGradesStore` will create any intermediate
+        write permissions to. `LocalFSReportStore` will create any intermediate
         directories as needed. Example::
 
             STORAGE_TYPE : "localfs"
-            ROOT_PATH : /tmp/edx/grade-downloads/
+            ROOT_PATH : /tmp/edx/report-downloads/
         """
         return cls(settings.GRADES_DOWNLOAD['ROOT_PATH'])
 
@@ -389,7 +389,7 @@ class LocalFSGradesStore(GradesStore):
     def links_for(self, course_id):
         """
         For a given `course_id`, return a list of `(filename, url)` tuples. `url`
-        can be plugged straight into an href. Note that `LocalFSGradesStore`
+        can be plugged straight into an href. Note that `LocalFSReportStore`
         will generate `file://` type URLs, so you'll need to copy the URL and
         open it in a new browser window. Again, this class is only meant for
         local development.

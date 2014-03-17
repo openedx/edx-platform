@@ -10,10 +10,10 @@ in-browser HTML5 video method (when in HTML5 mode).
 in XML.
 """
 
+import os
 import json
 import logging
 from operator import itemgetter
-from HTMLParser import HTMLParser
 
 from lxml import etree
 from pkg_resources import resource_string
@@ -33,12 +33,11 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String, Float, Boolean, List, Dict, ScopeIds
 from xmodule.fields import RelativeTime
 from .transcripts_utils import (
-    generate_srt_from_sjson,
-    asset,
     get_or_create_sjson,
     TranscriptException,
     generate_sjson_for_all_speeds,
-    youtube_speed_dict
+    youtube_speed_dict,
+    Transcript,
 )
 from .video_utils import create_youtube_string
 
@@ -271,13 +270,13 @@ class VideoModule(VideoFields, XModule):
                 track_url = self.runtime.handler_url(self, 'transcript').rstrip('/?') + '/download'
 
         if not self.transcripts:
-            transcript_language = 'en'
+            transcript_language = u'en'
             languages = {'en': 'English'}
         else:
             if self.transcript_language in self.transcripts:
                 transcript_language = self.transcript_language
             elif self.sub:
-                transcript_language = 'en'
+                transcript_language = u'en'
             else:
                 transcript_language = sorted(self.transcripts.keys())[0]
 
@@ -323,30 +322,47 @@ class VideoModule(VideoFields, XModule):
             'transcript_available_translations_url': self.runtime.handler_url(self, 'transcript').rstrip('/?') + '/available_translations',
         })
 
-    def get_transcript(self, format='srt'):
+    def get_transcript(self, transcript_format='srt'):
         """
-        Returns transcript in *.srt format.
+        Returns transcript, filename and MIME type.
 
         Raises:
             - NotFoundError if cannot find transcript file in storage.
             - ValueError if transcript file is empty or incorrect JSON.
             - KeyError if transcript file has incorrect format.
+
+        If language is 'en', self.sub should be correct subtitles name.
+        If language is 'en', but if self.sub is not defined, this means that we 
+        should search for video name in order to get proper transcript (old style courses).
+        If language is not 'en', give back transcript in proper language and format.
         """
         lang = self.transcript_language
-        subs_id = self.sub if lang == 'en' else self.youtube_id_1_0
-        data = asset(self.location, subs_id, lang).data
-        if format == 'txt':
-            text = json.loads(data)['text']
-            str_subs = HTMLParser().unescape("\n".join(text))
-            mime_type = 'text/plain'
+
+        if lang == 'en':
+            if self.sub:  # HTML5 case and (Youtube case for new style videos)
+                transcript_name = self.sub
+            elif self.youtube_id_1_0:  # old courses
+                transcript_name = self.youtube_id_1_0
+            else:
+                log.debug("No subtitles for 'en' language")
+                raise ValueError
+
+            data = Transcript.asset(self.location, transcript_name, lang).data
+            filename = '{}.{}'.format(transcript_name, transcript_format)
+            content = Transcript.convert(data, 'sjson', transcript_format)
         else:
-            str_subs = generate_srt_from_sjson(json.loads(data), speed=1.0)
-            mime_type = 'application/x-subrip'
-        if not str_subs:
-            log.debug('generate_srt_from_sjson produces no subtitles')
+            data = Transcript.asset(self.location, None, None, self.transcripts[lang]).data
+            filename = '{}.{}'.format(os.path.splitext(self.transcripts[lang])[0], transcript_format)
+            content = Transcript.convert(data, 'srt', transcript_format)
+
+        if not content:
+            log.debug('no subtitles produced in get_transcript')
             raise ValueError
 
-        return str_subs, format, mime_type
+        mime_type = 'text/plain' if transcript_format == 'txt' else 'application/x-subrip'
+
+        return content, filename, mime_type
+
 
     @XBlock.handler
     def transcript(self, request, dispatch):
@@ -384,34 +400,31 @@ class VideoModule(VideoFields, XModule):
 
         elif dispatch == 'download':
             try:
-                subs, format, mime_type = self.get_transcript(format=self.transcript_download_format)
+                transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(self.transcript_download_format)
             except (NotFoundError, ValueError, KeyError):
                 log.debug("Video@download exception")
                 response = Response(status=404)
             else:
                 response = Response(
-                    subs,
+                    transcript_content,
                     headerlist=[
-                        ('Content-Disposition', 'attachment; filename="{filename}.{format}"'.format(
-                            filename=self.transcript_language,
-                            format=format,
-                        )),
+                        ('Content-Disposition', 'attachment; filename="{}"'.format(transcript_filename)),
                     ]
                 )
-                response.content_type = mime_type
+                response.content_type = transcript_mime_type
 
         elif dispatch == 'available_translations':
             available_translations = []
             if self.sub:  # check if sjson exists for 'en'.
                 try:
-                    asset(self.location, self.sub, 'en')
+                    Transcript.asset(self.location, self.sub, 'en')
                 except NotFoundError:
                     pass
                 else:
                     available_translations = ['en']
             for lang in self.transcripts:
                 try:
-                   asset(self.location, None, None, self.transcripts[lang])
+                   Transcript.asset(self.location, None, None, self.transcripts[lang])
                 except NotFoundError:
                     continue
                 available_translations.append(lang)
@@ -462,13 +475,13 @@ class VideoModule(VideoFields, XModule):
         if youtube_id:
             # Youtube case:
             if self.transcript_language == 'en':
-                return asset(self.location, youtube_id).data
+                return Transcript.asset(self.location, youtube_id).data
 
             youtube_ids = youtube_speed_dict(self)
             assert youtube_id in youtube_ids
 
             try:
-                sjson_transcript = asset(self.location, youtube_id, self.transcript_language).data
+                sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
             except (NotFoundError):
                 log.info("Can't find content in storage for %s transcript: generating.", youtube_id)
                 generate_sjson_for_all_speeds(
@@ -477,17 +490,15 @@ class VideoModule(VideoFields, XModule):
                     {speed: youtube_id for youtube_id, speed in youtube_ids.iteritems()},
                     self.transcript_language
                 )
-                sjson_transcript = asset(self.location, youtube_id, self.transcript_language).data
+                sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
 
             return sjson_transcript
         else:
             # HTML5 case
             if self.transcript_language == 'en':
-                return asset(self.location, self.sub).data
+                return Transcript.asset(self.location, self.sub).data
             else:
                 return get_or_create_sjson(self)
-
-
 
 
 class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor):

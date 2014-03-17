@@ -105,12 +105,11 @@ nav.sequence-nav {
         padding: 0;
         position: relative;
         @include transition(none);
-        outline: 0;
 
-        &:focus {
+/*        &:focus {
           outline: 0;
         }
-
+*/
         &:hover, &:focus {
           background-color: #fff;
           background-repeat: no-repeat;
@@ -278,12 +277,11 @@ nav.sequence-nav {
           width: 40px;
           text-indent: -9999px;
           @include transition(all .2s $ease-in-out-quad 0s);
-          outline: 0;
 
-          &:focus {
+/*          &:focus {
             outline: 0;
           }
-
+*/
           &:hover {
             opacity: 0.5;
           }
@@ -354,7 +352,6 @@ nav.sequence-bottom {
           padding: lh(.5) 4px;
           text-indent: -9999px;
           @include transition(all .2s $ease-in-out-quad 0s);
-          outline: 0;
 
           &:hover {
             opacity: 0.5;
@@ -365,10 +362,10 @@ nav.sequence-bottom {
             opacity: 0.4;
           }
 
-          &:focus {
+/*          &:focus {
             outline: 0;
           }
-        }
+*/        }
       }
 
       &.prev {
@@ -399,10 +396,10 @@ nav.sequence-bottom {
 
 .xmodule_SequenceModule nav.sequence-bottom ul li.next a,
 .xmodule_SequenceModule nav.sequence-bottom ul li.prev a {
-  outline: 0;
 
-  &:focus {
+/*  &:focus {
     outline: 0;
   }
+*/
 }
 

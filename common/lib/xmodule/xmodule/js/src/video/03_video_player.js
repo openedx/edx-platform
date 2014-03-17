@@ -558,8 +558,19 @@ function (HTML5Video, Resizer) {
             }
         );
 
+        // Because of a recent change in the YouTube API (not documented), sometimes
+        // HTML5 mode loads after Flash mode has been loaded. In this case we have
+        // multiple speeds available but the variable `this.currentPlayerMode` is
+        // set to "flash". This is impossible because in Flash mode we can have
+        // only one speed available. Therefore we must execute the following code
+        // block if we have multiple speeds or if `this.currentPlayerMode` is set to
+        // "html5". If any of the two conditions are true, we then set the variable
+        // `this.currentPlayerMode` to "html5".
+        //
+        // For more information, please see the PR that introduced this change:
+        //     https://github.com/edx/edx-platform/pull/2841
         if (
-            this.currentPlayerMode === 'html5' &&
+            (this.currentPlayerMode === 'html5' || availablePlaybackRates.length > 1) &&
             this.videoType === 'youtube'
         ) {
             if (availablePlaybackRates.length === 1 && !this.isTouch) {
@@ -573,6 +584,8 @@ function (HTML5Video, Resizer) {
 
                 _restartUsingFlash(this);
             } else if (availablePlaybackRates.length > 1) {
+                this.currentPlayerMode = 'html5';
+
                 // We need to synchronize available frame rates with the ones
                 // that the user specified.
 

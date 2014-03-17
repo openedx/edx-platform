@@ -23,6 +23,10 @@
 @import 'base/animations';
 @import 'shared/tooltips';
 
+// base - elements
+@import 'elements/typography';
+@import 'elements/controls';
+
 // Course base / layout styles
 @import 'course/layout/courseware_header';
 @import 'course/layout/footer';

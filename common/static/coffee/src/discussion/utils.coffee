@@ -105,7 +105,7 @@ class @DiscussionUtil
       alertDiv = $("<div class='modal' role='alertdialog' id='discussion-alert' aria-describedby='discussion-alert-message'/>").css("display", "none")
       alertDiv.html(
         "<div class='inner-wrapper discussion-alert-wrapper'>" +
-        "  <button class='close-modal dismiss' aria-hidden='true'>&#10005;</button>" +
+        "  <button class='close-modal dismiss' aria-hidden='true'><i class='icon-remove'></i></button>" +
         "  <header><h2/><hr/></header>" +
         "  <p id='discussion-alert-message'/>" +
         "  <hr/>" +

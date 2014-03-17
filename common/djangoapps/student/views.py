@@ -490,6 +490,8 @@ def dashboard(request):
     # add in the default language if it's not in the list of released languages
     if settings.LANGUAGE_CODE not in language_options:
         language_options.append(settings.LANGUAGE_CODE)
+        # Re-alphabetize language options
+        language_options.sort()
 
     # try to get the prefered language for the user
     cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)

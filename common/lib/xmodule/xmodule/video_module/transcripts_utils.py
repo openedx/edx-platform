@@ -9,6 +9,7 @@ import requests
 import logging
 from pysrt import SubRipTime, SubRipItem, SubRipFile
 from lxml import etree
+from HTMLParser import HTMLParser
 
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
@@ -77,7 +78,7 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
     filedata = json.dumps(subs, indent=2)
     mime_type = 'application/json'
     filename = subs_filename(subs_id, language)
-    content_location = asset_location(item.location, filename)
+    content_location = Transcript.asset_location(item.location, filename)
     content = StaticContent(content_location, filename, mime_type, filedata)
     contentstore().save(content)
     return content_location
@@ -193,7 +194,7 @@ def remove_subs_from_store(subs_id, item, lang='en'):
     Remove from store, if transcripts content exists.
     """
     try:
-        content = asset(item.location, subs_id, lang)
+        content = Transcript.asset(item.location, subs_id, lang)
         contentstore().delete(content.get_id())
         log.info("Removed subs %s from store", subs_id)
     except NotFoundError:
@@ -213,7 +214,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, langua
     :returns: True, if all subs are generated and saved successfully.
     """
     _ = item.runtime.service(item, "i18n").ugettext
-    if subs_type != 'srt':
+    if subs_type.lower() != 'srt':
         raise TranscriptsGenerationException(_("We support only SubRip (*.srt) transcripts format."))
     try:
         srt_subs_obj = SubRipFile.from_string(subs_filedata)
@@ -412,30 +413,6 @@ def subs_filename(subs_id, lang='en'):
         return '{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
 
 
-def asset_location(location, filename):
-    """
-    Return asset location.
-
-    `location` is module location.
-    """
-    return StaticContent.compute_location(
-        location.org, location.course, filename
-    )
-
-
-def asset(location, subs_id, lang='en', filename=None):
-    """
-    Get asset from contentstore, asset location is built from subs_id and lang.
-
-    `location` is module location.
-    """
-    return contentstore().find(
-        asset_location(
-            location,
-            subs_filename(subs_id, lang) if not filename else filename
-        )
-    )
-
 
 def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
     """
@@ -444,7 +421,7 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
     `item` is module object.
     """
     try:
-        srt_transcripts = contentstore().find(asset_location(item.location, user_filename))
+        srt_transcript = contentstore().find(Transcript.asset_location(item.location, user_filename))
     except NotFoundError as ex:
         raise TranscriptException("{}: Can't find uploaded transcripts: {}".format(ex.message, user_filename))
 
@@ -454,7 +431,7 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
     generate_subs_from_source(
         result_subs_dict,
         os.path.splitext(user_filename)[1][1:],
-        srt_transcripts.data.decode('utf8'),
+        srt_transcript.data.decode('utf8'),
         item,
         lang
     )
@@ -477,8 +454,72 @@ def get_or_create_sjson(item):
     user_subs_id = os.path.splitext(user_filename)[0]
     source_subs_id, result_subs_dict = user_subs_id, {1.0: user_subs_id}
     try:
-        sjson_transcript = asset(item.location, source_subs_id, item.transcript_language).data
+        sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
     except (NotFoundError):  # generating sjson from srt
         generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, item.transcript_language)
-    sjson_transcript = asset(item.location, source_subs_id, item.transcript_language).data
+    sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
     return sjson_transcript
+
+class Transcript(object):
+    """
+    Container for transcript methods.
+    """
+
+    @staticmethod
+    def convert(content, input_format, output_format):
+        """
+        Convert transcript `content` from `input_format` to `output_format`.
+
+        Accepted input formats: sjson, srt.
+        Accepted output format: srt, txt.
+        """
+        assert input_format in ('srt', 'sjson')
+        assert output_format in ('txt', 'srt', 'sjson')
+
+        if input_format == output_format:
+            return content
+
+        if input_format == 'srt':
+
+            if output_format == 'txt':
+                text = SubRipFile.from_string(content.decode('utf8')).text
+                return HTMLParser().unescape(text)
+
+            elif output_format == 'sjson':
+                raise NotImplementedError
+
+        if input_format == 'sjson':
+
+            if output_format == 'txt':
+                text = json.loads(content)['text']
+                return HTMLParser().unescape("\n".join(text))
+
+            elif output_format == 'srt':
+                return generate_srt_from_sjson(json.loads(content), speed=1.0)
+
+    @staticmethod
+    def asset(location, subs_id, lang='en', filename=None):
+        """
+        Get asset from contentstore, asset location is built from subs_id and lang.
+
+        `location` is module location.
+        """
+        return contentstore().find(
+            Transcript.asset_location(
+                location,
+                subs_filename(subs_id, lang) if not filename else filename
+            )
+        )
+
+
+    @staticmethod
+    def asset_location(location, filename):
+        """
+        Return asset location.
+
+        `location` is module location.
+        """
+        return StaticContent.compute_location(
+            location.org, location.course, filename
+        )
+

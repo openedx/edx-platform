@@ -7,10 +7,22 @@ Define common steps for instructor dashboard acceptance tests.
 
 from __future__ import absolute_import
 
+from django.conf import settings
 from lettuce import world, step
+from mock import patch
 from nose.tools import assert_in  # pylint: disable=E0611
 
 from courseware.tests.factories import StaffFactory, InstructorFactory
+
+
+@step(u'Given I am "([^"]*)" for a very large course')
+def make_staff_or_instructor_for_large_course(step, role):
+    make_large_course(step, role)
+
+
+@patch.dict('courseware.access.settings.FEATURES', {"MAX_ENROLLMENT_INSTR_BUTTONS": 0})
+def make_large_course(step, role):
+    i_am_staff_or_instructor(step, role)
 
 
 @step(u'Given I am "([^"]*)" for a course')
@@ -99,5 +111,24 @@ def click_a_button(step, button):  # pylint: disable=unused-argument
 
         world.css_click('input[name="list-profiles"]')
 
+    elif button == "Download profile information as a CSV":
+        # Go to the data download section of the instructor dash
+        go_to_section("data_download")
+        # Don't do anything else, next step will handle clicking & downloading
+
     else:
         raise ValueError("Unrecognized button option " + button)
+
+
+@step(u'I visit the "([^"]*)" tab')
+def click_a_button(step, tab_name):  # pylint: disable=unused-argument
+    # course_info, membership, student_admin, data_download, analytics, send_email
+    tab_name_dict = {
+        'Course Info': 'course_info',
+        'Membership': 'membership',
+        'Student Admin': 'student_admin',
+        'Data Download': 'data_download',
+        'Analytics': 'analytics',
+        'Email': 'send_email',
+    }
+    go_to_section(tab_name_dict[tab_name])
