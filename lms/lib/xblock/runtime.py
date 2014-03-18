@@ -4,6 +4,7 @@ Module implementing `xblock.runtime.Runtime` functionality for the LMS
 
 import re
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from user_api import user_service
@@ -106,10 +107,11 @@ class LmsHandlerUrls(object):
         """
         local_resource_url for Studio
         """
-        return reverse('xblock_resource_url', kwargs={
+        path = reverse('xblock_resource_url', kwargs={
             'block_type': block.scope_ids.block_type,
             'uri': uri,
         })
+        return '//{}{}'.format(settings.SITE_NAME, path)
 
 
 class LmsPartitionService(PartitionService):
