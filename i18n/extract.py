@@ -61,7 +61,12 @@ def main(verbosity=1):
         config=base(LOCALE_DIR, 'babel_mako.cfg'),
         output=base(CONFIGURATION.source_messages_dir, 'mako.po'),
     )
-    execute(babel_mako_cmd, working_directory=BASE_DIR, stderr=DEVNULL)
+    if verbosity:
+        stderr = None
+    else:
+        stderr = DEVNULL
+
+    execute(babel_mako_cmd, working_directory=BASE_DIR, stderr=stderr)
 
     makemessages = "django-admin.py makemessages -l en -v{}".format(verbosity)
     ignores = " ".join('--ignore="{}/*"'.format(d) for d in CONFIGURATION.ignore_dirs)
@@ -70,11 +75,11 @@ def main(verbosity=1):
 
     # Extract strings from django source files, including .py files.
     make_django_cmd = makemessages + ' --extension html'
-    execute(make_django_cmd, working_directory=BASE_DIR, stderr=DEVNULL)
+    execute(make_django_cmd, working_directory=BASE_DIR, stderr=stderr)
 
     # Extract strings from Javascript source files.
     make_djangojs_cmd = makemessages + ' -d djangojs --extension js'
-    execute(make_djangojs_cmd, working_directory=BASE_DIR, stderr=DEVNULL)
+    execute(make_djangojs_cmd, working_directory=BASE_DIR, stderr=stderr)
 
     # makemessages creates 'django.po'. This filename is hardcoded.
     # Rename it to django-partial.po to enable merging into django.po later.
@@ -108,7 +113,7 @@ def main(verbosity=1):
             app=app_name,
             output=output_file,
         )
-        execute(babel_cmd, working_directory=app_dir, stderr=DEVNULL)
+        execute(babel_cmd, working_directory=app_dir, stderr=stderr)
 
     # Segment the generated files.
     segmented_files = segment_pofiles("en")
