@@ -3,7 +3,7 @@ Open-ended response in the courseware.
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, fulfill_after, fulfill
+from bok_choy.promise import EmptyPromise
 from .rubric import RubricPage
 
 
@@ -15,7 +15,7 @@ class OpenResponsePage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.is_css_present('div.xmodule_CombinedOpenEndedModule')
+        return self.q(css='div.xmodule_CombinedOpenEndedModule').present
 
     @property
     def assessment_type(self):
@@ -23,7 +23,7 @@ class OpenResponsePage(PageObject):
         Return the type of assessment currently active.
         Options are "self", "ai", or "peer"
         """
-        labels = self.css_text('section#combined-open-ended-status>div.statusitem-current')
+        labels = self.q(css='section#combined-open-ended-status>div.statusitem-current').text
 
         if len(labels) < 1:
             self.warning("Could not find assessment type label")
@@ -46,7 +46,7 @@ class OpenResponsePage(PageObject):
         Return an HTML string representing the essay prompt.
         """
         prompt_css = "section.open-ended-child>div.prompt"
-        prompts = self.css_map(prompt_css, lambda el: el.html.strip())
+        prompts = self.q(css=prompt_css).map(lambda el: el.get_attribute('innerHTML').strip()).results
 
         if len(prompts) == 0:
             self.warning("Could not find essay prompt on page.")
@@ -73,7 +73,7 @@ class OpenResponsePage(PageObject):
         Return the written feedback from the grader (if any).
         If no feedback available, returns None.
         """
-        feedback = self.css_text('div.written-feedback')
+        feedback = self.q(css='div.written-feedback').text
 
         if len(feedback) > 0:
             return feedback[0]
@@ -85,7 +85,7 @@ class OpenResponsePage(PageObject):
         """
         Alert message displayed to the user.
         """
-        alerts = self.css_text("div.open-ended-alert")
+        alerts = self.q(css="div.open-ended-alert").text
 
         if len(alerts) < 1:
             return ""
@@ -98,7 +98,7 @@ class OpenResponsePage(PageObject):
         Status message from the grader.
         If not present, return an empty string.
         """
-        status_list = self.css_text('div.grader-status')
+        status_list = self.q(css='div.grader-status').text
 
         if len(status_list) < 1:
             self.warning("No grader status found")
@@ -114,27 +114,25 @@ class OpenResponsePage(PageObject):
         Input a response to the prompt.
         """
         input_css = "textarea.short-form-response"
-        self.css_fill(input_css, response_str)
+        self.q(css=input_css).fill(response_str)
 
     def save_response(self):
         """
         Save the response for later submission.
         """
-        status_msg_shown = EmptyPromise(
+        self.q(css='input.save-button').first.click()
+        EmptyPromise(
             lambda: 'save' in self.alert_message.lower(),
             "Status message saved"
-        )
-
-        with fulfill_after(status_msg_shown):
-            self.css_click('input.save-button')
+        ).fulfill()
 
     def submit_response(self):
         """
         Submit a response for grading.
         """
-        self.css_click('input.submit-button')
+        self.q(css='input.submit-button').first.click()
         # modal dialog confirmation
-        self.css_click('button.ok-button')
+        self.q(css='button.ok-button').first.click()
 
         # Ensure that the submission completes
         self._wait_for_submitted(self.assessment_type)
@@ -148,11 +146,11 @@ class OpenResponsePage(PageObject):
             RubricPage(self.browser).wait_for_page()
 
         elif assessment_type == 'ai' or assessment_type == "peer":
-            fulfill(EmptyPromise(
+            EmptyPromise(
                 lambda: self.grader_status != 'Unanswered',
                 "Problem status is no longer 'unanswered'"
-            ))
+            ).fulfill()
 
         else:
             self.warning("Unrecognized assessment type '{0}'".format(assessment_type))
-            fulfill(EmptyPromise(lambda: True, "Unrecognized assessment type"))
+            EmptyPromise(lambda: True, "Unrecognized assessment type").fulfill()
