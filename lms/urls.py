@@ -153,9 +153,6 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
                         {'template': template}, name=value),)
 
 
-if settings.PERFSTATS:
-    urlpatterns += (url(r'^reprofile$', 'lms.lib.perfstats.views.end_profile'),)
-
 # Multicourse wiki (Note: wiki urls must be above the courseware ones because of
 # the custom tab catch-all)
 if settings.WIKI_ENABLED:
