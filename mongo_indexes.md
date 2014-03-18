@@ -47,10 +47,21 @@ Because we often scan for all courses regardless of the value of the other field
 ensureIndex({'_id.category': 1})
 ```
 
-
 NOTE, that index will only aid queries which provide the keys in exactly that form and order. The query can
 omit later fields of the query but not earlier. Thus ```modulestore.find({'_id.org': 'myu'})``` will not use
 the index as it omits the tag. As soon as mongo comes across an index field omitted from the query, it stops
 considering the index. On the other hand, ```modulestore.find({'_id.tag': 'i4x', '_id.org': 'myu', '_id.category': 'problem'})```
 will use the index to get the records matching the tag and org and then will scan all of them
 for matches to the category.
+
+To find out if any records have the wrong id structure, run
+```
+db.modulestore.find({$where: function() { 
+    var keys = Object.keys(this['_id']); 
+    var ref = ['tag', 'org', 'course', 'category', 'name', 'revision']; 
+    for (var i=0; i < ref.length; i++) { 
+        if (keys[i] != ref[i]) return true; 
+    } 
+    return false; }}, 
+    {_id: 1})
+```
