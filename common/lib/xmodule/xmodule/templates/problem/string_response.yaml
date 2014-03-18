@@ -27,7 +27,7 @@ data: |
 
      <p >Назовите столицу России </p>
      <stringresponse answer="Москва" type="ci">
-      <textline size="20"/>
+      <textline size="20" label="Назовите столицу России "/>
      </stringresponse>
         <solution>
             <div class="detailed-solution">

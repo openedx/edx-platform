@@ -15,6 +15,7 @@ from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
@@ -25,19 +26,18 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from util.json_request import JsonResponse
 from xmodule.modulestore.locator import BlockUsageLocator
 
-from ..transcripts_utils import (
+from xmodule.video_module.transcripts_utils import (
     generate_subs_from_source,
     generate_srt_from_sjson, remove_subs_from_store,
     download_youtube_subs, get_transcripts_from_youtube,
     copy_or_rename_transcript,
-    save_module,
     manage_video_subtitles_save,
     TranscriptsGenerationException,
     GetTranscriptsFromYouTubeException,
     TranscriptsRequestValidationException
 )
 
-from .access import has_access
+from .access import has_course_access
 
 __all__ = [
     'upload_transcripts',
@@ -46,7 +46,7 @@ __all__ = [
     'choose_transcripts',
     'replace_transcripts',
     'rename_transcripts',
-    'save_transcripts'
+    'save_transcripts',
 ]
 
 log = logging.getLogger(__name__)
@@ -125,17 +125,17 @@ def upload_transcripts(request):
             video_name = video_dict['video']
             # We are creating transcripts for every video source,
             # for the case that in future, some of video sources can be deleted.
-            statuses[video_name] = copy_or_rename_transcript(video_name, sub_attr, item)
+            statuses[video_name] = copy_or_rename_transcript(video_name, sub_attr, item, user=request.user)
             try:
                 # updates item.sub with `video_name` if it is successful.
-                copy_or_rename_transcript(video_name, sub_attr, item)
+                copy_or_rename_transcript(video_name, sub_attr, item, user=request.user)
                 selected_name = video_name  # name to write to item.sub field, chosen at random.
             except NotFoundError:
                 # subtitles file `sub_attr` is not presented in the system. Nothing to copy or rename.
                 return error_response(response, "Can't find transcripts in storage for {}".format(sub_attr))
 
         item.sub = selected_name  # write one of  new subtitles names to item.sub attribute.
-        save_module(item)
+        item.save_with_metadata(request.user)
         response['subs'] = item.sub
         response['status'] = 'Success'
     else:
@@ -271,7 +271,11 @@ def check_transcripts(request):
         #check youtube local and server transcripts for equality
         if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
             try:
-                youtube_server_subs = get_transcripts_from_youtube(youtube_id)
+                youtube_server_subs = get_transcripts_from_youtube(
+                    youtube_id,
+                    settings,
+                    item.runtime.service(item, "i18n")
+                )
                 if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
                     transcripts_presence['youtube_diff'] = False
             except GetTranscriptsFromYouTubeException:
@@ -388,7 +392,7 @@ def choose_transcripts(request):
 
     if item.sub != html5_id:  # update sub value
         item.sub = html5_id
-        save_module(item)
+        item.save_with_metadata(request.user)
     response = {'status': 'Success',  'subs': item.sub}
     return JsonResponse(response)
 
@@ -414,12 +418,12 @@ def replace_transcripts(request):
         return error_response(response, 'YouTube id {} is not presented in request data.'.format(youtube_id))
 
     try:
-        download_youtube_subs({1.0: youtube_id}, item)
+        download_youtube_subs({1.0: youtube_id}, item, settings)
     except GetTranscriptsFromYouTubeException as e:
         return error_response(response, e.message)
 
     item.sub = youtube_id
-    save_module(item)
+    item.save_with_metadata(request.user)
     response = {'status': 'Success',  'subs': item.sub}
     return JsonResponse(response)
 
@@ -439,15 +443,15 @@ def _validate_transcripts_data(request):
     """
     data = json.loads(request.GET.get('data', '{}'))
     if not data:
-        raise TranscriptsRequestValidationException('Incoming video data is empty.')
+        raise TranscriptsRequestValidationException(_('Incoming video data is empty.'))
 
     try:
         item = _get_item(request, data)
     except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
-        raise TranscriptsRequestValidationException("Can't find item by locator.")
+        raise TranscriptsRequestValidationException(_("Can't find item by locator."))
 
     if item.category != 'video':
-        raise TranscriptsRequestValidationException('Transcripts are supported only for "video" modules.')
+        raise TranscriptsRequestValidationException(_('Transcripts are supported only for "video" modules.'))
 
     # parse data form request.GET.['data']['video'] to useful format
     videos = {'youtube': '', 'html5': {}}
@@ -482,7 +486,7 @@ def rename_transcripts(request):
     for new_name in videos['html5'].keys():  # copy subtitles for every HTML5 source
         try:
             # updates item.sub with new_name if it is successful.
-            copy_or_rename_transcript(new_name, old_name, item)
+            copy_or_rename_transcript(new_name, old_name, item, user=request.user)
         except NotFoundError:
             # subtitles file `item.sub` is not presented in the system. Nothing to copy or rename.
             error_response(response, "Can't find transcripts in storage for {}".format(old_name))
@@ -518,10 +522,10 @@ def save_transcripts(request):
         for metadata_key, value in metadata.items():
             setattr(item, metadata_key, value)
 
-        save_module(item)  # item becomes updated with new values
+        item.save_with_metadata(request.user)  # item becomes updated with new values
 
         if new_sub:
-            manage_video_subtitles_save(None, item)
+            manage_video_subtitles_save(item, request.user)
         else:
             # If `new_sub` is empty, it means that user explicitly does not want to use
             # transcripts for current video ids and we remove all transcripts from storage.
@@ -546,11 +550,11 @@ def _get_item(request, data):
     locator = BlockUsageLocator(data.get('locator'))
     old_location = loc_mapper().translate_locator_to_location(locator)
 
-    # This is placed before has_access() to validate the location,
-    # because has_access() raises InvalidLocationError if location is invalid.
+    # This is placed before has_course_access() to validate the location,
+    # because has_course_access() raises InvalidLocationError if location is invalid.
     item = modulestore().get_item(old_location)
 
-    if not has_access(request.user, locator):
+    if not has_course_access(request.user, locator):
         raise PermissionDenied()
 
     return item

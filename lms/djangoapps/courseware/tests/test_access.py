@@ -102,3 +102,48 @@ class AccessTestCase(TestCase):
     def test__user_passed_as_none(self):
         """Ensure has_access handles a user being passed as null"""
         access.has_access(None, 'global', 'staff', None)
+
+class UserRoleTestCase(TestCase):
+    """
+    Tests for user roles.
+    """
+    def setUp(self):
+        self.course = Location('i4x://edX/toy/course/2012_Fall')
+        self.anonymous_user = AnonymousUserFactory()
+        self.student = UserFactory()
+        self.global_staff = UserFactory(is_staff=True)
+        self.course_staff = StaffFactory(course=self.course)
+        self.course_instructor = InstructorFactory(course=self.course)
+
+    def test_user_role_staff(self):
+        """Ensure that user role is student for staff masqueraded as student."""
+        self.assertEqual(
+            'staff',
+            access.get_user_role(self.course_staff, self.course.course_id)
+        )
+        # Masquerade staff
+        self.course_staff.masquerade_as_student = True
+        self.assertEqual(
+            'student',
+            access.get_user_role(self.course_staff, self.course.course_id)
+        )
+
+    def test_user_role_instructor(self):
+        """Ensure that user role is student for instructor masqueraded as student."""
+        self.assertEqual(
+            'instructor',
+            access.get_user_role(self.course_instructor, self.course.course_id)
+        )
+        # Masquerade instructor
+        self.course_instructor.masquerade_as_student = True
+        self.assertEqual(
+            'student',
+            access.get_user_role(self.course_instructor, self.course.course_id)
+        )
+
+    def test_user_role_anonymous(self):
+        """Ensure that user role is student for anonymous user."""
+        self.assertEqual(
+            'student',
+            access.get_user_role(self.anonymous_user, self.course.course_id)
+        )

@@ -4,11 +4,17 @@
       <div
         id="video_id1"
         class="video closed"
-        data-streams="0.75:7tqY6eQzVhE,1.0:cogebirgzzM"
+        data-streams="0.5:7tqY6eQzVhE,1.0:cogebirgzzM,1.5:abcdefghijkl"
         data-show-captions="true"
+        data-save-state-url="/save_user_state"
+        data-speed="1.5"
         data-start=""
         data-end=""
-        data-caption-asset-path="/static/subs/"
+        data-saved-video-position="0"
+        data-transcript-language="en"
+        data-transcript-languages='{"en": "English", "de": "Deutsch", "zh": "普通话"}'
+        data-transcript-translation-url="/transcript/translation"
+        data-transcript-available-translations-url="/transcript/available_translations"
         data-autoplay="False"
         data-yt-test-timeout="1500"
         data-yt-test-url="https://gdata.youtube.com/feeds/api/videos/"
@@ -22,7 +28,7 @@
             <span tabindex="-1" class="btn-play is-hidden" aria-hidden="true" aria-label="${_('Play video')}"></span>
             <div class="video-player-pre"></div>
             <section class="video-player">
-              <div id="id1"></div>
+              <iframe id="id1"></iframe>
             </section>
             <div class="video-player-post"></div>
             <section class="video-controls is-hidden">
@@ -48,7 +54,9 @@
                   </div>
                   <a href="#" class="add-fullscreen" title="Fill browser" role="button" aria-disabled="false">Fill Browser</a>
                   <a href="#" class="quality_control" title="HD off" role="button" aria-disabled="false">HD off</a>
-                  <a href="#" class="hide-subtitles" title="Turn off captions" role="button" aria-disabled="false">Captions</a>
+                  <div class="lang menu-container">
+                    <a href="#" class="hide-subtitles" title="Turn off captions" role="button" aria-disabled="false">Captions</a>
+                  </div>
                 </div>
               </div>
             </section>
@@ -70,9 +78,13 @@
         class="video"
         data-streams="0.75:7tqY6eQzVhE,1.0:cogebirgzzM"
         data-show-captions="true"
+        data-speed="1.0"
         data-start=""
         data-end=""
-        data-caption-asset-path="/static/subs/"
+        data-transcript-language="en"
+        data-transcript-languages='{"en": "English", "de": "Deutsch", "zh": "普通话"}'
+        data-transcript-translation-url="/transcript/translation"
+        data-transcript-available-translations-url="/transcript/available_translations"
         data-autoplay="False"
         data-yt-test-timeout="1500"
         data-yt-test-url="https://gdata.youtube.com/feeds/api/videos/"
@@ -83,7 +95,7 @@
           <article class="video-wrapper">
             <div class="video-player-pre"></div>
             <section class="video-player">
-              <div id="id2"></div>
+              <iframe id="id2"></iframe>
             </section>
             <div class="video-player-post"></div>
             <section class="video-controls">
@@ -109,7 +121,9 @@
                   </div>
                   <a href="#" class="add-fullscreen" title="Fill browser">Fill Browser</a>
                   <a href="#" class="quality_control" title="HD">HD</a>
-                  <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>
+                  <div class="lang menu-container">
+                    <a href="#" class="hide-subtitles" title="Turn off captions" role="button" aria-disabled="false">Captions</a>
+                  </div>
                 </div>
               </div>
             </section>
@@ -129,9 +143,13 @@
         class="video"
         data-streams="0.75:7tqY6eQzVhE,1.0:cogebirgzzM"
         data-show-captions="true"
+        data-speed="1.0"
         data-start=""
         data-end=""
-        data-caption-asset-path="/static/subs/"
+        data-transcript-language="en"
+        data-transcript-languages='{"en": "English", "de": "Deutsch", "zh": "普通话"}'
+        data-transcript-translation-url="/transcript/translation"
+        data-transcript-available-translations-url="/transcript/available_translations"
         data-autoplay="False"
         data-yt-test-timeout="1500"
         data-yt-test-url="https://gdata.youtube.com/feeds/api/videos/"
@@ -142,7 +160,7 @@
           <article class="video-wrapper">
             <div class="video-player-pre"></div>
             <section class="video-player">
-              <div id="id3"></div>
+              <iframe id="id3"></iframe>
             </section>
             <div class="video-player-post"></div>
             <section class="video-controls">
@@ -168,7 +186,9 @@
                   </div>
                   <a href="#" class="add-fullscreen" title="Fill browser">Fill Browser</a>
                   <a href="#" class="quality_control" title="HD">HD</a>
-                  <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>
+                  <div class="lang menu-container">
+                    <a href="#" class="hide-subtitles" title="Turn off captions" role="button" aria-disabled="false">Captions</a>
+                  </div>
                 </div>
               </div>
             </section>

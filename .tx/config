@@ -7,9 +7,21 @@ source_file = conf/locale/en/LC_MESSAGES/django-partial.po
 source_lang = en
 type = PO
 
-[edx-platform.djangojs]
-file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs.po
-source_file = conf/locale/en/LC_MESSAGES/djangojs.po
+[edx-platform.django-studio]
+file_filter = conf/locale/<lang>/LC_MESSAGES/django-studio.po
+source_file = conf/locale/en/LC_MESSAGES/django-studio.po
+source_lang = en
+type = PO
+
+[edx-platform.djangojs-partial]
+file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-partial.po
+source_file = conf/locale/en/LC_MESSAGES/djangojs-partial.po
+source_lang = en
+type = PO
+
+[edx-platform.djangojs-studio]
+file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-studio.po
+source_file = conf/locale/en/LC_MESSAGES/djangojs-studio.po
 source_lang = en
 type = PO
 
@@ -19,8 +31,20 @@ source_file = conf/locale/en/LC_MESSAGES/mako.po
 source_lang = en
 type = PO
 
+[edx-platform.mako-studio]
+file_filter = conf/locale/<lang>/LC_MESSAGES/mako-studio.po
+source_file = conf/locale/en/LC_MESSAGES/mako-studio.po
+source_lang = en
+type = PO
+
 [edx-platform.messages]
 file_filter = conf/locale/<lang>/LC_MESSAGES/messages.po
 source_file = conf/locale/en/LC_MESSAGES/messages.po
+source_lang = en
+type = PO
+
+[edx-platform.wiki]
+file_filter = conf/locale/<lang>/LC_MESSAGES/wiki.po
+source_file = conf/locale/en/LC_MESSAGES/wiki.po
 source_lang = en
 type = PO

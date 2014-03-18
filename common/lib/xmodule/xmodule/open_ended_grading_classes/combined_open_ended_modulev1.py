@@ -6,9 +6,9 @@ from xmodule.timeinfo import TimeInfo
 from xmodule.capa_module import ComplexEncoder
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
-from  xmodule.open_ended_grading_classes import self_assessment_module
-from  xmodule.open_ended_grading_classes import open_ended_module
-from functools import partial
+from xmodule.open_ended_grading_classes import self_assessment_module
+from xmodule.open_ended_grading_classes import open_ended_module
+from xmodule.util.duedate import get_extended_due_date
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
@@ -35,18 +35,31 @@ ACCEPT_FILE_UPLOAD = False
 # Contains all reasonable bool and case combinations of True
 TRUE_DICT = ["True", True, "TRUE", "true"]
 
+_ = lambda text: text
+
 HUMAN_TASK_TYPE = {
-    'selfassessment': "Self",
+    # Translators: "Self" is used to denote an openended response that is self-graded
+    'selfassessment': _("Self"),
     'openended': "edX",
-    'ml_grading.conf': "AI",
-    'peer_grading.conf': "Peer",
+    # Translators: "AI" is used to denote an openended response that is machine-graded
+    'ml_grading.conf': _("AI"),
+    # Translators: "Peer" is used to denote an openended response that is peer-graded
+    'peer_grading.conf': _("Peer"),
 }
 
 HUMAN_STATES = {
-    'intitial': "Not started.",
-    'assessing': "Being scored.",
-    'intermediate_done': "Scoring finished.",
-    'done': "Complete.",
+    # Translators: "Not started" is used to communicate to a student that their response
+    # has not yet been graded
+    'intitial': _("Not started."),
+    # Translators: "Being scored." is used to communicate to a student that their response
+    # are in the process of being scored
+    'assessing': _("Being scored."),
+    # Translators: "Scoring finished" is used to communicate to a student that their response
+    # have been scored, but the full scoring process is not yet complete
+    'intermediate_done': _("Scoring finished."),
+    # Translators: "Complete" is used to communicate to a student that their
+    # openended response has been fully scored
+    'done': _("Complete."),
 }
 
 # Default value that controls whether or not to skip basic spelling checks in the controller
@@ -86,6 +99,10 @@ class CombinedOpenEndedV1Module():
 
     # Where the templates live for this problem
     TEMPLATE_DIR = "combinedopenended"
+
+    # hack: included to make this class act enough like an xblock to get i18n
+    _services_requested = {"i18n": "need"}
+    _combined_services = _services_requested
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, metadata=None, static_data=None, **kwargs):
@@ -133,8 +150,7 @@ class CombinedOpenEndedV1Module():
             'peer_grade_finished_submissions_when_none_pending', False
         )
 
-        due_date = instance_state.get('due', None)
-
+        due_date = get_extended_due_date(instance_state)
         grace_period_string = instance_state.get('graceperiod', None)
         try:
             self.timeinfo = TimeInfo(due_date, grace_period_string)
@@ -543,6 +559,7 @@ class CombinedOpenEndedV1Module():
         """
         task_html = self.get_html_base()
         # set context variables and render template
+        ugettext = self.system.service(self, "i18n").ugettext
 
         context = {
             'items': [{'content': task_html}],
@@ -551,12 +568,12 @@ class CombinedOpenEndedV1Module():
             'state': self.state,
             'task_count': len(self.task_xml),
             'task_number': self.current_task_number + 1,
-            'status': self.get_status(False),
+            'status': ugettext(self.get_status(False)),
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
             'location': self.location,
             'legend_list': LEGEND_LIST,
-            'human_state': HUMAN_STATES.get(self.state, "Not started."),
+            'human_state': ugettext(HUMAN_STATES.get(self.state, "Not started.")),
             'is_staff': self.system.user_is_staff,
         }
 
@@ -569,7 +586,9 @@ class CombinedOpenEndedV1Module():
         Output: rendered html
         """
         context = self.get_context()
-        html = self.system.render_template('{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context)
+        html = self.system.render_template(
+            '{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context
+        )
         return html
 
     def get_html_nonsystem(self):
@@ -580,7 +599,9 @@ class CombinedOpenEndedV1Module():
         Output: HTML rendered directly via Mako
         """
         context = self.get_context()
-        html = self.system.render_template('{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context)
+        html = self.system.render_template(
+            '{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context
+        )
         return html
 
     def get_html_base(self):
@@ -653,7 +674,7 @@ class CombinedOpenEndedV1Module():
                 last_post_evaluation = task.format_feedback_with_evaluation(self.system, last_post_assessment)
             last_post_assessment = last_post_evaluation
             try:
-                rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', ""), self.system)
+                rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', "{}"), self.system)
             except Exception:
                 log.debug("Could not parse rubric data from child history.  "
                           "Likely we have not yet initialized a previous step, so this is perfectly fine.")
@@ -817,6 +838,7 @@ class CombinedOpenEndedV1Module():
         Input: AJAX data dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
+        ugettext = self.system.service(self, "i18n").ugettext
         all_responses = []
         success, can_see_rubric, error = self.check_if_student_has_done_needed_grading()
         if not can_see_rubric:
@@ -843,12 +865,20 @@ class CombinedOpenEndedV1Module():
                 rubric_scores = [[response['rubric_scores'][z]]]
                 grader_types = [[response['grader_types'][z]]]
                 feedback_items = [[response['feedback_items'][z]]]
-                rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']),
-                                                                      rubric_scores,
-                                                                      grader_types, feedback_items)
+                rubric_html = self.rubric_renderer.render_combined_rubric(
+                    stringify_children(self.static_data['rubric']),
+                    rubric_scores,
+                    grader_types,
+                    feedback_items
+                )
                 contexts.append({
                     'result': rubric_html,
-                    'task_name': 'Scored rubric',
+                    # Translators: "Scored rubric" appears to a user as part of a longer
+                    # string that looks something like: "Scored rubric from grader 1".
+                    # "Scored" is an adjective that modifies the noun "rubric".
+                    # That longer string appears when a user is viewing a graded rubric
+                    # returned from one of the graders of their openended response problem.
+                    'task_name': ugettext('Scored rubric'),
                     'feedback' : feedback
                 })
 
@@ -927,6 +957,7 @@ class CombinedOpenEndedV1Module():
         Input: AJAX data dictionary
         Output: AJAX dictionary to tbe rendered
         """
+        ugettext = self.system.service(self, "i18n").ugettext
         if self.state != self.DONE:
             if not self.ready_to_reset:
                 return self.out_of_sync_error(data)
@@ -937,9 +968,13 @@ class CombinedOpenEndedV1Module():
             return {
                 'success': False,
                 # This is a student_facing_error
-                'error': 
-                    _('You have attempted this question {your} times. You are only allowed to attempt it {allowed} times.')
-                .format(your = self.student_attempts, allowed = self.max_attempts)
+                'error': ugettext(
+                    'You have attempted this question {number_of_student_attempts} times. '
+                    'You are only allowed to attempt it {max_number_of_attempts} times.'
+                ).format(
+                    number_of_student_attempts=self.student_attempts,
+                    max_number_of_attempts=self.max_attempts
+                )
             }
         self.student_attempts +=1
         self.state = self.INITIAL
@@ -979,26 +1014,32 @@ class CombinedOpenEndedV1Module():
         Input: None
         Output: The status html to be rendered
         """
-        status = []
+        ugettext = self.system.service(self, "i18n").ugettext
+        status_list = []
         current_task_human_name = ""
         for i in xrange(0, len(self.task_xml)):
             human_task_name = self.extract_human_name_from_task(self.task_xml[i])
-
+            human_task_name = ugettext(human_task_name)
             # Extract the name of the current task for screen readers.
             if self.current_task_number == i:
                 current_task_human_name = human_task_name
-            task_data = {'task_number': i + 1, 'human_task': human_task_name, 'current': self.current_task_number==i}
-            status.append(task_data)
+            task_data = {
+                'task_number': i + 1,
+                'human_task': human_task_name,
+                'current': self.current_task_number == i
+            }
+            status_list.append(task_data)
 
         context = {
-            'status_list': status,
+            'status_list': status_list,
             'grader_type_image_dict': GRADER_TYPE_IMAGE_DICT,
             'legend_list': LEGEND_LIST,
             'render_via_ajax': render_via_ajax,
             'current_task_human_name': current_task_human_name,
         }
-        status_html = self.system.render_template("{0}/combined_open_ended_status.html".format(self.TEMPLATE_DIR),
-                                                  context)
+        status_html = self.system.render_template(
+            "{0}/combined_open_ended_status.html".format(self.TEMPLATE_DIR), context
+        )
 
         return status_html
 
@@ -1108,12 +1149,39 @@ class CombinedOpenEndedV1Module():
         """
         return dict out-of-sync error message, and also log.
         """
+        ugettext = self.system.service(self, "i18n").ugettext
         #This is a dev_facing_error
-        log.warning("Combined module state out sync. state: %r, data: %r. %s",
-                    self.state, data, msg)
+        log.warning(
+            "Combined module state out sync. state: %r, data: %r. %s",
+            self.state,
+            data,
+            msg
+        )
         #This is a student_facing_error
-        return {'success': False,
-                'error': _('The problem state got out-of-sync.  Please try reloading the page.')}
+        return {
+            'success': False,
+            'error': ugettext('The problem state got out-of-sync. Please try reloading the page.')
+        }
+
+    @classmethod
+    def service_declaration(cls, service_name):
+        """
+        This classmethod is copied from XBlock's service_declaration.
+        It is included to make this class act enough like an XBlock
+        to get i18n working on it.
+
+        This is currently only used for i18n, and will return "need"
+        in that case.
+
+        Arguments:
+            service_name (string): the name of the service requested.
+
+        Returns:
+            One of "need", "want", or None.
+
+        """
+        declaration = cls._combined_services.get(service_name)
+        return declaration
 
 
 class CombinedOpenEndedV1Descriptor():

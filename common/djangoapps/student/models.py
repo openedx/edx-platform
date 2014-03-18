@@ -10,31 +10,34 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
-from datetime import datetime
+import crum
+from datetime import datetime, timedelta
 import hashlib
 import json
 import logging
+from pytz import UTC
 import uuid
+from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
+from django.db.models import Count
 from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
 import django.dispatch
 from django.forms import ModelForm, forms
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext_lazy as _
-
-from course_modes.models import CourseMode
-import lms.lib.comment_client as cc
-from pytz import UTC
-import crum
-
+from django.utils.translation import ugettext_noop
+from django_countries import CountryField
 from track import contexts
 from track.views import server_track
 from eventtracking import tracker
+
+from course_modes.models import CourseMode
+import lms.lib.comment_client as cc
+from util.query import use_read_replica_if_available
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -191,8 +194,12 @@ class UserProfile(models.Model):
     this_year = datetime.now(UTC).year
     VALID_YEARS = range(this_year, this_year - 120, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
-
-    GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
+    GENDER_CHOICES = (
+        ('m', ugettext_noop('Male')),
+        ('f', ugettext_noop('Female')),
+        # Translators: 'Other' refers to the student's gender
+        ('o', ugettext_noop('Other'))
+    )
     gender = models.CharField(
         blank=True, null=True, max_length=6, db_index=True, choices=GENDER_CHOICES
     )
@@ -202,15 +209,15 @@ class UserProfile(models.Model):
     # ('p_se', 'Doctorate in science or engineering'),
     # ('p_oth', 'Doctorate in another field'),
     LEVEL_OF_EDUCATION_CHOICES = (
-        ('m', _("Master's or professional degree")),
-        ('b', _("Bachelor's degree")),
-        ('a', _("Associate's degree")),
-        ('s', _("Specialist's degree")),
-        ('hs', _("Secondary/high school")),
-        ('jhs', _("Junior secondary/junior high/middle school")),
-        ('el', _("Elementary/primary school")),
-        ('none', _("None")),
-        ('other', _("Other"))
+        ('m', ugettext_noop("Master's or professional degree")),
+        ('b', ugettext_noop("Bachelor's degree")),
+        ('a', ugettext_noop("Associate's degree")),
+        ('s', ugettext_noop("Specialist's degree")),
+        ('hs', ugettext_noop("Secondary/high school")),
+        ('jhs', ugettext_noop("Junior secondary/junior high/middle school")),
+        ('el', ugettext_noop("Elementary/primary school")),
+        ('none', ugettext_noop("None")),
+        ('other', ugettext_noop("Other"))
     )
     level_of_education = models.CharField(
         blank=True, null=True, max_length=6, db_index=True,
@@ -223,80 +230,80 @@ class UserProfile(models.Model):
     education_specialty = models.CharField(blank=True, null=True, max_length=30)
 
     WORK_TYPE_CHOICES = (
-        ('sch', _("School")),
-        ('lyc', _("Lyceum")),
-        ('edc', _('Education Center')),
-        ('gymn', _('Gymnasium')),
-        ('edu', _('Educational complex')),
-        ('kind', _('Kindergarten')),
-        ('npe', _('Non-profit educational institution')),
-        ('coll', _('College')),
-        ('none', _('None')),
-        ('other', _('Other'))
+        ('sch', ugettext_noop("School")),
+        ('lyc', ugettext_noop("Lyceum")),
+        ('edc', ugettext_noop('Education Center')),
+        ('gymn', ugettext_noop('Gymnasium')),
+        ('edu', ugettext_noop('Educational complex')),
+        ('kind', ugettext_noop('Kindergarten')),
+        ('npe', ugettext_noop('Non-profit educational institution')),
+        ('coll', ugettext_noop('College')),
+        ('none', ugettext_noop('None')),
+        ('other', ugettext_noop('Other'))
     )
     work_type = models.CharField(blank=True, null=True, max_length=6, choices=WORK_TYPE_CHOICES)
     work_number = models.IntegerField(blank=True, null=True, db_index=True)
     work_name = models.CharField(blank=True, null=True, max_length=255, db_index=False)
     work_login = models.CharField(blank=True, null=True, max_length=10, db_index=False)
     WORK_LOCATION_CHOICES = (
-        ('CAO', _('Central Administrative Okrug')),
-        ('EAO', _('Eastern Administrative Okrug')),
-        ('WAO', _('Western Administrative Okrug')),
-        ('NAO', _('Northern Administrative Okrug')),
-        ('NEAO', _('North-Eastern Administrative Okrug')),
-        ('NWAO', _('North-Western Administrative Okrug')),
-        ('SWAO', _('South-Western Administrative Okrug')),
-        ('SEAO', _('South-Eastern Administrative Okrug')),
-        ('SAO', _('Southern Administrative Okrug')),
-        ('zel', _('Zelenogradsky Administrative Okrug')),
-        ('troi', _('Troitsky Administrative Okrug')),
-        ('novo', _('Novomoskovsky Administrative Okrug')),
-        ('city', _('Territorial units with special status')),
-        ('non', _('None')),
-        ('other', _('Other'))
+        ('CAO', ugettext_noop('Central Administrative Okrug')),
+        ('EAO', ugettext_noop('Eastern Administrative Okrug')),
+        ('WAO', ugettext_noop('Western Administrative Okrug')),
+        ('NAO', ugettext_noop('Northern Administrative Okrug')),
+        ('NEAO', ugettext_noop('North-Eastern Administrative Okrug')),
+        ('NWAO', ugettext_noop('North-Western Administrative Okrug')),
+        ('SWAO', ugettext_noop('South-Western Administrative Okrug')),
+        ('SEAO', ugettext_noop('South-Eastern Administrative Okrug')),
+        ('SAO', ugettext_noop('Southern Administrative Okrug')),
+        ('zel', ugettext_noop('Zelenogradsky Administrative Okrug')),
+        ('troi', ugettext_noop('Troitsky Administrative Okrug')),
+        ('novo', ugettext_noop('Novomoskovsky Administrative Okrug')),
+        ('city', ugettext_noop('Territorial units with special status')),
+        ('non', ugettext_noop('None')),
+        ('other', ugettext_noop('Other'))
     )
     work_location = models.CharField(blank=True, null=True, max_length=6, db_index=False, choices=WORK_LOCATION_CHOICES)
     WORK_OCCUPATION_CHOICES = (
-        ('tchr', _('Teacher')),
-        ('tchrorg', _('Teacher and organizer')),
-        ('scltchr', _('Social teacher')),
-        ('edupsy', _('Educational Psychologist')),
-        ('care', _('Caregiver (including older)')),
-        ('mng', _('Manager (Director, Head of) the educational institution')),
-        ('vcmng', _('Vice manager (director, head of) the educational institution')),
-        ('smstr', _('Senior master')),
-        ('intr', _('Instructor')),
-        ('tchrsp', _('Teacher-pathologists, speech therapists (speech therapist)')),
-        ('tutor', _('Tutor')),
-        ('tchrlib', _('Teacher-librarian')),
-        ('slead', _('Senior leader')),
-        ('tchredu', _('Teacher of additional education (including older)')),
-        ('mushead', _('Musical head')),
-        ('conc', _('Concertmaster')),
-        ('mstrphy', _('Master of Physical Education')),
-        ('instphy', _('Instructor of Physical Education')),
-        ('meth', _('The Methodist (including older)')),
-        ('instlab', _('Instructor for Labour')),
-        ('instorg', _('Instructor-organizer life safety')),
-        ('coach', _('Coach and teacher (including older)')),
-        ('mstrind', _('Master of of industrial training')),
-        ('dtreg', _('The duty on the regime (including older)')),
-        ('lead', _('Leader')),
-        ('ascare', _('Assistant caregiver')),
-        ('juncare', _('Junior caregiver')),
-        ('secr', _('Secretary of teaching department')),
-        ('disp', _('Dispatcher of the educational institution')),
-        ('other', _('Other'))
+        ('tchr', ugettext_noop('Teacher')),
+        ('tchrorg', ugettext_noop('Teacher and organizer')),
+        ('scltchr', ugettext_noop('Social teacher')),
+        ('edupsy', ugettext_noop('Educational Psychologist')),
+        ('care', ugettext_noop('Caregiver (including older)')),
+        ('mng', ugettext_noop('Manager (Director, Head of) the educational institution')),
+        ('vcmng', ugettext_noop('Vice manager (director, head of) the educational institution')),
+        ('smstr', ugettext_noop('Senior master')),
+        ('intr', ugettext_noop('Instructor')),
+        ('tchrsp', ugettext_noop('Teacher-pathologists, speech therapists (speech therapist)')),
+        ('tutor', ugettext_noop('Tutor')),
+        ('tchrlib', ugettext_noop('Teacher-librarian')),
+        ('slead', ugettext_noop('Senior leader')),
+        ('tchredu', ugettext_noop('Teacher of additional education (including older)')),
+        ('mushead', ugettext_noop('Musical head')),
+        ('conc', ugettext_noop('Concertmaster')),
+        ('mstrphy', ugettext_noop('Master of Physical Education')),
+        ('instphy', ugettext_noop('Instructor of Physical Education')),
+        ('meth', ugettext_noop('The Methodist (including older)')),
+        ('instlab', ugettext_noop('Instructor for Labour')),
+        ('instorg', ugettext_noop('Instructor-organizer life safety')),
+        ('coach', ugettext_noop('Coach and teacher (including older)')),
+        ('mstrind', ugettext_noop('Master of of industrial training')),
+        ('dtreg', ugettext_noop('The duty on the regime (including older)')),
+        ('lead', ugettext_noop('Leader')),
+        ('ascare', ugettext_noop('Assistant caregiver')),
+        ('juncare', ugettext_noop('Junior caregiver')),
+        ('secr', ugettext_noop('Secretary of teaching department')),
+        ('disp', ugettext_noop('Dispatcher of the educational institution')),
+        ('other', ugettext_noop('Other'))
     )
     work_occupation = models.CharField(blank=True, null=True, max_length=10, db_index=False, choices=WORK_OCCUPATION_CHOICES)
     work_occupation_other = models.CharField(blank=True, null=True, max_length=10, db_index=False, choices=WORK_OCCUPATION_CHOICES)
     work_teaching_experience = models.IntegerField(blank=True, null=True, db_index=True)
     work_managing_experience = models.IntegerField(blank=True, null=True, db_index=True)
     WORK_QUALIFICATION_CATEGORY_CHOICES = (
-        ('none', _("None")),
-        ('high', _("High")),
-        ('first', _("First")),
-        ('second', _("Second"))
+        ('none', ugettext_noop("None")),
+        ('high', ugettext_noop("High")),
+        ('first', ugettext_noop("First")),
+        ('second', ugettext_noop("Second"))
     )
     work_qualification_category = models.CharField(blank=True, null=True, max_length=10, db_index=False, choices=WORK_QUALIFICATION_CATEGORY_CHOICES)
     work_qualification_category_year = models.IntegerField(blank=True, null=True, db_index=True)
@@ -306,6 +313,8 @@ class UserProfile(models.Model):
     allowed_courses = models.CharField(blank=True, null=True, max_length=255, db_index=False)
 
     mailing_address = models.TextField(blank=True, null=True)
+    city = models.TextField(blank=True, null=True)
+    country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
 
@@ -377,6 +386,68 @@ class PendingEmailChange(models.Model):
 
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
+
+
+class LoginFailures(models.Model):
+    """
+    This model will keep track of failed login attempts
+    """
+    user = models.ForeignKey(User)
+    failure_count = models.IntegerField(default=0)
+    lockout_until = models.DateTimeField(null=True)
+
+    @classmethod
+    def is_feature_enabled(cls):
+        """
+        Returns whether the feature flag around this functionality has been set
+        """
+        return settings.FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS']
+
+    @classmethod
+    def is_user_locked_out(cls, user):
+        """
+        Static method to return in a given user has his/her account locked out
+        """
+        try:
+            record = LoginFailures.objects.get(user=user)
+            if not record.lockout_until:
+                return False
+
+            now = datetime.now(UTC)
+            until = record.lockout_until
+            is_locked_out = until and now < until
+
+            return is_locked_out
+        except ObjectDoesNotExist:
+            return False
+
+    @classmethod
+    def increment_lockout_counter(cls, user):
+        """
+        Ticks the failed attempt counter
+        """
+        record, _ = LoginFailures.objects.get_or_create(user=user)
+        record.failure_count = record.failure_count + 1
+        max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
+
+        # did we go over the limit in attempts
+        if record.failure_count >= max_failures_allowed:
+            # yes, then store when this account is locked out until
+            lockout_period_secs = settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
+            record.lockout_until = datetime.now(UTC) + timedelta(seconds=lockout_period_secs)
+
+        record.save()
+
+    @classmethod
+    def clear_lockout_counter(cls, user):
+        """
+        Removes the lockout counters (normally called after a successful login)
+        """
+        try:
+            entry = LoginFailures.objects.get(user=user)
+            entry.delete()
+        except ObjectDoesNotExist:
+            return
 
 
 class CourseEnrollment(models.Model):
@@ -451,6 +522,28 @@ class CourseEnrollment(models.Model):
             enrollment.save()
 
         return enrollment
+
+    @classmethod
+    def num_enrolled_in(cls, course_id):
+        """
+        Returns the count of active enrollments in a course.
+
+        'course_id' is the course_id to return enrollments
+        """
+        enrollment_number = CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()
+
+        return enrollment_number
+
+    @classmethod
+    def is_course_full(cls, course):
+        """
+        Returns a boolean value regarding whether a course has already reached it's max enrollment
+        capacity
+        """
+        is_course_full = False
+        if course.max_student_enrollments_allowed is not None:
+            is_course_full = cls.num_enrolled_in(course.location.course_id) >= course.max_student_enrollments_allowed
+        return is_course_full
 
     def update_enrollment(self, mode=None, is_active=None):
         """
@@ -675,6 +768,22 @@ class CourseEnrollment(models.Model):
             courseenrollment__is_active=True
         )
 
+    @classmethod
+    def enrollment_counts(cls, course_id):
+        """
+        Returns a dictionary that stores the total enrollment count for a course, as well as the
+        enrollment count for each individual mode.
+        """
+        # Unfortunately, Django's "group by"-style queries look super-awkward
+        query = use_read_replica_if_available(cls.objects.filter(course_id=course_id, is_active=True).values('mode').order_by().annotate(Count('mode')))
+        total = 0
+        d = defaultdict(int)
+        for item in query:
+            d[item['mode']] = item['mode__count']
+            total += item['mode__count']
+        d['total'] = total
+        return d
+
     def activate(self):
         """Makes this `CourseEnrollment` record active. Saves immediately."""
         self.update_enrollment(is_active=True)
@@ -835,10 +944,16 @@ def update_user_information(sender, instance, created, **kwargs):
 @receiver(user_logged_in)
 def log_successful_login(sender, request, user, **kwargs):
     """Handler to log when logins have occurred successfully."""
-    AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.info(u"Login success - user.id: {0}".format(user.id))
+    else:
+        AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
 
 
 @receiver(user_logged_out)
 def log_successful_logout(sender, request, user, **kwargs):
     """Handler to log when logouts have occurred successfully."""
-    AUDIT_LOG.info(u"Logout - {0}".format(request.user))
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))
+    else:
+        AUDIT_LOG.info(u"Logout - {0}".format(request.user))

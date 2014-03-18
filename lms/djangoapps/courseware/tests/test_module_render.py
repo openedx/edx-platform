@@ -2,6 +2,7 @@
 Test for lms courseware app, module render unit
 """
 from ddt import ddt, data
+from functools import partial
 from mock import MagicMock, patch, Mock
 import json
 
@@ -12,6 +13,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
+from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
@@ -21,14 +23,14 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.x_module import XModuleDescriptor
-import courseware.module_render as render
+
+from courseware import module_render as render
+from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
+from courseware.model_data import FieldDataCache
+from courseware.tests.factories import StudentModuleFactory, UserFactory
 from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from courseware.model_data import FieldDataCache
 
-from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
-
-from .factories import UserFactory
 from lms.lib.xblock.runtime import quote_slashes
 
 
@@ -406,7 +408,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render('student_view')
 
-        self.assertIn('section class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
+        self.assertIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
 
     def test_xmodule_display_wrapper_disabled(self):
         module = render.get_module(
@@ -419,7 +421,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render('student_view')
 
-        self.assertNotIn('section class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
+        self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
 
     def test_static_link_rewrite(self):
         module = render.get_module(
@@ -506,8 +508,42 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             result_fragment.content
         )
 
-    @patch('courseware.module_render.has_access', Mock(return_value=True))
-    def test_histogram(self):
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
+@patch('courseware.module_render.has_access', Mock(return_value=True))
+class TestStaffDebugInfo(ModuleStoreTestCase):
+    """Tests to verify that Staff Debug Info panel and histograms are displayed to staff."""
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.request = RequestFactory().get('/')
+        self.request.user = self.user
+        self.request.session = {}
+        self.course = CourseFactory.create()
+
+        problem_xml = OptionResponseXMLFactory().build_xml(
+            question_text='The correct answer is Correct',
+            num_inputs=2,
+            weight=2,
+            options=['Correct', 'Incorrect'],
+            correct_option='Correct'
+        )
+        self.descriptor = ItemFactory.create(
+            category='problem',
+            data=problem_xml,
+            display_name='Option Response Problem'
+        )
+
+        self.location = self.descriptor.location
+        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id,
+            self.user,
+            self.descriptor
+        )
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': False})
+    def test_staff_debug_info_disabled(self):
         module = render.get_module(
             self.user,
             self.request,
@@ -516,11 +552,78 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.course.id,
         )
         result_fragment = module.render('student_view')
+        self.assertNotIn('Staff Debug', result_fragment.content)
 
-        self.assertIn(
-            'Staff Debug',
-            result_fragment.content
+    def test_staff_debug_info_enabled(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.field_data_cache,
+            self.course.id,
         )
+        result_fragment = module.render('student_view')
+        self.assertIn('Staff Debug', result_fragment.content)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_HISTOGRAMS_TO_STAFF': False})
+    def test_histogram_disabled(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.field_data_cache,
+            self.course.id,
+        )
+        result_fragment = module.render('student_view')
+        self.assertNotIn('histrogram', result_fragment.content)
+
+    def test_histogram_enabled_for_unscored_xmodules(self):
+        """Histograms should not display for xmodules which are not scored."""
+
+        html_descriptor = ItemFactory.create(
+            category='html',
+            data='Here are some course details.'
+        )
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id,
+            self.user,
+            self.descriptor
+        )
+        with patch('xmodule_modifiers.grade_histogram') as mock_grade_histogram:
+            mock_grade_histogram.return_value = []
+            module = render.get_module(
+                self.user,
+                self.request,
+                html_descriptor.location,
+                field_data_cache,
+                self.course.id,
+            )
+            module.render('student_view')
+            self.assertFalse(mock_grade_histogram.called)
+
+    def test_histogram_enabled_for_scored_xmodules(self):
+        """Histograms should display for xmodules which are scored."""
+
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_state_key=self.location,
+            student=UserFactory(),
+            grade=1,
+            max_grade=1,
+            state="{}",
+        )
+        with patch('xmodule_modifiers.grade_histogram') as mock_grade_histogram:
+            mock_grade_histogram.return_value = []
+            module = render.get_module(
+                self.user,
+                self.request,
+                self.location,
+                self.field_data_cache,
+                self.course.id,
+            )
+            module.render('student_view')
+            self.assertTrue(mock_grade_histogram.called)
+
 
 PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 
@@ -555,6 +658,9 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ),
             scope_ids=Mock(spec=ScopeIds),
         )
+        # Use the xblock_class's bind_for_student method
+        descriptor.bind_for_student = partial(xblock_class.bind_for_student, descriptor)
+
         if hasattr(xblock_class, 'module_class'):
             descriptor.module_class = xblock_class.module_class
 
@@ -592,3 +698,63 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'f82b5416c9f54b5ce33989511bb5ef2e',
             self._get_anonymous_id('MITx/6.00x/2013_Spring', descriptor_class)
         )
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch('track.views.tracker')
+class TestModuleTrackingContext(ModuleStoreTestCase):
+    """
+    Ensure correct tracking information is included in events emitted during XBlock callback handling.
+    """
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.request = RequestFactory().get('/')
+        self.request.user = self.user
+        self.request.session = {}
+        self.course = CourseFactory.create()
+
+        self.problem_xml = OptionResponseXMLFactory().build_xml(
+            question_text='The correct answer is Correct',
+            num_inputs=2,
+            weight=2,
+            options=['Correct', 'Incorrect'],
+            correct_option='Correct'
+        )
+
+    def test_context_contains_display_name(self, mock_tracker):
+        problem_display_name = u'Option Response Problem'
+        actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker, problem_display_name)
+        self.assertEquals(problem_display_name, actual_display_name)
+
+    def handle_callback_and_get_display_name_from_event(self, mock_tracker, problem_display_name=None):
+        """
+        Creates a fake module, invokes the callback and extracts the display name from the emitted problem_check event.
+        """
+        descriptor_kwargs = {
+            'category': 'problem',
+            'data': self.problem_xml
+        }
+        if problem_display_name:
+            descriptor_kwargs['display_name'] = problem_display_name
+
+        descriptor = ItemFactory.create(**descriptor_kwargs)
+
+        render.handle_xblock_callback(
+            self.request,
+            self.course.id,
+            quote_slashes(str(descriptor.location)),
+            'xmodule_handler',
+            'problem_check',
+        )
+
+        self.assertEquals(len(mock_tracker.send.mock_calls), 1)
+        mock_call = mock_tracker.send.mock_calls[0]
+        event = mock_call[1][0]
+
+        self.assertEquals(event['event_type'], 'problem_check')
+        return event['context']['module']['display_name']
+
+    def test_missing_display_name(self, mock_tracker):
+        actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker)
+        self.assertTrue(actual_display_name.startswith('problem'))

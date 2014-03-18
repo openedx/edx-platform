@@ -37,6 +37,10 @@ STATIC_ROOT = TEST_ROOT / "staticfiles"
 GITHUB_REPO_ROOT = TEST_ROOT / "data"
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 
+# For testing "push to lms"
+FEATURES['ENABLE_EXPORT_GIT'] = True
+GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
+
 # Makes the tests run much faster...
 SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 
@@ -146,8 +150,12 @@ CACHES = {
 
 }
 
+# Add external_auth to Installed apps for testing
+INSTALLED_APPS += ('external_auth', )
+
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
+
 
 ################################# CELERY ######################################
 
@@ -183,3 +191,34 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # This is to disable a test under the common directory that will not pass when run under CMS
 FEATURES['DISABLE_RESET_EMAIL_TEST'] = True
+
+# Toggles embargo on for testing
+FEATURES['EMBARGO'] = True
+
+# set up some testing for microsites
+MICROSITE_CONFIGURATION = {
+    "test_microsite": {
+        "domain_prefix": "testmicrosite",
+        "university": "test_microsite",
+        "platform_name": "Test Microsite",
+        "logo_image_url": "test_microsite/images/header-logo.png",
+        "email_from_address": "test_microsite@edx.org",
+        "payment_support_email": "test_microsite@edx.org",
+        "ENABLE_MKTG_SITE": False,
+        "SITE_NAME": "test_microsite.localhost",
+        "course_org_filter": "TestMicrositeX",
+        "course_about_show_social_links": False,
+        "css_overrides_file": "test_microsite/css/test_microsite.css",
+        "show_partners": False,
+        "show_homepage_promo_video": False,
+        "course_index_overlay_text": "This is a Test Microsite Overlay Text.",
+        "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
+        "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>"
+    },
+    "default": {
+        "university": "default_university",
+        "domain_prefix": "www",
+    }
+}
+MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
+FEATURES['USE_MICROSITES'] = True

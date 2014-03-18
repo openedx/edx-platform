@@ -1,0 +1,146 @@
+###################################
+October 23, 2013
+###################################
+
+*************
+edX Studio
+*************
+
+=============
+New Features
+=============
+
+* **Improved import experience** (STUD-595)
+
+  When you import a course, the Import screen now provides real-time status updates. The Import screen tells you when the import is in the
+  following stages:
+  * Uploading
+  * Unpacking
+  * Verifying
+  * Updated Course
+  * Success (Complete)
+
+* **Improved drag and drop experience in course outlines** (STUD-575)
+
+  The ability to drag and drop sections, subsections, and units in the course outline is enhanced in the following ways:
+
+  * The visual representation of where you are moving the course element to is improved, with a pointer and blue line indicating the
+    new position.
+
+  * You can more easily drag units from one subsection to another.
+
+  * When you cancel a drop, the course element returns to its original position.
+
+  * You can no longer drag a course element below the New Unit button, which was causing confusion. 
+
+* **Text customization capability**
+
+  You can now customize some of the UI text that your students see. You do this through the text_customization key in the Advanced
+  Settings for the course. (However, edX recommends that you contact your Program Manager before you modify the text_customization key.) 
+
+* **JavaScript loading performance**
+
+  JavaScript loading is changed in ways that should improve the performance on some pages.
+  Code contributors should note that JavaScript is now loaded through require.js.
+
+
+
+==========================
+Changes and Updates
+==========================
+
+The following changes are included in this release: 
+
+* In a course outline, you can no longer drag and drop a unit below the New Unit button. (STUD-152)
+ 
+* Course update content outside of HTML tags is no longer erroneously removed.(STUD-590)
+ 
+* In a course outline, dragging a unit over the Units label no longer causes the unit to be removed. (STUD-755)
+ 
+* Support text in the Assignment Types section of the Grading page is updated to clarify that you enter an integer, not a percent, in the W
+  eight of Total Grade field. (STUD-771)
+ 
+* Certain component errors no longer prevent the course from saving correctly. (STUD-786)
+ 
+* When you delete a Discussion component, the discussion is completely removed from the course. (STUD-811, STUD-817) 
+
+* When you are editing a course update, the update no longer disappears if you click outside of the Edit window. (STUD-822)
+ 
+* When you enter the integer 7 in the Total Weight of Grade field, the value is no longer changed to a decimal. (STUD-826)
+
+
+***************************************
+edX Learning Management System 
+***************************************
+
+=============
+New Features
+=============
+
+The following changes are included in this release: 
+
+* **Fixed views in Internet Explorer 9.x**
+
+  Problems with pages in Internet Explorer 9.x are resolved.
+
+* **Disabled downloading data for large courses**
+
+  For courses with over 200 students, downloading large data sets could fail. The Download Data button on the Instructor Dashboard is now
+  temporarily disabled to avoid this problem. 
+
+* **Improved Beta Instructor Dashboard**
+
+  You can access the Beta Instructor Dashboard from the current Instructor Dashboard by clicking Try the New Beta Dashboard. The Beta
+  version continued so evolve with a streamlined design and improved architecture. Both dashboards are currently available.
+
+* **Improved video and transcript experience** (BLD-420)
+
+  When you are playing a video with the transcript hidden, you can display the transcript by hovering the mouse pointer over the CC button. 
+  You can then click a paragraph in the displayed transcript to move to that point in the video. When you move the pointer off the CC button,
+  the transcript is hidden.
+
+* **Improved Learning Tools Interoperability (LTI)** (BLD-330, BLD-347)
+  
+  You can now use multiple LTI tools per page. You can also have an LTI module load external content in a new window.
+
+
+==========================
+Changes and Updates
+==========================
+
+* The link to open and close the calculator has additional aria attributes for accessibility. (BLD-164)
+ 
+* The Hints panel for the calculator is now accessible to screen readers. (BLD-165)
+ 
+* Students can now download video subtitles. (BLD-245)
+ 
+* Multi-speed video playback now works in Firefox browsers as expected. (BLD-287)
+ 
+* Window resizing no longer cuts off videos. (BLD-289)
+ 
+* Video HD control is now handicap accessible. (BLD-387)
+ 
+* You can now export courses that have LTI modules. (BLD-389)
+ 
+* A malformed custom parameter in an LTI component no longer permanently breaks the unit. (BLD-390)
+ 
+* The styles and text for the download links for videos and transcripts are updated for clarity and accessibility. (BLD-403)
+ 
+* The CC button in the video player now includes explanatory text that is accessible with a screen reader. (BLD-404)
+ 
+* LTI with the Piazza platform now works as expected. (BLD-405)
+ 
+* The **Close** button on dialog boxes is now defined as an HTML button and is accessible to screen readers. (LMS-582)
+
+
+******************
+Discussion Forums
+******************
+
+The following changes are included in this release: 
+
+* The color contrast of the Report Misuse link is updated for accessibility. (FOR-200)
+ 
+* The Report Misuse link now includes a tooltip that is accessible to screen readers. (FOR-201)
+ 
+* The Report Misuse link is now included in the page tab order, for keyboard accessibility. (FOR-209)

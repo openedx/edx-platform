@@ -22,6 +22,9 @@ urlpatterns = patterns('',  # nopep8
     url(r'^xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
         'contentstore.views.component_handler', name='component_handler'),
 
+    url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
+        'contentstore.views.xblock.xblock_resource', name='xblock_resource_url'),
+
     # temporary landing page for a course
     url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.landing', name='landing'),
@@ -36,18 +39,22 @@ urlpatterns = patterns('',  # nopep8
 
     url(r'^xmodule/', include('pipeline_js.urls')),
     url(r'^heartbeat$', include('heartbeat.urls')),
+
+    url(r'^user_api/', include('user_api.urls')),
+    url(r'^lang_pref/', include('lang_pref.urls')),
 )
 
 # User creation and updating views
 urlpatterns += patterns(
     '',
 
-    url(r'^create_account$', 'student.views.create_account'),
+    url(r'^create_account$', 'student.views.create_account', name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name='activate'),
 
     # ajax view that actually does the work
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
+    url(r'^embargo$', 'student.views.embargo', name="embargo"),
 )
 
 # restful api
@@ -70,12 +77,14 @@ urlpatterns += patterns(
     url(r'(?ix)^course($|/){}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
     url(r'(?ix)^subsection($|/){}$'.format(parsers.URL_RE_SOURCE), 'subsection_handler'),
     url(r'(?ix)^unit($|/){}$'.format(parsers.URL_RE_SOURCE), 'unit_handler'),
+    url(r'(?ix)^container($|/){}$'.format(parsers.URL_RE_SOURCE), 'container_handler'),
     url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
     url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan_handler'),
     url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler'),
     url(r'(?ix)^import/{}$'.format(parsers.URL_RE_SOURCE), 'import_handler'),
     url(r'(?ix)^import_status/{}/(?P<filename>.+)$'.format(parsers.URL_RE_SOURCE), 'import_status_handler'),
     url(r'(?ix)^export/{}$'.format(parsers.URL_RE_SOURCE), 'export_handler'),
+    url(r'(?ix)^xblock/{}/(?P<view_name>[^/]+)$'.format(parsers.URL_RE_SOURCE), 'xblock_view_handler'),
     url(r'(?ix)^xblock($|/){}$'.format(parsers.URL_RE_SOURCE), 'xblock_handler'),
     url(r'(?ix)^tabs/{}$'.format(parsers.URL_RE_SOURCE), 'tabs_handler'),
     url(r'(?ix)^settings/details/{}$'.format(parsers.URL_RE_SOURCE), 'settings_handler'),
@@ -96,9 +105,20 @@ urlpatterns += patterns('',
     url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
+
+if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
+    urlpatterns += (url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export_git/(?P<name>[^/]+)$',
+                        'contentstore.views.export_git', name='export_git'),)
+
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += patterns('',
         url(r'^status/', include('service_status.urls')),
+    )
+
+if settings.FEATURES.get('AUTH_USE_CAS'):
+    urlpatterns += (
+        url(r'^cas-auth/login/$', 'external_auth.views.cas_login', name="cas-login"),
+        url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
     )
 
 urlpatterns += patterns('', url(r'^admin/', include(admin.site.urls)),)

@@ -11,6 +11,7 @@ from django.utils.translation import ugettext as _
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
+from xmodule.modulestore.django import ModuleI18nService
 
 from courseware.access import has_access
 from lms.lib.xblock.runtime import LmsModuleSystem
@@ -30,6 +31,7 @@ STAFF_ERROR_MESSAGE = _(
         tech_support_email=settings.TECH_SUPPORT_EMAIL
     )
 )
+MAX_ALLOWED_FEEDBACK_LENGTH = 5000
 
 
 class MockStaffGradingService(object):
@@ -65,7 +67,6 @@ class MockStaffGradingService(object):
                                            'min_for_ml': 10})
                            ]})
 
-
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
                    submission_flagged):
         return self.get_next(course_id, 'fake location', grader_id)
@@ -80,9 +81,13 @@ class StaffGradingService(GradingService):
         config['system'] = LmsModuleSystem(
             static_url='/static',
             track_function=None,
-            get_module = None,
+            get_module=None,
             render_template=render_to_string,
             replace_urls=None,
+            descriptor_runtime=None,
+            services={
+                'i18n': ModuleI18nService(),
+            },
         )
         super(StaffGradingService, self).__init__(config)
         self.url = config['url'] + config['staff_grading']
@@ -91,7 +96,6 @@ class StaffGradingService(GradingService):
         self.save_grade_url = self.url + '/save_grade/'
         self.get_problem_list_url = self.url + '/get_problem_list/'
         self.get_notifications_url = self.url + "/get_notifications/"
-
 
     def get_problem_list(self, course_id, grader_id):
         """
@@ -111,7 +115,6 @@ class StaffGradingService(GradingService):
         """
         params = {'course_id': course_id, 'grader_id': grader_id}
         return self.get(self.get_problem_list_url, params)
-
 
     def get_next(self, course_id, location, grader_id):
         """
@@ -135,7 +138,6 @@ class StaffGradingService(GradingService):
                             params={'location': location,
                                     'grader_id': grader_id})
         return json.dumps(self._render_rubric(response))
-
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
                    submission_flagged):
@@ -353,18 +355,20 @@ def save_grade(request, course_id):
     #If the instructor has skipped grading the submission, then there will not be any rubric scores.
     #Only add in the rubric scores if the instructor has not skipped.
     if not skipped:
-        required|=set(['rubric_scores[]'])
+        required.add('rubric_scores[]')
     actual = set(p.keys())
     missing = required - actual
     if len(missing) > 0:
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
 
+    success, message = check_feedback_length(p)
+    if not success:
+        return _err_response(message)
+
     grader_id = unique_id_for_user(request.user)
 
-
     location = p['location']
-
 
     try:
         result_json = staff_grading_service().save_grade(course_id,
@@ -402,3 +406,13 @@ def save_grade(request, course_id):
     # Ok, save_grade seemed to work.  Get the next submission to grade.
     return HttpResponse(_get_next(course_id, grader_id, location),
                         mimetype="application/json")
+
+
+def check_feedback_length(data):
+    feedback = data.get("feedback")
+    if feedback and len(feedback) > MAX_ALLOWED_FEEDBACK_LENGTH:
+        return False, "Feedback is too long, Max length is {0} characters.".format(
+            MAX_ALLOWED_FEEDBACK_LENGTH
+        )
+    else:
+        return True, ""

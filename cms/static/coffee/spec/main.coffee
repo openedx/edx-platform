@@ -28,6 +28,7 @@ requirejs.config({
         "tinymce": "xmodule_js/common_static/js/vendor/tiny_mce/tiny_mce",
         "jquery.tinymce": "xmodule_js/common_static/js/vendor/tiny_mce/jquery.tinymce",
         "xmodule": "xmodule_js/src/xmodule",
+        "xblock/cms.runtime.v1": "coffee/src/xblock/cms.runtime.v1",
         "xblock": "xmodule_js/common_static/coffee/src/xblock",
         "utility": "xmodule_js/common_static/js/src/utility",
         "accessibility": "xmodule_js/common_static/js/src/accessibility_tools",
@@ -213,6 +214,9 @@ define([
 
     "js/spec/views/baseview_spec",
     "js/spec/views/paging_spec",
+
+    "js/spec/views/unit_spec"
+    "js/spec/views/xblock_spec"
 
     # these tests are run separate in the cms-squire suite, due to process
     # isolation issues with Squire.js

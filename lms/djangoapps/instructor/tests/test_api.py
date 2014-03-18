@@ -15,12 +15,13 @@ from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from django.core import mail
+from django.utils.timezone import utc
 
 from django.contrib.auth.models import User
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory
 from courseware.tests.factories import StaffFactory, InstructorFactory
 
@@ -33,6 +34,8 @@ from instructor.access import allow_access
 import instructor.views.api
 from instructor.views.api import _split_input_list, _msk_from_problem_urlname, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
+
+from .test_tools import get_extended_due
 
 
 @common_exceptions_400
@@ -1426,3 +1429,133 @@ class TestInstructorAPIHelpers(TestCase):
     def test_msk_from_problem_urlname_error(self):
         args = ('notagoodcourse', 'L2Node1')
         _msk_from_problem_urlname(*args)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test data dumps for reporting.
+    """
+
+    def setUp(self):
+        """
+        Fixtures.
+        """
+        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+        course = CourseFactory.create()
+        week1 = ItemFactory.create(due=due)
+        week2 = ItemFactory.create(due=due)
+        week3 = ItemFactory.create(due=due)
+        course.children = [week1.location.url(), week2.location.url(),
+                           week3.location.url()]
+
+        homework = ItemFactory.create(
+            parent_location=week1.location,
+            due=due
+        )
+        week1.children = [homework.location.url()]
+
+        user1 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=course.id,
+            module_state_key=week1.location.url()).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=course.id,
+            module_state_key=week2.location.url()).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=course.id,
+            module_state_key=week3.location.url()).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=course.id,
+            module_state_key=homework.location.url()).save()
+
+        user2 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user2.id,
+            course_id=course.id,
+            module_state_key=week1.location.url()).save()
+        StudentModule(
+            state='{}',
+            student_id=user2.id,
+            course_id=course.id,
+            module_state_key=homework.location.url()).save()
+
+        user3 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user3.id,
+            course_id=course.id,
+            module_state_key=week1.location.url()).save()
+        StudentModule(
+            state='{}',
+            student_id=user3.id,
+            course_id=course.id,
+            module_state_key=homework.location.url()).save()
+
+        self.course = course
+        self.week1 = week1
+        self.homework = homework
+        self.week2 = week2
+        self.user1 = user1
+        self.user2 = user2
+
+        self.instructor = InstructorFactory(course=course.location)
+        self.client.login(username=self.instructor.username, password='test')
+
+    def test_change_due_date(self):
+        url = reverse('change_due_date', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.url(),
+            'due_datetime': '12/30/2013 00:00'
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(datetime.datetime(2013, 12, 30, 0, 0, tzinfo=utc),
+                         get_extended_due(self.course, self.week1, self.user1))
+
+    def test_reset_date(self):
+        self.test_change_due_date()
+        url = reverse('reset_due_date', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.url(),
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(None,
+                         get_extended_due(self.course, self.week1, self.user1))
+
+    def test_show_unit_extensions(self):
+        self.test_change_due_date()
+        url = reverse('show_unit_extensions',
+                      kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'url': self.week1.location.url()})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(json.loads(response.content), {
+            u'data': [{u'Extended Due Date': u'2013-12-30 00:00',
+                       u'Full Name': self.user1.profile.name,
+                       u'Username': self.user1.username}],
+            u'header': [u'Username', u'Full Name', u'Extended Due Date'],
+            u'title': u'Users with due date extensions for %s' %
+            self.week1.display_name})
+
+    def test_show_student_extensions(self):
+        self.test_change_due_date()
+        url = reverse('show_student_extensions',
+                      kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'student': self.user1.username})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(json.loads(response.content), {
+            u'data': [{u'Extended Due Date': u'2013-12-30 00:00',
+                       u'Unit': self.week1.display_name}],
+            u'header': [u'Unit', u'Extended Due Date'],
+            u'title': u'Due date extensions for %s (%s)' % (
+            self.user1.profile.name, self.user1.username)})

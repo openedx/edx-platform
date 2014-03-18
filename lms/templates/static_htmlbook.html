@@ -2,8 +2,7 @@
 
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
-<%block name="title"><title>${_('{course_number} Textbook').format(course_number=course.display_number_with_default) | h}</title>
-</%block>
+<%block name="pagetitle">${_('{course_number} Textbook').format(course_number=course.display_number_with_default) | h}</%block>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
@@ -13,6 +12,7 @@
 
 <%block name="js_extra">
   <script type="text/javascript">
+	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
 (function($) {
     $.fn.myHTMLViewer = function(options) {
         var urlToLoad = null;
@@ -146,7 +146,8 @@
             <div id="bookpage" />
           </section>
         </section>
-
+		<span class="idU" style="display:none">${student.id}</span>
+		<span class="idDU" style="display:none">${student.username}</span>
       </div>
     </div>
 

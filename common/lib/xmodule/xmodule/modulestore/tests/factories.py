@@ -1,12 +1,8 @@
-import datetime
-
 from factory import Factory, lazy_attribute_sequence, lazy_attribute
 from factory.containers import CyclicDefinitionError
 from uuid import uuid4
-from pytz import UTC
 
-from xmodule.modulestore import Location
-from xmodule.x_module import prefer_xmodules
+from xmodule.modulestore import Location, prefer_xmodules
 from xblock.core import XBlock
 
 
@@ -60,8 +56,10 @@ class CourseFactory(XModuleFactory):
         for k, v in kwargs.iteritems():
             setattr(new_course, k, v)
 
+        # Save the attributes we just set
+        new_course.save()
         # Update the data in the mongo datastore
-        store.save_xmodule(new_course)
+        store.update_item(new_course)
         return new_course
 
 
@@ -127,7 +125,6 @@ class ItemFactory(XModuleFactory):
         # passed in via **kwargs. However, some of those aren't actual field values,
         # so pop those off for use separately
 
-        DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
         # catch any old style users before they get into trouble
         assert 'template' not in kwargs
         parent_location = Location(kwargs.pop('parent_location', None))
@@ -155,18 +152,19 @@ class ItemFactory(XModuleFactory):
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
             metadata['display_name'] = display_name
-        module = store.create_and_save_xmodule(location, metadata=metadata, definition_data=data)
+        store.create_and_save_xmodule(location, metadata=metadata, definition_data=data)
 
         module = store.get_item(location)
 
         for attr, val in kwargs.items():
             setattr(module, attr, val)
+        # Save the attributes we just set
         module.save()
 
-        store.save_xmodule(module)
+        store.update_item(module)
 
-        if location.category not in DETACHED_CATEGORIES:
+        if 'detached' not in module._class_tags:
             parent.children.append(location.url())
-            store.update_children(parent_location, parent.children)
+            store.update_item(parent, '**replace_user**')
 
         return store.get_item(location)

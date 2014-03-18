@@ -1,0 +1,63 @@
+###################################
+February 19, 2014
+###################################
+
+You can now access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+
+
+Course staff documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface.
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+Recent documentation additions include:
+
+* `Additional transcripts <http://edx.readthedocs.org/projects/ca/en/latest/create_video.html#additional-transcripts>`_ for videos.
+
+* `Course data <http://edx.readthedocs.org/projects/ca/en/latest/course_data.html#course-data>`_ in the instructor dashboard.
+
+* `Staffing data <http://edx.readthedocs.org/projects/ca/en/latest/course_staffing.html#course-staffing>`_ in the instructor dashboard.
+
+* `Enrollment data <http://edx.readthedocs.org/projects/ca/en/latest/course_enrollment.html#enrollment>`_ in the instructor dashboard.
+
+* The `Gene Explorer <http://edx.readthedocs.org/projects/ca/en/latest/additional_tools.html#gene-explorer>`_ tool.
+
+
+*************
+edX Studio
+*************
+
+
+* A problem with importing a course that has conditionals into a course of a different name is now fixed. (STUD-149)
+
+* Previously, when you canceled changes in a component, then reopened the component, your changes were still present. This problem is resolved.  When you now click **Cancel** in a component, your changes since the last save are properly discarded. (STUD-235)
+
+* A problem with changing a unit from Public to Private, which caused the error message "Studio's having trouble saving your work. The studio servers encountered an error" is fixed. (STUD-1316) 
+
+* The workflows for adding Latex HTML components and problems written in Latex are changed. You can no longer upload Latex files directly from the unit page.  See the following sections in documentation for more information:  `Import LaTeX Code into an HTML Component <http://edx.readthedocs.org/projects/ca/en/latest/create_html_component.html#import-latex-code>`_ and `Problem Written in LaTeX <http://edx.readthedocs.org/projects/ca/en/latest/advanced_problems.html#problem-written-in-latex>`_.
+
+* Developers can now include key-value pairs as a configurable setting in Studio without a special interface. This will be applicable to developers adding multiple-language video transcripts, the LTI custom parameters field, or any field where possible inputs are not known at compile-time. (BLD-658)
+
+* The **Add** button no longer becomes unavailable in some situations after you click **Clear** next to **Video Sources** in a Video component. (BLD-821)
+
+* Instructors can again post non-.srt video transcripts for students to download. (BLD-837)
+
+===========================
+Accessibility Improvements
+===========================
+
+* Course authors can now add labels to input fields for problems, making problems more accessible to screen readers. For more information, see the chapter `Working with Problem Components <http://edx.readthedocs.org/projects/ca/en/latest/create_problem_component.html>`_ in *Building a Course with edX Studio*. (LMS-1895)
+
+***************************************
+edX Learning Management System
+***************************************
+
+* A problem that caused timeouts in large courses when loading histograms is resolved. (LMS-1199)
+
+* When a student stops playing a video before it ends and closes the browser, the video starts from the place where the student stopped watching the next time the student views the video. (BLD-385)
+
+
+
+
+

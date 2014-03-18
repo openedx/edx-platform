@@ -17,7 +17,7 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 import mongoengine
 
-from courseware.roles import CourseStaffRole, GlobalStaff
+from student.roles import CourseStaffRole, GlobalStaff
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
@@ -37,13 +37,17 @@ TEST_MONGODB_LOG = {
 }
 
 FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
-FEATURES_WITH_SSL_AUTH['AUTH_USE_MIT_CERTIFICATES'] = True
+FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 
 
 class SysadminBaseTestCase(ModuleStoreTestCase):
     """
     Base class with common methods used in XML and Mongo tests
     """
+
+    TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
+    TEST_BRANCH = 'testing_do_not_delete'
+    TEST_BRANCH_COURSE = 'MITx/edx4edx_branch/edx4edx'
 
     def setUp(self):
         """Setup test case by adding primary user."""
@@ -58,11 +62,12 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
         GlobalStaff().add_users(self.user)
         self.client.login(username=self.user.username, password='foo')
 
-    def _add_edx4edx(self):
+    def _add_edx4edx(self, branch=None):
         """Adds the edx4edx sample course"""
-        return self.client.post(reverse('sysadmin_courses'), {
-            'repo_location': 'https://github.com/mitocw/edx4edx_lite.git',
-            'action': 'add_course', })
+        post_dict = {'repo_location': self.TEST_REPO, 'action': 'add_course', }
+        if branch:
+            post_dict['repo_branch'] = branch
+        return self.client.post(reverse('sysadmin_courses'), post_dict)
 
     def _rm_edx4edx(self):
         """Deletes the sample course from the XML store"""
@@ -301,10 +306,23 @@ class TestSysadmin(SysadminBaseTestCase):
         self.assertIsNotNone(course)
 
         # Delete a course
-        response = self._rm_edx4edx()
+        self._rm_edx4edx()
         course = def_ms.courses.get('{0}/edx4edx_lite'.format(
             os.path.abspath(settings.DATA_DIR)), None)
         self.assertIsNone(course)
+
+        # Load a bad git branch
+        response = self._add_edx4edx('asdfasdfasdf')
+        self.assertIn(GitImportError.REMOTE_BRANCH_MISSING,
+                      response.content.decode('utf-8'))
+
+        # Load a course from a git branch
+        self._add_edx4edx(self.TEST_BRANCH)
+        course = def_ms.courses.get('{0}/edx4edx_lite'.format(
+            os.path.abspath(settings.DATA_DIR)), None)
+        self.assertIsNotNone(course)
+        self.assertIn(self.TEST_BRANCH_COURSE, course.location.course_id)
+        self._rm_edx4edx()
 
         # Try and delete a non-existent course
         response = self.client.post(reverse('sysadmin_courses'),
@@ -467,7 +485,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'Not/Real/Testing'}))
-        self.assertIn(_('Cannot find course'), response.content)
+        self.assertEqual(404, response.status_code)
 
     def test_gitlog_courseteam_access(self):
         """

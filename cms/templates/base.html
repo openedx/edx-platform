@@ -3,10 +3,10 @@
 <%namespace name='static' file='static_content.html'/>
 
 <!doctype html>
-<!--[if IE 7]><html class="ie7 lte9 lte8 lte7"><![endif]-->
-<!--[if IE 8]><html class="ie8 lte9 lte8"><![endif]-->
-<!--[if IE 9]><html class="ie9 lte9"><![endif]-->
-<!--[if gt IE 9]><!--><html><!--<![endif]-->
+<!--[if IE 7]><html class="ie7 lte9 lte8 lte7" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if IE 8]><html class="ie8 lte9 lte8" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -32,7 +32,7 @@
     <%block name="header_extras"></%block>
   </head>
 
-  <body class="<%block name='bodyclass'></%block> hide-wip">
+  <body class="<%block name='bodyclass'></%block> hide-wip lang_${LANGUAGE_CODE}">
     <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
     <script type="text/javascript">

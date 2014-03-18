@@ -26,7 +26,8 @@ class LocalId(object):
 
     Should be hashable and distinguishable, but nothing else
     """
-    pass
+    def __str__(self):
+        return "localid_{}".format(id(self))
 
 
 class Locator(object):
@@ -50,6 +51,12 @@ class Locator(object):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
+    def __hash__(self):
+        """
+        Hash on contents.
+        """
+        return hash(unicode(self))
+
     def __repr__(self):
         '''
         repr(self) returns something like this: CourseLocator("mit.eecs.6002x")
@@ -63,13 +70,13 @@ class Locator(object):
         '''
         str(self) returns something like this: "mit.eecs.6002x"
         '''
-        return unicode(self).encode('utf8')
+        return unicode(self).encode('utf-8')
 
     def __unicode__(self):
         '''
         unicode(self) returns something like this: "mit.eecs.6002x"
         '''
-        return self.url()
+        return unicode(self).encode('utf-8')
 
     @abstractmethod
     def version(self):
@@ -197,22 +204,20 @@ class CourseLocator(Locator):
         """
         Return a string representing this location.
         """
+        parts = []
         if self.package_id:
-            result = self.package_id
+            parts.append(unicode(self.package_id))
             if self.branch:
-                result += '/' + BRANCH_PREFIX + self.branch
-            return result
-        elif self.version_guid:
-            return VERSION_PREFIX + str(self.version_guid)
-        else:
-            # raise InsufficientSpecificationError("missing package_id or version_guid")
-            return '<InsufficientSpecificationError: missing package_id or version_guid>'
+                parts.append(u"{prefix}{branch}".format(prefix=BRANCH_PREFIX, branch=self.branch))
+        if self.version_guid:
+            parts.append(u"{prefix}{guid}".format(prefix=VERSION_PREFIX, guid=self.version_guid))
+        return u"/".join(parts)
 
     def url(self):
         """
         Return a string containing the URL for this location.
         """
-        return 'edx://' + unicode(self)
+        return u'edx://' + unicode(self)
 
     def _validate_args(self, url, version_guid, package_id):
         """
@@ -431,22 +436,25 @@ class BlockUsageLocator(CourseLocator):
 
     def version_agnostic(self):
         """
-        Returns a copy of itself.
-        If both version_guid and package_id are known, use a blank package_id in the copy.
-
         We don't care if the locator's version is not the current head; so, avoid version conflict
         by reducing info.
+        Returns a copy of itself without any version info.
 
-        :param block_locator:
+        :raises: ValueError if the block locator has no package_id
         """
-        if self.version_guid:
-            return BlockUsageLocator(version_guid=self.version_guid,
-                                     branch=self.branch,
-                                     block_id=self.block_id)
-        else:
-            return BlockUsageLocator(package_id=self.package_id,
-                                     branch=self.branch,
-                                     block_id=self.block_id)
+        return BlockUsageLocator(package_id=self.package_id,
+                                 branch=self.branch,
+                                 block_id=self.block_id)
+
+    def course_agnostic(self):
+        """
+        We only care about the locator's version not its course.
+        Returns a copy of itself without any course info.
+
+        :raises: ValueError if the block locator has no version_guid
+        """
+        return BlockUsageLocator(version_guid=self.version_guid,
+                                 block_id=self.block_id)
 
     def set_block_id(self, new):
         """
@@ -487,6 +495,19 @@ class BlockUsageLocator(CourseLocator):
             raise ValueError('Could not parse "%s" as a package_id' % package_id)
         self._set_value(parse, 'block', self.set_block_id)
 
+    @classmethod
+    def make_relative(cls, course_locator, block_id):
+        """
+        Return a new instance which has the given block_id in the given course
+        :param course_locator: may be a BlockUsageLocator in the same snapshot
+        """
+        return BlockUsageLocator(
+            package_id=course_locator.package_id,
+            version_guid=course_locator.version_guid,
+            branch=course_locator.branch,
+            block_id=block_id
+        )
+
     def __unicode__(self):
         """
         Return a string representing this location.
@@ -525,7 +546,7 @@ class DefinitionLocator(Locator):
         Return a string containing the URL for this location.
         url(self) returns something like this: 'defx://version/519665f6223ebd6980884f2b'
         """
-        return 'defx://' + unicode(self)
+        return u'defx://' + unicode(self)
 
     def version(self):
         """

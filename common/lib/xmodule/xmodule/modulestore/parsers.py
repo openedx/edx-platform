@@ -7,7 +7,8 @@ BLOCK_PREFIX = r"block/"
 # Prefix for the version portion of a locator URL, when it is preceded by a course ID
 VERSION_PREFIX = r"version/"
 
-ALLOWED_ID_CHARS = r'[a-zA-Z0-9_\-~.:]'
+ALLOWED_ID_CHARS = r'[\w\-~.:]'
+
 
 URL_RE_SOURCE = r"""
     (?P<tag>edx://)?
@@ -20,7 +21,7 @@ URL_RE_SOURCE = r"""
         VERSION_PREFIX=VERSION_PREFIX, BLOCK_PREFIX=BLOCK_PREFIX
     )
 
-URL_RE = re.compile('^' + URL_RE_SOURCE + '$', re.IGNORECASE | re.VERBOSE)
+URL_RE = re.compile('^' + URL_RE_SOURCE + '$', re.IGNORECASE | re.VERBOSE | re.UNICODE)
 
 
 def parse_url(string, tag_optional=False):
@@ -54,7 +55,7 @@ def parse_url(string, tag_optional=False):
     return matched_dict
 
 
-BLOCK_RE = re.compile(r'^' + ALLOWED_ID_CHARS + r'+$', re.IGNORECASE)
+BLOCK_RE = re.compile(r'^' + ALLOWED_ID_CHARS + r'+$', re.IGNORECASE | re.UNICODE)
 
 
 def parse_block_ref(string):

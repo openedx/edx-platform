@@ -265,10 +265,10 @@ class TestRescoringTask(TestIntegrationTask):
         self.assertEqual(instructor_task.task_state, FAILURE)
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'NotImplementedError')
-        self.assertEqual(status['message'], "Problem's definition does not support rescoring")
+        self.assertEqual(status['message'], "Problem's definition does not support rescoring.")
 
         status = InstructorTaskModuleTestCase.get_task_status(instructor_task.task_id)
-        self.assertEqual(status['message'], "Problem's definition does not support rescoring")
+        self.assertEqual(status['message'], "Problem's definition does not support rescoring.")
 
     def define_randomized_custom_response_problem(self, problem_url_name, redefine=False):
         """
@@ -288,7 +288,11 @@ class TestRescoringTask(TestIntegrationTask):
             """ % ('!=' if redefine else '=='))
         problem_xml = factory.build_xml(script=script, cfn="check_func", expect="42", num_responses=1)
         if redefine:
-            self.module_store.update_item(InstructorTaskModuleTestCase.problem_location(problem_url_name), problem_xml)
+            descriptor = self.module_store.get_instance(
+                self.course.id, InstructorTaskModuleTestCase.problem_location(problem_url_name)
+            )
+            descriptor.data = problem_xml
+            self.module_store.update_item(descriptor, '**replace_user**')
         else:
             # Use "per-student" rerandomization so that check-problem can be called more than once.
             # Using "always" means we cannot check a problem twice, but we want to call once to get the

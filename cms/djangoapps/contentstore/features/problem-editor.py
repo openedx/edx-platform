@@ -7,7 +7,6 @@ from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
 from common import type_in_codemirror, open_new_course
 from advanced_settings import change_value
 from course_import import import_file, go_to_import
-from selenium.webdriver.common.keys import Keys
 
 DISPLAY_NAME = "Display Name"
 MAXIMUM_ATTEMPTS = "Maximum Attempts"
@@ -53,7 +52,7 @@ def i_can_modify_the_display_name(_step):
     # Verifying that the display name can be a string containing a floating point value
     # (to confirm that we don't throw an error because it is of the wrong type).
     index = world.get_setting_entry_index(DISPLAY_NAME)
-    set_field_value(index, '3.4')
+    world.set_field_value(index, '3.4')
     verify_modified_display_name()
 
 
@@ -63,10 +62,15 @@ def my_display_name_change_is_persisted_on_save(step):
     verify_modified_display_name()
 
 
+@step('the problem display name is "(.*)"$')
+def verify_problem_display_name(step, name):
+    assert_equal(name.upper(), world.browser.find_by_css('.problem-header').text)
+
+
 @step('I can specify special characters in the display name')
 def i_can_modify_the_display_name_with_special_chars(_step):
     index = world.get_setting_entry_index(DISPLAY_NAME)
-    set_field_value(index, "updated ' \" &")
+    world.set_field_value(index, "updated ' \" &")
     verify_modified_display_name_with_special_chars()
 
 
@@ -141,7 +145,7 @@ def set_the_max_attempts(step, max_attempts_set):
     # on firefox with selenium, the behaviour is different.
     # eg 2.34 displays as 2.34 and is persisted as 2
     index = world.get_setting_entry_index(MAXIMUM_ATTEMPTS)
-    set_field_value(index, max_attempts_set)
+    world.set_field_value(index, max_attempts_set)
     world.save_component_and_reopen(step)
     value = world.css_value('input.setting-input', index=index)
     assert value != "", "max attempts is blank"
@@ -169,7 +173,7 @@ def cancel_does_not_save_changes(step):
 def enable_latex_compiler(step):
     url = world.browser.url
     step.given("I select the Advanced Settings")
-    change_value(step, 'use_latex_compiler', True)
+    change_value(step, 'use_latex_compiler', 'true')
     world.visit(url)
     world.wait_for_xmodule()
 
@@ -254,12 +258,6 @@ def verify_high_level_source_links(step, visible):
                     msg="Expected not to find the latex button but it is present.")
 
     world.cancel_component(step)
-    if visible:
-        assert_true(world.is_css_present('.upload-button'),
-                    msg="Expected to find the upload button but it is not present.")
-    else:
-        assert_true(world.is_css_not_present('.upload-button'),
-                    msg="Expected not to find the upload button but it is present.")
 
 
 def verify_modified_weight():
@@ -282,23 +280,9 @@ def verify_unset_display_name():
     world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'Blank Advanced Problem', False)
 
 
-def set_field_value(index, value):
-    """
-    Set the field to the specified value.
-
-    Note: we cannot use css_fill here because the value is not set
-    until after you move away from that field.
-    Instead we will find the element, set its value, then hit the Tab key
-    to get to the next field.
-    """
-    elem = world.css_find('div.wrapper-comp-setting input.setting-input')[index]
-    elem.value = value
-    elem.type(Keys.TAB)
-
-
 def set_weight(weight):
     index = world.get_setting_entry_index(PROBLEM_WEIGHT)
-    set_field_value(index, weight)
+    world.set_field_value(index, weight)
 
 
 def open_high_level_source():

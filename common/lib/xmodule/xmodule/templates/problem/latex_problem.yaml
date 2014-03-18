@@ -99,7 +99,7 @@ data: |
     Где обычно находится земля? </p>
         <p>
           <optionresponse>
-            <optioninput options="('сверху','снизу')" correct="снизу"/>
+            <optioninput options="('сверху','снизу')" correct="снизу" label="Где земля?"/>
           </optionresponse>
         </p>
         <p>
@@ -109,7 +109,7 @@ data: |
     Какому количеству энергии, согласно равенству Эйнштейна эквивалентно тело массой [mathjaxinline]m[/mathjaxinline]? </p>
         <p>
           <symbolicresponse expect="m*c^2">
-            <textline size="90" correct_answer="m*c^2" math="1"/>
+            <textline size="90" correct_answer="m*c^2" math="1" label="Введите постоянную Эйнштейна"/>
           </symbolicresponse>
         </p>
         <p>
@@ -121,7 +121,7 @@ data: |
           <p style="display:inline">Energy saved = </p>
           <numericalresponse inline="1" answer="0.52">
             <responseparam description="Numerical Tolerance" type="tolerance" default="0.02" name="tol"/>
-            <formulaequationinput/>
+            <formulaequationinput label="Enter the equation"/>
           </numericalresponse>
           <p style="display:inline">&#xA0;EJ/year</p>
         </p>
@@ -132,7 +132,7 @@ data: |
     Какого цвета банан? </p>
         <p>
           <choiceresponse>
-            <checkboxgroup>
+            <checkboxgroup label="Какого цвета банан?">
               <choice correct="false" name="1">
                 <text>красный</text>
               </choice>
@@ -156,7 +156,7 @@ data: |
     In what U.S. state is Detroit located? </p>
         <p>
           <stringresponse answer="Michigan">
-            <textline/>
+            <textline label="What state contains Michigan?"/>
           </stringresponse>
         </p>
         <p>
@@ -181,7 +181,7 @@ data: |
     Enter a python list of two numbers which sum to 10, eg [9,1]: </p>
         <p>
           <customresponse cfn="sumtest" expect="[1,9]">
-            <textline correct_answer="[1,9]"/>
+            <textline correct_answer="[1,9]" label="Введите список на питоне"/>
           </customresponse>
         </p>
         <p>

@@ -54,6 +54,8 @@ lib_paths:
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
     - xmodule_js/common_static/js/test/i18n.js
+    - xmodule_js/common_static/coffee/src/xblock/
+    - xmodule_js/common_static/js/vendor/URI.min.js
 
 # Paths to source JavaScript files
 src_paths:

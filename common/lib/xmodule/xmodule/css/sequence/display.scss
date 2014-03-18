@@ -323,7 +323,7 @@ nav.sequence-nav {
   }
 }
 
-div.seq_contents {
+.seq_contents {
   display: none;
 }
 
@@ -393,7 +393,7 @@ nav.sequence-bottom {
   }
 }
 
-.xmodule_VerticalModule ol.vert-mod > li ul.sequence-nav-buttons {
+.xmodule_VerticalModule div.vert-mod > div ul.sequence-nav-buttons {
   list-style: none !important;
 }
 

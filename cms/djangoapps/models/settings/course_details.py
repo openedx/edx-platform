@@ -6,10 +6,8 @@ from json.encoder import JSONEncoder
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.inheritance import own_metadata
 from contentstore.utils import get_modulestore, course_image_url
 from models.settings import course_grading
-from contentstore.utils import update_item
 from xmodule.fields import Date
 from xmodule.modulestore.django import loc_mapper
 
@@ -25,6 +23,7 @@ class CourseDetails(object):
         self.enrollment_start = None
         self.enrollment_end = None
         self.syllabus = None  # a pdf file asset
+        self.short_description = ""
         self.overview = ""  # html to render as the overview
         self.intro_video = None  # a video pointer
         self.effort = None  # int hours/week
@@ -53,6 +52,12 @@ class CourseDetails(object):
         except ItemNotFoundError:
             pass
 
+        temploc = course_old_location.replace(category='about', name='short_description')
+        try:
+            course.short_description = get_modulestore(temploc).get_item(temploc).data
+        except ItemNotFoundError:
+            pass
+
         temploc = temploc.replace(name='overview')
         try:
             course.overview = get_modulestore(temploc).get_item(temploc).data
@@ -75,7 +80,25 @@ class CourseDetails(object):
         return course
 
     @classmethod
-    def update_from_json(cls, course_locator, jsondict):
+    def update_about_item(cls, course_old_location, about_key, data, course, user):
+        """
+        Update the about item with the new data blob. If data is None, then
+        delete the about item.
+        """
+        temploc = Location(course_old_location).replace(category='about', name=about_key)
+        store = get_modulestore(temploc)
+        if data is None:
+            store.delete_item(temploc)
+        else:
+            try:
+                about_item = store.get_item(temploc)
+            except ItemNotFoundError:
+                about_item = store.create_xmodule(temploc, system=course.runtime)
+            about_item.data = data
+            store.update_item(about_item, user.id)
+
+    @classmethod
+    def update_from_json(cls, course_locator, jsondict, user):
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
@@ -130,26 +153,15 @@ class CourseDetails(object):
             dirty = True
 
         if dirty:
-            # Save the data that we've just changed to the underlying
-            # MongoKeyValueStore before we update the mongo datastore.
-            descriptor.save()
-
-            get_modulestore(course_old_location).update_metadata(course_old_location, own_metadata(descriptor))
+            get_modulestore(course_old_location).update_item(descriptor, user.id)
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
-        temploc = Location(course_old_location).replace(category='about', name='syllabus')
-        update_item(temploc, jsondict['syllabus'])
+        for about_type in ['syllabus', 'overview', 'effort', 'short_description']:
+            cls.update_about_item(course_old_location, about_type, jsondict[about_type], descriptor, user)
 
-        temploc = temploc.replace(name='overview')
-        update_item(temploc, jsondict['overview'])
-
-        temploc = temploc.replace(name='effort')
-        update_item(temploc, jsondict['effort'])
-
-        temploc = temploc.replace(name='video')
         recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
-        update_item(temploc, recomposed_video_tag)
+        cls.update_about_item(course_old_location, 'video', recomposed_video_tag, descriptor, user)
 
         # Could just return jsondict w/o doing any db reads, but I put the reads in as a means to confirm
         # it persisted correctly
@@ -182,7 +194,7 @@ class CourseDetails(object):
         result = None
         if video_key:
             result = '<iframe width="560" height="315" src="//www.youtube.com/embed/' + \
-                video_key + '?autoplay=1&rel=0" frameborder="0" allowfullscreen=""></iframe>'
+                video_key + '?rel=0" frameborder="0" allowfullscreen=""></iframe>'
         return result
 
 

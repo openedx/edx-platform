@@ -1,0 +1,93 @@
+<%inherit file="base.html" />
+<%!
+import json
+
+from contentstore.views.helpers import xblock_studio_url
+from django.utils.translation import ugettext as _
+%>
+<%block name="title">${_("Container")}</%block>
+<%block name="bodyclass">is-signedin course container view-container</%block>
+
+<%namespace name='static' file='static_content.html'/>
+<%namespace name="units" file="widgets/units.html" />
+
+
+<%block name="jsextra">
+<%
+xblock_info = {
+    'id': str(xblock_locator),
+    'display-name': xblock.display_name_with_default,
+    'category': xblock.category,
+};
+%>
+<script type='text/javascript'>
+    require(["domReady!", "jquery", "js/models/xblock_info", "js/views/xblock",
+            "js/models/module_info", "coffee/src/views/unit",
+            "xmodule", "coffee/src/main", "xblock/cms.runtime.v1",
+            "js/views/metadata", "js/collections/metadata"],
+            function(doc, $, XBlockInfo, XBlockView) {
+                var model,
+                    view;
+                model = new XBlockInfo(${json.dumps(xblock_info) | n});
+                view = new XBlockView({
+                    el: $('.wrapper-xblock.level-page').first(),
+                    model: model,
+                    view: 'container_preview'
+                });
+                view.render();
+            });
+</script>
+
+</%block>
+
+<%block name="content">
+
+
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-navigation">
+        <h1 class="page-header">
+            <small class="navigation navigation-parents">
+                % for ancestor in ancestor_xblocks:
+                    <%
+                    ancestor_url = xblock_studio_url(ancestor, context_course)
+                    %>
+                    % if ancestor_url:
+                    <a href="${ancestor_url}"
+                       class="navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
+                    % endif
+                % endfor
+                <a href="#" class="navigation-link navigation-current">${xblock.display_name_with_default | h}</a>
+            </small>
+        </h1>
+
+        <nav class="nav-actions">
+            <h3 class="sr">${_("Page Actions")}</h3>
+            <ul>
+                <li class="sr nav-item">
+                    ${_("No Actions")}
+                </li>
+            </ul>
+        </nav>
+    </header>
+</div>
+
+<div class="wrapper-content wrapper">
+    <div class="inner-wrapper">
+        <section class="content-area">
+
+            <article class="content-primary window">
+                <section class="wrapper-xblock level-page" data-locator="${xblock_locator}"/>
+            </article>
+            <aside class="content-supplementary" role="complimentary">
+                <div class="bit">
+                    <h3 class="title-3">${_("What can I do on this page?")}</h3>
+                    <ul class="list-details">
+                        <li class="item-detail">${_("You can view course components that contain other components on this page. In the case of experiment blocks, this allows you to confirm that you have properly configured your experiment groups.")}</li>
+                    </ul>
+                </div>
+            </aside>
+        </section>
+    </div>
+</div>
+
+</%block>

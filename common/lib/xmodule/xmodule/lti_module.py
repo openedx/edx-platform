@@ -56,7 +56,6 @@ from pkg_resources import resource_string
 from xblock.core import String, Scope, List, XBlock
 from xblock.fields import Boolean, Float
 
-
 log = logging.getLogger(__name__)
 
 from django.utils.translation import ugettext as _
@@ -118,7 +117,7 @@ class LTIModule(LTIFields, XModule):
             launch_presentation_return_url
             lti_message_type
             lti_version
-            role
+            roles
             *+ all custom parameters*
 
         These parameters should be encoded and signed by *OAuth1* together with
@@ -291,7 +290,7 @@ class LTIModule(LTIFields, XModule):
         While testing locally and on Jenkins, mock_lti_server use http.referer
         to obtain scheme, so it is ok to have http(s) anyway.
         """
-        scheme = 'http' if 'sandbox' in self.system.hostname else 'https'
+        scheme = 'http' if 'sandbox' in self.system.hostname or self.system.debug else 'https'
         uri = '{scheme}://{host}{path}'.format(
             scheme=scheme,
             host=self.system.hostname,
@@ -327,8 +326,31 @@ class LTIModule(LTIFields, XModule):
         the link being launched.
         lti_id should be context_id by meaning.
         """
-        return u':'.join(urllib.quote(i) for i in (self.lti_id, self.get_resource_link_id(), self.get_user_id()))
+        return "{id}:{resource_link}:{user_id}".format(
+            id=urllib.quote(self.lti_id),
+            resource_link=urllib.quote(self.get_resource_link_id()),
+            user_id=urllib.quote(self.get_user_id())
+        )
 
+    def get_course(self):
+        """
+        Return course by course id.
+        """
+        course_location = CourseDescriptor.id_to_location(self.course_id)
+        course = self.descriptor.runtime.modulestore.get_item(course_location)
+        return course
+
+    @property
+    def role(self):
+        """
+        Get system user role and convert it to LTI role.
+        """
+        roles = {
+            'student': u'Student',
+            'staff': u'Administrator',
+            'instructor': u'Instructor',
+        }
+        return roles.get(self.system.get_user_role(), u'Student')
 
     def oauth_params(self, custom_parameters, client_key, client_secret):
         """
@@ -352,7 +374,7 @@ class LTIModule(LTIFields, XModule):
             u'launch_presentation_return_url': '',
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
-            u'role': u'student',
+            u'roles': self.role,
 
             # Parameters required for grading:
             u'resource_link_id': self.get_resource_link_id(),
@@ -511,7 +533,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         if action == 'replaceResultRequest':
             self.system.publish(
-                event={
+                self,
+                {
                     'event_name': 'grade',
                     'value': score * self.max_score(),
                     'max_value': self.max_score(),
@@ -607,10 +630,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         """
         Obtains client_key and client_secret credentials from current course.
         """
-        course_id = self.course_id
-        course_location = CourseDescriptor.id_to_location(course_id)
-        course = self.descriptor.runtime.modulestore.get_item(course_location)
-
+        course = self.get_course()
         for lti_passport in course.lti_passports:
             try:
                 lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]

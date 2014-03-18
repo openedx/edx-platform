@@ -1,20 +1,20 @@
 <%inherit file="main.html" />
-<%! from microsite_configuration.middleware import MicrositeConfiguration %>
+<%! from microsite_configuration import microsite %>
 <%namespace name='static' file='static_content.html'/>
 
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<%block name="title"><title>${_("Log into your {platform_name} Account").format(platform_name=platform_name)}</title></%block>
+<%block name="pagetitle">${_("Log into your {platform_name} Account").format(platform_name=platform_name)}</%block>
+
+<%block name="bodyclass">view-login</%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
     $(function() {
 
-      var view_name = 'view-login';
-
       // adding js class for styling with accessibility in mind
-      $('body').addClass('js').addClass(view_name);
+      $('body').addClass('js');
 
       // show forgot password modal UI if URL contains matching DOM ID
       if ($.deparam.fragment()['forgot-password-modal'] !== undefined) {
@@ -114,7 +114,7 @@
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
-        <h3 class="message-title">${_("The following errors occured while logging you in:")} </h3>
+        <h3 class="message-title">${_("The following errors occurred while logging you in:")} </h3>
         <ul class="message-copy">
           <li>${_("Your email or password is incorrect")}</li>
         </ul>
@@ -130,14 +130,14 @@
         <ol class="list-input">
           <li class="field required text" id="field-email">
             <label for="email">${_('E-mail')}</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" required aria-required="true" aria-described-by="email-tip" />
+            <input class="" id="email" type="email" name="email" value="" placeholder="${_('example: username@domain.com')}" required aria-required="true" aria-described-by="email-tip" />
             <span class="tip tip-input" id="email-tip">${_("This is the e-mail address you used to register with {platform}").format(platform=platform_name)}</span>
           </li>
           <li class="field required password" id="field-password">
             <label for="password">${_('Password')}</label>
             <input id="password" type="password" name="password" value="" required aria-required="true" />
             <span class="tip tip-input">
-              <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw" id="forgot-password-link" role="button" aria-haspopup="true">${_('Forgot password?')}</a>
+              <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw" id="forgot-password-link" tabindex="-1" role="button" aria-haspopup="true">${_('Forgot password?')}</a>
             </span>
           </li>
         </ol>
@@ -169,7 +169,7 @@
 
 <%
   # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
-  sidebar_file = MicrositeConfiguration.get_microsite_template_path('login-sidebar.html')
+  sidebar_file = microsite.get_template_path('login-sidebar.html')
 %>
 
     <%include file="${sidebar_file}" />

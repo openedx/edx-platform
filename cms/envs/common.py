@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
@@ -23,15 +24,16 @@ Longer TODO:
 # want to import all variables from base settings files
 # pylint: disable=W0401, W0611, W0614
 
+import imp
 import sys
 import lms.envs.common
-from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, enable_microsites
+from lms.envs.common import (
+    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES
+)
 from path import path
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.mixin import CmsBlockMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin, only_xmodules
 from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
@@ -43,7 +45,7 @@ FEATURES = {
 
     'ENABLE_DISCUSSION_SERVICE': False,
 
-    'AUTH_USE_MIT_CERTIFICATES': False,
+    'AUTH_USE_CERTIFICATES': False,
 
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
@@ -63,9 +65,27 @@ FEATURES = {
     # edX has explicitly added them to the course creator group.
     'ENABLE_CREATOR_GROUP': False,
 
+    # whether to use password policy enforcement or not
+    'ENFORCE_PASSWORD_POLICY': False,
+
     # If set to True, Studio won't restrict the set of advanced components
     # to just those pre-approved by edX
     'ALLOW_ALL_ADVANCED_COMPONENTS': False,
+
+    # Turn off account locking if failed login attempts exceeds a limit
+    'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+
+    # Allow editing of short description in course settings in cms
+    'EDITABLE_SHORT_DESCRIPTION': True,
+
+    # Hide any Personally Identifiable Information from application logs
+    'SQUELCH_PII_IN_LOGS': False,
+
+    # Toggles embargo functionality
+    'EMBARGO': False,
+
+    # Turn on/off Microsites feature
+    'USE_MICROSITES': False,
 }
 ENABLE_JASMINE = False
 
@@ -81,9 +101,11 @@ GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
-sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
+
+# For geolocation ip database
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
 
 
 ############################# WEB CONFIGURATION #############################
@@ -113,9 +135,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
+    'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.core.context_processors.csrf',
     'dealer.contrib.django.staff.context_processor',  # access git revision
+    'contentstore.context_processors.doc_url',
 )
 
 # use the ratelimit backend to prevent brute force attacks
@@ -165,32 +189,47 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'edxmako.middleware.MakoMiddleware',
+
+    # Allows us to dark-launch particular languages
+    'dark_lang.middleware.DarkLangMiddleware',
+
+    'embargo.middleware.EmbargoMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
+    # needs to run after locale middleware (or anything that modifies the request context)
+    'edxmako.middleware.MakoMiddleware',
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
+
+    # for expiring inactive sessions
+    'session_inactivity_timeout.middleware.SessionInactivityTimeout',
+
+    # use Django built in clickjacking protection
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+# Clickjacking protection can be enabled by setting this to 'DENY'
+X_FRAME_OPTIONS = 'ALLOW'
+
 ############# XBlock Configuration ##########
+
+# Import after sys.path fixup
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore import prefer_xmodules
+from xmodule.x_module import XModuleMixin
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin, XModuleMixin)
 
-# Only allow XModules in Studio
-XBLOCK_SELECT_FUNCTION = only_xmodules
-
-# Use the following lines to allow any xblock in Studio,
-# either by uncommenting them here, or adding them to your private.py
+# Allow any XBlock in Studio
 # You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
 # xblocks can be added via advanced settings
-# from xmodule.x_module import prefer_xmodules
-# XBLOCK_SELECT_FUNCTION = prefer_xmodules
+XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
@@ -203,7 +242,7 @@ TEMPLATE_DEBUG = False
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "localhost:8000"
+SITE_NAME = "localhost:8001"
 HTTPS = 'on'
 ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
@@ -232,18 +271,14 @@ STATICFILES_DIRS = [
     LMS_ROOT / "static",
 
     # This is how you would use the textbook images locally
-    # ("book", ENV_ROOT / "book_images")
+    # ("book", ENV_ROOT / "book_images"),
 ]
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'ru'  # http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
-# We want i18n to be turned off in production, at least until we have full localizations.
-# Thus we want the Django translation engine to be disabled. Otherwise even without
-# localization files, if the user's browser is set to a language other than us-en,
-# strings like "login" and "password" will be translated and the rest of the page will be
-# in English, which is confusing.
+LANGUAGES = lms.envs.common.LANGUAGES
 USE_I18N = True
 USE_L10N = True
 
@@ -264,6 +299,7 @@ PIPELINE_CSS = {
         'source_filenames': [
             'css/vendor/normalize.css',
             'css/vendor/font-awesome.css',
+            'css/vendor/html5-input-polyfills/number-polyfill.css',
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
@@ -401,6 +437,9 @@ INSTALLED_APPS = (
     'south',
     'method_override',
 
+    # Database-backed configuration
+    'config_models',
+
     # Monitor the status of services
     'service_status',
 
@@ -409,7 +448,6 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
-    'auth',
     'course_creators',
     'student',  # misleading name due to sharing with lms
     'course_groups',  # not used in cms (yet), but tests run
@@ -434,7 +472,19 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     # for managing course modes
-    'course_modes'
+    'course_modes',
+
+    # Dark-launching languages
+    'dark_lang',
+
+    # Student identity reverification
+    'reverification',
+
+    # User preferences
+    'user_api',
+    'django_openid_auth',
+
+    'embargo',
 )
 
 
@@ -461,6 +511,14 @@ TRACKING_BACKENDS = {
     }
 }
 
+#### PASSWORD POLICY SETTINGS #####
+
+PASSWORD_MIN_LENGTH = None
+PASSWORD_MAX_LENGTH = None
+PASSWORD_COMPLEXITY = {}
+PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = None
+PASSWORD_DICTIONARY = []
+
 # We're already logging events, and we don't want to capture user
 # names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
@@ -472,3 +530,29 @@ YOUTUBE_API = {
     'url': "http://video.google.com/timedtext",
     'params': {'lang': 'en', 'v': 'set_youtube_id_of_11_symbols_here'}
 }
+
+
+##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
+MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
+MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
+
+
+### Apps only installed in some instances
+
+OPTIONAL_APPS = (
+    'edx_jsdraw',
+    'mentoring',
+)
+
+for app_name in OPTIONAL_APPS:
+    # First attempt to only find the module rather than actually importing it,
+    # to avoid circular references - only try to import if it can't be found
+    # by find_module, which doesn't work with import hooks
+    try:
+        imp.find_module(app_name)
+    except ImportError:
+        try:
+            __import__(app_name)
+        except ImportError:
+            continue
+    INSTALLED_APPS += (app_name,)

@@ -28,24 +28,9 @@ class MemberListWidget
     template_html = $("#member-list-widget-template").html()
     @$container.html Mustache.render template_html, params
 
-    # bind info toggle
-    @$('.info-badge').click => @toggle_info()
-
     # bind add button
     @$('input[type="button"].add').click =>
       params.add_handler? @$('.add-field').val()
-
-  show_info: ->
-      @$('.info').show()
-      @$('.member-list').hide()
-
-  show_list: ->
-      @$('.info').hide()
-      @$('.member-list').show()
-
-  toggle_info: ->
-      @$('.info').toggle()
-      @$('.member-list').toggle()
 
   # clear the input text field
   clear_input: -> @$('.add-field').val ''
@@ -102,8 +87,6 @@ class AuthListWidget extends MemberListWidget
     @clear_errors()
     @clear_input()
     @reload_list()
-    @$('.info').hide()
-    @$('.member-list').show()
 
   # handle clicks on the add button
   add_handler: (input) ->
@@ -120,15 +103,12 @@ class AuthListWidget extends MemberListWidget
   # reload the list of members
   reload_list: ->
     # @clear_rows()
-    # @show_info()
     @get_member_list (error, member_list) =>
       # abort on error
       return @show_errors error unless error is null
 
       # only show the list of there are members
       @clear_rows()
-      @show_info()
-      # @show_info()
 
       # use _.each instead of 'for' so that member
       # is bound in the button callback.
@@ -145,8 +125,6 @@ class AuthListWidget extends MemberListWidget
               @clear_errors()
               @reload_list()
         @add_row [member.username, member.email, $revoke_btn]
-        # make sure the list is shown because there are members.
-        @show_list()
 
   # clear error display
   clear_errors: -> @$error_section?.text ''

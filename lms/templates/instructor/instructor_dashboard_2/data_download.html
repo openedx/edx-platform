@@ -43,7 +43,10 @@
   %endif
 
     <p><b>${_("Reports Available for Download")}</b></p>
-    <p>${_("Unique, new file links for the CSV reports are generated on each visit to this page. These unique links expire within 5 minutes, due to the sensitive nature of student grade information. Please note that the report filename contains a timestamp that represents when your file was generated; this timestamp is UTC, not your local timezone.")}</p><br>
+    <p>${_("A new CSV report is generated each time you click the <b>Generate Grade Report</b> button above. A link to each report remains available on this page, identified by the UTC date and time of generation. Reports are not deleted, so you will always be able to access previously generated reports from this page.")}</p>
+    ## Translators: a table of URL links to report files appears after this sentence.
+    <p>${_("<b>Note</b>: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")}</p><br>
+
     <div class="grade-downloads-table" id="grade-downloads-table" data-endpoint="${ section_data['list_grade_downloads_url'] }" ></div>
   </div>
 %endif

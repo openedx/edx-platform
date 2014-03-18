@@ -4,6 +4,7 @@
   from courseware.courses import course_image_url, get_course_about_section
   from courseware.access import has_access
   from django.conf import settings
+  from edxmako.shortcuts import marketing_link
 
   if settings.FEATURES.get('ENABLE_SHOPPING_CART'):
       cart_link = reverse('shoppingcart.views.show_cart')
@@ -11,7 +12,7 @@
       cart_link = ""
 %>
 <%namespace name='static' file='../static_content.html'/>
-<%! from microsite_configuration.middleware import MicrositeConfiguration %>
+<%! from microsite_configuration import microsite %>
 
 <%inherit file="../main.html" />
 
@@ -19,12 +20,19 @@
 
   <%
     if self.theme_enabled():
-      google_analytics_file = u'../' + MicrositeConfiguration.get_microsite_configuration_value('google_analytics_file', 'theme-google-analytics.html')
+      google_analytics_file = u'../{ga}'.format(
+        ga=microsite.get_value('google_analytics_file', 'theme-google-analytics.html')
+      )
     else:
       google_analytics_file = '../google_analytics.html'
   %>
 
   <%include file="${google_analytics_file}" />
+
+  ## OG (Open Graph) title and description added below to give social media info to display
+  ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
+  <meta property="og:title" content="${get_course_about_section(course, 'title')}" />
+  <meta property="og:description" content="${get_course_about_section(course, 'short_description')}" />
 </%block>
 
 <%block name="js_extra">
@@ -63,18 +71,24 @@
 
     ## making the conditional around this entire JS block for sanity
     %if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+      <%
+        perms_error = _('The currently logged-in user account does not have permission to enroll in this course. '
+                        'You may need to {start_logout_tag}log out{end_tag} then try the register button again. '
+                        'Please visit the {start_help_tag}help page{end_tag} for a possible solution.').format(
+                          start_help_tag="<a href='{url}'>".format(url=marketing_link('FAQ')), end_tag='</a>',
+                          start_logout_tag="<a href='{url}'>".format(url=reverse('logout'))
+                          )
+      %>
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
       } else if (xhr.status == 403) {
         location.href = "${reverse('course-specific-register', args=[course.id])}?course_id=${course.id}&enrollment_action=enroll";
       } else if (xhr.status == 400) { //This means the user did not have permission
-        $('#register_error').html('This course has restricted enrollment.  Sorry, you do not have permission to enroll.<br />' +
-                                  'You may need to log out and re-login with a university account, such as WebAuth'
-        ).css("display", "block");
+        $('#register_error').html("${perms_error}").css("display", "block");
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
         ).css("display", "block");
       }
     });
@@ -106,7 +120,7 @@
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="title"><title>${_("About {course.display_number_with_default}").format(course=course) | h}</title></%block>
+<%block name="pagetitle">${_("About {course.display_number_with_default}").format(course=course) | h}</%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -128,9 +142,8 @@
             <a href="${course_target}">
           %endif
 
-          <span class="register disabled">
-            ${_("You are registered for this course {course.display_number_with_default}").format(course=course) | h}
-          </span>
+          <span class="register disabled">${_("You are registered for this course")}</span>
+
           %if show_courseware_link:
             <strong>${_("View Courseware")}</strong>
             </a>
@@ -155,6 +168,10 @@
                       cost=registration_price)}
           </a>
           <div id="register_error"></div>
+        % elif is_course_full:
+          <span class="register disabled">
+            ${_("Course is full")}
+          </span>
         %else:
           <a href="#" class="register">
             ${_("Register for {course.display_number_with_default}").format(course=course) | h}
@@ -201,7 +218,7 @@
     <section class="course-sidebar">
       <section class="course-summary">
         <header>
-          % if MicrositeConfiguration.get_microsite_configuration_value('course_about_show_social_links', False):
+          % if microsite.get_value('course_about_show_social_links', False):
           <div class="social-sharing">
             <div class="sharing-message">${_("Share with friends and family!")}</div>
             ## TODO: this should probably be an overrideable block,
@@ -215,15 +232,34 @@
                 <img src="${static.url('images/social/email-sharing.png')}" alt="Email someone to say you've registered for this course">
               </a>
             % else:
-              <% 
-                site_domain = MicrositeConfiguration.get_microsite_configuration_value('site_domain', 'www.edx.org')
-                platform_name = MicrositeConfiguration.get_microsite_configuration_value('platform_name', 'edX')
-                
-                tweet_action = "http://twitter.com/intent/tweet?text=I+just+registered+for+"+course.number+"+"+get_course_about_section(course, 'title')+"+through+"+MicrositeConfiguration.get_microsite_configuration_value('course_about_twitter_account', '@edxonline')+":+http://"+site_domain+reverse('about_course', args=[course.id])
+              <%
+                site_domain = microsite.get_value('site_domain', 'www.edx.org')
+                platform_name = microsite.get_value('platform_name', 'edX')
 
-                facebook_link = MicrositeConfiguration.get_microsite_configuration_value('course_about_facebook_link', 'http://www.facebook.com/EdxOnline')
+                tweet_action = "http://twitter.com/intent/tweet?text=I+just+registered+for+{number}+{title}+through+{account}:+{url}".format(
+                    number=course.number,
+                    title=get_course_about_section(course, 'title'),
+                    account=microsite.get_value('course_about_twitter_account', '@edxonline'),
+                    url="http://{domain}{path}".format(
+                        domain=site_domain,
+                        path=reverse('about_course', args=[course.id])
+                    )
+                )
 
-                email_subject = "mailto:?subject=Take%20a%20course%20with%20"+platform_name+"%20online&body=I%20just%20registered%20for%20"+course.number+"%20"+get_course_about_section(course, 'title')+"%20through%20"+platform_name+"%20http://"+site_domain+reverse('about_course', args=[course.id])
+                facebook_link = microsite.get_value('course_about_facebook_link', 'http://www.facebook.com/EdxOnline')
+
+                email_subject = "mailto:?subject={subject}&body={body}".format(
+                    subject="Take a course with {platform} online".format(platform=platform_name),
+                    body="I just registered for {number} {title} through {platform} {url}".format(
+                        number=course.number,
+                        title=get_course_about_section(course, 'title'),
+                        platform=platform_name,
+                        url="http://{domain}{path}".format(
+                            domain=site_domain,
+                            path=reverse('about_course', args=[course.id]),
+                        )
+                    )
+                ).replace(" ", "%20")
               %>
               <a href="${tweet_action}" class="share">
                 <img src="${static.url('images/social/twitter-sharing.png')}" alt="Tweet that you've registered for this course">
@@ -241,8 +277,9 @@
 
         <ol class="important-dates">
           <li><div class="icon course-number"></div><p>${_("Course Number")}</p><span class="course-number">${course.display_number_with_default | h}</span></li>
+          % if not course.start_date_is_still_default:
           <li><div class="icon start"></div><p>${_("Classes Start")}</p><span class="start-date">${course.start_date_text}</span></li>
-
+          % endif
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
             % if get_course_about_section(course, "end_date") or course.end:

@@ -1,7 +1,11 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
+
+<%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">${_("Instructor Dashboard")}</%block>
+<%block name="nav_skip">#instructor-dashboard-content</%block>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
@@ -122,7 +126,7 @@ function goto( mode)
   %endif
 
 
-  <section class="instructor-dashboard-content">
+  <section class="instructor-dashboard-content" id="instructor-dashboard-content">
     <h1>${_("Instructor Dashboard")}</h1>
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">${_("Grades")}</a> |
@@ -140,6 +144,9 @@ function goto( mode)
           %if settings.FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
              | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">${_("Analytics")}</a>
           %endif
+          %if settings.FEATURES.get('CLASS_DASHBOARD'):
+             | <a href="#" onclick="goto('Metrics');" class="${modeflag.get('Metrics')}">${_("Metrics")}</a>
+          %endif
 	  ]
     </h2>
 
@@ -153,7 +160,7 @@ function goto( mode)
     %if offline_grade_log:
       <p>
         <span class="copy-warning">Pre-computed grades ${offline_grade_log} available: Use?
-          <input type='checkbox' name='use_offline_grades' value='${_("yes")}'>
+          <input type='checkbox' name='use_offline_grades' value="yes">
         </span>
       </p>
     %endif
@@ -393,6 +400,14 @@ function goto( mode)
   %else:
   <p>${_("User requires forum administrator privileges to perform administration tasks.  See instructor.")}</p>
   %endif
+  
+  <br />
+  <h2>${_("Explanation of Roles:")}</h2>
+  <p>${_("Forum Moderators: can edit or delete any post, remove misuse flags, close and re-open threads, endorse "
+  "responses, and see posts from all cohorts (if the course is cohorted). Moderators' posts are marked as 'staff'.")}</p>
+  <p>${_("Forum Admins: have moderator privileges, as well as the ability to edit the list of forum moderators "
+  "(e.g. to appoint a new moderator). Admins' posts are marked as 'staff'.")}</p>
+  <p>${_("Community TAs: have forum moderator privileges, and their posts are labelled 'Community TA'.")}</p>
 %endif
 
 ##-----------------------------------------------------------------------------
@@ -596,7 +611,7 @@ function goto( mode)
 
   %if analytics_results.get("StudentsEnrolled"):
     <p>
-      ${_("Students enrolled:")}
+      ${_("Students enrolled (historical count, includes those who have since unenrolled):")}
       ${analytics_results["StudentsEnrolled"]['data'][0]['students']}
       (${analytics_results["StudentsEnrolled"]['time']})
     </p>
@@ -662,6 +677,46 @@ function goto( mode)
       %endfor
       </table>
     </div>
+  %endif
+%endif
+
+%if modeflag.get('Metrics'):
+  %if not any (metrics_results.values()):
+    <p>${_("There is no data available to display at this time.")}</p>
+  %else:
+    <%namespace name="d3_stacked_bar_graph" file="/class_dashboard/d3_stacked_bar_graph.js"/>
+    <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
+
+    <script>
+      ${d3_stacked_bar_graph.body()}
+    </script>
+
+    <div id="metrics"></div>
+    
+    <h3 class="attention">${_("Loading the latest graphs for you; depending on your class size, this may take a few minutes.")}</h3>
+
+    %for i in range(0,len(metrics_results['section_display_name'])):
+        <div class="metrics-container" id="metrics_section_${i}">
+          <h2>${_("Section:")} ${metrics_results['section_display_name'][i]}</h2>
+          <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
+          <div class="metrics-left" id="metric_opened_${i}">
+            <h3>${_("Count of Students that Opened a Subsection")}</h3>
+            <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading...")}</p>
+          </div>
+          <div class="metrics-right" id="metric_grade_${i}">
+            <h3>${_("Grade Distribution per Problem")}</h3>
+            %if not metrics_results['section_has_problem'][i]:
+              <p>${_("There are no problems in this section.")}</p>
+            %else:
+              <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading...")}</p>
+            %endif
+          </div>
+        </div>
+    %endfor
+      <script>
+        ${all_section_metrics.body("metric_opened_","metric_grade_","metric_attempts_","metric_tooltip_",course.id)}
+      </script>
+
   %endif
 %endif
 

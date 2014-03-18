@@ -1,20 +1,22 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <article class="discussion-article" data-id="{{id}}">
     <div class="local"><a href="javascript:void(0)" class="dogear action-follow"></a></div>
     <div class="discussion-post local">
         <header>
-            <a href="#" class="vote-btn" data-tooltip="vote" role="button" aria-pressed="false"><span class="plus-icon"/><span class='votes-count-number'>{{votes.up_count}}</span> <span class="sr">votes (click to vote)</span></a>
+            <a href="#" class="vote-btn" role="button" aria-pressed="false"/>
             <h3>{{title}}</h3>
             <p class="posted-details">                
                 {{#user}}
                 <a href="{{user_url}}" class="username">{{username}}</a>
                 {{/user}}
                 {{^user}}
-                anonymous
+                ${_("anonymous")}
                 {{/user}}
 
                 <span class="timeago" title="{{created_at}}">{{created_at}}</span>
                 <span class="post-status-closed top-post-status" style="display: none">
-                    &bull; This thread is closed.
+                    &bull; ${_("This thread is closed.")}
                 </span>
             </p>
         </header>
@@ -25,8 +27,7 @@
     </ol>
 
     <div class="local post-tools">
-        <a href="{{permalink}}">Перейти к дискуссии</a>
-        <!-- <a href="javascript:void(0)" class="collapse-post">Hide discussion</a> -->
+        <a href="{{permalink}}">${_("View discussion")}</a>
     </div>
 
 </article>

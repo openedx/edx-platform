@@ -272,7 +272,7 @@ function PollMain(el) {
             c1 += 1;
 
             if (
-                (tempEl.tagName.toLowerCase() === 'section') &&
+                (tempEl.tagName.toLowerCase() === 'div') &&
                 ($(tempEl).hasClass('xmodule_WrapperModule') === true)
             ) {
                 _this.wrapperSectionEl = tempEl;

@@ -7,11 +7,11 @@ Installation
 
 Please refer to the following wiki pages in our [configuration repo](https://github.com/edx/configuration) to install edX:
 
-* [edX Developer Stack](https://github.com/edx/configuration/wiki/edX-Developer-Stack) 
+* [edX Developer Stack](https://github.com/edx/configuration/wiki/edX-Developer-Stack)
 <br/>These instructions are for developers who want to contribute or make changes to the edX source code.
-* [edX Production Stack](https://github.com/edx/configuration/wiki/edX-Production-Stack) 
+* [edX Production Stack](https://github.com/edx/configuration/wiki/edX-Production-Stack)
 <br/>Using Vagrant/Virtualbox this will setup all edX services on a single server in a production like configuration.
-* [edX Ubuntu 12.04 installation](https://github.com/edx/configuration/wiki/edX-Ubuntu-12.04-Installation) 
+* [edX Ubuntu 12.04 installation](https://github.com/edx/configuration/wiki/edX-Ubuntu-12.04-Installation)
 <br/>This will install edX on an existing Ubuntu 12.04 server.
 
 
@@ -19,22 +19,27 @@ License
 -------
 
 The code in this repository is licensed under version 3 of the AGPL unless
-otherwise noted.
-
-Please see ``LICENSE.txt`` for details.
+otherwise noted. Please see the
+[`LICENSE`](https://github.com/edx/edx-platform/blob/master/LICENSE) file
+for details.
 
 Documentation
 ------------
 
-High-level documentation of the code is located in the `doc` subdirectory. Start
-with `overview.md` to get an introduction to the architecture of the system.
+High-level documentation of the code is located in the `docs` subdirectory.
+Most (although not all) of our documentation is built using
+[Sphinx](http://sphinx-doc.org/): you can [view the built documentation on
+ReadTheDocs](http://edx.readthedocs.org/).
 
 How to Contribute
 -----------------
 
-Contributions are very welcome.
-
-Please read [How To Contribute](https://github.com/edx/edx-platform/wiki/How-To-Contribute) for details.
+Contributions are very welcome, but for legal reasons, you must submit a signed
+[individual contributor's agreement](http://code.edx.org/individual-contributor-agreement.pdf)
+before we can accept your contribution. See our
+[CONTRIBUTING](https://github.com/edx/edx-platform/blob/master/CONTRIBUTING.rst)
+file for more information -- it also contains guidelines for how to maintain
+high code quality, which will make your contribution more likely to be accepted.
 
 Reporting Security Issues
 -------------------------
@@ -44,5 +49,4 @@ Please do not report security issues in public. Please email security@edx.org
 Mailing List and IRC Channel
 ----------------------------
 
-You can discuss this code on the [edx-code Google Group](https://groups.google.com/forum/#!forum/edx-code) or in the
-`edx-code` IRC channel on Freenode.
+You can discuss this code on the [edx-code Google Group](https://groups.google.com/forum/#!forum/edx-code) or in the [`edx-code` IRC channel on Freenode](http://webchat.freenode.net/?channels=edx-code).

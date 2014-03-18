@@ -1,7 +1,7 @@
 {% extends "main_django.html" %}
-{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}{% load staticfiles %}
+{% load compressed %}{% load sekizai_tags i18n microsite %}{% load url from future %}{% load staticfiles %}
 
-{% block title %}<title>{% block pagetitle %}{% endblock %} | edX Wiki</title>{% endblock %}
+{% block title %}<title>{% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}</title>{% endblock %}
 
 {% block headextra %}
   {% compressed_css 'course' %}
@@ -46,13 +46,14 @@
 
 {% endblock %}
 
+{% block nav_skip %}#wiki-content{% endblock %}
 
 {% block body %}
   {% if course %}
     {% include "courseware/course_navigation.html" with active_page_context="wiki" %}
   {% endif %}
 
-  <section class="container wiki {{ selected_tab }}">
+  <section class="container wiki {{ selected_tab }}" id="wiki-content">
     <div class="wiki-wrapper">
       {% block wiki_body %}
         

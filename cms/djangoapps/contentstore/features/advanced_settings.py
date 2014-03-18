@@ -3,10 +3,9 @@
 
 from lettuce import world, step
 from nose.tools import assert_false, assert_equal, assert_regexp_matches  # pylint: disable=E0611
-from common import type_in_codemirror, press_the_notification_button
+from common import type_in_codemirror, press_the_notification_button, get_codemirror_value
 
 KEY_CSS = '.key input.policy-key'
-VALUE_CSS = 'textarea.json'
 DISPLAY_NAME_KEY = "display_name"
 DISPLAY_NAME_VALUE = '"Robot Super Course"'
 
@@ -101,7 +100,7 @@ def assert_policy_entries(expected_keys, expected_values):
     for key, value in zip(expected_keys, expected_values):
         index = get_index_of(key)
         assert_false(index == -1, "Could not find key: {key}".format(key=key))
-        found_value = world.css_find(VALUE_CSS)[index].value
+        found_value = get_codemirror_value(index)
         assert_equal(
             value, found_value,
             "Expected {} to have value {} but found {}".format(key, value, found_value)
@@ -120,15 +119,13 @@ def get_index_of(expected_key):
 
 def get_display_name_value():
     index = get_index_of(DISPLAY_NAME_KEY)
-    return world.css_value(VALUE_CSS, index=index)
-
+    return get_codemirror_value(index)
 
 def change_display_name_value(step, new_value):
     change_value(step, DISPLAY_NAME_KEY, new_value)
 
-
 def change_value(step, key, new_value):
-    type_in_codemirror(get_index_of(key), new_value)
-    world.wait(0.5)
+    index = get_index_of(key)
+    type_in_codemirror(index, new_value)
     press_the_notification_button(step, "Save")
     world.wait_for_ajax_complete()

@@ -14,7 +14,7 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 # For determining if a shibboleth course
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
@@ -229,7 +229,7 @@ def send_mail_to_student(student, param_dict):
     if 'course' in param_dict:
         param_dict['course_name'] = param_dict['course'].display_name_with_default
 
-    param_dict['site_name'] = MicrositeConfiguration.get_microsite_configuration_value(
+    param_dict['site_name'] = microsite.get_value(
         'SITE_NAME',
         param_dict['site_name']
     )
@@ -271,7 +271,7 @@ def send_mail_to_student(student, param_dict):
 
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        from_address = MicrositeConfiguration.get_microsite_configuration_value(
+        from_address = microsite.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )

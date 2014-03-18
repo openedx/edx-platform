@@ -42,13 +42,15 @@ def view_problem(step, problem_type):
 def set_external_grader_response(step, correctness):
     assert(correctness in ['correct', 'incorrect'])
 
-    response_dict = {'correct': True if correctness == 'correct' else False,
-                    'score': 1 if correctness == 'correct' else 0,
-                    'msg': 'Your problem was graded %s' % correctness}
+    response_dict = {
+        'correct': True if correctness == 'correct' else False,
+        'score': 1 if correctness == 'correct' else 0,
+        'msg': 'Your problem was graded {0}'.format(correctness)
+    }
 
     # Set the fake xqueue server to always respond
     # correct/incorrect when asked to grade a problem
-    world.xqueue.set_config('grade_response', response_dict)
+    world.xqueue.config['default'] = response_dict
 
 
 @step(u'I answer a "([^"]*)" problem "([^"]*)ly"')
@@ -119,7 +121,7 @@ def press_the_button_with_label(_step, buttonname):
 
 @step(u'The "([^"]*)" button does( not)? appear')
 def action_button_present(_step, buttonname, doesnt_appear):
-    button_css = 'section.action input[value*="%s"]' % buttonname
+    button_css = 'div.action input[value*="%s"]' % buttonname
     if bool(doesnt_appear):
         assert world.is_css_not_present(button_css)
     else:
@@ -139,7 +141,7 @@ def see_score(_step, score):
     # The problem progress is changed by
     # cms/static/xmodule_js/src/capa/display.js
     # so give it some time to render on the page.
-    score_css = 'section.problem-progress'
+    score_css = 'div.problem-progress'
     expected_text = '({})'.format(score)
     world.wait_for(lambda _: world.css_has_text(score_css, expected_text))
 

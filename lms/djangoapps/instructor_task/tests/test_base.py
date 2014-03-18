@@ -28,7 +28,7 @@ from instructor_task.views import instructor_task_status
 
 
 TEST_COURSE_ORG = 'edx'
-TEST_COURSE_NAME = 'Test Course'
+TEST_COURSE_NAME = 'test course'
 TEST_COURSE_NUMBER = '1.23x'
 TEST_SECTION_NAME = "Problem"
 TEST_COURSE_ID = 'edx/1.23x/test_course'
@@ -208,7 +208,9 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
                         'num_responses': 2}
         problem_xml = factory.build_xml(**factory_args)
         location = InstructorTaskTestCase.problem_location(problem_url_name)
-        self.module_store.update_item(location, problem_xml)
+        item = self.module_store.get_instance(self.course.id, location)
+        item.data = problem_xml
+        self.module_store.update_item(item, '**replace_user**')
 
     def get_student_module(self, username, descriptor):
         """Get StudentModule object for test course, given the `username` and the problem's `descriptor`."""

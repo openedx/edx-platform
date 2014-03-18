@@ -1,0 +1,80 @@
+// studio - elements - xblock rendering
+// ==========================
+
+// extends - UI archetypes - xblock rendering
+%wrap-xblock {
+  margin: $baseline;
+  border: 1px solid $gray-l4;
+  border-radius: ($baseline/5);
+  background: $white;
+  box-shadow: 0px 1px 1px $shadow-l1;
+
+
+  &:hover {
+    box-shadow: 0 0 1px $shadow;
+  }
+
+  // UI: xblock header
+  .xblock-header {
+    @include box-sizing(border-box);
+    @include ui-flexbox();
+    @extend %ui-align-center-flex;
+    border-bottom: 1px solid $gray-l4;
+    border-radius: ($baseline/5) ($baseline/5) 0 0;
+    min-height: ($baseline*2.5);
+    background-color: $gray-l6;
+
+    .header-details {
+      @extend %cont-truncated;
+      @extend %ui-justify-left-flex;
+      @include ui-flexbox();
+      padding-left: flex-gutter();
+      width: flex-grid(6,12);
+      vertical-align: top;
+    }
+
+    .header-actions {
+      @include ui-flexbox();
+      @extend %ui-justify-right-flex;
+      width: flex-grid(6,12);
+      vertical-align: top;
+    }
+  }
+
+  // UI: xblock render
+  .xblock-render {
+    @extend %anim-fadeIn;
+  }
+}
+
+// ====================
+
+// UI: xblocks - calls-to-action
+.wrapper-xblock .header-actions {
+  @extend %actions-header;
+}
+
+// UI: xblock is collapsible
+.wrapper-xblock.is-collapsible, .wrapper-xblock.xblock-type-container {
+
+  [class^="icon-"] {
+  font-style: normal;
+  }
+
+  .expand-collapse {
+    @extend %expand-collapse;
+    margin: 0 ($baseline/4);
+  }
+
+  &.collapsed .xblock-render {
+    display: none;
+  }
+
+  .action-view {
+
+    .action-button-text {
+      padding-right: ($baseline/5);
+      padding-left: 0;
+    }
+  }
+}

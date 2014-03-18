@@ -2,8 +2,9 @@
 Tests courseware views.py
 """
 import unittest
-from mock import MagicMock, patch
 from datetime import datetime
+
+from mock import MagicMock, patch
 from pytz import UTC
 
 from django.test import TestCase
@@ -30,15 +31,16 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from course_modes.models import CourseMode
 import shoppingcart
 
+from util.tests.test_date_utils import fake_ugettext, fake_pgettext
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestJumpTo(TestCase):
     """
-        Check the jumpto link for a course.
+    Check the jumpto link for a course.
     """
 
     def setUp(self):
-
         # Use toy course from XML
         self.course_name = 'edX/toy/2012_Fall'
 
@@ -71,7 +73,9 @@ class TestJumpTo(TestCase):
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class ViewsTestCase(TestCase):
-    """ Tests for views.py methods. """
+    """
+    Tests for views.py methods.
+    """
     def setUp(self):
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
@@ -255,8 +259,8 @@ class ViewsTestCase(TestCase):
         response = self.client.get(url)
         self.assertFalse('<script>' in response.content)
 
-
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+# setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE, TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
 class BaseDueDateTests(ModuleStoreTestCase):
     """
     Base class that verifies that due dates are rendered correctly on a page
@@ -289,8 +293,8 @@ class BaseDueDateTests(ModuleStoreTestCase):
         self.request = self.request_factory.get("foo")
         self.request.user = self.user
 
-        self.time_with_utc = "due Sep 18, 2013 at 11:30 UTC"
-        self.time_without_utc = "due Sep 18, 2013 at 11:30"
+        self.time_with_tz = "due Sep 18, 2013 at 11:30 UTC"
+        self.time_without_tz = "due Sep 18, 2013 at 11:30"
 
     def test_backwards_compatability(self):
         # The test course being used has show_timezone = False in the policy file
@@ -299,35 +303,34 @@ class BaseDueDateTests(ModuleStoreTestCase):
         # remove the timezone.
         course = self.set_up_course(due_date_display_format=None, show_timezone=False)
         text = self.get_text(course)
-        self.assertIn(self.time_without_utc, text)
-        self.assertNotIn(self.time_with_utc, text)
+        self.assertIn(self.time_without_tz, text)
+        self.assertNotIn(self.time_with_tz, text)
         # Test that show_timezone has been cleared (which means you get the default value of True).
         self.assertTrue(course.show_timezone)
 
     def test_defaults(self):
         course = self.set_up_course()
         text = self.get_text(course)
-        self.assertIn(self.time_with_utc, text)
+        self.assertIn(self.time_with_tz, text)
 
     def test_format_none(self):
         # Same for setting the due date to None
         course = self.set_up_course(due_date_display_format=None)
         text = self.get_text(course)
-        self.assertIn(self.time_with_utc, text)
+        self.assertIn(self.time_with_tz, text)
 
     def test_format_plain_text(self):
         # plain text due date
         course = self.set_up_course(due_date_display_format="foobar")
         text = self.get_text(course)
-        self.assertNotIn(self.time_with_utc, text)
+        self.assertNotIn(self.time_with_tz, text)
         self.assertIn("due foobar", text)
 
     def test_format_date(self):
-
         # due date with no time
         course = self.set_up_course(due_date_display_format=u"%b %d %y")
         text = self.get_text(course)
-        self.assertNotIn(self.time_with_utc, text)
+        self.assertNotIn(self.time_with_tz, text)
         self.assertIn("due Sep 18 13", text)
 
     def test_format_hidden(self):
@@ -342,7 +345,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         course = self.set_up_course(due_date_display_format=u"%%%", show_timezone=False)
         text = self.get_text(course)
         self.assertNotIn("%%%", text)
-        self.assertIn(self.time_with_utc, text)
+        self.assertIn(self.time_with_tz, text)
 
 
 class TestProgressDueDate(BaseDueDateTests):
@@ -367,3 +370,57 @@ class TestAccordionDueDate(BaseDueDateTests):
         return views.render_accordion(
             self.request, course, course.get_children()[0].id, None, None
         )
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class StartDateTests(ModuleStoreTestCase):
+    """
+    Test that start dates are properly localized and displayed on the student
+    dashboard.
+    """
+
+    def setUp(self):
+        self.request_factory = RequestFactory()
+        self.user = UserFactory.create()
+        self.request = self.request_factory.get("foo")
+        self.request.user = self.user
+
+    def set_up_course(self):
+        """
+        Create a stock course with a specific due date.
+
+        :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
+        """
+        course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
+        course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        return course
+
+    def get_about_text(self, course_id):
+        """
+        Get the text of the /about page for the course.
+        """
+        text = views.course_about(self.request, course_id).content
+        return text
+
+    @patch('util.date_utils.pgettext', fake_pgettext(translations={
+        ("abbreviated month name", "Sep"): "SEPTEMBER",
+    }))
+    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+        "SHORT_DATE_FORMAT": "%Y-%b-%d",
+    }))
+    def test_format_localized_in_studio_course(self):
+        course = self.set_up_course()
+        text = self.get_about_text(course.id)
+        # The start date is set in the set_up_course function above.
+        self.assertIn("2013-SEPTEMBER-16", text)
+
+    @patch('util.date_utils.pgettext', fake_pgettext(translations={
+        ("abbreviated month name", "Jul"): "JULY",
+    }))
+    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+        "SHORT_DATE_FORMAT": "%Y-%b-%d",
+    }))
+    def test_format_localized_in_xml_course(self):
+        text = self.get_about_text('edX/toy/TT_2012_Fall')
+        # The start date is set in common/test/data/two_toys/policies/TT_2012_Fall/policy.json
+        self.assertIn("2015-JULY-17", text)

@@ -7,7 +7,7 @@ Enrollments.
 from django.core.management.base import BaseCommand, CommandError
 
 from student.models import CourseEnrollment
-from django_comment_common.models import assign_default_role
+from django_comment_common.models import assign_default_role_on_enrollment
 
 
 class Command(BaseCommand):
@@ -23,7 +23,7 @@ class Command(BaseCommand):
 
         print "Updated roles for ",
         for i, enrollment in enumerate(CourseEnrollment.objects.filter(course_id=course_id, is_active=1), start=1):
-            assign_default_role(None, enrollment)
+            assign_default_role_on_enrollment(None, enrollment)
             if i % 1000 == 0:
                 print "{0}...".format(i),
         print

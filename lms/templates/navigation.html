@@ -11,7 +11,8 @@ import branding
 from status.status import get_site_status_msg
 %>
 
-<%! from microsite_configuration.middleware import MicrositeConfiguration %>
+<%! from microsite_configuration import microsite %>
+<%! from microsite_configuration.templatetags.microsite import platform_name %>
 
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
@@ -46,7 +47,12 @@ site_status_msg = get_site_status_msg(course_id)
   <h1 class="logo">
     <a href="${marketing_link('ROOT')}">
       <%block name="navigation_logo">
-          <img src="${static.url(branding.get_logo_url())}" alt="${MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME)} ${_('Home')}" />
+          <img src="${static.url(branding.get_logo_url())}" alt="
+          % if course:
+          ${course.display_org_with_default | h}: ${course.display_number_with_default | h} ${course.display_name_with_default | h} @
+          % endif
+          ${platform_name()}
+          " />
       </%block>
     </a>
   </h1>
@@ -84,7 +90,7 @@ site_status_msg = get_site_status_msg(course_id)
           <%block name="navigation_dropdown_menu_links" >
             <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
           </%block>
-          <li role="presentation"><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
+          <li><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
         </ul>
       </li>
     </ol>
@@ -92,7 +98,7 @@ site_status_msg = get_site_status_msg(course_id)
     % else:
     <ol class="left nav-global">
       <%block name="navigation_global_links">
-        % if settings.FEATURES.get('ENABLE_MKTG_SITE'):
+        % if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
           <li class="nav-global-01">
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>
@@ -120,7 +126,9 @@ site_status_msg = get_site_status_msg(course_id)
   </nav>
 </header>
 % if course:
+<!--[if IE]>
 <div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}Firefox{ff_link_end}.').format(chrome_link_start='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">', chrome_link_end='</a>', ff_link_start='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">', ff_link_end='</a>')}</div>
+<![endif]-->
 % endif
 
 %if not user.is_authenticated():

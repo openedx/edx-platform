@@ -8,24 +8,28 @@ local filesystem into machine-readable .mo files. This is typically
 necessary as part of the build process since these .mo files are
 needed by Django when serving the web app.
 
-The configuration file (in edx-platform/conf/locale/config) specifies which
+The configuration file (in edx-platform/conf/locale/config.yaml) specifies which
 languages to generate.
 
 """
 
-import os, sys, logging
+import argparse
+import logging
+import os
+import sys
+
 from polib import pofile
 
-from config import BASE_DIR, CONFIGURATION
-from execute import execute
+from i18n.config import BASE_DIR, CONFIGURATION
+from i18n.execute import execute
 
 LOG = logging.getLogger(__name__)
 
 
-def merge(locale, target='django.po', fail_if_missing=True):
+def merge(locale, target='django.po', sources=('django-partial.po',), fail_if_missing=True):
     """
-    For the given locale, merge django-partial.po, messages.po, mako.po -> django.po
-    target is the resulting filename
+    For the given locale, merge the `sources` files to become the `target`
+    file.  Note that the target file might also be one of the sources.
 
     If fail_if_missing is true, and the files to be merged are missing,
     throw an Exception, otherwise return silently.
@@ -34,37 +38,62 @@ def merge(locale, target='django.po', fail_if_missing=True):
     just return silently.
 
     """
-    LOG.info('Merging locale={0}'.format(locale))
+    LOG.info('Merging {target} for locale {locale}'.format(target=target, locale=locale))
     locale_directory = CONFIGURATION.get_messages_dir(locale)
-    files_to_merge = ('django-partial.po', 'messages.po', 'mako.po')
     try:
-        validate_files(locale_directory, files_to_merge)
+        validate_files(locale_directory, sources)
     except Exception, e:
         if not fail_if_missing:
             return
         raise e
 
     # merged file is merged.po
-    merge_cmd = 'msgcat -o merged.po ' + ' '.join(files_to_merge)
+    merge_cmd = 'msgcat -o merged.po ' + ' '.join(sources)
     execute(merge_cmd, working_directory=locale_directory)
 
     # clean up redunancies in the metadata
     merged_filename = locale_directory.joinpath('merged.po')
-    clean_metadata(merged_filename)
+    clean_pofile(merged_filename)
 
     # rename merged.po -> django.po (default)
-    django_filename = locale_directory.joinpath(target)
-    os.rename(merged_filename, django_filename) # can't overwrite file on Windows
+    target_filename = locale_directory.joinpath(target)
+    os.rename(merged_filename, target_filename)
 
 
-def clean_metadata(file):
+def merge_files(locale, fail_if_missing=True):
     """
-    Clean up redundancies in the metadata caused by merging.
+    Merge all the files in `locale`, as specified in config.yaml.
+    """
+    for target, sources in CONFIGURATION.generate_merge.items():
+        merge(locale, target, sources, fail_if_missing)
+
+
+def clean_pofile(file):
+    """
+    Clean various aspect of a .po file.
+
+    Fixes:
+
+        - Removes the ,fuzzy flag on metadata.
+
+        - Removes occurrence line numbers so that the generated files don't
+          generate a lot of line noise when they're committed.
+
+        - Removes any flags ending with "-format".  Mac gettext seems to add
+          these flags, Linux does not, and we don't seem to need them.  By
+          removing them, we reduce the unimportant differences that clutter
+          diffs as different developers work on the files.
+
     """
     # Reading in the .po file and saving it again fixes redundancies.
     pomsgs = pofile(file)
     # The msgcat tool marks the metadata as fuzzy, but it's ok as it is.
     pomsgs.metadata_is_fuzzy = False
+    for entry in pomsgs:
+        # Remove line numbers
+        entry.occurrences = [(filename, None) for (filename, lineno) in entry.occurrences]
+        # Remove -format flags
+        entry.flags = [f for f in entry.flags if not f.endswith("-format")]
     pomsgs.save()
 
 
@@ -81,16 +110,23 @@ def validate_files(dir, files_to_merge):
             raise Exception("I18N: Cannot generate because file not found: {0}".format(pathname))
 
 
-def main():
+def main(argv=None):
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-    for locale in CONFIGURATION.locales:
-        merge(locale)
+    parser = argparse.ArgumentParser(description="Generate merged and compiled message files.")
+    parser.add_argument("--strict", action='store_true', help="Complain about missing files.")
+
+    args = parser.parse_args(argv or [])
+
+    for locale in CONFIGURATION.translated_locales:
+        merge_files(locale, fail_if_missing=args.strict)
     # Dummy text is not required. Don't raise exception if files are missing.
-    merge(CONFIGURATION.dummy_locale, fail_if_missing=False)
+    for locale in CONFIGURATION.dummy_locales:
+        merge_files(locale, fail_if_missing=False)
+
     compile_cmd = 'django-admin.py compilemessages'
     execute(compile_cmd, working_directory=BASE_DIR)
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

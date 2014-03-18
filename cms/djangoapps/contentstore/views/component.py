@@ -1,17 +1,19 @@
+from __future__ import absolute_import
+
 import json
 import logging
 from collections import defaultdict
 
 from django.http import HttpResponseBadRequest, Http404
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_GET
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from edxmako.shortcuts import render_to_response
 
-from xmodule.modulestore.django import modulestore
 from util.date_utils import get_default_time_display
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
 
@@ -21,20 +23,21 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
-from xmodule.x_module import prefer_xmodules
 
 from lms.lib.xblock.runtime import unquote_slashes
 
-from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState
+from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_modulestore
+from contentstore.views.helpers import get_parent_xblock
 
 from models.settings.course_grading import CourseGradingModel
 
-from .access import has_access
+from .access import has_course_access
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
            'subsection_handler',
            'unit_handler',
+           'container_handler',
            'component_handler'
            ]
 
@@ -56,6 +59,8 @@ else:
 
     ADVANCED_COMPONENT_TYPES = [
         'annotatable',
+        'textannotation',  # module for annotating text (with annotation table)
+        'videoannotation',  # module for annotating video (with annotation table)
         'word_cloud',
         'master_class',
         'graphical_slider_tool',
@@ -66,7 +71,7 @@ ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
 
-@require_http_methods(["GET"])
+@require_GET
 @login_required
 def subsection_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
@@ -90,17 +95,7 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
         if item.location.category != 'sequential':
             return HttpResponseBadRequest()
 
-        parent_locs = modulestore().get_parent_locations(old_location, None)
-
-        # we're for now assuming a single parent
-        if len(parent_locs) != 1:
-            logging.error(
-                'Multiple (or none) parents have been found for %s',
-                unicode(locator)
-            )
-
-        # this should blow up if we don't find any parents, which would be erroneous
-        parent = modulestore().get_item(parent_locs[0])
+        parent = get_parent_xblock(item)
 
         # remove all metadata from the generic dictionary that is presented in a
         # more normalized UI. We only want to display the XBlocks fields, not
@@ -150,12 +145,12 @@ def _load_mixed_class(category):
     """
     Load an XBlock by category name, and apply all defined mixins
     """
-    component_class = XBlock.load_class(category, select=prefer_xmodules)
+    component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
 
 
-@require_http_methods(["GET"])
+@require_GET
 @login_required
 def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
@@ -237,24 +232,19 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
                 course_advanced_keys
             )
 
-        components = [
+        xblocks = item.get_children()
+        locators = [
             loc_mapper().translate_location(
-                course.location.course_id, component.location, False, True
+                course.location.course_id, xblock.location, False, True
             )
-            for component
-            in item.get_children()
+            for xblock in xblocks
         ]
 
         # TODO (cpennington): If we share units between courses,
         # this will need to change to check permissions correctly so as
         # to pick the correct parent subsection
-
-        containing_subsection_locs = modulestore().get_parent_locations(old_location, None)
-        containing_subsection = modulestore().get_item(containing_subsection_locs[0])
-        containing_section_locs = modulestore().get_parent_locations(
-            containing_subsection.location, None
-        )
-        containing_section = modulestore().get_item(containing_section_locs[0])
+        containing_subsection = get_parent_xblock(item)
+        containing_section = get_parent_xblock(containing_subsection)
 
         # cdodge hack. We're having trouble previewing drafts via jump_to redirect
         # so let's generate the link url here
@@ -270,8 +260,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
 
         preview_lms_link = (
-            '//{preview_lms_base}/courses/{org}/{course}/'
-            '{course_name}/courseware/{section}/{subsection}/{index}'
+            u'//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'
         ).format(
             preview_lms_base=preview_lms_base,
             lms_base=settings.LMS_BASE,
@@ -287,7 +276,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             'context_course': course,
             'unit': item,
             'unit_locator': locator,
-            'components': components,
+            'locators': locators,
             'component_templates': component_templates,
             'draft_preview_link': preview_lms_link,
             'published_preview_link': lms_link,
@@ -308,6 +297,42 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         return HttpResponseBadRequest("Only supports html requests")
 
 
+# pylint: disable=unused-argument
+@require_GET
+@login_required
+def container_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+    """
+    The restful handler for container xblock requests.
+
+    GET
+        html: returns the HTML page for editing a container
+        json: not currently supported
+    """
+    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+        try:
+            __, course, xblock, __ = _get_item_in_course(request, locator)
+        except ItemNotFoundError:
+            return HttpResponseBadRequest()
+
+        ancestor_xblocks = []
+        parent = get_parent_xblock(xblock)
+        while parent and parent.category != 'sequential':
+            ancestor_xblocks.append(parent)
+            parent = get_parent_xblock(parent)
+
+        ancestor_xblocks.reverse()
+
+        return render_to_response('container.html', {
+            'context_course': course,
+            'xblock': xblock,
+            'xblock_locator': locator,
+            'ancestor_xblocks': ancestor_xblocks,
+        })
+    else:
+        return HttpResponseBadRequest("Only supports html requests")
+
+
 @login_required
 def _get_item_in_course(request, locator):
     """
@@ -316,7 +341,7 @@ def _get_item_in_course(request, locator):
 
     Verifies that the caller has permission to access this item.
     """
-    if not has_access(request.user, locator):
+    if not has_course_access(request.user, locator):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(locator)
@@ -345,7 +370,7 @@ def component_handler(request, usage_id, handler, suffix=''):
 
     location = unquote_slashes(usage_id)
 
-    descriptor = modulestore().get_item(location)
+    descriptor = get_modulestore(location).get_item(location)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 
@@ -356,6 +381,8 @@ def component_handler(request, usage_id, handler, suffix=''):
         log.info("XBlock %s attempted to access missing handler %r", descriptor, handler, exc_info=True)
         raise Http404
 
-    modulestore().save_xmodule(descriptor)
+    # unintentional update to handle any side effects of handle call; so, request user didn't author
+    # the change
+    get_modulestore(location).update_item(descriptor, None)
 
     return webob_to_django_response(resp)

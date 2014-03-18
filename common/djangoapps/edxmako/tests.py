@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
+from edxmako import add_lookup, LOOKUP
 from edxmako.shortcuts import marketing_link
 from mock import patch
 from util.testing import UrlResetMixin
@@ -24,3 +25,15 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             expected_link = reverse('login')
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
+
+
+class AddLookupTests(TestCase):
+    """
+    Test the `add_lookup` function.
+    """
+    @patch('edxmako.LOOKUP', {})
+    def test_with_package(self):
+        add_lookup('test', 'management', __name__)
+        dirs = LOOKUP['test'].directories
+        self.assertEqual(len(dirs), 1)
+        self.assertTrue(dirs[0].endswith('management'))

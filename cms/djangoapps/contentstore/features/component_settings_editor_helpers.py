@@ -5,6 +5,7 @@ from lettuce import world
 from nose.tools import assert_equal, assert_in  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 from common import type_in_codemirror
+from selenium.webdriver.common.keys import Keys
 
 
 @world.absorb
@@ -22,9 +23,9 @@ def create_component_instance(step, category, component_type=None, is_advanced=F
 
     component_button_css = 'span.large-{}-icon'.format(category.lower())
     if category == 'problem':
-        module_css = 'section.xmodule_CapaModule'
+        module_css = 'div.xmodule_CapaModule'
     else:
-        module_css = 'section.xmodule_{}Module'.format(category.title())
+        module_css = 'div.xmodule_{}Module'.format(category.title())
 
     # Count how many of that module is on the page. Later we will
     # assert that one more was added.
@@ -140,11 +141,11 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
         for the problem, rather than derived from the defaults. This is verified
         by the existence of a "Clear" button next to the field value.
     """
-    assert_equal(display_name, setting.find_by_css('.setting-label')[0].html)
+    assert_equal(display_name, setting.find_by_css('.setting-label')[0].html.strip())
 
     # Check if the web object is a list type
     # If so, we use a slightly different mechanism for determining its value
-    if setting.has_class('metadata-list-enum'):
+    if setting.has_class('metadata-list-enum') or setting.has_class('metadata-dict'):
         list_value = ', '.join(ele.value for ele in setting.find_by_css('.list-settings-item'))
         assert_equal(value, list_value)
     elif setting.has_class('metadata-videolist-enum'):
@@ -219,3 +220,18 @@ def get_setting_entry_index(label):
                 return index
         return None
     return world.retry_on_exception(get_index)
+
+
+@world.absorb
+def set_field_value(index, value):
+    """
+    Set the field to the specified value.
+
+    Note: we cannot use css_fill here because the value is not set
+    until after you move away from that field.
+    Instead we will find the element, set its value, then hit the Tab key
+    to get to the next field.
+    """
+    elem = world.css_find('div.wrapper-comp-setting input.setting-input')[index]
+    elem.value = value
+    elem.type(Keys.TAB)

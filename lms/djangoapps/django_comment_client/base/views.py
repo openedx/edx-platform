@@ -17,7 +17,6 @@ from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators import csrf
 from django.core.files.storage import get_storage_class
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import User
 
 from edxmako.shortcuts import render_to_string
 from courseware.courses import get_course_with_access, get_course_by_id
@@ -26,7 +25,6 @@ from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
 from django_comment_client.utils import JsonResponse, JsonError, extract, add_courseware_context
 
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
-from django_comment_common.models import Role
 from courseware.access import has_access
 
 log = logging.getLogger(__name__)
@@ -85,7 +83,12 @@ def create_thread(request, course_id, commentable_id):
     else:
         anonymous_to_peers = False
 
-    thread = cc.Thread(**extract(post, ['body', 'title', 'tags']))
+    if 'title' not in post or not post['title'].strip():
+        return JsonError(_("Title can't be empty"))
+    if 'body' not in post or not post['body'].strip():
+        return JsonError(_("Body can't be empty"))
+
+    thread = cc.Thread(**extract(post, ['body', 'title']))
     thread.update_attributes(**{
         'anonymous': anonymous,
         'anonymous_to_peers': anonymous_to_peers,
@@ -141,8 +144,12 @@ def update_thread(request, course_id, thread_id):
     """
     Given a course id and thread id, update a existing thread, used for both static and ajax submissions
     """
+    if 'title' not in request.POST or not request.POST['title'].strip():
+        return JsonError(_("Title can't be empty"))
+    if 'body' not in request.POST or not request.POST['body'].strip():
+        return JsonError(_("Body can't be empty"))
     thread = cc.Thread.find(thread_id)
-    thread.update_attributes(**extract(request.POST, ['body', 'title', 'tags']))
+    thread.update_attributes(**extract(request.POST, ['body', 'title']))
     thread.save()
     if request.is_ajax():
         return ajax_content_response(request, course_id, thread.to_dict())
@@ -156,6 +163,9 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
     called from create_comment to do the actual creation
     """
     post = request.POST
+
+    if 'body' not in post or not post['body'].strip():
+        return JsonError(_("Body can't be empty"))
     comment = cc.Comment(**extract(post, ['body']))
 
     course = get_course_with_access(request.user, course_id, 'load')
@@ -197,7 +207,7 @@ def create_comment(request, course_id, thread_id):
     """
     if cc_settings.MAX_COMMENT_DEPTH is not None:
         if cc_settings.MAX_COMMENT_DEPTH < 0:
-            return JsonError("Comment level too deep")
+            return JsonError(_("Comment level too deep"))
     return _create_comment(request, course_id, thread_id=thread_id)
 
 
@@ -223,6 +233,8 @@ def update_comment(request, course_id, comment_id):
     handles static and ajax submissions
     """
     comment = cc.Comment.find(comment_id)
+    if 'body' not in request.POST or not request.POST['body'].strip():
+        return JsonError(_("Body can't be empty"))
     comment.update_attributes(**extract(request.POST, ['body']))
     comment.save()
     if request.is_ajax():
@@ -273,7 +285,7 @@ def create_sub_comment(request, course_id, comment_id):
     """
     if cc_settings.MAX_COMMENT_DEPTH is not None:
         if cc_settings.MAX_COMMENT_DEPTH <= cc.Comment.find(comment_id).depth:
-            return JsonError("Comment level too deep")
+            return JsonError(_("Comment level too deep"))
     return _create_comment(request, course_id, parent_id=comment_id)
 
 
@@ -527,15 +539,6 @@ def search_similar_threads(request, course_id, commentable_id):
     })
 
 
-@require_GET
-def tags_autocomplete(request, course_id):
-    value = request.GET.get('q', None)
-    results = []
-    if value:
-        results = cc.tags_autocomplete(value)
-    return JsonResponse(results)
-
-
 @require_POST
 @login_required
 @csrf.csrf_exempt
@@ -588,7 +591,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         error = _('Error uploading file. Please contact the site administrator. Thank you.')
 
     if error == '':
-        result = 'Good'
+        result = _('Good')
         file_url = file_storage.url(new_file_name)
         parsed_url = urlparse.urlparse(file_url)
         file_url = urlparse.urlunparse(

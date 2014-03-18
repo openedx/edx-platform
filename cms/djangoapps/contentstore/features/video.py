@@ -56,6 +56,13 @@ def i_created_a_video_with_subs_with_name(_step, sub_id):
     world.visit(video_url)
 
     world.wait_for_xmodule()
+
+    # update .sub filed with proper subs name (which mimics real Studio/XML behavior)
+    # this is needed only for that videos which are created in acceptance tests.
+    _step.given('I edit the component')
+    world.wait_for_ajax_complete()
+    _step.given('I save changes')
+
     world.disable_jquery_animations()
 
     world.wait_for_present('.is-initialized')
@@ -198,3 +205,17 @@ def click_button_video(_step, button_type):
     button = button_type.strip()
     world.css_click(VIDEO_BUTTONS[button])
 
+
+@step('I seek video to "([^"]*)" seconds$')
+def seek_video_to_n_seconds(_step, seconds):
+    time = float(seconds.strip())
+    jsCode = "$('.video').data('video-player-state').videoPlayer.onSlideSeek({{time: {0:f}}})".format(time)
+    world.browser.execute_script(jsCode)
+
+
+@step('I see video starts playing from "([^"]*)" position$')
+def start_playing_video_from_n_seconds(_step, position):
+    world.wait_for(
+        func=lambda _: world.css_html('.vidtime')[:4] == position.strip(),
+        timeout=5
+    )

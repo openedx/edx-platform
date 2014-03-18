@@ -20,6 +20,7 @@ if Backbone?
       @template(templateData)
 
     render: ->
+      @$el.addClass("response_" + @model.get("id"))
       @$el.html(@renderTemplate())
       @delegateEvents()
 
@@ -35,7 +36,7 @@ if Backbone?
 
     hideEditorChrome: ->
       @$('.wmd-button-row').hide()
-      @$('.wmd-preview').hide()
+      @$('.wmd-preview-container').hide()
       @$('.wmd-input').css({
         height: '35px',
         padding: '5px'
@@ -44,7 +45,7 @@ if Backbone?
 
     showEditorChrome: ->
       @$('.wmd-button-row').show()
-      @$('.wmd-preview').show()
+      @$('.wmd-preview-container').show()
       @$('.comment-post-control').show()
       @$('.wmd-input').css({
         height: '125px',
@@ -53,6 +54,7 @@ if Backbone?
 
     renderComments: ->
       comments = new Comments()
+      @commentViews = []
       comments.comparator = (comment) ->
         comment.get('created_at')
       collectComments = (comment) ->
@@ -69,6 +71,12 @@ if Backbone?
       view = new ResponseCommentView(model: comment)
       view.render()
       @$el.find(".comments .new-comment").before(view.el)
+      view.bind "comment:edit", (event) =>
+        @cancelEdit(event) if @editView?
+        @cancelCommentEdits()
+        @hideCommentForm()
+      view.bind "comment:cancel_edit", () => @showCommentForm()
+      @commentViews.push(view)
       view
 
     submitComment: (event) ->
@@ -91,13 +99,14 @@ if Backbone?
           body: body
         success: (response, textStatus) ->
           comment.set(response.content)
+          comment.updateInfo(response.annotated_content_info)
           view.render() # This is just to update the id for the most part, but might be useful in general
 
     _delete: (event) =>
       event.preventDefault()
       if not @model.can('can_delete')
         return
-      if not confirm "Are you sure to delete this response? "
+      if not confirm gettext("Are you sure you want to delete this response?")
         return
       url = @model.urlFor('_delete')
       @model.remove()
@@ -126,6 +135,9 @@ if Backbone?
 
     renderEditView: () ->
       @renderSubView(@editView)
+
+    cancelCommentEdits: () ->
+      _.each(@commentViews, (view) -> view.cancelEdit())
 
     hideCommentForm: () ->
       @$('.comment-form').closest('li').hide()
@@ -156,6 +168,7 @@ if Backbone?
     edit: (event) =>
       @createEditView()
       @renderEditView()
+      @cancelCommentEdits()
       @hideCommentForm()
 
     update: (event) =>

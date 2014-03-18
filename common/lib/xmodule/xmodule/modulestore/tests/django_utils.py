@@ -4,8 +4,8 @@ Modulestore configuration for test cases.
 
 from uuid import uuid4
 from django.test import TestCase
-from xmodule.modulestore.django import editable_modulestore, \
-    clear_existing_modulestores
+from xmodule.modulestore.django import (
+    editable_modulestore, clear_existing_modulestores, loc_mapper)
 from xmodule.contentstore.django import contentstore
 
 
@@ -196,18 +196,15 @@ class ModuleStoreTestCase(TestCase):
     """
 
     @staticmethod
-    def update_course(course, data):
+    def update_course(course):
         """
         Updates the version of course in the modulestore
-        with the metadata in 'data' and returns the updated version.
 
         'course' is an instance of CourseDescriptor for which we want
         to update metadata.
-
-        'data' is a dictionary with an entry for each CourseField we want to update.
         """
-        store = editable_modulestore('direct')
-        store.update_metadata(course.location, data)
+        store = editable_modulestore()
+        store.update_item(course, '**replace_user**')
         updated_course = store.get_instance(course.id, course.location)
         return updated_course
 
@@ -221,10 +218,21 @@ class ModuleStoreTestCase(TestCase):
         # even if we're using a mixed modulestore
         store = editable_modulestore()
         if hasattr(store, 'collection'):
+            connection = store.collection.database.connection
             store.collection.drop()
+            connection.close()
+        elif hasattr(store, 'close_all_connections'):
+            store.close_all_connections()
+
         if contentstore().fs_files:
             db = contentstore().fs_files.database
             db.connection.drop_database(db)
+            db.connection.close()
+
+        location_mapper = loc_mapper()
+        if location_mapper.db:
+            location_mapper.location_map.drop()
+            location_mapper.db.connection.close()
 
     @classmethod
     def setUpClass(cls):

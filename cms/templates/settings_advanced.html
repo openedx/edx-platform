@@ -64,7 +64,7 @@ require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/setting
         <section class="group-settings advanced-policies">
           <header>
             <h2 class="title-2">${_("Manual Policy Definition")}</h2>
-            <span class="tip">${_("Manually Edit Course Policy Values (JSON Key / Value pairs, use &quot; not &apos;)")}</span>
+           
           </header>
 
           <p class="instructions">${_("<strong>Warning</strong>: Do not modify these policies unless you are familiar with their purpose.")}</p>
@@ -82,6 +82,8 @@ require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/setting
         <p>${_("Advanced settings control specific course functionality. On this page, you can edit manual policies, which are JSON-based key and value pairs that control specific course settings.")}</p>
 
         <p>${_("Any policies you modify here override all other information you've defined elsewhere in Studio. Do not edit policies unless you are familiar with both their purpose and syntax.")}</p>
+
+        <p>${_("{em_start}Note:{em_end} When you enter strings as policy values, ensure that you use double quotation marks (&quot;) around the string. Do not use single quotation marks (&apos;).").format(em_start='<strong>', em_end="</strong>")}</p>
       </div>
 
       <div class="bit">

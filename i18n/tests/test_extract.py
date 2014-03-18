@@ -1,12 +1,13 @@
-import os
-import polib
-from unittest import TestCase
-from nose.plugins.skip import SkipTest
 from datetime import datetime, timedelta
+import os
+from unittest import TestCase
+
+from nose.plugins.skip import SkipTest
+import polib
 from pytz import UTC
 
-import extract
-from config import CONFIGURATION
+from i18n import extract
+from i18n.config import CONFIGURATION
 
 # Make sure setup runs only once
 SETUP_HAS_RUN = False
@@ -16,7 +17,7 @@ class TestExtract(TestCase):
     """
     Tests functionality of i18n/extract.py
     """
-    generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
+    generated_files = ('django-partial.po', 'djangojs-partial.po', 'mako.po')
 
     def setUp(self):
         # Skip this test because it takes too long (>1 minute)
@@ -86,5 +87,5 @@ class TestExtract(TestCase):
             po = polib.pofile(path)
             metadata = po.metadata
             value = metadata['Report-Msgid-Bugs-To']
-            expected = 'translation_team@edx.org'
+            expected = 'openedx-translation@googlegroups.com'
             self.assertEquals(expected, value)

@@ -7,6 +7,8 @@ from django.conf import settings
 from xmodule.open_ended_grading_classes import peer_grading_service
 from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
 
+from xmodule.modulestore.django import ModuleI18nService
+
 from courseware.access import has_access
 from lms.lib.xblock.runtime import LmsModuleSystem
 from edxmako.shortcuts import render_to_string
@@ -66,9 +68,13 @@ def staff_grading_notifications(course, user):
 def peer_grading_notifications(course, user):
     system = LmsModuleSystem(
         track_function=None,
-        get_module = None,
+        get_module=None,
         render_template=render_to_string,
         replace_urls=None,
+        descriptor_runtime=None,
+        services={
+            'i18n': ModuleI18nService(),
+        },
     )
     peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     pending_grading = False
@@ -115,7 +121,7 @@ def combined_notifications(course, user):
     #Set up return values so that we can return them for error cases
     pending_grading = False
     img_path = ""
-    notifications={}
+    notifications = {}
     notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
 
     #We don't want to show anonymous users anything.
@@ -126,9 +132,13 @@ def combined_notifications(course, user):
     system = LmsModuleSystem(
         static_url="/static",
         track_function=None,
-        get_module = None,
+        get_module=None,
         render_template=render_to_string,
         replace_urls=None,
+        descriptor_runtime=None,
+        services={
+            'i18n': ModuleI18nService(),
+        },
     )
     #Initialize controller query service using our mock system
     controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
@@ -159,7 +169,7 @@ def combined_notifications(course, user):
         #Non catastrophic error, so no real action
         #This is a dev_facing_error
         log.exception(
-            "Problem with getting notifications from controller query service for course {0} user {1}.".format(
+            u"Problem with getting notifications from controller query service for course {0} user {1}.".format(
                 course_id, student_id))
 
     if pending_grading:
@@ -185,7 +195,7 @@ def set_value_in_cache(student_id, course_id, notification_type, value):
 
 
 def create_key_name(student_id, course_id, notification_type):
-    key_name = "{prefix}{type}_{course}_{student}".format(prefix=KEY_PREFIX, type=notification_type, course=course_id,
+    key_name = u"{prefix}{type}_{course}_{student}".format(prefix=KEY_PREFIX, type=notification_type, course=course_id,
                                                           student=student_id)
     return key_name
 

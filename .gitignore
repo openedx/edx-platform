@@ -18,6 +18,10 @@ cms/envs/private.py
 .idea/
 .redcar/
 codekit-config.json
+.pycharm_helpers/
+
+### NFS artifacts
+.nfs*
 
 ### OS X artifacts
 *.DS_Store
@@ -27,21 +31,30 @@ codekit-config.json
 
 ### Internationalization artifacts
 *.mo
+*.po
+*.prob
+!django.po
+!django.mo
+!djangojs.po
+!djangojs.mo
 conf/locale/en/LC_MESSAGES/*.po
-!messages.po
-### Remove when we have real Esperanto translations. For now, ignore
-### dummy Esperanto files.
-conf/locale/eo/*
+conf/locale/en/LC_MESSAGES/*.mo
+conf/locale/fake*/LC_MESSAGES/*.po
+conf/locale/fake*/LC_MESSAGES/*.mo
+conf/locale/messages.mo
 
 ### Testing artifacts
 .testids/
 .noseids
 nosetests.xml
 .coverage
+.coverage.*
 coverage.xml
 cover/
 cover_html/
 reports/
+jscover.log
+jscover.log.*
 
 ### Installation artifacts
 *.egg-info
@@ -80,3 +93,4 @@ build
 lms/lib/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
+dist

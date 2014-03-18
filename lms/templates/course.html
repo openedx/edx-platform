@@ -25,7 +25,9 @@ from courseware.courses import course_image_url, get_course_about_section
         </div>
         <div class="bottom">
           <span class="university">${get_course_about_section(course, 'university')}</span>
+          % if not course.start_date_is_still_default:
           <span class="start-date">${course.start_date_text}</span>
+          % endif
         </div>
       </section>
     </div>

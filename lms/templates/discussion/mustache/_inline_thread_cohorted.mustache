@@ -1,23 +1,30 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <article class="discussion-article" data-id="{{id}}">
 <div class="group-visibility-label">{{group_string}}</div>
 
     <div class="thread-content-wrapper"></div>
-
+    <div class="add-response post-extended-content">
+        <button class="button add-response-btn">
+            <i class="icon icon-reply"></i>
+            <span class="add-response-btn-text">${_('Add A Response')}</span>
+        </button>
+    </div>
     <ol class="responses post-extended-content">
-        <li class="loading"><div class="loading-animation"><span class="sr">Loading content</span></div></li>
+        <li class="loading"><div class="loading-animation"><span class="sr">${_("Loading content")}</span></div></li>
     </ol>
     <form class="local discussion-reply-new post-extended-content"  data-id="{{id}}">
-        <h4>Post a response:</h4>
+        <h4>${_("Post a response:")}</h4>
         <ul class="discussion-errors"></ul>
         <div class="reply-body" data-id="{{id}}"></div>
         <div class="reply-post-control">
-            <a class="discussion-submit-post control-button" href="#">Submit</a>
+            <a class="discussion-submit-post control-button" href="#">${_("Submit")}</a>
         </div>
     </form>
 
     <div class="local post-tools">
-        <a href="javascript:void(0)" class="expand-post">View discussion</a>
-        <a href="javascript:void(0)" class="collapse-post">Hide discussion</a>
+        <a href="javascript:void(0)" class="expand-post">${_("View discussion")}</a>
+        <a href="javascript:void(0)" class="collapse-post">${_("Hide discussion")}</a>
     </div>
 
 </article>

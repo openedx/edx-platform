@@ -1,12 +1,12 @@
 if Backbone?
   class @DiscussionThreadView extends DiscussionContentView
 
+    INITIAL_RESPONSE_PAGE_SIZE = 25
+    SUBSEQUENT_RESPONSE_PAGE_SIZE = 100
+
     events:
       "click .discussion-submit-post": "submitComment"
-
-      # TODO tags
-      # Until we decide what to do w/ tags, removing them.
-      #"click .thread-tag": "tagSelected"
+      "click .add-response-btn": "scrollToAddResponse"
 
     $: (selector) ->
       @$el.find(selector)
@@ -14,6 +14,7 @@ if Backbone?
     initialize: ->
       super()
       @createShowView()
+      @responses = new Comments()
 
     renderTemplate: ->
       @template = _.template($("#thread-template").html())
@@ -21,53 +22,103 @@ if Backbone?
 
     render: ->
       @$el.html(@renderTemplate())
-      @$el.find(".loading").hide()
       @delegateEvents()
 
       @renderShowView()
       @renderAttrs()
 
-      # TODO tags
-      # Until we decide what to do w/ tags, removing them.
-      #@renderTags()
-
       @$("span.timeago").timeago()
       @makeWmdEditor "reply-body"
-      @renderResponses()
+      @renderAddResponseButton()
+      @responses.on("add", @renderResponse)
+      # Without a delay, jQuery doesn't add the loading extension defined in
+      # utils.coffee before safeAjax is invoked, which results in an error
+      setTimeout(
+        => @loadResponses(INITIAL_RESPONSE_PAGE_SIZE, @$el.find(".responses"), true),
+        100
+      )
       @
 
     cleanup: ->
       if @responsesRequest?
         @responsesRequest.abort()
 
-    # TODO tags
-    # Until we decide what to do w/ tags, removing them.
-    #renderTags: ->
-    #  # tags
-    #  for tag in @model.get("tags")
-    #    if !tags
-    #      tags = $('<div class="thread-tags">')
-    #    tags.append("<a href='#' class='thread-tag'>#{tag}</a>")
-    #  @$(".post-body").after(tags)
-
-    # TODO tags
-    # Until we decide what to do w tags, removing them.
-    #tagSelected: (e) ->
-    #  @trigger "tag:selected", $(e.target).html()
-
-    renderResponses: ->
-      setTimeout(=>
-        @$el.find(".loading").show()
-      , 200)
+    loadResponses: (responseLimit, elem, firstLoad) ->
       @responsesRequest = DiscussionUtil.safeAjax
         url: DiscussionUtil.urlFor('retrieve_single_thread', @model.get('commentable_id'), @model.id)
+        data:
+          resp_skip: @responses.size()
+          resp_limit: responseLimit if responseLimit
+        $elem: elem
+        $loading: elem
+        takeFocus: true
+        complete: =>
+          @responseRequest = null
         success: (data, textStatus, xhr) =>
-          @responsesRequest = null
-          @$el.find(".loading").remove()
           Content.loadContentInfos(data['annotated_content_info'])
-          comments = new Comments(data['content']['children'])
-          comments.each @renderResponse
+          @responses.add(data['content']['children'])
+          @renderResponseCountAndPagination(data['content']['resp_total'])
           @trigger "thread:responses:rendered"
+        error: =>
+          if firstLoad
+            DiscussionUtil.discussionAlert(
+              gettext("Sorry"),
+              gettext("We had some trouble loading responses. Please reload the page.")
+            )
+          else
+            DiscussionUtil.discussionAlert(
+              gettext("Sorry"),
+              gettext("We had some trouble loading more responses. Please try again.")
+            )
+
+    renderResponseCountAndPagination: (responseTotal) =>
+      @$el.find(".response-count").html(
+        interpolate(
+          ngettext(
+            "%(numResponses)s response",
+            "%(numResponses)s responses",
+            responseTotal
+          ),
+          {numResponses: responseTotal},
+          true
+        )
+      )
+      responsePagination = @$el.find(".response-pagination")
+      responsePagination.empty()
+      if responseTotal > 0
+        responsesRemaining = responseTotal - @responses.size()
+        showingResponsesText =
+          if responsesRemaining == 0
+            gettext("Showing all responses")
+          else
+            interpolate(
+              ngettext(
+                "Showing first response",
+                "Showing first %(numResponses)s responses",
+                @responses.size()
+              ),
+              {numResponses: @responses.size()},
+              true
+            )
+        responsePagination.append($("<span>").addClass("response-display-count").html(
+          _.escape(showingResponsesText)
+        ))
+        if responsesRemaining > 0
+          if responsesRemaining < SUBSEQUENT_RESPONSE_PAGE_SIZE
+            responseLimit = null
+            buttonText = gettext("Load all responses")
+          else
+            responseLimit = SUBSEQUENT_RESPONSE_PAGE_SIZE
+            buttonText = interpolate(
+              gettext("Load next %(numResponses)s responses"),
+              {numResponses: responseLimit},
+              true
+            )
+          loadMoreButton = $("<button>").addClass("load-response-button").html(
+            _.escape(buttonText)
+          )
+          loadMoreButton.click((event) => @loadResponses(responseLimit, loadMoreButton))
+          responsePagination.append(loadMoreButton)
 
     renderResponse: (response) =>
         response.set('thread', @model)
@@ -77,6 +128,18 @@ if Backbone?
         view.render()
         @$el.find(".responses").append(view.el)
         view.afterInsert()
+
+    renderAddResponseButton: ->
+      if @model.hasResponses() and @model.can('can_reply')
+        @$el.find('div.add-response').show()
+      else
+        @$el.find('div.add-response').hide()
+
+    scrollToAddResponse: (event) ->
+      event.preventDefault()
+      form = $(event.target).parents('article.discussion-article').find('form.discussion-reply-new')
+      $('html, body').scrollTop(form.offset().top)
+      form.find('.wmd-panel textarea').focus()
 
     addComment: =>
       @model.comment()
@@ -95,6 +158,7 @@ if Backbone?
       comment.set('thread', @model.get('thread'))
       @renderResponse(comment)
       @model.addComment()
+      @renderAddResponseButton()
 
       DiscussionUtil.safeAjax
         $elem: $(event.target)
@@ -116,10 +180,6 @@ if Backbone?
       newTitle = @editView.$(".edit-post-title").val()
       newBody  = @editView.$(".edit-post-body textarea").val()
 
-      # TODO tags
-      # Until we decide what to do w/ tags, removing them.
-      #newTags  = @editView.$(".edit-post-tags").val()
-
       url = DiscussionUtil.urlFor('update_thread', @model.id)
 
       DiscussionUtil.safeAjax
@@ -133,30 +193,19 @@ if Backbone?
               title: newTitle
               body: newBody
 
-              # TODO tags
-              # Until we decide what to do w/ tags, removing them.
-              #tags: newTags
-
           error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))
           success: (response, textStatus) =>
               # TODO: Move this out of the callback, this makes it feel sluggish
               @editView.$(".edit-post-title").val("").attr("prev-text", "")
               @editView.$(".edit-post-body textarea").val("").attr("prev-text", "")
-              @editView.$(".edit-post-tags").val("")
-              @editView.$(".edit-post-tags").importTags("")
               @editView.$(".wmd-preview p").html("")
 
               @model.set
                 title: newTitle
                 body: newBody
-                tags: response.content.tags
 
               @createShowView()
               @renderShowView()
-
-              # TODO tags
-              # Until we decide what to do w/ tags, removing them.
-              #@renderTags()
 
     createEditView: () ->
 
@@ -203,7 +252,7 @@ if Backbone?
       url = @model.urlFor('_delete')
       if not @model.can('can_delete')
         return
-      if not confirm "Are you sure to delete thread \"#{@model.get('title')}\"?"
+      if not confirm gettext("Are you sure you want to delete this post?")
         return
       @model.remove()
       @showView.undelegateEvents()

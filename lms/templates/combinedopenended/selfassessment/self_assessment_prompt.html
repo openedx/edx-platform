@@ -8,7 +8,10 @@
     <div class="visibility-control visibility-control-response">
         <div class="inner">
         </div>
-        <label class="section-header section-header-response" for="answer_${module_id}">${_('Response')}</label>
+        <label class="section-header section-header-response" for="answer_${module_id}">
+        ## Translators: "Response" labels a text area into which a user enters
+        ## his or her response to a prompt from an openended problem.
+        ${_("Response")}</label>
     </div>
     <div>
     <textarea name="answer" class="answer short-form-response" cols="70" rows="20" id="answer_${module_id}">${previous_answer|n}</textarea>

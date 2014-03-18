@@ -1,0 +1,47 @@
+
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="bodyclass">register verification-process is-not-verified step-confirmation</%block>
+<%block name="pagetitle">${_("Re-Verification Submission Confirmation")}</%block>
+
+<%block name="content">
+
+<div class="container">
+  <section class="wrapper">
+
+    <div class="wrapper-content-main">
+      <article class="content-main">
+        <section class="content-confirmation">
+          <div class="wrapper-view">
+            <div class="view">
+              <h3 class="title">${_("Your Credentials Have Been Updated")}</h3>
+
+              <div class="instruction">
+                <p>${_("We have received your re-verification details and submitted them for review. Your dashboard will show the notification status once the review is complete.")}</p>
+                <p>${_("Please note: The professor may ask you to re-verify again at other key points in the course.")}</p>
+              </div>
+
+              <div class="actions-next">
+                <ol class="list-nav">
+                  <li class="nav-item conditional">
+                    <a class="action action-primary" href="${reverse('verify_student_midcourse_reverify_dash')}">${_("Complete your other re-verifications")}</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="action" href="${reverse('dashboard')}">${_("Return to where you left off")}</a>
+                  </li>
+                </ol>
+              </div>
+
+            </div> <!-- /view -->
+          </div> <!-- /wrapper-view -->
+        </section>
+      </article>
+    </div> <!-- /wrapper-content-main -->
+
+    <%include file="_reverification_support.html" />
+  </section>
+</div>
+</%block>

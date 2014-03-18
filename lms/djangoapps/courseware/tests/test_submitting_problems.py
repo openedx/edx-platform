@@ -17,7 +17,6 @@ from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
 from courseware import grades
-from courseware.model_data import FieldDataCache
 from courseware.models import StudentModule
 
 from xmodule.modulestore.django import modulestore, editable_modulestore
@@ -229,9 +228,9 @@ class TestCourseGrader(TestSubmittingProblems):
         Add a grading policy to the course.
         """
 
-        course_data = {'grading_policy': grading_policy}
-        store = editable_modulestore('direct')
-        store.update_item(self.course.location, course_data)
+        self.course.grading_policy = grading_policy
+        store = editable_modulestore()
+        store.update_item(self.course, '**replace_user**')
         self.refresh_course()
 
     def get_grade_summary(self):

@@ -27,14 +27,14 @@ data: |
 
       <p>Введите два целых числа с суммой 10: </p>
       <customresponse cfn="test_add_to_ten">
-              <textline size="40" correct_answer="3"/><br/>
-              <textline size="40" correct_answer="7"/>
+              <textline size="40" correct_answer="3" label="Integer #1"/><br/>
+              <textline size="40" correct_answer="7" label="Integer #2"/>
       </customresponse>
 
       <p>Введите два целых числа с суммой 20: </p>
       <customresponse cfn="test_add" expect="20">
-              <textline size="40" correct_answer="11"/><br/>
-              <textline size="40" correct_answer="9"/>
+              <textline size="40" correct_answer="11" label="Integer #1"/><br/>
+              <textline size="40" correct_answer="9" label="Integer #2"/>
       </customresponse>
     
           <solution>

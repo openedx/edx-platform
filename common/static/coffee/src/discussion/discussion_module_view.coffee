@@ -2,9 +2,11 @@ if Backbone?
   class @DiscussionModuleView extends Backbone.View
     events:
       "click .discussion-show": "toggleDiscussion"
-      "keypress .discussion-show":
-        (event) -> DiscussionUtil.activateOnEnter(event, toggleDiscussion)
+      "keydown .discussion-show":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleDiscussion)
       "click .new-post-btn": "toggleNewPost"
+      "keydown .new-post-btn":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleNewPost)
       "click .new-post-cancel": "hideNewPost"
       "click .discussion-paginator a": "navigateToPage"
 
@@ -19,7 +21,7 @@ if Backbone?
       else
         @page = 1
 
-    toggleNewPost: (event) ->
+    toggleNewPost: (event) =>
       event.preventDefault()
       if !@newPostForm
         @toggleDiscussion()
@@ -38,13 +40,13 @@ if Backbone?
       event.preventDefault()
       @newPostForm.slideUp(300)
 
-    hideDiscussion: ->
+    hideDiscussion: =>
       @$("section.discussion").slideUp()
       @toggleDiscussionBtn.removeClass('shown')
-      @toggleDiscussionBtn.find('.button-text').html("Show Discussion")
+      @toggleDiscussionBtn.find('.button-text').html(gettext("Show Discussion"))
       @showed = false
 
-    toggleDiscussion: (event) ->
+    toggleDiscussion: (event) =>
       if @showed
         @hideDiscussion()
       else
@@ -61,8 +63,8 @@ if Backbone?
             =>
               @hideDiscussion()
               DiscussionUtil.discussionAlert(
-                "Sorry",
-                "We had some trouble loading the discussion. Please try again."
+                gettext("Sorry"),
+                gettext("We had some trouble loading the discussion. Please try again.")
               )
           )
 
@@ -154,7 +156,7 @@ if Backbone?
         =>
           @page = currPage
           DiscussionUtil.discussionAlert(
-            "Sorry",
-            "We had some trouble loading the threads you requested. Please try again."
+            gettext("Sorry"),
+            gettext("We had some trouble loading the threads you requested. Please try again.")
           )
       )

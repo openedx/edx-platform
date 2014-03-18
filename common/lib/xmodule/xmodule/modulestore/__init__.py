@@ -7,11 +7,15 @@ import logging
 import re
 
 from collections import namedtuple
+import collections
 
 from abc import ABCMeta, abstractmethod
+from xblock.plugin import default_select
 
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
+from xblock.runtime import Mixologist
+from xblock.core import XBlock
 
 log = logging.getLogger('edx.modulestore')
 
@@ -30,14 +34,29 @@ URL_RE = re.compile("""
 
 # TODO (cpennington): We should decide whether we want to expand the
 # list of valid characters in a location
-INVALID_CHARS = re.compile(r"[^\w.-]")
+INVALID_CHARS = re.compile(r"[^\w.%-]", re.UNICODE)
 # Names are allowed to have colons.
-INVALID_CHARS_NAME = re.compile(r"[^\w.:-]")
+INVALID_CHARS_NAME = re.compile(r"[^\w.:%-]", re.UNICODE)
 
 # html ids can contain word chars and dashes
-INVALID_HTML_CHARS = re.compile(r"[^\w-]")
+INVALID_HTML_CHARS = re.compile(r"[^\w-]", re.UNICODE)
 
 _LocationBase = namedtuple('LocationBase', 'tag org course category name revision')
+
+
+def _check_location_part(val, regexp):
+    """
+    Check that `regexp` doesn't match inside `val`. If it does, raise an exception
+
+    Args:
+        val (string): The value to check
+        regexp (re.RegexObject): The regular expression specifying invalid characters
+
+    Raises:
+        InvalidLocationError: Raised if any invalid character is found in `val`
+    """
+    if val is not None and regexp.search(val) is not None:
+        raise InvalidLocationError("Invalid characters in {!r}.".format(val))
 
 
 class Location(_LocationBase):
@@ -145,7 +164,6 @@ class Location(_LocationBase):
         Components may be set to None, which may be interpreted in some contexts
         to mean wildcard selection.
         """
-
         if (org is None and course is None and category is None and name is None and revision is None):
             location = loc_or_tag
         else:
@@ -161,30 +179,25 @@ class Location(_LocationBase):
             check_list(list_)
 
         def check_list(list_):
-            def check(val, regexp):
-                if val is not None and regexp.search(val) is not None:
-                    log.debug('invalid characters val="%s", list_="%s"' % (val, list_))
-                    raise InvalidLocationError("Invalid characters in '%s'." % (val))
-
             list_ = list(list_)
             for val in list_[:4] + [list_[5]]:
-                check(val, INVALID_CHARS)
+                _check_location_part(val, INVALID_CHARS)
             # names allow colons
-            check(list_[4], INVALID_CHARS_NAME)
+            _check_location_part(list_[4], INVALID_CHARS_NAME)
 
         if isinstance(location, Location):
             return location
         elif isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
-                log.debug('location is instance of %s but no URL match' % basestring)
+                log.debug(u"location %r doesn't match URL", location)
                 raise InvalidLocationError(location)
             groups = match.groupdict()
             check_dict(groups)
             return _LocationBase.__new__(_cls, **groups)
         elif isinstance(location, (list, tuple)):
             if len(location) not in (5, 6):
-                log.debug('location has wrong length')
+                log.debug(u'location has wrong length')
                 raise InvalidLocationError(location)
 
             if len(location) == 5:
@@ -207,9 +220,9 @@ class Location(_LocationBase):
         """
         Return a string containing the URL for this location
         """
-        url = "{0.tag}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
+        url = u"{0.tag}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
         if self.revision:
-            url += "@" + self.revision
+            url += u"@{rev}".format(rev=self.revision)  # pylint: disable=E1101
         return url
 
     def html_id(self):
@@ -217,7 +230,7 @@ class Location(_LocationBase):
         Return a string with a version of the location that is safe for use in
         html id attributes
         """
-        id_string = "-".join(str(v) for v in self.list() if v is not None)
+        id_string = u"-".join(v for v in self.list() if v is not None)
         return Location.clean_for_html(id_string)
 
     def dict(self):
@@ -231,6 +244,9 @@ class Location(_LocationBase):
         return list(self)
 
     def __str__(self):
+        return str(self.url().encode("utf-8"))
+
+    def __unicode__(self):
         return self.url()
 
     def __repr__(self):
@@ -245,9 +261,41 @@ class Location(_LocationBase):
         Throws an InvalidLocationError is this location does not represent a course.
         """
         if self.category != 'course':
-            raise InvalidLocationError('Cannot call course_id for {0} because it is not of category course'.format(self))
+            raise InvalidLocationError(u'Cannot call course_id for {0} because it is not of category course'.format(self))
 
         return "/".join([self.org, self.course, self.name])
+
+    COURSE_ID_RE = re.compile("""
+        (?P<org>[^/]+)/
+        (?P<course>[^/]+)/
+        (?P<name>.*)
+        """, re.VERBOSE)
+
+    @staticmethod
+    def parse_course_id(course_id):
+        """
+        Given a org/course/name course_id, return a dict of {"org": org, "course": course, "name": name}
+
+        If the course_id is not of the right format, raise ValueError
+        """
+        match = Location.COURSE_ID_RE.match(course_id)
+        if match is None:
+            raise ValueError("{} is not of form ORG/COURSE/NAME".format(course_id))
+        return match.groupdict()
+
+    def _replace(self, **kwargs):
+        """
+        Return a new :class:`Location` with values replaced
+        by the values specified in `**kwargs`
+        """
+        for name, value in kwargs.iteritems():
+            if name == 'name':
+                _check_location_part(value, INVALID_CHARS_NAME)
+            else:
+                _check_location_part(value, INVALID_CHARS)
+
+        # namedtuple is an old-style class, so don't use super
+        return _LocationBase._replace(self, **kwargs)
 
     def replace(self, **kwargs):
         '''
@@ -313,7 +361,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_items(self, location, course_id=None, depth=0):
+    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
@@ -353,6 +401,15 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
+    def get_orphans(self, course_location, branch):
+        """
+        Get all of the xblocks in the given course which have no parents and are not of types which are
+        usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
+        use children to point to their dependents.
+        """
+        pass
+
+    @abstractmethod
     def get_errored_courses(self):
         """
         Return a dictionary of course_dir -> [(msg, exception_str)], for each
@@ -378,44 +435,34 @@ class ModuleStoreWrite(ModuleStoreRead):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def update_item(self, location, data, allow_not_found=False):
+    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
         """
-        Set the data in the item specified by the location to
-        data
+        Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
+        should save with the update if it has that ability.
 
-        location: Something that can be passed to Location
-        data: A nested dictionary of problem data
-        """
-        pass
+        :param allow_not_found: whether this method should raise an exception if the given xblock
+        has not been persisted before.
+        :param force: fork the structure and don't update the course draftVersion if there's a version
+        conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-    @abstractmethod
-    def update_children(self, location, children):
-        """
-        Set the children for the item specified by the location to
-        children
-
-        location: Something that can be passed to Location
-        children: A list of child item identifiers
+        :raises VersionConflictError: if package_id and version_guid given and the current
+        version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
 
     @abstractmethod
-    def update_metadata(self, location, metadata):
+    def delete_item(self, location, user_id=None, **kwargs):
         """
-        Set the metadata for the item specified by the location to
-        metadata
+        Delete an item from persistence. Pass the user's unique id which the persistent store
+        should save with the update if it has that ability.
 
-        location: Something that can be passed to Location
-        metadata: A nested dictionary of module metadata
-        """
-        pass
+        :param delete_all_versions: removes both the draft and published version of this item from
+        the course if using draft and old mongo. Split may or may not implement this.
+        :param force: fork the structure and don't update the course draftVersion if there's a version
+        conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-    @abstractmethod
-    def delete_item(self, location):
-        """
-        Delete an item from this modulestore
-
-        location: Something that can be passed to Location
+        :raises VersionConflictError: if package_id and version_guid given and the current
+        version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
 
@@ -432,7 +479,9 @@ class ModuleStoreReadBase(ModuleStoreRead):
         metadata_inheritance_cache_subsystem=None, request_cache=None,
         modulestore_update_signal=None, xblock_mixins=(), xblock_select=None,
         # temporary parms to enable backward compatibility. remove once all envs migrated
-        db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None
+        db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None,
+        # allow lower level init args to pass harmlessly
+        ** kwargs
     ):
         '''
         Set up the error-tracking logic.
@@ -486,9 +535,75 @@ class ModuleStoreReadBase(ModuleStoreRead):
                 return c
         return None
 
+    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
+        """
+        Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
+        should save with the update if it has that ability.
+
+        :param allow_not_found: whether this method should raise an exception if the given xblock
+        has not been persisted before.
+        :param force: fork the structure and don't update the course draftVersion if there's a version
+        conflict (only applicable to version tracking and conflict detecting persistence stores)
+
+        :raises VersionConflictError: if package_id and version_guid given and the current
+        version head != version_guid and force is not True. (only applicable to version tracking stores)
+        """
+        raise NotImplementedError
+
+    def delete_item(self, location, user_id=None, delete_all_versions=False, delete_children=False, force=False):
+        """
+        Delete an item from persistence. Pass the user's unique id which the persistent store
+        should save with the update if it has that ability.
+
+        :param delete_all_versions: removes both the draft and published version of this item from
+        the course if using draft and old mongo. Split may or may not implement this.
+        :param force: fork the structure and don't update the course draftVersion if there's a version
+        conflict (only applicable to version tracking and conflict detecting persistence stores)
+
+        :raises VersionConflictError: if package_id and version_guid given and the current
+        version head != version_guid and force is not True. (only applicable to version tracking stores)
+        """
+        raise NotImplementedError
 
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     '''
     Implement interface functionality that can be shared.
     '''
-    pass
+    def __init__(self, **kwargs):
+        super(ModuleStoreWriteBase, self).__init__(**kwargs)
+        # TODO: Don't have a runtime just to generate the appropriate mixin classes (cpennington)
+        # This is only used by partition_fields_by_scope, which is only needed because
+        # the split mongo store is used for item creation as well as item persistence
+        self.mixologist = Mixologist(self.xblock_mixins)
+
+    def partition_fields_by_scope(self, category, fields):
+        """
+        Return dictionary of {scope: {field1: val, ..}..} for the fields of this potential xblock
+
+        :param category: the xblock category
+        :param fields: the dictionary of {fieldname: value}
+        """
+        if fields is None:
+            return {}
+        cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
+        result = collections.defaultdict(dict)
+        for field_name, value in fields.iteritems():
+            field = getattr(cls, field_name)
+            result[field.scope][field_name] = value
+        return result
+
+
+def only_xmodules(identifier, entry_points):
+    """Only use entry_points that are supplied by the xmodule package"""
+    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
+
+    return default_select(identifier, from_xmodule)
+
+
+def prefer_xmodules(identifier, entry_points):
+    """Prefer entry_points from the xmodule package"""
+    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
+    if from_xmodule:
+        return default_select(identifier, from_xmodule)
+    else:
+        return default_select(identifier, entry_points)

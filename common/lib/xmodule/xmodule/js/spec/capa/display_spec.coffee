@@ -52,19 +52,19 @@ describe 'Problem', ->
       expect(window.update_schematics).toHaveBeenCalled()
 
     it 'bind answer refresh on button click', ->
-      expect($('section.action input:button')).toHandleWith 'click', @problem.refreshAnswers
+      expect($('div.action input:button')).toHandleWith 'click', @problem.refreshAnswers
 
     it 'bind the check button', ->
-      expect($('section.action input.check')).toHandleWith 'click', @problem.check_fd
+      expect($('div.action input.check')).toHandleWith 'click', @problem.check_fd
 
     it 'bind the reset button', ->
-      expect($('section.action input.reset')).toHandleWith 'click', @problem.reset
+      expect($('div.action input.reset')).toHandleWith 'click', @problem.reset
 
     it 'bind the show button', ->
-      expect($('section.action button.show')).toHandleWith 'click', @problem.show
+      expect($('div.action button.show')).toHandleWith 'click', @problem.show
 
     it 'bind the save button', ->
-      expect($('section.action input.save')).toHandleWith 'click', @problem.save
+      expect($('div.action input.save')).toHandleWith 'click', @problem.save
 
     it 'bind the math input', ->
       expect($('input.math')).toHandleWith 'keyup', @problem.refreshMath
@@ -93,7 +93,7 @@ describe 'Problem', ->
         @problem.el.data('progress_status', 'foo')
         @problem.el.data('progress_detail', '1/1')
         @problem.renderProgressState()
-        expect(@problem.$('.problem-progress').html()).toEqual "(1/1 points)"
+        expect(@problem.$('.problem-progress').html()).toEqual "(1/1 point)"
 
   describe 'render', ->
     beforeEach ->
@@ -124,9 +124,15 @@ describe 'Problem', ->
         expect(@problem.bind).toHaveBeenCalled()
 
   describe 'check_fd', ->
-    xit 'should have more specs written for this functionality', ->
-      expect(false)
+    beforeEach ->
+      # Insert an input of type file outside of the problem.
+      $('.xblock-student_view').after('<input type="file" />')
+      @problem = new Problem($('.xblock-student_view'))
+      spyOn(@problem, 'check')
 
+    it 'check method is called if input of type file is not in problem', ->
+      @problem.check_fd()
+      expect(@problem.check).toHaveBeenCalled()
 
   describe 'check', ->
     beforeEach ->
@@ -509,5 +515,3 @@ describe 'Problem', ->
     xit 'serialize all answers', ->
       @problem.refreshAnswers()
       expect(@problem.answers).toEqual "input_1_1=one&input_1_2=two"
-
-

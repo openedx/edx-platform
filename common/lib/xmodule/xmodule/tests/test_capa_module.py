@@ -58,37 +58,31 @@ class CapaFactory(object):
         return cls.num
 
     @classmethod
-    def input_key(cls, input_num=2):
+    def input_key(cls, response_num=2, input_num=1):
         """
         Return the input key to use when passing GET parameters
         """
-        return ("input_" + cls.answer_key(input_num))
+        return ("input_" + cls.answer_key(response_num, input_num))
 
     @classmethod
-    def answer_key(cls, input_num=2):
+    def answer_key(cls, response_num=2, input_num=1):
         """
         Return the key stored in the capa problem answer dict
         """
         return (
-            "%s_%d_1" % (
+            "%s_%d_%d" % (
                 "-".join(['i4x', 'edX', 'capa_test', 'problem', 'SampleProblem%d' % cls.num]),
-                input_num,
+                response_num,
+                input_num
             )
         )
 
     @classmethod
     def create(cls,
-               graceperiod=None,
-               due=None,
-               max_attempts=None,
-               showanswer=None,
-               rerandomize=None,
-               force_save_button=None,
                attempts=None,
                problem_state=None,
                correct=False,
-               done=None,
-               text_customization=None
+               **kwargs
                ):
         """
         All parameters are optional, and are added to the created problem if specified.
@@ -109,24 +103,7 @@ class CapaFactory(object):
         location = Location(["i4x", "edX", "capa_test", "problem",
                              "SampleProblem{0}".format(cls.next_num())])
         field_data = {'data': cls.sample_problem_xml}
-
-        if graceperiod is not None:
-            field_data['graceperiod'] = graceperiod
-        if due is not None:
-            field_data['due'] = due
-        if max_attempts is not None:
-            field_data['max_attempts'] = max_attempts
-        if showanswer is not None:
-            field_data['showanswer'] = showanswer
-        if force_save_button is not None:
-            field_data['force_save_button'] = force_save_button
-        if rerandomize is not None:
-            field_data['rerandomize'] = rerandomize
-        if done is not None:
-            field_data['done'] = done
-        if text_customization is not None:
-            field_data['text_customization'] = text_customization
-
+        field_data.update(kwargs)
         descriptor = Mock(weight="1")
         if problem_state is not None:
             field_data.update(problem_state)
@@ -379,6 +356,13 @@ class CapaModuleTest(unittest.TestCase):
                                     due=self.yesterday_str)
         self.assertTrue(module.closed())
 
+    def test_due_date_extension(self):
+
+        module = CapaFactory.create(
+            max_attempts="1", attempts="0", due=self.yesterday_str,
+            extended_due=self.tomorrow_str)
+        self.assertFalse(module.closed())
+
     def test_parse_get_params(self):
 
         # Valid GET param dict
@@ -561,8 +545,8 @@ class CapaModuleTest(unittest.TestCase):
 
         # Create a request dictionary for check_problem.
         get_request_dict = {
-            CapaFactoryWithFiles.input_key(input_num=2): fileobjs,
-            CapaFactoryWithFiles.input_key(input_num=3): 'None',
+            CapaFactoryWithFiles.input_key(response_num=2): fileobjs,
+            CapaFactoryWithFiles.input_key(response_num=3): 'None',
         }
 
         module.check_problem(get_request_dict)
@@ -611,8 +595,8 @@ class CapaModuleTest(unittest.TestCase):
         # Create a webob Request with the files uploaded.
         post_data = []
         for fname, fileobj in zip(fnames, fileobjs):
-            post_data.append((CapaFactoryWithFiles.input_key(input_num=2), (fname, fileobj)))
-        post_data.append((CapaFactoryWithFiles.input_key(input_num=3), 'None'))
+            post_data.append((CapaFactoryWithFiles.input_key(response_num=2), (fname, fileobj)))
+        post_data.append((CapaFactoryWithFiles.input_key(response_num=3), 'None'))
         request = webob.Request.blank("/some/fake/url", POST=post_data, content_type='multipart/form-data')
 
         module.handle('xmodule_handler', request, 'problem_check')
@@ -1352,8 +1336,8 @@ class CapaModuleTest(unittest.TestCase):
                 module = CapaFactory.create(rerandomize=rerandomize)
                 assert 0 <= module.seed < 1000
 
-    @patch('xmodule.capa_module.log')
-    @patch('xmodule.capa_module.Progress')
+    @patch('xmodule.capa_base.log')
+    @patch('xmodule.capa_base.Progress')
     def test_get_progress_error(self, mock_progress, mock_log):
         """
         Check that an exception given in `Progress` produces a `log.exception` call.
@@ -1366,7 +1350,19 @@ class CapaModuleTest(unittest.TestCase):
             mock_log.exception.assert_called_once_with('Got bad progress')
             mock_log.reset_mock()
 
-    @patch('xmodule.capa_module.Progress')
+    @patch('xmodule.capa_base.Progress')
+    def test_get_progress_no_error_if_weight_zero(self, mock_progress):
+        """
+        Check that if the weight is 0 get_progress does not try to create a Progress object.
+        """
+        mock_progress.return_value = True
+        module = CapaFactory.create()
+        module.weight = 0
+        progress = module.get_progress()
+        self.assertIsNone(progress)
+        self.assertFalse(mock_progress.called)
+
+    @patch('xmodule.capa_base.Progress')
     def test_get_progress_calculate_progress_fraction(self, mock_progress):
         """
         Check that score and total are calculated correctly for the progress fraction.
@@ -1407,3 +1403,222 @@ class ComplexEncoderTest(unittest.TestCase):
         expected_str = '1-1*j'
         json_str = json.dumps(complex_num, cls=ComplexEncoder)
         self.assertEqual(expected_str, json_str[1:-1])  # ignore quotes
+
+
+class TestProblemCheckTracking(unittest.TestCase):
+    """
+    Ensure correct tracking information is included in events emitted during problem checks.
+    """
+
+    def setUp(self):
+        self.maxDiff = None
+
+    def test_choice_answer_text(self):
+        factory = self.capa_factory_for_problem_xml("""\
+            <problem display_name="Multiple Choice Questions">
+              <p>What color is the open ocean on a sunny day?</p>
+              <optionresponse>
+                <optioninput options="('yellow','blue','green')" correct="blue" label="What color is the open ocean on a sunny day?"/>
+              </optionresponse>
+              <p>Which piece of furniture is built for sitting?</p>
+              <multiplechoiceresponse>
+                <choicegroup type="MultipleChoice">
+                  <choice correct="false">
+                    <text>a table</text>
+                  </choice>
+                  <choice correct="false">
+                    <text>a desk</text>
+                  </choice>
+                  <choice correct="true">
+                    <text>a chair</text>
+                  </choice>
+                  <choice correct="false">
+                    <text>a bookshelf</text>
+                  </choice>
+                </choicegroup>
+              </multiplechoiceresponse>
+              <p>Which of the following are musical instruments?</p>
+              <choiceresponse>
+                <checkboxgroup direction="vertical" label="Which of the following are musical instruments?">
+                  <choice correct="true">a piano</choice>
+                  <choice correct="false">a tree</choice>
+                  <choice correct="true">a guitar</choice>
+                  <choice correct="false">a window</choice>
+                </checkboxgroup>
+              </choiceresponse>
+            </problem>
+            """)
+        module = factory.create()
+
+        answer_input_dict = {
+            factory.input_key(2): 'blue',
+            factory.input_key(3): 'choice_0',
+            factory.input_key(4): ['choice_0', 'choice_1'],
+        }
+
+        event = self.get_event_for_answers(module, answer_input_dict)
+
+        self.assertEquals(event['submission'], {
+            factory.answer_key(2): {
+                'question': 'What color is the open ocean on a sunny day?',
+                'answer': 'blue',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': True,
+                'variant': '',
+            },
+            factory.answer_key(3): {
+                'question': '',
+                'answer': u'<text>a table</text>',
+                'response_type': 'multiplechoiceresponse',
+                'input_type': 'choicegroup',
+                'correct': False,
+                'variant': '',
+            },
+            factory.answer_key(4): {
+                'question': 'Which of the following are musical instruments?',
+                'answer': [u'a piano', u'a tree'],
+                'response_type': 'choiceresponse',
+                'input_type': 'checkboxgroup',
+                'correct': False,
+                'variant': '',
+            },
+        })
+
+    def capa_factory_for_problem_xml(self, xml):
+        class CustomCapaFactory(CapaFactory):
+            """
+            A factory for creating a Capa problem with arbitrary xml.
+            """
+            sample_problem_xml = textwrap.dedent(xml)
+
+        return CustomCapaFactory
+
+    def get_event_for_answers(self, module, answer_input_dict):
+        with patch.object(module.runtime, 'track_function') as mock_track_function:
+            module.check_problem(answer_input_dict)
+
+            self.assertEquals(len(mock_track_function.mock_calls), 1)
+            mock_call = mock_track_function.mock_calls[0]
+            event = mock_call[1][1]
+
+            return event
+
+    def test_numerical_textline(self):
+        factory = CapaFactory
+        module = factory.create()
+
+        answer_input_dict = {
+            factory.input_key(2): '3.14'
+        }
+
+        event = self.get_event_for_answers(module, answer_input_dict)
+        self.assertEquals(event['submission'], {
+            factory.answer_key(2): {
+                'question': '',
+                'answer': '3.14',
+                'response_type': 'numericalresponse',
+                'input_type': 'textline',
+                'correct': True,
+                'variant': '',
+            }
+        })
+
+    def test_multiple_inputs(self):
+        factory = self.capa_factory_for_problem_xml("""\
+            <problem display_name="Multiple Inputs">
+              <p>Choose the correct color</p>
+              <optionresponse>
+                <p>What color is the sky?</p>
+                <optioninput options="('yellow','blue','green')" correct="blue"/>
+                <p>What color are pine needles?</p>
+                <optioninput options="('yellow','blue','green')" correct="green"/>
+              </optionresponse>
+            </problem>
+            """)
+        module = factory.create()
+
+        answer_input_dict = {
+            factory.input_key(2, 1): 'blue',
+            factory.input_key(2, 2): 'yellow',
+        }
+
+        event = self.get_event_for_answers(module, answer_input_dict)
+        self.assertEquals(event['submission'], {
+            factory.answer_key(2, 1): {
+                'question': '',
+                'answer': 'blue',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': True,
+                'variant': '',
+            },
+            factory.answer_key(2, 2): {
+                'question': '',
+                'answer': 'yellow',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': False,
+                'variant': '',
+            },
+        })
+
+    def test_rerandomized_inputs(self):
+        factory = CapaFactory
+        module = factory.create(rerandomize='always')
+
+        answer_input_dict = {
+            factory.input_key(2): '3.14'
+        }
+
+        event = self.get_event_for_answers(module, answer_input_dict)
+        self.assertEquals(event['submission'], {
+            factory.answer_key(2): {
+                'question': '',
+                'answer': '3.14',
+                'response_type': 'numericalresponse',
+                'input_type': 'textline',
+                'correct': True,
+                'variant': module.seed,
+            }
+        })
+
+    def test_file_inputs(self):
+        fnames = ["prog1.py", "prog2.py", "prog3.py"]
+        fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
+        fileobjs = [open(fpath) for fpath in fpaths]
+        for fileobj in fileobjs:
+            self.addCleanup(fileobj.close)
+
+        factory = CapaFactoryWithFiles
+        module = factory.create()
+
+        # Mock the XQueueInterface.
+        xqueue_interface = XQueueInterface("http://example.com/xqueue", Mock())
+        xqueue_interface._http_post = Mock(return_value=(0, "ok"))  # pylint: disable=protected-access
+        module.system.xqueue['interface'] = xqueue_interface
+
+        answer_input_dict = {
+            CapaFactoryWithFiles.input_key(response_num=2): fileobjs,
+            CapaFactoryWithFiles.input_key(response_num=3): 'None',
+        }
+
+        event = self.get_event_for_answers(module, answer_input_dict)
+        self.assertEquals(event['submission'], {
+            factory.answer_key(2): {
+                'question': '',
+                'answer': fpaths,
+                'response_type': 'coderesponse',
+                'input_type': 'filesubmission',
+                'correct': False,
+                'variant': '',
+            },
+            factory.answer_key(3): {
+                'answer': 'None',
+                'correct': True,
+                'question': '',
+                'response_type': 'customresponse',
+                'input_type': 'textline',
+                'variant': ''
+            }
+        })

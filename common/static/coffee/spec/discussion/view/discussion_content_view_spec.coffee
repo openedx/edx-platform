@@ -16,7 +16,7 @@ describe "DiscussionContentView", ->
                 <div class="post-body"><p>Post body.</p></div>
                 <div data-tooltip="Report Misuse" data-role="thread-flag" class="discussion-flag-abuse notflagged">
                 <i class="icon"></i><span class="flag-label">Report Misuse</span></div>
-                <div data-tooltip="pin this thread" data-role="thread-pin" class="admin-pin discussion-pin notpinned">
+                <div data-tooltip="pin this thread" class="admin-pin discussion-pin notpinned">
                 <i class="icon"></i><span class="pin-label">Pin Thread</span></div>
             </div>
             """
@@ -25,7 +25,7 @@ describe "DiscussionContentView", ->
         @threadData = {
             id: '01234567',
             user_id: '567',
-            course_id: 'mitX/999/test',
+            course_id: 'edX/999/test',
             body: 'this is a thread',
             created_at: '2013-04-03T20:08:39Z',
             abuse_flaggers: ['123'],

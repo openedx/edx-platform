@@ -77,7 +77,7 @@ def is_commentable_cohorted(course_id, commentable_id):
         # inline discussions are cohorted by default
         ans = True
 
-    log.debug("is_commentable_cohorted({0}, {1}) = {2}".format(course_id,
+    log.debug(u"is_commentable_cohorted({0}, {1}) = {2}".format(course_id,
                                                                commentable_id,
                                                                ans))
     return ans

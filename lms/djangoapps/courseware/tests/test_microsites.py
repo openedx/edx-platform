@@ -3,7 +3,6 @@ Tests related to the Microsites feature
 """
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-from unittest import skip
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -45,7 +44,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.course_outside_microsite = CourseFactory.create(display_name='Robot_Course_Outside_Microsite', org='FooX')
 
-    def create_test_accounts(self):
+    def create_student_accounts(self):
         """
         Build out the test accounts we'll use in these tests
         """
@@ -56,7 +55,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.create_account(username, email, password)
             self.activate_user(email)
 
-    @skip   # skipping - runs fine on localdev, not jenkins environment
+
     def test_microsite_anonymous_homepage_content(self):
         """
         Verify that the homepage, when accessed via a Microsite domain, returns
@@ -71,8 +70,8 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.assertContains(resp, 'This is a Test Microsite Overlay')   # Overlay test message
         self.assertContains(resp, 'test_microsite/images/header-logo.png')  # logo swap
-        self.assertContains(resp, 'test_microsite/css/test_microsite.css')  # css override
-        self.assertContains(resp, '<title>Test Microsite</title>')   # page title
+        self.assertContains(resp, 'test_microsite/css/test_microsite')  # css override
+        self.assertContains(resp, 'Test Microsite')   # page title
 
         # assert that test course display name is visible
         self.assertContains(resp, 'Robot_Super_Course')
@@ -89,7 +88,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # assert that the edX partners tag line is not in the HTML
         self.assertNotContains(resp, 'Explore free courses from')
 
-    @skip   # skipping - runs fine on localdev, not jenkins environment
+
     def test_not_microsite_anonymous_homepage_content(self):
         """
         Make sure we see the right content on the homepage if we are not in a microsite
@@ -102,7 +101,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.assertNotContains(resp, 'This is a Test Microsite Overlay')   # Overlay test message
         self.assertNotContains(resp, 'test_microsite/images/header-logo.png')  # logo swap
-        self.assertNotContains(resp, 'test_microsite/css/test_microsite.css')  # css override
+        self.assertNotContains(resp, 'test_microsite/css/test_microsite')  # css override
         self.assertNotContains(resp, '<title>Test Microsite</title>')   # page title
 
         # assert that test course display name IS NOT VISIBLE, since that is a Microsite only course
@@ -114,20 +113,14 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # assert that footer template has been properly overriden on homepage
         self.assertNotContains(resp, 'This is a Test Microsite footer')
 
-        # assert that the edX partners section is not in the HTML
-        self.assertContains(resp, '<section class="university-partners university-partners2x6">')
 
-        # assert that the edX partners tag line is not in the HTML
-        self.assertContains(resp, 'Explore free courses from')
-
-    @skip   # skipping - runs fine on localdev, not jenkins environment
     def test_microsite_course_enrollment(self):
         """
         Enroll user in a course scoped in a Microsite and one course outside of a Microsite
         and make sure that they are only visible in the right Dashboards
         """
 
-        self.create_test_accounts()
+        self.create_student_accounts()
 
         email, password = self.STUDENT_INFO[0]
         self.login(email, password)

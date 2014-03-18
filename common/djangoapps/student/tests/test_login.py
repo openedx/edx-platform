@@ -23,6 +23,7 @@ from external_auth.models import ExternalAuthMap
 
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
+
 class LoginTest(TestCase):
     '''
     Test student.views.login_user() view
@@ -55,6 +56,13 @@ class LoginTest(TestCase):
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', u'test@edx.org'])
 
+    @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
+    def test_login_success_no_pii(self):
+        response, mock_audit_log = self._login_response('test@edx.org', 'test_password', patched_audit_log='student.models.AUDIT_LOG')
+        self._assert_response(response, success=True)
+        self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
+        self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test@edx.org'])
+
     def test_login_success_unicode_email(self):
         unicode_email = u'test' + unichr(40960) + u'@edx.org'
         self.user.email = unicode_email
@@ -71,11 +79,28 @@ class LoginTest(TestCase):
                               value='Email or password is incorrect')
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
 
+    @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
+    def test_login_fail_no_user_exists_no_pii(self):
+        nonexistent_email = u'not_a_user@edx.org'
+        response, mock_audit_log = self._login_response(nonexistent_email, 'test_password')
+        self._assert_response(response, success=False,
+                              value='Email or password is incorrect')
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email'])
+        self._assert_not_in_audit_log(mock_audit_log, 'warning', [nonexistent_email])
+
     def test_login_fail_wrong_password(self):
         response, mock_audit_log = self._login_response('test@edx.org', 'wrong_password')
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'password for', u'test@edx.org', u'invalid'])
+
+    @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
+    def test_login_fail_wrong_password_no_pii(self):
+        response, mock_audit_log = self._login_response('test@edx.org', 'wrong_password')
+        self._assert_response(response, success=False,
+                              value='Email or password is incorrect')
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'password for', u'invalid'])
+        self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test@edx.org'])
 
     def test_login_not_activated(self):
         # De-activate the user
@@ -87,6 +112,19 @@ class LoginTest(TestCase):
         self._assert_response(response, success=False,
                               value="This account has not been activated")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
+
+    @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
+    def test_login_not_activated_no_pii(self):
+        # De-activate the user
+        self.user.is_active = False
+        self.user.save()
+
+        # Should now be unable to login
+        response, mock_audit_log = self._login_response('test@edx.org', 'test_password')
+        self._assert_response(response, success=False,
+                              value="This account has not been activated")
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
+        self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
 
     def test_login_unicode_email(self):
         unicode_email = u'test@edx.org' + unichr(40960)
@@ -108,6 +146,17 @@ class LoginTest(TestCase):
             response = self.client.post(logout_url)
         self.assertEqual(response.status_code, 302)
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout', u'test'])
+
+    @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
+    def test_logout_logging_no_pii(self):
+        response, _ = self._login_response('test@edx.org', 'test_password')
+        self._assert_response(response, success=True)
+        logout_url = reverse('logout')
+        with patch('student.models.AUDIT_LOG') as mock_audit_log:
+            response = self.client.post(logout_url)
+        self.assertEqual(response.status_code, 302)
+        self._assert_audit_log(mock_audit_log, 'info', [u'Logout'])
+        self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test'])
 
     def test_login_ratelimited_success(self):
         # Try (and fail) logging in with fewer attempts than the limit of 30
@@ -176,6 +225,18 @@ class LoginTest(TestCase):
         for log_string in log_strings:
             self.assertIn(log_string, format_string)
 
+    def _assert_not_in_audit_log(self, mock_audit_log, level, log_strings):
+        """
+        Check that the audit log has received the expected call as its last call.
+        """
+        method_calls = mock_audit_log.method_calls
+        name, args, _kwargs = method_calls[-1]
+        self.assertEquals(name, level)
+        self.assertEquals(len(args), 1)
+        format_string = args[0]
+        for log_string in log_strings:
+            self.assertNotIn(log_string, format_string)
+
 
 class UtilFnTest(TestCase):
     """
@@ -202,9 +263,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         self.course = CourseFactory.create(org='Stanford', number='456', display_name='NO SHIB')
         self.shib_course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
         self.shib_course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        metadata = own_metadata(self.shib_course)
-        metadata['enrollment_domain'] = self.shib_course.enrollment_domain
-        self.store.update_metadata(self.shib_course.location.url(), metadata)
+        self.store.update_item(self.shib_course, '**replace_user**')
         self.user_w_map = UserFactory.create(email='withmap@stanford.edu')
         self.extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
                                        external_email='withmap@stanford.edu',
@@ -224,7 +283,11 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         """
         response = self.client.post(reverse('login'), {'email': self.user_w_map.email, 'password': ''})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, json.dumps({'success': False, 'redirect': reverse('shib-login')}))
+        obj = json.loads(response.content)
+        self.assertEqual(obj, {
+            'success': False,
+            'redirect': reverse('shib-login'),
+        })
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test__get_course_enrollment_domain(self):
@@ -255,7 +318,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         noshib_response = self.client.get(TARGET_URL, follow=True)
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/accounts/login?next={url}'.format(url=TARGET_URL), 302))
-        self.assertContains(noshib_response, ("<title>Log into your {platform_name} Account</title>"
+        self.assertContains(noshib_response, ("Log into your {platform_name} Account | {platform_name}"
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 

@@ -26,7 +26,12 @@ $(document).ready(function(){
 
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
-    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal">&#10005;
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close Modal')}
+      </span>
+    </button>
 
     <div id="register" class="register">
       <header>
@@ -68,23 +73,6 @@ $(document).ready(function(){
 
             <input id="signup_tos" name="terms_of_service" type="hidden" value="true">
             <input id="signup_honor" name="honor_code" type="hidden" value="true">
-        
-<!--
-        <div class="input-group">
-          <label data-field="terms_of_service" class="terms-of-service" for="signup_tos">
-            <input id="signup_tos" name="terms_of_service" type="checkbox" value="true">
-            ${_('I agree to the {link_start}Terms of Service{link_end}*').format(
-              link_start='<a href="{url}" target="_blank">'.format(url=reverse('tos')),
-              link_end='</a>')}
-          </label>
-
-          <label data-field="honor_code" class="honor-code" for="signup_honor">
-            <input id="signup_honor" name="honor_code" type="checkbox" value="true">
-            ${_('I agree to the {link_start}Honor Code{link_end}*').format(
-              link_start='<a href="{url}" target="_blank">'.format(url=reverse('honor')),
-              link_end='</a>')}
-          </label>
-        </div>-->
 
         <div class="submit">
           <input name="submit" type="submit" value="${_('Create My Account')}">
@@ -106,13 +94,13 @@ $(document).ready(function(){
 <script type="text/javascript">
   (function() {
    $(document).delegate('#register_form', 'ajax:success', function(data, json, xhr) {
-     if(json.success) {
-       location.href="${reverse('dashboard')}";
-     } else {
-       $(".field-error").removeClass('field-error');
-       $('#register_error').html(json.value).stop().css("display", "block");
-       $("[data-field='"+json.field+"']").addClass('field-error')
-     }
+     location.href="${reverse('dashboard')}";
+    });
+   $(document).delegate('#register_form', 'ajax:error', function(event, jqXHR, textStatus) {
+     json = $.parseJSON(jqXHR.responseText);
+     $(".field-error").removeClass('field-error');
+     $('#register_error').html(json.value).stop().css("display", "block");
+     $("[data-field='"+json.field+"']").addClass('field-error')
     });
 
    // removing close link's default behavior

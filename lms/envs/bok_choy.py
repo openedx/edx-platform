@@ -1,10 +1,11 @@
-# Settings for bok choy tests
+"""
+Settings for bok choy tests
+"""
 
 import os
 from path import path
 
-
-CONFIG_ROOT = path(__file__).abspath().dirname()
+CONFIG_ROOT = path(__file__).abspath().dirname()  #pylint: disable=E1120
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
 ########################## Prod-like settings ###################################
@@ -16,7 +17,7 @@ TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 os.environ['SERVICE_VARIANT'] = 'bok_choy'
 os.environ['CONFIG_ROOT'] = CONFIG_ROOT
 
-from aws import * # pylint: disable=W0401, W0614
+from .aws import *  # pylint: disable=W0401, W0614
 
 
 ######################### Testing overrides ####################################
@@ -36,6 +37,12 @@ MONGO_MODULESTORE['OPTIONS']['fs_root'] = (TEST_ROOT / "data").abspath()
 XML_MODULESTORE = MODULESTORE['default']['OPTIONS']['stores']['xml']
 XML_MODULESTORE['OPTIONS']['data_dir'] = (TEST_ROOT / "data").abspath()
 
+# Configure the LMS to use our stub XQueue implementation
+XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
+
+# Configure the LMS to use our stub ORA implementation
+OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
+
 # Enable django-pipeline and staticfiles
 STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
 PIPELINE = True
@@ -45,7 +52,8 @@ import logging
 LOG_OVERRIDES = [
     ('track.middleware', logging.CRITICAL),
     ('edxmako.shortcuts', logging.ERROR),
-    ('dd.dogapi', logging.ERROR)
+    ('dd.dogapi', logging.ERROR),
+    ('edx.discussion', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)

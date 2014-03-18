@@ -3,12 +3,24 @@ Methods for exporting course data to XML
 """
 
 import logging
+import lxml.etree
+from xblock.fields import Scope
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
 from json import dumps
 import json
 import datetime
+import os
+from path import path
+import shutil
+
+DRAFT_DIR = "drafts"
+PUBLISHED_DIR = "published"
+EXPORT_VERSION_FILE = "format.json"
+EXPORT_VERSION_KEY = "export_format"
+
+DEFAULT_CONTENT_FIELDS = ['metadata', 'data']
 
 #from django.utils.functional import Promise
 #from django.utils.encoding import force_unicode
@@ -55,11 +67,13 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     course = modulestore.get_course(course_id)
 
     fs = OSFS(root_dir)
-    export_fs = fs.makeopendir(course_dir)
+    export_fs = course.runtime.export_fs = fs.makeopendir(course_dir)
 
-    xml = course.export_to_xml(export_fs)
+    root = lxml.etree.Element('unknown')
+    course.add_xml_to_node(root)
+
     with export_fs.open('course.xml', 'w') as course_xml:
-        course_xml.write(xml)
+        lxml.etree.ElementTree(root).write(course_xml)
 
     # export the static assets
     policies_dir = export_fs.makeopendir('policies')
@@ -100,7 +114,7 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
         draft_verticals = draft_modulestore.get_items([None, course_location.org, course_location.course,
                                                        'vertical', None, 'draft'])
         if len(draft_verticals) > 0:
-            draft_course_dir = export_fs.makeopendir('drafts')
+            draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
             for draft_vertical in draft_verticals:
                 parent_locs = draft_modulestore.get_parent_locations(draft_vertical.location, course.location.course_id)
                 # Don't try to export orphaned items.
@@ -110,7 +124,23 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
                     sequential = modulestore.get_item(Location(parent_locs[0]))
                     index = sequential.children.index(draft_vertical.location.url())
                     draft_vertical.xml_attributes['index_in_children_list'] = str(index)
-                    draft_vertical.export_to_xml(draft_course_dir)
+                    draft_vertical.runtime.export_fs = draft_course_dir
+                    node = lxml.etree.Element('unknown')
+                    draft_vertical.add_xml_to_node(node)
+
+
+def _export_field_content(xblock_item, item_dir):
+    """
+    Export all fields related to 'xblock_item' other than 'metadata' and 'data' to json file in provided directory
+    """
+    module_data = xblock_item.get_explicitly_set_fields_by_scope(Scope.content)
+    if isinstance(module_data, dict):
+        for field_name in module_data:
+            if field_name not in DEFAULT_CONTENT_FIELDS:
+                # filename format: {dirname}.{field_name}.json
+                with item_dir.open('{0}.{1}.{2}'.format(xblock_item.location.name, field_name, 'json'),
+                                   'w') as field_content_file:
+                    field_content_file.write(dumps(module_data.get(field_name, {}), cls=EdxJSONEncoder))
 
 
 def export_extra_content(export_fs, modulestore, course_id, course_location, category_type, dirname, file_suffix=''):
@@ -122,3 +152,93 @@ def export_extra_content(export_fs, modulestore, course_id, course_location, cat
         for item in items:
             with item_dir.open(item.location.name + file_suffix, 'w') as item_file:
                 item_file.write(item.data.encode('utf8'))
+
+                # export content fields other then metadata and data in json format in current directory
+                _export_field_content(item, item_dir)
+
+
+def convert_between_versions(source_dir, target_dir):
+    """
+    Converts a version 0 export format to version 1, and vice versa.
+
+    @param source_dir: the directory structure with the course export that should be converted.
+       The contents of source_dir will not be altered.
+    @param target_dir: the directory where the converted export should be written.
+    @return: the version number of the converted export.
+    """
+    def convert_to_version_1():
+        """ Convert a version 0 archive to version 0 """
+        os.mkdir(copy_root)
+        with open(copy_root / EXPORT_VERSION_FILE, 'w') as f:
+            f.write('{{"{export_key}": 1}}\n'.format(export_key=EXPORT_VERSION_KEY))
+
+        # If a drafts folder exists, copy it over.
+        copy_drafts()
+
+        # Now copy everything into the published directory
+        published_dir = copy_root / PUBLISHED_DIR
+        shutil.copytree(path(source_dir) / course_name, published_dir)
+        # And delete the nested drafts directory, if it exists.
+        nested_drafts_dir = published_dir / DRAFT_DIR
+        if nested_drafts_dir.isdir():
+            shutil.rmtree(nested_drafts_dir)
+
+    def convert_to_version_0():
+        """ Convert a version 1 archive to version 0 """
+        # Copy everything in "published" up to the top level.
+        published_dir = path(source_dir) / course_name / PUBLISHED_DIR
+        if not published_dir.isdir():
+            raise ValueError("a version 1 archive must contain a published branch")
+
+        shutil.copytree(published_dir, copy_root)
+
+        # If there is a "draft" branch, copy it. All other branches are ignored.
+        copy_drafts()
+
+    def copy_drafts():
+        """
+        Copy drafts directory from the old archive structure to the new.
+        """
+        draft_dir = path(source_dir) / course_name / DRAFT_DIR
+        if draft_dir.isdir():
+            shutil.copytree(draft_dir, copy_root / DRAFT_DIR)
+
+    root = os.listdir(source_dir)
+    if len(root) != 1 or (path(source_dir) / root[0]).isfile():
+        raise ValueError("source archive does not have single course directory at top level")
+
+    course_name = root[0]
+
+    # For this version of the script, we simply convert back and forth between version 0 and 1.
+    original_version = get_version(path(source_dir) / course_name)
+    if original_version not in [0, 1]:
+        raise ValueError("unknown version: " + str(original_version))
+    desired_version = 1 if original_version is 0 else 0
+
+    copy_root = path(target_dir) / course_name
+
+    if desired_version == 1:
+        convert_to_version_1()
+    else:
+        convert_to_version_0()
+
+    return desired_version
+
+
+def get_version(course_path):
+    """
+    Return the export format version number for the given
+    archive directory structure (represented as a path instance).
+
+    If the archived file does not correspond to a known export
+    format, None will be returned.
+    """
+    format_file = course_path / EXPORT_VERSION_FILE
+    if not format_file.isfile():
+        return 0
+    with open(format_file, "r") as f:
+        data = json.load(f)
+        if EXPORT_VERSION_KEY in data:
+            return data[EXPORT_VERSION_KEY]
+
+    return None

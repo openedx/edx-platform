@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from config import Configuration, LOCALE_DIR, CONFIGURATION
+from i18n.config import Configuration, LOCALE_DIR, CONFIGURATION
 
 class TestConfiguration(TestCase):
     """
@@ -9,7 +9,7 @@ class TestConfiguration(TestCase):
     """
 
     def test_config(self):
-        config_filename = os.path.normpath(os.path.join(LOCALE_DIR, 'config'))
+        config_filename = os.path.normpath(os.path.join(LOCALE_DIR, 'config.yaml'))
         config = Configuration(config_filename)
         self.assertEqual(config.source_locale, 'en')
 
@@ -29,5 +29,5 @@ class TestConfiguration(TestCase):
         self.assertIsNotNone(locales)
         self.assertIsInstance(locales, list)
         self.assertIn('en', locales)
-        self.assertEqual('eo', CONFIGURATION.dummy_locale)
+        self.assertEqual('eo', CONFIGURATION.dummy_locales[0])
         self.assertEqual('en', CONFIGURATION.source_locale)
