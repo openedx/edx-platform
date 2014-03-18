@@ -214,7 +214,7 @@ def get_setting_entry(label):
 @world.absorb
 def get_setting_entry_index(label):
     def get_index():
-        settings = world.css_find('.wrapper-comp-setting')
+        settings = world.css_find('.metadata_edit .wrapper-comp-setting')
         for index, setting in enumerate(settings):
             if setting.find_by_css('.setting-label')[0].value == label:
                 return index
@@ -232,6 +232,6 @@ def set_field_value(index, value):
     Instead we will find the element, set its value, then hit the Tab key
     to get to the next field.
     """
-    elem = world.css_find('div.wrapper-comp-setting input.setting-input')[index]
+    elem = world.css_find('.metadata_edit div.wrapper-comp-setting input.setting-input')[index]
     elem.value = value
     elem.type(Keys.TAB)
