@@ -8,8 +8,8 @@ from django.core.urlresolvers import reverse
 
 from foldit.views import foldit_ops, verify_code
 from foldit.models import PuzzleComplete, Score
-from student.models import unique_id_for_user
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.models import unique_id_for_user, CourseEnrollment
+from student.tests.factories import UserFactory
 
 from datetime import datetime, timedelta
 from pytz import UTC
@@ -29,10 +29,10 @@ class FolditTestCase(TestCase):
         self.user = UserFactory.create()
         self.user2 = UserFactory.create()
 
-        self.course_enrollment = CourseEnrollmentFactory.create(
+        self.course_enrollment = CourseEnrollment(
             user=self.user, course_id=self.course_id
         )
-        self.course_enrollment2 = CourseEnrollmentFactory.create(
+        self.course_enrollment2 = CourseEnrollment(
             user=self.user2, course_id=self.course_id2
         )
 

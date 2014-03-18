@@ -26,6 +26,7 @@ from django.http import HttpResponse
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.keys import CourseKey
 
 from mock import Mock, patch, sentinel
 from textwrap import dedent
@@ -495,13 +496,14 @@ class EnrollInCourseTest(TestCase):
 
         # Creating an enrollment doesn't actually enroll a student
         # (calling CourseEnrollment.enroll() would have)
-        enrollment = CourseEnrollment.get_or_create_enrollment(user, course_id)
+        course_key = CourseKey.from_string(course_id)
+        enrollment = CourseEnrollment.get_or_create_enrollment(user, course_key)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
         self.assert_no_events_were_emitted()
 
         # Until you explicitly activate it
         enrollment.activate()
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_key))
         self.assert_enrollment_event_was_emitted(user, course_id)
 
         # Activating something that's already active does nothing

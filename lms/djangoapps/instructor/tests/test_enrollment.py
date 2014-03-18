@@ -7,6 +7,7 @@ from abc import ABCMeta
 from courseware.models import StudentModule
 from django.test import TestCase
 from student.tests.factories import UserFactory
+from xmodule.modulestore.keys import CourseKey
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from instructor.enrollment import (EmailEnrollmentState,
@@ -17,7 +18,8 @@ from instructor.enrollment import (EmailEnrollmentState,
 class TestSettableEnrollmentState(TestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
-        self.course_id = 'robot:/a/fake/c::rse/id'
+        self.course_id = 'robot/fake/course'
+        self.course_key = CourseKey.from_string(self.course_id)
 
     def test_mes_create(self):
         """
@@ -47,7 +49,7 @@ class TestEnrollmentChangeBase(TestCase):
     __metaclass__ = ABCMeta
 
     def setUp(self):
-        self.course_id = 'robot:/a/fake/c::rse/id'
+        self.course_id = 'robot/fake/course'
 
     def _run_state_change_test(self, before_ideal, after_ideal, action):
         """
@@ -274,7 +276,7 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
 class TestInstructorEnrollmentStudentModule(TestCase):
     """ Test student module manipulations. """
     def setUp(self):
-        self.course_id = 'robot:/a/fake/c::rse/id'
+        self.course_id = 'fake/course/id'
 
     def test_reset_student_attempts(self):
         user = UserFactory()
