@@ -35,7 +35,7 @@ class UserProfileFactory(DjangoModelFactory):
     FACTORY_DJANGO_GET_OR_CREATE = ('user', )
 
     user = None
-    name = factory.LazyAttribute(u'{0.user.first_name} {0.user.last_name}'.format)
+    name = factory.LazyAttribute(u'Ⓕ {0.user.first_name} Ⓛ {0.user.last_name}'.format)
     level_of_education = None
     gender = u'm'
     mailing_address = None
