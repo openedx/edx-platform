@@ -415,7 +415,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             self.errored_courses[course_dir] = errorlog
         else:
             self.courses[course_dir] = course_descriptor
-            self._location_errors[course_descriptor.scope_ids.usage_id] = errorlog
+            self._course_errors[course_descriptor.scope_ids.usage_id] = errorlog
             self.parent_trackers[course_descriptor.id].make_known(course_descriptor.scope_ids.usage_id)
 
     def __unicode__(self):
