@@ -11,7 +11,7 @@ from datetime import datetime
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
-from xmodule.modulestore.mongo.base import location_to_query, namedtuple_to_son, get_course_id_no_run, MongoModuleStore
+from xmodule.modulestore.mongo.base import location_to_query, location_to_son, get_course_id_no_run, MongoModuleStore
 import pymongo
 from pytz import UTC
 
@@ -136,7 +136,7 @@ class DraftModuleStore(MongoModuleStore):
             raise InvalidVersionError(source_location)
         if not original:
             raise ItemNotFoundError(source_location)
-        original['_id'] = namedtuple_to_son(draft_location)
+        original['_id'] = location_to_son(draft_location)
         try:
             self.collection.insert(original)
         except pymongo.errors.DuplicateKeyError:
@@ -230,7 +230,7 @@ class DraftModuleStore(MongoModuleStore):
 
         # now query all draft content in another round-trip
         query = {
-            '_id': {'$in': [namedtuple_to_son(as_draft(Location(item))) for item in items]}
+            '_id': {'$in': [location_to_son(as_draft(Location(item))) for item in items]}
         }
         to_process_drafts = list(self.collection.find(query))
 
