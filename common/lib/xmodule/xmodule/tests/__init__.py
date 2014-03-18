@@ -19,6 +19,7 @@ from xblock.field_data import DictFieldData
 
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 
@@ -50,7 +51,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return 'resource/' + str(block.scope_ids.block_type) + '/' + uri
 
 
-def get_test_system(course_id=''):
+def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
     """
     Construct a test ModuleSystem instance.
 
