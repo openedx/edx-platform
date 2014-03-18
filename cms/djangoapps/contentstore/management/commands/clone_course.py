@@ -29,7 +29,7 @@ class Command(BaseCommand):
         mstore = modulestore('direct')
         cstore = contentstore()
 
-        mstore.ignore_write_events_on_courses.append(dest_course_id)
+        mstore.ignore_write_events_on_courses.add(dest_course_id)
 
         print("Cloning course {0} to {1}".format(source_course_id, dest_course_id))
 
