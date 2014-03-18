@@ -10,6 +10,8 @@ Change Log
 
    * - Date
      - Change
+   * - 19 Mar 2014
+     - Provided alternative formatting for the examples in the :ref:`Discussion Forums Data` chapter.
    * - 13 Mar 2014
      - Updated the :ref:`Student_Info` chapter.
    * - 24 Feb 14
