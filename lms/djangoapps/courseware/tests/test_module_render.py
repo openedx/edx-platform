@@ -370,7 +370,10 @@ class TestTOC(TestCase):
             self.assertIn(toc_section, actual)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(
+    MODULESTORE=TEST_DATA_MIXED_MODULESTORE,
+    STATICFILES_STORAGE='pipeline.storage.PipelineCachedStorage'
+)
 class TestHtmlModifiers(ModuleStoreTestCase):
     """
     Tests to verify that standard modifications to the output of XModule/XBlock

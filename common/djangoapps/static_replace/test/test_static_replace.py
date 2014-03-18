@@ -1,8 +1,8 @@
 import re
 
 from nose.tools import assert_equals, assert_true, assert_false  # pylint: disable=E0611
-from static_replace import (replace_static_urls, replace_course_urls,
-                            _url_replace_regex)
+from django.test.utils import override_settings
+from static_replace import replace_static_urls, replace_course_urls, _url_replace_regex
 from mock import patch, Mock
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore
@@ -13,6 +13,7 @@ COURSE_ID = 'org/course/run'
 STATIC_SOURCE = '"/static/file.png"'
 
 
+@override_settings(STATICFILES_STORAGE='pipeline.storage.PipelineCachedStorage')
 def test_multi_replace():
     course_source = '"/course/file.png"'
 
@@ -26,6 +27,7 @@ def test_multi_replace():
     )
 
 
+@override_settings(STATICFILES_STORAGE='pipeline.storage.PipelineCachedStorage')
 @patch('static_replace.staticfiles_storage')
 def test_storage_url_exists(mock_storage):
     mock_storage.exists.return_value = True
@@ -36,6 +38,7 @@ def test_storage_url_exists(mock_storage):
     mock_storage.url.called_once_with('data_dir/file.png')
 
 
+@override_settings(STATICFILES_STORAGE='pipeline.storage.PipelineCachedStorage')
 @patch('static_replace.staticfiles_storage')
 def test_storage_url_not_exists(mock_storage):
     mock_storage.exists.return_value = False
@@ -46,6 +49,7 @@ def test_storage_url_not_exists(mock_storage):
     mock_storage.url.called_once_with('file.png')
 
 
+@override_settings(STATICFILES_STORAGE='pipeline.storage.PipelineCachedStorage')
 @patch('static_replace.StaticContent')
 @patch('static_replace.modulestore')
 def test_mongo_filestore(mock_modulestore, mock_static_content):
