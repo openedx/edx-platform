@@ -5,7 +5,7 @@ import re
 from collections import namedtuple
 from opaque_keys import InvalidKeyError
 
-from xmodule.modulestore.keys import CourseKey, UsageKey
+from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey
 
 log = logging.getLogger(__name__)
 
@@ -32,11 +32,8 @@ class SlashSeparatedCourseKey(CourseKey):
     """Course key for old style org/course/run course identifiers"""
 
     CANONICAL_NAMESPACE = 'slashes'
-
-    def __init__(self, org, course, run):
-        self._org = org
-        self._course = course
-        self._run = run
+    KEY_FIELDS = ('org', 'course', 'run')
+    __slots__ = KEY_FIELDS
 
     @classmethod
     def _from_string(cls, serialized):
@@ -48,29 +45,17 @@ class SlashSeparatedCourseKey(CourseKey):
         return self.to_deprecated_string()
 
     @property
-    def org(self):
-        return self._org
-
-    @property
-    def course(self):
-        return self._course
-
-    @property
-    def run(self):
-        return self._run
-
-    @property
     def offering(self):
-        return '/'.join([self._course, self._run])
+        return '/'.join([self.course, self.run])
 
     def make_asset_key(self, path):
-        return Location('c4x', self._org, self._course, self._run, 'asset', path, None)
+        return Location('c4x', self.org, self.course, self.run, 'asset', path, None)
 
     def make_usage_key(self, block_type, name):
-        return Location('i4x', self._org, self._course, self._run, block_type, name, None)
+        return Location('i4x', self.org, self.course, self.run, block_type, name, None)
 
     def to_deprecated_string(self):
-        return '/'.join([self._org, self._course, self._run])
+        return '/'.join([self.org, self.course, self.run])
 
     def make_usage_key_from_deprecated_string(self, location_url):
         """
@@ -85,7 +70,7 @@ class SlashSeparatedCourseKey(CourseKey):
             log.debug(u"location %r doesn't match URL", location_url)
             raise InvalidKeyError(location_url)
         groups = match.groupdict()
-        return cls(run=self._run, **groups)
+        return cls(run=self.run, **groups)
 
 
 def _check_location_part(val, regexp):
@@ -109,7 +94,7 @@ def _check_location_part(val, regexp):
         raise InvalidKeyError("Invalid characters in {!r}.".format(val))
 
 
-class Location(UsageKey, namedtuple('Location', 'tag org course run category name revision')):
+class Location(UsageKey, DefinitionKey):
     """
     Encodes a location.
 
@@ -118,8 +103,8 @@ class Location(UsageKey, namedtuple('Location', 'tag org course run category nam
     {org}/{course}/{run}.
     """
     CANONICAL_NAMESPACE = 'location'
-
-    __slots__ = ()
+    KEY_FIELDS = ('tag', 'org', 'course', 'run', 'category', 'name', 'revision')
+    __slots__ = KEY_FIELDS
 
     @staticmethod
     def _clean(value, invalid):
@@ -170,7 +155,7 @@ class Location(UsageKey, namedtuple('Location', 'tag org course run category nam
             return False
         return True
 
-    def __new__(_cls, tag, org, course, run, category, name, revision):
+    def __init__(self, tag, org, course, run, category, name, revision):
         """
         Create a new Location that is a clone of the specifed one.
 
@@ -186,7 +171,16 @@ class Location(UsageKey, namedtuple('Location', 'tag org course run category nam
             _check_location_part(part, INVALID_CHARS)
         _check_location_part(name, INVALID_CHARS_NAME)
 
-        return super(_cls, Location).__new__(_cls, tag, org, course, run, category, name, revision)
+        return super(Location, self).__init__(tag, org, course, run, category, name, revision)
+
+    @property
+    def definition_key(self):
+        # Locations are both UsageKeys and DefinitionKeys
+        return self
+
+    @property
+    def block_type(self):
+        return self.category
 
     def url(self):
         """

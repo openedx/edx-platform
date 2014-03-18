@@ -6,6 +6,7 @@ from xblock.runtime import IdReader
 
 class CourseKey(OpaqueKey):
     KEY_TYPE = 'course_key'
+    __slots__ = ()
 
     @abstractproperty
     def org(self):
@@ -49,6 +50,7 @@ class DefinitionKey(OpaqueKey):
     An :class:`opaque_keys.OpaqueKey` identifying an XBlock definition.
     """
     KEY_TYPE = 'definition_key'
+    __slots__ = ()
 
     @abstractmethod
     def block_type(self):
@@ -63,6 +65,7 @@ class CourseObjectMixin(object):
     An abstract :class:`opaque_keys.OpaqueKey` mixin
     for keys that belong to courses.
     """
+    __slots__ = ()
 
     @abstractproperty
     def course_key(self):
@@ -85,6 +88,7 @@ class AssetKey(CourseObjectMixin, OpaqueKey):
     An :class:`opaque_keys.OpaqueKey` identifying a course asset.
     """
     KEY_TYPE = 'asset_key'
+    __slots__ = ()
 
     @abstractproperty
     def path(self):
@@ -99,6 +103,7 @@ class UsageKey(CourseObjectMixin, OpaqueKey):
     An :class:`opaque_keys.OpaqueKey` identifying an XBlock usage.
     """
     KEY_TYPE = 'usage_key'
+    __slots__ = ()
 
     @abstractproperty
     def definition_key(self):
