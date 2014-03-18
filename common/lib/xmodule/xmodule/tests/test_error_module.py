@@ -130,7 +130,7 @@ class TestErrorModuleConstruction(unittest.TestCase):
         self.descriptor = BrokenDescriptor(
             TestRuntime(Mock(spec=IdReader), field_data),
             field_data,
-            ScopeIds(None, None, None, 'i4x://org/course/broken/name')
+            ScopeIds(None, None, None, Location('i4x', 'org', 'course', 'run', 'broken', 'name', None)
         )
         self.descriptor.xmodule_runtime = TestRuntime(Mock(spec=IdReader), field_data)
         self.descriptor.xmodule_runtime.error_descriptor_class = ErrorDescriptor
