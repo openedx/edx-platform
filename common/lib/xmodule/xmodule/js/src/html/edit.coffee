@@ -39,7 +39,7 @@ class @HTMLEditingDescriptor
       },
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
       # Can have a single toolbar by just specifying "toolbar". Splitting for now so all are visible.
-      toolbar: "formatselect | fontselect | bold italic underline forecolor | bullist numlist outdent indent | link unlink image | blockquote wrapAsCode | code",
+      toolbar: "formatselect | fontselect | bold italic wrapAsCode underline forecolor | bullist numlist outdent indent blockquote | link unlink image | code",
       # TODO: i18n
       block_formats: "Paragraph=p;Preformatted=pre;Heading 1=h1;Heading 2=h2;Heading 3=h3",
       width: '100%',
