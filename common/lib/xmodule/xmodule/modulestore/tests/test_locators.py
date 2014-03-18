@@ -128,14 +128,14 @@ class LocatorTest(TestCase):
 
     def test_course_constructor_url_package_id_and_version_guid(self):
         test_id_loc = '519665f6223ebd6980884f2b'
-        testobj = CourseLocator(url='edx://mit.eecs-honors.6002x/' + VERSION_PREFIX + test_id_loc)
+        testobj = CourseLocator(url='edx://mit.eecs+honors.6002x/' + VERSION_PREFIX + test_id_loc)
         self.check_course_locn_fields(testobj, 'error parsing url with both course ID and version GUID',
                                       package_id='mit.eecs-honors.6002x',
                                       version_guid=ObjectId(test_id_loc))
 
     def test_course_constructor_url_package_id_branch_and_version_guid(self):
         test_id_loc = '519665f6223ebd6980884f2b'
-        testobj = CourseLocator(url='edx://mit.eecs.~6002x/' + BRANCH_PREFIX + 'draft-1/' + VERSION_PREFIX + test_id_loc)
+        testobj = CourseLocator(url='edx://mit.eecs+~6002x/' + BRANCH_PREFIX + 'draft-1/' + VERSION_PREFIX + test_id_loc)
         self.check_course_locn_fields(testobj, 'error parsing url with both course ID branch, and version GUID',
                                       package_id='mit.eecs.~6002x',
                                       branch='draft-1',
@@ -254,7 +254,7 @@ class LocatorTest(TestCase):
         """
         It seems we used to use colons in names; so, ensure they're acceptable.
         """
-        package_id = 'mit.eecs-1'
+        package_id = 'mit.eecs+1'
         branch = 'foo'
         block_id = 'problem:with-colon~2'
         testobj = BlockUsageLocator(package_id=package_id, branch=branch, block_id=block_id)
@@ -264,7 +264,7 @@ class LocatorTest(TestCase):
         """
         Test making a relative usage locator.
         """
-        package_id = 'mit.eecs-1'
+        package_id = 'mit.eecs+1'
         branch = 'foo'
         baseobj = CourseLocator(package_id=package_id, branch=branch)
         block_id = 'problem:with-colon~2'
@@ -281,7 +281,7 @@ class LocatorTest(TestCase):
     def test_repr(self):
         testurn = 'mit.eecs+6002x/' + BRANCH_PREFIX + 'published/' + BLOCK_PREFIX + 'HW3'
         testobj = BlockUsageLocator(package_id=testurn)
-        self.assertEqual('BlockUsageLocator("mit.eecs+6002x/branch/published/block/HW3")', repr(testobj))
+        self.assertEqual("BlockUsageLocator('mit.eecs', '6002x', 'published', None, 'HW3')", repr(testobj))
 
     def test_old_location_helpers(self):
         """
@@ -318,7 +318,7 @@ class LocatorTest(TestCase):
         """
         Test the url_reverse method
         """
-        locator = CourseLocator(package_id="a.fancy_course-id", branch="branch_1.2-3")
+        locator = CourseLocator(package_id="a+fancy_course-id", branch="branch_1.2-3")
         self.assertEqual(
             '/expression/{}/format'.format(unicode(locator)),
             locator.url_reverse('expression', 'format')
@@ -351,12 +351,13 @@ class LocatorTest(TestCase):
     # Utilities
 
     def check_course_locn_fields(self, testobj, msg, version_guid=None,
-                                 package_id=None, branch=None):
+                                 org=None, offering=None, branch=None):
         """
         Checks the version, package_id, and branch in testobj
         """
         self.assertEqual(testobj.version_guid, version_guid, msg)
-        self.assertEqual(testobj.package_id, package_id, msg)
+        self.assertEqual(testobj.org, org, msg)
+        self.assertEqual(testobj.offering, offering, msg)
         self.assertEqual(testobj.branch, branch, msg)
 
     def check_block_locn_fields(self, testobj, msg, version_guid=None,

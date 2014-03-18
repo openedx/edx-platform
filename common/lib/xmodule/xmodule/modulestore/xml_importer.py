@@ -284,7 +284,7 @@ def import_from_xml(
 
         finally:
             # turn back on all write signalling on stores that need it
-            if hasattr(store, 'ignore_write_events_on_courses') and
+            if (hasattr(store, 'ignore_write_events_on_courses') and
                     dest_course_id in store.ignore_write_events_on_courses):
                 store.ignore_write_events_on_courses.remove(dest_course_id)
                 store.refresh_cached_metadata_inheritance_tree(dest_course_id)
