@@ -343,7 +343,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_default_tabs_on_create_course(self):
         module_store = modulestore('direct')
-        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        CourseFactory.create(org='edX', course='999', run='Robot_Super_Course', display_name='Robot Super Course')
         course_location = Location('i4x', 'edX', '999', 'course', 'Robot_Super_Course', None)
 
         course = module_store.get_item(course_location)

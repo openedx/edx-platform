@@ -36,7 +36,7 @@ def delete_course_and_groups(course_id, commit=False):
     module_store = modulestore('direct')
     content_store = contentstore()
 
-    module_store.ignore_write_events_on_courses.append(course_id)
+    module_store.ignore_write_events_on_courses.add(course_id)
 
     if delete_course(module_store, content_store, course_id, commit):
 

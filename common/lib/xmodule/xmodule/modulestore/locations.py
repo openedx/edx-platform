@@ -155,7 +155,7 @@ class Location(UsageKey, DefinitionKey):
             return False
         return True
 
-    def __init__(self, tag, org, course, run, category, name, revision):
+    def __init__(self, tag, org, course, run, category, name, revision=None):
         """
         Create a new Location that is a clone of the specifed one.
 

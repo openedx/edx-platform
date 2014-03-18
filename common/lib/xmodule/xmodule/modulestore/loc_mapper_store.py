@@ -87,12 +87,12 @@ class LocMapperStore(object):
         Location block names and the values are the BlockUsageLocator.block_id.
         """
         if package_id is None:
-            package_id = u"{0.org}.{0.course}.{0.run}".format(course_location.course_key())
+            package_id = u"{0.org}.{0.course}.{0.run}".format(course_location.course_key)
 
         # very like _interpret_location_id but w/o the _id
-        location_id = self._construct_location_son(course_location.course_key())
+        location_id = self._construct_location_son(course_location.course_key)
         # create location id with lower case
-        location_id_lower = self._construct_location_son(course_location.course_key(), True)
+        location_id_lower = self._construct_location_son(course_location.course_key, True)
 
         try:
             self.location_map.insert({
@@ -147,7 +147,7 @@ class LocMapperStore(object):
         if len(maps) == 0:
             if add_entry_if_missing:
                 # create a new map
-                course_location = location.course_key().make_usage_key('course', location_id['_id']['name'])
+                course_location = location.course_key.make_usage_key('course', location_id['_id']['name'])
                 self.create_map_entry(course_location)
                 entry = self.location_map.find_one(location_id)
             else:
@@ -334,7 +334,7 @@ class LocMapperStore(object):
 
         :param location: a Location object which may be to a module or a course.
         """
-        return bson.son.SON([('_id', self._construct_location_son(location.course_key(), lower_only))])
+        return bson.son.SON([('_id', self._construct_location_son(location.course_key, lower_only))])
 
     def _generate_location_course_id(self, entry_id):
         """
@@ -398,7 +398,7 @@ class LocMapperStore(object):
         """
         See if the location x published pair is in the cache. If so, return the mapped locator.
         """
-        entry = self.cache.get(u'{}+{}'.format(location.course_key(), location))
+        entry = self.cache.get(u'{}+{}'.format(location.course_key, location))
         if entry is not None:
             if published:
                 return entry[0]

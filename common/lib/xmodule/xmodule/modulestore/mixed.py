@@ -112,10 +112,10 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 you can search by ``edited_by``, ``edited_on`` providing either a datetime for == (probably
                 useless) or a tuple (">"|"<" datetime) for after or before, etc.
         """
-        if (course_key is None) or (not isinstance(course_key, CourseKey)):
+        if not isinstance(course_key, CourseKey):
             raise Exception("Must pass in a course_key when calling get_items()")
 
-        store = self._get_modulestore_for_courseid(course_id)
+        store = self._get_modulestore_for_courseid(course_key)
         return store.get_items(course_key, **kwargs)
 
     def _get_course_id_from_course_location(self, course_location):
@@ -210,76 +210,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
             errs.update(store.get_errored_courses())
         return errs
 
-    def _get_course_id_from_block(self, block, store):
-        """
-        Get the course_id from the block or from asking its store. Expensive.
-        """
-        try:
-            return block.course_id
-        except UndefinedContext:
-            pass
-        try:
-            course = store._get_course_for_item(block.scope_ids.usage_id)
-            if course is not None:
-                return course.scope_ids.usage_id.course_id
-        except Exception:  # sorry, that method just raises vanilla Exception if it doesn't find course
-            pass
-
-    def _infer_course_id_try(self, location):
-        """
-        Create, Update, Delete operations don't require a fully-specified course_id, but
-        there's no complete & sound general way to compute the course_id except via the
-        proper modulestore. This method attempts several sound but not complete methods.
-        :param location: an old style Location
-        """
-        if isinstance(location, CourseLocator):
-            return location.package_id
-        elif isinstance(location, basestring):
-            try:
-                location = Location(location)
-            except InvalidLocationError:
-                # try to parse as a course_id
-                try:
-                    Location.parse_course_id(location)
-                    # it's already a course_id
-                    return location
-                except ValueError:
-                    # cannot interpret the location
-                    return None
-
-        # location is a Location at this point
-        if location.category == 'course':  # easiest case
-            return location.course_id
-        # try finding in loc_mapper
-        try:
-            # see if the loc mapper knows the course id (requires double translation)
-            locator = loc_mapper().translate_location_to_course_locator(None, location)
-            location = loc_mapper().translate_locator_to_location(locator, get_course=True)
-            return location.course_id
-        except ItemNotFoundError:
-            pass
-        # expensive query against all location-based modulestores to look for location.
-        for store in self.modulestores.itervalues():
-            if isinstance(location, store.reference_type):
-                try:
-                    xblock = store.get_item(location)
-                    course_id = self._get_course_id_from_block(xblock, store)
-                    if course_id is not None:
-                        return course_id
-                except NotImplementedError:
-                    blocks = store.get_items(location)
-                    if len(blocks) == 1:
-                        block = blocks[0]
-                        try:
-                            return block.course_id
-                        except UndefinedContext:
-                            pass
-                except ItemNotFoundError:
-                    pass
-        # if we get here, it must be in a Locator based store, but we won't be able to find
-        # it.
-        return None
-
     def create_course(self, course_id, user_id=None, store_name='default', **kwargs):
         """
         Creates and returns the course.
@@ -314,14 +244,10 @@ class MixedModuleStore(ModuleStoreWriteBase):
         it installs the new item as a child of the parent (if the parent_loc is a specific
         xblock reference).
 
-        :param course_or_parent_loc: Can be a course_id (org/course/run), CourseLocator,
-        Location, or BlockUsageLocator but must be what the persistence modulestore expects
+        :param course_or_parent_loc: Can be a CourseKey or UsageKey
         """
         # find the store for the course
-        course_id = self._infer_course_id_try(course_or_parent_loc)
-        if course_id is None:
-            raise ItemNotFoundError(u"Cannot find modulestore for %s" % course_or_parent_loc)
-
+        course_id = getattr(course_or_parent_loc, 'course_key', course_or_parent_loc)
         store = self._get_modulestore_for_courseid(course_id)
 
         location = kwargs.pop('location', None)
@@ -373,9 +299,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         Update the xblock persisted to be the same as the given for all types of fields
         (content, children, and metadata) attribute the change to the given user.
         """
-        course_id = self._infer_course_id_try(xblock.scope_ids.usage_id)
-        if course_id is None:
-            raise ItemNotFoundError(u"Cannot find modulestore for %s" % xblock.scope_ids.usage_id)
+        course_id = xblock.scope_ids.usage_id.course_key
         store = self._get_modulestore_for_courseid(course_id)
         return store.update_item(xblock, user_id)
 
@@ -383,9 +307,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
         """
-        course_id = self._infer_course_id_try(location)
-        if course_id is None:
-            raise ItemNotFoundError(u"Cannot find modulestore for %s" % location)
+        course_id = location.course_key
         store = self._get_modulestore_for_courseid(course_id)
         return store.delete_item(location, user_id=user_id, **kwargs)
 
