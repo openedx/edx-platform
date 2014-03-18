@@ -18,6 +18,7 @@ from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Integer
@@ -34,7 +35,7 @@ class DummySystem(ImportSystem):
     def __init__(self, load_error_modules):
 
         xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
-        course_id = "/".join([ORG, COURSE, 'test_run'])
+        course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
         course_dir = "test_dir"
         error_tracker = Mock()
         parent_tracker = Mock()
@@ -385,7 +386,7 @@ class ImportTestCase(BaseCourseTestCase):
         toy_id = "edX/toy/2012_Fall"
         two_toy_id = "edX/toy/TT_2012_Fall"
 
-        location = Location(["i4x", "edX", "toy", "video", "Welcome"])
+        location = Location("i4x", "edX", "toy", "2012_Fall", "video", "Welcome", None)
         toy_video = modulestore.get_item(location)
         two_toy_video = modulestore.get_item(location)
         self.assertEqual(toy_video.youtube_id_1_0, "p2Q6BrNhdh8")
@@ -419,8 +420,7 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEquals(ch2, also_ch2)
 
         print("making sure html loaded")
-        cloc = course.location
-        loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
+        loc = course.id.make_usage_key('html', 'secret:toylab')
         html = modulestore.get_item(loc)
         self.assertEquals(html.display_name, "Toy lab")
 
@@ -483,19 +483,11 @@ class ImportTestCase(BaseCourseTestCase):
 
         self.assertEqual(len(sections), 1)
 
-        location = course.location
-
-        conditional_location = Location(
-            location.tag, location.org, location.course,
-            'conditional', 'condone'
-        )
+        conditional_location = course.id.make_usage_key('conditional', 'condone')
         module = modulestore.get_item(conditional_location)
         self.assertEqual(len(module.children), 1)
 
-        poll_location = Location(
-            location.tag, location.org, location.course,
-            'poll_question', 'first_poll'
-        )
+        poll_location = course.id.make_usage_key('poll_question', 'first_poll')
         module = modulestore.get_item(poll_location)
         self.assertEqual(len(module.get_children()), 0)
         self.assertEqual(module.voted, False)
@@ -527,7 +519,7 @@ class ImportTestCase(BaseCourseTestCase):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['graphic_slider_tool'])
 
         sa_id = "edX/gst_test/2012_Fall"
-        location = Location(["i4x", "edX", "gst_test", "graphical_slider_tool", "sample_gst"])
+        location = Location("i4x", "edX", "gst_test", "2012_Fall", "graphical_slider_tool", "sample_gst", None)
         gst_sample = modulestore.get_item(location)
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\
@@ -544,11 +536,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         self.assertEqual(len(sections), 1)
 
-        location = course.location
-        location = Location(
-            location.tag, location.org, location.course,
-            'word_cloud', 'cloud1'
-        )
+        location = course.id.make_usage_key('word_cloud', 'cloud1')
         module = modulestore.get_item(location)
         self.assertEqual(len(module.get_children()), 0)
         self.assertEqual(module.num_inputs, 5)
