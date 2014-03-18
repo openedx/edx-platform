@@ -43,8 +43,6 @@ CC_MERCHANT_NAME = PLATFORM_NAME
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
-PERFSTATS = False
-
 DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
@@ -1096,7 +1094,6 @@ INSTALLED_APPS = (
     # Our courseware
     'circuit',
     'courseware',
-    'lms.lib.perfstats',
     'student',
     'static_template_view',
     'staticbook',
