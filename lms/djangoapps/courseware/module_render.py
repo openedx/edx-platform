@@ -1,9 +1,11 @@
+import hashlib
 import json
 import logging
 import mimetypes
 
 import static_replace
 
+from collections import OrderedDict
 from functools import partial
 from requests.auth import HTTPBasicAuth
 from dogapi import dog_stats_api
@@ -12,6 +14,7 @@ from opaque_keys import InvalidKeyError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.core.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
@@ -30,7 +33,7 @@ from student.models import anonymous_id_for_user, user_by_anonymous_id
 from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, KeyValueStore
-from xblock.exceptions import NoSuchHandlerError
+from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -660,30 +663,19 @@ def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argumen
     return HttpResponse(content, mimetype=mimetype)
 
 
-def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
+def _get_module_by_usage_id(request, course_id, usage_id):
     """
-    Invoke an XBlock handler, either authenticated or not.
+    Gets a module instance based on its `usage_id` in a course, for a given request/user
 
-    Arguments:
-        request (HttpRequest): the current request
-        course_id (str): A string of the form org/course/run
-        usage_id (str): A string of the form i4x://org/course/category/name@revision
-        handler (str): The name of the handler to invoke
-        suffix (str): The suffix to pass to the handler when invoked
-        user (User): The currently logged in user
-
+    Returns (location, descriptor, instance)
     """
+    user = request.user
+
     try:
         course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_id))
     except InvalidKeyError:
         raise Http404("Invalid location")
-
-    # Check submitted files
-    files = request.FILES or {}
-    error_msg = _check_files_limits(files)
-    if error_msg:
-        return HttpResponse(json.dumps({'success': error_msg}))
 
     try:
         descriptor = modulestore().get_item(usage_key)
@@ -696,13 +688,6 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         )
         raise Http404
 
-    tracking_context_name = 'module_callback_handler'
-    tracking_context = {
-        'module': {
-            'display_name': descriptor.display_name_with_default,
-        }
-    }
-
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
         user,
@@ -714,6 +699,37 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         # and load something they shouldn't have access to.
         log.debug("No module %s for user %s -- access denied?", usage_key, user)
         raise Http404
+
+    return instance
+
+
+def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
+    """
+    Invoke an XBlock handler, either authenticated or not.
+
+    Arguments:
+        request (HttpRequest): the current request
+        course_id (str): A string of the form org/course/run
+        usage_id (str): A string of the form i4x://org/course/category/name@revision
+        handler (str): The name of the handler to invoke
+        suffix (str): The suffix to pass to the handler when invoked
+        user (User): The currently logged in user
+    """
+
+    # Check submitted files
+    files = request.FILES or {}
+    error_msg = _check_files_limits(files)
+    if error_msg:
+        return HttpResponse(json.dumps({'success': error_msg}))
+
+    instance = _get_module_by_usage_id(request, course_id, usage_id)
+
+    tracking_context_name = 'module_callback_handler'
+    tracking_context = {
+        'module': {
+            'display_name': instance.display_name_with_default,
+        }
+    }
 
     req = django_to_webob_request(request)
     try:
@@ -741,6 +757,44 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         raise
 
     return webob_to_django_response(resp)
+
+
+def hash_resource(resource):
+    """
+    Hash a :class:`xblock.fragment.FragmentResource
+    """
+    md5 = hashlib.md5()
+    for data in resource:
+        md5.update(data)
+    return md5.hexdigest()
+
+
+def xblock_view(request, course_id, usage_id, view_name):
+    """
+    Returns the rendered view of a given XBlock, with related resources
+
+    Returns a json object containing two keys:
+        html: The rendered html of the view
+        resources: A list of tuples where the first element is the resource hash, and
+            the second is the resource description
+    """
+    instance = _get_module_by_usage_id(request, course_id, usage_id)
+
+    try:
+        fragment = instance.render(view_name)
+    except NoSuchViewError:
+        log.exception("Attempt to render missing view on %s: %s", instance, view_name)
+        raise Http404
+
+    hashed_resources = OrderedDict()
+    for resource in fragment.resources:
+        hashed_resources[hash_resource(resource)] = resource
+
+    return JsonResponse({
+        'html': fragment.content,
+        'resources': hashed_resources.items(),
+        'csrf_token': str(csrf(request)['csrf_token']),
+    })
 
 
 def get_score_bucket(grade, max_grade):

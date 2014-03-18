@@ -97,6 +97,9 @@ transifex-client==0.10
 # Ip network support for Embargo feature
 ipaddr==2.1.11
 
+# Used to allow to configure CORS headers for cross-domain requests
+django-cors-headers==0.12
+
 # We've tried several times to update the debug toolbar to version 1.0.1,
 # and had problems each time, resulting in us rolling back to 0.9.4. Before
 # submitting another pull request to do this update, check the following:
