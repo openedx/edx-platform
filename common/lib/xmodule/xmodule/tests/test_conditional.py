@@ -55,7 +55,7 @@ class ConditionalFactory(object):
         descriptor_system = get_test_descriptor_system()
 
         # construct source descriptor and module:
-        source_location = Location(["i4x", "edX", "conditional_test", "problem", "SampleProblem"])
+        source_location = Location("i4x", "edX", "conditional_test", "2012_Fall", "problem", "SampleProblem", None)
         if source_is_error_module:
             # Make an error descriptor and module
             source_descriptor = NonStaffErrorDescriptor.from_xml(
@@ -83,7 +83,7 @@ class ConditionalFactory(object):
         descriptor_system.load_item = {'child': child_descriptor, 'source': source_descriptor}.get
 
         # construct conditional module:
-        cond_location = Location(["i4x", "edX", "conditional_test", "conditional", "SampleConditional"])
+        cond_location = Location("i4x", "edX", "conditional_test", "2012_Fall", "conditional", "SampleConditional", None)
         field_data = DictFieldData({
             'data': '<conditional/>',
             'xml_attributes': {'attempted': 'true'},
