@@ -42,6 +42,8 @@ from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, 
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey, CourseKey
+from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
+from student.models import anonymous_id_for_user, user_by_anonymous_id
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
@@ -943,6 +945,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         usage_id (str): A string of the form i4x://org/course/category/name@revision
         handler (str): The name of the handler to invoke
         suffix (str): The suffix to pass to the handler when invoked
+        user (User): The currently logged in user
     """
 
     # Check submitted files
