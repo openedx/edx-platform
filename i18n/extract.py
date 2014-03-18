@@ -210,7 +210,8 @@ def is_key_string(string):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--verbose', '-v', action='count', default=0)
     args = parser.parse_args()
-    main(verbosity=args.verbose)
+    ret = main(verbosity=args.verbose)
+    sys.exit(ret)

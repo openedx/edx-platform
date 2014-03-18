@@ -8,8 +8,9 @@ import copy
 import fnmatch
 import logging
 import sys
-
+import argparse
 import polib
+import textwrap
 
 from i18n.config import CONFIGURATION
 
@@ -116,27 +117,28 @@ def segment_pofile(filename, segments):
     return files_written
 
 
-def main(argv):
-    """
-    $ segment.py LOCALE [...]
-
-    Segment the .po files in LOCALE(s) based on the segmenting rules in
-    config.yaml.
-
-    Note that segmenting is *not* idempotent: it modifies the input file, so
-    be careful that you don't run it twice on the same file.
-
-    """
+def main(locales=None, verbosity=1):
     # This is used as a tool only to segment translation files when adding a
     # new segment.  In the regular workflow, the work is done by the extract
     # phase calling the functions above.
-
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    if len(argv) < 2:
-        sys.exit("Need a locale to segment")
-    for locale in argv[1:]:
+    locales = locales or []
+    for locale in locales:
         segment_pofiles(locale)
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
+    description = textwrap.dedent("""
+        Segment the .po files in LOCALE(s) based on the segmenting rules in
+        config.yaml.
+
+        Note that segmenting is *not* idempotent: it modifies the input file, so
+        be careful that you don't run it twice on the same file.
+    """.strip())
+
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("locale", nargs="+", help="a locale to segment")
+    parser.add_argument("--verbose", "-v", action="count", default=0)
+    args = parser.parse_args()
+    main(locales=args.locale, verbosity=args.verbose)

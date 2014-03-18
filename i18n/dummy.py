@@ -25,6 +25,7 @@ where $DUMMY_LOCALE is the dummy_locale value set in the i18n config
 from __future__ import print_function
 import re
 import sys
+import argparse
 
 import polib
 from path import path
@@ -204,7 +205,7 @@ def main(verbosity=1):
     SOURCE_MSGS_DIR = CONFIGURATION.source_messages_dir
     for locale, converter in zip(CONFIGURATION.dummy_locales, [Dummy(), Dummy2()]):
         if verbosity:
-            print("Processing source language files into dummy strings, locale {}:".format(locale))
+            print('Processing source language files into dummy strings, locale "{}"'.format(locale))
         for source_file in CONFIGURATION.source_messages_dir.walkfiles('*.po'):
             if verbosity:
                 print('   ', source_file.relpath())
@@ -214,4 +215,8 @@ def main(verbosity=1):
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--verbose", "-v", action="count", default=0)
+    args = parser.parse_args()
+    ret = main(verbosity=args.verbose)
+    sys.exit(ret)

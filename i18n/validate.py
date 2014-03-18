@@ -149,20 +149,14 @@ def check_messages(filename, report_empty=False):
         log.info(" No problems found in {0}".format(filename))
 
 
-def parse_args(argv):
+def get_parser():
     """
-    Parse command line arguments, returning a dict of
-    valid options:
-
-        {
-            'empty': BOOLEAN,
-            'verbose': BOOLEAN,
-            'language': str
-        }
-
-    where 'language' is a language code, eg "fr"
+    Returns an argument parser for this script.
     """
-    parser = argparse.ArgumentParser(description="Automatically finds translation errors in all edx-platform *.po files, for all languages, unless one or more language(s) is specified to check.")
+    parser = argparse.ArgumentParser(description=(
+        "Automatically finds translation errors in all edx-platform *.po files, "
+        "for all languages, unless one or more language(s) is specified to check."
+    ))
 
     parser.add_argument(
         '-l', '--language',
@@ -179,39 +173,39 @@ def parse_args(argv):
 
     parser.add_argument(
         '-v', '--verbose',
-        action='store_true',
+        action='count', default=0,
         help="Turns on info-level logging."
     )
 
-    return vars(parser.parse_args(argv))
+    return parser
 
 
-def main():
-    """Main entry point for the tool."""
+def main(languages=None, empty=False, verbosity=1):
+    languages = languages or []
 
-    args_dict = parse_args(sys.argv[1:])
-    if args_dict['verbose']:
-        logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    else:
-        logging.basicConfig(stream=sys.stdout, level=logging.WARNING)
-
-    langs = args_dict['language']
-
-    if langs is not None:
-        # lang will be a list of language codes; test each language.
-        for lang in langs:
-            root = LOCALE_DIR / lang
-            # Assert that a directory for this language code exists on the system
-            if not os.path.isdir(root):
-                log.error(" {0} is not a valid directory.\nSkipping language '{1}'".format(root, lang))
-                continue
-            # If we found the language code's directory, validate the files.
-            validate_po_files(root, args_dict['empty'])
-
-    else:
-        # If lang is None, we walk all of the .po files under root, and test each one.
+    if not languages:
         root = LOCALE_DIR
-        validate_po_files(root, args_dict['empty'])
+        validate_po_files(root, empty)
+        return
+
+    # languages will be a list of language codes; test each language.
+    for language in languages:
+        root = LOCALE_DIR / language
+        # Assert that a directory for this language code exists on the system
+        if not root.isdir():
+            log.error(" {0} is not a valid directory.\nSkipping language '{1}'".format(root, language))
+            continue
+        # If we found the language code's directory, validate the files.
+        validate_po_files(root, empty)
+
 
 if __name__ == '__main__':
-    main()
+    parser = get_parser()
+    args = parser.parse_args()
+    if args.verbose:
+        log_level = logging.INFO
+    else:
+        log_level = logging.WARNING
+    logging.basicConfig(stream=sys.stdout, level=log_level)
+
+    main(languages=args.language, empty=args.empty, verbosity=args.verbose)
