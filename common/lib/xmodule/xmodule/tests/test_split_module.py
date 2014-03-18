@@ -2,11 +2,14 @@
 Tests for the Split Testing Module
 """
 import ddt
-from mock import Mock
+import lxml
+from mock import Mock, patch
+from fs.memoryfs import MemoryFS
 
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests import get_test_system
+from xmodule.split_test_module import SplitTestDescriptor
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.partitions.test_partitions import StaticPartitionService, MemoryUserTagsService
 
@@ -52,6 +55,7 @@ class SplitTestModuleTest(XModuleXmlImportTest):
 
         self.module_system.get_module = get_module
         self.module_system.descriptor_system = self.course.runtime
+        self.course.runtime.export_fs = MemoryFS()
 
         self.tags_service = MemoryUserTagsService()
         self.module_system._services['user_tags'] = self.tags_service  # pylint: disable=protected-access
@@ -120,3 +124,26 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         # So, we check that we get the same url_name when we call on the url_name twice.
         # We run the test ten times so that, if our storage is failing, we'll be most likely to notice it.
         self.assertEquals(self.split_test_module.child_descriptor.url_name, self.split_test_module.child_descriptor.url_name)
+
+    # Patch the definition_to_xml for the html children.
+    @patch('xmodule.html_module.HtmlDescriptor.definition_to_xml')
+    def test_export_import_round_trip(self, def_to_xml):
+        # The HtmlDescriptor definition_to_xml tries to write to the filesystem
+        # before returning an xml object. Patch this to just return the xml.
+        def_to_xml.return_value = lxml.etree.Element('html')
+
+        # Mock out the process_xml
+        # Expect it to return a child descriptor for the SplitTestDescriptor when called.
+        self.module_system.process_xml = Mock()
+
+        # Write out the xml.
+        xml_obj = self.split_test_module.definition_to_xml(MemoryFS())
+
+        self.assertEquals(xml_obj.get('user_partition_id'), '0')
+        self.assertIsNotNone(xml_obj.get('group_id_to_child'))
+
+        # Read the xml back in.
+        fields, children = SplitTestDescriptor.definition_from_xml(xml_obj, self.module_system)
+        self.assertEquals(fields.get('user_partition_id'), '0')
+        self.assertIsNotNone(fields.get('group_id_to_child'))
+        self.assertEquals(len(children), 2)

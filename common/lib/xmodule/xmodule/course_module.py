@@ -172,12 +172,12 @@ class CourseFields(object):
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
                              default=[], scope=Scope.content)
 
-    # This field is intended for Studio to update, not to be exposed directly via
-    # advanced_settings.
+    # This is should be scoped to content, but since it's defined in the policy
+    # file, it is currently scoped to settings.
     user_partitions = UserPartitionList(
         help="List of user partitions of this course into groups, used e.g. for experiments",
         default=[],
-        scope=Scope.content
+        scope=Scope.settings
     )
 
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
