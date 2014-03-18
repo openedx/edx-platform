@@ -12,7 +12,7 @@ ALLOWED_ID_CHARS = r'[\w\-~.:]'
 
 URL_RE_SOURCE = r"""
     (?P<tag>edx://)?
-    ((?P<package_id>{ALLOWED_ID_CHARS}+)/?)?
+    ((?P<org>{ALLOWED_ID_CHARS}+)\+(?P<offering>{ALLOWED_ID_CHARS}+)/?)?
     ({BRANCH_PREFIX}(?P<branch>{ALLOWED_ID_CHARS}+)/?)?
     ({VERSION_PREFIX}(?P<version_guid>[A-F0-9]+)/?)?
     ({BLOCK_PREFIX}(?P<block>{ALLOWED_ID_CHARS}+))?
@@ -55,7 +55,7 @@ def parse_url(string, tag_optional=False):
     return matched_dict
 
 
-BLOCK_RE = re.compile(r'^' + ALLOWED_ID_CHARS + r'+$', re.IGNORECASE | re.UNICODE)
+BLOCK_RE = re.compile(r'^{}+$'.format(ALLOWED_ID_CHARS), re.IGNORECASE | re.UNICODE)
 
 
 def parse_block_ref(string):
@@ -66,7 +66,7 @@ def parse_block_ref(string):
     otherwise returns None.
     """
     if len(string) > 0 and BLOCK_RE.match(string):
-        return {'block': string}
+        return {'block_id': string}
     return None
 
 
@@ -80,18 +80,22 @@ def parse_package_id(string):
 
     Examples of valid package_ids:
 
-      'mit.eecs.6002x'
-      'mit.eecs.6002x/branch/published'
-      'mit.eecs.6002x/block/HW3'
-      'mit.eecs.6002x/branch/published/block/HW3'
-      'mit.eecs.6002x/branch/published/version/519665f6223ebd6980884f2b/block/HW3'
+      'mit.eecs+6002x'
+      'mit.eecs+6002x/branch/published'
+      'mit.eecs+6002x/block/HW3'
+      'mit.eecs+6002x/branch/published/block/HW3'
+      'mit.eecs+6002x/branch/published/version/519665f6223ebd6980884f2b/block/HW3'
 
 
     Syntax:
 
       package_id = main_id [/branch/ branch] [/version/ version ] [/block/ block]
 
-      main_id = name [. name]*
+      main_id = org + offering
+
+      org = name [. name]*
+
+      offering = name [. name]*
 
       branch = name
 
