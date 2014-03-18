@@ -23,7 +23,7 @@ if not SERVICE_VARIANT
     # consider only the words remaining (parse out separators);
     clean_args = clean_args.join(' ').split(/\W/)
     # if lms or cms is among command line words, use it's env:
-    SERVICE_VARIANT = clean_args.include?('lms') ? "lms" : 
+    SERVICE_VARIANT = clean_args.include?('lms') ? "lms" :
 	(clean_args.include?('studio') or clean_args.include?('cms')) ? "cms" :
 	SERVICE_VARIANT
 end
