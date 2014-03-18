@@ -795,15 +795,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         return new_object
 
-    def fire_updated_modulestore_signal(self, location):
-        """
-        Send a signal using `self.modulestore_update_signal`, if that has been set
-        """
-        if self.modulestore_update_signal is not None:
-            self.modulestore_update_signal.send(
-                self, modulestore=self, course_id=location.course_id, location=location
-            )
-
     def _get_course_for_item(self, location, depth=0):
         '''
         for a given Xmodule, return the course that it belongs to
@@ -867,7 +858,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
             # was conditional on children or metadata having changed before dhm made one update to rule them all
             self.refresh_cached_metadata_inheritance_tree(xblock.location)
             # fire signal that we've written to DB
-            self.fire_updated_modulestore_signal(xblock.location)
         except ItemNotFoundError:
             if not allow_not_found:
                 raise
@@ -895,7 +885,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
         self.collection.remove({'_id': namedtuple_to_son(location)}, safe=self.collection.safe)
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(location)
-        self.fire_updated_modulestore_signal(location)
 
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location in this

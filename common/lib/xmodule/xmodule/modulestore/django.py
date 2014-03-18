@@ -66,7 +66,6 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
     return class_(
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
         request_cache=request_cache,
-        modulestore_update_signal=Signal(providing_args=['modulestore', 'course_id', 'location']),
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
         xblock_select=getattr(settings, 'XBLOCK_SELECT_FUNCTION', None),
         doc_store_config=doc_store_config,

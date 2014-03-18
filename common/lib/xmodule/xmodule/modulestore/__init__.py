@@ -252,7 +252,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         self,
         doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
-        modulestore_update_signal=None, xblock_mixins=(), xblock_select=None,
+        xblock_mixins=(), xblock_select=None,
         # temporary parms to enable backward compatibility. remove once all envs migrated
         db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None,
         # allow lower level init args to pass harmlessly
@@ -263,7 +263,6 @@ class ModuleStoreReadBase(ModuleStoreRead):
         '''
         self._course_errors = defaultdict(make_error_tracker)  # location -> ErrorLog
         self.metadata_inheritance_cache_subsystem = metadata_inheritance_cache_subsystem
-        self.modulestore_update_signal = modulestore_update_signal
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
         self.xblock_select = xblock_select
