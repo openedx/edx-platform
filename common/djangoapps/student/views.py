@@ -653,7 +653,7 @@ def _parse_course_id_from_string(input_str):
     @param input_str:
     @return: the course_id if found, None if not
     """
-    m_obj = re.match(r'^/courses/(?P<course_id>[^/]+)', input_str)
+    m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
     if m_obj:
         return CourseKey.from_string(m_obj.group('course_id'))
     return None
