@@ -12,7 +12,7 @@ class TestAnalyticsDistributions(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
-        self.course_id = 'some/robot/course/id'
+        self.course_id = 'robot/course/id'
 
         self.users = [UserFactory(
             profile__gender=['m', 'f', 'o'][i % 3],
@@ -53,7 +53,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
-        self.course_id = 'some/robot/course/id'
+        self.course_id = 'robot/course/id'
 
         self.users = [UserFactory(
             profile__year_of_birth=i + 1930,

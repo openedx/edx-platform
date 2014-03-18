@@ -15,6 +15,7 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.keys import CourseKey
 
 from bulk_email.models import CourseAuthorization
 
@@ -100,7 +101,7 @@ class TestStudentDashboardEmailViewXMLBacked(ModuleStoreTestCase):
 
         # Create student account
         student = UserFactory.create()
-        CourseEnrollmentFactory.create(user=student, course_id=self.course_name)
+        CourseEnrollmentFactory.create(user=student, course_id=self.course_name, course_key=CourseKey.from_string(self.course_name))
         self.client.login(username=student.username, password="test")
 
         try:
