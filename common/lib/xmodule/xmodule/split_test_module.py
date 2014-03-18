@@ -3,6 +3,7 @@ Module for running content split tests
 """
 
 import logging
+import json
 from webob import Response
 
 from xmodule.progress import Progress
@@ -251,11 +252,37 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
     def definition_to_xml(self, resource_fs):
 
         xml_object = etree.Element('split_test')
-        # TODO: also save the experiment id and the condition map
+        xml_object.set('group_id_to_child', json.dumps(self.group_id_to_child))
+        xml_object.set('user_partition_id', str(self.user_partition_id))
         for child in self.get_children():
-            xml_object.append(
-                etree.fromstring(child.export_to_xml(resource_fs)))
+            self.runtime.add_block_as_child_node(child, xml_object)
         return xml_object
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        children = []
+        raw_group_id_to_child = xml_object.attrib.get('group_id_to_child', None)
+        user_partition_id = xml_object.attrib.get('user_partition_id', None)
+        try:
+            group_id_to_child = json.loads(raw_group_id_to_child)
+        except ValueError:
+            msg = "group_id_to_child is not valid json"
+            log.exception(msg)
+            system.error_tracker(msg)
+
+        for child in xml_object:
+            try:
+                descriptor = system.process_xml(etree.tostring(child))
+                children.append(descriptor.scope_ids.usage_id)
+            except Exception:
+                msg = "Unable to load child when parsing split_test module."
+                log.exception(msg)
+                system.error_tracker(msg)
+
+        return ({
+            'group_id_to_child': group_id_to_child,
+            'user_partition_id': user_partition_id
+        }, children)
 
     def has_dynamic_children(self):
         """
