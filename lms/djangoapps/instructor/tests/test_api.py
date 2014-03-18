@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for instructor.api methods.
 """
@@ -23,7 +24,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory
-from courseware.tests.factories import StaffFactory, InstructorFactory
+from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory
+from student.roles import CourseBetaTesterRole
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
@@ -135,6 +137,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
+            ('bulk_beta_modify_access', {'emails': 'foo@example.org', 'action': 'add'}),
             ('modify_access', {'unique_student_identifier': self.user.email, 'rolename': 'beta', 'action': 'allow'}),
             ('list_course_role_members', {'rolename': 'beta'}),
             ('rescore_problem', {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
@@ -603,6 +606,193 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
             "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course and login.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+        )
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test bulk beta modify access endpoint.
+    """
+    def setUp(self):
+        self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course=self.course.location)
+        self.client.login(username=self.instructor.username, password='test')
+
+        self.beta_tester = BetaTesterFactory(course=self.course.location)
+        CourseEnrollment.enroll(
+            self.beta_tester,
+            self.course.id
+        )
+
+        self.notenrolled_student = UserFactory(username='NotEnrolledStudent')
+
+        self.notregistered_email = 'robot-not-an-email-yet@robot.org'
+        self.assertEqual(User.objects.filter(email=self.notregistered_email).count(), 0)
+
+        # uncomment to enable enable printing of large diffs
+        # from failed assertions in the event of a test failure.
+        # (comment because pylint C0103)
+        # self.maxDiff = None
+
+    def test_missing_params(self):
+        """ Test missing all query parameters. """
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+    def test_bad_action(self):
+        """ Test with an invalid action. """
+        action = 'robot-not-an-action'
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.beta_tester.email, 'action': action})
+        self.assertEqual(response.status_code, 400)
+
+    def test_add_notenrolled(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': False})
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(self.notenrolled_student))
+        # test the response data
+        expected = {
+            "action": "add",
+            "results": [
+                {
+                    "email": self.notenrolled_student.email,
+                    "error": False,
+                    "userDoesNotExist": False
+                }
+            ]
+        }
+
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_add_notenrolled_with_email(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(self.notenrolled_student))
+        # test the response data
+        expected = {
+            "action": "add",
+            "results": [
+                {
+                    "email": self.notenrolled_student.email,
+                    "error": False,
+                    "userDoesNotExist": False
+                }
+            ]
+        }
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been invited to a beta test for Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            u"Dear {0}\n\nYou have been invited to be a beta tester "
+            "for Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Visit https://edx.org/courses/MITx/999/Robot_Super_Course/about to join "
+            "the course and begin the beta test.\n\n----\n"
+            "This email was automatically sent from edx.org to {1}".format(
+                self.notenrolled_student.profile.name,
+                self.notenrolled_student.email
+            )
+        )
+
+    def test_enroll_with_email_not_registered(self):
+        # User doesn't exist
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'add', 'email_students': True})
+        self.assertEqual(response.status_code, 200)
+        # test the response data
+        expected = {
+            "action": "add",
+            "results": [
+                {
+                    "email": self.notregistered_email,
+                    "error": True,
+                    "userDoesNotExist": True
+                }
+            ]
+        }
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_remove_without_email(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.beta_tester.email, 'action': 'remove', 'email_students': False})
+        self.assertEqual(response.status_code, 200)
+
+        self.assertFalse(CourseBetaTesterRole(self.course.location).has_user(self.beta_tester))
+
+        # test the response data
+        expected = {
+            "action": "remove",
+            "results": [
+                {
+                    "email": self.beta_tester.email,
+                    "error": False,
+                    "userDoesNotExist": False
+                }
+            ]
+        }
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_remove_with_email(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.beta_tester.email, 'action': 'remove', 'email_students': True})
+        self.assertEqual(response.status_code, 200)
+
+        self.assertFalse(CourseBetaTesterRole(self.course.location).has_user(self.beta_tester))
+
+        # test the response data
+        expected = {
+            "action": "remove",
+            "results": [
+                {
+                    "email": self.beta_tester.email,
+                    "error": False,
+                    "userDoesNotExist": False
+                }
+            ]
+        }
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been removed from a beta test for Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear {full_name}\n\nYou have been removed as a beta tester for "
+            "Robot Super Course at edx.org by a member of the course staff. "
+            "The course will remain on your dashboard, but you will no longer "
+            "be part of the beta testing group.\n\n"
+            "Your other courses have not been affected.\n\n----\n"
+            "This email was automatically sent from edx.org to {email_address}".format(
+                full_name=self.beta_tester.profile.name,
+                email_address=self.beta_tester.email
+            )
         )
 
 

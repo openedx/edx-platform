@@ -140,6 +140,30 @@ def unenroll_email(course_id, student_email, email_students=False, email_params=
     return previous_state, after_state
 
 
+def send_beta_role_email(action, user, email_params):
+    """
+    Send an email to a user added or removed as a beta tester.
+
+    `action` is one of 'add' or 'remove'
+    `user` is the User affected
+    `email_params` parameters used while parsing email templates (a `dict`).
+    """
+    if action == 'add':
+        email_params['message'] = 'add_beta_tester'
+        email_params['email_address'] = user.email
+        email_params['full_name'] = user.profile.name
+
+    elif action == 'remove':
+        email_params['message'] = 'remove_beta_tester'
+        email_params['email_address'] = user.email
+        email_params['full_name'] = user.profile.name
+
+    else:
+        raise ValueError("Unexpected action received '{}' - expected 'add' or 'remove'".format(action))
+
+    send_mail_to_student(user.email, email_params)
+
+
 def reset_student_attempts(course_id, student, module_state_key, delete_module=False):
     """
     Reset student attempts for a problem. Optionally deletes all student state for the specified problem.
@@ -257,7 +281,15 @@ def send_mail_to_student(student, param_dict):
         'enrolled_unenroll': (
             'emails/unenroll_email_subject.txt',
             'emails/unenroll_email_enrolledmessage.txt'
-        )
+        ),
+        'add_beta_tester': (
+            'emails/add_beta_tester_email_subject.txt',
+            'emails/add_beta_tester_email_message.txt'
+        ),
+        'remove_beta_tester': (
+            'emails/remove_beta_tester_email_subject.txt',
+            'emails/remove_beta_tester_email_message.txt'
+        ),
     }
 
     subject_template, message_template = email_template_dict.get(message_type, (None, None))

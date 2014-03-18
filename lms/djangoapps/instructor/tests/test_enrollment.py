@@ -9,9 +9,13 @@ from django.test import TestCase
 from student.tests.factories import UserFactory
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from instructor.enrollment import (EmailEnrollmentState,
-                                   enroll_email, unenroll_email,
-                                   reset_student_attempts)
+from instructor.enrollment import (
+    EmailEnrollmentState,
+    enroll_email,
+    reset_student_attempts,
+    send_beta_role_email,
+    unenroll_email
+)
 
 
 class TestSettableEnrollmentState(TestCase):
@@ -365,3 +369,19 @@ class SettableEnrollmentState(EmailEnrollmentState):
             return EnrollmentObjects(email, None, None, cea)
         else:
             return EnrollmentObjects(email, None, None, None)
+
+
+class TestSendBetaRoleEmail(TestCase):
+    """
+    Test edge cases for `send_beta_role_email`
+    """
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.email_params = {'course': 'Robot Super Course'}
+
+    def test_bad_action(self):
+        bad_action = 'beta_tester'
+        error_msg = "Unexpected action received '{}' - expected 'add' or 'remove'".format(bad_action)
+        with self.assertRaisesRegexp(ValueError, error_msg):
+            send_beta_role_email(bad_action, self.user, self.email_params)

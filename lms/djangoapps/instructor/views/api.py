@@ -37,7 +37,12 @@ from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.views import get_task_completion_info
 from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
-from instructor.enrollment import enroll_email, unenroll_email, get_email_params
+from instructor.enrollment import (
+    enroll_email,
+    get_email_params,
+    send_beta_role_email,
+    unenroll_email
+)
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 import analytics.basic
 import analytics.distributions
@@ -274,6 +279,76 @@ def students_update_enrollment(request, course_id):
         'action': action,
         'results': results,
         'auto_enroll': auto_enroll,
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+@common_exceptions_400
+@require_query_params(
+    emails="stringified list of emails",
+    action="add or remove",
+)
+def bulk_beta_modify_access(request, course_id):
+    """
+    Enroll or unenroll users in beta testing program.
+
+    Query parameters:
+    - emails is string containing a list of emails separated by anything split_input_list can handle.
+    - action is one of ['add', 'remove']
+    """
+    action = request.GET.get('action')
+    emails_raw = request.GET.get('emails')
+    emails = _split_input_list(emails_raw)
+    email_students = request.GET.get('email_students') in ['true', 'True', True]
+    results = []
+    rolename = 'beta'
+    course = get_course_by_id(course_id)
+
+    email_params = {}
+    if email_students:
+        email_params = get_email_params(course, auto_enroll=False)
+
+    for email in emails:
+        try:
+            error = False
+            user_does_not_exist = False
+            user = User.objects.get(email=email)
+
+            if action == 'add':
+                allow_access(course, user, rolename)
+            elif action == 'remove':
+                revoke_access(course, user, rolename)
+            else:
+                return HttpResponseBadRequest(strip_tags(
+                    "Unrecognized action '{}'".format(action)
+                ))
+        except User.DoesNotExist:
+            error = True
+            user_does_not_exist = True
+        # catch and log any unexpected exceptions
+        # so that one error doesn't cause a 500.
+        except Exception as exc:  # pylint: disable=broad-except
+            log.exception("Error while #{}ing student")
+            log.exception(exc)
+            error = True
+        else:
+            # If no exception thrown, see if we should send an email
+            if email_students:
+                send_beta_role_email(action, user, email_params)
+        finally:
+            # Tabulate the action result of this email address
+            results.append({
+                'email': email,
+                'error': error,
+                'userDoesNotExist': user_does_not_exist
+            })
+
+    response_payload = {
+        'action': action,
+        'results': results,
     }
     return JsonResponse(response_payload)
 
