@@ -2,8 +2,7 @@ from factory import Factory, lazy_attribute_sequence, lazy_attribute
 from factory.containers import CyclicDefinitionError
 from uuid import uuid4
 
-from xmodule.modulestore import Location
-from xmodule.x_module import prefer_xmodules
+from xmodule.modulestore import Location, prefer_xmodules
 from xblock.core import XBlock
 
 
@@ -57,8 +56,10 @@ class CourseFactory(XModuleFactory):
         for k, v in kwargs.iteritems():
             setattr(new_course, k, v)
 
+        # Save the attributes we just set
+        new_course.save()
         # Update the data in the mongo datastore
-        store.save_xmodule(new_course)
+        store.update_item(new_course)
         return new_course
 
 
@@ -157,9 +158,10 @@ class ItemFactory(XModuleFactory):
 
         for attr, val in kwargs.items():
             setattr(module, attr, val)
+        # Save the attributes we just set
         module.save()
 
-        store.save_xmodule(module)
+        store.update_item(module)
 
         if 'detached' not in module._class_tags:
             parent.children.append(location.url())

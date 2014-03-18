@@ -36,6 +36,13 @@ class AcidView(PageObject):
         selector = '{} .acid-block {} .pass'.format(self.context_selector, test_selector)
         return bool(self.q(css=selector).results)
 
+    def child_test_passed(self, test_selector):
+        """
+        Return whether a particular :class:`.AcidParentBlock` test passed.
+        """
+        selector = '{} .acid-parent-block {} .pass'.format(self.context_selector, test_selector)
+        return bool(self.q(css=selector).execute(try_interval=0.1, timeout=3))
+
     @property
     def init_fn_passed(self):
         """
@@ -49,8 +56,8 @@ class AcidView(PageObject):
         Whether the tests of children passed
         """
         return all([
-            self.test_passed('.child-counts-match'),
-            self.test_passed('.child-values-match')
+            self.child_test_passed('.child-counts-match'),
+            self.child_test_passed('.child-values-match')
         ])
 
     @property

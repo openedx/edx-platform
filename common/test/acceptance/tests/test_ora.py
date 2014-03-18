@@ -206,7 +206,7 @@ class AIAssessmentTest(OpenResponseTest):
 
     XQUEUE_GRADE_RESPONSE = {
         'score': 1,
-        'feedback': {"spelling": "Ok.", "grammar": "Ok.", "markup_text": "NA"},
+        'feedback': json.dumps({"spelling": "Ok.", "grammar": "Ok.", "markup_text": "NA"}),
         'grader_type': 'BC',
         'success': True,
         'grader_id': 1,
@@ -251,7 +251,7 @@ class InstructorAssessmentTest(OpenResponseTest):
 
     XQUEUE_GRADE_RESPONSE = {
         'score': 1,
-        'feedback': {"feedback": "Good job!"},
+        'feedback': json.dumps({"feedback": "Good job!"}),
         'grader_type': 'IN',
         'success': True,
         'grader_id': 1,

@@ -308,8 +308,9 @@ class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):
         """)
         self.clear_subs_content(youtube_subs)
 
-        # Check transcripts_utils.TranscriptsGenerationException not thrown
-        transcripts_utils.generate_subs_from_source(youtube_subs, 'srt', srt_filedata, self.course)
+        # Check transcripts_utils.TranscriptsGenerationException not thrown.
+        # Also checks that uppercase file extensions are supported.
+        transcripts_utils.generate_subs_from_source(youtube_subs, 'SRT', srt_filedata, self.course)
 
         # Check assets status after importing subtitles.
         for subs_id in youtube_subs.values():
@@ -486,3 +487,64 @@ class TestYoutubeTranscripts(unittest.TestCase):
             transcripts = transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
         self.assertEqual(transcripts, expected_transcripts)
         mock_get.assert_called_with('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_youtube_id'})
+
+class TestTranscript(unittest.TestCase):
+    """
+    Tests for Transcript class e.g. different transcript conversions.
+    """
+    def setUp(self):
+
+        self.srt_transcript = textwrap.dedent("""\
+            0
+            00:00:10,500 --> 00:00:13,000
+            Elephant&#39;s Dream
+
+            1
+            00:00:15,000 --> 00:00:18,000
+            At the left we can see...
+
+        """)
+
+
+        self.sjson_transcript = textwrap.dedent("""\
+            {
+                "start": [
+                    10500,
+                    15000
+                ],
+                "end": [
+                    13000,
+                    18000
+                ],
+                "text": [
+                    "Elephant&#39;s Dream",
+                    "At the left we can see..."
+                ]
+            }
+        """)
+
+        self.txt_transcript = u"Elephant's Dream\nAt the left we can see..."
+
+    def test_convert_srt_to_txt(self):
+        expected = self.txt_transcript
+        actual = transcripts_utils.Transcript.convert(self.srt_transcript, 'srt', 'txt')
+        self.assertEqual(actual, expected)
+
+    def test_convert_srt_to_srt(self):
+        expected = self.srt_transcript
+        actual = transcripts_utils.Transcript.convert(self.srt_transcript, 'srt', 'srt')
+        self.assertEqual(actual, expected)
+
+    def test_convert_sjson_to_txt(self):
+        expected = self.txt_transcript
+        actual = transcripts_utils.Transcript.convert(self.sjson_transcript, 'sjson', 'txt')
+        self.assertEqual(actual, expected)
+
+    def test_convert_sjson_to_srt(self):
+        expected = self.srt_transcript
+        actual = transcripts_utils.Transcript.convert(self.sjson_transcript, 'sjson', 'srt')
+        self.assertEqual(actual, expected)
+
+    def test_convert_srt_to_sjson(self):
+        with self.assertRaises(NotImplementedError):
+            transcripts_utils.Transcript.convert(self.srt_transcript, 'srt', 'sjson')

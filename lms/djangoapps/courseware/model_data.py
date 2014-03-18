@@ -215,6 +215,11 @@ class FieldDataCache(object):
 
         returns the found object, or None if the object doesn't exist
         '''
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+            # If we're getting user data, we expect that the key matches the
+            # user we were constructed for.
+            assert key.user_id == self.user.id
+
         return self.cache.get(self._cache_key_from_kvs_key(key))
 
     def find_or_create(self, key):
@@ -226,11 +231,6 @@ class FieldDataCache(object):
 
         if field_object is not None:
             return field_object
-
-        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
-            # If we're getting user data, we expect that the key matches the
-            # user we were constructed for.
-            assert key.user_id == self.user.id
 
         if key.scope == Scope.user_state:
             field_object, _ = StudentModule.objects.get_or_create(

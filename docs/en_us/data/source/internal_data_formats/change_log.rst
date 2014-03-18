@@ -10,6 +10,8 @@ Change Log
 
    * - Date
      - Change
+   * - 13 Mar 2014
+     - Updated the :ref:`Student_Info` chapter.
    * - 24 Feb 14
      - Added descriptions of new fields to the :ref:`Wiki_Data` chapter.
    * - 21 Feb 14

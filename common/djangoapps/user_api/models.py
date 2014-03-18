@@ -1,14 +1,16 @@
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from django.db import models
 
 
 class UserPreference(models.Model):
     """A user's preference, stored as generic text to be processed by client"""
-    user = models.ForeignKey(User, db_index=True, related_name="+")
-    key = models.CharField(max_length=255, db_index=True)
+    KEY_REGEX = r"[-_a-zA-Z0-9]+"
+    user = models.ForeignKey(User, db_index=True, related_name="preferences")
+    key = models.CharField(max_length=255, db_index=True, validators=[RegexValidator(KEY_REGEX)])
     value = models.TextField()
 
-    class Meta:
+    class Meta:  # pylint: disable=missing-docstring
         unique_together = ("user", "key")
 
     @classmethod
@@ -33,3 +35,17 @@ class UserPreference(models.Model):
             return user_pref.value
         except cls.DoesNotExist:
             return default
+
+
+class UserCourseTag(models.Model):
+    """
+    Per-course user tags, to be used by various things that want to store tags about
+    the user.  Added initially to store assignment to experimental groups.
+    """
+    user = models.ForeignKey(User, db_index=True, related_name="+")
+    key = models.CharField(max_length=255, db_index=True)
+    course_id = models.CharField(max_length=255, db_index=True)
+    value = models.TextField()
+
+    class Meta:  # pylint: disable=missing-docstring
+        unique_together = ("user", "course_id", "key")

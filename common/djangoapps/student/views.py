@@ -27,7 +27,7 @@ from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbi
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.http import require_POST, require_GET
 
 from ratelimitbackend.exceptions import RateLimitException
@@ -74,7 +74,7 @@ from dogapi import dog_stats_api
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
@@ -344,13 +344,16 @@ def signin_user(request):
         # branding and allow that to process the login if it
         # is enabled and the header is in the request.
         return redirect(reverse('root'))
+    if settings.FEATURES.get('AUTH_USE_CAS'):
+        # If CAS is enabled, redirect auth handling to there
+        return redirect(reverse('cas-login'))
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action'),
-        'platform_name': MicrositeConfiguration.get_microsite_configuration_value(
+        'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
         ),
@@ -373,7 +376,7 @@ def register_user(request, extra_context=None):
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action'),
-        'platform_name': MicrositeConfiguration.get_microsite_configuration_value(
+        'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
         ),
@@ -416,11 +419,11 @@ def dashboard(request):
 
     # for microsites, we want to filter and only show enrollments for courses within
     # the microsites 'ORG'
-    course_org_filter = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')
+    course_org_filter = microsite.get_value('course_org_filter')
 
     # Let's filter out any courses in an "org" that has been declared to be
     # in a Microsite
-    org_filter_out_set = MicrositeConfiguration.get_all_microsite_orgs()
+    org_filter_out_set = microsite.get_all_orgs()
 
     # remove our current Microsite from the "filter out" list, if applicable
     if course_org_filter:
@@ -487,6 +490,8 @@ def dashboard(request):
     # add in the default language if it's not in the list of released languages
     if settings.LANGUAGE_CODE not in language_options:
         language_options.append(settings.LANGUAGE_CODE)
+        # Re-alphabetize language options
+        language_options.sort()
 
     # try to get the prefered language for the user
     cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
@@ -1000,6 +1005,9 @@ def _do_create_account(post_vars):
         profile.save()
     except Exception:
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+
+    UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
+
     return (user, profile, registration)
 
 
@@ -1160,7 +1168,7 @@ def create_account(request, post_override=None):
 
     # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
-        from_address = MicrositeConfiguration.get_microsite_configuration_value(
+        from_address = microsite.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
@@ -1502,7 +1510,7 @@ def change_email_request(request):
 
     message = render_to_string('emails/email_change.txt', context)
 
-    from_address = MicrositeConfiguration.get_microsite_configuration_value(
+    from_address = microsite.get_value(
         'email_from_address',
         settings.DEFAULT_FROM_EMAIL
     )

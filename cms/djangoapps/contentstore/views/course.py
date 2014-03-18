@@ -36,6 +36,7 @@ from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
+from util.string_utils import _has_non_ascii_characters
 
 from .access import has_course_access
 from .tabs import initialize_course_tabs
@@ -55,7 +56,7 @@ from contentstore import utils
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff
 from student import auth
 
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
            'settings_handler',
@@ -97,7 +98,7 @@ def course_handler(request, tag=None, package_id=None, branch=None, version_guid
         index entry.
     PUT
         json: update this course (index entry not xblock) such as repointing head, changing display name, org,
-        package_id, prettyid. Return same json as above.
+        package_id. Return same json as above.
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
@@ -266,6 +267,7 @@ def course_listing(request):
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
     })
 
 
@@ -312,6 +314,14 @@ def create_new_course(request):
     number = request.json.get('number')
     display_name = request.json.get('display_name')
     run = request.json.get('run')
+
+    # allow/disable unicode characters in course_id according to settings
+    if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
+        if _has_non_ascii_characters(org) or _has_non_ascii_characters(number) or _has_non_ascii_characters(run):
+            return JsonResponse(
+                {'error': _('Special characters not allowed in organization, course number, and course run.')},
+                status=400
+            )
 
     try:
         dest_location = Location(u'i4x', org, number, u'course', run)
@@ -376,8 +386,15 @@ def create_new_course(request):
         metadata = {}
     else:
         metadata = {'display_name': display_name}
+
+    # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for existing xml courses this
+    # cannot be changed in CourseDescriptor.
+    wiki_slug = "{0}.{1}.{2}".format(dest_location.org, dest_location.course, dest_location.name)
+    definition_data = {'wiki_slug': wiki_slug}
+
     modulestore('direct').create_and_save_xmodule(
         dest_location,
+        definition_data=definition_data,
         metadata=metadata
     )
     new_course = modulestore('direct').get_item(dest_location)
@@ -535,7 +552,7 @@ def settings_handler(request, tag=None, package_id=None, branch=None, version_gu
 
         # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
         # course about page should be editable in Studio
-        about_page_editable = not MicrositeConfiguration.get_microsite_configuration_value_for_org(
+        about_page_editable = not microsite.get_value_for_org(
             course_module.location.org,
             'ENABLE_MKTG_SITE',
             settings.FEATURES.get('ENABLE_MKTG_SITE', False)

@@ -2,7 +2,7 @@
 import re
 
 from django.conf import settings
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 COURSE_REGEX = re.compile(r'^.*?/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)')
 
@@ -19,7 +19,7 @@ def safe_get_host(request):
     if isinstance(settings.ALLOWED_HOSTS, (list, tuple)) and '*' not in settings.ALLOWED_HOSTS:
         return request.get_host()
     else:
-        return MicrositeConfiguration.get_microsite_configuration_value('site_domain', settings.SITE_NAME)
+        return microsite.get_value('site_domain', settings.SITE_NAME)
 
 
 def course_id_from_url(url):

@@ -4,7 +4,7 @@ based on the current micro site.
 """
 from django import template
 from django.conf import settings
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 register = template.Library()
 
@@ -37,4 +37,4 @@ def platform_name():
     Django template tag that outputs the current platform name:
     {% platform_name %}
     """
-    return MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME)
+    return microsite.get_value('platform_name', settings.PLATFORM_NAME)

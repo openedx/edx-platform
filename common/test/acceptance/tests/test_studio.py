@@ -147,6 +147,17 @@ class XBlockAcidBase(WebAppTest):
 
         self.auth_page.visit()
 
+    def validate_acid_block_preview(self, acid_block):
+        """
+        Validate the Acid Block's preview
+        """
+        self.assertTrue(acid_block.init_fn_passed)
+        self.assertTrue(acid_block.resource_url_passed)
+        self.assertTrue(acid_block.scope_passed('user_state'))
+        self.assertTrue(acid_block.scope_passed('user_state_summary'))
+        self.assertTrue(acid_block.scope_passed('preferences'))
+        self.assertTrue(acid_block.scope_passed('user_info'))
+
     def test_acid_block_preview(self):
         """
         Verify that all expected acid block tests pass in studio preview
@@ -155,22 +166,13 @@ class XBlockAcidBase(WebAppTest):
         self.outline.visit()
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
         unit = subsection.toggle_expand().unit('Test Unit').go_to()
-        container = unit.components[0].go_to_container()
 
-        acid_block = AcidView(self.browser, container.xblocks[0].preview_selector)
-        self.assertTrue(acid_block.init_fn_passed)
-        self.assertTrue(acid_block.child_tests_passed)
-        self.assertTrue(acid_block.resource_url_passed)
-        self.assertTrue(acid_block.scope_passed('user_state'))
-        self.assertTrue(acid_block.scope_passed('user_state_summary'))
-        self.assertTrue(acid_block.scope_passed('preferences'))
-        self.assertTrue(acid_block.scope_passed('user_info'))
+        acid_block = AcidView(self.browser, unit.components[0].preview_selector)
+        self.validate_acid_block_preview(acid_block)
 
-    # This will fail until we support editing on the container page
-    @expectedFailure
     def test_acid_block_editor(self):
         """
-        Verify that all expected acid block tests pass in studio preview
+        Verify that all expected acid block tests pass in studio editor
         """
 
         self.outline.visit()
@@ -181,7 +183,6 @@ class XBlockAcidBase(WebAppTest):
 
         acid_block = AcidView(self.browser, unit.components[0].edit().editor_selector)
         self.assertTrue(acid_block.init_fn_passed)
-        self.assertTrue(acid_block.child_tests_passed)
         self.assertTrue(acid_block.resource_url_passed)
         self.assertTrue(acid_block.scope_passed('content'))
         self.assertTrue(acid_block.scope_passed('settings'))
@@ -213,7 +214,36 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
         ).install()
 
 
-class XBlockAcidChildTest(XBlockAcidBase):
+class XBlockAcidParentBase(XBlockAcidBase):
+    """
+    Base class for tests that verify that parent XBlock integration is working correctly
+    """
+    __test__ = False
+
+    def validate_acid_block_preview(self, acid_block):
+        super(XBlockAcidParentBase, self).validate_acid_block_preview(acid_block)
+        self.assertTrue(acid_block.child_tests_passed)
+
+    def test_acid_block_preview(self):
+        """
+        Verify that all expected acid block tests pass in studio preview
+        """
+
+        self.outline.visit()
+        subsection = self.outline.section('Test Section').subsection('Test Subsection')
+        unit = subsection.toggle_expand().unit('Test Unit').go_to()
+        container = unit.components[0].go_to_container()
+
+        acid_block = AcidView(self.browser, container.xblocks[0].preview_selector)
+        self.validate_acid_block_preview(acid_block)
+
+    # This will fail until the container page supports editing
+    @expectedFailure
+    def test_acid_block_editor(self):
+        super(XBlockAcidParentBase, self).test_acid_block_editor()
+
+
+class XBlockAcidEmptyParentTest(XBlockAcidParentBase):
     """
     Tests of an AcidBlock with children
     """
@@ -232,7 +262,34 @@ class XBlockAcidChildTest(XBlockAcidBase):
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
-                        XBlockFixtureDesc('acid', 'Acid Block').add_children(
+                        XBlockFixtureDesc('acid_parent', 'Acid Parent Block').add_children(
+                        )
+                    )
+                )
+            )
+        ).install()
+
+
+class XBlockAcidChildTest(XBlockAcidParentBase):
+    """
+    Tests of an AcidBlock with children
+    """
+    __test__ = True
+
+    def setup_fixtures(self):
+
+        course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('acid_parent', 'Acid Parent Block').add_children(
                             XBlockFixtureDesc('acid', 'First Acid Child', metadata={'name': 'first'}),
                             XBlockFixtureDesc('acid', 'Second Acid Child', metadata={'name': 'second'}),
                             XBlockFixtureDesc('html', 'Html Child', data="<html>Contents</html>"),

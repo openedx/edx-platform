@@ -78,7 +78,6 @@ class DiscussionSingleThreadPage(CoursePage):
 
     def start_response_edit(self, response_id):
         """Click the edit button for the response, loading the editing view"""
-        from nose.tools import set_trace; set_trace()
         self.q(css=".response_{} .discussion-response .action-edit".format(response_id)).first.click()
         EmptyPromise(
             lambda: self.is_response_editor_visible(response_id),
@@ -91,8 +90,7 @@ class DiscussionSingleThreadPage(CoursePage):
 
     def is_comment_visible(self, comment_id):
         """Returns true if the comment is viewable onscreen"""
-        result = self._is_element_visible("#comment_{} .response-body".format(comment_id))
-        return result
+        return self._is_element_visible("#comment_{} .response-body".format(comment_id))
 
     def get_comment_body(self, comment_id):
         return self._get_element_text("#comment_{} .response-body".format(comment_id))
@@ -137,20 +135,6 @@ class DiscussionSingleThreadPage(CoursePage):
         """Replace the contents of the comment editor"""
         self.q(css="#comment_{} .wmd-input".format(comment_id)).fill(new_body)
 
-    #def submit_comment_edit(self, comment_id):
-        #"""Click the submit button on the comment editor"""
-        #new_body = self._get_comment_editor_value(comment_id)
-        #self.q(css="#comment_{} .post-update".format(comment_id)).first.click()
-        #EmptyPromise(
-            #lambda: (
-                #not self.is_comment_editor_visible(comment_id) and
-                #self.is_comment_visible(comment_id) and
-                #self.get_comment_body(comment_id) == new_body
-            #),
-            #"Comment edit succeeded"
-        #).fulfill()
-
-
     def submit_comment_edit(self, comment_id, new_comment_body):
         """Click the submit button on the comment editor"""
         self.q(css="#comment_{} .post-update".format(comment_id)).first.click()
@@ -162,7 +146,6 @@ class DiscussionSingleThreadPage(CoursePage):
             ),
             "Comment edit succeeded"
         ).fulfill()
-
 
     def cancel_comment_edit(self, comment_id, original_body):
         """Click the cancel button on the comment editor"""

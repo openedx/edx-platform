@@ -46,6 +46,7 @@ import re
 import shlex  # for splitting quoted strings
 import sys
 import pyparsing
+import html5lib
 
 from .registry import TagRegistry
 from chem import chemcalc
@@ -286,7 +287,26 @@ class InputTypeBase(object):
         context = self._get_render_context()
 
         html = self.capa_system.render_template(self.template, context)
-        return etree.XML(html)
+
+        try:
+            output = etree.XML(html)
+        except etree.XMLSyntaxError as ex:
+            # If `html` contains attrs with no values, like `controls` in <audio controls src='smth'/>,
+            # XML parser will raise exception, so wee fallback to html5parser, which will set empty "" values for such attrs.
+            try:
+                output = html5lib.parseFragment(html, treebuilder='lxml', namespaceHTMLElements=False)[0]
+            except IndexError:
+                raise ex
+
+        return output
+
+    def get_user_visible_answer(self, internal_answer):
+        """
+        Given the internal representation of the answer provided by the user, return the representation of the answer
+        as the user saw it.  Subclasses should override this method if and only if the internal represenation of the
+        answer is different from the answer that is displayed to the user.
+        """
+        return internal_answer
 
 
 #-----------------------------------------------------------------------------
@@ -385,6 +405,7 @@ class ChoiceGroup(InputTypeBase):
             raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
 
         self.choices = self.extract_choices(self.xml)
+        self._choices_map = dict(self.choices)  # pylint: disable=attribute-defined-outside-init
 
     @classmethod
     def get_attributes(cls):
@@ -418,6 +439,12 @@ class ChoiceGroup(InputTypeBase):
                     % choice.tag)
             choices.append((choice.get("name"), stringify_children(choice)))
         return choices
+
+    def get_user_visible_answer(self, internal_answer):
+        if isinstance(internal_answer, basestring):
+            return self._choices_map[internal_answer]
+
+        return [self._choices_map[i] for i in internal_answer]
 
 
 #-----------------------------------------------------------------------------
@@ -600,7 +627,6 @@ class FileSubmission(InputTypeBase):
     template = "filesubmission.html"
     tags = ['filesubmission']
 
-
     @staticmethod
     def parse_files(files):
         """
@@ -657,21 +683,21 @@ class CodeInput(InputTypeBase):
         # non-codemirror editor.
     ]
 
-
     @classmethod
     def get_attributes(cls):
         """
         Convert options to a convenient format.
         """
-        return [Attribute('rows', '30'),
-                Attribute('cols', '80'),
-                Attribute('hidden', ''),
+        return [
+            Attribute('rows', '30'),
+            Attribute('cols', '80'),
+            Attribute('hidden', ''),
 
-                # For CodeMirror
-                Attribute('mode', 'python'),
-                Attribute('linenumbers', 'true'),
-                # Template expects tabsize to be an int it can do math with
-                Attribute('tabsize', 4, transform=int),
+            # For CodeMirror
+            Attribute('mode', 'python'),
+            Attribute('linenumbers', 'true'),
+            # Template expects tabsize to be an int it can do math with
+            Attribute('tabsize', 4, transform=int),
         ]
 
     def setup_code_response_rendering(self):
@@ -725,7 +751,6 @@ class MatlabInput(CodeInput):
     """
     template = "matlabinput.html"
     tags = ['matlabinput']
-
 
     def setup(self):
         """
@@ -807,6 +832,8 @@ class MatlabInput(CodeInput):
             'queue_len': str(self.queue_len),
             'queue_msg': self.queue_msg,
             'button_enabled': self.button_enabled(),
+            'matlab_editor_js': '{static_url}js/vendor/CodeMirror/addons/octave.js'.format(
+                static_url=self.capa_system.STATIC_URL),
         }
         return extra_context
 
@@ -1021,8 +1048,8 @@ class ChemicalEquationInput(InputTypeBase):
         """
         Can set size of text field.
         """
-        return [Attribute('size', '20'),             
-                Attribute('label', ''),]
+        return [Attribute('size', '20'),
+                Attribute('label', ''), ]
 
     def _extra_context(self):
         """

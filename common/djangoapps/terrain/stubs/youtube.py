@@ -5,7 +5,6 @@ Stub implementation of YouTube for acceptance tests.
 from .http import StubHttpRequestHandler, StubHttpService
 import json
 import time
-import requests
 from urlparse import urlparse
 from collections import OrderedDict
 
@@ -80,7 +79,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             'data': OrderedDict({
                 'id': youtube_id,
                 'message': message,
-                'duration': 60,
+                'duration': 60 if youtube_id == 'OEoXaMPEzfM' else 77,
             })
         })
         response = "{cb}({data})".format(cb=callback, data=json.dumps(data))

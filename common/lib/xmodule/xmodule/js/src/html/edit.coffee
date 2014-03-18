@@ -42,7 +42,7 @@ class @HTMLEditingDescriptor
       # Disable visual aid on borderless table.
       visual:false,
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
-      theme_advanced_buttons1 : "formatselect,fontselect,bold,italic,underline,forecolor,|,bullist,numlist,outdent,indent,|,blockquote,wrapAsCode,|,link,unlink,|,image,",
+      theme_advanced_buttons1 : "formatselect,fontselect,bold,italic,underline,forecolor,|,bullist,numlist,outdent,indent,|,link,unlink,image,|,blockquote,wrapAsCode",
       theme_advanced_toolbar_location : "top",
       theme_advanced_toolbar_align : "left",
       theme_advanced_statusbar_location : "none",
@@ -80,6 +80,15 @@ class @HTMLEditingDescriptor
     )
 
     @visualEditor = ed
+    
+    ed.onExecCommand.add(@onExecCommandHandler)
+
+  # Intended to run after the "image" plugin is used so that static urls are set
+  # correctly in the Visual editor immediately after command use.
+  onExecCommandHandler: (ed, cmd, ui, val) =>
+      if cmd == 'mceInsertContent' and val.match(/^<img/)
+        content = rewriteStaticLinks(ed.getContent(), '/static/', @base_asset_url)
+        ed.setContent(content)
 
   onSwitchEditor: (e) =>
     e.preventDefault();
@@ -114,7 +123,7 @@ class @HTMLEditingDescriptor
     # both the startContent must be sync'ed up and the dirty flag set to false.
     content = rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url)
     visualEditor.setContent(content)
-    visualEditor.startContent = content
+    visualEditor.startContent = visualEditor.getContent({format : 'raw'})
     @focusVisualEditor(visualEditor)
     @showingVisualEditor = true
 
@@ -124,8 +133,6 @@ class @HTMLEditingDescriptor
 
   focusVisualEditor: (visualEditor) =>
     visualEditor.focus()
-    # Need to mark editor as not dirty both when it is initially created and when we switch back to it.
-    visualEditor.isNotDirty = true
     if not @$mceToolbar?
       @$mceToolbar = $(@element).find('table.mceToolbar')
 

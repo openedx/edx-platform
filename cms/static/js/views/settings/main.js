@@ -206,15 +206,14 @@ var DetailsView = ValidatingView.extend({
             var cachethis = this;
             var field = this.selectorToField[thisTarget.id];
             this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
-                mode: "text/html", lineNumbers: true, lineWrapping: true,
-                onChange: function (mirror) {
+                mode: "text/html", lineNumbers: true, lineWrapping: true});
+            this.codeMirrors[thisTarget.id].on('change', function (mirror) {
                     mirror.save();
                     cachethis.clearValidationErrors();
                     var newVal = mirror.getValue();
                     if (cachethis.model.get(field) != newVal) {
                         cachethis.setAndValidate(field, newVal);
                     }
-                }
             });
         }
     },

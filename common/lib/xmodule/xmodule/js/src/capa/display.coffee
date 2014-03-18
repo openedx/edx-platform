@@ -444,7 +444,7 @@ class @Problem
         $p = $(element).find('p.status')
         `// Translators: the word unanswered here is about answering a problem the student must solve.`
         $p.text gettext("unanswered")
-        $p.parent().removeClass().addClass "unanswered"
+        $p.parent().removeClass("correct incorrect").addClass "unanswered"
 
   inputtypeSetupMethods:
 
@@ -483,6 +483,31 @@ class @Problem
       display.render()
 
       return display
+
+    cminput: (container) =>
+      element = $(container).find("textarea")
+      tabsize = element.data("tabsize")
+      mode = element.data("mode")
+      linenumbers = element.data("linenums")
+      spaces = Array(parseInt(tabsize) + 1).join(" ")
+      CodeMirror.fromTextArea element[0], {
+          lineNumbers: linenumbers
+          indentUnit: tabsize
+          tabSize: tabsize
+          mode: mode
+          matchBrackets: true
+          lineWrapping: true
+          indentWithTabs: false
+          smartIndent: false
+          extraKeys: {
+            "Esc": (cm) ->
+              $(".grader-status").focus()
+              return false
+            "Tab": (cm) ->
+              cm.replaceSelection(spaces, "end")
+              return false
+          }
+        }
 
   inputtypeShowAnswerMethods:
     choicegroup: (element, display, answers) =>

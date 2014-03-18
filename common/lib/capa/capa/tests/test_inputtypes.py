@@ -20,6 +20,7 @@ TODO:
 import json
 from lxml import etree
 import unittest
+import textwrap
 import xml.sax.saxutils as saxutils
 
 from . import test_capa_system
@@ -434,6 +435,7 @@ class MatlabTest(unittest.TestCase):
             'tabsize': int(self.tabsize),
             'button_enabled': True,
             'queue_len': '3',
+            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
         }
 
         self.assertEqual(context, expected)
@@ -464,6 +466,7 @@ class MatlabTest(unittest.TestCase):
             'tabsize': int(self.tabsize),
             'button_enabled': True,
             'queue_len': '3',
+            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
         }
 
         self.assertEqual(context, expected)
@@ -494,6 +497,7 @@ class MatlabTest(unittest.TestCase):
                 'tabsize': int(self.tabsize),
                 'button_enabled': False,
                 'queue_len': '0',
+                'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
             }
 
             self.assertEqual(context, expected)
@@ -523,6 +527,7 @@ class MatlabTest(unittest.TestCase):
             'tabsize': int(self.tabsize),
             'button_enabled': True,
             'queue_len': '1',
+            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/addons/octave.js',
         }
 
         self.assertEqual(context, expected)
@@ -582,6 +587,40 @@ class MatlabTest(unittest.TestCase):
         self.assertEqual(input_state['queuekey'], queuekey)
         self.assertEqual(input_state['queuestate'], 'queued')
         self.assertFalse('queue_msg' in input_state)
+
+    def test_get_html(self):
+        # usual output
+        output = self.the_input.get_html()
+        self.assertEqual(
+            etree.tostring(output),
+            """<div>{\'status\': \'queued\', \'button_enabled\': True, \'rows\': \'10\', \'queue_len\': \'3\', \'mode\': \'\', \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\', \'linenumbers\': \'true\', \'queue_msg\': \'\', \'value\': \'print "good evening"\', \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\', \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/addons/octave.js\', \'hidden\': \'\', \'id\': \'prob_1_2\', \'tabsize\': 4}</div>"""
+        )
+
+        # test html, that is correct HTML5 html, but is not parsable by XML parser.
+        old_render_template = self.the_input.capa_system.render_template
+        self.the_input.capa_system.render_template = lambda *args: textwrap.dedent("""
+                <div class='matlabResponse'><div id='mwAudioPlaceHolder'>
+                <audio controls autobuffer autoplay src='data:audio/wav;base64='>Audio is not supported on this browser.</audio>
+                <div>Right click <a href=https://endpoint.mss-mathworks.com/media/filename.wav>here</a> and click \"Save As\" to download the file</div></div>
+                <div style='white-space:pre' class='commandWindowOutput'></div><ul></ul></div>
+            """).replace('\n', '')
+        output = self.the_input.get_html()
+        self.assertEqual(
+            etree.tostring(output),
+            textwrap.dedent("""
+            <div class='matlabResponse'><div id='mwAudioPlaceHolder'>
+            <audio src='data:audio/wav;base64=' autobuffer="" controls="" autoplay="">Audio is not supported on this browser.</audio>
+            <div>Right click <a href="https://endpoint.mss-mathworks.com/media/filename.wav">here</a> and click \"Save As\" to download the file</div></div>
+            <div style='white-space:pre' class='commandWindowOutput'/><ul/></div>
+            """).replace('\n', '').replace('\'', '\"')
+        )
+
+        # check that exception is raised during parsing for html.
+        self.the_input.capa_system.render_template = lambda *args: "<aaa"
+        with self.assertRaises(etree.XMLSyntaxError):
+            self.the_input.get_html()
+
+        self.the_input.capa_system.render_template = old_render_template
 
 
 class SchematicTest(unittest.TestCase):

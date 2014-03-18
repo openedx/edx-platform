@@ -26,6 +26,7 @@ from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.exceptions import UndefinedContext
 
 
 log = logging.getLogger(__name__)
@@ -217,6 +218,31 @@ class XModuleMixin(XBlockMixin):
         self.save()
         return self._field_data._kvs  # pylint: disable=protected-access
 
+    def get_content_titles(self):
+        """
+        Returns list of content titles for all of self's children.
+
+                         SEQUENCE
+                            |
+                         VERTICAL
+                        /        \
+                 SPLIT_TEST      DISCUSSION
+                /        \
+           VIDEO A      VIDEO B
+
+        Essentially, this function returns a list of display_names (e.g. content titles)
+        for all of the leaf nodes.  In the diagram above, calling get_content_titles on
+        SEQUENCE would return the display_names of `VIDEO A`, `VIDEO B`, and `DISCUSSION`.
+
+        This is most obviously useful for sequence_modules, which need this list to display
+        tooltips to users, though in theory this should work for any tree that needs
+        the display_names of all its leaf nodes.
+        """
+        if self.has_children:
+            return sum((child.get_content_titles() for child in self.get_children()), [])
+        else:
+            return [self.display_name_with_default]
+
     def get_children(self):
         """Returns a list of XBlock instances for the children of
         this module"""
@@ -274,6 +300,16 @@ class XModuleMixin(XBlockMixin):
         Return a css class identifying this module in the context of an icon
         """
         return self.icon_class
+
+    def has_dynamic_children(self):
+        """
+        Returns True if this descriptor has dynamic children for a given
+        student when the module is created.
+
+        Returns False if the children of this descriptor are the same
+        children that the module will return for any student.
+        """
+        return False
 
     # Functions used in the LMS
 
@@ -580,22 +616,6 @@ class ResourceTemplates(object):
                     return template
 
 
-def prefer_xmodules(identifier, entry_points):
-    """Prefer entry_points from the xmodule package"""
-    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
-    if from_xmodule:
-        return default_select(identifier, from_xmodule)
-    else:
-        return default_select(identifier, entry_points)
-
-
-def only_xmodules(identifier, entry_points):
-    """Only use entry_points that are supplied by the xmodule package"""
-    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
-
-    return default_select(identifier, from_xmodule)
-
-
 @XBlock.needs("i18n")
 class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     """
@@ -646,16 +666,6 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         # definition_locator is only used by mongostores which separate definitions from blocks
         self.edited_by = self.edited_on = self.previous_version = self.update_version = self.definition_locator = None
         self.xmodule_runtime = None
-
-    def has_dynamic_children(self):
-        """
-        Returns True if this descriptor has dynamic children for a given
-        student when the module is created.
-
-        Returns False if the children of this descriptor are the same
-        children that the module will return for any student.
-        """
-        return False
 
     @classmethod
     def _translate(cls, key):
@@ -811,7 +821,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         Returns the XModule corresponding to this descriptor. Expects that the system
         already supports all of the attributes needed by xmodules
         """
-        assert self.xmodule_runtime is not None
+        if self.xmodule_runtime is None:
+            raise UndefinedContext()
         assert self.xmodule_runtime.error_descriptor_class is not None
         if self.xmodule_runtime.xmodule_instance is None:
             try:

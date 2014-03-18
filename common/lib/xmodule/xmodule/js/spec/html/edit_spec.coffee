@@ -89,17 +89,15 @@ describe 'HTMLEditingDescriptor', ->
       @descriptor.showingVisualEditor = false
 
       visualEditorStub =
-        isNotDirty: false
         content: 'not set'
         startContent: 'not set',
         focus: () -> true
-        isDirty: () -> not @isNotDirty
+        isDirty: () -> false
         setContent: (x) -> @content = x
         getContent: -> @content
 
       @descriptor.showVisualEditor(visualEditorStub)
       expect(@descriptor.showingVisualEditor).toEqual(true)
-      expect(visualEditorStub.isDirty()).toEqual(false)
       expect(visualEditorStub.getContent()).toEqual('Advanced Editor Text')
       expect(visualEditorStub.startContent).toEqual('Advanced Editor Text')
     it 'When switching to visual editor links are rewritten to c4x format', ->
@@ -109,16 +107,14 @@ describe 'HTMLEditingDescriptor', ->
       @descriptor.showingVisualEditor = false
 
       visualEditorStub =
-        isNotDirty: false
         content: 'not set'
         startContent: 'not set',
         focus: () -> true
-        isDirty: () -> not @isNotDirty
+        isDirty: () -> false
         setContent: (x) -> @content = x
         getContent: -> @content
 
       @descriptor.showVisualEditor(visualEditorStub)
       expect(@descriptor.showingVisualEditor).toEqual(true)
-      expect(visualEditorStub.isDirty()).toEqual(false)
       expect(visualEditorStub.getContent()).toEqual('Advanced Editor Text with link /c4x/foo/bar/asset/dummy.jpg')
       expect(visualEditorStub.startContent).toEqual('Advanced Editor Text with link /c4x/foo/bar/asset/dummy.jpg')

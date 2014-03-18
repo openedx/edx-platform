@@ -65,6 +65,19 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     previewContents = @courseInfoEdit.$el.find('.update-contents').html()
                     expect(previewContents).not.toEqual('unsaved changes')
 
+                @doNotCloseNewCourseInfo = () ->
+                    @courseInfoEdit.onNew(@event)
+                    spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
+
+                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('unsaved changes')
+                    model = @collection.at(0)
+                    spyOn(model, "save").andCallThrough()
+
+                    cancelEditingUpdate(@courseInfoEdit, @courseInfoEdit.$modalCover, false)
+
+                    expect(model.save).not.toHaveBeenCalled()
+                    expect(@courseInfoEdit.$modalCover.hide).not.toHaveBeenCalled()
+
                 @cancelExistingCourseInfo = (useCancelButton) ->
                     @createNewUpdate('existing update')
                     @courseInfoEdit.$el.find('.edit-button').click()
@@ -125,8 +138,8 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             it "removes newly created course info on cancel", ->
                 @cancelNewCourseInfo(true)
 
-            it "removes newly created course info on click outside modal", ->
-                @cancelNewCourseInfo(false)
+            it "do not close new course info on click outside modal", ->
+                @doNotCloseNewCourseInfo()
 
             it "does not remove existing course info on cancel", ->
                 @cancelExistingCourseInfo(true)

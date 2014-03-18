@@ -5,8 +5,8 @@
 <%! import pytz %>
 <%! from django.conf import settings %>
 <%! from courseware.tabs import get_discussion_link %>
-<%! from microsite_configuration.middleware import MicrositeConfiguration %>
-<%! platform_name = MicrositeConfiguration.get_microsite_configuration_value("platform_name", settings.PLATFORM_NAME) %>
+<%! from microsite_configuration import microsite %>
+<%! platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME) %>
 
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
@@ -18,10 +18,10 @@
   <div class="inner-wrapper" id="help_wrapper">
     ## TODO: find a way to refactor this
     <button class="close-modal "tabindex="0">
-      &#10005;
+      <i class="icon-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close Modal')}
+        ${_('Close')}
       </span>
     </button>
 
@@ -53,7 +53,6 @@ discussion_link = get_discussion_link(course) if course else None
     <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(
         platform_name=platform_name
       )}</p>
-
     <hr>
 
     <div class="help-buttons">
@@ -70,10 +69,10 @@ discussion_link = get_discussion_link(course) if course else None
 
   <div class="inner-wrapper" id="feedback_form_wrapper">
     <button class="close-modal">
-      &#10005;
+      <i class="icon-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close Modal')}
+        ${_('Close')}
       </span>
     </button>
 
@@ -104,10 +103,10 @@ discussion_link = get_discussion_link(course) if course else None
 
   <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="0">
     <button class="close-modal" tabindex="0">
-      &#10005;
+      <i class="icon-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close Modal')}
+        ${_('Close')}
       </span>
     </button>
 

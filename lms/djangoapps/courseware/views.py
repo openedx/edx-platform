@@ -38,7 +38,7 @@ from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
 import shoppingcart
 
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 log = logging.getLogger("edx.courseware")
 
@@ -528,7 +528,7 @@ def registered_for_course(course, user):
 @cache_if_anonymous
 def course_about(request, course_id):
 
-    if MicrositeConfiguration.get_microsite_configuration_value(
+    if microsite.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     ):

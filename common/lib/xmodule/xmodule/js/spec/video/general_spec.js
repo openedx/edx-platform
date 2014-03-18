@@ -75,32 +75,8 @@
                         expect(state.el).toBe('#video_id');
                     });
 
-                    it('parse the videos if subtitles exist', function () {
-                        var sub = 'Z5KLxerq05Y';
-
-                        expect(state.videos).toEqual({
-                            '0.75': sub,
-                            '1.0': sub,
-                            '1.25': sub,
-                            '1.50': sub
-                        });
-                    });
-
-                    it(
-                        'parse the videos if subtitles do not exist',
-                        function ()
-                    {
-                        var sub = '';
-
-                        $('#example').find('.video').data('sub', '');
-                        state = new window.Video('#example');
-
-                        expect(state.videos).toEqual({
-                            '0.75': sub,
-                            '1.0': sub,
-                            '1.25': sub,
-                            '1.50': sub
-                        });
+                    it('doesn\'t have `videos` dictionary', function () {
+                        expect(state.videos).toBeUndefined();
                     });
 
                     it('parse Html5 sources', function () {

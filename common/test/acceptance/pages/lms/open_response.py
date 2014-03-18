@@ -131,6 +131,7 @@ class OpenResponsePage(PageObject):
         Submit a response for grading.
         """
         self.q(css='input.submit-button').first.click()
+
         # modal dialog confirmation
         self.q(css='button.ok-button').first.click()
 
