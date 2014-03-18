@@ -42,6 +42,9 @@ def base(path1, *paths):
 
 
 def main(verbosity=1):
+    """
+    Main entry point of script
+    """
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     create_dir_if_necessary(LOCALE_DIR)
     source_msgs_dir = CONFIGURATION.source_messages_dir
@@ -215,8 +218,8 @@ def is_key_string(string):
 
 
 if __name__ == '__main__':
+    # pylint: disable=invalid-name
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--verbose', '-v', action='count', default=0)
     args = parser.parse_args()
-    ret = main(verbosity=args.verbose)
-    sys.exit(ret)
+    main(verbosity=args.verbose)

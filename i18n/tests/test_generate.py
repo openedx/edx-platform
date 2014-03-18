@@ -56,7 +56,7 @@ class TestGenerate(TestCase):
         .mo files should exist, and be recently created (modified
         after start of test suite)
         """
-        generate.main(verbosity=0,strict=False)
+        generate.main(verbosity=0, strict=False)
         for locale in CONFIGURATION.translated_locales:
             for filename in ('django', 'djangojs'):
                 mofile = filename+'.mo'

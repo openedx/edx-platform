@@ -215,8 +215,8 @@ def main(verbosity=1):
 
 
 if __name__ == '__main__':
+    # pylint: disable=invalid-name
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--verbose", "-v", action="count", default=0)
     args = parser.parse_args()
-    ret = main(verbosity=args.verbose)
-    sys.exit(ret)
+    main(verbosity=args.verbose)

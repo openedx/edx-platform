@@ -1,3 +1,6 @@
+"""
+Utility library file for executing shell commands
+"""
 import os
 import subprocess
 import logging

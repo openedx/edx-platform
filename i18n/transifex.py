@@ -64,10 +64,12 @@ def get_new_header(po):
 
 
 if __name__ == '__main__':
+    # pylint: disable=invalid-name
     parser = argparse.ArgumentParser()
     parser.add_argument("command", help="push or pull")
     parser.add_argument("--verbose", "-v")
     args = parser.parse_args()
+    # pylint: enable=invalid-name
 
     if args.command == "push":
         push()

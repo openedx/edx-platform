@@ -112,6 +112,9 @@ def validate_files(dir, files_to_merge):
 
 
 def main(strict=True, verbosity=1):
+    """
+    Main entry point for script
+    """
     for locale in CONFIGURATION.translated_locales:
         merge_files(locale, fail_if_missing=strict)
     # Dummy text is not required. Don't raise exception if files are missing.
@@ -129,6 +132,7 @@ def main(strict=True, verbosity=1):
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
+    # pylint: disable=invalid-name
     parser = argparse.ArgumentParser(description="Generate merged and compiled message files.")
     parser.add_argument("--strict", action='store_true', help="Complain about missing files.")
     parser.add_argument("--verbose", "-v", action="count", default=0)

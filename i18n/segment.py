@@ -117,7 +117,10 @@ def segment_pofile(filename, segments):
     return files_written
 
 
-def main(locales=None, verbosity=1):
+def main(locales=None, verbosity=1):  # pylint: disable=unused-argument
+    """
+    Main entry point of script
+    """
     # This is used as a tool only to segment translation files when adding a
     # new segment.  In the regular workflow, the work is done by the extract
     # phase calling the functions above.
@@ -129,6 +132,7 @@ def main(locales=None, verbosity=1):
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
+    # pylint: disable=invalid-name
     description = textwrap.dedent("""
         Segment the .po files in LOCALE(s) based on the segmenting rules in
         config.yaml.

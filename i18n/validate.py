@@ -153,7 +153,7 @@ def get_parser():
     """
     Returns an argument parser for this script.
     """
-    parser = argparse.ArgumentParser(description=(
+    parser = argparse.ArgumentParser(description=(  # pylint: disable=redefined-outer-name
         "Automatically finds translation errors in all edx-platform *.po files, "
         "for all languages, unless one or more language(s) is specified to check."
     ))
@@ -180,7 +180,10 @@ def get_parser():
     return parser
 
 
-def main(languages=None, empty=False, verbosity=1):
+def main(languages=None, empty=False, verbosity=1):  # pylint: disable=unused-argument
+    """
+    Main entry point for script
+    """
     languages = languages or []
 
     if not languages:
@@ -200,6 +203,7 @@ def main(languages=None, empty=False, verbosity=1):
 
 
 if __name__ == '__main__':
+    # pylint: disable=invalid-name
     parser = get_parser()
     args = parser.parse_args()
     if args.verbose:
@@ -207,5 +211,6 @@ if __name__ == '__main__':
     else:
         log_level = logging.WARNING
     logging.basicConfig(stream=sys.stdout, level=log_level)
+    # pylint: enable=invalid-name
 
     main(languages=args.language, empty=args.empty, verbosity=args.verbose)
