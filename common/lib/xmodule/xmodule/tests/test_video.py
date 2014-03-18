@@ -113,7 +113,7 @@ class VideoDescriptorTest(unittest.TestCase):
 
     def setUp(self):
         system = get_test_descriptor_system()
-        location = Location('i4x', 'org', 'course', 'run', 'video' 'name')
+        location = Location('i4x', 'org', 'course', 'run', 'video', 'name', None)
         self.descriptor = system.construct_xblock_from_class(
             VideoDescriptor,
             scope_ids=ScopeIds(None, None, location, location),
@@ -142,7 +142,7 @@ class VideoDescriptorTest(unittest.TestCase):
         back out to XML.
         """
         system = DummySystem(load_error_modules=True)
-        location = Location("i4x", "edX", 'course', 'run', "video", 'SampleProblem1')
+        location = Location("i4x", "edX", 'course', 'run', "video", 'SampleProblem1', None)
         field_data = DictFieldData({'location': location})
         descriptor = VideoDescriptor(system, field_data, Mock())
         descriptor.youtube_id_0_75 = 'izygArpw-Qo'
@@ -158,7 +158,7 @@ class VideoDescriptorTest(unittest.TestCase):
         in the output string.
         """
         system = DummySystem(load_error_modules=True)
-        location = Location("i4x", "edX", 'course', 'run', "video", "SampleProblem1")
+        location = Location("i4x", "edX", 'course', 'run', "video", "SampleProblem1", None)
         field_data = DictFieldData({'location': location})
         descriptor = VideoDescriptor(system, field_data, Mock())
         descriptor.youtube_id_0_75 = 'izygArpw-Qo'
@@ -197,7 +197,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
               <transcript language="ge" src="german_translation.srt" />
             </video>
         '''
-        location = Location("i4x", "edX", 'course', 'run', "video", "SampleProblem1")
+        location = Location("i4x", "edX", 'course', 'run', "video", "SampleProblem1", None)
         field_data = DictFieldData({
             'data': sample_xml,
             'location': location
@@ -493,7 +493,7 @@ class VideoExportTestCase(unittest.TestCase):
     correctly.
     """
     def setUp(self):
-        self.location = Location("i4x", "edX", 'course', 'run', "video", "SampleProblem1")
+        self.location = Location("i4x", "edX", 'course', 'run', "video", "SampleProblem1", None)
 
     def assertXmlEqual(self, expected, xml):
         for attr in ['tag', 'attrib', 'text', 'tail']:

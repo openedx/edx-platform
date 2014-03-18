@@ -64,10 +64,10 @@ class SlashSeparatedCourseKey(CourseKey):
         return '/'.join([self._course, self._run])
 
     def make_asset_key(self, path):
-        return Location('c4x', self._org, self._course, self._run, 'asset', path)
+        return Location('c4x', self._org, self._course, self._run, 'asset', path, None)
 
     def make_usage_key(self, block_type, name):
-        return Location('i4x', self._org, self._course, self._run, block_type, name)
+        return Location('i4x', self._org, self._course, self._run, block_type, name, None)
 
     def to_deprecated_string(self):
         return '/'.join([self._org, self._course, self._run])
@@ -170,8 +170,7 @@ class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category
             return False
         return True
 
-    def __new__(_cls, tag=None, org=None, course=None, run=None, category=None,
-                name=None, revision=None):
+    def __new__(_cls, tag, org, course, run, category, name, revision):
         """
         Create a new Location that is a clone of the specifed one.
 
@@ -237,5 +236,6 @@ class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category
         id_string = u"-".join([v for v in id_fields if v is not None])
         return Location.clean_for_html(id_string)
 
+    @property
     def course_key(self):
         return SlashSeparatedCourseKey(self.org, self.course, self.run)
