@@ -116,27 +116,11 @@ define('MasterClassMain', [], function (logme) {
 
         // Populate the data to be sent to the server with user's words.
         
-
-
-        // Send the data to the server as an AJAX request. Attach a callback that will
-        // be fired on server's response.
-        $.postWithPrefix(
-            _this.ajax_url + '/' + 'csv', $.param(data),
-            function (response) {
-                if (response.status !== 'success') {
-                    console.log('ERROR: ' + response.error);
-
-                    return;
-                }
-            var csv = ConvertToCSV([response.data.header]) + ConvertToCSV(response.data.data);
             a=document.createElement('a');
             a.textContent='download';
-            a.download="emails.csv";
-            a.href=encodeURI('data:text/csv;charset=utf-8,'+csv);
+            a.download=_this.configJson.csv_name + ".xls";
+            a.href=encodeURI(_this.ajax_url + '/' + 'csv');
             a.click();
-             }
-        );
-
     }; // End-of: MasterClassMain.prototype.submitAnswer = function () {
 
 
@@ -209,24 +193,6 @@ define('MasterClassMain', [], function (logme) {
         );
     };
 
-    function ConvertToCSV(objArray) {
-            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-            var str = '';
-
-            for (var i = 0; i < array.length; i++) {
-                var line = '';
-            for (var index in array[i]) {
-                if (line != '') line += ','
-
-                line += array[i][index];
-            }
-
-            str += line + '\r\n';
-        }
-
-        return str;
-    }
-
     /**
      * @function showMasterClass
      *
@@ -298,11 +264,11 @@ define('MasterClassMain', [], function (logme) {
                     var li = $('<li/>')
                         .addClass('ui-menu-item')
                         .appendTo(all_registrations);
-                    $('<input/>').addClass('register-button').attr('type', 'checkbox').attr('id', 'email_' + key).attr('value', value).appendTo(li);
+                    $('<input/>').addClass('register-button').attr('type', 'checkbox').attr('id', 'email_' + key).attr('value', value.email).appendTo(li);
                     $('<label/>').attr('for', 'email_' + key).html("<span></span>").appendTo(li);
                     $('<a/>')
                         .addClass('ui-all')
-                        .text(value)
+                        .text(value.name + '(' + value.email +')')
                         .appendTo(li);
                 });
             $.each(response.passed_registrations, function(key, value)
@@ -310,11 +276,11 @@ define('MasterClassMain', [], function (logme) {
                     var li = $('<li/>')
                         .addClass('ui-menu-item')
                         .appendTo(passed_registrations);
-                    $('<input/>').addClass('unregister-button').attr('type', 'checkbox').attr('id', 'email_' + key).attr('value', value).appendTo(li);
+                    $('<input/>').addClass('unregister-button').attr('type', 'checkbox').attr('id', 'email_' + key).attr('value', value.email).appendTo(li);
                     $('<label/>').attr('for', 'email_' + key).html("<span></span>").appendTo(li);
                     $('<a/>')
                         .addClass('ui-all')
-                        .text(value)
+                        .text(value.name + ' (' + value.email +')')
                         .appendTo(li);
                 });
             var _this = this

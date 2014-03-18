@@ -10,6 +10,8 @@ If student have answered - words he entered and cloud.
 import json
 import logging
 import datetime
+import csv
+import StringIO
 
 from pkg_resources import resource_string
 from xmodule.raw_module import EmptyDataRawDescriptor
@@ -99,10 +101,21 @@ class MasterClassModule(MasterClassFields, XModule):
         if (total_register is None):
             total_register = 0
         additional_data = {}
+        allreg = []
+        passreg = []
+
+        for email in self.all_registrations:
+            user = User.objects.get(email=email)
+            allreg += [{'email': email, 'name': user.profile.lastname + ' ' + user.profile.firstname + ' ' + user.profile.middlename}]
+        for email in self.passed_registrations:
+            user = User.objects.get(email=email)
+            passreg += [{'email': email, 'name': user.profile.lastname + ' ' + user.profile.firstname + ' ' + user.profile.middlename}]
+
         if self.runtime.user_is_staff:
-            additional_data['all_registrations'] = self.all_registrations
-            additional_data['passed_registrations'] = self.passed_registrations
+            additional_data['all_registrations'] = allreg
+            additional_data['passed_registrations'] = passreg
             additional_data['is_staff'] = self.runtime.user_is_staff
+            additional_data['csv_name'] = self.runtime.course_id + " " + self.display_name
 
         if self.submitted and self.runtime.user.email not in self.all_registrations and self.runtime.user.email not in self.passed_registrations:
             self.submitted = False
@@ -207,17 +220,17 @@ class MasterClassModule(MasterClassFields, XModule):
                 })
         elif dispatch == 'csv':
             if self.runtime.user_is_staff:
-                header = [u'Email', u'ФИО']
+                header = [u'Email', u'Фамилия', u'Имя', u'Отчество',]
                 datatable = {'header': header, 'students': []}
                 data = []
                 for email in self.passed_registrations:
                     datarow = []
                     user = User.objects.get(email=email)
-                    datarow += [user.email, user.profile.name]
+                    datarow += [user.email, user.profile.lastname, user.profile.firstname, user.profile.middlename]
                     data += [datarow]
                 datatable['data'] = data
 
-                return json.dumps({'status': 'success', 'data': datatable})
+                return self.return_csv("   ", datatable, encoding="cp1251", dialect="excel-tab")
             else:
                 return json.dumps({
                     'status': 'fail',
@@ -257,6 +270,22 @@ class MasterClassModule(MasterClassFields, XModule):
         }
         self.content = self.system.render_template('master_class.html', context)
         return self.content
+    def return_csv(self, func, datatable, file_pointer=None, encoding="utf-8", dialect="excel"):
+        """Outputs a CSV file from the contents of a datatable."""
+        if file_pointer is None:
+            response = StringIO.StringIO()
+        else:
+            response = file_pointer
+        writer = csv.writer(response, dialect=dialect, quotechar='"', quoting=csv.QUOTE_ALL)
+        encoded_row = [unicode(s).encode(encoding) for s in datatable['header']]
+        writer.writerow(encoded_row)
+        for datarow in datatable['data']:
+            encoded_row = [unicode(s).encode(encoding) for s in datarow]
+            writer.writerow(encoded_row)
+        if file_pointer is None:
+            return response.getvalue()
+        else:
+            return response
 
 
 class MasterClassDescriptor(MasterClassFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):

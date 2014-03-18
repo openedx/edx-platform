@@ -12,10 +12,10 @@ from util.date_utils import get_time_display
     <h2 class="problem-header">${display_name}</h2>
 <%
     formatted_string = get_time_display(due)
-    due_date = (u'{date}').format(date=formatted_string)
+    due_date = '' if len(formatted_string)==0 else (u'<h4>Дата окончания регистрации: {date}</h4>').format(date=formatted_string)
     %>
     
-    <h4>Дата окончания регистрации: ${due_date}</h4>
+    ${due_date}
         <p>
 
     <section class="input_class_section">
