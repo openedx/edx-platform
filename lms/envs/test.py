@@ -66,6 +66,7 @@ NOSE_ARGS = [
 TEST_ROOT = path("test_root")
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
+STATICFILES_STORAGE = None
 
 STATUS_MESSAGE_PATH = TEST_ROOT / "status_message.json"
 

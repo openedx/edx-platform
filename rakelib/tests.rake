@@ -70,17 +70,11 @@ TEST_TASK_DIRS = []
 
     # Per System tasks/
     desc "Run all django tests on our djangoapps for the #{system}"
-    task "test_#{system}", [:test_id] => [
-        :clean_test_files, :install_prereqs,
-        "#{system}:gather_assets:test", "fasttest_#{system}"
-    ]
+    task "test_#{system}", [:test_id] => [:clean_test_files, :install_prereqs, "fasttest_#{system}"]
 
-    # Have a way to run the tests without running collectstatic -- useful when debugging without
-    # messing with static files.
+    # Have a way to run the tests without install prereqs
     task "fasttest_#{system}", [:test_id] => [test_id_dir, report_dir, :clean_reports_dir] do |t, args|
         args.with_defaults(:test_id => nil)
-
-
 
         begin
             run_tests(system, report_dir, args.test_id)

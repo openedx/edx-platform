@@ -54,6 +54,7 @@ STATICFILES_DIRS += [
     for course_dir in os.listdir(COMMON_TEST_DATA_ROOT)
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
+STATICFILES_STORAGE = None
 
 DOC_STORE_CONFIG = {
     'host': 'localhost',
