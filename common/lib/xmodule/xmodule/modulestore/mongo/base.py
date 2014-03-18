@@ -209,16 +209,15 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 )
 
 
-def namedtuple_to_son(namedtuple, prefix=''):
+def location_to_son(location, prefix=''):
     """
-    Converts a namedtuple into a SON object with the same key order
+    Converts a location into a SON object with the same key order
     """
     son = SON()
-    # pylint: disable=protected-access
-    for idx, field_name in enumerate(namedtuple._fields):
+    for field_name in location.KEY_FIELDS:
         # Temporary filtering of run field
         if field_name != 'run':
-            son[prefix + field_name] = namedtuple[idx]
+            son[prefix + field_name] = getattr(location, field_name)
     return son
 
 
@@ -231,7 +230,7 @@ def location_to_query(location, wildcard=True):
     If `wildcard` is True, then a None in a location is treated as a wildcard
     query. Otherwise, it is searched for literally
     """
-    query = namedtuple_to_son(location, prefix='_id.')
+    query = location_to_son(location, prefix='_id.')
 
     if wildcard:
         for key, value in query.items():
@@ -313,7 +312,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             ('_id.tag', 'i4x'),
             ('_id.org', location.org),
             ('_id.course', location.course),
-            ('_id.category', {'$in', list(block_types_with_children)})
+            ('_id.category', {'$in': list(block_types_with_children)})
         ])
         # we just want the Location, children, and inheritable metadata
         record_filter = {'_id': 1, 'definition.children': 1}
@@ -376,7 +375,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         '''
         TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
         '''
-        key = location.course_key.to_string()
+        key = location.course_key
         tree = {}
 
         if not force_refresh:
@@ -432,7 +431,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # first get non-draft in a round-trip
         query = {
             '_id': {'$in': [
-                namedtuple_to_son(course_key.make_usage_key_from_deprecated_string(item)) for item in items
+                location_to_son(course_key.make_usage_key_from_deprecated_string(item)) for item in items
             ]}
         }
         return list(self.collection.find(query))
@@ -812,7 +811,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # See http://www.mongodb.org/display/DOCS/Updating for
         # atomic update syntax
         result = self.collection.update(
-            {'_id': namedtuple_to_son(location)},
+            {'_id': location_to_son(location)},
             {'$set': update},
             multi=False,
             upsert=True,
@@ -882,7 +881,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
         # from overriding our default value set in the init method.
-        self.collection.remove({'_id': namedtuple_to_son(location)}, safe=self.collection.safe)
+        self.collection.remove({'_id': location_to_son(location)}, safe=self.collection.safe)
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(location)
 
