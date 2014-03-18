@@ -27,7 +27,7 @@ from path import path
 from polib import pofile
 
 from i18n.config import BASE_DIR, LOCALE_DIR, CONFIGURATION
-from i18n.execute import execute, create_dir_if_necessary, remove_file
+from i18n.execute import execute, remove_file
 from i18n.segment import segment_pofiles
 
 
@@ -46,7 +46,7 @@ def main(verbosity=1):
     Main entry point of script
     """
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    create_dir_if_necessary(LOCALE_DIR)
+    LOCALE_DIR.parent.makedirs_p()
     source_msgs_dir = CONFIGURATION.source_messages_dir
     remove_file(source_msgs_dir.joinpath('django.po'))
 

@@ -31,7 +31,6 @@ import polib
 from path import path
 
 from i18n.config import CONFIGURATION
-from i18n.execute import create_dir_if_necessary
 from i18n.converter import Converter
 
 
@@ -187,7 +186,7 @@ def make_dummy(filename, locale, converter):
     pofile.metadata['Plural-Forms'] = 'nplurals=2; plural=(n != 1);'
 
     new_file = new_filename(filename, locale)
-    create_dir_if_necessary(new_file)
+    new_file.parent.makedirs_p()
     pofile.save(new_file)
 
 

@@ -34,12 +34,6 @@ def call(command, working_directory=BASE_DIR):
     return (out, err)
 
 
-def create_dir_if_necessary(pathname):
-    dirname = os.path.dirname(pathname)
-    if not os.path.exists(dirname):
-        os.makedirs(dirname)
-
-
 def remove_file(filename, verbose=True):
     """
     Attempt to delete filename.
