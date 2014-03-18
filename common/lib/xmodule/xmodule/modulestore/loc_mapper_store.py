@@ -87,7 +87,8 @@ class LocMapperStore(object):
         Location block names and the values are the BlockUsageLocator.block_id.
         """
         if package_id is None:
-            package_id = u"{0.org}.{0.course}.{0.run}".format(course_location.course_key)
+            assert(isinstance(course_location.course_key, SlashSeparatedCourseKey))
+            package_id = u"{0.org}+{0.course}.{0.run}".format(course_location.course_key)
 
         # very like _interpret_location_id but w/o the _id
         location_id = self._construct_location_son(course_location.course_key)
@@ -196,7 +197,7 @@ class LocMapperStore(object):
         else:
             result = draft_usage
 
-        self._cache_location_map_entry(old_style_course_id, location, published_usage, draft_usage)
+        self._cache_location_map_entry(location, published_usage, draft_usage)
         return result
 
     def translate_locator_to_location(self, locator, get_course=False, lower_only=False):
@@ -266,7 +267,7 @@ class LocMapperStore(object):
                     draft_locator = BlockUsageLocator(
                         candidate[candidate_key], branch=candidate['draft_branch'], block_id=block_id
                     )
-                    self._cache_location_map_entry(old_course_id, location, published_locator, draft_locator)
+                    self._cache_location_map_entry(location, published_locator, draft_locator)
 
                     if get_course and category == 'course':
                         result = location
@@ -445,7 +446,7 @@ class LocMapperStore(object):
             return
         self.cache.set(old_course_id, (published_course_locator, draft_course_locator))
 
-    def _cache_location_map_entry(self, old_course_id, location, published_usage, draft_usage):
+    def _cache_location_map_entry(self, location, published_usage, draft_usage):
         """
         Cache the mapping from location to the draft and published Locators in entry.
         Also caches the inverse. If the location is category=='course', it caches it for
@@ -457,6 +458,6 @@ class LocMapperStore(object):
             setmany[u'courseIdLower+{}'.format(published_usage.package_id.lower())] = location
         setmany[unicode(published_usage)] = location
         setmany[unicode(draft_usage)] = location
-        setmany[u'{}+{}'.format(old_course_id, location.url())] = (published_usage, draft_usage)
-        setmany[old_course_id] = (published_usage, draft_usage)
+        setmany[unicode(location)] = (published_usage, draft_usage)
+        setmany[unicode(location.course_key)] = (published_usage, draft_usage)
         self.cache.set_many(setmany)
