@@ -168,8 +168,13 @@ class MongoContentStore(ContentStore):
 
             ]
         '''
-        course_filter = Location(XASSET_LOCATION_TAG, category="asset" if not get_thumbnails else "thumbnail",
-                                 course=location.course, org=location.org)
+        course_filter = Location(
+            XASSET_LOCATION_TAG,
+            org=location.org, course=location.course,
+            run=getattr(location.course_key, 'run', None),
+            category="asset" if not get_thumbnails else "thumbnail",
+            name=None
+        )
         # 'borrow' the function 'location_to_query' from the Mongo modulestore implementation
         if maxresults > 0:
             items = self.fs_files.find(
@@ -216,8 +221,6 @@ class MongoContentStore(ContentStore):
 
         :param location:  a c4x asset location
         """
-        # raises exception if location is not fully specified
-        Location.ensure_fully_specified(location)
         for attr in attr_dict.iterkeys():
             if attr in ['_id', 'md5', 'uploadDate', 'length']:
                 raise AttributeError("{} is a protected attribute.".format(attr))

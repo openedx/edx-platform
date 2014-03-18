@@ -24,14 +24,14 @@ def as_draft(location):
     """
     Returns the Location that is the draft for `location`
     """
-    return Location(location).replace(revision=DRAFT)
+    return location.replace(revision=DRAFT)
 
 
 def as_published(location):
     """
     Returns the Location that is the published version for `location`
     """
-    return Location(location).replace(revision=None)
+    return location.replace(revision=None)
 
 
 def wrap_draft(item):
@@ -90,9 +90,9 @@ class DraftModuleStore(MongoModuleStore):
         :param metadata: can be empty, the initial metadata for the kvs
         :param system: if you already have an xmodule from the course, the xmodule.system value
         """
-        draft_loc = as_draft(location)
-        if draft_loc.category in DIRECT_ONLY_CATEGORIES:
+        if location.category in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(location)
+        draft_loc = as_draft(location)
         return super(DraftModuleStore, self).create_xmodule(draft_loc, definition_data, metadata, system, fields)
 
     def get_items(self, course_key, settings=None, content=None, **kwargs):
@@ -130,7 +130,7 @@ class DraftModuleStore(MongoModuleStore):
 
         :param source: the location of the source (its revision must be None)
         """
-        original = self.collection.find_one(location_to_query(source_location))
+        original = self.collection.find_one(location_to_query(source_location, wildcard=False))
         draft_location = as_draft(source_location)
         if draft_location.category in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(source_location)
@@ -143,7 +143,7 @@ class DraftModuleStore(MongoModuleStore):
             raise DuplicateItemError(original['_id'])
 
         self.refresh_cached_metadata_inheritance_tree(draft_location)
-        self.fire_updated_modulestore_signal(get_course_id_no_run(draft_location), draft_location)
+        self.fire_updated_modulestore_signal(draft_location)
 
         return self._load_items([original])[0]
 
