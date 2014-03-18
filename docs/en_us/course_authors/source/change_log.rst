@@ -10,6 +10,8 @@ Change Log
 
    * - Date
      - Change
+   * - 3/19/14
+     - Updated the sections on :ref:`Beta_Testing`, :ref:`Discussions`, :ref:`Grades`, and :ref:`Student Data` with changes to the new Instructor Dashboard.
    * - 03/17/14
      - Reorganized this document into major sections: 
 
