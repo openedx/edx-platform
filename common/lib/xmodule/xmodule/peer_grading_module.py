@@ -612,7 +612,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             problem_location = self.link_to_location
 
         elif data.get('location') is not None:
-            problem_location = data.get('location')
+            problem_location = self.course_id.make_usage_key_from_deprecated_string(data.get('location'))
 
         module = self._find_corresponding_module_for_location(problem_location)
 

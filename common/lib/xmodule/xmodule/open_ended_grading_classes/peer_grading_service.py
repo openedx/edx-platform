@@ -63,7 +63,11 @@ class PeerGradingService(GradingService):
     def get_problem_list(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
         response = self.get(self.get_problem_list_url, params)
-        return self.try_to_decode(response)
+        data = self.try_to_decode(response)
+        if 'problem_list' in data:
+            for problem in data['problem_list']:
+                problem['location'] = course_id.make_usage_key_from_deprecated_string(problem['location'])
+        return data
 
     def get_notifications(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
