@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import os
+import sys
 import string
 import random
 import re
@@ -23,6 +24,11 @@ class TestGenerate(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        sys.stderr.write(
+            "\nExtracting i18n strings and generating dummy translations; "
+            "this may take a few minutes\n"
+        )
+        sys.stderr.flush()
         extract.main(verbosity=0)
         dummy.main(verbosity=0)
 
