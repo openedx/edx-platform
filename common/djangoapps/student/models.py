@@ -34,6 +34,7 @@ from django_countries import CountryField
 from track import contexts
 from track.views import server_track
 from eventtracking import tracker
+from xmodule.modulestore.keys import CourseKey
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -359,6 +360,27 @@ class LoginFailures(models.Model):
             return
 
 
+class CourseKeyField(models.CharField):
+    description = "A CourseKey object, saved to the DB in the form of a string"
+
+    __metaclass__ = models.SubfieldBase
+
+    def __init__(self, *args, **kwargs):
+        super(CourseKeyField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if isinstance(value, CourseKey):
+            return value
+        return CourseKey.from_string(value)
+
+    def get_prep_value(self, value):
+        if isinstance(value, str):
+            return value
+        if isinstance(value, unicode):
+            return value
+        return value._to_string()
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -372,7 +394,7 @@ class CourseEnrollment(models.Model):
     scattered across our views.
     """
     user = models.ForeignKey(User)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     # If is_active is False, then the student is not considered to be enrolled
@@ -394,7 +416,7 @@ class CourseEnrollment(models.Model):
         ).format(self.user, self.course_id, self.created, self.is_active)
 
     @classmethod
-    def get_or_create_enrollment(cls, user, course_id):
+    def get_or_create_enrollment(cls, user, course_key):
         """
         Create an enrollment for a user in a class. By default *this enrollment
         is not active*. This is useful for when an enrollment needs to go
@@ -416,12 +438,15 @@ class CourseEnrollment(models.Model):
         # save it to the database so that it can have an ID that we can throw
         # into our CourseEnrollment object. Otherwise, we'll get an
         # IntegrityError for having a null user_id.
+        #assert(isinstance(course_key, CourseKey))
+        #course_id = course_key.to_deprecated_string()
+
         if user.id is None:
             user.save()
 
         enrollment, created = CourseEnrollment.objects.get_or_create(
             user=user,
-            course_id=course_id,
+            course_id=course_key,
         )
 
         # If we *did* just create a new enrollment, set some defaults
@@ -506,7 +531,7 @@ class CourseEnrollment(models.Model):
                 log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)
 
     @classmethod
-    def enroll(cls, user, course_id, mode="honor"):
+    def enroll(cls, user, course_key, mode="honor"):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -526,7 +551,7 @@ class CourseEnrollment(models.Model):
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
         """
-        enrollment = cls.get_or_create_enrollment(user, course_id)
+        enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
         return enrollment
 
@@ -606,7 +631,7 @@ class CourseEnrollment(models.Model):
             log.error(err_msg.format(email, course_id))
 
     @classmethod
-    def is_enrolled(cls, user, course_id):
+    def is_enrolled(cls, user, course_key):
         """
         Returns True if the user is enrolled in the course (the entry must exist
         and it must have `is_active=True`). Otherwise, returns False.
@@ -618,7 +643,7 @@ class CourseEnrollment(models.Model):
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
         """
         try:
-            record = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            record = CourseEnrollment.objects.get(user=user, course_id=course_key)
             return record.is_active
         except cls.DoesNotExist:
             return False
