@@ -46,7 +46,7 @@ def merge(locale, target='django.po', sources=('django-partial.po',), fail_if_mi
     except Exception, e:
         if not fail_if_missing:
             return
-        raise e
+        raise
 
     # merged file is merged.po
     merge_cmd = 'msgcat -o merged.po ' + ' '.join(sources)
