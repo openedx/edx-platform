@@ -58,9 +58,6 @@ class @HTMLEditingDescriptor
       image : "#{baseUrl}/images/ico-tinymce-code.png",
       onclick : () ->
         ed.formatter.toggle('code')
-        # Without this, the dirty flag does not get set unless the user also types in text.
-        # Visual Editor must be marked as dirty or else we won't populate the Advanced Editor from it.
-        ed.isNotDirty = false
     })
 
     @visualEditor = ed
@@ -86,18 +83,14 @@ class @HTMLEditingDescriptor
 
   initInstanceCallback: (visualEditor) =>
     @rewriteLinksFromStatic(visualEditor)
-    @focusVisualEditor(visualEditor)
+    visualEditor.focus()
 
   rewriteLinksFromStatic: (visualEditor) =>
     visualEditor.setContent(rewriteStaticLinks(visualEditor.getContent({no_events: 1}), '/static/', @base_asset_url))
 
-  focusVisualEditor: (visualEditor) =>
-    visualEditor.focus()
-
   getVisualEditor: () ->
     ###
     Returns the instance of TinyMCE.
-    This is different from the textarea that exists in the HTML template (@tiny_mce_textarea.
 
     Pulled out as a helper method for unit test.
     ###
@@ -105,6 +98,5 @@ class @HTMLEditingDescriptor
 
   save: ->
     visualEditor = @getVisualEditor()
-    if visualEditor.isDirty()
-      text = rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
+    text = rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
     data: text
