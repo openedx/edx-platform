@@ -19,7 +19,6 @@ from mock import MagicMock, patch, Mock
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pyquery import PyQuery
-from courseware.module_render import hash_resource
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
@@ -560,6 +559,28 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
                 'bad_handler',
                 'bad_dispatch',
             )
+
+    def test_xblock_view_handler(self):
+        args=[
+            'edX/toy/2012_Fall',
+            quote_slashes('i4x://edX/toy/videosequence/Toy_Videos'),
+            'student_view'
+        ]
+        xblock_view_url = reverse(
+            'xblock_view',
+            args=args
+        )
+
+        request = self.request_factory.get(xblock_view_url)
+        request.user = self.mock_user
+        response = render.xblock_view(request, *args)
+        self.assertEquals(200, response.status_code)
+
+        expected = ['csrf_token',  'html', 'resources']
+        content = json.loads(response.content)
+        for section in expected:
+            self.assertIn(section, content)
+        self.assertIn('<div class="xblock xblock-student_view xmodule_display', content['html'])
 
     @XBlock.register_temp_plugin(GradedStatelessXBlock, identifier='stateless_scorer')
     def test_score_without_student_state(self):
