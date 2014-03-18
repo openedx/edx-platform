@@ -177,6 +177,12 @@ class OpaqueKey(object):
     def __hash__(self):
         return hash(self._key)
 
+    def __repr__(self):
+        return '{}({})'.format(
+            self.__class__.__name__,
+            ', '.join(repr(getattr(self, key)) for key in self.KEY_FIELDS)
+        )
+
     @classmethod
     def _drivers(cls):
         return ExtensionManager(

@@ -70,7 +70,7 @@ class SlashSeparatedCourseKey(CourseKey):
             log.debug(u"location %r doesn't match URL", location_url)
             raise InvalidKeyError(location_url)
         groups = match.groupdict()
-        return cls(run=self.run, **groups)
+        return Location(run=self.run, **groups)
 
 
 def _check_location_part(val, regexp):

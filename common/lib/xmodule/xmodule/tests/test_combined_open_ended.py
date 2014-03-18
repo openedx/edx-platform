@@ -999,7 +999,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         return result
 
     def _module(self):
-        return self.get_module_from_location(self.problem_location, COURSE)
+        return self.get_module_from_location(self.problem_location)
 
     def test_open_ended_load_and_save(self):
         """
@@ -1241,7 +1241,7 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         return result
 
     def _module(self):
-        return self.get_module_from_location(self.problem_location, COURSE)
+        return self.get_module_from_location(self.problem_location)
 
     def test_reset_fail(self):
         """
@@ -1306,7 +1306,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         """
         Test to see if a student submission without a file attached fails.
         """
-        module = self.get_module_from_location(self.problem_location, COURSE)
+        module = self.get_module_from_location(self.problem_location)
 
         # Simulate a student saving an answer
         response = module.handle_ajax("save_answer", {"student_answer": self.answer_text})
@@ -1326,7 +1326,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         """
         Test to see if a student submission with a file is handled properly.
         """
-        module = self.get_module_from_location(self.problem_location, COURSE)
+        module = self.get_module_from_location(self.problem_location)
 
         # Simulate a student saving an answer with a file
         response = module.handle_ajax("save_answer", {
@@ -1344,7 +1344,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         """
         Students can submit links instead of files.  Check that the link is properly handled.
         """
-        module = self.get_module_from_location(self.problem_location, COURSE)
+        module = self.get_module_from_location(self.problem_location)
 
         # Simulate a student saving an answer with a link.
         response = module.handle_ajax("save_answer", {

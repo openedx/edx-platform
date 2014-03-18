@@ -209,8 +209,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         if sources:
             locations = [location.strip() for location in sources.split(';')]
             for location in locations:
-                if Location.is_valid(location):  # Check valid location url.
-                    result.append(location)
+                result.append(location)
         return result
 
     def get_required_module_descriptors(self):

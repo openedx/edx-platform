@@ -100,8 +100,15 @@ class CapaFactory(object):
 
             attempts: also added to instance state.  Will be converted to an int.
         """
-        location = Location(["i4x", "edX", "capa_test", "problem",
-                             "SampleProblem{0}".format(cls.next_num())])
+        location = Location(
+            "i4x",
+            "edX",
+            "capa_test",
+            "2012_Fall",
+            "problem",
+            "SampleProblem{0}".format(cls.next_num()),
+            None
+        )
         field_data = {'data': cls.sample_problem_xml}
         field_data.update(kwargs)
         descriptor = Mock(weight="1")
