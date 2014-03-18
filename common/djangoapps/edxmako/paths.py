@@ -22,6 +22,13 @@ class DynamicTemplateLookup(TemplateLookup):
         self.directories.append(os.path.normpath(directory))
 
 
+def clear_lookups(namespace):
+    """
+    Remove mako template lookups for the given namespace.
+    """
+    if namespace in LOOKUP:
+        del LOOKUP[namespace]
+
 def add_lookup(namespace, directory, package=None):
     """
     Adds a new mako template lookup directory to the given namespace.
