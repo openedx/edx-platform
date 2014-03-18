@@ -55,17 +55,9 @@ edX Learning Management System
 
 * Students using Firefox browsers were only able to select 1.0 as the video speed. This problem is resolved and Firefox users can now select all available speed options. (BLD-895)
 
-===========================
-Accessibility Improvements
-===========================
-
-* 
-
 ***************************************
 Analytics
 ***************************************
-
-* Answer distributions on? (AN-590)
 
 * A problem that prevented data exports of courses with Unicode characters in the organization name is resolved. (AN-657)
 
@@ -74,4 +66,4 @@ Analytics
 Forums
 ***************************************
 
-* A problem that prevented students from viewing discussion components within a unit when cohorts were configured is resolved.(FOR-523)
+* A problem that prevented students from viewing discussion components within a unit when cohorts were configured is resolved. (FOR-523)
