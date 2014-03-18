@@ -484,8 +484,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         data_dir = getattr(item, 'data_dir', location.course)
         root = self.fs_root / data_dir
 
-        if not root.isdir():
-            root.mkdir()
+        root.makedirs_p()  # create directory if it doesn't exist
 
         resource_fs = OSFS(root)
 
