@@ -43,7 +43,7 @@ edX Learning Management System
 
 * A problem that prevented course staff from re-scoring a problem in the standard Instructor Dashboard is resolved. (LMS-2327)
 
-* Beta Instructor Dashboard parity (which buttons?  Adam) (LMS-1203)
+* In the Beta Instructor Dashboard, the button for listing enrolled students is only enabled for courses with fewer than 200 students. (LMS-1203)
 
 * In the Beta Instructor Dashboard, you can now use edX usernames as well as email addresses to set roles for course administrators and to work with student grades. (LMS-1438)
 
