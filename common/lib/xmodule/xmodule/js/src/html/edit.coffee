@@ -96,6 +96,10 @@ class @HTMLEditingDescriptor
     $currentTarget = $(e.currentTarget)
     if not $currentTarget.hasClass('current')
       $currentTarget.addClass('current')
+
+      # Initializing $mceToolbar if undefined.
+      if not @$mceToolbar?
+        @$mceToolbar = $(@element).find('table.mceToolbar')
       @$mceToolbar.toggleClass(HTMLEditingDescriptor.isInactiveClass)
       @$advancedEditorWrapper.toggleClass(HTMLEditingDescriptor.isInactiveClass)
 
