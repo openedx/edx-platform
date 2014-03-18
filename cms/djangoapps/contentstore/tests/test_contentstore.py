@@ -1812,30 +1812,6 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
 
-    def test_update_modulestore_signal_did_fire(self):
-        module_store = modulestore('direct')
-        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-
-        try:
-            module_store.modulestore_update_signal = Signal(providing_args=['modulestore', 'course_id', 'location'])
-
-            self.got_signal = False
-
-            def _signal_hander(modulestore=None, course_id=None, location=None, **kwargs):
-                self.got_signal = True
-
-            module_store.modulestore_update_signal.connect(_signal_hander)
-
-            new_component_location = Location('i4x', 'edX', '999', 'html', 'new_component')
-
-            # crate a new module
-            module_store.create_and_save_xmodule(new_component_location)
-
-        finally:
-            module_store.modulestore_update_signal = None
-
-        self.assertTrue(self.got_signal)
-
     def test_metadata_inheritance(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
