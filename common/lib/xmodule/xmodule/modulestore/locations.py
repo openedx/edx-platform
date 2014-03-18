@@ -109,7 +109,7 @@ def _check_location_part(val, regexp):
         raise InvalidKeyError("Invalid characters in {!r}.".format(val))
 
 
-class Location(UsageKey, namedtuple('LocationBase', 'tag org course run category name revision')):
+class Location(UsageKey, namedtuple('Location', 'tag org course run category name revision')):
     """
     Encodes a location.
 

@@ -269,7 +269,7 @@ class LTIModuleTest(LogicTest):
             self.assertEqual(real_lis_result_sourcedid, expected_sourcedId)
 
 
-    def test_client_key_secret(self, test):
+    def test_client_key_secret(self):
         """
         LTI module gets client key and secret provided.
         """
@@ -284,7 +284,7 @@ class LTIModuleTest(LogicTest):
         expected = ('test_client', 'test_secret')
         self.assertEqual(expected, (key, secret))
 
-    def test_client_key_secret_not_provided(self, test):
+    def test_client_key_secret_not_provided(self):
         """
         LTI module attempts to get client key and secret provided in cms.
 
@@ -303,7 +303,7 @@ class LTIModuleTest(LogicTest):
         expected = ('','')
         self.assertEqual(expected, key_secret)
 
-    def test_bad_client_key_secret(self, test):
+    def test_bad_client_key_secret(self):
         """
         LTI module attempts to get client key and secret provided in cms.
 
@@ -319,9 +319,9 @@ class LTIModuleTest(LogicTest):
         with self.assertRaises(LTIError):
             self.xmodule.get_client_key_secret()
 
-    @patch('xmodule.lti_module.signature.verify_hmac_sha1', return_value=True)
-    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', return_value=('test_client_key', u'test_client_secret'))
-    def test_successful_verify_oauth_body_sign(self, get_key_secret, mocked_verify):
+    @patch('xmodule.lti_module.signature.verify_hmac_sha1', Mock(return_value=True))
+    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', Mock(return_value=('test_client_key', u'test_client_secret')))
+    def test_successful_verify_oauth_body_sign(self):
         """
         Test if OAuth signing was successful.
         """
@@ -330,9 +330,9 @@ class LTIModuleTest(LogicTest):
         except LTIError:
             self.fail("verify_oauth_body_sign() raised LTIError unexpectedly!")
 
-    @patch('xmodule.lti_module.signature.verify_hmac_sha1', return_value=False)
-    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', return_value=('test_client_key', u'test_client_secret'))
-    def test_failed_verify_oauth_body_sign(self, get_key_secret, mocked_verify):
+    @patch('xmodule.lti_module.signature.verify_hmac_sha1', Mock(return_value=False))
+    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', Mock(return_value=('test_client_key', u'test_client_secret')))
+    def test_failed_verify_oauth_body_sign(self):
         """
         Oauth signing verify fail.
         """
