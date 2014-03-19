@@ -1,6 +1,7 @@
 """
 Helper functions for loading environment settings.
 """
+from __future__ import print_function
 import os
 import sys
 import json
@@ -34,7 +35,11 @@ class Env(object):
 
         # If the file does not exist, issue a warning and return an empty dict
         if not os.path.isfile(env_path):
-            print "Warning: could not find environment JSON file at '{path}'".format(path=env_path)
+            print(
+                "Warning: could not find environment JSON file "
+                "at '{path}'".format(path=env_path),
+                file=sys.stderr,
+            )
             return dict()
 
         # Otherwise, load the file as JSON and return the resulting dict
@@ -43,7 +48,11 @@ class Env(object):
                 return json.load(env_file)
 
         except ValueError:
-            print "Error: Could not parse JSON in {path}".format(path=env_path)
+            print(
+                "Error: Could not parse JSON "
+                "in {path}".format(path=env_path),
+                file=sys.stderr,
+            )
             sys.exit(1)
 
     @lazy

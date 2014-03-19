@@ -1,7 +1,8 @@
 """
 Run and manage servers for local development.
 """
-
+from __future__ import print_function
+import sys
 import argparse
 from paver.easy import *
 from .utils.cmd import django_cmd
@@ -21,7 +22,7 @@ def run_server(system, settings=None, port=None, skip_assets=False):
     If `skip_assets` is True, skip the asset compilation step.
     """
     if system not in ['lms', 'studio']:
-        print "System must be either lms or studio"
+        print("System must be either lms or studio", file=sys.stderr)
         exit(1)
 
     if not skip_assets:

@@ -89,7 +89,7 @@ def prereq_cache(cache_name, paths, install_func):
             cache_file.write(new_hash)
 
     else:
-        print '{cache} unchanged, skipping...'.format(cache=cache_name)
+        print('{cache} unchanged, skipping...'.format(cache=cache_name))
 
 
 def install_ruby_prereqs():
