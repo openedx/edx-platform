@@ -474,7 +474,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         Load an XModuleDescriptor from item, using the children stored in data_cache
         """
-        location = Location(course_key.run, **item['location'])
+        location = Location(run=course_key.run, **item['location'])
         data_dir = getattr(item, 'data_dir', location.course)
         root = self.fs_root / data_dir
 
