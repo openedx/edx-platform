@@ -33,9 +33,10 @@ from .access import has_course_access
 __all__ = ['assets_handler']
 
 
+# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
-def assets_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, asset_id=None):
+def assets_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None, asset_id=None):
     """
     The restful handler for assets.
     It allows retrieval of all the assets (as an HTML page), as well as uploading new assets,
