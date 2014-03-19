@@ -1306,7 +1306,6 @@ def auto_auth(request):
     reg.save()
 
     # Enroll the user in a course
-    from nose.tools import set_trace; set_trace()
     if course_id is not None:
         CourseEnrollment.enroll(user, course_id)
 
