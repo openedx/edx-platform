@@ -30,7 +30,7 @@ class TestOrphan(unittest.TestCase):
         'xblock_mixins': (InheritanceMixin,)
     }
 
-    split_package_id = 'test_org.test_course.runid'
+    split_course_key = CourseLocator.from_string('test_org+test_course.runid/branch/draft')
 
     def setUp(self):
         self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex[:5])
@@ -85,8 +85,7 @@ class TestOrphan(unittest.TestCase):
             self.old_mongo.update_item(parent, self.userid)
             # create pointer for split
             course_or_parent_locator = BlockUsageLocator(
-                package_id=self.split_package_id,
-                branch='draft',
+                course_key=self.split_course_key,
                 block_id=parent_name
             )
         else:
@@ -114,7 +113,7 @@ class TestOrphan(unittest.TestCase):
         fields.update(data)
         # split requires the course to be created separately from creating items
         self.split_mongo.create_course(
-            'test_org', 'my course', self.userid, self.split_package_id, fields=fields, root_block_id='runid'
+            'test_org', 'my course', self.userid, self.split_course_key.offering, fields=fields, root_block_id='runid'
         )
         self.course_location = Location('i4x', 'test_org', 'test_course', 'course', 'runid')
         self.old_mongo.create_and_save_xmodule(self.course_location, data, metadata)
@@ -135,7 +134,7 @@ class TestOrphan(unittest.TestCase):
         """
         Test that old mongo finds the orphans
         """
-        orphans = self.old_mongo.get_orphans(self.course_location, None)
+        orphans = self.old_mongo.get_orphans(self.course_location)
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
         location = self.course_location.replace(category='chapter', name='OrphanChapter')
         self.assertIn(location.url(), orphans)
@@ -148,11 +147,11 @@ class TestOrphan(unittest.TestCase):
         """
         Test that old mongo finds the orphans
         """
-        orphans = self.split_mongo.get_orphans(self.split_package_id, 'draft')
+        orphans = self.split_mongo.get_orphans(self.split_course_key)
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
-        location = BlockUsageLocator(package_id=self.split_package_id, branch='draft', block_id='OrphanChapter')
+        location = self.split_course_key.make_usage_key('chapter', 'OrphanChapter')
         self.assertIn(location, orphans)
-        location = BlockUsageLocator(package_id=self.split_package_id, branch='draft', block_id='OrphanVert')
+        location = self.split_course_key.make_usage_key('vertical', 'OrphanVert')
         self.assertIn(location, orphans)
-        location = BlockUsageLocator(package_id=self.split_package_id, branch='draft', block_id='OrphanHtml')
+        location = self.split_course_key.make_usage_key('html', 'OrphanHtml')
         self.assertIn(location, orphans)

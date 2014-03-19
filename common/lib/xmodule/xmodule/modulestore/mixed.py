@@ -190,7 +190,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         return self._get_modulestore_for_courseid(course_id).get_modulestore_type(course_id)
 
-    def get_orphans(self, course_location, branch):
+    def get_orphans(self, course_location):
         """
         Get all of the xblocks in the given course which have no parents and are not of types which are
         usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
@@ -198,7 +198,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         course_id = self._get_course_id_from_course_location(course_location)
         store = self._get_modulestore_for_courseid(course_id)
-        return store.get_orphans(course_location, branch)
+        return store.get_orphans(course_location)
 
     def get_errored_courses(self):
         """

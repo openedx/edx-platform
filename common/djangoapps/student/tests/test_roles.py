@@ -10,7 +10,7 @@ from student.tests.factories import AnonymousUserFactory
 
 from student.roles import GlobalStaff, CourseRole, CourseStaffRole
 from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 
 
 class RolesTestCase(TestCase):
@@ -70,9 +70,7 @@ class RolesTestCase(TestCase):
             "Student doesn't have access to {}".format(unicode(self.course.url()))
         )
         # now try accessing something internal to the course
-        vertical_locator = BlockUsageLocator(
-            package_id=course_locator.package_id, branch='published', block_id='madeup'
-        )
+        vertical_locator = course_locator.course_key.make_usage_key('vertical', 'madeup')
         vertical_location = self.course.replace(category='vertical', name='madeuptoo')
         self.assertTrue(
             CourseStaffRole(self.course.course_id).has_user(self.student),
