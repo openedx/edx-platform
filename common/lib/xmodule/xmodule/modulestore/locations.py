@@ -70,6 +70,8 @@ class SlashSeparatedCourseKey(CourseKey):
             log.debug(u"location %r doesn't match URL", location_url)
             raise InvalidKeyError(location_url)
         groups = match.groupdict()
+        if 'tag' in groups:
+            del groups['tag']
         return Location(run=self.run, **groups)
 
 
@@ -103,8 +105,10 @@ class Location(UsageKey, DefinitionKey):
     {org}/{course}/{run}.
     """
     CANONICAL_NAMESPACE = 'location'
-    KEY_FIELDS = ('tag', 'org', 'course', 'run', 'category', 'name', 'revision')
+    KEY_FIELDS = ('org', 'course', 'run', 'category', 'name', 'revision')
     __slots__ = KEY_FIELDS
+
+    DEPRECATED_TAG = 'i4x'
 
     @staticmethod
     def _clean(value, invalid):
@@ -144,18 +148,7 @@ class Location(UsageKey, DefinitionKey):
         """
         return Location._clean(value, INVALID_HTML_CHARS)
 
-    @staticmethod
-    def is_valid(value):
-        '''
-        Check if the value is a valid location, in any acceptable format.
-        '''
-        try:
-            Location(value)
-        except InvalidKeyError:
-            return False
-        return True
-
-    def __init__(self, tag, org, course, run, category, name, revision=None):
+    def __init__(self, org, course, run, category, name, revision=None):
         """
         Create a new Location that is a clone of the specifed one.
 
@@ -167,11 +160,11 @@ class Location(UsageKey, DefinitionKey):
         to mean wildcard selection.
         """
 
-        for part in (tag, org, course, run, category, revision):
+        for part in (org, course, run, category, revision):
             _check_location_part(part, INVALID_CHARS)
         _check_location_part(name, INVALID_CHARS_NAME)
 
-        return super(Location, self).__init__(tag, org, course, run, category, name, revision)
+        return super(Location, self).__init__(org, course, run, category, name, revision)
 
     @property
     def definition_key(self):
@@ -189,7 +182,7 @@ class Location(UsageKey, DefinitionKey):
         return self.to_deprecated_string()
 
     def to_deprecated_string(self):
-        url = u"{0.tag}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
+        url = u"{0.DEPRECATED_TAG}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
         if self.revision:
             url += u"@{rev}".format(rev=self.revision)  # pylint: disable=E1101
         return url
@@ -226,7 +219,7 @@ class Location(UsageKey, DefinitionKey):
         Return a string with a version of the location that is safe for use in
         html id attributes
         """
-        id_fields = [self.tag, self.org, self.course, self.category, self.name, self.revision]
+        id_fields = [self.DEPRECATED_TAG, self.org, self.course, self.category, self.name, self.revision]
         id_string = u"-".join([v for v in id_fields if v is not None])
         return Location.clean_for_html(id_string)
 
