@@ -118,8 +118,7 @@ def course_handler(request, tag=None, org=None, offering=None, branch=None, vers
             return create_new_course(request)
         elif not has_course_access(
             request.user,
-            BlockUsageLocator(package_id=package_id, branch=branch,
-                              version_guid=version_guid, block_id=block).package_id
+            CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid).package_id
         ):
             raise PermissionDenied()
         elif request.method == 'PUT':
@@ -129,7 +128,7 @@ def course_handler(request, tag=None, org=None, offering=None, branch=None, vers
         else:
             return HttpResponseBadRequest()
     elif request.method == 'GET':  # assume html
-        if package_id is None:
+        if offering is None:
             return course_listing(request)
         else:
             return course_index(request, org, offering, branch, version_guid, block)
@@ -486,14 +485,14 @@ def course_info_update_handler(request, tag=None, org=None, offering=None, branc
         return HttpResponseBadRequest("Only supports json requests")
 
     course_location = loc_mapper().translate_locator_to_location(
-        CourseLocator(package_id=package_id), get_course=True
+        CourseLocator(org=org, offering=offering), get_course=True
     )
     updates_location = course_location.replace(category='course_info', name=block)
     if provided_id == '':
         provided_id = None
 
     # check that logged in user has permissions to this item (GET shouldn't require this level?)
-    if not has_course_access(request.user, package_id):
+    if not has_course_access(request.user, course_location):
         raise PermissionDenied()
 
     if request.method == 'GET':

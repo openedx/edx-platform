@@ -30,7 +30,7 @@ from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.keys import CourseKey
 from xmodule.exceptions import SerializationError
 
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from .access import has_course_access
 
 from util.json_request import JsonResponse
@@ -49,10 +49,11 @@ log = logging.getLogger(__name__)
 CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11})")
 
 
+# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
-def import_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def import_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for importing a course.
 
@@ -62,18 +63,18 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
     POST or PUT
         json: import a course via the .tar.gz file specified in request.FILES
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+    course_id = CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid)
+    location = BlockUsageLocator(course_id, block)
     if not has_course_access(request.user, location.package_id):
         raise PermissionDenied()
 
-    course_id = CourseKey.from_string(package_id)
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
             raise NotImplementedError('coming soon')
         else:
             data_root = path(settings.GITHUB_REPO_ROOT)
-            course_subdir = "{0}-{1}".format(course_id.org, course_id.run)
+            course_subdir = "{0}-{1}".format(course_id.org, course_id.offering)
             course_dir = data_root / course_subdir
 
             filename = request.FILES['course-data'].name
@@ -262,10 +263,11 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
         return HttpResponseNotFound()
 
 
+# pylint: disable=unused-argument
 @require_GET
 @ensure_csrf_cookie
 @login_required
-def import_status_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, filename=None):
+def import_status_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None, filename=None):
     """
     Returns an integer corresponding to the status of a file import. These are:
 
@@ -275,7 +277,7 @@ def import_status_handler(request, tag=None, package_id=None, branch=None, versi
         3 : Importing to mongo
 
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+    location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
     if not has_course_access(request.user, location.package_id):
         raise PermissionDenied()
 
@@ -288,10 +290,11 @@ def import_status_handler(request, tag=None, package_id=None, branch=None, versi
     return JsonResponse({"ImportStatus": status})
 
 
+# pylint: disable=unused-argument
 @ensure_csrf_cookie
 @login_required
 @require_http_methods(("GET",))
-def export_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def export_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for exporting a course.
 
@@ -306,7 +309,7 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
     If the tar.gz file has been requested but the export operation fails, an HTML page will be returned
     which describes the error.
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+    location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
     if not has_course_access(request.user, location.package_id):
         raise PermissionDenied()
 
