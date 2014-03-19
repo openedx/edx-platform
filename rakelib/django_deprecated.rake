@@ -7,7 +7,7 @@ def deprecated(deprecated, deprecated_by)
     task deprecated, [:arg1, :arg2, :arg3, :arg4] do |t,args|
 
         # Need to install paver dependencies for the commands to work!
-        sh("pip install Paver==1.2.1 psutil==1.2.1 lazy==1.1 path.py==3.0.1")
+        sh("pip install -r requirements/edx/paver.txt")
 
         if deprecated == "cms" or deprecated == "lms"
             args.with_defaults(:arg1 => "dev", :arg2 => "")
