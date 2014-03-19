@@ -25,7 +25,7 @@ from ..pages.studio.textbooks import TextbooksPage
 from ..pages.xblock.acid import AcidView
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
-from .helpers import UniqueCourseTest
+from .helpers import UniqueCourseTest, load_data_str
 
 
 class LoggedOutTest(WebAppTest):

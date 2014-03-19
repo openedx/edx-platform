@@ -14,7 +14,7 @@ class AcidView(PageObject):
     def __init__(self, browser, context_selector):
         """
         Args:
-            browser (selenium controlled browser): The browser that this page is loaded in.
+            browser (selenium.webdriver): The Selenium-controlled browser that this page is loaded in.
             context_selector (str): The selector that identifies where this :class:`.AcidBlock` view
                 is on the page.
         """

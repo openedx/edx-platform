@@ -7,6 +7,7 @@ from bok_choy.promise import EmptyPromise
 from .course_page import CoursePage
 from .unit import UnitPage
 
+
 class CourseOutlineContainer(object):
     """
     A mixin to a CourseOutline page object that adds the ability to load
@@ -17,11 +18,19 @@ class CourseOutlineContainer(object):
     CHILD_CLASS = None
 
     def child(self, title, child_class=None):
+        """
+
+        :type self: object
+        """
         if not child_class:
             child_class = self.CHILD_CLASS
+
         return child_class(
             self.browser,
-            self.q(css=child_class.BODY_SELECTOR).filter()
+            self.q(css=child_class.BODY_SELECTOR).filter(
+                lambda el: title in [inner.text for inner in
+                                     el.find_elements_by_css_selector(child_class.NAME_SELECTOR)]
+            ).attrs('data-locator')[0]
         )
 
 
@@ -101,22 +110,24 @@ class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
         """
         Toggle the expansion of this subsection.
         """
-        self.disable_jquery_animations()
+        self.browser.execute_script("jQuery.fx.off = true;")
 
         def subsection_expanded():
             return all(
                 self.q(css=self._bounded_selector('.new-unit-item'))
-                    .map(lambda el: el.visible)
-                    .results
+                .map(lambda el: el.is_displayed())
+                .results
             )
 
         currently_expanded = subsection_expanded()
 
-        self.css_click(self._bounded_selector('.expand-collapse'))
-        fulfill(EmptyPromise(
+        self.q(css=self._bounded_selector('.expand-collapse')).first.click()
+
+        EmptyPromise(
             lambda: subsection_expanded() != currently_expanded,
-            "Check that the subsection {} has been toggled".format(self.locator),
-        ))
+            "Check that the subsection {} has been toggled".format(self.locator)
+        ).fulfill()
+
         return self
 
 

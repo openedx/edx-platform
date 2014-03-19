@@ -3,7 +3,6 @@ Unit page in Studio
 """
 
 from bok_choy.page_object import PageObject
-# from bok_choy.query import SubQuery
 from bok_choy.promise import EmptyPromise
 
 from . import BASE_URL
@@ -26,11 +25,11 @@ class UnitPage(PageObject):
 
     def is_browser_on_page(self):
         # Wait until all components have been loaded
-        number_of_leaf_xblocks = len(self.q(css='{} .xblock-student_view'.format(Component.BODY_SELECTOR)))
-        number_of_container_xblocks = len(self.q(css='{} .wrapper-xblock'.format(Component.BODY_SELECTOR)))
+        number_of_leaf_xblocks = len(self.q(css='{} .xblock-student_view'.format(Component.BODY_SELECTOR)).results)
+        number_of_container_xblocks = len(self.q(css='{} .wrapper-xblock'.format(Component.BODY_SELECTOR)).results)
         return (
-            self.is_css_present('body.view-unit') and
-            len(self.q(css=Component.BODY_SELECTOR)) == number_of_leaf_xblocks + number_of_container_xblocks
+            self.q(css='body.view-unit').present and
+            len(self.q(css=Component.BODY_SELECTOR).results) == number_of_leaf_xblocks + number_of_container_xblocks
         )
 
     @property
@@ -38,21 +37,24 @@ class UnitPage(PageObject):
         """
         Return a list of components loaded on the unit page.
         """
-        return self.q(css=Component.BODY_SELECTOR).map(lambda el: Component(self.browser, el['data-locator'])).results
+        return self.q(css=Component.BODY_SELECTOR).map(
+            lambda el: Component(self.browser, el.get_attribute('data-locator'))).results
 
     def edit_draft(self):
         """
         Started editing a draft of this unit.
         """
-        fulfill(EmptyPromise(
+        EmptyPromise(
             lambda: self.q(css='.create-draft').present,
             'Wait for edit draft link to be present'
-        ))
-        self.q(css='.create-draft').click()
-        fulfill(EmptyPromise(
+        ).fulfill()
+
+        self.q(css='.create-draft').first.click()
+
+        EmptyPromise(
             lambda: self.q(css='.editing-draft-alert').present,
             'Wait for draft mode to be activated'
-        ))
+        ).fulfill()
 
 
 class Component(PageObject):
@@ -69,7 +71,7 @@ class Component(PageObject):
         self.locator = locator
 
     def is_browser_on_page(self):
-        return self.is_css_present('{}[data-locator="{}"]'.format(self.BODY_SELECTOR, self.locator))
+        return self.q(css='{}[data-locator="{}"]'.format(self.BODY_SELECTOR, self.locator)).present
 
     def _bounded_selector(self, selector):
         """
@@ -83,7 +85,7 @@ class Component(PageObject):
 
     @property
     def name(self):
-        titles = self.css_text(self._bounded_selector(self.NAME_SELECTOR))
+        titles = self.q(css=self._bounded_selector(self.NAME_SELECTOR)).text
         if titles:
             return titles[0]
         else:
@@ -94,15 +96,15 @@ class Component(PageObject):
         return self._bounded_selector('.xblock-student_view')
 
     def edit(self):
-        self.css_click(self._bounded_selector('.edit-button'))
-        fulfill(EmptyPromise(
+        self.q(css=self._bounded_selector('.edit-button')).first.click()
+        EmptyPromise(
             lambda: all(
                 self.q(css=self._bounded_selector('.component-editor'))
-                    .map(lambda el: el.visible)
-                    .results
-                ),
+                .map(lambda el: el.is_displayed())
+                .results),
             "Verify that the editor for component {} has been expanded".format(self.locator)
-        ))
+        ).fulfill()
+
         return self
 
     @property

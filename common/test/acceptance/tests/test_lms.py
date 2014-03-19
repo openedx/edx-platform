@@ -87,7 +87,6 @@ class LanguageTest(UniqueCourseTest):
         self.password = "testpass"
         self.email = "test@example.com"
 
-    #@skip("Flakey in its present form; re-enable when fixed")
     def test_change_lang(self):
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.dashboard_page.visit()
@@ -99,7 +98,6 @@ class LanguageTest(UniqueCourseTest):
         # We should see the dummy-language text on the page
         self.assertIn(self.current_courses_text, changed_text)
 
-    #@skip("Flakey in its present form; re-enable when fixed")
     def test_language_persists(self):
         auto_auth_page = AutoAuthPage(self.browser, username=self.username, password=self.password, email=self.email, course_id=self.course_id)
         auto_auth_page.visit()

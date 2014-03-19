@@ -17,7 +17,7 @@ class LoginPage(PageObject):
     def is_browser_on_page(self):
         return any([
             'log in' in title.lower()
-            for title in self.css_text('span.title-super')
+            for title in self.q(css='span.title-super').text
         ])
 
     def login(self, email, password):

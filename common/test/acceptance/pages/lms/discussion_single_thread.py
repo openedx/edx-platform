@@ -33,7 +33,7 @@ class DiscussionSingleThreadPage(CoursePage):
 
     def get_num_displayed_responses(self):
         """Returns the number of responses actually rendered"""
-        return len(self.q(css=".discussion-response").text)
+        return len(self.q(css=".discussion-response").results)
 
     def get_shown_responses_text(self):
         """Returns the shown response count text, or None if not present"""
@@ -46,9 +46,13 @@ class DiscussionSingleThreadPage(CoursePage):
     def load_more_responses(self):
         """Clicks the load more responses button and waits for responses to load"""
         self.q(css=".load-response-button").first.click()
+
+        def _is_ajax_finished():
+            return self.browser.execute_script("return jQuery.active") == 0
+
         EmptyPromise(
-            lambda: not self.q(css=".loading").present,
-            "Loading more responses completed"
+            _is_ajax_finished,
+            "Loading more Responses"
         ).fulfill()
 
     def has_add_response_button(self):

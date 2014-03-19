@@ -22,13 +22,12 @@ class LoginPage(PageObject):
         Attempt to log in using `email` and `password`.
         """
 
+        self.q(css='input#email').fill(email)
+        self.q(css='input#password').fill(password)
+        self.q(css='button#submit').first.click()
+
         # Ensure that we make it to another page
-        on_next_page = EmptyPromise(
+        EmptyPromise(
             lambda: "login" not in self.browser.url,
             "redirected from the login page"
-        )
-
-        with fulfill_after(on_next_page):
-            self.css_fill('input#email', email)
-            self.css_fill('input#password', password)
-            self.css_click('button#submit')
+        ).fulfill()
