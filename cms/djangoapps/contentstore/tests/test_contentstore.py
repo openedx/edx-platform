@@ -1621,7 +1621,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertEqual(resp.status_code, 200)
         payload = parse_json(resp)
-        problem_loc = loc_mapper().translate_locator_to_location(BlockUsageLocator(payload['locator']))
+        problem_loc = loc_mapper().translate_locator_to_location(BlockUsageLocator.from_string(payload['locator']))
         problem = get_modulestore(problem_loc).get_item(problem_loc)
         # should be a CapaDescriptor
         self.assertIsInstance(problem, CapaDescriptor, "New problem is not a CapaDescriptor")

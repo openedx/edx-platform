@@ -242,12 +242,9 @@ class CourseUpdateTest(CourseTestCase):
             }
         )
 
-        branch = u'draft'
-        version = None
+        draft_branch = course_location.course_key.for_branch(u'draft')
         block = u'updates'
-        updates_locator = BlockUsageLocator(
-            package_id=course_location.course_key, branch=branch, version_guid=version, block_id=block
-        )
+        updates_locator = BlockUsageLocator(course_key=draft_branch, block_id=block)
 
         content = u"Sample update"
         payload = {'content': content, 'date': 'January 8, 2013'}
@@ -269,7 +266,7 @@ class CourseUpdateTest(CourseTestCase):
         # check posting on handouts
         block = u'handouts'
         handouts_locator = BlockUsageLocator(
-            package_id=updates_locator.package_id, branch=updates_locator.branch, version_guid=version, block_id=block
+            course_key=updates_locator.course_key.version_agnostic(), block_id=block
         )
         course_handouts_url = handouts_locator.url_reverse('xblock')
         content = u"Sample handout"

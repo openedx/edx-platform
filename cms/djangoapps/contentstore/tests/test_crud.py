@@ -142,8 +142,8 @@ class TemplateTests(unittest.TestCase):
         persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location)
 
-        id_locator = CourseLocator(package_id=test_course.location.package_id, branch='draft')
-        guid_locator = CourseLocator(version_guid=test_course.location.version_guid)
+        id_locator = test_course.location.for_branch('draft')
+        guid_locator = test_course.location.course_agnostic()
         # verify it can be retireved by id
         self.assertIsInstance(modulestore('split').get_course(id_locator), CourseDescriptor)
         # and by guid
@@ -181,7 +181,7 @@ class TemplateTests(unittest.TestCase):
 
         second_problem = persistent_factories.ItemFactory.create(
             display_name='problem 2',
-            parent_location=BlockUsageLocator(updated_loc, block_id=sub.location.block_id),
+            parent_location=BlockUsageLocator.make_relative(updated_loc, block_id=sub.location.block_id),
             user_id='testbot', category='problem',
             data="<problem></problem>"
         )

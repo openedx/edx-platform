@@ -22,7 +22,7 @@ class RolesTest(TestCase):
         self.instructor = User.objects.create_user('testinstructor', 'testinstructor+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
         self.location = Location('i4x', 'mitX', '101', 'course', 'test')
-        self.locator = CourseLocator(url='edx://mitX.101.test')
+        self.locator = CourseLocator.from_string('edx://mitX+101.test')
 
     def test_get_user_role_instructor(self):
         """

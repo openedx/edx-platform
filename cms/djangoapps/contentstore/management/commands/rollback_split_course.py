@@ -21,7 +21,7 @@ class Command(BaseCommand):
             )
 
         try:
-            locator = CourseLocator(url=args[0])
+            locator = CourseLocator.from_string(args[0])
         except ValueError:
             raise CommandError("Invalid locator string {}".format(args[0]))
 

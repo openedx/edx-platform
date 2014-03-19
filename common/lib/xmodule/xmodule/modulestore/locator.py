@@ -225,7 +225,7 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         super(CourseLocator, self).__init__(**{key: kwargs.get(key) for key in self.KEY_FIELDS})
 
         if self.version_guid is None and self.org is None and self.offering is None:
-            raise ValueError("Either version_guid or org and offering should be set")
+            raise InvalidKeyError("Either version_guid or org and offering should be set")
 
     @classmethod
     def _from_string(cls, serialized):
@@ -314,6 +314,19 @@ class CourseLocator(BlockLocatorBase, CourseKey):
             offering=None,
             branch=None,
             version_guid=self.version_guid
+        )
+
+    def for_branch(self, branch):
+        """
+        Return a new CourseLocator for another branch of the same course (also version agnostic)
+        """
+        if self.org is None:
+            raise InvalidKeyError("Branches must have full course ids not just versions")
+        return CourseLocator(
+            org=self.org,
+            offering=self.offering,
+            branch=branch,
+            version_guid=None
         )
 
 
