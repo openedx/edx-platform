@@ -437,8 +437,7 @@ def video_alignment(_step, transcript_visibility):
 
 @step('I can download transcript in "([^"]*)" format and has text "([^"]*)"$')
 def i_can_download_transcript(_step, format, text):
-    button = world.css_find('.video-tracks .a11y-menu-button').first
-    assert button.text.strip() == '.' + format
+    assert world.css_has_text('.video-tracks .a11y-menu-button', '.' + format, strip=True)
 
     formats = {
         'srt': 'application/x-subrip',
@@ -454,13 +453,14 @@ def i_can_download_transcript(_step, format, text):
 
 @step('I select the transcript format "([^"]*)"$')
 def select_transcript_format(_step, format):
-    button = world.css_find('.video-tracks .a11y-menu-button').first
-    button.mouse_over()
-    assert button.text.strip() == '...'
-
+    button_selector = '.video-tracks .a11y-menu-button'
     menu_selector = VIDEO_MENUS['download_transcript']
-    menu_items = world.css_find(menu_selector + ' a')
 
+    button = world.css_find(button_selector).first
+    button.mouse_over()
+    assert world.css_has_text(button_selector, '...', strip=True)
+
+    menu_items = world.css_find(menu_selector + ' a')
     for item in menu_items:
         if item['data-value'] == format:
             item.click()
@@ -468,4 +468,4 @@ def select_transcript_format(_step, format):
             break
 
     assert world.css_find(menu_selector + ' .active a')[0]['data-value'] == format
-    assert button.text.strip() == '.' + format
+    assert world.css_has_text(button_selector, '.' + format, strip=True)
