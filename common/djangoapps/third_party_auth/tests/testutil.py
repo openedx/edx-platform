@@ -8,6 +8,9 @@ import unittest
 
 from third_party_auth import provider
 
+# String. settings.FEATURES key for the boolean that enables third_party_auth.
+AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
+
 
 class FakeDjangoSettings(object):
     """A fake for Django settings."""

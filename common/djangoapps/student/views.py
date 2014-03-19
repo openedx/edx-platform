@@ -85,6 +85,9 @@ from util.password_policy_validators import (
     validate_password_dictionary
 )
 
+from third_party_auth import pipeline
+from third_party_auth import provider
+
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -383,19 +386,37 @@ def register_user(request, extra_context=None):
         # and registration is disabled.
         return redirect(reverse('root'))
 
+    pipeline_running = pipeline.running(request)
+
     context = {
         'course_id': request.GET.get('course_id'),
+        'email': '',
         'enrollment_action': request.GET.get('enrollment_action'),
+        'name': '',
+        'pipeline_running': pipeline_running,
         'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
         ),
+        'selected_provider': '',
+        'username': '',
     }
+
     if extra_context is not None:
         context.update(extra_context)
 
     if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
         return render_to_response('register-shib.html', context)
+
+    # If third-party auth is enabled, prepopulate the form with data from the
+    # selected provider.
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline_running:
+        running_pipeline = pipeline.get(request)
+        current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
+        overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
+        overrides['selected_provider'] = current_provider.NAME
+        context.update(overrides)
+
     return render_to_response('register.html', context)
 
 
@@ -1037,6 +1058,11 @@ def create_account(request, post_override=None):
     post_vars = post_override if post_override else request.POST
     extra_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
 
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
+        post_vars = dict(post_vars.items())
+        overrides = {'password': pipeline.make_random_password()}
+        post_vars.update(overrides)
+
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
     # unless originally we didn't get a valid email or name from the external auth
@@ -1234,9 +1260,17 @@ def create_account(request, post_override=None):
             login_user.save()
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(login_user.username, login_user.email))
 
+    dog_stats_api.increment("common.student.account_created")
+    redirect_url = try_change_enrollment(request)
+
+    # Resume the third-party-auth pipeline if necessary.
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
+        running_pipeline = pipeline.get(request)
+        redirect_url = pipeline.get_complete_url(running_pipeline['backend'])
+
     response = JsonResponse({
         'success': True,
-        'redirect_url': try_change_enrollment(request),
+        'redirect_url': redirect_url,
     })
 
     # set the login cookie for the edx marketing site

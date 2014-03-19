@@ -11,15 +11,14 @@ from third_party_auth import provider
 from third_party_auth import settings as auth_settings
 from third_party_auth.tests import testutil
 
-_AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
-
 
 class SettingsIntegrationTest(testutil.TestCase):
     """Integration tests of auth settings pipeline."""
 
-    @unittest.skipUnless(_AUTH_FEATURES_KEY in settings.FEATURES, _AUTH_FEATURES_KEY + ' not in settings.FEATURES')
+    @unittest.skipUnless(
+        testutil.AUTH_FEATURES_KEY in settings.FEATURES, testutil.AUTH_FEATURES_KEY + ' not in settings.FEATURES')
     def test_enable_third_party_auth_is_disabled_by_default(self):
-        self.assertIs(False, settings.FEATURES.get(_AUTH_FEATURES_KEY))
+        self.assertIs(False, settings.FEATURES.get(testutil.AUTH_FEATURES_KEY))
 
     @mock.patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_AUTH': True})
     def test_can_enable_google_oauth2(self):
