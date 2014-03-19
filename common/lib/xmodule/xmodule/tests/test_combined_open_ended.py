@@ -791,6 +791,14 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     def test_state_pe_single(self):
         self.ai_state_success(TEST_STATE_PE_SINGLE, iscore=0, tasks=[self.task_xml2])
 
+    def test_get_rubric(self):
+        self.combinedoe.ready_to_reset = True
+
+        response = self.combinedoe.get_rubric({})
+
+        # Should be succeeded.
+        self.assertEqual(response.get("success"), True)
+
 
 class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
     """

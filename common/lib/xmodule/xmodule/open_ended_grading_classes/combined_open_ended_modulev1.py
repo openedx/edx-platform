@@ -851,7 +851,7 @@ class CombinedOpenEndedV1Module():
 
         contexts = []
         rubric_number = self.current_task_number
-        if self.ready_to_reset:
+        if self.ready_to_reset and len(self.task_states) > rubric_number + 1:
             rubric_number+=1
         response = self.get_last_response(rubric_number)
         score_length = len(response['grader_types'])
