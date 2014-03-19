@@ -26,6 +26,7 @@ from xmodule_modifiers import wrap_xblock
 import xmodule.graders as xmgraders
 from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
 
@@ -85,11 +86,12 @@ def split_by_comma_and_whitespace(a_str):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
-    course = get_course_with_access(request.user, 'staff', course_id, depth=None)
+    course_key = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'staff', course_key, depth=None)
 
     instructor_access = has_access(request.user, 'instructor', course)   # an instructor can manage staff lists
 
-    forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
+    forum_admin_access = has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR)
 
     msg = ''
     email_msg = ''
