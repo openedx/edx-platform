@@ -202,10 +202,6 @@ function submit()
     editor.fire('SaveCodeMirror', codemirror);
 
 	editor.setContent(codemirror.getValue().replace(cc, '<span id="CmCaReT"></span>'));
-	editor.isNotDirty = !isDirty;
-	if (isDirty) {
-		editor.nodeChanged();
-	}
 
 	// Set cursor:
 	var el = editor.dom.select('span#CmCaReT')[0];
@@ -214,6 +210,22 @@ function submit()
 		editor.selection.setCursorLocation(el,0);
 		editor.dom.remove(el);
 	}
+    // EDX: added because CmCaReT span was getting left in when caret was within a style tag.
+    // Make sure to strip it out (and accept that caret will not be in the correct place).
+    else {
+        var content = editor.getContent();
+        var strippedContent = content.replace('<span id="CmCaReT"></span>', '');
+        if (content !== strippedContent) {
+            editor.setContent(strippedContent);
+        }
+    }
+
+    // EDX: moved block of code from original location since we may change content in bug fix code above.
+    editor.isNotDirty = !isDirty;
+	if (isDirty) {
+		editor.nodeChanged();
+	}
+
 }
 
 </script>
