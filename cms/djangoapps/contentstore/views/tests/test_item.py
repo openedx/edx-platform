@@ -37,7 +37,7 @@ class ItemTest(CourseTestCase):
         """
         Converts new locator to old id format (forcing to non-draft).
         """
-        return loc_mapper().translate_locator_to_location(BlockUsageLocator(locator)).replace(revision=None)
+        return loc_mapper().translate_locator_to_location(BlockUsageLocator.from_string(locator)).replace(revision=None)
 
     def get_item_from_modulestore(self, locator, draft=False):
         """
