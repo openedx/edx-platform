@@ -55,6 +55,7 @@ from .tools import (
     strip_if_string,
 )
 from xmodule.modulestore import Location
+from xmodule.modulestore.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
@@ -178,7 +179,7 @@ def require_level(level):
     def decorator(func):  # pylint: disable=C0111
         def wrapped(*args, **kwargs):  # pylint: disable=C0111
             request = args[0]
-            course = get_course_by_id(kwargs['course_id'])
+            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
 
             if has_access(request.user, level, course):
                 return func(*args, **kwargs)
