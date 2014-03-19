@@ -18,7 +18,6 @@ from xmodule.modulestore.keys import CourseKey, UsageKey
 
 from xmodule.modulestore.parsers import (
     parse_url,
-    parse_package_id,
     parse_block_ref,
     BRANCH_PREFIX,
     BLOCK_PREFIX,
@@ -208,7 +207,7 @@ class CourseLocator(BlockLocatorBase, CourseKey):
     org = None
     offering = None
 
-    def __init__(self, version_guid=None, **kwargs):
+    def __init__(self, org=None, offering=None, branch=None, version_guid=None):
         """
         Construct a CourseLocator
 
@@ -217,8 +216,11 @@ class CourseLocator(BlockLocatorBase, CourseKey):
             org, offering (string): the standard definition. Optional only if version_guid given
             branch (string): the branch such as 'draft', 'published', 'staged', 'beta'
         """
+        kwargs = {'org': org, 'offering': offering, 'branch': branch}
         if version_guid:
             kwargs.update(self._parse_version_guid(version_guid))
+        else:
+            kwargs['version_guid'] = None
 
         super(CourseLocator, self).__init__(**{key: kwargs.get(key) for key in self.KEY_FIELDS})
 
@@ -285,6 +287,35 @@ class CourseLocator(BlockLocatorBase, CourseKey):
     def make_asset_key(self, path):
         raise NotImplementedError()
 
+    def version_agnostic(self):
+        """
+        We don't care if the locator's version is not the current head; so, avoid version conflict
+        by reducing info.
+        Returns a copy of itself without any version info.
+
+        :raises: ValueError if the block locator has no package_id
+        """
+        return CourseLocator(
+            org=self.org,
+            offering=self.offering,
+            branch=self.branch,
+            version_guid=None
+        )
+
+    def course_agnostic(self):
+        """
+        We only care about the locator's version not its course.
+        Returns a copy of itself without any course info.
+
+        :raises: ValueError if the block locator has no version_guid
+        """
+        return CourseLocator(
+            org=None,
+            offering=None,
+            branch=None,
+            version_guid=self.version_guid
+        )
+
 
 class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey methods
     """
@@ -340,9 +371,10 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
 
         :raises: ValueError if the block locator has no package_id
         """
-        return BlockUsageLocator(package_id=self.package_id,
-                                 branch=self.branch,
-                                 block_id=self.block_id)
+        return BlockUsageLocator(
+            course_key=self.course_key.version_agnostic(),
+            block_id=self.block_id
+        )
 
     def course_agnostic(self):
         """
@@ -351,8 +383,10 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
 
         :raises: ValueError if the block locator has no version_guid
         """
-        return BlockUsageLocator(version_guid=self.version_guid,
-                                 block_id=self.block_id)
+        return BlockUsageLocator(
+            course_key=self.course_key.course_agnostic(),
+            block_id=self.block_id
+        )
 
     @staticmethod
     def _parse_block_ref(block_ref):
