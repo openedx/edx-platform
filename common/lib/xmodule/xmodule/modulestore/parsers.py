@@ -15,7 +15,7 @@ URL_RE_SOURCE = r"""
     ((?P<org>{ALLOWED_ID_CHARS}+)\+(?P<offering>{ALLOWED_ID_CHARS}+)/?)?
     ({BRANCH_PREFIX}(?P<branch>{ALLOWED_ID_CHARS}+)/?)?
     ({VERSION_PREFIX}(?P<version_guid>[A-F0-9]+)/?)?
-    ({BLOCK_PREFIX}(?P<block>{ALLOWED_ID_CHARS}+))?
+    ({BLOCK_PREFIX}(?P<block_id>{ALLOWED_ID_CHARS}+))?
     """.format(
         ALLOWED_ID_CHARS=ALLOWED_ID_CHARS, BRANCH_PREFIX=BRANCH_PREFIX,
         VERSION_PREFIX=VERSION_PREFIX, BLOCK_PREFIX=BLOCK_PREFIX

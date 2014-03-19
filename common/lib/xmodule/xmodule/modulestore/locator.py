@@ -70,21 +70,6 @@ class Locator(OpaqueKey):
         """
         raise InsufficientSpecificationError()
 
-    @staticmethod
-    def to_locator_or_location(location):
-        """
-        Convert the given locator like thing to the appropriate type of object, or, if already
-        that type, just return it. Returns an old Location, BlockUsageLocator,
-        or DefinitionLocator.
-
-        :param location: can be a Location, Locator, string, tuple, list, or dict.
-        """
-        if isinstance(location, basestring):
-            return Locator.parse_url(location)
-        if isinstance(location, dict):
-            return BlockUsageLocator(**location)
-        raise ValueError(location)
-
     URL_TAG_RE = re.compile(r'^(\w+)://')
     @staticmethod
     def parse_url(url):
@@ -166,7 +151,10 @@ class BlockLocatorBase(Locator):
 
     @property
     def package_id(self):
-        return self.ORG_SEPARATOR.join([self.org, self.offering])
+        if self.org or self.offering:
+            return u'{}{}{}'.format(self.org, self.ORG_SEPARATOR, self.offering)
+        else:
+            return None
 
     def _to_string(self):
         """
@@ -405,7 +393,7 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
     @staticmethod
     def _parse_block_ref(block_ref):
         if isinstance(block_ref, LocalId):
-            return {'block': block_ref}
+            return {'block_id': block_ref}
         else:
             parse = parse_block_ref(block_ref)
             if not parse:
@@ -456,19 +444,21 @@ class DefinitionLocator(Locator):
     """
     Container for how to locate a description (the course-independent content).
     """
+    CANONICAL_NAMESPACE = 'defx'
+    KEY_FIELDS = ('definition_id',)
 
     URL_RE = re.compile(r'^defx://' + VERSION_PREFIX + '([^/]+)$', re.IGNORECASE)
     def __init__(self, definition_id):
         if isinstance(definition_id, LocalId):
-            self.definition_id = definition_id
+            super(DefinitionLocator, self).__init__(definition_id)
         elif isinstance(definition_id, basestring):
             regex_match = self.URL_RE.match(definition_id)
             if regex_match is not None:
-                self.definition_id = self.as_object_id(regex_match.group(1))
+                super(DefinitionLocator, self).__init__(self.as_object_id(regex_match.group(1)))
             else:
-                self.definition_id = self.as_object_id(definition_id)
+                super(DefinitionLocator, self).__init__(self.as_object_id(definition_id))
         else:
-            self.definition_id = self.as_object_id(definition_id)
+            super(DefinitionLocator, self).__init__(self.as_object_id(definition_id))
 
     def _to_string(self):
         '''
@@ -482,7 +472,7 @@ class DefinitionLocator(Locator):
         Return a string containing the URL for this location.
         url(self) returns something like this: 'defx://version/519665f6223ebd6980884f2b'
         """
-        return u'defx://' + unicode(self)
+        return u'defx://' + self._to_string()
 
     def version(self):
         """
