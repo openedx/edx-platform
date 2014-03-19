@@ -136,19 +136,6 @@ class BlockLocatorBase(Locator):
 
         return parse
 
-    def _parse_version_guid(self, version_guid):
-        """
-        version_guid must be an instance of bson.objectid.ObjectId,
-        or able to be cast as one.
-        If it's a string, attempt to cast it as an ObjectId first.
-        """
-        version_guid = self.as_object_id(version_guid)
-
-        if not isinstance(version_guid, ObjectId):
-            raise TypeError('%s is not an instance of ObjectId' % version_guid)
-
-        return {'version_guid': version_guid}
-
     @property
     def package_id(self):
         if self.org or self.offering:
@@ -206,13 +193,15 @@ class CourseLocator(BlockLocatorBase, CourseKey):
             org, offering (string): the standard definition. Optional only if version_guid given
             branch (string): the branch such as 'draft', 'published', 'staged', 'beta'
         """
-        kwargs = {'org': org, 'offering': offering, 'branch': branch}
         if version_guid:
-            kwargs.update(self._parse_version_guid(version_guid))
-        else:
-            kwargs['version_guid'] = None
+            version_guid = self.as_object_id(version_guid)
 
-        super(CourseLocator, self).__init__(**{key: kwargs.get(key) for key in self.KEY_FIELDS})
+        super(CourseLocator, self).__init__(
+            org=org,
+            offering=offering,
+            branch=branch,
+            version_guid=version_guid
+        )
 
         if self.version_guid is None and self.org is None and self.offering is None:
             raise InvalidKeyError("Either version_guid or org and offering should be set")
