@@ -3,7 +3,7 @@
 
 from lettuce import world, step
 from nose.tools import assert_in, assert_equal  # pylint: disable=no-name-in-module
-from common import type_in_codemirror
+from common import type_in_codemirror, get_codemirror_value
 
 
 @step('I have created a Blank HTML Page$')
@@ -53,6 +53,14 @@ def type_in_codemirror_plugin(step, text):
     )
 
 
+@step('and the code editor displays "(.*)"$')
+def verify_code_editor_text(step, text):
+    use_plugin(
+        '.mce-i-code',
+        lambda: assert_equal(text, get_codemirror_value(0, "$('iframe').contents().find"))
+    )
+
+
 def use_plugin(button_class, action):
     # Click on plugin button
     world.css_click(button_class)
@@ -85,3 +93,39 @@ def image_static_link_is_rewritten(step):
 
         # Test onExecCommandHandler set the url to absolute.
         assert_in('c4x/MITx/999/asset/image.jpg', image['src'])
+
+
+@step('the expected toolbar buttons are displayed')
+def check_toolbar_buttons(step):
+    dropdowns = world.css_find('.mce-listbox')
+    assert_equal(2, len(dropdowns))
+
+    # Format dropdown
+    assert_equal('Paragraph', dropdowns[0].text)
+    assert_equal('Font Family', dropdowns[1].text)
+
+    # Font dropdown
+
+    buttons = world.css_find('.mce-ico')
+
+    assert_equal(14, len(buttons))
+
+    def check_class(index, button_name):
+        class_names = buttons[index]._element.get_attribute('class')
+        assert_equal("mce-ico mce-i-" + button_name, class_names)
+
+    check_class(0, 'bold')
+    check_class(1, 'italic')
+    # This is our custom "code style" button. It uses an image instead of a class.
+    check_class(2, 'none')
+    check_class(3, 'underline')
+    check_class(4, 'forecolor')
+    check_class(5, 'bullist')
+    check_class(6, 'numlist')
+    check_class(7, 'outdent')
+    check_class(8, 'indent')
+    check_class(9, 'blockquote')
+    check_class(10, 'link')
+    check_class(11, 'unlink')
+    check_class(12, 'image')
+    check_class(13, 'code')

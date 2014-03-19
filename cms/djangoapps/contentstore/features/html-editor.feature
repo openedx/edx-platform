@@ -39,3 +39,15 @@ Feature: CMS.HTML Editor
       .title { color: red; }
       --></style>
       """
+
+  Scenario: TinyMCE toolbar buttons are as expected
+    Given I have created a Blank HTML Page
+    When I edit the page
+    Then the expected toolbar buttons are displayed
+
+  Scenario: Static links are converted when switching between code editor and WYSIWYG views
+    Given I have created a Blank HTML Page
+    When I edit the page
+    And type "<img src="/static/image.jpg">" in the code editor and press OK
+    Then the image static link is rewritten to translate the path
+    And the code editor displays "<p><img src="/static/image.jpg" alt="" /></p>"
