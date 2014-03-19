@@ -21,7 +21,7 @@ from xmodule.modulestore import InvalidLocationError
 from xmodule.exceptions import NotFoundError
 from django.core.exceptions import PermissionDenied
 from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse
@@ -57,7 +57,7 @@ def assets_handler(request, tag=None, org=None, offering=None, branch=None, vers
     DELETE
         json: delete an asset
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+    location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
     if not has_course_access(request.user, location.package_id):
         raise PermissionDenied()
 

@@ -419,6 +419,10 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
     def definition_key(self):
         raise NotImplementedError()
 
+    @property
+    def package_id(self):
+        return self.course_key.package_id
+
     @classmethod
     def make_relative(cls, course_locator, block_id):
         """

@@ -14,7 +14,7 @@ from xmodule.modulestore.django import loc_mapper
 from ..utils import get_modulestore
 from .access import has_course_access
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 
 __all__ = ['checklists_handler']
 
@@ -23,7 +23,7 @@ __all__ = ['checklists_handler']
 @require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
-def checklists_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, checklist_index=None):
+def checklists_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None, checklist_index=None):
     """
     The restful handler for checklists.
 
@@ -33,7 +33,7 @@ def checklists_handler(request, tag=None, package_id=None, branch=None, version_
     POST or PUT
         json: updates the checked state for items within a particular checklist. checklist_index is required.
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+    location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
     if not has_course_access(request.user, location.package_id):
         raise PermissionDenied()
 
