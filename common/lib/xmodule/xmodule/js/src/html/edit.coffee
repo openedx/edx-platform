@@ -48,10 +48,6 @@ class @HTMLEditingDescriptor
       statusbar: false,
       # Necessary to avoid stripping of style tags.
       valid_children : "+body[style]",
-      # Prevent TinyMCE from adding extra <p>&nbsp;</p> in code.
-      forced_root_block : "",
-      force_br_newlines : true,
-      force_p_newlines : false,
       setup: @setupTinyMCE,
       # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
       # The tinyMCE callback passes in the editor as a paramter.

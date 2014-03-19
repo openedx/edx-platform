@@ -33,6 +33,7 @@ Feature: CMS.HTML Editor
     And I save the page
     Then the page has text:
       """
+      <p>&nbsp;</p>
       <p class="title">pages</p>
       <style><!--
       .title { color: red; }
