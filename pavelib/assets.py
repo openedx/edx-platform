@@ -88,10 +88,22 @@ def update_assets(args):
     Compile CoffeeScript and Sass, then collect static assets.
     """
     parser = argparse.ArgumentParser(prog='paver update_assets')
-    parser.add_argument('system', type=str, nargs='*', default=['lms', 'studio'], help="lms or studio")
-    parser.add_argument('--settings', type=str, default="dev", help="Django settings module")
-    parser.add_argument('--debug', action='store_true', default=False, help="Disable Sass compression")
-    parser.add_argument('--skip-collect', action='store_true', default=False, help="Skip collection of static assets")
+    parser.add_argument(
+        'system', type=str, nargs='*', default=['lms', 'studio'],
+        help="lms or studio",
+    )
+    parser.add_argument(
+        '--settings', type=str, default="dev",
+        help="Django settings module",
+    )
+    parser.add_argument(
+        '--debug', action='store_true', default=False,
+        help="Disable Sass compression",
+    )
+    parser.add_argument(
+        '--skip-collect', dest='collect', action='store_false', default=True,
+        help="Skip collection of static assets",
+    )
     args = parser.parse_args(args)
 
     compile_templated_sass(args.system, args.settings)
@@ -99,5 +111,5 @@ def update_assets(args):
     compile_coffeescript()
     compile_sass(args.debug)
 
-    if not args.skip_collect:
+    if args.collect:
         collect_assets(args.system, args.settings)
