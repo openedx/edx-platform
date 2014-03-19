@@ -173,6 +173,11 @@ class VideoFields(object):
         scope=Scope.preferences,
         default=1.0
     )
+    youtube_is_available = Boolean(
+        help="The availaibility of YouTube API for the user",
+        scope=Scope.user_info,
+        default=True
+    )
 
 
 class VideoModule(VideoFields, XModule):
@@ -221,12 +226,13 @@ class VideoModule(VideoFields, XModule):
     def handle_ajax(self, dispatch, data):
         accepted_keys = [
             'speed', 'saved_video_position', 'transcript_language',
-            'transcript_download_format',
+            'transcript_download_format', 'youtube_is_available'
         ]
 
         conversions = {
             'speed': json.loads,
             'saved_video_position': lambda v: RelativeTime.isotime_to_timedelta(v),
+            'youtube_is_available': json.loads,
         }
 
         if dispatch == 'save_user_state':
@@ -332,7 +338,7 @@ class VideoModule(VideoFields, XModule):
             - KeyError if transcript file has incorrect format.
 
         If language is 'en', self.sub should be correct subtitles name.
-        If language is 'en', but if self.sub is not defined, this means that we 
+        If language is 'en', but if self.sub is not defined, this means that we
         should search for video name in order to get proper transcript (old style courses).
         If language is not 'en', give back transcript in proper language and format.
         """

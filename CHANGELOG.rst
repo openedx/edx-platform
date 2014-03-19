@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fix problem with loading YouTube API is it is not available. BLD-531.
+
 Blades: Fix download subs for non youtube videos and non-en language. BLD-897.
 
 Blades: Fix issues related to videos that have separate YouTube IDs for the
