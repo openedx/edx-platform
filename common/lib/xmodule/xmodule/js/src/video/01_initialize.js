@@ -112,21 +112,59 @@ function (VideoPlayer, VideoStorage) {
         // Require JS. At the time when we reach this code, the stand alone
         // HTML5 player is already loaded, so no further testing in that case
         // is required.
-        var video;
+        var video, onYTApiReady;
 
-        if(state.videoType === 'youtube') {
-            YT.ready(function() {
+        if (state.videoType === 'youtube') {
+            state.youtubeApiAvailable = false;
+
+            onYTApiReady = function () {
+                console.log('[Video info]: YouTube API is available and is loaded.');
+
                 video = VideoPlayer(state);
 
                 state.modules.push(video);
                 state.__dfd__.resolve();
-            });
+
+                state.youtubeApiAvailable = true;
+            };
+
+            if (window.YT) {
+                window.YT.ready(onYTApiReady);
+            } else {
+                window.onYouTubeIframeAPIReady = function () {
+                    onYTApiReady();
+                };
+
+                _loadYoutubeApi(state);
+            }
         } else {
             video = VideoPlayer(state);
 
             state.modules.push(video);
             state.__dfd__.resolve();
         }
+    }
+
+    function _loadYoutubeApi(state) {
+        console.log('[Video info]: YouTube API is not loaded. Will try to load...');
+
+        window.setTimeout(function () {
+            // If YouTube API will load OK, it will run `onYouTubeIframeAPIReady`
+            // callback, which will set `state.youtubeApiAvailable` to `true`.
+            // If something goes wrong at this stage, `state.youtubeApiAvailable` is
+            // `false`.
+            _reportToServer(state, state.youtubeApiAvailable);
+        }, state.config.ytTestTimeout);
+
+        $.getScript(document.location.protocol + '//www.youtube.com/iframe_api');
+    }
+
+    function _reportToServer(state, youtubeIsAvailable) {
+        if (!youtubeIsAvailable) {
+            console.log('[Video info]: YouTube API is not available.');
+        }
+
+        state.saveState(true, { youtube_is_available: youtubeIsAvailable });
     }
 
     // function _configureCaptions(state)

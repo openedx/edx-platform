@@ -1,6 +1,5 @@
 (function ($, undefined) {
-    // Stub YouTube API.
-    window.YT = {
+    var stubbedYT = {
         Player: function () {
             var Player = jasmine.createSpyObj(
                 'YT.Player',
@@ -31,6 +30,9 @@
             return f();
         }
     };
+
+    // Stub YouTube API.
+    window.YT = stubbedYT;
 
     window.STATUS = window.YT.PlayerState;
 
@@ -158,6 +160,14 @@
             ) {
                 // Do nothing.
             } else if (settings.url == '/save_user_state') {
+                return {success: true};
+            } else if (settings.url === 'http://www.youtube.com/iframe_api') {
+                // Stub YouTube API.
+                window.YT = stubbedYT;
+
+                // Call the callback that must be called when YouTube API is loaded. By specification.
+                window.onYouTubeIframeAPIReady();
+
                 return {success: true};
             } else {
                 throw 'External request attempted for ' +
