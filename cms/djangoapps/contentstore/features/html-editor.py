@@ -2,7 +2,8 @@
 # pylint: disable=C0111
 
 from lettuce import world, step
-from nose.tools import assert_in  # pylint: disable=no-name-in-module
+from nose.tools import assert_in, assert_equal  # pylint: disable=no-name-in-module
+from common import type_in_codemirror
 
 
 @step('I have created a Blank HTML Page$')
@@ -38,16 +39,42 @@ def i_click_on_edit_icon(step):
 
 @step('I add an image with a static link via the Image Plugin Icon$')
 def i_click_on_image_plugin_icon(step):
-    # Click on image plugin button
-    world.css_click('.mce-i-image')
+    use_plugin(
+        '.mce-i-image',
+        lambda: world.css_fill('.mce-textbox', '/static/image.jpg', 0)
+    )
+
+
+@step('type "(.*)" in the code editor and press OK$')
+def type_in_codemirror_plugin(step, text):
+    use_plugin(
+        '.mce-i-code',
+        lambda: type_in_codemirror(0, text, "$('iframe').contents().find")
+    )
+
+
+def use_plugin(button_class, action):
+    # Click on plugin button
+    world.css_click(button_class)
 
     # Wait for the editing window to open.
     world.wait_for_visible('.mce-window')
 
-    # Fill in the first field (source).
-    world.css_fill('.mce-textbox', '/static/image.jpg', 0)
+    # Trigger the action
+    action()
+
     # Click OK
     world.css_click('.mce-primary')
+
+
+@step('I save the page$')
+def i_click_on_save(step):
+    world.save_component(step)
+
+
+@step('the page has text:')
+def check_page_text(step):
+    assert_equal(step.multiline, world.css_find('.xmodule_HtmlModule').html.strip())
 
 
 @step('the image static link is rewritten to translate the path$')
