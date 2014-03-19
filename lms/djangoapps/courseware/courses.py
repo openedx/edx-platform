@@ -53,7 +53,7 @@ def get_course(course_id, depth=0):
         raise ValueError("Invalid location: {}".format(course_id))
 
 
-def get_course_by_id(course_id, depth=0):
+def get_course_by_id(course_key, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
 
@@ -62,7 +62,7 @@ def get_course_by_id(course_id, depth=0):
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
     try:
-        return modulestore().get_course(course_id, depth=depth)
+        return modulestore().get_course(course_key, depth=depth)
     except (KeyError, ItemNotFoundError):
         raise Http404("Course not found.")
     except InvalidLocationError:
