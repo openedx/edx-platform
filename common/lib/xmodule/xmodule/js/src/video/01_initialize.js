@@ -595,32 +595,66 @@ function (VideoPlayer, VideoStorage) {
     //     data.
     function fetchMetadata() {
         var _this = this,
-            metadataXHRs = [];
+            metadataXHRs = [],
+            _fetchMetadata = function () {
+                $.each(this.videos, function (speed, url) {
+                    var xhr = _this.getVideoMetadata(url, function (data) {
+                        if (data.data) {
+                            _this.metadata[data.data.id] = data.data;
+                        }
+                    });
+
+                    metadataXHRs.push(xhr);
+                });
+
+                $.when.apply(this, metadataXHRs).done(function () {
+                    _this.el.trigger('metadata_received');
+
+                    // Not only do we trigger the "metadata_received" event, we also
+                    // set a flag to notify that metadata has been received. This
+                    // allows for code that will miss the "metadata_received" event
+                    // to know that metadata has been received. This is important in
+                    // cases when some code will subscribe to the "metadata_received"
+                    // event after it has been triggered.
+                    _this.youtubeMetadataReceived = true;
+
+                });
+            },
+            _reportToServer = function (isYouTubeAvailable) {
+                $.post(
+                    ${_this.ajax_url},
+                    {
+                        youtube_is_ok: isYouTubeAvailable
+                    }
+                );
+            };
 
         this.metadata = {};
 
-        $.each(this.videos, function (speed, url) {
-            var xhr = _this.getVideoMetadata(url, function (data) {
-                if (data.data) {
-                    _this.metadata[data.data.id] = data.data;
-                }
-            });
+        // Check for YouTube availability.
+        if (!window.YT) {
+            $.getScript(document.location.protocol + '//www.youtube.com/iframe_api')
+                .done(function(script, textStatus) {
+                    // YouTube API has loaded successfully. Notify the server.
+                    //
+                    // TODO: On the back-end create a handler for this request.
+                    _reportToServer(true);
 
-            metadataXHRs.push(xhr);
-        });
 
-        $.when.apply(this, metadataXHRs).done(function () {
-            _this.el.trigger('metadata_received');
-
-            // Not only do we trigger the "metadata_received" event, we also
-            // set a flag to notify that metadata has been received. This
-            // allows for code that will miss the "metadata_received" event
-            // to know that metadata has been received. This is important in
-            // cases when some code will subscribe to the "metadata_received"
-            // event after it has been triggered.
-            _this.youtubeMetadataReceived = true;
-
-        });
+                    // Now, when the API has loaded, and we know that YouTube is available,
+                    // fetch the metadata.
+                    _fetchMetadata();
+                })
+                .fail(function(jqxhr, settings, exception) {
+                    // Tell the server that YouTube API did not load.
+                    //
+                    // TODO: On the back-end create a handler for this request.
+                    // TODO: Write some kind of error to JavaScript console.
+                    _reportToServer(false);
+                });
+        } else {
+            _fetchMetadata();
+        }
     }
 
     // function parseSpeed()

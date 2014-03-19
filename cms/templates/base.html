@@ -89,6 +89,10 @@
                 "//www.youtube.com/player_api?noext",
                 // if youtube fails to load, fallback on a local file
                 // so that require doesn't fall over
+                // TODO: Reverse the order of the sources if the user has a setting that
+                // notifies us of youtube.com unavailability. The timeout is 60 seconds
+                // for all Require JS dependencies (see above variable `waitSeconds`).
+                // Maybe decrease this?
                 "js/src/youtube_fallback"
             ]
         },

@@ -267,6 +267,16 @@ def index(request, course_id, chapter=None, section=None,
             'masquerade': masq,
             'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
             'reverifications': fetch_reverify_banner_info(request, course_id),
+
+            # TODO: Need to retrieve this setting from database. If not set, default is `True`.
+            # This setting is unique for each user.
+            'youtube_is_ok': course.youtube_availability,
+
+            # TODO: Get the AJAX url.
+            'ajax_url': 'localhost:8001',
+
+            # TODO: Store this in course settings. Time in milliseconds.
+            'youtube_timeout': 2000
             }
 
         # Only show the chat if it's enabled by the course and in the

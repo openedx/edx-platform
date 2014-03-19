@@ -1,3 +1,4 @@
+<%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from microsite_configuration import page_title_breadcrumbs %>
 <%inherit file="/main.html" />
@@ -8,11 +9,11 @@
 
 <%block name="bodyclass">courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
-    % if section_title: 
+    % if section_title:
 ${page_title_breadcrumbs(section_title, course_name())}
     % else:
 ${page_title_breadcrumbs(course_name())}
-    %endif 
+    %endif
 </title></%block>
 
 <%block name="headextra">
@@ -49,9 +50,73 @@ ${page_title_breadcrumbs(course_name())}
   % endif
 
   <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
+  <!-- TODO: Make this load on a condition. If a student doesn't have
+        access to youtube.com (this setting stored on back-end for each student)
+        then any subsequent page loads should not load this script.
+
+        When this script loads for the first time, if there is no answer from
+        youtube.com or there is some kind of error, the back-end should be notified
+        and a setting for the student should be stored.
+  -->
   <script type="text/javascript">
-    document.write('\x3Cscript type="text/javascript" src="' +
-        document.location.protocol + '//www.youtube.com/iframe_api">\x3C/script>');
+    (function () {
+        // TODO:
+        //     Moving things to Video module. Later on will remove everything
+        //     after `return`. For now this anonymous function is a noop function.
+        return;
+
+        var youtubeIsOk = <% json.loads(youtube_is_ok) %>
+
+        // Only try to load the YouTube API if the user was able to do so
+        // last time.
+        if (youtubeIsOk) {
+            document.write('\x3Cscript type="text/javascript" src="' +
+                document.location.protocol + '//www.youtube.com/iframe_api">\x3C/script>');
+
+            // After a timeout check the state of the YouTube API.
+            window.setTimeout(function () {
+                if (window.YT === undefined) {
+                    youtubeIsOk = false;
+                } else {
+                    youtubeIsOk = true;
+                }
+
+                // Report the current state of the user. This will be saved in the database.
+                // On next page load this value will be used to determine whether to load
+                // or not the YouTube API from the start.
+                //
+                // TODO: On the back-end create a handler for this request.
+                $.post(
+                    ${ajax_url},
+                    {
+                        youtube_is_ok: youtubeIsOk
+                    }
+                );
+            }, ${youtube_timeout});
+        } else {
+            // Try loading the YouTube API asynchronously after the document renders.
+            // Maybe the user has access to it now?
+            $(document).ready(function () {
+                $.getScript("document.location.protocol + '//www.youtube.com/iframe_api")
+                    .done(function(script, textStatus) {
+                        youtubeIsOk = true;
+
+                        // YouTube API has loaded successfully. Notify the server.
+                        //
+                        // TODO: On the back-end create a handler for this request.
+                        $.post(
+                            ${ajax_url},
+                            {
+                                youtube_is_ok: youtubeIsOk
+                            }
+                        );
+                    })
+                    .fail(function(jqxhr, settings, exception) {
+                        // TODO: Should we do anything on fail?
+                    });
+            });
+        }
+    }());
   </script>
 
   <script type="text/javascript">
