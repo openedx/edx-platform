@@ -9,14 +9,6 @@ import signal
 import psutil
 
 
-def write_stderr(message):
-    """
-    Print a `message` str to stderr.
-    """
-    sys.stderr.write(message)
-    sys.stderr.flush()
-
-
 def kill_process(proc):
     """
     Kill the process `proc` created with `subprocess`.
@@ -61,7 +53,7 @@ def run_multi_processes(cmd_list, out_log=None, err_log=None):
         print("Processes ending")
 
     except Exception as err:
-        write_stderr("Error running process {}\n".format(err))
+        print("Error running process {}".format(err), file=sys.stderr)
 
     finally:
         for pid in pids:

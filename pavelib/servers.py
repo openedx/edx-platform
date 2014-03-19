@@ -6,7 +6,7 @@ import sys
 import argparse
 from paver.easy import *
 from .utils.cmd import django_cmd
-from .utils.process import write_stderr, run_process, run_multi_processes
+from .utils.process import run_process, run_multi_processes
 
 
 DEFAULT_PORT = {"lms": 8000, "studio": 8001}
@@ -164,4 +164,4 @@ def check_settings(args):
         sh("{import_cmd} | {shell_cmd}".format(import_cmd=import_cmd, shell_cmd=django_shell_cmd))
 
     except:
-        write_stderr("Failed to import settings\n")
+        print("Failed to import settings", file=sys.stderr)
