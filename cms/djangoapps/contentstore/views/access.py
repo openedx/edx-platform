@@ -1,5 +1,3 @@
-from ..utils import get_course_location_for_item
-from xmodule.modulestore.locator import CourseLocator
 from student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole
 from student import auth
 
