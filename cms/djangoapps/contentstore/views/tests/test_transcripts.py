@@ -76,7 +76,7 @@ class Basetranscripts(CourseTestCase):
     def _get_locator(self, resp):
         """ Returns the locator and old-style location (as a string) from the response returned by a create operation. """
         locator = json.loads(resp.content).get('locator')
-        return locator, loc_mapper().translate_locator_to_location(BlockUsageLocator(locator)).url()
+        return locator, loc_mapper().translate_locator_to_location(BlockUsageLocator.from_string(locator)).url()
 
     def get_youtube_ids(self):
         """Return youtube speeds and ids."""

@@ -215,7 +215,7 @@ class Location(UsageKey, DefinitionKey):
             (@(?P<revision>[^/]+))?
         """
 
-        match = re.match(pattern, serialized)
+        match = re.match(pattern, serialized, re.VERBOSE)
         if not match:
             raise InvalidKeyError(serialized)
 

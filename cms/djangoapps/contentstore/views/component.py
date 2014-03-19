@@ -15,7 +15,7 @@ from edxmako.shortcuts import render_to_response
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -68,7 +68,7 @@ ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
 @require_GET
 @login_required
-def subsection_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def subsection_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for subsection-specific requests.
 
@@ -77,7 +77,7 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+        locator = BlockUsageLocator(course_key=CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
         try:
             old_location, course, item, lms_link = _get_item_in_course(request, locator)
         except ItemNotFoundError:
@@ -145,7 +145,7 @@ def _load_mixed_class(category):
 
 @require_GET
 @login_required
-def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def unit_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for unit-specific requests.
 
@@ -154,7 +154,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+        locator = BlockUsageLocator(course_key=CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
         try:
             old_location, course, item, lms_link = _get_item_in_course(request, locator)
         except ItemNotFoundError:
@@ -291,7 +291,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
 # pylint: disable=unused-argument
 @require_GET
 @login_required
-def container_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def container_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for container xblock requests.
 
@@ -300,7 +300,7 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+        locator = BlockUsageLocator(course_key=CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
         try:
             __, course, xblock, __ = _get_item_in_course(request, locator)
         except ItemNotFoundError:
