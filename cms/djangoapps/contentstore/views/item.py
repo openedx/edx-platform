@@ -521,12 +521,12 @@ def orphan_handler(request, tag=None, org=None, offering=None, branch=None, vers
     old_location = loc_mapper().translate_locator_to_location(location)
     if request.method == 'GET':
         if has_course_access(request.user, location.package_id):
-            return JsonResponse(modulestore().get_orphans(old_location, 'draft'))
+            return JsonResponse(modulestore().get_orphans(old_location))
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
         if request.user.is_staff:
-            items = modulestore().get_orphans(old_location, 'draft')
+            items = modulestore().get_orphans(old_location)
             for itemloc in items:
                 modulestore('draft').delete_item(itemloc, delete_all_versions=True)
             return JsonResponse({'deleted': items})

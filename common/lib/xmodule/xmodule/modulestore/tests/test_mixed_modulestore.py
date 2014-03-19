@@ -315,12 +315,10 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         # create an orphan
         if default_ms == 'split':
             course_id = self.course_locations[self.MONGO_COURSEID].as_course_locator()
-            branch = course_id.branch
         else:
             course_id = self.MONGO_COURSEID
-            branch = None
         orphan = self.store.create_item(course_id, 'problem', block_id='orphan')
-        found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID], branch)
+        found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID])
         if default_ms == 'split':
             self.assertEqual(found_orphans, [orphan.location.version_agnostic()])
         else:
@@ -349,7 +347,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         """
         self.initdb(default_ms)
         self.store.create_item(self.course_locations[self.MONGO_COURSEID], 'problem', block_id='orphan')
-        orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID], None)
+        orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID])
         self.assertEqual(len(orphans), 0, "unexpected orphans: {}".format(orphans))
 
     @ddt.data('direct')

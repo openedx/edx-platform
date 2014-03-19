@@ -908,7 +908,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         return MONGO_MODULESTORE_TYPE
 
-    def get_orphans(self, course_location, _branch):
+    def get_orphans(self, course_location):
         """
         Return an array all of the locations for orphans in the course.
         """
