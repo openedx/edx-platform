@@ -547,7 +547,7 @@ def _get_item(request, data):
 
     Returns the item.
     """
-    locator = BlockUsageLocator(data.get('locator'))
+    locator = BlockUsageLocator.from_string(data.get('locator'))
     old_location = loc_mapper().translate_locator_to_location(locator)
 
     # This is placed before has_course_access() to validate the location,

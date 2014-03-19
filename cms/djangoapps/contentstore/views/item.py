@@ -23,7 +23,7 @@ import xmodule
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from xmodule.video_module import manage_video_subtitles_save
 
 from util.json_request import expect_json, JsonResponse
@@ -66,7 +66,7 @@ def hash_resource(resource):
 @require_http_methods(("DELETE", "GET", "PUT", "POST"))
 @login_required
 @expect_json
-def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def xblock_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for xblock requests.
 
@@ -100,8 +100,8 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                      if duplicate_source_locator is not present
               The locator (and old-style id) for the created xblock (minus children) is returned.
     """
-    if package_id is not None:
-        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+    if offering is not None:
+        locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
         if not has_course_access(request.user, locator.package_id):
             raise PermissionDenied()
         old_location = loc_mapper().translate_locator_to_location(locator)
@@ -145,8 +145,8 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
             )
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
-            parent_locator = BlockUsageLocator(request.json['parent_locator'])
-            duplicate_source_locator = BlockUsageLocator(request.json['duplicate_source_locator'])
+            parent_locator = BlockUsageLocator.from_string(request.json['parent_locator'])
+            duplicate_source_locator = BlockUsageLocator.from_string(request.json['duplicate_source_locator'])
 
             # _duplicate_item is dealing with locations to facilitate the recursive call for
             # duplicating children.
@@ -158,7 +158,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 request.json.get('display_name'),
                 request.user,
             )
-            course_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(parent_locator), get_course=True)
+            course_location = loc_mapper().translate_locator_to_location(parent_locator, get_course=True)
             dest_locator = loc_mapper().translate_location(dest_location, False, True)
             return JsonResponse({"locator": unicode(dest_locator)})
         else:
@@ -182,7 +182,7 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
         resources: A list of tuples where the first element is the resource hash, and
             the second is the resource description
     """
-    locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+    locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
     if not has_course_access(request.user, locator.package_id):
         raise PermissionDenied()
     old_location = loc_mapper().translate_locator_to_location(locator)
@@ -307,7 +307,7 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
 
     if children is not None:
         children_ids = [
-            loc_mapper().translate_locator_to_location(BlockUsageLocator(child_locator)).url()
+            loc_mapper().translate_locator_to_location(BlockUsageLocator.from_string(child_locator)).url()
             for child_locator
             in children
         ]
@@ -378,7 +378,7 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
 @expect_json
 def _create_item(request):
     """View for create items."""
-    parent_locator = BlockUsageLocator(request.json['parent_locator'])
+    parent_locator = BlockUsageLocator.from_string(request.json['parent_locator'])
     parent_location = loc_mapper().translate_locator_to_location(parent_locator)
     category = request.json['category']
 
@@ -504,7 +504,7 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
 # pylint: disable=W0613
 @login_required
 @require_http_methods(("GET", "DELETE"))
-def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
+def orphan_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
     """
     View for handling orphan related requests. GET gets all of the current orphans.
     DELETE removes all orphans (requires is_staff access)
@@ -515,7 +515,7 @@ def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid
     :param request:
     :param package_id: Locator syntax package_id
     """
-    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
+    location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
     # DHM: when split becomes back-end, move or conditionalize this conversion
     old_location = loc_mapper().translate_locator_to_location(location)
     if request.method == 'GET':
