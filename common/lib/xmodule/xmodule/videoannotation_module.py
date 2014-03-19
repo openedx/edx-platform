@@ -8,6 +8,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 from xmodule.annotator_token import retrieve_token
+from xmodule.annotator_mixin import getInstructions, getExtension, ANNOTATOR_COMMON_JS, ANNOTATOR_COMMON_CSS
 
 import textwrap
 
@@ -36,17 +37,13 @@ class AnnotatableFields(object):
 
 class VideoAnnotationModule(AnnotatableFields, XModule):
     '''Video Annotation Module'''
-    js = {
-        'coffee': [
-            resource_string(__name__, 'js/src/javascript_loader.coffee'),
-            resource_string(__name__, 'js/src/html/display.coffee'),
-            resource_string(__name__, 'js/src/annotatable/display.coffee'),
-        ],
-        'js': [
-            resource_string(__name__, 'js/src/collapsible.js'),
-        ]
-    }
-    css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
+    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                     resource_string(__name__, 'js/src/collapsible.coffee'),
+                     resource_string(__name__, 'js/src/html/display.coffee'),
+                     resource_string(__name__, 'js/src/annotatable/display.coffee')
+                     ],
+          'js': ANNOTATOR_COMMON_JS}
+    css = {'scss': ANNOTATOR_COMMON_CSS + [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'videoannotation'
 
     def __init__(self, *args, **kwargs):
@@ -62,24 +59,11 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
-        instructions = xmltree.find('instructions')
-        if instructions is not None:
-            instructions.tag = 'div'
-            xmltree.remove(instructions)
-            return etree.tostring(instructions, encoding='unicode')
-        return None
+        return getInstructions(xmltree)
 
     def _get_extension(self, srcurl):
         ''' get the extension of a given url '''
-        if 'youtu' in srcurl:
-            return 'video/youtube'
-        else:
-            spliturl = srcurl.split(".")
-            extensionplus1 = spliturl[len(spliturl) - 1]
-            spliturl = extensionplus1.split("?")
-            extensionplus2 = spliturl[0]
-            spliturl = extensionplus2.split("#")
-            return 'video/' + spliturl[0]
+        return getExtension
 
     def get_html(self):
         """ Renders parameters to template. """
