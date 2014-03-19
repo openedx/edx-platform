@@ -6,6 +6,7 @@ import mock
 from django.test import TestCase
 from django.contrib.auth.models import User
 from xmodule.modulestore import Location
+from xmodule.modulestore.keys import CourseKey
 from django.core.exceptions import PermissionDenied
 
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
