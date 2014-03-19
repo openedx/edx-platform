@@ -7,11 +7,6 @@ from abc import ABCMeta, abstractmethod
 
 from django.contrib.auth.models import User, Group
 
-from xmodule.modulestore import Location
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
-from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import CourseLocator, Locator
-
 
 class CourseIdRequired(Exception):
     """

@@ -535,6 +535,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         if course_locator.version_guid is None:
             course = self._lookup_course(course_locator)
             version_guid = course['structure']['_id']
+            course_locator = CourseLocator(
+                org=course_locator.org, offering=course_locator.offering, branch=course_locator.branch,
+                version_guid=version_guid
+            )
         else:
             version_guid = course_locator.version_guid
 
@@ -553,7 +557,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             for course_structure in next_versions:
                 result.setdefault(course_structure['previous_version'], []).append(
                     CourseLocator(version_guid=struct['_id']))
-        return VersionTree(CourseLocator(course_locator, version_guid=version_guid), result)
+        return VersionTree(course_locator, result)
 
 
     def get_block_generations(self, block_locator):
