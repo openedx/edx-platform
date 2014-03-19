@@ -441,12 +441,16 @@ class ImportTestCase(BaseCourseTestCase):
 
         # Expect to find an error/exception about characters in "®esources"
         expect = "Invalid characters"
-        errors = [(msg.encode("utf-8"), err.encode("utf-8"))
-                    for msg, err in
-                    modulestore.get_course_errors(course.id)]
+        errors = [
+            (msg.encode("utf-8"), err.encode("utf-8"))
+            for msg, err
+            in modulestore.get_course_errors(course.id)
+        ]
 
-        self.assertTrue(any(expect in msg or expect in err
-            for msg, err in errors))
+        self.assertTrue(any(
+            expect in msg or expect in err
+            for msg, err in errors
+        ))
         chapters = course.get_children()
         self.assertEqual(len(chapters), 4)
 
@@ -457,7 +461,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
-        toy_id = "edX/toy/2012_Fall"
+        toy_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         course = modulestore.get_course(toy_id)
         chapters = course.get_children()
@@ -548,7 +552,7 @@ class ImportTestCase(BaseCourseTestCase):
         """
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
-        toy_id = "edX/toy/2012_Fall"
+        toy_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         course = modulestore.get_course(toy_id)
 

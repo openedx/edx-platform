@@ -12,6 +12,7 @@ from cStringIO import StringIO
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
+from opaque_keys import InvalidKeyError
 from path import path
 
 from xmodule.error_module import ErrorDescriptor
@@ -20,7 +21,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.keys import CourseKey, UsageKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from xblock.fields import ScopeIds
@@ -415,7 +416,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             self.errored_courses[course_dir] = errorlog
         else:
             self.courses[course_dir] = course_descriptor
-            self._course_errors[course_descriptor.scope_ids.usage_id] = errorlog
+            self._course_errors[course_descriptor.id] = errorlog
             self.parent_trackers[course_descriptor.id].make_known(course_descriptor.scope_ids.usage_id)
 
     def __unicode__(self):

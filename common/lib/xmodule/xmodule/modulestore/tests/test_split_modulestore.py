@@ -446,9 +446,9 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(len(matches), 6)
         matches = modulestore().get_items(locator)
         self.assertEqual(len(matches), 6)
-        matches = modulestore().get_items(locator, category='chapter'})
+        matches = modulestore().get_items(locator, category='chapter')
         self.assertEqual(len(matches), 3)
-        matches = modulestore().get_items(locator, category='garbage'})
+        matches = modulestore().get_items(locator, category='garbage')
         self.assertEqual(len(matches), 0)
         matches = modulestore().get_items(
             locator,
