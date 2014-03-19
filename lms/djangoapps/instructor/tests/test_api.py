@@ -293,6 +293,28 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.get(url, {'emails': self.enrolled_student.email, 'action': action})
         self.assertEqual(response.status_code, 400)
 
+    def test_enroll_with_username(self):
+        # Test with an invalid email address (eg, a username).
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notenrolled_student.username, 'action': 'enroll', 'email_students': False})
+        self.assertEqual(response.status_code, 200)
+
+        # test the response data
+        expected = {
+            "action": "enroll",
+            'auto_enroll': False,
+            "results": [
+                {
+                    "email": self.notenrolled_student.username,
+                    "error": True,
+                    "invalidEmail": True
+                }
+            ]
+        }
+
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
     def test_enroll_without_email(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'enroll', 'email_students': False})
