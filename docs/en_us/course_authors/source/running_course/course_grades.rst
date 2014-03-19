@@ -91,7 +91,7 @@ To download a file of student grades:
 
 #. To open or save a grade report file, click the *course_id* \_grade_report_\ *date*.csv file name at the bottom of the page.
 
-.. note:: To prevent the accidental distribution of student data, you can only download these files by clicking the links on this page. You cannot copy a link and save it or email it, as the value for the link that you copy expires within five minutes.
+**Note**: To prevent the accidental distribution of student data, you can only download these files by clicking the links on this page. You cannot copy a link and save it or email it, as the value for the link that you copy expires within five minutes.
 
 =========================================================
 Check the progress of a single student
@@ -144,7 +144,7 @@ View a histogram of scores for a problem
 
 You can view a chart of the score distribution for a specified problem.
 
-.. note:: In order to view the score distribution for a problem, you need its unique identifier. See :ref:`find_URL`.
+**Note**: In order to view the score distribution for a problem, you need its unique identifier. See :ref:`find_URL`.
 
 To display demographic distributions for gender and educational attainment:
 
@@ -159,7 +159,7 @@ To display demographic distributions for gender and educational attainment:
    A graph displays a histogram of scores for that problem.
 
 ..  **Question**: (sent to Olga 31 Jan 14) this is a tough UI to use: how do they correlate the codes in this drop-down with actual constructed problems? the copy-and-paste UI on the Student Admin page actually works a little better imo.
-.. **Question**: I'd like to include an image, but need a good example. Elina suggested using the edX demo course (I don't have access), and a problem that has multiple possible answers
+.. **Question**: I'd like to include an image, but need a good example. Elina suggested using the edX demo course (I don't have access), and a problem that has multiple possible answers 
 
 .. _Adjust_grades:
 
@@ -201,7 +201,7 @@ To find the unique identifier in the URL for a problem:
 
 #. To copy the identifier that is assigned to the problem, select it, right click, and choose **Copy**.
 
-   .. note:: If the URL does not include "problem/" before the identifer, you will need to specify that module identifier as well. Select and copy both the module identifer and the problem identifier.
+   **Note**: If the URL does not include "problem/" before the identifer, you will need to specify that module identifier as well. Select and copy both the module identifer and the problem identifier.
 
    To close the Staff Debug viewer, click on the browser page outside of the viewer.
 
@@ -211,7 +211,7 @@ Rescore student submissions
 
 Each problem that you define for your course includes a correct answer, and may also include a tolerance or acceptable alternatives. If you decide to make a change to these values, you can rescore any responses that were already submitted. For a specified problem, you can rescore the work submitted by a single student, or rescore the submissions made by every enrolled student. 
 
-.. note:: You can only rescore problems that have a correct answer entered in edX Studio. Problems that are scored by an external grader cannot be rescored with this procedure.
+**Note**: You can only rescore problems that have a correct answer entered in edX Studio. Problems that are scored by an external grader cannot be rescored with this procedure.
 
 To rescore a problem, you need its unique identifier. See :ref:`find_URL`.
 
@@ -245,7 +245,7 @@ When you create a problem, you can limit the number of times that a student can 
 
 For more information about modifying a released problem, including other workarounds, see :ref:`Modifying a Released Problem`.
 
-.. note:: To reset the number of attempts for a problem, you need its unique identifier. See :ref:`find_URL`.
+**Note**: To reset the number of attempts for a problem, you need its unique identifier. See :ref:`find_URL`.
 
 To reset student attempts for a problem:
 

@@ -34,7 +34,7 @@ Course authors should follow the policies established by their organizations and
 Access student data
 ****************************
 
-You can view data about the students who are currently enrolled in your course. Data for enrolled students is also available for download in CSV (comma-separated values) format.  
+You can download data about the students who are currently enrolled in your course in a CSV (comma-separated values) file. For courses that have fewer than 200 students enrolled, you can also view data for enrolled students on the Instructor Dashboard.  
 
 ======================
 Student-reported data
@@ -60,17 +60,21 @@ You can access this self-reported information for all of the students who are en
 
 The student data that is available to course staff always reflects the set of live, current enrollments. Students can register for your course throughout the defined enrollment period, and they can unregister from a course at any time, which unenrolls them. Students can also change their email addresses and full names at any time. As a result, you may want to download student data periodically to gain insights into how the student population changes over time. 
 
+**Note**: In the future, edX may also request that students select a language and location. This data is not collected at this time.
+
 .. _View and download student data:
 
 ==========================================
-View and download student data
+Download or view student data
 ==========================================
 
-You can view and download student data to learn about population demographics at a specific point in time, compare demographics at different points in time, and plot trends in the population over time.
+You can download student data to learn about population demographics at a specific point in time, compare demographics at different points in time, and plot trends in the population over time. 
 
 **Important**: Do not navigate away from this page while you wait for the data to be prepared. The larger the enrollment for your course, the longer it takes to create and output the data. 
 
-To view or download student data:
+For smaller courses, you also have the option to view student data on the Instructor Dashboard. 
+
+To download or view student data:
 
 #. View the live version of your course.
 
@@ -78,20 +82,18 @@ To view or download student data:
 
 #. Click **Data Download**.
 
-#. To display student enrollment data, click **List enrolled students' profile information**.
+#. To download student enrollment data in a CSV file, click **Download profile information as a CSV**.
+
+   You are prompted to open or save the enrolled_profiles.csv file. All student-supplied data is included without truncation.
+
+#. To display student enrollment data, click **List enrolled students' profile information**. (This option is available only for courses with an enrollment of less than 200.)
 
    A table of the student data displays, with one row for each enrolled student. Longer values, such as student goals, are truncated.
 
  .. image:: ../Images/StudentData_Table.png
   :alt: Table with columns for the collected data points and rows for each student on the Instructor Dashboard
 
- .. note:: In the future, edX may also request that students select a language and location. This data is not collected at this time.
-
-5. To download student enrollment data in a CSV file, click **Download profile information as a CSV**.
-
-   You are prompted to open or save the enrolled_profiles.csv file. All student-supplied data is included without truncation.
-
-**Note**: In addition to the data for enrolled students, data for the course staff is included in the display or file.
+**Note**: In addition to the data for enrolled students, data for the course staff is included in the file or display.
 
 ==========================================
 View demographic distributions
@@ -112,10 +114,10 @@ To display demographic data for your students:
    * The Gender Distribution and Level of Education sections show tables with counts of responses made by enrolled students.
 
    .. image:: ../Images/Distribution_Education.png
-    :alt: Table with columns for different possible values for gender and total count reported for each value
+    :alt: Table with columns for different possible values for level of education completed and total count reported for each value
 
    .. image:: ../Images/Distribution_Gender.png
-    :alt: Table with columns for different possible values for level of education completed and total count reported for each value
+    :alt: Table with columns for different possible values for gender and total count reported for each value
 
    "No Data" is the sum of the students for whom no value exists for the demographic. 
 
