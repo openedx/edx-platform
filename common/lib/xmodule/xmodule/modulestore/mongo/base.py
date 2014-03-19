@@ -525,20 +525,23 @@ class MongoModuleStore(ModuleStoreWriteBase):
         '''
         Returns a list of course descriptors.
         '''
-        return [
-            self._load_items(
-                SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name']),
-                course
-            )
-            for course
-            # I tried to add '$and': [{'_id.org': {'$ne': 'edx'}}, {'_id.course': {'$ne': 'templates'}}]
-            # but it didn't do the right thing (it filtered all edx and all templates out)
-            in self.collection.find({'_id.category': 'course'})
-            if not (# TODO kill this
-                course['_id']['org'] == 'edx' and
-                course['_id']['course'] == 'templates'
-            )
-        ]
+        return sum(
+            [
+                 self._load_items(
+                    SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name']),
+                    [course]
+                )
+                for course
+                # I tried to add '$and': [{'_id.org': {'$ne': 'edx'}}, {'_id.course': {'$ne': 'templates'}}]
+                # but it didn't do the right thing (it filtered all edx and all templates out)
+                in self.collection.find({'_id.category': 'course'})
+                if not (# TODO kill this
+                    course['_id']['org'] == 'edx' and
+                    course['_id']['course'] == 'templates'
+                )
+            ],
+            []
+        )
 
     def _find_one(self, location):
         '''Look for a given location in the collection.  If revision is not
