@@ -173,10 +173,10 @@ class TestEdxJsonEncoder(unittest.TestCase):
         self.null_utc_tz = NullTZ()
 
     def test_encode_location(self):
-        loc = Location('i4x', 'org', 'course', 'category', 'name')
+        loc = Location('i4x', 'org', 'course', 'run', 'category', 'name', None)
         self.assertEqual(loc.url(), self.encoder.default(loc))
 
-        loc = Location('i4x', 'org', 'course', 'category', 'name', 'version')
+        loc = Location('i4x', 'org', 'course', 'run', 'category', 'name', 'version')
         self.assertEqual(loc.url(), self.encoder.default(loc))
 
     def test_encode_naive_datetime(self):
