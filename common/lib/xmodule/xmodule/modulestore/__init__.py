@@ -176,7 +176,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_orphans(self, course_location, branch):
+    def get_orphans(self, course_location):
         """
         Get all of the xblocks in the given course which have no parents and are not of types which are
         usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't

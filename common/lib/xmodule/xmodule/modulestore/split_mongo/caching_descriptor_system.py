@@ -1,7 +1,7 @@
 import sys
 import logging
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.modulestore.locator import BlockUsageLocator, LocalId
+from xmodule.modulestore.locator import BlockUsageLocator, LocalId, CourseLocator
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xblock.runtime import KvsFieldData
@@ -98,10 +98,13 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             block_id = LocalId()
 
         block_locator = BlockUsageLocator(
-            version_guid=course_entry_override['structure']['_id'],
+            CourseLocator(
+                version_guid=course_entry_override['structure']['_id'],
+                org=course_entry_override.get('org'),
+                offering=course_entry_override.get('offering'),
+                branch=course_entry_override.get('branch'),
+            ),
             block_id=block_id,
-            package_id=course_entry_override.get('package_id'),
-            branch=course_entry_override.get('branch')
         )
 
         kvs = SplitMongoKVS(
@@ -123,7 +126,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 json_data,
                 self,
                 BlockUsageLocator(
-                    version_guid=course_entry_override['structure']['_id'],
+                    CourseLocator(version_guid=course_entry_override['structure']['_id']),
                     block_id=block_id
                 ),
                 error_msg=exc_info_to_str(sys.exc_info())

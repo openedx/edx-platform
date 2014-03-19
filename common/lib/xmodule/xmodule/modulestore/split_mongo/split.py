@@ -442,20 +442,22 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         '''
         course = self._lookup_course(locator)
         items = self._get_parents_from_structure(locator.block_id, course['structure'])
-        return [BlockUsageLocator(
-                    url=locator.as_course_locator(),
-                    block_id=LocMapperStore.decode_key_from_mongo(parent_id),
-                )
-                for parent_id in items]
+        return [
+            BlockUsageLocator.make_relative(
+                locator,
+                block_id=LocMapperStore.decode_key_from_mongo(parent_id),
+            )
+            for parent_id in items
+        ]
 
-    def get_orphans(self, package_id, branch):
+    def get_orphans(self, course_id):
         """
         Return a dict of all of the orphans in the course.
 
         :param package_id:
         """
         detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
-        course = self._lookup_course(CourseLocator(package_id=package_id, branch=branch))
+        course = self._lookup_course(course_id)
         items = {LocMapperStore.decode_key_from_mongo(block_id) for block_id in course['structure']['blocks'].keys()}
         items.remove(course['structure']['root'])
         for block_id, block_data in course['structure']['blocks'].iteritems():
@@ -463,7 +465,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             if block_data['category'] in detached_categories:
                 items.discard(LocMapperStore.decode_key_from_mongo(block_id))
         return [
-            BlockUsageLocator(package_id=package_id, branch=branch, block_id=block_id)
+            BlockUsageLocator(course_key=course_id, block_id=block_id)
             for block_id in items
         ]
 
@@ -533,6 +535,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         if course_locator.version_guid is None:
             course = self._lookup_course(course_locator)
             version_guid = course['structure']['_id']
+            course_locator = CourseLocator(
+                org=course_locator.org, offering=course_locator.offering, branch=course_locator.branch,
+                version_guid=version_guid
+            )
         else:
             version_guid = course_locator.version_guid
 
@@ -551,7 +557,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             for course_structure in next_versions:
                 result.setdefault(course_structure['previous_version'], []).append(
                     CourseLocator(version_guid=struct['_id']))
-        return VersionTree(CourseLocator(course_locator, version_guid=version_guid), result)
+        return VersionTree(course_locator, result)
 
 
     def get_block_generations(self, block_locator):
@@ -594,9 +600,14 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             return None
         # convert the results value sets to locators
         for k, versions in result.iteritems():
-            result[k] = [BlockUsageLocator(version_guid=version, block_id=block_id)
-                for version in versions]
-        return VersionTree(BlockUsageLocator(version_guid=possible_roots[0], block_id=block_id), result)
+            result[k] = [
+                BlockUsageLocator(CourseLocator(version_guid=version), block_id=block_id)
+                for version in versions
+            ]
+        return VersionTree(
+            BlockUsageLocator(CourseLocator(version_guid=possible_roots[0]), block_id=block_id),
+            result
+        )
 
     def get_definition_successors(self, definition_locator, version_history_depth=1):
         '''
@@ -804,14 +815,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             if not continue_version:
                 self._update_head(index_entry, course_or_parent_locator.branch, new_id)
             item_loc = BlockUsageLocator(
-                package_id=course_or_parent_locator.package_id,
-                branch=course_or_parent_locator.branch,
+                course_or_parent_locator.version_agnostic(),
                 block_id=new_block_id,
             )
         else:
             item_loc = BlockUsageLocator(
+                CourseLocator(version_guid=new_id),
                 block_id=new_block_id,
-                version_guid=new_id,
             )
 
         # reconstruct the new_item from the cache
