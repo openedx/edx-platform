@@ -51,3 +51,14 @@ Feature: CMS.HTML Editor
     And type "<img src="/static/image.jpg">" in the code editor and press OK
     Then the image static link is rewritten to translate the path
     And the code editor displays "<p><img src="/static/image.jpg" alt="" /></p>"
+
+  Scenario: Code format toolbar button wraps text with code tags
+    Given I have created a Blank HTML Page
+    When I edit the page
+    And I set the text to "display as code" and I select the text
+    And I select the code toolbar button
+    And I save the page
+    Then the page has text:
+      """
+      <p><code>display as code</code></p>
+      """

@@ -95,7 +95,7 @@ def image_static_link_is_rewritten(step):
         assert_in('c4x/MITx/999/asset/image.jpg', image['src'])
 
 
-@step('the expected toolbar buttons are displayed')
+@step('the expected toolbar buttons are displayed$')
 def check_toolbar_buttons(step):
     dropdowns = world.css_find('.mce-listbox')
     assert_equal(2, len(dropdowns))
@@ -129,3 +129,18 @@ def check_toolbar_buttons(step):
     check_class(11, 'unlink')
     check_class(12, 'image')
     check_class(13, 'code')
+
+
+@step('I set the text to "(.*)" and I select the text$')
+def set_text_and_select(step, text):
+    script = """
+    var editor = tinyMCE.activeEditor;
+    editor.setContent(arguments[0]);
+    editor.selection.select(editor.dom.select('p')[0]);"""
+    world.browser.driver.execute_script(script, str(text))
+    world.wait_for_ajax_complete()
+
+@step('I select the code toolbar button$')
+def select_code_button(step):
+    # This is our custom "code style" button. It uses an image instead of a class.
+    world.css_click(".mce-i-none")
