@@ -29,6 +29,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models, transaction
 
+from xmodule_django.models import CourseKeyField
+
 
 # define custom states used by InstructorTask
 QUEUING = 'QUEUING'
@@ -58,7 +60,7 @@ class InstructorTask(models.Model):
     `updated` stores date that entry was last modified
     """
     task_type = models.CharField(max_length=50, db_index=True)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     task_key = models.CharField(max_length=255, db_index=True)
     task_input = models.CharField(max_length=255)
     task_id = models.CharField(max_length=255, db_index=True)  # max_length from celery_taskmeta
