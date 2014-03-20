@@ -101,7 +101,6 @@ class CapaFactory(object):
             attempts: also added to instance state.  Will be converted to an int.
         """
         location = Location(
-            "i4x",
             "edX",
             "capa_test",
             "2012_Fall",

@@ -189,9 +189,15 @@ class LocMapperStore(object):
             raise InvalidLocationError()
 
         published_usage = BlockUsageLocator(
-            package_id=entry['course_id'], branch=entry['prod_branch'], block_id=block_id)
+            package_id=entry['course_id'],
+            branch=entry['prod_branch'],
+            block_id=block_id
+        )
         draft_usage = BlockUsageLocator(
-            package_id=entry['course_id'], branch=entry['draft_branch'], block_id=block_id)
+            package_id=entry['course_id'],
+            branch=entry['draft_branch'],
+            block_id=block_id
+        )
         if published:
             result = published_usage
         else:
