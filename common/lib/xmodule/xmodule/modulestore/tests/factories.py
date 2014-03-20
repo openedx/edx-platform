@@ -50,7 +50,7 @@ class CourseFactory(XModuleFactory):
         name = kwargs.get('name', Location.clean(kwargs.get('display_name')))
         run = kwargs.get('run', name)
 
-        location = Location('i4x', org, number, run, 'course', name)
+        location = Location(org, number, run, 'course', name)
 
         # Write the data to the mongo datastore
         new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
