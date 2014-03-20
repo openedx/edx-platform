@@ -6,6 +6,10 @@
 
 <%! from microsite_configuration import microsite %>
 
+<%def name="theme_enabled()">
+  <% return settings.FEATURES.get("USE_CUSTOM_THEME", False) %>
+</%def>
+
 <%
   homepage_overlay_html = microsite.get_value('homepage_overlay_html')
 
@@ -13,6 +17,11 @@
   homepage_promo_video_youtube_id = microsite.get_value('homepage_promo_video_youtube_id', "XNaiOGxWeto")
 
   show_partners = microsite.get_value('show_partners', True)
+
+  if theme_enabled():
+    course_header = 'theme-course.html'
+  else:
+    course_header = None
 
 %>
 
@@ -69,7 +78,9 @@
   </header>
   <section class="container">
     <section class="highlighted-courses">
-
+      % if course_header:
+        <%include file="${course_header}" />
+      %endif
       % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
         <section class="courses">
             <ul class="courses-listing">
