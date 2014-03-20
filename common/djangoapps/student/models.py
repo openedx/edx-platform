@@ -39,6 +39,7 @@ from xmodule.modulestore.keys import CourseKey
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
+from xmodule_django.models import CourseKeyField
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -358,27 +359,6 @@ class LoginFailures(models.Model):
             entry.delete()
         except ObjectDoesNotExist:
             return
-
-
-class CourseKeyField(models.CharField):
-    description = "A CourseKey object, saved to the DB in the form of a string"
-
-    __metaclass__ = models.SubfieldBase
-
-    def __init__(self, *args, **kwargs):
-        super(CourseKeyField, self).__init__(*args, **kwargs)
-
-    def to_python(self, value):
-        if isinstance(value, CourseKey):
-            return value
-        return CourseKey.from_string(value)
-
-    def get_prep_value(self, value):
-        if isinstance(value, str):
-            return value
-        if isinstance(value, unicode):
-            return value
-        return value._to_string()
 
 
 class CourseEnrollment(models.Model):
