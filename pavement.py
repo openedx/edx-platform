@@ -9,6 +9,6 @@ import os
 # each of which run "pip install -e ." (as part of requirements/edx/local.txt)
 # Until we re-run pip install, the other copies of edx-platform could
 # take precedence, leading to some very strange results.
-sys.path.insert(1, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(__file__))
 
 from pavelib import *
