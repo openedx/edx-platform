@@ -1,5 +1,4 @@
 class @HTMLEditingDescriptor
-  @isInactiveClass : "is-inactive"
 
   constructor: (element) ->
     @element = element;
@@ -23,12 +22,7 @@ class @HTMLEditingDescriptor
       # TODO: we should share this CSS with studio (and LMS)
       content_css : "#{baseUrl}/css/tiny-mce.css",
       formats : {
-      # Disable h4, h5, and h6 styles as we don't have CSS for them.
-      # TODO: this doesn't seem to be working with the upgrade.
-        h4: {},
-        h5: {},
-        h6: {},
-      # tinyMCE does block level for code by default
+        # tinyMCE does block level for code by default
         code: {inline: 'code'}
       },
       # Disable visual aid on borderless table.
@@ -38,9 +32,7 @@ class @HTMLEditingDescriptor
         path: "#{baseUrl}/js/vendor/CodeMirror"
       },
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
-      # Can have a single toolbar by just specifying "toolbar". Splitting for now so all are visible.
       toolbar: "formatselect | fontselect | bold italic wrapAsCode underline forecolor | bullist numlist outdent indent blockquote | link unlink image | code",
-      # TODO: i18n
       block_formats: "Paragraph=p;Preformatted=pre;Heading 1=h1;Heading 2=h2;Heading 3=h3",
       width: '100%',
       height: '400px',
@@ -50,7 +42,7 @@ class @HTMLEditingDescriptor
       valid_children : "+body[style]",
       setup: @setupTinyMCE,
       # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
-      # The tinyMCE callback passes in the editor as a paramter.
+      # The tinyMCE callback passes in the editor as a parameter.
       init_instance_callback: @initInstanceCallback
     })
 
@@ -64,6 +56,8 @@ class @HTMLEditingDescriptor
 
     @visualEditor = ed
 
+    # These events were added to the plugin code as the TinyMCE PluginManager
+    # does not fire any events when plugins are opened or closed.
     ed.on('SaveImage', @imageAdded)
     ed.on('ShowCodeMirror', @showCodeEditor)
     ed.on('SaveCodeMirror', @saveCodeEditor)
