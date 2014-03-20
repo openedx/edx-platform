@@ -1,4 +1,4 @@
-#pylint: disable=E1101
+# pylint: disable=E1101
 """
 Tests for import_from_xml using the mongo modulestore.
 """

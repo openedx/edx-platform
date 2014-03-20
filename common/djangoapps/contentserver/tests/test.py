@@ -89,7 +89,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         self.client.logout()
         resp = self.client.get(self.url_unlocked)
-        self.assertEqual(resp.status_code, 200) #pylint: disable=E1103
+        self.assertEqual(resp.status_code, 200) # pylint: disable=E1103
 
     def test_locked_asset_not_logged_in(self):
         """
@@ -98,7 +98,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         self.client.logout()
         resp = self.client.get(self.url_locked)
-        self.assertEqual(resp.status_code, 403) #pylint: disable=E1103
+        self.assertEqual(resp.status_code, 403) # pylint: disable=E1103
 
     def test_locked_asset_not_registered(self):
         """
@@ -107,30 +107,30 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         self.client.login(username=self.usr, password=self.pwd)
         resp = self.client.get(self.url_locked)
-        self.assertEqual(resp.status_code, 403) #pylint: disable=E1103
+        self.assertEqual(resp.status_code, 403) # pylint: disable=E1103
 
     def test_locked_asset_registered(self):
         """
         Test that locked assets behave appropriately in case user is logged in
         and registered for the course.
         """
-        #pylint: disable=E1101
+        # pylint: disable=E1101
         course_id = "/".join([self.loc_locked.org, self.loc_locked.course, '2012_Fall'])
         CourseEnrollment.enroll(self.user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
 
         self.client.login(username=self.usr, password=self.pwd)
         resp = self.client.get(self.url_locked)
-        self.assertEqual(resp.status_code, 200) #pylint: disable=E1103
+        self.assertEqual(resp.status_code, 200) # pylint: disable=E1103
 
     def test_locked_asset_staff(self):
         """
         Test that locked assets behave appropriately in case user is staff.
         """
-        #pylint: disable=E1101
+        # pylint: disable=E1101
         course_id = "/".join([self.loc_locked.org, self.loc_locked.course, '2012_Fall'])
 
         self.client.login(username=self.staff_usr, password=self.staff_pwd)
         resp = self.client.get(self.url_locked)
-        self.assertEqual(resp.status_code, 200) #pylint: disable=E1103
+        self.assertEqual(resp.status_code, 200) # pylint: disable=E1103
 

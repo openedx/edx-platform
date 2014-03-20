@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#pylint: disable=C0111
+# pylint: disable=C0111
 
 from lettuce import world, step
 import os

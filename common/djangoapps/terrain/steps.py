@@ -1,15 +1,15 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 # Disable the "wildcard import" warning so we can bring in all methods from
 # course helpers and ui helpers
-#pylint: disable=W0401
+# pylint: disable=W0401
 
 # Disable the "Unused import %s from wildcard import" warning
-#pylint: disable=W0614
+# pylint: disable=W0614
 
 # Disable the "unused argument" warning because lettuce uses "step"
-#pylint: disable=W0613
+# pylint: disable=W0613
 
 # django_url is assigned late in the process of loading lettuce,
 # so we import this as a module, and then read django_url from

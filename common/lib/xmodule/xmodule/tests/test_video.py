@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#pylint: disable=W0212
+# pylint: disable=W0212
 """Test for Video Xmodule functional logic.
 These test data read from xml, not from mongo.
 

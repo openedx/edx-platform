@@ -1,4 +1,4 @@
-#pylint: disable=E1103, E1101
+# pylint: disable=E1103, E1101
 
 import copy
 import logging

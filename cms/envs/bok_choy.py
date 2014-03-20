@@ -13,7 +13,7 @@ from path import path
 # This is a convenience for ensuring (a) that we can consistently find the files
 # and (b) that the files are the same in Jenkins as in local dev.
 os.environ['SERVICE_VARIANT'] = 'bok_choy'
-os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()  #pylint: disable=E1120
+os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()  # pylint: disable=E1120
 
 from .aws import *  # pylint: disable=W0401, W0614
 
@@ -23,13 +23,13 @@ from .aws import *  # pylint: disable=W0401, W0614
 INSTALLED_APPS += ('django_extensions',)
 
 # Redirect to the test_root folder within the repo
-TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"  #pylint: disable=E1120
+TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"  # pylint: disable=E1120
 GITHUB_REPO_ROOT = (TEST_ROOT / "data").abspath()
 LOG_DIR = (TEST_ROOT / "log").abspath()
 
 # Configure Mongo modulestore to use the test folder within the repo
 for store in ["default", "direct"]:
-    MODULESTORE[store]['OPTIONS']['fs_root'] = (TEST_ROOT / "data").abspath()  #pylint: disable=E1120
+    MODULESTORE[store]['OPTIONS']['fs_root'] = (TEST_ROOT / "data").abspath()  # pylint: disable=E1120
 
 # Enable django-pipeline and staticfiles
 STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
