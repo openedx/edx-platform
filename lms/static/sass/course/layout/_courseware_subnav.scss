@@ -25,7 +25,7 @@ nav.course-material {
         color: darken($lighter-base-font-color, 20%);
         display: block;
         text-align: center;
-        padding: 8px 13px 12px;
+        padding: ($baseline/2) 12px;
         font-size: 14px;
         font-weight: 400;
         text-decoration: none;

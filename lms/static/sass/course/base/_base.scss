@@ -1,7 +1,6 @@
 body {
   min-width: 980px;
   min-height: 100%;
-  background-image: $course-bg-image;
   background-color: $course-bg-color;
 }
 
@@ -27,16 +26,14 @@ a {
 }
 
 .container {
-  padding: 20px 0 0 0;
 
   > div {
     display: table;
-    table-layout: fixed;
-    width: 100%;
-    border-radius: 3px;
     border: 1px solid $outer-border-color;
+    border-width: 0 1px 0 1px;
+    width: 100%;
     background: $container-bg;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    table-layout: fixed;
   }
 }
 
