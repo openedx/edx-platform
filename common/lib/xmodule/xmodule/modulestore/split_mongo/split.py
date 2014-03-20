@@ -366,8 +366,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     add_entry_if_missing=False
                 )
         assert isinstance(usage_key, BlockUsageLocator)
-        if not usage_key.is_initialized():
-            raise InsufficientSpecificationError("Not yet initialized: %s" % usage_key)
         course = self._lookup_course(usage_key)
         items = self._load_items(course, [usage_key.block_id], depth, lazy=True)
         if len(items) == 0:
@@ -1110,7 +1108,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             if block_id is None:
                 block_id = self._generate_block_id(structure_blocks, xblock.category)
             encoded_block_id = LocMapperStore.encode_key_for_mongo(block_id)
-            xblock.scope_ids.usage_id.block_id = block_id
+            new_usage_id = xblock.scope_ids.usage_id.replace(block_id=block_id)
+            xblock.scope_ids = xblock.scope_ids._replace(usage_id=new_usage_id)
         else:
             is_new = False
             encoded_block_id = LocMapperStore.encode_key_for_mongo(xblock.location.block_id)
@@ -1271,7 +1270,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
         the course but leaves the head pointer where it is (this change will not be in the course head).
         """
-        assert isinstance(usage_locator, BlockUsageLocator) and usage_locator.is_initialized()
+        assert isinstance(usage_locator, BlockUsageLocator)
         original_structure = self._lookup_course(usage_locator)['structure']
         if original_structure['root'] == usage_locator.block_id:
             raise ValueError("Cannot delete the root of a course")

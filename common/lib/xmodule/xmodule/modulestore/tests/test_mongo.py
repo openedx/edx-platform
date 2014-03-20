@@ -319,7 +319,7 @@ class TestMongoKeyValueStore(object):
 
     def setUp(self):
         self.data = {'foo': 'foo_value'}
-        self.location = Location('i4x://org/course/category/name@version')
+        self.location = Location('org', 'course', 'run', 'category', 'name', 'version')
         self.children = ['i4x://org/course/child/a', 'i4x://org/course/child/b']
         self.metadata = {'meta': 'meta_val'}
         self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata)

@@ -143,18 +143,6 @@ class BlockLocatorBase(Locator):
         else:
             return None
 
-    def _to_string(self):
-        """
-        Return a string representing this location.
-        """
-        parts = []
-        if self.package_id:
-            parts.append(unicode(self.package_id))
-            if self.branch:
-                parts.append(u"{prefix}{branch}".format(prefix=BRANCH_PREFIX, branch=self.branch))
-        if self.version_guid:
-            parts.append(u"{prefix}{guid}".format(prefix=VERSION_PREFIX, guid=self.version_guid))
-        return u"/".join(parts)
 
 
 class CourseLocator(BlockLocatorBase, CourseKey):
@@ -319,6 +307,19 @@ class CourseLocator(BlockLocatorBase, CourseKey):
             version_guid=version_guid
         )
 
+    def _to_string(self):
+        """
+        Return a string representing this location.
+        """
+        parts = []
+        if self.package_id:
+            parts.append(unicode(self.package_id))
+            if self.branch:
+                parts.append(u"{prefix}{branch}".format(prefix=BRANCH_PREFIX, branch=self.branch))
+        if self.version_guid:
+            parts.append(u"{prefix}{guid}".format(prefix=VERSION_PREFIX, guid=self.version_guid))
+        return u"/".join(parts)
+
 
 class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey methods
     """
@@ -359,7 +360,7 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         """
         Requests CourseLocator to deserialize its part and then adds the local deserialization of block
         """
-        course_key = CourseLocator.from_string(serialized)
+        course_key = CourseLocator._from_string(serialized)
         parsed_parts = parse_url(serialized, tag_optional=True)
         block_id = parsed_parts.get('block')
         if block_id is None:
@@ -394,16 +395,12 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
     @staticmethod
     def _parse_block_ref(block_ref):
         if isinstance(block_ref, LocalId):
-            return {'block_id': block_ref}
+            return block_ref
         else:
             parse = parse_block_ref(block_ref)
             if not parse:
                 raise ValueError('Could not parse "%s" as a block_ref' % block_ref)
-            return parse
-
-    @property
-    def course_key(self):
-        return getattr(self, 'course_key')
+            return parse.get('block_id')
 
     @property
     def definition_key(self):
@@ -412,6 +409,17 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
     @property
     def package_id(self):
         return self.course_key.package_id
+
+    @property
+    def branch(self):
+        return self.course_key.branch
+
+    @property
+    def version_guid(self):
+        return self.course_key.version_guid
+
+    def is_fully_specified(self):
+        return self.course_key.is_fully_specified()
 
     @classmethod
     def make_relative(cls, course_locator, block_id):
@@ -437,8 +445,21 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         """
         Return a string representing this location.
         """
-        rep = super(BlockUsageLocator, self)._to_string()
-        return rep + '/' + BLOCK_PREFIX + unicode(self.block_id)
+        return u"{course_key}/{BLOCK_PREFIX}{block_id}".format(
+            course_key=self.course_key._to_string(),
+            BLOCK_PREFIX=BLOCK_PREFIX,
+            block_id=self.block_id
+        )
+
+    def html_id(self):
+        """
+        Generate a discussion group id based on course
+
+        To make compatible with old Location object functionality. I don't believe this behavior fits at this
+        place, but I have no way to override. We should clearly define the purpose and restrictions of this
+        (e.g., I'm assuming periods are fine).
+        """
+        return re.sub('[^\w-]', '-', self._to_string())
 
 
 class DefinitionLocator(Locator):

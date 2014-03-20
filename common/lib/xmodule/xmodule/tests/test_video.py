@@ -493,7 +493,7 @@ class VideoExportTestCase(unittest.TestCase):
     correctly.
     """
     def setUp(self):
-        self.location = Location("i4x", "edX", 'course', 'run', "video", "SampleProblem1", None)
+        self.location = Location("edX", 'course', 'run', "video", "SampleProblem1", None)
 
     def assertXmlEqual(self, expected, xml):
         for attr in ['tag', 'attrib', 'text', 'tail']:

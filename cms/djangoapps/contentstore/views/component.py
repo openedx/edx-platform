@@ -77,7 +77,7 @@ def subsection_handler(request, tag=None, org=None, offering=None, branch=None, 
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(course_key=CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
+        locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
         try:
             old_location, course, item, lms_link = _get_item_in_course(request, locator)
         except ItemNotFoundError:
@@ -154,7 +154,7 @@ def unit_handler(request, tag=None, org=None, offering=None, branch=None, versio
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(course_key=CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
+        locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
         try:
             old_location, course, item, lms_link = _get_item_in_course(request, locator)
         except ItemNotFoundError:
@@ -300,7 +300,7 @@ def container_handler(request, tag=None, org=None, offering=None, branch=None, v
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(course_key=CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
+        locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
         try:
             __, course, xblock, __ = _get_item_in_course(request, locator)
         except ItemNotFoundError:
