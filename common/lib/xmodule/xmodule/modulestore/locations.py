@@ -5,7 +5,7 @@ import re
 from collections import namedtuple
 from opaque_keys import InvalidKeyError
 
-from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey
+from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey, AssetKey
 
 log = logging.getLogger(__name__)
 
@@ -49,10 +49,10 @@ class SlashSeparatedCourseKey(CourseKey):
         return '/'.join([self.course, self.run])
 
     def make_asset_key(self, path):
-        return Location('c4x', self.org, self.course, self.run, 'asset', path, None)
+        return AssetLocation(self.org, self.course, self.run, path, None)
 
     def make_usage_key(self, block_type, name):
-        return Location('i4x', self.org, self.course, self.run, block_type, name, None)
+        return Location(self.org, self.course, self.run, block_type, name, None)
 
     def to_deprecated_string(self):
         return '/'.join([self.org, self.course, self.run])
@@ -96,7 +96,7 @@ def _check_location_part(val, regexp):
         raise InvalidKeyError("Invalid characters in {!r}.".format(val))
 
 
-class Location(UsageKey, DefinitionKey):
+class LocationBase(object):
     """
     Encodes a location.
 
@@ -104,28 +104,24 @@ class Location(UsageKey, DefinitionKey):
     form {tag}://{org}/{course}/{category}/{name}[@{revision}], situated in the course
     {org}/{course}/{run}.
     """
-    CANONICAL_NAMESPACE = 'location'
     KEY_FIELDS = ('org', 'course', 'run', 'category', 'name', 'revision')
-    __slots__ = KEY_FIELDS
 
-    DEPRECATED_TAG = 'i4x'
-
-    @staticmethod
-    def _clean(value, invalid):
+    @classmethod
+    def _clean(cls, value, invalid):
         """
         invalid should be a compiled regexp of chars to replace with '_'
         """
         return re.sub('_+', '_', invalid.sub('_', value))
 
-    @staticmethod
-    def clean(value):
+    @classmethod
+    def clean(cls, value):
         """
         Return value, made into a form legal for locations
         """
-        return Location._clean(value, INVALID_CHARS)
+        return cls._clean(value, INVALID_CHARS)
 
-    @staticmethod
-    def clean_keeping_underscores(value):
+    @classmethod
+    def clean_keeping_underscores(cls, value):
         """
         Return value, replacing INVALID_CHARS, but not collapsing multiple '_' chars.
         This for cleaning asset names, as the YouTube ID's may have underscores in them, and we need the
@@ -133,20 +129,20 @@ class Location(UsageKey, DefinitionKey):
         """
         return INVALID_CHARS.sub('_', value)
 
-    @staticmethod
-    def clean_for_url_name(value):
+    @classmethod
+    def clean_for_url_name(cls, value):
         """
         Convert value into a format valid for location names (allows colons).
         """
-        return Location._clean(value, INVALID_CHARS_NAME)
+        return cls._clean(value, INVALID_CHARS_NAME)
 
-    @staticmethod
-    def clean_for_html(value):
+    @classmethod
+    def clean_for_html(cls, value):
         """
         Convert a string into a form that's safe for use in html ids, classes, urls, etc.
         Replaces all INVALID_HTML_CHARS with '_', collapses multiple '_' chars
         """
-        return Location._clean(value, INVALID_HTML_CHARS)
+        return cls._clean(value, INVALID_HTML_CHARS)
 
     def __init__(self, org, course, run, category, name, revision=None):
         """
@@ -164,7 +160,7 @@ class Location(UsageKey, DefinitionKey):
             _check_location_part(part, INVALID_CHARS)
         _check_location_part(name, INVALID_CHARS_NAME)
 
-        return super(Location, self).__init__(org, course, run, category, name, revision)
+        return super(LocationBase, self).__init__(org, course, run, category, name, revision)
 
     @property
     def definition_key(self):
@@ -226,3 +222,19 @@ class Location(UsageKey, DefinitionKey):
     @property
     def course_key(self):
         return SlashSeparatedCourseKey(self.org, self.course, self.run)
+
+
+class Location(LocationBase, UsageKey, DefinitionKey):
+    CANONICAL_NAMESPACE = 'location'
+    DEPRECATED_TAG = 'i4x'
+    __slots__ = LocationBase.KEY_FIELDS
+
+
+class AssetLocation(LocationBase, AssetKey):
+    CANONICAL_NAMESPACE = 'asset-location'
+    DEPRECATED_TAG = 'c4x'
+    KEY_FIELDS = ('org', 'course', 'run', 'name', 'revision')
+    __slots__ = KEY_FIELDS
+
+    def __init__(self, org, course, run, name, revision=None):
+        super(AssetLocation, self).__init__(org, course, run, 'asset', name, revision)
