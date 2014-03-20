@@ -41,6 +41,7 @@ nav.course-material {
         text-align: center;
         text-decoration: none;
         font-size: 14px;
+        opacity: 0.9;
 
         &:hover, &:focus {
           color: #333;
@@ -50,16 +51,11 @@ nav.course-material {
         &.active {
           background-color: $white;
           color: $blue;
+          opacity: 1;
+          border-left: 1px solid $outer-border-color;
+          border-right: 1px solid $outer-border-color;
         }
       }
-    }
-
-    li:first-child a.active {
-      border-left: 1px solid $outer-border-color;
-    }
-
-    li:last-child a.active {
-      border-right: 1px solid $outer-border-color;
     }
   }
 }
