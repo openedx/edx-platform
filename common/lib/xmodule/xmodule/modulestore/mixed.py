@@ -210,27 +210,26 @@ class MixedModuleStore(ModuleStoreWriteBase):
             errs.update(store.get_errored_courses())
         return errs
 
-    def create_course(self, course_id, user_id=None, store_name='default', **kwargs):
+    def create_course(self, course_key, user_id=None, store_name='default', **kwargs):
         """
         Creates and returns the course.
 
-        :param org: the org
-        :param fields: a dict of xblock field name - value pairs for the course module.
-        :param metadata: the old way of setting fields by knowing which ones are scope.settings v scope.content
-        :param definition_data: the complement to metadata which is also a subset of fields
-        :returns: course xblock
+        :param course_key: the CourseKey object for the course
+        :param user_id: id of the user creating the course
+        :param store_name: which datastore to use
+        :returns: course
         """
         store = self.modulestores[store_name]
         if not hasattr(store, 'create_course'):
             raise NotImplementedError(u"Cannot create a course on store %s" % store_name)
-        if store.get_modulestore_type(course_id) == SPLIT_MONGO_MODULESTORE_TYPE:
-            org = kwargs.pop('org', course_id.org)
+        if store.get_modulestore_type(course_key) == SPLIT_MONGO_MODULESTORE_TYPE:
+            org = kwargs.pop('org', course_key.org)
             fields = kwargs.pop('fields', {})
             fields.update(kwargs.pop('metadata', {}))
             fields.update(kwargs.pop('definition_data', {}))
-            course = store.create_course(course_id, org, user_id, fields=fields, **kwargs)
+            course = store.create_course(course_key, org, user_id, fields=fields, **kwargs)
         else:  # assume mongo
-            course = store.create_course(course_id, **kwargs)
+            course = store.create_course(course_key, **kwargs)
 
         return course
 
