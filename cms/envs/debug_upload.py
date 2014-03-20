@@ -1,4 +1,4 @@
-#pylint: disable=W0614, W0401
+# pylint: disable=W0614, W0401
 from .dev import *
 
 FILE_UPLOAD_HANDLERS = (

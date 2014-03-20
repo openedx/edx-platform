@@ -5,7 +5,7 @@ Settings for bok choy tests
 import os
 from path import path
 
-CONFIG_ROOT = path(__file__).abspath().dirname()  #pylint: disable=E1120
+CONFIG_ROOT = path(__file__).abspath().dirname()  # pylint: disable=E1120
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
 ########################## Prod-like settings ###################################

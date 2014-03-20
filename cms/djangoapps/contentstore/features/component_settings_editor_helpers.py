@@ -1,5 +1,5 @@
 # disable missing docstring
-#pylint: disable=C0111
+# pylint: disable=C0111
 
 from lettuce import world
 from nose.tools import assert_equal, assert_in  # pylint: disable=E0611

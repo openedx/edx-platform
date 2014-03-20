@@ -111,7 +111,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         ]
         utils.add_courseware_context(threads, self.course)
 
-        def assertThreadCorrect(thread, discussion, expected_title):  #pylint: disable=C0103
+        def assertThreadCorrect(thread, discussion, expected_title):  # pylint: disable=C0103
             self.assertEqual(
                 set(thread.keys()),
                 set(["commentable_id", "courseware_url", "courseware_title"])
@@ -146,7 +146,7 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         self.course.discussion_topics = {}
         self.course.save()
         self.discussion_num = 0
-        self.maxDiff = None #pylint: disable=C0103
+        self.maxDiff = None # pylint: disable=C0103
 
     def create_discussion(self, discussion_category, discussion_target, **kwargs):
         self.discussion_num += 1

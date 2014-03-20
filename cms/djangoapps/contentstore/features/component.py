@@ -1,9 +1,9 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 # Lettuce formats proposed definitions for unimplemented steps with the
 # argument name "step" instead of "_step" and pylint does not like that.
-#pylint: disable=W0613
+# pylint: disable=W0613
 
 from lettuce import world, step
 from nose.tools import assert_true, assert_in  # pylint: disable=E0611
