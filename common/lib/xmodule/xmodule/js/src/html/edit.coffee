@@ -48,7 +48,7 @@ class @HTMLEditingDescriptor
 
   setupTinyMCE: (ed) =>
     ed.addButton('wrapAsCode', {
-      title : 'Code',
+      title : 'Code block',
       image : "#{baseUrl}/images/ico-tinymce-code.png",
       onclick : () ->
         ed.formatter.toggle('code')
