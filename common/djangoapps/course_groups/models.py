@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
+from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class CourseUserGroup(models.Model):
 
     # Note: groups associated with particular runs of a course.  E.g. Fall 2012 and Spring
     # 2013 versions of 6.00x will have separate groups.
-    course_id = models.CharField(max_length=255, db_index=True,
+    course_id = CourseKeyField(max_length=255, db_index=True,
                                  help_text="Which course is this group associated with?")
 
     # For now, only have group type 'cohort', but adding a type field to support

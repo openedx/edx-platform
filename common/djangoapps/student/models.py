@@ -57,7 +57,7 @@ class AnonymousUserId(models.Model):
     """
     user = models.ForeignKey(User, db_index=True)
     anonymous_user_id = models.CharField(unique=True, max_length=32)
-    course_id = models.CharField(db_index=True, max_length=255)
+    course_id = CourseKeyField(db_index=True, max_length=255)
     unique_together = (user, course_id)
 
 
@@ -731,7 +731,7 @@ class CourseEnrollmentAllowed(models.Model):
     even if the enrollment time window is past.
     """
     email = models.CharField(max_length=255, db_index=True)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     auto_enroll = models.BooleanField(default=0)
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)

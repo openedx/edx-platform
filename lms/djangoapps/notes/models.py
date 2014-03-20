@@ -5,10 +5,12 @@ from django.core.exceptions import ValidationError
 from django.utils.html import strip_tags
 import json
 
+from xmodule_django.models import CourseKeyField
+
 
 class Note(models.Model):
     user = models.ForeignKey(User, db_index=True)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     uri = models.CharField(max_length=255, db_index=True)
     text = models.TextField(default="")
     quote = models.TextField(default="")

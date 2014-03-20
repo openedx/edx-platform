@@ -7,6 +7,7 @@ import pytz
 from django.core.exceptions import ValidationError
 from django.db import models
 from util.validate_on_save import ValidateOnSaveMixin
+from xmodule_django.models import CourseKeyField
 
 
 class MidcourseReverificationWindow(ValidateOnSaveMixin, models.Model):
@@ -17,7 +18,7 @@ class MidcourseReverificationWindow(ValidateOnSaveMixin, models.Model):
     overlapping time ranges.  This is enforced by this class's clean() method.
     """
     # the course that this window is attached to
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     start_date = models.DateTimeField(default=None, null=True, blank=True)
     end_date = models.DateTimeField(default=None, null=True, blank=True)
 
