@@ -45,27 +45,27 @@ class TestJumpTo(TestCase):
         self.course_name = 'edX/toy/2012_Fall'
 
     def test_jumpto_invalid_location(self):
-        location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
+        location = Location('edX', 'toy', 'NoSuchPlace', None)
         jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
     def test_jumpto_from_chapter(self):
-        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        location = Location('edX', 'toy', 'chapter', 'Overview')
         jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_id(self):
-        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        location = Location('edX', 'toy', 'chapter', 'Overview')
         jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_id_invalid_location(self):
-        location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
+        location = Location('edX', 'toy', 'NoSuchPlace', None)
         jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)

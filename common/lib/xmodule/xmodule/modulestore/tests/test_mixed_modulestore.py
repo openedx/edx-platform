@@ -146,7 +146,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             course_id: course_id
             for course_id in [self.MONGO_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
         }
-        self.fake_location = Location('i4x', 'foo', 'bar', 'vertical', 'baz')
+        self.fake_location = Location('foo', 'bar', 'vertical', 'baz')
         self.import_chapter_location = self.course_locations[self.MONGO_COURSEID].replace(
             category='chapter', name='Overview'
         )
@@ -358,11 +358,11 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.initdb(default_ms)
         course_locations = self.store.get_courses_for_wiki('toy')
         self.assertEqual(len(course_locations), 1)
-        self.assertIn(Location('i4x', 'edX', 'toy', 'course', '2012_Fall'), course_locations)
+        self.assertIn(Location('edX', 'toy', 'course', '2012_Fall'), course_locations)
 
         course_locations = self.store.get_courses_for_wiki('simple')
         self.assertEqual(len(course_locations), 1)
-        self.assertIn(Location('i4x', 'edX', 'simple', 'course', '2012_Fall'), course_locations)
+        self.assertIn(Location('edX', 'simple', 'course', '2012_Fall'), course_locations)
 
         self.assertEqual(len(self.store.get_courses_for_wiki('edX.simple.2012_Fall')), 0)
         self.assertEqual(len(self.store.get_courses_for_wiki('no_such_wiki')), 0)

@@ -70,7 +70,7 @@ class TestOrphan(unittest.TestCase):
         Create the item of the given category and block id in split and old mongo, add it to the optional
         parent. The parent category is only needed because old mongo requires it for the id.
         """
-        location = Location('i4x', 'test_org', 'test_course', category, name)
+        location = Location('test_org', 'test_course', category, name)
         self.old_mongo.create_and_save_xmodule(location, data, metadata, runtime)
         if isinstance(data, basestring):
             fields = {'data': data}
@@ -79,7 +79,7 @@ class TestOrphan(unittest.TestCase):
         fields.update(metadata)
         if parent_name:
             # add child to parent in mongo
-            parent_location = Location('i4x', 'test_org', 'test_course', parent_category, parent_name)
+            parent_location = Location('test_org', 'test_course', parent_category, parent_name)
             parent = self.old_mongo.get_item(parent_location)
             parent.children.append(location.url())
             self.old_mongo.update_item(parent, self.userid)
@@ -115,7 +115,7 @@ class TestOrphan(unittest.TestCase):
         self.split_mongo.create_course(
             'test_org', self.userid, self.split_course_key.offering, fields=fields, root_block_id='runid'
         )
-        self.course_location = Location('i4x', 'test_org', 'test_course', 'course', 'runid')
+        self.course_location = Location('test_org', 'test_course', 'course', 'runid')
         self.old_mongo.create_and_save_xmodule(self.course_location, data, metadata)
         runtime = self.old_mongo.get_item(self.course_location).runtime
 
