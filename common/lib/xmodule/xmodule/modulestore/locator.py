@@ -307,6 +307,18 @@ class CourseLocator(BlockLocatorBase, CourseKey):
             version_guid=None
         )
 
+    def for_version(self, version_guid):
+        """
+        Return a new CourseLocator for another version of the same course and branch. Usually used
+        when the head is updated (and thus the course x branch now points to this version)
+        """
+        return CourseLocator(
+            org=self.org,
+            offering=self.offering,
+            branch=self.branch,
+            version_guid=version_guid
+        )
+
 
 class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey methods
     """

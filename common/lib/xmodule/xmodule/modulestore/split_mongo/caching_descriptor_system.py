@@ -88,7 +88,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         else:
             # most recent retrieval is most likely the right one for next caller (see comment above fn)
             self.course_entry['branch'] = course_entry_override['branch']
-            self.course_entry['package_id'] = course_entry_override['package_id']
+            self.course_entry['org'] = course_entry_override['org']
+            self.course_entry['offering'] = course_entry_override['offering']
         # most likely a lazy loader or the id directly
         definition = json_data.get('definition', {})
         definition_id = self.modulestore.definition_locator(definition)
