@@ -14,7 +14,8 @@ from mock import Mock, patch
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse
-from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
+from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
+from django_comment_common.utils import seed_permissions_roles
 from django.core import mail
 from django.utils.timezone import utc
 
@@ -126,7 +127,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('get_distribution', {}),
             ('get_student_progress_url', {'unique_student_identifier': self.user.username}),
             ('reset_student_attempts', {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
-            ('update_forum_role_membership', {'email': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
+            ('update_forum_role_membership', {'unique_student_identifier': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
             ('list_forum_members', {'rolename': FORUM_ROLE_COMMUNITY_TA}),
             ('proxy_legacy_analytics', {'aname': 'ProblemGradeDistribution'}),
             ('send_email', {'send_to': 'staff', 'subject': 'test', 'message': 'asdf'}),
@@ -956,6 +957,58 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         }
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected)
+
+    def test_update_forum_role_membership(self):
+        """
+        Test update forum role membership with user's email and username.
+        """
+
+        # Seed forum roles for course.
+        seed_permissions_roles(self.course.id)
+
+        # Test add discussion admin with email.
+        self.assert_update_forum_role_membership(self.other_user.email, "Administrator", "allow")
+
+        # Test revoke discussion admin with email.
+        self.assert_update_forum_role_membership(self.other_user.email, "Administrator", "revoke")
+
+        # Test add discussion moderator with username.
+        self.assert_update_forum_role_membership(self.other_user.username, "Moderator", "allow")
+
+        # Test revoke discussion moderator with username.
+        self.assert_update_forum_role_membership(self.other_user.username, "Moderator", "revoke")
+
+        # Test add discussion community TA with email.
+        self.assert_update_forum_role_membership(self.other_user.email, "Community TA", "allow")
+
+        # Test revoke discussion community TA with username.
+        self.assert_update_forum_role_membership(self.other_user.username, "Community TA", "revoke")
+
+    def assert_update_forum_role_membership(self, unique_student_identifier, rolename, action):
+        """
+        Test update forum role membership.
+        Get unique_student_identifier, rolename and action and update forum role.
+        """
+
+        url = reverse('update_forum_role_membership', kwargs={'course_id': self.course.id})
+        response = self.client.get(
+            url,
+            {
+                'unique_student_identifier': unique_student_identifier,
+                'rolename': rolename,
+                'action': action,
+            }
+        )
+
+        # Status code should be 200.
+        self.assertEqual(response.status_code, 200)
+
+        user_roles = self.other_user.roles.filter(course_id=self.course.id).values_list("name", flat=True)
+        if action == 'allow':
+            self.assertIn(rolename, user_roles)
+        elif action == 'revoke':
+            self.assertNotIn(rolename, user_roles)
+
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
