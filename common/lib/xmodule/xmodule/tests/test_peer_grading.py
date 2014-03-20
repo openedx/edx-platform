@@ -148,7 +148,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         """
         with self.assertRaises(ItemNotFoundError):
             self.peer_grading._find_corresponding_module_for_location(
-                Location('i4x', 'org', 'course', 'run', 'category', 'name', 'revision')
+                Location('org', 'course', 'run', 'category', 'name', 'revision')
             )
 
     def test_get_instance_state(self):
@@ -238,7 +238,7 @@ class MockPeerGradingServiceProblemList(MockPeerGradingService):
                         "num_graded": 3,
                         "num_pending": 681,
                         "num_required": 3,
-                        "location": Location('i4x', 'edX', 'open_ended', '2012_Fall', 'combinedopenended', 'SampleQuestion', None),
+                        "location": Location('edX', 'open_ended', '2012_Fall', 'combinedopenended', 'SampleQuestion', None),
                         "problem_name": "Peer-Graded Essay"
                     },
                 ]}

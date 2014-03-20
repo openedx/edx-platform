@@ -85,7 +85,7 @@ class TestXMLModuleStore(unittest.TestCase):
         for course in store.get_courses():
             course_locations = store.get_courses_for_wiki(course.wiki_slug)
             self.assertEqual(len(course_locations), 1)
-            self.assertIn(Location('i4x', 'edX', course.location.course, 'course', '2012_Fall'), course_locations)
+            self.assertIn(Location('edX', course.location.course, 'course', '2012_Fall'), course_locations)
 
         course_locations = store.get_courses_for_wiki('no_such_wiki')
         self.assertEqual(len(course_locations), 0)
@@ -100,4 +100,4 @@ class TestXMLModuleStore(unittest.TestCase):
         course_locations = store.get_courses_for_wiki('simple')
         self.assertEqual(len(course_locations), 2)
         for course_number in ['toy', 'simple']:
-            self.assertIn(Location('i4x', 'edX', course_number, 'course', '2012_Fall'), course_locations)
+            self.assertIn(Location('edX', course_number, 'course', '2012_Fall'), course_locations)

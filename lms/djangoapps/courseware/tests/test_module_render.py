@@ -41,7 +41,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     Tests of courseware.module_render
     """
     def setUp(self):
-        self.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        self.location = Location('edX', 'toy', 'chapter', 'Overview')
         self.course_id = CourseKey.from_string('edX/toy/2012_Fall')
         self.toy_course = modulestore().get_course(self.course_id)
         self.mock_user = UserFactory()
@@ -82,7 +82,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         module = render.get_module(
             self.mock_user,
             mock_request,
-            Location('i4x', 'edX', 'toy', 'html', 'toyjumpto'),
+            Location('edX', 'toy', 'html', 'toyjumpto'),
             field_data_cache,
             self.course_id
         )
@@ -164,7 +164,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
-        self.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        self.location = Location('edX', 'toy', 'chapter', 'Overview')
         self.course_id = CourseKey.from_string('edX/toy/2012_Fall')
         self.toy_course = modulestore().get_course(self.course_id)
         self.mock_user = UserFactory()
@@ -275,7 +275,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
             render.handle_xblock_callback(
                 request,
                 self.course_id,
-                quote_slashes(str(Location('i4x', 'edX', 'toy', 'chapter', 'bad_location'))),
+                quote_slashes(str(Location('edX', 'toy', 'chapter', 'bad_location'))),
                 'xmodule_handler',
                 'goto_position',
             )

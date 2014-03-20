@@ -225,7 +225,7 @@ class TestMongoModuleStore(object):
         """
         Test getting, setting, and defaulting the locked attr and arbitrary attrs.
         """
-        location = Location('i4x', 'edX', 'toy', 'course', '2012_Fall')
+        location = Location('edX', 'toy', 'course', '2012_Fall')
         course_content, __ = TestMongoModuleStore.content_store.get_all_content_for_course(location)
         assert len(course_content) > 0
         # a bit overkill, could just do for content[0]
@@ -282,7 +282,7 @@ class TestMongoModuleStore(object):
         for course_number in self.courses:
             course_locations = self.store.get_courses_for_wiki(course_number)
             assert_equals(len(course_locations), 1)
-            assert_equals(Location('i4x', 'edX', course_number, 'course', '2012_Fall'), course_locations[0])
+            assert_equals(Location('edX', course_number, 'course', '2012_Fall'), course_locations[0])
 
         course_locations = self.store.get_courses_for_wiki('no_such_wiki')
         assert_equals(len(course_locations), 0)
@@ -300,7 +300,7 @@ class TestMongoModuleStore(object):
         course_locations = self.store.get_courses_for_wiki('simple')
         assert_equals(len(course_locations), 2)
         for course_number in ['toy', 'simple']:
-            assert_in(Location('i4x', 'edX', course_number, 'course', '2012_Fall'), course_locations)
+            assert_in(Location('edX', course_number, 'course', '2012_Fall'), course_locations)
 
         # configure simple course to use unique wiki_slug.
         simple_course = self.store.get_course(CourseKey.from_string('edX/simple/2012_Fall'))
@@ -309,7 +309,7 @@ class TestMongoModuleStore(object):
         # it should be retrievable with its new wiki_slug
         course_locations = self.store.get_courses_for_wiki('edX.simple.2012_Fall')
         assert_equals(len(course_locations), 1)
-        assert_in(Location('i4x', 'edX', 'simple', 'course', '2012_Fall'), course_locations)
+        assert_in(Location('edX', 'simple', 'course', '2012_Fall'), course_locations)
 
 
 class TestMongoKeyValueStore(object):
