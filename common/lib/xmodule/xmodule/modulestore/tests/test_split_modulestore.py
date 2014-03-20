@@ -472,8 +472,11 @@ class SplitModuleTest(unittest.TestCase):
                     new_ele_dict[spec['id']] = child
                 course = split_store.persist_xblock_dag(course, revision['user_id'])
         # publish "testx.wonderful"
-        to_publish = BlockUsageLocator(package_id="testx.wonderful", branch="draft", block_id="head23456")
-        destination = CourseLocator(package_id="testx.wonderful", branch="published")
+        to_publish = BlockUsageLocator(
+            CourseLocator(org="testx", offering="wonderful", branch="draft"),
+            block_id="head23456"
+        )
+        destination = CourseLocator(org="testx", offering="wonderful", branch="published")
         split_store.xblock_publish("test@edx.org", to_publish, destination, [to_publish.block_id], None)
 
     def tearDown(self):

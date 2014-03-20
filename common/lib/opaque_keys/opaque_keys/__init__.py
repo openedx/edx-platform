@@ -59,6 +59,7 @@ class OpaqueKey(object):
             identity. KeyImplementation instances will compare equal iff all of
             their KEY_FIELDS match, and will not compare equal to instances
             of different KeyImplementation classes (even if the KEY_FIELDS match).
+            These fields must be hashable.
 
     OpaqueKeys are immutable.
     """
