@@ -39,7 +39,7 @@ tinymce.PluginManager.add('codemirror', function(editor, url) {
 
 	// Add a button to the button bar
 	editor.addButton('code', {
-		title: 'Source code',
+		title: 'Edit HTML',
 		icon: 'code',
 		onclick: showSourceEditor
 	});
@@ -47,7 +47,7 @@ tinymce.PluginManager.add('codemirror', function(editor, url) {
 	// Add a menu item to the tools menu
 	editor.addMenuItem('code', {
 		icon: 'code',
-		text: 'Source code',
+		text: 'Edit HTML',
 		context: 'tools',
 		onclick: showSourceEditor
 	});
