@@ -122,7 +122,7 @@
 
         <ol>
         % for enabled in provider.Registry.enabled():
-          <li><a href="${pipeline.get_login_url(enabled.NAME)}">${_("Sign in with " + enabled.NAME)}</a>
+          <li><a href="${pipeline.get_login_url(enabled.NAME)}">${_("Sign in with {provider_name}").format(provider_name=enabled.NAME)}</a>
         % endfor
         </ol>
 
