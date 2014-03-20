@@ -90,7 +90,8 @@ class TestOrphan(unittest.TestCase):
             )
         else:
             course_or_parent_locator = CourseLocator(
-                package_id='test_org.test_course.runid',
+                org='test_org',
+                offering='test_course.runid',
                 branch='draft',
             )
         self.split_mongo.create_item(course_or_parent_locator, category, self.userid, block_id=name, fields=fields)
