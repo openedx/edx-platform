@@ -37,6 +37,9 @@ class SlashSeparatedCourseKey(CourseKey):
 
     @classmethod
     def _from_string(cls, serialized):
+        if serialized.count('/') != 2:
+            raise InvalidKeyError(serialized)
+
         # Turns encoded slashes into actual slashes
         return cls(*serialized.split('/'))
 
