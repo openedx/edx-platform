@@ -89,7 +89,7 @@ class TestPublish(unittest.TestCase):
         fields = metadata.copy()
         fields.update(data)
 
-        self.course_location = Location('i4x', 'test_org', 'test_course', 'course', 'runid')
+        self.course_location = Location('test_org', 'test_course', 'course', 'runid')
         self.old_mongo.create_and_save_xmodule(self.course_location, data, metadata)
         runtime = self.draft_mongo.get_item(self.course_location).runtime
 

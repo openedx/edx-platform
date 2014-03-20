@@ -113,7 +113,7 @@ class VideoDescriptorTest(unittest.TestCase):
 
     def setUp(self):
         system = get_test_descriptor_system()
-        location = Location('i4x', 'org', 'course', 'run', 'video', 'name', None)
+        location = Location('org', 'course', 'run', 'video', 'name', None)
         self.descriptor = system.construct_xblock_from_class(
             VideoDescriptor,
             scope_ids=ScopeIds(None, None, location, location),

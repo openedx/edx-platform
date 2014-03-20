@@ -84,7 +84,7 @@ class TestMigration(unittest.TestCase):
         only the live ones get to published. Some are only draft, some are both, some are only live.
         * about, static_tab, and conditional documents
         """
-        location = Location('i4x', 'test_org', 'test_course', 'course', 'runid')
+        location = Location('test_org', 'test_course', 'course', 'runid')
         self.course_location = location
         date_proxy = Date()
         metadata = {
