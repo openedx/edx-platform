@@ -1,8 +1,8 @@
 from django.db import models
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 class CourseKeyField(models.CharField):
-    description = "A CourseKey object, saved to the DB in the form of a string"
+    description = "A SlashSeparatedCourseKey object, saved to the DB in the form of a string"
 
     __metaclass__ = models.SubfieldBase
 
@@ -10,13 +10,9 @@ class CourseKeyField(models.CharField):
         super(CourseKeyField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
-        if isinstance(value, CourseKey):
-            return value
+        assert isinstance(value, str) or isinstance(value, unicode)
         return CourseKey.from_string(value)
 
     def get_prep_value(self, value):
-        if isinstance(value, str):
-            return value
-        if isinstance(value, unicode):
-            return value
+        assert isinstance(value, SlashSeparatedCourseKey)
         return value._to_string()
