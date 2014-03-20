@@ -6,7 +6,7 @@ Created on Aug 5, 2013
 import unittest
 import uuid
 from xmodule.modulestore import Location
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from mock import Mock
@@ -256,10 +256,13 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         org = 'foo_org'
         course = 'bar_course'
         new_style_package_id = '{}.geek_dept.{}.baz_run'.format(org, course)
+        prob_course_key = CourseLocator(
+            org=org, offering=course,
+            branch='published',
+        )
         prob_locator = BlockUsageLocator(
-            package_id=new_style_package_id,
+            prob_course_key,
             block_id='problem2',
-            branch='published'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertIsNone(prob_location, 'found entry in empty map table')
@@ -282,22 +285,19 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         self.assertEqual(prob_location, Location('i4x', org, course, 'course', 'baz_run', None))
         # explicit branch
         prob_locator = BlockUsageLocator(
-            package_id=prob_locator.package_id, branch='draft', block_id=prob_locator.block_id
+            prob_course_key.for_branch('draft'), block_id=prob_locator.block_id
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         # Even though the problem was set as draft, we always return revision=None to work
         # with old mongo/draft modulestores.
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', None))
-        prob_locator = BlockUsageLocator(
-            package_id=new_style_package_id, block_id='problem2', branch='production'
-        )
+        prob_locator = BlockUsageLocator(prob_course_key.for_branch('production'), block_id='problem2')
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', None))
         # same for chapter except chapter cannot be draft in old system
         chap_locator = BlockUsageLocator(
-            package_id=new_style_package_id,
+            prob_course_key.for_branch('production'),
             block_id='chapter48f',
-            branch='production'
         )
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location('i4x', org, course, 'chapter', '48f23a10395384929234'))
@@ -306,15 +306,14 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location('i4x', org, course, 'chapter', '48f23a10395384929234'))
         chap_locator = BlockUsageLocator(
-            package_id=new_style_package_id, block_id='chapter48f', branch='production'
+            prob_course_key.for_branch('production'), block_id='chapter48f'
         )
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location('i4x', org, course, 'chapter', '48f23a10395384929234'))
 
         # look for non-existent problem
         prob_locator2 = BlockUsageLocator(
-            package_id=new_style_package_id,
-            branch='draft',
+            prob_course_key.for_branch('draft'),
             block_id='problem3'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator2)
@@ -337,11 +336,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
             block_map={'abc123': {'problem': 'problem3'}}
         )
         # now query delta (2 entries point to it)
-        prob_locator = BlockUsageLocator(
-            package_id=new_style_package_id,
-            branch='production',
-            block_id='problem3'
-        )
+        prob_locator = BlockUsageLocator(prob_course_key.for_branch('production'), block_id='problem3')
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123'))
 
