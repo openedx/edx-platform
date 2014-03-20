@@ -155,6 +155,7 @@ def set_text_and_select(step, text):
     world.browser.driver.execute_script(script, str(text))
     world.wait_for_ajax_complete()
 
+
 @step('I select the code toolbar button$')
 def select_code_button(step):
     # This is our custom "code style" button. It uses an image instead of a class.
