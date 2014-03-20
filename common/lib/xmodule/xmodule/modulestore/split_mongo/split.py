@@ -598,9 +598,14 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             return None
         # convert the results value sets to locators
         for k, versions in result.iteritems():
-            result[k] = [BlockUsageLocator(version_guid=version, block_id=block_id)
-                for version in versions]
-        return VersionTree(BlockUsageLocator(version_guid=possible_roots[0], block_id=block_id), result)
+            result[k] = [
+                BlockUsageLocator(CourseLocator(version_guid=version), block_id=block_id)
+                for version in versions
+            ]
+        return VersionTree(
+            BlockUsageLocator(CourseLocator(version_guid=possible_roots[0]), block_id=block_id),
+            result
+        )
 
     def get_definition_successors(self, definition_locator, version_history_depth=1):
         '''
@@ -826,14 +831,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             if not continue_version:
                 self._update_head(index_entry, course_or_parent_locator.branch, new_id)
             item_loc = BlockUsageLocator(
-                package_id=course_or_parent_locator.package_id,
-                branch=course_or_parent_locator.branch,
+                course_or_parent_locator.version_agnostic(),
                 block_id=new_block_id,
             )
         else:
             item_loc = BlockUsageLocator(
+                CourseLocator(version_guid=new_id),
                 block_id=new_block_id,
-                version_guid=new_id,
             )
 
         # reconstruct the new_item from the cache
