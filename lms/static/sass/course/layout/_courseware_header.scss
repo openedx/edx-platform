@@ -36,12 +36,11 @@ nav.course-material {
 
       a {
         display: block;
-        padding: $baseline;
-        color: #555;
+        padding: $baseline ($baseline*.75);
+        color: $white;
         text-align: center;
         text-decoration: none;
         font-size: 14px;
-        opacity: 0.9;
 
         &:hover, &:focus {
           color: #333;
@@ -51,7 +50,6 @@ nav.course-material {
         &.active {
           background-color: $white;
           color: $blue;
-          opacity: 1;
           border-left: 1px solid $outer-border-color;
           border-right: 1px solid $outer-border-color;
         }

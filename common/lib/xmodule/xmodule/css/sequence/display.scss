@@ -47,7 +47,6 @@ nav.sequence-nav {
     z-index: 9999;
     width: 20px;
     height: 46px;
-    @include linear-gradient(left, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
     background-color: transparent;
     pointer-events: none;
   }
@@ -59,7 +58,6 @@ nav.sequence-nav {
     z-index: 9999;
     width: 20px;
     height: 46px;
-    @include linear-gradient(right, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
     background-color: transparent;
     pointer-events: none;
   }
@@ -69,8 +67,7 @@ nav.sequence-nav {
     z-index: 99;
     border: 1px solid #ccc;
     height: 44px;
-    margin: 0 30px;
-    @include linear-gradient(top, #ddd, #eee);
+    margin: 0 41px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset;
   }
 
@@ -82,8 +79,9 @@ nav.sequence-nav {
     display: table;
     height: 100%;
     margin: 0;
-    padding: 0 10px;
+    padding: 0;
     width: 100%;
+    background-color: $gray-l6;
 
     a {
       @extend .block-link;
@@ -94,17 +92,18 @@ nav.sequence-nav {
       min-width: 20px;
 
       a {
+        @include transition(none);
+        position: relative;
+        display: block;
+        margin: 0;
+        border: 1px solid transparent;
+        padding: 0;
         width: 100%;
         height: 42px;
-        margin: 0;
         background-position: center 14px;
         background-repeat: no-repeat;
-        border: 1px solid transparent;
         cursor: pointer;
-        display: block;
-        padding: 0;
-        position: relative;
-        @include transition(none);
+        bacgkround-color: $gray-l6;
 
 /*        &:focus {
           outline: 0;
@@ -119,6 +118,8 @@ nav.sequence-nav {
         &.active {
           background-color: #fff;
           z-index: 9;
+          border-left: 1px solid $gray-l4;
+          border-right: 1px solid $gray-l4;
 
           // &:after {
           //   content: '▲';
@@ -261,9 +262,7 @@ nav.sequence-nav {
       position: absolute;
       margin-bottom: 0;
       height: 44px;
-      width: 70px;
       border: 1px solid #ccc;
-      @include linear-gradient(top, #eee, #ddd);
       box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
       z-index: 1;
 
@@ -294,23 +293,21 @@ nav.sequence-nav {
       }
 
       &.prev {
-        left: -10px;
-        border-radius: 35px 0 0 35px;
+        left: 0;
+        border-radius: 5px 0 0 5px;
 
         a {
           background-image: url('../images/sequence-nav/previous-icon.png');
-          background-position: center 15px;
         }
+
       }
 
       &.next {
-        right: -10px;
-        border-radius: 0 35px 35px 0;
+        right: 0;
+        border-radius: 0 5px 5px 0;
 
         a {
-          margin-left: 30px;
           background-image: url('../images/sequence-nav/next-icon.png');
-          background-position: center 15px;
         }
       }
     }
@@ -332,17 +329,18 @@ nav.sequence-bottom {
   ul {
     @include clearfix();
     @include inline-block();
+    width: 100%;
 
     li {
       float: left;
       width: 50px;
       height: 44px;
       border: 1px solid #ccc;
-      @include linear-gradient(top, #eee, #ddd);
       box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
 
       &.prev, &.next {
         margin-bottom: 0;
+        width: 50%;
 
         a {
           background-position: center center;
@@ -369,7 +367,7 @@ nav.sequence-bottom {
       }
 
       &.prev {
-        border-radius: 35px 0 0 35px;
+        border-radius: 5px 0 0 5px;
 
         a {
           background-image: url('../images/sequence-nav/previous-icon.png');
@@ -378,7 +376,7 @@ nav.sequence-bottom {
       }
 
       &.next {
-        border-radius: 0 35px 35px 0;
+        border-radius: 0 5px 5px 0;
         border-left: none;
 
         a {
