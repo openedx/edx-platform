@@ -23,21 +23,21 @@ Feature: CMS.HTML Editor
   Scenario: TinyMCE image plugin sets urls correctly
     Given I have created a Blank HTML Page
     When I edit the page
-    And I add an image with a static link via the Image Plugin Icon
-    Then the image static link is rewritten to translate the path
+    And I add an image with static link "/static/image.jpg" via the Image Plugin Icon
+    Then the src link is rewritten to "c4x/MITx/999/asset/image.jpg"
 
   Scenario: TinyMCE link plugin sets urls correctly
     Given I have created a Blank HTML Page
     When I edit the page
-    And I add an link with a static link via the Link Plugin Icon
-    Then the link static link is rewritten to translate the path
+    And I add a link with static link "/static/image.jpg" via the Link Plugin Icon
+    Then the href link is rewritten to "c4x/MITx/999/asset/image.jpg"
 
   Scenario: TinyMCE and CodeMirror preserve style tags
     Given I have created a Blank HTML Page
     When I edit the page
     And type "<p class='title'>pages</p><style><!-- .title { color: red; } --></style>" in the code editor and press OK
     And I save the page
-    Then the page has text:
+    Then the page text is:
       """
       <p>&nbsp;</p>
       <p class="title">pages</p>
@@ -55,7 +55,7 @@ Feature: CMS.HTML Editor
     Given I have created a Blank HTML Page
     When I edit the page
     And type "<img src="/static/image.jpg">" in the code editor and press OK
-    Then the image static link is rewritten to translate the path
+    Then the src link is rewritten to "c4x/MITx/999/asset/image.jpg"
     And the code editor displays "<p><img src="/static/image.jpg" alt="" /></p>"
 
   Scenario: Code format toolbar button wraps text with code tags
@@ -64,7 +64,7 @@ Feature: CMS.HTML Editor
     And I set the text to "display as code" and I select the text
     And I select the code toolbar button
     And I save the page
-    Then the page has text:
+    Then the page text is:
       """
       <p><code>display as code</code></p>
       """

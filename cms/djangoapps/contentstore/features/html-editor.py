@@ -5,6 +5,8 @@ from lettuce import world, step
 from nose.tools import assert_in, assert_equal  # pylint: disable=no-name-in-module
 from common import type_in_codemirror, get_codemirror_value
 
+CODEMIRROR_SELECTOR_PREFIX = "$('iframe').contents().find"
+
 
 @step('I have created a Blank HTML Page$')
 def i_created_blank_html_page(step):
@@ -37,18 +39,18 @@ def i_click_on_edit_icon(step):
     world.edit_component()
 
 
-@step('I add an image with a static link via the Image Plugin Icon$')
-def i_click_on_image_plugin_icon(step):
+@step('I add an image with static link "(.*)" via the Image Plugin Icon$')
+def i_click_on_image_plugin_icon(step, path):
     use_plugin(
         '.mce-i-image',
-        lambda: world.css_fill('.mce-textbox', '/static/image.jpg', 0)
+        lambda: world.css_fill('.mce-textbox', path, 0)
     )
 
 
-@step('I add an link with a static link via the Link Plugin Icon$')
-def i_click_on_link_plugin_icon(step):
+@step('I add a link with static link "(.*)" via the Link Plugin Icon$')
+def i_click_on_link_plugin_icon(step, path):
     def fill_in_link_fields():
-        world.css_fill('.mce-textbox', '/static/image.jpg', 0)
+        world.css_fill('.mce-textbox', path, 0)
         world.css_fill('.mce-textbox', 'picture', 1)
 
     use_plugin('.mce-i-link', fill_in_link_fields)
@@ -58,7 +60,7 @@ def i_click_on_link_plugin_icon(step):
 def type_in_codemirror_plugin(step, text):
     use_plugin(
         '.mce-i-code',
-        lambda: type_in_codemirror(0, text, "$('iframe').contents().find")
+        lambda: type_in_codemirror(0, text, CODEMIRROR_SELECTOR_PREFIX)
     )
 
 
@@ -66,7 +68,7 @@ def type_in_codemirror_plugin(step, text):
 def verify_code_editor_text(step, text):
     use_plugin(
         '.mce-i-code',
-        lambda: assert_equal(text, get_codemirror_value(0, "$('iframe').contents().find"))
+        lambda: assert_equal(text, get_codemirror_value(0, CODEMIRROR_SELECTOR_PREFIX))
     )
 
 
@@ -89,25 +91,25 @@ def i_click_on_save(step):
     world.save_component(step)
 
 
-@step('the page has text:')
+@step('the page text is:')
 def check_page_text(step):
     assert_equal(step.multiline, world.css_find('.xmodule_HtmlModule').html.strip())
 
 
-@step('the image static link is rewritten to translate the path$')
-def image_static_link_is_rewritten(step):
+@step('the src link is rewritten to "(.*)"$')
+def image_static_link_is_rewritten(step, path):
     # Find the TinyMCE iframe within the main window
     with world.browser.get_iframe('mce_0_ifr') as tinymce:
         image = tinymce.find_by_tag('img').first
-        assert_in('c4x/MITx/999/asset/image.jpg', image['src'])
+        assert_in(path, image['src'])
 
 
-@step('the link static link is rewritten to translate the path$')
-def link_static_link_is_rewritten(step):
+@step('the href link is rewritten to "(.*)"$')
+def link_static_link_is_rewritten(step, path):
     # Find the TinyMCE iframe within the main window
     with world.browser.get_iframe('mce_0_ifr') as tinymce:
         link = tinymce.find_by_tag('a').first
-        assert_in('c4x/MITx/999/asset/image.jpg', link['href'])
+        assert_in(path, link['href'])
 
 
 @step('the expected toolbar buttons are displayed$')
@@ -117,33 +119,34 @@ def check_toolbar_buttons(step):
 
     # Format dropdown
     assert_equal('Paragraph', dropdowns[0].text)
-    assert_equal('Font Family', dropdowns[1].text)
-
     # Font dropdown
+    assert_equal('Font Family', dropdowns[1].text)
 
     buttons = world.css_find('.mce-ico')
 
-    assert_equal(14, len(buttons))
+    expected_buttons = [
+        'bold',
+        'italic',
+        # This is our custom "code style" button, which uses an image instead of a class.
+        'none',
+        'underline',
+        'forecolor',
+        'bullist',
+        'numlist',
+        'outdent',
+        'indent',
+        'blockquote',
+        'link',
+        'unlink',
+        'image',
+        'code',
+    ]
 
-    def check_class(index, button_name):
+    assert_equal(len(expected_buttons), len(buttons))
+
+    for index, button in enumerate(expected_buttons):
         class_names = buttons[index]._element.get_attribute('class')
-        assert_equal("mce-ico mce-i-" + button_name, class_names)
-
-    check_class(0, 'bold')
-    check_class(1, 'italic')
-    # This is our custom "code style" button. It uses an image instead of a class.
-    check_class(2, 'none')
-    check_class(3, 'underline')
-    check_class(4, 'forecolor')
-    check_class(5, 'bullist')
-    check_class(6, 'numlist')
-    check_class(7, 'outdent')
-    check_class(8, 'indent')
-    check_class(9, 'blockquote')
-    check_class(10, 'link')
-    check_class(11, 'unlink')
-    check_class(12, 'image')
-    check_class(13, 'code')
+        assert_equal("mce-ico mce-i-" + button, class_names)
 
 
 @step('I set the text to "(.*)" and I select the text$')
