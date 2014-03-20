@@ -48,8 +48,8 @@ class SlashSeparatedCourseKey(CourseKey):
     def offering(self):
         return '/'.join([self.course, self.run])
 
-    def make_asset_key(self, path):
-        return AssetLocation(self.org, self.course, self.run, path, None)
+    def make_asset_key(self, asset_type, path):
+        return AssetLocation(self.org, self.course, self.run, asset_type, path, None)
 
     def make_usage_key(self, block_type, name):
         return Location(self.org, self.course, self.run, block_type, name, None)
@@ -233,8 +233,7 @@ class Location(LocationBase, UsageKey, DefinitionKey):
 class AssetLocation(LocationBase, AssetKey):
     CANONICAL_NAMESPACE = 'asset-location'
     DEPRECATED_TAG = 'c4x'
-    KEY_FIELDS = ('org', 'course', 'run', 'name', 'revision')
-    __slots__ = KEY_FIELDS
+    __slots__ = LocationBase.KEY_FIELDS
 
-    def __init__(self, org, course, run, name, revision=None):
-        super(AssetLocation, self).__init__(org, course, run, 'asset', name, revision)
+    def __init__(self, org, course, run, asset_type, path, revision=None):
+        super(AssetLocation, self).__init__(org, course, run, asset_type, path, revision)

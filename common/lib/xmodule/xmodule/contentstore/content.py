@@ -8,7 +8,7 @@ import logging
 import StringIO
 from urlparse import urlparse, urlunparse
 
-from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
+from xmodule.modulestore.locations import AssetLocation, SlashSeparatedCourseKey
 from .django import contentstore
 from PIL import Image
 
@@ -39,10 +39,15 @@ class StaticContent(object):
             extension=XASSET_THUMBNAIL_TAIL_NAME,)
 
     @staticmethod
-    def compute_location(org, course, name, revision=None, is_thumbnail=False):
-        name = name.replace('/', '_')
-        return Location([XASSET_LOCATION_TAG, org, course, 'asset' if not is_thumbnail else 'thumbnail',
-                         Location.clean_keeping_underscores(name), revision])
+    def compute_location(org, course, path, revision=None, is_thumbnail=False):
+        path = path.replace('/', '_')
+        return AssetLocation(
+            org,
+            course,
+            'asset' if not is_thumbnail else 'thumbnail',
+            AssetLocation.clean_keeping_underscores(path),
+            revision
+        )
 
     def get_id(self):
         return StaticContent.get_id_from_location(self.location)

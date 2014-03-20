@@ -4,6 +4,7 @@ Tests for xmodule.modulestore.locator.
 from unittest import TestCase
 
 from bson.objectid import ObjectId
+from opaque_keys import InvalidKeyError
 from xmodule.modulestore.locator import Locator, CourseLocator, BlockUsageLocator, DefinitionLocator
 from xmodule.modulestore.parsers import BRANCH_PREFIX, BLOCK_PREFIX, VERSION_PREFIX
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, OverSpecificationError
@@ -45,12 +46,17 @@ class LocatorTest(TestCase):
             )
 
     def test_course_constructor_underspecified(self):
-        self.assertRaises(InsufficientSpecificationError, CourseLocator)
-        self.assertRaises(InsufficientSpecificationError, CourseLocator, branch='published')
+        with self.assertRaises(InsufficientSpecificationError):
+            CourseLocator()
+        with self.assertRaises(InsufficientSpecificationError):
+            CourseLocator(branch='published')
 
     def test_course_constructor_bad_version_guid(self):
-        self.assertRaises(ValueError, CourseLocator, version_guid="012345")
-        self.assertRaises(InsufficientSpecificationError, CourseLocator, version_guid=None)
+        with self.assertRaises(ValueError):
+            CourseLocator(version_guid="012345")
+
+        with self.assertRaises(InvalidKeyError):
+            CourseLocator(version_guid=None)
 
     def test_course_constructor_version_guid(self):
         # generate a random location
