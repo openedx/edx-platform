@@ -1115,7 +1115,10 @@ class TestItemCrud(SplitModuleTest):
         """
         test updating an items metadata ensuring the definition doesn't version but the course does if it should
         """
-        locator = BlockUsageLocator(package_id="testx.GreekHero", block_id="problem3_2", branch='draft')
+        locator = BlockUsageLocator(
+            CourseLocator(org="testx", offering="GreekHero", branch='draft'),
+            block_id="problem3_2"
+        )
         problem = modulestore().get_item(locator)
         pre_def_id = problem.definition_locator.definition_id
         pre_version_guid = problem.location.version_guid
@@ -1192,10 +1195,16 @@ class TestItemCrud(SplitModuleTest):
         """
         Test updating metadata, children, and definition in a single call ensuring all the versioning occurs
         """
-        locator = BlockUsageLocator(package_id="testx.GreekHero", branch='draft', block_id='problem1')
+        locator = BlockUsageLocator(
+            CourseLocator('testx', 'GreekHero', branch='draft'),
+            block_id='problem1'
+        )
         original = modulestore().get_item(locator)
         # first add 2 children to the course for the update to manipulate
-        locator = BlockUsageLocator(package_id="guestx.contender", block_id="head345679", branch='draft')
+        locator = BlockUsageLocator(
+            CourseLocator('guestx', 'contender', branch='draft'),
+            block_id="head345679"
+        )
         category = 'problem'
         new_payload = "<problem>empty</problem>"
         modulestore().create_item(
@@ -1235,22 +1244,21 @@ class TestItemCrud(SplitModuleTest):
                           modulestore().delete_item,
                           course.location,
                           'deleting_user')
-        reusable_location = BlockUsageLocator(
-            package_id=course.location.package_id,
-            block_id=course.location.block_id,
-            branch='draft')
+        reusable_location = course.location.replace(
+            course_key=course.id.replace(branch='draft')
+        )
 
         # delete a leaf
         problems = modulestore().get_items(reusable_location, {'category': 'problem'})
         locn_to_del = problems[0].location
         new_course_loc = modulestore().delete_item(locn_to_del, 'deleting_user', delete_children=False)
-        deleted = BlockUsageLocator(package_id=reusable_location.package_id,
-                                    branch=reusable_location.branch,
-                                    block_id=locn_to_del.block_id)
+        deleted = reusable_location.replace(block_id=locn_to_del.block_id)
         self.assertFalse(modulestore().has_item(deleted))
-        self.assertRaises(VersionConflictError, modulestore().has_item, reusable_location.package_id, locn_to_del)
+        with self.assertRaises(VersionConflictError):
+            modulestore().has_item(locn_to_del)
+
         locator = BlockUsageLocator(
-            version_guid=locn_to_del.version_guid,
+            CourseLocator(version_guid=locn_to_del.version_guid),
             block_id=locn_to_del.block_id
         )
         self.assertTrue(modulestore().has_item(locator))
@@ -1267,14 +1275,22 @@ class TestItemCrud(SplitModuleTest):
             """
             if node:
                 node_loc = node.location
-                self.assertFalse(modulestore().has_item(
-                    BlockUsageLocator(
-                        package_id=node_loc.package_id,
-                        branch=node_loc.branch,
-                        block_id=node.location.block_id)))
+                self.assertFalse(
+                    modulestore().has_item(
+                        BlockUsageLocator(
+                            CourseLocator(
+                                org=node_loc.org,
+                                offering=node_loc.offering,
+                                branch=node_loc.branch,
+                            ),
+                            block_id=node_loc.block_id
+                        )
+                    )
+                )
                 locator = BlockUsageLocator(
-                    version_guid=node.location.version_guid,
-                    block_id=node.location.block_id)
+                    CourseLocator(version_guid=node.location.version_guid),
+                    block_id=node.location.block_id
+                )
                 self.assertTrue(modulestore().has_item(locator))
                 if node.has_children:
                     for sub in node.get_children():
@@ -1287,9 +1303,9 @@ class TestItemCrud(SplitModuleTest):
         """
         course = modulestore().create_course('nihilx.deletion', 'nihilx', 'deleting_user')
         root = BlockUsageLocator(
-            package_id=course.location.package_id,
+            course.id.replace(branch='draft'),
             block_id=course.location.block_id,
-            branch='draft')
+        )
         for _ in range(4):
             self.create_subtree_for_deletion(root, ['chapter', 'vertical', 'problem'])
         return modulestore().get_item(root)

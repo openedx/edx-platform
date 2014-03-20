@@ -237,3 +237,7 @@ class AssetLocation(LocationBase, AssetKey):
 
     def __init__(self, org, course, run, asset_type, path, revision=None):
         super(AssetLocation, self).__init__(org, course, run, asset_type, path, revision)
+
+    @property
+    def path(self):
+        return self.name
