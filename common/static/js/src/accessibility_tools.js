@@ -141,3 +141,39 @@ $('.nav-skip').keypress(function(e) {
         }
     }
 });
+
+// Creates a window level SR object that can be used for giving audible feedback to screen readers.
+$(function(){
+    var SRAlert;
+
+    SRAlert = (function() {
+
+      function SRAlert() {
+        $('body').append('<div id="reader-feedback" class="sr" style="display:none" aria-hidden="false" aria-atomic="true" aria-live="assertive"></div>');
+        this.el = $('#reader-feedback');
+      }
+
+      SRAlert.prototype.clear = function() {
+        return this.el.html(' ');
+      };
+
+      SRAlert.prototype.readElts = function(elts) {
+        var feedback,
+          _this = this;
+        feedback = '';
+        $.each(elts, function(idx, value) {
+          return feedback += '<p>' + $(value).html() + '</p>\n';
+        });
+        return this.el.html(feedback);
+      };
+
+      SRAlert.prototype.readText = function(text) {
+        return this.el.text(text);
+      };
+
+      return SRAlert;
+
+    })();
+
+    window.SR = new SRAlert;
+});

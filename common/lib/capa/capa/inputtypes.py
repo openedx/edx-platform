@@ -259,6 +259,8 @@ class InputTypeBase(object):
             'id': self.input_id,
             'value': self.value,
             'status': self.status,
+            'status_class': self.status_class,
+            'status_display': self.status_display,
             'msg': self.msg,
             'STATIC_URL': self.capa_system.STATIC_URL,
         }
@@ -267,6 +269,34 @@ class InputTypeBase(object):
         )
         context.update(self._extra_context())
         return context
+
+    @property
+    def status_class(self):
+        """
+        Return the CSS class for the associated status.
+        """
+        statuses = {
+            'unsubmitted': 'unanswered',
+            'incomplete': 'incorrect',
+            'queued': 'processing',
+        }
+        return statuses.get(self.status, self.status)
+
+    @property
+    def status_display(self):
+        """
+        Return the human-readable and translated word for the associated status.
+        """
+        _ = self.capa_system.i18n.ugettext
+        statuses = {
+            'correct': _('correct'),
+            'incorrect': _('incorrect'),
+            'incomplete': _('incomplete'),
+            'unanswered': _('unanswered'),
+            'unsubmitted': _('unanswered'),
+            'queued': _('queued'),
+        }
+        return statuses.get(self.status, self.status)
 
     def _extra_context(self):
         """
@@ -1135,16 +1165,10 @@ class FormulaEquationInput(InputTypeBase):
         TODO (vshnayder): Get rid of 'previewer' once we have a standard way of requiring js to be loaded.
         """
         # `reported_status` is basically `status`, except we say 'unanswered'
-        reported_status = ''
-        if self.status == 'unsubmitted':
-            reported_status = 'unanswered'
-        elif self.status in ('correct', 'incorrect', 'incomplete'):
-            reported_status = self.status
 
         return {
             'previewer': '{static_url}js/capa/src/formula_equation_preview.js'.format(
                 static_url=self.capa_system.STATIC_URL),
-            'reported_status': reported_status,
         }
 
     def handle_ajax(self, dispatch, get):

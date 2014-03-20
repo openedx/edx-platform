@@ -193,10 +193,12 @@ class @Sequence
 
   mark_active: (position) ->
     # Mark the correct tab as selected, for a11y helpfulness.
-    @$("#sequence-list a[aria-selected='true']").attr("aria-selected", "false")
+    @$('#sequence-list [role="tab"]').attr({
+        'aria-selected' : null
+        });
     # Don't overwrite class attribute to avoid changing Progress class
     element = @link_for(position)
     element.removeClass("inactive")
     .removeClass("visited")
     .addClass("active")
-    .attr("aria-selected", "true")
+    .attr({"aria-selected": "true", 'tabindex': '0'})

@@ -57,6 +57,8 @@ class OptionInputTest(unittest.TestCase):
             'value': 'Down',
             'options': [('Up', 'Up'), ('Down', 'Down'), ('Don\'t know', 'Don\'t know')],
             'status': 'answered',
+            'status_class': 'answered',
+            'status_display': 'answered',
             'label': '',
             'msg': '',
             'inline': False,
@@ -117,6 +119,8 @@ class ChoiceGroupTest(unittest.TestCase):
             'id': 'sky_input',
             'value': 'foil3',
             'status': 'answered',
+            'status_class': 'answered',
+            'status_display': 'answered',
             'label': '',
             'msg': '',
             'input_type': expected_input_type,
@@ -170,6 +174,8 @@ class JavascriptInputTest(unittest.TestCase):
             'STATIC_URL': '/dummy-static/',
             'id': 'prob_1_2',
             'status': 'unanswered',
+            'status_class': 'unanswered',
+            'status_display': u'unanswered',
             # 'label': '',
             'msg': '',
             'value': '3',
@@ -203,6 +209,8 @@ class TextLineTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'BumbleBee',
             'status': 'unanswered',
+            'status_class': 'unanswered',
+            'status_display': u'unanswered',
             'label': 'testing 123',
             'size': size,
             'msg': '',
@@ -235,6 +243,8 @@ class TextLineTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'BumbleBee',
             'status': 'unanswered',
+            'status_class': 'unanswered',
+            'status_display': u'unanswered',
             'label': '',
             'size': size,
             'msg': '',
@@ -279,6 +289,8 @@ class TextLineTest(unittest.TestCase):
                 'id': 'prob_1_2',
                 'value': 'BumbleBee',
                 'status': 'unanswered',
+                'status_class': 'unanswered',
+                'status_display': u'unanswered',
                 'label': '',
                 'size': size,
                 'msg': '',
@@ -320,6 +332,8 @@ class FileSubmissionTest(unittest.TestCase):
             'STATIC_URL': '/dummy-static/',
             'id': 'prob_1_2',
             'status': 'queued',
+            'status_class': 'processing',
+            'status_display': u'queued',
             'label': '',
             'msg': the_input.submitted_msg,
             'value': 'BumbleBee.py',
@@ -370,6 +384,8 @@ class CodeInputTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': 'queued',
+            'status_class': 'processing',
+            'status_display': u'queued',
             # 'label': '',
             'msg': the_input.submitted_msg,
             'mode': mode,
@@ -424,6 +440,8 @@ class MatlabTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': 'queued',
+            'status_class': 'processing',
+            'status_display': u'queued',
             # 'label': '',
             'msg': self.the_input.submitted_msg,
             'mode': self.mode,
@@ -455,6 +473,8 @@ class MatlabTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': 'queued',
+            'status_class': 'processing',
+            'status_display': u'queued',
             # 'label': '',
             'msg': the_input.submitted_msg,
             'mode': self.mode,
@@ -486,6 +506,8 @@ class MatlabTest(unittest.TestCase):
                 'id': 'prob_1_2',
                 'value': 'print "good evening"',
                 'status': status,
+                'status_class': status,
+                'status_display': unicode(status),
                 # 'label': '',
                 'msg': '',
                 'mode': self.mode,
@@ -516,6 +538,8 @@ class MatlabTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': 'queued',
+            'status_class': 'processing',
+            'status_display': u'queued',
             # 'label': '',
             'msg': the_input.submitted_msg,
             'mode': self.mode,
@@ -593,7 +617,7 @@ class MatlabTest(unittest.TestCase):
         output = self.the_input.get_html()
         self.assertEqual(
             etree.tostring(output),
-            """<div>{\'status\': \'queued\', \'button_enabled\': True, \'rows\': \'10\', \'queue_len\': \'3\', \'mode\': \'\', \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\', \'linenumbers\': \'true\', \'queue_msg\': \'\', \'value\': \'print "good evening"\', \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\', \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/addons/octave.js\', \'hidden\': \'\', \'id\': \'prob_1_2\', \'tabsize\': 4}</div>"""
+            """<div>{\'status\': \'queued\', \'button_enabled\': True, \'linenumbers\': \'true\', \'rows\': \'10\', \'queue_len\': \'3\', \'mode\': \'\', \'cols\': \'80\', \'value\': \'print "good evening"\', \'status_class\': \'processing\', \'queue_msg\': \'\', \'STATIC_URL\': \'/dummy-static/\', \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\', \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/addons/octave.js\', \'hidden\': \'\', \'status_display\': u\'queued\', \'id\': \'prob_1_2\', \'tabsize\': 4}</div>"""
         )
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
@@ -661,6 +685,8 @@ class SchematicTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': value,
             'status': 'unsubmitted',
+            'status_class': 'unanswered',
+            'status_display': u'unanswered',
             'label': '',
             'msg': '',
             'initial_value': initial_value,
@@ -704,6 +730,8 @@ class ImageInputTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': value,
             'status': 'unsubmitted',
+            'status_class': 'unanswered',
+            'status_display': u'unanswered',
             'label': '',
             'width': width,
             'height': height,
@@ -759,6 +787,8 @@ class CrystallographyTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': value,
             'status': 'unsubmitted',
+            'status_class': 'unanswered',
+            'status_display': u'unanswered',
             # 'label': '',
             'msg': '',
             'width': width,
@@ -801,6 +831,8 @@ class VseprTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': value,
             'status': 'unsubmitted',
+            'status_class': 'unanswered',
+            'status_display': u'unanswered',
             'msg': '',
             'width': width,
             'height': height,
@@ -833,6 +865,8 @@ class ChemicalEquationTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'H2OYeah',
             'status': 'unanswered',
+            'status_class': 'unanswered',
+            'status_display': 'unanswered',
             'label': '',
             'msg': '',
             'size': self.size,
@@ -921,32 +955,15 @@ class FormulaEquationTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'x^2+1/2',
             'status': 'unanswered',
+            'status_class': 'unanswered',
+            'status_display': u'unanswered',
             'label': '',
-            'reported_status': '',
             'msg': '',
             'size': self.size,
             'previewer': '/dummy-static/js/capa/src/formula_equation_preview.js',
             'inline': False,
         }
         self.assertEqual(context, expected)
-
-    def test_rendering_reported_status(self):
-        """
-        Verify that the 'reported status' matches expectations.
-        """
-        test_values = {
-            '': '',  # Default
-            'unsubmitted': 'unanswered',
-            'correct': 'correct',
-            'incorrect': 'incorrect',
-            'incomplete': 'incomplete',
-            'not a status': ''
-        }
-
-        for self_status, reported_status in test_values.iteritems():
-            self.the_input.status = self_status
-            context = self.the_input._get_render_context()  # pylint: disable=W0212
-            self.assertEqual(context['reported_status'], reported_status)
 
     def test_formcalc_ajax_sucess(self):
         """
@@ -1069,6 +1086,8 @@ class DragAndDropTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': value,
             'status': 'unsubmitted',
+            'status_class': 'unanswered',
+            'status_display': u'unanswered',
             # 'label': '',
             'msg': '',
             'drag_and_drop_json': json.dumps(user_input)
@@ -1122,6 +1141,8 @@ class AnnotationInputTest(unittest.TestCase):
             'id': 'annotation_input',
             'value': value,
             'status': 'answered',
+            'status_class': 'answered',
+            'status_display': 'answered',
             # 'label': '',
             'msg': '',
             'title': 'foo',
@@ -1181,7 +1202,9 @@ class TestChoiceText(unittest.TestCase):
         state = {
             'value': '{}',
             'id': 'choicetext_input',
-            'status': 'answered'
+            'status': 'answered',
+            'status_class': 'answered',
+            'status_display': u'answered',
         }
 
         first_input = self.build_choice_element('numtolerance_input', 'choiceinput_0_textinput_0', 'false', '')
