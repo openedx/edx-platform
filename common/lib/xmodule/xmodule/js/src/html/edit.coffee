@@ -58,12 +58,13 @@ class @HTMLEditingDescriptor
 
     # These events were added to the plugin code as the TinyMCE PluginManager
     # does not fire any events when plugins are opened or closed.
-    ed.on('SaveImage', @imageAdded)
+    ed.on('SaveImage', @linkChanged)
+    ed.on('SaveLink', @linkChanged)
     ed.on('ShowCodeMirror', @showCodeEditor)
     ed.on('SaveCodeMirror', @saveCodeEditor)
 
-  imageAdded: (e) =>
-    # Intended to run after the "image" plugin is used so that static urls are set
+  linkChanged: (e) =>
+    # Intended to run after the "image" or "link" plugin is used so that static urls are set
     # correctly in the Visual editor immediately after command use.
     @rewriteLinksFromStatic(e.target)
 

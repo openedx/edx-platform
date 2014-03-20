@@ -45,6 +45,15 @@ def i_click_on_image_plugin_icon(step):
     )
 
 
+@step('I add an link with a static link via the Link Plugin Icon$')
+def i_click_on_link_plugin_icon(step):
+    def fill_in_link_fields():
+        world.css_fill('.mce-textbox', '/static/image.jpg', 0)
+        world.css_fill('.mce-textbox', 'picture', 1)
+
+    use_plugin('.mce-i-link', fill_in_link_fields)
+
+
 @step('type "(.*)" in the code editor and press OK$')
 def type_in_codemirror_plugin(step, text):
     use_plugin(
@@ -90,9 +99,15 @@ def image_static_link_is_rewritten(step):
     # Find the TinyMCE iframe within the main window
     with world.browser.get_iframe('mce_0_ifr') as tinymce:
         image = tinymce.find_by_tag('img').first
-
-        # Test onExecCommandHandler set the url to absolute.
         assert_in('c4x/MITx/999/asset/image.jpg', image['src'])
+
+
+@step('the link static link is rewritten to translate the path$')
+def link_static_link_is_rewritten(step):
+    # Find the TinyMCE iframe within the main window
+    with world.browser.get_iframe('mce_0_ifr') as tinymce:
+        link = tinymce.find_by_tag('a').first
+        assert_in('c4x/MITx/999/asset/image.jpg', link['href'])
 
 
 @step('the expected toolbar buttons are displayed$')

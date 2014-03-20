@@ -26,6 +26,12 @@ Feature: CMS.HTML Editor
     And I add an image with a static link via the Image Plugin Icon
     Then the image static link is rewritten to translate the path
 
+  Scenario: TinyMCE link plugin sets urls correctly
+    Given I have created a Blank HTML Page
+    When I edit the page
+    And I add an link with a static link via the Link Plugin Icon
+    Then the link static link is rewritten to translate the path
+
   Scenario: TinyMCE and CodeMirror preserve style tags
     Given I have created a Blank HTML Page
     When I edit the page
