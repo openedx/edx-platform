@@ -6,6 +6,7 @@ nav.course-material {
   padding: 0px;
   width: 100%;
   background-color: $blue;
+  box-shadow: 0 0 1px $shadow inset;
 
   .inner-wrapper {
     margin: 0 auto;
@@ -16,7 +17,7 @@ nav.course-material {
   ol.course-tabs {
     @include border-top-radius(4px);
     @include clearfix;
-    padding-left: ($baseline/2);
+    padding: 0 9px 0 10px;
 
     li {
       float: left;
@@ -47,10 +48,18 @@ nav.course-material {
         }
 
         &.active {
-          background-color: transparent;
-          color: $white;
+          background-color: $white;
+          color: $blue;
         }
       }
+    }
+
+    li:first-child a.active {
+      border-left: 1px solid $outer-border-color;
+    }
+
+    li:last-child a.active {
+      border-right: 1px solid $outer-border-color;
     }
   }
 }
