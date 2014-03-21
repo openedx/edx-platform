@@ -8,10 +8,10 @@ BLOCK_PREFIX = r"block/"
 VERSION_PREFIX = r"version/"
 
 ALLOWED_ID_CHARS = r'[\w\-~.:]'
-
+ALLOWED_ID_RE = re.compile(r'^' + ALLOWED_ID_CHARS + '+$', re.UNICODE)
 
 URL_RE_SOURCE = r"""
-    (?P<tag>edx://)?
+    (?P<tag>edx:)?
     ((?P<org>{ALLOWED_ID_CHARS}+)\+(?P<offering>{ALLOWED_ID_CHARS}+)/?)?
     ({BRANCH_PREFIX}(?P<branch>{ALLOWED_ID_CHARS}+)/?)?
     ({VERSION_PREFIX}(?P<version_guid>[A-F0-9]+)/?)?
@@ -26,25 +26,24 @@ URL_RE = re.compile('^' + URL_RE_SOURCE + '$', re.IGNORECASE | re.VERBOSE | re.U
 
 def parse_url(string, tag_optional=False):
     """
-    A url usually begins with 'edx://' (case-insensitive match),
-    followed by either a version_guid or a package_id. If tag_optional, then
+    A url usually begins with 'edx:' (case-insensitive match),
+    followed by either a version_guid or a org + offering pair. If tag_optional, then
     the url does not have to start with the tag and edx will be assumed.
 
     Examples:
-        'edx://version/0123FFFF'
-        'edx://mit.eecs.6002x'
-        'edx://mit.eecs.6002x/branch/published'
-        'edx://mit.eecs.6002x/branch/published/block/HW3'
-        'edx://mit.eecs.6002x/branch/published/version/000eee12345/block/HW3'
+        'edx:version/0123FFFF'
+        'edx:mit.eecs.6002x'
+        'edx:mit.eecs.6002x/branch/published'
+        'edx:mit.eecs.6002x/branch/published/block/HW3'
+        'edx:mit.eecs.6002x/branch/published/version/000eee12345/block/HW3'
 
     This returns None if string cannot be parsed.
 
-    If it can be parsed as a version_guid with no preceding package_id, returns a dict
+    If it can be parsed as a version_guid with no preceding org + offering, returns a dict
     with key 'version_guid' and the value,
 
-    If it can be parsed as a package_id, returns a dict
+    If it can be parsed as a org + offering, returns a dict
     with key 'id' and optional keys 'branch' and 'version_guid'.
-
     """
     match = URL_RE.match(string)
     if not match:

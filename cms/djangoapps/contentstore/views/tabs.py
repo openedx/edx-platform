@@ -66,10 +66,10 @@ def tabs_handler(request, tag=None, org=None, offering=None, branch=None, versio
     Instead use the general xblock URL (see item.xblock_handler).
     """
     locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-    if not has_course_access(request.user, locator.package_id):
+    old_location = loc_mapper().translate_locator_to_location(locator)
+    if not has_course_access(request.user, old_location.course_key):
         raise PermissionDenied()
 
-    old_location = loc_mapper().translate_locator_to_location(locator)
     store = get_modulestore(old_location)
     course_item = store.get_item(old_location)
 

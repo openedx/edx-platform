@@ -166,6 +166,10 @@ class LocationBase(object):
         return super(LocationBase, self).__init__(org, course, run, category, name, revision)
 
     @property
+    def tag(self):
+        return self.DEPRECATED_TAG
+
+    @property
     def definition_key(self):
         # Locations are both UsageKeys and DefinitionKeys
         return self

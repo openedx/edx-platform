@@ -6,17 +6,17 @@ In this way, courses can be served up both - say - XMLModuleStore or MongoModule
 """
 
 import logging
+from uuid import uuid4
 
 from . import ModuleStoreWriteBase
 from xmodule.modulestore.django import create_modulestore_instance, loc_mapper
-from xmodule.modulestore import Location, SPLIT_MONGO_MODULESTORE_TYPE, XML_MODULESTORE_TYPE
-from xmodule.modulestore.locator import CourseLocator, Locator
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
+from xmodule.modulestore.locator import CourseLocator, Locator, BlockUsageLocator
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.keys import CourseKey
-from uuid import uuid4
 from xmodule.modulestore.mongo.base import MongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.exceptions import UndefinedContext
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         super(MixedModuleStore, self).__init__(**kwargs)
 
         self.modulestores = {}
-        self.mappings = mappings
+        self.mappings = {CourseKey.from_string(course_id): store_name for course_id, store_name in mappings.iteritems()}
 
         if 'default' not in stores:
             raise Exception('Missing a default modulestore in the MixedModuleStore __init__ method.')
@@ -44,7 +44,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 # restrict xml to only load courses in mapping
                 store['OPTIONS']['course_ids'] = [
                     course_id
-                    for course_id, store_key in self.mappings.iteritems()
+                    for course_id, store_key in mappings.iteritems()
                     if store_key == key
                 ]
             self.modulestores[key] = create_modulestore_instance(
@@ -73,9 +73,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
     def has_item(self, usage_key):
         """
         Does the course include the xblock who's id is reference?
-
-        :param course_id: a course_id or package_id (slashed or dotted)
-        :param reference: a Location or BlockUsageLocator
         """
         store = self._get_modulestore_for_courseid(usage_key.course_key)
         return store.has_item(usage_key)
@@ -117,12 +114,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
         store = self._get_modulestore_for_courseid(course_key)
         return store.get_items(course_key, **kwargs)
-
-    def _get_course_id_from_course_location(self, course_location):
-        """
-        Get the proper course_id based on the type of course_location
-        """
-        return getattr(course_location, 'course_id', None) or getattr(course_location, 'package_id', None)
 
     def get_courses(self):
         '''
@@ -173,12 +164,12 @@ class MixedModuleStore(ModuleStoreWriteBase):
         except ItemNotFoundError:
             return None
 
-    def get_parent_locations(self, location, course_id):
+    def get_parent_locations(self, location):
         """
         returns the parent locations for a given location and course_id
         """
-        store = self._get_modulestore_for_courseid(course_id)
-        return store.get_parent_locations(location, course_id)
+        store = self._get_modulestore_for_courseid(location.course_key)
+        return store.get_parent_locations(location)
 
     def get_modulestore_type(self, course_id):
         """
@@ -190,15 +181,14 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         return self._get_modulestore_for_courseid(course_id).get_modulestore_type(course_id)
 
-    def get_orphans(self, course_location):
+    def get_orphans(self, course_key):
         """
         Get all of the xblocks in the given course which have no parents and are not of types which are
         usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
         use children to point to their dependents.
         """
-        course_id = self._get_course_id_from_course_location(course_location)
-        store = self._get_modulestore_for_courseid(course_id)
-        return store.get_orphans(course_location)
+        store = self._get_modulestore_for_courseid(course_key)
+        return store.get_orphans(course_key)
 
     def get_errored_courses(self):
         """
@@ -210,28 +200,25 @@ class MixedModuleStore(ModuleStoreWriteBase):
             errs.update(store.get_errored_courses())
         return errs
 
-    def create_course(self, course_key, user_id=None, store_name='default', **kwargs):
+    def create_course(self, org, offering, user_id=None, fields=None, store_name='default', **kwargs):
         """
         Creates and returns the course.
 
-        :param course_key: the CourseKey object for the course
-        :param user_id: id of the user creating the course
-        :param store_name: which datastore to use
-        :returns: course
+        Args:
+            org (str): the organization that owns the course
+            offering (str): the name of the course offering
+            user_id: id of the user creating the course
+            fields (dict): Fields to set on the course at initialization
+            kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
+
+        Returns: a CourseDescriptor
         """
         store = self.modulestores[store_name]
+
         if not hasattr(store, 'create_course'):
             raise NotImplementedError(u"Cannot create a course on store %s" % store_name)
-        if store.get_modulestore_type(course_key) == SPLIT_MONGO_MODULESTORE_TYPE:
-            org = kwargs.pop('org', course_key.org)
-            fields = kwargs.pop('fields', {})
-            fields.update(kwargs.pop('metadata', {}))
-            fields.update(kwargs.pop('definition_data', {}))
-            course = store.create_course(course_key, org, user_id, fields=fields, **kwargs)
-        else:  # assume mongo
-            course = store.create_course(course_key, **kwargs)
 
-        return course
+        return store.create_course(org, offering, user_id, fields, **kwargs)
 
     def create_item(self, course_or_parent_loc, category, user_id=None, **kwargs):
         """
@@ -253,9 +240,8 @@ class MixedModuleStore(ModuleStoreWriteBase):
             if isinstance(course_or_parent_loc, basestring):
                 parent_loc = None
                 if location is None:
-                    loc_dict = Location.parse_course_id(course_id)
-                    loc_dict['name'] = block_id
-                    location = Location(category=category, **loc_dict)
+                    course_key = SlashSeparatedCourseKey.from_string(course_id)
+                    location = course_key.make_usage_key(category, block_id)
             else:
                 parent_loc = course_or_parent_loc
                 # must have a legitimate location, compute if appropriate
@@ -272,9 +258,9 @@ class MixedModuleStore(ModuleStoreWriteBase):
             if isinstance(course_or_parent_loc, basestring):  # course_id
                 course_or_parent_loc = loc_mapper().translate_location_to_course_locator(
                     # hardcode draft version until we figure out how we're handling branches from app
-                    course_or_parent_loc, None, published=False
+                    SlashSeparatedCourseKey.from_string(course_or_parent_loc), published=False
                 )
-            elif not isinstance(course_or_parent_loc, CourseLocator):
+            elif not isinstance(course_or_parent_loc, (CourseLocator, BlockUsageLocator)):
                 raise ValueError(u"Cannot create a child of {} in split. Wrong repr.".format(course_or_parent_loc))
 
             # split handles all the fields in one dict not separated by scope

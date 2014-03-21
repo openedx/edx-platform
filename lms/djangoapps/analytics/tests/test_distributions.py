@@ -54,7 +54,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
-        self.course_id = 'robot/course/id'
+        self.course_id = SlashSeparatedCourseKey('robot', 'course', 'id')
 
         self.users = [UserFactory(
             profile__year_of_birth=i + 1930,

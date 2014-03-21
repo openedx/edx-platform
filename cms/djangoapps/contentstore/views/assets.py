@@ -57,8 +57,10 @@ def assets_handler(request, tag=None, org=None, offering=None, branch=None, vers
     DELETE
         json: delete an asset
     """
+    # translate merely to do auth check
     location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-    if not has_course_access(request.user, location.package_id):
+    sscourse_key = loc_mapper().translate_locator_to_location(location, get_course=True)
+    if not has_course_access(request.user, sscourse_key):
         raise PermissionDenied()
 
     response_format = request.REQUEST.get('format', 'html')

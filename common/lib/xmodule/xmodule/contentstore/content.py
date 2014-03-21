@@ -22,7 +22,7 @@ class StaticContent(object):
         self._data = data
         self.length = length
         self.last_modified_at = last_modified_at
-        self.thumbnail_location = Location(thumbnail_location) if thumbnail_location is not None else None
+        self.thumbnail_location = thumbnail_location
         # optional information about where this file was imported from. This is needed to support import/export
         # cycles
         self.import_path = import_path
@@ -62,7 +62,7 @@ class StaticContent(object):
     @staticmethod
     def get_url_path_from_location(location):
         if location is not None:
-            return u"/{tag}/{org}/{course}/{category}/{name}".format(**location.dict())
+            return u"/{0.tag}/{0.org}/{0.course}/{0.category}/{0.name}".format(location)
         else:
             return None
 

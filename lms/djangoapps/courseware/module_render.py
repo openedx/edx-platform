@@ -36,7 +36,7 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.keys import CourseKey, UsageKey
 from xmodule.util.duedate import get_extended_due_date
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_debug_info, wrap_xblock
 from xmodule.lti_module import LTIModule
@@ -567,7 +567,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     Invoke an XBlock handler, either authenticated or not.
 
     """
-    usage_key = UsageKey.from_string(usage_id)
+    usage_key = UsageKey.from_string(unquote_slashes(usage_id))
 
     # Check parameters and fail fast if there's a problem
     if not Location.is_valid(usage_key):

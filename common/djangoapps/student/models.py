@@ -35,6 +35,7 @@ from track import contexts
 from track.views import server_track
 from eventtracking import tracker
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -498,9 +499,10 @@ class CourseEnrollment(models.Model):
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
+            assert(isinstance(self.course_id, SlashSeparatedCourseKey))
             data = {
                 'user_id': self.user.id,
-                'course_id': self.course_id,
+                'course_id': self.course_id.to_deprecated_string(),
                 'mode': self.mode,
             }
 
@@ -625,31 +627,6 @@ class CourseEnrollment(models.Model):
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_key)
             return record.is_active
-        except cls.DoesNotExist:
-            return False
-
-    @classmethod
-    def is_enrolled_by_partial(cls, user, course_id_partial):
-        """
-        Returns `True` if the user is enrolled in a course that starts with
-        `course_id_partial`. Otherwise, returns False.
-
-        Can be used to determine whether a student is enrolled in a course
-        whose run name is unknown.
-
-        `user` is a Django User object. If it hasn't been saved yet (no `.id`
-               attribute), this method will automatically save it before
-               adding an enrollment for it.
-
-        `course_id_partial` is a starting substring for a fully qualified
-               course_id (e.g. "edX/Test101/").
-        """
-        try:
-            return CourseEnrollment.objects.filter(
-                user=user,
-                course_id__startswith=course_id_partial,
-                is_active=1
-            ).exists()
         except cls.DoesNotExist:
             return False
 

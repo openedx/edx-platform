@@ -141,9 +141,8 @@ class CourseRole(GroupBasedRole):
     """
     def __init__(self, role, course_id):
         """
-        Location may be either a Location, a string, dict, or tuple which Location will accept
-        in its constructor, or a CourseLocator. Handle all these giving some preference to
-        the preferred naming.
+        Args:
+            course_id (CourseKey)
         """
         self.course_id = course_id
         self.role = role

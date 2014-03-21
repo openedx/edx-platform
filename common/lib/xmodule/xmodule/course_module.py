@@ -437,7 +437,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             if isinstance(self.location, Location):
                 self.wiki_slug = self.location.course
             elif isinstance(self.location, CourseLocator):
-                self.wiki_slug = self.location.package_id or self.display_name
+                self.wiki_slug = self.id.offering or self.display_name
 
         if self.due_date_display_format is None and self.show_timezone is False:
             # For existing courses with show_timezone set to False (and no due_date_display_format specified),

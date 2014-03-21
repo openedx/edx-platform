@@ -560,7 +560,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         Get the course with the given courseid (org/course/run)
         """
         assert(isinstance(course_key, SlashSeparatedCourseKey))
-        location = Location('i4x', course_key.org, course_key.course, course_key.run, 'course', course_key.run)
+        location = course_key.make_usage_key('course', course_key.run)
         try:
             return self.get_item(location, depth=depth)
         except ItemNotFoundError:
@@ -650,17 +650,25 @@ class MongoModuleStore(ModuleStoreWriteBase):
         modules = self._load_items(course_id, list(items))
         return modules
 
-    def create_course(self, course_id, definition_data=None, metadata=None, fields=None, runtime=None):
+    def create_course(self, org, offering, user_id=None, fields=None, **kwargs):
         """
-        Create a course with the given course_id.
-        Raises InvalidLocationError if an existing course with this org/name is found.
+        Creates and returns the course.
+
+        Args:
+            org (str): the organization that owns the course
+            offering (str): the name of the course offering
+            user_id: id of the user creating the course
+            fields (dict): Fields to set on the course at initialization
+            kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
+
+        Returns: a CourseDescriptor
+
+        Raises:
+            InvalidLocationError: If a course with the same org and offering already exists
         """
-        if isinstance(course_id, Location):
-            location = course_id
-            if location.category != 'course':
-                raise ValueError(u"Course roots must be of category 'course': {}".format(unicode(location)))
-        else:
-            location = Location('i4x', course_id.org, course_id.course, course_id.run, 'course', course_id.run)
+
+        course, _, run = offering.partition('/')
+        course_id = SlashSeparatedCourseKey(org, course, run)
 
         # Check if a course with this org/run has been defined before
         course_search_location = SON([
@@ -678,7 +686,9 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 "There are already courses with the given org and course id: {}".format([
                     course['_id'] for course in courses
                 ]))
-        course = self.create_and_save_xmodule(location, definition_data, metadata, runtime, fields)
+
+        location = course_id.make_usage_key('course', course_id.run)
+        course = self.create_and_save_xmodule(location, fields=fields, **kwargs)
 
         # clone a default 'about' overview module as well
         about_location = location.replace(
@@ -739,8 +749,9 @@ class MongoModuleStore(ModuleStoreWriteBase):
             ScopeIds(None, location.category, location, location),
             dbmodel,
         )
-        for key, value in fields.iteritems():
-            setattr(xmodule, key, value)
+        if fields is not None:
+            for key, value in fields.iteritems():
+                setattr(xmodule, key, value)
         # decache any pending field settings from init
         xmodule.save()
         return xmodule
@@ -872,7 +883,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(location)
 
-    def get_parent_locations(self, location, course_id):
+    def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
         '''
@@ -894,12 +905,12 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         return MONGO_MODULESTORE_TYPE
 
-    def get_orphans(self, course_location):
+    def get_orphans(self, course_key):
         """
         Return an array all of the locations for orphans in the course.
         """
         detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
-        query = self._course_key_to_son(getattr(course_location, 'course_key', course_location))
+        query = self._course_key_to_son(course_key)
         query['_id.category'] = {'$nin': detached_categories}
         all_items = self.collection.find(query)
         all_reachable = set()

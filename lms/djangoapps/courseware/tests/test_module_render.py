@@ -681,7 +681,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 # This value is set by observation, so that later changes to the student
                 # id computation don't break old data
                 '5afe5d9bb03796557ee2614f5c9611fb',
-                self._get_anonymous_id(course_id, descriptor_class)
+                self._get_anonymous_id(SlashSeparatedCourseKey.from_string(course_id), descriptor_class)
             )
 
     @data(*PER_COURSE_ANONYMIZED_DESCRIPTORS)
@@ -743,8 +743,8 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
 
         render.handle_xblock_callback(
             self.request,
-            self.course.id,
-            quote_slashes(str(descriptor.location)),
+            self.course.id.to_deprecated_string(),
+            quote_slashes(str(descriptor.location.to_deprecated_string())),
             'xmodule_handler',
             'problem_check',
         )

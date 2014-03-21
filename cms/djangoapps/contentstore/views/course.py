@@ -26,7 +26,7 @@ from xmodule.modulestore.keys import CourseKey
 
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
@@ -80,7 +80,7 @@ def _get_locator_and_course(org, offering, branch, version_guid, block_id, user,
     """
     locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block_id)
     course_location = loc_mapper().translate_locator_to_location(locator)
-    if not has_course_access(user, locator.package_id):
+    if not has_course_access(user, course_location.course_key):
         raise PermissionDenied()
     course_module = modulestore().get_item(course_location, depth=depth)
     return locator, course_module
@@ -106,7 +106,7 @@ def course_handler(request, tag=None, org=None, offering=None, branch=None, vers
         index entry.
     PUT
         json: update this course (index entry not xblock) such as repointing head, changing display name, org,
-        package_id. Return same json as above.
+        offering. Return same json as above.
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
@@ -118,7 +118,10 @@ def course_handler(request, tag=None, org=None, offering=None, branch=None, vers
             return create_new_course(request)
         elif not has_course_access(
             request.user,
-            CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid).package_id
+            loc_mapper().translate_locator_to_location(
+                CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid),
+                get_course=True
+            )
         ):
             raise PermissionDenied()
         elif request.method == 'PUT':
@@ -215,10 +218,13 @@ def _accessible_courses_list_from_groups(request):
             # strip starting text "staff_"
             course_id = user_staff_group_name[6:]
 
-        course_ids.add(course_id.replace('/', '.').lower())
+        course_id = CourseKey.from_string(course_id)
+        if isinstance(CourseKey, CourseLocator):
+            course_id = loc_mapper().translate_locator_to_location(course_id, get_course=True, lower_only=True)
+        course_ids.add(course_id)
 
     for course_id in course_ids:
-        course = modulestore('direct').get_course(CourseKey.from_string(course_id))
+        course = modulestore('direct').get_course(course_id)
         if course is None:
             raise ItemNotFoundError(course_id)
         courses_list.append(course)
@@ -247,7 +253,7 @@ def course_listing(request):
 
             # update location entry in "loc_mapper" for user courses (add keys 'lower_id' and 'lower_course_id')
             for course in courses:
-                loc_mapper().create_map_entry(course.location)
+                loc_mapper().create_map_entry(course.id)
 
     def format_course_for_view(course):
         """
@@ -372,7 +378,7 @@ def create_new_course(request):
     # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
     # existing xml courses this cannot be changed in CourseDescriptor.
     ## TODO get rid of defining wiki slug in this org/course/name specific way
-    wiki_slug = "{0}.{1}.{2}".format(org, course, name)
+    wiki_slug = "{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.name)
     definition_data = {'wiki_slug': wiki_slug}
 
     # Create the course then fetch it from the modulestore
@@ -382,11 +388,15 @@ def create_new_course(request):
         if CourseRole.course_group_already_exists(course_key):
             raise InvalidLocationError()
 
+        fields = {}
+        fields.update(definition_data)
+        fields.update(metadata)
+
         # Creating the course raises InvalidLocationError if an existing course with this org/name is found
         modulestore('direct').create_course(
-            course_key,
-            definition_data=definition_data,
-            metadata=metadata
+            course_key.org,
+            course_key.offering,
+            fields=fields,
         )
     except InvalidLocationError:
         return JsonResponse({

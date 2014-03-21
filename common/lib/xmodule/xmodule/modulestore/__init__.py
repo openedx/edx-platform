@@ -135,8 +135,6 @@ class ModuleStoreRead(object):
                 return False
             if not self._value_matches(value, criteria):
                 return False
-            elif criteria is not None:
-                return False
         return True
 
     def _value_matches(self, target, criteria):
@@ -167,7 +165,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_parent_locations(self, location, course_id):
+    def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
 
@@ -176,7 +174,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_orphans(self, course_location):
+    def get_orphans(self, course_key):
         """
         Get all of the xblocks in the given course which have no parents and are not of types which are
         usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
@@ -220,7 +218,7 @@ class ModuleStoreWrite(ModuleStoreRead):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if package_id and version_guid given and the current
+        :raises VersionConflictError: if org, offering,  and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
@@ -236,20 +234,24 @@ class ModuleStoreWrite(ModuleStoreRead):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if package_id and version_guid given and the current
+        :raises VersionConflictError: if org, offering,  and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
 
     @abstractmethod
-    def create_course(self, course_key, user_id=None, store_name='default', **kwargs):
+    def create_course(self, org, offering, user_id=None, fields=None, **kwargs):
         """
         Creates and returns the course.
 
-        :param course_key: the CourseKey object for the course
-        :param user_id: id of the user creating the course
-        :param store_name: which datastore to use
-        :returns: course
+        Args:
+            org (str): the organization that owns the course
+            offering (str): the name of the course offering
+            user_id: id of the user creating the course
+            fields (dict): Fields to set on the course at initialization
+            kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
+
+        Returns: a CourseDescriptor
         """
         pass
 
@@ -317,7 +319,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if package_id and version_guid given and the current
+        :raises VersionConflictError: if org, offering,  and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         raise NotImplementedError
@@ -332,7 +334,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if package_id and version_guid given and the current
+        :raises VersionConflictError: if org, offering,  and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         raise NotImplementedError

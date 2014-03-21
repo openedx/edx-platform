@@ -64,7 +64,7 @@ def import_static_content(
             fullname_with_subpath = content_path.replace(static_dir, '')
             if fullname_with_subpath.startswith('/'):
                 fullname_with_subpath = fullname_with_subpath[1:]
-            asset_key = target_course_id.make_asset_key(fullname_with_subpath)
+            asset_key = target_course_id.make_asset_key('asset', fullname_with_subpath)
 
             policy_ele = policy.get(asset_key.path, {})
             displayname = policy_ele.get('displayname', filename)
@@ -314,6 +314,10 @@ def import_module(
 
     if 'index_in_children_list' in getattr(module, 'xml_attributes', []):
         del module.xml_attributes['index_in_children_list']
+
+    # Move the module to a new course
+    new_usage_key = module.scope_ids.usage_key.map_into_course(dest_course_id)
+    module.scope_ids = module.scope_ids._replace(usage_key=new_usage_key)
 
     store.update_item(module, '**replace_user**', allow_not_found=allow_not_found)
 

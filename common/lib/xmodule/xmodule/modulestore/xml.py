@@ -12,16 +12,14 @@ from cStringIO import StringIO
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
-from opaque_keys import InvalidKeyError
 from path import path
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
-from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
-from xmodule.modulestore.keys import CourseKey, UsageKey
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from xblock.fields import ScopeIds
@@ -32,7 +30,6 @@ from . import ModuleStoreReadBase, Location, XML_MODULESTORE_TYPE
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata, inheriting_field_data
-import collections
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
@@ -725,7 +722,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         for mod_loc, module in self.modules[course_id].iteritems():
             if _block_matches_all(mod_loc, module):
-                items.append(mod_loc)
+                items.append(module)
 
         return items
 
@@ -743,7 +740,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return dict((k, self.errored_courses[k].errors) for k in self.errored_courses)
 
-    def get_orphans(self, course_location):
+    def get_orphans(self, course_key):
         """
         Get all of the xblocks in the given course which have no parents and are not of types which are
         usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
@@ -762,18 +759,17 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         raise NotImplementedError("XMLModuleStores are read-only")
 
-    def get_parent_locations(self, location, course_id):
+    def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
 
         returns an iterable of things that can be passed to Location.  This may
         be empty if there are no parents.
         '''
-        location = Location.ensure_fully_specified(location)
-        if not self.parent_trackers[course_id].is_known(location):
-            raise ItemNotFoundError("{0} not in {1}".format(location, course_id))
+        if not self.parent_trackers[location.course_key].is_known(location):
+            raise ItemNotFoundError("{0} not in {1}".format(location, location.course_key))
 
-        return self.parent_trackers[course_id].parents(location)
+        return self.parent_trackers[location.course_key].parents(location)
 
     def get_modulestore_type(self, course_id):
         """

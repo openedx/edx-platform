@@ -110,7 +110,7 @@ def export_to_xml(modulestore, contentstore, course_id, root_dir, course_dir, dr
         if len(draft_verticals) > 0:
             draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
             for draft_vertical in draft_verticals:
-                parent_locs = draft_modulestore.get_parent_locations(draft_vertical.location, course.id)
+                parent_locs = draft_modulestore.get_parent_locations(draft_vertical.location)
                 # Don't try to export orphaned items.
                 if len(parent_locs) > 0:
                     logging.debug('parent_locs = {0}'.format(parent_locs))

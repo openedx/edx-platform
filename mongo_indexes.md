@@ -16,8 +16,9 @@ location_map:
 =============
 
 ```
-ensureIndex({'_id.org': 1, '_id.course': 1})
-ensureIndex({'course_id': 1})
+ensureIndex({'org': 1, 'offering': 1})
+ensureIndex({'lower_org': 1, 'lower_offering': 1})
+ensureIndex({'schema': 1})
 ```
 
 fs.files:
@@ -42,7 +43,7 @@ Because we often query for some subset of the id, we define this index:
 ensureIndex({'_id.tag': 1, '_id.org': 1, '_id.course': 1, '_id.category': 1, '_id.name': 1, '_id.revision': 1})
 ```
 
-Because we often scan for all courses regardless of the value of the other fields:
+Because we often scan for all category='course' regardless of the value of the other fields:
 ```
 ensureIndex({'_id.category': 1})
 ```
