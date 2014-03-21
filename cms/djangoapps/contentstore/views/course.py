@@ -389,7 +389,7 @@ def create_new_course(request):
 
     # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for existing xml courses this
     # cannot be changed in CourseDescriptor.
-    wiki_slug = "{0}.{1}.{2}".format(dest_location.org, dest_location.course, dest_location.name)
+    wiki_slug = u"{0}.{1}.{2}".format(dest_location.org, dest_location.course, dest_location.name)
     definition_data = {'wiki_slug': wiki_slug}
 
     modulestore('direct').create_and_save_xmodule(

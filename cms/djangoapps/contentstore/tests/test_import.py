@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # pylint: disable=E1101
 """
 Tests for import_from_xml using the mongo modulestore.
@@ -76,6 +77,25 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertIsNotNone(course)
 
         return module_store, content_store, course, course_location
+
+    def test_unicode_chars_in_course_name_import(self):
+        """
+        # Test that importing course with unicode 'id' and 'display name' doesn't give UnicodeEncodeError
+        """
+        module_store = modulestore('direct')
+        target_location = Location(['i4x', u'Юникода', 'unicode_course', 'course', u'échantillon'])
+        import_from_xml(
+            module_store,
+            'common/test/data/',
+            ['2014_Uni'],
+            target_location_namespace=target_location
+        )
+
+        course = module_store.get_item(target_location)
+        self.assertIsNotNone(course)
+
+        # test that course 'display_name' same as imported course 'display_name'
+        self.assertEqual(course.display_name, u"Φυσικά το όνομα Unicode")
 
     def test_static_import(self):
         '''
