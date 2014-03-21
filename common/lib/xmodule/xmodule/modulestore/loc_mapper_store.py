@@ -204,7 +204,7 @@ class LocMapperStore(object):
             block_id=block_id
         )
         draft_usage = BlockUsageLocator(
-            prod_course_locator.replace(branch=entry['draft_branch']),
+            prod_course_locator.for_branch(entry['draft_branch']),
             block_id=block_id
         )
         if published:
@@ -272,15 +272,25 @@ class LocMapperStore(object):
                         None)
 
                     if lower_only:
-                        candidate_key = "lower_course_id"
+                        candidate_org = "lower_org"
+                        candidate_offering = "lower_offering"
                     else:
-                        candidate_key = "course_id"
+                        candidate_org = "org"
+                        candidate_offering = "offering"
 
                     published_locator = BlockUsageLocator(
-                        candidate[candidate_key], branch=candidate['prod_branch'], block_id=block_id
+                        CourseLocator(
+                            org=candidate[candidate_org], offering=candidate[candidate_offering],
+                            branch=candidate['prod_branch']
+                        ),
+                        block_id=block_id
                     )
                     draft_locator = BlockUsageLocator(
-                        candidate[candidate_key], branch=candidate['draft_branch'], block_id=block_id
+                        CourseLocator(
+                            org=candidate[candidate_org], offering=candidate[candidate_offering],
+                            branch=candidate['draft_branch']
+                        ),
+                        block_id=block_id
                     )
                     self._cache_location_map_entry(location, published_locator, draft_locator)
 
@@ -318,8 +328,12 @@ class LocMapperStore(object):
                 if 'name' not in item['_id']:
                     entry = item
                     break
-        published_course_locator = CourseLocator(package_id=entry['course_id'], branch=entry['prod_branch'])
-        draft_course_locator = CourseLocator(package_id=entry['course_id'], branch=entry['draft_branch'])
+        published_course_locator = CourseLocator(
+            org=entry['org'], offering=entry['offering'], branch=entry['prod_branch']
+        )
+        draft_course_locator = CourseLocator(
+            org=entry['org'], offering=entry['offering'], branch=entry['draft_branch']
+        )
         self._cache_course_locator(old_style_course_id, published_course_locator, draft_course_locator)
         if published:
             return published_course_locator

@@ -79,14 +79,15 @@ class Locator(OpaqueKey):
 
         :param url: the url to parse
         """
+        # TODO remove in favor of the Key.from_string method
         parsed = Locator.URL_TAG_RE.match(url)
         if parsed is None:
             raise ValueError(parsed)
         parsed = parsed.group(1)
         if parsed == 'edx':
-            return BlockUsageLocator(url)
+            return BlockUsageLocator.from_string(url)
         elif parsed == 'defx':
-            return DefinitionLocator(url)
+            return DefinitionLocator.from_string(url)
         return None
 
     @classmethod

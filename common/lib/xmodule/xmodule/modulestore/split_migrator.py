@@ -48,7 +48,7 @@ class SplitMigrator(object):
         original_course = self.direct_modulestore.get_item(course_location)
         new_course_root_locator = self.loc_mapper.translate_location(course_location)
         new_course = self.split_modulestore.create_course(
-            new_package_id, course_location.org, 
+            course_location.org, course_location.offering,
             user.id,
             fields=self._get_json_fields_translate_children(original_course, old_course_id, True),
             root_block_id=new_course_root_locator.block_id,
@@ -56,7 +56,7 @@ class SplitMigrator(object):
         )
 
         self._copy_published_modules_to_course(new_course, course_location, old_course_id, user)
-        self._add_draft_modules_to_course(new_package_id, old_course_id, course_location, user)
+        self._add_draft_modules_to_course(new_course.id, old_course_id, course_location, user)
 
         return new_package_id
 
@@ -93,13 +93,13 @@ class SplitMigrator(object):
         # children which meant some pointers were to non-existent locations in 'direct'
         self.split_modulestore.internal_clean_children(course_version_locator)
 
-    def _add_draft_modules_to_course(self, new_package_id, old_course_id, old_course_loc, user):
+    def _add_draft_modules_to_course(self, published_course_key, old_course_id, old_course_loc, user):
         """
         update each draft. Create any which don't exist in published and attach to their parents.
         """
         # each true update below will trigger a new version of the structure. We may want to just have one new version
         # but that's for a later date.
-        new_draft_course_loc = CourseLocator(package_id=new_package_id, branch='draft')
+        new_draft_course_loc = published_course_key.for_branch('draft')
         # to prevent race conditions of grandchilden being added before their parents and thus having no parent to
         # add to
         awaiting_adoption = {}

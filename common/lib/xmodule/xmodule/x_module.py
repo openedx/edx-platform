@@ -18,14 +18,12 @@ from webob.multidict import MultiDict
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
 from xblock.fragment import Fragment
-from xblock.plugin import default_select
 from xblock.runtime import Runtime
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
-from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
-from xmodule.modulestore.locator import BlockUsageLocator
-from xmodule.modulestore.keys import OpaqueKeyReader, UsageKey
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.keys import OpaqueKeyReader
 from xmodule.exceptions import UndefinedContext
 
 
