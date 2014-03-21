@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 from copy import deepcopy
 from collections import namedtuple
 
-from stevedore.extension import ExtensionManager
+from stevedore.enabled import EnabledExtensionManager
 
 
 class MissingNamespaceError(Exception):
@@ -17,7 +17,8 @@ class InvalidKeyError(Exception):
     Raised to indicated that a serialized key isn't valid (wasn't able to be parsed
     by any available providers).
     """
-    pass
+    def __init__(self, key_class, serialized):
+        super(InvalidKeyError, self).__init__('{}: {}'.format(key_class, serialized))
 
 
 class OpaqueKeyMetaclass(ABCMeta):
@@ -186,8 +187,13 @@ class OpaqueKey(object):
 
     @classmethod
     def _drivers(cls):
-        return ExtensionManager(
+        """
+        Return a driver manager for all key classes that are
+        subclasses of `cls`.
+        """
+        return EnabledExtensionManager(
             cls.KEY_TYPE,
+            check_func=lambda extension: issubclass(extension.plugin, cls),
             invoke_on_load=False,
         )
 
@@ -195,13 +201,14 @@ class OpaqueKey(object):
     def from_string(cls, serialized):
         """
         Return a :class:`OpaqueKey` object deserialized from
-        the `serialized` argument.
+        the `serialized` argument. This object will be an instance
+        of a subclass of the `cls` argument.
 
         Args:
             serialized: A stringified form of a :class:`OpaqueKey`
         """
         if serialized is None:
-            raise InvalidKeyError(serialized)
+            raise InvalidKeyError(cls, serialized)
 
         try:
             namespace, rest = cls._separate_namespace(serialized)
@@ -217,7 +224,8 @@ class OpaqueKey(object):
     def _from_string_fallback(cls, serialized):
         """
         Return a :class:`OpaqueKey` object deserialized from
-        the `serialized` argument.
+        the `serialized` argument. This object will be an instance
+        of a subclass of the `cls` argument.
 
         Args:
             serialized: A malformed serialized :class:`OpaqueKey` that
@@ -229,4 +237,4 @@ class OpaqueKey(object):
             except InvalidKeyError:
                 pass
 
-        raise InvalidKeyError(serialized)
+        raise InvalidKeyError(cls, serialized)

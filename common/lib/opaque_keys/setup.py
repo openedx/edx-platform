@@ -9,4 +9,11 @@ setup(
     install_requires=[
         "stevedore"
     ],
+    entry_points={
+        'opaque_keys.testing': [
+            'base10 = opaque_keys.tests.test_opaque_keys:Base10Key',
+            'hex = opaque_keys.tests.test_opaque_keys:HexKey',
+            'dict = opaque_keys.tests.test_opaque_keys:DictKey',
+        ]
+    }
 )

@@ -20,18 +20,8 @@ class DummyKey(OpaqueKey):
     """
     Key type for testing
     """
-    KEY_TYPE = 'testing'
+    KEY_TYPE = 'opaque_keys.testing'
     __slots__ = ()
-
-    @classmethod
-    def _drivers(cls):
-        # Set up a fake extension manager for testing
-        return ExtensionManager.make_test_instance(
-            [
-                _mk_extension('hex', HexKey),
-                _mk_extension('base10', Base10Key),
-            ]
-        )
 
 
 class HexKey(DummyKey):
@@ -44,11 +34,11 @@ class HexKey(DummyKey):
     @classmethod
     def _from_string(cls, serialized):
         if not serialized.startswith('0x'):
-            raise InvalidKeyError(serialized)
+            raise InvalidKeyError(cls, serialized)
         try:
             return cls(int(serialized, 16))
         except (ValueError, TypeError):
-            raise InvalidKeyError(serialized)
+            raise InvalidKeyError(cls, serialized)
 
 
 class Base10Key(DummyKey):
@@ -63,7 +53,7 @@ class Base10Key(DummyKey):
         try:
             return cls(int(serialized))
         except (ValueError, TypeError):
-            raise InvalidKeyError(serialized)
+            raise InvalidKeyError(cls, serialized)
 
 class DictKey(DummyKey):
     KEY_FIELDS = ('value',)
@@ -77,7 +67,7 @@ class DictKey(DummyKey):
         try:
             return cls(json.loads(serialized))
         except (ValueError, TypeError):
-            raise InvalidKeyError(serialized)
+            raise InvalidKeyError(cls, serialized)
 
 class KeyTests(TestCase):
     def test_namespace_from_string(self):
@@ -154,3 +144,10 @@ class KeyTests(TestCase):
         self.assertNotEquals(id(original.value), id(deep.value))
 
         self.assertEquals(copy.deepcopy([original]), [original])
+
+    def test_subclass(self):
+        with self.assertRaises(InvalidKeyError):
+            HexKey.from_string('base10:15')
+
+        with self.assertRaises(InvalidKeyError):
+            Base10Key.from_string('0x10')

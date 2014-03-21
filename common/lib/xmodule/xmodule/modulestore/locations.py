@@ -38,7 +38,7 @@ class SlashSeparatedCourseKey(CourseKey):
     @classmethod
     def _from_string(cls, serialized):
         if serialized.count('/') != 2:
-            raise InvalidKeyError(serialized)
+            raise InvalidKeyError(cls, serialized)
 
         # Turns encoded slashes into actual slashes
         return cls(*serialized.split('/'))
@@ -71,32 +71,11 @@ class SlashSeparatedCourseKey(CourseKey):
         match = URL_RE.match(location_url)
         if match is None:
             log.debug(u"location %r doesn't match URL", location_url)
-            raise InvalidKeyError(location_url)
+            raise InvalidKeyError(Location, location_url)
         groups = match.groupdict()
         if 'tag' in groups:
             del groups['tag']
         return Location(run=self.run, **groups)
-
-
-def _check_location_part(val, regexp):
-    """
-    Check that `regexp` doesn't match inside `val`. If it does, raise an exception
-
-    Args:
-        val (string): The value to check
-        regexp (re.RegexObject): The regular expression specifying invalid characters
-
-    Raises:
-        InvalidKeyError: Raised if any invalid character is found in `val`
-    """
-    if val is None:
-        return
-
-    if not isinstance(val, basestring):
-        raise InvalidKeyError("{!r} is not a string".format(val))
-
-    if regexp.search(val) is not None:
-        raise InvalidKeyError("Invalid characters in {!r}.".format(val))
 
 
 class LocationBase(object):
@@ -108,6 +87,27 @@ class LocationBase(object):
     {org}/{course}/{run}.
     """
     KEY_FIELDS = ('org', 'course', 'run', 'category', 'name', 'revision')
+
+    @classmethod
+    def _check_location_part(cls, val, regexp):
+        """
+        Check that `regexp` doesn't match inside `val`. If it does, raise an exception
+
+        Args:
+            val (string): The value to check
+            regexp (re.RegexObject): The regular expression specifying invalid characters
+
+        Raises:
+            InvalidKeyError: Raised if any invalid character is found in `val`
+        """
+        if val is None:
+            return
+
+        if not isinstance(val, basestring):
+            raise InvalidKeyError(cls, "{!r} is not a string".format(val))
+
+        if regexp.search(val) is not None:
+            raise InvalidKeyError(cls, "Invalid characters in {!r}.".format(val))
 
     @classmethod
     def _clean(cls, value, invalid):
@@ -160,8 +160,8 @@ class LocationBase(object):
         """
 
         for part in (org, course, run, category, revision):
-            _check_location_part(part, INVALID_CHARS)
-        _check_location_part(name, INVALID_CHARS_NAME)
+            self._check_location_part(part, INVALID_CHARS)
+        self._check_location_part(name, INVALID_CHARS_NAME)
 
         return super(LocationBase, self).__init__(org, course, run, category, name, revision)
 
@@ -209,7 +209,7 @@ class LocationBase(object):
 
         match = re.match(pattern, serialized, re.VERBOSE)
         if not match:
-            raise InvalidKeyError(serialized)
+            raise InvalidKeyError(cls, serialized)
 
         return cls(**match.groupdict())
 
