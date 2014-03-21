@@ -445,9 +445,9 @@ class LocMapperStore(object):
         entry = self.cache.get(old_course_id)
         if entry is not None:
             if published:
-                return entry[0].as_course_locator()
+                return entry[0].course_key
             else:
-                return entry[1].as_course_locator()
+                return entry[1].course_key
 
     def _get_location_from_cache(self, locator):
         """

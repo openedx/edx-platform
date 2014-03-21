@@ -203,12 +203,12 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
     def test_get_items(self, default_ms):
         self.initdb(default_ms)
         for course_id, course_locn in self.course_locations.iteritems():
-            if hasattr(course_locn, 'as_course_locator'):
-                locn = course_locn.as_course_locator()
+            if hasattr(course_locn, 'course_key'):
+                locn = course_locn.course_key
             else:
                 locn = course_locn.replace(org=None, course=None, name=None)
             # NOTE: use get_course if you just want the course. get_items is expensive
-            modules = self.store.get_items(CourseKey.from_string(course_id), category='course')
+            modules = self.store.get_items(locn, category='course')
             self.assertEqual(len(modules), 1)
             self.assertEqual(modules[0].location, course_locn)
 
@@ -314,7 +314,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         self.initdb(default_ms)
         # create an orphan
         if default_ms == 'split':
-            course_id = self.course_locations[self.MONGO_COURSEID].as_course_locator()
+            course_id = self.course_locations[self.MONGO_COURSEID].course_key
         else:
             course_id = self.MONGO_COURSEID
         orphan = self.store.create_item(course_id, 'problem', block_id='orphan')
@@ -335,8 +335,8 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         loc_mapper().translate_location(self.MONGO_COURSEID)
         orphan = self.store.create_item(self.MONGO_COURSEID, 'problem', block_id='orphan')
         self.assertEqual(
-            orphan.location.version_agnostic().as_course_locator(),
-            self.course_locations[self.MONGO_COURSEID].as_course_locator()
+            orphan.location.course_key.version_agnostic(),
+            self.course_locations[self.MONGO_COURSEID].course_key
         )
 
     @ddt.data('direct')
