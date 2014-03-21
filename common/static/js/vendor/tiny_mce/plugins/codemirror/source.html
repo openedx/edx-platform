@@ -46,20 +46,20 @@ function inArray(key, arr)
 		},
 		jsFiles: [// Default JS files
 // MODIFIED FOR EDX VENDOR FILE LOCATIONS.
-			'codemirror.js',
-//			'addon/edit/matchbrackets.js',
-			'xml.js',
-			'javascript.js',
-			'addons/css.js',
-			'addons/htmlmixed.js',
-			'addons/dialog/dialog.js',
-			'addons/searchcursor.js',
-			'addons/search.js'
-//			'addon/selection/active-line.js'
+            'codemirror-compressed.js',
+//			'addon/edit/matchbrackets.js', Chose not to enable
+//			'mode/xml/xml.js', In compressed
+//			'mode/javascript/javascript.js', In compressed
+//			'mode/css/css.js', In compressed
+//			'mode/htmlmixed/htmlmixed.js', In compressed
+			'CodeMirror/addons/dialog/dialog.js'
+//			'addon/search/searchcursor.js', In compressed
+//			'addon/search/search.js', In compressed
+//			'addon/selection/active-line.js' Chose not to enable
 		],
 		cssFiles: [
-			'codemirror.css',
-			'addons/dialog/dialog.css'
+			'CodeMirror/codemirror.css',
+			'CodeMirror/addons/dialog/dialog.css'
 		]
 	};
 

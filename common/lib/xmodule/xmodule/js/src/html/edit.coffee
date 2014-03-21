@@ -29,7 +29,7 @@ class @HTMLEditingDescriptor
       visual: false,
       plugins: "textcolor, link, image, codemirror",
       codemirror: {
-        path: "#{baseUrl}/js/vendor/CodeMirror"
+        path: "#{baseUrl}/js/vendor"
       },
       image_advtab: true,
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
