@@ -18,4 +18,4 @@ class CourseKeyField(models.CharField):
 
     def get_prep_value(self, value):
         assert isinstance(value, SlashSeparatedCourseKey)
-        return value._to_string()
+        return value.to_deprecated_string()

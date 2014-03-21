@@ -227,11 +227,11 @@ def delete_course(modulestore, contentstore, source_location, commit=False):
     _delete_assets(contentstore, assets, commit)
 
     # then delete all course modules
-    modules = module.store.get_items(CourseKey.from_string(source_location.course_id))
+    modules = module.store.get_items(source_location.course_key)
     _delete_modules_except_course(modulestore, modules, source_location, commit)
 
     # then delete all draft course modules
-    modules = module.store.get_items(CourseKey.from_string(source_location.course_id), revision='draft')
+    modules = module.store.get_items(source_location.course_key, revision='draft')
     _delete_modules_except_course(modulestore, modules, source_location, commit)
 
     # finally delete the top-level course module itself

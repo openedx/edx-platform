@@ -8,6 +8,7 @@ from celery.states import READY_STATES, SUCCESS, FAILURE, REVOKED
 from courseware.module_render import get_xqueue_callback_url_prefix
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.locations import Location
 from instructor_task.models import InstructorTask, PROGRESS
 
 
@@ -229,34 +230,37 @@ def get_status_from_instructor_task(instructor_task):
     return status
 
 
-def check_arguments_for_rescoring(course_id, problem_url):
+def check_arguments_for_rescoring(usage_key):
     """
     Do simple checks on the descriptor to confirm that it supports rescoring.
 
-    Confirms first that the problem_url is defined (since that's currently typed
+    Confirms first that the usage_key is defined (since that's currently typed
     in).  An ItemNotFoundException is raised if the corresponding module
     descriptor doesn't exist.  NotImplementedError is raised if the
     corresponding module doesn't support rescoring calls.
     """
-    descriptor = modulestore().get_instance(course_id, problem_url)
+    descriptor = modulestore().get_item(usage_key)
     if not hasattr(descriptor, 'module_class') or not hasattr(descriptor.module_class, 'rescore_problem'):
         msg = "Specified module does not support rescoring."
         raise NotImplementedError(msg)
 
 
-def encode_problem_and_student_input(problem_url, student=None):
+def encode_problem_and_student_input(usage_key, student=None):
     """
-    Encode optional problem_url and optional student into task_key and task_input values.
+    Encode optional usage_key and optional student into task_key and task_input values.
 
-    `problem_url` is full URL of the problem.
-    `student` is the user object of the student
+    Args:
+        usage_key (Location): The usage_key identifying the problem.
+        student (User): the student affected
     """
+
+    assert isinstance(usage_key, Location)
     if student is not None:
-        task_input = {'problem_url': problem_url, 'student': student.username}
-        task_key_stub = "{student}_{problem}".format(student=student.id, problem=problem_url)
+        task_input = {'problem_url': usage_key.to_deprecated_string(), 'student': student.username}
+        task_key_stub = "{student}_{problem}".format(student=student.id, problem=usage_key.to_deprecated_string())
     else:
-        task_input = {'problem_url': problem_url}
-        task_key_stub = "_{problem}".format(problem=problem_url)
+        task_input = {'problem_url': usage_key.to_deprecated_string()}
+        task_key_stub = "_{problem}".format(problem=usage_key.to_deprecated_string())
 
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()

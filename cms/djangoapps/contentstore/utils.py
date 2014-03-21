@@ -65,56 +65,6 @@ def get_modulestore(category_or_location):
         return modulestore()
 
 
-def get_course_location_for_item(location):
-    '''
-    cdodge: for a given Xmodule, return the course that it belongs to
-    NOTE: This makes a lot of assumptions about the format of the course location
-    Also we have to assert that this module maps to only one course item - it'll throw an
-    assert if not
-    '''
-    # check to see if item is already a course, if so we can skip this
-    if location.category != 'course':
-        # @hack! We need to find the course location however, we don't
-        # know the 'name' parameter in this context, so we have
-        # to assume there's only one item in this query even though we are not specifying a name
-        courses = modulestore().get_items(CourseKey.from_string(location.course_id), category='course')
-
-        # make sure we found exactly one match on this above course search
-        found_cnt = len(courses)
-        if found_cnt == 0:
-            raise Exception('Could not find course for {0}'.format(location.course.id))
-
-        if found_cnt > 1:
-            raise Exception('Found more than one course for {0}. There should only be one!!! Dump = {1}'.format(location.course.id, courses))
-
-        location = courses[0].location
-
-    return location
-
-
-def get_course_for_item(location):
-    '''
-    cdodge: for a given Xmodule, return the course that it belongs to
-    NOTE: This makes a lot of assumptions about the format of the course location
-    Also we have to assert that this module maps to only one course item - it'll throw an
-    assert if not
-    '''
-    # @hack! We need to find the course location however, we don't
-    # know the 'name' parameter in this context, so we have
-    # to assume there's only one item in this query even though we are not specifying a name
-    courses = modulestore().get_items(CourseKey.from_string(location.course_id), category='course')
-
-    # make sure we found exactly one match on this above course search
-    found_cnt = len(courses)
-    if found_cnt == 0:
-        raise BaseException('Could not find course for {0}'.format(location.course.id))
-
-    if found_cnt > 1:
-        raise BaseException('Found more than one course for {0}. There should only be one!!! Dump = {1}'.format(location.course.id, courses))
-
-    return courses[0]
-
-
 def get_lms_link_for_item(location, course_id, preview=False):
     """
     Returns an LMS link to the course with a jump_to to the provided location.
