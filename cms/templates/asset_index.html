@@ -27,7 +27,7 @@ require(["domReady", "jquery", "js/models/asset", "js/collections/asset",
     var assets = new AssetCollection();
 
     assets.url = "${asset_callback_url}";
-    var assetsView = new AssetsView({collection: assets, el: $('#asset-library')});
+    var assetsView = new AssetsView({collection: assets, el: $('.assets-wrapper')});
     assetsView.render();
     assetsView.setPage(0);
 
@@ -148,7 +148,12 @@ require(["domReady", "jquery", "js/models/asset", "js/collections/asset",
 
 <div class="wrapper-content wrapper">
     <section class="content">
-        <article id="asset-library" class="content-primary" role="main"></article>
+        <article class="content-primary" role="main">
+            <div class="assets-wrapper"/>
+            <div class="ui-loading">
+                <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading&hellip;")}</span></p>
+            </div>
+        </article>
 
         <aside class="content-supplementary" role="complimentary">
             <div class="bit">
