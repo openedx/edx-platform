@@ -64,6 +64,21 @@ def i_click_on_link_plugin_icon(step, path):
     use_plugin('.mce-i-link', fill_in_link_fields)
 
 
+@step('the link is shown as "(.*)" in the Link Plugin$')
+def check_link_in_link_plugin(step, path):
+    # Ensure caret position is within the link just created.
+    script = """
+    var editor = tinyMCE.activeEditor;
+    editor.selection.select(editor.dom.select('a')[0]);"""
+    world.browser.driver.execute_script(script)
+    world.wait_for_ajax_complete()
+
+    use_plugin(
+        '.mce-i-link',
+        lambda: assert_equal(path, world.css_find('.mce-textbox')[0].value)
+    )
+
+
 @step('type "(.*)" in the code editor and press OK$')
 def type_in_codemirror_plugin(step, text):
     use_plugin(

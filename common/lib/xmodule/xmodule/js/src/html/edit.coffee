@@ -61,7 +61,8 @@ class @HTMLEditingDescriptor
     # does not fire any events when plugins are opened or closed.
     ed.on('SaveImage', @saveImage)
     ed.on('EditImage', @editImage)
-    ed.on('SaveLink', @linkChanged)
+    ed.on('SaveLink', @saveLink)
+    ed.on('EditLink', @editLink)
     ed.on('ShowCodeMirror', @showCodeEditor)
     ed.on('SaveCodeMirror', @saveCodeEditor)
 
@@ -75,10 +76,15 @@ class @HTMLEditingDescriptor
     if data['src']
       data['src'] = rewriteStaticLinks(data['src'], '/static/', @base_asset_url)
 
-  linkChanged: (e) =>
-    # Intended to run after the "image" or "link" plugin is used so that static urls are set
-    # correctly in the Visual editor immediately after command use.
-    @rewriteLinksFromStatic(e.target)
+  editLink: (data) =>
+    # Called when the link plugin will be shown. Input arg is the JSON version of the link data.
+    if data['href']
+      data['href'] = rewriteStaticLinks(data['href'], @base_asset_url, '/static/')
+
+  saveLink: (data) =>
+    # Called when the link plugin in saved. Input arg is the JSON version of the link data.
+    if data['href']
+      data['href'] = rewriteStaticLinks(data['href'], '/static/', @base_asset_url)
 
   showCodeEditor: (codeEditor) =>
     # Called when the CodeMirror Editor is displayed to convert links to show satic prefix.

@@ -32,7 +32,7 @@ Feature: CMS.HTML Editor
     When I edit the page
     And I add a link with static link "/static/image.jpg" via the Link Plugin Icon
     Then the href link is rewritten to "c4x/MITx/999/asset/image.jpg"
-
+    And the link is shown as "/static/image.jpg" in the Link Plugin
 
   Scenario: TinyMCE and CodeMirror preserve style tags
     Given I have created a Blank HTML Page
