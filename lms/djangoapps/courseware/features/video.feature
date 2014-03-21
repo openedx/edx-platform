@@ -181,11 +181,11 @@ Feature: LMS Video component
       | track               | download_track |
       | http://example.org/ | true           |
     And I open the section with videos
-    Then I can download transcript in "srt" format and has text "00:00:00,270"
+    Then I can download transcript in "srt" format that has text "00:00:00,270"
     And I select the transcript format "txt"
-    Then I can download transcript in "txt" format and has text "Hi, welcome to Edx."
+    Then I can download transcript in "txt" format that has text "Hi, welcome to Edx."
     When I open video "B"
-    Then I can download transcript in "txt" format and has text "Hi, welcome to Edx."
+    Then I can download transcript in "txt" format that has text "Hi, welcome to Edx."
     When I open video "C"
     Then menu "download_transcript" doesn't exist
 
@@ -212,9 +212,10 @@ Feature: LMS Video component
     And it has a video in "Youtube" mode:
       | transcripts                       | sub         | download_track |
       | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
+    Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
     And I select language with code "zh"
     And I see "好 各位同学" text in the captions
-    Then I can download transcript in "srt" format and has text "好 各位同学"
+    Then I can download transcript in "srt" format that has text "好 各位同学"
 
   # 22
   Scenario: Download button works correctly for non-english transcript in HTML5 mode of Video component
@@ -224,9 +225,10 @@ Feature: LMS Video component
     And it has a video in "HTML5" mode:
       | transcripts                       | sub         | download_track |
       | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
+    Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
     And I select language with code "zh"
     And I see "好 各位同学" text in the captions
-    Then I can download transcript in "srt" format and has text "好 各位同学"
+    Then I can download transcript in "srt" format that has text "好 各位同学"
 
   # 23
   Scenario: Download button works correctly w/o english transcript in HTML5 mode of Video component
@@ -236,7 +238,7 @@ Feature: LMS Video component
       | transcripts                       | download_track |
       | {"zh": "chinese_transcripts.srt"} | true           |
     And I see "好 各位同学" text in the captions
-    Then I can download transcript in "srt" format and has text "好 各位同学"
+    Then I can download transcript in "srt" format that has text "好 各位同学"
 
   # 24
   Scenario: Download button works correctly w/o english transcript in Youtube mode of Video component
@@ -246,4 +248,4 @@ Feature: LMS Video component
       | transcripts                       | download_track |
       | {"zh": "chinese_transcripts.srt"} | true           |
     And I see "好 各位同学" text in the captions
-    Then I can download transcript in "srt" format and has text "好 各位同学"
+    Then I can download transcript in "srt" format that has text "好 各位同学"

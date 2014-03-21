@@ -135,6 +135,8 @@ def add_video_to_course(course, player_mode, hashes, display_name='Video'):
         })
 
     world.scenario_dict['VIDEO'] = world.ItemFactory.create(**kwargs)
+    world.wait_for_present('.is-initialized')
+    world.wait_for_invisible('.video-wrapper .spinner')
 
 
 def _get_sjson_filename(videoId, lang):
@@ -355,11 +357,13 @@ def check_text_in_the_captions(_step, text):
 
 @step('I select language with code "([^"]*)"$')
 def select_language(_step, code):
-    _open_menu("language")
-    selector = VIDEO_MENUS["language"] + ' li[data-lang-code={code}]'.format(
+    selector = VIDEO_MENUS["language"] + ' li[data-lang-code="{code}"]'.format(
         code=code
     )
 
+    world.wait_for_present(selector)
+    world.css_find(VIDEO_BUTTONS["CC"])[0].mouse_over()
+    world.wait_for_visible(selector)
     world.css_click(selector)
 
     assert world.css_has_class(selector, 'active')
@@ -435,7 +439,7 @@ def video_alignment(_step, transcript_visibility):
     assert all([width, height])
 
 
-@step('I can download transcript in "([^"]*)" format and has text "([^"]*)"$')
+@step('I can download transcript in "([^"]*)" format that has text "([^"]*)"$')
 def i_can_download_transcript(_step, format, text):
     assert world.css_has_text('.video-tracks .a11y-menu-button', '.' + format, strip=True)
 
