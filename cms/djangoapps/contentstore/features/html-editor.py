@@ -99,9 +99,9 @@ def i_click_on_save(step):
     world.save_component(step)
 
 
-@step('the page text is:')
+@step('the page text contains:')
 def check_page_text(step):
-    assert_equal(step.multiline, world.css_find('.xmodule_HtmlModule').html.strip())
+    assert_in(step.multiline, world.css_find('.xmodule_HtmlModule').html)
 
 
 @step('the src link is rewritten to "(.*)"$')

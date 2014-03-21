@@ -39,9 +39,8 @@ Feature: CMS.HTML Editor
     When I edit the page
     And type "<p class='title'>pages</p><style><!-- .title { color: red; } --></style>" in the code editor and press OK
     And I save the page
-    Then the page text is:
+    Then the page text contains:
       """
-      <p>&nbsp;</p>
       <p class="title">pages</p>
       <style><!--
       .title { color: red; }
@@ -66,7 +65,7 @@ Feature: CMS.HTML Editor
     And I set the text to "display as code" and I select the text
     And I select the code toolbar button
     And I save the page
-    Then the page text is:
+    Then the page text contains:
       """
       <p><code>display as code</code></p>
       """

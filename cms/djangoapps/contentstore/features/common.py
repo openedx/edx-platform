@@ -329,9 +329,11 @@ def type_in_codemirror(index, text, find_prefix="$"):
 
 
 def get_codemirror_value(index=0, find_prefix="$"):
-    return world.browser.driver.execute_script("""
+    return world.browser.driver.execute_script(
+        """
         return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();
-        """.format(index=index, find_prefix=find_prefix))
+        """.format(index=index, find_prefix=find_prefix)
+    )
 
 
 def upload_file(filename):

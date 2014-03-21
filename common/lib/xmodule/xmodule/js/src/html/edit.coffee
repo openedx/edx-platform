@@ -81,12 +81,14 @@ class @HTMLEditingDescriptor
     @rewriteLinksFromStatic(e.target)
 
   showCodeEditor: (codeEditor) =>
-    # Called with the CodeMirror Editor is displayed to convert links to show satic prefix.
+    # Called when the CodeMirror Editor is displayed to convert links to show satic prefix.
+    # The input argument is the CodeMirror instance.
     content = rewriteStaticLinks(codeEditor.getValue(), @base_asset_url, '/static/')
     codeEditor.setValue(content)
 
   saveCodeEditor: (codeEditor) =>
     # Called when the CodeMirror Editor is saved to convert links back to the full form.
+    # The input argument is the CodeMirror instance.
     content = rewriteStaticLinks(codeEditor.getValue(), '/static/', @base_asset_url)
     codeEditor.setValue(content)
 

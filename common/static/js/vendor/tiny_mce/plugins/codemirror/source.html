@@ -110,14 +110,15 @@ function start()
 	}
 
 	// Create legend for keyboard shortcuts for find & replace:
-	var head = parent.document.querySelectorAll('.mce-foot')[0],
-		div = parent.document.createElement('div'),
-		td1 = '<td style="font-size:11px;background:#777;color:#fff;padding:0 4px">',
-		td2 = '<td style="font-size:11px;padding-right:5px">';
-	div.innerHTML = '<table cellspacing="0" cellpadding="0" style="border-spacing:4px"><tr>' + td1 + (isMac ? '&#8984;-F' : 'Ctrl-F</td>') + td2 + tinymce.translate('Start search') + '</td>' + td1 + (isMac ? '&#8984;-G' : 'Ctrl-G') + '</td>' + td2 + tinymce.translate('Find next') + '</td>' + td1 + (isMac ? '&#8984;-Alt-F' : 'Shift-Ctrl-F') + '</td>' + td2 + tinymce.translate('Find previous') + '</td></tr>' + '<tr>' + td1 + (isMac ? '&#8984;-Alt-F' : 'Shift-Ctrl-F') + '</td>' + td2 + tinymce.translate('Replace') + '</td>' + td1 + (isMac ? 'Shift-&#8984;-Alt-F' : 'Shift-Ctrl-R') +'</td>' + td2 + tinymce.translate('Replace all') + '</td></tr></table>';
-	div.style.position = 'absolute';
-	div.style.left = div.style.bottom = '5px';
-	head.appendChild(div);
+// Disabled by EDX.
+//	var head = parent.document.querySelectorAll('.mce-foot')[0],
+//		div = parent.document.createElement('div'),
+//		td1 = '<td style="font-size:11px;background:#777;color:#fff;padding:0 4px">',
+//		td2 = '<td style="font-size:11px;padding-right:5px">';
+//	div.innerHTML = '<table cellspacing="0" cellpadding="0" style="border-spacing:4px"><tr>' + td1 + (isMac ? '&#8984;-F' : 'Ctrl-F</td>') + td2 + tinymce.translate('Start search') + '</td>' + td1 + (isMac ? '&#8984;-G' : 'Ctrl-G') + '</td>' + td2 + tinymce.translate('Find next') + '</td>' + td1 + (isMac ? '&#8984;-Alt-F' : 'Shift-Ctrl-F') + '</td>' + td2 + tinymce.translate('Find previous') + '</td></tr>' + '<tr>' + td1 + (isMac ? '&#8984;-Alt-F' : 'Shift-Ctrl-F') + '</td>' + td2 + tinymce.translate('Replace') + '</td>' + td1 + (isMac ? 'Shift-&#8984;-Alt-F' : 'Shift-Ctrl-R') +'</td>' + td2 + tinymce.translate('Replace all') + '</td></tr></table>';
+//	div.style.position = 'absolute';
+//	div.style.left = div.style.bottom = '5px';
+//	head.appendChild(div);
 
 	// Set CodeMirror cursor to same position as cursor was in TinyMCE:
 	var html = editor.getContent({source_view: true});
