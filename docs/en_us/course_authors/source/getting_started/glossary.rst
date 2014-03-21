@@ -249,14 +249,6 @@ H
   See :ref:`Working with HTML Components` for more information.
 
 
-.. _HTML View:
- 
-**HTML View**
-
-  The view in the HTML component editor allows you to enter HTML code directly.
-
-  See :ref:`The User Interface` for more information.
-
 
 .. _I:
 
@@ -530,15 +522,6 @@ V
   A component that you can use to add recorded videos to your course. 
 
   See :ref:`Working with Video Components` for more information.
-
-
-.. _Visual View:
- 
-**Visual View**
-
-  The view in the HTML component editor that allows you format text without using HTML code.
-
-  See :ref:`The User Interface` for more information.
 
 
 .. _W:
