@@ -25,12 +25,14 @@ Feature: CMS.HTML Editor
     When I edit the page
     And I add an image with static link "/static/image.jpg" via the Image Plugin Icon
     Then the src link is rewritten to "c4x/MITx/999/asset/image.jpg"
+    And the link is shown as "/static/image.jpg" in the Image Plugin
 
   Scenario: TinyMCE link plugin sets urls correctly
     Given I have created a Blank HTML Page
     When I edit the page
     And I add a link with static link "/static/image.jpg" via the Link Plugin Icon
     Then the href link is rewritten to "c4x/MITx/999/asset/image.jpg"
+
 
   Scenario: TinyMCE and CodeMirror preserve style tags
     Given I have created a Blank HTML Page

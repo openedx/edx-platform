@@ -31,6 +31,7 @@ class @HTMLEditingDescriptor
       codemirror: {
         path: "#{baseUrl}/js/vendor/CodeMirror"
       },
+      image_advtab: true,
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
       toolbar: "formatselect | fontselect | bold italic wrapAsCode underline forecolor | bullist numlist outdent indent blockquote | link unlink image | code",
       block_formats: "Paragraph=p;Preformatted=pre;Heading 1=h1;Heading 2=h2;Heading 3=h3",
@@ -58,10 +59,21 @@ class @HTMLEditingDescriptor
 
     # These events were added to the plugin code as the TinyMCE PluginManager
     # does not fire any events when plugins are opened or closed.
-    ed.on('SaveImage', @linkChanged)
+    ed.on('SaveImage', @saveImage)
+    ed.on('EditImage', @editImage)
     ed.on('SaveLink', @linkChanged)
     ed.on('ShowCodeMirror', @showCodeEditor)
     ed.on('SaveCodeMirror', @saveCodeEditor)
+
+  editImage: (data) =>
+    # Called when the image plugin will be shown. Input arg is the JSON version of the image data.
+    if data['src']
+      data['src'] = rewriteStaticLinks(data['src'], @base_asset_url, '/static/')
+
+  saveImage: (data) =>
+    # Called when the image plugin in saved. Input arg is the JSON version of the image data.
+    if data['src']
+      data['src'] = rewriteStaticLinks(data['src'], '/static/', @base_asset_url)
 
   linkChanged: (e) =>
     # Intended to run after the "image" or "link" plugin is used so that static urls are set
