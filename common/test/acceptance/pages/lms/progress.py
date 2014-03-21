@@ -12,9 +12,10 @@ class ProgressPage(CoursePage):
 
     url_path = "progress"
 
+    #@property
     def is_browser_on_page(self):
-        has_course_info = self.is_css_present('div.course-info')
-        has_graph = self.is_css_present('div#grade-detail-graph')
+        has_course_info = self.q(css='div.course-info').present
+        has_graph = self.q(css='div#grade-detail-graph').present
         return has_course_info and has_graph
 
     def scores(self, chapter, section):
@@ -46,7 +47,7 @@ class ProgressPage(CoursePage):
         Returns `None` if it cannot find such a chapter.
         """
         chapter_css = 'div.chapters section h2'
-        chapter_titles = self.css_map(chapter_css, lambda el: el.text.lower().strip())
+        chapter_titles = self.q(css=chapter_css).map(lambda el: el.text.lower().strip()).results
 
         try:
             # CSS indices are 1-indexed, so add one to the list index
@@ -65,7 +66,7 @@ class ProgressPage(CoursePage):
         # Get the links containing the section titles in `chapter_index`.
         # The link text is the section title.
         section_css = 'div.chapters>section:nth-of-type({0}) div.sections div h3 a'.format(chapter_index)
-        section_titles = self.css_map(section_css, lambda el: el.text.lower().strip())
+        section_titles = self.q(css=section_css).map(lambda el: el.text.lower().strip()).results
 
         # The section titles also contain "n of m possible points" on the second line
         # We have to remove this to find the right title
@@ -95,7 +96,7 @@ class ProgressPage(CoursePage):
             chapter_index, section_index
         )
 
-        text_scores = self.css_text(score_css)
+        text_scores = self.q(css=score_css).text
 
         # Convert text scores to tuples of (points, max_points)
         return [tuple(map(int, score.split('/'))) for score in text_scores]

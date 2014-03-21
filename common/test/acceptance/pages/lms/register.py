@@ -34,7 +34,7 @@ class RegisterPage(PageObject):
     def is_browser_on_page(self):
         return any([
             'register' in title.lower()
-            for title in self.css_text('span.title-sub')
+            for title in self.q(css='span.title-sub').text
         ])
 
     def provide_info(self, email, password, username, full_name):
@@ -42,18 +42,18 @@ class RegisterPage(PageObject):
         Fill in registration info.
         `email`, `password`, `username`, and `full_name` are the user's credentials.
         """
-        self.css_fill('input#email', email)
-        self.css_fill('input#password', password)
-        self.css_fill('input#username', username)
-        self.css_fill('input#name', full_name)
-        self.css_check('input#tos-yes')
-        self.css_check('input#honorcode-yes')
+        self.q(css='input#email').fill(email)
+        self.q(css='input#password').fill(password)
+        self.q(css='input#username').fill(username)
+        self.q(css='input#name').fill(full_name)
+        self.q(css='input#tos-yes').first.click()
+        self.q(css='input#honorcode-yes').first.click()
 
     def submit(self):
         """
         Submit registration info to create an account.
         """
-        self.css_click('button#submit')
+        self.q(css='button#submit').first.click()
 
         # The next page is the dashboard; make sure it loads
         dashboard = DashboardPage(self.browser)

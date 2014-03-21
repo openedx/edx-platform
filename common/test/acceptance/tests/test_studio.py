@@ -1,7 +1,7 @@
 """
 Acceptance tests for Studio.
 """
-from unittest import expectedFailure
+from unittest import skip
 
 from bok_choy.web_app_test import WebAppTest
 
@@ -25,7 +25,7 @@ from ..pages.studio.textbooks import TextbooksPage
 from ..pages.xblock.acid import AcidView
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
-from .helpers import UniqueCourseTest
+from .helpers import UniqueCourseTest, load_data_str
 
 
 class LoggedOutTest(WebAppTest):
@@ -237,8 +237,7 @@ class XBlockAcidParentBase(XBlockAcidBase):
         acid_block = AcidView(self.browser, container.xblocks[0].preview_selector)
         self.validate_acid_block_preview(acid_block)
 
-    # This will fail until the container page supports editing
-    @expectedFailure
+    @skip('This will fail until the container page supports editing')
     def test_acid_block_editor(self):
         super(XBlockAcidParentBase, self).test_acid_block_editor()
 
@@ -299,12 +298,10 @@ class XBlockAcidChildTest(XBlockAcidParentBase):
             )
         ).install()
 
-    # This will fail until we fix support of children in pure XBlocks
-    @expectedFailure
+    @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block_preview(self):
         super(XBlockAcidChildTest, self).test_acid_block_preview()
 
-    # This will fail until we fix support of children in pure XBlocks
-    @expectedFailure
+    @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block_editor(self):
         super(XBlockAcidChildTest, self).test_acid_block_editor()

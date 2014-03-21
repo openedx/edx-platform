@@ -23,4 +23,5 @@ class FindCoursesPage(PageObject):
         Retrieve the list of available course IDs
         on the page.
         """
-        return self.css_map('article.course', lambda el: el['id'])
+
+        return self.q(css='article.course').attrs('id')
