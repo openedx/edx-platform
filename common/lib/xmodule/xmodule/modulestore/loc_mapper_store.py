@@ -133,7 +133,6 @@ class LocMapperStore(object):
 
         Will raise ItemNotFoundError if there's no mapping and add_entry_if_missing is False.
 
-        :param old_style_course_id: the course_id used in old mongo not the new one (optional, will use location)
         :param location:  a Location pointing to a module
         :param published: a boolean to indicate whether the caller wants the draft or published branch.
         :param add_entry_if_missing: a boolean as to whether to raise ItemNotFoundError or to create an entry if
@@ -156,8 +155,7 @@ class LocMapperStore(object):
         if len(maps) == 0:
             if add_entry_if_missing:
                 # create a new map
-                course_location = location.course_key.make_usage_key('course', course_son['_id']['name'])
-                self.create_map_entry(course_location)
+                self.create_map_entry(location.course_key)
                 entry = self.location_map.find_one(course_son)
             else:
                 raise ItemNotFoundError(location)
@@ -196,14 +194,17 @@ class LocMapperStore(object):
         else:
             raise InvalidLocationError()
 
+        prod_course_locator = CourseLocator(
+            org=entry['org'],
+            offering=entry['offering'],
+            branch=entry['prod_branch']
+        )
         published_usage = BlockUsageLocator(
-            package_id=entry['course_id'],
-            branch=entry['prod_branch'],
+            prod_course_locator,
             block_id=block_id
         )
         draft_usage = BlockUsageLocator(
-            package_id=entry['course_id'],
-            branch=entry['draft_branch'],
+            prod_course_locator.replace(branch=entry['draft_branch']),
             block_id=block_id
         )
         if published:
