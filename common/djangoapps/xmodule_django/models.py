@@ -10,7 +10,7 @@ class CourseKeyField(models.CharField):
         super(CourseKeyField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
-        assert isinstance(value, str) or isinstance(value, unicode)
+        assert isinstance(value, basestring)
         return CourseKey.from_string(value)
 
     def get_prep_value(self, value):
