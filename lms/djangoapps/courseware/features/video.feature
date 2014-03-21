@@ -218,17 +218,17 @@ Feature: LMS Video component
     Then I can download transcript in "srt" format that has text "好 各位同学"
 
   # 22
-  Scenario: Download button works correctly for non-english transcript in HTML5 mode of Video component
-    Given I am registered for the course "test_course"
-    And I have a "chinese_transcripts.srt" transcript file in assets
-    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-    And it has a video in "HTML5" mode:
-      | transcripts                       | sub         | download_track |
-      | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
-    Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
-    And I select language with code "zh"
-    And I see "好 各位同学" text in the captions
-    Then I can download transcript in "srt" format that has text "好 各位同学"
+  # Scenario: Download button works correctly for non-english transcript in HTML5 mode of Video component
+  #   Given I am registered for the course "test_course"
+  #   And I have a "chinese_transcripts.srt" transcript file in assets
+  #   And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+  #   And it has a video in "HTML5" mode:
+  #    | transcripts                       | sub         | download_track |
+  #    | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
+  #   Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
+  #   And I select language with code "zh"
+  #   And I see "好 各位同学" text in the captions
+  #   Then I can download transcript in "srt" format that has text "好 各位同学"
 
   # 23
   Scenario: Download button works correctly w/o english transcript in HTML5 mode of Video component
