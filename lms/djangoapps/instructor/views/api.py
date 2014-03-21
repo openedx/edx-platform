@@ -13,7 +13,9 @@ import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.utils.html import strip_tags
@@ -251,6 +253,21 @@ def students_update_enrollment(request, course_id):
     results = []
     for email in emails:
         try:
+            # Use django.core.validators.validate_email to check email address
+            # validity (obviously, cannot check if email actually /exists/,
+            # simply that it is plausibly valid)
+            validate_email(email)
+        except ValidationError:
+            # Flag this email as an error if invalid, but continue checking
+            # the remaining in the list
+            results.append({
+                'email': email,
+                'error': True,
+                'invalidEmail': True,
+            })
+            continue
+
+        try:
             if action == 'enroll':
                 before, after = enroll_email(course_id, email, auto_enroll, email_students, email_params)
             elif action == 'unenroll':
@@ -273,6 +290,7 @@ def students_update_enrollment(request, course_id):
             results.append({
                 'email': email,
                 'error': True,
+                'invalidEmail': False,
             })
 
     response_payload = {
