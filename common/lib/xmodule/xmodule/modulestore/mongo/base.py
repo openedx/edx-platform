@@ -299,7 +299,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         self.ignore_write_events_on_courses = set()
 
-    def _compute_metadata_inheritance_tree(self, location):
+    def _compute_metadata_inheritance_tree(self, course_id):
         '''
         TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
         '''
@@ -309,8 +309,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         block_types_with_children = set(name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False))
         query = SON([
             ('_id.tag', 'i4x'),
-            ('_id.org', location.org),
-            ('_id.course', location.course),
+            ('_id.org', course_id.org),
+            ('_id.course', course_id.course),
             ('_id.category', {'$in': list(block_types_with_children)})
         ])
         # we just want the Location, children, and inheritable metadata
@@ -329,7 +329,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         # now go through the results and order them by the location url
         for result in resultset:
-            location = Location(run=location.course_key.run, **result['_id'])
+            location = Location(run=course_id.run, **result['_id'])
             # We need to collate between draft and non-draft
             # i.e. draft verticals will have draft children but will have non-draft parents currently
             location = location.replace(revision=None)
@@ -370,31 +370,30 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         return metadata_to_inherit
 
-    def _get_cached_metadata_inheritance_tree(self, location, force_refresh=False):
+    def _get_cached_metadata_inheritance_tree(self, course_id, force_refresh=False):
         '''
         TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
         '''
-        key = location.course_key
         tree = {}
 
         if not force_refresh:
             # see if we are first in the request cache (if present)
-            if self.request_cache is not None and key in self.request_cache.data.get('metadata_inheritance', {}):
-                return self.request_cache.data['metadata_inheritance'][key]
+            if self.request_cache is not None and course_id in self.request_cache.data.get('metadata_inheritance', {}):
+                return self.request_cache.data['metadata_inheritance'][course_id]
 
             # then look in any caching subsystem (e.g. memcached)
             if self.metadata_inheritance_cache_subsystem is not None:
-                tree = self.metadata_inheritance_cache_subsystem.get(key, {})
+                tree = self.metadata_inheritance_cache_subsystem.get(course_id, {})
             else:
                 logging.warning('Running MongoModuleStore without a metadata_inheritance_cache_subsystem. This is OK in localdev and testing environment. Not OK in production.')
 
         if not tree:
             # if not in subsystem, or we are on force refresh, then we have to compute
-            tree = self._compute_metadata_inheritance_tree(location)
+            tree = self._compute_metadata_inheritance_tree(course_id)
 
             # now write out computed tree to caching subsystem (e.g. memcached), if available
             if self.metadata_inheritance_cache_subsystem is not None:
-                self.metadata_inheritance_cache_subsystem.set(key, tree)
+                self.metadata_inheritance_cache_subsystem.set(course_id, tree)
 
         # now populate a request_cache, if available. NOTE, we are outside of the
         # scope of the above if: statement so that after a memcache hit, it'll get
@@ -404,17 +403,17 @@ class MongoModuleStore(ModuleStoreWriteBase):
             # defined
             if 'metadata_inheritance' not in self.request_cache.data:
                 self.request_cache.data['metadata_inheritance'] = {}
-            self.request_cache.data['metadata_inheritance'][key] = tree
+            self.request_cache.data['metadata_inheritance'][course_id] = tree
 
         return tree
 
-    def refresh_cached_metadata_inheritance_tree(self, location):
+    def refresh_cached_metadata_inheritance_tree(self, course_id):
         """
         Refresh the cached metadata inheritance tree for the org/course combination
         for location
         """
-        if location.course_key not in self.ignore_write_events_on_courses:
-            self._get_cached_metadata_inheritance_tree(location, force_refresh=True)
+        if course_id not in self.ignore_write_events_on_courses:
+            self._get_cached_metadata_inheritance_tree(course_id, force_refresh=True)
 
     def _clean_item_data(self, item):
         """
@@ -483,7 +482,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         cached_metadata = {}
         if apply_cached_metadata:
-            cached_metadata = self._get_cached_metadata_inheritance_tree(location)
+            cached_metadata = self._get_cached_metadata_inheritance_tree(course_key)
 
         services = {}
         if self.i18n_service:

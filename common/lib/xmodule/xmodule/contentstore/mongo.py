@@ -168,12 +168,9 @@ class MongoContentStore(ContentStore):
 
             ]
         '''
-        course_filter = Location(
-            XASSET_LOCATION_TAG,
-            org=location.org, course=location.course,
-            run=getattr(location.course_key, 'run', None),
-            category="asset" if not get_thumbnails else "thumbnail",
-            name=None
+        course_filter = location.course_key.make_asset_key(
+            "asset" if not get_thumbnails else "thumbnail",
+            None
         )
         # 'borrow' the function 'location_to_query' from the Mongo modulestore implementation
         if maxresults > 0:

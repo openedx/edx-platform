@@ -646,7 +646,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @patch('courseware.module_render.has_access', Mock(return_value=True))
     def _get_anonymous_id(self, course_id, xblock_class):
-        location = Location('dummy_org', 'dummy_course', 'dummy_category', 'dummy_name')
+        location = Location('dummy_org', 'dummy_course', 'dummy_run', 'dummy_category', 'dummy_name')
         descriptor = Mock(
             spec=xblock_class,
             _field_data=Mock(spec=FieldData),
