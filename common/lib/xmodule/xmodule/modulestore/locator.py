@@ -407,6 +407,14 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         raise NotImplementedError()
 
     @property
+    def org(self):
+        return self.course_key.org
+
+    @property
+    def offering(self):
+        return self.course_key.offering
+
+    @property
     def package_id(self):
         return self.course_key.package_id
 
