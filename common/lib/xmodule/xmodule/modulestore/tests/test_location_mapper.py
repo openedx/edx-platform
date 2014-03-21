@@ -43,7 +43,7 @@ class TestLocationMapper(LocMapperSetupSansDjango):
     def test_create_map(self):
         org = 'foo_org'
         course = 'bar_course'
-        loc_mapper().create_map_entry(Location('i4x', org, course, 'course', 'baz_run'))
+        loc_mapper().create_map_entry(SlashSeparatedCourseKey(org, course, 'baz_run'))
         # pylint: disable=protected-access
         entry = loc_mapper().location_map.find_one({
             '_id': loc_mapper()._construct_location_son(org, course, 'baz_run')
