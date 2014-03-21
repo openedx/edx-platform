@@ -3,6 +3,8 @@ Tests for ORA (Open Response Assessment) through the LMS UI.
 """
 
 import json
+from unittest import skip
+
 from bok_choy.promise import Promise, BrokenPromise
 from ..pages.lms.peer_confirm import PeerConfirmPage
 from ..pages.studio.auto_auth import AutoAuthPage
@@ -215,6 +217,7 @@ class AIAssessmentTest(OpenResponseTest):
         'rubric_xml': load_data_str('ora_rubric.xml')
     }
 
+    @skip('Intermittently failing, see ORA-342')
     def test_ai_assessment(self):
         """
         Given I am viewing an AI-assessment problem that has a trained ML model
@@ -260,6 +263,7 @@ class InstructorAssessmentTest(OpenResponseTest):
         'rubric_xml': load_data_str('ora_rubric.xml')
     }
 
+    @skip('Intermittently failing, see ORA-342')
     def test_instructor_assessment(self):
         """
         Given an instructor has graded my submission
