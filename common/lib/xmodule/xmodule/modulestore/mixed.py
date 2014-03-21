@@ -33,7 +33,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         super(MixedModuleStore, self).__init__(**kwargs)
 
         self.modulestores = {}
-        self.mappings = mappings
+        self.mappings = {CourseKey.from_string(course_id): store_name for course_id, store_name in mappings.viewitems()}
 
         if 'default' not in stores:
             raise Exception('Missing a default modulestore in the MixedModuleStore __init__ method.')
@@ -44,7 +44,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 # restrict xml to only load courses in mapping
                 store['OPTIONS']['course_ids'] = [
                     course_id
-                    for course_id, store_key in self.mappings.iteritems()
+                    for course_id, store_key in mappings.iteritems()
                     if store_key == key
                 ]
             self.modulestores[key] = create_modulestore_instance(

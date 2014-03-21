@@ -160,9 +160,9 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # Perfunctory check, since expansion is made for convenience of other task
     # code that doesn't need the entry_id.
     if course_id != entry.course_id:
-        format_msg = u"Course id conflict: explicit value {} does not match task value {}"
-        log.warning("Task %s: %s", task_id, format_msg.format(course_id, entry.course_id))
-        raise ValueError("Course id conflict: explicit value does not match task value")
+        format_msg = u"Course id conflict: explicit value %r does not match task value %r"
+        log.warning("Task %s: " + format_msg, task_id, course_id, entry.course_id)
+        raise ValueError(format_msg % (course_id, entry.course_id))
 
     # Fetch the CourseEmail.
     email_id = task_input['email_id']
@@ -188,16 +188,17 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
 
     # Sanity check that course for email_obj matches that of the task referencing it.
     if course_id != email_obj.course_id:
-        format_msg = u"Course id conflict: explicit value {} does not match email value {}"
-        log.warning("Task %s: %s", task_id, format_msg.format(course_id, entry.course_id))
-        raise ValueError("Course id conflict: explicit value does not match email value")
+        format_msg = u"Course id conflict: explicit value %r does not match email value %r"
+        log.warning("Task %s: " + format_msg, task_id, course_id, email_obj.course_id)
+        raise ValueError(format_msg % (course_id, email_obj.course_id))
 
     # Fetch the course object.
-    try:
-        course = get_course(course_id)
-    except ValueError:
-        log.exception("Task %s: course not found: %s", task_id, course_id)
-        raise
+    course = get_course(course_id)
+
+    if course is None:
+        msg = "Task %s: course not found: %s"
+        log.error(msg, task_id, course_id)
+        raise ValueError(msg % (task_id, course_id))
 
     # Get arguments that will be passed to every subtask.
     to_option = email_obj.to_option

@@ -80,10 +80,15 @@ def get_course_with_access(user, action, course_id, depth=0):
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
     course = get_course_by_id(course_id, depth=depth)
+
+    if course is None:
+        raise Http404("Course not found.")
+
     if not has_access(user, action, course, course_id):
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
         raise Http404("Course not found.")
+
     return course
 
 

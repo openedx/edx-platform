@@ -17,6 +17,7 @@ from django.contrib.auth.models import User
 from html_to_text import html_to_text
 
 from django.conf import settings
+from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
 
@@ -62,7 +63,7 @@ class CourseEmail(Email):
         (SEND_TO_STAFF, 'Staff and instructors'),
         (SEND_TO_ALL, 'All')
     )
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     to_option = models.CharField(max_length=64, choices=TO_OPTION_CHOICES, default=SEND_TO_MYSELF)
 
     def __unicode__(self):

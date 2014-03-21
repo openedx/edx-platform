@@ -560,7 +560,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         Get the course with the given courseid (org/course/run)
         """
         assert(isinstance(course_key, SlashSeparatedCourseKey))
-        location = Location('i4x', course_key.org, course_key.course, course_key.run, 'course', course_key.run)
+        location = course_key.make_usage_key('course', course_key.run)
         try:
             return self.get_item(location, depth=depth)
         except ItemNotFoundError:
