@@ -168,6 +168,8 @@ ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
 for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
 
+WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
+
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
                             syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),

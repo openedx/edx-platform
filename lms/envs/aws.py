@@ -43,9 +43,6 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
-# Enable Berkeley forums
-FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
-
 # IMPORTANT: With this enabled, the server must always be behind a proxy that
 # strips the header HTTP_X_FORWARDED_PROTO from client requests. Otherwise,
 # a user can fool our server into thinking it was an https connection.

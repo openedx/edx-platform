@@ -1,13 +1,13 @@
 """
-Static Pages page for a course.
+Pages page for a course.
 """
 
 from .course_page import CoursePage
 
 
-class StaticPagesPage(CoursePage):
+class PagesPage(CoursePage):
     """
-    Static Pages page for a course.
+    Pages page for a course.
     """
 
     url_path = "tabs"

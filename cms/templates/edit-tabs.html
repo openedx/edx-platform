@@ -4,7 +4,7 @@
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
 %>
-<%block name="title">Static Pages</%block>
+<%block name="title">${_("Pages")}</%block>
 <%block name="bodyclass">is-signedin course view-static-pages</%block>
 
 <%block name="jsextra">
@@ -18,7 +18,7 @@
                 });
 
                 new TabsEditView({
-                    el: $('.main-wrapper'),
+                    el: $('.tab-list'),
                     model: model,
                     mast: $('.wrapper-mast')
                 });
@@ -31,7 +31,8 @@
   <header class="mast has-actions has-subtitle">
     <h1 class="page-header">
       <small class="subtitle">${_("Content")}</small>
-      <span class="sr">&gt; </span>${_("Static Pages")}
+      ## Translators: Pages refer to the tabs that appear in the top navigation of each course.
+      <span class="sr">&gt; </span>${_("Pages")}
     </h1>
 
     <nav class="nav-actions">
@@ -47,44 +48,74 @@
 
 <div class="wrapper-content wrapper">
   <section class="content">
-    <div class="introduction has-links">
-      <p class="copy">${_("Use Static Pages to share a syllabus, a calendar, handouts, or other supplements to your courseware.")}</p>
-      <p class="copy">${_("NOTE: all content on Static Pages will be visible to anyone who knows the URL, regardless of whether they are registered in the course or not.")}</p>
-      <nav class="nav-introduction-supplementary">
-        <ul>
-          <li class="nav-item">
-          <a rel="modal" href="#preview-lms-staticpages"><i class="icon-question-sign"></i>${_("What do static pages look like in my course?")}</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
+    <article class="content-primary" role="main">
+
+      <div class="inner-wrapper">
+        <article class="unit-body">
+
+          <div class="tab-list">
+            <ol class="course-nav-tab-list components">
+
+              % for tab in built_in_tabs:
+                <li class="course-nav-tab fixed">
+                  <div class="course-nav-tab-header">
+                    <h3 class="title">${_(tab.name)}</h3>
+                  </div>
+                  <div class="course-nav-tab-actions wrapper-actions-list">
+                    <ul class="actions-list">
+
+                    % if tab.is_hideable:
+                      <li class="action-item action-visible">
+                          <label for="[id]"><span class="sr">${_("Show this page")}</span></label>
+                          <input type="checkbox" id="[id]" class="toggle-checkbox" data-tooltip="${_('Show/hide page')}" />
+                          <div class="action-button"><i class="icon-eye-open"></i><i class="icon-eye-close"></i></div>
+                      </li>
+                   %endif
+
+                    </ul>
+                  </div>
+                  <div class="drag-handle is-fixed" data-tooltip="${_('Cannot be reordered')}">
+                    <span class="sr">${_("Fixed page")}</span>
+                  </div>
+                </li>
+              % endfor
+
+              % for locator in components:
+              <li class="component" data-locator="${locator}"></li>
+              % endfor
+
+              <li class="new-component-item">
+
+              </li>
+            </ol>
+          </div>
+
+          <div class="add-pages">
+              <p>${_("You can add additional custom pages to your course.")} <a href="#" class="button new-button new-tab"><i class="icon-plus"></i>${_("Add a New Page")}</a></p>
+          </div>
+        </article>
+      </div>
+    </article>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">${_("What are Pages?")}</h3>
+        <p>${_("Pages are the items that appear in your course navigation. Some are required and cannot be moved or edited (Courseware, Course info, Discussion, Progress, Wiki), and you can add your own custom pages to hold additional content you want to provide to your students, like a syllabus, calendar, or handouts.")}</p>
+      </div>
+      <div class="bit">
+        <h3 class="title-3">${_("How do Pages look to students in my course?")}</h3>
+        <p>${_("Pages are the navigational items that appear across the top of your course.")} <br /> <a rel="modal" href="#preview-lms-staticpages">${_("See an example")}</a></p>
+      </div>
+    </aside>
+
   </section>
 </div>
 
-<div class="main-wrapper">
-  <div class="inner-wrapper">
-    <article class="unit-body">
-
-      <div class="tab-list">
-        <ol class='components'>
-          % for locator in components:
-          <li class="component" data-locator="${locator}"/>
-          % endfor
-
-          <li class="new-component-item">
-
-          </li>
-        </ol>
-      </div>
-    </article>
-  </div>
-</div>
-
 <div class="content-modal" id="preview-lms-staticpages">
-  <h3 class="title">${_("Static Pages in Your Course")}</h3>
+  <h3 class="title">${_("Pages in Your Course")}</h3>
   <figure>
-    <img src="${static.url("img/preview-lms-staticpages.png")}" alt="${_('Preview of Static Pages in your course')}" />
-    <figcaption class="description">${_("The names of your Static Pages appear in your course's main navigation bar, along with Courseware, Course Info, Discussion, Wiki, and Progress.")}</figcaption>
+    <img src="${static.url("img/preview-lms-staticpages.png")}" alt="${_('Preview of Pages in your course')}" />
+    <figcaption class="description">${_("The names of your Pages appear in your course's main navigation bar, along with Courseware, Course Info, Discussion, Wiki, and Progress.")}</figcaption>
   </figure>
 
   <a href="#" rel="view" class="action action-modal-close">

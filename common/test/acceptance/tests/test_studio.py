@@ -10,7 +10,7 @@ from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.studio.checklists import ChecklistsPage
 from ..pages.studio.course_import import ImportPage
 from ..pages.studio.course_info import CourseUpdatesPage
-from ..pages.studio.edit_tabs import StaticPagesPage
+from ..pages.studio.edit_tabs import PagesPage
 from ..pages.studio.export import ExportPage
 from ..pages.studio.howitworks import HowitworksPage
 from ..pages.studio.index import DashboardPage
@@ -93,7 +93,7 @@ class CoursePagesTest(UniqueCourseTest):
             clz(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
             for clz in [
                 AssetIndexPage, ChecklistsPage, ImportPage, CourseUpdatesPage,
-                StaticPagesPage, ExportPage, CourseTeamPage, CourseOutlinePage, SettingsPage,
+                PagesPage, ExportPage, CourseTeamPage, CourseOutlinePage, SettingsPage,
                 AdvancedSettingsPage, GradingPage, TextbooksPage
             ]
         ]

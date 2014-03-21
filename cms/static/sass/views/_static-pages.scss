@@ -1,24 +1,125 @@
-// studio - views - course static pages
+// studio - views - course pages
 // ====================
 
 .view-static-pages {
 
-  .new-static-page-button {
-    @include grey-button;
-    display: block;
-    text-align: center;
-    padding: 12px 0;
+  // page structure
+  .content-primary,
+  .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
   }
 
-  .nav-introduction-supplementary {
+  .content-primary {
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
 
-    .icon-question-sign {
-      display: inline-block;
-      vertical-align: baseline;
-      margin-right: ($baseline/4);
+    .add-pages {
+      @extend %ui-well;
+      margin: ($baseline*1.5) 0;
+      background-color: $gray-l4;
+      padding: ($baseline*2);
+      text-align: center;
+      color: $gray;
+
+      .new-button {
+        @include font-size(14);
+        margin-left: $baseline;
+
+        [class^="icon-"] {
+          margin-right: ($baseline/2);
+        }
+      }
     }
-
   }
+
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
+
+  .wrapper-actions-list {
+    top: 6px;
+
+    .actions-list {
+
+      .action-item {
+        position: relative;
+        display: inline-block;
+        min-width: ($baseline*1.5);
+        margin: 0;
+        text-align: center;
+
+        .action-button,
+        .toggle-actions-view {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          display: inline-block;
+          border: 0;
+          background: none;
+          color: $gray-l3;
+
+          &:hover {
+            background-color: $blue;
+            color: $gray-l6;
+          }
+        }
+
+        &.action-visible {
+          position: relative;
+        }
+
+        &.action-visible label {
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 30px;
+          width: 30px;
+
+          &:hover {
+            background-color: $blue;
+          }
+        }
+
+        &.action-visible .toggle-checkbox {
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 30px;
+          width: 30px;
+          opacity: 0;
+        }
+
+        &.action-visible .toggle-checkbox:hover ~ .action-button,
+        &.action-visible .toggle-checkbox:checked:hover ~ .action-button {
+          background-color: $blue;
+          color: $gray-l6;
+        }
+
+        &.action-visible .toggle-checkbox ~ .action-button {
+          .icon-eye-open {
+            display: inline-block;
+          }
+
+          .icon-eye-close {
+            display: none;
+          }
+        }
+
+        &.action-visible .toggle-checkbox:checked ~ .action-button {
+          background-color: $gray;
+          color: $white;
+
+          .icon-eye-open {
+            display: none;
+          }
+
+          .icon-eye-close {
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+
 
   .unit-body {
     padding: 0;
@@ -78,7 +179,8 @@
     }
   }
 
-  .component {
+  .component,
+  .course-nav-tab {
     position: relative;
     border: 1px solid $mediumGrey;
     border-top: none;
@@ -114,6 +216,12 @@
       &:hover {
         background: url(../img/drag-handles.png) center no-repeat #fff;
       }
+
+      &.is-fixed {
+        cursor: default;
+        width: ($baseline*1.5);
+        background: $gray-l4 none;
+      }
     }
 
     // uses similar styling as assets.scss, unit.scss
@@ -130,17 +238,18 @@
       display: none;
     }
 
-    .component-actions {
+    .component-actions,
+    .course-nav-tab-actions {
       display: inline-block;
       float: right;
-      margin-right: $baseline*2;
+      margin-right: ($baseline*2);
       padding: 8px 0px;
       vertical-align: middle;
       text-align: center;
 
       .action-item {
         display: inline-block;
-        margin: ($baseline/4) 0 ($baseline/4) ($baseline/4);
+        margin: ($baseline/4) 0 ($baseline/4) ($baseline/2);
 
         .action-button {
           @include transition(all $tmg-f2 ease-in-out 0s);
@@ -176,6 +285,36 @@
           display: none;
         }
       }
+    }
+  }
+
+  // basic course nav items - overrides from above
+  .course-nav-tab {
+    padding: ($baseline*.75) ($baseline/4) ($baseline*.75) $baseline;
+
+    &.fixed {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+      opacity: .7;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    .course-nav-tab-header {
+      display: inline-block;
+      width:80%;
+
+      .title {
+        @extend %t-title4;
+        font-weight: 300;
+        color: $gray;
+      }
+    }
+
+    .course-nav-tab-actions {
+      display: inline-block;
+      padding: ($baseline/10);
     }
   }
 
