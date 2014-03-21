@@ -43,6 +43,13 @@ from .video_utils import create_youtube_string
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import KvsFieldData
+from urlparse import urlparse
+
+def get_ext(filename):
+    # Prevent incorrectly parsing urls like 'http://abc.com/path/video.mp4?xxxx'.
+    path = urlparse(filename).path
+    return path.rpartition('.')[-1]
+
 
 log = logging.getLogger(__name__)
 
@@ -259,7 +266,6 @@ class VideoModule(VideoFields, XModule):
         track_url = None
         transcript_download_format = self.transcript_download_format
 
-        get_ext = lambda filename: filename.rpartition('.')[-1]
         sources = {get_ext(src): src for src in self.html5_sources}
 
         if self.download_video:
