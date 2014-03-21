@@ -1002,8 +1002,9 @@ class TestItemCrud(SplitModuleTest):
         """
         Check that using odd characters in block id don't break ability to add and retrieve block.
         """
-        parent_locator = BlockUsageLocator(org='guestx', offering='contender', block_id="head345679", branch='draft')
-        chapter_locator = BlockUsageLocator(org='guestx', offering='contender', block_id="foo.bar_-~:0", branch='draft')
+        course_key = CourseLocator(org='guestx', offering='contender', branch='draft')
+        parent_locator = BlockUsageLocator(course_key, block_id="head345679")
+        chapter_locator = BlockUsageLocator(course_key, block_id="foo.bar_-~:0")
         modulestore().create_item(
             parent_locator, 'chapter', 'anotheruser',
             block_id=chapter_locator.block_id,
@@ -1014,7 +1015,7 @@ class TestItemCrud(SplitModuleTest):
         self.assertEqual(new_module.location.block_id, "foo.bar_-~:0")  # hardcode to ensure BUL init didn't change
         # now try making that a parent of something
         new_payload = "<problem>empty</problem>"
-        problem_locator = BlockUsageLocator(org='guestx', offering='contender', block_id="prob.bar_-~:99a", branch='draft')
+        problem_locator = BlockUsageLocator(course_key, block_id="prob.bar_-~:99a")
         modulestore().create_item(
             chapter_locator, 'problem', 'anotheruser',
             block_id=problem_locator.block_id,
