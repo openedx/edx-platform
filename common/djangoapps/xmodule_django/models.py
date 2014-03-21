@@ -11,7 +11,7 @@ class CourseKeyField(models.CharField):
 
     def to_python(self, value):
         assert isinstance(value, basestring) or isinstance(value, SlashSeparatedCourseKey)
-        return CourseKey.from_string(value)
+        return SlashSeparatedCourseKey.from_string(value)
 
     def get_prep_value(self, value):
         assert isinstance(value, SlashSeparatedCourseKey)
