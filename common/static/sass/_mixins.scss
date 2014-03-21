@@ -265,6 +265,24 @@
   padding: ($baseline*0.75) $baseline;
 }
 
+.ui-loading {
+  @include animation(fadeIn $tmg-f2 linear 1);
+  @extend %ui-well;
+  opacity: .6;
+  background-color: $white;
+  padding: ($baseline*1.5) $baseline;
+  text-align: center;
+
+  .spin {
+    @extend %anim-rotateCW;
+    display: inline-block;
+  }
+
+  .copy {
+    padding-left: ($baseline/4);
+  }
+}
+
 // ====================
 
 // extends - content - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
