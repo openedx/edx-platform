@@ -192,7 +192,7 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         )
 
         if self.version_guid is None and self.org is None and self.offering is None:
-            raise InvalidKeyError("Either version_guid or org and offering should be set")
+            raise InvalidKeyError(self.__class__, "Either version_guid or org and offering should be set")
 
     @classmethod
     def _from_string(cls, serialized):
@@ -204,7 +204,7 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         try:
             return cls(**{key: kwargs.get(key) for key in cls.KEY_FIELDS})
         except ValueError:
-            raise InvalidKeyError("Either version_guid or org and offering should be set: {}".format(serialized))
+            raise InvalidKeyError(cls, "Either version_guid or org and offering should be set: {}".format(serialized))
 
     def is_fully_specified(self):
         """
@@ -287,7 +287,7 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         Return a new CourseLocator for another branch of the same course (also version agnostic)
         """
         if self.org is None:
-            raise InvalidKeyError("Branches must have full course ids not just versions")
+            raise InvalidKeyError(self.__class__, "Branches must have full course ids not just versions")
         return CourseLocator(
             org=self.org,
             offering=self.offering,
@@ -351,7 +351,7 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         """
         block_id = self._parse_block_ref(block_id)
         if block_id is None:
-            raise InvalidKeyError("Missing block id")
+            raise InvalidKeyError(self.__class__, "Missing block id")
 
         super(BlockUsageLocator, self).__init__(course_key=course_key, block_id=block_id)
 
@@ -364,7 +364,7 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         parsed_parts = parse_url(serialized, tag_optional=True)
         block_id = parsed_parts.get('block')
         if block_id is None:
-            raise InvalidKeyError("Missing block id: {}".format(serialized))
+            raise InvalidKeyError(cls, "Missing block id: {}".format(serialized))
         return cls(course_key, block_id)
 
     def version_agnostic(self):
