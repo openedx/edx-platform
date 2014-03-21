@@ -360,7 +360,7 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         """
         Requests CourseLocator to deserialize its part and then adds the local deserialization of block
         """
-        course_key = CourseLocator._from_string(serialized)
+        course_key = CourseLocator.from_string(serialized)
         parsed_parts = parse_url(serialized, tag_optional=True)
         block_id = parsed_parts.get('block')
         if block_id is None:
