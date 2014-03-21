@@ -13,4 +13,4 @@ class ImportPage(CoursePage):
     url_path = "import"
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-import')
+        return self.q(css='body.view-import').present

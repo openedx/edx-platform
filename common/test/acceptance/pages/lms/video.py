@@ -4,7 +4,7 @@ Video player in the courseware.
 
 import time
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, fulfill_after
+from bok_choy.promise import EmptyPromise
 from bok_choy.javascript import wait_for_js, js_defined
 
 
@@ -17,7 +17,7 @@ class VideoPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.is_css_present('div.xmodule_VideoModule')
+        return self.q(css='div.xmodule_VideoModule').present
 
     @property
     def elapsed_time(self):
@@ -40,37 +40,37 @@ class VideoPage(PageObject):
         """
         Return a boolean indicating whether the video is playing.
         """
-        return self.is_css_present('a.video_control') and self.is_css_present('a.video_control.pause')
+        return self.q(css='a.video_control').present and self.q(css='a.video_control.pause').present
 
     @property
     def is_paused(self):
         """
         Return a boolean indicating whether the video is paused.
         """
-        return self.is_css_present('a.video_control') and self.is_css_present('a.video_control.play')
+        return self.q(css='a.video_control').present and self.q(css='a.video_control.play').present
 
     @wait_for_js
     def play(self):
         """
         Start playing the video.
         """
-        with fulfill_after(EmptyPromise(lambda: self.is_playing, "Video is playing")):
-            self.css_click('a.video_control.play')
+        self.q(css='a.video_control.play').first.click()
+        EmptyPromise(lambda: self.is_playing, "Video is playing")
 
     @wait_for_js
     def pause(self):
         """
         Pause the video.
         """
-        with fulfill_after(EmptyPromise(lambda: self.is_paused, "Video is paused")):
-            self.css_click('a.video_control.pause')
+        self.q(css='a.video_control.pause').first.click()
+        EmptyPromise(lambda: self.is_paused, "Video is paused")
 
     def _video_time(self):
         """
         Return a tuple `(elapsed_time, duration)`, each in seconds.
         """
         # The full time has the form "0:32 / 3:14"
-        all_times = self.css_text('div.vidtime')
+        all_times = self.q(css='div.vidtime').text
 
         if len(all_times) == 0:
             self.warning('Could not find video time')
@@ -82,7 +82,7 @@ class VideoPage(PageObject):
             elapsed_str, duration_str = full_time.split(' / ')
 
             # Convert each string to seconds
-            return (self._parse_time_str(elapsed_str), self._parse_time_str(duration_str))
+            return self._parse_time_str(elapsed_str), self._parse_time_str(duration_str)
 
     def _parse_time_str(self, time_str):
         """
