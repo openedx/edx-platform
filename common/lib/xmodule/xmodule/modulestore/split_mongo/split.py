@@ -247,9 +247,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         if not course_locator.is_fully_specified():
             raise InsufficientSpecificationError('Not fully specified: %s' % course_locator)
 
-        if course_locator.package_id is not None and course_locator.branch is not None:
+        if course_locator.org and course_locator.offering and course_locator.branch:
             # use the package_id
-            index = self.db_connection.get_course_index(course_locator.package_id)
+            index = self.db_connection.get_course_index(course_locator)
             if index is None:
                 raise ItemNotFoundError(course_locator)
             if course_locator.branch not in index['versions']:
@@ -482,9 +482,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             'edited_on': when the course was originally created
         }
         """
-        if course_locator.offering is None:
+        if not (course_locator.offering and course_locator.org):
             return None
-        index = self.db_connection.get_course_index(course_locator.package_id)
+        index = self.db_connection.get_course_index(course_locator)
         return index
 
     # TODO figure out a way to make this info accessible from the course descriptor
@@ -864,7 +864,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         # check offering's uniqueness
         locator = CourseLocator(org=org, offering=offering, branch=master_branch)
-        index = self.db_connection.get_course_index(locator.package_id)
+        index = self.db_connection.get_course_index(locator)
         if index is not None:
             raise DuplicateCourseError(locator.package_id, index)
 
@@ -1200,7 +1200,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         # get the destination's index, and source and destination structures.
         source_structure = self._lookup_course(source_course)['structure']
-        index_entry = self.db_connection.get_course_index(destination_course.package_id)
+        index_entry = self.db_connection.get_course_index(destination_course)
         if index_entry is None:
             # brand new course
             raise ItemNotFoundError(destination_course)
@@ -1314,21 +1314,19 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         return result
 
-    def delete_course(self, package_id):
+    def delete_course(self, course_key):
         """
         Remove the given course from the course index.
 
         Only removes the course from the index. The data remains. You can use create_course
         with a versions hash to restore the course; however, the edited_on and
         edited_by won't reflect the originals, of course.
-
-        :param package_id: uses package_id rather than locator to emphasize its global effect
         """
-        index = self.db_connection.get_course_index(package_id)
+        index = self.db_connection.get_course_index(course_key)
         if index is None:
-            raise ItemNotFoundError(package_id)
+            raise ItemNotFoundError(course_key)
         # this is the only real delete in the system. should it do something else?
-        log.info(u"deleting course from split-mongo: %s", package_id)
+        log.info(u"deleting course from split-mongo: %s", course_key)
         self.db_connection.delete_course_index(index['_id'])
 
     def get_errored_courses(self):
@@ -1447,7 +1445,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         :param continue_version: if True, assumes this operation requires a head version and will not create a new
         version but instead continue an existing transaction on this version. This flag cannot be True if force is True.
         """
-        if locator.package_id is None or locator.branch is None:
+        if locator.org is None or locator.offering is None or locator.branch is None:
             if continue_version:
                 raise InsufficientSpecificationError(
                     "To continue a version, the locator must point to one ({}).".format(locator)
@@ -1455,7 +1453,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             else:
                 return None
         else:
-            index_entry = self.db_connection.get_course_index(locator.package_id)
+            index_entry = self.db_connection.get_course_index(locator)
             is_head = (
                 locator.version_guid is None or
                 index_entry['versions'][locator.branch] == locator.version_guid
