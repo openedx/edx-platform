@@ -441,7 +441,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         MakoMiddleware().process_request(self.request)
 
         course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
-        self.course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+        self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
 
         self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
         self.section = ItemFactory(category='sequential', parent_location=self.chapter.location)

@@ -158,7 +158,7 @@ def get_module(user, request, usage_key, field_data_cache,
     if possible.  If not possible, return None.
     """
     try:
-        descriptor = modulestore().get_instance(usage_key, depth=depth)
+        descriptor = modulestore().get_item(usage_key, depth=depth)
         return get_module_for_descriptor(user, request, descriptor, field_data_cache, usage_key.course_key,
                                          position=position,
                                          wrap_xmodule_display=wrap_xmodule_display,

@@ -452,7 +452,7 @@ class SplitModuleTest(unittest.TestCase):
                         block = course
                     else:
                         block_usage = BlockUsageLocator.make_relative(course.location, block_id)
-                        block = split_store.get_instance(course.location.course_key, block_usage)
+                        block = split_store.get_item(block_usage)
                     for key, value in fields.iteritems():
                         setattr(block, key, value)
                 # create new blocks into dag: parent must already exist; thus, order is important
@@ -464,7 +464,7 @@ class SplitModuleTest(unittest.TestCase):
                         parent = course
                     else:
                         block_usage = BlockUsageLocator.make_relative(course.location, spec['parent'])
-                        parent = split_store.get_instance(course.location.course_key, block_usage)
+                        parent = split_store.get_item(block_usage)
                     block_id = LocalId(spec['id'])
                     child = split_store.create_xblock(
                         course.runtime, spec['category'], spec['fields'], block_id, parent_xblock=parent
