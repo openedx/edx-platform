@@ -191,6 +191,14 @@ if FEATURES.get('AUTH_USE_CAS'):
     )
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+    CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
+    if CAS_ATTRIBUTE_CALLBACK:
+        import importlib
+        CAS_USER_DETAILS_RESOLVER = getattr(
+            importlib.import_module(CAS_ATTRIBUTE_CALLBACK['module']),
+            CAS_ATTRIBUTE_CALLBACK['function']
+        )
+
 
 ################ SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
