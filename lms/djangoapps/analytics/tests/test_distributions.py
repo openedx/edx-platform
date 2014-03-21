@@ -4,6 +4,7 @@ from django.test import TestCase
 from nose.tools import raises
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from analytics.distributions import profile_distribution, AVAILABLE_PROFILE_FEATURES
 
@@ -12,7 +13,7 @@ class TestAnalyticsDistributions(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
-        self.course_id = 'robot/course/id'
+        self.course_id = SlashSeparatedCourseKey('robot', 'course', 'id')
 
         self.users = [UserFactory(
             profile__gender=['m', 'f', 'o'][i % 3],

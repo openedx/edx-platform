@@ -89,7 +89,7 @@ class ItemFactory(XModuleFactory):
 
     @lazy_attribute
     def parent_location(self):
-        default_location = Location('i4x://MITx/999/course/Robot_Super_Course')
+        default_location = Location('MITx', '999', 'Robot_Super_Course', 'course', 'Robot_Super_Course', None)
         try:
             parent = self.parent
         # This error is raised if the caller hasn't provided either parent or parent_location
@@ -130,7 +130,7 @@ class ItemFactory(XModuleFactory):
 
         # catch any old style users before they get into trouble
         assert 'template' not in kwargs
-        parent_location = Location(kwargs.pop('parent_location', None))
+        parent_location = kwargs.pop('parent_location', None)
         data = kwargs.pop('data', None)
         category = kwargs.pop('category', None)
         display_name = kwargs.pop('display_name', None)
