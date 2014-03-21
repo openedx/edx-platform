@@ -96,10 +96,9 @@ nav.sequence-nav {
         position: relative;
         display: block;
         margin: 0;
-        border: 1px solid transparent;
         padding: 0;
         width: 100%;
-        height: 42px;
+        height: 44px;
         background-position: center 14px;
         background-repeat: no-repeat;
         cursor: pointer;
@@ -262,7 +261,6 @@ nav.sequence-nav {
       position: absolute;
       margin-bottom: 0;
       height: 44px;
-      border: 1px solid #ccc;
       box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
       z-index: 1;
 
@@ -340,7 +338,7 @@ nav.sequence-bottom {
 
       &.prev, &.next {
         margin-bottom: 0;
-        width: 50%;
+        width: 49%;
 
         a {
           background-position: center center;
