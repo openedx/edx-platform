@@ -333,11 +333,12 @@ def _get_item_in_course(request, locator):
 
     Verifies that the caller has permission to access this item.
     """
-    if not has_course_access(request.user, locator.package_id):
+    old_location = loc_mapper().translate_locator_to_location(locator)
+    course_location = old_location.course_key
+
+    if not has_course_access(request.user, course_location):
         raise PermissionDenied()
 
-    old_location = loc_mapper().translate_locator_to_location(locator)
-    course_location = loc_mapper().translate_locator_to_location(locator, True)
     course = modulestore().get_item(course_location)
     item = modulestore().get_item(old_location, depth=1)
     lms_link = get_lms_link_for_item(old_location, course_id=course.id)

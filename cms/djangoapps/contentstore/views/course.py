@@ -80,7 +80,7 @@ def _get_locator_and_course(org, offering, branch, version_guid, block_id, user,
     """
     locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block_id)
     course_location = loc_mapper().translate_locator_to_location(locator)
-    if not has_course_access(user, locator.package_id):
+    if not has_course_access(user, course_location.course_key):
         raise PermissionDenied()
     course_module = modulestore().get_item(course_location, depth=depth)
     return locator, course_module
@@ -118,7 +118,10 @@ def course_handler(request, tag=None, org=None, offering=None, branch=None, vers
             return create_new_course(request)
         elif not has_course_access(
             request.user,
-            CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid).package_id
+            loc_mapper().translate_locator_to_location(
+                CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid),
+                get_course=True
+            )
         ):
             raise PermissionDenied()
         elif request.method == 'PUT':
