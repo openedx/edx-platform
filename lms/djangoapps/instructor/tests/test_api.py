@@ -904,6 +904,38 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         })
         self.assertEqual(response.status_code, 200)
 
+    def test_modify_access_with_fake_user(self):
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'unique_student_identifier': 'GandalfTheGrey',
+            'rolename': 'staff',
+            'action': 'revoke',
+        })
+        self.assertEqual(response.status_code, 200)
+        expected = {
+            'unique_student_identifier': 'GandalfTheGrey',
+            'userDoesNotExist': True,
+        }
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
+    def test_modify_access_with_inactive_user(self):
+        self.other_user.is_active = False
+        self.other_user.save()  # pylint: disable=no-member
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.other_user.username,
+            'rolename': 'beta',
+            'action': 'allow',
+        })
+        self.assertEqual(response.status_code, 200)
+        expected = {
+            'unique_student_identifier': self.other_user.username,
+            'inactiveUser': True,
+        }
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
     def test_modify_access_revoke_not_allowed(self):
         """ Test revoking access that a user does not have. """
         url = reverse('modify_access', kwargs={'course_id': self.course.id})
@@ -924,7 +956,16 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
             'rolename': 'instructor',
             'action': 'revoke',
         })
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
+        # check response content
+        expected = {
+            'unique_student_identifier': self.instructor.username,
+            'rolename': 'instructor',
+            'action': 'revoke',
+            'removingSelfAsInstructor': True,
+        }
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
 
     def test_list_course_role_members_noparams(self):
         """ Test missing all query parameters. """
