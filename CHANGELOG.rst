@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fixed bug when image mapped input's Show Answer multiplies rectangles on
+ many inputtypes. BLD-810.
+
 LMS: Enabled screen reader feedback of problem responses.
   LMS-2158
 

@@ -557,7 +557,7 @@ class @Problem
       #   'regions': '[[10,10], [30,30], [10, 30], [30, 10]]'
       # } }
       types =
-        rectangle: (coords) =>
+        rectangle: (ctx, coords) =>
           reg = /^\(([0-9]+),([0-9]+)\)-\(([0-9]+),([0-9]+)\)$/
           rects = coords.replace(/\s*/g, '').split(/;/)
 
@@ -573,7 +573,7 @@ class @Problem
           ctx.stroke()
           ctx.fill()
 
-        regions: (coords) =>
+        regions: (ctx, coords) =>
           parseCoords = (coords) =>
             reg = JSON.parse(coords)
 
@@ -618,11 +618,12 @@ class @Problem
       ctx.strokeStyle = "#FF0000";
       ctx.lineWidth = "2";
 
-      $.each answers, (key, answer) =>
-        $.each answer, (key, value) =>
-          types[key](value) if types[key]? and value
-
-      container.html(canvas)
+      if answers[id]
+        $.each answers[id], (key, value) =>
+          types[key](ctx, value) if types[key]? and value
+        container.html(canvas)
+      else
+        console.log "Answer is absent for image input with id=#{id}"
 
   inputtypeHideAnswerMethods:
     choicegroup: (element, display) =>
