@@ -99,11 +99,8 @@ class @HTMLEditingDescriptor
     codeEditor.setValue(content)
 
   initInstanceCallback: (visualEditor) =>
-    @rewriteLinksFromStatic(visualEditor)
-    visualEditor.focus()
-
-  rewriteLinksFromStatic: (visualEditor) =>
     visualEditor.setContent(rewriteStaticLinks(visualEditor.getContent({no_events: 1}), '/static/', @base_asset_url))
+    visualEditor.focus()
 
   getVisualEditor: () ->
     ###
