@@ -47,6 +47,7 @@ import shlex  # for splitting quoted strings
 import sys
 import pyparsing
 import html5lib
+import bleach
 
 from .registry import TagRegistry
 from chem import chemcalc
@@ -746,7 +747,7 @@ class CodeInput(InputTypeBase):
         if self.status == 'incomplete':
             self.status = 'queued'
             self.queue_len = self.msg
-            self.msg = self.submitted_msg
+            self.msg = bleach.clean(self.submitted_msg)
 
     def setup(self):
         """ setup this input type """
@@ -802,7 +803,14 @@ class MatlabInput(CodeInput):
         # this is only set if we don't have a graded response
         # the graded response takes precedence
         if 'queue_msg' in self.input_state and self.status in ['queued', 'incomplete', 'unsubmitted']:
-            self.queue_msg = self.input_state['queue_msg']
+            attributes = bleach.ALLOWED_ATTRIBUTES.copy()
+            attributes.update({'*': ['class', 'style', 'id'], 'audio': ['controls', 'autobuffer', 'autoplay', 'src']})
+            self.queue_msg = bleach.clean(self.input_state['queue_msg'],
+                    tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre'],
+                    styles=['white-space'],
+                    attributes=attributes
+                    )
+
         if 'queuestate' in self.input_state and self.input_state['queuestate'] == 'queued':
             self.status = 'queued'
             self.queue_len = 1

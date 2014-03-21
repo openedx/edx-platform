@@ -8,8 +8,8 @@
 
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
-bleach==1.2.2
-html5lib==0.95
+bleach==1.4
+html5lib==0.999
 boto==2.13.3
 celery==3.0.19
 dealer==0.2.3
