@@ -18,12 +18,13 @@ class RolesTestCase(TestCase):
     """
 
     def setUp(self):
-        self.course = Location('i4x://edX/toy/course/2012_Fall')
+        self.course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        self.course_loc = self.course_id.make_usage_key('course', '2012_Fall')
         self.anonymous_user = AnonymousUserFactory()
         self.student = UserFactory()
         self.global_staff = UserFactory(is_staff=True)
-        self.course_staff = StaffFactory(course=self.course.course_id)
-        self.course_instructor = InstructorFactory(course=self.course.course_id)
+        self.course_staff = StaffFactory(course=self.course_id)
+        self.course_instructor = InstructorFactory(course=self.course_id)
 
     def test_global_staff(self):
         self.assertFalse(GlobalStaff().has_user(self.student))
@@ -50,32 +51,32 @@ class RolesTestCase(TestCase):
         """
         Test that giving a user a course role enables access appropriately
         """
-        course_locator = loc_mapper().translate_location(self.course, add_entry_if_missing=True)
+        course_locator = loc_mapper().translate_location(self.course_loc, add_entry_if_missing=True)
         self.assertFalse(
-            CourseStaffRole(self.course.course_id).has_user(self.student),
+            CourseStaffRole(self.course_id).has_user(self.student),
             "Student has premature access to {}".format(unicode(course_locator))
         )
         self.assertFalse(
-            CourseStaffRole(self.course.course_id).has_user(self.student),
-            "Student has premature access to {}".format(self.course.url())
+            CourseStaffRole(self.course_id).has_user(self.student),
+            "Student has premature access to {}".format(self.course_id)
         )
-        CourseStaffRole(self.course.course_id).add_users(self.student)
+        CourseStaffRole(self.course_id).add_users(self.student)
         self.assertTrue(
-            CourseStaffRole(self.course.course_id).has_user(self.student),
+            CourseStaffRole(self.course_id).has_user(self.student),
             "Student doesn't have access to {}".format(unicode(course_locator))
         )
         self.assertTrue(
-            CourseStaffRole(self.course.course_id).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(self.course.url()))
+            CourseStaffRole(self.course_id).has_user(self.student),
+            "Student doesn't have access to {}".format(unicode(self.course_id))
         )
         # now try accessing something internal to the course
         vertical_locator = course_locator.course_key.make_usage_key('vertical', 'madeup')
-        vertical_location = self.course.replace(category='vertical', name='madeuptoo')
+        vertical_location = self.replace(category='vertical', name='madeuptoo')
         self.assertTrue(
-            CourseStaffRole(self.course.course_id).has_user(self.student),
+            CourseStaffRole(self.course_id).has_user(self.student),
             "Student doesn't have access to {}".format(unicode(vertical_locator))
         )
         self.assertTrue(
-            CourseStaffRole(self.course.course_id).has_user(self.student),
+            CourseStaffRole(self.course_id).has_user(self.student),
             "Student doesn't have access to {}".format(unicode(vertical_location.url()))
         )

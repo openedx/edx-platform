@@ -130,7 +130,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # just pick one vertical
         descriptor = store.get_items(CourseKey.from_string(course.id), category='vertical',)
-        locator = loc_mapper().translate_location(course.location.course_id, descriptor.location, True, True)
+        locator = loc_mapper().translate_location(course.id, descriptor.location, True, True)
         resp = self.client.get_html(locator.url_reverse('unit'))
         self.assertEqual(resp.status_code, 200)
         _test_no_locations(self, resp)

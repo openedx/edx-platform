@@ -595,19 +595,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
         module = self._load_items(usage_key.course_key, [item], depth)[0]
         return module
 
-    def get_instance(self, course_id, location, depth=0):
-        """
-        TODO (vshnayder): implement policy tracking in mongo.
-        For now, just delegate to get_item and ignore policy.
-
-        depth (int): An argument that some module stores may use to prefetch
-            descendents of the queried modules for more efficient results later
-            in the request. The depth is counted in the number of
-            calls to get_children() to cache. None indicates to cache all descendents.
-        """
-        return self.get_item(location, depth=depth)
-
-
     def _course_key_to_son(self, course_id):
         """
         Generate the partial key to look up items relative to a given course

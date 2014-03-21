@@ -418,18 +418,18 @@ def create_new_course(request):
     # auto-enroll the course creator in the course so that "View Live" will
     # work.
     CourseEnrollment.enroll(request.user, new_course.id)
-    _users_assign_default_role(new_course.location)
+    _users_assign_default_role(new_course.id)
 
     return JsonResponse({'url': new_location.url_reverse("course/", "")})
 
 
-def _users_assign_default_role(course_location):
+def _users_assign_default_role(course_id):
     """
     Assign 'Student' role to all previous users (if any) for this course
     """
-    enrollments = CourseEnrollment.objects.filter(course_id=course_location.course_id)
+    enrollments = CourseEnrollment.objects.filter(course_id=course_id)
     for enrollment in enrollments:
-        assign_default_role(course_location.course_key, enrollment.user)
+        assign_default_role(course_id, enrollment.user)
 
 
 # pylint: disable=unused-argument

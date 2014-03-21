@@ -1052,7 +1052,7 @@ class TestItemCrud(SplitModuleTest):
         # start transaction w/ simple creation
         user = random.getrandbits(32)
         new_course = modulestore().create_course('test_org.test_transaction', 'test_org', user)
-        new_course_locator = new_course.location.as_course_locator()
+        new_course_locator = new_course.id
         index_history_info = modulestore().get_course_history_info(new_course.location)
         course_block_prev_version = new_course.previous_version
         course_block_update_version = new_course.update_version
@@ -1337,7 +1337,7 @@ class TestItemCrud(SplitModuleTest):
         if not category_queue:
             return
         node = modulestore().create_item(parent, category_queue[0], 'deleting_user')
-        node_loc = BlockUsageLocator(parent.as_course_locator(), block_id=node.location.block_id)
+        node_loc = BlockUsageLocator(parent.course_key, block_id=node.location.block_id)
         for _ in range(4):
             self.create_subtree_for_deletion(node_loc, category_queue[1:])
 

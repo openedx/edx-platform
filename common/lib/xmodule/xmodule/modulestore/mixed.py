@@ -85,7 +85,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         This method is explicitly not implemented as we need a course_id to disambiguate
         We should be able to fix this when the data-model rearchitecting is done
         """
-        store = self._get_modulestore_for_courseid(usage_key.course_id)
+        store = self._get_modulestore_for_courseid(usage_key.course_key)
         return store.get_item(usage_key, depth)
 
     def get_items(self, course_key, settings=None, content=None, **kwargs):
