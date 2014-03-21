@@ -1,16 +1,17 @@
 from django.test import TestCase
-from mock import MagicMock
-from mock import patch
+from mock import MagicMock, Mock, patch
 
-import courseware.tabs as tabs
+from courseware import tabs
+from courseware.courses import get_course_by_id
 
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from .helpers import LoginEnrollmentTestCase
 
 FAKE_REQUEST = None
 
@@ -113,7 +114,8 @@ class ExternalLinkTestCase(TestCase):
         self.assertEqual(tab_list[0].is_active, False)
 
 
-class StaticTabTestCase(TestCase):
+class StaticTabTestCase(ModuleStoreTestCase):
+    """Tests for static tabs."""
 
     def setUp(self):
 
@@ -146,6 +148,26 @@ class StaticTabTestCase(TestCase):
             self.schlug, self.course, self.user, tab=self.tabby, generator=tabs._static_tab
         )
         self.assertEqual(tab_list[0].is_active, False)
+
+    @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+    def test_get_static_tab_contents(self):
+        course = get_course_by_id('edX/toy/2012_Fall')
+        request = get_request_for_user(UserFactory.create())
+        tab = tabs.get_static_tab_by_slug(course, 'resources')
+
+        # Test render works okay
+        tab_content = tabs.get_static_tab_contents(request, course, tab)
+        self.assertIn('edX/toy/2012_Fall', tab_content)
+        self.assertIn('static_tab', tab_content)
+
+        # Test when render raises an exception
+        with patch('courseware.tabs.get_module') as mock_module_render:
+            mock_module_render.return_value = MagicMock(
+                render=Mock(side_effect=Exception('Render failed!'))
+            )
+            static_tab = tabs.get_static_tab_contents(request, course, tab)
+            self.assertIn("this module is temporarily unavailable", static_tab)
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
