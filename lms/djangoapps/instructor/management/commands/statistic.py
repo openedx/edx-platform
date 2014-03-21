@@ -163,7 +163,7 @@ def fullstat(request = None):
     request = DummyRequest()
     
 
-    header = [u'ФИО', u'ФИО (измененное)', u'логин школы', u'email', u'email (измененное)', u'курс', u'зарегистрирован', u'2/3', u'100%', u'Задачи/Задания(Модули)']
+    header = [u'ФИО', u'ФИО (измененное)', u'логин школы', u'email', u'email (измененное)', u'курс', u'зарегистрирован', u"дата регистрации на курс", u'2/3', u'100%', u'Задачи/Задания(Модули)']
     assignments = []
     datatable = {'header': header, 'assignments': assignments, 'students': []}
     data = []
@@ -247,10 +247,10 @@ def fullstat(request = None):
             datarow += [course_name]
 
             try:
-                user.courseenrollment_set.filter(course_id = course_id)[0]
-                datarow += [u'Да']
+                courseenrollment = user.courseenrollment_set.filter(course_id = course_id)[0]
+                datarow += [u'Да', courseenrollment.created.strftime('%d/%m/%Y')]
             except:
-                datarow += [u'Нет']
+                datarow += [u'Нет', '']
                 data.append(datarow)
                 continue
             
@@ -325,7 +325,7 @@ def fullstat(request = None):
                 assignments += [section['format']]
             assignments += [chapter['display_name']]
 
-        header = [u'ФИО', u'логин школы', u'email', u'2/3', u'100%']
+        header = [u'ФИО', u'логин школы', u'email', u"дата регистрации на курс", u'2/3', u'100%']
         header += assignments
         datatable = {'header': header, 'assignments': assignments, 'students': []}
         data = []
@@ -339,6 +339,9 @@ def fullstat(request = None):
                 datarow += [name]
                 datarow += [user.profile.work_login]
                 datarow += [user.email]
+
+                courseenrollment = user.courseenrollment_set.filter(course_id = course_id)[0]
+                courseenrollment.created.strftime('%d/%m/%Y')
                 
                 #Raw statistic by problems
                 statprob = edxdata[course.id][user.email]["prob_info"]
