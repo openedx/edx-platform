@@ -13,4 +13,4 @@ class PagesPage(CoursePage):
     url_path = "tabs"
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-static-pages')
+        return self.q(css='body.view-static-pages').present

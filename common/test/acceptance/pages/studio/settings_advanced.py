@@ -13,4 +13,4 @@ class AdvancedSettingsPage(CoursePage):
     url_path = "settings/advanced"
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.advanced')
+        return self.q(css='body.advanced').present
