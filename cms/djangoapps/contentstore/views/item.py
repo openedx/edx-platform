@@ -102,9 +102,10 @@ def xblock_handler(request, tag=None, org=None, offering=None, branch=None, vers
     """
     if offering is not None:
         locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-        if not has_course_access(request.user, locator.package_id):
-            raise PermissionDenied()
         old_location = loc_mapper().translate_locator_to_location(locator)
+
+        if not has_course_access(request.user, old_location.course_key):
+            raise PermissionDenied()
 
         if request.method == 'GET':
             accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
@@ -125,7 +126,7 @@ def xblock_handler(request, tag=None, org=None, offering=None, branch=None, vers
             delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
 
             return _delete_item_at_location(old_location, delete_children, delete_all_versions, request.user)
-        else:  # Since we have a package_id, we are updating an existing xblock.
+        else:  # Since we have an offering id, we are updating an existing xblock.
             if block == 'handouts' and old_location is None:
                 # update handouts location in loc_mapper
                 course_location = loc_mapper().translate_locator_to_location(locator, get_course=True)
@@ -165,7 +166,7 @@ def xblock_handler(request, tag=None, org=None, offering=None, branch=None, vers
             return _create_item(request)
     else:
         return HttpResponseBadRequest(
-            "Only instance creation is supported without a package_id.",
+            "Only instance creation is supported without a org and offering.",
             content_type="text/plain"
         )
 
@@ -173,7 +174,8 @@ def xblock_handler(request, tag=None, org=None, offering=None, branch=None, vers
 @require_http_methods(("GET"))
 @login_required
 @expect_json
-def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, version_guid=None, block=None):
+def xblock_view_handler(request, view_name, org=None, offering=None, tag=None, branch=None, version_guid=None,
+                        block=None, tag=None):
     """
     The restful handler for requests for rendered xblock views.
 
@@ -183,9 +185,9 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
             the second is the resource description
     """
     locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-    if not has_course_access(request.user, locator.package_id):
-        raise PermissionDenied()
     old_location = loc_mapper().translate_locator_to_location(locator)
+    if not has_course_access(request.user, old_location.course_key):
+        raise PermissionDenied()
 
     accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
 
@@ -385,7 +387,7 @@ def _create_item(request):
 
     display_name = request.json.get('display_name')
 
-    if not has_course_access(request.user, parent_locator.package_id):
+    if not has_course_access(request.user, parent_location.course_key):
         raise PermissionDenied()
 
     parent = get_modulestore(category).get_item(parent_location)
@@ -512,21 +514,18 @@ def orphan_handler(request, tag=None, org=None, offering=None, branch=None, vers
 
     An orphan is a block whose category is not in the DETACHED_CATEGORY list, is not the root, and is not reachable
     from the root via children
-
-    :param request:
-    :param package_id: Locator syntax package_id
     """
     location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
     # DHM: when split becomes back-end, move or conditionalize this conversion
     old_location = loc_mapper().translate_locator_to_location(location)
     if request.method == 'GET':
-        if has_course_access(request.user, location.package_id):
-            return JsonResponse(modulestore().get_orphans(old_location))
+        if has_course_access(request.user, old_location.course_key):
+            return JsonResponse(modulestore().get_orphans(old_location.course_key))
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
         if request.user.is_staff:
-            items = modulestore().get_orphans(old_location)
+            items = modulestore().get_orphans(old_location.course_key)
             for itemloc in items:
                 modulestore('draft').delete_item(itemloc, delete_all_versions=True)
             return JsonResponse({'deleted': items})

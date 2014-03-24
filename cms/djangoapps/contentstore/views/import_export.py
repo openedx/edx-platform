@@ -65,7 +65,7 @@ def import_handler(request, tag=None, org=None, offering=None, branch=None, vers
     """
     course_id = CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid)
     location = BlockUsageLocator(course_id, block)
-    if not has_course_access(request.user, location.package_id):
+    if not has_course_access(request.user, location):
         raise PermissionDenied()
 
 
@@ -151,7 +151,7 @@ def import_handler(request, tag=None, org=None, offering=None, branch=None, vers
 
                 # Use sessions to keep info about import progress
                 session_status = request.session.setdefault("import_status", {})
-                key = location.package_id + filename
+                key = unicode(location) + filename
                 session_status[key] = 1
                 request.session.modified = True
 
@@ -278,12 +278,12 @@ def import_status_handler(request, tag=None, org=None, offering=None, branch=Non
 
     """
     location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-    if not has_course_access(request.user, location.package_id):
+    if not has_course_access(request.user, location):
         raise PermissionDenied()
 
     try:
         session_status = request.session["import_status"]
-        status = session_status[location.package_id + filename]
+        status = session_status[unicode(location) + filename]
     except KeyError:
         status = 0
 
@@ -310,7 +310,7 @@ def export_handler(request, tag=None, org=None, offering=None, branch=None, vers
     which describes the error.
     """
     location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-    if not has_course_access(request.user, location.package_id):
+    if not has_course_access(request.user, location):
         raise PermissionDenied()
 
     course_module = modulestore().get_course(location.course_key)

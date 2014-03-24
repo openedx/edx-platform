@@ -743,7 +743,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return dict((k, self.errored_courses[k].errors) for k in self.errored_courses)
 
-    def get_orphans(self, course_location):
+    def get_orphans(self, course_key):
         """
         Get all of the xblocks in the given course which have no parents and are not of types which are
         usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't

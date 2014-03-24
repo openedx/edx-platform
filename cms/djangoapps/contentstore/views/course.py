@@ -106,7 +106,7 @@ def course_handler(request, tag=None, org=None, offering=None, branch=None, vers
         index entry.
     PUT
         json: update this course (index entry not xblock) such as repointing head, changing display name, org,
-        package_id. Return same json as above.
+        offering. Return same json as above.
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
@@ -250,7 +250,7 @@ def course_listing(request):
 
             # update location entry in "loc_mapper" for user courses (add keys 'lower_id' and 'lower_course_id')
             for course in courses:
-                loc_mapper().create_map_entry(course.location)
+                loc_mapper().create_map_entry(course.id)
 
     def format_course_for_view(course):
         """

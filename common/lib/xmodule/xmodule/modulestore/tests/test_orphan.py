@@ -135,7 +135,7 @@ class TestOrphan(unittest.TestCase):
         """
         Test that old mongo finds the orphans
         """
-        orphans = self.old_mongo.get_orphans(self.course_location)
+        orphans = self.old_mongo.get_orphans(self.course_location.course_key)
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
         location = self.course_location.replace(category='chapter', name='OrphanChapter')
         self.assertIn(location.url(), orphans)

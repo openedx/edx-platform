@@ -27,9 +27,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         modulestore: the module store that can be used to retrieve additional
         modules
 
-        course_entry: the originally fetched enveloped course_structure w/ branch and package_id info.
+        course_entry: the originally fetched enveloped course_structure w/ branch and course id info.
         Callers to _load_item provide an override but that function ignores the provided structure and
-        only looks at the branch and package_id
+        only looks at the branch and course id
 
         module_data: a dict mapping Location -> json that was cached from the
             underlying modulestore
@@ -81,7 +81,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     # the thread is working with more than one named container pointing to the same specific structure is
     # low; thus, the course_entry is most likely correct. If the thread is looking at > 1 named container
     # pointing to the same structure, the access is likely to be chunky enough that the last known container
-    # is the intended one when not given a course_entry_override; thus, the caching of the last branch/package_id.
+    # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course id.
     def xblock_from_json(self, class_, block_id, json_data, course_entry_override=None):
         if course_entry_override is None:
             course_entry_override = self.course_entry

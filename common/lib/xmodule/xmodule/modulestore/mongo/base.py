@@ -904,12 +904,12 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         return MONGO_MODULESTORE_TYPE
 
-    def get_orphans(self, course_location):
+    def get_orphans(self, course_key):
         """
         Return an array all of the locations for orphans in the course.
         """
         detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
-        query = self._course_key_to_son(getattr(course_location, 'course_key', course_location))
+        query = self._course_key_to_son(course_key)
         query['_id.category'] = {'$nin': detached_categories}
         all_items = self.collection.find(query)
         all_reachable = set()
