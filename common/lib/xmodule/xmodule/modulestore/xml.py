@@ -454,7 +454,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             with open(policy_path) as f:
                 return json.load(f)
         except (IOError, ValueError) as err:
-            msg = "ERROR: loading course policy from {0}".format(policy_path)
+            msg = "ERROR: loading course policy from {0}, {1}".format(policy_path, "Invalid policy.json")
             tracker(msg)
             log.warning(msg + " " + str(err))
         return {}
