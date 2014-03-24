@@ -38,11 +38,10 @@ class AnnotatableFields(object):
 class VideoAnnotationModule(AnnotatableFields, XModule):
     '''Video Annotation Module'''
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/html/display.coffee'),
                      resource_string(__name__, 'js/src/annotatable/display.coffee')
                      ],
-          'js': ANNOTATOR_COMMON_JS}
+          'js': ANNOTATOR_COMMON_JS + [resource_string(__name__, 'js/src/collapsible.js')]}
     css = {'scss': ANNOTATOR_COMMON_CSS + [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'videoannotation'
 
