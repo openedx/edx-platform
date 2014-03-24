@@ -863,7 +863,8 @@ class SplitModuleItemTests(SplitModuleTest):
         parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 1)
         self.assertEqual(parents[0].block_id, 'head12345')
-        self.assertEqual(parents[0].package_id, "testx+GreekHero")
+        self.assertEqual(parents[0].org, "testx")
+        self.assertEqual(parents[0].offering, "GreekHero")
         locator.block_id = 'chapter2'
         parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 1)
@@ -930,7 +931,7 @@ class TestItemCrud(SplitModuleTest):
             fields={'display_name': 'new sequential'}
         )
         # check that course version changed and course's previous is the other one
-        self.assertEqual(new_module.location.package_id, "testx+GreekHero")
+        self.assertEqual(new_module.location.offering, "GreekHero")
         self.assertNotEqual(new_module.location.version_guid, premod_course.location.version_guid)
         self.assertIsNone(locator.version_guid, "Version inadvertently filled in")
         current_course = modulestore().get_course(locator)

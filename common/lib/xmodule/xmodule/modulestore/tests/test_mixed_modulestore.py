@@ -84,7 +84,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         """
         AssertEqual replacement for CourseLocator
         """
-        if not (loc1.package_id == loc2.package_id and loc1.branch == loc2.branch and loc1.block_id == loc2.block_id):
+        if loc1.version_agnostic() != loc2.version_agnostic():
             self.fail(self._formatMessage(msg, u"{} != {}".format(unicode(loc1), unicode(loc2))))
 
     def setUp(self):

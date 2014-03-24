@@ -27,7 +27,7 @@ URL_RE = re.compile('^' + URL_RE_SOURCE + '$', re.IGNORECASE | re.VERBOSE | re.U
 def parse_url(string, tag_optional=False):
     """
     A url usually begins with 'edx://' (case-insensitive match),
-    followed by either a version_guid or a package_id. If tag_optional, then
+    followed by either a version_guid or a org + offering pair. If tag_optional, then
     the url does not have to start with the tag and edx will be assumed.
 
     Examples:
@@ -39,12 +39,11 @@ def parse_url(string, tag_optional=False):
 
     This returns None if string cannot be parsed.
 
-    If it can be parsed as a version_guid with no preceding package_id, returns a dict
+    If it can be parsed as a version_guid with no preceding org + offering, returns a dict
     with key 'version_guid' and the value,
 
-    If it can be parsed as a package_id, returns a dict
+    If it can be parsed as a org + offering, returns a dict
     with key 'id' and optional keys 'branch' and 'version_guid'.
-
     """
     match = URL_RE.match(string)
     if not match:

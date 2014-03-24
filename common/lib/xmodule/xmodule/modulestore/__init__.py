@@ -220,7 +220,7 @@ class ModuleStoreWrite(ModuleStoreRead):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if package_id and version_guid given and the current
+        :raises VersionConflictError: if org, offering,  and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
@@ -236,7 +236,7 @@ class ModuleStoreWrite(ModuleStoreRead):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if package_id and version_guid given and the current
+        :raises VersionConflictError: if org, offering,  and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
@@ -321,7 +321,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if package_id and version_guid given and the current
+        :raises VersionConflictError: if org, offering,  and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         raise NotImplementedError
@@ -336,7 +336,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if package_id and version_guid given and the current
+        :raises VersionConflictError: if org, offering,  and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         raise NotImplementedError

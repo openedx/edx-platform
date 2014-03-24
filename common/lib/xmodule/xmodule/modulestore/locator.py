@@ -123,7 +123,7 @@ class BlockLocatorBase(Locator):
     def _parse_url(cls, url):
         """
         url must be a string beginning with 'edx://' and containing
-        either a valid version_guid or package_id (with optional branch), or both.
+        either a valid version_guid or org & offering (with optional branch), or both.
         """
         if not isinstance(url, basestring):
             raise TypeError('%s is not an instance of basestring' % url)
@@ -139,7 +139,7 @@ class BlockLocatorBase(Locator):
 
     @property
     def package_id(self):
-        if self.org or self.offering:
+        if self.org and self.offering:
             return u'{}{}{}'.format(self.org, self.ORG_SEPARATOR, self.offering)
         else:
             return None
@@ -260,7 +260,7 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         by reducing info.
         Returns a copy of itself without any version info.
 
-        :raises: ValueError if the block locator has no package_id
+        :raises: ValueError if the block locator has no org & offering
         """
         return CourseLocator(
             org=self.org,
@@ -313,7 +313,7 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         Return a string representing this location.
         """
         parts = []
-        if self.package_id:
+        if self.offering:
             parts.append(unicode(self.package_id))
             if self.branch:
                 parts.append(u"{prefix}{branch}".format(prefix=BRANCH_PREFIX, branch=self.branch))
@@ -331,7 +331,7 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
     the defined element in the course. Courses can be a version of an offering, the
     current draft head, or the current production version.
 
-    Locators can contain both a version and a package_id w/ branch. The split mongo functions
+    Locators can contain both a version and a org + offering w/ branch. The split mongo functions
     may raise errors if these conflict w/ the current db state (i.e., the course's branch !=
     the version_guid)
 
@@ -374,7 +374,7 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         by reducing info.
         Returns a copy of itself without any version info.
 
-        :raises: ValueError if the block locator has no package_id
+        :raises: ValueError if the block locator has no org and offering
         """
         return BlockUsageLocator(
             course_key=self.course_key.version_agnostic(),

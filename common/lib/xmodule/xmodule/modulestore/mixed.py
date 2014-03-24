@@ -73,9 +73,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
     def has_item(self, usage_key):
         """
         Does the course include the xblock who's id is reference?
-
-        :param course_id: a course_id or package_id (slashed or dotted)
-        :param reference: a Location or BlockUsageLocator
         """
         store = self._get_modulestore_for_courseid(usage_key.course_key)
         return store.has_item(usage_key)
@@ -117,12 +114,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
         store = self._get_modulestore_for_courseid(course_key)
         return store.get_items(course_key, **kwargs)
-
-    def _get_course_id_from_course_location(self, course_location):
-        """
-        Get the proper course_id based on the type of course_location
-        """
-        return getattr(course_location, 'course_id', None) or getattr(course_location, 'package_id', None)
 
     def get_courses(self):
         '''

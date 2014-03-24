@@ -200,7 +200,8 @@ class LocatorTest(TestCase):
             offering=None,
             version_guid=ObjectId(test_id_loc)
         )
-        self.assertIsNone(agnostic.package_id)
+        self.assertIsNone(agnostic.offering)
+        self.assertIsNone(agnostic.org)
 
     def test_block_constructor_url_kitchen_sink(self):
         test_id_loc = '519665f6223ebd6980884f2b'
