@@ -63,7 +63,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
 
     def _get_extension(self, srcurl):
         ''' get the extension of a given url '''
-        return getExtension
+        return getExtension(srcurl)
 
     def get_html(self):
         """ Renders parameters to template. """

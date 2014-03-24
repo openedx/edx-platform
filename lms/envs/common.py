@@ -796,6 +796,7 @@ main_vendor_js = [
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
+    'js/vendor/ova/vjs.youtube.js',
     'js/vendor/URI.min.js',
 ]
 
@@ -812,6 +813,7 @@ PIPELINE_CSS = {
             'css/vendor/jquery.qtip.min.css',
             'css/vendor/responsive-carousel/responsive-carousel.css',
             'css/vendor/responsive-carousel/responsive-carousel.slide.css',
+            'css/vendor/ova/video-js.min.css',
         ],
         'output_filename': 'css/lms-style-vendor.css',
     },
