@@ -5,22 +5,23 @@ from django.contrib.auth.models import User
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-
+from django.utils.translation import ugettext_noop
 from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 
-from django.utils.translation import ugettext_noop as _u
-
-FORUM_ROLE_ADMINISTRATOR = _u('Administrator')
-FORUM_ROLE_MODERATOR = _u('Moderator')
-FORUM_ROLE_COMMUNITY_TA = _u('Community TA')
-FORUM_ROLE_STUDENT = _u('Student')
+FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
+FORUM_ROLE_MODERATOR = ugettext_noop('Moderator')
+FORUM_ROLE_COMMUNITY_TA = ugettext_noop('Community TA')
+FORUM_ROLE_STUDENT = ugettext_noop('Student')
 
 
 @receiver(post_save, sender=CourseEnrollment)
-def assign_default_role(sender, instance, **kwargs):
+def assign_default_role_on_enrollment(sender, instance, **kwargs):
+    """
+    Assign forum default role 'Student'
+    """
     # The code below would remove all forum Roles from a user when they unenroll
     # from a course. Concerns were raised that it should apply only to students,
     # or that even the history of student roles is important for research
@@ -35,8 +36,15 @@ def assign_default_role(sender, instance, **kwargs):
     #     return
 
     # We've enrolled the student, so make sure they have the Student role
-    role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
-    instance.user.roles.add(role)
+    assign_default_role(instance.course_id, instance.user)
+
+
+def assign_default_role(course_id, user):
+    """
+    Assign forum default role 'Student' to user
+    """
+    role, __ = Role.objects.get_or_create(course_id=course_id, name="Student")
+    user.roles.add(role)
 
 class Permission(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False, primary_key=True)

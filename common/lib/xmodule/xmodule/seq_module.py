@@ -3,14 +3,16 @@ import logging
 
 from lxml import etree
 
-from xmodule.mako_module import MakoModuleDescriptor
-from xmodule.xml_module import XmlDescriptor
-from xmodule.x_module import XModule
-from xmodule.progress import Progress
-from xmodule.exceptions import NotFoundError
 from xblock.fields import Integer, Scope
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
+
+from .exceptions import NotFoundError
+from .fields import Date
+from .mako_module import MakoModuleDescriptor
+from .progress import Progress
+from .x_module import XModule
+from .xml_module import XmlDescriptor
 
 log = logging.getLogger(__name__)
 
@@ -25,6 +27,15 @@ class SequenceFields(object):
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
     position = Integer(help="Last tab viewed in this sequence", scope=Scope.user_state)
+    due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    extended_due = Date(
+        help="Date that this problem is due by for a particular student. This "
+             "can be set by an instructor, and will override the global due "
+             "date if it is set to a date that is later than the global due "
+             "date.",
+        default=None,
+        scope=Scope.user_state,
+    )
 
 
 class SequenceModule(SequenceFields, XModule):
@@ -77,13 +88,12 @@ class SequenceModule(SequenceFields, XModule):
             rendered_child = child.render('student_view', context)
             fragment.add_frag_resources(rendered_child)
 
+            titles = child.get_content_titles()
+            print titles
             childinfo = {
                 'content': rendered_child.content,
-                'title': "\n".join(
-                    grand_child.display_name
-                    for grand_child in child.get_children()
-                    if grand_child.display_name is not None
-                ),
+                'title': "\n".join(titles),
+                'page_title': titles[0] if titles else '',
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
@@ -127,7 +137,8 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
         children = []
         for child in xml_object:
             try:
-                children.append(system.process_xml(etree.tostring(child, encoding='unicode')).location.url())
+                child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
+                children.append(child_block.scope_ids.usage_id)
             except Exception as e:
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
@@ -138,6 +149,5 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('sequential')
         for child in self.get_children():
-            xml_object.append(
-                etree.fromstring(child.export_to_xml(resource_fs)))
+            self.runtime.add_block_as_child_node(child, xml_object)
         return xml_object

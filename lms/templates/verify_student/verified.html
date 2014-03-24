@@ -1,10 +1,11 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="bodyclass">register verification-process is-verified</%block>
-<%block name="title"><title>${_("Register for {} | Verification").format(course_name)}</title></%block>
+<%block name="pagetitle">${_("Register for {} | Verification").format(course_name)}</%block>
 
 <%block name="js_extra">
 <script type="text/javascript">

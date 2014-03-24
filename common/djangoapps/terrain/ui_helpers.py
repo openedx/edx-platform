@@ -264,7 +264,7 @@ def url_equals(url):
 
 
 @world.absorb
-def is_css_present(css_selector, wait_time=10):
+def is_css_present(css_selector, wait_time=30):
     return world.browser.is_element_present_by_css(css_selector, wait_time=wait_time)
 
 

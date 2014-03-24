@@ -49,7 +49,6 @@ class CircuitPreprocessor(markdown.preprocessors.Preprocessor):
     preRegex = re.compile(r'^circuit-schematic:(?P<data>.*)$')
 
     def run(self, lines):
-        print "running circuit preprocessor"
         def convertLine(line):
             m = self.preRegex.match(line)
             if m:
@@ -69,5 +68,4 @@ class CircuitLink(markdown.inlinepatterns.Pattern):
 
 def makeExtension(configs=None):
     to_return = CircuitExtension(configs=configs)
-    print "circuit returning ", to_return
     return to_return

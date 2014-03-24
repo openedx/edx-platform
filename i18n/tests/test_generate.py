@@ -1,21 +1,30 @@
+from datetime import datetime, timedelta
 import os
 import string
 import random
 import re
-from polib import pofile
+
 from unittest import TestCase
-from datetime import datetime, timedelta
+from mock import patch
+from polib import pofile
 from pytz import UTC
 
-import generate
-from config import CONFIGURATION
+from i18n import extract
+from i18n import generate
+from i18n import dummy
+from i18n.config import CONFIGURATION
 
 
 class TestGenerate(TestCase):
     """
     Tests functionality of i18n/generate.py
     """
-    generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
+    generated_files = ('django-partial.po', 'djangojs-partial.po', 'mako.po')
+
+    @classmethod
+    def setUpClass(cls):
+        extract.main()
+        dummy.main()
 
     def setUp(self):
         # Subtract 1 second to help comparisons with file-modify time succeed,
@@ -31,6 +40,8 @@ class TestGenerate(TestCase):
         self.assertTrue(os.path.exists(filename))
         os.remove(filename)
 
+    # Patch dummy_locales to not have esperanto present
+    @patch.object(CONFIGURATION, 'dummy_locales', ['fake2'])
     def test_main(self):
         """
         Runs generate.main() which should merge source files,
@@ -40,7 +51,7 @@ class TestGenerate(TestCase):
         after start of test suite)
         """
         generate.main()
-        for locale in CONFIGURATION.locales:
+        for locale in CONFIGURATION.translated_locales:
             for filename in ('django', 'djangojs'):
                 mofile = filename+'.mo'
                 path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)
@@ -48,7 +59,10 @@ class TestGenerate(TestCase):
                 self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
                 self.assertTrue(datetime.fromtimestamp(os.path.getmtime(path), UTC) >= self.start_time,
                                 msg='File not recently modified: %s' % path)
-            self.assert_merge_headers(locale)
+            # Segmenting means that the merge headers don't work they way they
+            # used to, so don't make this check for now. I'm not sure if we'll
+            # get the merge header back eventually, or delete this code eventually.
+            # self.assert_merge_headers(locale)
 
     def assert_merge_headers(self, locale):
         """

@@ -33,6 +33,7 @@ src_paths:
 
 # Paths to library JavaScript files (optional)
 lib_paths:
+    - common_static/js/test/i18n.js
     - common_static/coffee/src/ajax_prefix.js
     - common_static/coffee/src/logger.js
     - common_static/js/vendor/jasmine-jquery.js
@@ -56,6 +57,7 @@ lib_paths:
     - common_static/js/vendor/analytics.js
     - common_static/js/test/add_ajax_prefix.js
     - common_static/js/src/utility.js
+    - public/js/split_test_staff.js
 
 # Paths to spec (test) JavaScript files
 spec_paths:

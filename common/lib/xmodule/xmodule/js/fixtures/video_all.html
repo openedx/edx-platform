@@ -5,9 +5,15 @@
         id="video_id"
         class="video closed"
         data-show-captions="true"
+        data-save-state-url="/save_user_state"
+        data-speed="1.5"
         data-start=""
         data-end=""
-        data-caption-asset-path="/static/subs/"
+        data-saved-video-position="0"
+        data-transcript-language="en"
+        data-transcript-languages='{"en": "English", "de": "Deutsch", "zh": "普通话"}'
+        data-transcript-translation-url="/transcript/translation"
+        data-transcript-available-translations-url="/transcript/available_translations"
         data-sub="Z5KLxerq05Y"
         data-mp4-source="xmodule/include/fixtures/test.mp4"
         data-webm-source="xmodule/include/fixtures/test.webm"
@@ -51,7 +57,9 @@
                   </div>
                   <a href="#" class="add-fullscreen" title="Fill browser" role="button" aria-disabled="false">Fill Browser</a>
                   <a href="#" class="quality_control" title="HD off" role="button" aria-disabled="false">HD off</a>
-                  <a href="#" class="hide-subtitles" title="Turn off captions" role="button" aria-disabled="false">Captions</a>
+                  <div class="lang menu-container">
+                    <a href="#" class="hide-subtitles" title="Turn off captions" role="button" aria-disabled="false">Captions</a>
+                  </div>
                 </div>
               </div>
             </section>
@@ -61,6 +69,23 @@
         </div>
 
         <div class="focus_grabber last"></div>
+
+        <ul class="wrapper-downloads">
+          <li class="video-tracks">
+            <div class="a11y-menu-container">
+                <a class="a11y-menu-button" href="#" title=".srt">.srt</a>
+                <ol class="a11y-menu-list">
+                  <li class="a11y-menu-item">
+                    <a class="a11y-menu-item-link" href="#txt" title="Text (.txt) file" data-value="txt">Text (.txt) file</a>
+                  </li>
+                  <li class="a11y-menu-item active">
+                    <a class="a11y-menu-item-link" href="#srt" title="SubRip (.srt) file" data-value="srt">SubRip (.srt) file</a>
+                  </li>
+                </ol>
+            </div>
+          </li>
+        </ul>
+
       </div>
     </div>
   </div>

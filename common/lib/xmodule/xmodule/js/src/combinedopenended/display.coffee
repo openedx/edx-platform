@@ -195,7 +195,7 @@ class @CombinedOpenEnded
     @can_upload_files = false
     @open_ended_child= @$(@oe).find(@open_ended_child_sel)
 
-    @out_of_sync_message = gettext('The problem state got out of sync.  Try reloading the page.')
+    @out_of_sync_message = gettext 'The problem state got out of sync.  Try reloading the page.'
 
     if @task_number>1
       @prompt_hide()
@@ -249,7 +249,11 @@ class @CombinedOpenEnded
     fd.append('submission_id', submission_id)
     fd.append('grader_id', grader_id)
     if(!score)
-      @gentle_alert gettext("You need to pick a rating before you can submit.")
+      ###
+      Translators: A "rating" is a score a student gives to indicate how well
+      they feel they were graded on this problem
+      ###
+      @gentle_alert gettext "You need to pick a rating before you can submit."
       return
     else
       fd.append('score', score)
@@ -293,10 +297,15 @@ class @CombinedOpenEnded
       @replace_text_inputs()
       @hint_area.attr('disabled', true)
       if @task_number<@task_count
-        @gentle_alert gettext("Your score did not meet the criteria to move to the next step.")
+        ###
+        Translators: this message appears when transitioning between openended grading
+        types (i.e. self assesment to peer assessment). Sometimes, if a student
+        did not perform well at one step, they cannot move on to the next one.
+        ###
+        @gentle_alert gettext "Your score did not meet the criteria to move to the next step."
     else if @child_state == 'initial'
       @answer_area.attr("disabled", false)
-      @submit_button.prop('value', gettext('Submit'))
+      @submit_button.prop('value', gettext 'Submit')
       @submit_button.click @confirm_save_answer
       @setup_file_upload()
       @save_button.click @store_answer
@@ -305,14 +314,18 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
       @hide_file_upload()
-      @submit_button.prop('value', gettext('Submit assessment'))
+      ###
+      Translators: one clicks this button after one has finished filling out the grading
+      form for an openended assessment
+      ###
+      @submit_button.prop('value', gettext 'Submit assessment')
       @submit_button.click @save_assessment
       @submit_button.attr("disabled",true)
       if @child_type == "openended"
         @submit_button.hide()
         @queueing()
         @grader_status = @$(@grader_status_sel)
-        @grader_status.html("<span class='grading'>" + gettext('Your response has been submitted.  Please check back later for your grade.') + "</span>")
+        @grader_status.html("<span class='grading'>" + gettext "Your response has been submitted. Please check back later for your grade." + "</span>")
       else if @child_type == "selfassessment"
         @setup_score_selection()
     else if @child_state == 'post_assessment'
@@ -321,7 +334,11 @@ class @CombinedOpenEnded
         @skip_post_assessment()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
-      @submit_button.prop('value', gettext('Submit post-assessment'))
+      ###
+      Translators: this button is clicked to submit a student's rating of
+      an evaluator's assessment
+      ###
+      @submit_button.prop('value', gettext 'Submit post-assessment')
       if @child_type=="selfassessment"
          @submit_button.click @save_hint
       else
@@ -353,7 +370,7 @@ class @CombinedOpenEnded
       @save_button.attr("disabled",true)
       $.postWithPrefix "#{@ajax_url}/store_answer", data, (response) =>
         if response.success
-          @gentle_alert(gettext("Answer saved, but not yet submitted."))
+          @gentle_alert(gettext "Answer saved, but not yet submitted.")
         else
           @errors_area.html(response.error)
         @save_button.attr("disabled",false)
@@ -368,6 +385,7 @@ class @CombinedOpenEnded
       @rub.initialize(@location)
       @child_state = 'assessing'
       @find_assessment_elements()
+      @answer_area.val(response.student_response)
       @rebind()
       answer_area_div = @$(@answer_area_div_sel)
       answer_area_div.html(response.student_response)
@@ -377,7 +395,13 @@ class @CombinedOpenEnded
       @gentle_alert response.error
 
   confirm_save_answer: (event) =>
-    @save_answer(event) if confirm(gettext('Please confirm that you wish to submit your work. You will not be able to make any changes after submitting.'))
+    ###
+    Translators: This string appears in a confirmation box after one tries to submit
+    an openended problem
+    ###
+    confirmation_text = gettext 'Please confirm that you wish to submit your work. You will not be able to make any changes after submitting.' 
+    accessible_confirm confirmation_text, =>
+      @save_answer(event)
 
   save_answer: (event) =>
     @$el.find(@oe_alert_sel).remove()
@@ -398,7 +422,7 @@ class @CombinedOpenEnded
             # Don't submit the file in the case of it being too large, deal with the error locally.
             @submit_button.show()
             @submit_button.attr('disabled', false)
-            @gentle_alert "You are trying to upload a file that is too large for our system.  Please choose a file under 2MB or paste a link to it into the answer box."
+            @gentle_alert gettext "You are trying to upload a file that is too large for our system.  Please choose a file under 2MB or paste a link to it into the answer box."
             return
 
       fd = new FormData()
@@ -421,14 +445,14 @@ class @CombinedOpenEnded
       @errors_area.html(@out_of_sync_message)
 
   keydown_handler: (event) =>
-    #Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
+    # Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
     if event.which == 17 && @is_ctrl==false
       @is_ctrl=true
     else if @is_ctrl==true && event.which == 13 && @child_state == 'assessing' && @rub.check_complete()
       @save_assessment(event)
 
   keyup_handler: (event) =>
-    #Handle keyup event when ctrl key is released
+    # Handle keyup event when ctrl key is released
     if event.which == 17 && @is_ctrl==true
       @is_ctrl=false
 
@@ -452,7 +476,7 @@ class @CombinedOpenEnded
 
           @rebind()
         else
-          @errors_area.html(response.error)
+          @gentle_alert response.error
     else
       @errors_area.html(@out_of_sync_message)
 
@@ -484,7 +508,9 @@ class @CombinedOpenEnded
       @errors_area.html(@out_of_sync_message)
 
   confirm_reset: (event) =>
-    @reset(event) if confirm(gettext('Are you sure you want to remove your previous response to this question?'))
+    message = gettext 'Are you sure you want to remove your previous response to this question?'
+    accessible_confirm message, =>
+      @reset(event)
 
   reset: (event) =>
     event.preventDefault()
@@ -521,9 +547,14 @@ class @CombinedOpenEnded
           @rebind()
           @next_problem_button.hide()
           if !response.allow_reset
-            @gentle_alert gettext("Moved to next step.")
+            @gentle_alert gettext "Moved to next step."
           else
-            @gentle_alert gettext("Your score did not meet the criteria to move to the next step.")
+            ###
+            Translators: this message appears when transitioning between openended grading
+            types (i.e. self assesment to peer assessment). Sometimes, if a student
+            did not perform well at one step, they cannot move on to the next one.
+            ###
+            @gentle_alert gettext "Your score did not meet the criteria to move to the next step."
             @show_combined_rubric_current()
         else
           @errors_area.html(response.error)
@@ -560,7 +591,7 @@ class @CombinedOpenEnded
         @$(@file_upload_preview_sel).hide()
         @$(@file_upload_box_sel).change @preview_image
       else
-        @gentle_alert gettext('File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.')
+        @gentle_alert gettext 'File uploads are required for this question, but are not supported in your browser. Try the newest version of Google Chrome. Alternatively, if you have uploaded the image to another website, you can paste a link to it into the answer box.'
 
   hide_file_upload: =>
     if @accept_file_upload == "True"
@@ -581,12 +612,20 @@ class @CombinedOpenEnded
   collapse_question: (event) =>
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
-    if @question_header.text() == gettext("Hide Question")
-      new_text = gettext("Show Question")
-      Logger.log 'oe_hide_question', {location: @location}
-    else
+    if @prompt_container.hasClass('open')
+      ###
+      Translators: "Show Question" is some text that, when clicked, shows a question's
+      content that had been hidden
+      ###
+      new_text = gettext "Show Question"
       Logger.log 'oe_show_question', {location: @location}
-      new_text = gettext("Hide Question")
+    else
+      ###
+      Translators: "Hide Question" is some text that, when clicked, hides a question's
+      content
+      ###
+      Logger.log 'oe_hide_question', {location: @location}
+      new_text = gettext "Hide Question"
     @question_header.text(new_text)
     return false
 
@@ -626,19 +665,19 @@ class @CombinedOpenEnded
     if @prompt_container.is(":hidden")==true
       @prompt_container.slideToggle()
       @prompt_container.toggleClass('open')
-      @question_header.text("Hide Question")
+      @question_header.text(gettext "Hide Question")
 
   prompt_hide: () =>
     if @prompt_container.is(":visible")==true
       @prompt_container.slideToggle()
       @prompt_container.toggleClass('open')
-      @question_header.text(gettext("Show Question"))
+      @question_header.text(gettext "Show Question")
 
   log_feedback_click: (event) ->
-    link_text = @$(event.target).html()
-    if link_text == gettext('See full feedback')
+    target = @$(event.target)
+    if target.hasClass('see-full-feedback')
       Logger.log 'oe_show_full_feedback', {}
-    else if link_text == gettext('Respond to Feedback')
+    else if target.hasClass('respond-to-feedback')
       Logger.log 'oe_show_respond_to_feedback', {}
     else
       generated_event_type = link_text.toLowerCase().replace(" ","_")

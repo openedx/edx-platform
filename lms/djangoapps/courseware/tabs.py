@@ -27,6 +27,11 @@ from open_ended_grading import open_ended_notifications
 
 import waffle
 
+# We only need to scrape strings for i18n in this file, since ugettext is 
+# called on them in the template:
+# https://github.com/edx/edx-platform/blob/master/lms/templates/courseware/course_navigation.html#L29
+_ = lambda text: text
+
 log = logging.getLogger(__name__)
 
 
@@ -63,9 +68,13 @@ def _courseware(tab, user, course, active_page, request):
     """
     link = reverse('courseware', args=[course.id])
     if waffle.flag_is_active(request, 'merge_course_tabs'):
-        return [CourseTab('Course Content', link, active_page == "courseware")]
+        # Translators: 'Course Content' refers to the tab in the courseware
+        # that leads to the content of a course
+        return [CourseTab(_('Course Content'), link, active_page == "courseware")]
     else:
-        return [CourseTab('Courseware', link, active_page == "courseware")]
+        # Translators: 'Courseware' refers to the tab in the courseware
+        # that leads to the content of a course
+        return [CourseTab(_('Courseware'), link, active_page == "courseware")]
 
 
 def _course_info(tab, user, course, active_page, request):
@@ -111,7 +120,9 @@ def _external_discussion(tab, user, course, active_page, request):
     """
     This returns a tab that links to an external discussion service
     """
-    return [CourseTab('Discussion', tab['link'], active_page == 'discussion')]
+    # Translators: 'Discussion' refers to the tab in the courseware
+    # that leads to the discussion forums
+    return [CourseTab(_('Discussion'), tab['link'], active_page == 'discussion')]
 
 
 def _external_link(tab, user, course, active_page, request):
@@ -165,7 +176,9 @@ def _staff_grading(tab, user, course, active_page, request):
     if has_access(user, course, 'staff'):
         link = reverse('staff_grading', args=[course.id])
 
-        tab_name = "Staff grading"
+        # Translators: "Staff grading" appears on a tab that allows
+        # staff to view openended problems that require staff grading
+        tab_name = _("Staff grading")
 
         notifications  = open_ended_notifications.staff_grading_notifications(course, user)
         pending_grading = notifications['pending_grading']
@@ -179,13 +192,16 @@ def _staff_grading(tab, user, course, active_page, request):
 def _syllabus(tab, user, course, active_page, request):
     """Display the syllabus tab"""
     link = reverse('syllabus', args=[course.id])
-    return [CourseTab('Syllabus', link, active_page == 'syllabus')]
+    return [CourseTab(_('Syllabus'), link, active_page == 'syllabus')]
 
 
 def _peer_grading(tab, user, course, active_page, request):
     if user.is_authenticated():
         link = reverse('peer_grading', args=[course.id])
-        tab_name = "Peer grading"
+
+        # Translators: "Peer grading" appears on a tab that allows
+        # students to view openended problems that require grading
+        tab_name = _("Peer grading")
 
         notifications = open_ended_notifications.peer_grading_notifications(course, user)
         pending_grading = notifications['pending_grading']
@@ -199,7 +215,11 @@ def _peer_grading(tab, user, course, active_page, request):
 def _combined_open_ended_grading(tab, user, course, active_page, request):
     if user.is_authenticated():
         link = reverse('open_ended_notifications', args=[course.id])
-        tab_name = "Open Ended Panel"
+
+        # Translators: "Open Ended Panel" appears on a tab that, when clicked,
+        # opens up a panel that displays information about openended problems
+        # that a user has submitted or needs to grade
+        tab_name = _("Open Ended Panel")
 
         notifications  = open_ended_notifications.combined_notifications(course, user)
         pending_grading = notifications['pending_grading']
@@ -216,17 +236,24 @@ def _notes_tab(tab, user, course, active_page, request):
         return [CourseTab(tab['name'], link, active_page == 'notes')]
     return []
 
+def _instructor(course, active_page):
+    link = reverse('instructor_dashboard', args=[course.id])
+    # Translators: 'Instructor' appears on the tab that leads to
+    # the instructor dashboard, which is a portal where an instructor
+    # can get data and perform various actions on their course
+    return CourseTab(_('Instructor'), link, active_page == 'instructor')
 
 #### Validators
 def key_checker(expected_keys):
     """
     Returns a function that checks that specified keys are present in a dict
     """
-    def check(d):
-        for k in expected_keys:
-            if k not in d:
-                raise InvalidTabsException("Key {0} not present in {1}"
-                                           .format(k, d))
+    def check(dictionary):
+        for key in expected_keys:
+            if key not in dictionary:
+                raise InvalidTabsException(
+                    "Key {0} not present in {1}".format(key, dictionary)
+                )
     return check
 
 
@@ -259,7 +286,7 @@ VALID_TAB_TYPES = {
     'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
     'notes': TabImpl(null_validator, _notes_tab),
     'syllabus': TabImpl(null_validator, _syllabus)
-    }
+}
 
 
 ### External interface below this.
@@ -330,9 +357,7 @@ def get_course_tabs(user, course, active_page, request):
 
     # Instructor tab is special--automatically added if user is staff for the course
     if has_access(user, course, 'staff'):
-        tabs.append(CourseTab('Instructor',
-                              reverse('instructor_dashboard', args=[course.id]),
-                              active_page == 'instructor'))
+        tabs.append(_instructor(course, active_page))
 
     return tabs
 
@@ -388,8 +413,7 @@ def get_default_tabs(user, course, active_page, request):
         tabs.extend(_progress({'name': 'Progress'}, user, course, active_page, request))
 
     if has_access(user, course, 'staff'):
-        link = reverse('instructor_dashboard', args=[course.id])
-        tabs.append(CourseTab('Instructor', link, active_page == 'instructor'))
+        tabs.append(_instructor(course, active_page))
 
     return tabs
 

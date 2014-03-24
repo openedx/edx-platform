@@ -21,20 +21,20 @@ def add_page(step):
 
 @step(u'I should see a static page named "([^"]*)"$')
 def see_a_static_page_named_foo(step, name):
-    pages_css = 'section.xmodule_StaticTabModule'
+    pages_css = 'div.xmodule_StaticTabModule'
     page_name_html = world.css_html(pages_css)
     assert_equal(page_name_html, '\n    {name}\n'.format(name=name))
 
 
 @step(u'I should not see any static pages$')
 def not_see_any_static_pages(step):
-    pages_css = 'section.xmodule_StaticTabModule'
+    pages_css = 'div.xmodule_StaticTabModule'
     assert (world.is_css_not_present(pages_css, wait_time=30))
 
 
 @step(u'I "(edit|delete)" the static page$')
 def click_edit_or_delete(step, edit_or_delete):
-    button_css = 'div.component-actions a.%s-button' % edit_or_delete
+    button_css = 'ul.component-actions a.%s-button' % edit_or_delete
     world.css_click(button_css)
 
 

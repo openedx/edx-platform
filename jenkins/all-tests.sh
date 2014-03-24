@@ -98,6 +98,7 @@ END
 
     "bok-choy")
         rake test:bok_choy
+        rake test:bok_choy:coverage
         ;;
 
 esac

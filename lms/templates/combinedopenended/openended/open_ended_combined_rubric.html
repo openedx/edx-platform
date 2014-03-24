@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ungettext %>
 <div class="rubric">
     % for i in range(len(categories)):
         <% category = categories[i] %>
@@ -5,6 +6,16 @@
         <ul class="rubric-list">
         % for j in range(len(category['options'])):
             <% option = category['options'][j] %>
+            <%
+                points_earned_msg = ungettext(
+                    "{num} point: {explanatory_text}",
+                    "{num} points: {explanatory_text}",
+                    option['points']
+                ).format(
+                    num=option['points'],
+                    explanatory_text=option['text'],
+                )
+            %>
             %if len(category['options'][j]['grader_types'])>0:
                 <li class="rubric-list-item">
             %else:
@@ -19,12 +30,13 @@
                         %else:
                             <label class="choicegroup_incorrect wrapper-score-selection"></label>
                         %endif
-                            <span class="wrappable"> ${option['points']} баллов : ${option['text']}</span>
+
+                            <span class="wrappable"> ${points_earned_msg}</span>
                         </label>
                     %else:
                         <label class="rubric-elements-info">
                             <span class="wrapper-score-selection"> </span>
-                            <span class="wrappable"> ${option['points']} баллов : ${option['text']}</span>
+                            <span class="wrappable"> ${points_earned_msg}</span>
                         </label>
                     %endif
                 </div>

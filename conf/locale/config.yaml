@@ -1,0 +1,60 @@
+# Configuration for i18n workflow.
+
+locales:
+    - en  # English - Source Language
+    - ru  # Russian
+
+
+# The locales used for fake-accented English, for testing.
+dummy_locales:
+    - eo
+    - fake2
+
+# Directories we don't search for strings.
+ignore_dirs:
+    - docs
+    - src
+    - i18n
+    - test_root
+    - common/static/xmodule/modules
+    - common/static/xmodule/descriptors
+
+
+# Third-party installed apps that we also extract strings from.  When adding a
+# file here, also add it to the django.po merge files below, and to the
+# .tx/config file so that it will be pushed to and pulled from transifex.
+third_party:
+    - wiki
+
+
+# How should .po files be segmented?  See i18n/segment.py for details. Strings
+# that are only found in a particular segment are segregated into that .po file
+# so that translators can focus on separate parts of the product.
+#
+# We segregate Studio so we can provide new languages for LMS without having to
+# also translate the Studio strings. LMS needs the strings from lms/* and
+# common/*, so those will stay in the main .po file.
+segment:
+    django-partial.po:          # This .po file..
+        django-studio.po:       #  produces this .po file..
+            - cms/*             #   by segregating strings from these files.
+        # Anything that doesn't match a pattern stays in the original file.
+    djangojs-partial.po:
+        djangojs-studio.po:
+            - cms/*
+    mako.po:
+        mako-studio.po:
+            - cms/*
+
+# How should the generate step merge files?
+generate_merge:
+    django.po:
+        - django-partial.po
+        - django-studio.po
+        - mako.po
+        - mako-studio.po
+        - messages.po
+        - wiki.po
+    djangojs.po:
+        - djangojs-partial.po
+        - djangojs-studio.po

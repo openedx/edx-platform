@@ -5,9 +5,7 @@
   <div class="member-list-widget">
     <div class="header">
       <div class="title"> {{title}} </div>
-      <div class="info-badge"></div>
     </div>
-    <div class="info"> {{info}} </div>
     <div class="member-list">
       <table>
         <thead>
@@ -20,6 +18,7 @@
         <tbody></tbody>
       </table>
     </div>
+    <div class="info"> {{info}} </div>
     <div class="bottom-bar">
       <input type="text" name="add-field" class="add-field" placeholder="{{add_placeholder}}">
       <input type="button" name="add" class="add" value="{{add_btn_label}}">
@@ -33,7 +32,7 @@
   <textarea rows="6" cols="50" name="student-emails" placeholder="${_("Student Emails")}" spellcheck="false"></textarea>
   <br>
 
-  <input type="checkbox" name="auto-enroll" value="${_("Auto-Enroll")}" style="margin-top: 1em;">
+  <input type="checkbox" name="auto-enroll" value="Auto-Enroll" style="margin-top: 1em;">
   <label for="auto-enroll">${_("Auto Enroll")}</label>
   <div class="auto-enroll-hint">
     <p> ${_("If auto enroll is <em>checked</em>, students who have not yet registered for edX will be automatically enrolled.")}
@@ -42,7 +41,7 @@
   </div>
   
   <div>
-    <input type="checkbox" name="email-students" value="${_("Notify-students-by-email")}">
+    <input type="checkbox" name="email-students" value="Notify-students-by-email">
     <label for="email-students">${_("Notify students by email")}</label>
     <div class="email-students-hint">
       <p> ${_("If email students is <em>checked</em> students will receive an email notification.")}
@@ -72,7 +71,7 @@
     <p>
       ${_("Staff cannot modify staff or beta tester lists. To modify these lists, "
       "contact your instructor and ask them to add you as an instructor for staff "
-      "and beta lists, or a forum admin for forum management.")}
+      "and beta lists, or a discussion admin for discussion management.")}
     </p>
   %endif
 
@@ -95,7 +94,7 @@
       data-display-name="${_("Instructors")}"
       data-info-text="
         ${_("Instructors are the core administration of your course. Instructors can "
-        "add and remove course staff, as well as administer forum access.")}"
+        "add and remove course staff, as well as administer discussion access.")}"
       data-list-endpoint="${ section_data['list_course_role_members_url'] }"
       data-modify-endpoint="${ section_data['modify_access_url'] }"
       data-add-button-label="${_("Add Instructor")}"
@@ -115,23 +114,25 @@
 
     <div class="auth-list-container"
       data-rolename="Administrator"
-      data-display-name="${_("Forum Admins")}"
+      data-display-name="${_("Discussion Admins")}"
       data-info-text="
-        ${_("Forum admins can moderate the course forums as well as administer "
-        "other forum roles.")}"
+        ${_("Discussion admins can edit or delete any post, clear misuse flags, close "
+         "and re-open threads, endorse responses, and see posts from all cohorts. "
+         "They CAN add/delete other moderators and their posts are marked as 'staff'.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
-      data-add-button-label="Add ${_("Forum Admin")}"
+      data-add-button-label="Add ${_("Discussion Admin")}"
     ></div>
   %endif
 
   %if section_data['access']['instructor'] or section_data['access']['forum_admin']:
     <div class="auth-list-container"
       data-rolename="Moderator"
-      data-display-name="${_("Forum Moderators")}"
+      data-display-name="${_("Discussion Moderators")}"
       data-info-text="
-        ${_("Forum moderators can moderate the course forums. They cannot add other "
-        "moderators.")}"
+        ${_("Discussion moderators can edit or delete any post, clear misuse flags, close "
+         "and re-open threads, endorse responses, and see posts from all cohorts. "
+         "They CANNOT add/delete other moderators and their posts are marked as 'staff'.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="${_("Add Moderator")}"
@@ -139,10 +140,12 @@
 
     <div class="auth-list-container"
       data-rolename="Community TA"
-      data-display-name="${_("Forum Community TAs")}"
+      data-display-name="${_("Discussion Community TAs")}"
       data-info-text="
         ${_("Community TA's are members of the community whom you deem particularly "
-        "helpful on the forums.")}"
+        "helpful on the discussion boards. They can edit or delete any post, clear misuse flags, "
+        "close and re-open threads, endorse responses, and see posts from all cohorts. "
+        "Their posts are marked 'Community TA'.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="Add ${_("Community TA")}"

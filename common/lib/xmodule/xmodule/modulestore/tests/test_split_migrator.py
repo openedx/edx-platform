@@ -20,6 +20,7 @@ from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.mongo.base import MongoModuleStore
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore.mongo import draft
+from xmodule.modulestore.tests import test_location_mapper
 
 
 class TestMigration(unittest.TestCase):
@@ -43,10 +44,8 @@ class TestMigration(unittest.TestCase):
 
     def setUp(self):
         super(TestMigration, self).setUp()
-        noop_cache = mock.Mock(spec=['get', 'set_many'])
-        noop_cache.configure_mock(**{'get.return_value': None})
         # pylint: disable=W0142
-        self.loc_mapper = LocMapperStore(noop_cache, **self.db_config)
+        self.loc_mapper = LocMapperStore(test_location_mapper.TrivialCache(), **self.db_config)
         self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
         self.draft_mongo = DraftModuleStore(self.db_config, **self.modulestore_options)
         self.split_mongo = SplitMongoModuleStore(
@@ -103,7 +102,7 @@ class TestMigration(unittest.TestCase):
         location = location.replace(category='chapter', name=uuid.uuid4().hex)
         chapter2 = self._create_and_get_item(self.old_mongo, location, {}, {'display_name': 'Chapter 2'}, runtime)
         course_root.children.append(chapter2.location.url())
-        self.old_mongo.update_children(course_root.location, course_root.children)
+        self.old_mongo.update_item(course_root, '**replace_user**')
         # vertical in live only
         location = location.replace(category='vertical', name=uuid.uuid4().hex)
         live_vert = self._create_and_get_item(self.old_mongo, location, {}, {'display_name': 'Live vertical'}, runtime)
@@ -141,7 +140,7 @@ class TestMigration(unittest.TestCase):
         self.create_random_units(self.old_mongo, live_vert)
 
         # update the chapter
-        self.old_mongo.update_children(chapter1.location, chapter1.children)
+        self.old_mongo.update_item(chapter1, '**replace_user**')
 
         # now the other one w/ the conditional
         # first create some show children
@@ -170,7 +169,7 @@ class TestMigration(unittest.TestCase):
         # add direct children
         self.create_random_units(self.old_mongo, conditional)
         chapter2.children.append(conditional.location.url())
-        self.old_mongo.update_children(chapter2.location, chapter2.children)
+        self.old_mongo.update_item(chapter2, '**replace_user**')
 
         # and the ancillary docs (not children)
         location = location.replace(category='static_tab', name=uuid.uuid4().hex)
@@ -208,9 +207,9 @@ class TestMigration(unittest.TestCase):
                     cc_store, location, data, {'display_name': str(uuid.uuid4())}, parent.runtime
                 )
                 cc_parent.children.append(element.location.url())
-        store.update_children(parent.location, parent.children)
+        store.update_item(parent, '**replace_user**')
         if cc_store is not None:
-            cc_store.update_children(cc_parent.location, cc_parent.children)
+            cc_store.update_item(cc_parent, '**replace_user**')
 
     def compare_courses(self, presplit, published):
         # descend via children to do comparison
@@ -272,7 +271,8 @@ class TestMigration(unittest.TestCase):
                 self.compare_dags(presplit, pre_child, split_child, published)
 
     def test_migrator(self):
-        self.migrator.migrate_mongo_course(self.course_location, random.getrandbits(32))
+        user = mock.Mock(id=1)
+        self.migrator.migrate_mongo_course(self.course_location, user)
         # now compare the migrated to the original course
         self.compare_courses(self.old_mongo, True)
         self.compare_courses(self.draft_mongo, False)

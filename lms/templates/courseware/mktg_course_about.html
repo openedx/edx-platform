@@ -8,7 +8,7 @@
 
 <%inherit file="../mktg_iframe.html" />
 
-<%block name="title"><title>${_("About {course_number}").format(course_number=course.display_number_with_default) | h}</title></%block>
+<%block name="pagetitle">${_("About {course_number}").format(course_number=course.display_number_with_default) | h}</%block>
 
 <%block name="bodyclass">view-iframe-content view-partial-mktgregister</%block>
 
@@ -37,7 +37,7 @@
         window.top.location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : '${_("An error occurred. Please try again later.")}')
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
         ).css("display", "block");
       }
     });
@@ -75,11 +75,11 @@
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
         <input name="course_id" type="hidden" value="${course.id}">
-        <input name="enrollment_action" type="hidden" value="${_("enroll")}">
+        <input name="enrollment_action" type="hidden" value="enroll">
         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
       </fieldset>
       <div class="submit">
-        <input name="enroll" type="submit" value="${_("enroll")}">
+        <input name="enroll" type="submit" value="enroll">
       </div>
     </form>
   </div>

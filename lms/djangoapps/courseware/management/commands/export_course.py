@@ -16,7 +16,6 @@ from path import path
 from django.core.management.base import BaseCommand, CommandError
 
 from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.xml_exporter import export_to_xml
 
 

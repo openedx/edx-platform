@@ -1,0 +1,45 @@
+
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="bodyclass">register verification-process is-not-verified step-confirmation</%block>
+<%block name="pagetitle">${_("Re-Verification Failed")}</%block>
+
+<%block name="js_extra">
+<script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
+<script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.keybd.js')}"></script>
+</%block>
+<%block name="content">
+
+<div class="container">
+  <section class="wrapper">
+
+    <div class="wrapper-content-main">
+      <article class="content-main">
+        <section class="content-confirmation">
+          <div class="wrapper-view">
+            <div class="view">
+              <h3 class="title">${_("Re-Verification Failed")}</h3>
+
+              <div class="instruction">
+                <p>${_("Your re-verification was submitted after the re-verification deadline, and you can no longer be re-verified.")}</p>
+                <p>${_("Please contact support if you believe this message to be in error.")}</p>
+              </div>
+
+              <ol class="list-nav">
+                <li class="nav-item">
+                  <a class="action action-primary" href="${reverse('dashboard')}">${_("Return to Your Dashboard")}</a>
+                </li>
+              </ol>
+            </div> <!-- /view -->
+          </div> <!-- /wrapper-view -->
+        </section>
+      </article>
+    </div> <!-- /wrapper-content-main -->
+
+    <%include file="_reverification_support.html" />
+  </section>
+</div>
+</%block>

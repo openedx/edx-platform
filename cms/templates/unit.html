@@ -4,13 +4,15 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from xmodule.modulestore.django import loc_mapper
 %>
+<%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
 <%block name="title">${_("Individual Unit")}</%block>
 <%block name="bodyclass">is-signedin course unit view-unit</%block>
 
 <%block name="jsextra">
   <script type='text/javascript'>
-require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit", "jquery.ui"],
+require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit", "jquery.ui",
+        "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
     function(doc, $, ModuleModel, UnitEditView, ui) {
   window.unit_location_analytics = '${unit_locator}';
 
@@ -19,6 +21,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
 
   new UnitEditView({
     el: $('.main-wrapper'),
+    view: 'unit',
     model: new ModuleModel({
       id: '${unit_locator}',
       state: '${unit_state}'
@@ -30,6 +33,10 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       $(this).prepend($emptyEditor);
   });
 });
+  </script>
+  
+  <script type="text/template" id="image-modal-tpl">
+    <%static:include path="js/imageModal.underscore" />
   </script>
 
 </%block>
@@ -48,7 +55,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
         <article class="unit-body window">
         <p class="unit-name-input"><label for="unit-display-name-input">${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" id="unit-display-name-input" class="unit-display-name-input" /></p>
           <ol class="components">
-            % for locator in components:
+            % for locator in locators:
             <li class="component" data-locator="${locator}"/>
             % endfor
             <li class="new-component-item adding">
@@ -164,7 +171,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
               % endif
               ${_("with the subsection {link_start}{name}{link_end}").format(
                   name=subsection.display_name_with_default,
-                  link_start='<a href="{url}">'.format(url=subsection_url),
+                  link_start=u'<a href="{url}">'.format(url=subsection_url),
                   link_end='</a>',
                 )}
               </p>
@@ -207,5 +214,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       </div>
     </div>
   </div>
+  
+  
 
 </%block>

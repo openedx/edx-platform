@@ -159,6 +159,9 @@ if Backbone?
     created_at_time: ->
       new Date(@get("created_at")).getTime()
 
+    hasResponses: ->
+      @get('comments_count') > 0
+
   class @Comment extends @Content
     urlMappers:
       'reply': -> DiscussionUtil.urlFor('create_sub_comment', @id)

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 import json
-from mock import patch, ANY
+from mock import patch
 from pytz import UTC
 
 from django.test.utils import override_settings
@@ -87,20 +87,19 @@ class OpenEndedPostTest(ModuleStoreTestCase):
             module = get_module_for_student(self.student_on_accessing, course, self.problem_location)
             task = module.child_module.get_task_number(self.open_ended_task_number)
 
-            qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
-            student_info = {'anonymous_student_id': anonymous_id_for_user(self.student_on_accessing, ''),
-                            'submission_time': qtime}
-
-            contents = task.payload.copy()
-            contents.update({
-                'max_score': 2,
-                'student_info': json.dumps(student_info),
-                'student_response': "Here is an answer.",
-            })
+            student_response = "Here is an answer."
+            student_anonymous_id = anonymous_id_for_user(self.student_on_accessing, '')
+            submission_time = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
 
             result = post_submission_for_student(self.student_on_accessing, course, self.problem_location, self.open_ended_task_number, dry_run=False)
+
             self.assertTrue(result)
-            mock_send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
+            mock_send_to_queue_body_arg = json.loads(mock_send_to_queue.call_args[1]['body'])
+            self.assertEqual(mock_send_to_queue_body_arg['max_score'], 2)
+            self.assertEqual(mock_send_to_queue_body_arg['student_response'], student_response)
+            body_arg_student_info = json.loads(mock_send_to_queue_body_arg['student_info'])
+            self.assertEqual(body_arg_student_info['anonymous_student_id'], student_anonymous_id)
+            self.assertGreaterEqual(body_arg_student_info['submission_time'], submission_time)
 
     def test_post_submission_for_student_on_post_assessment(self):
         course = get_course_with_access(self.student_on_post_assessment, self.course_id, 'load')

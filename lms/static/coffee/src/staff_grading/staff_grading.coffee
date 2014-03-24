@@ -284,6 +284,7 @@ class @StaffGrading
 
   get_problem_list: () ->
     @list_view = true
+    @render_view(true)
     @backend.post('get_problem_list', {}, @ajax_callback)
 
   submit_and_get_next: () ->
@@ -338,7 +339,7 @@ class @StaffGrading
     @max_score = 0
     @state = state_no_data
 
-  render_view: () ->
+  render_view: (before_ajax) ->
     # clear the problem list and breadcrumbs
     @problem_list.html('''
         <tr>
@@ -370,10 +371,13 @@ class @StaffGrading
     @meta_info_wrapper.toggle(show_grading_elements)
     @action_button.hide()
 
-    if @list_view
-      @render_list()
+    if before_ajax
+      @scroll_to_top()
     else
-      @render_problem()
+      if @list_view
+        @render_list()
+      else
+        @render_problem()
 
   problem_link:(problem) ->
     problem_name = problem.problem_name
@@ -425,8 +429,8 @@ class @StaffGrading
 
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
-      available = _.template(gettext("<%= num %> available"), {num: @num_pending})
-      graded = _.template(gettext("<%= num %> graded"), {num: @num_graded})
+      available = _.template(gettext("<%= num %> available "), {num: @num_pending})
+      graded = _.template(gettext("<%= num %> graded "), {num: @num_graded})
       needed = _.template(gettext("<%= num %> more needed to start ML"),
         {num: Math.max(@min_for_ml - @num_graded, 0)})
       meta_list = $("<div>")

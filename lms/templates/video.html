@@ -17,14 +17,21 @@
     ${'data-webm-source="{}"'.format(sources.get('webm')) if sources.get('webm') else ''}
     ${'data-ogg-source="{}"'.format(sources.get('ogv')) if sources.get('ogv') else ''}
 
+    data-save-state-url="${ajax_url}"
     data-caption-data-dir="${data_dir}"
     data-show-captions="${show_captions}"
+    data-general-speed="${general_speed}"
+    data-speed="${speed}"
+    data-saved-video-position="${saved_video_position}"
     data-start="${start}"
     data-end="${end}"
-    data-caption-asset-path="${caption_asset_path}"
+    data-transcript-language="${transcript_language}"
+    data-transcript-languages='${transcript_languages}'
     data-autoplay="${autoplay}"
     data-yt-test-timeout="${yt_test_timeout}"
     data-yt-test-url="${yt_test_url}"
+    data-transcript-translation-url="${transcript_translation_url}"
+    data-transcript-available-translations-url="${transcript_available_translations_url}"
 
     ## For now, the option "data-autohide-html5" is hard coded. This option
     ## either enables or disables autohiding of controls and captions on mouse
@@ -56,20 +63,19 @@
           </section>
           <div class="video-player-post"></div>
           <section class="video-controls is-hidden">
-              <div class="slider" title="Video position"></div>
-
+              <div class="slider" title="${_('Video position')}"></div>
               <div>
                   <ul class="vcr">
                       <li><a class="video_control" href="#" title="${_('Play')}" role="button" aria-disabled="false"></a></li>
                       <li><div class="vidtime">0:00 / 0:00</div></li>
                   </ul>
                   <div class="secondary-controls">
-                      <div class="speeds">
+                      <div class="speeds menu-container">
                           <a href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
                               <h3>${_('Speed')}</h3>
                               <p class="active"></p>
                           </a>
-                          <ol class="video_speeds"></ol>
+                          <ol class="video_speeds menu" role="menu"></ol>
                       </div>
                       <div class="volume">
                           <a href="#" title="${_('Volume')}" role="button" aria-disabled="false"></a>
@@ -80,7 +86,10 @@
                       <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
                       <a href="#" class="quality_control" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
 
-                      <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
+                      <div class="lang menu-container">
+                        <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-
+                        disabled="false">${_('Turn off captions')}</a>
+                      </div>
                   </div>
               </div>
           </section>
@@ -103,10 +112,30 @@
     % endif
     % if track:
         <li class="video-tracks">
-            ${('<a href="%s">' + _('Download timed transcript') + '</a>') % track}
+          % if transcript_download_format:
+            ${('<a href="%s">' + _('Download transcript') + '</a>') % track
+            }
+            <div class="a11y-menu-container">
+                <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
+                <ol class="a11y-menu-list">
+                % for item in transcript_download_formats_list:
+                  % if item['value'] == transcript_download_format:
+                  <li class="a11y-menu-item active">
+                  % else:
+                  <li class="a11y-menu-item">
+                  % endif
+                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_('{file_format}'.format(file_format=item['display_name']))}" data-value="${item['value']}">
+                        ${_('{file_format}'.format(file_format=item['display_name']))}
+                      </a>
+                  </li>
+                % endfor
+                </ol>
+            </div>
+          % else:
+            ${('<a href="%s" class="external-track">' + _('Download transcript') + '</a>') % track
+            }
+          % endif
         </li>
     % endif
   </ul>
 </div>
-
-

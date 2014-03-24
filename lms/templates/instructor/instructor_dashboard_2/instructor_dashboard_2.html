@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
+
+<%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
 ## ----- Tips on adding something to the new instructor dashboard -----
@@ -15,6 +16,9 @@
 ##   when clicked. The .coffee files use the name=xx to pick out inputs, not id=
 ## 5. Implement your standard django/python in lms/djangoapps/instructor/views/api.py
 ## 6. And tests go in lms/djangoapps/instructor/tests/
+
+<%block name="pagetitle">${_("Instructor Dashboard")}</%block>
+<%block name="nav_skip">#instructor-dashboard-content</%block>
 
 <%block name="headextra">
   <%static:css group='style-course-vendor'/>
@@ -55,7 +59,7 @@
   ## not checking access because if user can see this, they are at least course staff (with studio edit access)
   <div class="studio-edit-link"><a href="${studio_url}" target="_blank">${_('Edit Course In Studio')}</a></div>
 %endif
-<section class="instructor-dashboard-content-2">
+<section class="instructor-dashboard-content-2" id="instructor-dashboard-content">
 
   <h1>${_("Instructor Dashboard")}</h1>
   <hr />

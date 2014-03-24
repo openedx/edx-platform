@@ -37,10 +37,14 @@ class DiscussionFields(object):
 
 
 class DiscussionModule(DiscussionFields, XModule):
-    js = {'coffee':
-          [resource_string(__name__, 'js/src/time.coffee'),
-          resource_string(__name__, 'js/src/discussion/display.coffee')]
-          }
+    js = {
+        'coffee': [
+            resource_string(__name__, 'js/src/discussion/display.coffee')
+        ],
+        'js': [
+            resource_string(__name__, 'js/src/time.js')
+        ]
+    }
     js_module_name = "InlineDiscussion"
 
     def get_html(self):

@@ -16,10 +16,10 @@ urlpatterns = ('',  # nopep8
         # ...
 
     # certificate view
-
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
+    url(r'^token$', 'student.views.token', name="token"),
     url(r'^login$', 'student.views.signin_user', name="signin_user"),
     url(r'^register$', 'student.views.register_user', name="register_user"),
 
@@ -68,7 +68,13 @@ urlpatterns = ('',  # nopep8
 
     url(r'^user_api/', include('user_api.urls')),
 
+    url(r'^lang_pref/', include('lang_pref.urls')),
+
     url(r'^', include('waffle.urls')),
+
+    url(r'^i18n/', include('django.conf.urls.i18n')),
+
+    url(r'^embargo$', 'student.views.embargo', name="embargo"),
 )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
@@ -136,7 +142,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
         continue
 
     # These urls are enabled separately
-    if key == "ROOT" or key == "COURSES" or key == "FAQ":
+    if key == "ROOT" or key == "COURSES":
         continue
 
     # Make the assumptions that the templates are all in the same dir
@@ -193,6 +199,9 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xblock/(?P<usage_id>[^/]*)/handler_noauth/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
             'courseware.module_render.handle_xblock_callback_noauth',
             name='xblock_handler_noauth'),
+        url(r'xblock/resource/(?P<block_type>[^/]+)/(?P<uri>.*)$',
+            'courseware.module_render.xblock_resource',
+            name='xblock_resource_url'),
 
         # Software Licenses
 
@@ -350,7 +359,10 @@ if settings.COURSEWARE_ENABLED:
             url(r'^notification_prefs/enable/', 'notification_prefs.views.ajax_enable'),
             url(r'^notification_prefs/disable/', 'notification_prefs.views.ajax_disable'),
             url(r'^notification_prefs/status/', 'notification_prefs.views.ajax_status'),
-            url(r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/', 'notification_prefs.views.unsubscribe'),
+            url(r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/',
+                'notification_prefs.views.set_subscription', {'subscribe': False}, name="unsubscribe_forum_update"),
+            url(r'^notification_prefs/resubscribe/(?P<token>[a-zA-Z0-9-_=]+)/',
+                'notification_prefs.views.set_subscription', {'subscribe': True}, name="resubscribe_forum_update"),
         )
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
@@ -373,6 +385,19 @@ if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/',
             include('instructor.views.api_urls'))
+    )
+
+if settings.FEATURES.get('CLASS_DASHBOARD'):
+    urlpatterns += (
+        # Json request data for metrics for entire course
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/all_sequential_open_distrib$',
+            'class_dashboard.views.all_sequential_open_distrib', name="all_sequential_open_distrib"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/all_problem_grade_distribution$',
+            'class_dashboard.views.all_problem_grade_distribution', name="all_problem_grade_distribution"),
+
+        # Json request data for metrics for particular section
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/problem_grade_distribution/(?P<section>\d+)$',
+            'class_dashboard.views.section_problem_grade_distrib', name="section_problem_grade_distrib"),
     )
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -473,6 +498,12 @@ if settings.FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
 if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
+    )
+
+# Third-party auth.
+if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    urlpatterns += (
+        url(r'', include('third_party_auth.urls')),
     )
 
 urlpatterns = patterns(*urlpatterns)

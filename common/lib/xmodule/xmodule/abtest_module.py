@@ -111,7 +111,8 @@ class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
             child_content_urls = []
             for child in group:
                 try:
-                    child_content_urls.append(system.process_xml(etree.tostring(child)).location.url())
+                    child_block = system.process_xml(etree.tostring(child))
+                    child_content_urls.append(child_block.scope_ids.usage_id)
                 except:
                     log.exception("Unable to load child when parsing ABTest. Continuing...")
                     continue
@@ -148,7 +149,7 @@ class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
 
             for child_loc in group:
                 child = self.system.load_item(child_loc)
-                group_elem.append(etree.fromstring(child.export_to_xml(resource_fs)))
+                self.runtime.add_block_as_child_node(child, group_elem)
 
         return xml_object
 

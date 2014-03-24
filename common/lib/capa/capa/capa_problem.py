@@ -7,11 +7,11 @@
 # Each Response may have one or more Input entry fields.
 # The capa problem may include a solution.
 #
-'''
+"""
 Main module which shows problems (of "capa" type).
 
 This is used by capa_module.
-'''
+"""
 
 from datetime import datetime
 import logging
@@ -25,17 +25,13 @@ from copy import deepcopy
 from capa.correctmap import CorrectMap
 import capa.inputtypes as inputtypes
 import capa.customrender as customrender
+import capa.responsetypes as responsetypes
 from capa.util import contextualize_text, convert_files_to_filenames
 import capa.xqueue_interface as xqueue_interface
 
-# to be replaced with auto-registering
-import capa.responsetypes as responsetypes
 from capa.safe_exec import safe_exec
 
 from pytz import UTC
-
-# dict of tagname, Response Class -- this should come from auto-registering
-response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 
 # extra things displayed after "show answers" is pressed
 solution_tags = ['solution']
@@ -58,7 +54,7 @@ html_problem_semantics = [
     "script",
     "hintgroup",
     "openendedparam",
-    "openendedrubric"
+    "openendedrubric",
 ]
 
 log = logging.getLogger(__name__)
@@ -67,37 +63,79 @@ log = logging.getLogger(__name__)
 # main class for this module
 
 
-class LoncapaProblem(object):
-    '''
-    Main class for capa Problems.
-    '''
+class LoncapaSystem(object):
+    """
+    An encapsulation of resources needed from the outside.
 
-    def __init__(self, problem_text, id, state=None, seed=None, system=None):
-        '''
+    These interfaces are collected here so that a caller of LoncapaProblem
+    can provide these resources however make sense for their environment, and
+    this code can remain independent.
+
+    Attributes:
+        i18n: an object implementing the `gettext.Translations` interface so
+            that we can use `.ugettext` to localize strings.
+
+    See :class:`ModuleSystem` for documentation of other attributes.
+
+    """
+    def __init__(                                       # pylint: disable=invalid-name
+        self,
+        ajax_url,
+        anonymous_student_id,
+        cache,
+        can_execute_unsafe_code,
+        DEBUG,                                          # pylint: disable=invalid-name
+        filestore,
+        i18n,
+        node_path,
+        render_template,
+        seed,      # Why do we do this if we have self.seed?
+        STATIC_URL,                                     # pylint: disable=invalid-name
+        xqueue,
+    ):
+        self.ajax_url = ajax_url
+        self.anonymous_student_id = anonymous_student_id
+        self.cache = cache
+        self.can_execute_unsafe_code = can_execute_unsafe_code
+        self.DEBUG = DEBUG                              # pylint: disable=invalid-name
+        self.filestore = filestore
+        self.i18n = i18n
+        self.node_path = node_path
+        self.render_template = render_template
+        self.seed = seed                     # Why do we do this if we have self.seed?
+        self.STATIC_URL = STATIC_URL                    # pylint: disable=invalid-name
+        self.xqueue = xqueue
+
+
+class LoncapaProblem(object):
+    """
+    Main class for capa Problems.
+    """
+
+    def __init__(self, problem_text, id, capa_system, state=None, seed=None):
+        """
         Initializes capa Problem.
 
         Arguments:
 
-         - problem_text (string): xml defining the problem
-         - id           (string): identifier for this problem; often a filename (no spaces)
-         - seed         (int): random number generator seed (int)
-         - state        (dict): containing the following keys:
-                                - 'seed' - (int) random number generator seed
-                                - 'student_answers' - (dict) maps input id to the stored answer for that input
-                                - 'correct_map' (CorrectMap) a map of each input to their 'correctness'
-                                - 'done' - (bool) indicates whether or not this problem is considered done
-                                - 'input_state' - (dict) maps input_id to a dictionary that holds the state for that input
-         - system       (ModuleSystem): ModuleSystem instance which provides OS,
-                                        rendering, and user context
+            problem_text (string): xml defining the problem.
+            id (string): identifier for this problem, often a filename (no spaces).
+            capa_system (LoncapaSystem): LoncapaSystem instance which provides OS,
+                rendering, user context, and other resources.
+            state (dict): containing the following keys:
+                - `seed` (int) random number generator seed
+                - `student_answers` (dict) maps input id to the stored answer for that input
+                - `correct_map` (CorrectMap) a map of each input to their 'correctness'
+                - `done` (bool) indicates whether or not this problem is considered done
+                - `input_state` (dict) maps input_id to a dictionary that holds the state for that input
+            seed (int): random number generator seed.
 
-        '''
+        """
 
         ## Initialize class variables from state
         self.do_reset()
         self.problem_id = id
-        self.system = system
-        if self.system is None:
-            raise Exception()
+        self.capa_system = capa_system
 
         state = state or {}
 
@@ -143,9 +181,9 @@ class LoncapaProblem(object):
         self.extracted_tree = self._extract_html(self.tree)
 
     def do_reset(self):
-        '''
+        """
         Reset internal state to unfinished, with no answers
-        '''
+        """
         self.student_answers = dict()
         self.correct_map = CorrectMap()
         self.done = False
@@ -165,11 +203,11 @@ class LoncapaProblem(object):
         return u"LoncapaProblem ({0})".format(self.problem_id)
 
     def get_state(self):
-        '''
+        """
         Stored per-user session data neeeded to:
             1) Recreate the problem
             2) Populate any student answers.
-        '''
+        """
 
         return {'seed': self.seed,
                 'student_answers': self.student_answers,
@@ -178,9 +216,9 @@ class LoncapaProblem(object):
                 'done': self.done}
 
     def get_max_score(self):
-        '''
+        """
         Return the maximum score for this problem.
-        '''
+        """
         maxscore = 0
         for responder in self.responders.values():
             maxscore += responder.get_max_score()
@@ -197,7 +235,7 @@ class LoncapaProblem(object):
             try:
                 correct += self.correct_map.get_npoints(key)
             except Exception:
-                log.error('key=%s, correct_map = %s' % (key, self.correct_map))
+                log.error('key=%s, correct_map = %s', key, self.correct_map)
                 raise
 
         if (not self.student_answers) or len(self.student_answers) == 0:
@@ -208,12 +246,12 @@ class LoncapaProblem(object):
                     'total': self.get_max_score()}
 
     def update_score(self, score_msg, queuekey):
-        '''
+        """
         Deliver grading response (e.g. from async code checking) to
             the specific ResponseType that requested grading
 
         Returns an updated CorrectMap
-        '''
+        """
         cmap = CorrectMap()
         cmap.update(self.correct_map)
         for responder in self.responders.values():
@@ -225,12 +263,12 @@ class LoncapaProblem(object):
         return cmap
 
     def ungraded_response(self, xqueue_msg, queuekey):
-        '''
+        """
         Handle any responses from the xqueue that do not contain grades
         Will try to pass the queue message to all inputtypes that can handle ungraded responses
 
         Does not return any value
-        '''
+        """
         # check against each inputtype
         for the_input in self.inputs.values():
             # if the input type has an ungraded function, pass in the values
@@ -238,17 +276,17 @@ class LoncapaProblem(object):
                 the_input.ungraded_response(xqueue_msg, queuekey)
 
     def is_queued(self):
-        '''
+        """
         Returns True if any part of the problem has been submitted to an external queue
         (e.g. for grading.)
-        '''
+        """
         return any(self.correct_map.is_queued(answer_id) for answer_id in self.correct_map)
 
     def get_recentmost_queuetime(self):
-        '''
+        """
         Returns a DateTime object that represents the timestamp of the most recent
         queueing request, or None if not queued
-        '''
+        """
         if not self.is_queued():
             return None
 
@@ -266,7 +304,7 @@ class LoncapaProblem(object):
         return max(queuetimes)
 
     def grade_answers(self, answers):
-        '''
+        """
         Grade student responses.  Called by capa_module.check_problem.
 
         `answers` is a dict of all the entries from request.POST, but with the first part
@@ -275,7 +313,7 @@ class LoncapaProblem(object):
         Thus, for example, input_ID123 -> ID123, and input_fromjs_ID123 -> fromjs_ID123
 
         Calls the Response for each question in this problem, to do the actual grading.
-        '''
+        """
 
         # if answers include File objects, convert them to filenames.
         self.student_answers = convert_files_to_filenames(answers)
@@ -325,7 +363,6 @@ class LoncapaProblem(object):
 
         # start new with empty CorrectMap
         newcmap = CorrectMap()
-
         # Call each responsetype instance to do actual grading
         for responder in self.responders.values():
             # File objects are passed only if responsetype explicitly allows
@@ -334,7 +371,8 @@ class LoncapaProblem(object):
             # an earlier submission, so for now skip these entirely.
             # TODO: figure out where to get file submissions when rescoring.
             if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
-                raise Exception("Cannot rescore problems with possible file submissions")
+                _ = self.capa_system.i18n.ugettext
+                raise Exception(_(u"Cannot rescore problems with possible file submissions"))
 
             # use 'student_answers' only if it is provided, and if it might contain a file
             # submission that would not exist in the persisted "student_answers".
@@ -366,7 +404,7 @@ class LoncapaProblem(object):
             if answer:
                 answer_map[entry.get('id')] = contextualize_text(answer, self.context)
 
-        log.debug('answer_map = %s' % answer_map)
+        log.debug('answer_map = %s', answer_map)
         return answer_map
 
     def get_answer_ids(self):
@@ -382,18 +420,18 @@ class LoncapaProblem(object):
         return answer_ids
 
     def get_html(self):
-        '''
+        """
         Main method called externally to get the HTML to be rendered for this capa Problem.
-        '''
+        """
         html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
         return html
 
     def handle_input_ajax(self, data):
-        '''
+        """
         InputTypes can support specialized AJAX calls. Find the correct input and pass along the correct data
 
         Also, parse out the dispatch from the get so that it can be passed onto the input type nicely
-        '''
+        """
 
         # pull out the id
         input_id = data['input_id']
@@ -401,37 +439,35 @@ class LoncapaProblem(object):
             dispatch = data['dispatch']
             return self.inputs[input_id].handle_ajax(dispatch, data)
         else:
-            log.warning("Could not find matching input for id: %s" % input_id)
+            log.warning("Could not find matching input for id: %s", input_id)
             return {}
 
     # ======= Private Methods Below ========
 
     def _process_includes(self):
-        '''
+        """
         Handle any <include file="foo"> tags by reading in the specified file and inserting it
         into our XML tree.  Fail gracefully if debugging.
-        '''
+        """
         includes = self.tree.findall('.//include')
         for inc in includes:
             filename = inc.get('file')
             if filename is not None:
                 try:
-                    # open using ModuleSystem OSFS filestore
-                    ifp = self.system.filestore.open(filename)
+                    # open using LoncapaSystem OSFS filestore
+                    ifp = self.capa_system.filestore.open(filename)
                 except Exception as err:
                     log.warning(
-                        'Error %s in problem xml include: %s' % (
-                            err, etree.tostring(inc, pretty_print=True)
-                        )
+                        'Error %s in problem xml include: %s',
+                        err,
+                        etree.tostring(inc, pretty_print=True)
                     )
                     log.warning(
-                        'Cannot find file %s in %s' % (
-                            filename, self.system.filestore
-                        )
+                        'Cannot find file %s in %s', filename, self.capa_system.filestore
                     )
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): need real error handling, display to users
-                    if not self.system.get('DEBUG'):
+                    if not self.capa_system.DEBUG:
                         raise
                     else:
                         continue
@@ -440,14 +476,14 @@ class LoncapaProblem(object):
                     incxml = etree.XML(ifp.read())
                 except Exception as err:
                     log.warning(
-                        'Error %s in problem xml include: %s' % (
-                            err, etree.tostring(inc, pretty_print=True)
-                        )
+                        'Error %s in problem xml include: %s',
+                        err,
+                        etree.tostring(inc, pretty_print=True)
                     )
-                    log.warning('Cannot parse XML in %s' % (filename))
+                    log.warning('Cannot parse XML in %s', (filename))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): same as above
-                    if not self.system.get('DEBUG'):
+                    if not self.capa_system.DEBUG:
                         raise
                     else:
                         continue
@@ -480,11 +516,11 @@ class LoncapaProblem(object):
                 continue
 
             # path is an absolute path or a path relative to the data dir
-            dir = os.path.join(self.system.filestore.root_path, dir)
+            dir = os.path.join(self.capa_system.filestore.root_path, dir)
             # Check that we are within the filestore tree.
-            reldir = os.path.relpath(dir, self.system.filestore.root_path)
+            reldir = os.path.relpath(dir, self.capa_system.filestore.root_path)
             if ".." in reldir:
-                log.warning("Ignoring Python directory outside of course: %r" % dir)
+                log.warning("Ignoring Python directory outside of course: %r", dir)
                 continue
 
             abs_dir = os.path.normpath(dir)
@@ -493,13 +529,13 @@ class LoncapaProblem(object):
         return path
 
     def _extract_context(self, tree):
-        '''
+        """
         Extract content of <script>...</script> from the problem.xml file, and exec it in the
         context of this problem.  Provides ability to randomize problems, and also set
         variables for problem answer checking.
 
         Problem XML goes to Python execution context. Runs everything in script tags.
-        '''
+        """
         context = {}
         context['seed'] = self.seed
         all_code = ''
@@ -531,9 +567,9 @@ class LoncapaProblem(object):
                     context,
                     random_seed=self.seed,
                     python_path=python_path,
-                    cache=self.system.cache,
+                    cache=self.capa_system.cache,
                     slug=self.problem_id,
-                    unsafely=self.system.can_execute_unsafe_code(),
+                    unsafely=self.capa_system.can_execute_unsafe_code(),
                 )
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)
@@ -546,7 +582,7 @@ class LoncapaProblem(object):
         return context
 
     def _extract_html(self, problemtree):  # private
-        '''
+        """
         Main (private) function which converts Problem XML tree to HTML.
         Calls itself recursively.
 
@@ -554,7 +590,7 @@ class LoncapaProblem(object):
         Calls render_html of Response instances to render responses into XHTML.
 
         Used by get_html.
-        '''
+        """
         if not isinstance(problemtree.tag, basestring):
             # Comment and ProcessingInstruction nodes are not Elements,
             # and we're ok leaving those behind.
@@ -594,17 +630,21 @@ class LoncapaProblem(object):
                 self.input_state[input_id] = {}
 
             # do the rendering
-            state = {'value': value,
-                     'status': status,
-                     'id': input_id,
-                     'input_state': self.input_state[input_id],
-                     'feedback': {'message': msg,
-                                  'hint': hint,
-                                  'hintmode': hintmode, }}
+            state = {
+                'value': value,
+                'status': status,
+                'id': input_id,
+                'input_state': self.input_state[input_id],
+                'feedback': {
+                    'message': msg,
+                    'hint': hint,
+                    'hintmode': hintmode,
+                }
+            }
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
             # save the input type so that we can make ajax calls on it if we need to
-            self.inputs[input_id] = input_type_cls(self.system, problemtree, state)
+            self.inputs[input_id] = input_type_cls(self.capa_system, problemtree, state)
             return self.inputs[input_id].get_html()
 
         # let each Response render itself
@@ -617,7 +657,7 @@ class LoncapaProblem(object):
         # let each custom renderer render itself:
         if problemtree.tag in customrender.registry.registered_tags():
             renderer_class = customrender.registry.get_class_for_tag(problemtree.tag)
-            renderer = renderer_class(self.system, problemtree)
+            renderer = renderer_class(self.capa_system, problemtree)
             return renderer.get_html()
 
         # otherwise, render children recursively, and copy over attributes
@@ -640,7 +680,7 @@ class LoncapaProblem(object):
         return tree
 
     def _preprocess_problem(self, tree):  # private
-        '''
+        """
         Assign IDs to all the responses
         Assign sub-IDs to all entries (textline, schematic, etc.)
         Annoted correctness and value
@@ -649,10 +689,10 @@ class LoncapaProblem(object):
         Also create capa Response instances for each responsetype and save as self.responders
 
         Obtain all responder answers and save as self.responder_answers dict (key = response)
-        '''
+        """
         response_id = 1
         self.responders = {}
-        for response in tree.xpath('//' + "|//".join(response_tag_dict)):
+        for response in tree.xpath('//' + "|//".join(responsetypes.registry.registered_tags())):
             response_id_str = self.problem_id + "_" + str(response_id)
             # create and save ID for this response
             response.set('id', response_id_str)
@@ -673,8 +713,8 @@ class LoncapaProblem(object):
                 answer_id = answer_id + 1
 
             # instantiate capa Response
-            responder = response_tag_dict[response.tag](response, inputfields,
-                                                        self.context, self.system)
+            responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
+            responder = responsetype_cls(response, inputfields, self.context, self.capa_system)
             # save in list in self
             self.responders[response] = responder
 

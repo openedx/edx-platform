@@ -6,14 +6,14 @@ import textwrap
 import mock
 
 from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFactory
-from . import test_system, new_loncapa_problem
+from . import test_capa_system, new_loncapa_problem
 
 
 class CapaHtmlRenderTest(unittest.TestCase):
 
     def setUp(self):
         super(CapaHtmlRenderTest, self).setUp()
-        self.system = test_system()
+        self.capa_system = test_capa_system()
 
     def test_blank_problem(self):
         """
@@ -44,7 +44,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         """)
 
         # Create the problem
-        problem = new_loncapa_problem(xml_str, system=self.system)
+        problem = new_loncapa_problem(xml_str, capa_system=self.capa_system)
 
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
@@ -119,12 +119,12 @@ class CapaHtmlRenderTest(unittest.TestCase):
         xml_str = StringResponseXMLFactory().build_xml(**kwargs)
 
         # Mock out the template renderer
-        the_system = test_system()
+        the_system = test_capa_system()
         the_system.render_template = mock.Mock()
         the_system.render_template.return_value = "<div>Input Template Render</div>"
 
         # Create the problem and render the HTML
-        problem = new_loncapa_problem(xml_str, system=the_system)
+        problem = new_loncapa_problem(xml_str, capa_system=the_system)
         rendered_html = etree.XML(problem.get_html())
 
         # Expect problem has been turned into a <div>
@@ -154,6 +154,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         expected_textline_context = {
             'STATIC_URL': '/dummy-static/',
             'status': 'unsubmitted',
+            'label': '',
             'value': '',
             'preprocessor': None,
             'msg': '',
@@ -253,7 +254,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         self.assertRegexpMatches(the_html, r"<div>\s+</div>")
 
     def _create_test_file(self, path, content_str):
-        test_fp = self.system.filestore.open(path, "w")
+        test_fp = self.capa_system.filestore.open(path, "w")
         test_fp.write(content_str)
         test_fp.close()
 

@@ -1,9 +1,12 @@
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
+from django_comment_common.models import (
+    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT)
+from django_comment_common.utils import seed_permissions_roles
+from student.models import CourseEnrollment, UserProfile
 from util.testing import UrlResetMixin
 from mock import patch
-from django.core.urlresolvers import reverse, NoReverseMatch
 
 
 class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
@@ -19,82 +22,134 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         # of the UrlResetMixin)
         super(AutoAuthEnabledTestCase, self).setUp()
         self.url = '/auto_auth'
-        self.cms_csrf_url = "signup"
-        self.lms_csrf_url = "signin_user"
         self.client = Client()
 
     def test_create_user(self):
         """
         Test that user gets created when visiting the page.
         """
+        self._auto_auth()
+        self.assertEqual(User.objects.count(), 1)
+        self.assertTrue(User.objects.all()[0].is_active)
 
-        self.client.get(self.url)
+    def test_create_same_user(self):
+        self._auto_auth(username='test')
+        self._auto_auth(username='test')
+        self.assertEqual(User.objects.count(), 1)
 
-        qset = User.objects.all()
-
-        # assert user was created and is active
-        self.assertEqual(qset.count(), 1)
-        user = qset[0]
-        assert user.is_active
+    def test_create_multiple_users(self):
+        """
+        Test to make sure multiple users are created.
+        """
+        self._auto_auth()
+        self._auto_auth()
+        self.assertEqual(User.objects.all().count(), 2)
 
     def test_create_defined_user(self):
         """
         Test that the user gets created with the correct attributes
         when they are passed as parameters on the auto-auth page.
         """
-
-        self.client.get(
-            self.url,
-            {'username': 'robot', 'password': 'test', 'email': 'robot@edx.org'}
+        self._auto_auth(
+            username='robot', password='test',
+            email='robot@edx.org', full_name="Robot Name"
         )
 
-        qset = User.objects.all()
-
-        # assert user was created with the correct username and password
-        self.assertEqual(qset.count(), 1)
-        user = qset[0]
+        # Check that the user has the correct info
+        user = User.objects.get(username='robot')
         self.assertEqual(user.username, 'robot')
         self.assertTrue(user.check_password('test'))
         self.assertEqual(user.email, 'robot@edx.org')
 
-    @patch('student.views.random.randint')
-    def test_create_multiple_users(self, randint):
+        # Check that the user has a profile
+        user_profile = UserProfile.objects.get(user=user)
+        self.assertEqual(user_profile.name, "Robot Name")
+
+        # By default, the user should not be global staff
+        self.assertFalse(user.is_staff)
+
+    def test_create_staff_user(self):
+
+        # Create a staff user
+        self._auto_auth(username='test', staff='true')
+        user = User.objects.get(username='test')
+        self.assertTrue(user.is_staff)
+
+        # Revoke staff privileges
+        self._auto_auth(username='test', staff='false')
+        user = User.objects.get(username='test')
+        self.assertFalse(user.is_staff)
+
+    def test_course_enrollment(self):
+
+        # Create a user and enroll in a course
+        course_id = "edX/Test101/2014_Spring"
+        self._auto_auth(username='test', course_id=course_id)
+
+        # Check that a course enrollment was created for the user
+        self.assertEqual(CourseEnrollment.objects.count(), 1)
+        enrollment = CourseEnrollment.objects.get(course_id=course_id)
+        self.assertEqual(enrollment.user.username, "test")
+
+    def test_double_enrollment(self):
+
+        # Create a user and enroll in a course
+        course_id = "edX/Test101/2014_Spring"
+        self._auto_auth(username='test', course_id=course_id)
+
+        # Make the same call again, re-enrolling the student in the same course
+        self._auto_auth(username='test', course_id=course_id)
+
+        # Check that only one course enrollment was created for the user
+        self.assertEqual(CourseEnrollment.objects.count(), 1)
+        enrollment = CourseEnrollment.objects.get(course_id=course_id)
+        self.assertEqual(enrollment.user.username, "test")
+
+    def test_set_roles(self):
+
+        course_id = "edX/Test101/2014_Spring"
+        seed_permissions_roles(course_id)
+        course_roles = dict((r.name, r) for r in Role.objects.filter(course_id=course_id))
+        self.assertEqual(len(course_roles), 4)  # sanity check
+
+        # Student role is assigned by default on course enrollment.
+        self._auto_auth(username='a_student', course_id=course_id)
+        user = User.objects.get(username='a_student')
+        user_roles = user.roles.all()
+        self.assertEqual(len(user_roles), 1)
+        self.assertEqual(user_roles[0], course_roles[FORUM_ROLE_STUDENT])
+
+        self._auto_auth(username='a_moderator', course_id=course_id, roles='Moderator')
+        user = User.objects.get(username='a_moderator')
+        user_roles = user.roles.all()
+        self.assertEqual(
+            set(user_roles),
+            set([course_roles[FORUM_ROLE_STUDENT],
+                course_roles[FORUM_ROLE_MODERATOR]]))
+
+        # check multiple roles work.
+        self._auto_auth(username='an_admin', course_id=course_id,
+                        roles='{},{}'.format(FORUM_ROLE_MODERATOR, FORUM_ROLE_ADMINISTRATOR))
+        user = User.objects.get(username='an_admin')
+        user_roles = user.roles.all()
+        self.assertEqual(
+            set(user_roles),
+            set([course_roles[FORUM_ROLE_STUDENT],
+                course_roles[FORUM_ROLE_MODERATOR],
+                course_roles[FORUM_ROLE_ADMINISTRATOR]]))
+
+    def _auto_auth(self, **params):
         """
-        Test to make sure multiple users are created.
+        Make a request to the auto-auth end-point and check
+        that the response is successful.
         """
-        randint.return_value = 1
-        self.client.get(self.url)
+        response = self.client.get(self.url, params)
+        self.assertEqual(response.status_code, 200)
 
-        randint.return_value = 2
-        self.client.get(self.url)
-
-        qset = User.objects.all()
-
-        # make sure that USER_1 and USER_2 were created correctly
-        self.assertEqual(qset.count(), 2)
-        user1 = qset[0]
-        self.assertEqual(user1.username, 'USER_1')
-        self.assertTrue(user1.check_password('PASS_1'))
-        self.assertEqual(user1.email, 'USER_1_dummy_test@mitx.mit.edu')
-        self.assertEqual(qset[1].username, 'USER_2')
-
-    @patch.dict("django.conf.settings.FEATURES", {"MAX_AUTO_AUTH_USERS": 1})
-    def test_login_already_created_user(self):
-        """
-        Test that when we have reached the limit for automatic users
-        a subsequent request results in an already existant one being
-        logged in.
-        """
-        # auto-generate 1 user (the max)
-        url = '/auto_auth'
-        self.client.get(url)
-
-        # go to the site again
-        self.client.get(url)
-        qset = User.objects.all()
-
-        # make sure it is the same user
-        self.assertEqual(qset.count(), 1)
+        # Check that session and CSRF are set in the response
+        for cookie in ['csrftoken', 'sessionid']:
+            self.assertIn(cookie, response.cookies)  # pylint: disable=E1103
+            self.assertTrue(response.cookies[cookie].value)  # pylint: disable=E1103
 
 
 class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):
@@ -118,19 +173,3 @@ class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
-
-    def test_csrf_enabled(self):
-        """
-        test that when not load testing, csrf protection is on
-        """
-        cms_csrf_url = "signup"
-        lms_csrf_url = "signin_user"
-        self.client = Client(enforce_csrf_checks=True)
-        try:
-            csrf_protected_url = reverse(cms_csrf_url)
-            response = self.client.post(csrf_protected_url)
-        except NoReverseMatch:
-            csrf_protected_url = reverse(lms_csrf_url)
-            response = self.client.post(csrf_protected_url)
-
-        self.assertEqual(response.status_code, 403)

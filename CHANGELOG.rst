@@ -5,6 +5,93 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fix issues related to videos that have separate YouTube IDs for the
+different video speeds. BLD-915, BLD-901.
+
+Blades: Add .txt and .srt options to the "download transcript" button. BLD-844.
+
+Blades: Fix bug when transcript cutting off view in full view mode. BLD-852.
+
+Blades: Show start time or starting position on slider and VCR. BLD-823.
+
+Common: Upgraded CodeMirror to 3.21.0 with an accessibility patch applied.
+  LMS-1802
+
+Studio: Add new container page that can display nested xblocks. STUD-1244.
+
+Blades: Allow multiple transcripts with video. BLD-642.
+
+CMS: Add feature to allow exporting a course to a git repository by
+specifying the giturl in the course settings.
+
+Studio: Fix import/export bug with conditional modules. STUD-149
+
+Blades: Persist student progress in video. BLD-385.
+
+Blades: Fix for the list metadata editor that gets into a bad state where "Add"
+  is disabled. BLD-821.
+
+Blades: Add view for field type Dict in Studio. BLD-658.
+
+Blades: Refactor stub implementation of LTI Provider. BLD-601.
+
+Studio: Added ability to edit course short descriptions that appear on the course catalog page.
+
+LMS: In left accordion and progress page, due dates are now displayed in time
+zone specified by settings.TIME_ZONE, instead of UTC always
+
+LMS:  If the course start date is kept at the default studio value (Jan 1, 2030)
+and advertised_start is not set, the start date is not displayed in the
+/courses tile view, the course about page, or the dashboard
+
+LMS: Add ability to redirect to a splash screen.
+
+Blades: Add role parameter to LTI. BLD-583.
+
+Blades: Bugfix "In Firefox YouTube video with start time plays from 00:00:00".
+BLD-708.
+
+Blades: Fix bug when image response in Firefox does not retain input. BLD-711.
+
+Blades: Give numerical response tolerance as a range. BLD-25.
+
+Common: Add a utility app for building databased-backed configuration
+  for specific application features. Includes admin site customization
+  for easier administration and tracking.
+
+Common: Add the ability to dark-launch site translations. These languages
+  will be unavailable to users except through the use of a specific query
+  parameter.
+
+Blades: Allow user with BetaTester role correctly use LTI. BLD-641.
+
+Blades: Video player persist speed preferences between videos. BLD-237.
+
+Blades: Change the download video field to a dropdown that will allow students
+to download the first source listed in the alternate sources. BLD-364.
+
+Blades: Change the track field to a dropdown that will allow students
+to download the transcript of the video without timecodes. BLD-368.
+
+Blades: Video player start-end time range is now shown even before Play is
+clicked. Video player VCR time shows correct non-zero total time for YouTube
+videos even before Play is clicked. BLD-529.
+
+Studio: Add ability to duplicate components on the unit page.
+
+Blades: Adds CookieStorage utility for video player that provides convenient
+  way to work with cookies.
+
+Blades: Fix comparison of float numbers. BLD-434.
+
+Blades: Allow regexp strings as the correct answer to a string response question. BLD-475.
+
+Common: MixedModulestore is now the only approved access to the persistence layer
+  - takes a new parameter 'reference_type' which can be 'Location' or 'Locator'. Mixed
+  then tries to ensure that every reference in any xblock gets converted to that type on
+  retrieval. Because we're moving to Locators, the default is Locator; so, you should change
+  all existing configurations to 'Location' (unless you're using split)
+
 Common: Add feature flags to allow developer use of pure XBlocks
   - ALLOW_ALL_ADVANCED_COMPONENTS disables the hard-coded list of advanced
     components in Studio, and allows any xblock to be added as an
@@ -23,6 +110,8 @@ Common: Previously, theming was activated by providing a value for the THEME_NAM
 Studio: Newly-created courses default to being published on Jan 1, 2030
 
 Studio: Added pagination to the Files & Uploads page.
+
+Common: Centralized authorization mechanisms and removed the app-specific ones.
 
 Blades: Video player improvements:
   - Disable edX controls on iPhone/iPod (native controls are used).
@@ -150,6 +239,8 @@ HTML5 videos. If end time is set, the video can still play until the end, after
 it pauses on the end time.
 
 Blades: Disallow users to enter video url's in http.
+
+Studio/LMS: Ability to cap the max number of active enrollments in a course
 
 LMS: Improve the acessibility of the forum follow post buttons.
 
@@ -290,6 +381,8 @@ assessors to edit the original submitter's work.
 
 LMS: Fixed a bug that caused links from forum user profile pages to
 threads to lead to 404s if the course id contained a '-' character.
+
+Studio/LMS: Add password policy enforcement to new account creation
 
 Studio/LMS: Added ability to set due date formatting through Studio's Advanced
 Settings.  The key is due_date_display_format, and the value should be a format

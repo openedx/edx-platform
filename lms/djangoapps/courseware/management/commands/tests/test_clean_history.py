@@ -14,11 +14,13 @@ from courseware.management.commands.clean_history import StudentModuleHistoryCle
 
 # In lots of places in this file, smhc == StudentModuleHistoryCleaner
 
+
 def parse_date(sdate):
     """Parse a string date into a datetime."""
     parsed = dateutil.parser.parse(sdate)
     parsed = parsed.replace(tzinfo=dateutil.tz.gettz('UTC'))
     return parsed
+
 
 class SmhcSayStubbed(StudentModuleHistoryCleaner):
     """StudentModuleHistoryCleaner, but with .say() stubbed for testing."""
@@ -110,7 +112,8 @@ class HistoryCleanerTest(TransactionTestCase):
 
         """
         cursor = connection.cursor()
-        cursor.executemany("""
+        cursor.executemany(
+            """
             INSERT INTO courseware_studentmodulehistory
             (id, created, student_module_id)
             VALUES (%s, %s, %s)
@@ -191,8 +194,8 @@ class HistoryCleanerNoDbTest(HistoryCleanerTest):
     def test_a_bunch_of_rows(self):
         smhc = SmhcDbMocked()
         smhc.set_rows([
-            ( 4, "2013-07-13 16:30:00.000"),    # keep
-            ( 8, "2013-07-13 16:30:01.100"),
+            (4, "2013-07-13 16:30:00.000"),    # keep
+            (8, "2013-07-13 16:30:01.100"),
             (15, "2013-07-13 16:30:01.200"),
             (16, "2013-07-13 16:30:01.300"),    # keep
             (23, "2013-07-13 16:30:02.400"),
@@ -212,8 +215,8 @@ class HistoryCleanerWitDbTest(HistoryCleanerTest):
         # Cleaning a student_module_id with no history leaves the db unchanged.
         smhc = SmhcSayStubbed()
         self.write_history([
-            ( 4, "2013-07-13 16:30:00.000", 11),    # keep
-            ( 8, "2013-07-13 16:30:01.100", 11),
+            (4, "2013-07-13 16:30:00.000", 11),    # keep
+            (8, "2013-07-13 16:30:01.100", 11),
             (15, "2013-07-13 16:30:01.200", 11),
             (16, "2013-07-13 16:30:01.300", 11),    # keep
             (23, "2013-07-13 16:30:02.400", 11),
@@ -225,8 +228,8 @@ class HistoryCleanerWitDbTest(HistoryCleanerTest):
         smhc.clean_one_student_module(22)
         self.assert_said(smhc, "No history for student_module_id 22")
         self.assert_history([
-            ( 4, "2013-07-13 16:30:00.000", 11),    # keep
-            ( 8, "2013-07-13 16:30:01.100", 11),
+            (4, "2013-07-13 16:30:00.000", 11),    # keep
+            (8, "2013-07-13 16:30:01.100", 11),
             (15, "2013-07-13 16:30:01.200", 11),
             (16, "2013-07-13 16:30:01.300", 11),    # keep
             (23, "2013-07-13 16:30:02.400", 11),
@@ -239,8 +242,8 @@ class HistoryCleanerWitDbTest(HistoryCleanerTest):
         # Cleaning a student_module_id with 8 records, 4 to delete.
         smhc = SmhcSayStubbed()
         self.write_history([
-            ( 4, "2013-07-13 16:30:00.000", 11),    # keep
-            ( 8, "2013-07-13 16:30:01.100", 11),
+            (4, "2013-07-13 16:30:00.000", 11),    # keep
+            (8, "2013-07-13 16:30:01.100", 11),
             (15, "2013-07-13 16:30:01.200", 11),
             (16, "2013-07-13 16:30:01.300", 11),    # keep
             (17, "2013-07-13 16:30:01.310", 22),    # other student_module_id!
@@ -253,7 +256,7 @@ class HistoryCleanerWitDbTest(HistoryCleanerTest):
         smhc.clean_one_student_module(11)
         self.assert_said(smhc, "Deleting 4 rows of 8 for student_module_id 11")
         self.assert_history([
-            ( 4, "2013-07-13 16:30:00.000", 11),    # keep
+            (4, "2013-07-13 16:30:00.000", 11),    # keep
             (16, "2013-07-13 16:30:01.300", 11),    # keep
             (17, "2013-07-13 16:30:01.310", 22),    # other student_module_id!
             (98, "2013-07-13 16:30:02.600", 11),    # keep
@@ -261,12 +264,12 @@ class HistoryCleanerWitDbTest(HistoryCleanerTest):
         ])
 
     def test_a_bunch_of_rows_dry_run(self):
-        # Cleaning a student_module_id with 8 records, 4 to delete, 
+        # Cleaning a student_module_id with 8 records, 4 to delete,
         # but don't really do it.
         smhc = SmhcSayStubbed(dry_run=True)
         self.write_history([
-            ( 4, "2013-07-13 16:30:00.000", 11),    # keep
-            ( 8, "2013-07-13 16:30:01.100", 11),
+            (4, "2013-07-13 16:30:00.000", 11),    # keep
+            (8, "2013-07-13 16:30:01.100", 11),
             (15, "2013-07-13 16:30:01.200", 11),
             (16, "2013-07-13 16:30:01.300", 11),    # keep
             (23, "2013-07-13 16:30:02.400", 11),
@@ -278,8 +281,8 @@ class HistoryCleanerWitDbTest(HistoryCleanerTest):
         smhc.clean_one_student_module(11)
         self.assert_said(smhc, "Would have deleted 4 rows of 8 for student_module_id 11")
         self.assert_history([
-            ( 4, "2013-07-13 16:30:00.000", 11),    # keep
-            ( 8, "2013-07-13 16:30:01.100", 11),
+            (4, "2013-07-13 16:30:00.000", 11),    # keep
+            (8, "2013-07-13 16:30:01.100", 11),
             (15, "2013-07-13 16:30:01.200", 11),
             (16, "2013-07-13 16:30:01.300", 11),    # keep
             (23, "2013-07-13 16:30:02.400", 11),
@@ -400,7 +403,8 @@ class HistoryCleanerMainTest(HistoryCleanerTest):
             (1, "2013-07-15 11:47:00.000", 1),
         ])
         smhc.main()
-        self.assert_said(smhc,
+        self.assert_said(
+            smhc,
             'Last student_module_id is 1',
             'No stored state',
             '(not really cleaning 0)',
@@ -420,7 +424,8 @@ class HistoryCleanerMainTest(HistoryCleanerTest):
             (5, "2013-07-15 15:04:00.000", 26),
         ])
         smhc.main()
-        self.assert_said(smhc,
+        self.assert_said(
+            smhc,
             'Last student_module_id is 26',
             'Loaded stored state: {"next_student_module_id": 25}',
             '(not really cleaning 25)',
@@ -441,7 +446,8 @@ class HistoryCleanerMainTest(HistoryCleanerTest):
             (8, "2013-07-15 15:04:00.000", 29),
         ])
         smhc.main(batch_size=3)
-        self.assert_said(smhc,
+        self.assert_said(
+            smhc,
             'Last student_module_id is 29',
             'Loaded stored state: {"next_student_module_id": 25}',
             '(not really cleaning 25)',
@@ -467,7 +473,8 @@ class HistoryCleanerMainTest(HistoryCleanerTest):
             (8, "2013-07-15 15:04:00.000", 29),
         ])
         smhc.main(batch_size=3)
-        self.assert_said(smhc,
+        self.assert_said(
+            smhc,
             'Last student_module_id is 29',
             'Loaded stored state: {"next_student_module_id": 25}',
             '(not really cleaning 25)',

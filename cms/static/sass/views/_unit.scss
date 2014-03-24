@@ -420,7 +420,20 @@ body.course.unit,.view-unit {
       }
     }
 
-    .xmodule_display {
+    // Special xBlock and xModule styling
+    .xblock-type-container {
+
+      .xblock-header-elementlevel {
+        line-height: $baseline*2;
+        min-height: $baseline*2;
+      }
+
+      .xblock-render-elementlevel {
+        display: none;
+      }
+    }
+
+    .xblock-student_view {
       padding: 2*$baseline $baseline $baseline;
       overflow-x: auto;
 
@@ -640,7 +653,6 @@ body.course.unit,.view-unit {
       }
 
       &:hover {
-        @include transition(opacity $tmg-f2 ease-in-out 0s);
         opacity: 1.0;
       }
 
@@ -654,9 +666,7 @@ body.course.unit,.view-unit {
       }
 
       .wrapper-comp-setting {
-        display: inline-block;
         min-width: 300px;
-        width: 55%;
         top: 0;
         vertical-align: top;
         margin-bottom:5px;
@@ -670,7 +680,7 @@ body.course.unit,.view-unit {
         display: inline-block;
         position: relative;
         left: 0;
-        width: 33%;
+        width: 25%;
         min-width: 100px;
         margin-right: ($baseline/2);
         font-weight: 600;
@@ -708,9 +718,14 @@ body.course.unit,.view-unit {
         text-overflow: ellipsis;
       }
 
-      input[type="number"] {
+      //Allows users to copy full value of disabled inputs.
+      input.is-disabled{
+        text-overflow: clip;
+        opacity: .5;
+      }
 
-        width: 38.5%;
+      input[type="number"] {
+        width: 42%;
         box-shadow: 0 1px 2px $shadow-l1 inset;
         //For webkit browsers which render number fields differently, make input wider.
         -moz-column-width: {
@@ -768,7 +783,6 @@ body.course.unit,.view-unit {
         display: inline-block;
         font-color: $gray-l6;
         min-width: ($baseline*10);
-        width: 35%;
         vertical-align: top;
       }
 
@@ -855,26 +869,117 @@ body.course.unit,.view-unit {
           }
         }
       }
+
+      // TYPE: Dict
+      .metadata-dict {
+        * {
+          @include box-sizing(border-box);
+        }
+
+        // label
+        .setting-label {
+            vertical-align: top;
+            margin-top: ($baseline*.75);
+        }
+
+        // inputs and labels
+        .wrapper-dict-settings {
+          width: 55%;
+          display: inline-block;
+          min-width: 240px;
+
+          // enumerated fields
+          .list-settings {
+            margin: ($baseline/2) 0 0;
+
+            .list-settings-item {
+              margin-bottom: ($baseline/2);
+            }
+
+            // inputs
+            .input {
+              width: 43%;
+              margin-right: ($baseline/4);
+              vertical-align: middle;
+              display: inline-block;
+
+              &.input-value {
+                margin-right: ($baseline/2);
+              }
+            }
+          }
+        }
+
+        .setting-clear {
+          vertical-align: top;
+          margin: ($baseline*.75) 0 0 0;
+        }
+
+        .create-setting {
+          @extend %ui-btn-flat-outline;
+          @extend %t-action3;
+          display: block;
+          width: 88%;
+          padding: ($baseline/2);
+          font-weight: 600;
+
+          *[class^="icon-"] {
+            margin-right: ($baseline/4);
+          }
+        }
+
+        .remove-setting {
+          @include transition(color 0.25s ease-in-out);
+          @include font-size(20);
+          display: inline-block;
+          background: transparent;
+          color: $blue-l3;
+
+          &:hover {
+            color: $blue;
+          }
+        }
+      }
     }
   }
 }
 // ====================
 
 // Editing Units from Courseware
+//uses similar styling as static-pages.scss
 body.unit {
 
   .component {
-    padding-top: 30px;
 
-    .component-actions {
+
+    .wrapper-component-action-header {
       @include box-sizing(border-box);
       position: absolute;
-      width: 100%;
-      padding: 15px;
       top: 0;
       left: 0;
-      border-bottom: 1px solid $lightBluishGrey2;
-      background: $lightGrey;
+      padding: $baseline/4 $baseline/2;
+      width: 100%;
+      border-bottom: 1px solid $gray-l4;
+      background-color: $gray-l6;
+    }
+
+    .component-header {
+      display: inline-block;
+      overflow: hidden;
+      padding: $baseline/2 0px 0px $baseline/4;
+      max-width: 60%;
+      color: $gray-l1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 300;
+    }
+
+    .component-actions {
+      display: inline-block;
+      float: right;
+      max-width: 40%;
+      vertical-align: middle;
+      text-align: center;
     }
 
     &.editing {
@@ -882,6 +987,53 @@ body.unit {
     }
   }
 }
+
+// ====================
+
+// Component Header Actions
+// uses similar styling as assets.scss, static-pages.scss
+
+body.unit {
+
+  .component-actions {
+
+    .action-item {
+      display: inline-block;
+      margin: ($baseline/4) 0 ($baseline/4) ($baseline/4);
+
+      .action-button {
+        display: block;
+        padding: 0 $baseline/2;
+        width: auto;
+        height: ($baseline*1.5);
+        border-radius: 3px;
+        color: $gray-l1;
+
+        &:hover {
+          background-color: $blue;
+          color: $gray-l6;
+        }
+
+        .action-button-text {
+          padding-left: 1px;
+          vertical-align: bottom;
+          text-transform: uppercase;
+          line-height: 17px;
+        }
+
+        &.delete-button:hover {
+          background-color: $gray-l1;
+        }
+      }
+
+      [class^="icon-"] {
+        display: inline-block;
+        vertical-align: bottom;
+      }
+    }
+  }
+}
+
 // ====================
 
 // Unit Page Sidebar
@@ -1144,7 +1296,7 @@ body.unit {
 
 .edit-state-public {
   .delete-draft,
-  .component-actions,
+  .wrapper-component-action-header,
   .new-component-item,
   .editing-draft-alert,
   .publish-draft-message,
@@ -1189,4 +1341,71 @@ body.unit {
 //  hides latex compiler button if settings mode is-active
 div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
  display: none;
+}
+
+// ====================
+
+// xblock - unit page container
+
+body.unit .xblock-type-container {
+  @extend %wrap-xblock;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+
+  &:hover {
+    @include transition(all $tmg-f2 linear 0s);
+    border-color: $blue;
+
+    .container-drag {
+      background-color: $blue;
+      border-color: $blue;
+    }
+  }
+
+  .xblock-header {
+    margin-bottom: 0;
+    border-bottom: 0;
+    border-radius: ($baseline/5);
+
+    .xblock-details {
+      font-size: .9em;
+    }
+  }
+
+  // UI: container xblock drag handle
+
+  // TODO: abstract out drag handles into generic control used on unit, container, outline pages.
+  .container-drag {
+    position: absolute;
+    display: block;
+    top: 0px;
+    right: -16px;
+    z-index: 10;
+    width: 16px;
+    height: 50px;
+    border-radius: 0 3px 3px 0;
+    border: 1px solid $lightBluishGrey2;
+    background: url(../img/white-drag-handles.png) center no-repeat $lightBluishGrey2;
+    cursor: move;
+    @include transition(none);
+  }
+
+  .xblock-render {
+    display: none;
+  }
+}
+
+// UI: special case discussion, HTML xmodule styling
+
+body.unit .component {
+  .xmodule_DiscussionModule, .xmodule_HtmlModule, .xblock {
+    margin-top: ($baseline*1.5);
+  }
+}
+
+body.unit .component.editing {
+  .xmodule_DiscussionModule, .xmodule_HtmlModule, .xblock {
+    margin-top: 0;
+  }
 }

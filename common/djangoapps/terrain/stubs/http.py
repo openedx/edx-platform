@@ -6,10 +6,58 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import urlparse
 import threading
 import json
+from functools import wraps
 from lazy import lazy
 
 from logging import getLogger
 LOGGER = getLogger(__name__)
+
+
+def require_params(method, *required_keys):
+    """
+    Decorator to ensure that the method has all the required parameters.
+
+    Example:
+
+        @require_params('GET', 'id', 'state')
+        def handle_request(self):
+            # ....
+
+    would send a 400 response if no GET parameters were specified
+    for 'id' or 'state' (or if those parameters had empty values).
+
+    The wrapped function should be a method of a `StubHttpRequestHandler`
+    subclass.
+
+    Currently, "GET" and "POST" are the only supported methods.
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+
+            # Read either GET querystring params or POST dict params
+            if method == "GET":
+                params = self.get_params
+            elif method == "POST":
+                params = self.post_dict
+            else:
+                raise ValueError("Unsupported method '{method}'".format(method=method))
+
+            # Check for required values
+            missing = []
+            for key in required_keys:
+                if params.get(key) is None:
+                    missing.append(key)
+
+            if len(missing) > 0:
+                msg = "Missing required key(s) {keys}".format(keys=",".join(missing))
+                self.send_response(400, content=msg, headers={'Content-type': 'text/plain'})
+
+            # If nothing is missing, execute the function as usual
+            else:
+                return func(self, *args, **kwargs)
+        return wrapper
+    return decorator
 
 
 class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
@@ -23,14 +71,13 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         """
         Redirect messages to keep the test console clean.
         """
+        LOGGER.debug(self._format_msg(format_str, *args))
 
-        msg = "{0} - - [{1}] {2}\n".format(
-            self.client_address[0],
-            self.log_date_time_string(),
-            format_str % args
-        )
-
-        LOGGER.debug(msg)
+    def log_error(self, format_str, *args):
+        """
+        Helper to log a server error.
+        """
+        LOGGER.error(self._format_msg(format_str, *args))
 
     @lazy
     def request_content(self):
@@ -71,27 +118,63 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         """
         Return the GET parameters (querystring in the URL).
         """
-        return urlparse.parse_qs(self.path)
+        query = urlparse.urlparse(self.path).query
+
+        # By default, `parse_qs` returns a list of values for each param
+        # For convenience, we replace lists of 1 element with just the element
+        return {
+            k:v[0] if len(v) == 1 else v
+            for k,v in urlparse.parse_qs(query).items()
+        }
+
+    @lazy
+    def path_only(self):
+        """
+        Return the URL path without GET parameters.
+        Removes the trailing slash if there is one.
+        """
+        path = urlparse.urlparse(self.path).path
+        if path.endswith('/'):
+            return path[:-1]
+        else:
+            return path
 
     def do_PUT(self):
         """
         Allow callers to configure the stub server using the /set_config URL.
+        The request should have POST data, such that:
+
+            Each POST parameter is the configuration key.
+            Each POST value is a JSON-encoded string value for the configuration.
         """
         if self.path == "/set_config" or self.path == "/set_config/":
 
-            for key, value in self.post_dict.iteritems():
-                self.log_message("Set config '{0}' to '{1}'".format(key, value))
+            if len(self.post_dict) > 0:
+                for key, value in self.post_dict.iteritems():
 
-                try:
-                    value = json.loads(value)
+                    # Decode the params as UTF-8
+                    try:
+                        key = unicode(key, 'utf-8')
+                        value = unicode(value, 'utf-8')
+                    except UnicodeDecodeError:
+                        self.log_message("Could not decode request params as UTF-8")
 
-                except ValueError:
-                    self.log_message(u"Could not parse JSON: {0}".format(value))
-                    self.send_response(400)
+                    self.log_message(u"Set config '{0}' to '{1}'".format(key, value))
 
-                else:
-                    self.server.set_config(unicode(key, 'utf-8'), value)
-                    self.send_response(200)
+                    try:
+                        value = json.loads(value)
+
+                    except ValueError:
+                        self.log_message(u"Could not parse JSON: {0}".format(value))
+                        self.send_response(400)
+
+                    else:
+                        self.server.config[key] = value
+                        self.send_response(200)
+
+            # No parameters sent to configure, so return success by default
+            else:
+                self.send_response(200)
 
         else:
             self.send_response(404)
@@ -119,6 +202,25 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         if content is not None:
             self.wfile.write(content)
 
+    def send_json_response(self, content):
+        """
+        Send a response with status code 200, the given content serialized as
+        JSON, and the Content-Type header set appropriately
+        """
+        self.send_response(200, json.dumps(content), {"Content-Type": "application/json"})
+
+    def _format_msg(self, format_str, *args):
+        """
+        Format message for logging.
+        `format_str` is a string with old-style Python format escaping;
+        `args` is an array of values to fill into the string.
+        """
+        return u"{0} - - [{1}] {2}\n".format(
+            self.client_address[0],
+            self.log_date_time_string(),
+            format_str % args
+        )
+
 
 class StubHttpService(HTTPServer, object):
     """
@@ -134,11 +236,11 @@ class StubHttpService(HTTPServer, object):
         Configure the server to listen on localhost.
         Default is to choose an arbitrary open port.
         """
-        address = ('127.0.0.1', port_num)
+        address = ('0.0.0.0', port_num)
         HTTPServer.__init__(self, address, self.HANDLER_CLASS)
 
         # Create a dict to store configuration values set by the client
-        self._config = dict()
+        self.config = dict()
 
         # Start the server in a separate thread
         server_thread = threading.Thread(target=self.serve_forever)
@@ -165,17 +267,3 @@ class StubHttpService(HTTPServer, object):
         """
         _, port = self.server_address
         return port
-
-    def config(self, key, default=None):
-        """
-        Return the configuration value for `key`.  If this
-        value has not been set, return `default` instead.
-        """
-        return self._config.get(key, default)
-
-    def set_config(self, key, value):
-        """
-        Set the configuration `value` for `key`.
-        """
-        self._config[key] = value
-

@@ -4,13 +4,13 @@ if Backbone?
         "click .vote-btn":
           (event) -> @toggleVote(event)
         "keydown .vote-btn":
-          (event) -> DiscussionUtil.activateOnEnter(event, @toggleVote)
+          (event) -> DiscussionUtil.activateOnSpace(event, @toggleVote)
         "click .action-endorse": "toggleEndorse"
         "click .action-delete": "_delete"
         "click .action-edit": "edit"
         "click .discussion-flag-abuse": "toggleFlagAbuse"
-        "keypress .discussion-flag-abuse":
-          (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
+        "keydown .discussion-flag-abuse":
+          (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
 
     $: (selector) ->
         @$el.find(selector)
@@ -45,7 +45,7 @@ if Backbone?
         @$el.prepend('<div class="staff-banner">' + gettext('staff') + '</div>')
       else if DiscussionUtil.isTA(@model.get("user_id"))
         @$el.addClass("community-ta")
-        @$el.prepend('<div class="community-ta-banner">Community TA</div>')
+        @$el.prepend('<div class="community-ta-banner">' + gettext('Community TA') + '</div>')
 
     edit: (event) ->
         @trigger "response:edit", event
@@ -75,7 +75,12 @@ if Backbone?
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
         @$(".discussion-flag-abuse").attr("aria-pressed", "true")
-        @$(".discussion-flag-abuse .flag-label").html(gettext("Misuse Reported"))
+        @$(".discussion-flag-abuse").attr("data-tooltip", gettext("Misuse Reported, click to remove report"))
+        ###
+        Translators: The text between start_sr_span and end_span is not shown
+        in most browsers but will be read by screen readers.
+        ###
+        @$(".discussion-flag-abuse .flag-label").html(interpolate(gettext("Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"), {"start_sr_span": "<span class='sr'>", "end_span": "</span>"}, true))
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      

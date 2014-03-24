@@ -40,8 +40,8 @@ data: |
         <p>
     Какой язык программирования является лучшим на данный момент? </p>
         <p>
-          <customresponse cfn="test_str" expect="c++">
-            <textline correct_answer="c++"/>
+          <customresponse cfn="test_str" expect="python">
+            <textline correct_answer="python" label="Какой язык программирования является лучшим на данный момент?"/>
             <hintgroup hintfn="hint_fn"/>
           </customresponse>
         </p>

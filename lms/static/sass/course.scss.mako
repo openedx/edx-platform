@@ -2,8 +2,8 @@
 
 @import 'base/reset';
 @import 'base/font_face';
-@import 'base/mixins';
 @import 'base/variables';
+@import 'base/mixins';
 
 ## THEMING
 ## -------

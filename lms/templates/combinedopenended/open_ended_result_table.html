@@ -19,7 +19,11 @@
                 %if len(co['feedback'])>2:
                     <div class="collapsible evaluation-response">
                         <header>
-                            <a href="#">${_("See full feedback")}</a>
+                            ## Translators: "See full feedback" is the text of
+                            ## a link that allows a user to see more detailed
+                            ## feedback from a self, peer, or instructor
+                            ## graded openended problem
+                            <a href="#" class="see-full-feedback">${_("See full feedback")}</a>
                         </header>
                         <section class="feedback-full">
                             ${co['feedback']}
@@ -33,7 +37,10 @@
                     <input type="hidden" value="${co['submission_id']}" class="submission_id" />
                     <div class="collapsible evaluation-response">
                         <header>
-                            <a href="#">${_("Respond to Feedback")}</a>
+                            ## Translators: this text forms a link that, when
+                            ## clicked, allows a user to respond to the feedback
+                            ## the user received on his or her openended problem
+                            <a href="#" class="respond-to-feedback">${_("Respond to Feedback")}</a>
                         </header>
                         <section id="evaluation" class="evaluation">
                             <p>${_("How accurate do you find this feedback?")}</p>

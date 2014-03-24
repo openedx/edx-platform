@@ -22,7 +22,6 @@ from django.views.decorators.http import require_http_methods, require_GET
 from django.utils.translation import ugettext as _
 
 from edxmako.shortcuts import render_to_response
-from auth.authz import create_all_course_groups
 
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.django import contentstore
@@ -31,10 +30,12 @@ from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.exceptions import SerializationError
 
 from xmodule.modulestore.locator import BlockUsageLocator
-from .access import has_access
+from .access import has_course_access
 
 from util.json_request import JsonResponse
 from extract_tar import safetar_extractall
+from student.roles import CourseInstructorRole, CourseStaffRole
+from student import auth
 
 
 __all__ = ['import_handler', 'import_status_handler', 'export_handler']
@@ -61,7 +62,7 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
         json: import a course via the .tar.gz file specified in request.FILES
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_access(request.user, location):
+    if not has_course_access(request.user, location):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(location)
@@ -225,15 +226,17 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
                         draft_store=modulestore()
                     )
 
-                    logging.debug('new course at {0}'.format(course_items[0].location))
+                    new_location = course_items[0].location
+                    logging.debug('new course at {0}'.format(new_location))
 
                     session_status[key] = 3
                     request.session.modified = True
 
-                    create_all_course_groups(request.user, course_items[0].location)
-                    logging.debug('created all course groups at {0}'.format(course_items[0].location))
+                    auth.add_users(request.user, CourseInstructorRole(new_location), request.user)
+                    auth.add_users(request.user, CourseStaffRole(new_location), request.user)
+                    logging.debug('created all course groups at {0}'.format(new_location))
 
-                # Send errors to client with stage at which error occured.
+                # Send errors to client with stage at which error occurred.
                 except Exception as exception:   # pylint: disable=W0703
                     return JsonResponse(
                         {
@@ -272,7 +275,7 @@ def import_status_handler(request, tag=None, package_id=None, branch=None, versi
 
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_access(request.user, location):
+    if not has_course_access(request.user, location):
         raise PermissionDenied()
 
     try:
@@ -303,7 +306,7 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
     which describes the error.
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_access(request.user, location):
+    if not has_course_access(request.user, location):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(location)
@@ -321,6 +324,9 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
         try:
             export_to_xml(modulestore('direct'), contentstore(), old_location, root_dir, name, modulestore())
 
+            logging.debug('tar file being generated at {0}'.format(export_file.name))
+            with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
+                tar_file.add(root_dir / name, arcname=name)
         except SerializationError, e:
             logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
             unit = None
@@ -349,7 +355,6 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
                 'edit_unit_url': unit_locator.url_reverse("unit") if parent else "",
                 'course_home_url': location.url_reverse("course"),
                 'export_url': export_url
-
             })
         except Exception, e:
             logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
@@ -361,14 +366,8 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
                 'course_home_url': location.url_reverse("course"),
                 'export_url': export_url
             })
-
-        logging.debug('tar file being generated at {0}'.format(export_file.name))
-        tar_file = tarfile.open(name=export_file.name, mode='w:gz')
-        tar_file.add(root_dir / name, arcname=name)
-        tar_file.close()
-
-        # remove temp dir
-        shutil.rmtree(root_dir / name)
+        finally:
+            shutil.rmtree(root_dir / name)
 
         wrapper = FileWrapper(export_file)
         response = HttpResponse(wrapper, content_type='application/x-tgz')

@@ -85,7 +85,7 @@ data: |
     What is the best programming language that exists today? You may enter your answer in upper or lower case, with or without quotes. </p>
         <p>
           <customresponse cfn="test_str" expect="python">
-            <textline correct_answer="python"/>
+            <textline correct_answer="python" label="What is the best programming language that exists today?"/>
             <hintgroup hintfn="hint_fn"/>
           </customresponse>
         </p>

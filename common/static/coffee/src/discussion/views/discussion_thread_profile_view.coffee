@@ -5,10 +5,10 @@ if Backbone?
       "click .vote-btn":
         (event) -> @toggleVote(event)
       "keydown .vote-btn":
-        (event) -> DiscussionUtil.activateOnEnter(event, @toggleVote)
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleVote)
       "click .action-follow": "toggleFollowing"
-      "keypress .action-follow":
-        (event) -> DiscussionUtil.activateOnEnter(event, toggleFollowing)
+      "keydown .action-follow":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleFollowing)
       "click .expand-post": "expandPost"
       "click .collapse-post": "collapsePost"
 

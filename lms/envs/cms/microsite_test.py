@@ -6,7 +6,7 @@ This is a localdev test for the Microsite processing pipeline
 # pylint: disable=W0401, W0614
 
 from .dev import *
-from .dev import SUBDOMAIN_BRANDING, VIRTUAL_UNIVERSITIES
+from ..dev import ENV_ROOT, FEATURES
 
 
 MICROSITE_CONFIGURATION = {
@@ -27,12 +27,12 @@ MICROSITE_CONFIGURATION = {
         "course_index_overlay_text": "Explore free courses from leading universities.",
         "course_index_overlay_logo_file": "openedx/images/header-logo.png",
         "homepage_overlay_html": "<h1>Take an Open edX Course</h1>"
-    },
+    }
 }
 
-if len(MICROSITE_CONFIGURATION.keys()) > 0:
-    enable_microsites(
-        MICROSITE_CONFIGURATION,
-        SUBDOMAIN_BRANDING,
-        VIRTUAL_UNIVERSITIES
-    )
+MICROSITE_ROOT_DIR = ENV_ROOT / 'edx-microsite'
+
+# pretend we are behind some marketing site, we want to be able to assert that the Microsite config values override
+# this global setting
+FEATURES['ENABLE_MKTG_SITE'] = True
+FEATURES['USE_MICROSITES'] = True

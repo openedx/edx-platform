@@ -1,18 +1,20 @@
 # pylint: disable=C0111
 # pylint: disable=W0621
 
-from lettuce import world, step
-from nose.tools import assert_true, assert_in, assert_false  # pylint: disable=E0611
-
-from auth.authz import get_user_by_email, get_course_groupname_for_role
-from django.conf import settings
-
-from selenium.webdriver.common.keys import Keys
 import time
 import os
-from django.contrib.auth.models import Group
+from lettuce import world, step
+from nose.tools import assert_true, assert_in  # pylint: disable=no-name-in-module
+from django.conf import settings
+
+from student.roles import CourseRole, CourseStaffRole, CourseInstructorRole
+from student.models import get_user
+
+from selenium.webdriver.common.keys import Keys
 
 from logging import getLogger
+from student.tests.factories import AdminFactory
+from student import auth
 logger = getLogger(__name__)
 
 from terrain.browser import reset_data
@@ -158,11 +160,9 @@ def add_course_author(user, course):
     Add the user to the instructor group of the course
     so they will have the permissions to see it in studio
     """
-    for role in ("staff", "instructor"):
-        groupname = get_course_groupname_for_role(course.location, role)
-        group, __ = Group.objects.get_or_create(name=groupname)
-        user.groups.add(group)
-    user.save()
+    global_admin = AdminFactory()
+    for role in (CourseStaffRole, CourseInstructorRole):
+        auth.add_users(global_admin, role(course.location), user)
 
 
 def create_a_course():
@@ -171,7 +171,7 @@ def create_a_course():
 
     user = world.scenario_dict.get("USER")
     if not user:
-        user = get_user_by_email('robot+studio@edx.org')
+        user = get_user('robot+studio@edx.org')
 
     add_course_author(user, course)
 
@@ -319,20 +319,18 @@ def i_am_shown_a_notification(step):
 
 
 def type_in_codemirror(index, text):
-    world.wait(1)  # For now, slow this down so that it works. TODO: fix it.
-    world.css_click("div.CodeMirror-lines", index=index)
-    world.browser.execute_script("$('div.CodeMirror.CodeMirror-focused > div').css('overflow', '')")
-    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
-    if world.is_mac():
-        g._element.send_keys(Keys.COMMAND + 'a')
-    else:
-        g._element.send_keys(Keys.CONTROL + 'a')
-    g._element.send_keys(Keys.DELETE)
-    g._element.send_keys(text)
-    if world.is_firefox():
-        world.trigger_event('div.CodeMirror', index=index, event='blur')
+    script = """
+    var cm = $('div.CodeMirror:eq({})').get(0).CodeMirror;
+    cm.getInputField().focus();
+    cm.setValue(arguments[0]);
+    cm.getInputField().blur();""".format(index)
+    world.browser.driver.execute_script(script, str(text))
     world.wait_for_ajax_complete()
 
+def get_codemirror_value(index=0):
+    return world.browser.driver.execute_script("""
+        return $('div.CodeMirror:eq({})').get(0).CodeMirror.getValue();
+        """.format(index))
 
 def upload_file(filename):
     path = os.path.join(TEST_ROOT, filename)
@@ -358,7 +356,7 @@ def other_user_login(step, name):
         login_form.find_by_name('submit').click()
     world.retry_on_exception(fill_login_form)
     assert_true(world.is_css_present('.new-course-button'))
-    world.scenario_dict['USER'] = get_user_by_email(name + '@edx.org')
+    world.scenario_dict['USER'] = get_user(name + '@edx.org')
 
 
 @step(u'the user "([^"]*)" exists( as a course (admin|staff member|is_staff))?$')
@@ -368,18 +366,17 @@ def create_other_user(_step, name, has_extra_perms, role_name):
     if has_extra_perms:
         if role_name == "is_staff":
             user.is_staff = True
+            user.save()
         else:
             if role_name == "admin":
                 # admins get staff privileges, as well
-                roles = ("staff", "instructor")
+                roles = (CourseStaffRole, CourseInstructorRole)
             else:
-                roles = ("staff",)
+                roles = (CourseStaffRole,)
             location = world.scenario_dict["COURSE"].location
+            global_admin = AdminFactory()
             for role in roles:
-                groupname = get_course_groupname_for_role(location, role)
-                group, __ = Group.objects.get_or_create(name=groupname)
-                user.groups.add(group)
-        user.save()
+                auth.add_users(global_admin, role(location), user)
 
 
 @step('I log out')
@@ -393,10 +390,20 @@ def i_edit_a_draft(_step):
 
 
 @step(u'I click on "replace with draft"$')
-def i_edit_a_draft(_step):
+def i_replace_w_draft(_step):
     world.css_click("a.publish-draft")
+
+
+@step(u'I click on "delete draft"$')
+def i_delete_draft(_step):
+    world.css_click("a.delete-draft")
 
 
 @step(u'I publish the unit$')
 def publish_unit(_step):
     world.select_option('visibility-select', 'public')
+
+
+@step(u'I unpublish the unit$')
+def unpublish_unit(_step):
+    world.select_option('visibility-select', 'private')

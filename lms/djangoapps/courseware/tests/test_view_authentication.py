@@ -3,7 +3,6 @@ import pytz
 
 from mock import patch
 
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
@@ -26,6 +25,7 @@ from courseware.tests.factories import (
     OrgStaffFactory,
     OrgInstructorFactory,
 )
+from xmodule.modulestore.django import modulestore
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -85,7 +85,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         urls.extend([
             reverse('book', kwargs={'course_id': course.id,
                                     'book_index': index})
-            for index, book in enumerate(course.textbooks)
+            for index in xrange(len(course.textbooks))
         ])
         for url in urls:
             check_for_get_code(self, 200, url)
@@ -113,6 +113,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course = CourseFactory.create(number='999', display_name='Robot_Super_Course')
         self.overview_chapter = ItemFactory.create(display_name='Overview')
         self.courseware_chapter = ItemFactory.create(display_name='courseware')
+        self.course = modulestore().get_course(self.course.id)
 
         self.test_course = CourseFactory.create(number='666', display_name='Robot_Sub_Course')
         self.other_org_course = CourseFactory.create(org='Other_Org_Course')
@@ -127,7 +128,9 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
             parent_location=self.overview_chapter.location,
             display_name='Welcome'
         )
+        self.test_course = modulestore().get_course(self.test_course.id)
 
+        self.global_staff_user = GlobalStaffFactory()
         self.unenrolled_user = UserFactory(last_name="Unenrolled")
 
         self.enrolled_user = UserFactory(last_name="Enrolled")
@@ -135,10 +138,11 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         CourseEnrollmentFactory(user=self.enrolled_user, course_id=self.test_course.id)
 
         self.staff_user = StaffFactory(course=self.course.location)
-        self.instructor_user = InstructorFactory(course=self.course.location)
+        self.instructor_user = InstructorFactory(
+            course=self.course.location)
         self.org_staff_user = OrgStaffFactory(course=self.course.location)
-        self.org_instructor_user = OrgInstructorFactory(course=self.course.location)
-        self.global_staff_user = GlobalStaffFactory()
+        self.org_instructor_user = OrgInstructorFactory(
+            course=self.course.location)
 
     def test_redirection_unenrolled(self):
         """
@@ -263,10 +267,10 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # Make courses start in the future
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
-        course_data = {'start': tomorrow}
-        test_course_data = {'start': tomorrow}
-        self.course = self.update_course(self.course, course_data)
-        self.test_course = self.update_course(self.test_course, test_course_data)
+        self.course.start = tomorrow
+        self.test_course.start = tomorrow
+        self.course = self.update_course(self.course)
+        self.test_course = self.update_course(self.test_course)
 
         self.assertFalse(self.course.has_started())
         self.assertFalse(self.test_course.has_started())
@@ -288,10 +292,10 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
-        course_data = {'start': tomorrow}
-        test_course_data = {'start': tomorrow}
-        self.course = self.update_course(self.course, course_data)
-        self.test_course = self.update_course(self.test_course, test_course_data)
+        self.course.start = tomorrow
+        self.test_course.start = tomorrow
+        self.course = self.update_course(self.course)
+        self.test_course = self.update_course(self.test_course)
 
         self.login(self.instructor_user)
         # Enroll in the classes---can't see courseware otherwise.
@@ -311,10 +315,10 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
-        course_data = {'start': tomorrow}
-        test_course_data = {'start': tomorrow}
-        self.course = self.update_course(self.course, course_data)
-        self.test_course = self.update_course(self.test_course, test_course_data)
+        self.course.start = tomorrow
+        self.test_course.start = tomorrow
+        self.course = self.update_course(self.course)
+        self.test_course = self.update_course(self.test_course)
 
         self.login(self.global_staff_user)
         self.enroll(self.course, True)
@@ -335,13 +339,14 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         nextday = tomorrow + datetime.timedelta(days=1)
         yesterday = now - datetime.timedelta(days=1)
 
-        course_data = {'enrollment_start': tomorrow, 'enrollment_end': nextday}
-        test_course_data = {'enrollment_start': yesterday, 'enrollment_end': tomorrow}
-
         # self.course's enrollment period hasn't started
-        self.course = self.update_course(self.course, course_data)
+        self.course.enrollment_start = tomorrow
+        self.course.enrollment_end = nextday
         # test_course course's has
-        self.test_course = self.update_course(self.test_course, test_course_data)
+        self.test_course.enrollment_start = yesterday
+        self.test_course.enrollment_end = tomorrow
+        self.course = self.update_course(self.course)
+        self.test_course = self.update_course(self.test_course)
 
         # First, try with an enrolled student
         self.login(self.unenrolled_user)

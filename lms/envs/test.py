@@ -40,6 +40,9 @@ FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 
+# Toggles embargo on for testing
+FEATURES['EMBARGO'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
@@ -73,6 +76,8 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 # Where the content data is checked out.  This may not exist on jenkins.
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
+USE_I18N = True
+LANGUAGE_CODE = 'en'  # tests assume they will get English.
 
 XQUEUE_INTERFACE = {
     "url": "http://sandbox-xqueue.edx.org",
@@ -83,7 +88,6 @@ XQUEUE_INTERFACE = {
     "basic_auth": ('anant', 'agarwal'),
 }
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
-
 
 # Don't rely on a real staff grading backend
 MOCK_STAFF_GRADING = True
@@ -112,10 +116,6 @@ MODULESTORE = {
         }
     }
 }
-
-# Starting modulestores generates log messages.  If we wait to init modulestores,
-# then those messages will be silenced by the test runner.
-INIT_MODULESTORE_ON_STARTUP = False
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
@@ -257,7 +257,6 @@ XQUEUE_PORT = 8040
 YOUTUBE_PORT = 8031
 LTI_PORT = 8765
 
-
 ################### Make tests faster
 
 #http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
@@ -269,6 +268,9 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
     # 'django.contrib.auth.hashers.CryptPasswordHasher',
 )
+
+### This enables the Metrics tab for the Instructor dashboard ###########
+FEATURES['CLASS_DASHBOARD'] = True
 
 ################### Make tests quieter
 
@@ -297,13 +299,14 @@ MICROSITE_CONFIGURATION = {
         "course_index_overlay_text": "This is a Test Microsite Overlay Text.",
         "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
         "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>"
+    },
+    "default": {
+        "university": "default_university",
+        "domain_prefix": "www",
     }
 }
+MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
+FEATURES['USE_MICROSITES'] = True
 
-if len(MICROSITE_CONFIGURATION.keys()) > 0:
-    enable_microsites(
-        MICROSITE_CONFIGURATION,
-        SUBDOMAIN_BRANDING,
-        VIRTUAL_UNIVERSITIES,
-        microsites_root=ENV_ROOT / 'edx-platform' / 'test_microsites'
-    )
+######### LinkedIn ########
+LINKEDIN_API['COMPANY_ID'] = '0000000'

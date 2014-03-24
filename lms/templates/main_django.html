@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}{% load staticfiles %}
-<html>
+{% load compressed %}{% load sekizai_tags i18n microsite %}{% load url from future %}{% load staticfiles %}
+<html lang="{{LANGUAGE_CODE}}">
 <head>
-  {# "edX" should *not* be translated #}
-  {% block title %}<title>edX</title>{% endblock %}
+  <meta charset="UTF-8">
+  {% block title %}<title>{% platform_name %}</title>{% endblock %}
 
   <link rel="icon" type="image/x-icon" href="{% static "images/favicon.ico" %}" />
 
@@ -28,13 +28,13 @@
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
 </head>
 
-<body class="{% block bodyclass %}{% endblock %}">
-  <a class="nav-skip" href="#content">{% trans "Skip to this view's content" %}</a>
+<body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
+  <a class="nav-skip" href="{% block nav_skip %}#content{% endblock %}">{% trans "Skip to this view's content" %}</a>
   {% include "navigation.html" %}
-  <section class="content-wrapper" id="content">
+  <div class="content-wrapper" id="content">
     {% block body %}{% endblock %}
     {% block bodyextra %}{% endblock %}
-  </section>
+  </div>
 
   {% include "footer.html" %}
 

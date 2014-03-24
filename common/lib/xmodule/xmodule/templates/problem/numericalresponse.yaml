@@ -6,13 +6,13 @@ metadata:
 
        Ответ сравнивается с правильным с заданной точностью.
 
-       Введите значение числа Пи:
+       >>Введите значение числа Пи:<<
        = 3.14159 +- .02
        
-       Оцените чему равно 502*9:
+       >>Оцените чему равно 502*9:<<
        = 4518 +- 15%
 
-       Количество пальцев на руке обычного человека:
+       >>Количество пальцев на руке обычного человека:<<
        = 5
 
        [explanation]
@@ -41,19 +41,19 @@ data: |
    <p>Введите значение числа Пи:
        <numericalresponse answer="3.14159">
            <responseparam type="tolerance" default=".02" />
-           <formulaequationinput />
+           <formulaequationinput label="Введите значение числа Пи" />
        </numericalresponse>
    </p>
    <p>Оцените чему равно 502*9:
        <numericalresponse answer="$computed_response">
            <responseparam type="tolerance" default="15%"/>
-           <formulaequationinput />
+           <formulaequationinput label="Оцените чему равно 502*9"/>
        </numericalresponse>
    </p>
 
    <p>Количество пальцев на руке обычного человека:
        <numericalresponse answer="5">
-           <formulaequationinput />
+           <formulaequationinput label="Количество пальцев на руке обычного человека"/>
        </numericalresponse>
    </p>
        <solution>

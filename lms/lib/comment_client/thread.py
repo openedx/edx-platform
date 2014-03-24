@@ -11,12 +11,13 @@ class Thread(models.Model):
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
-        'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers'
+        'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned',
+        'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total'
     ]
 
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
-        'closed', 'tags', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned'
+        'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned'
     ]
 
     initializable_fields = updatable_fields
@@ -34,7 +35,7 @@ class Thread(models.Model):
                           'recursive': False}
         params = merge_dict(default_params, strip_blank(strip_none(query_params)))
 
-        if query_params.get('text') or query_params.get('tags'):
+        if query_params.get('text'):
             url = cls.url(action='search')
         else:
             url = cls.url(action='get_all', params=extract(params, 'commentable_id'))
@@ -73,10 +74,9 @@ class Thread(models.Model):
             'recursive': kwargs.get('recursive'),
             'user_id': kwargs.get('user_id'),
             'mark_as_read': kwargs.get('mark_as_read', True),
+            'resp_skip': kwargs.get('response_skip'),
+            'resp_limit': kwargs.get('response_limit'),
         }
-
-        # user_id may be none, in which case it shouldn't be part of the
-        # request.
         request_params = strip_none(request_params)
 
         response = perform_request('get', url, request_params)

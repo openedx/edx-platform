@@ -6,9 +6,9 @@ JSON views which the instructor dashboard requests.
 Many of these GETs may become PUTs in the future.
 """
 
-import re
-import logging
 import json
+import logging
+import re
 import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
@@ -16,6 +16,7 @@ from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.utils.html import strip_tags
 from util.json_request import JsonResponse
 
 from courseware.access import has_access
@@ -35,7 +36,6 @@ from instructor_task.views import get_task_completion_info
 from instructor_task.models import GradesStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import enroll_email, unenroll_email, get_email_params
-from instructor.views.tools import strip_if_string, get_student_from_identifier
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 import analytics.basic
 import analytics.distributions
@@ -43,6 +43,18 @@ import analytics.csvs
 import csv
 
 from bulk_email.models import CourseEmail
+
+from .tools import (
+    dump_student_extensions,
+    dump_module_extensions,
+    find_unit,
+    get_student_from_identifier,
+    handle_dashboard_error,
+    parse_datetime,
+    set_due_date_extension,
+    strip_if_string,
+)
+from xmodule.modulestore import Location
 
 log = logging.getLogger(__name__)
 
@@ -237,7 +249,9 @@ def students_update_enrollment(request, course_id):
             elif action == 'unenroll':
                 before, after = unenroll_email(course_id, email, email_students, email_params)
             else:
-                return HttpResponseBadRequest("Unrecognized action '{}'".format(action))
+                return HttpResponseBadRequest(strip_tags(
+                    "Unrecognized action '{}'".format(action)
+                ))
 
             results.append({
                 'email': email,
@@ -292,9 +306,9 @@ def modify_access(request, course_id):
     action = request.GET.get('action')
 
     if not rolename in ['instructor', 'staff', 'beta']:
-        return HttpResponseBadRequest(
+        return HttpResponseBadRequest(strip_tags(
             "unknown rolename '{}'".format(rolename)
-        )
+        ))
 
     user = User.objects.get(email=email)
 
@@ -309,7 +323,9 @@ def modify_access(request, course_id):
     elif action == 'revoke':
         revoke_access(course, user, rolename)
     else:
-        return HttpResponseBadRequest("unrecognized action '{}'".format(action))
+        return HttpResponseBadRequest(strip_tags(
+            "unrecognized action '{}'".format(action)
+        ))
 
     response_payload = {
         'email': email,
@@ -475,9 +491,9 @@ def get_distribution(request, course_id):
     available_features = analytics.distributions.AVAILABLE_PROFILE_FEATURES
     # allow None so that requests for no feature can list available features
     if not feature in available_features + (None,):
-        return HttpResponseBadRequest(
+        return HttpResponseBadRequest(strip_tags(
             "feature '{}' not available.".format(feature)
-        )
+        ))
 
     response_payload = {
         'course_id': course_id,
@@ -822,7 +838,9 @@ def list_forum_members(request, course_id):
 
     # filter out unsupported for roles
     if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest("Unrecognized rolename '{}'.".format(rolename))
+        return HttpResponseBadRequest(strip_tags(
+            "Unrecognized rolename '{}'.".format(rolename)
+        ))
 
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)
@@ -920,7 +938,9 @@ def update_forum_role_membership(request, course_id):
         return HttpResponseBadRequest("Operation requires instructor access.")
 
     if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest("Unrecognized rolename '{}'.".format(rolename))
+        return HttpResponseBadRequest(strip_tags(
+            "Unrecognized rolename '{}'.".format(rolename)
+        ))
 
     user = User.objects.get(email=email)
     target_is_instructor = has_access(user, course, 'instructor')
@@ -991,6 +1011,87 @@ def proxy_legacy_analytics(request, course_id):
         )
 
 
+def _display_unit(unit):
+    """
+    Gets string for displaying unit to user.
+    """
+    name = getattr(unit, 'display_name', None)
+    if name:
+        return u'{0} ({1})'.format(name, unit.location.url())
+    else:
+        return unit.location.url()
+
+
+@handle_dashboard_error
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('student', 'url', 'due_datetime')
+def change_due_date(request, course_id):
+    """
+    Grants a due date extension to a student for a particular unit.
+    """
+    course = get_course_by_id(course_id)
+    student = get_student_from_identifier(request.GET.get('student'))
+    unit = find_unit(course, request.GET.get('url'))
+    due_date = parse_datetime(request.GET.get('due_datetime'))
+    set_due_date_extension(course, unit, student, due_date)
+
+    return JsonResponse(_(
+        'Successfully changed due date for student {0} for {1} '
+        'to {2}').format(student.profile.name, _display_unit(unit),
+                         due_date.strftime('%Y-%m-%d %H:%M')))
+
+
+@handle_dashboard_error
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('student', 'url')
+def reset_due_date(request, course_id):
+    """
+    Rescinds a due date extension for a student on a particular unit.
+    """
+    course = get_course_by_id(course_id)
+    student = get_student_from_identifier(request.GET.get('student'))
+    unit = find_unit(course, request.GET.get('url'))
+    set_due_date_extension(course, unit, student, None)
+
+    return JsonResponse(_(
+        'Successfully reset due date for student {0} for {1} '
+        'to {2}').format(student.profile.name, _display_unit(unit),
+                         unit.due.strftime('%Y-%m-%d %H:%M')))
+
+
+@handle_dashboard_error
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('url')
+def show_unit_extensions(request, course_id):
+    """
+    Shows all of the students which have due date extensions for the given unit.
+    """
+    course = get_course_by_id(course_id)
+    unit = find_unit(course, request.GET.get('url'))
+    return JsonResponse(dump_module_extensions(course, unit))
+
+
+@handle_dashboard_error
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('student')
+def show_student_extensions(request, course_id):
+    """
+    Shows all of the due date extensions granted to a particular student in a
+    particular course.
+    """
+    student = get_student_from_identifier(request.GET.get('student'))
+    course = get_course_by_id(course_id)
+    return JsonResponse(dump_student_extensions(course, student))
+
+
 def _split_input_list(str_list):
     """
     Separate out individual student email from the comma, or space separated string.
@@ -1024,6 +1125,7 @@ def _msk_from_problem_urlname(course_id, urlname):
     if "combinedopenended" not in urlname:
         urlname = "problem/" + urlname
 
-    (org, course_name, __) = course_id.split("/")
-    module_state_key = "i4x://" + org + "/" + course_name + "/" + urlname
+    parts = Location.parse_course_id(course_id)
+    parts['urlname'] = urlname
+    module_state_key = u"i4x://{org}/{course}/{urlname}".format(**parts)
     return module_state_key

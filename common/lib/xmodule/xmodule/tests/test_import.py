@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import ddt
 import unittest
 
 from fs.memoryfs import MemoryFS
@@ -10,13 +11,17 @@ from mock import Mock, patch
 from django.utils.timezone import UTC
 
 from xmodule.xml_module import is_pointer_tag
-from xmodule.modulestore import Location
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+from xmodule.modulestore import Location, only_xmodules
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LocationReader
 from xmodule.modulestore.inheritance import compute_inherited_metadata
-from xmodule.x_module import XModuleMixin, only_xmodules
+from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore.inheritance import InheritanceMixin
+
+from xblock.core import XBlock
+from xblock.fields import Scope, String, Integer
+from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 
 ORG = 'test_org'
@@ -31,7 +36,6 @@ class DummySystem(ImportSystem):
         xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
         course_id = "/".join([ORG, COURSE, 'test_run'])
         course_dir = "test_dir"
-        policy = {}
         error_tracker = Mock()
         parent_tracker = Mock()
 
@@ -39,11 +43,12 @@ class DummySystem(ImportSystem):
             xmlstore=xmlstore,
             course_id=course_id,
             course_dir=course_dir,
-            policy=policy,
             error_tracker=error_tracker,
             parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
-            mixins=(InheritanceMixin, XModuleMixin)
+            mixins=(InheritanceMixin, XModuleMixin),
+            field_data=KvsFieldData(DictKeyValueStore()),
+            id_reader=LocationReader(),
         )
 
     def render_template(self, _template, _context):
@@ -70,6 +75,44 @@ class BaseCourseTestCase(unittest.TestCase):
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)
         return courses[0]
+
+
+class GenericXBlock(XBlock):
+    """XBlock for testing pure xblock xml import"""
+    has_children = True
+    field1 = String(default="something", scope=Scope.user_state)
+    field2 = Integer(scope=Scope.user_state)
+
+
+@ddt.ddt
+class PureXBlockImportTest(BaseCourseTestCase):
+    """
+    Tests of import pure XBlocks (not XModules) from xml
+    """
+
+    def assert_xblocks_are_good(self, block):
+        """Assert a number of conditions that must be true for `block` to be good."""
+        scope_ids = block.scope_ids
+        self.assertIsNotNone(scope_ids.usage_id)
+        self.assertIsNotNone(scope_ids.def_id)
+
+        for child_id in block.children:
+            child = block.runtime.get_block(child_id)
+            self.assert_xblocks_are_good(child)
+
+    @XBlock.register_temp_plugin(GenericXBlock)
+    @ddt.data(
+        "<genericxblock/>",
+        "<genericxblock field1='abc' field2='23' />",
+        "<genericxblock field1='abc' field2='23'><genericxblock/></genericxblock>",
+    )
+    @patch('xmodule.x_module.XModuleMixin.location')
+    def test_parsing_pure_xblock(self, xml, mock_location):
+        system = self.get_system(load_error_modules=False)
+        descriptor = system.process_xml(xml)
+        self.assertIsInstance(descriptor, GenericXBlock)
+        self.assert_xblocks_are_good(descriptor)
+        self.assertFalse(mock_location.called)
 
 
 class ImportTestCase(BaseCourseTestCase):
@@ -115,17 +158,14 @@ class ImportTestCase(BaseCourseTestCase):
         system = self.get_system()
         descriptor = system.process_xml(bad_xml)
 
-        resource_fs = None
-        tag_xml = descriptor.export_to_xml(resource_fs)
-        re_import_descriptor = system.process_xml(tag_xml)
+        node = etree.Element('unknown')
+        descriptor.add_xml_to_node(node)
+        re_import_descriptor = system.process_xml(etree.tostring(node))
 
-        self.assertEqual(re_import_descriptor.__class__.__name__,
-                         'ErrorDescriptorWithMixins')
+        self.assertEqual(re_import_descriptor.__class__.__name__, 'ErrorDescriptorWithMixins')
 
-        self.assertEqual(descriptor.contents,
-                         re_import_descriptor.contents)
-        self.assertEqual(descriptor.error_msg,
-                         re_import_descriptor.error_msg)
+        self.assertEqual(descriptor.contents, re_import_descriptor.contents)
+        self.assertEqual(descriptor.error_msg, re_import_descriptor.error_msg)
 
     def test_fixed_xml_tag(self):
         """Make sure a tag that's been fixed exports as the original tag type"""
@@ -142,12 +182,11 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor = system.process_xml(xml_str_in)
 
         # export it
-        resource_fs = None
-        xml_str_out = descriptor.export_to_xml(resource_fs)
+        node = etree.Element('unknown')
+        descriptor.add_xml_to_node(node)
 
         # Now make sure the exported xml is a sequential
-        xml_out = etree.fromstring(xml_str_out)
-        self.assertEqual(xml_out.tag, 'sequential')
+        self.assertEqual(node.tag, 'sequential')
 
     def test_metadata_import_export(self):
         """Two checks:
@@ -181,19 +220,19 @@ class ImportTestCase(BaseCourseTestCase):
         )
 
         # Now export and check things
-        resource_fs = MemoryFS()
-        exported_xml = descriptor.export_to_xml(resource_fs)
+        descriptor.runtime.export_fs = MemoryFS()
+        node = etree.Element('unknown')
+        descriptor.add_xml_to_node(node)
 
         # Check that the exported xml is just a pointer
-        print("Exported xml:", exported_xml)
-        pointer = etree.fromstring(exported_xml)
-        self.assertTrue(is_pointer_tag(pointer))
+        print("Exported xml:", etree.tostring(node))
+        self.assertTrue(is_pointer_tag(node))
         # but it's a special case course pointer
-        self.assertEqual(pointer.attrib['course'], COURSE)
-        self.assertEqual(pointer.attrib['org'], ORG)
+        self.assertEqual(node.attrib['course'], COURSE)
+        self.assertEqual(node.attrib['org'], ORG)
 
         # Does the course still have unicorns?
-        with resource_fs.open('course/{url_name}.xml'.format(url_name=url_name)) as f:
+        with descriptor.runtime.export_fs.open('course/{url_name}.xml'.format(url_name=url_name)) as f:
             course_xml = etree.fromstring(f.read())
 
         self.assertEqual(course_xml.attrib['unicorn'], 'purple')
@@ -207,7 +246,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         # Does the chapter tag now have a due attribute?
         # hardcoded path to child
-        with resource_fs.open('chapter/ch.xml') as f:
+        with descriptor.runtime.export_fs.open('chapter/ch.xml') as f:
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')
         self.assertFalse('due' in chapter_xml.attrib)
@@ -410,7 +449,7 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertTrue(any(expect in msg or expect in err
             for msg, err in errors))
         chapters = course.get_children()
-        self.assertEqual(len(chapters), 3)
+        self.assertEqual(len(chapters), 4)
 
     def test_url_name_mangling(self):
         """

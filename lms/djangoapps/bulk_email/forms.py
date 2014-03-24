@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from bulk_email.models import CourseEmailTemplate, COURSE_EMAIL_MESSAGE_BODY_TAG, CourseAuthorization
 
 from courseware.courses import get_course_by_id
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -64,12 +64,12 @@ class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
             get_course_by_id(course_id, depth=1)
         except Exception as exc:
             msg = 'Error encountered ({0})'.format(str(exc).capitalize())
-            msg += ' --- Entered course id was: "{0}". '.format(course_id)
+            msg += u' --- Entered course id was: "{0}". '.format(course_id)
             msg += 'Please recheck that you have supplied a course id in the format: ORG/COURSE/RUN'
             raise forms.ValidationError(msg)
 
         # Now, try and discern if it is a Studio course - HTML editor doesn't work with XML courses
-        is_studio_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
+        is_studio_course = modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE
         if not is_studio_course:
             msg = "Course Email feature is only available for courses authored in Studio. "
             msg += '"{0}" appears to be an XML backed course.'.format(course_id)

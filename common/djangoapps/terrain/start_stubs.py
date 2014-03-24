@@ -6,18 +6,17 @@ from lettuce import before, after, world
 from django.conf import settings
 from terrain.stubs.youtube import StubYouTubeService
 from terrain.stubs.xqueue import StubXQueueService
-
-
-USAGE = "USAGE: python -m fakes.start SERVICE_NAME PORT_NUM"
+from terrain.stubs.lti import StubLtiService
 
 SERVICES = {
     "youtube": {"port": settings.YOUTUBE_PORT, "class": StubYouTubeService},
     "xqueue": {"port": settings.XQUEUE_PORT, "class": StubXQueueService},
+    "lti": {"port": settings.LTI_PORT, "class": StubLtiService},
 }
 
 
-@before.all
-def start_stubs():
+@before.each_scenario
+def start_stubs(_):
     """
     Start each stub service running on a local port.
     """
@@ -26,7 +25,7 @@ def start_stubs():
         setattr(world, name, fake_server)
 
 
-@after.all
+@after.each_scenario
 def stop_stubs(_):
     """
     Shut down each stub service.

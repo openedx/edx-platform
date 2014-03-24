@@ -105,6 +105,14 @@ describe 'MarkdownEditingDescriptor', ->
         Enter the number of fingers on a human hand:
         = 5
 
+        Range tolerance case
+        = [6, 7]
+        = (1, 2)
+
+        If first and last symbols are not brackets, or they are not closed, stringresponse will appear.
+        = (7), 7
+        = (1+2
+
         [Explanation]
         Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.
 
@@ -134,6 +142,22 @@ describe 'MarkdownEditingDescriptor', ->
         <numericalresponse answer="5">
           <formulaequationinput />
         </numericalresponse>
+
+        <p>Range tolerance case</p>
+        <numericalresponse answer="[6, 7]">
+          <formulaequationinput />
+        </numericalresponse>
+        <numericalresponse answer="(1, 2)">
+          <formulaequationinput />
+        </numericalresponse>
+
+        <p>If first and last symbols are not brackets, or they are not closed, stringresponse will appear.</p>
+        <stringresponse answer="(7), 7" type="ci" >
+          <textline size="20"/>
+        </stringresponse>
+        <stringresponse answer="(1+2" type="ci" >
+          <textline size="20"/>
+        </stringresponse>
 
         <solution>
         <div class="detailed-solution">
@@ -270,7 +294,7 @@ describe 'MarkdownEditingDescriptor', ->
         <p>The answer is correct if it matches every character of the expected answer. This can be a problem with international spelling, dates, or anything where the format of the answer is not clear.</p>
 
         <p>Which US state has Lansing as its capital?</p>
-        <stringresponse answer="Michigan" type="ci">
+        <stringresponse answer="Michigan" type="ci" >
           <textline size="20"/>
         </stringresponse>
 
@@ -279,6 +303,29 @@ describe 'MarkdownEditingDescriptor', ->
         <p>Explanation</p>
 
         <p>Lansing is the capital of Michigan, although it is not Michgan's largest city, or even the seat of the county in which it resides.</p>
+
+        </div>
+        </solution>
+        </problem>""")
+    it 'converts StringResponse with regular expression to xml', ->
+      data = MarkdownEditingDescriptor.markdownToXml("""Who lead the civil right movement in the United States of America?
+        = | \w*\.?\s*Luther King\s*.*
+
+        [Explanation]
+        Test Explanation.
+        [Explanation]
+        """)
+      expect(data).toEqual("""<problem>
+        <p>Who lead the civil right movement in the United States of America?</p>
+        <stringresponse answer="\w*\.?\s*Luther King\s*.*" type="ci regexp" >
+          <textline size="20"/>
+        </stringresponse>
+
+        <solution>
+        <div class="detailed-solution">
+        <p>Explanation</p>
+
+        <p>Test Explanation.</p>
 
         </div>
         </solution>
@@ -296,7 +343,10 @@ describe 'MarkdownEditingDescriptor', ->
         """)
       expect(data).toEqual("""<problem>
         <p>Who lead the civil right movement in the United States of America?</p>
-        <stringresponse answer="Dr. Martin Luther King Jr._or_Doctor Martin Luther King Junior_or_Martin Luther King_or_Martin Luther King Junior" type="ci">
+        <stringresponse answer="Dr. Martin Luther King Jr." type="ci" >
+          <additional_answer>Doctor Martin Luther King Junior</additional_answer>
+          <additional_answer>Martin Luther King</additional_answer>
+          <additional_answer>Martin Luther King Junior</additional_answer>
           <textline size="20"/>
         </stringresponse>
 
@@ -309,6 +359,193 @@ describe 'MarkdownEditingDescriptor', ->
         </div>
         </solution>
         </problem>""")
+    it 'converts StringResponse with multiple answers and regular expressions to xml', ->
+      data = MarkdownEditingDescriptor.markdownToXml("""Write a number from 1 to 4.
+        =| ^One$
+        or= two
+        or= ^thre+
+        or= ^4|Four$
+
+        [Explanation]
+        Test Explanation.
+        [Explanation]
+        """)
+      expect(data).toEqual("""<problem>
+        <p>Write a number from 1 to 4.</p>
+        <stringresponse answer="^One$" type="ci regexp" >
+          <additional_answer>two</additional_answer>
+          <additional_answer>^thre+</additional_answer>
+          <additional_answer>^4|Four$</additional_answer>
+          <textline size="20"/>
+        </stringresponse>
+
+        <solution>
+        <div class="detailed-solution">
+        <p>Explanation</p>
+
+        <p>Test Explanation.</p>
+
+        </div>
+        </solution>
+        </problem>""")
+    # test labels
+    it 'converts markdown labels to label attributes', ->
+      data = MarkdownEditingDescriptor.markdownToXml(""">>Who lead the civil right movement in the United States of America?<<
+        = | \w*\.?\s*Luther King\s*.*
+
+        [Explanation]
+        Test Explanation.
+        [Explanation]
+        """)
+      expect(data).toEqual("""<problem>
+    <p>Who lead the civil right movement in the United States of America?</p>
+    <stringresponse answer="w*.?s*Luther Kings*.*" type="ci regexp" >
+      <textline label="Who lead the civil right movement in the United States of America?" size="20"/>
+    </stringresponse>
+    
+    <solution>
+    <div class="detailed-solution">
+    <p>Explanation</p>
+    
+    <p>Test Explanation.</p>
+    
+    </div>
+    </solution>
+    </problem>""")
+    it 'handles multiple questions with labels', ->
+      data = MarkdownEditingDescriptor.markdownToXml("""
+        France is a country in Europe.
+        
+        >>What is the capital of France?<<
+        = Paris
+        
+        Germany is a country in Europe, too.
+        
+        >>What is the capital of Germany?<<
+        ( ) Bonn
+        ( ) Hamburg
+        (x) Berlin
+        ( ) Donut
+      """)
+      expect(data).toEqual("""<problem>
+    <p>France is a country in Europe.</p>
+    
+    <p>What is the capital of France?</p>
+    <stringresponse answer="Paris" type="ci" >
+      <textline label="What is the capital of France?" size="20"/>
+    </stringresponse>
+    
+    <p>Germany is a country in Europe, too.</p>
+    
+    <p>What is the capital of Germany?</p>
+    <multiplechoiceresponse>
+      <choicegroup type="MultipleChoice">
+        <choice correct="false">Bonn</choice>
+        <choice correct="false">Hamburg</choice>
+        <choice correct="true">Berlin</choice>
+        <choice correct="false">Donut</choice>
+      </choicegroup>
+    </multiplechoiceresponse>
+    
+    
+    </problem>""")
+    it 'tests multiple questions with only one label', ->
+      data = MarkdownEditingDescriptor.markdownToXml("""
+        France is a country in Europe.
+
+        >>What is the capital of France?<<
+        = Paris
+
+        Germany is a country in Europe, too.
+
+        What is the capital of Germany?
+        ( ) Bonn
+        ( ) Hamburg
+        (x) Berlin
+        ( ) Donut
+        """)
+      expect(data).toEqual("""<problem>
+    <p>France is a country in Europe.</p>
+    
+    <p>What is the capital of France?</p>
+    <stringresponse answer="Paris" type="ci" >
+      <textline label="What is the capital of France?" size="20"/>
+    </stringresponse>
+    
+    <p>Germany is a country in Europe, too.</p>
+    
+    <p>What is the capital of Germany?</p>
+    <multiplechoiceresponse>
+      <choicegroup type="MultipleChoice">
+        <choice correct="false">Bonn</choice>
+        <choice correct="false">Hamburg</choice>
+        <choice correct="true">Berlin</choice>
+        <choice correct="false">Donut</choice>
+      </choicegroup>
+    </multiplechoiceresponse>
+    
+    
+    </problem>""")
+    it 'tests malformed labels', ->
+      data = MarkdownEditingDescriptor.markdownToXml("""
+        France is a country in Europe.
+
+        >>What is the capital of France?<
+        = Paris
+
+        blah>>What is the capital of <<Germany?<<
+        ( ) Bonn
+        ( ) Hamburg
+        (x) Berlin
+        ( ) Donut
+      """)
+      expect(data).toEqual("""<problem>
+    <p>France is a country in Europe.</p>
+    
+    <p>>>What is the capital of France?<</p>
+    <stringresponse answer="Paris" type="ci" >
+      <textline size="20"/>
+    </stringresponse>
+    
+    <p>blahWhat is the capital of Germany?</p>
+    <multiplechoiceresponse>
+      <choicegroup label="What is the capital of &lt;&lt;Germany?" type="MultipleChoice">
+        <choice correct="false">Bonn</choice>
+        <choice correct="false">Hamburg</choice>
+        <choice correct="true">Berlin</choice>
+        <choice correct="false">Donut</choice>
+      </choicegroup>
+    </multiplechoiceresponse>
+    
+    
+    </problem>""")
+    it 'adds labels to formulae', ->
+      data = MarkdownEditingDescriptor.markdownToXml("""
+      >>Enter the numerical value of Pi:<<
+      = 3.14159 +- .02
+      """)
+      expect(data).toEqual("""<problem>
+    <p>Enter the numerical value of Pi:</p>
+    <numericalresponse answer="3.14159">
+      <responseparam type="tolerance" default=".02" />
+      <formulaequationinput label="Enter the numerical value of Pi:" />
+    </numericalresponse>
+    
+    
+    </problem>""")
+    it 'escapes entities in labels', ->
+      data = MarkdownEditingDescriptor.markdownToXml("""
+      >>What is the "capital" of France & the 'best' > place < to live"?<<
+      = Paris
+      """)
+      expect(data).toEqual("""<problem>
+    <p>What is the "capital" of France & the 'best' > place < to live"?</p>
+    <stringresponse answer="Paris" type="ci" >
+      <textline label="What is the &quot;capital&quot; of France &amp; the &apos;best&apos; &gt; place &lt; to live&quot;?" size="20"/>
+    </stringresponse>
+    
+    
+    </problem>""")
     # test oddities
     it 'converts headers and oddities to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""Not a header

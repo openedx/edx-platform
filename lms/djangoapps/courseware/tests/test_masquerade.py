@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from courseware.roles import CourseStaffRole
+from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from lms.lib.xblock.runtime import quote_slashes
@@ -63,7 +63,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
     def test_staff_debug_for_staff(self):
         resp = self.get_cw_section()
-        sdebug = '<div><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Staff Debug Info</a></div>'
+        sdebug = '<div aria-hidden="true"><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Staff Debug Info</a></div>'
 
         self.assertTrue(sdebug in resp.content)
 

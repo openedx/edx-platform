@@ -7,16 +7,16 @@ import unittest
 import uuid
 from xmodule.modulestore import Location
 from xmodule.modulestore.locator import BlockUsageLocator
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from mock import Mock
 
 
-class TestLocationMapper(unittest.TestCase):
+class LocMapperSetupSansDjango(unittest.TestCase):
     """
-    Test the location to locator mapper
+    Create and destroy a loc mapper for each test
     """
-
+    loc_store = None
     def setUp(self):
         modulestore_options = {
             'host': 'localhost',
@@ -27,14 +27,19 @@ class TestLocationMapper(unittest.TestCase):
         cache_standin = TrivialCache()
         self.instrumented_cache = Mock(spec=cache_standin, wraps=cache_standin)
         # pylint: disable=W0142
-        TestLocationMapper.loc_store = LocMapperStore(self.instrumented_cache, **modulestore_options)
+        LocMapperSetupSansDjango.loc_store = LocMapperStore(self.instrumented_cache, **modulestore_options)
 
     def tearDown(self):
         dbref = TestLocationMapper.loc_store.db
         dbref.drop_collection(TestLocationMapper.loc_store.location_map)
         dbref.connection.close()
-        TestLocationMapper.loc_store = None
+        self.loc_store = None
 
+
+class TestLocationMapper(LocMapperSetupSansDjango):
+    """
+    Test the location to locator mapper
+    """
     def test_create_map(self):
         org = 'foo_org'
         course = 'bar_course'
@@ -80,14 +85,22 @@ class TestLocationMapper(unittest.TestCase):
         Request translation, check package_id, block_id, and branch
         """
         prob_locator = loc_mapper().translate_location(
-            old_style_course_id, 
-            location, 
+            old_style_course_id,
+            location,
             published= (branch=='published'),
             add_entry_if_missing=add_entry
         )
         self.assertEqual(prob_locator.package_id, new_style_package_id)
         self.assertEqual(prob_locator.block_id, block_id)
         self.assertEqual(prob_locator.branch, branch)
+
+        course_locator = loc_mapper().translate_location_to_course_locator(
+           old_style_course_id,
+           location,
+           published=(branch == 'published'),
+        )
+        self.assertEqual(course_locator.package_id, new_style_package_id)
+        self.assertEqual(course_locator.branch, branch)
 
     def test_translate_location_read_only(self):
         """
@@ -106,7 +119,7 @@ class TestLocationMapper(unittest.TestCase):
 
         new_style_package_id = '{}.geek_dept.{}.baz_run'.format(org, course)
         block_map = {
-            'abc123': {'problem': 'problem2'}, 
+            'abc123': {'problem': 'problem2', 'vertical': 'vertical2'},
             'def456': {'problem': 'problem4'},
             'ghi789': {'problem': 'problem7'},
         }
@@ -117,7 +130,7 @@ class TestLocationMapper(unittest.TestCase):
         )
         test_problem_locn = Location('i4x', org, course, 'problem', 'abc123')
         # only one course matches
-        self.translate_n_check(test_problem_locn, old_style_course_id, new_style_package_id, 'problem2', 'published')
+
         # look for w/ only the Location (works b/c there's only one possible course match). Will force
         # cache as default translation for this problemid
         self.translate_n_check(test_problem_locn, None, new_style_package_id, 'problem2', 'published')
@@ -128,10 +141,18 @@ class TestLocationMapper(unittest.TestCase):
                 Location('i4x', org, course, 'problem', '1def23'),
                 add_entry_if_missing=False
             )
+        test_no_cat_locn = test_problem_locn.replace(category=None)
+        with self.assertRaises(InvalidLocationError):
+            loc_mapper().translate_location(
+                old_style_course_id, test_no_cat_locn, False, False
+            )
+        test_no_cat_locn = test_no_cat_locn.replace(name='def456')
+        # only one course matches
+        self.translate_n_check(test_no_cat_locn, old_style_course_id, new_style_package_id, 'problem4', 'published')
 
         # add a distractor course (note that abc123 has a different translation in this one)
         distractor_block_map = {
-            'abc123': {'problem': 'problem3'}, 
+            'abc123': {'problem': 'problem3'},
             'def456': {'problem': 'problem4'},
             'ghi789': {'problem': 'problem7'},
         }
@@ -373,7 +394,7 @@ def loc_mapper():
     """
     Mocks the global location mapper.
     """
-    return TestLocationMapper.loc_store
+    return LocMapperSetupSansDjango.loc_store
 
 
 def render_to_template_mock(*_args):
@@ -389,14 +410,20 @@ class TrivialCache(object):
     def __init__(self):
         self.cache = {}
 
-    def get(self, key):
+    def get(self, key, default=None):
         """
         Mock the .get
         """
-        return self.cache.get(key)
+        return self.cache.get(key, default)
 
     def set_many(self, entries):
         """
         mock set_many
         """
         self.cache.update(entries)
+
+    def set(self, key, entry):
+        """
+        mock set
+        """
+        self.cache[key] = entry

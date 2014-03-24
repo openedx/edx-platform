@@ -5,8 +5,10 @@ from fs.memoryfs import MemoryFS
 
 from mock import Mock, patch
 
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+from xblock.runtime import KvsFieldData, DictKeyValueStore
+
 import xmodule.course_module
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LocationReader
 from django.utils.timezone import UTC
 
 
@@ -32,7 +34,6 @@ class DummySystem(ImportSystem):
                                   load_error_modules=load_error_modules)
         course_id = "/".join([ORG, COURSE, 'test_run'])
         course_dir = "test_dir"
-        policy = {}
         error_tracker = Mock()
         parent_tracker = Mock()
 
@@ -40,10 +41,11 @@ class DummySystem(ImportSystem):
             xmlstore=xmlstore,
             course_id=course_id,
             course_dir=course_dir,
-            policy=policy,
             error_tracker=error_tracker,
             parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
+            field_data=KvsFieldData(DictKeyValueStore()),
+            id_reader=LocationReader(),
         )
 
 
@@ -132,22 +134,28 @@ class IsNewCourseTestCase(unittest.TestCase):
             print "Comparing %s to %s" % (a, b)
             assertion(a_score, b_score)
 
+    start_advertised_settings = [
+        # start, advertised, result, is_still_default
+        ('2012-12-02T12:00', None, 'Dec 02, 2012', False),
+        ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011', False),
+        ('2012-12-02T12:00', 'Spring 2012', 'Spring 2012', False),
+        ('2012-12-02T12:00', 'November, 2011', 'November, 2011', False),
+        (xmodule.course_module.CourseFields.start.default, None, 'TBD', True),
+        (xmodule.course_module.CourseFields.start.default, 'January 2014', 'January 2014', False),
+    ]
+
     @patch('xmodule.course_module.datetime.now')
     def test_start_date_text(self, gmtime_mock):
         gmtime_mock.return_value = NOW
-
-        settings = [
-            # start, advertized, result
-            ('2012-12-02T12:00', None, 'Dec 02, 2012'),
-            ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011'),
-            ('2012-12-02T12:00', 'Spring 2012', 'Spring 2012'),
-            ('2012-12-02T12:00', 'November, 2011', 'November, 2011'),
-        ]
-
-        for s in settings:
+        for s in self.start_advertised_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
             print "Checking start=%s advertised=%s" % (s[0], s[1])
             self.assertEqual(d.start_date_text, s[2])
+
+    def test_start_date_is_default(self):
+        for s in self.start_advertised_settings:
+            d = get_dummy_course(start=s[0], advertised_start=s[1])
+            self.assertEqual(d.start_date_is_still_default, s[3])
 
     def test_display_organization(self):
         descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)

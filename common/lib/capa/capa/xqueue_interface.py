@@ -13,9 +13,9 @@ dateformat = '%Y%m%d%H%M%S'
 def _(s): return s;
 
 def make_hashkey(seed):
-    '''
+    """
     Generate a string key by hashing
-    '''
+    """
     h = hashlib.md5()
     h.update(str(seed))
     return h.hexdigest()
@@ -58,12 +58,12 @@ def parse_xreply(xreply):
 
 
 class XQueueInterface(object):
-    '''
+    """
     Interface to the external grading system
-    '''
+    """
 
     def __init__(self, url, django_auth, requests_auth=None):
-        self.url = url
+        self.url = unicode(url)
         self.auth = django_auth
         self.session = requests.Session()
         self.session.auth = requests_auth
@@ -107,8 +107,10 @@ class XQueueInterface(object):
         return self._http_post(self.url + '/xqueue/login/', payload)
 
     def _send_to_queue(self, header, body, files_to_upload):
-        payload = {'xqueue_header': header,
-                   'xqueue_body': body}
+        payload = {
+            'xqueue_header': header,
+            'xqueue_body': body
+        }
         files = {}
         if files_to_upload is not None:
             for f in files_to_upload:

@@ -54,6 +54,30 @@
 
 // ====================
 
+
+// extends - UI - used for page/view-level wrappers (for centering/grids)
+%ui-wrapper {
+  @include clearfix();
+  @include box-sizing(border-box);
+  width: 100%;
+}
+
+// extends - UI - window
+%ui-window {
+  @include clearfix();
+  border-radius: 3px;
+  box-shadow: 0 1px 2px 1px $shadow-l1;
+  margin-bottom: $baseline;
+  border: 1px solid $light-gray;
+  background: $white;
+}
+
+// extends - UI archetypes - well
+%ui-well {
+  box-shadow: inset 0 1px 2px 1px $shadow-l1;
+  padding: ($baseline*0.75) $baseline;
+}
+
 // extends - UI - visual link
 %ui-fake-link {
   cursor: pointer;
@@ -72,6 +96,26 @@
 %ui-depth3 { z-index: 1000; }
 %ui-depth4 { z-index: 10000; }
 %ui-depth5 { z-index: 100000; }
+
+// extends - UI - utility - nth-type style clearing
+%wipe-first-child {
+
+  &:first-child {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+// extends - UI - utility - nth-type style clearing
+%wipe-last-child {
+
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
 
 // extends -hidden elems - screenreaders
 %text-sr {

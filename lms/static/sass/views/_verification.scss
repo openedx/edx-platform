@@ -1,110 +1,9 @@
 // lms - views - verification flow
 // ====================
 
-// MISC: extends - type
-// application: canned headings
-%hd-lv1 {
-  @extend %t-title1;
-  @extend %t-weight1;
-  color: $m-gray-d4;
-  margin: 0 0 ($baseline*2) 0;
-}
-
-%hd-lv2 {
-  @extend %t-title4;
-  @extend %t-weight1;
-  margin: 0 0 ($baseline*0.75) 0;
-  border-bottom: 1px solid $m-gray-l4;
-  padding-bottom: ($baseline/2);
-  color: $m-gray-d4;
-}
-
-%hd-lv3 {
-  @extend %t-title6;
-  @extend %t-weight4;
-  margin: 0 0 ($baseline/4) 0;
-  color: $m-gray-d4;
-}
-
-%hd-lv4 {
-  @extend %t-title6;
-  @extend %t-weight2;
-  margin: 0 0 $baseline 0;
-  color: $m-gray-d4;
-}
-
-%hd-lv5 {
-  @extend %t-title7;
-  @extend %t-weight4;
-  margin: 0 0 ($baseline/4) 0;
-  color: $m-gray-d4;
-}
-
-// application: canned copy
-%copy-base {
-  @extend %t-copy-base;
-  color: $m-gray-d2;
-}
-
-%copy-lead1 {
-  @extend %t-copy-lead2;
-  color: $m-gray;
-}
-
-%copy-detail {
-  @extend %t-copy-sub1;
-  @extend %t-weight3;
-  color: $m-gray-d1;
-}
-
-%copy-metadata {
-  @extend %t-copy-sub2;
-  color: $m-gray-d1;
-
-
-  %copy-metadata-value {
-    @extend %t-weight2;
-  }
-
-  %copy-metadata-value {
-    @extend %t-weight4;
-  }
-}
-
-// application: canned links
-%copy-link {
-  border-bottom: 1px dotted transparent;
-
-  &:hover, &:active {
-    border-color: $link-color-d1;
-  }
-}
-
-// ====================
-
 // MISC: extends - button
 %btn-verify-primary {
   @extend %btn-primary-green;
-}
-
-// ====================
-
-// MISC: extends - UI - window
-%ui-window {
-  @include clearfix();
-  border-radius: ($baseline/10);
-  box-shadow: 0 1px 2px 1px $shadow-l1;
-  margin-bottom: $baseline;
-  border: 1px solid $m-gray-l3;
-  background: $white;
-}
-
-// ====================
-
-// MISC: extends - UI - well
-%ui-well {
-  box-shadow: inset 0 1px 2px 1px $shadow-l1;
-  padding: ($baseline*0.75) $baseline;
 }
 
 // ====================
@@ -153,7 +52,8 @@
 // ====================
 
 // VIEW: all verification steps
-.verification-process {
+.verification-process,
+.midcourse-reverification-process {
 
   // reset: box-sizing (making things so right its scary)
   * {
@@ -1080,6 +980,7 @@
     width: flex-grid(12,12);
     border-radius: ($baseline/10);
     background: $m-gray-l4;
+    padding: ($baseline*.75) $baseline;
 
     .help-inline, .wizard-steps {
 
@@ -1894,7 +1795,477 @@
       }
     }
   }
+
+  // VIEW: midcourse re-verification
+  &.midcourse-reverification-process {
+
+    // step-dash
+
+    &.step-dash {
+
+      .content-main > .title {
+        @extend %t-title7;
+        display: block;
+        font-weight: 600;
+        color: $m-gray;
+      }
+
+      .wrapper-reverify-open,
+      .wrapper-reverify-status {
+        display: inline-block;
+        vertical-align: top;
+        width: 48%;
+      }
+
+      .copy .title {
+        @extend %t-title6;
+        font-weight: 600;
+      }
+
+      .wrapper-reverify-status .title {
+        @extend %t-title6;
+        font-weight: normal;
+        color: $m-gray;
+      }
+
+      .action-reverify {
+        padding: ($baseline/2) ($baseline*0.75);
+      }
+
+      .reverification-list {
+        margin-right: ($baseline*1.5);
+        padding: 0;
+        list-style-type: none;
+
+        .item {
+          box-shadow: 0 2px 5px 0 $shadow-l1 inset;
+          margin: ($baseline*.75) ($baseline*.75) ($baseline*.75) 0;
+          border: 1px solid $m-gray-t2;
+
+          &.complete {
+            border: 1px solid $success-color;
+
+            .course-info {
+              opacity: .5;
+
+              .course-name {
+                font-weight: normal;
+              }
+            }
+
+            .reverify-status {
+              @extend %t-weight4;
+              border-top: 1px solid $light-gray;
+              background-color: $m-gray-l4;
+              color: $success-color;
+            }
+          }
+
+          &.pending {
+            border: 1px solid $warning-color;
+
+            .course-info {
+              opacity: .5;
+
+              .course-name {
+                font-weight: normal;
+              }
+            }
+
+            .reverify-status {
+              @extend %t-weight4;
+              border-top: 1px solid $light-gray;
+              background-color: $m-gray-l4;
+              color: $warning-color;
+            }
+          }
+
+          &.failed {
+            border: 1px solid $alert-color;
+
+            .course-info {
+              opacity: .5;
+
+              .course-name {
+                font-weight: normal;
+              }
+            }
+
+            .reverify-status {
+              @extend %t-weight4;
+              border-top: 1px solid $light-gray;
+              background-color: $m-gray-l4;
+              color: $alert-color;
+            }
+          }
+        }
+
+        .course-info {
+          margin-bottom: ($baseline/2);
+          padding: ($baseline/2) ($baseline*.75);
+        }
+
+        .course-name {
+          @extend %t-title5;
+          display: block;
+          font-weight: bold;
+        }
+
+        .deadline {
+          @extend %copy-detail;
+          display: block;
+          margin-top: ($baseline/4);
+        }
+
+        .reverify-status {
+          background-color: $light-gray;
+          padding: ($baseline/2) ($baseline*.75);
+        }
+      }
+
+      .support {
+        margin-top: $baseline;
+        @extend %t-copy-sub1;
+      }
+
+      .wrapper-reverification-help {
+        margin-top: $baseline;
+        border-top: 1px solid $light-gray;
+        padding-top: ($baseline*1.5);
+
+        .faq-item {
+          display: inline-block;
+          vertical-align: top;
+          width: flex-grid(4,12);
+          padding-right: $baseline;
+
+          &:last-child {
+            padding-right: 0;
+          }
+
+          .faq-answer {
+            @extend %t-copy-sub1;
+          }
+        }
+      }
+    }
+
+    // step-photos
+    &.step-photos {
+
+      .block-photo .title {
+        @extend %t-title4;
+        color: $m-blue-d1;
+      }
+
+      .wrapper-task {
+        @include clearfix();
+        width: flex-grid(12,12);
+        margin: $baseline 0;
+
+        .wrapper-help {
+          float: right;
+          width: flex-grid(6,12);
+          padding: 0 $baseline;
+
+          .help {
+            margin-bottom: ($baseline*1.5);
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .title {
+              @extend %hd-lv3;
+            }
+
+            .copy {
+              @extend %copy-detail;
+            }
+
+            .example {
+              color: $m-gray-l2;
+            }
+
+            // help - general list
+            .list-help {
+              margin-top: ($baseline/2);
+              color: $black;
+
+              .help-item {
+                margin-bottom: ($baseline/4);
+                border-bottom: 1px solid $m-gray-l4;
+                padding-bottom: ($baseline/4);
+
+                &:last-child {
+                  margin-bottom: 0;
+                  border-bottom: none;
+                  padding-bottom: 0;
+                }
+              }
+
+              .help-item-emphasis {
+                @extend %t-weight4;
+              }
+            }
+
+            // help - faq
+            .list-faq {
+              margin-bottom: $baseline;
+            }
+          }
+        }
+
+        .task {
+          @extend %ui-window;
+          float: left;
+          width: flex-grid(6,12);
+          margin-right: flex-gutter();
+        }
+
+        .controls {
+          padding: ($baseline*0.75) $baseline;
+          background: $m-gray-l4;
+
+          .list-controls {
+            position: relative;
+          }
+
+          .control {
+            position: absolute;
+
+            .action {
+              @extend %btn-primary-blue;
+              padding: ($baseline/2) ($baseline*0.75);
+
+              *[class^="icon-"] {
+                @extend %t-icon4;
+                padding: ($baseline*.25) ($baseline*.5);
+                display: block;
+              }
+            }
+
+            // STATE: hidden
+            &.is-hidden {
+              visibility: hidden;
+            }
+
+            // STATE: shown
+            &.is-shown {
+              visibility: visible;
+            }
+
+            // STATE: approved
+            &.approved {
+
+              .action {
+                @extend %btn-verify-primary;
+                padding: ($baseline/2) ($baseline*0.75);
+              }
+            }
+          }
+
+          // control - redo
+          .control-redo {
+            position: absolute;
+            left: ($baseline/2);
+          }
+
+          // control - take/do
+          .control-do {
+            left: 45%;
+          }
+
+          // control - approve
+          .control-approve {
+            position: absolute;
+            right: ($baseline/2);
+          }
+        }
+
+        .msg {
+          @include clearfix();
+          margin-top: ($baseline*2);
+
+          .copy {
+            float: left;
+            width: flex-grid(8,12);
+            margin-right: flex-gutter();
+          }
+
+          .list-actions {
+            position: relative;
+            top: -($baseline/2);
+            float: left;
+            width: flex-grid(4,12);
+            text-align: right;
+
+            .action-retakephotos a {
+              @extend %btn-primary-blue;
+              @include font-size(14);
+              padding: ($baseline/2) ($baseline*.75);
+            }
+          }
+        }
+
+        .msg-followup {
+          border-top: ($baseline/10) solid $m-gray-t0;
+          padding-top: $baseline;
+        }
+      }
+
+      .review-task {
+        margin-bottom: ($baseline*1.5);
+        padding: ($baseline*0.75) $baseline;
+        border-radius: ($baseline/10);
+        background: $m-gray-l4;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        > .title {
+          @extend %hd-lv3;
+        }
+
+        .copy {
+          @extend %copy-base;
+
+          strong {
+            @extend %t-weight5;
+            color: $m-gray-d4;
+          }
+        }
+      }
+
+
+      // individual task - name
+      .review-task-name {
+        @include clearfix();
+        border: 1px solid $light-gray;
+
+        .copy {
+          float: left;
+          width: flex-grid(8,12);
+          margin-right: flex-gutter();
+        }
+
+        .list-actions {
+          position: relative;
+          top: -($baseline);
+          float: left;
+          width: flex-grid(4,12);
+          text-align: right;
+
+          .action-editname a {
+            @extend %btn-primary-blue;
+            @include font-size(14);
+            padding: ($baseline/2) ($baseline*.75);
+          }
+        }
+      }
+
+      .nav-wizard {
+        padding: ($baseline*.75) $baseline;
+
+        .prompt-verify {
+          float: left;
+          width: flex-grid(6,12);
+          margin: 0 flex-gutter() 0 0;
+
+          .title {
+            @extend %hd-lv4;
+            margin-bottom: ($baseline/4);
+          }
+
+          .copy {
+            @extend %t-copy-sub1;
+            @extend %t-weight3;
+          }
+
+          .list-actions {
+            margin-top: ($baseline/2);
+          }
+
+          .action-verify label  {
+            @extend %t-copy-sub1;
+          }
+        }
+
+        .wizard-steps {
+          margin-top: ($baseline/2);
+
+          .wizard-step {
+            margin-right: flex-gutter();
+            display: inline-block;
+            vertical-align: middle;
+
+            &:last-child {
+              margin-right: 0;
+            }
+          }
+        }
+      }
+
+
+      .modal {
+
+        fieldset {
+          margin-top: $baseline;
+        }
+
+        .close-modal {
+          @include font-size(24);
+          color: $m-blue-d3;
+
+          &:hover, &:focus {
+            color: $m-blue-d1;
+            border: none;
+          }
+        }
+      }
+
+    }
+  }
+
+  &.step-confirmation {
+
+    .instruction {
+      display: inline-block;
+      width: flex-grid(8,12);
+      vertical-align: top;
+    }
+
+    .actions-next {
+      display: inline-block;
+      width: flex-grid(4,12);
+      vertical-align: top;
+      margin-top: $baseline;
+    }
+
+    .nav-item {
+      display: block;
+      margin: 0 0 $baseline 0;
+      text-align: center;
+
+      &.conditional:after {
+        content: "or";
+        display: block;
+        margin: $baseline 0;
+      }
+    }
+
+  }
 }
+
+
+//reverify notification special styles
+.msg-reverify {
+  .reverify-list {
+    margin: ($baseline/4) 0;
+  }
+}
+
 // ====================
 
 // STATE: already verified

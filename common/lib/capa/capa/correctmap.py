@@ -50,7 +50,7 @@ class CorrectMap(object):
     ):
 
         if answer_id is not None:
-            self.cmap[str(answer_id)] = {
+            self.cmap[answer_id] = {
                 'correctness': correctness,
                 'npoints': npoints,
                 'msg': msg,
@@ -63,13 +63,13 @@ class CorrectMap(object):
         return repr(self.cmap)
 
     def get_dict(self):
-        '''
+        """
         return dict version of self
-        '''
+        """
         return self.cmap
 
     def set_dict(self, correct_map):
-        '''
+        """
         Set internal dict of CorrectMap to provided correct_map dict
 
         correct_map is saved by LMS as a plaintext JSON dump of the correctmap dict. This
@@ -85,7 +85,7 @@ class CorrectMap(object):
         Special migration case:
             If correct_map is a one-level dict, then convert it to the new dict of dicts format.
 
-        '''
+        """
         # empty current dict
         self.__init__()
 
@@ -149,17 +149,17 @@ class CorrectMap(object):
         return self.get_property(answer_id, 'hintmode', None)
 
     def set_hint_and_mode(self, answer_id, hint, hintmode):
-        '''
+        """
           - hint     : (string) HTML text for hint
           - hintmode : (string) mode for hint display ('always' or 'on_request')
-        '''
+        """
         self.set_property(answer_id, 'hint', hint)
         self.set_property(answer_id, 'hintmode', hintmode)
 
     def update(self, other_cmap):
-        '''
+        """
         Update this CorrectMap with the contents of another CorrectMap
-        '''
+        """
         if not isinstance(other_cmap, CorrectMap):
             raise Exception('CorrectMap.update called with invalid argument %s' % other_cmap)
         self.cmap.update(other_cmap.get_dict())

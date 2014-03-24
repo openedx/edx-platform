@@ -5,14 +5,12 @@ class @DiscussionViewSpecHelper
             expect(button.hasClass("is-cast")).toBe(true)
             expect(button.attr("aria-pressed")).toEqual("true")
             expect(button.attr("data-tooltip")).toEqual("remove vote")
-            expect(button.find(".votes-count-number").html()).toEqual("43")
-            expect(button.find(".sr").html()).toEqual("votes (click to remove your vote)")
+            expect(button.text()).toEqual("43 votes (click to remove your vote)")
         else
             expect(button.hasClass("is-cast")).toBe(false)
             expect(button.attr("aria-pressed")).toEqual("false")
             expect(button.attr("data-tooltip")).toEqual("vote")
-            expect(button.find(".votes-count-number").html()).toEqual("42")
-            expect(button.find(".sr").html()).toEqual("votes (click to vote)")
+            expect(button.text()).toEqual("42 votes (click to vote)")
 
     @checkRenderVote = (view, model) ->
         view.renderVote()
@@ -99,15 +97,19 @@ class @DiscussionViewSpecHelper
         expect(view.unvote).toHaveBeenCalled()
         expect(event.preventDefault.callCount).toEqual(2)
 
-    @checkVoteButtonEvents = (view) ->
-        spyOn(view, "toggleVote")
-        button = view.$el.find(".vote-btn")
+    @checkButtonEvents = (view, viewFunc, buttonSelector) ->
+        spy = spyOn(view, viewFunc)
+        button = view.$el.find(buttonSelector)
 
         button.click()
-        expect(view.toggleVote).toHaveBeenCalled()
-        view.toggleVote.reset()
+        expect(spy).toHaveBeenCalled()
+        spy.reset()
         button.trigger($.Event("keydown", {which: 13}))
-        expect(view.toggleVote).toHaveBeenCalled()
-        view.toggleVote.reset()
+        expect(spy).not.toHaveBeenCalled()
+        spy.reset()
         button.trigger($.Event("keydown", {which: 32}))
-        expect(view.toggleVote).not.toHaveBeenCalled()
+        expect(spy).toHaveBeenCalled()
+        
+
+    @checkVoteButtonEvents = (view) ->
+        @checkButtonEvents(view, "toggleVote", ".vote-btn")

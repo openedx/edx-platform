@@ -58,6 +58,7 @@ class AjaxEnabledTestClient(Client):
         return self.get(path, data or {}, follow, HTTP_ACCEPT="application/json", **extra)
 
 
+
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class CourseTestCase(ModuleStoreTestCase):
     def setUp(self):

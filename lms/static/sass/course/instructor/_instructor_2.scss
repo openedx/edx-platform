@@ -458,6 +458,69 @@ section.instructor-dashboard-content-2 {
 }
 
 
+.instructor-dashboard-wrapper-2 section.idash-section#metrics {
+
+  .metrics-container {
+    position: relative;
+    width: 100%;
+    float: left;
+    clear: both;
+    margin-top: 25px;
+  }
+  .metrics-left {
+    position: relative;
+    width: 30%;
+    height: 640px;
+    float: left;
+    margin-right: 2.5%;
+  }
+  .metrics-left svg {
+	width: 100%;
+  }
+  .metrics-right {
+    position: relative;
+    width: 65%;
+    height: 295px;
+    float: left;
+    margin-left: 2.5%;
+    margin-bottom: 25px;
+  }
+  .metrics-right svg {
+	width: 100%;
+  }
+
+  .metrics-tooltip {
+    width: 250px;
+    background-color: lightgray;
+    padding: 3px;
+  }
+
+  .stacked-bar-graph-legend {
+    fill: white;
+  }
+
+  p.loading {
+    padding-top: 100px;
+    text-align: center;
+  }
+
+  p.nothing {
+    padding-top: 25px;
+  }
+
+  h3.attention {
+    padding: 10px;
+    border: 1px solid #999;
+    border-radius: 5px;
+    margin-top: 25px;
+  }
+
+  input#graph_reload {
+    display: none;
+  }
+}
+
+
 .profile-distribution-widget {
   margin-bottom: $baseline * 2;
 
@@ -480,7 +543,7 @@ section.instructor-dashboard-content-2 {
 
   .last-updated {
     line-height: 2.2em;
-    @include font-size(10);
+    @include font-size(12);
   }
 
   .display-graph .graph-placeholder {
@@ -526,30 +589,15 @@ section.instructor-dashboard-content-2 {
     font-size: $body-font-size * 4/5;
   }
 
-  .info-badge {
-    // float: right;
-    position: absolute;
-    top: $baseline / 2;
-    right: $baseline / 2;
-    width: 17px;
-    height: 17px;
-    background: url('../images/info-icon-dark.png') left center no-repeat;
-    opacity: 0.35;
-    &:hover, &:focus  { opacity: 0.45; }
-    &:active { opacity: 0.5; }
-  }
-
   .info {
-    display: none;
-
     @include box-sizing(border-box);
     max-height: $content-height;
     padding: $baseline;
 
     border: 1px solid $light-gray;
-    border-top: none;
     color: $lighter-base-font-color;
     line-height: 1.3em;
+    font-size: .85em;
   }
 
   .member-list {

@@ -1,0 +1,671 @@
+# edX translation file
+# Copyright (C) 2014 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2014.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1a\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2014-03-18 13:26+0000\n"
+"PO-Revision-Date: 2014-03-18 13:26:30.537790\n"
+"Last-Translator: \n"
+"Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.3\n"
+"Language: en\n"
+
+#: wiki/admin.py:70 wiki/models/article.py:25
+msgid "created"
+msgstr ""
+
+#: wiki/forms.py:30
+msgid "Only localhost... muahahaha"
+msgstr ""
+
+#: wiki/forms.py:36 wiki/forms.py:44 wiki/forms.py:205
+msgid "Title"
+msgstr ""
+
+#: wiki/forms.py:36
+msgid "Initial title of the article. May be overridden with revision titles."
+msgstr ""
+
+#: wiki/forms.py:37
+msgid "Type in some contents"
+msgstr ""
+
+#: wiki/forms.py:38
+msgid ""
+"This is just the initial contents of your article. After creating it, you "
+"can use more complex features like adding plugins, meta data, related "
+"articles etc..."
+msgstr ""
+
+#: wiki/forms.py:45 wiki/forms.py:207
+msgid "Contents"
+msgstr ""
+
+#: wiki/forms.py:48 wiki/forms.py:210
+msgid "Summary"
+msgstr ""
+
+#: wiki/forms.py:48
+msgid ""
+"Give a short reason for your edit, which will be stated in the revision log."
+msgstr ""
+
+#: wiki/forms.py:97
+msgid ""
+"While you were editing, someone else changed the revision. Your contents "
+"have been automatically merged with the new contents. Please review the text"
+" below."
+msgstr ""
+
+#: wiki/forms.py:99
+msgid "No changes made. Nothing to save."
+msgstr ""
+
+#: wiki/forms.py:161
+msgid "Select an option"
+msgstr ""
+
+#: wiki/forms.py:206
+msgid "Slug"
+msgstr ""
+
+#: wiki/forms.py:206
+msgid ""
+"This will be the address where your article can be found. Use only "
+"alphanumeric characters and - or _. Note that you cannot change the slug "
+"after creating the article."
+msgstr ""
+
+#: wiki/forms.py:210
+msgid "Write a brief message for the article's history log."
+msgstr ""
+
+#: wiki/forms.py:220
+msgid "A slug may not begin with an underscore."
+msgstr ""
+
+#: wiki/forms.py:229
+#, python-format
+msgid "A deleted article with slug \"%s\" already exists."
+msgstr ""
+
+#: wiki/forms.py:231
+#, python-format
+msgid "A slug named \"%s\" already exists."
+msgstr ""
+
+#: wiki/forms.py:244
+msgid "Yes, I am sure"
+msgstr ""
+
+#: wiki/forms.py:246
+msgid "Purge"
+msgstr ""
+
+#: wiki/forms.py:247
+msgid ""
+"Purge the article: Completely remove it (and all its contents) with no undo."
+" Purging is a good idea if you want to free the slug such that users can "
+"create new articles in its place."
+msgstr ""
+
+#: wiki/forms.py:254 wiki/plugins/attachments/forms.py:24
+#: wiki/plugins/images/forms.py:64
+msgid "You are not sure enough!"
+msgstr ""
+
+#: wiki/forms.py:256
+msgid "While you tried to delete this article, it was modified. TAKE CARE!"
+msgstr ""
+
+#: wiki/forms.py:262
+msgid "Lock article"
+msgstr ""
+
+#: wiki/forms.py:262
+msgid "Deny all users access to edit this article."
+msgstr ""
+
+#: wiki/forms.py:265
+msgid "Permissions"
+msgstr ""
+
+#: wiki/forms.py:269
+msgid "Owner"
+msgstr ""
+
+#: wiki/forms.py:270
+msgid "Enter the username of the owner."
+msgstr ""
+
+#: wiki/forms.py:271
+msgid "(none)"
+msgstr ""
+
+#: wiki/forms.py:276
+msgid "Inherit permissions"
+msgstr ""
+
+#: wiki/forms.py:276
+msgid ""
+"Check here to apply the above permissions recursively to articles under this"
+" one."
+msgstr ""
+
+#: wiki/forms.py:281
+msgid "Permission settings for the article were updated."
+msgstr ""
+
+#: wiki/forms.py:283
+msgid "Your permission settings were unchanged, so nothing saved."
+msgstr ""
+
+#: wiki/forms.py:322
+msgid "No user with that username"
+msgstr ""
+
+#: wiki/forms.py:344
+msgid "Article locked for editing"
+msgstr ""
+
+#: wiki/forms.py:351
+msgid "Article unlocked for editing"
+msgstr ""
+
+#: wiki/forms.py:364
+msgid "Filter..."
+msgstr ""
+
+#: wiki/core/plugins/base.py:44
+msgid "Settings for plugin"
+msgstr ""
+
+#: wiki/models/article.py:20 wiki/models/pluginbase.py:165
+#: wiki/plugins/attachments/models.py:19
+msgid "current revision"
+msgstr ""
+
+#: wiki/models/article.py:22
+msgid ""
+"The revision being displayed for this article. If you need to do a roll-"
+"back, simply change the value of this field."
+msgstr ""
+
+#: wiki/models/article.py:26
+msgid "modified"
+msgstr ""
+
+#: wiki/models/article.py:27
+msgid "Article properties last modified"
+msgstr ""
+
+#: wiki/models/article.py:29
+msgid "owner"
+msgstr ""
+
+#: wiki/models/article.py:31
+msgid ""
+"The owner of the article, usually the creator. The owner always has both "
+"read and write access."
+msgstr ""
+
+#: wiki/models/article.py:33
+msgid "group"
+msgstr ""
+
+#: wiki/models/article.py:35
+msgid ""
+"Like in a UNIX file system, permissions can be given to a user according to "
+"group membership. Groups are handled through the Django auth system."
+msgstr ""
+
+#: wiki/models/article.py:37
+msgid "group read access"
+msgstr ""
+
+#: wiki/models/article.py:38
+msgid "group write access"
+msgstr ""
+
+#: wiki/models/article.py:39
+msgid "others read access"
+msgstr ""
+
+#: wiki/models/article.py:40
+msgid "others write access"
+msgstr ""
+
+#: wiki/models/article.py:168
+#, python-format
+msgid "Article without content (%(id)d)"
+msgstr ""
+
+#: wiki/models/article.py:197
+msgid "content type"
+msgstr ""
+
+#: wiki/models/article.py:199
+msgid "object ID"
+msgstr ""
+
+#: wiki/models/article.py:206
+msgid "Article for object"
+msgstr ""
+
+#: wiki/models/article.py:207
+msgid "Articles for object"
+msgstr ""
+
+#: wiki/models/article.py:215
+msgid "revision number"
+msgstr ""
+
+#: wiki/models/article.py:220
+msgid "IP address"
+msgstr ""
+
+#: wiki/models/article.py:221
+msgid "user"
+msgstr ""
+
+#: wiki/models/article.py:232
+msgid "deleted"
+msgstr ""
+
+#: wiki/models/article.py:233
+msgid "locked"
+msgstr ""
+
+#: wiki/models/article.py:251 wiki/models/pluginbase.py:39
+msgid "article"
+msgstr ""
+
+#: wiki/models/article.py:254
+msgid "article contents"
+msgstr ""
+
+#: wiki/models/article.py:258
+msgid "article title"
+msgstr ""
+
+#: wiki/models/article.py:259
+msgid ""
+"Each revision contains a title field that must be filled out, even if the "
+"title has not changed"
+msgstr ""
+
+#: wiki/models/pluginbase.py:77
+msgid "original article"
+msgstr ""
+
+#: wiki/models/pluginbase.py:78
+msgid "Permissions are inherited from this article"
+msgstr ""
+
+#: wiki/models/pluginbase.py:138
+msgid "A plugin was changed"
+msgstr ""
+
+#: wiki/models/pluginbase.py:167
+msgid ""
+"The revision being displayed for this plugin.If you need to do a roll-back, "
+"simply change the value of this field."
+msgstr ""
+
+#: wiki/models/urlpath.py:40
+msgid "Cache lookup value for articles"
+msgstr ""
+
+#: wiki/models/urlpath.py:42
+msgid "slug"
+msgstr ""
+
+#: wiki/models/urlpath.py:134
+msgid "(root)"
+msgstr ""
+
+#: wiki/models/urlpath.py:144
+msgid "URL path"
+msgstr ""
+
+#: wiki/models/urlpath.py:145
+msgid "URL paths"
+msgstr ""
+
+#: wiki/models/urlpath.py:151
+msgid "Sorry but you cannot have a root article with a slug."
+msgstr ""
+
+#: wiki/models/urlpath.py:153
+msgid "A non-root note must always have a slug."
+msgstr ""
+
+#: wiki/models/urlpath.py:156
+#, python-format
+msgid "There is already a root node on %s"
+msgstr ""
+
+#: wiki/models/urlpath.py:260
+msgid ""
+"Articles who lost their parents\n"
+"===============================\n"
+"\n"
+"The children of this article have had their parents deleted. You should probably find a new home for them."
+msgstr ""
+
+#: wiki/models/urlpath.py:263
+msgid "Lost and found"
+msgstr ""
+
+#: wiki/plugins/attachments/forms.py:9
+msgid "Description"
+msgstr ""
+
+#: wiki/plugins/attachments/forms.py:10
+msgid "A short summary of what the file contains"
+msgstr ""
+
+#: wiki/plugins/attachments/forms.py:19
+msgid "Yes I am sure..."
+msgstr ""
+
+#: wiki/plugins/attachments/markdown_extensions.py:33
+msgid "Click to download file"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py:21
+msgid ""
+"The revision of this attachment currently in use (on all articles using the "
+"attachment)"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py:24
+msgid "original filename"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py:36
+msgid "attachment"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py:37
+msgid "attachments"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py:79
+msgid "file"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py:85
+msgid "attachment revision"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py:86
+msgid "attachment revisions"
+msgstr ""
+
+#: wiki/plugins/attachments/views.py:51
+#, python-format
+msgid "%s was successfully added."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py:54 wiki/plugins/attachments/views.py:116
+#, python-format
+msgid "Your file could not be saved: %s"
+msgstr ""
+
+#: wiki/plugins/attachments/views.py:57 wiki/plugins/attachments/views.py:120
+msgid ""
+"Your file could not be saved, probably because of a permission error on the "
+"web server."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py:114
+#, python-format
+msgid "%s uploaded and replaces old attachment."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py:128
+msgid ""
+"Your new file will automatically be renamed to match the file already "
+"present. Files with different extensions are not allowed."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py:180
+#, python-format
+msgid "Current revision changed for %s."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py:199
+#, python-format
+msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py:229
+#, python-format
+msgid "The file %s was deleted."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py:232
+#, python-format
+msgid "This article is no longer related to the file %s."
+msgstr ""
+
+#: wiki/plugins/attachments/wiki_plugin.py:30
+msgid "Attachments"
+msgstr ""
+
+#: wiki/plugins/attachments/wiki_plugin.py:36
+#, python-format
+msgid "A file was changed: %s"
+msgstr ""
+
+#: wiki/plugins/attachments/wiki_plugin.py:36
+#, python-format
+msgid "A file was deleted: %s"
+msgstr ""
+
+#: wiki/plugins/help/wiki_plugin.py:13
+msgid "Help"
+msgstr ""
+
+#: wiki/plugins/images/forms.py:16
+#, python-format
+msgid ""
+"New image %s was successfully uploaded. You can use it by selecting it from "
+"the list of available images."
+msgstr ""
+
+#: wiki/plugins/images/forms.py:59
+msgid "Are you sure?"
+msgstr ""
+
+#: wiki/plugins/images/models.py:40
+msgid "image"
+msgstr ""
+
+#: wiki/plugins/images/models.py:41
+msgid "images"
+msgstr ""
+
+#: wiki/plugins/images/models.py:45
+#, python-format
+msgid "Image: %s"
+msgstr ""
+
+#: wiki/plugins/images/models.py:45
+msgid "Current revision not set!!"
+msgstr ""
+
+#: wiki/plugins/images/models.py:92
+msgid "image revision"
+msgstr ""
+
+#: wiki/plugins/images/models.py:93
+msgid "image revisions"
+msgstr ""
+
+#: wiki/plugins/images/models.py:98
+#, python-format
+msgid "Image Revsion: %d"
+msgstr ""
+
+#: wiki/plugins/images/views.py:64
+#, python-format
+msgid "%s has been restored"
+msgstr ""
+
+#: wiki/plugins/images/views.py:66
+#, python-format
+msgid "%s has been marked as deleted"
+msgstr ""
+
+#: wiki/plugins/images/views.py:116
+#, python-format
+msgid "%(file)s has been changed to revision #%(revision)d"
+msgstr ""
+
+#: wiki/plugins/images/views.py:150
+#, python-format
+msgid "%(file)s has been saved."
+msgstr ""
+
+#: wiki/plugins/images/wiki_plugin.py:15
+msgid "Images"
+msgstr ""
+
+#: wiki/plugins/images/wiki_plugin.py:26
+#, python-format
+msgid "An image was added: %s"
+msgstr ""
+
+#: wiki/plugins/links/wiki_plugin.py:20
+msgid "Links"
+msgstr ""
+
+#: wiki/plugins/notifications/forms.py:13
+msgid "Notifications"
+msgstr ""
+
+#: wiki/plugins/notifications/forms.py:17
+msgid "When this article is edited"
+msgstr ""
+
+#: wiki/plugins/notifications/forms.py:18
+msgid "Also receive emails about article edits"
+msgstr ""
+
+#: wiki/plugins/notifications/forms.py:41
+msgid "Your notification settings were updated."
+msgstr ""
+
+#: wiki/plugins/notifications/forms.py:43
+msgid "Your notification settings were unchanged, so nothing saved."
+msgstr ""
+
+#: wiki/plugins/notifications/models.py:18
+#, python-format
+msgid "%(user)s subscribing to %(article)s (%(type)s)"
+msgstr ""
+
+#: wiki/plugins/notifications/models.py:40
+#, python-format
+msgid "Article deleted: %s"
+msgstr ""
+
+#: wiki/plugins/notifications/models.py:43
+#, python-format
+msgid "Article modified: %s"
+msgstr ""
+
+#: wiki/plugins/notifications/models.py:46
+#, python-format
+msgid "New article created: %s"
+msgstr ""
+
+#: wiki/views/accounts.py:25
+msgid "You are now sign up... and now you can sign in!"
+msgstr ""
+
+#: wiki/views/accounts.py:32
+msgid "You are no longer logged in. Bye bye!"
+msgstr ""
+
+#: wiki/views/accounts.py:57
+msgid "You are now logged in! Have fun!"
+msgstr ""
+
+#: wiki/views/article.py:85
+#, python-format
+msgid "New article '%s' created."
+msgstr ""
+
+#: wiki/views/article.py:92
+#, python-format
+msgid "There was an error creating this article: %s"
+msgstr ""
+
+#: wiki/views/article.py:94
+msgid "There was an error creating this article."
+msgstr ""
+
+#: wiki/views/article.py:172
+msgid ""
+"This article cannot be deleted because it has children or is a root article."
+msgstr ""
+
+#: wiki/views/article.py:183
+msgid ""
+"This article together with all its contents are now completely gone! Thanks!"
+msgstr ""
+
+#: wiki/views/article.py:190
+#, python-format
+msgid ""
+"The article \"%s\" is now marked as deleted! Thanks for keeping the site "
+"free from unwanted material!"
+msgstr ""
+
+#: wiki/views/article.py:267
+msgid "Your changes were saved."
+msgstr ""
+
+#: wiki/views/article.py:290
+msgid "A new revision of the article was succesfully added."
+msgstr ""
+
+#: wiki/views/article.py:343
+msgid "Restoring article"
+msgstr ""
+
+#: wiki/views/article.py:345
+#, python-format
+msgid "The article \"%s\" and its children are now restored."
+msgstr ""
+
+#: wiki/views/article.py:529
+#, python-format
+msgid "The article %s is now set to display revision #%d"
+msgstr ""
+
+#: wiki/views/article.py:591
+msgid "New title"
+msgstr ""
+
+#: wiki/views/article.py:615
+#, python-format
+msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
+msgstr ""
+
+#: wiki/views/article.py:619
+#, python-format
+msgid ""
+"A new revision was created: Merge between Revision #%(r1)d and Revision "
+"#%(r2)d"
+msgstr ""

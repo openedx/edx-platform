@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.template import RequestContext %>
 
 <%!
   from django.core.urlresolvers import reverse
@@ -7,12 +8,19 @@
   from pytz import timezone as _timezone
   from django.conf import settings
 %>
+
+<%
+  cert_name_short = settings.CERT_NAME_SHORT
+  cert_name_long = settings.CERT_NAME_LONG
+%>
+
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
 
-<%block name="title"><title>${_("Dashboard")}</title></%block>
+<%block name="pagetitle">${_("Dashboard")}</%block>
 <%block name="bodyclass">view-dashboard is-authenticated</%block>
+<%block name="nav_skip">#my-courses</%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -25,6 +33,15 @@
 
         $(this).closest('.message.is-expandable').toggleClass('is-expanded');
     }
+
+    $("#failed-verification-button-dismiss").click(function(event) {
+      $.ajax({
+        url: "${reverse('verify_student_toggle_failed_banner_off')}",
+        type: "post",
+        data: { 'user_id': ${user.id}, }
+        })
+      $("#failed-verification-banner").addClass('is-hidden');
+      })
 
     $("#upgrade-to-verified").click(function(event) {
       user = $(event.target).data("user");
@@ -73,6 +90,18 @@
              function(data){
                $("#password_reset_complete_link").click();
              });
+    });
+
+    $("#submit-lang").click(function(event, xhr) {
+        event.preventDefault();
+        $.post('/lang_pref/setlang/',
+            {"language": $('#settings-language-value').val()})
+        .done(
+            function(data){
+                // submit form as normal
+                $('.settings-language-form').submit();
+            }
+        );
     });
 
     $("#change_email_form").submit(function(){
@@ -155,6 +184,12 @@
   </script>
 </%block>
 
+% if reverifications["must_reverify"] or reverifications["denied"]:
+  <section class="dashboard-banner">
+    <%include file='dashboard/_dashboard_prompt_midcourse_reverify.html' />
+  </section>
+% endif
+
 <section class="container dashboard" id="dashboard-main" aria-hidden="false" style="padding-top: 10px">
 
   %if message:
@@ -216,6 +251,10 @@ text-transform: capitalize;
           </span> <span class="data">${ user.email | h }</span>
         </li>
 
+        %if len(language_options) > 1:
+        <%include file='dashboard/_dashboard_info_language.html' />
+        %endif
+
         % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
         <li class="controls--account">
           <span class="title"><div class="icon"></div><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
@@ -228,12 +267,14 @@ text-transform: capitalize;
 
         <%include file='dashboard/_dashboard_status_verification.html' />
 
+        <%include file='dashboard/_dashboard_reverification_sidebar.html' />
+
       </ul>
     </section>
 
   </section>
 
-  <section class="my-courses">
+  <section class="my-courses" id="my-courses">
     <header>
       <h2>${_("Current Courses")}</h2>
     </header>
@@ -283,10 +324,21 @@ text-transform: capitalize;
 
 <section id="email-settings-modal" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
-    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal">&#10005;
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close Modal')}
+      </span>
+    </button>
 
     <header>
-      <h2 id="email-settings-title">${_('Email Settings for {course_number}').format(course_number='<span id="email_settings_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
+      <h2 id="email-settings-title">
+        ${_('Email Settings for {course_number}').format(course_number='<span id="email_settings_course_number"></span>')}
+        <span class="sr">,
+          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+          ${_("modal open")}
+        </span>
+      </h2>
       <hr/>
     </header>
 
@@ -304,10 +356,21 @@ text-transform: capitalize;
 
 <section id="password_reset_complete" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="password-reset-email">
-    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal">&#10005;
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close Modal')}
+      </span>
+    </button>
 
     <header>
-      <h2 id="password-reset-email">${_('Password Reset Email Sent')}<span class="sr">, ${_("modal open")}</span></h2>
+      <h2 id="password-reset-email">
+        ${_('Password Reset Email Sent')}
+        <span class="sr">,
+          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+          ${_("modal open")}
+        </span>
+      </h2>
       <hr/>
     </header>
     <div>
@@ -322,10 +385,21 @@ text-transform: capitalize;
 
 <section id="change_email" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="change_email_title">
-    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal">&#10005;
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close Modal')}
+      </span>
+    </button>
 
     <header>
-      <h2><span id="change_email_title">${_("Change Email")}</span><span class="sr">, ${_("modal open")}</span></h2>
+      <h2>
+        <span id="change_email_title">${_("Change Email")}</span>
+        <span class="sr">,
+          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+          ${_("modal open")}
+        </span>
+      </h2>
       <hr/>
     </header>
     <div id="change_email_body">
@@ -350,22 +424,37 @@ text-transform: capitalize;
   </div>
 </section>
 
+<%include file='modal/_modal-settings-language.html' />
+
 <section id="apply_name_change" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="change-name-title">
-    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal">&#10005;
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close Modal')}
+      </span>
+    </button>
 
     <header>
-      <h2 id="change-name-title">${_("Change your name")}<span class="sr">, ${_("modal open")}</span></h2>
+      <h2 id="change-name-title">
+        ${_("Change your name")}
+        <span class="sr">,
+          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+          ${_("modal open")}
+        </span>
+      </h2>
       <hr/>
     </header>
     <div id="change_name_body">
       <form id="change_name_form">
         <div id="change_name_error" class="modal-form-error"> </div>
-        <p>${_("To uphold the credibility of {platform} certificates, all name changes will be logged and recorded.").format(platform=settings.PLATFORM_NAME)}</p>
+        ## Translators: note that {platform} {cert_name_short} will look something like: "edX certificate". Please do not change the order of these placeholders.
+        <p>${_("To uphold the credibility of your {platform} {cert_name_short}, all name changes will be logged and recorded.").format(platform=settings.PLATFORM_NAME, cert_name_short=cert_name_short)}</p>
         <br/>
         <fieldset>
           <div class="input-group">
-            <label>${_("Enter your desired full name, as it will appear on the {platform} certificates:").format(platform=settings.PLATFORM_NAME)}</label>
+            ## Translators: note that {platform} {cert_name_short} will look something like: "edX certificate". Please do not change the order of these placeholders.
+            <label>${_("Enter your desired full name, as it will appear on your {platform} {cert_name_short}:").format(platform=settings.PLATFORM_NAME, cert_name_short=cert_name_short)}</label>
             <input id="new_name_field" value="" type="text" />
             <label>${_("Reason for name change:")}</label>
             <textarea id="name_rationale_field" value=""></textarea>
@@ -381,9 +470,21 @@ text-transform: capitalize;
 
 <section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
   <div class="inner-wrapper" role="alertdialog" aria-labelledy="unenrollment-modal-title">
-    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal">&#10005;
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close Modal')}
+      </span>
+    </button>
+
     <header>
-      <h2 id="unenrollment-modal-title">${_('<span id="track-info"></span> {course_number}?  <span id="refund-info"></span>').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
+      <h2 id="unenrollment-modal-title">
+        ${_('<span id="track-info"></span> {course_number}?  <span id="refund-info"></span>').format(course_number='<span id="unenroll_course_number"></span>')}
+        <span class="sr">,
+          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+          ${_("modal open")}
+        </span>
+      </h2>
       <hr/>
     </header>
     <div id="unenroll_error" class="modal-form-error"></div>

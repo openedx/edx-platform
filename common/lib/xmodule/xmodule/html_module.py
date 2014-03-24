@@ -3,14 +3,11 @@ from fs.errors import ResourceNotFoundError
 import logging
 import os
 import sys
-from datetime import datetime
 from lxml import etree
 from path import path
-from pytz import UTC
 
 from pkg_resources import resource_string
-from xblock.fields import Scope, String, Boolean
-from xmodule.fields import Date
+from xblock.fields import Scope, String, Boolean, List
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
@@ -18,6 +15,7 @@ from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
+from xblock.core import XBlock
 
 log = logging.getLogger("edx.courseware")
 
@@ -47,6 +45,10 @@ class HtmlModule(HtmlFields, XModule):
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
             resource_string(__name__, 'js/src/collapsible.coffee'),
             resource_string(__name__, 'js/src/html/display.coffee')
+        ],
+        'js': [
+            resource_string(__name__, 'js/src/html/imageModal.js'),
+            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.pkgd.js')
         ]
     }
     js_module_name = "HTMLModule"
@@ -228,17 +230,12 @@ class AboutFields(object):
     )
     data = String(
         help=_("Html contents to display for this module"),
-        default="",
+        default=u"",
         scope=Scope.content
     )
-    # this exists purely to override the default start date
-    start = Date(
-        help="placeholder to make sure that About is always active",
-        default=datetime.fromtimestamp(0, UTC),
-        scope=Scope.settings,
-    )
 
 
+@XBlock.tag("detached")
 class AboutModule(AboutFields, HtmlModule):
     """
     Overriding defaults but otherwise treated as HtmlModule.
@@ -246,6 +243,7 @@ class AboutModule(AboutFields, HtmlModule):
     pass
 
 
+@XBlock.tag("detached")
 class AboutDescriptor(AboutFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
@@ -266,20 +264,15 @@ class StaticTabFields(object):
         default=_("Empty"),
     )
     data = String(
-        default=textwrap.dedent("""\
+        default=textwrap.dedent(u"""\
             <p>This is where you can add additional pages to your courseware. Click the 'edit' button to begin editing.</p>
         """),
         scope=Scope.content,
         help=_("HTML for the additional pages")
     )
-    # this exists purely to override the default start date
-    start = Date(
-        help="placeholder to make sure that Static Tabs are always active",
-        default=datetime.fromtimestamp(0, UTC),
-        scope=Scope.settings,
-    )
 
 
+@XBlock.tag("detached")
 class StaticTabModule(StaticTabFields, HtmlModule):
     """
     Supports the field overrides
@@ -287,6 +280,7 @@ class StaticTabModule(StaticTabFields, HtmlModule):
     pass
 
 
+@XBlock.tag("detached")
 class StaticTabDescriptor(StaticTabFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
@@ -300,26 +294,29 @@ class CourseInfoFields(object):
     """
     Field overrides
     """
-    data = String(
-        help=_("Html contents to display for this module"),
-        default="<ol></ol>",
+    items = List(
+        help=_("List of course update items"),
+        default=[],
         scope=Scope.content
     )
-    # this exists purely to override the default start date
-    start = Date(
-        help="placeholder to make sure that Course Info is always active",
-        default=datetime.fromtimestamp(0, UTC),
-        scope=Scope.settings,
+    data = String(
+        help=_("Html contents to display for this module"),
+        default=u"<ol></ol>",
+        scope=Scope.content
     )
 
 
+@XBlock.tag("detached")
 class CourseInfoModule(CourseInfoFields, HtmlModule):
     """
     Just to support xblock field overrides
     """
-    pass
+    # statuses
+    STATUS_VISIBLE = 'visible'
+    STATUS_DELETED = 'deleted'
 
 
+@XBlock.tag("detached")
 class CourseInfoDescriptor(CourseInfoFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located

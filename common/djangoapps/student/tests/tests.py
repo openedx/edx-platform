@@ -11,6 +11,7 @@ import unittest
 from datetime import datetime, timedelta
 import pytz
 
+from django.core.cache import cache
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -20,6 +21,7 @@ from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -30,7 +32,7 @@ from textwrap import dedent
 
 from student.models import anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user
 from student.views import (process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper,
-                           change_enrollment, complete_course_mode_info)
+                           change_enrollment, complete_course_mode_info, token, course_from_id)
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.test_email import mock_render_to_string
 
@@ -67,8 +69,11 @@ class ResetPasswordTests(TestCase):
         bad_pwd_resp = password_reset(bad_pwd_req)
         # If they've got an unusable password, we return a successful response code
         self.assertEquals(bad_pwd_resp.status_code, 200)
-        self.assertEquals(bad_pwd_resp.content, json.dumps({'success': True,
-                                                            'value': "('registration/password_reset_done.html', [])"}))
+        obj = json.loads(bad_pwd_resp.content)
+        self.assertEquals(obj, {
+            'success': True,
+            'value': "('registration/password_reset_done.html', [])",
+        })
 
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_nonexist_email_password_reset(self):
@@ -79,12 +84,36 @@ class ResetPasswordTests(TestCase):
         # Note: even if the email is bad, we return a successful response code
         # This prevents someone potentially trying to "brute-force" find out which emails are and aren't registered with edX
         self.assertEquals(bad_email_resp.status_code, 200)
-        self.assertEquals(bad_email_resp.content, json.dumps({'success': True,
-                                                              'value': "('registration/password_reset_done.html', [])"}))
+        obj = json.loads(bad_email_resp.content)
+        self.assertEquals(obj, {
+            'success': True,
+            'value': "('registration/password_reset_done.html', [])",
+        })
 
-    @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
-                         dedent("""Skipping Test because CMS has not provided necessary templates for password reset.
-                                If LMS tests print this message, that needs to be fixed."""))
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    def test_password_reset_ratelimited(self):
+        """ Try (and fail) resetting password 30 times in a row on an non-existant email address """
+        cache.clear()
+
+        for i in xrange(30):
+            good_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+            good_resp = password_reset(good_req)
+            self.assertEquals(good_resp.status_code, 200)
+
+        # then the rate limiter should kick in and give a HttpForbidden response
+        bad_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+        bad_resp = password_reset(bad_req)
+        self.assertEquals(bad_resp.status_code, 403)
+
+        cache.clear()
+
+    @unittest.skipIf(
+        settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
+        dedent("""
+            Skipping Test because CMS has not provided necessary templates for password reset.
+            If LMS tests print this message, that needs to be fixed.
+        """)
+    )
     @patch('django.core.mail.send_mail')
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_reset_password_email(self, send_email):
@@ -93,9 +122,11 @@ class ResetPasswordTests(TestCase):
         good_req = self.request_factory.post('/password_reset/', {'email': self.user.email})
         good_resp = password_reset(good_req)
         self.assertEquals(good_resp.status_code, 200)
-        self.assertEquals(good_resp.content,
-                          json.dumps({'success': True,
-                                      'value': "('registration/password_reset_done.html', [])"}))
+        obj = json.loads(good_resp.content)
+        self.assertEquals(obj, {
+            'success': True,
+            'value': "('registration/password_reset_done.html', [])",
+        })
 
         ((subject, msg, from_addr, to_addrs), sm_kwargs) = send_email.call_args
         self.assertIn("Password reset", subject)
@@ -556,3 +587,26 @@ class AnonymousLookupTable(TestCase):
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class Token(ModuleStoreTestCase):
+    """
+    Test for the token generator. This creates a random course and passes it through the token file which generates the
+    token that will be passed in to the annotation_storage_url.
+    """
+    request_factory = RequestFactory()
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+    COURSE_ORG = "edx"
+
+    def setUp(self):
+        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        self.user = User.objects.create(username="username", email="username")
+        self.req = self.request_factory.post('/token?course_id=edx/100/test_course', {'user': self.user})
+        self.req.user = self.user
+
+    def test_token(self):
+        expected = HttpResponse("eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpc3N1ZWRBdCI6ICIyMDE0LTAxLTIzVDE5OjM1OjE3LjUyMjEwNC01OjAwIiwgImNvbnN1bWVyS2V5IjogInh4eHh4eHh4LXh4eHgteHh4eC14eHh4LXh4eHh4eHh4eHh4eCIsICJ1c2VySWQiOiAidXNlcm5hbWUiLCAidHRsIjogODY0MDB9.OjWz9mzqJnYuzX-f3uCBllqJUa8PVWJjcDy_McfxLvc", mimetype="text/plain")
+        response = token(self.req)
+        self.assertEqual(expected.content.split('.')[0], response.content.split('.')[0])

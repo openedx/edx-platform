@@ -1,7 +1,7 @@
 import logging
 import urllib
 
-from functools import partial
+from collections import defaultdict
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from edxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
@@ -19,16 +19,16 @@ from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access
-from courseware.courses import (get_courses, get_course_with_access,
-                                get_courses_by_university, sort_by_announcement)
+from courseware.courses import get_courses, get_course_with_access, sort_by_announcement
 import courseware.tabs as tabs
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
-from .module_render import toc_for_course, get_module_for_descriptor, get_module
+from .module_render import toc_for_course, get_module_for_descriptor
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
 from student.models import UserTestGroup, CourseEnrollment
+from student.views import course_from_id, single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore import Location
@@ -37,6 +37,8 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
 import shoppingcart
+
+from microsite_configuration import microsite
 
 log = logging.getLogger("edx.courseware")
 
@@ -230,13 +232,13 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
-    request.user = user	# keep just one instance of User
+    request.user = user  # keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
     staff_access = has_access(user, course, 'staff')
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
-        log.debug('User %s tried to view course %s but is not enrolled' % (user, course.location.url()))
+        log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.url())
         return redirect(reverse('about_course', args=[course.id]))
 
     masq = setup_masquerade(request, staff_access)
@@ -247,8 +249,8 @@ def index(request, course_id, chapter=None, section=None,
 
         course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
         if course_module is None:
-            log.warning('If you see this, something went wrong: if we got this'
-                        ' far, should have gotten a course module for this user')
+            log.warning(u'If you see this, something went wrong: if we got this'
+                        u' far, should have gotten a course module for this user')
             return redirect(reverse('about_course', args=[course.id]))
 
         if chapter is None:
@@ -263,7 +265,8 @@ def index(request, course_id, chapter=None, section=None,
             'fragment': Fragment(),
             'staff_access': staff_access,
             'masquerade': masq,
-            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
+            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+            'reverifications': fetch_reverify_banner_info(request, course_id),
             }
 
         # Only show the chat if it's enabled by the course and in the
@@ -326,7 +329,7 @@ def index(request, course_id, chapter=None, section=None,
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
             context['fragment'] = section_module.render('student_view')
-
+            context['section_title'] = section_descriptor.display_name_with_default
         else:
             # section is none, so display a message
             prev_section = get_current_child(chapter_module)
@@ -422,9 +425,9 @@ def jump_to(request, course_id, location):
     try:
         (course_id, chapter, section, position) = path_to_location(modulestore(), course_id, location)
     except ItemNotFoundError:
-        raise Http404("No data at this location: {0}".format(location))
+        raise Http404(u"No data at this location: {0}".format(location))
     except NoPathToItem:
-        raise Http404("This location is not in any class: {0}".format(location))
+        raise Http404(u"This location is not in any class: {0}".format(location))
 
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.
@@ -449,9 +452,19 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
+    reverifications = fetch_reverify_banner_info(request, course_id)
 
-    return render_to_response('courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
-            'course': course, 'staff_access': staff_access, 'masquerade': masq})
+    context = {
+        'request': request,
+        'course_id': course_id,
+        'cache': None,
+        'course': course,
+        'staff_access': staff_access,
+        'masquerade': masq,
+        'reverifications': reverifications,
+    }
+
+    return render_to_response('courseware/info.html', context)
 
 
 @ensure_csrf_cookie
@@ -514,7 +527,11 @@ def registered_for_course(course, user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
-    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
+
+    if microsite.get_value(
+        'ENABLE_MKTG_SITE',
+        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+    ):
         raise Http404
 
     course = get_course_with_access(request.user, course_id, 'see_exists')
@@ -543,6 +560,9 @@ def course_about(request, course_id):
         reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
             reg_url=reverse('register_user'), course_id=course.id)
 
+    # see if we have already filled up all allowed enrollments
+    is_course_full = CourseEnrollment.is_course_full(course)
+
     return render_to_response('courseware/course_about.html',
                               {'course': course,
                                'style': 'full',
@@ -551,7 +571,8 @@ def course_about(request, course_id):
                                'registration_price': registration_price,
                                'in_cart': in_cart,
                                'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
-                               'show_courseware_link': show_courseware_link})
+                               'show_courseware_link': show_courseware_link,
+                               'is_course_full': is_course_full})
 
 
 @ensure_csrf_cookie
@@ -649,6 +670,7 @@ def _progress(request, course_id, student_id):
         'grade_summary': grade_summary,
         'staff_access': staff_access,
         'student': student,
+        'reverifications': fetch_reverify_banner_info(request, course_id)
     }
 
     with grades.manual_transaction():
@@ -656,6 +678,21 @@ def _progress(request, course_id, student_id):
 
     return response
 
+
+def fetch_reverify_banner_info(request, course_id):
+    """
+    Fetches needed context variable to display reverification banner in courseware
+    """
+    reverifications = defaultdict(list)
+    user = request.user
+    if not user.id:
+        return reverifications
+    enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
+    course = course_from_id(course_id)
+    info = single_course_reverification_info(user, course, enrollment)
+    if info:
+        reverifications[info.status].append(info)
+    return reverifications
 
 @login_required
 def submission_history(request, course_id, student_username, location):

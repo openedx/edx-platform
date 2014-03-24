@@ -103,9 +103,9 @@ class ShibSPTest(ModuleStoreTestCase):
         """Asserts that shibboleth login attempt is being logged"""
         method_name, args, _kwargs = audit_log_call
         self.assertEquals(method_name, 'info')
-        self.assertEquals(len(args), 2)
+        self.assertEquals(len(args), 1)
         self.assertIn(u'logged in via Shibboleth', args[0])
-        self.assertEquals(remote_user, args[1])
+        self.assertIn(remote_user, args[0])
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_shib_login(self):
@@ -166,9 +166,9 @@ class ShibSPTest(ModuleStoreTestCase):
                     self._assert_shib_login_is_logged(audit_log_calls[0], remote_user)
                     method_name, args, _kwargs = audit_log_calls[1]
                     self.assertEquals(method_name, 'info')
-                    self.assertEquals(len(args), 3)
+                    self.assertEquals(len(args), 1)
                     self.assertIn(u'Login success', args[0])
-                    self.assertEquals(remote_user, args[2])
+                    self.assertIn(remote_user, args[0])
                 elif idp == "https://idp.stanford.edu/" and remote_user == 'inactive@stanford.edu':
                     self.assertEqual(response.status_code, 403)
                     self.assertIn("Account not yet activated: please look for link in your email", response.content)
@@ -177,7 +177,7 @@ class ShibSPTest(ModuleStoreTestCase):
                     self._assert_shib_login_is_logged(audit_log_calls[0], remote_user)
                     method_name, args, _kwargs = audit_log_calls[1]
                     self.assertEquals(method_name, 'warning')
-                    self.assertEquals(len(args), 2)
+                    self.assertEquals(len(args), 1)
                     self.assertIn(u'is not active after external login', args[0])
                     # self.assertEquals(remote_user, args[1])
                 elif idp == "https://idp.stanford.edu/" and remote_user == 'womap@stanford.edu':
@@ -190,9 +190,9 @@ class ShibSPTest(ModuleStoreTestCase):
                     self._assert_shib_login_is_logged(audit_log_calls[0], remote_user)
                     method_name, args, _kwargs = audit_log_calls[1]
                     self.assertEquals(method_name, 'info')
-                    self.assertEquals(len(args), 3)
+                    self.assertEquals(len(args), 1)
                     self.assertIn(u'Login success', args[0])
-                    self.assertEquals(remote_user, args[2])
+                    self.assertIn(remote_user, args[0])
                 elif idp == "https://someother.idp.com/" and remote_user in \
                             ['withmap@stanford.edu', 'womap@stanford.edu', 'inactive@stanford.edu']:
                     self.assertEqual(response.status_code, 403)
@@ -202,7 +202,7 @@ class ShibSPTest(ModuleStoreTestCase):
                 else:
                     self.assertEqual(response.status_code, 200)
                     self.assertContains(response,
-                                        ("<title>Preferences for {platform_name}</title>"
+                                        ("Preferences for {platform_name}"
                                          .format(platform_name=settings.PLATFORM_NAME)))
                     # no audit logging calls
                     self.assertEquals(len(audit_log_calls), 0)
@@ -330,9 +330,7 @@ class ShibSPTest(ModuleStoreTestCase):
         for domain in ["", "shib:https://idp.stanford.edu/"]:
             # set domains
             course.enrollment_domain = domain
-            metadata = own_metadata(course)
-            metadata['enrollment_domain'] = domain
-            self.store.update_metadata(course.location.url(), metadata)
+            self.store.update_item(course, '**replace_user**')
 
             # setting location to test that GET params get passed through
             login_request = self.request_factory.get('/course_specific_login/MITx/999/Robot_Super_Course' +
@@ -401,15 +399,11 @@ class ShibSPTest(ModuleStoreTestCase):
         # create 2 course, one with limited enrollment one without
         shib_course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
         shib_course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        metadata = own_metadata(shib_course)
-        metadata['enrollment_domain'] = shib_course.enrollment_domain
-        self.store.update_metadata(shib_course.location.url(), metadata)
+        self.store.update_item(shib_course, '**replace_user**')
 
         open_enroll_course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         open_enroll_course.enrollment_domain = ''
-        metadata = own_metadata(open_enroll_course)
-        metadata['enrollment_domain'] = open_enroll_course.enrollment_domain
-        self.store.update_metadata(open_enroll_course.location.url(), metadata)
+        self.store.update_item(open_enroll_course, '**replace_user**')
 
         # create 3 kinds of students, external_auth matching shib_course, external_auth not matching, no external auth
         shib_student = UserFactory.create()
@@ -475,9 +469,7 @@ class ShibSPTest(ModuleStoreTestCase):
 
         course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
         course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        metadata = own_metadata(course)
-        metadata['enrollment_domain'] = course.enrollment_domain
-        self.store.update_metadata(course.location.url(), metadata)
+        self.store.update_item(course, '**replace_user**')
 
         # use django test client for sessions and url processing
         # no enrollment before trying

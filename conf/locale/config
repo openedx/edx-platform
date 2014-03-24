@@ -1,4 +1,1 @@
-{
- "locales" : ["en","ru"],
- "dummy-locale" : "eo"
-}
+This file is now at config.yaml in the same directory.

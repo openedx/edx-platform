@@ -29,23 +29,22 @@ from edxmako.shortcuts import render_to_response
 import mongoengine
 
 from courseware.courses import get_course_by_id
-from courseware.roles import CourseStaffRole, CourseInstructorRole
 import dashboard.git_import as git_import
 from dashboard.git_import import GitImportError
+from student.roles import CourseStaffRole, CourseInstructorRole
 from dashboard.models import CourseImportLog
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
 from student.models import CourseEnrollment, UserProfile, Registration
 import track.views
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.xml import XMLModuleStore
 
 
 log = logging.getLogger(__name__)
-
 
 
 class SysadminDashboardView(TemplateView):
@@ -161,7 +160,7 @@ class Users(SysadminDashboardView):
         email_domain = getattr(settings, 'SSL_AUTH_EMAIL_DOMAIN', 'MIT.EDU')
 
         msg = u''
-        if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        if settings.FEATURES['AUTH_USE_CERTIFICATES']:
             if not '@' in uname:
                 email = '{0}@{1}'.format(uname, email_domain)
             else:
@@ -203,7 +202,7 @@ class Users(SysadminDashboardView):
         profile.name = name
         profile.save()
 
-        if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        if settings.FEATURES['AUTH_USE_CERTIFICATES']:
             credential_string = getattr(settings, 'SSL_AUTH_DN_FORMAT_STRING',
                                         '/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}')
             credentials = credential_string.format(name, email)
@@ -273,7 +272,7 @@ class Users(SysadminDashboardView):
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'users': 'active-section'},
-            'mitx_version': getattr(settings, 'VERSION_STRING', ''),
+            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
         }
         return render_to_response(self.template_name, context)
 
@@ -317,7 +316,7 @@ class Users(SysadminDashboardView):
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'users': 'active-section'},
-            'mitx_version': getattr(settings, 'VERSION_STRING', ''),
+            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
         }
         return render_to_response(self.template_name, context)
 
@@ -349,7 +348,7 @@ class Courses(SysadminDashboardView):
 
         return info
 
-    def get_course_from_git(self, gitloc, datatable):
+    def get_course_from_git(self, gitloc, branch, datatable):
         """This downloads and runs the checks for importing a course in git"""
 
         if not (gitloc.endswith('.git') or gitloc.startswith('http:') or
@@ -358,11 +357,11 @@ class Courses(SysadminDashboardView):
                      "and be a valid url")
 
         if self.is_using_mongo:
-            return self.import_mongo_course(gitloc)
+            return self.import_mongo_course(gitloc, branch)
 
-        return self.import_xml_course(gitloc, datatable)
+        return self.import_xml_course(gitloc, branch, datatable)
 
-    def import_mongo_course(self, gitloc):
+    def import_mongo_course(self, gitloc, branch):
         """
         Imports course using management command and captures logging output
         at debug level for display in template
@@ -370,7 +369,7 @@ class Courses(SysadminDashboardView):
 
         msg = u''
 
-        logging.debug('Adding course using git repo {0}'.format(gitloc))
+        log.debug('Adding course using git repo {0}'.format(gitloc))
 
         # Grab logging output for debugging imports
         output = StringIO.StringIO()
@@ -391,7 +390,7 @@ class Courses(SysadminDashboardView):
 
         error_msg = ''
         try:
-            git_import.add_repo(gitloc, None)
+            git_import.add_repo(gitloc, None, branch)
         except GitImportError as ex:
             error_msg = str(ex)
         ret = output.getvalue()
@@ -412,7 +411,7 @@ class Courses(SysadminDashboardView):
         msg += "<pre>{0}</pre>".format(escape(ret))
         return msg
 
-    def import_xml_course(self, gitloc, datatable):
+    def import_xml_course(self, gitloc, branch, datatable):
         """Imports a git course into the XMLModuleStore"""
 
         msg = u''
@@ -437,13 +436,31 @@ class Courses(SysadminDashboardView):
             cmd_output = escape(
                 subprocess.check_output(cmd, stderr=subprocess.STDOUT, cwd=cwd)
             )
-        except subprocess.CalledProcessError:
-            return _('Unable to clone or pull repository. Please check your url.')
+        except subprocess.CalledProcessError as ex:
+            log.exception('Git pull or clone output was: %r', ex.output)
+            # Translators: unable to download the course content from
+            # the source git repository. Clone occurs if this is brand
+            # new, and pull is when it is being updated from the
+            # source.
+            return _('Unable to clone or pull repository. Please check '
+                     'your url. Output was: {0!r}'.format(ex.output))
 
         msg += u'<pre>{0}</pre>'.format(cmd_output)
         if not os.path.exists(gdir):
             msg += _('Failed to clone repository to {0}').format(gdir)
             return msg
+        # Change branch if specified
+        if branch:
+            try:
+                git_import.switch_branch(branch, gdir)
+            except GitImportError as ex:
+                return str(ex)
+            # Translators: This is a git repository branch, which is a
+            # specific version of a courses content
+            msg += u'<p>{0}</p>'.format(
+                _('Successfully switched to branch: '
+                  '{branch_name}'.format(branch_name=branch)))
+
         self.def_ms.try_load_course(os.path.abspath(gdir))
         errlog = self.def_ms.errored_courses.get(cdir, '')
         if errlog:
@@ -495,7 +512,7 @@ class Courses(SysadminDashboardView):
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'courses': 'active-section'},
-            'mitx_version': getattr(settings, 'VERSION_STRING', ''),
+            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
         }
         return render_to_response(self.template_name, context)
 
@@ -512,8 +529,9 @@ class Courses(SysadminDashboardView):
         courses = self.get_courses()
         if action == 'add_course':
             gitloc = request.POST.get('repo_location', '').strip().replace(' ', '').replace(';', '')
+            branch = request.POST.get('repo_branch', '').strip().replace(' ', '').replace(';', '')
             datatable = self.make_datatable()
-            self.msg += self.get_course_from_git(gitloc, datatable)
+            self.msg += self.get_course_from_git(gitloc, branch, datatable)
 
         elif action == 'del_course':
             course_id = request.POST.get('course_id', '').strip()
@@ -531,8 +549,8 @@ class Courses(SysadminDashboardView):
                                       course_id, escape(str(err))
                                   )
 
-            is_mongo_course = (modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE)
-            if course_found and not is_mongo_course:
+            is_xml_course = (modulestore().get_modulestore_type(course_id) == XML_MODULESTORE_TYPE)
+            if course_found and is_xml_course:
                 cdir = course.data_dir
                 self.def_ms.courses.pop(cdir)
 
@@ -547,7 +565,7 @@ class Courses(SysadminDashboardView):
                              u"{0} = {1} ({2})</font>".format(
                                  cdir, course.id, course.display_name))
 
-            elif course_found and is_mongo_course:
+            elif course_found and not is_xml_course:
                 # delete course that is stored with mongodb backend
                 loc = course.location
                 content_store = contentstore()
@@ -564,7 +582,7 @@ class Courses(SysadminDashboardView):
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'courses': 'active-section'},
-            'mitx_version': getattr(settings, 'VERSION_STRING', ''),
+            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
         }
         return render_to_response(self.template_name, context)
 
@@ -603,7 +621,7 @@ class Staffing(SysadminDashboardView):
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'staffing': 'active-section'},
-            'mitx_version': getattr(settings, 'VERSION_STRING', ''),
+            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
         }
         return render_to_response(self.template_name, context)
 
@@ -674,8 +692,8 @@ class GitLogs(TemplateView):
             else:
                 mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
         except mongoengine.connection.ConnectionError:
-            logging.exception('Unable to connect to mongodb to save log, '
-                              'please check MONGODB_LOG settings.')
+            log.exception('Unable to connect to mongodb to save log, '
+                          'please check MONGODB_LOG settings.')
 
         if course_id is None:
             # Require staff if not going to specific course
@@ -686,8 +704,8 @@ class GitLogs(TemplateView):
             try:
                 course = get_course_by_id(course_id)
             except Exception:  # pylint: disable=broad-except
-                cilset = None
-                error_msg = _('Cannot find course {0}').format(course_id)
+                log.info('Cannot find course {0}'.format(course_id))
+                raise Http404
 
             # Allow only course team, instructors, and staff
             if not (request.user.is_staff or
