@@ -27,13 +27,13 @@ class TestLTI(BaseTestXmodule):
         mocked_signature_after_sign = u'my_signature%3D'
         mocked_decoded_signature = u'my_signature='
 
-        lti_id = self.item_descriptor.lti_id
+        context_id = self.item_descriptor.course_id
         user_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
         hostname = self.item_descriptor.xmodule_runtime.hostname
         resource_link_id = unicode(urllib.quote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
 
-        sourcedId = "{id}:{resource_link}:{user_id}".format(
-            id=urllib.quote(lti_id),
+        sourcedId = "{context}:{resource_link}:{user_id}".format(
+            context=urllib.quote(context_id),
             resource_link=urllib.quote(resource_link_id),
             user_id=urllib.quote(user_id)
         )
@@ -49,6 +49,7 @@ class TestLTI(BaseTestXmodule):
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
             u'roles': u'Student',
+            u'context_id': context_id,
 
             u'resource_link_id': resource_link_id,
             u'lis_result_sourcedid': sourcedId,
