@@ -58,7 +58,7 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
             spyOn(@moduleEdit, 'loadEdit')
             spyOn(@moduleEdit, 'delegateEvents')
             spyOn($.fn, 'append')
-            spyOn($, 'getScript')
+            spyOn($, 'getScript').andReturn($.Deferred().resolve().promise())
 
             window.loadedXBlockResources = undefined
 
