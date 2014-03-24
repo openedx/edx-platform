@@ -72,7 +72,7 @@ class @HTMLEditingDescriptor
       data['src'] = rewriteStaticLinks(data['src'], @base_asset_url, '/static/')
 
   saveImage: (data) =>
-    # Called when the image plugin in saved. Input arg is the JSON version of the image data.
+    # Called when the image plugin is saved. Input arg is the JSON version of the image data.
     if data['src']
       data['src'] = rewriteStaticLinks(data['src'], '/static/', @base_asset_url)
 
@@ -82,12 +82,12 @@ class @HTMLEditingDescriptor
       data['href'] = rewriteStaticLinks(data['href'], @base_asset_url, '/static/')
 
   saveLink: (data) =>
-    # Called when the link plugin in saved. Input arg is the JSON version of the link data.
+    # Called when the link plugin is saved. Input arg is the JSON version of the link data.
     if data['href']
       data['href'] = rewriteStaticLinks(data['href'], '/static/', @base_asset_url)
 
   showCodeEditor: (codeEditor) =>
-    # Called when the CodeMirror Editor is displayed to convert links to show satic prefix.
+    # Called when the CodeMirror Editor is displayed to convert links to show static prefix.
     # The input argument is the CodeMirror instance.
     content = rewriteStaticLinks(codeEditor.getValue(), @base_asset_url, '/static/')
     codeEditor.setValue(content)
