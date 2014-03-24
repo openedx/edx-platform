@@ -804,9 +804,15 @@ class MatlabInput(CodeInput):
         # the graded response takes precedence
         if 'queue_msg' in self.input_state and self.status in ['queued', 'incomplete', 'unsubmitted']:
             attributes = bleach.ALLOWED_ATTRIBUTES.copy()
-            attributes.update({'*': ['class', 'style', 'id'], 'audio': ['controls', 'autobuffer', 'autoplay', 'src']})
+            # Yuck! but bleach does not offer the option of passing in allowed_protocols,
+            # and matlab uses data urls for images
+            if u'data' not in bleach.BleachSanitizer.allowed_protocols:
+                bleach.BleachSanitizer.allowed_protocols.append(u'data')
+            attributes.update({'*': ['class', 'style', 'id'],
+                    'audio': ['controls', 'autobuffer', 'autoplay', 'src'],
+                    'img': ['src', 'width', 'height', 'class']})
             self.queue_msg = bleach.clean(self.input_state['queue_msg'],
-                    tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre'],
+                    tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre', 'img'],
                     styles=['white-space'],
                     attributes=attributes
                     )
