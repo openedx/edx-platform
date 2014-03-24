@@ -81,16 +81,14 @@ def check_link_in_link_plugin(step, path):
 
 @step('type "(.*)" in the code editor and press OK$')
 def type_in_codemirror_plugin(step, text):
-    use_plugin(
-        '.mce-i-code',
+    use_code_editor(
         lambda: type_in_codemirror(0, text, CODEMIRROR_SELECTOR_PREFIX)
     )
 
 
 @step('and the code editor displays "(.*)"$')
 def verify_code_editor_text(step, text):
-    use_plugin(
-        '.mce-i-code',
+    use_code_editor(
         lambda: assert_equal(text, get_codemirror_value(0, CODEMIRROR_SELECTOR_PREFIX))
     )
 
@@ -98,8 +96,22 @@ def verify_code_editor_text(step, text):
 def use_plugin(button_class, action):
     # Click on plugin button
     world.css_click(button_class)
+    perform_action_in_plugin(action)
 
-    # Wait for the editing window to open.
+
+def use_code_editor(action):
+    # Click on plugin button
+    buttons = world.css_find('div.mce-widget>button')
+
+    code_editor = [button for button in buttons if button.text == 'HTML']
+    assert_equal(1, len(code_editor))
+    code_editor[0].click()
+
+    perform_action_in_plugin(action)
+
+
+def perform_action_in_plugin(action):
+     # Wait for the plugin window to open.
     world.wait_for_visible('.mce-window')
 
     # Trigger the action
@@ -147,13 +159,15 @@ def check_toolbar_buttons(step):
 
     buttons = world.css_find('.mce-ico')
 
+    # Note that the code editor icon is not present because we are now showing text instead of an icon.
+    # However, other test points user the code editor, so we have already verified its presence.
     expected_buttons = [
         'bold',
         'italic',
-        # This is our custom "code style" button, which uses an image instead of a class.
-        'none',
         'underline',
         'forecolor',
+        # This is our custom "code style" button, which uses an image instead of a class.
+        'none',
         'bullist',
         'numlist',
         'outdent',
@@ -161,8 +175,7 @@ def check_toolbar_buttons(step):
         'blockquote',
         'link',
         'unlink',
-        'image',
-        'code',
+        'image'
     ]
 
     assert_equal(len(expected_buttons), len(buttons))
