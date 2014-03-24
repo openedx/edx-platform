@@ -2,3 +2,4 @@
 
 -e git+https://github.com/edx-solutions/xblock-mentoring.git@c520ab407804eddcb7a8ce2e33a3179e6f6cbeae#egg=xblock-mentoring
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@72979958f491b7d0c544e150ddbb114c43276fe5#egg=xblock-image-explorer
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@d094379bbfc8c951b76ba62872f9807777fb586f#egg=xblock-drag-and-drop
