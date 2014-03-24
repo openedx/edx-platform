@@ -41,6 +41,11 @@ For references to edX1010 pages:
 
 To set text in a "Code format"
         ::
+-or-
+
+.. code-block:: xml
+
+(text in code-block:: xml is in different colors)
 
 To cross reference between sections of a document
 
@@ -54,6 +59,6 @@ To make the cross reference in text:
 
 External page reference
 
-        see `Create a Problem <Create_Problem.html>`_ 
+        see `Create a Problem <http://site.Create_Problem.html>`_ 
 
       
