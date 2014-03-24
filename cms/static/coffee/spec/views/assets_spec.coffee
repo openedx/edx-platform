@@ -236,6 +236,20 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                 create_sinon.respondWithJson(requests, @mockAssetsResponse)
                 return requests
 
+            it "should show a status indicator while loading", ->
+                appendSetFixtures('<div class="ui-loading"/>')
+                expect($('.ui-loading').is(':visible')).toBe(true)
+                setup.call(this)
+                expect($('.ui-loading').is(':visible')).toBe(false)
+
+            it "should hide the status indicator if an error occurs while loading", ->
+                requests = create_sinon.requests(this)
+                appendSetFixtures('<div class="ui-loading"/>')
+                expect($('.ui-loading').is(':visible')).toBe(true)
+                @view.setPage(0)
+                create_sinon.respondWithError(requests)
+                expect($('.ui-loading').is(':visible')).toBe(false)
+
             it "should render both assets", ->
                 requests = setup.call(this)
                 expect(@view.$el).toContainText("test asset 1")
