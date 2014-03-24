@@ -251,7 +251,7 @@ class CourseLocator(BlockLocatorBase, CourseKey):
             block_id=block_id
         )
 
-    def make_asset_key(self, path):
+    def make_asset_key(self, asset_type, path):
         raise NotImplementedError()
 
     def version_agnostic(self):

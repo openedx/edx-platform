@@ -35,7 +35,7 @@ class CourseKey(OpaqueKey):
         raise NotImplementedError()
 
     @abstractmethod
-    def make_asset_key(self, path):
+    def make_asset_key(self, asset_type, path):
         """
         Return an asset key, given the given the specified path.
 

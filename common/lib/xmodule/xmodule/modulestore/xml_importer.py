@@ -64,7 +64,7 @@ def import_static_content(
             fullname_with_subpath = content_path.replace(static_dir, '')
             if fullname_with_subpath.startswith('/'):
                 fullname_with_subpath = fullname_with_subpath[1:]
-            asset_key = target_course_id.make_asset_key(fullname_with_subpath)
+            asset_key = target_course_id.make_asset_key('asset', fullname_with_subpath)
 
             policy_ele = policy.get(asset_key.path, {})
             displayname = policy_ele.get('displayname', filename)
