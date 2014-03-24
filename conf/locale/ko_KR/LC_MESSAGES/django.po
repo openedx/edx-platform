@@ -32,6 +32,7 @@
 # Translators:
 # blindrenderer, 2014
 # jdpark7 <jdpark7@gmail.com>, 2013
+# chans <kcsgoodboy@gmail.com>, 2014
 # SunahLim <whitetree70@snu.ac.kr>, 2013
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -47,13 +48,14 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# chans <kcsgoodboy@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-15 15:05-0400\n"
-"PO-Revision-Date: 2014-02-24 17:06+0000\n"
-"Last-Translator: nedbat <ned@edx.org>\n"
+"POT-Creation-Date: 2014-03-24 10:06-0400\n"
+"PO-Revision-Date: 2014-03-19 02:33+0000\n"
+"Last-Translator: chans <kcsgoodboy@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -62,48 +64,13 @@ msgstr ""
 "Language: ko_KR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#. Translators: "Open Ended Panel" appears on a tab that, when clicked,
-#. opens up a panel that displays information about openended problems
-#. that a user has submitted or needs to grade
-#: cms/djangoapps/contentstore/utils.py lms/djangoapps/courseware/tabs.py
+#. Translators: "Open Ended Panel" appears on a tab that, when clicked, opens
+#. up a panel that
+#. displays information about open-ended problems that a user has submitted or
+#. needs to grade
+#: cms/djangoapps/contentstore/utils.py common/lib/xmodule/xmodule/tabs.py
 msgid "Open Ended Panel"
 msgstr ""
-
-#: lms/templates/courseware/courseware-error.html
-msgid "Courseware"
-msgstr "강좌물"
-
-#. Translators: "Course Info" is the name of the course's information and
-#. updates page
-#. Translators: "Course Info" is the name of the course's information and
-#. updates page
-#: cms/djangoapps/contentstore/views/tabs.py
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Course Info"
-msgstr ""
-
-#. Translators: "Discussion" is the title of the course forum page
-#. Translators: "Discussion" is the title of the course forum page
-#. Translators: 'Discussion' refers to the tab in the courseware
-#. that leads to the discussion forums
-#: cms/djangoapps/contentstore/views/tabs.py
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/djangoapps/courseware/tabs.py
-msgid "Discussion"
-msgstr ""
-
-#. Translators: "Wiki" is the title of the course's wiki page
-#. Translators: "Wiki" is the title of the course's wiki page
-#: cms/djangoapps/contentstore/views/tabs.py
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/djangoapps/course_wiki/views.py lms/templates/wiki/base.html
-msgid "Wiki"
-msgstr ""
-
-#: lms/templates/peer_grading/peer_grading.html
-msgid "Progress"
-msgstr "진도"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -133,9 +100,9 @@ msgstr ""
 msgid "Moderator"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: common/djangoapps/django_comment_common/models.py
 msgid "Community TA"
-msgstr "커뮤니티 조교"
+msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Student"
@@ -799,6 +766,26 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "correct"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "incorrect"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "incomplete"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "unanswered"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "queued"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
 msgid ""
 "Your file(s) have been submitted. As soon as your submission is graded, this"
 " message will be replaced with the grader's feedback."
@@ -1006,6 +993,56 @@ msgstr ""
 #. does not yet have an announced start date.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "TBD"
+msgstr ""
+
+#: lms/templates/courseware/courseware-error.html
+msgid "Courseware"
+msgstr "강좌물"
+
+#. Translators: "Course Info" is the name of the course's information and
+#. updates page
+#: common/lib/xmodule/xmodule/tabs.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Course Info"
+msgstr ""
+
+#: lms/templates/peer_grading/peer_grading.html
+msgid "Progress"
+msgstr "진도"
+
+#. Translators: "Wiki" is the name of the course's wiki page
+#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/course_wiki/views.py
+#: lms/templates/wiki/base.html
+msgid "Wiki"
+msgstr ""
+
+#. Translators: "Discussion" is the title of the course forum page
+#. Translators: 'Discussion' refers to the tab in the courseware that leads to
+#. the discussion forums
+#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
+msgid "Discussion"
+msgstr ""
+
+#: lms/templates/instructor/staff_grading.html
+msgid "Staff grading"
+msgstr "담당 직원 채점"
+
+#. Translators: "Peer grading" appears on a tab that allows
+#. students to view open-ended problems that require grading
+#: common/lib/xmodule/xmodule/tabs.py
+msgid "Peer grading"
+msgstr ""
+
+#: lms/templates/courseware/syllabus.html
+msgid "Syllabus"
+msgstr "강의 계획서"
+
+#. Translators: 'Instructor' appears on the tab that leads to the instructor
+#. dashboard, which is
+#. a portal where an instructor can get data and perform various actions on
+#. their course
+#: common/lib/xmodule/xmodule/tabs.py
+msgid "Instructor"
 msgstr ""
 
 #. Translators: "Self" is used to denote an openended response that is self-
@@ -1295,33 +1332,6 @@ msgstr ""
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
-msgstr ""
-
-#. Translators: 'Course Content' refers to the tab in the courseware
-#. that leads to the content of a course
-#: lms/djangoapps/courseware/tabs.py
-msgid "Course Content"
-msgstr ""
-
-#: lms/templates/instructor/staff_grading.html
-msgid "Staff grading"
-msgstr "담당 직원 채점"
-
-#: lms/templates/courseware/syllabus.html
-msgid "Syllabus"
-msgstr "강의 계획서"
-
-#. Translators: "Peer grading" appears on a tab that allows
-#. students to view openended problems that require grading
-#: lms/djangoapps/courseware/tabs.py
-msgid "Peer grading"
-msgstr ""
-
-#. Translators: 'Instructor' appears on the tab that leads to
-#. the instructor dashboard, which is a portal where an instructor
-#. can get data and perform various actions on their course
-#: lms/djangoapps/courseware/tabs.py
-msgid "Instructor"
 msgstr ""
 
 #: lms/templates/video.html
@@ -1666,6 +1676,53 @@ msgid "Task is already running."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Username"
+msgstr ""
+
+#: lms/templates/help_modal.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+msgid "Name"
+msgstr "이름"
+
+#: lms/templates/dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/university_profile/edge.html
+msgid "Email"
+msgstr "이메일"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Language"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Location"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Birth Year"
+msgstr ""
+
+#: lms/templates/register.html lms/templates/signup_modal.html
+msgid "Gender"
+msgstr "성(생물학적)"
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Level of Education"
+msgstr "교육 수준"
+
+#: lms/templates/register.html
+msgid "Mailing Address"
+msgstr "주소"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Goals"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 #: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "Complete"
 msgstr ""
@@ -1711,28 +1768,238 @@ msgstr ""
 msgid "Data Download"
 msgstr "데이터 다운로드"
 
-#: lms/templates/dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/university_profile/edge.html
-msgid "Email"
-msgstr "이메일"
-
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
 msgstr "분석"
 
-#: lms/djangoapps/instructor/views/tools.py
-msgid "Unable to parse date: "
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Course Statistics At A Glance"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/tools.py
-msgid "Couldn't find module for url: {0}"
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Found a single student.  "
 msgstr ""
 
-#: lms/djangoapps/instructor/views/tools.py
-msgid "Username"
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Couldn't find student with that email or username."
 msgstr ""
 
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "List of students enrolled in {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Summary Grades of students enrolled in {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Raw Grades of students enrolled in {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to create a background task for rescoring \"{0}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Failed to create a background task for rescoring \"{0}\": problem not found."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to create a background task for rescoring \"{url}\": {message}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to create a background task for resetting \"{0}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Failed to create a background task for resetting \"{0}\": problem not found."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to create a background task for resetting \"{url}\": {message}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Found module.  "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Couldn't find module with that urlname: {url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Deleted student module state for {state}!"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to delete module state for {id}/{url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Module state successfully reset!"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Couldn't reset module state for {id}/{url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Failed to create a background task for rescoring \"{key}\" for student {id}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to create a background task for rescoring \"{key}\": {id}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Progress page for username: {username} with email address: {email}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Assignment Name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Please enter an assignment name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Invalid assignment name '{name}'"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "External email"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Grades for assignment \"{name}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "List of Staff"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "List of Instructors"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Student profile data for course {course_id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Found {num} records to dump."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Couldn't find module with that urlname."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Student state for problem {problem}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "List of Beta Testers"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Your email was successfully queued for sending. Please note that for large "
+"classes, it may take up to an hour (or more, if other courses are "
+"simultaneously sending email) to send all emails."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Your email was successfully queued for sending."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Grades from {course_id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "No remote gradebook defined in course metadata"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "No remote gradebook url defined in settings.FEATURES"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "No gradebook name defined in course remote_gradebook metadata"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to communicate with gradebook server at {url}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Error: {err}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Remote gradebook response for {action}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Full name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Roles"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "List of Forum {name}s in course {id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Error: unknown rolename \"{0}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Error: unknown username \"{0}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Error: user \"{0}\" does not have rolename \"{1}\", cannot remove"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Removed \"{0}\" from \"{1}\" forum role = \"{2}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Error: user \"{0}\" already has rolename \"{1}\", cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Error: user \"{0}\" should first be added as staff before adding as a forum "
+"administrator, cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Added \"{0}\" to \"{1}\" forum role = \"{2}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "{0} in course {1}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "ID"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
 #: lms/templates/dashboard.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/register.html
@@ -1740,6 +2007,38 @@ msgstr ""
 #: lms/templates/verify_student/_modal_editname.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Full Name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "edX email"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Enrollment of students"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Un-enrollment of students"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Failed to find any background tasks for course \"{course}\", module "
+"\"{problem}\" and student \"{student}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Failed to find any background tasks for course \"{course}\" and module "
+"\"{problem}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Unable to parse date: "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Couldn't find module for url: {0}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
@@ -1935,6 +2234,13 @@ msgstr ""
 msgid ""
 "Could not contact the external grading server. Please contact the "
 "development team at {email}."
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/staff_grading_service.py
+msgid ""
+"Cannot find any open response problems in this course. Have you submitted "
+"answers to any open response assessment questions? If not, please do so and "
+"return to this page."
 msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
@@ -2771,12 +3077,12 @@ msgstr ""
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/forgot_password_modal.html
 #: lms/templates/help_modal.html lms/templates/help_modal.html
-#: lms/templates/help_modal.html lms/templates/login_modal.html
-#: lms/templates/signup_modal.html
+#: lms/templates/help_modal.html lms/templates/signup_modal.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/modal/_modal-settings-language.html
+#: lms/templates/modal/accessible_confirm.html
 msgid "Close"
 msgstr "닫기"
 
@@ -3176,6 +3482,12 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
+"Special characters not allowed in organization, course number, and course "
+"run."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid ""
 "Unable to create course '{name}'.\n"
 "\n"
 "{err}"
@@ -3373,14 +3685,14 @@ msgid "Pending"
 msgstr ""
 
 #: cms/templates/login.html lms/templates/login.html
-#: lms/templates/login_modal.html lms/templates/university_profile/edge.html
+#: lms/templates/university_profile/edge.html
 msgid "Forgot password?"
 msgstr ""
 
 #: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/login_modal.html
-#: lms/templates/provider_login.html lms/templates/provider_login.html
-#: lms/templates/register.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/login.html lms/templates/provider_login.html
+#: lms/templates/provider_login.html lms/templates/register.html
+#: lms/templates/sysadmin_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Password"
 msgstr ""
@@ -4075,15 +4387,10 @@ msgid ""
 " be in English."
 msgstr ""
 
-#: lms/templates/help_modal.html
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Name"
-msgstr "이름"
-
 #: lms/templates/help_modal.html lms/templates/login.html
-#: lms/templates/login_modal.html lms/templates/provider_login.html
-#: lms/templates/provider_login.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/register.html
+#: lms/templates/provider_login.html lms/templates/provider_login.html
+#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register.html
 msgid "E-mail"
 msgstr "이메일"
 
@@ -4267,7 +4574,7 @@ msgstr " {platform_name} 계정에 로그인 하십시요."
 msgid "Log into My {platform_name} Account"
 msgstr "내  {platform_name} 계정에 로그인"
 
-#: lms/templates/login.html lms/templates/login_modal.html
+#: lms/templates/login.html
 msgid "Access My Courses"
 msgstr "내 강좌 접근"
 
@@ -4313,26 +4620,9 @@ msgstr "예: username@domain.com"
 msgid "Account Preferences"
 msgstr "계정 선호사항 설정"
 
-#: lms/templates/login.html lms/templates/login_modal.html
+#: lms/templates/login.html
 msgid "Remember me"
 msgstr "내 로그인 정보 기억"
-
-#: lms/templates/login_modal.html lms/templates/provider_login.html
-#: lms/templates/university_profile/edge.html
-msgid "Log In"
-msgstr "로그인"
-
-#: lms/templates/login_modal.html
-msgid "Not enrolled?"
-msgstr "등록 안 하였나요?"
-
-#: lms/templates/login_modal.html
-msgid "Sign up."
-msgstr "등록하세요."
-
-#: lms/templates/login_modal.html
-msgid "login via openid"
-msgstr "오픈아이디로 로그인"
 
 #: lms/templates/lti.html
 msgid "External resource"
@@ -4438,7 +4728,7 @@ msgstr "확인"
 msgid "[Reject]"
 msgstr "[거절]"
 
-#: lms/templates/navigation.html lms/templates/navigation.html
+#: lms/templates/navigation.html
 msgid "Global Navigation"
 msgstr "전역 찾아가기"
 
@@ -4500,16 +4790,21 @@ msgid "Reset"
 msgstr "재설정"
 
 #: lms/templates/problem.html
-msgid "Show Answer(s)"
-msgstr "답(들) 보기"
+msgid "Show Answer"
+msgstr ""
 
 #: lms/templates/problem.html
-msgid "(for question(s) above - adjacent to each field)"
-msgstr "(위에 있는 질문(들)에 대해 - 각 항목 근처에)"
+msgid "Reveal Answer"
+msgstr ""
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
 msgstr "{num_total} 제출중에서 {num_used} 를 사용하였습니다."
+
+#: lms/templates/provider_login.html
+#: lms/templates/university_profile/edge.html
+msgid "Log In"
+msgstr "로그인"
 
 #: lms/templates/provider_login.html
 msgid ""
@@ -4711,18 +5006,10 @@ msgstr ""
 msgid "Highest Level of Education Completed"
 msgstr "최종 학력"
 
-#: lms/templates/register.html lms/templates/signup_modal.html
-msgid "Gender"
-msgstr "성(생물학적)"
-
 #: lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Year of Birth"
 msgstr "생년"
-
-#: lms/templates/register.html
-msgid "Mailing Address"
-msgstr "주소"
 
 #: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
@@ -5178,10 +5465,6 @@ msgid "Skip to end of transcript."
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Captions"
-msgstr ""
-
-#: lms/templates/video.html
 msgid ""
 "Activating an item in this group will spool the video to the corresponding "
 "time point. To skip transcript, go to previous item."
@@ -5465,6 +5748,12 @@ msgstr "선수요건"
 msgid "Additional Resources"
 msgstr "추가 자원"
 
+#. Translators: 'needs attention' is an alternative string for the
+#. notification image that indicates the tab "needs attention".
+#: lms/templates/courseware/course_navigation.html
+msgid "needs attention"
+msgstr ""
+
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/course_navigation.html
 msgid "Staff view"
@@ -5596,6 +5885,13 @@ msgstr ""
 msgid "Calculator Output Field"
 msgstr ""
 
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible. Please email us at {link_to_support_email} to "
+"report any problems or downtime."
+msgstr ""
+
 #: lms/templates/courseware/grade_summary.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade summary"
@@ -5619,19 +5915,14 @@ msgid "{course_number} Course Info"
 msgstr ""
 
 #: lms/templates/courseware/info.html lms/templates/courseware/info.html
-#: lms/templates/courseware/welcome-back.html
-#: lms/templates/courseware/welcome-back.html
 msgid "Course Updates &amp; News"
 msgstr "강좌 업데이트 &amp; 새소식"
 
 #: lms/templates/courseware/info.html
-#: lms/templates/courseware/welcome-back.html
-#: lms/templates/courseware/welcome-back.html
 msgid "Handout Navigation"
 msgstr "유인물 찾아가기"
 
 #: lms/templates/courseware/info.html
-#: lms/templates/courseware/welcome-back.html
 msgid "Course Handouts"
 msgstr "강좌 유인물"
 
@@ -5844,7 +6135,6 @@ msgid ""
 msgstr "한 명 혹은 여러 학생을 등록하거나 등록취소 : 이메일을  새 줄 혹은 콤마로 구분하여 입력;"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Notify students by email"
 msgstr "학생들에게 이메일로 통지"
 
@@ -6887,10 +7177,6 @@ msgstr "문제 목록 로딩 ..."
 msgid "Gender Distribution"
 msgstr "성별 분포"
 
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Level of Education"
-msgstr "교육 수준"
-
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
 msgstr ""
@@ -7125,12 +7411,20 @@ msgid "section_display_name"
 msgstr "섹션_표시_이름"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Enter student emails separated by new lines or commas."
-msgstr "학생들의 이메일을 새로운 줄이나 콤마로 분리하여 입력하세요."
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Enter email addresses separated by new lines or commas."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Student Emails"
-msgstr "학생 이메일"
+msgid ""
+"You will not get notification for emails that bounce, so please double-check"
+" spelling."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Email Addresses"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Auto Enroll"
@@ -7138,20 +7432,26 @@ msgstr "자동 등록"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If auto enroll is <em>checked</em>, students who have not yet registered for"
-" edX will be automatically enrolled."
-msgstr "자동 등록이 <em>체크</em> 되어 있으면,  edX에 등록되지 않은 학생들은 자동으로 등록될 것입니다."
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid ""
-"If auto enroll is left <em>unchecked</em>, students who have not yet "
-"registered for edX will not be enrolled, but will be allowed to enroll."
+"If this option is <em>checked</em>, users who have not yet registered for "
+"{platform_name} will be automatically enrolled."
 msgstr ""
-"자동 등록이 <em>체크</em> 되어 있지 않으면,  edX에 등록되지 않은 학생들은 등록되지 않지만, 등록이 허용될 것입니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If email students is <em>checked</em> students will receive an email "
+"If this option is left <em>unchecked</em>, users who have not yet registered"
+" for {platform_name} will not be enrolled, but will be allowed to enroll "
+"once they make an account."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Notify users by email"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"If this option is <em>checked</em>, users will receive an email "
 "notification."
 msgstr ""
 
@@ -7164,8 +7464,35 @@ msgid "Unenroll"
 msgstr "등록취소"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Batch Beta Testers"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Note: Users must have an activated {platform_name} account before they can "
+"be enrolled as a beta tester."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add beta testers"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Remove beta testers"
+msgstr ""
+
+#. Translators: an "Administration List" is a list, such as Course Staff, that
+#. users can be added to.
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Administration List Management"
 msgstr "관리 목록 관리"
+
+#. Translators: an "Administrator Group" is a group, such as Course Staff,
+#. that
+#. users can be added to.
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Select an Administrator Group:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Getting available lists..."
@@ -7224,8 +7551,8 @@ msgstr ""
 "없습니다."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Beta Tester"
-msgstr "베타 테스터"
+msgid "Add Beta Tester"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Admins"
@@ -7239,7 +7566,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Discussion Admin"
+msgid "Add Discussion Admin"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7270,6 +7597,10 @@ msgid ""
 "from all cohorts. Their posts are marked 'Community TA'."
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Community TA"
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
 msgstr ""
@@ -7281,6 +7612,10 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Message:"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -7420,12 +7755,6 @@ msgid ""
 "Don't see your preferred language? {link_start}Volunteer to become a "
 "translator!{link_end}"
 msgstr ""
-
-#. Translators: this is a control to allow users to exit out of this modal
-#. interface (a menu or piece of UI that takes the full focus of the screen)
-#: lms/templates/modal/accessible_confirm.html
-msgid "Close Modal"
-msgstr "모달 닫기"
 
 #. Translators: this text gives status on if the modal interface (a menu or
 #. piece of UI that takes the full focus of the screen) is open or not
@@ -9202,9 +9531,11 @@ msgid ""
 "respond to student questions. You add or edit updates in HTML."
 msgstr ""
 
-#: cms/templates/edit-tabs.html cms/templates/export.html
-#: cms/templates/widgets/header.html
-msgid "Static Pages"
+#. Translators: Pages refer to the tabs that appear in the top navigation of
+#. each course.
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
+#: cms/templates/export.html cms/templates/widgets/header.html
+msgid "Pages"
 msgstr ""
 
 #: cms/templates/edit-tabs.html
@@ -9212,33 +9543,78 @@ msgid "New Page"
 msgstr ""
 
 #: cms/templates/edit-tabs.html
-msgid ""
-"Use Static Pages to share a syllabus, a calendar, handouts, or other "
-"supplements to your courseware."
+msgid "Show this page"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Show/hide page"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Cannot be reordered"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Fixed page"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "You can add additional custom pages to your course."
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Add a New Page"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "What are pages?"
 msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"NOTE: all content on Static Pages will be visible to anyone who knows the "
-"URL, regardless of whether they are registered in the course or not."
+"Pages are listed horizontally at the top of your course. Default pages "
+"(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
+"textbooks and custom pages that you create."
 msgstr ""
 
 #: cms/templates/edit-tabs.html
-msgid "What do static pages look like in my course?"
-msgstr ""
-
-#: cms/templates/edit-tabs.html
-msgid "Static Pages in Your Course"
-msgstr ""
-
-#: cms/templates/edit-tabs.html
-msgid "Preview of Static Pages in your course"
+msgid "Custom pages"
 msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"The names of your Static Pages appear in your course's main navigation bar, "
-"along with Courseware, Course Info, Discussion, Wiki, and Progress."
+"You can create and edit custom pages to provide students with additional "
+"course content. For example, you can create pages for the grading policy, "
+"course slides, and a course calendar. "
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "How do pages look to students in my course?"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid ""
+"Students see the default and custom pages at the top of your course and use "
+"these links to navigate."
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "See an example"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Pages in Your Course"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Preview of Pages in your course"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid ""
+"Pages appear in your course's top navigation bar. The default pages "
+"(Courseware, Course Info, Discussion, Wiki, and Progress) are followed by "
+"textbooks and custom pages."
 msgstr ""
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
