@@ -35,6 +35,7 @@ from track import contexts
 from track.views import server_track
 from eventtracking import tracker
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -498,9 +499,10 @@ class CourseEnrollment(models.Model):
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
+            assert(isinstance(self.course_id, SlashSeparatedCourseKey))
             data = {
                 'user_id': self.user.id,
-                'course_id': self.course_id,
+                'course_id': self.course_id.to_deprecated_string(),
                 'mode': self.mode,
             }
 

@@ -22,7 +22,7 @@ class TestAnalyticsBasic(TestCase):
 
     def test_enrolled_students_features_username(self):
         self.assertIn('username', AVAILABLE_FEATURES)
-        userreports = enrolled_students_features(self.course_id, ['username'])
+        userreports = enrolled_students_features(self.course_key, ['username'])
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
             self.assertEqual(userreport.keys(), ['username'])
@@ -32,7 +32,7 @@ class TestAnalyticsBasic(TestCase):
         query_features = ('username', 'name', 'email')
         for feature in query_features:
             self.assertIn(feature, AVAILABLE_FEATURES)
-        userreports = enrolled_students_features(self.course_id, query_features)
+        userreports = enrolled_students_features(self.course_key, query_features)
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
             self.assertEqual(set(userreport.keys()), set(query_features))
