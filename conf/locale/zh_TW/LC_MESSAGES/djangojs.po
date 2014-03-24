@@ -28,9 +28,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-15 15:04-0400\n"
-"PO-Revision-Date: 2014-02-24 17:06+0000\n"
-"Last-Translator: JoeyChiou <Joeyc0916@gmail.com>\n"
+"POT-Creation-Date: 2014-03-24 10:06-0400\n"
+"PO-Revision-Date: 2014-03-24 14:25+0000\n"
+"Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -97,16 +97,30 @@ msgid "(%(num_points)s point possible)"
 msgid_plural "(%(num_points)s points possible)"
 msgstr[0] ""
 
-#. Translators: the word Answer here refers to the answer to a problem the
-#. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Hide Answer(s)"
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Answer:"
 msgstr ""
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Show Answer(s)"
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Hide Answer"
+msgstr ""
+
+#. Translators: the word Answer here refers to the answer to a problem the
+#. student must solve.;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Show Answer"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Reveal Answer"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Answer hidden"
 msgstr ""
 
 #. Translators: the word unanswered here is about answering a problem the
@@ -736,6 +750,26 @@ msgstr ""
 msgid "Post body"
 msgstr ""
 
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+msgid "Error fetching distribution."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+msgid "Unavailable metric display."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+msgid "Error fetching grade distributions."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+msgid "<%= num_students %> students scored."
+msgstr ""
+
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Loading..."
 msgstr ""
@@ -763,6 +797,23 @@ msgid ""
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Username"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Email"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Revoke access"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Enter username or email"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
 msgstr ""
 
@@ -777,59 +828,97 @@ msgid "Error changing user's permissions."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Error enrolling/unenrolling students."
+msgid "Error adding/removing users as beta testers."
 msgstr ""
 
+#. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Successfully enrolled and sent email to the following students:"
+msgid "These users were successfully added as beta testers:"
 msgstr ""
 
-#. Translators: A list of students appears after this sentence.;
+#. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Successfully enrolled the following students:"
+msgid "These users were successfully removed as beta testers:"
 msgstr ""
 
-#. Translators: A list of students appears after this sentence.;
+#. Translators: A list of users appears after this sentence;
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "These users were not added as beta testers:"
+msgstr ""
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "These users were not removed as beta testers:"
+msgstr ""
+
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following students. They will be "
+"Users must create and activate their account before they can be promoted to "
+"beta tester."
+msgstr ""
+
+#. Translators: A list of email addresses appears after this sentence;
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Could not find users associated with the following email addresses:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error enrolling/unenrolling users."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "The following email addresses are invalid:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Successfully enrolled and sent email to the following users:"
+msgstr ""
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Successfully enrolled the following users:"
+msgstr ""
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid ""
+"Successfully sent enrollment emails to the following users. They will be "
 "allowed to enroll once they register:"
 msgstr ""
 
-#. Translators: A list of students appears after this sentence.;
+#. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "These students will be allowed to enroll once they register:"
+msgid "These users will be allowed to enroll once they register:"
 msgstr ""
 
-#. Translators: A list of students appears after this sentence.;
+#. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following students. They will be "
+"Successfully sent enrollment emails to the following users. They will be "
 "enrolled once they register:"
 msgstr ""
 
-#. Translators: A list of students appears after this sentence.;
+#. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "These students will be enrolled once they register:"
+msgid "These users will be enrolled once they register:"
 msgstr ""
 
-#. Translators: A list of students appears after this sentence.;
+#. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
-"Emails successfully sent. The following students are no longer enrolled in "
-"the course:"
+"Emails successfully sent. The following users are no longer enrolled in the "
+"course:"
 msgstr ""
 
-#. Translators: A list of students appears after this sentence.;
+#. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "The following students are no longer enrolled in the course:"
+msgid "The following users are no longer enrolled in the course:"
 msgstr ""
 
-#. Translators: A list of students appears after this sentence.;
+#. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
-"These students were not affliliated with the course so could not be "
-"unenrolled:"
+"These users were not affiliated with the course so could not be unenrolled:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
@@ -845,17 +934,21 @@ msgid "Your email was successfully queued for sending."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
-msgid "yourself"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-msgid "everyone who is staff or instructor on this course"
+msgid ""
+"You are about to send an email titled '<%= subject %>' to yourself. Is this "
+"OK?"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
-"ALL (everyone who is enrolled in this course as student, staff, or "
-"instructor)"
+"You are about to send an email titled '<%= subject %>' to everyone who is "
+"staff or instructor on this course. Is this OK?"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid ""
+"You are about to send an email titled '<%= subject %>' to ALL (everyone who "
+"is enrolled in this course as student, staff, or instructor). Is this OK?"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
@@ -863,10 +956,6 @@ msgid ""
 "Your email was successfully queued for sending. Please note that for large "
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-msgid "You are about to send an email titled \""
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
@@ -990,6 +1079,60 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Error listing task history for this student and problem."
+msgstr ""
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Task Type"
+msgstr ""
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Task inputs"
+msgstr ""
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Task ID"
+msgstr ""
+
+#. Translators: a "Requester" is a username that requested a task such as
+#. sending email
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Requester"
+msgstr ""
+
+#. Translators: A timestamp of when a task (eg, sending email) was submitted
+#. appears after this
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Submitted"
+msgstr ""
+
+#. Translators: The length of a task (eg, sending email) in seconds appears
+#. this
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Duration (sec)"
+msgstr ""
+
+#. Translators: The state (eg, "In progress") of a task (eg, sending email)
+#. appears after this.
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "State"
+msgstr ""
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Task Status"
+msgstr ""
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Task Progress"
 msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
@@ -1243,6 +1386,10 @@ msgstr ""
 
 #: cms/static/js/index.js
 msgid "Please do not use any spaces in this field."
+msgstr ""
+
+#: cms/static/js/index.js
+msgid "Please do not use any spaces or special characters in this field."
 msgstr ""
 
 #: cms/static/js/index.js
