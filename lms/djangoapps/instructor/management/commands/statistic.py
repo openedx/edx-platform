@@ -343,7 +343,8 @@ def fullstat(request = None):
                 datarow += [user.email]
 
                 courseenrollment = user.courseenrollment_set.filter(course_id = course_id)[0]
-                courseenrollment.created.strftime('%d/%m/%Y')
+
+                datarow += [courseenrollment.created.strftime('%d/%m/%Y')]
                 
                 #Raw statistic by problems
                 statprob = edxdata[course.id][user.email]["prob_info"]
