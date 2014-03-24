@@ -830,7 +830,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
     def create_course(
         self, org, offering, user_id, fields=None,
         master_branch='draft', versions_dict=None, root_category='course',
-        root_block_id='course', **kwargs,
+        root_block_id='course', **kwargs
     ):
         """
         Create a new entry in the active courses index which points to an existing or new structure. Returns
