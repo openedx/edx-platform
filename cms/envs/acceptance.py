@@ -119,5 +119,6 @@ except ImportError:
     pass
 
 # Point the URL used to test YouTube availability to our stub YouTube server
-YOUTUBE_TEST_URL = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
-YOUTUBE_API['url'] = "http://127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
+YOUTUBE['API'] = 'youtube.com/iframe_api'
+YOUTUBE['TEST_URL'] = "127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
+YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)

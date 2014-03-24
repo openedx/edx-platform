@@ -325,7 +325,8 @@ class VideoModule(VideoFields, XModule):
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
             'yt_test_timeout': 1500,
-            'yt_test_url': settings.YOUTUBE_TEST_URL,
+            'yt_api_url': settings.YOUTUBE['API'],
+            'yt_test_url': settings.YOUTUBE['TEST_URL'],
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.descriptor.fields['transcript_download_format'].values,
             'transcript_language': transcript_language,

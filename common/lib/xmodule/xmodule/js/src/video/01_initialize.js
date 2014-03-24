@@ -156,7 +156,7 @@ function (VideoPlayer, VideoStorage) {
             _reportToServer(state, state.youtubeApiAvailable);
         }, state.config.ytTestTimeout);
 
-        $.getScript(document.location.protocol + '//www.youtube.com/iframe_api');
+        $.getScript(document.location.protocol + '//' + state.config.ytApiUrl);
     }
 
     function _reportToServer(state, youtubeIsAvailable) {
@@ -704,7 +704,7 @@ function (VideoPlayer, VideoStorage) {
         }
         successHandler = ($.isFunction(callback)) ? callback : null;
         xhr = $.ajax({
-            url: this.config.ytTestUrl + url + '?v=2&alt=jsonc',
+            url: document.location.protocol + '//'  + this.config.ytTestUrl + url + '?v=2&alt=jsonc',
             dataType: 'jsonp',
             timeout: this.config.ytTestTimeout,
             success: successHandler
