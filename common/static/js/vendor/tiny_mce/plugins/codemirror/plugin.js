@@ -38,9 +38,11 @@ tinymce.PluginManager.add('codemirror', function(editor, url) {
 	};
 
 	// Add a button to the button bar
+    // EDX changed to show "HTML" on toolbar button
 	editor.addButton('code', {
 		title: 'Edit HTML',
-		icon: 'code',
+        text: 'HTML',
+		icon: false,
 		onclick: showSourceEditor
 	});
 
