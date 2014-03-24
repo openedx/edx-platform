@@ -35,6 +35,16 @@ class Command(BaseCommand):
                     dest='username',
                     default=False,
                     help='The username or email address for whom grading and certification should be requested'),
+        make_option('-G', '--grade',
+                    metavar='GRADE',
+                    dest='grade_value',
+                    default=None,
+                    help='The grade string, such as "Distinction", which should be passed to the certificate agent'),
+        make_option('-T', '--template',
+                    metavar='TEMPLATE',
+                    dest='template_file',
+                    default=None,
+                    help='The template file used to render this certificate, like "QMSE01-distinction.pdf"'),
     )
 
     def handle(self, *args, **options):
@@ -59,7 +69,9 @@ class Command(BaseCommand):
             xq = XQueueCertInterface()
             if options['insecure']:
                 xq.use_https = False
-            ret = xq.regen_cert(student, course_id, course=course)
+            ret = xq.regen_cert(student, course_id, course=course, 
+                                forced_grade=options['grade_value'], 
+                                template_file=options['template_file'])
             print '{0} - {1}'.format(student, ret)
         else:
             print "noop option given, skipping work queueing..."

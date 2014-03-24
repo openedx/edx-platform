@@ -5,6 +5,15 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Support for viewing built-in tabs on the Pages page. STUD-1193
+
+Blades: Fixed bug when image mapped input's Show Answer multiplies rectangles on
+ many inputtypes. BLD-810.
+
+Studio and LMS: Upgrade version of TinyMCE to 4.0.16. Switch from tabbed Visual/HTML
+Editor for HTML modules to showing the code editor as a plugin within TinyMCE (triggered
+from toolbar). STUD-1422
+
 LMS: Enabled screen reader feedback of problem responses.
   LMS-2158
 

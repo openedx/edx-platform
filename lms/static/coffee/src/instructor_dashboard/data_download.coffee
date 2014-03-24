@@ -45,7 +45,7 @@ class DataDownload
     # this handler binds to both the download
     # and the csv button
     @$list_studs_csv_btn.click (e) =>
-      url = @$list_studs_btn.data 'endpoint'
+      url = @$list_studs_csv_btn.data 'endpoint'
       # handle csv special case
       # redirect the document to the csv file.
       url += '/csv'
@@ -75,7 +75,7 @@ class DataDownload
             forceFitColumns: true
             rowHeight: 35
 
-          columns = ({id: feature, field: feature, name: feature} for feature in data.queried_features)
+          columns = ({id: feature, field: feature, name: data.feature_names[feature]} for feature in data.queried_features)
           grid_data = data.students
 
           $table_placeholder = $ '<div/>', class: 'slickgrid'

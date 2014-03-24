@@ -1257,7 +1257,7 @@ def grade_summary(request, course_id):
     """Display the grade summary for a course."""
     course = get_course_with_access(request.user, course_id, 'staff')
 
-    # For now, just a static page
+    # For now, just a page
     context = {'course': course,
                'staff_access': True, }
     return render_to_response('courseware/grade_summary.html', context)

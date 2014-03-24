@@ -168,6 +168,8 @@ ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
 for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
 
+WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
+
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
                             syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
@@ -191,6 +193,14 @@ if FEATURES.get('AUTH_USE_CAS'):
     )
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+    CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
+    if CAS_ATTRIBUTE_CALLBACK:
+        import importlib
+        CAS_USER_DETAILS_RESOLVER = getattr(
+            importlib.import_module(CAS_ATTRIBUTE_CALLBACK['module']),
+            CAS_ATTRIBUTE_CALLBACK['function']
+        )
+
 
 ################ SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.

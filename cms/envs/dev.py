@@ -8,6 +8,9 @@ This config file runs the simplest dev environment"""
 from .common import *
 from logsettings import get_logger_config
 
+# import settings from LMS for consistent behavior with CMS
+from lms.envs.dev import (WIKI_ENABLED)
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",

@@ -34,7 +34,7 @@ class ProfileDistributionWidget
     @reset_display()
 
     @get_profile_distributions @feature,
-      error: std_ajax_err => @show_error "Error fetching distribution."
+      error: std_ajax_err => @show_error gettext("Error fetching distribution.")
       success: (data) =>
         feature_res = data.feature_results
         if feature_res.type is 'EASY_CHOICE'
@@ -74,7 +74,7 @@ class ProfileDistributionWidget
           ]
         else
           console.warn("unable to show distribution #{feature_res.type}")
-          @show_error 'Unavailable metric display.'
+          @show_error gettext('Unavailable metric display.')
 
   # fetch distribution data from server.
   # `handler` can be either a callback for success
@@ -110,9 +110,11 @@ class GradeDistributionDisplay
 
   load: ->
     @get_grade_distributions
-      error: std_ajax_err => @show_error "Error fetching grade distributions."
+      error: std_ajax_err => @show_error gettext("Error fetching grade distributions.")
       success: (data) =>
-        @$container.find('.last-updated').text "Last Updated: #{data.time}"
+        time_updated = gettext("Last Updated: <%= timestamp %>")
+        full_time_updated = _.template(time_updated, {timestamp: data.time})
+        @$container.find('.last-updated').text full_time_updated
 
         # populate selector
         @$problem_selector.empty()
@@ -145,8 +147,10 @@ class GradeDistributionDisplay
     total_students = _.reduce ([0].concat grade_info),
       (accum, {grade, max_grade, num_students}) -> accum + num_students
 
+    msg = gettext("<%= num_students %> students scored.")
+    full_msg = _.template(msg, {num_students: total_students})
     # show total students
-    @$container.find('.display-text').text "#{total_students} students scored."
+    @$container.find('.display-text').text full_msg
 
     # render to graph
     graph_placeholder = $ '<div/>', class: 'graph-placeholder'

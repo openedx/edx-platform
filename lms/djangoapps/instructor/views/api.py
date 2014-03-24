@@ -13,7 +13,9 @@ import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.utils.html import strip_tags
@@ -251,6 +253,21 @@ def students_update_enrollment(request, course_id):
     results = []
     for email in emails:
         try:
+            # Use django.core.validators.validate_email to check email address
+            # validity (obviously, cannot check if email actually /exists/,
+            # simply that it is plausibly valid)
+            validate_email(email)
+        except ValidationError:
+            # Flag this email as an error if invalid, but continue checking
+            # the remaining in the list
+            results.append({
+                'email': email,
+                'error': True,
+                'invalidEmail': True,
+            })
+            continue
+
+        try:
             if action == 'enroll':
                 before, after = enroll_email(course_id, email, auto_enroll, email_students, email_params)
             elif action == 'unenroll':
@@ -273,6 +290,7 @@ def students_update_enrollment(request, course_id):
             results.append({
                 'email': email,
                 'error': True,
+                'invalidEmail': False,
             })
 
     response_payload = {
@@ -377,8 +395,25 @@ def modify_access(request, course_id):
     course = get_course_with_access(
         request.user, course_id, 'instructor', depth=None
     )
+    try:
+        user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
+    except User.DoesNotExist:
+        response_payload = {
+            'unique_student_identifier': request.GET.get('unique_student_identifier'),
+            'userDoesNotExist': True,
+        }
+        return JsonResponse(response_payload)
 
-    user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
+    # Check that user is active, because add_users
+    # in common/djangoapps/student/roles.py fails
+    # silently when we try to add an inactive user.
+    if not user.is_active:
+        response_payload = {
+            'unique_student_identifier': user.username,
+            'inactiveUser': True,
+        }
+        return JsonResponse(response_payload)
+
     rolename = request.GET.get('rolename')
     action = request.GET.get('action')
 
@@ -389,9 +424,13 @@ def modify_access(request, course_id):
 
     # disallow instructors from removing their own instructor access.
     if rolename == 'instructor' and user == request.user and action != 'allow':
-        return HttpResponseBadRequest(
-            "An instructor cannot remove their own instructor access."
-        )
+        response_payload = {
+            'unique_student_identifier': user.username,
+            'rolename': rolename,
+            'action': action,
+            'removingSelfAsInstructor': True,
+        }
+        return JsonResponse(response_payload)
 
     if action == 'allow':
         allow_access(course, user, rolename)
@@ -493,10 +532,27 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     TO DO accept requests for different attribute sets.
     """
     available_features = analytics.basic.AVAILABLE_FEATURES
-    query_features = ['username', 'name', 'email', 'language', 'location', 'year_of_birth', 'gender',
-                      'level_of_education', 'mailing_address', 'goals']
+    query_features = [
+        'username', 'name', 'email', 'language', 'location', 'year_of_birth',
+        'gender', 'level_of_education', 'mailing_address', 'goals'
+    ]
 
     student_data = analytics.basic.enrolled_students_features(course_id, query_features)
+
+    # Scrape the query features for i18n - can't translate here because it breaks further queries
+    # and how the coffeescript works. The actual translation will be done in data_download.coffee
+    query_features_names = {
+        'username': _('Username'),
+        'name': _('Name'),
+        'email': _('Email'),
+        'language': _('Language'),
+        'location': _('Location'),
+        'year_of_birth': _('Birth Year'),
+        'gender': _('Gender'),
+        'level_of_education': _('Level of Education'),
+        'mailing_address': _('Mailing Address'),
+        'goals': _('Goals'),
+    }
 
     if not csv:
         response_payload = {
@@ -504,6 +560,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
             'students': student_data,
             'students_count': len(student_data),
             'queried_features': query_features,
+            'feature_names': query_features_names,
             'available_features': available_features,
         }
         return JsonResponse(response_payload)

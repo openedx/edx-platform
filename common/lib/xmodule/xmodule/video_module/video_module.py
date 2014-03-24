@@ -43,6 +43,13 @@ from .video_utils import create_youtube_string
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import KvsFieldData
+from urlparse import urlparse
+
+def get_ext(filename):
+    # Prevent incorrectly parsing urls like 'http://abc.com/path/video.mp4?xxxx'.
+    path = urlparse(filename).path
+    return path.rpartition('.')[-1]
+
 
 log = logging.getLogger(__name__)
 
@@ -259,7 +266,6 @@ class VideoModule(VideoFields, XModule):
         track_url = None
         transcript_download_format = self.transcript_download_format
 
-        get_ext = lambda filename: filename.rpartition('.')[-1]
         sources = {get_ext(src): src for src in self.html5_sources}
 
         if self.download_video:
@@ -319,7 +325,8 @@ class VideoModule(VideoFields, XModule):
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
             'yt_test_timeout': 1500,
-            'yt_test_url': settings.YOUTUBE_TEST_URL,
+            'yt_api_url': settings.YOUTUBE['API'],
+            'yt_test_url': settings.YOUTUBE['TEST_URL'],
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.descriptor.fields['transcript_download_format'].values,
             'transcript_language': transcript_language,

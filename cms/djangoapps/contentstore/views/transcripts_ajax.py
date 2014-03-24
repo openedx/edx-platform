@@ -262,9 +262,9 @@ def check_transcripts(request):
             log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
 
         # youtube server
-        youtube_api = copy.deepcopy(settings.YOUTUBE_API)
-        youtube_api['params']['v'] = youtube_id
-        youtube_response = requests.get(youtube_api['url'], params=youtube_api['params'])
+        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
+        youtube_text_api['params']['v'] = youtube_id
+        youtube_response = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
 
         if youtube_response.status_code == 200 and youtube_response.text:
             transcripts_presence['youtube_server'] = True

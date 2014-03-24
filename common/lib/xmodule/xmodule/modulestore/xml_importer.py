@@ -312,7 +312,7 @@ def import_module(
         source_course_location, dest_course_location, allow_not_found=False,
         do_import_static=True):
 
-    logging.debug('processing import of module {}...'.format(module.location.url()))
+    logging.debug(u'processing import of module {}...'.format(module.location.url()))
 
     if do_import_static and 'data' in module.fields and isinstance(module.fields['data'], xblock.fields.String):
         # we want to convert all 'non-portable' links in the module_data
@@ -518,13 +518,13 @@ def remap_namespace(module, target_location_namespace):
         # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
         # values then remap it so that the wiki does not point to the old wiki.
         if original_location.course_id != target_location_namespace.course_id:
-            original_unique_wiki_slug = '{0}.{1}.{2}'.format(
+            original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
                 original_location.org,
                 original_location.course,
                 original_location.name
             )
             if module.wiki_slug == original_unique_wiki_slug or module.wiki_slug == original_location.course:
-                module.wiki_slug = '{0}.{1}.{2}'.format(
+                module.wiki_slug = u'{0}.{1}.{2}'.format(
                     target_location_namespace.org,
                     target_location_namespace.course,
                     target_location_namespace.name,

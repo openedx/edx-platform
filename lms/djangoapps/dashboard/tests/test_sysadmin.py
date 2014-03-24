@@ -159,13 +159,13 @@ class TestSysadmin(SysadminBaseTestCase):
                                     {'action': 'create_user',
                                      'student_fullname': 'blah',
                                      'student_password': 'foozor', })
-        self.assertIn(_('Must provide username'), response.content)
+        self.assertIn(_('Must provide username'), response.content.decode('utf-8'))
         # no full name
         response = self.client.post(reverse('sysadmin'),
                                     {'action': 'create_user',
                                      'student_uname': 'test_cuser+sysadmin@edx.org',
                                      'student_password': 'foozor', })
-        self.assertIn(_('Must provide full name'), response.content)
+        self.assertIn(_('Must provide full name'), response.content.decode('utf-8'))
 
         # Test create valid user
         self.client.post(reverse('sysadmin'),
@@ -190,20 +190,20 @@ class TestSysadmin(SysadminBaseTestCase):
         # Try no username
         response = self.client.post(reverse('sysadmin'),
                                     {'action': 'del_user', })
-        self.assertIn(_('Must provide username'), response.content)
+        self.assertIn(_('Must provide username'), response.content.decode('utf-8'))
 
         # Try bad usernames
         response = self.client.post(reverse('sysadmin'),
                                     {'action': 'del_user',
                                      'student_uname': 'flabbergast@example.com',
                                      'student_fullname': 'enigma jones', })
-        self.assertIn(_('Cannot find user with email address'), response.content)
+        self.assertIn(_('Cannot find user with email address'), response.content.decode('utf-8'))
 
         response = self.client.post(reverse('sysadmin'),
                                     {'action': 'del_user',
                                      'student_uname': 'flabbergast',
                                      'student_fullname': 'enigma jones', })
-        self.assertIn(_('Cannot find user with username'), response.content)
+        self.assertIn(_('Cannot find user with username'), response.content.decode('utf-8'))
 
         self.client.post(reverse('sysadmin'),
                          {'action': 'del_user',
@@ -268,7 +268,7 @@ class TestSysadmin(SysadminBaseTestCase):
 
         self.assertIn('{0} test0'.format(_('Failed in authenticating')),
                       response.content)
-        self.assertIn(_('fixed password'), response.content)
+        self.assertIn(_('fixed password'), response.content.decode('utf-8'))
 
         self.assertTrue(self.client.login(username='test0',
                                           password=eamap.internal_password))
@@ -277,7 +277,7 @@ class TestSysadmin(SysadminBaseTestCase):
         self._setstaff_login()
         response = self.client.post(reverse('sysadmin'),
                                     {'action': 'repair_eamap', })
-        self.assertIn(_('All ok!'), response.content)
+        self.assertIn(_('All ok!'), response.content.decode('utf-8'))
 
     def test_xml_course_add_delete(self):
         """add and delete course from xml module store"""

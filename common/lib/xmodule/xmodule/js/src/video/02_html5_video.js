@@ -186,16 +186,16 @@ function () {
             // Create HTML markup for individual sources of the HTML5 <video>
             // element.
             $.each(sourceStr, function (videoType, videoSource) {
-                if (
-                    (_this.config.videoSources[videoType]) &&
-                    (_this.config.videoSources[videoType].length)
-                ) {
+                var url = _this.config.videoSources[videoType];
+                if (url && url.length) {
                     sourceStr[videoType] =
                         '<source ' +
-                            'src="' + _this.config.videoSources[videoType] +
+                            'src="' + url +
                             // Following hack allows to open the same video twice
                             // https://code.google.com/p/chromium/issues/detail?id=31014
-                            '?' + (new Date()).getTime() +
+                            // Check whether the url already has a '?' inside, and if so,
+                            // use '&' instead of '?' to prevent breaking the url's integrity.
+                            (url.indexOf('?') == -1 ? '?' : '&') + (new Date()).getTime() +
                             '" ' + 'type="video/' + videoType + '" ' +
                         '/> ';
                 }
