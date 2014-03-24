@@ -7,7 +7,10 @@ from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
 from xmodule.modulestore import InvalidLocationError
 from cache_toolbox.core import get_cached_content, set_cached_content
 from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.keys import CourseKey
 
+# TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
+# to change this file so instead of using course_id_partial, we're just using asset keys
 
 class StaticContentServer(object):
     def process_request(self, request):
