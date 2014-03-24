@@ -18,7 +18,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from xmodule_django.models import CourseKeyField
+from xmodule_django.models import CourseKeyField, LocationKeyField
 
 
 class StudentModule(models.Model):
@@ -38,7 +38,7 @@ class StudentModule(models.Model):
     # but for abtests and the like, this can be set to a shared value
     # for many instances of the module.
     # Filename for homeworks, etc.
-    module_state_key = models.CharField(max_length=255, db_index=True, db_column='module_id')
+    module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
     student = models.ForeignKey(User, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
 
