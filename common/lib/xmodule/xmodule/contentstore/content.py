@@ -103,6 +103,7 @@ class StaticContent(object):
 
     @staticmethod
     def get_location_from_path(path):
+        from nose.tools import set_trace; set_trace()
         # remove leading / character if it is there one
         if path.startswith('/'):
             path = path[1:]

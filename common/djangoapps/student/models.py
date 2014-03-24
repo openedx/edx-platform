@@ -631,31 +631,6 @@ class CourseEnrollment(models.Model):
             return False
 
     @classmethod
-    def is_enrolled_by_partial(cls, user, course_id_partial):
-        """
-        Returns `True` if the user is enrolled in a course that starts with
-        `course_id_partial`. Otherwise, returns False.
-
-        Can be used to determine whether a student is enrolled in a course
-        whose run name is unknown.
-
-        `user` is a Django User object. If it hasn't been saved yet (no `.id`
-               attribute), this method will automatically save it before
-               adding an enrollment for it.
-
-        `course_id_partial` is a starting substring for a fully qualified
-               course_id (e.g. "edX/Test101/").
-        """
-        try:
-            return CourseEnrollment.objects.filter(
-                user=user,
-                course_id__startswith=course_id_partial,
-                is_active=1
-            ).exists()
-        except cls.DoesNotExist:
-            return False
-
-    @classmethod
     def enrollment_mode_for_user(cls, user, course_id):
         """
         Returns the enrollment mode for the given user for the given course
