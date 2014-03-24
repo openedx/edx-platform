@@ -1066,9 +1066,23 @@ BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
 ############################## Video ##########################################
 
-# URL to test YouTube availability
-YOUTUBE_TEST_URL = 'https://gdata.youtube.com/feeds/api/videos/'
+YOUTUBE = {
+    # YouTube JavaScript API
+    'API': 'www.youtube.com/iframe_api',
 
+    # URL to test YouTube availability
+    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+
+    # Current youtube api for requesting transcripts.
+    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
+    'TEXT_API': {
+        'url': 'video.google.com/timedtext',
+        'params': {
+            'lang': 'en',
+            'v': 'set_youtube_id_of_11_symbols_here',
+        },
+    },
+}
 
 ################################### APPS ######################################
 INSTALLED_APPS = (

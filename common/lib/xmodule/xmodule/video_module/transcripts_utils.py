@@ -97,9 +97,9 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n):
 
     utf8_parser = etree.XMLParser(encoding='utf-8')
 
-    youtube_api = copy.deepcopy(settings.YOUTUBE_API)
-    youtube_api['params']['v'] = youtube_id
-    data = requests.get(youtube_api['url'], params=youtube_api['params'])
+    youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
+    youtube_text_api['params']['v'] = youtube_id
+    data = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
 
     if data.status_code != 200 or not data.text:
         msg = _("Can't receive transcripts from Youtube for {youtube_id}. Status code: {status_code}.").format(
@@ -522,4 +522,3 @@ class Transcript(object):
         return StaticContent.compute_location(
             location.org, location.course, filename
         )
-

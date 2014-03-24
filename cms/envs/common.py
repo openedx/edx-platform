@@ -425,9 +425,23 @@ CELERY_QUEUES = {
 
 ############################## Video ##########################################
 
-# URL to test YouTube availability
-YOUTUBE_TEST_URL = 'https://gdata.youtube.com/feeds/api/videos/'
+YOUTUBE = {
+    # YouTube JavaScript API
+    'API': 'www.youtube.com/iframe_api',
 
+    # URL to test YouTube availability
+    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+
+    # Current youtube api for requesting transcripts.
+    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
+    'TEXT_API': {
+        'url': 'video.google.com/timedtext',
+        'params': {
+            'lang': 'en',
+            'v': 'set_youtube_id_of_11_symbols_here',
+        },
+    },
+}
 
 ############################ APPS #####################################
 
@@ -528,14 +542,6 @@ PASSWORD_DICTIONARY = []
 # names/passwords.  Heartbeat events are likely not interesting.
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 TRACKING_ENABLED = True
-
-# Current youtube api for requesting transcripts.
-# for example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
-YOUTUBE_API = {
-    'url': "http://video.google.com/timedtext",
-    'params': {'lang': 'en', 'v': 'set_youtube_id_of_11_symbols_here'}
-}
-
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
