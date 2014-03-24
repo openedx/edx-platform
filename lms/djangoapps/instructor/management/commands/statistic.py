@@ -91,8 +91,6 @@ def gendata(request):
     data = {}
     for course in modulestore().get_courses():
         data[course.id] = {}
-        if course.id not in coursemap:
-            continue
         print("Loading info for course {courseid}".format(courseid = course.id))
         
         enrolled_students = User.objects.filter(
@@ -123,6 +121,10 @@ def gendata(request):
             statsec = []
 
             courseware_summary = grades.progress_summary(user, request, course);
+
+            if courseware_summary is None:
+                continue
+
             complition = 0
             complition_cnt = 0
             for chapter in courseware_summary:
