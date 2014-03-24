@@ -26,7 +26,7 @@ from xmodule.modulestore.keys import CourseKey
 
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
@@ -375,7 +375,7 @@ def create_new_course(request):
     # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
     # existing xml courses this cannot be changed in CourseDescriptor.
     ## TODO get rid of defining wiki slug in this org/course/name specific way
-    wiki_slug = "{0}.{1}.{2}".format(org, course, name)
+    wiki_slug = "{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.name)
     definition_data = {'wiki_slug': wiki_slug}
 
     # Create the course then fetch it from the modulestore
@@ -385,11 +385,15 @@ def create_new_course(request):
         if CourseRole.course_group_already_exists(course_key):
             raise InvalidLocationError()
 
+        fields = {}
+        fields.update(definition_data)
+        fields.update(metadata)
+
         # Creating the course raises InvalidLocationError if an existing course with this org/name is found
         modulestore('direct').create_course(
-            course_key,
-            definition_data=definition_data,
-            metadata=metadata
+            course_key.org,
+            course_key.offering,
+            fields=fields,
         )
     except InvalidLocationError:
         return JsonResponse({

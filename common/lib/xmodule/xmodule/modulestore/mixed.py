@@ -210,28 +210,25 @@ class MixedModuleStore(ModuleStoreWriteBase):
             errs.update(store.get_errored_courses())
         return errs
 
-    def create_course(self, course_key, user_id=None, store_name='default', **kwargs):
+    def create_course(self, org, offering, user_id=None, fields=None, store_name='default', **kwargs):
         """
         Creates and returns the course.
 
-        :param course_key: the CourseKey object for the course
-        :param user_id: id of the user creating the course
-        :param store_name: which datastore to use
-        :returns: course
+        Args:
+            org (str): the organization that owns the course
+            offering (str): the name of the course offering
+            user_id: id of the user creating the course
+            fields (dict): Fields to set on the course at initialization
+            kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
+
+        Returns: a CourseDescriptor
         """
         store = self.modulestores[store_name]
+
         if not hasattr(store, 'create_course'):
             raise NotImplementedError(u"Cannot create a course on store %s" % store_name)
-        if store.get_modulestore_type(course_key) == SPLIT_MONGO_MODULESTORE_TYPE:
-            org = kwargs.pop('org', course_key.org)
-            fields = kwargs.pop('fields', {})
-            fields.update(kwargs.pop('metadata', {}))
-            fields.update(kwargs.pop('definition_data', {}))
-            course = store.create_course(course_key, org, user_id, fields=fields, **kwargs)
-        else:  # assume mongo
-            course = store.create_course(course_key, **kwargs)
 
-        return course
+        return store.create_course(org, offering, user_id, fields, store_name=store_name, **kwargs)
 
     def create_item(self, course_or_parent_loc, category, user_id=None, **kwargs):
         """

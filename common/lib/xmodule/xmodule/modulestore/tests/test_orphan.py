@@ -114,7 +114,7 @@ class TestOrphan(unittest.TestCase):
         fields.update(data)
         # split requires the course to be created separately from creating items
         self.split_mongo.create_course(
-            'test_org', self.userid, self.split_course_key.offering, fields=fields, root_block_id='runid'
+            'test_org', 'test_offering', self.userid, self.split_course_key.offering, fields=fields, root_block_id='runid'
         )
         self.course_location = Location('test_org', 'test_course', 'test_run', 'course', 'runid')
         self.old_mongo.create_and_save_xmodule(self.course_location, data, metadata)

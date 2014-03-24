@@ -441,7 +441,7 @@ class SplitModuleTest(unittest.TestCase):
         split_store = modulestore()
         for course_id, course_spec in SplitModuleTest.COURSE_CONTENT.iteritems():
             course = split_store.create_course(
-                course_id, course_spec['org'], course_spec['user_id'],
+                course_spec['org'], course_spec['offering'], course_spec['user_id'],
                 fields=course_spec['fields'],
                 root_block_id=course_spec['root_block_id']
             )
@@ -1051,7 +1051,7 @@ class TestItemCrud(SplitModuleTest):
         """
         # start transaction w/ simple creation
         user = random.getrandbits(32)
-        new_course = modulestore().create_course('test_org.test_transaction', 'test_org', user)
+        new_course = modulestore().create_course('test_org', 'test_transaction', user)
         new_course_locator = new_course.id
         index_history_info = modulestore().get_course_history_info(new_course.location)
         course_block_prev_version = new_course.previous_version
@@ -1321,7 +1321,7 @@ class TestItemCrud(SplitModuleTest):
         """
         Create a course we can delete
         """
-        course = modulestore().create_course('nihilx.deletion', 'nihilx', 'deleting_user')
+        course = modulestore().create_course('nihilx', 'deletion', 'deleting_user')
         root = BlockUsageLocator(
             course.id.replace(branch='draft'),
             block_id=course.location.block_id,
@@ -1351,7 +1351,7 @@ class TestCourseCreation(SplitModuleTest):
         The simplest case but probing all expected results from it.
         """
         # Oddly getting differences of 200nsec
-        new_course = modulestore().create_course('test_org.test_course', 'test_org', 'create_user')
+        new_course = modulestore().create_course('test_org', 'test_course', 'create_user')
         new_locator = new_course.location
         # check index entry
         index_info = modulestore().get_course_index_info(new_locator)
@@ -1489,7 +1489,7 @@ class TestCourseCreation(SplitModuleTest):
         """
         user = random.getrandbits(32)
         new_course = modulestore().create_course(
-            'test_org.test_transaction', 'test_org', user,
+            'test_org', 'test_transaction', user,
             root_block_id='top', root_category='chapter'
         )
         self.assertEqual(new_course.location.block_id, 'top')
@@ -1511,7 +1511,7 @@ class TestCourseCreation(SplitModuleTest):
         courses = modulestore().get_courses()
         with self.assertRaises(DuplicateCourseError):
             dupe_course_key = courses[0].location.course_key
-            modulestore().create_course(dupe_course_key.org, dupe_course_key.offering, 'org', 'pretty', user)
+            modulestore().create_course(dupe_course_key.org, dupe_course_key.offering, user)
 
 
 class TestInheritance(SplitModuleTest):

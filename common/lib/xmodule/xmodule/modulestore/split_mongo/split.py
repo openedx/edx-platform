@@ -828,13 +828,21 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         return self.get_item(item_loc)
 
     def create_course(
-        self, offering, org, user_id, fields=None,
+        self, org, offering, user_id, fields=None,
         master_branch='draft', versions_dict=None, root_category='course',
-        root_block_id='course'
+        root_block_id='course', **kwargs,
     ):
         """
         Create a new entry in the active courses index which points to an existing or new structure. Returns
         the course root of the resulting entry (the location has the course id)
+
+        Arguments:
+
+            org (str): the organization that owns the course
+            offering (str): the name of the course offering
+            user_id: id of the user creating the course
+            fields (dict): Fields to set on the course at initialization
+            kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
 
         offering: If it's already taken, this method will raise DuplicateCourseError
 

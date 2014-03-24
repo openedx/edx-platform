@@ -650,17 +650,25 @@ class MongoModuleStore(ModuleStoreWriteBase):
         modules = self._load_items(course_id, list(items))
         return modules
 
-    def create_course(self, course_id, definition_data=None, metadata=None, fields=None, runtime=None):
+    def create_course(self, org, offering, user_id=None, fields=None, **kwargs):
         """
-        Create a course with the given course_id.
-        Raises InvalidLocationError if an existing course with this org/name is found.
+        Creates and returns the course.
+
+        Args:
+            org (str): the organization that owns the course
+            offering (str): the name of the course offering
+            user_id: id of the user creating the course
+            fields (dict): Fields to set on the course at initialization
+            kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
+
+        Returns: a CourseDescriptor
+
+        Raises:
+            InvalidLocationError: If a course with the same org and offering already exists
         """
-        if isinstance(course_id, Location):
-            location = course_id
-            if location.category != 'course':
-                raise ValueError(u"Course roots must be of category 'course': {}".format(unicode(location)))
-        else:
-            location = Location('i4x', course_id.org, course_id.course, course_id.run, 'course', course_id.run)
+
+        course, _, run = offering.partition('/')
+        course_id = SlashSeparatedCourseKey(org, course, run)
 
         # Check if a course with this org/run has been defined before
         course_search_location = SON([
@@ -678,6 +686,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 "There are already courses with the given org and course id: {}".format([
                     course['_id'] for course in courses
                 ]))
+
+        location = course_id.make_usage_key('course', course_id.run)
         course = self.create_and_save_xmodule(location, definition_data, metadata, runtime, fields)
 
         # clone a default 'about' overview module as well

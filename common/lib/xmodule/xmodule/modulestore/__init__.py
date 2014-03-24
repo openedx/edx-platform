@@ -242,14 +242,18 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
     @abstractmethod
-    def create_course(self, course_key, user_id=None, store_name='default', **kwargs):
+    def create_course(self, org, offering, user_id=None, fields=None, **kwargs):
         """
         Creates and returns the course.
 
-        :param course_key: the CourseKey object for the course
-        :param user_id: id of the user creating the course
-        :param store_name: which datastore to use
-        :returns: course
+        Args:
+            org (str): the organization that owns the course
+            offering (str): the name of the course offering
+            user_id: id of the user creating the course
+            fields (dict): Fields to set on the course at initialization
+            kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
+
+        Returns: a CourseDescriptor
         """
         pass
 

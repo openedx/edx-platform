@@ -281,7 +281,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         """
         self.initdb('direct')
         with self.assertRaises(NotImplementedError):
-            self.store.create_course("org/course/run", store_name='xml')
+            self.store.create_course("org", "course/run", store_name='xml')
 
     @ddt.data('direct', 'split')
     def test_get_course(self, default_ms):
