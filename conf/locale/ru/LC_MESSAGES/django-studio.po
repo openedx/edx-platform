@@ -5243,7 +5243,7 @@ msgstr "Создать пользователя"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Download list of all users (csv file)"
-msgstr "Скачать список всех пользователей (csv фаил)"
+msgstr "Скачать список всех пользователей (csv файл)"
 
 #: lms/templates/sysadmin_dashboard.html
 #, fuzzy
@@ -6593,9 +6593,8 @@ msgstr "Просмотр курса"
 
 #. Translators: The course's name will be added to the end of this sentence.
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#, fuzzy
 msgid "Are you sure you want to unregister from"
-msgstr "Вы уверены что хотите удалить регистрацию с курса {course_number}?"
+msgstr "Вы уверены что хотите удалить регистрацию с курса"
 
 #. Translators: The course's name will be added to the end of this sentence.
 #: lms/templates/dashboard/_dashboard_course_listing.html

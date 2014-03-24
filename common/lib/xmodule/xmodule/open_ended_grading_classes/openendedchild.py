@@ -487,7 +487,7 @@ class OpenEndedChild(object):
         try:
             # Try to upload the file to S3.
             has_file_to_upload, image_tag = self.check_for_file_and_upload(data)
-            data['student_answer'] += image_tag
+            data['student_answer'] = image_tag + data['student_answer']
             success = True
             if not has_file_to_upload:
                 # If there is no file to upload, probably the student has embedded the link in the answer text

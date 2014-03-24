@@ -268,7 +268,7 @@ define('MasterClassMain', [], function (logme) {
                     $('<label/>').attr('for', 'email_' + key).html("<span></span>").appendTo(li);
                     $('<a/>')
                         .addClass('ui-all')
-                        .text(value.name + '(' + value.email +')')
+                        .text(value.name + ' (' + value.email +')')
                         .appendTo(li);
                 });
             $.each(response.passed_registrations, function(key, value)

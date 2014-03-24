@@ -8356,7 +8356,7 @@ msgstr "Создать пользователя"
 
 #: lms/templates/sysadmin_dashboard.html:94
 msgid "Download list of all users (csv file)"
-msgstr "Скачать список всех пользователей (csv фаил)"
+msgstr "Скачать список всех пользователей (csv файл)"
 
 #: lms/templates/sysadmin_dashboard.html:100
 #, fuzzy
