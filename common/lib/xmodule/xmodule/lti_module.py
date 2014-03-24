@@ -309,8 +309,26 @@ class LTIModule(LTIFields, XModule):
         context and imported into another system or context.
 
         This parameter is required.
+
+        Example:  u'edx.org-i4x-2-3-lti-31de800015cf4afb973356dbe81496df'
+
+        Hostname, edx.org,
+        makes resource_link_id change on import to another system.
+
+        Last part of location, location.name - 31de800015cf4afb973356dbe81496df,
+        is random hash, updated by course_id,
+        this makes resource_link_id unique inside single course.
+
+        First part of location is tag-org-course-category, i4x-2-3-lti.
+
+        Location.name itself does not change on import to another course,
+        but org and course_id change.
+
+        So together with org and course_id in a form of
+        i4x-2-3-lti-31de800015cf4afb973356dbe81496df this part of resource_link_id:
+        makes resource_link_id to be unique among courses inside same system.
         """
-        return unicode(urllib.quote(self.id))
+        return unicode(urllib.quote("{}-{}".format(self.system.hostname, self.location.html_id())))
 
     def get_lis_result_sourcedid(self):
         """
