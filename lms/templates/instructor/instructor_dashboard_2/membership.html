@@ -71,7 +71,7 @@
       ${_("Note: Users must have an activated {platform_name} account before they can be enrolled as a beta tester.").format(platform_name=settings.PLATFORM_NAME)}
     </label>
 
-  <textarea rows="6" cols="50" name="student-emails-for-beta" placeholder="${_("Email addresses")}" spellcheck="false"></textarea>
+  <textarea rows="6" cols="50" name="student-emails-for-beta" placeholder="${_("Email Addresses")}" spellcheck="false"></textarea>
   </p>
 
   <div class="enroll-option">
@@ -84,8 +84,8 @@
   </div>
 
   <div>
-    <input type="button" name="beta-testers" class="enrollment-button" value="${_("Add beta tester(s)")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="add" >
-    <input type="button" name="beta-testers" class="enrollment-button" value="${_("Remove beta tester(s)")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="remove" >
+    <input type="button" name="beta-testers" class="enrollment-button" value="${_("Add beta testers")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="add" >
+    <input type="button" name="beta-testers" class="enrollment-button" value="${_("Remove beta testers")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="remove" >
   </div>
 
   <div class="request-response"></div>
@@ -95,12 +95,14 @@
 </div>
 
 <div class="vert-right member-lists-management">
+  ## Translators: an "Administration List" is a list, such as Course Staff, that users can be added to.
   <h2> ${_("Administration List Management")} </h2>
 
   <div class="request-response-error"></div>
 
   <div class="wrapper-member-select">
-    <label for="member-lists-selector">Select an Administrator Group:</label>
+    ## Translators: an "Administrator Group" is a group, such as Course Staff, that users can be added to.
+    <label for="member-lists-selector">${_("Select an Administrator Group:")}</label>
     <select id="member-lists-selector" class="member-lists-selector">
       <option> ${_("Getting available lists...")} </option>
     </select>
@@ -150,7 +152,7 @@
         "privileges.")}"
       data-list-endpoint="${ section_data['list_course_role_members_url'] }"
       data-modify-endpoint="${ section_data['modify_access_url'] }"
-      data-add-button-label="Add ${_("Beta Tester")}"
+      data-add-button-label="${_("Add Beta Tester")}"
     ></div>
 
     <div class="auth-list-container"
@@ -162,7 +164,7 @@
          "They CAN add/delete other moderators and their posts are marked as 'staff'.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
-      data-add-button-label="Add ${_("Discussion Admin")}"
+      data-add-button-label="${_("Add Discussion Admin")}"
     ></div>
   %endif
 
@@ -189,7 +191,7 @@
         "Their posts are marked 'Community TA'.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
-      data-add-button-label="Add ${_("Community TA")}"
+      data-add-button-label="${_("Add Community TA")}"
     ></div>
   %endif
 

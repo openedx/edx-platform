@@ -511,10 +511,27 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     TO DO accept requests for different attribute sets.
     """
     available_features = analytics.basic.AVAILABLE_FEATURES
-    query_features = ['username', 'name', 'email', 'language', 'location', 'year_of_birth', 'gender',
-                      'level_of_education', 'mailing_address', 'goals']
+    query_features = [
+        'username', 'name', 'email', 'language', 'location', 'year_of_birth',
+        'gender', 'level_of_education', 'mailing_address', 'goals'
+    ]
 
     student_data = analytics.basic.enrolled_students_features(course_id, query_features)
+
+    # Scrape the query features for i18n - can't translate here because it breaks further queries
+    # and how the coffeescript works. The actual translation will be done in data_download.coffee
+    query_features_names = {
+        'username': _('Username'),
+        'name': _('Name'),
+        'email': _('Email'),
+        'language': _('Language'),
+        'location': _('Location'),
+        'year_of_birth': _('Birth Year'),
+        'gender': _('Gender'),
+        'level_of_education': _('Level of Education'),
+        'mailing_address': _('Mailing Address'),
+        'goals': _('Goals'),
+    }
 
     if not csv:
         response_payload = {
@@ -522,6 +539,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
             'students': student_data,
             'students_count': len(student_data),
             'queried_features': query_features,
+            'feature_names': query_features_names,
             'available_features': available_features,
         }
         return JsonResponse(response_payload)

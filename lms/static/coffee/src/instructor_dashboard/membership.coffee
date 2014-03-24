@@ -69,8 +69,8 @@ class AuthListWidget extends MemberListWidget
     super $container,
       title: $container.data 'display-name'
       info: $container.data 'info-text'
-      labels: ["Username", "Email", "Revoke access"]
-      add_placeholder: "Enter username or email"
+      labels: [gettext("Username"), gettext("Email"), gettext("Revoke access")]
+      add_placeholder: gettext("Enter username or email")
       add_btn_label: $container.data 'add-button-label'
       add_handler: (input) => @add_handler input
 
@@ -116,7 +116,8 @@ class AuthListWidget extends MemberListWidget
         # if there are members, show the list
 
         # create revoke button and insert it into the row
-        $revoke_btn = $ '<div class="revoke"><i class="icon-remove-sign"></i> Revoke access</div>',
+        label_trans = gettext("Revoke access")
+        $revoke_btn = $ _.template('<div class="revoke"><i class="icon-remove-sign"></i> <%= label %></div>', {label: label_trans}),
           class: 'revoke'
         $revoke_btn.click =>
             @modify_member_access member.email, 'revoke', (error) =>
