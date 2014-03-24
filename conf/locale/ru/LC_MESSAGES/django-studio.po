@@ -1111,21 +1111,18 @@ msgstr "Оценки:"
 #. Translators: "Peer-Assessment" refers to the peer-assessed mode of
 #. openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-#, fuzzy
 msgid "Peer-Assessment"
 msgstr "Перекрестная проверка"
 
 #. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
 #. of openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-#, fuzzy
 msgid "Instructor-Assessment"
 msgstr "Проверка инструктором"
 
 #. Translators: "AI-Assessment" refers to the machine-graded mode of openended
 #. evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-#, fuzzy
 msgid "AI-Assessment"
 msgstr "Проверка ИИ"
 
@@ -1185,12 +1182,10 @@ msgstr ""
 #. are sent to, either to be machine-graded, peer-graded, or instructor-
 #. graded.
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-#, fuzzy
 msgid "No feedback available from grader."
-msgstr "Обратная связь пока недоступна"
+msgstr "Обратная связь пока недоступнаю"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-#, fuzzy
 msgid "Error handling action. Please try again."
 msgstr ""
 "Произошла ошибка сохранения ваших изменений. Пожалуйста, попробуйте ещё раз."
@@ -1198,7 +1193,6 @@ msgstr ""
 #. Translators: this string appears once an openended response
 #. is submitted but before it has been graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-#, fuzzy
 msgid ""
 "Your response has been submitted. Please check back later for your grade."
 msgstr ""
@@ -1208,22 +1202,20 @@ msgstr ""
 #. Translators: "Not started" communicates to a student that their response
 #. has not yet been graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-#, fuzzy
 msgid "Not started"
-msgstr "Запущен"
+msgstr "Не начат"
 
 #. Translators: "In progress" communicates to a student that their response
 #. is currently in the grading process
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-#, fuzzy
 msgid "In progress"
-msgstr "Прогресс"
+msgstr "В процессе проверки"
 
 #. Translators: "Done" communicates to a student that their response
 #. has been fully graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
 msgid "Done"
-msgstr ""
+msgstr "Проверено"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
 msgid ""
