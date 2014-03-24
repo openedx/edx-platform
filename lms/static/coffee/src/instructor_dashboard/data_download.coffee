@@ -45,7 +45,7 @@ class DataDownload
     # this handler binds to both the download
     # and the csv button
     @$list_studs_csv_btn.click (e) =>
-      url = @$list_studs_btn.data 'endpoint'
+      url = @$list_studs_csv_btn.data 'endpoint'
       # handle csv special case
       # redirect the document to the csv file.
       url += '/csv'
