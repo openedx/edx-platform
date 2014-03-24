@@ -4,8 +4,7 @@ Loaded by Django's settings mechanism. Consequently, this module must not
 invoke the Django armature.
 """
 
-from social.backends import google
-from social.backends import linkedin
+from social.backends import google, linkedin
 
 
 class BaseProvider(object):
@@ -34,21 +33,35 @@ class BaseProvider(object):
 
     @classmethod
     def get_email(cls, unused_provider_details):
-        """Gets email address string from `provider_details` dict.
+        """Gets user's email address.
 
         Provider responses can contain arbitrary data. This method can be
         overridden to extract an email address from the provider details
         extracted by the social_details pipeline step.
+
+        Args:
+            unused_provider_details: dict of string -> string. Data about the
+                user passed back by the provider.
+
+        Returns:
+            String or None. The user's email address, if any.
         """
         return None
 
     @classmethod
     def get_name(cls, unused_provider_details):
-        """Gets name string from `provider_details` dict.
+        """Gets user's name.
 
         Provider responses can contain arbitrary data. This method can be
         overridden to extract a full name for a user from the provider details
         extracted by the social_details pipeline step.
+
+        Args:
+            unused_provider_details: dict of string -> string. Data about the
+                user passed back by the provider.
+
+        Returns:
+            String or None. The user's full name, if any.
         """
         return None
 
@@ -59,9 +72,19 @@ class BaseProvider(object):
         common.djangoapps.student.views.register_user uses this to populate the
         new account creation form with values supplied by the user's chosen
         provider, preventing duplicate data entry.
+
+        Args:
+            pipeline_kwargs: dict of string -> object. Keyword arguments
+                accumulated by the pipeline thus far.
+
+        Returns:
+            Dict of string -> string. Keys are names of form fields; values are
+            values for that field. Where there is no value, the empty string
+            must be used.
         """
         # Details about the user sent back from the provider.
         details = pipeline_kwargs.get('details')
+
         # Get the username separately to take advantage of the de-duping logic
         # built into the pipeline. The provider cannot de-dupe because it can't
         # check the state of taken usernames in our system. Note that there is
@@ -69,6 +92,7 @@ class BaseProvider(object):
         # creation of the user object, so it is still possible for users to get
         # an error on submit.
         suggested_username = pipeline_kwargs.get('username')
+
         return {
             'email': cls.get_email(details) or '',
             'name': cls.get_name(details) or '',
@@ -77,7 +101,7 @@ class BaseProvider(object):
 
     @classmethod
     def merge_onto(cls, settings):
-        """Merge class-level settings onto a django `settings` module."""
+        """Merge class-level settings onto a django settings module."""
         for key, value in cls.SETTINGS.iteritems():
             setattr(settings, key, value)
 
@@ -143,7 +167,7 @@ class Registry(object):
 
     @classmethod
     def _enable(cls, provider):
-        """Enables a single `provider`."""
+        """Enables a single provider."""
         if provider.NAME in cls._ENABLED:
             raise ValueError('Provider %s already enabled' % provider.NAME)
         cls._ENABLED[provider.NAME] = provider
@@ -152,10 +176,12 @@ class Registry(object):
     def configure_once(cls, provider_names):
         """Configures providers.
 
-        Takes `provider_names`, a list of string.
+        Args:
+            provider_names: list of string. The providers to configure.
         """
         if cls._CONFIGURED:
             raise ValueError('Provider registry already configured')
+
         # Flip the bit eagerly -- configure() should not be re-callable if one
         # _enable call fails.
         cls._CONFIGURED = True
@@ -173,7 +199,7 @@ class Registry(object):
 
     @classmethod
     def get(cls, provider_name):
-        """Gets provider named `provider_name` string if enabled, else None."""
+        """Gets provider named provider_name string if enabled, else None."""
         cls._check_configured()
         return cls._ENABLED.get(provider_name)
 
@@ -181,8 +207,10 @@ class Registry(object):
     def get_by_backend_name(cls, backend_name):
         """Gets provider (or None) by backend name.
 
-        Arg is string `backend_name`, a python-social-auth
-        backends.base.BaseAuth.name (for example, 'google-oauth2').
+        Args:
+            backend_name: string. The python-social-auth
+                backends.base.BaseAuth.name (for example, 'google-oauth2') to
+                try and get a provider for.
         """
         cls._check_configured()
         for enabled in cls._ENABLED.values():

@@ -12,8 +12,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
-<%! from third_party_auth import pipeline %>
-<%! from third_party_auth import provider %>
+<%! from third_party_auth import pipeline, provider %>
 <%! import calendar %>
 
 <%block name="pagetitle">${_("Register for {platform_name}").format(platform_name=platform_name)}</%block>

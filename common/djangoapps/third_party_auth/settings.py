@@ -52,7 +52,7 @@ _MIDDLEWARE_CLASSES = (
 
 
 def _merge_auth_info(django_settings, auth_info):
-    """Merge `auth_info` dict onto `django_settings` module."""
+    """Merge auth_info dict onto django_settings module."""
     enabled_provider_names = []
     to_merge = []
 
@@ -76,14 +76,18 @@ def _set_global_settings(django_settings):
         'social.apps.django_app.default',
         'third_party_auth',
     )
+
     # Inject exception middleware to make redirects fire.
     django_settings.MIDDLEWARE_CLASSES += _MIDDLEWARE_CLASSES
+
     # Where to send the user if there's an error during social authentication.
     # Details about the error will be added to this URL as args so they will be
     # logged.
     django_settings.SOCIAL_AUTH_LOGIN_ERROR_URL = '/register'
+
     # Where to send the user once social authentication is successful.
     django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
+
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.
     django_settings.SOCIAL_AUTH_PIPELINE = (
@@ -98,12 +102,15 @@ def _set_global_settings(django_settings):
         'social.pipeline.social_auth.load_extra_data',
         'social.pipeline.user.user_details',
     )
+
     # We let the user specify their email address during signup.
     django_settings.SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
+
     # Disable exceptions by default for prod so you get redirect behavior
     # instead of a Django error page. During development you may want to
     # enable this when you want to get stack traces rather than redirections.
     django_settings.SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+
     # Context processors required under Django.
     django_settings.SOCIAL_AUTH_UUID_LENGTH = 4
     django_settings.TEMPLATE_CONTEXT_PROCESSORS += (
@@ -113,7 +120,7 @@ def _set_global_settings(django_settings):
 
 
 def _set_provider_settings(django_settings, enabled_providers, auth_info):
-    """Set provider-specific settings."""
+    """Sets provider-specific settings."""
     # Must prepend here so we get called first.
     django_settings.AUTHENTICATION_BACKENDS = (
         tuple(enabled_provider.get_authentication_backend() for enabled_provider in enabled_providers) +
@@ -128,7 +135,7 @@ def _set_provider_settings(django_settings, enabled_providers, auth_info):
 
 
 def apply_settings(auth_info, django_settings):
-    """Apply settings from `auth_info` dict to `django_settings` module."""
+    """Applies settings from auth_info dict to django_settings module."""
     provider_names = auth_info.keys()
     provider.Registry.configure_once(provider_names)
     enabled_providers = provider.Registry.enabled()

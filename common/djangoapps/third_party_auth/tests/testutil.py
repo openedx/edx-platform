@@ -16,7 +16,7 @@ class FakeDjangoSettings(object):
     """A fake for Django settings."""
 
     def __init__(self, mappings):
-        """Initializes the fake from `mappings`, a dict."""
+        """Initializes the fake from mappings dict."""
         for key, value in mappings.iteritems():
             setattr(self, key, value)
 

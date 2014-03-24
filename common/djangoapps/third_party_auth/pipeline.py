@@ -18,7 +18,7 @@ with an implementation of
         [...]
 
 B will be invoked twice: once when initially proceeding through the pipeline
-before it is paused, and and once when other code finishes and the pipeline
+before it is paused, and once when other code finishes and the pipeline
 resumes. Consequently, many decorated functions will first invoke a predicate
 to determine if they are in their first or second execution (usually by
 checking side-effects from the first run).
@@ -31,9 +31,7 @@ See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 """
 
 import random
-# string is deprecated, but it's still the surest way to get these charsets.
-# pylint: disable-msg=deprecated-module
-import string
+import string  # pylint: disable-msg=deprecated-module
 
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
@@ -50,7 +48,7 @@ _PASSWORD_CHARSET = string.letters + string.digits
 
 
 def get(request):
-    """Gets the running pipeline from `request`."""
+    """Gets the running pipeline from the passed request."""
     return request.session.get('partial_pipeline')
 
 
@@ -62,17 +60,25 @@ def _get_url(view_name, backend_name):
 def get_complete_url(backend_name):
     """Gets URL for the endpoint that returns control to the auth pipeline.
 
-    Arg is `backend_name`, the name of the python-social-auth backend from the
-    running pipeline (for example, 'google-oauth2'). Returns string.
+    Args:
+        backend_name: string. Name of the python-social-auth backend from the
+            currently-running pipeline.
+
+    Returns:
+        String. URL that finishes the auth pipeline for a provider.
     """
     return _get_url('social:complete', backend_name)
 
 
 def get_login_url(provider_name):
-    """Gets the login URL for the endpoint that kicks of auth with a provider.
+    """Gets the login URL for the endpoint that kicks off auth with a provider.
 
-    Args are `provider_name`, a string containing the name of a
-    provider.Provider that has been enabled. Returns string.
+    Args:
+        provider_name: string. The name of the provider.Provider that has been
+            enabled.
+
+    Returns:
+        String. URL that starts the auth pipeline for a provider.
     """
     enabled_provider = provider.Registry.get(provider_name)
     if not enabled_provider:
@@ -80,7 +86,7 @@ def get_login_url(provider_name):
     return _get_url('social:begin', enabled_provider.BACKEND_CLASS.name)
 
 
-def make_random_password(length=None, seed=None):
+def make_random_password(length=None, choice_fn=random.SystemRandom().choice):
     """Makes a random password.
 
     When a user creates an account via a social provider, we need to create a
@@ -89,21 +95,20 @@ def make_random_password(length=None, seed=None):
     this password; that's OK because they can always use the reset password
     flow to set it to a known value.
 
-    Args are `length`, an int that determines the number of chars in the
-    returned value, and `seed`, a hashable object used to initialize the RNG.
-    `seed` is for tests only; do not pass it otherwise.
+    Args:
+        choice_fn: function or method. Takes an iterable and returns a random
+            element.
+        length: int. Number of chars in the returned value. None to use default.
+
+    Returns:
+        String. The resulting password.
     """
-    if length is None:
-        length = _DEFAULT_RANDOM_PASSWORD_LENGTH
-
-    if seed is not None:
-        random.seed(seed)
-
-    return ''.join(random.choice(_PASSWORD_CHARSET) for _ in xrange(length))
+    length = length if length is not None else _DEFAULT_RANDOM_PASSWORD_LENGTH
+    return ''.join(choice_fn(_PASSWORD_CHARSET) for _ in xrange(length))
 
 
 def running(request):
-    """Returns True iff `request` is running a third-party auth pipeline."""
+    """Returns True iff request is running a third-party auth pipeline."""
     return request.session.get('partial_pipeline') is not None  # Avoid False for {}.
 
 
@@ -111,7 +116,7 @@ def running(request):
 # to the auth backend's authenticate(). pylint: disable-msg=unused-argument
 @partial.partial
 def redirect_to_supplementary_form(strategy, details, response, uid, user=None, *args, **kwargs):
-    """Cut point that dispatches user to a create account or sign in form."""
+    """Dispatches user to a create account form if they are new."""
     if user is not None:
         return
 

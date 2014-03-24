@@ -85,8 +85,7 @@ from util.password_policy_validators import (
     validate_password_dictionary
 )
 
-from third_party_auth import pipeline
-from third_party_auth import provider
+from third_party_auth import pipeline, provider
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -1060,8 +1059,7 @@ def create_account(request, post_override=None):
 
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
         post_vars = dict(post_vars.items())
-        overrides = {'password': pipeline.make_random_password()}
-        post_vars.update(overrides)
+        post_vars.update({'password': pipeline.make_random_password()})
 
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those

@@ -2,8 +2,7 @@
 Unit tests for settings code.
 """
 
-from third_party_auth import provider
-from third_party_auth import settings
+from third_party_auth import provider, settings
 from third_party_auth.tests import testutil
 
 

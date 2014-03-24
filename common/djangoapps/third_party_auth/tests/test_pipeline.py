@@ -15,15 +15,11 @@ from third_party_auth.tests import testutil
 class MakeRandomPasswordTest(testutil.TestCase):
     """Tests formation of random placeholder passwords."""
 
-    def tearDown(self):
-        random.seed()  # Make random random again.
+    def setUp(self):
         super(MakeRandomPasswordTest, self).tearDown()
+        self.seed = 1
 
-    def test_custom_length(self):
-        custom_length = 20
-        self.assertEqual(custom_length, len(pipeline.make_random_password(length=custom_length)))
-
-    def test_default_length(self):
+    def test_default_args(self):
         self.assertEqual(pipeline._DEFAULT_RANDOM_PASSWORD_LENGTH, len(pipeline.make_random_password()))
 
     def test_probably_only_uses_charset(self):
@@ -32,8 +28,9 @@ class MakeRandomPasswordTest(testutil.TestCase):
             self.assertIn(char, pipeline._PASSWORD_CHARSET)
 
     def test_pseudorandomly_picks_chars_from_charset(self):
-        seed = 1
-        random.seed(seed)
+        random_instance = random.Random(self.seed)
         expected = ''.join(
-            random.choice(pipeline._PASSWORD_CHARSET) for _ in xrange(pipeline._DEFAULT_RANDOM_PASSWORD_LENGTH))
-        self.assertEqual(expected, pipeline.make_random_password(seed=seed))
+            random_instance.choice(pipeline._PASSWORD_CHARSET)
+            for _ in xrange(pipeline._DEFAULT_RANDOM_PASSWORD_LENGTH))
+        random_instance.seed(self.seed)
+        self.assertEqual(expected, pipeline.make_random_password(choice_fn=random_instance.choice))
