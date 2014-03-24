@@ -32,7 +32,7 @@ ANNOTATOR_COMMON_JS = [
     resource_string(__name__, 'js/src/ova/share-annotator.js'),
     resource_string(__name__, 'js/src/ova/tinymce.min.js'),
     resource_string(__name__, 'js/src/ova/richText-annotator.js'),
-    resource_string(__name__, 'js/src/ova/reply-Annotator.js'),
+    resource_string(__name__, 'js/src/ova/reply-annotator.js'),
     resource_string(__name__, 'js/src/ova/tags-annotator.js'),
     resource_string(__name__, 'js/src/ova/flagging-annotator.js'),
     resource_string(__name__, 'js/src/ova/jquery-Watch.js'),
