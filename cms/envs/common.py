@@ -553,6 +553,13 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 OPTIONAL_APPS = (
     'edx_jsdraw',
     'mentoring',
+
+    # edx-ora2
+    'submissions',
+    'openassessment',
+    'openassessment.assessment',
+    'openassessment.workflow',
+    'openassessment.xblock'
 )
 
 for app_name in OPTIONAL_APPS:
