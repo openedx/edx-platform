@@ -1337,12 +1337,12 @@ msgstr "Готова ли задача к очистке или нет."
 
 #: common/lib/xmodule/xmodule/capa_base.py:1168
 msgid "Your answers have been saved."
-msgstr ""
+msgstr "Ваши ответы были сохранены."
 
 #: common/lib/xmodule/xmodule/capa_base.py:1170
 msgid ""
 "Your answers have been saved but not graded. Click 'Check' to grade them."
-msgstr ""
+msgstr "Ваши ответы были сохранены, но не проверены. Для проверки нажмите кнопку \"Проверка\""
 
 #: common/lib/xmodule/xmodule/capa_base.py:1207
 msgid "Refresh the page and make an attempt before resetting."
