@@ -33,7 +33,7 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.keys import CourseKey, UsageKey
@@ -566,8 +566,17 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     """
     Invoke an XBlock handler, either authenticated or not.
 
+    Arguments:
+        request (HttpRequest): the current request
+        course_id (str): A string of the form org/course/run
+        usage_id (str): A string of the form i4x://org/course/category/name@revision
+        handler (str): The name of the handler to invoke
+        suffix (str): The suffix to pass to the handler when invoked
+        user (User): The currently logged in user
+
     """
-    usage_key = UsageKey.from_string(unquote_slashes(usage_id))
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_id))
 
     # Check parameters and fail fast if there's a problem
     if not Location.is_valid(usage_key):
