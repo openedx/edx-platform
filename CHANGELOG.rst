@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Added template for iFrames. BLD-611.
+
 Studio: Support for viewing built-in tabs on the Pages page. STUD-1193
 
 Blades: Fixed bug when image mapped input's Show Answer multiplies rectangles on
