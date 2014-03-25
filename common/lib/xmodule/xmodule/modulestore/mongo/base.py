@@ -212,7 +212,7 @@ def location_to_son(location, prefix=''):
     """
     Converts a location into a SON object with the same key order
     """
-    son = SON()
+    son = SON({'tag': 'i4x'})
     for field_name in location.KEY_FIELDS:
         # Temporary filtering of run field
         if field_name != 'run':
@@ -329,10 +329,9 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         # now go through the results and order them by the location url
         for result in resultset:
-            location = Location(run=course_id.run, **result['_id'])
-            # We need to collate between draft and non-draft
-            # i.e. draft verticals will have draft children but will have non-draft parents currently
-            location = location.replace(revision=None)
+            # manually pick it apart b/c the db has tag and we want revision = None regardless
+            location = self._location_from_id(result['_id'], course_id.run).replace(revision=None)
+
             location_url = location.url()
             if location_url in results_by_url:
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
@@ -450,7 +449,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             for item in to_process:
                 self._clean_item_data(item)
                 children.extend(item.get('definition', {}).get('children', []))
-                data[Location(run=course_key.run, **item['location'])] = item
+                data[self._location_from_id(item['location'], course_key.run)] = item
 
             if depth == 0:
                 break
@@ -472,7 +471,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         Load an XModuleDescriptor from item, using the children stored in data_cache
         """
-        location = Location(run=course_key.run, **item['location'])
+        location = self._location_from_id(item['location'], course_key.run)
         data_dir = getattr(item, 'data_dir', location.course)
         root = self.fs_root / data_dir
 
@@ -548,7 +547,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         ItemNotFoundError.
         '''
         item = self.collection.find_one(
-            location_to_query(location, wildcard=False),
+            {'_id': location_to_son(location)},
             sort=[('revision', pymongo.ASCENDING)],
         )
         if item is None:
@@ -835,8 +834,10 @@ class MongoModuleStore(ModuleStoreWriteBase):
             }
             if xblock.has_children:
                 # convert all to urls
-                xblock.children = [child.url() if isinstance(child, Location) else child
-                                   for child in xblock.children]
+                xblock.children = [
+                    child.to_deprecated_string() if isinstance(child, Location) else child
+                    for child in xblock.children
+                ]
                 payload.update({'definition.children': xblock.children})
             self._update_single_item(xblock.location, payload)
             # for static tabs, their containing course also records their display name
@@ -888,7 +889,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         course.  Needed for path_to_location().
         '''
         query = self._course_key_to_son(location.course_key)
-        query['definition.children'] = location.url()
+        query['definition.children'] = location.to_deprecated_string()
         items = self.collection.find(query, {'_id': True})
         return [
             location.course_key.make_usage_key(i['_id']['category'], i['_id']['name'])
@@ -917,7 +918,9 @@ class MongoModuleStore(ModuleStoreWriteBase):
         item_locs = set()
         for item in all_items:
             if item['_id']['category'] != 'course':
-                item_locs.add(Location(item['_id']).replace(revision=None).url())
+                item_locs.add(
+                    self._location_from_id(item['_id'], course_key.run).replace(revision=None).to_deprecated_string()
+                )
             all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
         item_locs -= all_reachable
         return list(item_locs)
@@ -929,7 +932,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         :return: list of course locations
         """
         courses = self.collection.find({'definition.data.wiki_slug': wiki_slug})
-        return [Location(run=course['_id']['name'], **course['_id']) for course in courses]
+        return [self._location_from_id(course['_id'], course['_id']['name']) for course in courses]
 
     def _create_new_field_data(self, _category, _location, definition_data, metadata):
         """
@@ -943,3 +946,9 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         field_data = KvsFieldData(kvs)
         return field_data
+
+    def _location_from_id(self, id_dict, run):
+        """
+        Return the Location decoding this id_dict and run
+        """
+        return Location(id_dict['org'], id_dict['course'], run, id_dict['category'], id_dict['name'], id_dict['revision'])
