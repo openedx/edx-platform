@@ -171,7 +171,7 @@ class ReportDownloads
     columns = [
       id: 'link'
       field: 'link'
-      name: gettext('File Name (Newest First)')
+      name: gettext('File Name')
       toolTip: gettext("Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.")
       sortable: false
       minWidth: 150

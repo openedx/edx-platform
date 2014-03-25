@@ -6,25 +6,25 @@
   <h2>${_("Data Download")}</h2>
   <div class="request-response-error msg msg-error copy" id="data-request-response-error"></div>
 
-  <p>${_("The following button generates a CSV file of all students enrolled in this course, along with profile information such as email address and username.")}</p>
+  <p>${_("Click to generate a CSV file of all students enrolled in this course, along with profile information such as email address and username:")}</p>
 
   <p><input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['get_students_features_url'] }" data-csv="true"></p>
 
   % if not disable_buttons:
-    <p>${_("For smaller courses, profile information for enrolled students can be listed directly on this page:")}</p>
+    <p>${_("For smaller courses, click to list profile information for enrolled students directly on this page:")}</p>
     <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}" data-endpoint="${ section_data['get_students_features_url'] }"></p>
   %endif
   <div class="data-display-table" id="data-student-profiles-table"></div>
   
 
   <br>
-  <p>${_("The following button displays the grading configuration for the course. The grading configuration is the breakdown of graded subsections of the course (such as exams and problem sets), and can be changed on the 'Grading' page (under 'Settings') in Studio.")}</p>
+  <p>${_("Click to display the grading configuration for the course. The grading configuration is the breakdown of graded subsections of the course (such as exams and problem sets), and can be changed on the 'Grading' page (under 'Settings') in Studio.")}</p>
   <p><input type="button" name="dump-gradeconf" value="${_("Grading Configuration")}" data-endpoint="${ section_data['get_grading_config_url'] }"></p>
 
   <div class="data-display-text" id="data-grade-config-text"></div>
   <br>
 
-  <p>${_("Download a CSV of anonymized student IDs by clicking this button.")}</p>
+  <p>${_("Click to download a CSV of anonymized student IDs:")}</p>
   <p><input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}"></p>
 </div>
 
@@ -34,7 +34,7 @@
     <h2> ${_("Reports")}</h2>
 
   %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
-    <p>${_("The following button will generate a CSV grade report for all currently enrolled students.  Generated reports appear in a table below and can be downloaded.")}</p>
+    <p>${_("Click to generate a CSV grade report for all currently enrolled students.  Links to generated reports appear in a table below when report generation is complete.")}</p>
 
     <p>${_("For large courses, generating this report may take several hours. Please be patient and do not click the button multiple times. Clicking the button multiple times will significantly slow the grade generation process.")}</p>
 
@@ -49,10 +49,15 @@
 
     <p><b>${_("Reports Available for Download")}</b></p>
     <p>
-      ${_("Grade reports listed below are generated each time the <b>Generate Grade Report</b> button is clicked. A link to each grade report remains available on this page, identified by the UTC date and time of generation. Grade reports are not deleted, so you will always be able to access previously generated reports from this page.")}
-      ## Translators: "these rules" in this sentence references a detailed description of the grading reports that will appear in a table that contains a mix of different types of reports.  This sentence intends to indicate that the description of the grading report does not apply to the other reports that may appear in the table.
-      ${_("Other reports may appear in the table for which these rules will not necessarily apply.")}
+      ${_("The grade reports listed below are generated each time the <b>Generate Grade Report</b> button is clicked. A link to each grade report remains available on this page, identified by the UTC date and time of generation. Grade reports are not deleted, so you will always be able to access previously generated reports from this page.")}
     </p>
+
+  %if settings.FEATURES.get('ENABLE_ASYNC_ANSWER_DISTRIBUTION'):
+    <p>
+      ${_("The answer distribution report listed below is generated periodically by an automated background process. The report is cumulative, so answers submitted after the process starts are included in a subsequent report. The report is generated several times per day.")}
+    </p>
+  %endif
+
     ## Translators: a table of URL links to report files appears after this sentence.
     <p>${_("<b>Note</b>: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")}</p><br>
 
