@@ -4,6 +4,7 @@ from urlparse import urlparse
 from django.http import Http404
 from django.shortcuts import redirect
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
 
 from wiki.models import reverse as wiki_reverse
@@ -71,10 +72,16 @@ class Middleware(object):
             # Let's see if user is enrolled or the course allows for public access
             course = get_course_with_access(request.user, course_id, 'load')
             if not course.allow_public_wiki_access:
+                # if a user is not authenticated, redirect them to login
+                if not request.user.is_authenticated():
+                    return redirect(reverse('accounts_login'))
+
                 is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
                 is_staff = has_access(request.user, course, 'staff')
                 if not (is_enrolled or is_staff):
-                    raise PermissionDenied()
+                    # if a user is logged in, but not authorized to see a page,
+                    # we'll redirect them to the course about page
+                    return redirect(reverse('about_course', args=[course_id]))
 
             prepend_string = '/courses/' + course_id
             wiki_reverse._transform_url = lambda url: prepend_string + url
