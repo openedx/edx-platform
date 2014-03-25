@@ -11,14 +11,16 @@ Change Log
    * - Date
      - Change  
    * - 04/01/14 
-     - Update the :ref:`Establish a Grading Policy` chapter to emphasize that grading is applied to subsections only. 
+     - Update the :ref:`Establish a Grading Policy` chapter to emphasize that grading is applied to subsections only.   
+   * - 
+     - Updated the :ref:`Releasing Your Course Index` section to include :ref:`Launch`.
    * - 03/31/14 
      - Expanded the :ref:`Grades` chapter to include the new :ref:`Review_Answers` section.
    * - 03/27/14
      - Updated the :ref:`Add Pages` section to reflect feature changes.
-   * - 3/27/14
+   * - 03/27/14
      - Updated the section on :ref:`Beta_Testing` to include the new "batch add" feature.
-   * - 3/19/14
+   * - 03/19/14
      - Updated the sections on :ref:`Beta_Testing`, :ref:`Discussions`, :ref:`Grades`, and :ref:`Student Data` with changes to the new Instructor Dashboard.
    * - 03/17/14
      - Reorganized this document into major sections: 
@@ -57,7 +59,7 @@ Change Log
    * - 02/24/14
      - Created new chapter, :ref:`Getting Started with edX`.
    * -
-     - Updated :ref:`Add a Course Video` section
+     - Updated :ref:`Add a Course Video` section.
    * - 02/21/14
      - Added the :ref:`Beta_Testing` chapter. 
    * - 02/19/14

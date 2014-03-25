@@ -36,6 +36,8 @@ To provide access to features on the LMS Instructor Dashboard you assign the Cou
 
 * See course HTML errors.
 
+* Send email messages to course participants.
+
 **Instructors** have access to all of the same options for running the course as the course staff. They can also:
 
 * Add and remove course staff.
