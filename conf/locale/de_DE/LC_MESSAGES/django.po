@@ -23,6 +23,7 @@
 # ramirezterrix <maximilian@kindshofer.net>, 2014
 # ramirezterrix <maximilian@kindshofer.net>, 2014
 # Shan9204 <shanmathuran.sritharan@paluno.uni-due.de>, 2013
+# Shan9204 <shanmathuran.sritharan@paluno.uni-due.de>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from German (Germany) (http://www.transifex.com/projects/p/edx-platform/language/de_DE/)
 # Copyright (C) 2014 edX
@@ -49,6 +50,7 @@
 # ramirezterrix <maximilian@kindshofer.net>, 2014
 # pongratz <pongratz@tum.de>, 2014
 # Shan9204 <shanmathuran.sritharan@paluno.uni-due.de>, 2013
+# Shan9204 <shanmathuran.sritharan@paluno.uni-due.de>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -63,13 +65,14 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Shan9204 <shanmathuran.sritharan@paluno.uni-due.de>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 10:06-0400\n"
-"PO-Revision-Date: 2014-02-24 17:06+0000\n"
-"Last-Translator: nedbat <ned@edx.org>\n"
+"POT-Creation-Date: 2014-03-25 10:28-0400\n"
+"PO-Revision-Date: 2014-03-25 13:07+0000\n"
+"Last-Translator: Shan9204 <shanmathuran.sritharan@paluno.uni-due.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/projects/p/edx-platform/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -220,7 +223,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Email or password is incorrect."
-msgstr "Email oder Password ist falsch."
+msgstr "E-Mail oder Password ist falsch."
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -263,7 +266,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
-msgstr "Es existiert bereits ein Konto mit dieser Emailadresse '{email}'."
+msgstr "Es existiert bereits ein Konto mit dieser E-Mailadresse '{email}'."
 
 #: common/djangoapps/student/views.py
 msgid "Error (401 {field}). E-mail us."
@@ -381,7 +384,7 @@ msgstr "Es existiert bereits ein Konto mit dieser Emailadresse"
 
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
-msgstr "Die alte Emailadresse ist identisch mit der neuen."
+msgstr "Die alte E-Mailadresse ist identisch mit der neuen."
 
 #: common/djangoapps/student/views.py
 msgid "Name required"
@@ -1275,7 +1278,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
-"{statuc_code}."
+"{status_code}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
@@ -3855,14 +3858,6 @@ msgstr "Datenschutzbestimmungen"
 msgid "Help"
 msgstr "Hilfe"
 
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "Visual"
-msgstr "Visuell"
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "HTML"
-msgstr "HTML"
-
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
 msgstr ""
@@ -4175,7 +4170,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Password Reset Email Sent"
-msgstr "Passwort-Rücksetz-E-mail wurde gesendet"
+msgstr "Passwort-Rücksetz-E-Mail wurde gesendet"
 
 #: lms/templates/dashboard.html
 msgid ""
@@ -4187,11 +4182,11 @@ msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 msgid "Change Email"
-msgstr "Email ändern"
+msgstr "E-Mail ändern"
 
 #: lms/templates/dashboard.html
 msgid "Please enter your new email address:"
-msgstr "Bitte geben Sie Ihre neue Emailadresse ein:"
+msgstr "Bitte geben Sie Ihre neue E-Mailadresse ein:"
 
 #: lms/templates/dashboard.html
 msgid "Please confirm your password:"
@@ -4202,8 +4197,8 @@ msgid ""
 "We will send a confirmation to both {email} and your new email as part of "
 "the process."
 msgstr ""
-"Als Teil des Prozesses senden wir Ihnen an {email} und Ihre neue Email eine "
-"Bestätigung"
+"Als Teil des Prozesses senden wir Ihnen an {email} und Ihre neue E-Mail eine"
+" Bestätigung"
 
 #: lms/templates/dashboard.html
 msgid "Change your name"
@@ -4425,7 +4420,7 @@ msgstr "Mein Passwort zurücksetzen"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
-msgstr "Email ist nicht korrekt."
+msgstr "E-Mail ist nicht korrekt."
 
 #: lms/templates/help_modal.html
 msgid "{platform_name} Help"
@@ -6294,7 +6289,7 @@ msgid "Students"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Answer distribution for problems"
+msgid "Score distribution for problems"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
@@ -7190,7 +7185,7 @@ msgid "Skip"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Grade Distribution"
+msgid "Score Distribution"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
@@ -7267,8 +7262,8 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button generates a CSV file of all students enrolled in this "
-"course, along with profile information such as email address and username."
+"Click to generate a CSV file of all students enrolled in this course, along "
+"with profile information such as email address and username:"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -7277,7 +7272,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"For smaller courses, profile information for enrolled students can be listed"
+"For smaller courses, click to list profile information for enrolled students"
 " directly on this page:"
 msgstr ""
 
@@ -7287,10 +7282,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays the grading configuration for the course. The "
-"grading configuration is the breakdown of graded subsections of the course "
-"(such as exams and problem sets), and can be changed on the 'Grading' page "
-"(under 'Settings') in Studio."
+"Click to display the grading configuration for the course. The grading "
+"configuration is the breakdown of graded subsections of the course (such as "
+"exams and problem sets), and can be changed on the 'Grading' page (under "
+"'Settings') in Studio."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -7298,7 +7293,7 @@ msgid "Grading Configuration"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of anonymized student IDs by clicking this button."
+msgid "Click to download a CSV of anonymized student IDs:"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -7311,9 +7306,9 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button will generate a CSV grade report for all currently "
-"enrolled students.  Generated reports appear in a table below and can be "
-"downloaded."
+"Click to generate a CSV grade report for all currently enrolled students.  "
+"Links to generated reports appear in a table below when report generation is"
+" complete."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -7339,24 +7334,19 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Grade reports listed below are generated each time the <b>Generate Grade "
-"Report</b> button is clicked. A link to each grade report remains available "
-"on this page, identified by the UTC date and time of generation. Grade "
+"The grade reports listed below are generated each time the <b>Generate Grade"
+" Report</b> button is clicked. A link to each grade report remains available"
+" on this page, identified by the UTC date and time of generation. Grade "
 "reports are not deleted, so you will always be able to access previously "
 "generated reports from this page."
 msgstr ""
 
-#. Translators: "these rules" in this sentence references a detailed
-#. description of the grading reports that will appear in a table that
-#. contains
-#. a mix of different types of reports.  This sentence intends to indicate
-#. that
-#. the description of the grading report does not apply to the other reports
-#. that may appear in the table.
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Other reports may appear in the table for which these rules will not "
-"necessarily apply."
+"The answer distribution report listed below is generated periodically by an "
+"automated background process. The report is cumulative, so answers submitted"
+" after the process starts are included in a subsequent report. The report is"
+" generated several times per day."
 msgstr ""
 
 #. Translators: a table of URL links to report files appears after this
@@ -8381,7 +8371,7 @@ msgstr ""
 #: lms/templates/static_templates/server-error.html
 msgid ""
 "Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at <a href=\"{email}\">{email}</a>."
+" please email us at {email}."
 msgstr ""
 
 #: lms/templates/static_templates/server-overloaded.html
@@ -9413,6 +9403,10 @@ msgstr ""
 #: cms/templates/index.html cms/templates/manage_users.html
 #: cms/templates/overview.html cms/templates/textbooks.html
 msgid "Page Actions"
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid "Loading&hellip;"
 msgstr ""
 
 #: cms/templates/asset_index.html

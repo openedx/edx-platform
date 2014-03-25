@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 10:06-0400\n"
+"POT-Creation-Date: 2014-03-25 10:27-0400\n"
 "PO-Revision-Date: 2014-03-24 14:25+0000\n"
 "Last-Translator: ramirezterrix <maximilian@kindshofer.net>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/projects/p/edx-platform/language/de_DE/)\n"
@@ -838,8 +838,8 @@ msgstr ""
 "einmal."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
-msgid "File Name (Newest First)"
-msgstr "Dateinname (neuste zuerst)"
+msgid "File Name"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
@@ -876,6 +876,21 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid ""
+"Could not find a user with username or email address '<%= identifier %>'."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid ""
+"Error: User '<%= username %>' has not yet activated their account. Users "
+"must create and activate their accounts before they can be assigned a role."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error: You cannot remove yourself from the Instructor group!"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -982,7 +997,7 @@ msgstr "Ihre Nachricht darf nicht leer sein."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
-msgstr "Ihre Email wurde erfolgreich zum Senden vorbereitet"
+msgstr "Ihre E-Mail wurde erfolgreich zum Senden vorbereitet"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
@@ -1008,7 +1023,7 @@ msgid ""
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
 msgstr ""
-"Ihre E-mail wurde erfolgreich gesendet. Bitte beachten sie, dass es für "
+"Ihre E-Mail wurde erfolgreich gesendet. Bitte beachten sie, dass es für "
 "große Kurse mehrere Stunden (falls mehrere Kurse gleichzeitig E-Mails senden"
 " noch einmal länger) dauern kann bis alle E-Mails versendet wurden ."
 
@@ -1018,7 +1033,7 @@ msgstr "Fehler beim Senden der E-Mail."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There is no email history for this course."
-msgstr "Sie haben keine Emails für diesen Kurs."
+msgstr "Sie haben keine E-Mails für diesen Kurs."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email task history for this course."
@@ -1032,7 +1047,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
 msgstr ""
-"Bitte geben Sie eine Teilnehmer-Emailadresse oder einen Benutzernamen ein."
+"Bitte geben Sie eine Teilnehmer-E-Mailadresse oder einen Benutzernamen ein."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""

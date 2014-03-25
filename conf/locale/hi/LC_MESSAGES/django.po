@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 10:06-0400\n"
+"POT-Creation-Date: 2014-03-25 10:28-0400\n"
 "PO-Revision-Date: 2014-02-27 00:20+0000\n"
 "Last-Translator: anantvima <anant.vima@anu.edu.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -1323,10 +1323,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
-"{statuc_code}."
+"{status_code}."
 msgstr ""
-"यू ट्यूब से {youtube_id} के लिए प्रतिलिपियां नहीं मिल रही हैं। स्टेटस कोड: "
-"{statuc_code}"
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "Can't find any transcripts on the Youtube service."
@@ -4113,14 +4111,6 @@ msgstr "निजता नीति"
 msgid "Help"
 msgstr "सहायता"
 
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "Visual"
-msgstr "दृश्य"
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "HTML"
-msgstr "एच टी एम एल"
-
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
 msgstr " {} | के लिए अपना रजिस्ट्रेशन अपग्रेड करें। अपना ट्रैक चुनें।"
@@ -6770,8 +6760,8 @@ msgid "Students"
 msgstr "छात्र"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Answer distribution for problems"
-msgstr "समस्याओं के उत्तर"
+msgid "Score distribution for problems"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -7727,8 +7717,8 @@ msgid "Skip"
 msgstr "आगे बढ़ें"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Grade Distribution"
-msgstr "ग्रेड वितरण"
+msgid "Score Distribution"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid ""
@@ -7809,12 +7799,9 @@ msgstr "पाठ्यक्रम चेतावनियां"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button generates a CSV file of all students enrolled in this "
-"course, along with profile information such as email address and username."
+"Click to generate a CSV file of all students enrolled in this course, along "
+"with profile information such as email address and username:"
 msgstr ""
-"नीचे दीया गया बटन इस पाठ्यक्रम में दाखिल सभी छात्रों की एक सीएसवी फ़ाइल "
-"बनाता है, और साथ-साथ प्रोफ़ाइल जानकारी, जैसे की ई-मेल पता और उपयोगकर्ता नाम,"
-" भी बनाता है।"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download profile information as a CSV"
@@ -7822,11 +7809,9 @@ msgstr "एक CSV के रूप में प्रोफ़ाइल जा
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"For smaller courses, profile information for enrolled students can be listed"
+"For smaller courses, click to list profile information for enrolled students"
 " directly on this page:"
 msgstr ""
-"छोटे पाठ्यक्रमों के लिए, दाखिल छात्रों की प्रोफ़ाइल जानकारी इस पेज पर सीधे "
-"सूचीबद्ध की जा सकती है:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "List enrolled students' profile information"
@@ -7834,22 +7819,19 @@ msgstr "दाखिल छात्रों की प्रोफाइल �
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays the grading configuration for the course. The "
-"grading configuration is the breakdown of graded subsections of the course "
-"(such as exams and problem sets), and can be changed on the 'Grading' page "
-"(under 'Settings') in Studio."
+"Click to display the grading configuration for the course. The grading "
+"configuration is the breakdown of graded subsections of the course (such as "
+"exams and problem sets), and can be changed on the 'Grading' page (under "
+"'Settings') in Studio."
 msgstr ""
-"यह बटन पाठ्यक्रम की ग्रेडिंग कॉनफ़िगरेशन को दिखाता है। ग्रेडिंग कॉनफ़िगरेशन "
-"पाठ्यक्रम के भिन्न-भिन्न भागों (जैसे कि परीक्षाएं और समस्या सेट) का खंड होता"
-" है और इसको स्टूडियो में 'ग्रेडिंग' पेज (सेटिंग्स के नीचे) बदला जा सकता है।"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Grading Configuration"
 msgstr "ग्रेडिंग कॉन्फ़िगरेशन"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of anonymized student IDs by clicking this button."
-msgstr "इस बटन पर क्लिक करके गुमनाम छात्रों के आईडी की CSV डाउनलोड करें।"
+msgid "Click to download a CSV of anonymized student IDs:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Get Student Anonymized IDs CSV"
@@ -7861,13 +7843,10 @@ msgstr "रिपोर्ट्स"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button will generate a CSV grade report for all currently "
-"enrolled students.  Generated reports appear in a table below and can be "
-"downloaded."
+"Click to generate a CSV grade report for all currently enrolled students.  "
+"Links to generated reports appear in a table below when report generation is"
+" complete."
 msgstr ""
-"नीचे दिया गया बटन सभी छात्र जिनके पास मौजूदा दाखिला है के लिए एक CSV ग्रेड "
-"रिपोर्ट बनाएगा। तैयार रिपोर्ट नीचे एक टेबल में दिखाई देगी और उसे डाउनलोड "
-"किया जा सकता है।"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7898,32 +7877,20 @@ msgstr "रिपोर्ट्स डाउनलोड करने के �
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Grade reports listed below are generated each time the <b>Generate Grade "
-"Report</b> button is clicked. A link to each grade report remains available "
-"on this page, identified by the UTC date and time of generation. Grade "
+"The grade reports listed below are generated each time the <b>Generate Grade"
+" Report</b> button is clicked. A link to each grade report remains available"
+" on this page, identified by the UTC date and time of generation. Grade "
 "reports are not deleted, so you will always be able to access previously "
 "generated reports from this page."
 msgstr ""
-"नीचे दी गई सूची में जो ग्रेड रिपोर्ट्स हैं वे तब बनती हैं जब <b>ग्रेड की "
-"रिपोर्ट बनाएं</b> बटन क्लिक किया जाता है। हर ग्रेड रिपोर्ट का लिंक इसी पेज "
-"पर रहेगा, जो की यूटीसी तारीख और रिपोर्ट के बने हुए समय से पहचाना जा सकता है।"
-" ग्रेड रिपोर्ट्स नष्ट नहीं की जाती हैं, इसलिए आप हमेशा ही इस पेज से पहले "
-"बनाई गई रिपोर्ट पा सकते हैं।"
 
-#. Translators: "these rules" in this sentence references a detailed
-#. description of the grading reports that will appear in a table that
-#. contains
-#. a mix of different types of reports.  This sentence intends to indicate
-#. that
-#. the description of the grading report does not apply to the other reports
-#. that may appear in the table.
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Other reports may appear in the table for which these rules will not "
-"necessarily apply."
+"The answer distribution report listed below is generated periodically by an "
+"automated background process. The report is cumulative, so answers submitted"
+" after the process starts are included in a subsequent report. The report is"
+" generated several times per day."
 msgstr ""
-"ऐसी अन्य रिपोर्ट्स भी तालिका में दिखाई दे सकती हैं जिनके लिए ज़रूरी नहीं है "
-"कि ये नियम लागू होंगे।"
 
 #. Translators: a table of URL links to report files appears after this
 #. sentence.
@@ -9082,10 +9049,8 @@ msgstr " <em>{platform_name}</em> के सरवरों पर 500 error ह
 #: lms/templates/static_templates/server-error.html
 msgid ""
 "Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at <a href=\"{email}\">{email}</a>."
+" please email us at {email}."
 msgstr ""
-"कृपया थोड़ी देर रुक कर पेज को फिर से रीलोड करें। अगर तब भी समस्या बनी रहती "
-"है तो हमसे <a href=\"{email}\">{email}</a> पर संपर्क करें।"
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the <em>{platform_name}</em> servers are overloaded"
@@ -10240,6 +10205,10 @@ msgstr "विषय-वस्तु"
 #: cms/templates/index.html cms/templates/manage_users.html
 #: cms/templates/overview.html cms/templates/textbooks.html
 msgid "Page Actions"
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid "Loading&hellip;"
 msgstr ""
 
 #: cms/templates/asset_index.html
