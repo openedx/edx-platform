@@ -161,7 +161,7 @@ class @StaffGrading
     @message_container = $('.message-container')
 
     @prompt_name_container = $('.prompt-name')
-    @prompt_container = $('.prompt-container-staff')
+    @prompt_container = $('.prompt-container')
     @prompt_wrapper = $('.prompt-wrapper')
 
     @submission_container = $('.submission-container')
@@ -188,6 +188,8 @@ class @StaffGrading
     $(window).keydown @keydown_handler
     $(window).keyup @keyup_handler
     @question_header = $('.question-header')
+    @question_header.click @collapse_question
+    @collapse_question()
 
     # model state
     @state = state_no_data

@@ -3,8 +3,6 @@
 Command to generate statistics.
 """
 import csv
-import time
-from time import sleep
 import sys
 
 from django.core.management.base import BaseCommand
@@ -12,6 +10,7 @@ from optparse import make_option
 
 from xmodule.modulestore.django import modulestore
 from courseware.courses import get_course
+from courseware.access import _has_staff_access_to_course_id
 from django.contrib.auth.models import User
 
 from instructor.offline_gradecalc import student_grades
@@ -96,7 +95,8 @@ def gendata(request):
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course.id,
         ).prefetch_related("groups").order_by('username')
-
+        enrolled_students = [st for st in enrolled_students if _has_staff_access_to_course_id(st, course.id)]
+        
         if enrolled_students.count() <= 0:
             continue
 
@@ -162,27 +162,25 @@ def gendata(request):
 
 def fullstat(request = None):
 
-    print("Dumping fullstat")
-
     request = DummyRequest()
     
 
     header = [u'ФИО', u'ФИО (измененное)', u'логин школы', u'email', u'email (измененное)', u'курс', u'зарегистрирован', u"дата регистрации на курс", u'2/3', u'100%', u'Задачи/Задания(Модули)']
     assignments = []
-    datatable = {'header': header, 'assignments': assignments, 'students': []}
-    data = []
+    datatablefull = {'header': header, 'assignments': assignments, 'students': []}
+    datafull = []
 
-    for course_id, course_name in coursemap.iteritems():
-        course = get_course(course_id)
-    
-        datarow = [u'-', u'-', u'-', u'-', u'-', course_name, u'-', u'-', u'-']
+    for course in modulestore().get_courses():
+        
+        datarow = [u'-', u'-', u'-', u'-', u'-', course.id, u'-', u'-', u'-']
         
         assignments = []
         
         enrolled_students = User.objects.filter(
-            courseenrollment__course_id=course_id,
+            courseenrollment__course_id=course.id,
         ).prefetch_related("groups").order_by('username')
-
+        enrolled_students = [st for st in enrolled_students if _has_staff_access_to_course_id(st, course.id)]
+        
 
         gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=True, use_offline=False)
         courseware_summary = grades.progress_summary(enrolled_students[0], request, course);
@@ -198,10 +196,13 @@ def fullstat(request = None):
             assignments += [chapter['display_name']]
 
         datarow += assignments
-        data.append(datarow)
+        datafull.append(datarow)
         
 
     edxdata = gendata(request)
+
+
+    print("Dumping fullstat")
 
     f = open("/opt/data.csv")
 
@@ -255,7 +256,7 @@ def fullstat(request = None):
                 datarow += [u'Да', courseenrollment.created.strftime('%d/%m/%Y')]
             except:
                 datarow += [u'Нет', '']
-                data.append(datarow)
+                datafull.append(datarow)
                 continue
             
             #Raw statistic by problems
@@ -277,37 +278,16 @@ def fullstat(request = None):
             datarow += statprob
             datarow += statsec
             
-            data.append(datarow)
+            datafull.append(datarow)
         except:
             pass
-    datatable['data'] = data
-    return_csv('full_stat.csv',datatable, open("/var/www/edx/fullstat.csv", "wb"))
+    datatablefull['data'] = datafull
+    return_csv('full_stat.csv',datatablefull, open("/var/www/edx/fullstat.csv", "wb"))
 
-
-
-    f = open("/opt/data.csv")
-
-    if f is None:
-        return False;
-
-    ff = UnicodeDictReader(f, delimiter=';', quoting=csv.QUOTE_NONE)
-
-
-    usermap = {}
-    idx = 0
-    for row in ff:
-        idx += 1
-        usermap.setdefault(row['email'],[]).append(row)
 
     for course in modulestore().get_courses():
 
         print("Dumping course {courseid}".format(courseid = course.id))
-
-
-        enrolled_students = User.objects.filter(
-            courseenrollment__course_id=course.id,
-            courseenrollment__is_active=1,
-        ).prefetch_related("groups").order_by('username')
 
 
         assignments = []
@@ -315,6 +295,8 @@ def fullstat(request = None):
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course.id,
         ).prefetch_related("groups").order_by('username')
+        enrolled_students = [st for st in enrolled_students if _has_staff_access_to_course_id(st, course.id)]
+        
 
 
         gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=True, use_offline=False)
@@ -348,7 +330,7 @@ def fullstat(request = None):
                 datarow += [user.profile.work_login]
                 datarow += [user.email]
 
-                courseenrollment = user.courseenrollment_set.filter(course_id = course_id)[0]
+                courseenrollment = user.courseenrollment_set.filter(course_id = course.id)[0]
 
                 datarow += [courseenrollment.created.strftime('%d/%m/%Y')]
                 

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2014-03-24 18:07+0400\n"
-"PO-Revision-Date: 2014-02-12 15:32+0300\n"
+"PO-Revision-Date: 2014-03-25 16:33+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -87,9 +87,8 @@ msgstr "Удалить"
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html:17
 #: lms/templates/wiki/includes/article_menu.html:11
-#, fuzzy
 msgid "View"
-msgstr "Посмотреть все"
+msgstr "Просмотр"
 
 #: cms/templates/html_error.html:18 lms/templates/module-error.html:10
 msgid "Error:"
@@ -1609,9 +1608,8 @@ msgstr "Учетная запись."
 #. Translators: The 'Group' here refers to the group of users that has been
 #. sorted into group_id
 #: lms/templates/split_test_staff_view.html:7
-#, fuzzy
 msgid "Group {group_id}"
-msgstr "О курсе {course_id}"
+msgstr "Группа {group_id}"
 
 #: lms/templates/staff_problem_info.html:19
 msgid "Staff Debug Info"
@@ -1630,7 +1628,6 @@ msgid "Comment"
 msgstr "Комментарий"
 
 #: lms/templates/staff_problem_info.html:34
-#, fuzzy
 msgid "comment"
 msgstr "комментарий"
 
@@ -2239,9 +2236,8 @@ msgid "About {course.display_number_with_default}"
 msgstr "О {course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html:145
-#, fuzzy
 msgid "You are registered for this course"
-msgstr "Вы зарегистрированы на:"
+msgstr "Вы зарегистрированы на этот курс"
 
 #: lms/templates/courseware/course_about.html:148
 msgid "View Courseware"
@@ -2258,9 +2254,8 @@ msgid ""
 msgstr "{course.display_number_with_default} Информация о курсе"
 
 #: lms/templates/courseware/course_about.html:173
-#, fuzzy
 msgid "Course is full"
-msgstr "Учебный год"
+msgstr "Курс полон"
 
 #: lms/templates/courseware/course_about.html:177
 msgid "Register for {course.display_number_with_default}"
@@ -2448,9 +2443,8 @@ msgid "Gradebook"
 msgstr "Журнал оценок"
 
 #: lms/templates/courseware/info.html:7
-#, fuzzy
 msgid "{course_number} Course Info"
-msgstr "{course_number} курс"
+msgstr "{course_number} Информация о курсе"
 
 #: lms/templates/courseware/info.html:32 lms/templates/courseware/info.html:41
 #: lms/templates/courseware/welcome-back.html:22
@@ -2514,9 +2508,8 @@ msgid "Analytics"
 msgstr "Аналитика"
 
 #: lms/templates/courseware/instructor_dashboard.html:148
-#, fuzzy
 msgid "Metrics"
-msgstr "Психометрика"
+msgstr "Метрики"
 
 #: lms/templates/courseware/instructor_dashboard.html:170
 msgid "Grade Downloads"
@@ -3107,9 +3100,8 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html:704
 #: lms/templates/courseware/instructor_dashboard.html:711
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html:39
-#, fuzzy
 msgid "Loading..."
-msgstr "Загружаю"
+msgstr "Загрузка..."
 
 #: lms/templates/courseware/instructor_dashboard.html:707
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html:25
@@ -3234,9 +3226,8 @@ msgid "{course_number} Progress"
 msgstr "{course_number} Прогресс"
 
 #: lms/templates/courseware/progress.html:45
-#, fuzzy
 msgid "Course Progress"
-msgstr "Прогресс"
+msgstr "Прогресс Курса"
 
 #: lms/templates/courseware/progress.html:47
 msgid "Course Progress for Student '{username}' ({email})"
@@ -3826,9 +3817,8 @@ msgstr "Обновить ответ"
 
 #: lms/templates/discussion/_underscore_templates.html:169
 #: lms/templates/discussion/_underscore_templates.html:170
-#, fuzzy
 msgid "Delete Comment"
-msgstr "Удалить блок"
+msgstr "Удалить комментарий"
 
 #: lms/templates/discussion/_underscore_templates.html:181
 #, python-format
@@ -3836,14 +3826,12 @@ msgid "-posted %(time_ago)s by"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html:197
-#, fuzzy
 msgid "Editing comment"
-msgstr "Дополнительные комментарии:"
+msgstr "Отредактировать комментарий"
 
 #: lms/templates/discussion/_underscore_templates.html:202
-#, fuzzy
 msgid "Update comment"
-msgstr "Добавить комментарий"
+msgstr "Обновить комментарий"
 
 #: lms/templates/discussion/_underscore_templates.html:227
 #, python-format
@@ -3863,9 +3851,8 @@ msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html:253
-#, fuzzy
 msgid "DISCUSSION HOME:"
-msgstr "ДИСКУССИИ"
+msgstr "ДИСКУССИИ:"
 
 #: lms/templates/discussion/_underscore_templates.html:260
 msgid "HOW TO USE EDX DISCUSSIONS"
@@ -3926,20 +3913,20 @@ msgid ", "
 msgstr ""
 
 #: lms/templates/discussion/_user_profile.html:8
-#, fuzzy, python-format
+#, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] "начатая дискуссия"
-msgstr[1] "начатые дискуссии"
-msgstr[2] "начатых дискуссий"
+msgstr[0] "%s начатая дискуссия"
+msgstr[1] "%s начатые дискуссии"
+msgstr[2] "%s начатых дискуссий"
 
 #: lms/templates/discussion/_user_profile.html:9
-#, fuzzy, python-format
+#, python-format
 msgid "%s comment"
 msgid_plural "%s comments"
-msgstr[0] "%s новый комментарий"
-msgstr[1] "%s новых комментария"
-msgstr[2] "%s новых комментариев"
+msgstr[0] "%s комментарий"
+msgstr[1] "%s комментария"
+msgstr[2] "%s комментариев"
 
 #: lms/templates/discussion/index.html:9
 #: lms/templates/discussion/user_profile.html:7
@@ -3973,15 +3960,13 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_thread.mustache:24
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache:26
 #: lms/templates/discussion/mustache/_profile_thread.mustache:30
-#, fuzzy
 msgid "View discussion"
-msgstr "дискуссии"
+msgstr "Просмотр дискуссии"
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache:25
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache:27
-#, fuzzy
 msgid "Hide discussion"
-msgstr "Найти дискуссию"
+msgstr "Спрятать дискуссию"
 
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache:11
 msgid "This thread has been pinned by course staff."
@@ -4953,14 +4938,12 @@ msgid "These reports are delimited by start and end dates."
 msgstr ""
 
 #: lms/templates/shoppingcart/download_report.html:19
-#, fuzzy
 msgid "Start Date: "
-msgstr "Дата начала курса"
+msgstr "Дата начала:"
 
 #: lms/templates/shoppingcart/download_report.html:21
-#, fuzzy
 msgid "End Date: "
-msgstr "Дата окончания курса"
+msgstr "Дата окончанияЖ"
 
 #: lms/templates/shoppingcart/download_report.html:39
 msgid ""
@@ -6296,14 +6279,12 @@ msgstr ""
 #: lms/templates/wiki/includes/article_menu.html:21
 #: lms/templates/wiki/includes/article_menu.html:30
 #: lms/templates/wiki/includes/article_menu.html:40
-#, fuzzy
 msgid "{span_start}(active){span_end}"
-msgstr "{span_start}активен{span_end}"
+msgstr "{span_start}(активен){span_end}"
 
 #: lms/templates/wiki/includes/article_menu.html:29
-#, fuzzy
 msgid "Changes"
-msgstr "замена"
+msgstr "Изменения"
 
 #: lms/templates/wiki/includes/article_menu.html:56
 msgid "{span_start}active{span_end}"

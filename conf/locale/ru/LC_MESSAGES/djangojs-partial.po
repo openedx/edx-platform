@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2014-03-24 18:07+0400\n"
-"PO-Revision-Date: 2013-11-29 19:05+0300\n"
+"PO-Revision-Date: 2014-03-25 21:06+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -78,31 +78,30 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js:117
 msgid "(%(earned)s/%(possible)s point)"
 msgid_plural "(%(earned)s/%(possible)s points)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "(%(earned)s/%(possible)s балл)"
+msgstr[1] "(%(earned)s/%(possible)s балла)"
+msgstr[2] "(%(earned)s/%(possible)s баллов)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10). There will always be at least 1 point possible.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js:127
-#, fuzzy
 msgid "(%(num_points)s point possible)"
 msgid_plural "(%(num_points)s points possible)"
-msgstr[0] "%s балл"
-msgstr[1] "%s балла"
-msgstr[2] "%s баллов"
+msgstr[0] "(%(num_points)s балл)"
+msgstr[1] "(%(num_points)s балла)"
+msgstr[2] "(%(num_points)s баллов)"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js:457
 msgid "Hide Answer(s)"
-msgstr ""
+msgstr "Спрятать ответ(ы)"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js:468
 msgid "Show Answer(s)"
-msgstr ""
+msgstr "Показать ответ(ы)"
 
 #. Translators: the word unanswered here is about answering a problem the
 #. student must solve.;
@@ -194,8 +193,9 @@ msgid ""
 "answer box."
 msgstr ""
 "Для данной задачи требуется отправка файлов, но данная функциональность не "
-"поддерживается вашим браузером. Попробуйте обновить ваш браузер, либо использовать последнюю версию Google Chrome. Также вы "
-"можете загрузить ваш фаил в интернет и вставить ссылку в поле для ответа."
+"поддерживается вашим браузером. Попробуйте обновить ваш браузер, либо "
+"использовать последнюю версию Google Chrome. Также вы можете загрузить ваш "
+"фаил в интернет и вставить ссылку в поле для ответа."
 
 #. Translators: "Show Question" is some text that, when clicked, shows a
 #. question's
@@ -447,12 +447,11 @@ msgid "We had some trouble loading more threads. Please try again."
 msgstr "Произошла ошибка при сохранении изменений. Попробуйте еще раз."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js:247
-#, fuzzy
 msgid "%(unread_count)s new comment"
 msgid_plural "%(unread_count)s new comments"
-msgstr[0] "%s новый комментарий"
-msgstr[1] "%s новых комментария"
-msgstr[2] "%s новых комментариев"
+msgstr[0] "%(unread_count)s новый комментарий"
+msgstr[1] "%(unread_count)s новых комментария"
+msgstr[2] "%(unread_count)s новых комментариев"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js:555
 #, fuzzy
@@ -742,12 +741,11 @@ msgstr ""
 
 #. Translators: the names of months, keep the pipe (|) separators.
 #: lms/static/admin/js/calendar.js:27 lms/static/admin/js/dateparse.js:33
-#, fuzzy
 msgid ""
 "January|February|March|April|May|June|July|August|September|October|November|"
 "December"
 msgstr ""
-"Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь "
+"Январь|Февраль|Март|Апрель|Май|Июнь|Июль|Август|Сентябрь|Октябрь|Ноябрь|"
 "Декабрь"
 
 #. Translators: abbreviations for days of the week, keep the pipe (|)
@@ -767,9 +765,8 @@ msgstr "Спрятать"
 
 #. Translators: the names of days, keep the pipe (|) separators.
 #: lms/static/admin/js/dateparse.js:35
-#, fuzzy
 msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr "Понедельник Вторник Среда Четверг Пятница Суббота Воскресенье"
+msgstr "Понедельник|Вторник|Среда|Четверг|Пятница|Суббота|Воскресенье"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:49
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:85
