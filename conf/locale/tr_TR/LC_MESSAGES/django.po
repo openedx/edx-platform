@@ -72,7 +72,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 10:06-0400\n"
+"POT-Creation-Date: 2014-03-25 10:28-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: Hakan Senel <hgsenel@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
@@ -1336,9 +1336,8 @@ msgstr "Skorunuzu kaydederken hata. Lütfen ders çalışanlarına bildiriniz."
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
-"{statuc_code}."
+"{status_code}."
 msgstr ""
-"Youtube'dan  {youtube_id} için altyazı alınamadı. Durum kodu: {statuc_code}."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "Can't find any transcripts on the Youtube service."
@@ -4098,14 +4097,6 @@ msgstr "Gizlilik İlkeleri"
 msgid "Help"
 msgstr "Yardım"
 
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "Visual"
-msgstr "Görsel"
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "HTML"
-msgstr "HTML"
-
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
 msgstr "{} için Kaydınızı Yükseltin | Hedefinizi Seçiniz"
@@ -6741,8 +6732,8 @@ msgid "Students"
 msgstr "Öğrenciler"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Answer distribution for problems"
-msgstr "Sorular için cevap dağılımı"
+msgid "Score distribution for problems"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -7693,8 +7684,8 @@ msgid "Skip"
 msgstr "Atla"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Grade Distribution"
-msgstr "Not Dağılımı"
+msgid "Score Distribution"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid ""
@@ -7774,12 +7765,9 @@ msgstr "Ders Uyarıları"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button generates a CSV file of all students enrolled in this "
-"course, along with profile information such as email address and username."
+"Click to generate a CSV file of all students enrolled in this course, along "
+"with profile information such as email address and username:"
 msgstr ""
-"Aşağıdaki buton, e-posta adresi ve kullanıcı adı gibi profil bilgileriyle "
-"birlikte bu derse kayıtlı olan öğrencileri listeleyen CSV dosyasını "
-"oluşturur."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download profile information as a CSV"
@@ -7787,11 +7775,9 @@ msgstr "Profil bilgilerini CSV dosyası olarak indir"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"For smaller courses, profile information for enrolled students can be listed"
+"For smaller courses, click to list profile information for enrolled students"
 " directly on this page:"
 msgstr ""
-"Daha küçük dersler için, kayıtlı öğrencilerin bilgileri bu sayfada doğrudan "
-"listelenir:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "List enrolled students' profile information"
@@ -7799,24 +7785,19 @@ msgstr "Kayıtlı öğrencilerin profil bilgisini listele"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays the grading configuration for the course. The "
-"grading configuration is the breakdown of graded subsections of the course "
-"(such as exams and problem sets), and can be changed on the 'Grading' page "
-"(under 'Settings') in Studio."
+"Click to display the grading configuration for the course. The grading "
+"configuration is the breakdown of graded subsections of the course (such as "
+"exams and problem sets), and can be changed on the 'Grading' page (under "
+"'Settings') in Studio."
 msgstr ""
-"Aşağıdaki buton dersin notlandırma yapılandırmasını gösterir. Notlandırma "
-"yapılandırması dersin notlandırılmış alt bölümlerinin (örneğin sınavlar ve "
-"problem setleri) analizidir ve Studio içindeki 'Notlandırma' sayfasından "
-"('Kurulum' bölümünde) değiştirilebilir."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Grading Configuration"
 msgstr "Notlandırma Konfigürasyonu"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of anonymized student IDs by clicking this button."
+msgid "Click to download a CSV of anonymized student IDs:"
 msgstr ""
-"Bu butona basarak anonimleştirilmiş öğrenci kimliklerini CSV olarak indirin."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Get Student Anonymized IDs CSV"
@@ -7828,13 +7809,10 @@ msgstr "Raporlar"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button will generate a CSV grade report for all currently "
-"enrolled students.  Generated reports appear in a table below and can be "
-"downloaded."
+"Click to generate a CSV grade report for all currently enrolled students.  "
+"Links to generated reports appear in a table below when report generation is"
+" complete."
 msgstr ""
-"Aşağıdaki buton şu an için kayıtlı olan bütün öğrenciler için CSV not raporu"
-" oluşturacaktır. Oluşturulan raporlar aşağıda bir tabloda, indirilecek "
-"şekilde gösterilmektedir."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7864,31 +7842,20 @@ msgstr "İndirme için Hazır Raporlar"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Grade reports listed below are generated each time the <b>Generate Grade "
-"Report</b> button is clicked. A link to each grade report remains available "
-"on this page, identified by the UTC date and time of generation. Grade "
+"The grade reports listed below are generated each time the <b>Generate Grade"
+" Report</b> button is clicked. A link to each grade report remains available"
+" on this page, identified by the UTC date and time of generation. Grade "
 "reports are not deleted, so you will always be able to access previously "
 "generated reports from this page."
 msgstr ""
-"Aşağıda listelenen not raporları <b>Not Raporu Oluştur</b> butonuna "
-"tıklandığı zaman oluşturulur. Her not raporuna olan bağlantı, oluşturulduğu "
-"UTC tarihi ve zamanıyla belirlenmiş şekilde sayfada sunulur. Not raporları "
-"silinmez ve böylece eskiden oluşturulmuş raporlara bu sayfa üzerinde "
-"erişebilirsiniz."
 
-#. Translators: "these rules" in this sentence references a detailed
-#. description of the grading reports that will appear in a table that
-#. contains
-#. a mix of different types of reports.  This sentence intends to indicate
-#. that
-#. the description of the grading report does not apply to the other reports
-#. that may appear in the table.
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Other reports may appear in the table for which these rules will not "
-"necessarily apply."
+"The answer distribution report listed below is generated periodically by an "
+"automated background process. The report is cumulative, so answers submitted"
+" after the process starts are included in a subsequent report. The report is"
+" generated several times per day."
 msgstr ""
-"Bu kuralların genellikle uymayacağı fiğer raporlar bu tabloda görünebilir."
 
 #. Translators: a table of URL links to report files appears after this
 #. sentence.
@@ -9026,10 +8993,8 @@ msgstr "<em>{platform_name}</em> sunucularında 500 hatası oldu."
 #: lms/templates/static_templates/server-error.html
 msgid ""
 "Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at <a href=\"{email}\">{email}</a>."
+" please email us at {email}."
 msgstr ""
-"Lütfen bir kaç dakika bekleyin ve sayfayı yeniden yükleyin. Eğer sorun devam"
-" ederse, lütfen <a href=\"{email}\">{email}</a> adresine eposta atınız."
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the <em>{platform_name}</em> servers are overloaded"
@@ -10183,6 +10148,10 @@ msgstr "İçerik"
 #: cms/templates/overview.html cms/templates/textbooks.html
 msgid "Page Actions"
 msgstr "Sayfa İşlemleri"
+
+#: cms/templates/asset_index.html
+msgid "Loading&hellip;"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "What files are listed here?"

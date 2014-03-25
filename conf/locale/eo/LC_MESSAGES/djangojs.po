@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 10:57-0400\n"
-"PO-Revision-Date: 2014-03-24 14:58:46.326786\n"
+"POT-Creation-Date: 2014-03-25 10:43-0400\n"
+"PO-Revision-Date: 2014-03-25 14:44:32.725277\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -846,8 +846,8 @@ msgid "Error generating grades. Please try again."
 msgstr "Érrör générätïng grädés. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυ#"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
-msgid "File Name (Newest First)"
-msgstr "Fïlé Nämé (Néwést Fïrst) Ⱡ'σяє#"
+msgid "File Name"
+msgstr "Fïlé Nämé #"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
@@ -887,6 +887,28 @@ msgstr "Érrör fétçhïng lïst för rölé Ⱡ'σяєм #"
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
 msgstr "Érrör çhängïng üsér's pérmïssïöns. Ⱡ'σяєм ιρ#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid ""
+"Could not find a user with username or email address '<%= identifier %>'."
+msgstr ""
+"Çöüld nöt fïnd ä üsér wïth üsérnämé ör émäïl äddréss '<%= identifier %>'. "
+"Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid ""
+"Error: User '<%= username %>' has not yet activated their account. Users "
+"must create and activate their accounts before they can be assigned a role."
+msgstr ""
+"Érrör: Ûsér '<%= username %>' häs nöt ýét äçtïvätéd théïr äççöünt. Ûsérs "
+"müst çréäté änd äçtïväté théïr äççöünts ßéföré théý çän ßé ässïgnéd ä rölé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error: You cannot remove yourself from the Instructor group!"
+msgstr ""
+"Érrör: Ýöü çännöt rémövé ýöürsélf fröm thé Ìnstrüçtör gröüp! Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."

@@ -95,7 +95,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 10:06-0400\n"
+"POT-Creation-Date: 2014-03-25 10:28-0400\n"
 "PO-Revision-Date: 2014-03-01 15:39+0000\n"
 "Last-Translator: ovnicraft <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -1369,10 +1369,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
-"{statuc_code}."
+"{status_code}."
 msgstr ""
-"No se han podido recibir las transcripciones de Youtube para {youtube_id}. "
-"Código del estado del proceso: {statuc_code}."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "Can't find any transcripts on the Youtube service."
@@ -4169,14 +4167,6 @@ msgstr "Política de privacidad"
 msgid "Help"
 msgstr "Ayuda"
 
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "Visual"
-msgstr "Visual"
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "HTML"
-msgstr "HTML"
-
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
 msgstr "Actualice su registro para {} | Elija su ruta"
@@ -6854,8 +6844,8 @@ msgid "Students"
 msgstr "Estudiantes"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Answer distribution for problems"
-msgstr "Distribución de respuestas a los problemas"
+msgid "Score distribution for problems"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -7811,8 +7801,8 @@ msgid "Skip"
 msgstr "Omitir"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Grade Distribution"
-msgstr "Distribución de calificaciones"
+msgid "Score Distribution"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid ""
@@ -7891,8 +7881,8 @@ msgstr "Advertencias del curso"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button generates a CSV file of all students enrolled in this "
-"course, along with profile information such as email address and username."
+"Click to generate a CSV file of all students enrolled in this course, along "
+"with profile information such as email address and username:"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -7901,7 +7891,7 @@ msgstr "Descargar la informaicón de perfíl como archivo CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"For smaller courses, profile information for enrolled students can be listed"
+"For smaller courses, click to list profile information for enrolled students"
 " directly on this page:"
 msgstr ""
 
@@ -7911,10 +7901,10 @@ msgstr "Listar la información de perfil de los estudiantes inscritos"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays the grading configuration for the course. The "
-"grading configuration is the breakdown of graded subsections of the course "
-"(such as exams and problem sets), and can be changed on the 'Grading' page "
-"(under 'Settings') in Studio."
+"Click to display the grading configuration for the course. The grading "
+"configuration is the breakdown of graded subsections of the course (such as "
+"exams and problem sets), and can be changed on the 'Grading' page (under "
+"'Settings') in Studio."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -7922,10 +7912,8 @@ msgid "Grading Configuration"
 msgstr "Configuración de calificaciones"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of anonymized student IDs by clicking this button."
+msgid "Click to download a CSV of anonymized student IDs:"
 msgstr ""
-"Descargue un archivo CSV con la información de los estudiantes en forma "
-"anónima haciendo clic en este botón."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Get Student Anonymized IDs CSV"
@@ -7939,14 +7927,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button will generate a CSV grade report for all currently "
-"enrolled students.  Generated reports appear in a table below and can be "
-"downloaded."
+"Click to generate a CSV grade report for all currently enrolled students.  "
+"Links to generated reports appear in a table below when report generation is"
+" complete."
 msgstr ""
-"El siguiente botón generará un reporte de calificaciones en un archivo CSV "
-"para todos los estudiantes actualmente inscritos. Los reportes generados "
-"aparecen en la tabla a continuación y pueden ser descargados al equipo "
-"local."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7977,24 +7961,19 @@ msgstr "Reportes disponibles para descargar"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Grade reports listed below are generated each time the <b>Generate Grade "
-"Report</b> button is clicked. A link to each grade report remains available "
-"on this page, identified by the UTC date and time of generation. Grade "
+"The grade reports listed below are generated each time the <b>Generate Grade"
+" Report</b> button is clicked. A link to each grade report remains available"
+" on this page, identified by the UTC date and time of generation. Grade "
 "reports are not deleted, so you will always be able to access previously "
 "generated reports from this page."
 msgstr ""
 
-#. Translators: "these rules" in this sentence references a detailed
-#. description of the grading reports that will appear in a table that
-#. contains
-#. a mix of different types of reports.  This sentence intends to indicate
-#. that
-#. the description of the grading report does not apply to the other reports
-#. that may appear in the table.
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Other reports may appear in the table for which these rules will not "
-"necessarily apply."
+"The answer distribution report listed below is generated periodically by an "
+"automated background process. The report is cumulative, so answers submitted"
+" after the process starts are included in a subsequent report. The report is"
+" generated several times per day."
 msgstr ""
 
 #. Translators: a table of URL links to report files appears after this
@@ -9131,10 +9110,8 @@ msgstr ""
 #: lms/templates/static_templates/server-error.html
 msgid ""
 "Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at <a href=\"{email}\">{email}</a>."
+" please email us at {email}."
 msgstr ""
-"Por favor espere unos segundos y vuelva a cargar la página. Si el problema "
-"persiste, por favor envíenos un email a <a href=\"{email}\">{email}</a>."
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the <em>{platform_name}</em> servers are overloaded"
@@ -10317,6 +10294,10 @@ msgstr "Contenido"
 #: cms/templates/overview.html cms/templates/textbooks.html
 msgid "Page Actions"
 msgstr "Acciones de página"
+
+#: cms/templates/asset_index.html
+msgid "Loading&hellip;"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "What files are listed here?"

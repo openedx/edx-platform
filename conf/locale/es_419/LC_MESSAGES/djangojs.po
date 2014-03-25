@@ -39,7 +39,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 10:06-0400\n"
+"POT-Creation-Date: 2014-03-25 10:27-0400\n"
 "PO-Revision-Date: 2014-03-24 14:25+0000\n"
 "Last-Translator: juancamilom <juan.montoya@hmltda.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -866,8 +866,8 @@ msgid "Error generating grades. Please try again."
 msgstr "Error al generar las calificaciones. Por favor inténtelo nuevamente."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
-msgid "File Name (Newest First)"
-msgstr "Nombre de archivo (Más nuevo arriba)"
+msgid "File Name"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
@@ -904,6 +904,21 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid ""
+"Could not find a user with username or email address '<%= identifier %>'."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid ""
+"Error: User '<%= username %>' has not yet activated their account. Users "
+"must create and activate their accounts before they can be assigned a role."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error: You cannot remove yourself from the Instructor group!"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js

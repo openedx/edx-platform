@@ -8,7 +8,7 @@ from i18n.config import CONFIGURATION
 from i18n.execute import execute
 from i18n.extract import EDX_MARKER
 
-TRANSIFEX_HEADER = 'edX community translations have been downloaded from {}'
+TRANSIFEX_HEADER = u'edX community translations have been downloaded from {}'
 TRANSIFEX_URL = 'https://www.transifex.com/projects/p/edx-platform/'
 
 
