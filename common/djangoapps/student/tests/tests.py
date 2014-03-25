@@ -376,26 +376,26 @@ class EnrollInCourseTest(TestCase):
         self.assertFalse(self.mock_server_track.called)
         self.mock_server_track.reset_mock()
 
-    def assert_enrollment_event_was_emitted(self, user, course_id):
+    def assert_enrollment_event_was_emitted(self, user, course_key):
         """Ensures an enrollment event was emitted since the last event related assertion"""
         self.mock_server_track.assert_called_once_with(
             sentinel.request,
             'edx.course.enrollment.activated',
             {
-                'course_id': course_id,
+                'course_id': course_key.to_string(),
                 'user_id': user.pk,
                 'mode': 'honor'
             }
         )
         self.mock_server_track.reset_mock()
 
-    def assert_unenrollment_event_was_emitted(self, user, course_id):
+    def assert_unenrollment_event_was_emitted(self, user, course_key):
         """Ensures an unenrollment event was emitted since the last event related assertion"""
         self.mock_server_track.assert_called_once_with(
             sentinel.request,
             'edx.course.enrollment.deactivated',
             {
-                'course_id': course_id,
+                'course_id': course_key.to_string(),
                 'user_id': user.pk,
                 'mode': 'honor'
             }
@@ -405,7 +405,7 @@ class EnrollInCourseTest(TestCase):
     def test_enrollment_non_existent_user(self):
         # Testing enrollment of newly unsaved user (i.e. no database entry)
         user = User(username="rusty", email="rusty@fake.edx.org")
-        course_id = "edX/Test101/2013"
+        course_id = CourseKey.from_string("edX/Test101/2013")
 
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
 
@@ -421,7 +421,7 @@ class EnrollInCourseTest(TestCase):
 
     def test_enrollment_by_email(self):
         user = User.objects.create(username="jack", email="jack@fake.edx.org")
-        course_id = "edX/Test101/2013"
+        course_id = CourseKey.from_string("edX/Test101/2013")
 
         CourseEnrollment.enroll_by_email("jack@fake.edx.org", course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
@@ -458,8 +458,8 @@ class EnrollInCourseTest(TestCase):
 
     def test_enrollment_multiple_classes(self):
         user = User(username="rusty", email="rusty@fake.edx.org")
-        course_id1 = "edX/Test101/2013"
-        course_id2 = "MITx/6.003z/2012"
+        course_id1 = CourseKey.from_string("edX/Test101/2013")
+        course_id2 = CourseKey.from_string("MITx/6.003z/2012")
 
         CourseEnrollment.enroll(user, course_id1)
         self.assert_enrollment_event_was_emitted(user, course_id1)
@@ -480,7 +480,7 @@ class EnrollInCourseTest(TestCase):
 
     def test_activation(self):
         user = User.objects.create(username="jack", email="jack@fake.edx.org")
-        course_id = "edX/Test101/2013"
+        course_id = CourseKey.from_string("edX/Test101/2013")
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
 
         # Creating an enrollment doesn't actually enroll a student
