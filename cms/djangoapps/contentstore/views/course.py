@@ -73,7 +73,11 @@ def _get_locator_and_course(package_id, branch, version_guid, block_id, user, de
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block_id)
     if not has_course_access(user, locator):
         raise PermissionDenied()
+
     course_location = loc_mapper().translate_locator_to_location(locator)
+    if course_location is None:
+        raise PermissionDenied()
+
     course_module = modulestore().get_item(course_location, depth=depth)
     return locator, course_module
 
