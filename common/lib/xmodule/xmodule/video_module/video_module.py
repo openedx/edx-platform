@@ -782,6 +782,11 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                     # If the user has specified html5 sources, make sure we don't use the default video
                     if youtube_id != '' or 'html5_sources' in field_data:
                         field_data['youtube_id_{0}'.format(normalized_speed.replace('.', '_'))] = youtube_id
+            elif attr not in cls.fields:
+                # Don't set attributes which are not in VideoDescriptor
+                # Note: This is a workaround. Export should be patched so that it does not include
+                # fields not in cls.fields"
+                continue
             else:
                 #  Convert XML attrs into Python values.
                 if attr in conversions:
