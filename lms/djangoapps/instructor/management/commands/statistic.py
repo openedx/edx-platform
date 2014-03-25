@@ -156,11 +156,13 @@ def gendata(request):
 
             data[course.id][user.email]["prob_info"] = statprob
             data[course.id][user.email]["sec_info"] = statsec
+        print("Loading info for course {courseid} - COMPLETE - total {users}".format(courseid = course.id, users = len (data[course.id]) ))
     return data
 
 
 def fullstat(request = None):
 
+    print("Dumping fullstat")
 
     request = DummyRequest()
     
@@ -298,6 +300,9 @@ def fullstat(request = None):
         usermap.setdefault(row['email'],[]).append(row)
 
     for course in modulestore().get_courses():
+
+        print("Dumping course {courseid}".format(courseid = course.id))
+
 
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course.id,
