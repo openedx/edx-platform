@@ -321,7 +321,8 @@ def fullstat(request = None):
         courseware_summary = grades.progress_summary(enrolled_students[0], request, course);
 
         if courseware_summary is None:
-           continue
+            print "No courseware_summary"
+            continue
 
         assignments += [score.section for score in gradeset['raw_scores']]
         
@@ -371,7 +372,8 @@ def fullstat(request = None):
                 datarow += statsec
                 
                 data.append(datarow)
-            except:
+            except Exception as e:
+                print e
                 pass
         datatable['data'] = data
         return_csv(course.id,datatable, open("/var/www/edx/" + course.id.replace('/','_') + ".xls", "wb"), encoding="cp1251", dialect="excel-tab")
