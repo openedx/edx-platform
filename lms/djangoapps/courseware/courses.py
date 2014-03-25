@@ -52,9 +52,9 @@ def get_course(course_id, depth=0):
         course_loc = CourseDescriptor.id_to_location(course_id)
         return modulestore().get_instance(course_id, course_loc, depth=depth)
     except (KeyError, ItemNotFoundError):
-        raise ValueError("Course not found: {}".format(course_id))
+        raise ValueError(u"Course not found: {0}".format(course_id))
     except InvalidLocationError:
-        raise ValueError("Invalid location: {}".format(course_id))
+        raise ValueError(u"Invalid location: {0}".format(course_id))
 
 
 def get_course_by_id(course_id, depth=0):
@@ -127,7 +127,7 @@ def find_file(filesystem, dirs, filename):
         filepath = path(directory) / filename
         if filesystem.exists(filepath):
             return filepath
-    raise ResourceNotFoundError("Could not find {0}".format(filename))
+    raise ResourceNotFoundError(u"Could not find {0}".format(filename))
 
 
 def get_course_about_section(course, section_key):
@@ -191,15 +191,16 @@ def get_course_about_section(course, section_key):
                     html = about_module.render('student_view').content
                 except Exception:  # pylint: disable=broad-except
                     html = render_to_string('courseware/error-message.html', None)
-                    log.exception("Error rendering course={course}, section_key={section_key}".format(
-                        course=course,
-                        section_key=section_key
-                    ))
+                    log.exception(
+                        u"Error rendering course={course}, section_key={section_key}".format(
+                            course=course, section_key=section_key
+                        ))
             return html
 
         except ItemNotFoundError:
-            log.warning("Missing about section {key} in course {url}".format(
-                key=section_key, url=course.location.url()))
+            log.warning(
+                u"Missing about section {key} in course {url}".format(key=section_key, url=course.location.url())
+            )
             return None
     elif section_key == "title":
         return course.display_name_with_default
@@ -243,10 +244,10 @@ def get_course_info_section(request, course, section_key):
             html = info_module.render('student_view').content
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
-            log.exception("Error rendering course={course}, section_key={section_key}".format(
-                course=course,
-                section_key=section_key
-            ))
+            log.exception(
+                u"Error rendering course={course}, section_key={section_key}".format(
+                    course=course, section_key=section_key
+                ))
 
     return html
 
@@ -282,8 +283,9 @@ def get_course_syllabus_section(course, section_key):
                     static_asset_path=course.static_asset_path,
                 )
         except ResourceNotFoundError:
-            log.exception("Missing syllabus section {key} in course {url}".format(
-                key=section_key, url=course.location.url()))
+            log.exception(
+                u"Missing syllabus section {key} in course {url}".format(key=section_key, url=course.location.url())
+            )
             return "! Syllabus missing !"
 
     raise KeyError("Invalid about key " + str(section_key))
