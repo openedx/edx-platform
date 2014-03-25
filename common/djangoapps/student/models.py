@@ -453,23 +453,20 @@ class PasswordHistory(models.Model):
         if not settings.FEATURES['ADVANCED_SECURITY']:
             return True
 
-        min_diff_passwords_required = 0
-        if user.is_staff:
-            if cls.is_staff_password_reuse_restricted():
+        if user.is_staff and cls.is_staff_password_reuse_restricted():
                 min_diff_passwords_required = \
                     settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
         elif cls.is_student_password_reuse_restricted():
             min_diff_passwords_required = \
                 settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
+        else:
+            min_diff_passwords_required = 0
 
-        history = PasswordHistory.objects.filter(user=user).order_by('-time_set')
-
-        reuse_distance = 0
+        # just limit the result set to the number of different
+        # password we need
+        history = PasswordHistory.objects.filter(user=user).order_by('-time_set')[:min_diff_passwords_required]
 
         for entry in history:
-            # did we reach the minimum amount of intermediate different passwords?
-            if reuse_distance >= min_diff_passwords_required:
-                return True
 
             # be sure to re-use the same salt
             # NOTE, how the salt is serialized in the password field is dependent on the algorithm
@@ -483,12 +480,13 @@ class PasswordHistory(models.Model):
             else:
                 # This means we got something unexpected. We don't want to throw an exception, but
                 # log as an error and basically allow any password reuse
-                AUDIT_LOG.error('Unknown password hashing algorithm "{0}" found in existing password hash, password reuse policy will not be enforced!!!'.format(algorithm))
+                AUDIT_LOG.error('''
+                                Unknown password hashing algorithm "{0}" found in existing password
+                                hash, password reuse policy will not be enforced!!!
+                                '''.format(algorithm))
                 return True
 
-            if entry.password != hashed_password:
-                reuse_distance +=  1
-            else:
+            if entry.password == hashed_password:
                 return False
 
         return True
