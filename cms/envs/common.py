@@ -241,10 +241,6 @@ XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin, XModuleMixin)
 # xblocks can be added via advanced settings
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
-############################ SIGNAL HANDLERS ################################
-# This is imported to register the exception signal handling that logs exceptions
-import monitoring.exceptions  # noqa
-
 ############################ DJANGO_BUILTINS ################################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
 DEBUG = False
@@ -509,6 +505,9 @@ INSTALLED_APPS = (
     'django_openid_auth',
 
     'embargo',
+
+    # Monitoring signals
+    'monitoring',
 )
 
 
