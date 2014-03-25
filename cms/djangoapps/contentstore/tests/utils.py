@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
+from contentstore.utils import get_modulestore
 from xmodule.modulestore.django import loc_mapper
 
 
@@ -95,6 +96,8 @@ class CourseTestCase(ModuleStoreTestCase):
         self.course_locator = loc_mapper().translate_location(
             self.course.location.course_id, self.course.location, False, True
         )
+        self.store = get_modulestore(self.course.location)
+
 
     def createNonStaffAuthedUserClient(self):
         """
@@ -126,3 +129,17 @@ class CourseTestCase(ModuleStoreTestCase):
                     descend(child, stack)
 
         descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])
+
+    def reloadCourse(self):
+        """
+        Reloads the course object from the database
+        """
+        self.course = self.store.get_item(self.course.location)
+
+    def saveCourse(self):
+        """
+        Updates the course object in the database
+        """
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+

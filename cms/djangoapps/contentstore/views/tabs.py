@@ -1,6 +1,7 @@
 """
 Views related to course tabs
 """
+import sys
 from access import has_course_access
 from util.json_request import expect_json, JsonResponse
 
@@ -14,7 +15,7 @@ from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
-from xmodule.tabs import CourseTabList, StaticTab, CourseTab
+from xmodule.tabs import CourseTabList, StaticTab, CourseTab, InvalidTabsException
 
 from ..utils import get_modulestore
 
@@ -52,84 +53,95 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         if request.method == 'GET':
             raise NotImplementedError('coming soon')
         else:
-            if 'tabs' in request.json:
-                def get_location_for_tab(tab):
-                    """  Returns the location (old-style) for a tab. """
-                    return loc_mapper().translate_locator_to_location(BlockUsageLocator(tab))
-
-                tabs = request.json['tabs']
-
-                # get list of existing static tabs in course
-                # make sure they are the same lengths (i.e. the number of passed in tabs equals the number
-                # that we know about) otherwise we will inadvertently drop some!
-                existing_static_tabs = [t for t in course_item.tabs if t['type'] == 'static_tab']
-                if len(existing_static_tabs) != len(tabs):
-                    return JsonResponse(
-                        {"error": "number of tabs must be {}".format(len(existing_static_tabs))}, status=400
-                    )
-
-                # load all reference tabs, return BadRequest if we can't find any of them
-                tab_items = []
-                for tab in tabs:
-                    item = modulestore('direct').get_item(get_location_for_tab(tab))
-                    if item is None:
-                        return JsonResponse(
-                            {"error": "no tab for found location {}".format(tab)}, status=400
-                        )
-
-                    tab_items.append(item)
-
-                # now just go through the existing course_tabs and re-order the static tabs
-                reordered_tabs = []
-                static_tab_idx = 0
-                for tab in course_item.tabs:
-                    if isinstance(tab, StaticTab):
-                        reordered_tabs.append(
-                            StaticTab(
-                                name=tab_items[static_tab_idx].display_name,
-                                url_slug=tab_items[static_tab_idx].location.name,
-                            )
-                        )
-                        static_tab_idx += 1
-                    else:
-                        reordered_tabs.append(tab)
-
-                # OK, re-assemble the static tabs in the new order
-                course_item.tabs = reordered_tabs
-                modulestore('direct').update_item(course_item, request.user.id)
-                return JsonResponse()
+            if 'tab_ids' in request.json:
+                return reorder_tabs_handler(course_item, request)
+            elif 'tab_id' in request.json:
+                return edit_tab_handler(course_item, request)
             else:
                 raise NotImplementedError('Creating or changing tab content is not supported.')
+
     elif request.method == 'GET':  # assume html
         # get all tabs from the tabs list: static tabs (a.k.a. user-created tabs) and built-in tabs
-        # we do this because this is also the order in which items are displayed in the LMS
+        # present in the same order they are displayed in LMS
 
-        static_tabs = []
-        built_in_tabs = []
-        for tab in CourseTabList.iterate_displayable(course_item, settings, include_instructor_tab=False):
+        tabs_to_render = []
+        for tab in CourseTabList.iterate_displayable_cms(
+                course_item,
+                settings,
+            ):
             if isinstance(tab, StaticTab):
                 static_tab_loc = old_location.replace(category='static_tab', name=tab.url_slug)
-                static_tabs.append(modulestore('direct').get_item(static_tab_loc))
-            else:
-                built_in_tabs.append(tab)
-
-        # create a list of components for each static tab
-        components = [
-            loc_mapper().translate_location(
-                course_item.location.course_id, static_tab.location, False, True
-            )
-            for static_tab
-            in static_tabs
-        ]
+                static_tab = modulestore('direct').get_item(static_tab_loc)
+                tab.locator = loc_mapper().translate_location(
+                    course_item.location.course_id, static_tab.location, False, True
+                )
+            tabs_to_render.append(tab)
 
         return render_to_response('edit-tabs.html', {
             'context_course': course_item,
-            'built_in_tabs': built_in_tabs,
-            'components': components,
+            'tabs_to_render': tabs_to_render,
             'course_locator': locator
         })
     else:
         return HttpResponseNotFound()
+
+def reorder_tabs_handler(course_item, request):
+    """
+    Helper function for handling reorder of tabs request
+    """
+
+    old_tab_list = course_item.tabs
+
+    ids_of_new_tab_order = request.json['tab_ids']
+
+    # create a new list in the new order
+    new_tab_list = []
+    for tab_id in ids_of_new_tab_order:
+        tab = CourseTabList.get_tab_by_id(old_tab_list, tab_id)
+        if tab is None:
+            return JsonResponse(
+                {"error": "Tab with id '{0}' does not exist.".format(tab_id)}, status=400
+            )
+        new_tab_list.append(tab)
+
+    # the old_tab_list may contain additional tabs that were not rendered in the UI because of
+    # global or course settings.  so add those to the end of the list.
+    old_tab_ids = [tab.tab_id for tab in old_tab_list]
+    non_displayed_tab_ids = set(old_tab_ids) - set(ids_of_new_tab_order)
+    for non_displayed_tab_id in non_displayed_tab_ids:
+        new_tab_list.append(CourseTabList.get_tab_by_id(old_tab_list, non_displayed_tab_id))
+
+    # validate the tabs to make sure everything is Ok (e.g., did the client try to reorder unmovable tabs?)
+    try:
+        CourseTabList.validate_tabs(new_tab_list)
+    except InvalidTabsException:
+        return JsonResponse(
+            {"error": "New list of tabs is not valid: {0}.".format(sys.exc_info()[0])}, status=400
+        )
+
+    course_item.tabs = new_tab_list
+    modulestore('direct').update_item(course_item, request.user.id)
+
+    return JsonResponse()
+
+
+def edit_tab_handler(course_item, request):
+    """
+    Helper function for handling requests to edit settings of a single tab
+    """
+    tab_id = request.json['tab_id']
+
+    tab = CourseTabList.get_tab_by_id(course_item.tabs, tab_id)
+    if tab is None:
+        return JsonResponse(
+            {"error": "Tab with id '{0}' does not exist.".format(tab_id)}, status=400
+        )
+
+    if 'is_hidden' in request.json:
+        tab.is_hidden = request.json['is_hidden']
+        modulestore('direct').update_item(course_item, request.user.id)
+
+    return JsonResponse()
 
 
 # "primitive" tab edit functions driven by the command line.

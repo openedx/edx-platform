@@ -498,7 +498,6 @@ class CourseTabListTestCase(TabTestCase):
         for i, tab in enumerate(tabs.CourseTabList.iterate_displayable(
             self.course,
             self.settings,
-            include_instructor_tab=True,
         )):
             if i == len(self.course.tabs):
                 self.assertEquals(tab.type, tabs.InstructorTab.type)

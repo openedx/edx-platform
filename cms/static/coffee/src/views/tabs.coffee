@@ -18,7 +18,8 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
 
       @options.mast.find('.new-tab').on('click', @addNewTab)
       $('.add-pages .new-tab').on('click', @addNewTab)
-      @$('.components').sortable(
+      $('.toggle-checkbox').on('click', @toggleVisibilityOfTab)
+      @$('.course-nav-tab-list').sortable(
         handle: '.drag-handle'
         update: @tabMoved
         helper: 'clone'
@@ -26,13 +27,36 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
         placeholder: 'component-placeholder'
         forcePlaceholderSize: true
         axis: 'y'
-        items: '> .component'
+        items: '> .course_tab'
       )
 
+    toggleVisibilityOfTab: (event, ui) =>
+      checkbox_element = event.srcElement
+      tab_element = $(checkbox_element).parents(".course_tab")[0]
+
+      tab_id = $(tab_element).data('tab-id')
+      is_hidden = $(checkbox_element).is(':checked')
+
+      analytics.track "Toggle Page Visibility",
+        course: course_location_analytics
+
+      saving = new NotificationView.Mini({title: gettext("Saving&hellip;")})
+      saving.show()
+
+      $.ajax({
+        type:'POST',
+        url: @model.url(),
+        data: JSON.stringify({
+          tab_id : tab_id,
+          is_hidden : is_hidden
+        }),
+        contentType: 'application/json'
+      }).success(=> saving.hide())
+
     tabMoved: (event, ui) =>
-      tabs = []
-      @$('.component').each((idx, element) =>
-          tabs.push($(element).data('locator'))
+      tab_ids = []
+      @$('.course_tab').each((idx, element) =>
+          tab_ids.push($(element).data('tab-id'))
       )
 
       analytics.track "Reordered Pages",
@@ -45,7 +69,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
         type:'POST',
         url: @model.url(),
         data: JSON.stringify({
-          tabs : tabs
+          tab_ids : tab_ids
         }),
         contentType: 'application/json'
       }).success(=> saving.hide())
