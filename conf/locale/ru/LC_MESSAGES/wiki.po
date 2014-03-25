@@ -2,20 +2,20 @@
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2014.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-18 13:26+0000\n"
+"POT-Creation-Date: 2014-03-24 18:08+0400\n"
 "PO-Revision-Date: 2014-03-18 13:26:30.537790\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
-"Language: en\n"
 
 #: wiki/admin.py:70 wiki/models/article.py:25
 msgid "created"
@@ -60,8 +60,8 @@ msgstr ""
 #: wiki/forms.py:97
 msgid ""
 "While you were editing, someone else changed the revision. Your contents "
-"have been automatically merged with the new contents. Please review the text"
-" below."
+"have been automatically merged with the new contents. Please review the text "
+"below."
 msgstr ""
 
 #: wiki/forms.py:99
@@ -111,8 +111,8 @@ msgstr ""
 
 #: wiki/forms.py:247
 msgid ""
-"Purge the article: Completely remove it (and all its contents) with no undo."
-" Purging is a good idea if you want to free the slug such that users can "
+"Purge the article: Completely remove it (and all its contents) with no undo. "
+"Purging is a good idea if you want to free the slug such that users can "
 "create new articles in its place."
 msgstr ""
 
@@ -155,8 +155,8 @@ msgstr ""
 
 #: wiki/forms.py:276
 msgid ""
-"Check here to apply the above permissions recursively to articles under this"
-" one."
+"Check here to apply the above permissions recursively to articles under this "
+"one."
 msgstr ""
 
 #: wiki/forms.py:281
@@ -357,7 +357,8 @@ msgid ""
 "Articles who lost their parents\n"
 "===============================\n"
 "\n"
-"The children of this article have had their parents deleted. You should probably find a new home for them."
+"The children of this article have had their parents deleted. You should "
+"probably find a new home for them."
 msgstr ""
 
 #: wiki/models/urlpath.py:263
@@ -666,6 +667,6 @@ msgstr ""
 #: wiki/views/article.py:619
 #, python-format
 msgid ""
-"A new revision was created: Merge between Revision #%(r1)d and Revision "
-"#%(r2)d"
+"A new revision was created: Merge between Revision #%(r1)d and Revision #"
+"%(r2)d"
 msgstr ""

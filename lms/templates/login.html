@@ -1,179 +1,277 @@
-<%inherit file="main.html" />
-<%! from microsite_configuration import microsite %>
-<%namespace name='static' file='static_content.html'/>
-
-<%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<%block name="pagetitle">${_("Log into your {platform_name} Account").format(platform_name=platform_name)}</%block>
+<%
+suppress_toplevel_navigation = True
+%>
 
-<%block name="bodyclass">view-login</%block>
+<%inherit file="/main.html" />
+
+<%namespace name='static' file='/static_content.html'/>
+<%! from django.core.urlresolvers import reverse %>
+
+<%block name="title"><title>Департамент образования города Москвы - центр педагогического мастерства - курсы повышения квалификации учителей</title></%block>
+<%block name="bodyclass">no-header edge-landing</%block>
+
+<%block name="content">
+
+
+<style>
+.olimpiada-logo-large {
+  display: block;
+  height: 110px;
+  margin: 10px auto 0 auto;
+  width: 1100px;
+}
+.log-in-form {
+  width: 270px !important;
+  height: 300px;
+}
+.banners {
+    background: #F0EFEF;  border-top: 1px solid #8A8C8F;  border-bottom: 1px solid #8A8C8F;  width: 100%;  height: 83px;
+    margin-bottom: 40px;
+}
+.banners-inner {
+   width: 930px;  height: 83px;  text-align: center;  margin-left: auto;  margin-right: auto;  background: #f0efef;  background: -moz-linear-gradient(left, #f0efef 0%, #ffffff 50%, #f0efef 100%);  background: -webkit-gradient(linear, left top, right top, color-stop(0%,#f0efef), color-stop(50%,#ffffff), color-stop(100%,#f0efef));  background: -webkit-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: -o-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: -ms-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: linear-gradient(to right, #f0efef 0%,#ffffff 50%,#f0efef 100%);  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0efef', endColorstr='#f0efef',GradientType=1 );  border-bottom: 1px solid #8A8C8F;
+}
+.banners-inner a img {
+  margin: 12px;
+}
+
+.footer-short {
+  border-top: 1px solid #c4c5c7;
+  padding: 0 0 10px 0;
+}
+
+footer .colophon .nav-colophon li a {
+color: #333;
+}
+
+footer a:link, footer a:visited, footer a:hover, footer a:active {
+  border-bottom: none;
+  color: #1d9dd9;
+  text-decoration: none !important;
+  font-family: "Open Sans",Verdana,Geneva,sans-serif;
+}
+
+footer a:hover {
+  border-bottom: 1px dotted #1d9dd9;
+  color: #1d9dd9;
+}
+
+footer .references .copyright {
+margin: 0;
+}
+
+footer .colophon {
+margin-right: 1.69492%;
+width: 66.10169%;
+float: left;
+}
+footer .references {
+margin: -10px 0 0 0;
+width: 32.20339%;
+float: right;
+}
+.modal-form-error {
+background: tint($red,90%);
+color: rgb(143, 14, 14);
+display: block;
+font-weight: bold;
+}
+</style>
+
+<style>
+div.announcements-wrapper section.announcements > ol {
+list-style: none;
+margin-bottom: 1.41575em;
+padding-left: 0;
+}
+div.announcements-wrapper section.announcements > ol > li h2 {
+font-size: 0.875em;
+font-weight: bold;
+background: url("/static/images/calendar-icon.png") 0 center no-repeat;
+padding-left: 20px;
+margin-bottom: 5px;
+margin-top: 10px;
+}
+</style>
+
+<script>
+  $(window).bind("load", function() { 
+       
+       var footerHeight = 0,
+           footerTop = 0,
+           $footer = $("#footer-short");
+           
+       positionFooter();
+       
+       function positionFooter() {
+       
+                footerHeight = $footer.height();
+                footerTop = ($(window).scrollTop()+$(window).height()-footerHeight)+"px";
+       
+               if ( ($(document.body).height()+footerHeight) < $(window).height()) {
+                   $footer.css({
+                        position: "absolute"
+                   }).animate({
+                        top: footerTop
+                   })
+               } else {
+                   $footer.css({
+                        position: "static"
+                   })
+               }
+               
+       }
+
+       $(window)
+               .scroll(positionFooter)
+               .resize(positionFooter)
+               
+});
+</script>
+
+<div class="wrapper">
+<div>
+<div class="olimpiada-logo-large"><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Coat_of_Arms_of_Moscow.svg/200px-Coat_of_Arms_of_Moscow.svg.png?uselang=ru" style="
+    float: left;
+    height: 140px;
+"><span style="
+    margin-top: 5px;
+    margin-left: 60px;
+    float: left;
+    font-size: larger;
+    font-weight: 800;
+    white-space: nowrap;
+">Департамент образования города Москвы<br>
+Центр педагогического мастерства<br>
+<span style="padding-top: 5px;
+font-weight: bolder;
+font-size: x-large;
+">Курсы повышения квалификации учителей</span><span>
+ </span></span></div>
+</div>
+<div class="banners">
+  <div class="banners-inner">
+  <a href="http://info.olimpiada.ru/" target="_blank"><img src="${static.url('/static/images/banners/olimp.png')}" border="0" alt="Олимпиада.ру" ></a>
+  <a href="http://vos.olimpiada.ru/" target="_blank"><img src="${static.url('/static/images/banners/vseros.png')}" border="0" alt="Всероссийская олимпиада"></a>
+  <a href="http://statgrad.org/" target="_blank"><img src="${static.url('/static/images/banners/statgrad.png')}" border="0" alt="Статград"></a>
+ </div>
+</div>
+
+<div class="main-wrapper" style="width:1142px; margin-bottom:50px;">
+  <div class="content">
+    <div class="log-in-form">
+      <h2>Новости</h2>
+      % if site_wide_announcements:
+        <div class="announcements-wrapper">
+           <section class="announcements">
+            <ol>
+                % for announcement in site_wide_announcements:
+                <li class="announcement">
+                    <h2 class="title"><span class="date">
+<%! from django.template.defaultfilters import date as _date%>
+${ _date(announcement.creation_date, "j/m/Y")}</span></h2>
+                    <p style="font-size: smaller;">${announcement.content}</p>
+                    <!-- <a id="hide" href="${reverse('announcement_hide', args=[announcement.pk])}?next=${request.path}">Убрать</a> -->
+                </li>
+                % endfor
+            </ol>
+           </section>
+        </div>
+    % endif
+    </div>
+    <div class="log-in-form">
+      <h2>${_("Log in to your courses")}</h2>
+      <form id="login_form" data-remote="true" method="post" action="/login_ajax">
+        <div class="row">
+          <label>${_("Email")}</label>
+          <input name="email" type="email" class="email-field" tabindex="1">
+        </div>
+        <div class="row">
+          <label>${_("Password")}</label>
+          <input name="password" type="password" class="password-field" tabindex="2">
+        </div>
+        <div class="row submit">
+          <input name="submit" type="submit" value="${_("Log In")}" class="log-in-submit-button" tabindex="3">
+          <a href="#forgot-password-modal"  rel="leanModal" class="pwd-reset forgot-button">${_("Forgot password?")}</a>
+        </div>
+      </form>
+    </div>
+    <div class="sign-up" style="width: 280px;">
+      <h3>${_("Register for classes")}</h3>
+      <p style="font-size: smaller;">Для регистрации на курсы директору необходимо заполнить форму отчета и внести в нее данные о своих сотрудниках. Форму отчета нужно отправить до 22-00 20 сентября 2013 года. Форма размещена <a href="http://www.statgrad.org/#509" target="_blank"> на сайте системы Статград.</a> Свои вопросы вы можете задать, написав на адрес почты <a href="mailto:statgrad@yandex.ru">statgrad@yandex.ru</a> или <a href="mailto:edu.olimpiada@yandex.ru">edu.olimpiada@yandex.ru</a>.</p>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+</%block>
+
+
+<div class="wrapper wrapper-footer">
+  <footer>
+    <div class="colophon">
+      <nav class="nav-colophon">
+      <ol>
+      </ol>
+      </nav>
+    </div>
+
+    <div class="references">
+      <nav class="nav-legal">
+        <ul>
+<li>
+      <a href="http://olimpiada.ru/">Olimpiada.ru</a>
+      </li>
+      <li>
+      <a href="http://vos.olimpiada.ru/">Всероссийская олимпиада в Москве</a>
+      </li>
+      <li>
+      <a href="http://mosolymp.olimpiada.ru/">Московская олимпиада школьников</a>
+      </li>
+      <li>
+      <a href="http://info.olimpiada.ru/calendar">Календарь олимпиад</a>
+</li>
+        </ul>
+      </nav>
+
+      <p class="copyright">© 2013 ГБОУ ЦПМ г. Москва.</p>
+      <p class="copyright">Powered by <a href="http://code.edx.org/">edX</a>.</p>
+    </div>
+  </footer>
+</div>
 
 <%block name="js_extra">
-  <script type="text/javascript">
-    $(function() {
+<script type="text/javascript" src="${static.url('js/jquery.maskedinput.min.js')}"></script>
+<script type="text/javascript">
 
-      // adding js class for styling with accessibility in mind
-      $('body').addClass('js');
-
-      // show forgot password modal UI if URL contains matching DOM ID
+  (function() {
+    $(document).ready(function() {
       if ($.deparam.fragment()['forgot-password-modal'] !== undefined) {
         $('.pwd-reset').click();
       }
-
-      // new window/tab opening
-      $('a[rel="external"], a[class="new-vp"]')
-      .click( function() {
-      window.open( $(this).attr('href') );
-      return false;
-      });
-
-      // form field label styling on focus
-      $("form :input").focus(function() {
-        $("label[for='" + this.id + "']").parent().addClass("is-focused");
-      }).blur(function() {
-        $("label").parent().removeClass("is-focused");
-      });
+    })
+    $(document).delegate('#login_form', 'ajax:success', function(data, json, xhr) {
+     if(json.success) {
+        next = getParameterByName('next');
+        if(next) {
+           location.href = next;
+       } else {
+           location.href = "${reverse('dashboard')}";
+       }
+     } else {
+       if($('#login_error').length == 0) {
+         $('#login_form').prepend('<div id="login_error" class="modal-form-error"></div>');
+       }
+       $('#login_error').html(json.value).stop().css("display", "block");
+       $('#login_error').effect("shake");
+     }
     });
-
-    (function() {
-      toggleSubmitButton(true);
-
-      $('#login-form').on('submit', function() {
-        toggleSubmitButton(false);
-      });
-
-      $('#login-form').on('ajax:error', function() {
-        toggleSubmitButton(true);
-      });
-
-      $('#login-form').on('ajax:success', function(event, json, xhr) {
-        if(json.success) {
-          var u=decodeURI(window.location.search);
-          next=u.split("next=")[1];
-          if (next && !isExternal(next)) {
-            location.href=next;
-          }  else if(json.redirect_url){
-            location.href=json.redirect_url;
-          } else {
-            location.href="${reverse('dashboard')}";
-          }
-        } else if(json.hasOwnProperty('redirect')) {
-          var u=decodeURI(window.location.search);
-          if (!isExternal(json.redirect)) { // a paranoid check.  Our server is the one providing json.redirect
-              location.href=json.redirect+u;
-          } // else we just remain on this page, which is fine since this particular path implies a login failure
-            // that has been generated via packet tampering (json.redirect has been messed with).
-        } else {
-          toggleSubmitButton(true);
-          $('.message.submission-error').addClass('is-shown').focus();
-          $('.message.submission-error .message-copy').html(json.value);
-        }
-      });
-      $("#forgot-password-link").click(function() {
-        $("#forgot-password-modal .close-modal").focus()
-      })
-
-    })(this);
-
-    function toggleSubmitButton(enable) {
-      var $submitButton = $('form .form-actions #submit');
-
-      if(enable) {
-        $submitButton.
-          removeClass('is-disabled').
-          removeProp('disabled').
-          html("${_('Log into My {platform_name} Account').format(platform_name=platform_name)} <span class='orn-plus'>+</span> ${_('Access My Courses')}");
-      }
-      else {
-        $submitButton.
-          addClass('is-disabled').
-          prop('disabled', true).
-          text("${_(u'Processing your account information…')}");
-      }
-    }
-  </script>
+  })(this)
+</script>
 </%block>
 
-<section class="introduction">
-  <header>
-    <h1 class="title">
-      <span class="title-super">${_("Please log in")}</span>
-      <span class="title-sub">${_("to access your account and courses")}</span>
-    </h1>
-  </header>
-</section>
-
-<section class="login container">
-  <section role="main" class="content">
-    <form role="form" id="login-form" method="post" data-remote="true" action="/login_ajax" novalidate>
-
-      <!-- status messages -->
-      <div role="alert" class="status message">
-        <h3 class="message-title">${_("We're Sorry, {platform_name} accounts are unavailable currently").format(platform_name=platform_name)}</h3>
-      </div>
-
-      <div role="alert" class="status message submission-error" tabindex="-1">
-        <h3 class="message-title">${_("The following errors occurred while logging you in:")} </h3>
-        <ul class="message-copy">
-          <li>${_("Your email or password is incorrect")}</li>
-        </ul>
-      </div>
-
-      <p class="instructions sr">
-        ${_('Please provide the following information to log into your {platform_name} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.').format(platform_name=platform_name)}
-      </p>
-
-      <div class="group group-form group-form-requiredinformation">
-        <h2 class="sr">${_('Required Information')}</h2>
-
-        <ol class="list-input">
-          <li class="field required text" id="field-email">
-            <label for="email">${_('E-mail')}</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="${_('example: username@domain.com')}" required aria-required="true" aria-described-by="email-tip" />
-            <span class="tip tip-input" id="email-tip">${_("This is the e-mail address you used to register with {platform}").format(platform=platform_name)}</span>
-          </li>
-          <li class="field required password" id="field-password">
-            <label for="password">${_('Password')}</label>
-            <input id="password" type="password" name="password" value="" required aria-required="true" />
-            <span class="tip tip-input">
-              <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw" id="forgot-password-link" tabindex="-1" role="button" aria-haspopup="true">${_('Forgot password?')}</a>
-            </span>
-          </li>
-        </ol>
-      </div>
-
-      <div class="group group-form group-form-secondary group-form-accountpreferences">
-        <h2 class="sr">${_('Account Preferences')}</h2>
-
-        <ol class="list-input">
-          <li class="field required checkbox" id="field-remember">
-            <input id="remember-yes" type="checkbox" name="remember" value="true" />
-            <label for="remember-yes">${_('Remember me')}</label>
-          </li>
-        </ol>
-      </div>
-
-% if course_id and enrollment_action:
-      <input type="hidden" name="enrollment_action" value="${enrollment_action | h}" />
-      <input type="hidden" name="course_id" value="${course_id | h}" />
-% endif
-
-      <div class="form-actions">
-        <button name="submit" type="submit" id="submit" class="action action-primary action-update"></button>
-      </div>
-    </form>
-  </section>
-
-  <aside role="complementary">
-
-<%
-  # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
-  sidebar_file = microsite.get_template_path('login-sidebar.html')
-%>
-
-    <%include file="${sidebar_file}" />
-
-  </aside>
-  </section>
-
+<%include file="/signup_modal.html" />
+<%include file="/forgot_password_modal.html" />
