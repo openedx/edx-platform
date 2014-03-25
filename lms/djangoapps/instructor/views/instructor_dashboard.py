@@ -24,10 +24,6 @@ from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
-<<<<<<< HEAD
-
-=======
->>>>>>> release-2014-03-18
 
 from .tools import get_units_with_due_date, title_or_url
 
@@ -58,10 +54,6 @@ def instructor_dashboard_2(request, course_id):
         _section_student_admin(course_id, access),
         _section_data_download(course_id, access),
         _section_analytics(course_id, access),
-      # The metrics tab has been implemented in the beta dashboard but is
-      # currently turned off due to some problems. There is code including some
-      # coffee files that are included but will not run.
-#        _section_metrics(course_id, access),
     ]
 
     if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):

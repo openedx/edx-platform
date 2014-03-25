@@ -52,7 +52,6 @@ from instructor_task.api import (
     submit_bulk_course_email
 )
 from instructor_task.views import get_task_completion_info
-from class_dashboard import dashboard_data
 from edxmako.shortcuts import render_to_response, render_to_string
 from class_dashboard import dashboard_data
 from psychometrics import psychoanalyze
