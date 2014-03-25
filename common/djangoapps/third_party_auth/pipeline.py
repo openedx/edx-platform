@@ -40,10 +40,7 @@ from social.pipeline import partial
 from . import provider
 
 
-# Int. Default size for randomly-generated passwords.
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12
-# String. The characters available to the random password generator. Must pass
-# the ORM's validation routines.
 _PASSWORD_CHARSET = string.letters + string.digits
 
 

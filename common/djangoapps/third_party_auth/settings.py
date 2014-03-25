@@ -45,7 +45,7 @@ If true, it:
 
 from . import provider
 
-# Tuple of string. Additional Django middleware classes.
+
 _MIDDLEWARE_CLASSES = (
     'social.apps.django_app.middleware.SocialAuthExceptionMiddleware',
 )
