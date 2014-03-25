@@ -32,7 +32,6 @@ MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
         'OPTIONS': {
-            'reference_type': 'Location',
             'mappings': {},
             'stores': {
                 'default': {

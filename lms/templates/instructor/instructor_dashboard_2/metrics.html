@@ -1,65 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
 
-<style type="text/css">
-
-.metrics-container {
-    position: relative;
-    width: 100%;
-    float: left;
-    clear: both;
-    margin-top: 25px;
-}
-.metrics-left {
-    position: relative;
-    width: 30%;
-    height: 640px;
-    float: left;
-    margin-right: 2.5%;
-}
-.metrics-left svg {
-	width: 100%;
-}
-.metrics-right {
-    position: relative;
-    width: 65%;
-    height: 295px;
-    float: left;
-    margin-left: 2.5%;
-    margin-bottom: 25px;
-}
-.metrics-right svg {
-	width: 100%;
-}
-
-.metrics-tooltip {
-    width: 250px;
-    background-color: lightgray;
-    padding: 3px;
-}
-
-.stacked-bar-graph-legend {
-    fill: white;
-}
-
-p.loading {
-  padding-top: 100px;
-  text-align: center;
-}
-
-p.nothing {
-  padding-top: 25px;
-}
-
-h3.attention {
-  padding: 10px;
-  border: 1px solid #999;
-  border-radius: 5px;
-  margin-top: 25px;
-}
-
-</style>
-
 <script>
 	${d3_stacked_bar_graph.body()}
 </script>
@@ -70,37 +11,66 @@ h3.attention {
     <%namespace name="d3_stacked_bar_graph" file="/class_dashboard/d3_stacked_bar_graph.js"/>
     <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
     
-    <h3 class="attention">Loading the latest graphs for you; depending on your class size, this may take a few minutes.</h3>
+    <h3 class="attention" id="graph_load">${_("Loading the latest graphs for you; depending on your class size, this may take a few minutes.")}</h3>
+    <input type="button" id="graph_reload" value="${_("Reload Graphs")}" />
 
     %for i in range(0,len(section_data['sub_section_display_name'])):
-      <div class="metrics-container" id="metrics_section_${i}">
-        <h2>Section: ${section_data['sub_section_display_name'][i]}</h2>
-        <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
-        <div class="metrics-left" id="metric_opened_${i}">
-          <h3>Count of Students Opened a Subsection</h3>
-          <p class="loading"><i class="icon-spinner icon-spin icon-large"></i> Loading...</p>
+        <div class="metrics-container" id="metrics_section_${i}">
+          <h2>${_("Section:")} ${section_data['sub_section_display_name'][i]}</h2>
+          <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
+          <div class="metrics-left" id="metric_opened_${i}">
+            <h3>${_("Count of Students Opened a Subsection")}</h3>
+          </div>
+          <div class="metrics-right" id="metric_grade_${i}" data-section-has-problem=${section_data['section_has_problem'][i]}>
+            <h3>${_("Grade Distribution per Problem")}</h3>
+          </div>
         </div>
-        <div class="metrics-right" id="metric_grade_${i}">
-          <h3>Grade Distribution per Problem</h3>
-          %if not section_data['section_has_problem'][i]:
-            <p class="nothing">${_("There are no problems in this section.")}</p>
-          %else:
-            <p class="loading"><i class="icon-spinner icon-spin icon-large"></i> Loading...</p>
-          %endif
-        </div>
-      </div>
     %endfor
       <script>
       	$(function () {
       		var firstLoad = true;
-      		
+
+            loadGraphs = function() {
+              $('#graph_load').show();
+              $('#graph_reload').hide();
+              $('.loading').remove();
+
+              var nothingText = "${_('There are no problems in this section.')}";
+              var loadingText = "${_('Loading...')}";
+      		  var nothingP = '<p class="nothing">' + nothingText  + '</p>';
+              var loading = '<p class="loading"><i class="icon-spinner icon-spin icon-large"></i>' + loadingText + '</p>';
+
+              $('.metrics-left').each(function() {
+                $(this).append(loading);
+              });
+              $('.metrics-right p.nothing').remove();
+              $('.metrics-right').each(function() {
+                if ($(this).data('section-has-problem') === "False") {
+                  $(this).append(nothingP);
+                } else {
+                  $(this).append(loading);
+                }
+              });
+              $('.metrics-left svg, .metrics-right svg').remove();
+
+              ${all_section_metrics.body("metric_opened_","metric_grade_","metric_attempts_","metric_tooltip_",course.id)}
+
+              setTimeout(function() {
+                $('#graph_load, #graph_reload').toggle();
+              }, 5000);
+            }
+
          	$('.instructor-nav a').click(function () {
 				if ($(this).data('section') === "metrics" && firstLoad) {
-	      			${all_section_metrics.body("metric_opened_","metric_grade_","metric_attempts_","metric_tooltip_",course.id)}
+	      			loadGraphs();
 	      			firstLoad = false;
 	      		}
 	   		});
-	   		
+
+            $('#graph_reload').click(function () {
+                loadGraphs();
+	   		});
+
 	   		if (window.location.hash === "#view-metrics") {
 	   			$('.instructor-nav a[data-section="metrics"]').click();
 	   		}

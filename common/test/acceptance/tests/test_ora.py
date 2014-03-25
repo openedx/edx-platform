@@ -3,7 +3,7 @@ Tests for ORA (Open Response Assessment) through the LMS UI.
 """
 
 import json
-from bok_choy.promise import fulfill, Promise
+from bok_choy.promise import fulfill, Promise, BrokenPromise
 from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.lms.course_info import CourseInfoPage
 from ..pages.lms.tab_nav import TabNavPage
@@ -204,7 +204,7 @@ class AIAssessmentTest(OpenResponseTest):
 
     XQUEUE_GRADE_RESPONSE = {
         'score': 1,
-        'feedback': {"spelling": "Ok.", "grammar": "Ok.", "markup_text": "NA"},
+        'feedback': json.dumps({"spelling": "Ok.", "grammar": "Ok.", "markup_text": "NA"}),
         'grader_type': 'BC',
         'success': True,
         'grader_id': 1,
@@ -249,7 +249,7 @@ class InstructorAssessmentTest(OpenResponseTest):
 
     XQUEUE_GRADE_RESPONSE = {
         'score': 1,
-        'feedback': {"feedback": "Good job!"},
+        'feedback': json.dumps({"feedback": "Good job!"}),
         'grader_type': 'IN',
         'success': True,
         'grader_id': 1,

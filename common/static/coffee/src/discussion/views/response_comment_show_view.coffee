@@ -2,7 +2,14 @@ if Backbone?
   class @ResponseCommentShowView extends DiscussionContentView
 
     events:
-        "click .action-delete": "_delete"
+        "click .action-delete":
+          (event) -> @_delete(event)
+        "keydown .action-delete":
+          (event) -> DiscussionUtil.activateOnSpace(event, @_delete)
+        "click .action-edit":
+          (event) -> @edit(event)
+        "keydown .action-edit":
+          (event) -> DiscussionUtil.activateOnSpace(event, @edit)
 
     tagName: "li"
 
@@ -14,6 +21,9 @@ if Backbone?
       can_delete:
         enable: -> @$(".action-delete").show()
         disable: -> @$(".action-delete").hide()
+      editable:
+        enable: -> @$(".action-edit").show()
+        disable: -> @$(".action-edit").hide()
 
     render: ->
       @template = _.template($("#response-comment-show-template").html())
@@ -48,7 +58,7 @@ if Backbone?
       else if DiscussionUtil.isTA(@model.get("user_id"))
         @$el.find("a.profile-link").after('<span class="community-ta-label">' + gettext('Community TA') + '</span>')
 
-    _delete: (event) ->
+    _delete: (event) =>
         @trigger "comment:_delete", event
 
     renderFlagged: =>
@@ -68,4 +78,5 @@ if Backbone?
     updateModelDetails: =>
       @renderFlagged()
 
-
+    edit: (event) =>
+      @trigger "comment:edit", event

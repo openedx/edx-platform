@@ -130,12 +130,12 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('send_email', {'send_to': 'staff', 'subject': 'test', 'message': 'asdf'}),
             ('list_instructor_tasks', {}),
             ('list_background_email_tasks', {}),
-            ('list_grade_downloads', {}),
+            ('list_report_downloads', {}),
             ('calculate_grades_csv', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
-            ('modify_access', {'email': self.user.email, 'rolename': 'beta', 'action': 'allow'}),
+            ('modify_access', {'unique_student_identifier': self.user.email, 'rolename': 'beta', 'action': 'allow'}),
             ('list_course_role_members', {'rolename': 'beta'}),
             ('rescore_problem', {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
         ]
@@ -639,7 +639,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         """ Test with an invalid action parameter. """
         url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
-            'email': self.other_staff.email,
+            'unique_student_identifier': self.other_staff.email,
             'rolename': 'staff',
             'action': 'robot-not-an-action',
         })
@@ -649,7 +649,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         """ Test with an invalid action parameter. """
         url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
-            'email': self.other_staff.email,
+            'unique_student_identifier': self.other_staff.email,
             'rolename': 'robot-not-a-roll',
             'action': 'revoke',
         })
@@ -658,7 +658,16 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     def test_modify_access_allow(self):
         url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
-            'email': self.other_instructor.email,
+            'unique_student_identifier': self.other_instructor.email,
+            'rolename': 'staff',
+            'action': 'allow',
+        })
+        self.assertEqual(response.status_code, 200)
+
+    def test_modify_access_allow_with_uname(self):
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.other_instructor.username,
             'rolename': 'staff',
             'action': 'allow',
         })
@@ -667,7 +676,16 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     def test_modify_access_revoke(self):
         url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
-            'email': self.other_staff.email,
+            'unique_student_identifier': self.other_staff.email,
+            'rolename': 'staff',
+            'action': 'revoke',
+        })
+        self.assertEqual(response.status_code, 200)
+
+    def test_modify_access_revoke_with_username(self):
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.other_staff.username,
             'rolename': 'staff',
             'action': 'revoke',
         })
@@ -677,7 +695,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         """ Test revoking access that a user does not have. """
         url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
-            'email': self.other_staff.email,
+            'unique_student_identifier': self.other_staff.email,
             'rolename': 'instructor',
             'action': 'revoke',
         })
@@ -689,7 +707,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         """
         url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
-            'email': self.instructor.email,
+            'unique_student_identifier': self.instructor.email,
             'rolename': 'instructor',
             'action': 'revoke',
         })
@@ -794,9 +812,9 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertTrue(body.startswith('"User ID","Anonymized user ID"\n"2","42"\n'))
         self.assertTrue(body.endswith('"7","42"\n'))
 
-    def test_list_grade_downloads(self):
-        url = reverse('list_grade_downloads', kwargs={'course_id': self.course.id})
-        with patch('instructor_task.models.LocalFSGradesStore.links_for') as mock_links_for:
+    def test_list_report_downloads(self):
+        url = reverse('list_report_downloads', kwargs={'course_id': self.course.id})
+        with patch('instructor_task.models.LocalFSReportStore.links_for') as mock_links_for:
             mock_links_for.return_value = [
                 ('mock_file_name_1', 'https://1.mock.url'),
                 ('mock_file_name_2', 'https://2.mock.url'),

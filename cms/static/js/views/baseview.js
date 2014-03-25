@@ -1,44 +1,53 @@
-define(
-    [
-        'jquery',
-        'underscore',
-        'backbone',
-        "js/utils/handle_iframe_binding"
-    ],
+define(["jquery", "underscore", "backbone", "js/utils/handle_iframe_binding"],
     function ($, _, Backbone, IframeUtils) {
-    /*  This view is extended from backbone with custom functions 'beforeRender' and 'afterRender'. It allows other
-        views, which extend from it to access these custom functions. 'afterRender' function of BaseView calls a utility
-        function 'iframeBinding' which modifies iframe src urls on a page so that they are rendered as part of the DOM.
-        Other common functions which need to be run before/after can also be added here.
-    */
+        /*
+          This view is extended from backbone to provide useful functionality for all Studio views.
+          This functionality includes:
+            - automatic expand and collapse of elements with the 'ui-toggle-expansion' class specified
+            - additional control of rendering by overriding 'beforeRender' or 'afterRender'
 
-    var BaseView = Backbone.View.extend({
-        //override the constructor function
-        constructor: function(options) {
-            _.bindAll(this, 'beforeRender', 'render', 'afterRender');
-            var _this = this;
-            this.render = _.wrap(this.render, function (render) {
-                _this.beforeRender();
-                render();
-                _this.afterRender();
-                return _this;
-            });
+          Note: the default 'afterRender' function calls a utility function 'iframeBinding' which modifies
+          iframe src urls on a page so that they are rendered as part of the DOM.
+         */
 
-            //call Backbone's own constructor
-            Backbone.View.prototype.constructor.apply(this, arguments);
-        },
+        var BaseView = Backbone.View.extend({
+            events: {
+                "click .ui-toggle-expansion": "toggleExpandCollapse"
+            },
 
-        beforeRender: function () {
-        },
+            //override the constructor function
+            constructor: function(options) {
+                _.bindAll(this, 'beforeRender', 'render', 'afterRender');
+                var _this = this;
+                this.render = _.wrap(this.render, function (render) {
+                    _this.beforeRender();
+                    render();
+                    _this.afterRender();
+                    return _this;
+                });
 
-        render: function () {
-            return this;
-        },
+                //call Backbone's own constructor
+                Backbone.View.prototype.constructor.apply(this, arguments);
+            },
 
-        afterRender: function () {
-            IframeUtils.iframeBinding(this);
-        }
+            beforeRender: function() {
+            },
+
+            render: function() {
+                return this;
+            },
+
+            afterRender: function() {
+                IframeUtils.iframeBinding(this);
+            },
+
+            toggleExpandCollapse: function(event) {
+                var target = $(event.target);
+                event.preventDefault();
+                target.closest('.expand-collapse').toggleClass('expand').toggleClass('collapse');
+                target.closest('.is-collapsible, .window').toggleClass('collapsed');
+            }
+        });
+
+        return BaseView;
     });
-
-    return BaseView;
-});

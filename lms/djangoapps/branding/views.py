@@ -9,7 +9,7 @@ import student.views
 import courseware.views
 from student.models import UserProfile
 
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 
@@ -28,7 +28,7 @@ def index(request):
         from external_auth.views import ssl_login
         return ssl_login(request)
 
-    enable_mktg_site = MicrositeConfiguration.get_microsite_configuration_value(
+    enable_mktg_site = microsite.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
@@ -36,11 +36,11 @@ def index(request):
     if enable_mktg_site:
         return redirect(settings.MKTG_URLS.get('ROOT'))
 
-    university = MicrositeConfiguration.match_university(request.META.get('HTTP_HOST'))
+    domain = request.META.get('HTTP_HOST')
 
     # keep specialized logic for Edge until we can migrate over Edge to fully use
     # microsite definitions
-    if university == 'edge':
+    if domain and 'edge.edx.org' in domain:
         context = {
             'suppress_toplevel_navigation': True
         }
@@ -60,7 +60,7 @@ def courses(request):
     to that. Otherwise, if subdomain branding is on, this is the university
     profile page. Otherwise, it's the edX courseware.views.courses page
     """
-    enable_mktg_site = MicrositeConfiguration.get_microsite_configuration_value(
+    enable_mktg_site = microsite.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )

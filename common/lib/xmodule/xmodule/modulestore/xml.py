@@ -19,6 +19,7 @@ from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
+from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
@@ -582,9 +583,35 @@ class XMLModuleStore(ModuleStoreReadBase):
         if os.path.isdir(base_dir / url_name):
             self._load_extra_content(system, course_descriptor, category, base_dir / url_name, course_dir)
 
-    def _load_extra_content(self, system, course_descriptor, category, path, course_dir):
+    def _import_field_content(self, course_descriptor, category, file_path):
+        """
+        Import field data content for field other than 'data' or 'metadata' form json file and
+        return field data content as dictionary
+        """
+        slug, location, data_content = None, None, None
+        try:
+            # try to read json file
+            # file_path format: {dirname}.{field_name}.json
+            dirname, field, file_suffix = file_path.split('/')[-1].split('.')
+            if file_suffix == 'json' and field not in DEFAULT_CONTENT_FIELDS:
+                slug = os.path.splitext(os.path.basename(dirname))[0]
+                location = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
+                with open(file_path) as field_content_file:
+                    field_data = json.load(field_content_file)
+                    data_content = {field: field_data}
+        except (IOError, ValueError):
+            # ignore this exception
+            # only new exported courses which use content fields other than 'metadata' and 'data'
+            # will have this file '{dirname}.{field_name}.json'
+            data_content = None
 
-        for filepath in glob.glob(path / '*'):
+        return slug, location, data_content
+
+    def _load_extra_content(self, system, course_descriptor, category, content_path, course_dir):
+        """
+        Import fields data content from files
+        """
+        for filepath in glob.glob(content_path / '*'):
             if not os.path.isfile(filepath):
                 continue
 
@@ -593,28 +620,55 @@ class XMLModuleStore(ModuleStoreReadBase):
 
             with open(filepath) as f:
                 try:
-                    html = f.read().decode('utf-8')
-                    # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
-                    slug = os.path.splitext(os.path.basename(filepath))[0]
-                    loc = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
-                    module = system.construct_xblock(
-                        category,
-                        # We're loading a descriptor, so student_id is meaningless
-                        # We also don't have separate notions of definition and usage ids yet,
-                        # so we use the location for both
-                        ScopeIds(None, category, loc, loc),
-                        DictFieldData({'data': html, 'location': loc, 'category': category}),
-                    )
-                    # VS[compat]:
-                    # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
-                    # from the course policy
-                    if category == "static_tab":
-                        for tab in course_descriptor.tabs or []:
-                            if tab.get('url_slug') == slug:
-                                module.display_name = tab['name']
-                    module.data_dir = course_dir
-                    module.save()
-                    self.modules[course_descriptor.id][module.scope_ids.usage_id] = module
+                    if filepath.find('.json') != -1:
+                        # json file with json data content
+                        slug, loc, data_content = self._import_field_content(course_descriptor, category, filepath)
+                        if data_content is None:
+                            continue
+                        else:
+                            try:
+                                # get and update data field in xblock runtime
+                                module = system.load_item(loc)
+                                for key, value in data_content.iteritems():
+                                    setattr(module, key, value)
+                                module.save()
+                            except ItemNotFoundError:
+                                module = None
+                                data_content['location'] = loc
+                                data_content['category'] = category
+                    else:
+                        slug = os.path.splitext(os.path.basename(filepath))[0]
+                        loc = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
+                        # html file with html data content
+                        html = f.read().decode('utf-8')
+                        try:
+                            module = system.load_item(loc)
+                            module.data = html
+                            module.save()
+                        except ItemNotFoundError:
+                            module = None
+                            data_content = {'data': html, 'location': loc, 'category': category}
+
+                    if module is None:
+                        module = system.construct_xblock(
+                            category,
+                            # We're loading a descriptor, so student_id is meaningless
+                            # We also don't have separate notions of definition and usage ids yet,
+                            # so we use the location for both
+                            ScopeIds(None, category, loc, loc),
+                            DictFieldData(data_content),
+                        )
+                        # VS[compat]:
+                        # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
+                        # from the course policy
+                        if category == "static_tab":
+                            for tab in course_descriptor.tabs or []:
+                                if tab.get('url_slug') == slug:
+                                    module.display_name = tab['name']
+                        module.data_dir = course_dir
+                        module.save()
+
+                        self.modules[course_descriptor.id][module.scope_ids.usage_id] = module
                 except Exception, e:
                     logging.exception("Failed to load %s. Skipping... \
                             Exception: %s", filepath, unicode(e))
@@ -736,3 +790,12 @@ class XMLModuleStore(ModuleStoreReadBase):
         "split" for new-style split MongoDB backed courses.
         """
         return XML_MODULESTORE_TYPE
+
+    def get_courses_for_wiki(self, wiki_slug):
+        """
+        Return the list of courses which use this wiki_slug
+        :param wiki_slug: the course wiki root slug
+        :return: list of course locations
+        """
+        courses = self.get_courses()
+        return [course.location for course in courses if (course.wiki_slug == wiki_slug)]

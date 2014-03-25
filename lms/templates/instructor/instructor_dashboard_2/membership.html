@@ -6,6 +6,7 @@
     <div class="header">
       <div class="title"> {{title}} </div>
     </div>
+    <div class="info"> {{info}} </div>
     <div class="member-list">
       <table>
         <thead>
@@ -18,7 +19,6 @@
         <tbody></tbody>
       </table>
     </div>
-    <div class="info"> {{info}} </div>
     <div class="bottom-bar">
       <input type="text" name="add-field" class="add-field" placeholder="{{add_placeholder}}">
       <input type="button" name="add" class="add" value="{{add_btn_label}}">
@@ -28,28 +28,31 @@
 
 <div class="vert-left batch-enrollment">
   <h2> ${_("Batch Enrollment")} </h2>
-  <p> ${_("Enter student emails separated by new lines or commas.")} </p>
-  <textarea rows="6" cols="50" name="student-emails" placeholder="${_("Student Emails")}" spellcheck="false"></textarea>
-  <br>
+  <p>
+    <label for="student-emails">${_("Enter student emails separated by new lines or commas.")} </label>
+    <textarea rows="6" name="student-emails" placeholder="${_("Student Emails")}" spellcheck="false"></textarea>
+  </p>
 
-  <input type="checkbox" name="auto-enroll" value="Auto-Enroll" style="margin-top: 1em;">
-  <label for="auto-enroll">${_("Auto Enroll")}</label>
-  <div class="auto-enroll-hint">
-    <p> ${_("If auto enroll is <em>checked</em>, students who have not yet registered for edX will be automatically enrolled.")}
-        ${_("If auto enroll is left <em>unchecked</em>, students who have not yet registered for edX will not be enrolled, but will be allowed to enroll.")}
-    </p>
-  </div>
-  
-  <div>
-    <input type="checkbox" name="email-students" value="Notify-students-by-email">
-    <label for="email-students">${_("Notify students by email")}</label>
-    <div class="email-students-hint">
-      <p> ${_("If email students is <em>checked</em> students will receive an email notification.")}
-      </p>
+  <div class="enroll-option">
+    <input type="checkbox" name="auto-enroll" value="Auto-Enroll" style="margin-top: 1em;">
+    <label for="auto-enroll">${_("Auto Enroll")}</label>
+    <div class="hint auto-enroll-hint">
+      <span class="hint-caret"></span>
+      <p> ${_("If auto enroll is <em>checked</em>, students who have not yet registered for edX will be automatically enrolled.")}
+          ${_("If auto enroll is left <em>unchecked</em>, students who have not yet registered for edX will not be enrolled, but will be allowed to enroll.")}</p>
     </div>
   </div>
-  
-  <div>
+
+  <div class="enroll-option">
+    <input type="checkbox" name="email-students" value="Notify-students-by-email">
+    <label for="email-students">${_("Notify students by email")}</label>
+    <div class="hint email-students-hint">
+      <span class="hint-caret"></span>
+      <p> ${_("If email students is <em>checked</em> students will receive an email notification.")}</p>
+    </div>
+  </div>
+
+  <div class="enroll-actions actions">
     <input type="button" name="enroll" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" >
     <input type="button" name="unenroll" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" >
   </div>
@@ -61,17 +64,22 @@
 <div class="vert-right member-lists-management">
   <h2> ${_("Administration List Management")} </h2>
 
-  <select id="member-lists-selector">
-    <option> ${_("Getting available lists...")} </option>
-  </select>
-
   <div class="request-response-error"></div>
+
+  <div class="wrapper-member-select">
+    <label for="member-lists-selector">Select an Administrator Group:</label>
+    <select id="member-lists-selector" class="member-lists-selector">
+      <option> ${_("Getting available lists...")} </option>
+    </select>
+
+  </div>
+
 
   %if not section_data['access']['instructor']:
     <p>
       ${_("Staff cannot modify staff or beta tester lists. To modify these lists, "
       "contact your instructor and ask them to add you as an instructor for staff "
-      "and beta lists, or a forum admin for forum management.")}
+      "and beta lists, or a discussion admin for discussion management.")}
     </p>
   %endif
 
@@ -94,7 +102,7 @@
       data-display-name="${_("Instructors")}"
       data-info-text="
         ${_("Instructors are the core administration of your course. Instructors can "
-        "add and remove course staff, as well as administer forum access.")}"
+        "add and remove course staff, as well as administer discussion access.")}"
       data-list-endpoint="${ section_data['list_course_role_members_url'] }"
       data-modify-endpoint="${ section_data['modify_access_url'] }"
       data-add-button-label="${_("Add Instructor")}"
@@ -114,23 +122,23 @@
 
     <div class="auth-list-container"
       data-rolename="Administrator"
-      data-display-name="${_("Forum Admins")}"
+      data-display-name="${_("Discussion Admins")}"
       data-info-text="
-        ${_("Forum admins can edit or delete any post, clear misuse flags, close "
+        ${_("Discussion admins can edit or delete any post, clear misuse flags, close "
          "and re-open threads, endorse responses, and see posts from all cohorts. "
          "They CAN add/delete other moderators and their posts are marked as 'staff'.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
-      data-add-button-label="Add ${_("Forum Admin")}"
+      data-add-button-label="Add ${_("Discussion Admin")}"
     ></div>
   %endif
 
   %if section_data['access']['instructor'] or section_data['access']['forum_admin']:
     <div class="auth-list-container"
       data-rolename="Moderator"
-      data-display-name="${_("Forum Moderators")}"
+      data-display-name="${_("Discussion Moderators")}"
       data-info-text="
-        ${_("Forum moderators can edit or delete any post, clear misuse flags, close "
+        ${_("Discussion moderators can edit or delete any post, clear misuse flags, close "
          "and re-open threads, endorse responses, and see posts from all cohorts. "
          "They CANNOT add/delete other moderators and their posts are marked as 'staff'.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
@@ -140,10 +148,10 @@
 
     <div class="auth-list-container"
       data-rolename="Community TA"
-      data-display-name="${_("Forum Community TAs")}"
+      data-display-name="${_("Discussion Community TAs")}"
       data-info-text="
         ${_("Community TA's are members of the community whom you deem particularly "
-        "helpful on the forums. They can edit or delete any post, clear misuse flags, "
+        "helpful on the discussion boards. They can edit or delete any post, clear misuse flags, "
         "close and re-open threads, endorse responses, and see posts from all cohorts. "
         "Their posts are marked 'Community TA'.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"

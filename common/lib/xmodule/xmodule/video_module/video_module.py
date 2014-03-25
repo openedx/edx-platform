@@ -33,12 +33,11 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String, Float, Boolean, List, Dict, ScopeIds
 from xmodule.fields import RelativeTime
 from .transcripts_utils import (
-    generate_srt_from_sjson,
-    asset,
     get_or_create_sjson,
     TranscriptException,
     generate_sjson_for_all_speeds,
-    youtube_speed_dict
+    youtube_speed_dict,
+    Transcript,
 )
 from .video_utils import create_youtube_string
 
@@ -156,6 +155,15 @@ class VideoFields(object):
         scope=Scope.preferences,
         default="en"
     )
+    transcript_download_format = String(
+        help="Transcript file format to download by user.",
+        scope=Scope.preferences,
+        values=[
+            {"display_name": "SubRip (.srt) file", "value": "srt"},
+            {"display_name": "Text (.txt) file", "value": "txt"}
+        ],
+        default='srt',
+    )
     speed = Float(
         help="The last speed that was explicitly set by user for the video.",
         scope=Scope.user_state,
@@ -194,6 +202,7 @@ class VideoModule(VideoFields, XModule):
             resource_string(module, 'js/src/video/025_focus_grabber.js'),
             resource_string(module, 'js/src/video/02_html5_video.js'),
             resource_string(module, 'js/src/video/03_video_player.js'),
+            resource_string(module, 'js/src/video/035_video_accessible_menu.js'),
             resource_string(module, 'js/src/video/04_video_control.js'),
             resource_string(module, 'js/src/video/05_video_quality_control.js'),
             resource_string(module, 'js/src/video/06_video_progress_slider.js'),
@@ -203,20 +212,33 @@ class VideoModule(VideoFields, XModule):
             resource_string(module, 'js/src/video/10_main.js')
         ]
     }
-    css = {'scss': [resource_string(module, 'css/video/display.scss')]}
+    css = {'scss': [
+        resource_string(module, 'css/video/display.scss'),
+        resource_string(module, 'css/video/accessible_menu.scss'),
+    ]}
     js_module_name = "Video"
 
     def handle_ajax(self, dispatch, data):
-        accepted_keys = ['speed', 'saved_video_position', 'transcript_language']
-        if dispatch == 'save_user_state':
+        accepted_keys = [
+            'speed', 'saved_video_position', 'transcript_language',
+            'transcript_download_format',
+        ]
 
+        conversions = {
+            'speed': json.loads,
+            'saved_video_position': lambda v: RelativeTime.isotime_to_timedelta(v),
+        }
+
+        if dispatch == 'save_user_state':
             for key in data:
                 if hasattr(self, key) and key in accepted_keys:
-                    if key == 'saved_video_position':
-                        relative_position = RelativeTime.isotime_to_timedelta(data[key])
-                        self.saved_video_position = relative_position
+                    if key in conversions:
+                        value = conversions[key](data[key])
                     else:
-                        setattr(self, key, json.loads(data[key]))
+                        value = data[key]
+
+                    setattr(self, key, value)
+
                     if key == 'speed':
                         self.global_speed = self.speed
 
@@ -229,6 +251,7 @@ class VideoModule(VideoFields, XModule):
 
     def get_html(self):
         track_url = None
+        transcript_download_format = self.transcript_download_format
 
         get_ext = lambda filename: filename.rpartition('.')[-1]
         sources = {get_ext(src): src for src in self.html5_sources}
@@ -242,17 +265,18 @@ class VideoModule(VideoFields, XModule):
         if self.download_track:
             if self.track:
                 track_url = self.track
-            elif self.sub:
+                transcript_download_format = None
+            elif self.sub or self.transcripts:
                 track_url = self.runtime.handler_url(self, 'transcript').rstrip('/?') + '/download'
 
         if not self.transcripts:
-            transcript_language = 'en'
+            transcript_language = u'en'
             languages = {'en': 'English'}
         else:
             if self.transcript_language in self.transcripts:
                 transcript_language = self.transcript_language
             elif self.sub:
-                transcript_language = 'en'
+                transcript_language = u'en'
             else:
                 transcript_language = sorted(self.transcripts.keys())[0]
 
@@ -290,30 +314,55 @@ class VideoModule(VideoFields, XModule):
             # configuration setting field.
             'yt_test_timeout': 1500,
             'yt_test_url': settings.YOUTUBE_TEST_URL,
+            'transcript_download_format': transcript_download_format,
+            'transcript_download_formats_list': self.descriptor.fields['transcript_download_format'].values,
             'transcript_language': transcript_language,
             'transcript_languages': json.dumps(sorted_languages),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript').rstrip('/?') + '/translation',
             'transcript_available_translations_url': self.runtime.handler_url(self, 'transcript').rstrip('/?') + '/available_translations',
         })
 
-    def get_transcript(self):
+    def get_transcript(self, transcript_format='srt'):
         """
-        Returns transcript in *.srt format.
+        Returns transcript, filename and MIME type.
 
         Raises:
             - NotFoundError if cannot find transcript file in storage.
             - ValueError if transcript file is empty or incorrect JSON.
             - KeyError if transcript file has incorrect format.
+
+        If language is 'en', self.sub should be correct subtitles name.
+        If language is 'en', but if self.sub is not defined, this means that we 
+        should search for video name in order to get proper transcript (old style courses).
+        If language is not 'en', give back transcript in proper language and format.
         """
         lang = self.transcript_language
-        subs_id = self.sub if lang == 'en' else self.youtube_id_1_0
-        data = asset(self.location, subs_id, lang).data
-        str_subs = generate_srt_from_sjson(json.loads(data), speed=1.0)
-        if not str_subs:
-            log.debug('generate_srt_from_sjson produces no subtitles')
+
+        if lang == 'en':
+            if self.sub:  # HTML5 case and (Youtube case for new style videos)
+                transcript_name = self.sub
+            elif self.youtube_id_1_0:  # old courses
+                transcript_name = self.youtube_id_1_0
+            else:
+                log.debug("No subtitles for 'en' language")
+                raise ValueError
+
+            data = Transcript.asset(self.location, transcript_name, lang).data
+            filename = '{}.{}'.format(transcript_name, transcript_format)
+            content = Transcript.convert(data, 'sjson', transcript_format)
+        else:
+            data = Transcript.asset(self.location, None, None, self.transcripts[lang]).data
+            filename = '{}.{}'.format(os.path.splitext(self.transcripts[lang])[0], transcript_format)
+            content = Transcript.convert(data, 'srt', transcript_format)
+
+        if not content:
+            log.debug('no subtitles produced in get_transcript')
             raise ValueError
 
-        return str_subs
+        mime_type = 'text/plain' if transcript_format == 'txt' else 'application/x-subrip'
+
+        return content, filename, mime_type
+
 
     @XBlock.handler
     def transcript(self, request, dispatch):
@@ -329,7 +378,7 @@ class VideoModule(VideoFields, XModule):
         `available_translations`: returns list of languages, for which SRT files exist. For 'en' check if SJSON exists.
         """
         if dispatch == 'translation':
-            if 'language' not in request.GET or 'videoId' not in request.GET:
+            if 'language' not in request.GET:
                 log.info("Invalid /transcript GET parameters.")
                 return Response(status=400)
 
@@ -341,8 +390,8 @@ class VideoModule(VideoFields, XModule):
                 self.transcript_language = lang
 
             try:
-                transcript = self.translation(request.GET.get('videoId'))
-            except TranscriptException as ex:
+                transcript = self.translation(request.GET.get('videoId', None))
+            except (TranscriptException, NotFoundError) as ex:
                 log.info(ex.message)
                 response = Response(status=404)
             else:
@@ -351,31 +400,31 @@ class VideoModule(VideoFields, XModule):
 
         elif dispatch == 'download':
             try:
-                subs = self.get_transcript()
+                transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(self.transcript_download_format)
             except (NotFoundError, ValueError, KeyError):
                 log.debug("Video@download exception")
                 response = Response(status=404)
             else:
                 response = Response(
-                    subs,
+                    transcript_content,
                     headerlist=[
-                        ('Content-Disposition', 'attachment; filename="{0}.srt"'.format(self.transcript_language)),
+                        ('Content-Disposition', 'attachment; filename="{}"'.format(transcript_filename)),
                     ]
                 )
-                response.content_type = "application/x-subrip"
+                response.content_type = transcript_mime_type
 
         elif dispatch == 'available_translations':
             available_translations = []
             if self.sub:  # check if sjson exists for 'en'.
                 try:
-                    asset(self.location, self.sub, 'en')
+                    Transcript.asset(self.location, self.sub, 'en')
                 except NotFoundError:
                     pass
                 else:
                     available_translations = ['en']
             for lang in self.transcripts:
                 try:
-                   asset(self.location, None, None, self.transcripts[lang])
+                   Transcript.asset(self.location, None, None, self.transcripts[lang])
                 except NotFoundError:
                     continue
                 available_translations.append(lang)
@@ -390,53 +439,66 @@ class VideoModule(VideoFields, XModule):
 
         return response
 
-    def translation(self, subs_id):
+    def translation(self, youtube_id):
         """
         This is called to get transcript file for specific language.
 
-        subs_id: str: must be on of: self.sub or one of youtube_ids.
+        youtube_id: str: must be one of youtube_ids or None if HTML video
 
         Logic flow:
 
-        If english -> give back `sub` subtitles:
-            Return what we have in contentstore for given subs_id,
-            We should not regenerate needed transcripts, if, for example, they present for youtube 1.0 speed,
-            and we need for other speeds. Such generation should be done in transcripts workflow.
-        If non-english:
-            a) extract subs_id from srt file name
-            if non-youtube:
-                b) try to find sjson by subs_id and return if sucessful
-                c) otherwise generate sjson from srt and return it.
-            if youtube:
-                b) try to find sjson by subs_id and return if sucessful
-                c) generate sjson from srt for all youtube speeds
+        If youtube_id doesn't exist, we have a video in HTML5 mode. Otherwise,
+        video video in Youtube or Flash modes.
+
+        if youtube:
+            If english -> give back youtube_id subtitles:
+                Return what we have in contentstore for given youtube_id.
+            If non-english:
+                a) extract youtube_id from srt file name.
+                b) try to find sjson by youtube_id and return if successful.
+                c) generate sjson from srt for all youtube speeds.
+        if non-youtube:
+            If english -> give back `sub` subtitles:
+                Return what we have in contentstore for given subs_if that is stored in self.sub.
+            If non-english:
+                a) try to find previously generated sjson.
+                b) otherwise generate sjson from srt and return it.
 
         Filenames naming:
             en: subs_videoid.srt.sjson
             non_en: uk_subs_videoid.srt.sjson
+
+        Raises:
+            NotFoundError if for 'en' subtitles no asset is uploaded.
         """
-        if self.transcript_language == 'en':
-            return asset(self.location, subs_id).data
 
-        if not self.youtube_id_1_0:  # Non-youtube (HTML5) case:
-            return get_or_create_sjson(self)
+        if youtube_id:
+            # Youtube case:
+            if self.transcript_language == 'en':
+                return Transcript.asset(self.location, youtube_id).data
 
-        # Youtube case:
-        youtube_ids = youtube_speed_dict(self)
-        assert subs_id in youtube_ids
+            youtube_ids = youtube_speed_dict(self)
+            assert youtube_id in youtube_ids
 
-        try:
-            sjson_transcript = asset(self.location, subs_id, self.transcript_language).data
-        except (NotFoundError):
-            log.info("Can't find content in storage for %s transcript: generating.", subs_id)
-            generate_sjson_for_all_speeds(
-                self,
-                self.transcripts[self.transcript_language],
-                {speed: subs_id for subs_id, speed in youtube_ids.iteritems()},
-                self.transcript_language
-            )
-        sjson_transcript = asset(self.location, subs_id, self.transcript_language).data
-        return sjson_transcript
+            try:
+                sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
+            except (NotFoundError):
+                log.info("Can't find content in storage for %s transcript: generating.", youtube_id)
+                generate_sjson_for_all_speeds(
+                    self,
+                    self.transcripts[self.transcript_language],
+                    {speed: youtube_id for youtube_id, speed in youtube_ids.iteritems()},
+                    self.transcript_language
+                )
+                sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
+
+            return sjson_transcript
+        else:
+            # HTML5 case
+            if self.transcript_language == 'en':
+                return Transcript.asset(self.location, self.sub).data
+            else:
+                return get_or_create_sjson(self)
 
 
 class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor):

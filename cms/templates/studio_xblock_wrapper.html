@@ -1,0 +1,43 @@
+<%! from django.utils.translation import ugettext as _ %>
+% if xblock.location != xblock_context['root_xblock'].location:
+  % if xblock.has_children:
+<section class="wrapper-xblock level-nesting" data-locator="${locator}">
+  % else:
+<section class="wrapper-xblock level-element" data-locator="${locator}">
+  % endif
+% endif
+    <header class="xblock-header">
+        <div class="header-details">
+            ${xblock.display_name_with_default | h}
+        </div>
+        <div class="header-actions">
+            <ul class="actions-list">
+                % if not xblock_context['read_only']:
+                <li class="action-item action-edit">
+                    <a href="#" class="edit-button action-button">
+                        <i class="icon-edit"></i>
+                        <span class="action-button-text">${_("Edit")}</span>
+                    </a>
+                </li>
+                <li class="action-item action-duplicate">
+                    <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
+                    <i class="icon-copy"></i>
+                    <span class="sr">${_("Duplicate this component")}</span>
+                    </a>
+                </li>
+                <li class="action-item action-delete">
+                    <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
+                    <i class="icon-trash"></i>
+                    <span class="sr">${_("Delete this component")}</span>
+                    </a>
+                </li>
+                % endif
+            </ul>
+        </div>
+    </header>
+    <article class="xblock-render">
+${content}
+    </article>
+% if xblock.location != xblock_context['root_xblock'].location:
+</section>
+% endif

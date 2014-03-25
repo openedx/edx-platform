@@ -10,6 +10,8 @@ describe 'ResponseCommentShowView', ->
             <i class="icon"></i><span class="flag-label"></span></div>
             <div style="display:none" class="discussion-delete-comment action-delete" data-role="comment-delete" data-tooltip="Delete Comment" role="button" aria-pressed="false" tabindex="0">
               <i class="icon icon-remove"></i><span class="sr delete-label">Delete Comment</span></div>
+            <div style="display:none" class="discussion-edit-comment action-edit" data-tooltip="Edit Comment" role="button" tabindex="0">
+              <i class="icon icon-pencil"></i><span class="sr">Edit Comment</span></div>
             <p class="posted-details">&ndash;posted <span class="timeago" title="<%- created_at %>"><%- created_at %></span> by
             <% if (obj.username) { %>
             <a href="<%- user_url %>" class="profile-link"><%- username %></a>
@@ -61,13 +63,30 @@ describe 'ResponseCommentShowView', ->
             @comment.unflagAbuse()
             expect(@comment.get 'abuse_flaggers').toEqual []
 
-    describe 'comment deletion', ->
+    describe '_delete', ->
 
-        it 'triggers the delete event when the delete icon is clicked', ->
+        it 'triggers on the correct events', ->
             DiscussionUtil.loadRoles []
             @comment.updateInfo {ability: {'can_delete': true}}
+            @view.render()
+            DiscussionViewSpecHelper.checkButtonEvents(@view, "_delete", ".action-delete")
+
+        it 'triggers the delete event', ->
             triggerTarget = jasmine.createSpy()
             @view.bind "comment:_delete", triggerTarget
+            @view._delete()
+            expect(triggerTarget).toHaveBeenCalled()
+
+    describe 'edit', ->
+
+        it 'triggers on the correct events', ->
+            DiscussionUtil.loadRoles []
+            @comment.updateInfo {ability: {'can_edit': true}}
             @view.render()
-            @view.$el.find('.action-delete').click()
+            DiscussionViewSpecHelper.checkButtonEvents(@view, "edit", ".action-edit")
+
+        it 'triggers comment:edit when the edit button is clicked', ->
+            triggerTarget = jasmine.createSpy()
+            @view.bind "comment:edit", triggerTarget
+            @view.edit()
             expect(triggerTarget).toHaveBeenCalled()

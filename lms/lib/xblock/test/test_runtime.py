@@ -2,6 +2,7 @@
 Tests of the LMS XBlock Runtime and associated utilities
 """
 
+from django.contrib.auth.models import User
 from ddt import ddt, data
 from mock import Mock
 from unittest import TestCase
@@ -85,3 +86,53 @@ class TestHandlerUrl(TestCase):
     def test_handler_name(self):
         self.assertIn('handler1', self._parsed_path('handler1'))
         self.assertIn('handler_a', self._parsed_path('handler_a'))
+
+
+class TestUserServiceAPI(TestCase):
+    """Test the user service interface"""
+
+    def setUp(self):
+        self.course_id = "org/course/run"
+
+        self.user = User(username='runtime_robot', email='runtime_robot@edx.org', password='test', first_name='Robot')
+        self.user.save()
+
+        def mock_get_real_user(_anon_id):
+            """Just returns the test user"""
+            return self.user
+
+        self.runtime = LmsModuleSystem(
+            static_url='/static',
+            track_function=Mock(),
+            get_module=Mock(),
+            render_template=Mock(),
+            replace_urls=str,
+            course_id=self.course_id,
+            get_real_user=mock_get_real_user,
+            descriptor_runtime=Mock(),
+        )
+        self.scope = 'course'
+        self.key = 'key1'
+
+        self.mock_block = Mock()
+        self.mock_block.service_declaration.return_value = 'needs'
+
+    def test_get_set_tag(self):
+        # test for when we haven't set the tag yet
+        tag = self.runtime.service(self.mock_block, 'user_tags').get_tag(self.scope, self.key)
+        self.assertIsNone(tag)
+
+        # set the tag
+        set_value = 'value'
+        self.runtime.service(self.mock_block, 'user_tags').set_tag(self.scope, self.key, set_value)
+        tag = self.runtime.service(self.mock_block, 'user_tags').get_tag(self.scope, self.key)
+
+        self.assertEqual(tag, set_value)
+
+        # Try to set tag in wrong scope
+        with self.assertRaises(ValueError):
+            self.runtime.service(self.mock_block, 'user_tags').set_tag('fake_scope', self.key, set_value)
+
+        # Try to get tag in wrong scope
+        with self.assertRaises(ValueError):
+            self.runtime.service(self.mock_block, 'user_tags').get_tag('fake_scope', self.key)

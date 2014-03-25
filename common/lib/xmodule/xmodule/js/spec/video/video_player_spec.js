@@ -45,7 +45,6 @@ function (VideoPlayer) {
 
                 it('create video caption', function () {
                     expect(state.videoCaption).toBeDefined();
-                    expect(state.youtubeId('1.0')).toEqual('Z5KLxerq05Y');
                     expect(state.speed).toEqual('1.50');
                     expect(state.config.transcriptTranslationUrl)
                         .toEqual('/transcript/translation');
@@ -103,6 +102,35 @@ function (VideoPlayer) {
                 });
             });
 
+            it('create Flash player', function () {
+                var player;
+
+                spyOn($.fn, 'trigger');
+                state = jasmine.initializePlayerYouTube();
+                state.videoEl = state.el.find('video, iframe').width(100);
+                player = state.videoPlayer.player;
+                player.getAvailablePlaybackRates.andReturn([1]);
+                state.currentPlayerMode = 'html5';
+                spyOn(window.YT, 'Player').andCallThrough();
+                state.videoPlayer.onReady();
+
+                expect(YT.Player).toHaveBeenCalledWith('id', {
+                    playerVars: {
+                        controls: 0,
+                        wmode: 'transparent',
+                        rel: 0,
+                        showinfo: 0,
+                        enablejsapi: 1,
+                        modestbranding: 1
+                    },
+                    videoId: 'abcdefghijkl',
+                    events: jasmine.any(Object)
+                });
+
+                expect(state.resizer.setElement).toHaveBeenCalled();
+                expect(state.resizer.align).toHaveBeenCalled();
+            });
+
             // We can't test the invocation of HTML5Video because it is not
             // available globally. It is defined within the scope of Require
             // JS.
@@ -153,6 +181,25 @@ function (VideoPlayer) {
 
             it('autoplay the first video', function () {
                 expect(state.videoPlayer.play).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('onReady YouTube', function () {
+            beforeEach(function () {
+                state = jasmine.initializePlayerYouTube();
+
+                state.videoEl = $('video, iframe');
+            });
+
+            it('multiple speeds and flash mode, change back to html5 mode', function () {
+                var playbackRates = state.videoPlayer.player.getAvailablePlaybackRates();
+
+                state.currentPlayerMode = 'flash';
+
+                state.videoPlayer.onReady();
+
+                expect(playbackRates.length).toBe(4);
+                expect(state.currentPlayerMode).toBe('html5');
             });
         });
 
@@ -538,10 +585,8 @@ function (VideoPlayer) {
 
         describe('updatePlayTime', function () {
             beforeEach(function () {
-                state = jasmine.initializePlayer();
-
+                state = jasmine.initializePlayerYouTube();
                 state.videoEl = $('video, iframe');
-
                 spyOn(state.videoCaption, 'updatePlayTime').andCallThrough();
                 spyOn(state.videoProgressSlider, 'updatePlayTime').andCallThrough();
             });
@@ -560,26 +605,10 @@ function (VideoPlayer) {
                 }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
-                    var htmlStr;
-
+                    state.videoPlayer.goToStartTime = false;
                     state.videoPlayer.updatePlayTime(60);
 
-                    htmlStr = $('.vidtime').html();
-
-                    // We resort to this trickery because Firefox and Chrome
-                    // round the total time a bit differently.
-                    if (
-                        htmlStr.match('1:00 / 1:01') ||
-                        htmlStr.match('1:00 / 1:00')
-                    ) {
-                        expect(true).toBe(true);
-                    } else {
-                        expect(true).toBe(false);
-                    }
-
-                    // The below test has been replaced by above trickery:
-                    //
-                    //     expect($('.vidtime')).toHaveHtml('1:00 / 1:01');
+                    expect($('.vidtime')).toHaveHtml('1:00 / 1:00');
                 });
             });
 
@@ -589,6 +618,7 @@ function (VideoPlayer) {
                 }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
+                    state.videoPlayer.goToStartTime = false;
                     state.videoPlayer.updatePlayTime(60);
 
                     expect(state.videoCaption.updatePlayTime)
@@ -606,6 +636,7 @@ function (VideoPlayer) {
                 }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
+                    state.videoPlayer.goToStartTime = false;
                     state.videoPlayer.updatePlayTime(60);
 
                     expect(state.videoProgressSlider.updatePlayTime)
@@ -677,35 +708,47 @@ function (VideoPlayer) {
 
         describe('updatePlayTime with invalid endTime', function () {
             beforeEach(function () {
-                state = jasmine.initializePlayer(
-                    {
-                        end: 100000
-                    }
-                );
+                state = {
+                    videoPlayer: {
+                        duration: function () {
+                            // The video will be 60 seconds long.
+                            return 60;
+                        },
+                        goToStartTime: true,
+                        startTime: undefined,
+                        endTime: undefined,
+                        player: {
+                            seekTo: function () {}
+                        },
+                        figureOutStartEndTime: jasmine.createSpy(),
+                        figureOutStartingTime: jasmine.createSpy().andReturn(0)
+                    },
+                    config: {
+                        savedVideoPosition: 0,
+                        startTime: 0,
 
-                state.videoEl = $('video, iframe');
-
-                spyOn(state.videoPlayer, 'updatePlayTime').andCallThrough();
+                        // We are setting the end-time to 10000 seconds. The
+                        // video will be less than this, the code will reset
+                        // the end time to `null` - i.e. to the end of the video.
+                        // This is the expected behavior we will test for.
+                        endTime: 10000
+                    },
+                    currentPlayerMode: 'html5',
+                    trigger: function () {},
+                    browserIsFirefox: false,
+                    isFlashMode: jasmine.createSpy().andReturn(false)
+                };
             });
 
             it('invalid endTime is reset to null', function () {
-                var duration;
+                VideoPlayer.prototype.updatePlayTime.call(state, 0);
 
-                state.videoPlayer.updatePlayTime.reset();
-                state.videoPlayer.play();
+                expect(state.videoPlayer.figureOutStartingTime).toHaveBeenCalled();
 
-                waitsFor(
-                    function () {
-                        return state.videoPlayer.isPlaying() &&
-                            state.videoPlayer.initialSeekToStartTime === false;
-                    },
-                    'updatePlayTime was invoked and duration is set',
-                    WAIT_TIMEOUT
-                );
+                VideoPlayer.prototype.figureOutStartEndTime.call(state, 60);
+                VideoPlayer.prototype.figureOutStartingTime.call(state, 60);
 
-                runs(function () {
-                    expect(state.videoPlayer.endTime).toBe(null);
-                });
+                expect(state.videoPlayer.endTime).toBe(null);
             });
         });
 
@@ -717,6 +760,7 @@ function (VideoPlayer) {
                     state.videoEl = $('video, iframe');
 
                     spyOn(state.videoCaption, 'resize').andCallThrough();
+                    spyOn($.fn, 'trigger').andCallThrough();
                     state.videoControl.toggleFullScreen(jQuery.Event('click'));
                 });
 
@@ -731,7 +775,8 @@ function (VideoPlayer) {
 
                 it('tell VideoCaption to resize', function () {
                     expect(state.videoCaption.resize).toHaveBeenCalled();
-                    expect(state.resizer.setMode).toHaveBeenCalled();
+                    expect(state.resizer.setMode).toHaveBeenCalledWith('both');
+                    expect(state.resizer.delta.substract).toHaveBeenCalled();
                 });
             });
 
@@ -764,6 +809,7 @@ function (VideoPlayer) {
                     expect(state.videoCaption.resize).toHaveBeenCalled();
                     expect(state.resizer.setMode)
                         .toHaveBeenCalledWith('width');
+                    expect(state.resizer.delta.reset).toHaveBeenCalled();
                 });
             });
         });
@@ -990,7 +1036,8 @@ function (VideoPlayer) {
                         updatePlayTime: jasmine.createSpy(),
                         setPlaybackRate: jasmine.createSpy(),
                         player: jasmine.createSpyObj('player', ['setPlaybackRate'])
-                    }
+                    },
+                    isFlashMode: jasmine.createSpy().andReturn(false)
                 };
             });
 
@@ -1008,7 +1055,7 @@ function (VideoPlayer) {
                 });
 
                 it('convert the current time to the new speed', function () {
-                    state.currentPlayerMode = 'flash';
+                    state.isFlashMode.andReturn(true);
                     VideoPlayer.prototype.onSpeedChange.call(state, '0.75', false);
                     expect(state.videoPlayer.currentTime).toBe('120.000');
                 });

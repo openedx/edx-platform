@@ -1,5 +1,6 @@
 import json
 import logging
+import mimetypes
 
 import static_replace
 
@@ -22,6 +23,7 @@ from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.lib.xblock.field_data import LmsFieldData
 from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes
 from edxmako.shortcuts import render_to_string
+from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from xblock.core import XBlock
@@ -549,6 +551,23 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, request.user)
 
 
+def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argument
+    """
+    Return a package resource for the specified XBlock.
+    """
+    try:
+        xblock_class = XBlock.load_class(block_type, select=settings.XBLOCK_SELECT_FUNCTION)
+        content = xblock_class.open_local_resource(uri)
+    except IOError:
+        log.info('Failed to load xblock resource', exc_info=True)
+        raise Http404
+    except Exception:  # pylint: disable-msg=broad-except
+        log.error('Failed to load xblock resource', exc_info=True)
+        raise Http404
+    mimetype, _ = mimetypes.guess_type(uri)
+    return HttpResponse(content, mimetype=mimetype)
+
+
 def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     """
     Invoke an XBlock handler, either authenticated or not.
@@ -577,6 +596,13 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         )
         raise Http404
 
+    tracking_context_name = 'module_callback_handler'
+    tracking_context = {
+        'module': {
+            'display_name': descriptor.display_name_with_default,
+        }
+    }
+
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
         user,
@@ -591,7 +617,8 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
 
     req = django_to_webob_request(request)
     try:
-        resp = instance.handle(handler, req, suffix)
+        with tracker.get_tracker().context(tracking_context_name, tracking_context):
+            resp = instance.handle(handler, req, suffix)
 
     except NoSuchHandlerError:
         log.exception("XBlock %s attempted to access missing handler %r", instance, handler)

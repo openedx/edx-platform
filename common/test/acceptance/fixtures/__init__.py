@@ -8,3 +8,6 @@ XQUEUE_STUB_URL = os.environ.get('xqueue_url', 'http://localhost:8040')
 
 # Get the URL of the Ora stub used in the test
 ORA_STUB_URL = os.environ.get('ora_url', 'http://localhost:8041')
+
+# Get the URL of the comments service stub used in the test
+COMMENTS_STUB_URL = os.environ.get('comments_url', 'http://localhost:4567')

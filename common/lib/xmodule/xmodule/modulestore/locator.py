@@ -22,12 +22,14 @@ log = logging.getLogger(__name__)
 
 class LocalId(object):
     """
-    Class for local ids for non-persisted xblocks
-
-    Should be hashable and distinguishable, but nothing else
+    Class for local ids for non-persisted xblocks (which can have hardcoded block_ids if necessary)
     """
+    def __init__(self, block_id=None):
+        self.block_id = block_id
+        super(LocalId, self).__init__()
+
     def __str__(self):
-        return "localid_{}".format(id(self))
+        return "localid_{}".format(self.block_id or id(self))
 
 
 class Locator(object):
@@ -50,6 +52,12 @@ class Locator(object):
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
+    def __hash__(self):
+        """
+        Hash on contents.
+        """
+        return hash(unicode(self))
 
     def __repr__(self):
         '''
@@ -198,16 +206,14 @@ class CourseLocator(Locator):
         """
         Return a string representing this location.
         """
+        parts = []
         if self.package_id:
-            result = unicode(self.package_id)
+            parts.append(unicode(self.package_id))
             if self.branch:
-                result += '/' + BRANCH_PREFIX + self.branch
-            return result
-        elif self.version_guid:
-            return u"{prefix}{guid}".format(prefix=VERSION_PREFIX, guid=self.version_guid)
-        else:
-            # raise InsufficientSpecificationError("missing package_id or version_guid")
-            return '<InsufficientSpecificationError: missing package_id or version_guid>'
+                parts.append(u"{prefix}{branch}".format(prefix=BRANCH_PREFIX, branch=self.branch))
+        if self.version_guid:
+            parts.append(u"{prefix}{guid}".format(prefix=VERSION_PREFIX, guid=self.version_guid))
+        return u"/".join(parts)
 
     def url(self):
         """
@@ -354,8 +360,7 @@ class CourseLocator(Locator):
         Generate a discussion group id based on course
 
         To make compatible with old Location object functionality. I don't believe this behavior fits at this
-        place, but I have no way to override. If this is really needed, it should probably use the pretty_id to seed
-        the name although that's mutable. We should also clearly define the purpose and restrictions of this
+        place, but I have no way to override. We should clearly define the purpose and restrictions of this
         (e.g., I'm assuming periods are fine).
         """
         return self.package_id
@@ -432,22 +437,25 @@ class BlockUsageLocator(CourseLocator):
 
     def version_agnostic(self):
         """
-        Returns a copy of itself.
-        If both version_guid and package_id are known, use a blank package_id in the copy.
-
         We don't care if the locator's version is not the current head; so, avoid version conflict
         by reducing info.
+        Returns a copy of itself without any version info.
 
-        :param block_locator:
+        :raises: ValueError if the block locator has no package_id
         """
-        if self.version_guid:
-            return BlockUsageLocator(version_guid=self.version_guid,
-                                     branch=self.branch,
-                                     block_id=self.block_id)
-        else:
-            return BlockUsageLocator(package_id=self.package_id,
-                                     branch=self.branch,
-                                     block_id=self.block_id)
+        return BlockUsageLocator(package_id=self.package_id,
+                                 branch=self.branch,
+                                 block_id=self.block_id)
+
+    def course_agnostic(self):
+        """
+        We only care about the locator's version not its course.
+        Returns a copy of itself without any course info.
+
+        :raises: ValueError if the block locator has no version_guid
+        """
+        return BlockUsageLocator(version_guid=self.version_guid,
+                                 block_id=self.block_id)
 
     def set_block_id(self, new):
         """

@@ -7,21 +7,10 @@ if Backbone?
 
     initialize: ->
       super()
-      @createShowView()
 
     render: ->
       @renderShowView()
       @
-
-    createShowView: () ->
-
-      if @editView?
-        @editView.undelegateEvents()
-        @editView.$el.empty()
-        @editView = null
-
-      @showView = new ResponseCommentShowView(model: @model)
-      @showView.bind "comment:_delete", @_delete
 
     renderSubView: (view) ->
       view.setElement(@$el)
@@ -29,7 +18,26 @@ if Backbone?
       view.delegateEvents()
 
     renderShowView: () ->
-      @renderSubView(@showView)
+      if not @showView?
+        if @editView?
+          @editView.undelegateEvents()
+          @editView.$el.empty()
+          @editView = null
+        @showView = new ResponseCommentShowView(model: @model)
+        @showView.bind "comment:_delete", @_delete
+        @showView.bind "comment:edit", @edit
+        @renderSubView(@showView)
+
+    renderEditView: () ->
+      if not @editView?
+        if @showView?
+          @showView.undelegateEvents()
+          @showView.$el.empty()
+          @showView = null
+        @editView = new ResponseCommentEditView(model: @model)
+        @editView.bind "comment:update", @update
+        @editView.bind "comment:cancel_edit", @cancelEdit
+        @renderSubView(@editView)
 
     _delete: (event) =>
       event.preventDefault()
@@ -51,3 +59,27 @@ if Backbone?
             gettext("Sorry"),
             gettext("We had some trouble deleting this comment. Please try again.")
           )
+
+    cancelEdit: (event) =>
+      @trigger "comment:cancel_edit", event
+      @renderShowView()
+
+    edit: (event) =>
+      @trigger "comment:edit", event
+      @renderEditView()
+
+    update: (event) =>
+      newBody = @editView.$(".edit-comment-body textarea").val()
+      url = DiscussionUtil.urlFor("update_comment", @model.id)
+      DiscussionUtil.safeAjax
+        $elem: $(event.target)
+        $loading: $(event.target)
+        url: url
+        type: "POST"
+        dataType: "json"
+        data:
+          body: newBody
+        error: DiscussionUtil.formErrorHandler(@$(".edit-comment-form-errors"))
+        success: (response, textStatus) =>
+          @model.set("body", newBody)
+          @cancelEdit()

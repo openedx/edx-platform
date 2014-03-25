@@ -43,7 +43,6 @@ def msgfmt_check_po_file(filename):
     if err != '':
         log.info('\n' + out)
         log.warn('\n' + err)
-    assert not err
 
 
 def tags_in_string(msg):

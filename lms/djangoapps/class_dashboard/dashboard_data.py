@@ -4,6 +4,7 @@ Computes the data to display on the Instructor Dashboard
 
 from courseware import models
 from django.db.models import Count
+from django.utils.translation import ugettext as _
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
@@ -20,6 +21,8 @@ def get_problem_grade_distribution(course_id):
         'max_grade' - max grade for this problem
         'grade_distrib' - array of tuples (`grade`,`count`).
     """
+
+    # Aggregate query on studentmodule table for grade data for all problems in course
     db_query = models.StudentModule.objects.filter(
         course_id__exact=course_id,
         grade__isnull=False,
@@ -27,9 +30,12 @@ def get_problem_grade_distribution(course_id):
     ).values('module_state_key', 'grade', 'max_grade').annotate(count_grade=Count('grade'))
 
     prob_grade_distrib = {}
+
+    # Loop through resultset building data for each problem
     for row in db_query:
         curr_problem = row['module_state_key']
 
+        # Build set of grade distributions for each problem that has student responses
         if curr_problem in prob_grade_distrib:
             prob_grade_distrib[curr_problem]['grade_distrib'].append((row['grade'], row['count_grade']))
 
@@ -55,11 +61,13 @@ def get_sequential_open_distrib(course_id):
     Outputs a dict mapping the 'module_id' to the number of students that have opened that subsection/sequential.
     """
 
+    # Aggregate query on studentmodule table for "opening a subsection" data
     db_query = models.StudentModule.objects.filter(
         course_id__exact=course_id,
         module_type__exact="sequential",
     ).values('module_state_key').annotate(count_sequential=Count('module_state_key'))
 
+    # Build set of "opened" data for each subsection that has "opened" data
     sequential_open_distrib = {}
     for row in db_query:
         sequential_open_distrib[row['module_state_key']] = row['count_sequential']
@@ -67,7 +75,7 @@ def get_sequential_open_distrib(course_id):
     return sequential_open_distrib
 
 
-def get_problem_set_grade_distribution(course_id, problem_set):
+def get_problem_set_grade_distrib(course_id, problem_set):
     """
     Returns the grade distribution for the problems specified in `problem_set`.
 
@@ -82,6 +90,7 @@ def get_problem_set_grade_distribution(course_id, problem_set):
       'grade_distrib' - array of tuples (`grade`,`count`) ordered by `grade`
     """
 
+    # Aggregate query on studentmodule table for grade data for set of problems in course
     db_query = models.StudentModule.objects.filter(
         course_id__exact=course_id,
         grade__isnull=False,
@@ -94,6 +103,8 @@ def get_problem_set_grade_distribution(course_id, problem_set):
     ).annotate(count_grade=Count('grade')).order_by('module_state_key', 'grade')
 
     prob_grade_distrib = {}
+
+    # Loop through resultset building data for each problem
     for row in db_query:
         if row['module_state_key'] not in prob_grade_distrib:
             prob_grade_distrib[row['module_state_key']] = {
@@ -110,7 +121,7 @@ def get_problem_set_grade_distribution(course_id, problem_set):
     return prob_grade_distrib
 
 
-def get_d3_problem_grade_distribution(course_id):
+def get_d3_problem_grade_distrib(course_id):
     """
     Returns problem grade distribution information for each section, data already in format for d3 function.
 
@@ -124,10 +135,13 @@ def get_d3_problem_grade_distribution(course_id):
     prob_grade_distrib = get_problem_grade_distribution(course_id)
     d3_data = []
 
+    # Retrieve course object down to problems
     course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
+
+    # Iterate through sections, subsections, units, problems
     for section in course.get_children():
         curr_section = {}
-        curr_section['display_name'] = own_metadata(section)['display_name']
+        curr_section['display_name'] = own_metadata(section).get('display_name', '')
         data = []
         c_subsection = 0
         for subsection in section.get_children():
@@ -137,25 +151,44 @@ def get_d3_problem_grade_distribution(course_id):
                 c_unit += 1
                 c_problem = 0
                 for child in unit.get_children():
-                    if (child.location.category == 'problem'):
+
+                    # Student data is at the problem level
+                    if child.location.category == 'problem':
                         c_problem += 1
                         stack_data = []
+
+                        # Construct label to display for this problem
                         label = "P{0}.{1}.{2}".format(c_subsection, c_unit, c_problem)
 
-                        # Some problems have no data because students have not tried them yet
+                        # Only problems in prob_grade_distrib have had a student submission.
                         if child.location.url() in prob_grade_distrib:
+
+                            # Get max_grade, grade_distribution for this problem
                             problem_info = prob_grade_distrib[child.location.url()]
-                            problem_name = own_metadata(child)['display_name']
+
+                            # Get problem_name for tooltip
+                            problem_name = own_metadata(child).get('display_name', '')
+
+                            # Compute percent of this grade over max_grade
                             max_grade = float(problem_info['max_grade'])
                             for (grade, count_grade) in problem_info['grade_distrib']:
                                 percent = 0.0
                                 if max_grade > 0:
                                     percent = (grade * 100.0) / max_grade
 
-                                tooltip = "{0} {3} - {1} students ({2:.0f}%: {4:.0f}/{5:.0f} questions)".format(
-                                    label, count_grade, percent, problem_name, grade, max_grade
+                                # Construct tooltip for problem in grade distibution view
+                                tooltip = _("{label} {problem_name} - {count_grade} {students} ({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})").format(
+                                    label=label,
+                                    problem_name=problem_name,
+                                    count_grade=count_grade,
+                                    students=_("students"),
+                                    percent=percent,
+                                    grade=grade,
+                                    max_grade=max_grade,
+                                    questions=_("questions"),
                                 )
 
+                                # Construct data to be sent to d3
                                 stack_data.append({
                                     'color': percent,
                                     'value': count_grade,
@@ -174,7 +207,7 @@ def get_d3_problem_grade_distribution(course_id):
     return d3_data
 
 
-def get_d3_sequential_open_distribution(course_id):
+def get_d3_sequential_open_distrib(course_id):
     """
     Returns how many students opened a sequential/subsection for each section, data already in format for d3 function.
 
@@ -188,24 +221,32 @@ def get_d3_sequential_open_distribution(course_id):
 
     d3_data = []
 
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
+    # Retrieve course object down to subsection
+    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
+
+    # Iterate through sections, subsections
     for section in course.get_children():
         curr_section = {}
-        curr_section['display_name'] = own_metadata(section)['display_name']
+        curr_section['display_name'] = own_metadata(section).get('display_name', '')
         data = []
         c_subsection = 0
+
+        # Construct data for each subsection to be sent to d3
         for subsection in section.get_children():
             c_subsection += 1
-            subsection_name = own_metadata(subsection)['display_name']
+            subsection_name = own_metadata(subsection).get('display_name', '')
 
             num_students = 0
             if subsection.location.url() in sequential_open_distrib:
                 num_students = sequential_open_distrib[subsection.location.url()]
 
             stack_data = []
-            tooltip = "{0} student(s) opened Subsection {1}: {2}".format(
-                num_students, c_subsection, unicode(subsection_name).encode("utf-8")
+            tooltip = _("{num_students} student(s) opened Subsection {subsection_num}: {subsection_name}").format(
+                num_students=num_students,
+                subsection_num=c_subsection,
+                subsection_name=subsection_name,
             )
+
             stack_data.append({
                 'color': 0,
                 'value': num_students,
@@ -223,7 +264,7 @@ def get_d3_sequential_open_distribution(course_id):
     return d3_data
 
 
-def get_d3_section_grade_distribution(course_id, section):
+def get_d3_section_grade_distrib(course_id, section):
     """
     Returns the grade distribution for the problems in the `section` section in a format for the d3 code.
 
@@ -236,7 +277,7 @@ def get_d3_section_grade_distribution(course_id, section):
     data object to be in.
 
     If this is requested multiple times quickly for the same course, it is better to call
-    get_d3_problem_grade_distribution and pick out the sections of interest.
+    get_d3_problem_grade_distrib and pick out the sections of interest.
 
     Returns an array of dicts with the following keys (taken from d3_stacked_bar_graph.js's documentation)
       'xValue' - Corresponding value for the x-axis
@@ -246,6 +287,7 @@ def get_d3_section_grade_distribution(course_id, section):
         'tooltip' - (Optional) Text to display on mouse hover
     """
 
+    # Retrieve course object down to problems
     course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
 
     problem_set = []
@@ -264,12 +306,15 @@ def get_d3_section_grade_distribution(course_id, section):
                     problem_info[child.location.url()] = {
                         'id': child.location.url(),
                         'x_value': "P{0}.{1}.{2}".format(c_subsection, c_unit, c_problem),
-                        'display_name': own_metadata(child)['display_name'],
+                        'display_name': own_metadata(child).get('display_name', ''),
                     }
 
-    grade_distrib = get_problem_set_grade_distribution(course_id, problem_set)
+    # Retrieve grade distribution for these problems
+    grade_distrib = get_problem_set_grade_distrib(course_id, problem_set)
 
     d3_data = []
+
+    # Construct data for each problem to be sent to d3
     for problem in problem_set:
         stack_data = []
 
@@ -280,13 +325,16 @@ def get_d3_section_grade_distribution(course_id, section):
                 if max_grade > 0:
                     percent = (grade * 100.0) / max_grade
 
-                tooltip = "{0} {3} - {1} students ({2:.0f}%: {4:.0f}/{5:.0f} questions)".format(
-                    problem_info[problem]['x_value'],
-                    count_grade,
-                    percent,
-                    problem_info[problem]['display_name'],
-                    grade,
-                    max_grade,
+                # Construct tooltip for problem in grade distibution view
+                tooltip = _("{problem_info_x} {problem_info_n} - {count_grade} {students} ({percent:.0f}%: {grade:.0f}/{max_grade:.0f} {questions})").format(
+                    problem_info_x=problem_info[problem]['x_value'],
+                    count_grade=count_grade,
+                    students=_("students"),
+                    percent=percent,
+                    problem_info_n=problem_info[problem]['display_name'],
+                    grade=grade,
+                    max_grade=max_grade,
+                    questions=_("questions"),
                 )
 
                 stack_data.append({
@@ -317,7 +365,7 @@ def get_section_display_name(course_id):
     section_display_name = [""] * len(course.get_children())
     i = 0
     for section in course.get_children():
-        section_display_name[i] = own_metadata(section)['display_name']
+        section_display_name[i] = own_metadata(section).get('display_name', '')
         i += 1
 
     return section_display_name

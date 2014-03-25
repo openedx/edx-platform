@@ -171,8 +171,8 @@ setup_instructor_dashboard_sections = (idash_content) ->
     constructor: window.InstructorDashboard.sections.Analytics
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#analytics"
   ,
-#    constructor: window.InstructorDashboard.sections.Metrics
-#    $element: idash_content.find ".#{CSS_IDASH_SECTION}#metrics"
+    constructor: window.InstructorDashboard.sections.Metrics
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#metrics"
   ]
 
   sections_to_initialize.map ({constructor, $element}) ->

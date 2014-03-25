@@ -3,8 +3,6 @@
 This test file will verify proper password policy enforcement, which is an option feature
 """
 import json
-import uuid
-
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from mock import patch
@@ -19,9 +17,10 @@ class TestPasswordPolicy(TestCase):
     def setUp(self):
         super(TestPasswordPolicy, self).setUp()
         self.url = reverse('create_account')
+
         self.url_params = {
-            'username': 'foo_bar' + uuid.uuid4().hex,
-            'email': 'foo' + uuid.uuid4().hex + '@bar.com',
+            'username': 'username',
+            'email': 'foo_bar@bar.com',
             'name': 'username',
             'terms_of_service': 'true',
             'honor_code': 'true',

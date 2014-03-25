@@ -10,10 +10,11 @@
 
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
-    <button class="close-modal">&#10005;
+    <button class="close-modal">
+      <i class="icon-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close Modal')}
+        ${_('Close')}
       </span>
     </button>
 
@@ -71,7 +72,7 @@
               <select id="signup_ed_level" name="level_of_education">
                   <option value="">--</option>
                   %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
-                      <option value="${code}">${ed_level}</option>
+                      <option value="${code}">${_(ed_level)}</option>
                   %endfor
               </select>
             </div>
@@ -85,7 +86,7 @@
               <select id="signup_gender" name="gender">
                   <option value="">--</option>
                   %for code, gender in UserProfile.GENDER_CHOICES:
-                      <option value="${code}">${gender}</option>
+                      <option value="${code}">${_(gender)}</option>
                   %endfor
               </select>
             </div>

@@ -60,6 +60,7 @@ pyparsing==1.5.6
 python-memcached==1.48
 python-openid==2.2.5
 python-dateutil==2.1
+python-social-auth==0.1.21
 pytz==2012h
 pysrt==0.4.7
 PyYAML==3.10
@@ -106,7 +107,7 @@ django-debug-toolbar-mongo
 # Used for testing
 chrono==1.0.2
 coverage==3.7
-ddt==0.6.0
+ddt==0.7.1
 django-crum==0.5
 django_nose==1.1
 factory_boy==2.2.1

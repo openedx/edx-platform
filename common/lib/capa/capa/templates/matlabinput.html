@@ -1,11 +1,22 @@
-<section id="textbox_${id}" class="textbox">
-  <textarea rows="${rows}" cols="${cols}" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}"
-       % if hidden:
-      	    style="display:none;"
-       % endif
+<section id="textbox_${id}" class="capa_inputtype cminput">
+<div class="script_placeholder" data-src="${matlab_editor_js}"/>
+<textarea 
+  rows="${rows}" 
+  cols="${cols}" 
+  name="input_${id}" 
+  aria-describedby="answer_${id}" 
+  id="input_${id}"
+  data-tabsize="${tabsize}"
+  data-mode="octave"
+  % if linenumbers:
+  data-linenums="true"
+  % endif
+ % if hidden:
+  style="display:none;"
+ % endif
   >${value|h}</textarea>
 
-  <div class="grader-status">
+  <div class="grader-status" tabindex="-1">
     % if status == 'unsubmitted':
       <span class="unanswered" style="display:inline-block;" id="status_${id}"><span class="sr">Status: </span>Unanswered</span>
     % elif status == 'correct':
@@ -40,28 +51,7 @@
   %endif
 
   <script>
-    // Note: We need to make the area follow the CodeMirror for this to work.
     $(function(){
-      var cm = CodeMirror.fromTextArea(document.getElementById("input_${id}"), {
-        % if linenumbers == 'true':
-        lineNumbers: true,
-        % endif
-        mode: "matlab",
-        matchBrackets: true,
-        lineWrapping: true,
-        indentUnit: "${tabsize}",
-        tabSize: "${tabsize}",
-        indentWithTabs: false,
-        extraKeys: {
-            "Tab": function(cm) {
-                cm.replaceSelection("${' '*tabsize}", "end");
-            }
-        },
-        smartIndent: false
-      });
-
-      $("#textbox_${id}").find('.CodeMirror-scroll').height(${int(13.5*eval(rows))});
-
       var gentle_alert = function (parent_elt, msg) {
           if($(parent_elt).find('.capa_alert').length) {
               $(parent_elt).find('.capa_alert').remove();
@@ -80,8 +70,13 @@
           input_id = "${id}";
 
           // save the codemirror text to the textarea
-          cm.save();
+          // since there could be multiple codemirror instances on the page,
+          // save all of them.
+          $('.CodeMirror').each(function(i, el){
+            el.CodeMirror.save();
+          });
           var input = $("#input_${id}");
+
           // pull out the coded text
           submission = input.val();
 

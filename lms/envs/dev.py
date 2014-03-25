@@ -282,7 +282,7 @@ EDX_API_KEY = None
 ####################### Shoppingcart ###########################
 FEATURES['ENABLE_SHOPPING_CART'] = True
 
-########################## CLASS DASHBOARD ########################
+### This enables the Metrics tab for the Instructor dashboard ###########
 FEATURES['CLASS_DASHBOARD'] = True
 
 #####################################################################

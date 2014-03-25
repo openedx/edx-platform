@@ -7,7 +7,7 @@ from lxml import etree
 from path import path
 
 from pkg_resources import resource_string
-from xblock.fields import Scope, String, Boolean
+from xblock.fields import Scope, String, Boolean, List
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
@@ -42,12 +42,12 @@ class HtmlModule(HtmlFields, XModule):
     js = {
         'coffee': [
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
-            resource_string(__name__, 'js/src/collapsible.coffee'),
-            resource_string(__name__, 'js/src/html/display.coffee')
+            resource_string(__name__, 'js/src/html/display.coffee'),
         ],
         'js': [
+            resource_string(__name__, 'js/src/collapsible.js'),
             resource_string(__name__, 'js/src/html/imageModal.js'),
-            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.pkgd.js')
+            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.pkgd.js'),
         ]
     }
     js_module_name = "HTMLModule"
@@ -229,7 +229,7 @@ class AboutFields(object):
     )
     data = String(
         help="Html contents to display for this module",
-        default="",
+        default=u"",
         scope=Scope.content
     )
 
@@ -263,7 +263,7 @@ class StaticTabFields(object):
         default="Empty",
     )
     data = String(
-        default=textwrap.dedent("""\
+        default=textwrap.dedent(u"""\
             <p>This is where you can add additional pages to your courseware. Click the 'edit' button to begin editing.</p>
         """),
         scope=Scope.content,
@@ -293,9 +293,14 @@ class CourseInfoFields(object):
     """
     Field overrides
     """
+    items = List(
+        help="List of course update items",
+        default=[],
+        scope=Scope.content
+    )
     data = String(
         help="Html contents to display for this module",
-        default="<ol></ol>",
+        default=u"<ol></ol>",
         scope=Scope.content
     )
 
@@ -305,7 +310,9 @@ class CourseInfoModule(CourseInfoFields, HtmlModule):
     """
     Just to support xblock field overrides
     """
-    pass
+    # statuses
+    STATUS_VISIBLE = 'visible'
+    STATUS_DELETED = 'deleted'
 
 
 @XBlock.tag("detached")

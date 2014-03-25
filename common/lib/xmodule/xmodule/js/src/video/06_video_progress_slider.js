@@ -101,11 +101,10 @@ function () {
     }
 
     // Rebuild the slider start-end range (if it doesn't take up the
-    // whole slider). Remember that endTime === null means the end time
+    // whole slider). Remember that endTime === null means the end-time
     // is set to the end of video by default.
     function updateStartEndTimeRegion(params) {
-        var isFlashMode = this.currentPlayerMode === 'flash',
-            left, width, start, end, duration, rangeParams;
+        var left, width, start, end, duration, rangeParams;
 
         // We must have a duration in order to determine the area of range.
         // It also must be non-zero.
@@ -120,7 +119,7 @@ function () {
 
         if (start > duration) {
             start = 0;
-        } else if (isFlashMode) {
+        } else if (this.isFlashMode()) {
             start /= Number(this.speed);
         }
 
@@ -128,7 +127,7 @@ function () {
         // video, then we set it to the end of the video.
         if (end === null || end > duration) {
             end = duration;
-        } else if (isFlashMode) {
+        } else if (this.isFlashMode()) {
             end /= Number(this.speed);
         }
 
@@ -180,6 +179,10 @@ function () {
     function onSlide(event, ui) {
         this.videoProgressSlider.frozen = true;
 
+        // Remember the seek to value so that we don't repeat ourselves on the
+        // 'stop' slider event.
+        this.videoProgressSlider.lastSeekValue = ui.value;
+
         this.trigger(
             'videoPlayer.onSlideSeek',
             {'type': 'onSlideSeek', 'time': ui.value}
@@ -196,10 +199,16 @@ function () {
 
         this.videoProgressSlider.frozen = true;
 
-        this.trigger(
-            'videoPlayer.onSlideSeek',
-            {'type': 'onSlideSeek', 'time': ui.value}
-        );
+        // Only perform a seek if we haven't made a seek for the new slider value.
+        // This is necessary so that if the user only clicks on the slider, without
+        // dragging it, then only one seek is made, even when a 'slide' and a 'stop'
+        // events are triggered on the slider.
+        if (this.videoProgressSlider.lastSeekValue !== ui.value) {
+            this.trigger(
+                'videoPlayer.onSlideSeek',
+                {'type': 'onSlideSeek', 'time': ui.value}
+            );
+        }
 
         // ARIA
         this.videoProgressSlider.handle.attr(
@@ -216,8 +225,8 @@ function () {
             duration = Math.floor(params.duration);
 
         if (
-            (this.videoProgressSlider.slider) &&
-            (!this.videoProgressSlider.frozen)
+            this.videoProgressSlider.slider &&
+            !this.videoProgressSlider.frozen
         ) {
             this.videoProgressSlider.slider
                 .slider('option', 'max', duration)

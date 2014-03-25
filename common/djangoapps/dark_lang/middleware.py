@@ -74,7 +74,7 @@ class DarkLangMiddleware(object):
     def _activate_preview_language(self, request):
         """
         If the request has the get parameter ``preview-lang``,
-        and that language appears doesn't appear in ``self.released_langs``,
+        and that language doesn't appear in ``self.released_langs``,
         then set the session ``django_language`` to that language.
         """
         if 'clear-lang' in request.GET:

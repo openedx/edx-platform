@@ -1,8 +1,8 @@
-define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
-        "js/views/feedback_notification", "js/views/metadata", "js/collections/metadata"
-        "js/utils/modal", "jquery.inputnumber", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-(Backbone, $, _, gettext, XBlock, NotificationView, MetadataView, MetadataCollection, ModalUtils) ->
-  class ModuleEdit extends Backbone.View
+define ["jquery", "underscore", "gettext", "xblock/runtime.v1",
+        "js/views/xblock", "js/views/feedback_notification", "js/views/metadata", "js/collections/metadata"
+        "js/utils/modal", "jquery.inputnumber"],
+($, _, gettext, XBlock, XBlockView, NotificationView, MetadataView, MetadataCollection, ModalUtils) ->
+  class ModuleEdit extends XBlockView
     tagName: 'li'
     className: 'component'
     editorMode: 'editor-mode'
@@ -79,31 +79,9 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
           url: "#{decodeURIComponent(@model.url())}/#{viewName}"
           type: 'GET'
           headers:
-            Accept: 'application/x-fragment+json'
-          success: (data) =>
-            $(target).html(data.html)
-
-            for value in data.resources
-              do (value) =>
-                hash = value[0]
-                if not window.loadedXBlockResources?
-                  window.loadedXBlockResources = []
-
-                if hash not in window.loadedXBlockResources
-                  resource = value[1]
-                  switch resource.mimetype
-                    when "text/css"
-                      switch resource.kind
-                        when "text" then $('head').append("<style type='text/css'>#{resource.data}</style>")
-                        when "url" then $('head').append("<link rel='stylesheet' href='#{resource.data}' type='text/css'>")
-                    when "application/javascript"
-                      switch resource.kind
-                        when "text" then $('head').append("<script>#{resource.data}</script>")
-                        when "url" then $.getScript(resource.data)
-                    when "text/html"
-                      switch resource.placement
-                        when "head" then $('head').append(resource.data)
-                  window.loadedXBlockResources.push(hash)
+            Accept: 'application/json'
+          success: (fragment) =>
+            @renderXBlockFragment(fragment, target, viewName)
             callback()
         )
 

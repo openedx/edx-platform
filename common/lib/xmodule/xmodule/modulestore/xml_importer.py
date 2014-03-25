@@ -6,7 +6,7 @@ import json
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
-from xblock.fields import Scope, Reference, ReferenceList
+from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
@@ -514,11 +514,21 @@ def remap_namespace(module, target_location_namespace):
                         chapter['url'], target_location_namespace
                     )
 
-        # if there is a wiki_slug which is the same as the original location
-        # (aka default value), then remap that so the wiki doesn't point to
-        # the old Wiki.
-        if module.wiki_slug == original_location.course:
-            module.wiki_slug = target_location_namespace.course
+        # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
+        # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
+        # values then remap it so that the wiki does not point to the old wiki.
+        if original_location.course_id != target_location_namespace.course_id:
+            original_unique_wiki_slug = '{0}.{1}.{2}'.format(
+                original_location.org,
+                original_location.course,
+                original_location.name
+            )
+            if module.wiki_slug == original_unique_wiki_slug or module.wiki_slug == original_location.course:
+                module.wiki_slug = '{0}.{1}.{2}'.format(
+                    target_location_namespace.org,
+                    target_location_namespace.course,
+                    target_location_namespace.name,
+                )
 
         module.save()
 
@@ -547,15 +557,25 @@ def remap_namespace(module, target_location_namespace):
             ).url()
         return new_ref
 
-    for field in all_fields:
-        if isinstance(module.fields.get(field), Reference):
-            new_ref = convert_ref(getattr(module, field))
-            setattr(module, field, new_ref)
+    for field_name in all_fields:
+        field_object = module.fields.get(field_name)
+        if isinstance(field_object, Reference):
+            new_ref = convert_ref(getattr(module, field_name))
+            setattr(module, field_name, new_ref)
             module.save()
-        elif isinstance(module.fields.get(field), ReferenceList):
-            references = getattr(module, field)
+        elif isinstance(field_object, ReferenceList):
+            references = getattr(module, field_name)
             new_references = [convert_ref(reference) for reference in references]
-            setattr(module, field, new_references)
+            setattr(module, field_name, new_references)
+            module.save()
+        elif isinstance(field_object, ReferenceValueDict):
+            reference_dict = getattr(module, field_name)
+            new_reference_dict = {
+                key: convert_ref(reference)
+                for key, reference
+                in reference_dict.items()
+            }
+            setattr(module, field_name, new_reference_dict)
             module.save()
 
     return module

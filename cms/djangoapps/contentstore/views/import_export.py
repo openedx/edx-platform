@@ -324,6 +324,9 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
         try:
             export_to_xml(modulestore('direct'), contentstore(), old_location, root_dir, name, modulestore())
 
+            logging.debug('tar file being generated at {0}'.format(export_file.name))
+            with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
+                tar_file.add(root_dir / name, arcname=name)
         except SerializationError, e:
             logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
             unit = None
@@ -352,7 +355,6 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
                 'edit_unit_url': unit_locator.url_reverse("unit") if parent else "",
                 'course_home_url': location.url_reverse("course"),
                 'export_url': export_url
-
             })
         except Exception, e:
             logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
@@ -364,14 +366,8 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
                 'course_home_url': location.url_reverse("course"),
                 'export_url': export_url
             })
-
-        logging.debug('tar file being generated at {0}'.format(export_file.name))
-        tar_file = tarfile.open(name=export_file.name, mode='w:gz')
-        tar_file.add(root_dir / name, arcname=name)
-        tar_file.close()
-
-        # remove temp dir
-        shutil.rmtree(root_dir / name)
+        finally:
+            shutil.rmtree(root_dir / name)
 
         wrapper = FileWrapper(export_file)
         response = HttpResponse(wrapper, content_type='application/x-tgz')

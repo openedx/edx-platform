@@ -1,0 +1,52 @@
+###################################
+February 26, 2014
+###################################
+
+You can now access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+
+
+Course staff documentation, *Building a Course with edX Studio*, is available online_. You can also download the guide as a PDF from the edX Studio user interface.
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+Recent changes to *Building a Course with edX Studio* include:
+
+* `Getting Started with edX <http://edx.readthedocs.org/projects/ca/en/latest/accounts.html#getting-started-with-edx>`_
+
+* `Beta Testing a Course <http://edx.readthedocs.org/projects/ca/en/latest/beta_testing.html#beta-testing>`_
+
+* Updates to `Import LaTeX Code into an HTML Component <http://edx.readthedocs.org/projects/ca/en/latest/create_html_component.html#import-latex-code>`_
+
+* Updates to `Establishing a Grading Policy <http://edx.readthedocs.org/projects/ca/en/latest/establish_grading_policy.html#establish-a-grading-policy>`_
+
+Recent updates to *edX Data Documentation* include:
+
+* `Wiki Data <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/wiki_data.html#wiki-data>`_
+
+* `Discussion Forum Data <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/discussion_data.html#discussion-forums-data>`_
+
+* `Tracking Logs <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/tracking_logs.html#tracking-logs>`_
+
+
+
+*************
+edX Studio
+*************
+
+* Performance when you log in to Studio on edge.edx.org is improved. (STUD-1133)
+
+* A problem that caused deleted textbooks to remain in your course is resolved. (STUD-1327)
+
+* The following problem is resolved:  When viewing a multiple choice problem in Studio, if you selected the correct answer, Studio cleared your selection and marked the problem as incorrect. This problem only occurred in Studio and did not affect students. (BLD-788)
+
+
+*************
+Discussions
+*************
+
+
+* Course staff can now delete comments made on discussion responses.
+
+

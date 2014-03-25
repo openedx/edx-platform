@@ -53,10 +53,7 @@ class DiscussionSingleThreadPage(CoursePage):
 
     def has_add_response_button(self):
         """Returns true if the add response button is visible, false otherwise"""
-        return (
-            self.is_css_present(".add-response-btn") and
-            self.css_map(".add-response-btn", lambda el: el.visible)[0]
-        )
+        return self._is_element_visible(".add-response-btn")
 
     def click_add_response_button(self):
         """
@@ -67,4 +64,95 @@ class DiscussionSingleThreadPage(CoursePage):
         fulfill(EmptyPromise(
             lambda: self.is_css_present("#wmd-input-reply-body-{thread_id}:focus".format(thread_id=self.thread_id)),
             "Response field received focus"
+        ))
+
+    def _is_element_visible(self, selector):
+        return any(self.css_map(selector, lambda el: el.visible))
+
+    def is_response_editor_visible(self, response_id):
+        """Returns true if the response editor is present, false otherwise"""
+        return self._is_element_visible(".response_{} .edit-post-body".format(response_id))
+
+    def start_response_edit(self, response_id):
+        """Click the edit button for the response, loading the editing view"""
+        self.css_click(".response_{} .discussion-response .action-edit".format(response_id))
+        fulfill(EmptyPromise(
+            lambda: self.is_response_editor_visible(response_id),
+            "Response edit started"
+        ))
+
+    def is_add_comment_visible(self, response_id):
+        """Returns true if the "add comment" form is visible for a response"""
+        return self._is_element_visible(".response_{} .new-comment".format(response_id))
+
+    def is_comment_visible(self, comment_id):
+        """Returns true if the comment is viewable onscreen"""
+        return self._is_element_visible("#comment_{} .response-body".format(comment_id))
+
+    def get_comment_body(self, comment_id):
+        return self._get_element_text("#comment_{} .response-body".format(comment_id))
+
+    def is_comment_deletable(self, comment_id):
+        """Returns true if the delete comment button is present, false otherwise"""
+        return self._is_element_visible("#comment_{} div.action-delete".format(comment_id))
+
+    def delete_comment(self, comment_id):
+        with self.handle_alert():
+            self.css_click("#comment_{} div.action-delete".format(comment_id))
+        fulfill(EmptyPromise(
+            lambda: not self.is_comment_visible(comment_id),
+            "Deleted comment was removed"
+        ))
+
+    def is_comment_editable(self, comment_id):
+        """Returns true if the edit comment button is present, false otherwise"""
+        return self._is_element_visible("#comment_{} .action-edit".format(comment_id))
+
+    def is_comment_editor_visible(self, comment_id):
+        """Returns true if the comment editor is present, false otherwise"""
+        return self._is_element_visible("#comment_{} .edit-comment-body".format(comment_id))
+
+    def _get_comment_editor_value(self, comment_id):
+        return self.css_value("#comment_{} .wmd-input".format(comment_id))[0]
+
+    def start_comment_edit(self, comment_id):
+        """Click the edit button for the comment, loading the editing view"""
+        old_body = self.get_comment_body(comment_id)
+        self.css_click("#comment_{} .action-edit".format(comment_id))
+        fulfill(EmptyPromise(
+            lambda: (
+                self.is_comment_editor_visible(comment_id) and
+                not self.is_comment_visible(comment_id) and
+                self._get_comment_editor_value(comment_id) == old_body
+            ),
+            "Comment edit started"
+        ))
+
+    def set_comment_editor_value(self, comment_id, new_body):
+        """Replace the contents of the comment editor"""
+        self.css_fill("#comment_{} .wmd-input".format(comment_id), new_body)
+
+    def submit_comment_edit(self, comment_id):
+        """Click the submit button on the comment editor"""
+        new_body = self._get_comment_editor_value(comment_id)
+        self.css_click("#comment_{} .post-update".format(comment_id))
+        fulfill(EmptyPromise(
+            lambda: (
+                not self.is_comment_editor_visible(comment_id) and
+                self.is_comment_visible(comment_id) and
+                self.get_comment_body(comment_id) == new_body
+            ),
+            "Comment edit succeeded"
+        ))
+
+    def cancel_comment_edit(self, comment_id, original_body):
+        """Click the cancel button on the comment editor"""
+        self.css_click("#comment_{} .post-cancel".format(comment_id))
+        fulfill(EmptyPromise(
+            lambda: (
+                not self.is_comment_editor_visible(comment_id) and
+                self.is_comment_visible(comment_id) and
+                self.get_comment_body(comment_id) == original_body
+            ),
+            "Comment edit was canceled"
         ))

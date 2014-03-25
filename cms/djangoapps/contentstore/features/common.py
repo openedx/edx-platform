@@ -319,20 +319,18 @@ def i_am_shown_a_notification(step):
 
 
 def type_in_codemirror(index, text):
-    world.wait(1)  # For now, slow this down so that it works. TODO: fix it.
-    world.css_click("div.CodeMirror-lines", index=index)
-    world.browser.execute_script("$('div.CodeMirror.CodeMirror-focused > div').css('overflow', '')")
-    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
-    if world.is_mac():
-        g._element.send_keys(Keys.COMMAND + 'a')
-    else:
-        g._element.send_keys(Keys.CONTROL + 'a')
-    g._element.send_keys(Keys.DELETE)
-    g._element.send_keys(text)
-    if world.is_firefox():
-        world.trigger_event('div.CodeMirror', index=index, event='blur')
+    script = """
+    var cm = $('div.CodeMirror:eq({})').get(0).CodeMirror;
+    cm.getInputField().focus();
+    cm.setValue(arguments[0]);
+    cm.getInputField().blur();""".format(index)
+    world.browser.driver.execute_script(script, str(text))
     world.wait_for_ajax_complete()
 
+def get_codemirror_value(index=0):
+    return world.browser.driver.execute_script("""
+        return $('div.CodeMirror:eq({})').get(0).CodeMirror.getValue();
+        """.format(index))
 
 def upload_file(filename):
     path = os.path.join(TEST_ROOT, filename)

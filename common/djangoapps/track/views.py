@@ -1,6 +1,6 @@
 import datetime
 
-from pytz import UTC
+import pytz
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -59,7 +59,7 @@ def user_track(request):
             "event": request.REQUEST['event'],
             "agent": _get_request_header(request, 'HTTP_USER_AGENT'),
             "page": page,
-            "time": datetime.datetime.now(UTC),
+            "time": datetime.datetime.utcnow(),
             "host": _get_request_header(request, 'SERVER_NAME'),
             "context": eventtracker.get_tracker().resolve_context(),
         }
@@ -92,7 +92,7 @@ def server_track(request, event_type, event, page=None):
         "event": event,
         "agent": _get_request_header(request, 'HTTP_USER_AGENT'),
         "page": page,
-        "time": datetime.datetime.now(UTC),
+        "time": datetime.datetime.utcnow(),
         "host": _get_request_header(request, 'SERVER_NAME'),
         "context": eventtracker.get_tracker().resolve_context(),
     }
@@ -136,7 +136,7 @@ def task_track(request_info, task_info, event_type, event, page=None):
             "event": full_event,
             "agent": request_info.get('agent', 'unknown'),
             "page": page,
-            "time": datetime.datetime.now(UTC),
+            "time": datetime.datetime.utcnow(),
             "host": request_info.get('host', 'unknown'),
             "context": eventtracker.get_tracker().resolve_context(),
         }

@@ -12,7 +12,7 @@ import branding
 from status.status import get_site_status_msg
 %>
 
-<%! from microsite_configuration.middleware import MicrositeConfiguration %>
+<%! from microsite_configuration import microsite %>
 <%! from microsite_configuration.templatetags.microsite import platform_name %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -50,7 +50,7 @@ site_status_msg = get_site_status_msg(course_id)
       <%block name="navigation_logo">
           <img src="${static.url(branding.get_logo_url())}" alt="
           % if course:
-          ${course.display_org_with_default | h}: ${course.display_number_with_default | h} ${course.display_name_with_default | h} @ 
+          ${course.display_org_with_default | h}: ${course.display_number_with_default | h} ${course.display_name_with_default | h} @
           % endif
           ${platform_name()}
           " />
@@ -102,7 +102,7 @@ site_status_msg = get_site_status_msg(course_id)
     % else:
     <ol class="left nav-global">
       <%block name="navigation_global_links">
-        % if MicrositeConfiguration.get_microsite_configuration_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+        % if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
           <li class="nav-global-01">
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>

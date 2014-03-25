@@ -4,6 +4,7 @@ Methods for exporting course data to XML
 
 import logging
 import lxml.etree
+from xblock.fields import Scope
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
@@ -18,6 +19,9 @@ DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"
 EXPORT_VERSION_FILE = "format.json"
 EXPORT_VERSION_KEY = "export_format"
+
+DEFAULT_CONTENT_FIELDS = ['metadata', 'data']
+
 
 class EdxJSONEncoder(json.JSONEncoder):
     """
@@ -120,6 +124,20 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
                     draft_vertical.add_xml_to_node(node)
 
 
+def _export_field_content(xblock_item, item_dir):
+    """
+    Export all fields related to 'xblock_item' other than 'metadata' and 'data' to json file in provided directory
+    """
+    module_data = xblock_item.get_explicitly_set_fields_by_scope(Scope.content)
+    if isinstance(module_data, dict):
+        for field_name in module_data:
+            if field_name not in DEFAULT_CONTENT_FIELDS:
+                # filename format: {dirname}.{field_name}.json
+                with item_dir.open('{0}.{1}.{2}'.format(xblock_item.location.name, field_name, 'json'),
+                                   'w') as field_content_file:
+                    field_content_file.write(dumps(module_data.get(field_name, {}), cls=EdxJSONEncoder))
+
+
 def export_extra_content(export_fs, modulestore, course_id, course_location, category_type, dirname, file_suffix=''):
     query_loc = Location('i4x', course_location.org, course_location.course, category_type, None)
     items = modulestore.get_items(query_loc, course_id)
@@ -129,6 +147,9 @@ def export_extra_content(export_fs, modulestore, course_id, course_location, cat
         for item in items:
             with item_dir.open(item.location.name + file_suffix, 'w') as item_file:
                 item_file.write(item.data.encode('utf8'))
+
+                # export content fields other then metadata and data in json format in current directory
+                _export_field_content(item, item_dir)
 
 
 def convert_between_versions(source_dir, target_dir):

@@ -404,7 +404,8 @@ class @CombinedOpenEnded
     an openended problem
     ###
     confirmation_text = gettext 'Please confirm that you wish to submit your work. You will not be able to make any changes after submitting.' 
-    @save_answer(event) if confirm(confirmation_text)
+    accessible_confirm confirmation_text, =>
+      @save_answer(event)
 
   save_answer: (event) =>
     @$el.find(@oe_alert_sel).remove()
@@ -511,7 +512,9 @@ class @CombinedOpenEnded
       @errors_area.html(@out_of_sync_message)
 
   confirm_reset: (event) =>
-    @reset(event) if confirm(gettext 'Are you sure you want to remove your previous response to this question?')
+    message = gettext 'Are you sure you want to remove your previous response to this question?'
+    accessible_confirm message, =>
+      @reset(event)
 
   reset: (event) =>
     event.preventDefault()

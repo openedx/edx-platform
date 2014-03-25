@@ -745,3 +745,63 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'f82b5416c9f54b5ce33989511bb5ef2e',
             self._get_anonymous_id('MITx/6.00x/2013_Spring', descriptor_class)
         )
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch('track.views.tracker')
+class TestModuleTrackingContext(ModuleStoreTestCase):
+    """
+    Ensure correct tracking information is included in events emitted during XBlock callback handling.
+    """
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.request = RequestFactory().get('/')
+        self.request.user = self.user
+        self.request.session = {}
+        self.course = CourseFactory.create()
+
+        self.problem_xml = OptionResponseXMLFactory().build_xml(
+            question_text='The correct answer is Correct',
+            num_inputs=2,
+            weight=2,
+            options=['Correct', 'Incorrect'],
+            correct_option='Correct'
+        )
+
+    def test_context_contains_display_name(self, mock_tracker):
+        problem_display_name = u'Option Response Problem'
+        actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker, problem_display_name)
+        self.assertEquals(problem_display_name, actual_display_name)
+
+    def handle_callback_and_get_display_name_from_event(self, mock_tracker, problem_display_name=None):
+        """
+        Creates a fake module, invokes the callback and extracts the display name from the emitted problem_check event.
+        """
+        descriptor_kwargs = {
+            'category': 'problem',
+            'data': self.problem_xml
+        }
+        if problem_display_name:
+            descriptor_kwargs['display_name'] = problem_display_name
+
+        descriptor = ItemFactory.create(**descriptor_kwargs)
+
+        render.handle_xblock_callback(
+            self.request,
+            self.course.id,
+            quote_slashes(str(descriptor.location)),
+            'xmodule_handler',
+            'problem_check',
+        )
+
+        self.assertEquals(len(mock_tracker.send.mock_calls), 1)
+        mock_call = mock_tracker.send.mock_calls[0]
+        event = mock_call[1][0]
+
+        self.assertEquals(event['event_type'], 'problem_check')
+        return event['context']['module']['display_name']
+
+    def test_missing_display_name(self, mock_tracker):
+        actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker)
+        self.assertTrue(actual_display_name.startswith('problem'))

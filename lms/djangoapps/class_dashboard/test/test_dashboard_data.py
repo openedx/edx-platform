@@ -1,9 +1,10 @@
-from mock import Mock, patch
+"""
+Tests for class dashboard (Metrics tab in instructor dashboard)
+"""
+
 import json
 
 from django.test.utils import override_settings
-from django.test import TestCase
-from django.core import management
 from django.core.urlresolvers import reverse
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -11,14 +12,12 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
-from courseware.models import StudentModule
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from xmodule.modulestore import Location
 
-from xmodule.course_module import CourseDescriptor
 from class_dashboard.dashboard_data import (get_problem_grade_distribution, get_sequential_open_distrib,
-                                            get_problem_set_grade_distribution, get_d3_problem_grade_distribution,
-                                            get_d3_sequential_open_distribution, get_d3_section_grade_distribution,
+                                            get_problem_set_grade_distrib, get_d3_problem_grade_distrib,
+                                            get_d3_sequential_open_distrib, get_d3_section_grade_distrib,
                                             get_section_display_name, get_array_section_has_problem
                                             )
 from class_dashboard.views import has_instructor_access_for_class
@@ -29,9 +28,7 @@ USER_COUNT = 11
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     """
-    Tests needed:
-      - simple test, make sure output correct
-      - test when a problem has two max_grade's, should just take the larger value
+    Tests related to class_dashboard/dashboard_data.py
     """
 
     def setUp(self):
@@ -39,22 +36,26 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password='test')
         self.attempts = 3
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            display_name=u"test course omega \u03a9",
+        )
 
         section = ItemFactory.create(
             parent_location=self.course.location,
             category="chapter",
-            display_name="test factory section",
+            display_name=u"test factory section omega \u03a9",
         )
         sub_section = ItemFactory.create(
             parent_location=section.location,
             category="sequential",
+            display_name=u"test subsection omega \u03a9",
         )
 
         unit = ItemFactory.create(
             parent_location=sub_section.location,
             category="vertical",
-            metadata={'graded': True, 'format': 'Homework'}
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name=u"test unit omega \u03a9",
         )
 
         self.users = [UserFactory.create() for _ in xrange(USER_COUNT)]
@@ -68,7 +69,8 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                 parent_location=unit.location,
                 category=category,
                 data=StringResponseXMLFactory().build_xml(answer='foo'),
-                metadata={'rerandomize': 'always'}
+                metadata={'rerandomize': 'always'},
+                display_name=u"test problem omega \u03a9 " + str(i)
             )
 
             for j, user in enumerate(self.users):
@@ -107,7 +109,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     def test_get_problemset_grade_distrib(self):
 
         prob_grade_distrib = get_problem_grade_distribution(self.course.id)
-        probset_grade_distrib = get_problem_set_grade_distribution(self.course.id, prob_grade_distrib)
+        probset_grade_distrib = get_problem_set_grade_distrib(self.course.id, prob_grade_distrib)
 
         for problem in probset_grade_distrib:
             max_grade = probset_grade_distrib[problem]['max_grade']
@@ -121,7 +123,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_get_d3_problem_grade_distrib(self):
 
-        d3_data = get_d3_problem_grade_distribution(self.course.id)
+        d3_data = get_d3_problem_grade_distrib(self.course.id)
         for data in d3_data:
             for stack_data in data['data']:
                 sum_values = 0
@@ -131,7 +133,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_get_d3_sequential_open_distrib(self):
 
-        d3_data = get_d3_sequential_open_distribution(self.course.id)
+        d3_data = get_d3_sequential_open_distrib(self.course.id)
 
         for data in d3_data:
             for stack_data in data['data']:
@@ -141,7 +143,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_get_d3_section_grade_distrib(self):
 
-        d3_data = get_d3_section_grade_distribution(self.course.id, 0)
+        d3_data = get_d3_section_grade_distrib(self.course.id, 0)
 
         for stack_data in d3_data:
             sum_values = 0
@@ -152,7 +154,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     def test_get_section_display_name(self):
 
         section_display_name = get_section_display_name(self.course.id)
-        self.assertMultiLineEqual(section_display_name[0], 'test factory section')
+        self.assertMultiLineEqual(section_display_name[0], u"test factory section omega \u03a9")
 
     def test_get_array_section_has_problem(self):
 
@@ -160,7 +162,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         self.assertEquals(b_section_has_problem[0], True)
 
     def test_dashboard(self):
-         
+
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
         response = self.client.post(
             url,
@@ -169,11 +171,10 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
             }
         )
         self.assertContains(response, '<h2>Course Statistics At A Glance</h2>')
-        
-    def test_has_instructor_access_for_class(self): #user, course_id):
+
+    def test_has_instructor_access_for_class(self):
         """
         Test for instructor access
         """
         ret_val = has_instructor_access_for_class(self.instructor, self.course.id)
         self.assertEquals(ret_val, True)
-        

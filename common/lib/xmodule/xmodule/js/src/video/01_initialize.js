@@ -65,6 +65,7 @@ function (VideoPlayer, VideoStorage) {
         getDuration: getDuration,
         getVideoMetadata: getVideoMetadata,
         initialize: initialize,
+        isFlashMode: isFlashMode,
         parseSpeed: parseSpeed,
         parseVideoSources: parseVideoSources,
         parseYoutubeStreams: parseYoutubeStreams,
@@ -202,12 +203,6 @@ function (VideoPlayer, VideoStorage) {
         );
 
         state.speeds = ['0.75', '1.0', '1.25', '1.50'];
-        state.videos = {
-            '0.75': state.config.sub,
-            '1.0':  state.config.sub,
-            '1.25': state.config.sub,
-            '1.50':  state.config.sub
-        };
 
         // We must have at least one non-YouTube video source available.
         // Otherwise, return a negative.
@@ -556,7 +551,7 @@ function (VideoPlayer, VideoStorage) {
             _this.videos[speed] = video[1];
         });
 
-        return true;
+        return _.isString(this.videos['1.0']);
     }
 
     // function parseVideoSources(, mp4Source, webmSource, oggSource)
@@ -708,7 +703,11 @@ function (VideoPlayer, VideoStorage) {
     }
 
     function youtubeId(speed) {
-        return this.videos[speed || this.speed] || this.videos['1.0'];
+        var currentSpeed = this.isFlashMode() ? this.speed : '1.0';
+
+        return  this.videos[speed] ||
+                this.videos[currentSpeed] ||
+                this.videos['1.0'];
     }
 
     function getDuration() {
@@ -717,6 +716,10 @@ function (VideoPlayer, VideoStorage) {
         } catch (err) {
             return this.metadata[this.youtubeId('1.0')].duration;
         }
+    }
+
+    function isFlashMode() {
+        return this.currentPlayerMode === 'flash';
     }
 
     function getCurrentLanguage() {

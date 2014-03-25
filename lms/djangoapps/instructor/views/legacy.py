@@ -54,6 +54,7 @@ from instructor_task.api import (
 from instructor_task.views import get_task_completion_info
 from class_dashboard import dashboard_data
 from edxmako.shortcuts import render_to_response, render_to_string
+from class_dashboard import dashboard_data
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, unique_id_for_user
 from student.views import course_from_id
@@ -62,7 +63,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
 
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 log = logging.getLogger(__name__)
 
@@ -173,7 +174,7 @@ def instructor_dashboard(request, course_id):
         # complete the url using information about the current course:
         parts = Location.parse_course_id(course_id)
         parts['url'] = urlname
-        return u"i4x://{org}/{name}/{url}".format(**parts)
+        return u"i4x://{org}/{course}/{url}".format(**parts)
 
     def get_student_from_identifier(unique_student_identifier):
         """Gets a student object using either an email address or username"""
@@ -822,9 +823,7 @@ def instructor_dashboard(request, course_id):
     # Metrics
 
     metrics_results = {}
-#    if settings.FEATURES.get('CLASS_DASHBOARD') and idash_mode == 'Metrics':
-    if idash_mode == 'Metrics':
-#        metrics_results['attempts_timestamp'] = dashboard_data.get_last_populate(course_id, "studentmoduleexpand")
+    if settings.FEATURES.get('CLASS_DASHBOARD') and idash_mode == 'Metrics':
         metrics_results['section_display_name'] = dashboard_data.get_section_display_name(course_id)
         metrics_results['section_has_problem'] = dashboard_data.get_array_section_has_problem(course_id)
 
@@ -885,34 +884,35 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # context for rendering
 
-    context = {'course': course,
-               'staff_access': True,
-               'admin_access': request.user.is_staff,
-               'instructor_access': instructor_access,
-               'forum_admin_access': forum_admin_access,
-               'datatable': datatable,
-               'course_stats': course_stats,
-               'msg': msg,
-               'modeflag': {idash_mode: 'selectedmode'},
-               'studio_url': studio_url,
+    context = {
+        'course': course,
+        'staff_access': True,
+        'admin_access': request.user.is_staff,
+        'instructor_access': instructor_access,
+        'forum_admin_access': forum_admin_access,
+        'datatable': datatable,
+        'course_stats': course_stats,
+        'msg': msg,
+        'modeflag': {idash_mode: 'selectedmode'},
+        'studio_url': studio_url,
 
-               'to_option': email_to_option,      # email
-               'subject': email_subject,          # email
-               'editor': email_editor,            # email
-               'email_msg': email_msg,            # email
-               'show_email_tab': show_email_tab,  # email
+        'to_option': email_to_option,      # email
+        'subject': email_subject,          # email
+        'editor': email_editor,            # email
+        'email_msg': email_msg,            # email
+        'show_email_tab': show_email_tab,  # email
 
-               'problems': problems,		# psychometrics
-               'plots': plots,			# psychometrics
-               'course_errors': modulestore().get_item_errors(course.location),
-               'instructor_tasks': instructor_tasks,
-               'offline_grade_log': offline_grades_available(course_id),
-               'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
+        'problems': problems,		# psychometrics
+        'plots': plots,			# psychometrics
+        'course_errors': modulestore().get_item_errors(course.location),
+        'instructor_tasks': instructor_tasks,
+        'offline_grade_log': offline_grades_available(course_id),
+        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
-               'analytics_results': analytics_results,
-               'disable_buttons': disable_buttons,
-               'metrics_results': metrics_results,
-               }
+        'analytics_results': analytics_results,
+        'disable_buttons': disable_buttons,
+        'metrics_results': metrics_results,
+    }
 
     if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
@@ -1296,7 +1296,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
         ceaset.delete()
 
     if email_students:
-        stripped_site_name = MicrositeConfiguration.get_microsite_configuration_value(
+        stripped_site_name = microsite.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
@@ -1390,7 +1390,7 @@ def _do_unenroll_students(course_id, students, email_students=False):
     old_students, _ = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in old_students)
 
-    stripped_site_name = MicrositeConfiguration.get_microsite_configuration_value(
+    stripped_site_name = microsite.get_value(
         'SITE_NAME',
         settings.SITE_NAME
     )
@@ -1470,7 +1470,7 @@ def send_mail_to_student(student, param_dict):
     # add some helpers and microconfig subsitutions
     if 'course' in param_dict:
         param_dict['course_name'] = param_dict['course'].display_name_with_default
-    param_dict['site_name'] = MicrositeConfiguration.get_microsite_configuration_value(
+    param_dict['site_name'] = microsite.get_value(
         'SITE_NAME',
         param_dict.get('site_name', '')
     )
@@ -1498,7 +1498,7 @@ def send_mail_to_student(student, param_dict):
 
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        from_address = MicrositeConfiguration.get_microsite_configuration_value(
+        from_address = microsite.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )

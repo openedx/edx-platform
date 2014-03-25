@@ -7,6 +7,16 @@
   import waffle
 %>
 
+<%
+  cert_name_short = course.cert_name_short
+  if cert_name_short == "":
+    cert_name_short = settings.CERT_NAME_SHORT
+  
+  cert_name_long = course.cert_name_long
+  if cert_name_long == "":
+    cert_name_long = settings.CERT_NAME_LONG
+%>
+
 <%namespace name='static' file='../static_content.html'/>
 
 <li class="course-item">
@@ -79,7 +89,7 @@
             </div>
 
             <div class="wrapper-extended">
-                <p class="message-copy">${_("You can still sign up for an ID verified certificate for this course. If you plan to complete the whole course, it is a great way to recognize your achievement. {a_start}Learn more about verified certificates{a_end}.").format(a_start='<a href="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT')), a_end="</a>")}</p>
+                <p class="message-copy">${_("You can still sign up for an ID verified {cert_name_long} for this course. If you plan to complete the whole course, it is a great way to recognize your achievement. {link_start}Learn more about the verified {cert_name_long}{link_end}.").format(link_start='<a href="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT')), link_end="</a>", cert_name_long=cert_name_long)}</p>
 
               <ul class="actions message-actions">
                 <li class="action-item">
@@ -104,11 +114,22 @@
       % endif
 
       % if enrollment.mode != "verified":
-      <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='Are you sure you want to unregister from'; document.getElementById('refund-info').innerHTML=''">${_('Unregister')}</a>
+        ## Translators: The course's name will be added to the end of this sentence.
+        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from")}'; document.getElementById('refund-info').innerHTML=''">
+          ${_('Unregister')}
+        </a>
       % elif show_refund_option:
-      <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='Are you sure you want to unregister from the verified certificate track of'; document.getElementById('refund-info').innerHTML=gettext('You will be refunded the amount you paid.')">${_('Unregister')}</a>
+        ## Translators: The course's name will be added to the end of this sentence.
+        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from the verified {cert_name_long} track of").format(cert_name_long=cert_name_long)}';
+        document.getElementById('refund-info').innerHTML=gettext('You will be refunded the amount you paid.')">
+          ${_('Unregister')}
+        </a>
       % else:
-      <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='Are you sure you want to unregister from the verified certificate track of'; document.getElementById('refund-info').innerHTML=gettext('The refund deadline for this course has passed, so you will not receive a refund.')">${_('Unregister')}</a>
+        ## Translators: The course's name will be added to the end of this sentence.
+        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from the verified {cert_name_long} track of").format(cert_name_long=cert_name_long)}';
+        document.getElementById('refund-info').innerHTML=gettext('The refund deadline for this course has passed, so you will not receive a refund.')">
+          ${_('Unregister')}
+        </a>
       % endif
 
 % if show_email_settings:

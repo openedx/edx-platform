@@ -30,6 +30,7 @@ from django.dispatch import receiver, Signal
 import django.dispatch
 from django.forms import ModelForm, forms
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext_noop
 from django_countries import CountryField
 from track import contexts
 from track.views import server_track
@@ -190,7 +191,12 @@ class UserProfile(models.Model):
     this_year = datetime.now(UTC).year
     VALID_YEARS = range(this_year, this_year - 120, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
-    GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
+    GENDER_CHOICES = (
+        ('m', ugettext_noop('Male')),
+        ('f', ugettext_noop('Female')),
+        # Translators: 'Other' refers to the student's gender
+        ('o', ugettext_noop('Other'))
+    )
     gender = models.CharField(
         blank=True, null=True, max_length=6, db_index=True, choices=GENDER_CHOICES
     )
@@ -200,15 +206,17 @@ class UserProfile(models.Model):
     # ('p_se', 'Doctorate in science or engineering'),
     # ('p_oth', 'Doctorate in another field'),
     LEVEL_OF_EDUCATION_CHOICES = (
-        ('p', 'Doctorate'),
-        ('m', "Master's or professional degree"),
-        ('b', "Bachelor's degree"),
-        ('a', "Associate's degree"),
-        ('hs', "Secondary/high school"),
-        ('jhs', "Junior secondary/junior high/middle school"),
-        ('el', "Elementary/primary school"),
-        ('none', "None"),
-        ('other', "Other")
+        ('p', ugettext_noop('Doctorate')),
+        ('m', ugettext_noop("Master's or professional degree")),
+        ('b', ugettext_noop("Bachelor's degree")),
+        ('a', ugettext_noop("Associate's degree")),
+        ('hs', ugettext_noop("Secondary/high school")),
+        ('jhs', ugettext_noop("Junior secondary/junior high/middle school")),
+        ('el', ugettext_noop("Elementary/primary school")),
+        # Translators: 'None' refers to the student's level of education
+        ('none', ugettext_noop("None")),
+        # Translators: 'Other' refers to the student's level of education
+        ('other', ugettext_noop("Other"))
     )
     level_of_education = models.CharField(
         blank=True, null=True, max_length=6, db_index=True,
@@ -880,10 +888,16 @@ def update_user_information(sender, instance, created, **kwargs):
 @receiver(user_logged_in)
 def log_successful_login(sender, request, user, **kwargs):
     """Handler to log when logins have occurred successfully."""
-    AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.info(u"Login success - user.id: {0}".format(user.id))
+    else:
+        AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
 
 
 @receiver(user_logged_out)
 def log_successful_logout(sender, request, user, **kwargs):
     """Handler to log when logouts have occurred successfully."""
-    AUDIT_LOG.info(u"Logout - {0}".format(request.user))
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))
+    else:
+        AUDIT_LOG.info(u"Logout - {0}".format(request.user))

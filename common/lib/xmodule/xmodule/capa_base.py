@@ -925,7 +925,8 @@ class CapaMixin(CapaFields):
         event_info['problem_id'] = self.location.url()
 
         answers = self.make_dict_of_responses(data)
-        event_info['answers'] = convert_files_to_filenames(answers)
+        answers_without_files = convert_files_to_filenames(answers)
+        event_info['answers'] = answers_without_files
 
         # Can override current time
         current_time = datetime.datetime.now(UTC())
@@ -1016,7 +1017,10 @@ class CapaMixin(CapaFields):
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts
+        event_info['submission'] = self.get_submission_metadata_safe(answers_without_files, correct_map)
+
         self.unmask_log(event_info)
+
         self.runtime.track_function('problem_check', event_info)
 
         if hasattr(self.runtime, 'psychometrics_handler'):  # update PsychometricsData using callback
@@ -1078,6 +1082,90 @@ class CapaMixin(CapaFields):
                 return "%i hr, %i min" % (hr_display, min_display)
             else:
                 return "%i hr, %i min, %i sec" % (hr_display, min_display, sec_display)
+
+    def get_submission_metadata_safe(self, answers, correct_map):
+        """
+        Ensures that no exceptions are thrown while generating input metadata summaries.  Returns the
+        summary if it is successfully created, otherwise an empty dictionary.
+        """
+        try:
+            return self.get_submission_metadata(answers, correct_map)
+        except Exception:  # pylint: disable=broad-except
+            # NOTE: The above process requires deep inspection of capa structures that may break for some
+            # uncommon problem types.  Ensure that it does not prevent answer submission in those
+            # cases.  Any occurrences of errors in this block should be investigated and resolved.
+            log.exception('Unable to gather submission metadata, it will not be included in the event.')
+
+        return {}
+
+    def get_submission_metadata(self, answers, correct_map):
+        """
+        Return a map of inputs to their corresponding summarized metadata.
+
+        Returns:
+            A map whose keys are a unique identifier for the input (in this case a capa input_id) and
+            whose values are:
+
+                question (str): Is the prompt that was presented to the student.  It corresponds to the
+                    label of the input.
+                answer (mixed): Is the answer the student provided.  This may be a rich structure,
+                    however it must be json serializable.
+                response_type (str): The XML tag of the capa response type.
+                input_type (str): The XML tag of the capa input type.
+                correct (bool): Whether or not the provided answer is correct.  Will be an empty
+                    string if correctness could not be determined.
+                variant (str): In some cases the same question can have several different variants.
+                    This string should uniquely identify the variant of the question that was answered.
+                    In the capa context this corresponds to the `seed`.
+
+        This function attempts to be very conservative and make very few assumptions about the structure
+        of the problem.  If problem related metadata cannot be located it should be replaced with empty
+        strings ''.
+        """
+
+        input_metadata = {}
+        for input_id, internal_answer in answers.iteritems():
+            answer_input = self.lcp.inputs.get(input_id)
+
+            if answer_input is None:
+                log.warning('Input id %s is not mapped to an input type.', input_id)
+
+            answer_response = None
+            for response, responder in self.lcp.responders.iteritems():
+                for other_input_id in self.lcp.responder_answers[response]:
+                    if other_input_id == input_id:
+                        answer_response = responder
+
+            if answer_response is None:
+                log.warning('Answer responder could not be found for input_id %s.', input_id)
+
+            user_visible_answer = internal_answer
+            if hasattr(answer_input, 'get_user_visible_answer'):
+                user_visible_answer = answer_input.get_user_visible_answer(internal_answer)
+
+            # If this problem has rerandomize enabled, then it will generate N variants of the
+            # question, one per unique seed value.  In this case we would like to know which
+            # variant was selected.  Ideally it would be nice to have the exact question that
+            # was presented to the user, with values interpolated etc, but that can be done
+            # later if necessary.
+            variant = ''
+            if self.rerandomize != 'never':
+                variant = self.seed
+
+            is_correct = correct_map.is_correct(input_id)
+            if is_correct is None:
+                is_correct = ''
+
+            input_metadata[input_id] = {
+                'question': getattr(answer_input, 'loaded_attributes', {}).get('label', ''),
+                'answer': user_visible_answer,
+                'response_type': getattr(getattr(answer_response, 'xml', None), 'tag', ''),
+                'input_type': getattr(answer_input, 'tag', ''),
+                'correct': is_correct,
+                'variant': variant,
+            }
+
+        return input_metadata
 
     def rescore_problem(self):
         """

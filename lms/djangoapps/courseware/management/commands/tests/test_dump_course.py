@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """Tests for Django management commands"""
 
 import json
@@ -18,6 +20,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_from_xml
 
 DATA_DIR = 'common/test/data/'
@@ -41,6 +44,14 @@ class CommandsTestBase(TestCase):
         """Load test courses and return list of ids"""
         store = modulestore()
 
+        # Add a course with a unicode name, if the modulestore
+        # supports adding modules.
+        if hasattr(store, 'create_xmodule'):
+            CourseFactory.create(org=u'ëḋẌ',
+                                 course=u'śíḿṕĺé',
+                                 display_name=u'2012_Fáĺĺ',
+                                 modulestore=store)
+
         courses = store.get_courses()
         if TEST_COURSE_ID not in [c.id for c in courses]:
             import_from_xml(store, DATA_DIR, ['toy', 'simple'])
@@ -57,7 +68,8 @@ class CommandsTestBase(TestCase):
     def test_dump_course_ids(self):
         kwargs = {'modulestore': 'default'}
         output = self.call_command('dump_course_ids', **kwargs)
-        dumped_courses = output.strip().split('\n')
+        dumped_courses = output.decode('utf-8').strip().split('\n')
+
         self.assertEqual(self.loaded_courses, dumped_courses)
 
     def test_dump_course_structure(self):

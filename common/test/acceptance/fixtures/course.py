@@ -224,9 +224,6 @@ class CourseFixture(StudioApiFixture):
         """
         self._create_course()
 
-        # Remove once STUD-1248 is resolved
-        self._update_loc_map()
-
         self._install_course_updates()
         self._install_course_handouts()
         self._configure_course()
@@ -361,20 +358,6 @@ class CourseFixture(StudioApiFixture):
                 raise CourseFixtureError(
                     "Could not add update to course: {0}.  Status was {1}".format(
                         update, response.status_code))
-
-    def _update_loc_map(self):
-        """
-        Force update of the location map.
-        """
-        # We perform a GET request to force Studio to update the course location map.
-        # This is a (minor) bug in the Studio RESTful API: STUD-1248
-        url = "{base}/course_info/{course}".format(base=STUDIO_BASE_URL, course=self._course_loc)
-        response = self.session.get(url, headers={'Accept': 'text/html'})
-
-        if not response.ok:
-            raise CourseFixtureError(
-                "Could not load Studio dashboard to trigger location map update.  Status was {0}".format(
-                    response.status_code))
 
     def _create_xblock_children(self, parent_loc, xblock_descriptions):
         """

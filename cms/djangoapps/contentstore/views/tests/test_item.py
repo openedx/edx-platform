@@ -15,6 +15,7 @@ from django.test.client import RequestFactory
 from contentstore.views.component import component_handler
 
 from contentstore.tests.utils import CourseTestCase
+from contentstore.utils import compute_publish_state, PublishState
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.django import modulestore
@@ -70,6 +71,28 @@ class ItemTest(CourseTestCase):
 class GetItem(ItemTest):
     """Tests for '/xblock' GET url."""
 
+    def _create_vertical(self, parent_locator=None):
+        """
+        Creates a vertical, returning its locator.
+        """
+        resp = self.create_xblock(category='vertical', parent_locator=parent_locator)
+        self.assertEqual(resp.status_code, 200)
+        return self.response_locator(resp)
+
+    def _get_container_preview(self, locator):
+        """
+        Returns the HTML and resources required for the xblock at the specified locator
+        """
+        preview_url = '/xblock/{locator}/container_preview'.format(locator=locator)
+        resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
+        self.assertEqual(resp.status_code, 200)
+        resp_content = json.loads(resp.content)
+        html = resp_content['html']
+        self.assertTrue(html)
+        resources = resp_content['resources']
+        self.assertIsNotNone(resources)
+        return html, resources
+
     def test_get_vertical(self):
         # Add a vertical
         resp = self.create_xblock(category='vertical')
@@ -79,6 +102,77 @@ class GetItem(ItemTest):
         resp_content = json.loads(resp.content)
         resp = self.client.get('/xblock/' + resp_content['locator'])
         self.assertEqual(resp.status_code, 200)
+
+    def test_get_empty_container_fragment(self):
+        root_locator = self._create_vertical()
+        html, __ = self._get_container_preview(root_locator)
+
+        # Verify that the Studio wrapper is not added
+        self.assertNotIn('wrapper-xblock', html)
+
+        # Verify that the header and article tags are still added
+        self.assertIn('<header class="xblock-header">', html)
+        self.assertIn('<article class="xblock-render">', html)
+
+    def test_get_container_fragment(self):
+        root_locator = self._create_vertical()
+
+        # Add a problem beneath a child vertical
+        child_vertical_locator = self._create_vertical(parent_locator=root_locator)
+        resp = self.create_xblock(parent_locator=child_vertical_locator, category='problem', boilerplate='multiplechoice.yaml')
+        self.assertEqual(resp.status_code, 200)
+
+        # Get the preview HTML
+        html, __ = self._get_container_preview(root_locator)
+
+        # Verify that the Studio nesting wrapper has been added
+        self.assertIn('level-nesting', html)
+        self.assertIn('<header class="xblock-header">', html)
+        self.assertIn('<article class="xblock-render">', html)
+
+        # Verify that the Studio element wrapper has been added
+        self.assertIn('level-element', html)
+
+    def test_get_container_nested_container_fragment(self):
+        """
+        Test the case of the container page containing a link to another container page.
+        """
+        # Add a wrapper with child beneath a child vertical
+        root_locator = self._create_vertical()
+
+        resp = self.create_xblock(parent_locator=root_locator, category="wrapper")
+        self.assertEqual(resp.status_code, 200)
+        wrapper_locator = self.response_locator(resp)
+
+        resp = self.create_xblock(parent_locator=wrapper_locator, category='problem', boilerplate='multiplechoice.yaml')
+        self.assertEqual(resp.status_code, 200)
+
+        # Get the preview HTML and verify the View -> link is present.
+        html, __ = self._get_container_preview(root_locator)
+        self.assertIn('wrapper-xblock', html)
+        self.assertRegexpMatches(
+            html,
+            # The instance of the wrapper class will have an auto-generated ID (wrapperxxx). Allow anything
+            # for the 3 characters after wrapper.
+            (r'"/container/MITx.999.Robot_Super_Course/branch/draft/block/wrapper.{3}" class="action-button">\s*'
+             '<span class="action-button-text">View</span>')
+        )
+
+    def test_split_test(self):
+        """
+        Test that a split_test module renders all of its children in Studio.
+        """
+        root_locator = self._create_vertical()
+        resp = self.create_xblock(category='split_test', parent_locator=root_locator)
+        self.assertEqual(resp.status_code, 200)
+        split_test_locator = self.response_locator(resp)
+        resp = self.create_xblock(parent_locator=split_test_locator, category='html', boilerplate='announcement.yaml')
+        self.assertEqual(resp.status_code, 200)
+        resp = self.create_xblock(parent_locator=split_test_locator, category='html', boilerplate='zooming_image.yaml')
+        self.assertEqual(resp.status_code, 200)
+        html, __ = self._get_container_preview(split_test_locator)
+        self.assertIn('Announcement', html)
+        self.assertIn('Zooming', html)
 
 
 class DeleteItem(ItemTest):
@@ -565,11 +659,13 @@ class TestEditItem(ItemTest):
         self.assertNotEqual(draft.data, published.data)
 
         # Get problem by 'xblock_handler'
-        resp = self.client.get('/xblock/' + self.problem_locator + '/student_view', HTTP_ACCEPT='application/x-fragment+json')
+        view_url = '/xblock/{locator}/student_view'.format(locator=self.problem_locator)
+        resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
 
         # Activate the editing view
-        resp = self.client.get('/xblock/' + self.problem_locator + '/studio_view', HTTP_ACCEPT='application/x-fragment+json')
+        view_url = '/xblock/{locator}/studio_view'.format(locator=self.problem_locator)
+        resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
 
         # Both published and draft content should still be different
@@ -577,17 +673,60 @@ class TestEditItem(ItemTest):
         draft = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertNotEqual(draft.data, published.data)
 
+    def test_publish_states_of_nested_xblocks(self):
+        """ Test publishing of a unit page containing a nested xblock  """
+
+        resp = self.create_xblock(parent_locator=self.seq_locator, display_name='Test Unit', category='vertical')
+        unit_locator = self.response_locator(resp)
+        resp = self.create_xblock(parent_locator=unit_locator, category='wrapper')
+        wrapper_locator = self.response_locator(resp)
+        resp = self.create_xblock(parent_locator=wrapper_locator, category='html')
+        html_locator = self.response_locator(resp)
+
+        # The unit and its children should be private initially
+        unit_update_url = '/xblock/' + unit_locator
+        unit = self.get_item_from_modulestore(unit_locator, True)
+        html = self.get_item_from_modulestore(html_locator, True)
+        self.assertEqual(compute_publish_state(unit), PublishState.private)
+        self.assertEqual(compute_publish_state(html), PublishState.private)
+
+        # Make the unit public and verify that the problem is also made public
+        resp = self.client.ajax_post(
+            unit_update_url,
+            data={'publish': 'make_public'}
+        )
+        self.assertEqual(resp.status_code, 200)
+        unit = self.get_item_from_modulestore(unit_locator, True)
+        html = self.get_item_from_modulestore(html_locator, True)
+        self.assertEqual(compute_publish_state(unit), PublishState.public)
+        self.assertEqual(compute_publish_state(html), PublishState.public)
+
+        # Make a draft for the unit and verify that the problem also has a draft
+        resp = self.client.ajax_post(
+            unit_update_url,
+            data={
+                'id': unit_locator,
+                'metadata': {},
+                'publish': 'create_draft'
+            }
+        )
+        self.assertEqual(resp.status_code, 200)
+        unit = self.get_item_from_modulestore(unit_locator, True)
+        html = self.get_item_from_modulestore(html_locator, True)
+        self.assertEqual(compute_publish_state(unit), PublishState.draft)
+        self.assertEqual(compute_publish_state(html), PublishState.draft)
+
 
 @ddt.ddt
 class TestComponentHandler(TestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
 
-        patcher = patch('contentstore.views.component.modulestore')
-        self.modulestore = patcher.start()
+        patcher = patch('contentstore.views.component.get_modulestore')
+        self.get_modulestore = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.descriptor = self.modulestore.return_value.get_item.return_value
+        self.descriptor = self.get_modulestore.return_value.get_item.return_value
 
         self.usage_id = 'dummy_usage_id'
 
@@ -626,3 +765,34 @@ class TestComponentHandler(TestCase):
         self.descriptor.handle = create_response
 
         self.assertEquals(component_handler(self.request, self.usage_id, 'dummy_handler').status_code, status_code)
+
+
+@ddt.ddt
+class TestNativeXBlock(ItemTest):
+    """
+    Test a "native" XBlock (not an XModule shim).
+    """
+
+    @ddt.data(('problem', True), ('acid', False))
+    @ddt.unpack
+    def test_save_cancel_buttons(self, category, include_buttons):
+        """
+        Native XBlocks handle their own persistence, so Studio
+        should not render Save/Cancel buttons for them.
+        """
+        # Create the XBlock
+        resp = self.create_xblock(category=category)
+        self.assertEqual(resp.status_code, 200)
+        native_loc = json.loads(resp.content)['locator']
+
+        # Render the XBlock
+        view_url = '/xblock/{locator}/student_view'.format(locator=native_loc)
+        resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
+        self.assertEqual(resp.status_code, 200)
+
+        # Check that the save and cancel buttons are hidden for native XBlocks,
+        # but shown for XModule shim XBlocks
+        resp_html = json.loads(resp.content)['html']
+        assert_func = self.assertIn if include_buttons else self.assertNotIn
+        assert_func('save-button', resp_html)
+        assert_func('cancel-button', resp_html)

@@ -132,7 +132,7 @@ try:
     # Markdown 2.1.0 changed from 2.0.3. We try importing the new version first,
     # but import the 2.0.3 version if it fails
     from markdown.util import etree
-except:
+except:  # pylint: disable=bare-except
     from markdown import etree
 
 
@@ -172,21 +172,21 @@ class VideoExtension(markdown.Extension):
 
     def extendMarkdown(self, md, md_globals):
         self.add_inline(md, 'bliptv', Bliptv,
-            r'([^(]|^)http://(\w+\.|)blip.tv/file/get/(?P<bliptvfile>\S+.flv)')
+                        r'([^(]|^)http://(\w+\.|)blip.tv/file/get/(?P<bliptvfile>\S+.flv)')
         self.add_inline(md, 'dailymotion', Dailymotion,
-            r'([^(]|^)http://www\.dailymotion\.com/(?P<dailymotionid>\S+)')
+                        r'([^(]|^)http://www\.dailymotion\.com/(?P<dailymotionid>\S+)')
         self.add_inline(md, 'gametrailers', Gametrailers,
-            r'([^(]|^)http://www.gametrailers.com/video/[a-z0-9-]+/(?P<gametrailersid>\d+)')
+                        r'([^(]|^)http://www.gametrailers.com/video/[a-z0-9-]+/(?P<gametrailersid>\d+)')
         self.add_inline(md, 'metacafe', Metacafe,
-            r'([^(]|^)http://www\.metacafe\.com/watch/(?P<metacafeid>\S+)/')
+                        r'([^(]|^)http://www\.metacafe\.com/watch/(?P<metacafeid>\S+)/')
         self.add_inline(md, 'veoh', Veoh,
-            r'([^(]|^)http://www\.veoh\.com/\S*(#watch%3D|watch/)(?P<veohid>\w+)')
+                        r'([^(]|^)http://www\.veoh\.com/\S*(#watch%3D|watch/)(?P<veohid>\w+)')
         self.add_inline(md, 'vimeo', Vimeo,
-            r'([^(]|^)http://(www.|)vimeo\.com/(?P<vimeoid>\d+)\S*')
+                        r'([^(]|^)http://(www.|)vimeo\.com/(?P<vimeoid>\d+)\S*')
         self.add_inline(md, 'yahoo', Yahoo,
-            r'([^(]|^)http://video\.yahoo\.com/watch/(?P<yahoovid>\d+)/(?P<yahooid>\d+)')
+                        r'([^(]|^)http://video\.yahoo\.com/watch/(?P<yahoovid>\d+)/(?P<yahooid>\d+)')
         self.add_inline(md, 'youtube', Youtube,
-            r'([^(]|^)http://www\.youtube\.com/watch\?\S*v=(?P<youtubeargs>[A-Za-z0-9_&=-]+)\S*')
+                        r'([^(]|^)http://www\.youtube\.com/watch\?\S*v=(?P<youtubeargs>[A-Za-z0-9_&=-]+)\S*')
 
 
 class Bliptv(markdown.inlinepatterns.Pattern):
@@ -247,7 +247,7 @@ class Yahoo(markdown.inlinepatterns.Pattern):
         param = etree.Element('param')
         param.set('name', 'flashVars')
         param.set('value', "id=%s&vid=%s" % (m.group('yahooid'),
-                m.group('yahoovid')))
+                                             m.group('yahoovid')))
         obj.append(param)
         return obj
 
@@ -261,24 +261,24 @@ class Youtube(markdown.inlinepatterns.Pattern):
 
 
 def flash_object(url, width, height):
-        obj = etree.Element('object')
-        obj.set('type', 'application/x-shockwave-flash')
-        obj.set('width', width)
-        obj.set('height', height)
-        obj.set('data', url)
-        param = etree.Element('param')
-        param.set('name', 'movie')
-        param.set('value', url)
-        obj.append(param)
-        param = etree.Element('param')
-        param.set('name', 'allowFullScreen')
-        param.set('value', 'true')
-        obj.append(param)
-        #param = etree.Element('param')
-        #param.set('name', 'allowScriptAccess')
-        #param.set('value', 'sameDomain')
-        #obj.append(param)
-        return obj
+    obj = etree.Element('object')
+    obj.set('type', 'application/x-shockwave-flash')
+    obj.set('width', width)
+    obj.set('height', height)
+    obj.set('data', url)
+    param = etree.Element('param')
+    param.set('name', 'movie')
+    param.set('value', url)
+    obj.append(param)
+    param = etree.Element('param')
+    param.set('name', 'allowFullScreen')
+    param.set('value', 'true')
+    obj.append(param)
+    #param = etree.Element('param')
+    #param.set('name', 'allowScriptAccess')
+    #param.set('value', 'sameDomain')
+    #obj.append(param)
+    return obj
 
 
 def makeExtension(configs=None):

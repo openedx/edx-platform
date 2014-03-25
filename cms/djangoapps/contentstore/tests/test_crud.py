@@ -1,4 +1,5 @@
 import unittest
+
 from xmodule import templates
 from xmodule.modulestore.tests import persistent_factories
 from xmodule.course_module import CourseDescriptor
@@ -6,11 +7,9 @@ from xmodule.modulestore.django import modulestore, loc_mapper, clear_existing_m
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, LocalId
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore import inheritance
-from xmodule.x_module import prefer_xmodules
-from xblock.core import XBlock
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TemplateTests(unittest.TestCase):
@@ -19,7 +18,9 @@ class TemplateTests(unittest.TestCase):
     """
 
     def setUp(self):
-        clear_existing_modulestores()
+        clear_existing_modulestores()  # redundant w/ cleanup but someone was getting errors
+        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections, 'split')
+        self.addCleanup(clear_existing_modulestores)
 
     def test_get_templates(self):
         found = templates.all_templates()
@@ -52,13 +53,15 @@ class TemplateTests(unittest.TestCase):
         self.assertIsNotNone(HtmlDescriptor.get_template('announcement.yaml'))
 
     def test_factories(self):
-        test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='tempcourse',
-            display_name='fun test course', user_id='testbot')
+        test_course = persistent_factories.PersistentCourseFactory.create(
+            course_id='testx.tempcourse', org='testx',
+            display_name='fun test course', user_id='testbot'
+        )
         self.assertIsInstance(test_course, CourseDescriptor)
         self.assertEqual(test_course.display_name, 'fun test course')
         index_info = modulestore('split').get_course_index_info(test_course.location)
         self.assertEqual(index_info['org'], 'testx')
-        self.assertEqual(index_info['prettyid'], 'tempcourse')
+        self.assertEqual(index_info['_id'], 'testx.tempcourse')
 
         test_chapter = persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location)
@@ -67,25 +70,33 @@ class TemplateTests(unittest.TestCase):
         test_course = modulestore('split').get_course(test_chapter.location)
         self.assertIn(test_chapter.location.block_id, test_course.children)
 
+        with self.assertRaises(DuplicateCourseError):
+            persistent_factories.PersistentCourseFactory.create(
+                course_id='testx.tempcourse', org='testx', 
+                display_name='fun test course', user_id='testbot'
+            )
+
     def test_temporary_xblocks(self):
         """
-        Test using load_from_json to create non persisted xblocks
+        Test create_xblock to create non persisted xblocks
         """
-        test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='tempcourse',
-            display_name='fun test course', user_id='testbot')
+        test_course = persistent_factories.PersistentCourseFactory.create(
+            course_id='testx.tempcourse', org='testx',
+            display_name='fun test course', user_id='testbot'
+        )
 
-        test_chapter = self.load_from_json({'category': 'chapter',
-            'fields': {'display_name': 'chapter n'}},
-            test_course.system, parent_xblock=test_course)
+        test_chapter = modulestore('split').create_xblock(
+            test_course.system, 'chapter', {'display_name': 'chapter n'}, parent_xblock=test_course
+        )
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         self.assertEqual(test_chapter.display_name, 'chapter n')
         self.assertIn(test_chapter, test_course.get_children())
 
         # test w/ a definition (e.g., a problem)
         test_def_content = '<problem>boo</problem>'
-        test_problem = self.load_from_json({'category': 'problem',
-            'fields': {'data': test_def_content}},
-            test_course.system, parent_xblock=test_chapter)
+        test_problem = modulestore('split').create_xblock(
+            test_course.system, 'problem', {'data': test_def_content}, parent_xblock=test_chapter
+        )
         self.assertIsInstance(test_problem, CapaDescriptor)
         self.assertEqual(test_problem.data, test_def_content)
         self.assertIn(test_problem, test_chapter.get_children())
@@ -97,20 +108,22 @@ class TemplateTests(unittest.TestCase):
         try saving temporary xblocks
         """
         test_course = persistent_factories.PersistentCourseFactory.create(
-            org='testx', prettyid='tempcourse',
-            display_name='fun test course', user_id='testbot')
-        test_chapter = self.load_from_json({'category': 'chapter',
-            'fields': {'display_name': 'chapter n'}},
-            test_course.system, parent_xblock=test_course)
+            course_id='testx.tempcourse', org='testx', 
+            display_name='fun test course', user_id='testbot'
+        )
+        test_chapter = modulestore('split').create_xblock(
+            test_course.system, 'chapter', {'display_name': 'chapter n'}, parent_xblock=test_course
+        )
+        self.assertEqual(test_chapter.display_name, 'chapter n')
         test_def_content = '<problem>boo</problem>'
         # create child
-        new_block = self.load_from_json({
-            'category': 'problem',
-            'fields': {
+        new_block = modulestore('split').create_xblock(
+            test_course.system,
+            'problem',
+            fields={
                 'data': test_def_content,
                 'display_name': 'problem'
-            }},
-            test_course.system,
+            },
             parent_xblock=test_chapter
         )
         self.assertIsNotNone(new_block.definition_locator)
@@ -134,8 +147,7 @@ class TemplateTests(unittest.TestCase):
 
     def test_delete_course(self):
         test_course = persistent_factories.PersistentCourseFactory.create(
-            org='testx',
-            prettyid='edu.harvard.history.doomed',
+            course_id='edu.harvard.history.doomed', org='testx',
             display_name='doomed test course',
             user_id='testbot')
         persistent_factories.ItemFactory.create(display_name='chapter 1',
@@ -158,10 +170,10 @@ class TemplateTests(unittest.TestCase):
         Test get_block_generations
         """
         test_course = persistent_factories.PersistentCourseFactory.create(
-            org='testx',
-            prettyid='edu.harvard.history.hist101',
+            course_id='edu.harvard.history.hist101', org='testx',
             display_name='history test course',
-            user_id='testbot')
+            user_id='testbot'
+        )
         chapter = persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location, user_id='testbot')
         sub = persistent_factories.ItemFactory.create(display_name='subsection 1',
@@ -227,45 +239,4 @@ class TemplateTests(unittest.TestCase):
         # force instantiation of location mapper which must inject itself into the split
         mapper = loc_mapper()
         self.assertEqual(modulestore('split').loc_mapper, mapper)
-
-    # ================================= JSON PARSING ===========================
-    # These are example methods for creating xmodules in memory w/o persisting them.
-    # They were in x_module but since xblock is not planning to support them but will
-    # allow apps to use this type of thing, I put it here.
-    @staticmethod
-    def load_from_json(json_data, system, default_class=None, parent_xblock=None):
-        """
-        This method instantiates the correct subclass of XModuleDescriptor based
-        on the contents of json_data. It does not persist it and can create one which
-        has no usage id.
-
-        parent_xblock is used to compute inherited metadata as well as to append the new xblock.
-
-        json_data:
-        - 'location' : must have this field
-        - 'category': the xmodule category (required or location must be a Location)
-        - 'metadata': a dict of locally set metadata (not inherited)
-        - 'children': a list of children's usage_ids w/in this course
-        - 'definition':
-        - '_id' (optional): the usage_id of this. Will generate one if not given one.
-        """
-        class_ = XBlock.load_class(
-            json_data.get('category', json_data.get('location', {}).get('category')),
-            default_class,
-            select=prefer_xmodules
-        )
-        usage_id = json_data.get('_id', None)
-        if not '_inherited_settings' in json_data and parent_xblock is not None:
-            json_data['_inherited_settings'] = parent_xblock.xblock_kvs.inherited_settings.copy()
-            json_fields = json_data.get('fields', {})
-            for field_name in inheritance.InheritanceMixin.fields:
-                if field_name in json_fields:
-                    json_data['_inherited_settings'][field_name] = json_fields[field_name]
-
-        new_block = system.xblock_from_json(class_, usage_id, json_data)
-        if parent_xblock is not None:
-            parent_xblock.children.append(new_block.scope_ids.usage_id)
-            # decache pending children field settings
-            parent_xblock.save()
-        return new_block
 

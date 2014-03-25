@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-25 10:17-0500\n"
-"PO-Revision-Date: 2014-02-25 15:18:19.594059\n"
+"POT-Creation-Date: 2014-03-15 15:35-0400\n"
+"PO-Revision-Date: 2014-03-15 19:36:44.732383\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -362,6 +362,12 @@ msgstr ""
 "¢σηѕє¢т#"
 
 #: common/static/coffee/src/discussion/utils.js
+msgid "We had some trouble processing your request. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé pröçéssïng ýöür réqüést. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
+
+#: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
@@ -437,12 +443,14 @@ msgstr "Löädïng thréäd lïst Ⱡ'σя#"
 msgid "Click to remove report"
 msgstr "Çlïçk tö rémövé répört Ⱡ'σяє#"
 
+#. Translators: The text between start_sr_span and end_span is not shown
+#. in most browsers but will be read by screen readers.
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported, %(start_sr_span)s click to remove report%(end_span)s"
+msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
 msgstr ""
-"Mïsüsé Répörtéd, %(start_sr_span)s çlïçk tö rémövé répört%(end_span)s Ⱡ'σяєм"
-" ιρѕυм #"
+"Mïsüsé Répörtéd%(start_sr_span)s, çlïçk tö rémövé répört%(end_span)s Ⱡ'σяєм "
+"ιρѕυм#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
@@ -451,6 +459,16 @@ msgstr ""
 msgid "Report Misuse"
 msgstr "Répört Mïsüsé Ⱡ'#"
 
+#. Translators: The text between start_sr_span and end_span is not shown
+#. in most browsers but will be read by screen readers.
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
+msgstr "Pïnnéd%(start_sr_span)s, çlïçk tö ünpïn%(end_span)s Ⱡ'σяєм #"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+msgid "Click to unpin"
+msgstr "Çlïçk tö ünpïn Ⱡ'#"
+
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pinned"
 msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
@@ -458,10 +476,6 @@ msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pin Thread"
 msgstr "Pïn Thréäd Ⱡ#"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinning is not currently available"
-msgstr "Pïnnïng ïs nöt çürréntlý äväïläßlé Ⱡ'σяєм ιρ#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
@@ -538,12 +552,10 @@ msgid "Are you sure you want to delete this response?"
 msgstr "Àré ýöü süré ýöü wänt tö délété thïs réspönsé? Ⱡ'σяєм ιρѕυм #"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%s ago"
 msgstr "%s ägö Ⱡ'σяєм ιρѕ#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%s from now"
 msgstr "%s fröm nöw Ⱡ#"
 
@@ -556,7 +568,6 @@ msgid "about a minute"
 msgstr "äßöüt ä mïnüté Ⱡ'#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d mïnüté #"
@@ -567,7 +578,6 @@ msgid "about an hour"
 msgstr "äßöüt än höür Ⱡ'#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] "äßöüt %d höür Ⱡ'#"
@@ -578,7 +588,6 @@ msgid "a day"
 msgstr "ä däý Ⱡ'σяєм ι#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d däý Ⱡ'σяєм ιρѕ#"
@@ -589,7 +598,6 @@ msgid "about a month"
 msgstr "äßöüt ä mönth Ⱡ'#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d mönth #"
@@ -600,19 +608,16 @@ msgid "about a year"
 msgstr "äßöüt ä ýéär Ⱡ#"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d ýéär #"
 msgstr[1] "%d ýéärs #"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Available %s"
 msgstr "Àväïläßlé %s Ⱡ#"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -622,7 +627,6 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
 "Týpé ïntö thïs ßöx tö fïltér döwn thé lïst öf äväïläßlé %s. Ⱡ'σяєм ιρѕυм "
@@ -637,7 +641,6 @@ msgid "Choose all"
 msgstr "Çhöösé äll Ⱡ#"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Click to choose all %s at once."
 msgstr "Çlïçk tö çhöösé äll %s ät önçé. Ⱡ'σяєм ι#"
 
@@ -650,12 +653,10 @@ msgid "Remove"
 msgstr "Rémövé Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Chosen %s"
 msgstr "Çhösén %s #"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -669,7 +670,6 @@ msgid "Remove all"
 msgstr "Rémövé äll Ⱡ#"
 
 #: lms/static/admin/js/SelectFilter2.js
-#, c-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Çlïçk tö rémövé äll çhösén %s ät önçé. Ⱡ'σяєм ιρѕ#"
 
@@ -818,11 +818,28 @@ msgstr "Fïlé Nämé (Néwést Fïrst) Ⱡ'σяє#"
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
-"sensitive nature of student grade information."
+"sensitive nature of student information."
 msgstr ""
 "Lïnks äré générätéd ön démänd änd éxpïré wïthïn 5 mïnütés düé tö thé "
-"sénsïtïvé nätüré öf stüdént grädé ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢#"
+"sénsïtïvé nätüré öf stüdént ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Please enter a username or email."
+msgstr "Pléäsé éntér ä üsérnämé ör émäïl. Ⱡ'σяєм ι#"
+
+#. Translators: A rolename appears this sentence.;
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error fetching list for role"
+msgstr "Érrör fétçhïng lïst för rölé Ⱡ'σяєм #"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error changing user's permissions."
+msgstr "Érrör çhängïng üsér's pérmïssïöns. Ⱡ'σяєм ιρ#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Error enrolling/unenrolling students."
+msgstr "Érrör énröllïng/ünénröllïng stüdénts. Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following students:"
@@ -830,10 +847,12 @@ msgstr ""
 "Süççéssfüllý énrölléd änd sént émäïl tö thé föllöwïng stüdénts: Ⱡ'σяєм ιρѕυм"
 " ∂σłσя#"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following students:"
 msgstr "Süççéssfüllý énrölléd thé föllöwïng stüdénts: Ⱡ'σяєм ιρѕυм#"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
@@ -842,12 +861,14 @@ msgstr ""
 "Süççéssfüllý sént énröllmént émäïls tö thé föllöwïng stüdénts. Théý wïll ßé "
 "ällöwéd tö énröll önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be allowed to enroll once they register:"
 msgstr ""
 "Thésé stüdénts wïll ßé ällöwéd tö énröll önçé théý régïstér: Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
@@ -856,10 +877,12 @@ msgstr ""
 "Süççéssfüllý sént énröllmént émäïls tö thé föllöwïng stüdénts. Théý wïll ßé "
 "énrölléd önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be enrolled once they register:"
 msgstr "Thésé stüdénts wïll ßé énrölléd önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂#"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Emails successfully sent. The following students are no longer enrolled in "
@@ -868,12 +891,14 @@ msgstr ""
 "Émäïls süççéssfüllý sént. Thé föllöwïng stüdénts äré nö löngér énrölléd ïn "
 "thé çöürsé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following students are no longer enrolled in the course:"
 msgstr ""
 "Thé föllöwïng stüdénts äré nö löngér énrölléd ïn thé çöürsé: Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
 
+#. Translators: A list of students appears after this sentence.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These students were not affliliated with the course so could not be "
@@ -1257,6 +1282,15 @@ msgstr "Lïst ïtém #"
 msgid "Heading"
 msgstr "Héädïng #"
 
+#: lms/templates/class_dashboard/all_section_metrics.js
+#: lms/templates/class_dashboard/all_section_metrics.js
+msgid "Unable to retrieve data, please try again later."
+msgstr "Ûnäßlé tö rétrïévé dätä, pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "Number of Students"
+msgstr "Nümßér öf Stüdénts Ⱡ'σ#"
+
 #: cms/static/coffee/src/main.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
@@ -1271,12 +1305,12 @@ msgid "Studio's having trouble saving your work"
 msgstr "Stüdïö's hävïng tröüßlé sävïng ýöür wörk Ⱡ'σяєм ιρѕυ#"
 
 #: cms/static/coffee/src/views/module_edit.js
-#, c-format
 msgid "<em>Editing:</em> %s"
 msgstr "<em>Édïtïng:</em> %s Ⱡ'σ#"
 
 #: cms/static/coffee/src/views/module_edit.js
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js

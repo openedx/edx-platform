@@ -13,20 +13,24 @@ function () {
                 elementRatio: null
             },
             callbacksList = [],
+            delta = {
+                height: 0,
+                width: 0
+            },
             module = {},
             mode = null,
             config;
 
         var initialize = function (params) {
-            if (config) {
-                config = $.extend(true, config, params);
-            } else {
-                config = $.extend(true, {}, defaults, params);
+            if (!config) {
+                config = defaults;
             }
+
+            config = $.extend(true, {}, config, params);
 
             if (!config.element) {
                 console.log(
-                    '[Video info]: Required parameter `element` is not passed.'
+                    'Required parameter `element` is not passed.'
                 );
             }
 
@@ -35,8 +39,8 @@ function () {
 
         var getData = function () {
             var container = $(config.container),
-                containerWidth = container.width(),
-                containerHeight = container.height(),
+                containerWidth = container.width() + delta.width,
+                containerHeight = container.height() + delta.height,
                 containerRatio = config.containerRatio,
 
                 element = $(config.element),
@@ -74,7 +78,6 @@ function () {
                 default:
                     if (data.containerRatio >= data.elementRatio) {
                         alignByHeightOnly();
-
                     } else {
                         alignByWidthOnly();
                     }
@@ -123,6 +126,12 @@ function () {
             return module;
         };
 
+        var setElement = function (element) {
+            config.element = element;
+
+            return module;
+        };
+
         var addCallback = function (func) {
             if ($.isFunction(func)) {
                 callbacksList.push(func);
@@ -142,7 +151,7 @@ function () {
 
                 addCallback(decorator);
             } else {
-                console.error('[Video info]: TypeError: Argument is not a function.');
+                console.error('TypeError: Argument is not a function.');
             }
 
             return module;
@@ -168,6 +177,29 @@ function () {
             }
         };
 
+        var cleanDelta = function () {
+            delta['height'] = 0;
+            delta['width'] = 0;
+
+            return module;
+        };
+
+        var addDelta = function (value, side) {
+            if (_.isNumber(value) && _.isNumber(delta[side])) {
+                delta[side] += value;
+            }
+
+            return module;
+        };
+
+        var substractDelta = function (value, side) {
+            if (_.isNumber(value) && _.isNumber(delta[side])) {
+                delta[side] -= value;
+            }
+
+            return module;
+        };
+
         initialize.apply(module, arguments);
 
         return $.extend(true, module, {
@@ -176,11 +208,17 @@ function () {
             alignByHeightOnly: alignByHeightOnly,
             setParams: initialize,
             setMode: setMode,
+            setElement: setElement,
             callbacks: {
                 add: addCallback,
                 once: addOnceCallback,
                 remove: removeCallback,
                 removeAll: removeCallbacks
+            },
+            delta: {
+                add: addDelta,
+                substract: substractDelta,
+                reset: cleanDelta
             }
         });
     };

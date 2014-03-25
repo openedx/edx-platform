@@ -359,6 +359,19 @@ class XBlockAcidBase(UniqueCourseTest):
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.tab_nav = TabNavPage(self.browser)
 
+
+    def validate_acid_block_view(self, acid_block):
+        """
+        Verify that the LMS view for the Acid Block is correct
+        """
+        self.assertTrue(acid_block.init_fn_passed)
+        self.assertTrue(acid_block.resource_url_passed)
+        self.assertTrue(acid_block.scope_passed('user_state'))
+        self.assertTrue(acid_block.scope_passed('user_state_summary'))
+        self.assertTrue(acid_block.scope_passed('preferences'))
+        self.assertTrue(acid_block.scope_passed('user_info'))
+
+
     def test_acid_block(self):
         """
         Verify that all expected acid block tests pass in the lms.
@@ -368,10 +381,7 @@ class XBlockAcidBase(UniqueCourseTest):
         self.tab_nav.go_to_tab('Courseware')
 
         acid_block = AcidView(self.browser, '.xblock-student_view[data-block-type=acid]')
-        self.assertTrue(acid_block.init_fn_passed)
-        self.assertTrue(acid_block.doc_ready_passed)
-        self.assertTrue(acid_block.child_tests_passed)
-        self.assertTrue(acid_block.scope_passed('user_state'))
+        self.validate_acid_block_view(acid_block)
 
 
 class XBlockAcidNoChildTest(XBlockAcidBase):
@@ -417,7 +427,7 @@ class XBlockAcidChildTest(XBlockAcidBase):
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
-                        XBlockFixtureDesc('acid', 'Acid Block').add_children(
+                        XBlockFixtureDesc('acid_parent', 'Acid Parent Block').add_children(
                             XBlockFixtureDesc('acid', 'First Acid Child', metadata={'name': 'first'}),
                             XBlockFixtureDesc('acid', 'Second Acid Child', metadata={'name': 'second'}),
                             XBlockFixtureDesc('html', 'Html Child', data="<html>Contents</html>"),
@@ -426,6 +436,10 @@ class XBlockAcidChildTest(XBlockAcidBase):
                 )
             )
         ).install()
+
+    def validate_acid_block_view(self, acid_block):
+        super(XBlockAcidChildTest, self).validate_acid_block_view()
+        self.assertTrue(acid_block.child_tests_passed)
 
     # This will fail until we fix support of children in pure XBlocks
     @expectedFailure

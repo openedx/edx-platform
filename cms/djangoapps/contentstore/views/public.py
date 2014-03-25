@@ -10,7 +10,7 @@ from django.conf import settings
 from edxmako.shortcuts import render_to_response
 
 from external_auth.views import ssl_login_shortcut, ssl_get_cert_from_request
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 __all__ = ['signup', 'login_page', 'howitworks']
 
@@ -44,12 +44,16 @@ def login_page(request):
         # to course now that the user is authenticated via
         # the decorator.
         return redirect('/course')
+    if settings.FEATURES.get('AUTH_USE_CAS'):
+        # If CAS is enabled, redirect auth handling to there
+        return redirect(reverse('cas-login'))
+
     return render_to_response(
         'login.html',
         {
             'csrf': csrf_token,
             'forgot_password_link': "//{base}/login#forgot-password-modal".format(base=settings.LMS_BASE),
-            'platform_name': MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME),
+            'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         }
     )
 

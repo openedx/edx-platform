@@ -11,6 +11,7 @@ import unittest
 from datetime import datetime, timedelta
 import pytz
 
+from django.core.cache import cache
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -88,6 +89,23 @@ class ResetPasswordTests(TestCase):
             'success': True,
             'value': "('registration/password_reset_done.html', [])",
         })
+
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    def test_password_reset_ratelimited(self):
+        """ Try (and fail) resetting password 30 times in a row on an non-existant email address """
+        cache.clear()
+
+        for i in xrange(30):
+            good_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+            good_resp = password_reset(good_req)
+            self.assertEquals(good_resp.status_code, 200)
+
+        # then the rate limiter should kick in and give a HttpForbidden response
+        bad_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+        bad_resp = password_reset(bad_req)
+        self.assertEquals(bad_resp.status_code, 403)
+
+        cache.clear()
 
     @unittest.skipIf(
         settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),

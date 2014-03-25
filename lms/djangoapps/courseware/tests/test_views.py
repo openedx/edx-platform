@@ -442,3 +442,32 @@ class StartDateTests(ModuleStoreTestCase):
         text = self.get_about_text('edX/toy/TT_2012_Fall')
         # The start date is set in common/test/data/two_toys/policies/TT_2012_Fall/policy.json
         self.assertIn("2015-JULY-17", text)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class ProgressPageTests(ModuleStoreTestCase):
+    """
+    Tests that verify that the progress page works correctly.
+    """
+
+    def setUp(self):
+        self.request_factory = RequestFactory()
+        self.user = UserFactory.create()
+        self.request = self.request_factory.get("foo")
+        self.request.user = self.user
+
+        MakoMiddleware().process_request(self.request)
+
+        course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
+        self.course = modulestore().get_instance(course.id, course.location)  # pylint: disable=no-member
+
+        self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
+        self.section = ItemFactory(category='sequential', parent_location=self.chapter.location)
+        self.vertical = ItemFactory(category='vertical', parent_location=self.section.location)
+
+    def test_pure_ungraded_xblock(self):
+        ItemFactory(category='acid', parent_location=self.vertical.location)
+
+        resp = views.progress(self.request, self.course.id)
+        self.assertEquals(resp.status_code, 200)
+

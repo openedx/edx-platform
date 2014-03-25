@@ -22,6 +22,9 @@ urlpatterns = patterns('',  # nopep8
     url(r'^xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
         'contentstore.views.component_handler', name='component_handler'),
 
+    url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
+        'contentstore.views.xblock.xblock_resource', name='xblock_resource_url'),
+
     # temporary landing page for a course
     url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.landing', name='landing'),
@@ -74,6 +77,7 @@ urlpatterns += patterns(
     url(r'(?ix)^course($|/){}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
     url(r'(?ix)^subsection($|/){}$'.format(parsers.URL_RE_SOURCE), 'subsection_handler'),
     url(r'(?ix)^unit($|/){}$'.format(parsers.URL_RE_SOURCE), 'unit_handler'),
+    url(r'(?ix)^container($|/){}$'.format(parsers.URL_RE_SOURCE), 'container_handler'),
     url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
     url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan_handler'),
     url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler'),
@@ -109,6 +113,12 @@ if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += patterns('',
         url(r'^status/', include('service_status.urls')),
+    )
+
+if settings.FEATURES.get('AUTH_USE_CAS'):
+    urlpatterns += (
+        url(r'^cas-auth/login/$', 'external_auth.views.cas_login', name="cas-login"),
+        url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
     )
 
 urlpatterns += patterns('', url(r'^admin/', include(admin.site.urls)),)

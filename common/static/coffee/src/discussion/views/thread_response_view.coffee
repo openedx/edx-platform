@@ -20,6 +20,7 @@ if Backbone?
       @template(templateData)
 
     render: ->
+      @$el.addClass("response_" + @model.get("id"))
       @$el.html(@renderTemplate())
       @delegateEvents()
 
@@ -53,6 +54,7 @@ if Backbone?
 
     renderComments: ->
       comments = new Comments()
+      @commentViews = []
       comments.comparator = (comment) ->
         comment.get('created_at')
       collectComments = (comment) ->
@@ -69,6 +71,12 @@ if Backbone?
       view = new ResponseCommentView(model: comment)
       view.render()
       @$el.find(".comments .new-comment").before(view.el)
+      view.bind "comment:edit", (event) =>
+        @cancelEdit(event) if @editView?
+        @cancelCommentEdits()
+        @hideCommentForm()
+      view.bind "comment:cancel_edit", () => @showCommentForm()
+      @commentViews.push(view)
       view
 
     submitComment: (event) ->
@@ -128,6 +136,9 @@ if Backbone?
     renderEditView: () ->
       @renderSubView(@editView)
 
+    cancelCommentEdits: () ->
+      _.each(@commentViews, (view) -> view.cancelEdit())
+
     hideCommentForm: () ->
       @$('.comment-form').closest('li').hide()
 
@@ -157,6 +168,7 @@ if Backbone?
     edit: (event) =>
       @createEditView()
       @renderEditView()
+      @cancelCommentEdits()
       @hideCommentForm()
 
     update: (event) =>

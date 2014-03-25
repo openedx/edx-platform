@@ -24,7 +24,10 @@ from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
+<<<<<<< HEAD
 
+=======
+>>>>>>> release-2014-03-18
 
 from .tools import get_units_with_due_date, title_or_url
 
@@ -32,7 +35,7 @@ from .tools import get_units_with_due_date, title_or_url
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):
-    """Display the instructor dashboard for a course."""
+    """ Display the instructor dashboard for a course. """
 
     course = get_course_by_id(course_id, depth=None)
     is_studio_course = (modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE)
@@ -68,6 +71,10 @@ def instructor_dashboard_2(request, course_id):
     if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
        is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
         sections.append(_section_send_email(course_id, access, course))
+
+    # Gate access to Metrics tab by featue flag and staff authorization
+    if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
+        sections.append(_section_metrics(course_id, access))
 
     studio_url = None
     if is_studio_course:
@@ -195,7 +202,7 @@ def _section_data_download(course_id, access):
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_id}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_id}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
-        'list_grade_downloads_url': reverse('list_grade_downloads', kwargs={'course_id': course_id}),
+        'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': course_id}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_id}),
     }
     return section_data
