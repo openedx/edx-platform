@@ -81,8 +81,7 @@ define ["jquery", "underscore", "gettext", "xblock/runtime.v1",
           headers:
             Accept: 'application/json'
           success: (fragment) =>
-            @renderXBlockFragment(fragment, target, viewName)
-            callback()
+            @renderXBlockFragment(fragment, target).done(callback)
         )
 
     render: -> @loadView('student_view', @$el, =>
