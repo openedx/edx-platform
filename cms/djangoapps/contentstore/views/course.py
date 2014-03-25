@@ -220,6 +220,9 @@ def _accessible_courses_list_from_groups(request):
             raise ItemNotFoundError(course_id)
 
         course = modulestore('direct').get_course(course_location.course_id)
+        if course is None:
+            raise ItemNotFoundError(course_id)
+
         courses_list.append(course)
 
     return courses_list
