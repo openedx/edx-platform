@@ -663,7 +663,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                         # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
                         # from the course policy
                         if category == "static_tab":
-                            tab = CourseTabList.get_tab_by_slug(course=course_descriptor, url_slug=slug)
+                            tab = CourseTabList.get_tab_by_slug(tab_list=course_descriptor.tabs, url_slug=slug)
                             if tab:
                                 module.display_name = tab.name
                         module.data_dir = course_dir
