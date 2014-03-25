@@ -15,6 +15,18 @@ REPORT_DIR = File.join(REPO_ROOT, "reports")
 
 # Environment constants
 SERVICE_VARIANT = ENV['SERVICE_VARIANT']
+# if service variant, honor that;
+#  - if not, pass the correct ENV tokens for lms or cms
+if not SERVICE_VARIANT
+    # ignore command line environments, e.g. "rake e1=this"
+    clean_args = ARGV.delete_if { |x| /=/.match(x) }
+    # consider only the words remaining (parse out separators);
+    clean_args = clean_args.join(' ').split(/\W/)
+    # if lms or cms is among command line words, use it's env:
+    SERVICE_VARIANT = clean_args.include?('lms') ? "lms" :
+	(clean_args.include?('studio') or clean_args.include?('cms')) ? "cms" :
+	SERVICE_VARIANT
+end
 CONFIG_PREFIX = SERVICE_VARIANT ? SERVICE_VARIANT + "." : ""
 ENV_FILE = File.join(ENV_ROOT, CONFIG_PREFIX + "env.json")
 ENV_TOKENS = File.exists?(ENV_FILE) ? JSON.parse(File.read(ENV_FILE)) : {}
