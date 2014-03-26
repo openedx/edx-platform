@@ -960,7 +960,7 @@ def xblock_view(request, course_id, usage_id, view_name):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-    instance, tracking_context = _get_module_by_usage_id(request, course_id, usage_id)
+    instance, _ = _get_module_by_usage_id(request, course_id, usage_id)
 
     try:
         fragment = instance.render(view_name, context=request.GET)
