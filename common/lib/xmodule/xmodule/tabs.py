@@ -469,6 +469,7 @@ class SingleTextbookTab(CourseTab):
     """
     type = 'single_textbook'
     is_movable = False
+    is_collection_item = True
 
     def to_json(self):
         raise NotImplementedError('SingleTextbookTab should not be serialized.')
@@ -480,8 +481,13 @@ class TextbookTabsBase(AuthenticatedCourseTab):
     """
     is_collection = True
 
-    def __init__(self, name, tab):
-        super(TextbookTabsBase, self).__init__(name, name, '', tab)
+    def __init__(self, tab_id, tab):
+        # Translators: 'Textbooks' refers to the tab in the course that leads to the course' textbooks
+        super(TextbookTabsBase, self).__init__(
+            name=_("Textbooks"),
+            tab_id=tab_id,
+            link_func=None, tab=tab
+        )
 
     @abstractmethod
     def items(self, course):
@@ -499,9 +505,8 @@ class TextbookTabs(TextbookTabsBase):
     type = 'textbooks'
 
     def __init__(self, tab=None):
-        # Translators: NAATODO
         super(TextbookTabs, self).__init__(
-            name=_("Textbooks"),
+            tab_id=self.type,
             tab=tab,
         )
 
@@ -525,9 +530,8 @@ class PDFTextbookTabs(TextbookTabsBase):
     type = 'pdf_textbooks'
 
     def __init__(self, tab=None):
-        # Translators: NAATODO
         super(PDFTextbookTabs, self).__init__(
-            name=_("Textbooks"),
+            tab_id=self.type,
             tab=tab,
         )
 
@@ -548,9 +552,8 @@ class HtmlTextbookTabs(TextbookTabsBase):
     type = 'html_textbooks'
 
     def __init__(self, tab=None):
-        # Translators: NAATODO
         super(HtmlTextbookTabs, self).__init__(
-            name=_("Textbooks"),
+            tab_id=self.type,
             tab=tab,
         )
 
@@ -748,10 +751,16 @@ class CourseTabList(List):
 
     @staticmethod
     def get_tab_by_type(tab_list, tab_type):
+        """
+        Look for a tab with the specified type.  Returns the first matching tab.
+        """
         return next((tab for tab in tab_list if tab.type == tab_type), None)
 
     @staticmethod
     def get_tab_by_id(tab_list, tab_id):
+        """
+        Look for a tab with the specified tab_id.  Returns the first matching tab.
+        """
         return next((tab for tab in tab_list if tab.tab_id == tab_id), None)
 
     @staticmethod
@@ -913,6 +922,7 @@ class InvalidTabsException(Exception):
     A complaint about invalid tabs.
     """
     pass
+
 
 class UnequalTabsException(Exception):
     """

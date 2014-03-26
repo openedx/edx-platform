@@ -98,8 +98,7 @@ class CourseTestCase(ModuleStoreTestCase):
         )
         self.store = get_modulestore(self.course.location)
 
-
-    def createNonStaffAuthedUserClient(self):
+    def create_non_staff_authed_user_client(self):
         """
         Create a non-staff user, log them in, and return the client, user to use for testing.
         """
@@ -117,7 +116,7 @@ class CourseTestCase(ModuleStoreTestCase):
         client.login(username=uname, password=password)
         return client, nonstaff
 
-    def populateCourse(self):
+    def populate_course(self):
         """
         Add 2 chapters, 4 sections, 8 verticals, 16 problems to self.course (branching 2)
         """
@@ -130,16 +129,15 @@ class CourseTestCase(ModuleStoreTestCase):
 
         descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])
 
-    def reloadCourse(self):
+    def reload_course(self):
         """
         Reloads the course object from the database
         """
         self.course = self.store.get_item(self.course.location)
 
-    def saveCourse(self):
+    def save_course(self):
         """
         Updates the course object in the database
         """
         self.course.save()
         self.store.update_item(self.course, self.user.id)
-

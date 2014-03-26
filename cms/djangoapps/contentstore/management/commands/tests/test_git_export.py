@@ -151,7 +151,7 @@ class TestGitExport(CourseTestCase):
         self.assertEqual(expect_string, git_log)
 
         # Make changes to course so there is something commit
-        self.populateCourse()
+        self.populate_course()
         git_export_utils.export_to_git(
             self.course.id,
             'file://{0}'.format(self.bare_repo_dir),

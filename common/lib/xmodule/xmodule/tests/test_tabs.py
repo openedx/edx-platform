@@ -15,6 +15,15 @@ class TabTestCase(unittest.TestCase):
         self.settings.FEATURES = {}
         self.reverse = lambda name, args: "name/{0}/args/{1}".format(name, ",".join(str(a) for a in args))
 
+    def set_up_books(self, num_books):
+
+        self.books = [MagicMock() for _ in range(num_books)]
+        for book_index, book in enumerate(self.books):
+            book.title = 'Book{0}'.format(book_index)
+        self.course.textbooks = self.books
+        self.course.pdf_textbooks = self.books
+        self.course.html_textbooks = self.books
+
     def check_tab(
             self,
             tab_class,
@@ -57,19 +66,25 @@ class TabTestCase(unittest.TestCase):
         self.check_get_and_set_methods(tab)
 
         # check to_json and from_json methods
-        serialized_tab = tab.to_json()
-        deserialized_tab = tab_class.from_json(serialized_tab)
-        self.assertEquals(serialized_tab, deserialized_tab)
+        self.check_tab_json_methods(tab)
 
         # check equality methods
+        self.check_tab_equality(tab, dict_tab)
+
+        # return tab for any additional tests
+        return tab
+
+    def check_tab_equality(self, tab, dict_tab):
         self.assertEquals(tab, dict_tab)  # test __eq__
         ne_dict_tab = dict_tab
         ne_dict_tab['type'] = 'fake_type'
         self.assertNotEquals(tab, ne_dict_tab)  # test __ne__: incorrect type
         self.assertNotEquals(tab, {'fake_key': 'fake_value'})  # test __ne__: missing type
 
-        # return tab for any additional tests
-        return tab
+    def check_tab_json_methods(self, tab):
+        serialized_tab = tab.to_json()
+        deserialized_tab = tab.from_json(serialized_tab)
+        self.assertEquals(serialized_tab, deserialized_tab)
 
     def check_can_display_results(self, tab, expected_value=True, for_authenticated_users_only=False, for_staff_only=False):
         """Check can display results for various users"""
@@ -160,6 +175,17 @@ class WikiTestCase(TabTestCase):
         tab = self.check_wiki_tab()
         self.check_can_display_results(tab, expected_value=False)
 
+    def test_wiki_visibility(self):
+
+        wiki_tab = tabs.WikiTab()
+        self.assertTrue(wiki_tab.is_hideable)
+        wiki_tab.is_hidden = True
+        self.assertTrue(wiki_tab['is_hidden'])
+        self.check_tab_json_methods(wiki_tab)
+        self.check_tab_equality(wiki_tab, wiki_tab.to_json())
+        wiki_tab['is_hidden'] = False
+        self.assertFalse(wiki_tab.is_hidden)
+
 
 class ExternalLinkTestCase(TabTestCase):
     """Test cases for External Link Tab."""
@@ -202,15 +228,9 @@ class TextbooksTestCase(TabTestCase):
     def setUp(self):
         super(TextbooksTestCase, self).setUp()
 
+        self.set_up_books(2)
+
         self.dict_tab = MagicMock()
-        book1 = MagicMock()
-        book2 = MagicMock()
-        book1.title = 'Book1: Algebra'
-        book2.title = 'Book2: Topology'
-        books = [book1, book2]
-        self.course.textbooks = books
-        self.course.pdf_textbooks = books
-        self.course.html_textbooks = books
         self.course.tabs = [
             tabs.CoursewareTab(),
             tabs.CourseInfoTab(),
@@ -219,7 +239,7 @@ class TextbooksTestCase(TabTestCase):
             tabs.HtmlTextbookTabs(),
         ]
         self.num_textbook_tabs = sum(1 for tab in self.course.tabs if isinstance(tab, tabs.TextbookTabsBase))
-        self.num_textbooks = self.num_textbook_tabs * len(books)
+        self.num_textbooks = self.num_textbook_tabs * len(self.books)
 
     def test_textbooks_enabled(self):
 
@@ -233,7 +253,7 @@ class TextbooksTestCase(TabTestCase):
                 book_type, book_index = tab.tab_id.split("/", 1)
                 expected_link = self.reverse(type_to_reverse_name[book_type], args=[self.course.id, book_index])
                 self.assertEqual(tab.link_func(self.course, self.reverse), expected_link)
-                self.assertTrue(tab.name.startswith('Book{0}:'.format(1 + int(book_index))))
+                self.assertTrue(tab.name.startswith('Book{0}'.format(book_index)))
                 num_textbooks_found = num_textbooks_found + 1
         self.assertEquals(num_textbooks_found, self.num_textbooks)
 
@@ -381,10 +401,11 @@ class NeedNameTestCase(unittest.TestCase):
             tabs.need_name(self.invalid_dict)
 
 
-class ValidateTabsTestCase(unittest.TestCase):
-    """Test cases for validating tabs."""
+class TabListTestCase(TabTestCase):
+    """Base class for Test cases involving tab lists."""
 
     def setUp(self):
+        super(TabListTestCase, self).setUp()
 
         # invalid tabs
         self.invalid_tabs = [
@@ -428,9 +449,6 @@ class ValidateTabsTestCase(unittest.TestCase):
                 {'type': tabs.WikiTab.type, 'name': 'fake_name'},
                 {'type': tabs.DiscussionTab.type, 'name': 'fake_name'},
                 {'type': tabs.ExternalLinkTab.type, 'name': 'fake_name', 'link': 'fake_link'},
-                {'type': tabs.TextbookTabs.type},
-                {'type': tabs.PDFTextbookTabs.type},
-                {'type': tabs.HtmlTextbookTabs.type},
                 {'type': tabs.ProgressTab.type, 'name': 'fake_name'},
                 {'type': tabs.StaticTab.type, 'name': 'fake_name', 'url_slug': 'schlug'},
                 {'type': tabs.PeerGradingTab.type},
@@ -438,6 +456,9 @@ class ValidateTabsTestCase(unittest.TestCase):
                 {'type': tabs.OpenEndedGradingTab.type},
                 {'type': tabs.NotesTab.type, 'name': 'fake_name'},
                 {'type': tabs.SyllabusTab.type},
+                {'type': tabs.TextbookTabs.type},
+                {'type': tabs.PDFTextbookTabs.type},
+                {'type': tabs.HtmlTextbookTabs.type},
             ],
             # with external discussion
             [
@@ -446,6 +467,12 @@ class ValidateTabsTestCase(unittest.TestCase):
                 {'type': tabs.ExternalDiscussionTab.type, 'name': 'fake_name', 'link': 'fake_link'}
             ],
         ]
+
+        self.all_valid_tab_list = tabs.CourseTabList().from_json(self.valid_tabs[1])
+
+
+class ValidateTabsTestCase(TabListTestCase):
+    """Test cases for validating tabs."""
 
     def test_validate_tabs(self):
         tab_list = tabs.CourseTabList()
@@ -458,7 +485,7 @@ class ValidateTabsTestCase(unittest.TestCase):
             self.assertEquals(len(from_json_result), len(valid_tab_list))
 
 
-class CourseTabListTestCase(TabTestCase):
+class CourseTabListTestCase(TabListTestCase):
     """Testing the generator method for iterating through displayable tabs"""
 
     def test_initialize_default_without_syllabus(self):
@@ -488,21 +515,39 @@ class CourseTabListTestCase(TabTestCase):
         self.assertTrue(tabs.DiscussionTab() in self.course.tabs)
 
     def test_iterate_displayable(self):
+        # enable all tab types
         self.settings.FEATURES['ENABLE_TEXTBOOK'] = True
-        self.course.tabs = [
-            tabs.CoursewareTab(),
-            tabs.CourseInfoTab(),
-            tabs.WikiTab(),
-        ]
+        self.settings.FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+        self.settings.FEATURES['ENABLE_STUDENT_NOTES'] = True
+        self.course.hide_progress_tab = False
+
+        # create 1 book per textbook type
+        self.set_up_books(1)
+
+        self.course.tabs = self.all_valid_tab_list
+
+        for i, tab in enumerate(tabs.CourseTabList.iterate_displayable_cms(
+            self.course,
+            self.settings,
+        )):
+            self.assertEquals(tab.type, self.course.tabs[i].type)
 
         for i, tab in enumerate(tabs.CourseTabList.iterate_displayable(
             self.course,
             self.settings,
         )):
-            if i == len(self.course.tabs):
+            if getattr(tab, 'is_collection_item', False):
+                self.assertTrue(getattr(self.course.tabs[i], 'is_collection', False))
+            elif i == len(self.course.tabs):
                 self.assertEquals(tab.type, tabs.InstructorTab.type)
             else:
                 self.assertEquals(tab.type, self.course.tabs[i].type)
+
+    def test_find_methods(self):
+        self.course.tabs = self.all_valid_tab_list
+        for tab in self.course.tabs:
+            self.assertEquals(tabs.CourseTabList.get_tab_by_type(self.course.tabs, tab.type), tab)
+            self.assertEquals(tabs.CourseTabList.get_tab_by_id(self.course.tabs, tab.tab_id), tab)
 
 
 class DiscussionLinkTestCase(TabTestCase):

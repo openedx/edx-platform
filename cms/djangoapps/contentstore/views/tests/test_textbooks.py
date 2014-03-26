@@ -56,7 +56,7 @@ class TextbookIndexTestCase(CourseTestCase):
             }
         ]
         self.course.pdf_textbooks = content
-        self.saveCourse()
+        self.save_course()
 
         resp = self.client.get(
             self.url,
@@ -84,7 +84,7 @@ class TextbookIndexTestCase(CourseTestCase):
 
         # should be the same, except for added ID
         no_ids = []
-        self.reloadCourse()
+        self.reload_course()
         for textbook in self.course.pdf_textbooks:
             del textbook["id"]
             no_ids.append(textbook)
@@ -190,7 +190,7 @@ class TextbookDetailTestCase(CourseTestCase):
         self.course.pdf_textbooks = [self.textbook1, self.textbook2]
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
-        self.saveCourse()
+        self.save_course()
         self.url_nonexist = self.course_locator.url_reverse("textbooks", "20")
 
     def test_get_1(self):
@@ -216,14 +216,14 @@ class TextbookDetailTestCase(CourseTestCase):
         "Delete a textbook by ID"
         resp = self.client.delete(self.url1)
         self.assertEqual(resp.status_code, 204)
-        self.reloadCourse()
+        self.reload_course()
         self.assertEqual(self.course.pdf_textbooks, [self.textbook2])
 
     def test_delete_nonexistant(self):
         "Delete a textbook by ID, when the ID doesn't match an existing textbook"
         resp = self.client.delete(self.url_nonexist)
         self.assertEqual(resp.status_code, 404)
-        self.reloadCourse()
+        self.reload_course()
         self.assertEqual(self.course.pdf_textbooks, [self.textbook1, self.textbook2])
 
     def test_create_new_by_id(self):
@@ -244,7 +244,7 @@ class TextbookDetailTestCase(CourseTestCase):
         self.assertEqual(resp2.status_code, 200)
         compare = json.loads(resp2.content)
         self.assertEqual(compare, textbook)
-        self.reloadCourse()
+        self.reload_course()
         self.assertEqual(
             self.course.pdf_textbooks,
             [self.textbook1, self.textbook2, textbook]

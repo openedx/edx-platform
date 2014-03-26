@@ -65,7 +65,7 @@
                   <%
                     tab_name = _(tab.name)
                     if tab.is_collection:
-                        item_names = [item.name for item in tab.items(context_course)]
+                        item_names = [_(item.name) for item in tab.items(context_course)]
                         num_items = sum(1 for item in tab.items(context_course))
                         tab_name = tab_name + " ({0}): {1}".format(num_items, ", ".join(item_names))
                    %>
@@ -79,7 +79,7 @@
 
                         % if tab.is_hideable:
                           <li class="action-item action-visible">
-                              <label for="[id]"><span class="sr">${_("Show this page")}</span></label>
+                              <label><span class="sr">${_("Show this page")}</span></label>
                               % if tab.is_hidden:
                                 <input type="checkbox" class="toggle-checkbox" data-tooltip="${_('Show/hide page')}" checked />
                               % else:

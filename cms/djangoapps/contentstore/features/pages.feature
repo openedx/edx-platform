@@ -15,10 +15,6 @@ Feature: CMS.Pages
         When I confirm the prompt
         Then I should not see any static pages
 
-    Scenario: Users can see built-in pages
-        Given I have opened the pages page in a new course
-        Then I should see the default built-in pages
-
     # Safari won't update the name properly
     @skip_safari
     Scenario: Users can edit static pages
@@ -35,3 +31,22 @@ Feature: CMS.Pages
         Then the static tabs are in the reverse order
         And I reload the page
         Then the static tabs are in the reverse order
+
+    Scenario: Users can see built-in pages
+        Given I have opened the pages page in a new course
+        Then I should see the default built-in pages
+
+    Scenario: Users can toggle visibility on hideable pages
+        Given I have opened the pages page in a new course
+        Then I should see the "wiki" page as "visible"
+        When I toggle the visibility of the "wiki" page
+        And I reload the page
+        Then I should see the "wiki" page as "hidden"
+
+    Scenario: Users can reorder pages
+        Given I have opened the pages page in a new course
+        When I reorder the tabs
+        Then the tabs are in the reverse order
+        And I reload the page
+        Then the tabs are in the reverse order
+

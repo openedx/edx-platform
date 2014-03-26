@@ -68,7 +68,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         for tab in CourseTabList.iterate_displayable_cms(
                 course_item,
                 settings,
-            ):
+        ):
             if isinstance(tab, StaticTab):
                 static_tab_loc = old_location.replace(category='static_tab', name=tab.url_slug)
                 static_tab = modulestore('direct').get_item(static_tab_loc)
@@ -84,6 +84,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         })
     else:
         return HttpResponseNotFound()
+
 
 def reorder_tabs_handler(course_item, request):
     """
@@ -114,9 +115,9 @@ def reorder_tabs_handler(course_item, request):
     # validate the tabs to make sure everything is Ok (e.g., did the client try to reorder unmovable tabs?)
     try:
         CourseTabList.validate_tabs(new_tab_list)
-    except InvalidTabsException:
+    except InvalidTabsException, e:
         return JsonResponse(
-            {"error": "New list of tabs is not valid: {0}.".format(sys.exc_info()[0])}, status=400
+            {"error": "New list of tabs is not valid: {0}.".format(str(e))}, status=400
         )
 
     course_item.tabs = new_tab_list
