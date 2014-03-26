@@ -15,20 +15,10 @@ class ControllerQueryService(GradingService):
         self.url = config['url'] + config['grading_controller']
         self.login_url = self.url + '/login/'
         self.check_eta_url = self.url + '/get_submission_eta/'
-        self.is_unique_url = self.url + '/is_name_unique/'
         self.combined_notifications_url = self.url + '/combined_notifications/'
         self.grading_status_list_url = self.url + '/get_grading_status_list/'
         self.flagged_problem_list_url = self.url + '/get_flagged_problem_list/'
         self.take_action_on_flags_url = self.url + '/take_action_on_flags/'
-
-    def check_if_name_is_unique(self, location, problem_id, course_id):
-        params = {
-            'course_id': course_id,
-            'location': location,
-            'problem_id': problem_id
-        }
-        response = self.get(self.is_unique_url, params)
-        return response
 
     def check_for_eta(self, location):
         params = {
@@ -83,14 +73,6 @@ class MockControllerQueryService(object):
     """
 
     def __init__(self, config, system):
-        pass
-
-    def check_if_name_is_unique(self, *args, **kwargs):
-        """
-        Mock later if needed.  Stub function for now.
-        @param params:
-        @return:
-        """
         pass
 
     def check_for_eta(self, *args, **kwargs):
