@@ -20,13 +20,10 @@ Feature: LMS Video component
     And all sources are correct
 
   # 3
-  # Firefox doesn't have HTML5 (only mp4 - fix here)
-  # Disabled because does_not_autoplay fails with the
-  # selenium upgrade from 2.34.0 to 2.39.0. See TE-368
-#  @skip_firefox
-#  Scenario: Autoplay is disabled in LMS for a Video component
-#    Given the course has a Video component in HTML5 mode
-#    Then when I view the video it does not have autoplay enabled
+  @skip_firefox
+  Scenario: Autoplay is disabled in LMS for a Video component
+    Given the course has a Video component in "HTML5" mode
+    Then when I view the video it does not have autoplay enabled
 
   # 4
   # Youtube testing
@@ -82,19 +79,19 @@ Feature: LMS Video component
     Then video "C" should start playing at speed "1.0"
 
   # 10
-  # Scenario: Language menu works correctly in Video component
-  #   Given I am registered for the course "test_course"
-  #   And I have a "chinese_transcripts.srt" transcript file in assets
-  #   And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-  #   And it has a video in "Youtube" mode:
-  #    | transcripts                       | sub         |
-  #    | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM |
-  #   And I make sure captions are closed
-  #   And I see video menu "language" with correct items
-  #   And I select language with code "zh"
-  #   Then I see "好 各位同学" text in the captions
-  #   And I select language with code "en"
-  #   And I see "Hi, welcome to Edx." text in the captions
+   Scenario: Language menu works correctly in Video component
+     Given I am registered for the course "test_course"
+     And I have a "chinese_transcripts.srt" transcript file in assets
+     And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+     And it has a video in "Youtube" mode:
+      | transcripts                       | sub         |
+      | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM |
+     And I make sure captions are closed
+     And I see video menu "language" with correct items
+     And I select language with code "zh"
+     Then I see "好 各位同学" text in the captions
+     And I select language with code "en"
+     And I see "Hi, welcome to Edx." text in the captions
 
   # 11
   Scenario: CC button works correctly w/o english transcript in HTML5 mode of Video component
@@ -207,30 +204,30 @@ Feature: LMS Video component
     And I see duration "1:00"
 
   # 21
-  # Scenario: Download button works correctly for non-english transcript in Youtube mode of V# ideo component
-  #   Given I am registered for the course "test_course"
-  #   And I have a "chinese_transcripts.srt" transcript file in assets
-  #   And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-  #   And it has a video in "Youtube" mode:
-  #    | transcripts                       | sub         | download_track |
-  #    | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
-  #   Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
-  #   And I select language with code "zh"
-  #   And I see "好 各位同学" text in the captions
-  #   Then I can download transcript in "srt" format that has text "好 各位同学"
+   Scenario: Download button works correctly for non-english transcript in Youtube mode of Video component
+     Given I am registered for the course "test_course"
+     And I have a "chinese_transcripts.srt" transcript file in assets
+     And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+     And it has a video in "Youtube" mode:
+      | transcripts                       | sub         | download_track |
+      | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
+     Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
+     And I select language with code "zh"
+     And I see "好 各位同学" text in the captions
+     Then I can download transcript in "srt" format that has text "好 各位同学"
 
   # 22
-  # Scenario: Download button works correctly for non-english transcript in HTML5 mode of Video component
-  #   Given I am registered for the course "test_course"
-  #   And I have a "chinese_transcripts.srt" transcript file in assets
-  #   And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-  #   And it has a video in "HTML5" mode:
-  #    | transcripts                       | sub         | download_track |
-  #    | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
-  #   Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
-  #   And I select language with code "zh"
-  #   And I see "好 各位同学" text in the captions
-  #   Then I can download transcript in "srt" format that has text "好 各位同学"
+   Scenario: Download button works correctly for non-english transcript in HTML5 mode of Video component
+     Given I am registered for the course "test_course"
+     And I have a "chinese_transcripts.srt" transcript file in assets
+     And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+     And it has a video in "HTML5" mode:
+      | transcripts                       | sub         | download_track |
+      | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
+     Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
+     And I select language with code "zh"
+     And I see "好 各位同学" text in the captions
+     Then I can download transcript in "srt" format that has text "好 各位同学"
 
   # 23
   Scenario: Download button works correctly w/o english transcript in HTML5 mode of Video component
