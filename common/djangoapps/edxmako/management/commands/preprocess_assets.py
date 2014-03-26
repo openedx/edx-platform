@@ -2,7 +2,7 @@
 Preprocess templatized asset files, enabling asset authors to use
 Python/Django inside of Sass and CoffeeScript. This preprocessing
 will happen before the invocation of the asset compiler (currently
-handled by the asset Rakefile).
+handled by the assets paver file).
 
 For this to work, assets need to be named with the appropriate
 template extension (e.g., .mako for Mako templates). Currently Mako

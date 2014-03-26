@@ -182,9 +182,7 @@ namespace :'test:bok_choy' do
         sh("#{REPO_ROOT}/scripts/reset-test-db.sh")
 
         # Collect static assets
-        Rake::Task["gather_assets"].invoke('lms', 'bok_choy')
-        Rake::Task["gather_assets"].reenable
-        Rake::Task["gather_assets"].invoke('cms', 'bok_choy')
+        sh("paver update_assets --settings=bok_choy")
     end
 
     desc "Run acceptance tests that use the bok-choy framework but skip setup"
