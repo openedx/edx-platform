@@ -55,7 +55,7 @@
         <article class="unit-body">
 
           <div class="tab-list">
-            <ol class="course-nav-tab-list components">
+            <ol class="course-nav-list course components">
 
               % for tab in tabs_to_render:
                 % if isinstance(tab, StaticTab):
@@ -64,20 +64,37 @@
 
                   <%
                     tab_name = _(tab.name)
+                    item_names_formatted = ""
+                    item_names = []
+                    num_items = 0
                     if tab.is_collection:
                         item_names = [_(item.name) for item in tab.items(context_course)]
                         num_items = sum(1 for item in tab.items(context_course))
-                        tab_name = tab_name + " ({0}): {1}".format(num_items, ", ".join(item_names))
-                    css_class = "course-nav-tab course-tab"
+                    css_class = "course-nav-item course-nav-tab course-tab"
                     if tab.is_movable:
                         css_class = css_class + " sortable-tab"
                    %>
 
+                    % if tab.is_hideable or tab.is_movable:
                     <li class="${css_class}" data-tab-id="${tab.tab_id}">
-                      <div class="course-nav-tab-header">
-                        <h3 class="title">${tab_name}</h3>
+                      <div class="course-nav-item-header">
+                        % if tab.is_collection:
+                          <h3 class="title-sub">${tab_name}</h3>
+
+                          <ul class="course-nav-item-children">
+                          % for item_name in item_names:
+                            <li class="course-nav-item-child title">
+                              ${item_name}
+                            </li>
+                          % endfor
+                          </ul>
+
+                        % else:
+                          <h3 class="title">${tab_name}</h3>
+                        % endif
                       </div>
-                      <div class="course-nav-tab-actions wrapper-actions-list">
+
+                      <div class="course-nav-item-actions wrapper-actions-list">
                         <ul class="actions-list">
 
                         % if tab.is_hideable:
@@ -97,10 +114,38 @@
 
                       % if tab.is_movable:
                         <div class="drag-handle" data-tooltip="${_('Drag to reorder')}">
-                          <span class="sr">${_("Fixed page")}</span>
+                          <span class="sr">${_("Drag to reorder")}</span>
+                        </div>
+                      % else:
+                        <div class="drag-handle is-fixed" data-tooltip="${_('This page cannot be reordered')}">
+                          <span class="sr">${_("This page cannot be reordered")}</span>
                         </div>
                       % endif
                     </li>
+
+                    % else:
+                    <li class="course-nav-item course_tab is-fixed" data-tab-id="${tab.tab_id}">
+                      <div class="course-nav-item-header">
+                        <h3 class="title">${tab_name}</h3>
+
+                        % if tab.is_collection:
+                          <ul class="course-nav-item-children">
+                          % for item_name in item_names:
+                            <li class="course-nav-item-child">
+                              ${item_name}
+                            </li>
+                          % endfor
+                          </ul>
+                        % endif
+                          </ul>
+                      </div>
+
+                      <div class="drag-handle is-fixed" data-tooltip="${_('This page cannot be reordered')}">
+                        <span class="sr">${_("This page cannot be reordered")}</span>
+                      </div>
+                    </li>
+                    % endif
+
                % endif
               % endfor
 
