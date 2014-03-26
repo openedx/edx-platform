@@ -1,5 +1,5 @@
 # disable missing docstring
-#pylint: disable=C0111
+# pylint: disable=C0111
 
 import json
 from lettuce import world, step
@@ -142,7 +142,7 @@ def set_the_weight_to_abc(step, bad_weight):
 
 @step('if I set the max attempts to "(.*)", it will persist as a valid integer$')
 def set_the_max_attempts(step, max_attempts_set):
-    # on firefox with selenium, the behaviour is different.
+    # on firefox with selenium, the behavior is different.
     # eg 2.34 displays as 2.34 and is persisted as 2
     index = world.get_setting_entry_index(MAXIMUM_ATTEMPTS)
     world.set_field_value(index, max_attempts_set)

@@ -831,18 +831,18 @@ def add_user_to_default_group(user, group):
     utg.save()
 
 
-@receiver(post_save, sender=User)
-def update_user_information(sender, instance, created, **kwargs):
+def create_comments_service_user(user):
     if not settings.FEATURES['ENABLE_DISCUSSION_SERVICE']:
         # Don't try--it won't work, and it will fill the logs with lots of errors
         return
     try:
-        cc_user = cc.User.from_django_user(instance)
+        cc_user = cc.User.from_django_user(user)
         cc_user.save()
     except Exception as e:
         log = logging.getLogger("edx.discussion")
-        log.error(unicode(e))
-        log.error("update user info to discussion failed for user with id: " + str(instance.id))
+        log.error(
+            "Could not create comments service user with id {}".format(user.id),
+            exc_info=True)
 
 # Define login and logout handlers here in the models file, instead of the views file,
 # so that they are more likely to be loaded when a Studio user brings up the Studio admin

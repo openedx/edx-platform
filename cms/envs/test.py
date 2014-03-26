@@ -17,6 +17,9 @@ import os
 from path import path
 from warnings import filterwarnings
 
+# import settings from LMS for consistent behavior with CMS
+from lms.envs.test import (WIKI_ENABLED)
+
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
@@ -222,3 +225,7 @@ MICROSITE_CONFIGURATION = {
 }
 MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
 FEATURES['USE_MICROSITES'] = True
+
+# For consistency in user-experience, keep the value of this setting in sync with
+# the one in lms/envs/test.py
+FEATURES['ENABLE_DISCUSSION_SERVICE'] = False

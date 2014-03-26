@@ -34,7 +34,7 @@
         color: #666;
       }
 
-      &.ui-state-hover {
+      &.ui-state-hover, &.ui-state-focus {
         a {
           color: #666;
         }

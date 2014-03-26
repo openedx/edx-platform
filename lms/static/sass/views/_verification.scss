@@ -33,7 +33,7 @@
       @extend %ui-fake-link;
       color: $m-blue-d2;
 
-      &:hover {
+      &:hover, &:focus {
         color: $m-blue;
       }
     }

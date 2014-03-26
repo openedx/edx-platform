@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 import mock
 from datetime import datetime
@@ -109,7 +111,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         ]
         utils.add_courseware_context(threads, self.course)
 
-        def assertThreadCorrect(thread, discussion, expected_title):  #pylint: disable=C0103
+        def assertThreadCorrect(thread, discussion, expected_title):  # pylint: disable=C0103
             self.assertEqual(
                 set(thread.keys()),
                 set(["commentable_id", "courseware_url", "courseware_title"])
@@ -144,7 +146,7 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         self.course.discussion_topics = {}
         self.course.save()
         self.discussion_num = 0
-        self.maxDiff = None #pylint: disable=C0103
+        self.maxDiff = None # pylint: disable=C0103
 
     def create_discussion(self, discussion_category, discussion_target, **kwargs):
         self.discussion_num += 1
@@ -296,7 +298,7 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         now = datetime.now()
         later = datetime.max
         self.create_discussion("Chapter 1", "Discussion 1", start=now)
-        self.create_discussion("Chapter 1", "Discussion 2", start=later)
+        self.create_discussion("Chapter 1", "Discussion 2 обсуждение", start=later)
         self.create_discussion("Chapter 2", "Discussion", start=now)
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=later)
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)

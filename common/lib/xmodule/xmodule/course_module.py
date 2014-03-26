@@ -12,13 +12,13 @@ from xmodule.modulestore import Location
 from xmodule.partitions.partitions import UserPartition
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
+from xmodule.tabs import CourseTabList
 import json
 
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
 from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
-
 
 log = logging.getLogger(__name__)
 
@@ -172,12 +172,12 @@ class CourseFields(object):
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
                              default=[], scope=Scope.content)
 
-    # This field is intended for Studio to update, not to be exposed directly via
-    # advanced_settings.
+    # This is should be scoped to content, but since it's defined in the policy
+    # file, it is currently scoped to settings.
     user_partitions = UserPartitionList(
         help="List of user partitions of this course into groups, used e.g. for experiments",
         default=[],
-        scope=Scope.content
+        scope=Scope.settings
     )
 
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
@@ -225,7 +225,7 @@ class CourseFields(object):
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", default="Empty", display_name="Display Name", scope=Scope.settings)
     show_chat = Boolean(help="Whether to show the chat widget in this course", default=False, scope=Scope.settings)
-    tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
+    tabs = CourseTabList(help="List of tabs to enable in this course", scope=Scope.settings, default=[])
     end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)
     discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
     discussion_topics = Dict(help="Map of topics names to ids", scope=Scope.settings)
@@ -456,44 +456,15 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             self.syllabus_present = False
         else:
             self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
-        self._grading_policy = {}
 
+        self._grading_policy = {}
         self.set_grading_policy(self.grading_policy)
 
         if self.discussion_topics == {}:
             self.discussion_topics = {_('General'): {'id': self.location.html_id()}}
 
-        # TODO check that this is still needed here and can't be by defaults.
-        if not self.tabs:
-            # When calling the various _tab methods, can omit the 'type':'blah' from the
-            # first arg, since that's only used for dispatch
-            tabs = []
-            tabs.append({'type': 'courseware'})
-            # Translators: "Course Info" is the name of the course's information and updates page
-            tabs.append({'type': 'course_info', 'name': _('Course Info')})
-
-            if self.syllabus_present:
-                tabs.append({'type': 'syllabus'})
-
-            tabs.append({'type': 'textbooks'})
-
-            # # If they have a discussion link specified, use that even if we feature
-            # # flag discussions off. Disabling that is mostly a server safety feature
-            # # at this point, and we don't need to worry about external sites.
-            if self.discussion_link:
-                tabs.append({'type': 'external_discussion', 'link': self.discussion_link})
-            else:
-                # Translators: "Discussion" is the title of the course forum page
-                tabs.append({'type': 'discussion', 'name': _('Discussion')})
-
-            # Translators: "Wiki" is the title of the course's wiki page
-            tabs.append({'type': 'wiki', 'name': _('Wiki')})
-
-            if not self.hide_progress_tab:
-                # Translators: "Progress" is the title of the student's grade information page
-                tabs.append({'type': 'progress', 'name': _('Progress')})
-
-            self.tabs = tabs
+        if not getattr(self, "tabs", []):
+            CourseTabList.initialize_default(self)
 
     def set_grading_policy(self, course_policy):
         """

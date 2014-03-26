@@ -250,7 +250,7 @@ section.combined-open-ended-status {
   margin-bottom: 2px;
   padding: $baseline/2;
 
-  &:hover {
+  &:hover, &:focus {
     background-color: #eee;
   }
   .rubric-label-selected{
@@ -477,7 +477,7 @@ div.rubric {
         padding: $baseline/2;
         border-radius: $baseline/4;
 
-        &:hover {
+        &:hover, &:focus {
           background-color: #eee;
         }
 

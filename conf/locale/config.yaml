@@ -7,6 +7,7 @@ locales:
     - bg_BG  # Bulgarian (Bulgaria)
     - bn  # Bengali
     - bn_BD  # Bengali (Bangladesh)
+    - ca  # Catalan
     - ca@valencia  # Catalan (Valencia)
     - cs  # Czech
     - cy  # Welsh
@@ -39,6 +40,7 @@ locales:
     - lt_LT  # Lithuanian (Lithuania)
     - ml  # Malayalam
     - mn  # Mongolian
+    - ms  # Malay
     - nb  # Norwegian Bokmål
     - ne  # Nepali
     - nl_NL  # Dutch (Netherlands)

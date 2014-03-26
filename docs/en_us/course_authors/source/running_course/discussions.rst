@@ -108,10 +108,10 @@ You can designate a team of people to help you run course discussions. Different
 
 **Note**: Discussion responses and comments made by course staff and instructors are also marked as "Staff".
 
-Before you can assign roles to your discussion administrators, you need their email addresses. 
+Before you can assign roles to your discussion administrators, you need their email addresses or usernames. 
 
-* To get the email address for a staff member, on the Instructor Dashboard click **Membership** and then select Course Staff from the drop-down list.
-* To get the email address of a student, on the Instructor Dashboard click **Data Download** > **List enrolled students' profile information**.
+* To get this information for a staff member, on the Instructor Dashboard click **Membership** and then select **Course Staff** from the drop-down list.
+* To get this information for an enrolled student, on the Instructor Dashboard click **Data Download** > **Download profile information as a CSV**.
 
 **Tip**: These instructions are for the new Instructor Dashboard: click **Try New Beta Dashboard**.
 
@@ -125,11 +125,9 @@ To assign a role:
 
 #. In the Administration List Management section, use the drop-down list to select Discussion Admins, Discussion Moderators, or Discussion Community TAs.
 
-#. Under the list of users who currently have that role, enter an email address and click **Add** for the role type.
+#. Under the list of users who currently have that role, enter an email address or username and click **Add** for the role type.
 
-#. To remove an assigned role, view the list of users and then click revoke access (the **X**) next to that email address. 
-
-You can also use the older version of the Instructor Dashboard. You need the usernames of your discussion moderators or students. Click **Forum Admin**, enter the username in the appropriate field, then click the **Add** button for the role you want to assign.  
+#. To remove an assigned role, view the list of users and then click **Revoke access**.
 
 .. _Running_discussions:
 
@@ -141,7 +139,7 @@ On an ongoing basis, discussion administrators run the course discussions by mak
 
 ========================
 Seed a discussion
-======================== 
+========================
 
 Before you contribute to a discussion, you can decide whether you want to be identified as a staff member or community TA, or to appear like other students' work. Depending on the subject and your purpose, one or the other might be more appropriate to spark discussion and inform students.
 
@@ -149,9 +147,9 @@ You can also post anonymously. Regardless of your role, you can choose to make a
 
 * To identify your posts with your role, log in with your discussion administrator email address and add the post or response. The responses and comments that you make include a colored banner with either "Staff" or "Community TA".
  
-* To post as a student, you must set up an alternate, test account with a different email address, go to the course URL and register, and then join the discussion. Reponses and comments do not have a banner and appear like any other student post. 
+* To post as a student, you must set up an alternate account with a different email address, go to the course URL and register, and then join the discussion. When you post as a student, your responses and comments do not have a banner or other distinguishing features: they appear the same as any other student post.
 
-note:: Posts by discussion administrators do not include a colored "Staff" or "Community TA" banner. Only responses to posts and comments made on responses do.
+**Note**: Posts by discussion administrators do not include a colored "Staff" or "Community TA" banner. The colored banner appears only when discussion administrators respond to existing posts or make a comment.
 
 ==========================================
 Use conventions in discussion subjects

@@ -292,7 +292,7 @@ section.instructor-dashboard-content-2 {
     margin-right: 0;
   }
 
-  .batch-enrollment {
+  .batch-enrollment, .batch-beta-testers {
     textarea {
       margin-top: 0.2em;
       height: auto;
@@ -323,7 +323,7 @@ section.instructor-dashboard-content-2 {
   }
 
   .enroll-option {
-    margin-bottom: ($baseline/2);
+    margin: ($baseline/2) 0;
     position: relative;
 
       label {
@@ -339,6 +339,7 @@ section.instructor-dashboard-content-2 {
       padding: ($baseline/2);
       width: 50%;
       background-color: $light-gray;
+      box-shadow: 2px 2px 3px $shadow;
 
       .hint-caret {
         display: block;
@@ -359,6 +360,11 @@ section.instructor-dashboard-content-2 {
 
 
   label[for="email-students"]:hover + .email-students-hint {
+    display: block;
+  }
+
+  label[for="email-students-beta"]:hover + .email-students-beta-hint {
+    width: 30%;
     display: block;
   }
 
@@ -467,7 +473,7 @@ section.instructor-dashboard-content-2 {
         color: $lighter-base-font-color;
         cursor: pointer;
 
-        &:hover {
+        &:hover, &:focus {
           color: $alert-color;
         }
       }

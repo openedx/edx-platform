@@ -3,8 +3,7 @@ PageObjects related to the AcidBlock
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, BrokenPromise, fulfill
-
+from bok_choy.promise import EmptyPromise, BrokenPromise
 
 class AcidView(PageObject):
     """
@@ -15,7 +14,7 @@ class AcidView(PageObject):
     def __init__(self, browser, context_selector):
         """
         Args:
-            browser (splinter.browser.Browser): The browser that this page is loaded in.
+            browser (selenium.webdriver): The Selenium-controlled browser that this page is loaded in.
             context_selector (str): The selector that identifies where this :class:`.AcidBlock` view
                 is on the page.
         """
@@ -25,14 +24,17 @@ class AcidView(PageObject):
         self.context_selector = context_selector
 
     def is_browser_on_page(self):
-        return self.is_css_present('{}.xblock-initialized .acid-block'.format(self.context_selector))
+        return (
+            self.q(css='{} .acid-block'.format(self.context_selector)).present and
+            self.browser.execute_script("return $({!r}).data('initialized')".format(self.context_selector))
+        )
 
     def test_passed(self, test_selector):
         """
         Return whether a particular :class:`.AcidBlock` test passed.
         """
         selector = '{} .acid-block {} .pass'.format(self.context_selector, test_selector)
-        return bool(self.q(css=selector).execute(try_interval=0.1, timeout=3))
+        return bool(self.q(css=selector).results)
 
     def child_test_passed(self, test_selector):
         """

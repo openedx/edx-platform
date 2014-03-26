@@ -4,7 +4,8 @@
 <%! from datetime import datetime %>
 <%! import pytz %>
 <%! from django.conf import settings %>
-<%! from courseware.tabs import get_discussion_link %>
+<%! from django.core.urlresolvers import reverse %>
+<%! from xmodule.tabs import CourseTabList %>
 <%! from microsite_configuration import microsite %>
 <%! platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME) %>
 
@@ -31,7 +32,8 @@
     </header>
 
 <%
-discussion_link = get_discussion_link(course) if course else None
+  discussion_tab = CourseTabList.get_discussion(course) if course else None
+  discussion_link = discussion_tab.link_func(course, reverse) if (discussion_tab and discussion_tab.can_display(course, settings, True, True)) else None
 %>
 
 % if discussion_link:

@@ -13,7 +13,9 @@ import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.utils.html import strip_tags
@@ -37,7 +39,12 @@ from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.views import get_task_completion_info
 from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
-from instructor.enrollment import enroll_email, unenroll_email, get_email_params
+from instructor.enrollment import (
+    enroll_email,
+    get_email_params,
+    send_beta_role_email,
+    unenroll_email
+)
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 import analytics.basic
 import analytics.distributions
@@ -246,6 +253,21 @@ def students_update_enrollment(request, course_id):
     results = []
     for email in emails:
         try:
+            # Use django.core.validators.validate_email to check email address
+            # validity (obviously, cannot check if email actually /exists/,
+            # simply that it is plausibly valid)
+            validate_email(email)
+        except ValidationError:
+            # Flag this email as an error if invalid, but continue checking
+            # the remaining in the list
+            results.append({
+                'email': email,
+                'error': True,
+                'invalidEmail': True,
+            })
+            continue
+
+        try:
             if action == 'enroll':
                 before, after = enroll_email(course_id, email, auto_enroll, email_students, email_params)
             elif action == 'unenroll':
@@ -268,12 +290,83 @@ def students_update_enrollment(request, course_id):
             results.append({
                 'email': email,
                 'error': True,
+                'invalidEmail': False,
             })
 
     response_payload = {
         'action': action,
         'results': results,
         'auto_enroll': auto_enroll,
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+@common_exceptions_400
+@require_query_params(
+    emails="stringified list of emails",
+    action="add or remove",
+)
+def bulk_beta_modify_access(request, course_id):
+    """
+    Enroll or unenroll users in beta testing program.
+
+    Query parameters:
+    - emails is string containing a list of emails separated by anything split_input_list can handle.
+    - action is one of ['add', 'remove']
+    """
+    action = request.GET.get('action')
+    emails_raw = request.GET.get('emails')
+    emails = _split_input_list(emails_raw)
+    email_students = request.GET.get('email_students') in ['true', 'True', True]
+    results = []
+    rolename = 'beta'
+    course = get_course_by_id(course_id)
+
+    email_params = {}
+    if email_students:
+        email_params = get_email_params(course, auto_enroll=False)
+
+    for email in emails:
+        try:
+            error = False
+            user_does_not_exist = False
+            user = User.objects.get(email=email)
+
+            if action == 'add':
+                allow_access(course, user, rolename)
+            elif action == 'remove':
+                revoke_access(course, user, rolename)
+            else:
+                return HttpResponseBadRequest(strip_tags(
+                    "Unrecognized action '{}'".format(action)
+                ))
+        except User.DoesNotExist:
+            error = True
+            user_does_not_exist = True
+        # catch and log any unexpected exceptions
+        # so that one error doesn't cause a 500.
+        except Exception as exc:  # pylint: disable=broad-except
+            log.exception("Error while #{}ing student")
+            log.exception(exc)
+            error = True
+        else:
+            # If no exception thrown, see if we should send an email
+            if email_students:
+                send_beta_role_email(action, user, email_params)
+        finally:
+            # Tabulate the action result of this email address
+            results.append({
+                'email': email,
+                'error': error,
+                'userDoesNotExist': user_does_not_exist
+            })
+
+    response_payload = {
+        'action': action,
+        'results': results,
     }
     return JsonResponse(response_payload)
 
@@ -302,8 +395,25 @@ def modify_access(request, course_id):
     course = get_course_with_access(
         request.user, course_id, 'instructor', depth=None
     )
+    try:
+        user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
+    except User.DoesNotExist:
+        response_payload = {
+            'unique_student_identifier': request.GET.get('unique_student_identifier'),
+            'userDoesNotExist': True,
+        }
+        return JsonResponse(response_payload)
 
-    user = get_student_from_identifier(request.GET.get('unique_student_identifier'))
+    # Check that user is active, because add_users
+    # in common/djangoapps/student/roles.py fails
+    # silently when we try to add an inactive user.
+    if not user.is_active:
+        response_payload = {
+            'unique_student_identifier': user.username,
+            'inactiveUser': True,
+        }
+        return JsonResponse(response_payload)
+
     rolename = request.GET.get('rolename')
     action = request.GET.get('action')
 
@@ -314,9 +424,13 @@ def modify_access(request, course_id):
 
     # disallow instructors from removing their own instructor access.
     if rolename == 'instructor' and user == request.user and action != 'allow':
-        return HttpResponseBadRequest(
-            "An instructor cannot remove their own instructor access."
-        )
+        response_payload = {
+            'unique_student_identifier': user.username,
+            'rolename': rolename,
+            'action': action,
+            'removingSelfAsInstructor': True,
+        }
+        return JsonResponse(response_payload)
 
     if action == 'allow':
         allow_access(course, user, rolename)
@@ -418,10 +532,27 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     TO DO accept requests for different attribute sets.
     """
     available_features = analytics.basic.AVAILABLE_FEATURES
-    query_features = ['username', 'name', 'email', 'language', 'location', 'year_of_birth', 'gender',
-                      'level_of_education', 'mailing_address', 'goals']
+    query_features = [
+        'username', 'name', 'email', 'language', 'location', 'year_of_birth',
+        'gender', 'level_of_education', 'mailing_address', 'goals'
+    ]
 
     student_data = analytics.basic.enrolled_students_features(course_id, query_features)
+
+    # Scrape the query features for i18n - can't translate here because it breaks further queries
+    # and how the coffeescript works. The actual translation will be done in data_download.coffee
+    query_features_names = {
+        'username': _('Username'),
+        'name': _('Name'),
+        'email': _('Email'),
+        'language': _('Language'),
+        'location': _('Location'),
+        'year_of_birth': _('Birth Year'),
+        'gender': _('Gender'),
+        'level_of_education': _('Level of Education'),
+        'mailing_address': _('Mailing Address'),
+        'goals': _('Goals'),
+    }
 
     if not csv:
         response_payload = {
@@ -429,6 +560,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
             'students': student_data,
             'students_count': len(student_data),
             'queried_features': query_features,
+            'feature_names': query_features_names,
             'available_features': available_features,
         }
         return JsonResponse(response_payload)
@@ -898,7 +1030,7 @@ def send_email(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_query_params(
-    email="the target users email",
+    unique_student_identifier="email or username of user to change access",
     rolename="the forum role",
     action="'allow' or 'revoke'",
 )
@@ -923,7 +1055,7 @@ def update_forum_role_membership(request, course_id):
         request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
 
-    email = strip_if_string(request.GET.get('email'))
+    unique_student_identifier = request.GET.get('unique_student_identifier')
     rolename = request.GET.get('rolename')
     action = request.GET.get('action')
 
@@ -942,7 +1074,7 @@ def update_forum_role_membership(request, course_id):
             "Unrecognized rolename '{}'.".format(rolename)
         ))
 
-    user = User.objects.get(email=email)
+    user = get_student_from_identifier(unique_student_identifier)
     target_is_instructor = has_access(user, course, 'instructor')
     # cannot revoke instructor
     if target_is_instructor and action == 'revoke' and rolename == FORUM_ROLE_ADMINISTRATOR:

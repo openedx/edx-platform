@@ -2,7 +2,7 @@
 Initialize the mako template lookup
 """
 from django.conf import settings
-from . import add_lookup
+from . import add_lookup, clear_lookups
 
 
 def run():
@@ -14,5 +14,6 @@ def run():
     """
     template_locations = settings.MAKO_TEMPLATES
     for namespace, directories in template_locations.items():
+        clear_lookups(namespace)
         for directory in directories:
             add_lookup(namespace, directory)

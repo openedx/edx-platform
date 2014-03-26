@@ -43,8 +43,6 @@ CC_MERCHANT_NAME = PLATFORM_NAME
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
-PERFSTATS = False
-
 DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
@@ -79,7 +77,10 @@ FEATURES = {
                                         # set to None to do no university selection
 
     'ENABLE_TEXTBOOK': True,
+
+    # for consistency in user-experience, keep the value of this setting in sync with the one in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
+
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
@@ -530,6 +531,7 @@ LANGUAGES = (
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
     ('bn', u'বাংলা'),  # Bengali
     ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+    ('ca', u'Català'),  # Catalan
     ('ca@valencia', u'Català (València)'),  # Catalan (Valencia)
     ('cs', u'Čeština'),  # Czech
     ('cy', u'Cymraeg'),  # Welsh
@@ -562,6 +564,7 @@ LANGUAGES = (
     ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
     ('ml', u'മലയാളം'),  # Malayalam
     ('mn', u'Монгол хэл'),  # Mongolian
+    ('ms', u'Bahasa Melayu'),  # Malay
     ('nb', u'Norsk bokmål'),  # Norwegian Bokmål
     ('ne', u'नेपाली'),  # Nepali
     ('nl-nl', u'Nederlands (Nederland)'),  # Dutch (Netherlands)
@@ -1065,9 +1068,23 @@ BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
 ############################## Video ##########################################
 
-# URL to test YouTube availability
-YOUTUBE_TEST_URL = 'https://gdata.youtube.com/feeds/api/videos/'
+YOUTUBE = {
+    # YouTube JavaScript API
+    'API': 'www.youtube.com/iframe_api',
 
+    # URL to test YouTube availability
+    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+
+    # Current youtube api for requesting transcripts.
+    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
+    'TEXT_API': {
+        'url': 'video.google.com/timedtext',
+        'params': {
+            'lang': 'en',
+            'v': 'set_youtube_id_of_11_symbols_here',
+        },
+    },
+}
 
 ################################### APPS ######################################
 INSTALLED_APPS = (
@@ -1096,7 +1113,6 @@ INSTALLED_APPS = (
     # Our courseware
     'circuit',
     'courseware',
-    'lms.lib.perfstats',
     'student',
     'static_template_view',
     'staticbook',
@@ -1473,6 +1489,13 @@ ALL_LANGUAGES = (
 OPTIONAL_APPS = (
     'edx_jsdraw',
     'mentoring',
+
+    # edx-ora2
+    'submissions',
+    'openassessment',
+    'openassessment.assessment',
+    'openassessment.workflow',
+    'openassessment.xblock'
 )
 
 for app_name in OPTIONAL_APPS:

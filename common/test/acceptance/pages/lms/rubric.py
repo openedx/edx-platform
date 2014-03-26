@@ -3,7 +3,7 @@ Rubric for open-ended response problems, including calibration and peer-grading.
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, fulfill_after, fulfill_before
+from bok_choy.promise import EmptyPromise
 
 
 class ScoreMismatchError(Exception):
@@ -24,7 +24,7 @@ class RubricPage(PageObject):
         """
         Return a boolean indicating whether the rubric is available.
         """
-        return self.is_css_present('div.rubric')
+        return self.q(css='div.rubric').present
 
     @property
     def categories(self):
@@ -37,7 +37,7 @@ class RubricPage(PageObject):
         The rubric is not always visible; if it's not available,
         this will return an empty list.
         """
-        return self.css_text('span.rubric-category')
+        return self.q(css='span.rubric-category').text
 
     def set_scores(self, scores):
         """
@@ -60,10 +60,9 @@ class RubricPage(PageObject):
 
         # Set the score for each category
         for score_index in range(len(scores)):
-
             # Check that we have the enough radio buttons
             category_css = "div.rubric>ul.rubric-list:nth-of-type({0})".format(score_index + 1)
-            if scores[score_index] > self.css_count(category_css + ' input.score-selection'):
+            if scores[score_index] > len(self.q(css=category_css + ' input.score-selection').results):
                 raise ScoreMismatchError(
                     "Tried to select score {0} but there are only {1} options".format(
                         score_index, len(scores)))
@@ -74,7 +73,12 @@ class RubricPage(PageObject):
                     category_css +
                     ">li.rubric-list-item:nth-of-type({0}) input.score-selection".format(scores[score_index] + 1)
                 )
-                self.css_check(input_css)
+
+                EmptyPromise(lambda: self._select_score_radio_button(input_css), "Score selection failed.").fulfill()
+
+    def _select_score_radio_button(self, radio_button_css):
+        self.q(css=radio_button_css).first.click()
+        return self.q(css=radio_button_css).selected
 
     @property
     def feedback(self):
@@ -86,14 +90,13 @@ class RubricPage(PageObject):
         If feedback could not be interpreted (unexpected CSS class),
             the list will contain a `None` item.
         """
-
         # Get the green checkmark / red x labels
         # We need to filter out the similar-looking CSS classes
         # for the rubric items that are NOT marked correct/incorrect
         feedback_css = 'div.rubric-label>label'
         labels = [
             el_class for el_class in
-            self.css_map(feedback_css, lambda el: el['class'])
+            self.q(css=feedback_css).attrs('class')
             if el_class != 'rubric-elements-info'
         ]
 
@@ -110,17 +113,29 @@ class RubricPage(PageObject):
 
         return map(map_feedback, labels)
 
-    def submit(self):
+    def submit(self, promise_check_type=None):
         """
         Submit the rubric.
+        `promise_check_type` is either 'self', or 'peer'. If promise check is not required then don't pass any value.
         """
         # Wait for the button to become enabled
         button_css = 'input.submit-button'
-        button_enabled = EmptyPromise(
-            lambda: all(self.css_map(button_css, lambda el: not el['disabled'])),
-            "Submit button enabled"
-        )
+
+        EmptyPromise(
+            lambda: all(self.q(css=button_css).map(lambda el: not el.get_attribute('disabled')).results),
+            "Submit button not enabled"
+        ).fulfill()
 
         # Submit the assessment
-        with fulfill_before(button_enabled):
-            self.css_click(button_css)
+        self.q(css=button_css).first.click()
+
+        if promise_check_type == 'self':
+            # Check if submitted rubric is available
+            EmptyPromise(
+                lambda: self.q(css='div.rubric-label>label').present, 'Submitted Rubric not available!'
+            ).fulfill()
+        elif promise_check_type == 'peer':
+            # Check if we are ready for peer grading
+            EmptyPromise(
+                lambda: self.q(css='input.calibration-feedback-button').present, 'Not ready for peer grading!'
+            ).fulfill()

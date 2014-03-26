@@ -1,4 +1,4 @@
-#pylint: disable=C0111
+# pylint: disable=C0111
 
 from lettuce import step
 from lettuce import world

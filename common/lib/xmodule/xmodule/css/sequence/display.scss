@@ -5,7 +5,7 @@ $border-color: #C8C8C8;
   border-left: 1px solid lighten($border-color, 10%);
   display: block;
 
-  &:hover {
+  &:hover, &:focus {
     background: none;
   }
 }
@@ -23,7 +23,7 @@ $border-color: #C8C8C8;
       border-left: 1px solid lighten($border-color, 10%);
       display: block;
 
-      &:hover {
+      &:hover, &:focus {
         background: none;
       }
     }
@@ -131,7 +131,7 @@ nav.sequence-nav {
           //   color: #aaa;
           // }
 
-          &:hover {
+          &:hover, &:focus {
             background-color: #fff;
             background-repeat: no-repeat;
             background-position: center 14px;
@@ -282,7 +282,7 @@ nav.sequence-nav {
             outline: 0;
           }
 */
-          &:hover {
+          &:hover, &:focus {
             opacity: 0.5;
           }
 
@@ -353,7 +353,7 @@ nav.sequence-bottom {
           text-indent: -9999px;
           @include transition(all .2s $ease-in-out-quad 0s);
 
-          &:hover {
+          &:hover, &:focus {
             opacity: 0.5;
             background-position: center 15px;
           }
@@ -402,4 +402,3 @@ nav.sequence-bottom {
   }
 */
 }
-

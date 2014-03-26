@@ -127,7 +127,7 @@ To enable an XBlock for testing in your devstack (https://github.com/edx/configu
     #. Advanced -> your-block
 
 Note the name ``your-block`` used in Studio must exactly match the key you used to add your
-block to your ``setup.py`` ``entry_points`` list.
+block to your ``setup.py`` ``entry_points`` list (if you are still discovering Xblocks and simply used the ``startnew.py`` script as described at https://github.com/edx/XBlock/blob/master/doc/getting_started.rst , look in the ``setup.py`` file that was created)
 
 
 Deploying your XBlock

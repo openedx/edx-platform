@@ -2,9 +2,9 @@
 Unit tests for the asset upload endpoint.
 """
 
-#pylint: disable=C0111
-#pylint: disable=W0621
-#pylint: disable=W0212
+# pylint: disable=C0111
+# pylint: disable=W0621
+# pylint: disable=W0212
 
 from datetime import datetime
 from io import BytesIO

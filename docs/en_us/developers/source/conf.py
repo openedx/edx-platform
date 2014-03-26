@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-#pylint: disable=C0103
-#pylint: disable=W0622
-#pylint: disable=W0212
-#pylint: disable=W0613
+# pylint: disable=C0103
+# pylint: disable=W0622
+# pylint: disable=W0212
+# pylint: disable=W0613
 
 import sys, os
 from path import path

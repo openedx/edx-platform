@@ -28,7 +28,7 @@ import imp
 import sys
 import lms.envs.common
 from lms.envs.common import (
-    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES
+    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED
 )
 from path import path
 
@@ -43,7 +43,9 @@ FEATURES = {
 
     'GITHUB_PUSH': False,
 
-    'ENABLE_DISCUSSION_SERVICE': False,
+    # for consistency in user-experience, keep the value of this setting in sync with the
+    # one in lms/envs/common.py
+    'ENABLE_DISCUSSION_SERVICE': True,
 
     'AUTH_USE_CERTIFICATES': False,
 
@@ -423,9 +425,23 @@ CELERY_QUEUES = {
 
 ############################## Video ##########################################
 
-# URL to test YouTube availability
-YOUTUBE_TEST_URL = 'https://gdata.youtube.com/feeds/api/videos/'
+YOUTUBE = {
+    # YouTube JavaScript API
+    'API': 'www.youtube.com/iframe_api',
 
+    # URL to test YouTube availability
+    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+
+    # Current youtube api for requesting transcripts.
+    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
+    'TEXT_API': {
+        'url': 'video.google.com/timedtext',
+        'params': {
+            'lang': 'en',
+            'v': 'set_youtube_id_of_11_symbols_here',
+        },
+    },
+}
 
 ############################ APPS #####################################
 
@@ -527,14 +543,6 @@ PASSWORD_DICTIONARY = []
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 TRACKING_ENABLED = True
 
-# Current youtube api for requesting transcripts.
-# for example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
-YOUTUBE_API = {
-    'url': "http://video.google.com/timedtext",
-    'params': {'lang': 'en', 'v': 'set_youtube_id_of_11_symbols_here'}
-}
-
-
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
@@ -545,6 +553,13 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 OPTIONAL_APPS = (
     'edx_jsdraw',
     'mentoring',
+
+    # edx-ora2
+    'submissions',
+    'openassessment',
+    'openassessment.assessment',
+    'openassessment.workflow',
+    'openassessment.xblock'
 )
 
 for app_name in OPTIONAL_APPS:

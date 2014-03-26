@@ -72,7 +72,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-15 15:05-0400\n"
+"POT-Creation-Date: 2014-03-25 10:28-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: Hakan Senel <hgsenel@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
@@ -83,64 +83,13 @@ msgstr ""
 "Language: tr_TR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#. Translators: "Open Ended Panel" appears on a tab that, when clicked,
-#. opens up a panel that displays information about openended problems
-#. that a user has submitted or needs to grade
-#: cms/djangoapps/contentstore/utils.py lms/djangoapps/courseware/tabs.py
+#. Translators: "Open Ended Panel" appears on a tab that, when clicked, opens
+#. up a panel that
+#. displays information about open-ended problems that a user has submitted or
+#. needs to grade
+#: cms/djangoapps/contentstore/utils.py common/lib/xmodule/xmodule/tabs.py
 msgid "Open Ended Panel"
 msgstr "Açıklı Uçlu Paneli"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: "Courseware" is the title of the page where you access a
-#. course's videos and problems.
-#. Translators: 'Courseware' refers to the tab in the courseware
-#. that leads to the content of a course
-#: cms/djangoapps/contentstore/views/tabs.py lms/djangoapps/courseware/tabs.py
-#: lms/templates/courseware/courseware-error.html
-msgid "Courseware"
-msgstr "Ders yazılımı"
-
-#. Translators: "Course Info" is the name of the course's information and
-#. updates page
-#. Translators: "Course Info" is the name of the course's information and
-#. updates page
-#: cms/djangoapps/contentstore/views/tabs.py
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Course Info"
-msgstr "Ders Bilgisi"
-
-#. Translators: "Discussion" is the title of the course forum page
-#. Translators: "Discussion" is the title of the course forum page
-#. Translators: 'Discussion' refers to the tab in the courseware
-#. that leads to the discussion forums
-#: cms/djangoapps/contentstore/views/tabs.py
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/djangoapps/courseware/tabs.py
-msgid "Discussion"
-msgstr "Tartışma"
-
-#. Translators: "Wiki" is the title of the course's wiki page
-#. Translators: "Wiki" is the title of the course's wiki page
-#: cms/djangoapps/contentstore/views/tabs.py
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/djangoapps/course_wiki/views.py lms/templates/wiki/base.html
-msgid "Wiki"
-msgstr "Wiki"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: "Progress" is the title of the student's grade information
-#. page
-#: cms/djangoapps/contentstore/views/tabs.py
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/templates/peer_grading/peer_grading.html
-#, fuzzy
-msgid "Progress"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"İlerleme\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"İşlem sürüyor"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -171,7 +120,6 @@ msgid "Moderator"
 msgstr "Moderatör"
 
 #: common/djangoapps/django_comment_common/models.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Community TA"
 msgstr "Topluluk Öğretim Elemanı"
 
@@ -231,7 +179,7 @@ msgstr "üçüncü sınıf ortaokul/üçüncü sınıf lise/orta okul"
 
 #: common/djangoapps/student/models.py
 msgid "Elementary/primary school"
-msgstr ""
+msgstr "Temel/İlkokul"
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
@@ -280,7 +228,7 @@ msgstr "Fazla sayıda hatalı giriş. Lütfen daha sonra tekrar deneyin."
 msgid "Email or password is incorrect."
 msgstr ""
 "#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"hatalı e-posta ya da şifre.\n"
+"Hatalı e-posta ya da şifre.\n"
 "#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
 "E-posta yada şifre hatalı."
 
@@ -290,7 +238,7 @@ msgid ""
 "message. Please check your e-mail for the activation instructions."
 msgstr ""
 "Bu hesap henüz aktif hale getirilmedi. Size tekrar aktivasyon mesajı "
-"yolladık. Lütfen e-mail kutunuzu kontrol edin."
+"yolladık. Lütfen e-posta kutunuzu kontrol edin."
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
@@ -319,23 +267,23 @@ msgstr "Beklenmedik hesap durumu"
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Public Username '{username}' already exists."
-msgstr "Bu kullanıcı  '{username}' adı mevcut."
+msgstr "Bu kullanıcı  '{username}' adı ile zaten mevcut."
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
-msgstr "Bu e-postaya '{email}' ait bir hesap bulunmaktadır."
+msgstr "Bu e-postaya '{email}' ait bir hesap zaten bulunmaktadır."
 
 #: common/djangoapps/student/views.py
 msgid "Error (401 {field}). E-mail us."
-msgstr "Hata (401 {field}). Lütfen bize e-posta atın."
+msgstr "Hata (401 {field}). Bize e-posta atın."
 
 #: common/djangoapps/student/views.py
 msgid "To enroll, you must follow the honor code."
-msgstr "Kaydolmak için onur kodunu takip etmeniz gerekmektedir. "
+msgstr "Kaydolmak için onur kodunu kabul etmeniz gerekmektedir. "
 
 #: common/djangoapps/student/views.py
 msgid "You must accept the terms of service."
-msgstr "Kullanıcı koşullarınıı kabul etmeniz gerekmektedir."
+msgstr "Hizmet koşullarını kabul etmelisiniz."
 
 #: common/djangoapps/student/views.py
 msgid "Username must be minimum of two characters long"
@@ -404,7 +352,7 @@ msgstr "Geçerli bir e-posta adresi gerekmektedir."
 #: common/djangoapps/student/views.py
 msgid "Username should only consist of A-Z and 0-9, with no spaces."
 msgstr ""
-"Kullanıcı adınız sadece A-Z ve 0-9 karakterlerinden boşluksuz biçimde "
+"Kullanıcı adınız sadece A-Z ve 0-9 karakterlerinden boşluk bulunmadan "
 "oluşabilir."
 
 #: common/djangoapps/student/views.py
@@ -417,19 +365,21 @@ msgstr "Aktivasyon e-postası gönderilemedi."
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
-msgstr "Bilinmeyen hata. Lütfen bize e-mail atın ve bizi bilgilendirin."
+msgstr ""
+"Bilinmeyen hata. Lütfen bize e-posta atın ve ne olduğuyla ilgili bizi "
+"bilgilendirin."
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
-msgstr "Bu e-mail adına kayıtlı inaktif kullanıcı bulunmuyor."
+msgstr "Bu e-posta adına kayıtlı inaktif kullanıcı bulunmuyor."
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send reactivation email"
-msgstr "Yeni aktivasyon maili gönderilmemektedir."
+msgstr "Yeni aktivasyon epostası gönderilmemektedir."
 
 #: common/djangoapps/student/views.py
 msgid "Invalid password"
-msgstr "Geçersiz şifre."
+msgstr "Geçersiz şifre"
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail address required."
@@ -437,7 +387,7 @@ msgstr "Geçerli bir e-posta adresi gerekmektedir."
 
 #: common/djangoapps/student/views.py
 msgid "An account with this e-mail already exists."
-msgstr "Bu e-postaya ait bir hesap bulunmaktadır."
+msgstr "Bu e-postaya ait bir hesap zaten bulunmaktadır."
 
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
@@ -851,6 +801,26 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr "Olası dosya yüklemeleri olan problemler yeniden notlandırılamaz."
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "correct"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "incorrect"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "incomplete"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "unanswered"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "queued"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
 msgid ""
 "Your file(s) have been submitted. As soon as your submission is graded, this"
 " message will be replaced with the grader's feedback."
@@ -1081,6 +1051,85 @@ msgstr "Genel"
 msgid "TBD"
 msgstr "DSB"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: 'Courseware' refers to the tab in the courseware that leads to
+#. the content of a course
+#: common/lib/xmodule/xmodule/tabs.py
+#: lms/templates/courseware/courseware-error.html
+msgid "Courseware"
+msgstr "Ders yazılımı"
+
+#. Translators: "Course Info" is the name of the course's information and
+#. updates page
+#: common/lib/xmodule/xmodule/tabs.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Course Info"
+msgstr "Ders Bilgisi"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Progress" is the name of the student's course progress page
+#: common/lib/xmodule/xmodule/tabs.py
+#: lms/templates/peer_grading/peer_grading.html
+#, fuzzy
+msgid "Progress"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"İlerleme\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"İşlem sürüyor"
+
+#. Translators: "Wiki" is the name of the course's wiki page
+#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/course_wiki/views.py
+#: lms/templates/wiki/base.html
+msgid "Wiki"
+msgstr "Wiki"
+
+#. Translators: "Discussion" is the title of the course forum page
+#. Translators: 'Discussion' refers to the tab in the courseware that leads to
+#. the discussion forums
+#: common/lib/xmodule/xmodule/tabs.py common/lib/xmodule/xmodule/tabs.py
+msgid "Discussion"
+msgstr "Tartışma"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Staff grading" appears on a tab that allows
+#. staff to view open-ended problems that require staff grading
+#: common/lib/xmodule/xmodule/tabs.py
+#: lms/templates/instructor/staff_grading.html
+#, fuzzy
+msgid "Staff grading"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"Personel Notlandırılması\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Eğitmen Notlandırılması"
+
+#. Translators: "Peer grading" appears on a tab that allows
+#. students to view open-ended problems that require grading
+#: common/lib/xmodule/xmodule/tabs.py
+msgid "Peer grading"
+msgstr "Kişiyle Notlandırma"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Syllabus" appears on a tab that, when clicked, opens the
+#. syllabus of the course.
+#: common/lib/xmodule/xmodule/tabs.py lms/templates/courseware/syllabus.html
+#, fuzzy
+msgid "Syllabus"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"Ders Programı\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Takvim"
+
+#. Translators: 'Instructor' appears on the tab that leads to the instructor
+#. dashboard, which is
+#. a portal where an instructor can get data and perform various actions on
+#. their course
+#: common/lib/xmodule/xmodule/tabs.py
+msgid "Instructor"
+msgstr "Eğitmen"
+
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
@@ -1287,9 +1336,8 @@ msgstr "Skorunuzu kaydederken hata. Lütfen ders çalışanlarına bildiriniz."
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
-"{statuc_code}."
+"{status_code}."
 msgstr ""
-"Youtube'dan  {youtube_id} için altyazı alınamadı. Durum kodu: {statuc_code}."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "Can't find any transcripts on the Youtube service."
@@ -1391,47 +1439,6 @@ msgstr "edX Wiki'ye Hoşgeldiniz"
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
 msgstr "Bir makale eklemek için dersin wikisini ziyaret et"
-
-#. Translators: 'Course Content' refers to the tab in the courseware
-#. that leads to the content of a course
-#: lms/djangoapps/courseware/tabs.py
-msgid "Course Content"
-msgstr "Ders İçeriği"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: "Staff grading" appears on a tab that allows
-#. staff to view openended problems that require staff grading
-#: lms/djangoapps/courseware/tabs.py
-#: lms/templates/instructor/staff_grading.html
-#, fuzzy
-msgid "Staff grading"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Personel Notlandırılması\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Eğitmen Notlandırılması"
-
-#: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
-#, fuzzy
-msgid "Syllabus"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Ders Programı\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Takvim"
-
-#. Translators: "Peer grading" appears on a tab that allows
-#. students to view openended problems that require grading
-#: lms/djangoapps/courseware/tabs.py
-msgid "Peer grading"
-msgstr "Kişiyle Notlandırma"
-
-#. Translators: 'Instructor' appears on the tab that leads to
-#. the instructor dashboard, which is a portal where an instructor
-#. can get data and perform various actions on their course
-#: lms/djangoapps/courseware/tabs.py
-msgid "Instructor"
-msgstr "Eğitmen"
 
 #: lms/djangoapps/courseware/features/video.py lms/templates/video.html
 msgid "ERROR: No playable video sources found!"
@@ -1766,11 +1773,11 @@ msgstr "Yorum Seviyesi Çok Derin"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "allowed file types are '%(file_types)s'"
-msgstr "Kabul edilen dosya türleri '%(file_types)s'"
+msgstr "kabul edilen dosya türleri şunlardır '%(file_types)s'"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "maximum upload file size is %(file_size)sK"
-msgstr "Maksimum dosya yükleme boyutu %(file_size)sK dır."
+msgstr "Maksimum dosya yükleme boyutu %(file_size)sK"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid ""
@@ -1795,6 +1802,55 @@ msgstr "Böyle bir kullanıcı yok."
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
 msgstr "Görev zaten devam ediyor."
+
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Username"
+msgstr "Kullanıcı adı"
+
+#: lms/templates/help_modal.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+msgid "Name"
+msgstr "İsim"
+
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/templates/dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/university_profile/edge.html
+msgid "Email"
+msgstr "E-posta"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Language"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Location"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Birth Year"
+msgstr ""
+
+#: lms/templates/register.html lms/templates/signup_modal.html
+msgid "Gender"
+msgstr "Cinsiyet"
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Level of Education"
+msgstr "Eğitim Seviyesi"
+
+#: lms/templates/register.html
+msgid "Mailing Address"
+msgstr "Posta Adresi"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Goals"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/verify_student/midcourse_reverify_dash.html
@@ -1849,29 +1905,238 @@ msgid "Data Download"
 msgstr "Veri İndir"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: lms/templates/dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/university_profile/edge.html
-msgid "Email"
-msgstr "E-posta"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
 msgstr "Analitikler"
 
-#: lms/djangoapps/instructor/views/tools.py
-msgid "Unable to parse date: "
-msgstr "Tarih okunamadı:"
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Course Statistics At A Glance"
+msgstr ""
 
-#: lms/djangoapps/instructor/views/tools.py
-msgid "Couldn't find module for url: {0}"
-msgstr "url: {0} için modül bulunamadı"
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Found a single student.  "
+msgstr ""
 
-#: lms/djangoapps/instructor/views/tools.py
-msgid "Username"
-msgstr "Kullanıcı adı"
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Couldn't find student with that email or username."
+msgstr ""
 
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "List of students enrolled in {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Summary Grades of students enrolled in {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Raw Grades of students enrolled in {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to create a background task for rescoring \"{0}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Failed to create a background task for rescoring \"{0}\": problem not found."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to create a background task for rescoring \"{url}\": {message}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to create a background task for resetting \"{0}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Failed to create a background task for resetting \"{0}\": problem not found."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to create a background task for resetting \"{url}\": {message}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Found module.  "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Couldn't find module with that urlname: {url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Deleted student module state for {state}!"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to delete module state for {id}/{url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Module state successfully reset!"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Couldn't reset module state for {id}/{url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Failed to create a background task for rescoring \"{key}\" for student {id}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to create a background task for rescoring \"{key}\": {id}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Progress page for username: {username} with email address: {email}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Assignment Name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Please enter an assignment name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Invalid assignment name '{name}'"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "External email"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Grades for assignment \"{name}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "List of Staff"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "List of Instructors"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Student profile data for course {course_id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Found {num} records to dump."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Couldn't find module with that urlname."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Student state for problem {problem}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "List of Beta Testers"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Your email was successfully queued for sending. Please note that for large "
+"classes, it may take up to an hour (or more, if other courses are "
+"simultaneously sending email) to send all emails."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Your email was successfully queued for sending."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Grades from {course_id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "No remote gradebook defined in course metadata"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "No remote gradebook url defined in settings.FEATURES"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "No gradebook name defined in course remote_gradebook metadata"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Failed to communicate with gradebook server at {url}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Error: {err}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Remote gradebook response for {action}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Full name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Roles"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "List of Forum {name}s in course {id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Error: unknown rolename \"{0}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Error: unknown username \"{0}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Error: user \"{0}\" does not have rolename \"{1}\", cannot remove"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Removed \"{0}\" from \"{1}\" forum role = \"{2}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Error: user \"{0}\" already has rolename \"{1}\", cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Error: user \"{0}\" should first be added as staff before adding as a forum "
+"administrator, cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Added \"{0}\" to \"{1}\" forum role = \"{2}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "{0} in course {1}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "ID"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
 #: lms/templates/dashboard.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/register.html
@@ -1885,6 +2150,38 @@ msgstr ""
 "Tam İsim\n"
 "#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
 "Tam İsim *"
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "edX email"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Enrollment of students"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Un-enrollment of students"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Failed to find any background tasks for course \"{course}\", module "
+"\"{problem}\" and student \"{student}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Failed to find any background tasks for course \"{course}\" and module "
+"\"{problem}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Unable to parse date: "
+msgstr "Tarih okunamadı:"
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Couldn't find module for url: {0}"
+msgstr "url: {0} için modül bulunamadı"
 
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor/views/tools.py
@@ -2091,6 +2388,13 @@ msgid ""
 msgstr ""
 "Dış notlandırma sunucusuyla bağlantı kurulamadı. Lütfen {email} adresi "
 "üzerinden geliştirme takımıyla bağlantı kurunuz."
+
+#: lms/djangoapps/open_ended_grading/staff_grading_service.py
+msgid ""
+"Cannot find any open response problems in this course. Have you submitted "
+"answers to any open response assessment questions? If not, please do so and "
+"return to this page."
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "AI Assessment"
@@ -2806,7 +3110,7 @@ msgstr "Bu görüntünün içeriğine atla"
 #: lms/templates/registration/password_reset_complete.html
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
-msgstr "Parolanızın sıfırlama işlemi tamamlandı."
+msgstr "Parolanızın Sıfırlama İşlemi Tamam"
 
 #: lms/templates/registration/password_reset_complete.html
 msgid ""
@@ -2854,7 +3158,7 @@ msgstr "Kaydınızı yaparken aşağıdaki hatalar oldu:"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "You must complete all fields."
-msgstr "Tüm alanları tamamlamalısınız."
+msgstr "Tüm alanları doldurmalısınız."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The two password fields didn't match."
@@ -2889,8 +3193,13 @@ msgstr ""
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 #: lms/templates/register-shib.html lms/templates/register.html
+#, fuzzy
 msgid "Required Information"
-msgstr "Gerekli bilgiler"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"Gerekli Bilgiler\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Gerekli bilgiler"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password"
@@ -2963,7 +3272,7 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Thanks for using our site!"
-msgstr "Bizim sitemizi kullandığınız için teşekkür ederiz!"
+msgstr "Sitemizi kullandığınız için teşekkür ederiz!"
 
 #: lms/templates/registration/password_reset_email.html
 msgid "The edX Team"
@@ -2987,7 +3296,7 @@ msgstr "Yeni yazı ekleme"
 
 #: lms/templates/wiki/create.html
 msgid "Create article"
-msgstr "Yazı ekle"
+msgstr "Yazı oluştur"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
 #: lms/templates/wiki/delete.html.py
@@ -3060,18 +3369,21 @@ msgstr "Değişikleri kaydet"
 msgid "Preview"
 msgstr "Önizleme"
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a control to allow users to exit out of this modal
 #. interface (a menu or piece of UI that takes the full focus of the screen)
+#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/forgot_password_modal.html
 #: lms/templates/help_modal.html lms/templates/help_modal.html
-#: lms/templates/help_modal.html lms/templates/login_modal.html
-#: lms/templates/signup_modal.html
+#: lms/templates/help_modal.html lms/templates/signup_modal.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/modal/_modal-settings-language.html
+#: lms/templates/modal/accessible_confirm.html
 msgid "Close"
 msgstr "Kapa"
 
@@ -3079,8 +3391,11 @@ msgstr "Kapa"
 msgid "Wiki Preview"
 msgstr "Wiki Önizleme"
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this text gives status on if the modal interface (a menu or
 #. piece of UI that takes the full focus of the screen) is open or not
+#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html
@@ -3090,7 +3405,7 @@ msgstr "pencere açık"
 
 #: lms/templates/wiki/edit.html
 msgid "Back to editor"
-msgstr "Editöre geri dön."
+msgstr "Editöre geri dön"
 
 #: lms/templates/wiki/history.html
 msgid "History"
@@ -3167,7 +3482,7 @@ msgstr "Bundan sonra, elle gözden geçirmek önemlidir."
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Create new merged version"
-msgstr "Yeni birleştirilmiş sürüm yarat."
+msgstr "Yeni birleştirilmiş sürüm yarat"
 
 #: lms/templates/wiki/preview_inline.html
 msgid "Previewing revision:"
@@ -3192,7 +3507,7 @@ msgid ""
 "  "
 msgstr ""
 "\n"
-" Bunu kullanmak için <a href=\"%(login_url)s\">giriş</a> or <a href=\"%(signup_url)s\">sign up</a> yapmalısınız."
+" Bunu kullanmak için <a href=\"%(login_url)s\">giriş</a> veya <a href=\"%(signup_url)s\">sign up</a> yapmalısınız."
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in or sign up to use this function."
@@ -3234,9 +3549,8 @@ msgid ""
 "To create a new wiki article, create a link to it. Clicking the link gives "
 "you the creation page."
 msgstr ""
-"Yeni bir wiki içeriği oluşturmak için, buna bağlı bir link oluşturmanız "
-"gerekmektedir. Linke tıklamak size bir içerik oluşturma sayfasına "
-"yönlendirecektir."
+"Yeni bir wiki içeriği oluşturmak için, buna bağlı bir link oluşturun. Linke "
+"tıklamak sizi bir içerik oluşturma sayfasına yönlendirecektir."
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "[Article Name](wiki:ArticleName)"
@@ -3385,7 +3699,7 @@ msgstr "Eski haline getir"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "anonymous (IP logged)"
-msgstr "Bilinmeyen (IP girişi)"
+msgstr "anonim (IP girişi)"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "File history"
@@ -3504,11 +3818,17 @@ msgstr "Yükleme Tamamlandı"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
+"Special characters not allowed in organization, course number, and course "
+"run."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid ""
 "Unable to create course '{name}'.\n"
 "\n"
 "{err}"
 msgstr ""
-"Ders ismi oluşturmaya uygun değil  '{name}'.\n"
+"'{name}' dersi oluşturulamadı.\n"
 "\n"
 "{err}"
 
@@ -3518,8 +3838,8 @@ msgid ""
 " and course run. Please change either organization or course number to be "
 "unique."
 msgstr ""
-"Bu ders  aynı organizasyon, ders numarası ve ders akışı ile zaten "
-"bulunmaktadır.  Lütfen organizasyonu ya da ders numarasını değiştirin."
+"Bu ders aynı kurum, ders numarası ve ders akışı ile zaten tanımlanmıştır.  "
+"Lütfen kurumu ya da ders numarasını değiştirin."
 
 #: cms/djangoapps/contentstore/views/course.py
 #: cms/djangoapps/contentstore/views/course.py
@@ -3527,17 +3847,15 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Please change either the organization or course number so that it is unique."
-msgstr ""
-"Lütfen organizasyonu ya da ders numarasını tekrar olmayak şekilde "
-"değiştirin."
+msgstr "Lütfen kurumu ya da ders numarasını özgün olacak şekilde değiştirin."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change at least one field to be unique."
 msgstr ""
-"Aynı organizasyon ve ders numarası zaten bulunmaktadır. Farklı bir ders "
-"yaratmak için, lütfen en az bir alanı değiştirin."
+"Aynı kurum ve numara ile tanımlı bir ders zaten bulunmaktadır. Farklı bir "
+"ders yaratmak için, lütfen en az bir alanı özgün olacak şekilde değiştirin."
 
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
@@ -3545,7 +3863,7 @@ msgstr "Ders git havuzuna başarıyla aktarıldı"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
-msgstr "Şu an için .tar.gz dosyası yüklemeyi destekliyoruz."
+msgstr "Şu an için sadece .tar.gz dosyası yüklemeyi destekliyoruz."
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
@@ -3595,7 +3913,7 @@ msgstr "`role` gerekmektedir."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Only instructors may create other instructors"
-msgstr "Sadece eğitmenler başka eğitmenler yaratabilir."
+msgstr "Sadece eğitmenler başka eğitmenler oluşturabilir."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "You may not remove the last instructor from a course"
@@ -3607,7 +3925,7 @@ msgstr "talep edilmeyen"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "pending"
-msgstr "Beklemede"
+msgstr "beklemede"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "granted"
@@ -3615,7 +3933,7 @@ msgstr "onaylandı"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "denied"
-msgstr "red edildi"
+msgstr "reddedildi"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Studio user"
@@ -3627,7 +3945,7 @@ msgstr "Son durum düzeltme tarihi"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Current course creator state"
-msgstr "Mevcut kursu oluşturan kişinin durumu"
+msgstr "Mevcut dersi oluşturan kişinin durumu"
 
 #: cms/djangoapps/course_creators/models.py
 msgid ""
@@ -3714,14 +4032,14 @@ msgid "Pending"
 msgstr "Beklemede"
 
 #: cms/templates/login.html lms/templates/login.html
-#: lms/templates/login_modal.html lms/templates/university_profile/edge.html
+#: lms/templates/university_profile/edge.html
 msgid "Forgot password?"
 msgstr "Şifremi unuttum"
 
 #: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/login_modal.html
-#: lms/templates/provider_login.html lms/templates/provider_login.html
-#: lms/templates/register.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/login.html lms/templates/provider_login.html
+#: lms/templates/provider_login.html lms/templates/register.html
+#: lms/templates/sysadmin_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Password"
 msgstr "Şifre"
@@ -3778,14 +4096,6 @@ msgstr "Gizlilik İlkeleri"
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "Yardım"
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "Visual"
-msgstr "Görsel"
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "HTML"
-msgstr "HTML"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
@@ -3943,12 +4253,12 @@ msgstr "veya"
 
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
-msgstr "Bu Dersi İzle"
+msgstr "Bu Dersi İzleyin"
 
 #: common/templates/course_modes/choose.html
 msgid "Sign up to audit this course for free and track your own progress."
 msgstr ""
-"Bu dersi izlemek için ücretsiz kaydolun ve kendiniz ilerlemenizi kontrol "
+"Bu dersi izlemek için ücretsiz kaydolun ve ilerlemenizi kendiniz kontrol "
 "edin."
 
 #: common/templates/course_modes/choose.html
@@ -4125,7 +4435,7 @@ msgstr "Herhangi bir ders için kaydınız gözükmüyor"
 
 #: lms/templates/dashboard.html
 msgid "Find courses now!"
-msgstr "Şimdi ders bul!"
+msgstr "Şimdi dersleri bul!"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't been enrolled in any courses yet."
@@ -4133,7 +4443,7 @@ msgstr "Hiç derse henüz kayıt yaptırmadığınız görünüyor."
 
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
-msgstr "Kürs-yükleme hataları"
+msgstr "Ders-yükleme hataları"
 
 #: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -4263,7 +4573,7 @@ msgstr "Öğrenci Kayıt Formu"
 
 #: lms/templates/enroll_students.html
 msgid "Course: "
-msgstr "Kurs:"
+msgstr "Ders:"
 
 #: lms/templates/enroll_students.html
 msgid "Add new students"
@@ -4468,15 +4778,10 @@ msgstr ""
 "Herhangi bir dilde yazılan soruları anlamak için elimizden geleni yaparken, "
 "yanıtlarımız İngilizce olacaktır."
 
-#: lms/templates/help_modal.html
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Name"
-msgstr "İsim"
-
 #: lms/templates/help_modal.html lms/templates/login.html
-#: lms/templates/login_modal.html lms/templates/provider_login.html
-#: lms/templates/provider_login.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/register.html
+#: lms/templates/provider_login.html lms/templates/provider_login.html
+#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register.html
 msgid "E-mail"
 msgstr "E-posta"
 
@@ -4587,7 +4892,7 @@ msgstr "Lütfen daha sonra tekrar deneyiniz."
 
 #: lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
-msgstr "<strong>{university_name}</strong> den ücretsiz kurslar"
+msgstr "<strong>{university_name}</strong> den ücretsiz dersler"
 
 #: lms/templates/index.html
 msgid "The Future of Online Education"
@@ -4647,7 +4952,7 @@ msgstr "Kayıtlı Değil misiniz?"
 
 #: lms/templates/login-sidebar.html
 msgid "Sign up for {platform_name} today!"
-msgstr "Bugün {platform_name} kaydolun!"
+msgstr "Bugün {platform_name}'e kaydolun!"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
@@ -4666,9 +4971,9 @@ msgstr "{platform_name}  hesabına giriş yap"
 msgid "Log into My {platform_name} Account"
 msgstr " {platform_name} hesabıma giriş yap"
 
-#: lms/templates/login.html lms/templates/login_modal.html
+#: lms/templates/login.html
 msgid "Access My Courses"
-msgstr "Kurslarıma ulaş"
+msgstr "Derslerime Ulaş"
 
 #: lms/templates/login.html lms/templates/register.html
 msgid "Processing your account information…"
@@ -4713,26 +5018,9 @@ msgstr "örnek: kullanıcıadı@domain.com"
 msgid "Account Preferences"
 msgstr "Hesap Ayarları"
 
-#: lms/templates/login.html lms/templates/login_modal.html
+#: lms/templates/login.html
 msgid "Remember me"
 msgstr "Beni hatırla"
-
-#: lms/templates/login_modal.html lms/templates/provider_login.html
-#: lms/templates/university_profile/edge.html
-msgid "Log In"
-msgstr "Giriş yap"
-
-#: lms/templates/login_modal.html
-msgid "Not enrolled?"
-msgstr "Kayıtlı değil misiniz?"
-
-#: lms/templates/login_modal.html
-msgid "Sign up."
-msgstr "Kayıt ol."
-
-#: lms/templates/login_modal.html
-msgid "login via openid"
-msgstr "openid aracılığıyla giriş yap"
 
 #: lms/templates/lti.html
 msgid "External resource"
@@ -4844,7 +5132,7 @@ msgstr "Onayla"
 msgid "[Reject]"
 msgstr "[Reddet]"
 
-#: lms/templates/navigation.html lms/templates/navigation.html
+#: lms/templates/navigation.html
 msgid "Global Navigation"
 msgstr "Küresel Navigasyon"
 
@@ -4906,16 +5194,21 @@ msgid "Reset"
 msgstr "Sıfırla"
 
 #: lms/templates/problem.html
-msgid "Show Answer(s)"
-msgstr "Yanıt(lar)ı Göster"
+msgid "Show Answer"
+msgstr ""
 
 #: lms/templates/problem.html
-msgid "(for question(s) above - adjacent to each field)"
-msgstr "(yukarıdaki soru(lar) için - her alana bitişik)"
+msgid "Reveal Answer"
+msgstr ""
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
 msgstr "{num_total} sunuştan {num_used}'ini kullandınız"
+
+#: lms/templates/provider_login.html
+#: lms/templates/university_profile/edge.html
+msgid "Log In"
+msgstr "Giriş Yap"
 
 #: lms/templates/provider_login.html
 msgid ""
@@ -4982,11 +5275,11 @@ msgstr "Hesap Onayları"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr "{link_start}Kullanım Koşulları{link_end} kabul ediyorum"
+msgstr "{link_start}Hizmet Koşullarını{link_end} kabul ediyorum"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr " {link_start}Onur Kodunu{link_end} kabul ediyorum"
+msgstr " {link_start}Onur Kodu Şartlarını{link_end} kabul ediyorum"
 
 #: lms/templates/register-shib.html
 msgid "Update My Account"
@@ -5002,11 +5295,11 @@ msgstr "Zaten kayıtlı mısın?"
 
 #: lms/templates/register-sidebar.html
 msgid "Click here to log in."
-msgstr "Giriş yapmak için tıklayın."
+msgstr "Giriş yapmak için buraya tıklayın."
 
 #: lms/templates/register-sidebar.html
 msgid "Welcome to {platform_name}"
-msgstr "{platform_name}e hoşgeldin"
+msgstr "{platform_name}'e hoşgeldiniz"
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -5014,9 +5307,9 @@ msgid ""
 "future free courses. Not ready to take a course just yet? Registering puts "
 "you on our mailing list - we will update you as courses are added."
 msgstr ""
-" {platform_name}e kayıt olmak size mevcut olan büyün ücretsiz derslere "
-"ulaşma imkanını verir. Henüz ders almadınız mı? Kayıt olduğunuzda mail "
-"listemize eklenirsiniz ve yeni bir ders açıldığında size haber vereceğiz."
+" {platform_name}'e kayıt olmak size bütün ücretsiz derslere ulaşma imkanını "
+"verir. Henüz ders almadınız mı? Kayıt olduğunuzda mail listemize "
+"eklenirsiniz ve yeni bir ders açıldığında size haber verilir."
 
 #: lms/templates/register-sidebar.html
 msgid "Next Steps"
@@ -5041,11 +5334,11 @@ msgid ""
 "the email?  Check your spam folder and mark {platform_name} emails as 'not "
 "spam'.  At {platform_name}, we communicate mostly through email."
 msgstr ""
-" {platform_name}e katıldığınızda bir aktivasyon maili alıcaksınız. İşlemleri"
-" tamamlamak için aktivasyon linkine tıklamalısınız. E-postayı görmediniz mi?"
-" Spam dosyalarınız kontrol edin ve {platform_name}i spam değil olarak "
-"işaretleyin. {platform_name}de iletişim kurmak için çoğunlukla e-posta "
-"kullanırız."
+" {platform_name}'e katıldığınızda bir aktivasyon maili alacaksınız. "
+"İşlemleri tamamlamak için aktivasyon linkine tıklamalısınız. E-postayı "
+"görmediniz mi? Spam klasörünüzü kontrol edin ve {platform_name}'i spam değil"
+" olarak işaretleyin. {platform_name}'de iletişim kurmak için çoğunlukla "
+"e-posta kullanırız."
 
 #: lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
@@ -5127,18 +5420,10 @@ msgstr "Ülke"
 msgid "Highest Level of Education Completed"
 msgstr "Bitirdiğiniz En Yüksek Okul Seviyesi"
 
-#: lms/templates/register.html lms/templates/signup_modal.html
-msgid "Gender"
-msgstr "Cinsiyet"
-
 #: lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Year of Birth"
 msgstr "Doğum Yılı"
-
-#: lms/templates/register.html
-msgid "Mailing Address"
-msgstr "Posta Adresi"
 
 #: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
@@ -5180,7 +5465,7 @@ msgstr "Sonraki"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {span_start}{platform_name}{span_end}"
-msgstr "{span_start}{platform_name}{span_end} için kaydolun"
+msgstr "{span_start}{platform_name}{span_end} İçin Kaydolun"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "E-mail *"
@@ -5228,7 +5513,7 @@ msgstr "Posta Adresi"
 
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
-msgstr "{platform_name} için kaydolma amacı"
+msgstr "{platform_name}'e kaydolmanın amaçları"
 
 #: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Terms of Service{link_end}*"
@@ -5602,10 +5887,6 @@ msgid "Skip to end of transcript."
 msgstr "Altyazının sonuna atla."
 
 #: lms/templates/video.html
-msgid "Captions"
-msgstr "Altyazılar"
-
-#: lms/templates/video.html
 msgid ""
 "Activating an item in this group will spool the video to the corresponding "
 "time point. To skip transcript, go to previous item."
@@ -5904,6 +6185,12 @@ msgstr "Gereklilikler"
 msgid "Additional Resources"
 msgstr "Ek Kaynaklar"
 
+#. Translators: 'needs attention' is an alternative string for the
+#. notification image that indicates the tab "needs attention".
+#: lms/templates/courseware/course_navigation.html
+msgid "needs attention"
+msgstr ""
+
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/course_navigation.html
 msgid "Staff view"
@@ -6038,6 +6325,13 @@ msgstr "Hesapla"
 msgid "Calculator Output Field"
 msgstr "Hesap Makinesi Çıktı Alanı"
 
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible. Please email us at {link_to_support_email} to "
+"report any problems or downtime."
+msgstr ""
+
 #: lms/templates/courseware/grade_summary.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade summary"
@@ -6061,19 +6355,14 @@ msgid "{course_number} Course Info"
 msgstr "{course_number} Ders Bilgisi"
 
 #: lms/templates/courseware/info.html lms/templates/courseware/info.html
-#: lms/templates/courseware/welcome-back.html
-#: lms/templates/courseware/welcome-back.html
 msgid "Course Updates &amp; News"
 msgstr "Ders Güncellemeleri &amp; Haberleri"
 
 #: lms/templates/courseware/info.html
-#: lms/templates/courseware/welcome-back.html
-#: lms/templates/courseware/welcome-back.html
 msgid "Handout Navigation"
 msgstr "Bildiri Navigasyonu"
 
 #: lms/templates/courseware/info.html
-#: lms/templates/courseware/welcome-back.html
 msgid "Course Handouts"
 msgstr "Ders Notları"
 
@@ -6311,7 +6600,6 @@ msgstr ""
 "biri ayrı sayfa olacalk şekilde veya virgülle ayrılmış şekilde giriniz;"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Notify students by email"
 msgstr "Öğrencileri e-posta ile bilgilendir"
 
@@ -6444,8 +6732,8 @@ msgid "Students"
 msgstr "Öğrenciler"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Answer distribution for problems"
-msgstr "Sorular için cevap dağılımı"
+msgid "Score distribution for problems"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6738,11 +7026,11 @@ msgstr "Kimlik Onaylandı"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
-msgstr "Kurs Bitti- {end_date}"
+msgstr "Ders Tamamlandı - {end_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Started - {start_date}"
-msgstr "Kurs Başladı - {start_date}"
+msgstr "Ders Başladı - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course has not yet started"
@@ -7396,8 +7684,8 @@ msgid "Skip"
 msgstr "Atla"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Grade Distribution"
-msgstr "Not Dağılımı"
+msgid "Score Distribution"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid ""
@@ -7422,10 +7710,6 @@ msgstr "Problem listesi yükleniyor.."
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Gender Distribution"
 msgstr "Cinsiyet Dağılımı"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Level of Education"
-msgstr "Eğitim Seviyesi"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
@@ -7481,8 +7765,8 @@ msgstr "Ders Uyarıları"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button generates a CSV file of all students enrolled in this "
-"course, along with profile information such as email address and username."
+"Click to generate a CSV file of all students enrolled in this course, along "
+"with profile information such as email address and username:"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -7491,11 +7775,9 @@ msgstr "Profil bilgilerini CSV dosyası olarak indir"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"For smaller courses, profile information for enrolled students can be listed"
+"For smaller courses, click to list profile information for enrolled students"
 " directly on this page:"
 msgstr ""
-"Daha küçük dersler için, kayıtlı öğrencilerin bilgileri bu sayfada doğrudan "
-"listelenir:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "List enrolled students' profile information"
@@ -7503,10 +7785,10 @@ msgstr "Kayıtlı öğrencilerin profil bilgisini listele"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button displays the grading configuration for the course. The "
-"grading configuration is the breakdown of graded subsections of the course "
-"(such as exams and problem sets), and can be changed on the 'Grading' page "
-"(under 'Settings') in Studio."
+"Click to display the grading configuration for the course. The grading "
+"configuration is the breakdown of graded subsections of the course (such as "
+"exams and problem sets), and can be changed on the 'Grading' page (under "
+"'Settings') in Studio."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -7514,9 +7796,8 @@ msgid "Grading Configuration"
 msgstr "Notlandırma Konfigürasyonu"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of anonymized student IDs by clicking this button."
+msgid "Click to download a CSV of anonymized student IDs:"
 msgstr ""
-"Bu butona basarak anonimleştirilmiş öğrenci kimliklerini CSV olarak indirin."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Get Student Anonymized IDs CSV"
@@ -7528,13 +7809,10 @@ msgstr "Raporlar"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The following button will generate a CSV grade report for all currently "
-"enrolled students.  Generated reports appear in a table below and can be "
-"downloaded."
+"Click to generate a CSV grade report for all currently enrolled students.  "
+"Links to generated reports appear in a table below when report generation is"
+" complete."
 msgstr ""
-"Aşağıdaki buton şu an için kayıtlı olan bütün öğrenciler için CSV not raporu"
-" oluşturacaktır. Oluşturulan raporlar aşağıda bir tabloda, indirilecek "
-"şekilde gösterilmektedir."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7564,29 +7842,19 @@ msgstr "İndirme için Hazır Raporlar"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Grade reports listed below are generated each time the <b>Generate Grade "
-"Report</b> button is clicked. A link to each grade report remains available "
-"on this page, identified by the UTC date and time of generation. Grade "
+"The grade reports listed below are generated each time the <b>Generate Grade"
+" Report</b> button is clicked. A link to each grade report remains available"
+" on this page, identified by the UTC date and time of generation. Grade "
 "reports are not deleted, so you will always be able to access previously "
 "generated reports from this page."
 msgstr ""
-"Aşağıda listelenen not raporları <b>Not Raporu Oluştur</b> butonuna "
-"tıklandığı zaman oluşturulur. Her not raporuna olan bağlantı, oluşturulduğu "
-"UTC tarihi ve zamanıyla belirlenmiş şekilde sayfada sunulur. Not raporları "
-"silinmez ve böylece eskiden oluşturulmuş raporlara bu sayfa üzerinde "
-"erişebilirsiniz."
 
-#. Translators: "these rules" in this sentence references a detailed
-#. description of the grading reports that will appear in a table that
-#. contains
-#. a mix of different types of reports.  This sentence intends to indicate
-#. that
-#. the description of the grading report does not apply to the other reports
-#. that may appear in the table.
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Other reports may appear in the table for which these rules will not "
-"necessarily apply."
+"The answer distribution report listed below is generated periodically by an "
+"automated background process. The report is cumulative, so answers submitted"
+" after the process starts are included in a subsequent report. The report is"
+" generated several times per day."
 msgstr ""
 
 #. Translators: a table of URL links to report files appears after this
@@ -7692,14 +7960,20 @@ msgid "section_display_name"
 msgstr "bölüm_görüntü_ismi"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Enter student emails separated by new lines or commas."
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Enter email addresses separated by new lines or commas."
 msgstr ""
-"Öğrenci e-posta adreslerini aralarına virgül koyarak, ya da her birini ayrı "
-"satır halinde yazınız."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Student Emails"
-msgstr "Öğrenci e-postaları"
+msgid ""
+"You will not get notification for emails that bounce, so please double-check"
+" spelling."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Email Addresses"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Auto Enroll"
@@ -7707,28 +7981,28 @@ msgstr "Otomatik Kayıt"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If auto enroll is <em>checked</em>, students who have not yet registered for"
-" edX will be automatically enrolled."
+"If this option is <em>checked</em>, users who have not yet registered for "
+"{platform_name} will be automatically enrolled."
 msgstr ""
-"Eğer otomatik kayıt <em>işaretli</em> ise, henüz edX'e kayıt yaptırmamış "
-"öğrenciler otomatik olarak kaydedilecektir."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If auto enroll is left <em>unchecked</em>, students who have not yet "
-"registered for edX will not be enrolled, but will be allowed to enroll."
+"If this option is left <em>unchecked</em>, users who have not yet registered"
+" for {platform_name} will not be enrolled, but will be allowed to enroll "
+"once they make an account."
 msgstr ""
-"Eğer otomatik kayıt <em>işaretli değil</em> ise, edX'e henüz kayıt "
-"yaptırmamış öğrenciler otomatik olarak kaydedilmeyecek ama kayıt "
-"yaptırmasına izin verilecektir."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Notify users by email"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If email students is <em>checked</em> students will receive an email "
+"If this option is <em>checked</em>, users will receive an email "
 "notification."
 msgstr ""
-"Eğer e-posta öğrenciler <em>işaretliyse</em>, öğrenciler bir duyuru "
-"e-postası alacaklar."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Enroll"
@@ -7739,8 +8013,35 @@ msgid "Unenroll"
 msgstr "Kaydı iptal et"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Batch Beta Testers"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Note: Users must have an activated {platform_name} account before they can "
+"be enrolled as a beta tester."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add beta testers"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Remove beta testers"
+msgstr ""
+
+#. Translators: an "Administration List" is a list, such as Course Staff, that
+#. users can be added to.
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Administration List Management"
 msgstr "Yönetici Liste İdaresi"
+
+#. Translators: an "Administrator Group" is a group, such as Course Staff,
+#. that
+#. users can be added to.
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Select an Administrator Group:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Getting available lists..."
@@ -7808,8 +8109,8 @@ msgstr ""
 "yetkileri yoktur."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Beta Tester"
-msgstr "Beta Sınayıcısı"
+msgid "Add Beta Tester"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Admins"
@@ -7827,8 +8128,8 @@ msgstr ""
 "EKLEYEBİLİR/SİLEBİLİR ve iletileri 'personel' olarak etiketlidir."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Discussion Admin"
-msgstr "Tartışma Yöneticisi"
+msgid "Add Discussion Admin"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Moderators"
@@ -7868,6 +8169,10 @@ msgstr ""
 "destekleyebilir ve bütün kohortlardan gelen mesajları görebilir. İletileri, "
 "'Topluluk Öğretim Görevlisi' olarak işaretlenir."
 
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Community TA"
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Reload Graphs"
 msgstr "Grafikleri Yeniden Yükle"
@@ -7880,6 +8185,10 @@ msgstr "Bir Altbölüm Açmış Öğrencilerin Sayısı"
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
 msgstr "E-posta Gönder"
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Message:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
@@ -8037,12 +8346,6 @@ msgid ""
 msgstr ""
 "Tercih ettiğiniz dili göremediniz mi? {link_start}Gönüllü çevirmen "
 "olunuz!{link_end}"
-
-#. Translators: this is a control to allow users to exit out of this modal
-#. interface (a menu or piece of UI that takes the full focus of the screen)
-#: lms/templates/modal/accessible_confirm.html
-msgid "Close Modal"
-msgstr "Kip Kapat"
 
 #. Translators: this text gives status on if the modal interface (a menu or
 #. piece of UI that takes the full focus of the screen) is open or not
@@ -8690,10 +8993,8 @@ msgstr "<em>{platform_name}</em> sunucularında 500 hatası oldu."
 #: lms/templates/static_templates/server-error.html
 msgid ""
 "Please wait a few seconds and then reload the page. If the problem persists,"
-" please email us at <a href=\"{email}\">{email}</a>."
+" please email us at {email}."
 msgstr ""
-"Lütfen bir kaç dakika bekleyin ve sayfayı yeniden yükleyin. Eğer sorun devam"
-" ederse, lütfen <a href=\"{email}\">{email}</a> adresine eposta atınız."
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the <em>{platform_name}</em> servers are overloaded"
@@ -9849,6 +10150,10 @@ msgid "Page Actions"
 msgstr "Sayfa İşlemleri"
 
 #: cms/templates/asset_index.html
+msgid "Loading&hellip;"
+msgstr ""
+
+#: cms/templates/asset_index.html
 msgid "What files are listed here?"
 msgstr "Burada hangi dosyalar listelenmiş?"
 
@@ -9973,11 +10278,11 @@ msgstr "Aksiyon Yok"
 
 #: cms/templates/container.html
 msgid "Publishing Status"
-msgstr ""
+msgstr "Yayınlanma Durumu"
 
 #: cms/templates/container.html
 msgid "This content is published with unit {unit_name}."
-msgstr ""
+msgstr "Bu içerik {unit_name} birimi ile yayınlanmıştır. "
 
 #: cms/templates/container.html
 msgid ""
@@ -10008,51 +10313,91 @@ msgstr ""
 " ve öğrencilerin sorularına yanıt vermek için kullanın. Güncellemeleri HTML "
 "içinde değiştirebilir yenilerini ekleyebilirsiniz."
 
-#: cms/templates/edit-tabs.html cms/templates/export.html
-#: cms/templates/widgets/header.html
-msgid "Static Pages"
-msgstr "Durağan Sayfa"
+#. Translators: Pages refer to the tabs that appear in the top navigation of
+#. each course.
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
+#: cms/templates/export.html cms/templates/widgets/header.html
+msgid "Pages"
+msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "New Page"
 msgstr "Yeni Sayfa"
 
 #: cms/templates/edit-tabs.html
-msgid ""
-"Use Static Pages to share a syllabus, a calendar, handouts, or other "
-"supplements to your courseware."
+msgid "Show this page"
 msgstr ""
-"Statik Sayfaları der içeriğini, takvimi, bildirileri veya ders yazılımınıza "
-"yapacağınız ekleri paylaşmak için kullanınız."
+
+#: cms/templates/edit-tabs.html
+msgid "Show/hide page"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Cannot be reordered"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Fixed page"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "You can add additional custom pages to your course."
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Add a New Page"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "What are pages?"
+msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"NOTE: all content on Static Pages will be visible to anyone who knows the "
-"URL, regardless of whether they are registered in the course or not."
+"Pages are listed horizontally at the top of your course. Default pages "
+"(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
+"textbooks and custom pages that you create."
 msgstr ""
-"Not: Statik Sayfalar'da yer alan bütün içerik, derse kayıtlı olsunlar veya "
-"olmasında, URL'yi bilen herkes tarafından ulaşılabilir."
 
 #: cms/templates/edit-tabs.html
-msgid "What do static pages look like in my course?"
-msgstr "Dersimdeki statik sayfalar nedir?"
-
-#: cms/templates/edit-tabs.html
-msgid "Static Pages in Your Course"
-msgstr "Dersinizdeki Statik Sayfalar"
-
-#: cms/templates/edit-tabs.html
-msgid "Preview of Static Pages in your course"
-msgstr "Dersinizdeki Statik Sayfaların Önizlemesi"
+msgid "Custom pages"
+msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"The names of your Static Pages appear in your course's main navigation bar, "
-"along with Courseware, Course Info, Discussion, Wiki, and Progress."
+"You can create and edit custom pages to provide students with additional "
+"course content. For example, you can create pages for the grading policy, "
+"course slides, and a course calendar. "
 msgstr ""
-"Statik Sayfaların isimleri, Ders Yazılımı, Ders Bilgi, Tartışma, Wiki ve "
-"İlerleme bölümleriylre birlikte, dersinizin navigasyon çubuğunda "
-"görünecektir. "
+
+#: cms/templates/edit-tabs.html
+msgid "How do pages look to students in my course?"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid ""
+"Students see the default and custom pages at the top of your course and use "
+"these links to navigate."
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "See an example"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Pages in Your Course"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Preview of Pages in your course"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid ""
+"Pages appear in your course's top navigation bar. The default pages "
+"(Courseware, Course Info, Discussion, Wiki, and Progress) are followed by "
+"textbooks and custom pages."
+msgstr ""
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 #: cms/templates/howitworks.html cms/templates/howitworks.html

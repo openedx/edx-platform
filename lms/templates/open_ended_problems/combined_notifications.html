@@ -36,7 +36,7 @@
                     <a href="${notification['url']}" class="notification-link">
                         <div class="notification-title">${notification['name']}</div>
                         %if notification['alert']:
-                        <p class="alert-message"><img src="/static/images/grading_notification.png" /> ${notification['alert_message']}</p>
+                        <p class="alert-message"><img src="${static.url('images/grading_notification.png')}" /> ${notification['alert_message']}</p>
                         %endif
                     <div class="notification-description">
                         <p>${notification['description']}</p>
