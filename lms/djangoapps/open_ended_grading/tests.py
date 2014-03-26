@@ -62,10 +62,9 @@ class StudentProblemListMockQuery(object):
     def get_grading_status_list(self, *args, **kwargs):
         """
         Get a mock grading status list with locations from the open_ended test course.
-        @returns: json formatted grading status message.
+        @returns: grading status message dictionary.
         """
-        grading_status_list = json.dumps(
-            {
+        return {
                 "version": 1,
                 "problem_list": [
                     {
@@ -95,8 +94,6 @@ class StudentProblemListMockQuery(object):
                 ],
                 "success": True
             }
-        )
-        return grading_status_list
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

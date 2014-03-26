@@ -25,7 +25,7 @@ class ControllerQueryService(GradingService):
             'location': location,
         }
         response = self.get(self.check_eta_url, params)
-        return response
+        return response.json()
 
     def check_combined_notifications(self, course_id, student_id, user_is_staff, last_time_viewed):
         params = {
@@ -36,7 +36,7 @@ class ControllerQueryService(GradingService):
         }
         log.debug(self.combined_notifications_url)
         response = self.get(self.combined_notifications_url, params)
-        return response
+        return response.json()
 
     def get_grading_status_list(self, course_id, student_id):
         params = {
@@ -45,7 +45,7 @@ class ControllerQueryService(GradingService):
         }
 
         response = self.get(self.grading_status_list_url, params)
-        return response
+        return response.json()
 
     def get_flagged_problem_list(self, course_id):
         params = {
@@ -53,7 +53,7 @@ class ControllerQueryService(GradingService):
         }
 
         response = self.get(self.flagged_problem_list_url, params)
-        return response
+        return response.json()
 
     def take_action_on_flags(self, course_id, student_id, submission_id, action_type):
         params = {
@@ -64,7 +64,7 @@ class ControllerQueryService(GradingService):
         }
 
         response = self.post(self.take_action_on_flags_url, params)
-        return response
+        return response.json()
 
 
 class MockControllerQueryService(object):
@@ -84,15 +84,47 @@ class MockControllerQueryService(object):
         pass
 
     def check_combined_notifications(self, *args, **kwargs):
-        combined_notifications = '{"flagged_submissions_exist": false, "version": 1, "new_student_grading_to_view": false, "success": true, "staff_needs_to_grade": false, "student_needs_to_peer_grade": true, "overall_need_to_check": true}'
+        combined_notifications = {
+            "flagged_submissions_exist": False,
+            "version": 1,
+            "new_student_grading_to_view": False,
+            "success": True,
+            "staff_needs_to_grade": False,
+            "student_needs_to_peer_grade": True,
+            "overall_need_to_check": True
+        }
         return combined_notifications
 
     def get_grading_status_list(self, *args, **kwargs):
-        grading_status_list = '{"version": 1, "problem_list": [{"problem_name": "Science Question -- Machine Assessed", "grader_type": "NA", "eta_available": true, "state": "Waiting to be Graded", "eta": 259200, "location": "i4x://MITx/oe101x/combinedopenended/Science_SA_ML"}, {"problem_name": "Humanities Question -- Peer Assessed", "grader_type": "NA", "eta_available": true, "state": "Waiting to be Graded", "eta": 259200, "location": "i4x://MITx/oe101x/combinedopenended/Humanities_SA_Peer"}], "success": true}'
+        grading_status_list = {
+            "version": 1,
+            "problem_list": [
+                {
+                    "problem_name": "Science Question -- Machine Assessed",
+                    "grader_type": "NA",
+                    "eta_available": True,
+                    "state": "Waiting to be Graded",
+                    "eta": 259200,
+                    "location": "i4x://MITx/oe101x/combinedopenended/Science_SA_ML"
+                }, {
+                    "problem_name": "Humanities Question -- Peer Assessed",
+                    "grader_type": "NA",
+                    "eta_available": True,
+                    "state": "Waiting to be Graded",
+                    "eta": 259200,
+                    "location": "i4x://MITx/oe101x/combinedopenended/Humanities_SA_Peer"
+                }
+            ],
+            "success": True
+        }
         return grading_status_list
 
     def get_flagged_problem_list(self, *args, **kwargs):
-        flagged_problem_list = '{"version": 1, "success": false, "error": "No flagged submissions exist for course: MITx/oe101x/2012_Fall"}'
+        flagged_problem_list = {
+            "version": 1,
+            "success": False,
+            "error": "No flagged submissions exist for course: MITx/oe101x/2012_Fall"
+        }
         return flagged_problem_list
 
     def take_action_on_flags(self, *args, **kwargs):
@@ -113,5 +145,4 @@ def convert_seconds_to_human_readable(seconds):
     else:
         human_string = "{0} days".format(round(seconds / (60 * 60 * 24), 1))
 
-    eta_string = "{0}".format(human_string)
-    return eta_string
+    return human_string
