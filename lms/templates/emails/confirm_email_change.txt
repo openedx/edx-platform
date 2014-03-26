@@ -1,19 +1,20 @@
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 ## Again, ugly hack that needs to be changed
 ## TODO: this probably needs better formatting to look nice in an
 ##       email client (Mako leaves awkward whitespace)
 % if stanford_theme_enabled():
-  This is to confirm that you changed the e-mail associated with
-  ${settings.PLATFORM_NAME} from ${old_email} to ${new_email}. If you
-  did not make this request, please contact us at
+  ${_("This is to confirm that you changed the e-mail associated with "
+      "{platform_name} from {old_email} to {new_email}. If you "
+      "did not make this request, please contact us at").format(platform_name=settings.PLATFORM_NAME, old_email=old_email, new_email=new_email)}
 
   ${settings.CONTACT_EMAIL}
 % else:
-  This is to confirm that you changed the e-mail associated with
-  ${settings.PLATFORM_NAME} from ${old_email} to ${new_email}. If you
-  did not make this request, please contact us immediately. Contact
-  information is listed at:
+  ${_("This is to confirm that you changed the e-mail associated with "
+      "{platform_name} from {old_email} to {new_email}. If you "
+      "did not make this request, please contact us immediately. Contact "
+      "information is listed at:").format(platform_name=settings.PLATFORM_NAME, old_email=old_email, new_email=new_email)}
 
   % if is_secure:
     https://${ site }${reverse('contact')}
@@ -22,5 +23,5 @@
   % endif
 % endif
 
-We keep a log of old e-mails, so if this request was unintentional, we
-can investigate.
+${_("We keep a log of old e-mails, so if this request was unintentional, we "
+    "can investigate.")}
