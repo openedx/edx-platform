@@ -2,6 +2,7 @@
 <%! 
 from django.utils.translation import ugettext as _ 
 from util.date_utils import get_time_display
+from django.conf import settings
 %>
 
 <section
@@ -11,7 +12,7 @@ from util.date_utils import get_time_display
 >
     <h2 class="problem-header">${display_name}</h2>
 <%
-    formatted_string = get_time_display(due)
+    formatted_string = get_time_display(due, "DATE_TIME", coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
     due_date = '' if len(formatted_string)==0 else (u'<h4>Дата окончания регистрации: {date}</h4>').format(date=formatted_string)
     %>
     

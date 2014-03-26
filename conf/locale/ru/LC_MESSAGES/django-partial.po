@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2014-03-24 18:07+0400\n"
-"PO-Revision-Date: 2014-03-26 13:58+0300\n"
+"PO-Revision-Date: 2014-03-26 14:22+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -666,7 +666,7 @@ msgstr "Неверный ID"
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py:118
 msgid "LONG_DATE_FORMAT"
-msgstr ""
+msgstr "%d %B %Y, %A"
 
 #. Translators: the translation for "DATE_TIME_FORMAT" must be a format
 #. string for formatting dates with times.  For example, the American
@@ -674,7 +674,7 @@ msgstr ""
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py:126
 msgid "DATE_TIME_FORMAT"
-msgstr ""
+msgstr "%d %b %Y в %H:%M"
 
 #. Translators: the translation for "SHORT_DATE_FORMAT" must be a
 #. format string for formatting dates in a brief form.  For example,
@@ -682,14 +682,14 @@ msgstr ""
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py:160
 msgid "SHORT_DATE_FORMAT"
-msgstr ""
+msgstr "%d %b %Y"
 
 #. Translators: the translation for "TIME_FORMAT" must be a format
 #. string for formatting times.  For example, the American English
 #. form is "%H:%M:%S". See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py:172
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "%H:%M:%S"
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
