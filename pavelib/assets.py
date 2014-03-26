@@ -22,7 +22,8 @@ def theme_sass_paths():
 
     if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
         theme_name = edxapp_env.env_tokens.get('THEME_NAME', '')
-        theme_root = path(edxapp_env.REPO_ROOT).dirname() / "themes" / theme_name
+        parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
+        theme_root = parent_dir / "themes" / theme_name
         return [theme_root / "static" / "sass"]
 
     else:

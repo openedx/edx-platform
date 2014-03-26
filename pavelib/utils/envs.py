@@ -15,7 +15,7 @@ class Env(object):
     """
 
     # Root of the git repository (edx-platform)
-    REPO_ROOT = path(__file__).dirname().dirname().dirname()
+    REPO_ROOT = path(__file__).parent.parent.parent
 
     # Service variant (lms, cms, etc.) configured with an environment variable
     # We use this to determine which envs.json file to load.
@@ -29,12 +29,16 @@ class Env(object):
         """
 
         # Find the env JSON file
-        env_path = "env.json"
-        if self.SERVICE_VARIANT is not None:
-            env_path = self.REPO_ROOT.dirname() / "{service}.env.json".format(service=self.SERVICE_VARIANT)
+        if self.SERVICE_VARIANT:
+            env_path = self.REPO_ROOT.parent / "{service}.env.json".format(service=self.SERVICE_VARIANT)
+        else:
+            env_path = path("env.json").abspath()
 
-        # If the file does not exist, issue a warning and return an empty dict
-        if not os.path.isfile(env_path):
+        # If the file does not exist, here or one level up,
+        # issue a warning and return an empty dict
+        if not env_path.isfile():
+            env_path = env_path.parent.parent / env_path.basename()
+        if not env_path.isfile():
             print(
                 "Warning: could not find environment JSON file "
                 "at '{path}'".format(path=env_path),
