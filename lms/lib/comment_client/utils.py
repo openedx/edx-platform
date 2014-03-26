@@ -87,7 +87,7 @@ def perform_request(method, url, data_or_params=None, raw=False):
         if raw:
             return response.text
         else:
-            return json.loads(response.text)
+            return response.json()
 
 
 class CommentClientError(Exception):
