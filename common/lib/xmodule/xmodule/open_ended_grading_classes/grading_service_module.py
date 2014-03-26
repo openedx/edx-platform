@@ -5,7 +5,7 @@ import requests
 from dogapi import dog_stats_api
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 
-from .combined_open_ended_rubric import CombinedOpenEndedRubric
+from .combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
 from lxml import etree
 
 log = logging.getLogger(__name__)
@@ -153,10 +153,9 @@ class GradingService(object):
                 response_json['rubric'] = rubric_html
             return response_json
         # if we can't parse the rubric into HTML,
-        except etree.XMLSyntaxError, RubricParsingError:
+        except (etree.XMLSyntaxError, RubricParsingError):
             #This is a dev_facing_error
-            log.exception("Cannot parse rubric string. Raw string: {0}"
-            .format(rubric))
+            log.exception("Cannot parse rubric string. Raw string: {0}".format(rubric))
             return {'success': False,
                     'error': 'Error displaying submission'}
         except ValueError:
