@@ -2,6 +2,7 @@ import unittest
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.content import ContentStore
 from xmodule.modulestore import Location
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class Content:
@@ -34,5 +35,7 @@ class ContentTest(unittest.TestCase):
     def test_compute_location(self):
         # We had a bug that __ got converted into a single _. Make sure that substitution of INVALID_CHARS (like space)
         # still happen.
-        asset_location = StaticContent.compute_location('mitX', '400', 'subs__1eo_jXvZnE .srt.sjson')
-        self.assertEqual(Location(u'c4x', u'mitX', u'400', u'asset', u'subs__1eo_jXvZnE_.srt.sjson', None), asset_location)
+        asset_location = StaticContent.compute_location(
+            SlashSeparatedCourseKey('mitX', '400', 'ignore'), 'subs__1eo_jXvZnE .srt.sjson'
+        )
+        self.assertEqual(Location(u'mitX', u'400', u'ignore', u'asset', u'subs__1eo_jXvZnE_.srt.sjson', None), asset_location)

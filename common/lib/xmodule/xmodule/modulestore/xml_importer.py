@@ -6,7 +6,7 @@ import json
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.keys import CourseKey, UsageKey
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
@@ -64,7 +64,7 @@ def import_static_content(
             fullname_with_subpath = content_path.replace(static_dir, '')
             if fullname_with_subpath.startswith('/'):
                 fullname_with_subpath = fullname_with_subpath[1:]
-            asset_key = target_course_id.make_asset_key('asset', fullname_with_subpath)
+            asset_key = StaticContent.compute_location(target_course_id, fullname_with_subpath)
 
             policy_ele = policy.get(asset_key.path, {})
             displayname = policy_ele.get('displayname', filename)
@@ -317,7 +317,7 @@ def import_module(
 
     # Move the module to a new course
     new_usage_key = module.scope_ids.usage_id.map_into_course(dest_course_id)
-    module.scope_ids = module.scope_ids._replace(usage_key=new_usage_key)
+    module.scope_ids = module.scope_ids._replace(usage_id=new_usage_key)
 
     store.update_item(module, '**replace_user**', allow_not_found=allow_not_found)
 
@@ -425,6 +425,7 @@ def import_course_draft(
         # For each index_in_children_list key, there is a list of vertical descriptors.
         for key in sorted(drafts.iterkeys()):
             for descriptor in drafts[key]:
+                course_key = descriptor.location.course_key
                 try:
                     def _import_module(module):
                         module.location = module.location.replace(revision='draft')
@@ -437,7 +438,7 @@ def import_course_draft(
                             sequential_url = module.xml_attributes['parent_sequential_url']
                             index = int(module.xml_attributes['index_in_children_list'])
 
-                            seq_location = Location(sequential_url)
+                            seq_location = course_key.make_usage_key_from_deprecated_string(sequential_url)
 
                             # IMPORTANT: Be sure to update the sequential
                             # in the NEW namespace
@@ -606,7 +607,11 @@ def validate_category_hierarchy(
             parents.append(module)
 
     for parent in parents:
-        for child_loc in [Location(child) for child in parent.children]:
+        children = [
+            child if isinstance(child, UsageKey) else course_id.make_usage_key_from_deprecated_string(child)
+            for child in parent.children
+        ]
+        for child_loc in children:
             if child_loc.category != expected_child_category:
                 err_cnt += 1
                 print(
@@ -697,7 +702,7 @@ def perform_xlint(
         warn_cnt += _warn_cnt
 
     # first count all errors and warnings as part of the XMLModuleStore import
-    for err_log in module_store._location_errors.itervalues():
+    for err_log in module_store._course_errors.itervalues():
         for err_log_entry in err_log.errors:
             msg = err_log_entry[0]
             if msg.startswith('ERROR:'):
@@ -745,7 +750,7 @@ def perform_xlint(
         )
 
         # check for a presence of a course marketing video
-        if not module_store.get_items(CourseKey.from_string(course_id), category='about', name='video'):
+        if not module_store.get_items(course_id, category='about', name='video'):
             print(
                 "WARN: Missing course marketing video. It is recommended "
                 "that every course have a marketing video."

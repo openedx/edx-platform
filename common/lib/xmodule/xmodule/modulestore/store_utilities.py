@@ -66,17 +66,19 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
 
     # NOTE: ultimately link updating is not a hard requirement, so if something blows up with
     # the regex subsitution, log the error and continue
+    c4x_link_base = StaticContent.get_base_url_path_for_course_assets(source_course_id)
     try:
-        c4x_link_base = StaticContent.get_base_url_path_for_course_assets(source_course_id)
         text = re.sub(_prefix_only_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
     except Exception as e:
         logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", c4x_link_base, text, str(e))
 
+    jump_to_link_base = u'/courses/{course_key:s}/jump_to/i4x://{course_key.org}/{course_key.course}/'.format(
+        course_key=source_course_id
+    )
     try:
-        jump_to_link_base = u'/courses/{org}/{course}/{name}/jump_to/i4x://{org}/{course}/'.format(**course_id_dict)
         text = re.sub(_prefix_and_category_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
     except Exception as e:
-        logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", jump_to_link_base, text, str(e))
+        logging.warning("Error on regex substituion %r for text = %r.\n\nError msg = %s", jump_to_link_base, text, str(e))
 
     # Also, there commonly is a set of link URL's used in the format:
     # /courses/<org>/<course>/<name> which will be broken if migrated to a different course_id

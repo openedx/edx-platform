@@ -2,8 +2,7 @@ import pymongo
 import gridfs
 from gridfs.errors import NoFile
 
-from xmodule.modulestore import Location
-from xmodule.modulestore.mongo.base import location_to_query
+from xmodule.modulestore.mongo.base import location_to_query, MongoModuleStore, location_to_son
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 
 import logging
@@ -131,7 +130,7 @@ class MongoContentStore(ContentStore):
         assets, __ = self.get_all_content_for_course(course_location)
 
         for asset in assets:
-            asset_location = Location(asset['_id'])
+            asset_location = MongoModuleStore._location_from_id(asset['_id'], course_location.run)
             self.export(asset_location, output_directory)
             for attr, value in asset.iteritems():
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
@@ -175,11 +174,11 @@ class MongoContentStore(ContentStore):
         # 'borrow' the function 'location_to_query' from the Mongo modulestore implementation
         if maxresults > 0:
             items = self.fs_files.find(
-                location_to_query(course_filter),
+                location_to_query(course_filter, wildcard=True, tag=XASSET_LOCATION_TAG),
                 skip=start, limit=maxresults, sort=sort
             )
         else:
-            items = self.fs_files.find(location_to_query(course_filter), sort=sort)
+            items = self.fs_files.find(location_to_query(course_filter, wildcard=True, tag=XASSET_LOCATION_TAG), sort=sort)
         count = items.count()
         return list(items), count
 
@@ -221,10 +220,12 @@ class MongoContentStore(ContentStore):
         for attr in attr_dict.iterkeys():
             if attr in ['_id', 'md5', 'uploadDate', 'length']:
                 raise AttributeError("{} is a protected attribute.".format(attr))
-        item = self.fs_files.find_one(location_to_query(location))
+        asset_db_key = {'_id': location_to_son(location, tag=XASSET_LOCATION_TAG)}
+        # FIXME remove fetch and use a form of update which fails if doesn't exist
+        item = self.fs_files.find_one(asset_db_key)
         if item is None:
-            raise NotFoundError()
-        self.fs_files.update({"_id": item["_id"]}, {"$set": attr_dict})
+            raise NotFoundError(asset_db_key)
+        self.fs_files.update(asset_db_key, {"$set": attr_dict})
 
     def get_attrs(self, location):
         """
@@ -236,7 +237,7 @@ class MongoContentStore(ContentStore):
 
         :param location: a c4x asset location
         """
-        item = self.fs_files.find_one(location_to_query(location))
+        item = self.fs_files.find_one({'_id': location_to_son(location, tag=XASSET_LOCATION_TAG)})
         if item is None:
             raise NotFoundError()
         return item

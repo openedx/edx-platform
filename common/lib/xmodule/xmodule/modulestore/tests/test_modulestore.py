@@ -14,9 +14,9 @@ def check_path_to_location(modulestore):
 
     should_work = (
         (course_id.make_usage_key('video', 'Welcome'),
-         ("edX/toy/2012_Fall", "Overview", "Welcome", None)),
+         (course_id, "Overview", "Welcome", None)),
         (course_id.make_usage_key('chapter', 'Overview'),
-         ("edX/toy/2012_Fall", "Overview", None, None)),
+         (course_id, "Overview", None, None)),
     )
 
     for location, expected in should_work:

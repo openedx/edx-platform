@@ -1,9 +1,5 @@
 from itertools import repeat
-
-from xmodule.course_module import CourseDescriptor
-
 from .exceptions import (ItemNotFoundError, NoPathToItem)
-from . import Location
 
 
 def path_to_location(modulestore, usage_key):
@@ -63,15 +59,13 @@ def path_to_location(modulestore, usage_key):
             # isn't found so we don't have to do it explicitly.  Call this
             # first to make sure the location is there (even if it's a course, and
             # we would otherwise immediately exit).
-            parents = modulestore.get_parent_usages(next_usage, course_id)
+            parents = modulestore.get_parent_locations(next_usage)
 
             # print 'Processing loc={0}, path={1}'.format(next_usage, path)
             if next_usage.definition_key.block_type == "course":
-                # confirm that this is the right course
-                if course_id == next_usage.course_key:
-                    # Found it!
-                    path = (next_usage, path)
-                    return flatten(path)
+                # Found it!
+                path = (next_usage, path)
+                return flatten(path)
 
             # otherwise, add parent locations at the end
             newpath = (next_usage, path)

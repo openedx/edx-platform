@@ -31,15 +31,11 @@ TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().
 class Basetranscripts(CourseTestCase):
     """Base test class for transcripts tests."""
 
-    org = 'MITx'
-    number = '999'
-
     def clear_subs_content(self):
         """Remove, if transcripts content exists."""
         for youtube_id in self.get_youtube_ids().values():
             filename = 'subs_{0}.srt.sjson'.format(youtube_id)
-            content_location = StaticContent.compute_location(
-                self.org, self.number, filename)
+            content_location = StaticContent.compute_location(self.course.id, filename)
             try:
                 content = contentstore().find(content_location)
                 contentstore().delete(content.get_id())
@@ -157,7 +153,7 @@ class TestUploadtranscripts(Basetranscripts):
         self.assertEqual(item.sub, filename)
 
         content_location = StaticContent.compute_location(
-            self.org, self.number, 'subs_{0}.srt.sjson'.format(filename))
+            self.course.id, 'subs_{0}.srt.sjson'.format(filename))
         self.assertTrue(contentstore().find(content_location))
 
     def test_fail_data_without_id(self):
@@ -326,8 +322,7 @@ class TestDownloadtranscripts(Basetranscripts):
         mime_type = 'application/json'
         filename = 'subs_{0}.srt.sjson'.format(subs_id)
 
-        content_location = StaticContent.compute_location(
-            self.org, self.number, filename)
+        content_location = StaticContent.compute_location(self.course.id, filename)
         content = StaticContent(content_location, filename, mime_type, filedata)
         contentstore().save(content)
         del_cached_content(content_location)
@@ -503,8 +498,7 @@ class TestChecktranscripts(Basetranscripts):
         mime_type = 'application/json'
         filename = 'subs_{0}.srt.sjson'.format(subs_id)
 
-        content_location = StaticContent.compute_location(
-            self.org, self.number, filename)
+        content_location = StaticContent.compute_location(self.course.id, filename)
         content = StaticContent(content_location, filename, mime_type, filedata)
         contentstore().save(content)
         del_cached_content(content_location)

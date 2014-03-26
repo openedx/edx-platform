@@ -174,7 +174,7 @@ def xblock_handler(request, tag=None, org=None, offering=None, branch=None, vers
 @require_http_methods(("GET"))
 @login_required
 @expect_json
-def xblock_view_handler(request, view_name, org=None, offering=None, tag=None, branch=None, version_guid=None,
+def xblock_view_handler(request, view_name, org=None, offering=None, branch=None, version_guid=None,
                         block=None, tag=None):
     """
     The restful handler for requests for rendered xblock views.

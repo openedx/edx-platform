@@ -2,7 +2,6 @@
 
 import logging
 import re
-from collections import namedtuple
 from opaque_keys import InvalidKeyError
 
 from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey, AssetKey
@@ -70,8 +69,12 @@ class SlashSeparatedCourseKey(CourseKey):
         """
         match = URL_RE.match(location_url)
         if match is None:
-            log.debug(u"location %r doesn't match URL", location_url)
-            raise InvalidKeyError(Location, location_url)
+            # try seeing if it's a legitimate new form
+            try:
+                return UsageKey.from_string(location_url)
+            except InvalidKeyError:
+                log.debug(u"location %r doesn't match URL", location_url)
+                raise InvalidKeyError(Location, location_url)
         groups = match.groupdict()
         if 'tag' in groups:
             del groups['tag']
@@ -207,7 +210,7 @@ class LocationBase(object):
             (?P<course>[^/]+)/
             (?P<run>[^/]+)/
             (?P<category>[^/]+)/
-            (?P<name>[^@]+)
+            (?P<name>[^@/]+)
             (@(?P<revision>[^/]+))?
         """
 
@@ -232,9 +235,13 @@ class LocationBase(object):
 
 
 class Location(LocationBase, UsageKey, DefinitionKey):
+
     CANONICAL_NAMESPACE = 'location'
     DEPRECATED_TAG = 'i4x'
     __slots__ = LocationBase.KEY_FIELDS
+
+    def map_into_course(self, course_key):
+        return Location(course_key.org, course_key.course, course_key.run, self.category, self.name, self.revision)
 
 
 class AssetLocation(LocationBase, AssetKey):

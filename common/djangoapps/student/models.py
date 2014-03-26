@@ -41,6 +41,7 @@ from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
+from IPython.external.decorators._decorators import deprecated
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -627,6 +628,34 @@ class CourseEnrollment(models.Model):
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_key)
             return record.is_active
+        except cls.DoesNotExist:
+            return False
+
+    @classmethod
+    @deprecated
+    def is_enrolled_by_partial(cls, user, course_id_partial):
+        """
+        Returns `True` if the user is enrolled in a course that starts with
+        `course_id_partial`. Otherwise, returns False.
+
+        Can be used to determine whether a student is enrolled in a course
+        whose run name is unknown.
+
+        `user` is a Django User object. If it hasn't been saved yet (no `.id`
+               attribute), this method will automatically save it before
+               adding an enrollment for it.
+
+        `course_id_partial` (CourseKey) is missing the run component
+        """
+        assert isinstance(course_id_partial, SlashSeparatedCourseKey)
+        assert not course_id_partial.run  # None or empty string
+        querystring = unicode(course_id_partial).replace('None', '')
+        try:
+            return CourseEnrollment.objects.filter(
+                user=user,
+                course_id__startswith=querystring,
+                is_active=1
+            ).exists()
         except cls.DoesNotExist:
             return False
 

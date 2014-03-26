@@ -176,8 +176,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         course_assets, __ = content_store.get_all_content_for_course(course_id)
         self.assertGreater(len(course_assets), 0, "No assets to lock")
-        content_store.set_attr(course_assets[0], 'locked', True)
-        return course_assets[0]
+        asset_key = modulestore()._location_from_id(course_assets[0]['_id'], course_id)
+        content_store.set_attr(asset_key, 'locked', True)
+        return asset_key
 
     def test_edit_unit_toy(self):
         self.check_edit_unit('toy')
@@ -1549,13 +1550,13 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         with mock.patch.dict('django.conf.settings.FEATURES', {'ALLOW_UNICODE_COURSE_ID': False}):
             error_message = "Special characters not allowed in organization, course number, and course run."
-            self.course_data['org'] = u'Юникода'
+            self.course_data['org'] = u'��������������'
             self.assert_create_course_failed(error_message)
 
-            self.course_data['number'] = u'échantillon'
+            self.course_data['number'] = u'��chantillon'
             self.assert_create_course_failed(error_message)
 
-            self.course_data['run'] = u'όνομα'
+            self.course_data['run'] = u'����������'
             self.assert_create_course_failed(error_message)
 
     def assert_course_permission_denied(self):

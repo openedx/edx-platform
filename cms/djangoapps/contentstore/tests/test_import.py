@@ -92,7 +92,9 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
         content = None
         try:
-            location = StaticContent.get_location_from_path('/c4x/edX/test_import_course/asset/should_be_imported.html')
+            location = StaticContent.get_location_from_path(
+                '/c4x/edX/test_import_course/asset/should_be_imported.html'
+            )
             content = content_store.find(location)
         except NotFoundError:
             pass
@@ -123,10 +125,10 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
 
-        handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course_info', 'handouts', None]))
+        handouts = module_store.get_item(Location('edX', 'toy', '2012_Fall','course_info', 'handouts'))
         self.assertIn('/static/', handouts.data)
 
-        handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'html', 'toyhtml', None]))
+        handouts = module_store.get_item(Location('edX', 'toy', '2012_Fall','html', 'toyhtml'))
         self.assertIn('/static/', handouts.data)
 
     def test_tab_name_imports_correctly(self):
@@ -144,7 +146,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             target_course_id=target_course_id
         )
         conditional_module = module_store.get_item(
-            Location(['i4x', 'testX', 'conditional_copy', 'conditional', 'condone'])
+            Location('testX', 'conditional_copy', 'copy_run', 'conditional', 'condone')
         )
         self.assertIsNotNone(conditional_module)
         self.assertListEqual(
@@ -172,7 +174,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             target_course_id=target_course_id
         )
         peergrading_module = module_store.get_item(
-            Location(['i4x', 'testX', 'peergrading_copy', 'peergrading', 'PeerGradingLinked'])
+            Location('testX', 'peergrading_copy', 'copy_run', 'peergrading', 'PeerGradingLinked')
         )
         self.assertIsNotNone(peergrading_module)
         self.assertEqual(
@@ -190,7 +192,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             target_course_id=target_course_id
         )
         split_test_module = module_store.get_item(
-            Location(['i4x', 'testX', 'split_test_copy', 'split_test', 'split1'])
+            Location('testX', 'split_test_copy', 'copy_run', 'split_test', 'split1'])
         )
         self.assertIsNotNone(split_test_module)
         self.assertEqual(
