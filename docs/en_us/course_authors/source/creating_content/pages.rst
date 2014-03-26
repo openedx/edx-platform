@@ -38,6 +38,7 @@ You can create other pages for the grading policy, course slides, or any other p
 See:
 
 * :ref:`Add a Page`
+* :ref:`Show or Hide the Course Wiki Page`
 * :ref:`Reorder Pages`
 * :ref:`Delete a Page`
 * :ref:`Code for Dynamic HTML Schedule`
@@ -70,6 +71,30 @@ Add a Page
 #. Click **Save**. 
 
 The new page is immediately available to students, if the course has started.
+
+.. _Show or Hide the Course Wiki Page:
+
+************************************************
+Show or Hide the Course Wiki Page
+************************************************
+
+By default, your course includes a Wiki. Students and course staff can use the Wiki to post content and comment on others' content.
+
+If you do not want to use the Wiki in your course, you can hide it.
+
+The eye icon in the Wiki object indicates that the Wiki is visible in your course:
+
+.. image:: ../Images/pages_wiki_on.png
+ :alt: Image of the Pages page with the Wiki made visible
+
+Click the eye icon to hide the Wiki. The icon changes:
+
+.. image:: ../Images/pages_wiki_off.png
+ :alt: Image of the Pages page with the Wiki made visible
+
+Click it again to make the Wiki visible.
+
+.. note:: Content remains in the Wiki when you hide it. For example, you could hide the Wiki during an exam. After the exam, you could make the Wiki visible again. The content that was previously posted will be available.
 
 .. _Reorder Pages:
 

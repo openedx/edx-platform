@@ -10,6 +10,9 @@ Change Log
 
    * - Date
      - Change  
+   * - 04/03/14
+     - Updated the :ref:`Adding Pages to a Course` chapter to reflect ability to
+       :ref:`Show or Hide the Course Wiki Page`.
    * - 04/02/14
      - Reorganized the sections :ref:`Building a Course Index` and
        :ref:`Creating Course Content Index` to better reflect the workflow of
