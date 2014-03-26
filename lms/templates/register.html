@@ -121,6 +121,7 @@
 
         <ol>
         % for enabled in provider.Registry.enabled():
+          ## Translators: provider_name is the name of an external, third-party user authentication service (like Google or LinkedIn).
           <li><a href="${pipeline.get_login_url(enabled.NAME)}">${_("Sign in with {provider_name}").format(provider_name=enabled.NAME)}</a>
         % endfor
         </ol>
@@ -132,6 +133,7 @@
         % else:
 
         <p class="instructions">
+          ## Translators: provider_name is the name of an external, third-party user authentication service (like Google or LinkedIn).
           ${_("You've successfully signed in with {selected_provider}.").format(selected_provider=selected_provider)}<br />
           ${_("Finish your account registration below to start learning.")}
         </p>
@@ -160,9 +162,9 @@
 
           % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline_running:
 
-          <li class="is-disabled field optional password" id="field-password">
+          <li class="is-disabled field optional password" id="field-password" hidden>
             <label for="password">${_('Password')}</label>
-            <input id="password" type="password" name="password" value="" disabled placeholder="${_('You signed in with {selected_provider} and do not need to set a password with {platform_name}').format(platform_name=platform_name, selected_provider=selected_provider)}"/>
+            <input id="password" type="password" name="password" value="" disabled required aria-required="true" />
           </li>
 
           % else:
