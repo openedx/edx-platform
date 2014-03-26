@@ -2,6 +2,7 @@
 import json
 import logging
 import requests
+from dogapi import dog_stats_api
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
@@ -43,6 +44,32 @@ class GradingService(object):
         response.raise_for_status()
 
         return response.json()
+
+    def _metric_name(self, suffix):
+        """
+        Return a metric name for datadog, using `self.METRIC_NAME` as
+        a prefix, and `suffix` as the suffix.
+
+        Arguments:
+            suffix (str): The metric suffix to use.
+        """
+        return '{}.{}'.format(self.METRIC_NAME, suffix)
+
+    def _record_result(self, action, data, tags=None):
+        """
+        Log results from an API call to an ORA service to datadog.
+
+        Arguments:
+            action (str): The ORA action being recorded.
+            data (dict): The data returned from the ORA service. Should contain the key 'success'.
+            tags (list): A list of tags to attach to the logged metric.
+        """
+        if tags is None:
+            tags = []
+
+        tags.append(u'result:{}'.format(data.get('success', False)))
+        tags.append(u'action:{}'.format(action))
+        dog_stats_api.increment(self._metric_name('request.count'), tags=tags)
 
     def post(self, url, data, allow_redirects=False):
         """
