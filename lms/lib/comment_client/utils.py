@@ -33,12 +33,13 @@ def merge_dict(dic1, dic2):
 
 
 @contextmanager
-def request_timer(request_id, method, url):
+def request_timer(request_id, method, url, tags=None):
     start = time()
-    yield
+    with dog_stats_api.timer('comment_client.request.time', tags=tags):
+        yield
     end = time()
     duration = end - start
-    dog_stats_api.histogram('comment_client.request.time', duration, end)
+
     log.info(
         "comment_client_request_log: request_id={request_id}, method={method}, "
         "url={url}, duration={duration}".format(
@@ -50,7 +51,16 @@ def request_timer(request_id, method, url):
     )
 
 
-def perform_request(method, url, data_or_params=None, raw=False):
+def perform_request(method, url, data_or_params=None, raw=False,
+                    metric_action=None, metric_tags=None, paged_results=False):
+
+    if metric_tags is None:
+        metric_tags = []
+
+    metric_tags.append(u'method:{}'.format(method))
+    if metric_action:
+        metric_tags.append(u'action:{}'.format(metric_action))
+
     if data_or_params is None:
         data_or_params = {}
     headers = {
@@ -66,7 +76,7 @@ def perform_request(method, url, data_or_params=None, raw=False):
     else:
         data = None
         params = merge_dict(data_or_params, request_id_dict)
-    with request_timer(request_id, method, url):
+    with request_timer(request_id, method, url, metric_tags):
         response = requests.request(
             method,
             url,
@@ -75,6 +85,14 @@ def perform_request(method, url, data_or_params=None, raw=False):
             headers=headers,
             timeout=5
         )
+
+    metric_tags.append(u'status_code:{}'.format(response.status_code))
+    if response.status_code > 200:
+        metric_tags.append(u'result:failure')
+    else:
+        metric_tags.append(u'result:success')
+
+    dog_stats_api.increment('comment_client.request.count', tags=metric_tags)
 
     if 200 < response.status_code < 500:
         raise CommentClientRequestError(response.text, response.status_code)
@@ -87,7 +105,24 @@ def perform_request(method, url, data_or_params=None, raw=False):
         if raw:
             return response.text
         else:
-            return response.json()
+            data = response.json()
+            if paged_results:
+                dog_stats_api.histogram(
+                    'comment_client.request.paged.result_count',
+                    value=len(data.get('collection', [])),
+                    tags=metric_tags
+                )
+                dog_stats_api.histogram(
+                    'comment_client.request.paged.page',
+                    value=data.get('page', 1),
+                    tags=metric_tags
+                )
+                dog_stats_api.histogram(
+                    'comment_client.request.paged.num_pages',
+                    value=data.get('num_pages', 1),
+                    tags=metric_tags
+                )
+            return data
 
 
 class CommentClientError(Exception):
