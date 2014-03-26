@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 18:07+0400\n"
-"PO-Revision-Date: 2014-03-26 14:22+0300\n"
+"POT-Creation-Date: 2014-03-26 10:56+0000\n"
+"PO-Revision-Date: 2014-03-26 15:03+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -90,11 +90,11 @@ msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py:14
 msgid "Administrator"
-msgstr ""
+msgstr "Администратор"
 
 #: common/djangoapps/django_comment_common/models.py:15
 msgid "Moderator"
-msgstr ""
+msgstr "Модератор"
 
 #: common/djangoapps/django_comment_common/models.py:16
 msgid "Community TA"
@@ -121,11 +121,11 @@ msgstr "Отключенная Учетная запись"
 
 #: common/djangoapps/student/models.py:198
 msgid "Male"
-msgstr ""
+msgstr "Мужчина"
 
 #: common/djangoapps/student/models.py:199
 msgid "Female"
-msgstr ""
+msgstr "Женщина"
 
 #. Translators: 'Other' refers to the student's gender
 #: common/djangoapps/student/models.py:201
@@ -2443,7 +2443,7 @@ msgstr ""
 #. has not yet been graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:53
 msgid "Not started."
-msgstr ""
+msgstr "Проверка не начата."
 
 #. Translators: "Being scored." is used to communicate to a student that their
 #. response
@@ -2627,21 +2627,20 @@ msgstr ""
 #. has not yet been graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:100
 msgid "Not started"
-msgstr ""
+msgstr "Проверка не начата"
 
 #. Translators: "In progress" communicates to a student that their response
 #. is currently in the grading process
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:103
-#, fuzzy
 msgid "In progress"
-msgstr "Прогресс"
+msgstr "В процессе"
 
 #. Translators: "Done" communicates to a student that their response
 #. has been fully graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:106
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:107
 msgid "Done"
-msgstr ""
+msgstr "Проверено"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:192
 msgid "The problem close date has passed, and this problem is now closed."
@@ -2703,9 +2702,8 @@ msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:23
-#, fuzzy
 msgid "Navigation"
-msgstr "Глобальная навигация"
+msgstr "Навигация"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:123
 msgid "About these documents"
@@ -2717,9 +2715,8 @@ msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:129
 #: lms/templates/wiki/plugins/attachments/index.html:40
-#, fuzzy
 msgid "Search"
-msgstr "Поиск сообщений"
+msgstr "Поиск"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:132
 msgid "Copyright"
@@ -2750,9 +2747,8 @@ msgid "Computer Science"
 msgstr "Информатика"
 
 #: lms/djangoapps/branding/views.py:88 lms/templates/wiki/history.html:5
-#, fuzzy
 msgid "History"
-msgstr "Посмотреть историю"
+msgstr "Историю"
 
 #: lms/djangoapps/branding/views.py:89
 msgid "Literature"
@@ -3577,6 +3573,23 @@ msgid "Instructor Assessment"
 msgstr "Проверка инструктором"
 
 #: lms/djangoapps/open_ended_grading/utils.py:27
+msgid "Currently being Graded"
+msgstr "В текущий момент проверяется"
+
+#: lms/djangoapps/open_ended_grading/utils.py:28
+#: lms/djangoapps/open_ended_grading/utils.py:31
+msgid "Waiting to be Graded"
+msgstr "Ожидает проверки"
+
+#: lms/djangoapps/open_ended_grading/utils.py:29
+msgid "Finished"
+msgstr "Проверка завершена"
+
+#: lms/djangoapps/open_ended_grading/utils.py:30
+msgid "Flagged"
+msgstr "Отмеченно"
+
+#: lms/djangoapps/open_ended_grading/utils.py:34
 msgid ""
 "Error occurred while contacting the grading service.  Please notify course "
 "staff."
@@ -3584,13 +3597,13 @@ msgstr ""
 "При обращении к сервису проверки работ возникла ошибка. Пожалуйста, "
 "уведомите преподавателей."
 
-#: lms/djangoapps/open_ended_grading/utils.py:28
+#: lms/djangoapps/open_ended_grading/utils.py:35
 msgid ""
 "Error occurred while contacting the grading service.  Please notify your edX "
 "point of contact."
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/utils.py:102
+#: lms/djangoapps/open_ended_grading/utils.py:109
 msgid "for course {0} and student {1}."
 msgstr "для курса {0} и студента {1}."
 

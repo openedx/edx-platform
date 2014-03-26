@@ -183,10 +183,12 @@ def fullstat(request = None):
         
         if len(enrolled_students) <= 0:
             continue
-
+            
         gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=True, use_offline=False)
         courseware_summary = grades.progress_summary(enrolled_students[0], request, course);
 
+        if courseware_summary is None:
+            continue
 
         assignments += [score.section for score in gradeset['raw_scores']]
         

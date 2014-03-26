@@ -23,6 +23,13 @@ GRADER_DISPLAY_NAMES = {
     'BC': _("Automatic Checker"),
     'IN': _("Instructor Assessment"),
 }
+STATE_DISPLAY_NAMES = {
+    "Currently being Graded": _("Currently being Graded"),
+    "Waiting to be Graded": _("Waiting to be Graded"),
+    "Finished": _("Finished"),
+    "Flagged": _("Flagged"),
+    "Waiting to be Graded": _("Waiting to be Graded"),
+}
 
 STUDENT_ERROR_MESSAGE = _("Error occurred while contacting the grading service.  Please notify course staff.")
 STAFF_ERROR_MESSAGE = _("Error occurred while contacting the grading service.  Please notify your edX point of contact.")
@@ -172,7 +179,9 @@ class StudentProblemList(object):
 
             # Map the grader name from ORA to a human readable version.
             grader_type_display_name = GRADER_DISPLAY_NAMES.get(problem['grader_type'], "edX Assessment")
+            state_display_name = STATE_DISPLAY_NAMES.get(problem['state'], "Waiting to be Graded")
             problem['actual_url'] = problem_url
             problem['grader_type_display_name'] = grader_type_display_name
+            problem['state_display_name'] = state_display_name
             valid_problems.append(problem)
         return valid_problems

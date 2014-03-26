@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 18:07+0400\n"
+"POT-Creation-Date: 2014-03-26 10:56+0000\n"
 "PO-Revision-Date: 2013-11-29 19:05+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -28,14 +28,14 @@ msgstr ""
 msgid "Studio's having trouble saving your work"
 msgstr "Студия не может сохранить Вашу работу"
 
-#: cms/static/coffee/src/views/module_edit.js:88
+#: cms/static/coffee/src/views/module_edit.js:75
 #, c-format
 msgid "<em>Editing:</em> %s"
 msgstr "<em>Редактирование:</em> %s"
 
-#: cms/static/coffee/src/views/module_edit.js:159
-#: cms/static/coffee/src/views/tabs.js:67
-#: cms/static/coffee/src/views/unit.js:95
+#: cms/static/coffee/src/views/module_edit.js:146
+#: cms/static/coffee/src/views/tabs.js:58
+#: cms/static/coffee/src/views/unit.js:72
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js:39
 #: cms/static/js/models/section.js:28 cms/static/js/views/asset.js:80
 #: cms/static/js/views/course_info_handout.js:59
@@ -44,40 +44,40 @@ msgstr "<em>Редактирование:</em> %s"
 msgid "Saving&hellip;"
 msgstr "Сохранение&hellip;"
 
-#: cms/static/coffee/src/views/tabs.js:106
+#: cms/static/coffee/src/views/tabs.js:97
 msgid "Delete Component Confirmation"
 msgstr "Подверждение удаления компонента"
 
-#: cms/static/coffee/src/views/tabs.js:107
+#: cms/static/coffee/src/views/tabs.js:98
 msgid ""
 "Are you sure you want to delete this component? This action cannot be undone."
 msgstr "Вы уверены, что хотите удалить этот компонент? Операция необратима."
 
-#: cms/static/coffee/src/views/tabs.js:121
-#: cms/static/coffee/src/views/unit.js:229 cms/static/js/base.js:282
+#: cms/static/coffee/src/views/tabs.js:112
+#: cms/static/coffee/src/views/unit.js:206 cms/static/js/base.js:282
 #: cms/static/js/views/course_info_update.js:148
 msgid "Deleting&hellip;"
 msgstr "Удаление&hellip;"
 
-#: cms/static/coffee/src/views/unit.js:175
+#: cms/static/coffee/src/views/unit.js:152
 #, fuzzy
 msgid "Adding&hellip;"
 msgstr "Сохранение&hellip;"
 
-#: cms/static/coffee/src/views/unit.js:191
+#: cms/static/coffee/src/views/unit.js:168
 #, fuzzy
 msgid "Duplicating&hellip;"
 msgstr "Удаление&hellip;"
 
-#: cms/static/coffee/src/views/unit.js:220
+#: cms/static/coffee/src/views/unit.js:197
 msgid "Delete this component?"
 msgstr "Удалить этот компонент?"
 
-#: cms/static/coffee/src/views/unit.js:221
+#: cms/static/coffee/src/views/unit.js:198
 msgid "Deleting this component is permanent and cannot be undone."
 msgstr "Удаление этого компонента необратимо."
 
-#: cms/static/coffee/src/views/unit.js:224
+#: cms/static/coffee/src/views/unit.js:201
 msgid "Yes, delete this component"
 msgstr "Да, удалить"
 

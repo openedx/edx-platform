@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 18:07+0400\n"
+"POT-Creation-Date: 2014-03-26 10:56+0000\n"
 "PO-Revision-Date: 2014-03-25 16:33+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -1196,28 +1196,28 @@ msgstr ""
 msgid "working..."
 msgstr ""
 
-#: lms/templates/master_class.html:28 lms/templates/register.html:201
+#: lms/templates/master_class.html:29 lms/templates/register.html:201
 #: lms/templates/university_profile/edge.html:34
 msgid "Register"
 msgstr "Регистрация"
 
-#: lms/templates/master_class.html:34
+#: lms/templates/master_class.html:35
 msgid "Passed registration:"
 msgstr "Прошедшие регистрацию:"
 
-#: lms/templates/master_class.html:35
+#: lms/templates/master_class.html:36
 msgid "Total places:"
 msgstr "Всего мест:"
 
-#: lms/templates/master_class.html:41
+#: lms/templates/master_class.html:42
 msgid "Staff Inforamtion"
 msgstr "Информация для преподавателей"
 
-#: lms/templates/master_class.html:42
+#: lms/templates/master_class.html:43
 msgid "Students pending registration"
 msgstr "Студенты, ожидающие регистрацию"
 
-#: lms/templates/master_class.html:46
+#: lms/templates/master_class.html:47
 msgid "Students passed registration"
 msgstr "Студенты, прошедшие регистрацию"
 
@@ -4028,6 +4028,10 @@ msgstr ""
 #: lms/templates/instructor/staff_grading.html:56
 msgid "Prompt"
 msgstr "Условие задачи"
+
+#: lms/templates/instructor/staff_grading.html:56
+msgid "(Hide)"
+msgstr "(скрыть)"
 
 #: lms/templates/instructor/staff_grading.html:69
 #: lms/templates/peer_grading/peer_grading_problem.html:32
@@ -10917,9 +10921,6 @@ msgstr ""
 
 #~ msgid "e.g. sch9999"
 #~ msgstr "например sch9999"
-
-#~ msgid "(Hide)"
-#~ msgstr "(скрыть)"
 
 #~ msgid "Hide Prompt"
 #~ msgstr "Скрыть задание"
