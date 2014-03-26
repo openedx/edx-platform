@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2014-03-24 18:07+0400\n"
-"PO-Revision-Date: 2014-01-30 13:35+0300\n"
+"PO-Revision-Date: 2014-03-26 13:58+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -616,9 +616,8 @@ msgid "Username should only consist of A-Z and 0-9, with no spaces."
 msgstr ""
 
 #: common/djangoapps/student/views.py:1201
-#, fuzzy
 msgid "Password: "
-msgstr "Форма сброса пароля"
+msgstr "Пароль:"
 
 #: common/djangoapps/student/views.py:1240
 msgid "Could not send activation e-mail."
@@ -714,7 +713,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:211
 msgctxt "weekday name"
 msgid "Monday"
-msgstr ""
+msgstr "Понедельник"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Tuesday Februrary 11, 2014". It is used for the %A
@@ -722,7 +721,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:215
 msgctxt "weekday name"
 msgid "Tuesday"
-msgstr ""
+msgstr "Вторник"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Wednesday Februrary 12, 2014". It is used for the %A
@@ -730,7 +729,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:219
 msgctxt "weekday name"
 msgid "Wednesday"
-msgstr ""
+msgstr "Среда"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Thursday Februrary 13, 2014". It is used for the %A
@@ -738,7 +737,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:223
 msgctxt "weekday name"
 msgid "Thursday"
-msgstr ""
+msgstr "Четверг"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Friday Februrary 14, 2014". It is used for the %A
@@ -746,7 +745,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:227
 msgctxt "weekday name"
 msgid "Friday"
-msgstr ""
+msgstr "Пятница"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Saturday Februrary 15, 2014". It is used for the %A
@@ -754,7 +753,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:231
 msgctxt "weekday name"
 msgid "Saturday"
-msgstr ""
+msgstr "Суббота"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Sunday Februrary 16, 2014". It is used for the %A
@@ -762,7 +761,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:235
 msgctxt "weekday name"
 msgid "Sunday"
-msgstr ""
+msgstr "Воскресенье"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Mon Feb 10, 2014". It is used for the %a
@@ -770,7 +769,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:242
 msgctxt "abbreviated weekday name"
 msgid "Mon"
-msgstr ""
+msgstr "Пн"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Tue Feb 11, 2014". It is used for the %a
@@ -778,7 +777,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:246
 msgctxt "abbreviated weekday name"
 msgid "Tue"
-msgstr ""
+msgstr "Вт"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Wed Feb 12, 2014". It is used for the %a
@@ -786,7 +785,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:250
 msgctxt "abbreviated weekday name"
 msgid "Wed"
-msgstr ""
+msgstr "Ср"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Thu Feb 13, 2014". It is used for the %a
@@ -794,7 +793,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:254
 msgctxt "abbreviated weekday name"
 msgid "Thu"
-msgstr ""
+msgstr "Чт"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Fri Feb 14, 2014". It is used for the %a
@@ -802,7 +801,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:258
 msgctxt "abbreviated weekday name"
 msgid "Fri"
-msgstr ""
+msgstr "Пт"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sat Feb 15, 2014". It is used for the %a
@@ -810,7 +809,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:262
 msgctxt "abbreviated weekday name"
 msgid "Sat"
-msgstr ""
+msgstr "Сб"
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sun Feb 16, 2014". It is used for the %a
@@ -818,16 +817,15 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:266
 msgctxt "abbreviated weekday name"
 msgid "Sun"
-msgstr ""
+msgstr "Вс"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jan 10, 2014". It is used for the %b
 #. directive in date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py:273
-#, fuzzy
 msgctxt "abbreviated month name"
 msgid "Jan"
-msgstr "Заблокировать"
+msgstr "Янв"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Feb 10, 2014". It is used for the %b
@@ -835,7 +833,7 @@ msgstr "Заблокировать"
 #: common/djangoapps/util/date_utils.py:277
 msgctxt "abbreviated month name"
 msgid "Feb"
-msgstr ""
+msgstr "Фев"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Mar 10, 2014". It is used for the %b
@@ -843,7 +841,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:281
 msgctxt "abbreviated month name"
 msgid "Mar"
-msgstr ""
+msgstr "Мрт"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Apr 10, 2014". It is used for the %b
@@ -851,7 +849,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:285
 msgctxt "abbreviated month name"
 msgid "Apr"
-msgstr ""
+msgstr "Апр"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "May 10, 2014". It is used for the %b
@@ -859,7 +857,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:289
 msgctxt "abbreviated month name"
 msgid "May"
-msgstr ""
+msgstr "Май"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jun 10, 2014". It is used for the %b
@@ -867,7 +865,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:293
 msgctxt "abbreviated month name"
 msgid "Jun"
-msgstr ""
+msgstr "Июн"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jul 10, 2014". It is used for the %b
@@ -875,7 +873,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:297
 msgctxt "abbreviated month name"
 msgid "Jul"
-msgstr ""
+msgstr "Июл"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Aug 10, 2014". It is used for the %b
@@ -883,7 +881,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:301
 msgctxt "abbreviated month name"
 msgid "Aug"
-msgstr ""
+msgstr "Авг"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Sep 10, 2014". It is used for the %b
@@ -891,7 +889,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:305
 msgctxt "abbreviated month name"
 msgid "Sep"
-msgstr ""
+msgstr "Сен"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Oct 10, 2014". It is used for the %b
@@ -899,7 +897,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:309
 msgctxt "abbreviated month name"
 msgid "Oct"
-msgstr ""
+msgstr "Окт"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Nov 10, 2014". It is used for the %b
@@ -907,16 +905,15 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:313
 msgctxt "abbreviated month name"
 msgid "Nov"
-msgstr ""
+msgstr "Нбр"
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Dec 10, 2014". It is used for the %b
 #. directive in date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py:317
-#, fuzzy
 msgctxt "abbreviated month name"
 msgid "Dec"
-msgstr "Детали"
+msgstr "Дек"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "January 10, 2014". It is used for the %B directive in
@@ -924,7 +921,7 @@ msgstr "Детали"
 #: common/djangoapps/util/date_utils.py:324
 msgctxt "month name"
 msgid "January"
-msgstr ""
+msgstr "Январь"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "February 10, 2014". It is used for the %B directive in
@@ -932,16 +929,15 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:328
 msgctxt "month name"
 msgid "February"
-msgstr ""
+msgstr "Февраль"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "March 10, 2014". It is used for the %B directive in
 #. date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py:332
-#, fuzzy
 msgctxt "month name"
 msgid "March"
-msgstr "Поиск сообщений"
+msgstr "Март"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "April 10, 2014". It is used for the %B directive in
@@ -949,7 +945,7 @@ msgstr "Поиск сообщений"
 #: common/djangoapps/util/date_utils.py:336
 msgctxt "month name"
 msgid "April"
-msgstr ""
+msgstr "Апрель"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "May 10, 2014". It is used for the %B directive in
@@ -957,7 +953,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:340
 msgctxt "month name"
 msgid "May"
-msgstr ""
+msgstr "Май"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "June 10, 2014". It is used for the %B directive in
@@ -965,7 +961,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:344
 msgctxt "month name"
 msgid "June"
-msgstr ""
+msgstr "Июнь"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "July 10, 2014". It is used for the %B directive in
@@ -973,7 +969,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:348
 msgctxt "month name"
 msgid "July"
-msgstr ""
+msgstr "Июль"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "August 10, 2014". It is used for the %B directive in
@@ -981,7 +977,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:352
 msgctxt "month name"
 msgid "August"
-msgstr ""
+msgstr "Август"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "September 10, 2014". It is used for the %B directive in
@@ -989,7 +985,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:356
 msgctxt "month name"
 msgid "September"
-msgstr ""
+msgstr "Сентябрь"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "October 10, 2014". It is used for the %B directive in
@@ -997,7 +993,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:360
 msgctxt "month name"
 msgid "October"
-msgstr ""
+msgstr "Октябрь"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "November 10, 2014". It is used for the %B directive in
@@ -1005,7 +1001,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:364
 msgctxt "month name"
 msgid "November"
-msgstr ""
+msgstr "Ноябрь"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "December 10, 2014". It is used for the %B directive in
@@ -1013,7 +1009,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py:368
 msgctxt "month name"
 msgid "December"
-msgstr ""
+msgstr "Декабрь"
 
 #: common/djangoapps/util/password_policy_validators.py:23
 #, fuzzy
@@ -1342,7 +1338,9 @@ msgstr "Ваши ответы были сохранены."
 #: common/lib/xmodule/xmodule/capa_base.py:1170
 msgid ""
 "Your answers have been saved but not graded. Click 'Check' to grade them."
-msgstr "Ваши ответы были сохранены, но не проверены. Для проверки нажмите кнопку \"Проверка\""
+msgstr ""
+"Ваши ответы были сохранены, но не проверены. Для проверки нажмите кнопку "
+"\"Проверка\""
 
 #: common/lib/xmodule/xmodule/capa_base.py:1207
 msgid "Refresh the page and make an attempt before resetting."
@@ -2100,7 +2098,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py:344
-#, fuzzy
 msgid "Course Handouts"
 msgstr "Информация о курсе"
 
@@ -2531,21 +2528,18 @@ msgstr ""
 #. Translators: "Self-Assessment" refers to the self-assessed mode of
 #. openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py:18
-#, fuzzy
 msgid "Self-Assessment"
-msgstr "Перекрестная проверка"
+msgstr "Самопроверка"
 
 #. Translators: "Peer-Assessment" refers to the peer-assessed mode of
 #. openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py:20
-#, fuzzy
 msgid "Peer-Assessment"
 msgstr "Перекрестная проверка"
 
 #. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
 #. of openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py:22
-#, fuzzy
 msgid "Instructor-Assessment"
 msgstr "Проверка инструктором"
 
@@ -2553,7 +2547,6 @@ msgstr "Проверка инструктором"
 #. evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py:24
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py:26
-#, fuzzy
 msgid "AI-Assessment"
 msgstr "Проверка ИИ"
 

@@ -95,9 +95,9 @@ def gendata(request):
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course.id,
         ).prefetch_related("groups").order_by('username')
-        enrolled_students = [st for st in enrolled_students if _has_staff_access_to_course_id(st, course.id)]
+        enrolled_students = [st for st in enrolled_students if not _has_staff_access_to_course_id(st, course.id)]
         
-        if enrolled_students.count() <= 0:
+        if len(enrolled_students) <= 0:
             continue
 
         #Category weights
@@ -179,8 +179,10 @@ def fullstat(request = None):
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course.id,
         ).prefetch_related("groups").order_by('username')
-        enrolled_students = [st for st in enrolled_students if _has_staff_access_to_course_id(st, course.id)]
+        enrolled_students = [st for st in enrolled_students if not _has_staff_access_to_course_id(st, course.id)]
         
+        if len(enrolled_students) <= 0:
+            continue
 
         gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=True, use_offline=False)
         courseware_summary = grades.progress_summary(enrolled_students[0], request, course);
@@ -252,7 +254,7 @@ def fullstat(request = None):
             datarow += [course_name]
 
             try:
-                courseenrollment = user.courseenrollment_set.filter(course_id = course_id)[0]
+                courseenrollment = user.courseenrollment_set.filter(course_id = course.id)[0]
                 datarow += [u'Да', courseenrollment.created.strftime('%d/%m/%Y')]
             except:
                 datarow += [u'Нет', '']
@@ -295,7 +297,7 @@ def fullstat(request = None):
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course.id,
         ).prefetch_related("groups").order_by('username')
-        enrolled_students = [st for st in enrolled_students if _has_staff_access_to_course_id(st, course.id)]
+        enrolled_students = [st for st in enrolled_students if not _has_staff_access_to_course_id(st, course.id)]
         
 
 
