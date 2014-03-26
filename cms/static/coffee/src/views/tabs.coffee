@@ -55,7 +55,6 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
 
     tabMoved: (event, ui) =>
       tab_ids = []
-      debugger;
       @$('.course_tab').each((idx, element) =>
           tab_ids.push($(element).data('tab-id'))
       )
@@ -84,6 +83,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       )
 
       $('.new-component-item').before(editor.$el)
+      editor.$el.addClass('course_tab')
       editor.$el.addClass('new')
       setTimeout(=>
         editor.$el.removeClass('new')
