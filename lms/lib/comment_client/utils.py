@@ -50,7 +50,7 @@ def request_timer(request_id, method, url):
     )
 
 
-def perform_request(method, url, data_or_params=None, *args, **kwargs):
+def perform_request(method, url, data_or_params=None, raw=False):
     if data_or_params is None:
         data_or_params = {}
     headers = {
@@ -84,7 +84,7 @@ def perform_request(method, url, data_or_params=None, *args, **kwargs):
     elif response.status_code == 500:
         raise CommentClient500Error(response.text)
     else:
-        if kwargs.get("raw", False):
+        if raw:
             return response.text
         else:
             return json.loads(response.text)

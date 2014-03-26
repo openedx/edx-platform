@@ -27,7 +27,7 @@ class Thread(models.Model):
     type = 'thread'
 
     @classmethod
-    def search(cls, query_params, *args, **kwargs):
+    def search(cls, query_params):
 
         default_params = {'page': 1,
                           'per_page': 20,
@@ -41,7 +41,7 @@ class Thread(models.Model):
             url = cls.url(action='get_all', params=extract(params, 'commentable_id'))
             if params.get('commentable_id'):
                 del params['commentable_id']
-        response = perform_request('get', url, params, *args, **kwargs)
+        response = perform_request('get', url, params)
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
     @classmethod
