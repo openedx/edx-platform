@@ -180,7 +180,7 @@
   }
 
   .component,
-  .course-nav-tab {
+  .course-nav-item {
     position: relative;
     border: 1px solid $mediumGrey;
     border-top: none;
@@ -239,7 +239,7 @@
     }
 
     .component-actions,
-    .course-nav-tab-actions {
+    .course-nav-item-actions {
       display: inline-block;
       float: right;
       margin-right: ($baseline*2);
@@ -289,30 +289,31 @@
   }
 
   // basic course nav items - overrides from above
-  .course-nav-tab {
+  .course-nav-item {
     padding: ($baseline*.75) ($baseline/4) ($baseline*.75) $baseline;
+    background: $white;
 
-    &.fixed {
+    &.is-fixed {
+      @extend %ui-disabled;
       @include transition(opacity $tmg-f2 ease-in-out 0s);
-      opacity: .7;
-
-      &:hover {
-        opacity: 1;
-      }
+      opacity: 0.5;
     }
 
-    .course-nav-tab-header {
+    .course-nav-item-header {
       display: inline-block;
       width:80%;
 
       .title {
         @extend %t-title4;
-        font-weight: 300;
-        color: $gray;
+      }
+
+      .title-sub {
+        @extend %t-title7;
+         color: $gray-l2;
       }
     }
 
-    .course-nav-tab-actions {
+    .course-nav-item-actions {
       display: inline-block;
       padding: ($baseline/10);
     }
@@ -335,7 +336,6 @@
     @include transition(background-color $tmg-s3 linear 0s);
     padding: 20px 20px 22px;
     font-size: 24px;
-    font-weight: 300;
     background: #fff;
   }
 
@@ -395,4 +395,3 @@
     outline: 0;
   }
 }
-
