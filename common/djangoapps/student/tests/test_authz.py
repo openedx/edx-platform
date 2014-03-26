@@ -4,7 +4,7 @@ Tests authz.py
 import mock
 
 from django.test import TestCase
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from xmodule.modulestore import Location
 from django.core.exceptions import PermissionDenied
 
@@ -78,9 +78,10 @@ class CreatorGroupTest(TestCase):
         """
         with mock.patch.dict('django.conf.settings.FEATURES',
                              {'DISABLE_COURSE_CREATION': False, "ENABLE_CREATOR_GROUP": True}):
-            self.user.is_authenticated = False
-            add_users(self.admin, CourseCreatorRole(), self.user)
-            self.assertFalse(has_access(self.user, CourseCreatorRole()))
+            anonymous_user = AnonymousUser()
+            role = CourseCreatorRole()
+            add_users(self.admin, role, anonymous_user)
+            self.assertFalse(has_access(anonymous_user, role))
 
     def test_add_user_not_active(self):
         """
