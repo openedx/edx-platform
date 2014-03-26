@@ -15,7 +15,7 @@ class Env(object):
     """
 
     # Root of the git repository (edx-platform)
-    REPO_ROOT = path(__file__).parent.parent.parent
+    REPO_ROOT = path(__file__).abspath().parent.parent.parent
 
     # Service variant (lms, cms, etc.) configured with an environment variable
     # We use this to determine which envs.json file to load.
