@@ -206,6 +206,12 @@ $('#fileupload').fileupload({
                         chooseBtn.html("${_("Choose new file")}").show();
                         bar.hide();
                     }
+                    var serverMsg = $.parseJSON(result);
+                    var warnMsg = result.hasOwnProperty("WarnMsg") ?  result.WarnMsg : "" ;
+                    if (result.hasOwnProperty("Stage")) {
+                        var stage = result.Stage;
+                        CourseImport.stageWarning(stage, defaults[stage] + warnMsg);
+                    }
                     chooseBtn.html("${_("Choose new file")}").show();
                     bar.hide();
                 });

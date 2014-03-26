@@ -271,6 +271,28 @@
             color: $red;
           }
         }
+
+        // STATE: warnings
+        &.has-warning {
+
+          .icon-cog {
+            visibility: hidden;
+            opacity: 0.0;
+          }
+
+          .icon-warning-sign {
+            visibility: visible;
+            opacity: 1.0;
+          }
+
+          *[class^="icon-"] {
+            color: $orange;
+          }
+
+          .status-detail .title, .status-detail .copy {
+            color: $orange;
+          }
+        }
       }
     }
   }

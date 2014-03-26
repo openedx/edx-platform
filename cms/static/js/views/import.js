@@ -84,6 +84,7 @@ define(
                     $(elem).removeClass("is-complete").
                         removeClass("is-started").
                         removeClass("has-error").
+                        removeClass("has-warning").
                         addClass("is-not-started");
                     $(elem).find('p.error').remove(); // remove error messages
                     $(elem).find('p.copy').show();
@@ -141,6 +142,29 @@ define(
                 var message = msg || gettext("There was an error with the upload");
                 var elem = $('ol.status-progress').children().eq(stageNo);
                 elem.removeClass('is-started').addClass('has-error');
+                elem.find('p.copy').hide().after("<p class='copy error'>" + message + "</p>");
+            },
+
+
+            /**
+             * Give warning message at the list element that corresponds to the stage
+             * where the warning occurred.
+             * @param {int} stageNo Stage of import process at which warning/error occurred.
+             * @param {string} msg Warning message to display.
+             */
+            stageWarning: function (stageNo, msg) {
+                // Make all stages including the warning stage 'complete'.
+                var all = $('ol.status-progress').children();
+                _.map(all, function (elem){
+                    $(elem).
+                        removeClass("is-not-started").
+                        removeClass("is-started").
+                        addClass("is-complete");
+                    updateCog($(elem), false);
+                });
+                var message = msg || gettext("There was an error with the upload");
+                var elem = $('ol.status-progress').children().eq(stageNo);
+                elem.removeClass('is-started').addClass('has-warning');
                 elem.find('p.copy').hide().after("<p class='copy error'>" + message + "</p>");
             }
 

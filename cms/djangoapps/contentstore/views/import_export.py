@@ -249,6 +249,22 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
                 finally:
                     shutil.rmtree(course_dir)
 
+                warning_list = []
+                # Get all errors and warnings during import_from_xml
+                for err_log in _module_store._location_errors.itervalues():
+                    for err_log_entry, err_log_traceback in err_log.errors:
+                        warning_list.append(err_log_entry)
+
+                if warning_list:
+                    return JsonResponse(
+                        {
+                            'Status': 'OK',
+                            'WarnMsg': "\n ".join(warning_list),
+                            'Stage': 2
+                        },
+                        status=200
+                    )
+
                 return JsonResponse({'Status': 'OK'})
     elif request.method == 'GET':  # assume html
         course_module = modulestore().get_item(old_location)
