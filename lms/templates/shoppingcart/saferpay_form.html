@@ -1,0 +1,7 @@
+        <form action="${action}" method="post">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+            % for pk, pv in params.iteritems():
+                <input type="hidden" name="${pk}" value="${pv}" />
+            % endfor
+                <input type="submit" value="Check Out" />
+        </form>

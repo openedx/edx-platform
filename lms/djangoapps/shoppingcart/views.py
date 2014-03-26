@@ -15,7 +15,7 @@ from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, Universit
 from student.models import CourseEnrollment
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException
 from .models import Order, PaidCourseRegistration, OrderItem
-from .processors import process_postpay_callback, render_purchase_form_html
+from .processors import process_postpay_callback, render_purchase_form_html, process_purchase_callback
 
 log = logging.getLogger("shoppingcart")
 
@@ -92,8 +92,23 @@ def remove_item(request):
     return HttpResponse('OK')
 
 
+@login_required
+def purchase_callback(request):
+    """
+    This is the entry point that can be used when the user clicks 'Buy' (or something similar).
+    This simply turns around and calls the interface to the payment processor module
+    """
+    params = request.POST.dict()
+
+    result = process_purchase_callback(params)
+    if result['success'] and 'redirect_url' in result:
+        return HttpResponseRedirect(result['redirect_url'])
+    else:
+        return render_to_response('shoppingcart/error.html', {'order': result['order'],
+                                                              'error_html': result['error_html']})
+
+
 @csrf_exempt
-@require_POST
 def postpay_callback(request):
     """
     Receives the POST-back from processor.
@@ -104,7 +119,11 @@ def postpay_callback(request):
     If unsuccessful the order will be left untouched and HTML messages giving more detailed error info will be
     returned.
     """
-    params = request.POST.dict()
+    if request.method == 'POST':
+        params = request.POST.dict()
+    else:
+        params = request.GET.dict()
+
     result = process_postpay_callback(params)
     if result['success']:
         return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
