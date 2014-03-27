@@ -53,7 +53,6 @@ def change_name(step, new_name):
 
 @step(u'I reorder the static pages')
 def reorder_static_pages(_step):
-    # For some reason, the drag_and_drop method did not work in this case.
     reorder_pages_with_css_class('.component')
 
 
@@ -135,6 +134,7 @@ def page_toggle_visibility(step, page_id):
 
 
 def reorder_pages_with_css_class(css_class):
+    # For some reason, the drag_and_drop method did not work in this case.
     draggables = world.css_find(css_class + ' .drag-handle')
     source = draggables.first
     target = draggables.last

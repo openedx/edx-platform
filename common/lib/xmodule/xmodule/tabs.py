@@ -739,15 +739,11 @@ class CourseTabList(List):
         return None
 
     @staticmethod
-    def get_tab_by_slug(course, url_slug):
+    def get_tab_by_slug(tab_list, url_slug):
         """
         Look for a tab with the specified 'url_slug'.  Returns the tab or None if not found.
         """
-        for tab in course.tabs:
-            # The validation code checks that these exist.
-            if tab.get('url_slug') == url_slug:
-                return tab
-        return None
+        return next((tab for tab in tab_list if tab.get('url_slug') == url_slug), None)
 
     @staticmethod
     def get_tab_by_type(tab_list, tab_type):

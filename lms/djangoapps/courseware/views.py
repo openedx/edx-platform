@@ -481,7 +481,7 @@ def static_tab(request, course_id, tab_slug):
     """
     course = get_course_with_access(request.user, course_id, 'load')
 
-    tab = CourseTabList.get_tab_by_slug(course, tab_slug)
+    tab = CourseTabList.get_tab_by_slug(course.tabs, tab_slug)
     if tab is None:
         raise Http404
 

@@ -34,9 +34,6 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       checkbox_element = event.srcElement
       tab_element = $(checkbox_element).parents(".course-tab")[0]
 
-      tab_id = $(tab_element).data('tab-id')
-      is_hidden = $(checkbox_element).is(':checked')
-
       saving = new NotificationView.Mini({title: gettext("Saving&hellip;")})
       saving.show()
 
@@ -44,8 +41,11 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
         type:'POST',
         url: @model.url(),
         data: JSON.stringify({
-          tab_id : tab_id,
-          is_hidden : is_hidden
+          tab_id_locator : {
+            tab_id: $(tab_element).data('tab-id'),
+            tab_locator: $(tab_element).data('locator')
+          },
+          is_hidden : $(checkbox_element).is(':checked')
         }),
         contentType: 'application/json'
       }).success(=> saving.hide())

@@ -53,7 +53,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         else:
             if 'tabs' in request.json:
                 return reorder_tabs_handler(course_item, request)
-            elif 'tab_id' in request.json:
+            elif 'tab_id_locator' in request.json:
                 return edit_tab_handler(course_item, request)
             else:
                 raise NotImplementedError('Creating or changing tab content is not supported.')
@@ -90,17 +90,19 @@ def reorder_tabs_handler(course_item, request):
     Helper function for handling reorder of tabs request
     """
 
-    old_tab_list = course_item.tabs
-
+    # Tabs are identified by tab_id or locators.
+    # The locators are used to identify static tabs since they are xmodules.
+    # Although all tabs have tab_ids, newly created static tabs do not know
+    # their tab_ids since the xmodule editor uses only locators to identify new objects.
     ids_locators_of_new_tab_order = request.json['tabs']
+
+    # original tab list in original order
+    old_tab_list = course_item.tabs
 
     # create a new list in the new order
     new_tab_list = []
     for tab_id_locator in ids_locators_of_new_tab_order:
-        if 'tab_id' in tab_id_locator:
-            tab = CourseTabList.get_tab_by_id(old_tab_list, tab_id_locator['tab_id'])
-        elif 'tab_locator' in tab_id_locator:
-            tab = get_tab_by_locator(old_tab_list, tab_id_locator['tab_locator'])
+        tab = get_tab_by_tab_id_locator(old_tab_list, tab_id_locator)
         if tab is None:
             return JsonResponse(
                 {"error": "Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
@@ -120,6 +122,7 @@ def reorder_tabs_handler(course_item, request):
             {"error": "New list of tabs is not valid: {0}.".format(str(e))}, status=400
         )
 
+    # persist the new order of the tabs
     course_item.tabs = new_tab_list
     modulestore('direct').update_item(course_item, request.user.id)
 
@@ -130,21 +133,36 @@ def edit_tab_handler(course_item, request):
     """
     Helper function for handling requests to edit settings of a single tab
     """
-    tab_id = request.json['tab_id']
 
-    tab = CourseTabList.get_tab_by_id(course_item.tabs, tab_id)
+    # Tabs are identified by tab_id or locator
+    tab_id_locator = request.json['tab_id_locator']
+
+    # Find the given tab in the course
+    tab = get_tab_by_tab_id_locator(course_item.tabs, tab_id_locator)
     if tab is None:
         return JsonResponse(
-            {"error": "Tab with id '{0}' does not exist.".format(tab_id)}, status=400
+            {"error": "Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
         )
 
     if 'is_hidden' in request.json:
+        # set the is_hidden attribute on the requested tab
         tab.is_hidden = request.json['is_hidden']
         modulestore('direct').update_item(course_item, request.user.id)
     else:
         raise NotImplementedError('Unsupported request to edit tab: {0}'.format(request.json))
 
     return JsonResponse()
+
+
+def get_tab_by_tab_id_locator(tab_list, tab_id_locator):
+    """
+    Look for a tab with the specified tab_id or locator.  Returns the first matching tab.
+    """
+    if 'tab_id' in tab_id_locator:
+        tab = CourseTabList.get_tab_by_id(tab_list, tab_id_locator['tab_id'])
+    elif 'tab_locator' in tab_id_locator:
+        tab = get_tab_by_locator(tab_list, tab_id_locator['tab_locator'])
+    return tab
 
 
 def get_tab_by_locator(tab_list, tab_locator):

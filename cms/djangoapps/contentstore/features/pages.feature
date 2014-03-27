@@ -52,6 +52,11 @@ Feature: CMS.Pages
         Given I have opened the pages page in a new course
         Then I should see the "wiki" page as "visible"
         When I toggle the visibility of the "wiki" page
+        Then I should see the "wiki" page as "hidden"
         And I reload the page
         Then I should see the "wiki" page as "hidden"
+        When I toggle the visibility of the "wiki" page
+        Then I should see the "wiki" page as "visible"
+        And I reload the page
+        Then I should see the "wiki" page as "visible"
 

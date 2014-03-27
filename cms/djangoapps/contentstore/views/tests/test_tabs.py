@@ -30,6 +30,8 @@ class TabsPageTests(CourseTestCase):
         self.reload_course()
 
     def check_invalid_tab_id_response(self, resp):
+        """Verify response is an error listing the invalid_tab_id"""
+
         self.assertEqual(resp.status_code, 400)
         resp_content = json.loads(resp.content)
         self.assertIn("error", resp_content)
@@ -58,6 +60,7 @@ class TabsPageTests(CourseTestCase):
 
     def test_view_index(self):
         """Basic check that the Pages page responds correctly"""
+
         resp = self.client.get_html(self.url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn('course-nav-tab-list', resp.content)
@@ -96,6 +99,7 @@ class TabsPageTests(CourseTestCase):
 
     def test_reorder_tabs_invalid_list(self):
         """Test re-ordering of tabs with invalid tab list"""
+
         orig_tab_ids = [tab.tab_id for tab in self.course.tabs]
         tab_ids = list(orig_tab_ids)
 
@@ -113,6 +117,7 @@ class TabsPageTests(CourseTestCase):
 
     def test_reorder_tabs_invalid_tab(self):
         """Test re-ordering of tabs with invalid tab"""
+
         invalid_tab_ids = ['courseware', 'info', 'invalid_tab_id']
 
         # post the request
@@ -124,6 +129,7 @@ class TabsPageTests(CourseTestCase):
 
     def check_toggle_tab_visiblity(self, tab_type, new_is_hidden_setting):
         """Helper method to check changes in tab visibility"""
+
         # find the tab
         old_tab = CourseTabList.get_tab_by_type(self.course.tabs, tab_type)
 
@@ -133,7 +139,10 @@ class TabsPageTests(CourseTestCase):
         # post the request
         resp = self.client.ajax_post(
             self.url,
-            data=json.dumps({'tab_id': old_tab.tab_id, 'is_hidden': new_is_hidden_setting}),
+            data=json.dumps({
+                'tab_id_locator': {'tab_id': old_tab.tab_id},
+                'is_hidden': new_is_hidden_setting
+            }),
         )
         self.assertEqual(resp.status_code, 204)
 
@@ -144,6 +153,7 @@ class TabsPageTests(CourseTestCase):
 
     def test_toggle_tab_visibility(self):
         """Test toggling of tab visiblity"""
+
         self.check_toggle_tab_visiblity(WikiTab.type, True)
         self.check_toggle_tab_visiblity(WikiTab.type, False)
 
@@ -153,7 +163,9 @@ class TabsPageTests(CourseTestCase):
         # post the request
         resp = self.client.ajax_post(
             self.url,
-            data=json.dumps({'tab_id': 'invalid_tab_id'}),
+            data=json.dumps({
+                'tab_id_locator': {'tab_id': 'invalid_tab_id'}
+            }),
         )
         self.check_invalid_tab_id_response(resp)
 
