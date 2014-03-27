@@ -80,7 +80,12 @@
             "URI": "js/vendor/URI.min",
 
             // externally hosted files
-            "tender": "//edxedge.tenderapp.com/tender_widget",
+            "tender": [
+                "//edxedge.tenderapp.com/tender_widget",
+                // if tender fails to load, fallback on a local file
+                // so that require doesn't fall over
+                "js/src/tender_fallback"
+            ],
             "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
             "youtube": [
                 // youtube URL does not end in ".js". We add "?noext" to the path so
@@ -168,6 +173,9 @@
             "backbone.paginator": {
                 deps: ["backbone"],
                 exports: "Backbone.Paginator"
+            },
+            "tender": {
+                exports: 'Tender'
             },
             "youtube": {
                 exports: "YT"
