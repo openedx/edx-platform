@@ -202,13 +202,22 @@ class BetaTesterBulkAddition
         success: (data) => @display_response data
         error: std_ajax_err => @fail_with_error gettext "Error adding/removing users as beta testers."
 
+  # clear the input text field
+  clear_input: ->
+    @$emails_input.val ''
+    # default for the checkboxes should be checked
+    @$checkbox_emailstudents.attr('checked', true)
+    @$checkbox_autoenroll.attr('checked', true)
+
   fail_with_error: (msg) ->
     console.warn msg
+    @clear_input()
     @$task_response.empty()
     @$request_response_error.empty()
     @$request_response_error.text msg
 
   display_response: (data_from_server) ->
+    @clear_input()
     @$task_response.empty()
     @$request_response_error.empty()
     errors = []
@@ -284,13 +293,22 @@ class BatchEnrollment
         error: std_ajax_err => @fail_with_error gettext "Error enrolling/unenrolling users."
 
 
+  # clear the input text field
+  clear_input: ->
+    @$emails_input.val ''
+    # default for the checkboxes should be checked
+    @$checkbox_emailstudents.attr('checked', true)
+    @$checkbox_autoenroll.attr('checked', true)
+
   fail_with_error: (msg) ->
     console.warn msg
+    @clear_input()
     @$task_response.empty()
     @$request_response_error.empty()
     @$request_response_error.text msg
 
   display_response: (data_from_server) ->
+    @clear_input()
     @$task_response.empty()
     @$request_response_error.empty()
 
