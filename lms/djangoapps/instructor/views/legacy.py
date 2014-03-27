@@ -228,20 +228,20 @@ def instructor_dashboard(request, course_id):
     if action == 'Dump list of enrolled students' or action == 'List enrolled students':
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
-        datatable['title'] = _('List of students enrolled in {0}').format(course_id)
+        datatable['title'] = _('List of students enrolled in {course_id}').format(course_id=course_id)
         track.views.server_track(request, "list-students", {}, page="idashboard")
 
     elif 'Dump Grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
-        datatable['title'] = _('Summary Grades of students enrolled in {0}').format(course_id)
+        datatable['title'] = _('Summary Grades of students enrolled in {course_id}').format(course_id=course_id)
         track.views.server_track(request, "dump-grades", {}, page="idashboard")
 
     elif 'Dump all RAW grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
                                                    get_raw_scores=True, use_offline=use_offline)
-        datatable['title'] = _('Raw Grades of students enrolled in {0}').format(course_id)
+        datatable['title'] = _('Raw Grades of students enrolled in {course_id}').format(course_id=course_id)
         track.views.server_track(request, "dump-grades-raw", {}, page="idashboard")
 
     elif 'Download CSV of all student grades' in action:
@@ -270,13 +270,17 @@ def instructor_dashboard(request, course_id):
             instructor_task = submit_rescore_problem_for_all_students(request, course_id, problem_url)
             if instructor_task is None:
                 msg += '<font color="red">{text}</font>'.format(
-                    text=_('Failed to create a background task for rescoring "{0}".').format(problem_url)
+                    text=_('Failed to create a background task for rescoring "{problem_url}".').format(
+                        problem_url=problem_url
+                    )
                 )
             else:
                 track.views.server_track(request, "rescore-all-submissions", {"problem": problem_url, "course": course_id}, page="idashboard")
         except ItemNotFoundError as err:
             msg += '<font color="red">{text}</font>'.format(
-                text=_('Failed to create a background task for rescoring "{0}": problem not found.').format(problem_url)
+                text=_('Failed to create a background task for rescoring "{problem_url}": problem not found.').format(
+                    problem_url=problem_url
+                )
             )
         except Exception as err:
             log.error("Encountered exception from rescore: {0}".format(err))
@@ -293,14 +297,16 @@ def instructor_dashboard(request, course_id):
             instructor_task = submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
             if instructor_task is None:
                 msg += '<font color="red">{text}</font>'.format(
-                    text=_('Failed to create a background task for resetting "{0}".').format(problem_url)
+                    text=_('Failed to create a background task for resetting "{problem_url}".').format(problem_url=problem_url)
                 )
             else:
                 track.views.server_track(request, "reset-all-attempts", {"problem": problem_url, "course": course_id}, page="idashboard")
         except ItemNotFoundError as err:
             log.error('Failure to reset: unknown problem "{0}"'.format(err))
             msg += '<font color="red">{text}</font>'.format(
-                text=_('Failed to create a background task for resetting "{0}": problem not found.').format(problem_url)
+                text=_('Failed to create a background task for resetting "{problem_url}": problem not found.').format(
+                    problem_url=problem_url
+                )
             )
         except Exception as err:
             log.error("Encountered exception from reset: {0}".format(err))
@@ -985,7 +991,7 @@ def _list_course_forum_members(course_id, rolename, datatable):
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)
     except Role.DoesNotExist:
-        return '<font color="red">' + _('Error: unknown rolename "{0}"').format(rolename) + '</font>'
+        return '<font color="red">' + _('Error: unknown rolename "{rolename}"').format(rolename=rolename) + '</font>'
     uset = role.users.all().order_by('username')
     msg = 'Role = {0}'.format(rolename)
     log.debug('role={0}'.format(rolename))
@@ -1009,11 +1015,11 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     try:
         user = User.objects.get(username=uname)
     except User.DoesNotExist:
-        return '<font color="red">' + _('Error: unknown username "{0}"').format(uname) + '</font>'
+        return '<font color="red">' + _('Error: unknown username "{username}"').format(username=uname) + '</font>'
     try:
         role = Role.objects.get(name=rolename, course_id=course.id)
     except Role.DoesNotExist:
-        return '<font color="red">' + _('Error: unknown rolename "{0}"').format(rolename) + '</font>'
+        return '<font color="red">' + _('Error: unknown rolename "{rolename}"').format(rolename=rolename) + '</font>'
 
     # check whether role already has the specified user:
     alreadyexists = role.users.filter(username=uname).exists()
@@ -1021,19 +1027,19 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     log.debug('rolename={0}'.format(rolename))
     if add_or_remove == FORUM_ROLE_REMOVE:
         if not alreadyexists:
-            msg = '<font color="red">' + _('Error: user "{0}" does not have rolename "{1}", cannot remove').format(uname, rolename) + '</font>'
+            msg = '<font color="red">' + _('Error: user "{username}" does not have rolename "{rolename}", cannot remove').format(username=uname, rolename=rolename) + '</font>'
         else:
             user.roles.remove(role)
-            msg = '<font color="green">' + _('Removed "{0}" from "{1}" forum role = "{2}"').format(user, course.id, rolename) + '</font>'
+            msg = '<font color="green">' + _('Removed "{username}" from "{course_id}" forum role = "{rolename}"').format(username=user, course_id=course.id, rolename=rolename) + '</font>'
     else:
         if alreadyexists:
-            msg = '<font color="red">' + _('Error: user "{0}" already has rolename "{1}", cannot add').format(uname, rolename) + '</font>'
+            msg = '<font color="red">' + _('Error: user "{username}" already has rolename "{rolename}", cannot add').format(username=uname, rolename=rolename) + '</font>'
         else:
             if (rolename == FORUM_ROLE_ADMINISTRATOR and not has_access(user, course, 'staff')):
-                msg = '<font color="red">' + _('Error: user "{0}" should first be added as staff before adding as a forum administrator, cannot add').format(uname) + '</font>'
+                msg = '<font color="red">' + _('Error: user "{username}" should first be added as staff before adding as a forum administrator, cannot add').format(username=uname) + '</font>'
             else:
                 user.roles.add(role)
-                msg = '<font color="green">' + _('Added "{0}" to "{1}" forum role = "{2}"').format(user, course.id, rolename) + '</font>'
+                msg = '<font color="green">' + _('Added "{username}" to "{course_id}" forum role = "{rolename}"').format(username=user, course_id=course.id, rolename=rolename) + '</font>'
 
     return msg
 
@@ -1055,7 +1061,7 @@ def _role_members_table(role, title, course_id):
     uset = role.users_with_role()
     datatable = {'header': [_('Username'), _('Full name')]}
     datatable['data'] = [[x.username, x.profile.name] for x in uset]
-    datatable['title'] = _('{0} in course {1}').format(title, course_id)
+    datatable['title'] = _('{title} in course {course_id}').format(title=title, course_id=course_id)
     return datatable
 
 
