@@ -35,6 +35,10 @@ class SettingsUnitTest(testutil.TestCase):
         for middleware_name in settings._MIDDLEWARE_CLASSES:
             self.assertIn(middleware_name, self.settings.MIDDLEWARE_CLASSES)
 
+    def test_apply_settings_adds_fields_stored_in_session(self):
+        settings.apply_settings({}, self.settings)
+        self.assertEqual(settings._FIELDS_STORED_IN_SESSION, self.settings.FIELDS_STORED_IN_SESSION)
+
     def test_apply_settings_adds_third_party_auth_to_installed_apps(self):
         settings.apply_settings({}, self.settings)
         self.assertIn('third_party_auth', self.settings.INSTALLED_APPS)

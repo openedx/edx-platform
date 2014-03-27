@@ -365,11 +365,13 @@ def signin_user(request):
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action'),
+        'pipeline_running': 'true' if pipeline.running(request) else 'false',
         'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
         ),
     }
+
     return render_to_response('login.html', context)
 
 
@@ -385,14 +387,12 @@ def register_user(request, extra_context=None):
         # and registration is disabled.
         return redirect(reverse('root'))
 
-    pipeline_running = pipeline.running(request)
-
     context = {
         'course_id': request.GET.get('course_id'),
         'email': '',
         'enrollment_action': request.GET.get('enrollment_action'),
         'name': '',
-        'pipeline_running': pipeline_running,
+        'running_pipeline': None,
         'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
@@ -409,10 +409,11 @@ def register_user(request, extra_context=None):
 
     # If third-party auth is enabled, prepopulate the form with data from the
     # selected provider.
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline_running:
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
         overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
+        overrides['running_pipeline'] = running_pipeline
         overrides['selected_provider'] = current_provider.NAME
         context.update(overrides)
 
@@ -710,6 +711,7 @@ def accounts_login(request):
             return external_auth.views.course_specific_login(request, course_id)
 
     context = {
+        'pipeline_running': 'false',
         'platform_name': settings.PLATFORM_NAME,
     }
     return render_to_response('login.html', context)
@@ -719,22 +721,60 @@ def accounts_login(request):
 @ensure_csrf_cookie
 def login_user(request, error=""):
     """AJAX request to log in the user."""
-    if 'email' not in request.POST or 'password' not in request.POST:
-        return JsonResponse({
-            "success": False,
-            "value": _('There was an error receiving your login information. Please email us.'),  # TODO: User error message
-        })  # TODO: this should be status code 400  # pylint: disable=fixme
 
-    email = request.POST['email']
-    password = request.POST['password']
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.warning(u"Login failed - Unknown user email")
-        else:
-            AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
-        user = None
+    backend_name = None
+    email = None
+    password = None
+    redirect_url = None
+    response = None
+    running_pipeline = None
+    third_party_auth_requested = settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request)
+    third_party_auth_successful = False
+    trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
+    user = None
+
+    if third_party_auth_requested and not trumped_by_first_party_auth:
+        # The user has already authenticated via third-party auth and has not
+        # asked to do first party auth by supplying a username or password. We
+        # now want to put them through the same logging and cookie calculation
+        # logic as with first-party auth.
+        running_pipeline = pipeline.get(request)
+        user_id = running_pipeline['kwargs'].get('user')
+        backend_name = running_pipeline['backend']
+        requested_provider = provider.Registry.get_by_backend_name(backend_name)
+
+        try:
+            user = pipeline.get_authenticated_user(user_id, backend_name)
+            third_party_auth_successful = True
+        except User.DoesNotExist:
+            AUDIT_LOG.warning(
+                u'Login failed - user with id %s has no social auth with backend_name %s'.format(
+                    user_id=user_id, backend_name=backend_name))
+            return JsonResponse({
+                "success": False,
+                ## Translators: provider_name is the name of an external, third-party user authentication service (like
+                ## Google or LinkedIn).
+                "value": _('There is no {platform_name} account associated with your {provider_name} account. Please use your {platform_name} credentials or pick another provider.').format(
+                    platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME)
+            })  # TODO: this should be status code 401  # pylint: disable=fixme
+
+    else:
+
+        if 'email' not in request.POST or 'password' not in request.POST:
+            return JsonResponse({
+                "success": False,
+                "value": _('There was an error receiving your login information. Please email us.'),  # TODO: User error message
+            })  # TODO: this should be status code 400  # pylint: disable=fixme
+
+        email = request.POST['email']
+        password = request.POST['password']
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                AUDIT_LOG.warning(u"Login failed - Unknown user email")
+            else:
+                AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
 
     # check if the user has a linked shibboleth account, if so, redirect the user to shib-login
     # This behavior is pretty much like what gmail does for shibboleth.  Try entering some @stanford.edu
@@ -773,14 +813,17 @@ def login_user(request, error=""):
     # username so that authentication is guaranteed to fail and we can take
     # advantage of the ratelimited backend
     username = user.username if user else ""
-    try:
-        user = authenticate(username=username, password=password, request=request)
-    # this occurs when there are too many attempts from the same IP address
-    except RateLimitException:
-        return JsonResponse({
-            "success": False,
-            "value": _('Too many failed login attempts. Try again later.'),
-        })  # TODO: this should be status code 429  # pylint: disable=fixme
+
+    if not third_party_auth_successful:
+        try:
+            user = authenticate(username=username, password=password, request=request)
+        # this occurs when there are too many attempts from the same IP address
+        except RateLimitException:
+            return JsonResponse({
+                "success": False,
+                "value": _('Too many failed login attempts. Try again later.'),
+            })  # TODO: this should be status code 429  # pylint: disable=fixme
+
     if user is None:
         # tick the failed login counters if the user exists in the database
         if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
@@ -820,6 +863,9 @@ def login_user(request, error=""):
             raise
 
         redirect_url = try_change_enrollment(request)
+
+        if third_party_auth_successful:
+            redirect_url = pipeline.get_complete_url(backend_name)
 
         dog_stats_api.increment("common.student.successful_login")
         response = JsonResponse({
@@ -1052,7 +1098,7 @@ def create_account(request, post_override=None):
     JSON call to create new edX account.
     Used by form in signup_modal.html, which is included into navigation.html
     """
-    js = {'success': False}
+    js = {'success': False}  # pylint: disable-msg=invalid-name
 
     post_vars = post_override if post_override else request.POST
     extra_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})

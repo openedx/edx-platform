@@ -46,8 +46,9 @@ If true, it:
 from . import provider
 
 
+_FIELDS_STORED_IN_SESSION = ['auth_entry']
 _MIDDLEWARE_CLASSES = (
-    'social.apps.django_app.middleware.SocialAuthExceptionMiddleware',
+    'third_party_auth.middleware.ExceptionMiddleware',
 )
 
 
@@ -71,6 +72,11 @@ def _merge_auth_info(django_settings, auth_info):
 
 def _set_global_settings(django_settings):
     """Set provider-independent settings."""
+
+    # Whitelisted URL query parameters retrained in the pipeline session.
+    # Params not in this whitelist will be silently dropped.
+    django_settings.FIELDS_STORED_IN_SESSION = _FIELDS_STORED_IN_SESSION
+
     # Register and configure python-social-auth with Django.
     django_settings.INSTALLED_APPS += (
         'social.apps.django_app.default',
@@ -80,10 +86,10 @@ def _set_global_settings(django_settings):
     # Inject exception middleware to make redirects fire.
     django_settings.MIDDLEWARE_CLASSES += _MIDDLEWARE_CLASSES
 
-    # Where to send the user if there's an error during social authentication.
-    # Details about the error will be added to this URL as args so they will be
-    # logged.
-    django_settings.SOCIAL_AUTH_LOGIN_ERROR_URL = '/register'
+    # Where to send the user if there's an error during social authentication
+    # and we cannot send them to a more specific URL
+    # (see middleware.ExceptionMiddleware).
+    django_settings.SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
 
     # Where to send the user once social authentication is successful.
     django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
@@ -91,6 +97,7 @@ def _set_global_settings(django_settings):
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.
     django_settings.SOCIAL_AUTH_PIPELINE = (
+        'third_party_auth.pipeline.parse_query_params',
         'social.pipeline.social_auth.social_details',
         'social.pipeline.social_auth.social_uid',
         'social.pipeline.social_auth.auth_allowed',

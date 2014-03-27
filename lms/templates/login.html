@@ -4,6 +4,7 @@
 
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
+<%! from third_party_auth import provider, pipeline %>
 
 <%block name="pagetitle">${_("Log into your {platform_name} Account").format(platform_name=platform_name)}</%block>
 
@@ -93,6 +94,17 @@
           text("${_(u'Processing your account information…')}");
       }
     }
+
+    (function post_form_if_pipeline_running(pipeline_running) {
+       // If the pipeline is running, the user has already authenticated via a
+       // third-party provider. We want to invoke /login_ajax to loop in the
+       // code that does logging and sets cookies on the request. It is most
+       // consistent to do that by using the same mechanism that is used when
+       // the use does first-party sign-in: POSTing the sign-in form.
+       if (pipeline_running) {
+         $('#login-form').submit();
+       }
+    })(${pipeline_running})
   </script>
 </%block>
 
@@ -164,6 +176,24 @@
         <button name="submit" type="submit" id="submit" class="action action-primary action-update"></button>
       </div>
     </form>
+
+    % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+
+    <hr />
+
+    <p class="instructions">
+      ${_('or, if you have connected one of these providers, log in below.')}
+    </p>
+
+    <ol>
+    % for enabled in provider.Registry.enabled():
+      ## Translators: provider_name is the name of an external, third-party user authentication provider (like Google or LinkedIn).
+      <li><a href="${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_LOGIN)}">${_("Sign in with {provider_name}").format(provider_name=enabled.NAME)}</a>
+    % endfor
+    </ol>
+
+    % endif
+
   </section>
 
   <aside role="complementary">

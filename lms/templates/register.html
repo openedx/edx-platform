@@ -113,7 +113,7 @@
 
       % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 
-        % if not pipeline_running:
+        % if not running_pipeline:
 
         <p class="instructions">
           ${_("Register to start learning today!")}
@@ -122,7 +122,7 @@
         <ol>
         % for enabled in provider.Registry.enabled():
           ## Translators: provider_name is the name of an external, third-party user authentication service (like Google or LinkedIn).
-          <li><a href="${pipeline.get_login_url(enabled.NAME)}">${_("Sign in with {provider_name}").format(provider_name=enabled.NAME)}</a>
+          <li><a href="${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_REGISTER)}">${_("Sign in with {provider_name}").format(provider_name=enabled.NAME)}</a>
         % endfor
         </ol>
 
@@ -132,11 +132,28 @@
 
         % else:
 
-        <p class="instructions">
-          ## Translators: provider_name is the name of an external, third-party user authentication service (like Google or LinkedIn).
-          ${_("You've successfully signed in with {selected_provider}.").format(selected_provider=selected_provider)}<br />
-          ${_("Finish your account registration below to start learning.")}
-        </p>
+          % if running_pipeline['kwargs'].get('is_login'):
+
+            ## Translators: selected_provider is the name of an external, third-party user authentication servie (like Google or LinkedIn). platform_name is the name of the Open edX deployment (for example, 'edX' for edx.org).
+            <p class="instructions">
+              ${_("You've successfully signed in with <strong>{selected_provider}</strong>, but we couldn't find your <strong>{platform_name}</strong> account.").format(platform_name=platform_name, selected_provider=selected_provider)}
+            </p>
+            <p class="instructions">
+              ${_("If you already have an account with <strong>{platform_name}</strong> and you want to sign into it with <strong>{selected_provider}</strong>, please <a href='/login'>sign in</a> and associate your account with <strong>{selected_provider}</strong>.").format(platform_name=platform_name, selected_provider=selected_provider)}
+            </p>
+            <p class="instructions">
+              ${_("If you do not have an account with <strong>{platform_name}</strong>, please register below:").format(platform_name=platform_name)}
+            </p>
+
+          % else:
+
+          <p class="instructions">
+            ## Translators: selected_provider is the name of an external, third-party user authentication service (like Google or LinkedIn).
+            ${_("You've successfully signed in with <strong>{selected_provider}</strong>.").format(selected_provider=selected_provider)}<br />
+            ${_("Finish your account registration below to start learning.")}
+          </p>
+
+          % endif
 
         % endif
 
@@ -160,7 +177,7 @@
             <input class="" id="email" type="email" name="email" value="${email}" placeholder="${_('example: username@domain.com')}" required aria-required="true" />
           </li>
 
-          % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline_running:
+          % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and running_pipeline:
 
           <li class="is-disabled field optional password" id="field-password" hidden>
             <label for="password">${_('Password')}</label>

@@ -1,5 +1,32 @@
 """Auth pipeline definitions.
 
+Auth pipelines handle the process of authenticating a user. They involve a
+consumer system and a provider service. The general pattern is:
+
+    1. The consumer system exposes a URL endpoint that starts the process.
+    2. When a user visits that URL, the client system redirects the user to a
+       page served by the provider. The user authenticates with the provider.
+       The provider handles authentication failure however it wants.
+    3. On success, the provider POSTs to a URL endpoint on the consumer to
+       invoke the pipeline. It sends back an arbitrary payload of data about
+       the user.
+    4. The pipeline begins, executing each function in its stack. The stack is
+       defined on django's settings object's SOCIAL_AUTH_PIPELINE. This is done
+       in settings._set_global_settings.
+    5. Each pipeline function is variadic. Most pipeline functions are part of
+       the pythons-social-auth library; our extensions are defined below. The
+       pipeline is the same no matter what provider is used.
+    6. Pipeline functions can return a dict to add arguments to the function
+       invoked next. They can return None if this is not necessary.
+    7. Pipeline functions may be decorated with @partial.partial. This pauses
+       the pipeline and serializes its state onto the request's session. When
+       this is done they may redirect to other edX handlers to execute edX
+       account registration/sign in code.
+    8. In that code, redirecting to get_complete_url() resumes the pipeline.
+       This happens by hitting a handler exposed by the consumer system.
+    9. In this way, execution moves between the provider, the pipeline, and
+       arbitrary consumer system code.
+
 Gotcha alert!:
 
 Bear in mind that when pausing and resuming a pipeline function decorated with
@@ -33,15 +60,36 @@ See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 import random
 import string  # pylint: disable-msg=deprecated-module
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
+from social.exceptions import AuthException
 from social.pipeline import partial
 
 from . import provider
 
 
+AUTH_ENTRY_KEY = 'auth_entry'
+AUTH_ENTRY_LOGIN = 'login'
+AUTH_ENTRY_REGISTER = 'register'
+_AUTH_ENTRY_CHOICES = frozenset([AUTH_ENTRY_LOGIN, AUTH_ENTRY_REGISTER])
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12
 _PASSWORD_CHARSET = string.letters + string.digits
+
+
+class AuthEntryError(AuthException):
+    """Raised when auth_entry is missing or invalid on URLs.
+
+    auth_entry tells us whether the auth flow was initiated to register a new
+    user (in which case it has the value of AUTH_ENTRY_REGISTER) or log in an
+    existing user (in which case it has the value of AUTH_ENTRY_LOGIN).
+
+    This is necessary because the edX code we hook into the pipeline to
+    redirect to the existing auth flows needs to know what case we are in in
+    order to format its output correctly (for example, the register code is
+    invoked earlier than the login code, and it needs to know if the login flow
+    was requested to dispatch correctly).
+    """
 
 
 def get(request):
@@ -49,9 +97,52 @@ def get(request):
     return request.session.get('partial_pipeline')
 
 
-def _get_url(view_name, backend_name):
-    """Protected wrapper for reverse()."""
-    return reverse(view_name, kwargs={'backend': backend_name})
+def get_authenticated_user(user_id, backend_name):
+    """Gets a saved user authenticated by a particular backend.
+
+    Between pipeline steps User objects are not saved -- only the id. We need
+    to reconstitute the user and set its .backend, which is ordinarily monkey-
+    patched on by Django during authenticate(), so it will function like a
+    user returned by authenticate().
+
+    Args:
+        user_id: long. Id of the user to get.
+        backend_name: string. The name of the third-party auth backend from
+            the running pipeline.
+
+    Returns:
+        User if user is found and has a social auth from the passed
+        backend_name.
+
+    Raises:
+        User.DoesNotExist: if no user matching user_id is found.
+        AssertionError: if the user is not authenticated.
+    """
+    match = False
+    user = User.objects.get(id=user_id)
+    assert user.is_authenticated()
+
+    for association in user.social_auth.all():
+        if association.provider == backend_name:
+            match = True
+            break
+
+    if not match:
+        raise User.DoesNotExist
+
+    user.backend = provider.Registry.get_by_backend_name(backend_name).get_authentication_backend()
+    return user
+
+
+def _get_url(view_name, backend_name, auth_entry=None):
+    """Creates a URL to hook into social auth endpoints."""
+    kwargs = {'backend': backend_name}
+    url = reverse(view_name, kwargs=kwargs)
+
+    if auth_entry:
+        url += '?%s=%s' % (AUTH_ENTRY_KEY, auth_entry)
+
+    return url
 
 
 def get_complete_url(backend_name):
@@ -67,20 +158,26 @@ def get_complete_url(backend_name):
     return _get_url('social:complete', backend_name)
 
 
-def get_login_url(provider_name):
+def get_login_url(provider_name, auth_entry):
     """Gets the login URL for the endpoint that kicks off auth with a provider.
 
     Args:
         provider_name: string. The name of the provider.Provider that has been
             enabled.
+        auth_entry: string. Query argument specifying the desired entry point
+            for the auth pipeline. Used by the pipeline for later branching.
+            Must be one of _AUTH_ENTRY_CHOICES.
 
     Returns:
         String. URL that starts the auth pipeline for a provider.
     """
+    assert auth_entry in _AUTH_ENTRY_CHOICES
     enabled_provider = provider.Registry.get(provider_name)
+
     if not enabled_provider:
         raise ValueError('Provider %s not enabled' % provider_name)
-    return _get_url('social:begin', enabled_provider.BACKEND_CLASS.name)
+
+    return _get_url('social:begin', enabled_provider.BACKEND_CLASS.name, auth_entry=auth_entry)
 
 
 def make_random_password(length=None, choice_fn=random.SystemRandom().choice):
@@ -109,12 +206,32 @@ def running(request):
     return request.session.get('partial_pipeline') is not None  # Avoid False for {}.
 
 
-# Signature set by framework; prepending 'unused_' causes TypeError on dispatch
-# to the auth backend's authenticate(). pylint: disable-msg=unused-argument
-@partial.partial
-def redirect_to_supplementary_form(strategy, details, response, uid, user=None, *args, **kwargs):
-    """Dispatches user to a create account form if they are new."""
-    if user is not None:
-        return
+# Pipeline functions.
+# Signatures are set by python-social-auth; prepending 'unused_' causes
+# TypeError on dispatch to the auth backend's authenticate().
+# pylint: disable-msg=unused-argument
 
-    return redirect('/register', name='register_user')
+
+def parse_query_params(strategy, response, *args, **kwargs):
+    """Reads whitelisted query params, transforms them into pipeline args."""
+    auth_entry = strategy.session.get(AUTH_ENTRY_KEY)
+
+    if not (auth_entry and auth_entry in _AUTH_ENTRY_CHOICES):
+        raise AuthEntryError(strategy.backend, 'auth_entry missing or invalid')
+
+    return {
+        # Whether the auth pipeline entered from /login.
+        'is_login': auth_entry == AUTH_ENTRY_LOGIN,
+        # Whether the auth pipeline entered from /register.
+        'is_register': auth_entry == AUTH_ENTRY_REGISTER,
+    }
+
+
+@partial.partial
+def redirect_to_supplementary_form(strategy, details, response, uid, is_login=None, is_register=None, user=None, *args, **kwargs):
+    """Dispatches user to a create account form if they are new."""
+    if is_login:
+        return redirect('/login', name='signin_user')
+
+    if is_register and user is None:
+        return redirect('/register', name='register_user')
