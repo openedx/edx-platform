@@ -181,16 +181,19 @@ class BetaTesterBulkAddition
     @$emails_input           = @$container.find("textarea[name='student-emails-for-beta']")
     @$btn_beta_testers       = @$container.find("input[name='beta-testers']")
     @$checkbox_emailstudents = @$container.find("input[name='email-students']")
+    @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']")
     @$task_response          = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
 
     # click handlers
     @$btn_beta_testers.click =>
       emailStudents = @$checkbox_emailstudents.is(':checked')
+      autoEnroll = @$checkbox_autoenroll.is(':checked')
       send_data = 
         action: $(event.target).data('action')  # 'add' or 'remove'
         emails: @$emails_input.val()
         email_students: emailStudents
+        auto_enroll: autoEnroll
 
       $.ajax
         dataType: 'json'
@@ -218,8 +221,6 @@ class BetaTesterBulkAddition
         errors.push student_results
       else
         successes.push student_results
-
-    console.log(sr.email for sr in successes)
 
     render_list = (label, emails) =>
       task_res_section = $ '<div/>', class: 'request-res-section'

@@ -33,7 +33,7 @@ from django_comment_common.models import (
 )
 
 from courseware.models import StudentModule
-from student.models import unique_id_for_user
+from student.models import unique_id_for_user, CourseEnrollment
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.views import get_task_completion_info
@@ -322,6 +322,7 @@ def bulk_beta_modify_access(request, course_id):
     emails_raw = request.GET.get('emails')
     emails = _split_input_list(emails_raw)
     email_students = request.GET.get('email_students') in ['true', 'True', True]
+    auto_enroll = request.GET.get('auto_enroll') in ['true', 'True', True]
     results = []
     rolename = 'beta'
     course = get_course_by_id(course_id)
@@ -357,6 +358,12 @@ def bulk_beta_modify_access(request, course_id):
             # If no exception thrown, see if we should send an email
             if email_students:
                 send_beta_role_email(action, user, email_params)
+            # See if we should autoenroll the student
+            if auto_enroll:
+                # Check if student is already enrolled
+                if not CourseEnrollment.is_enrolled(user, course_id):
+                    CourseEnrollment.enroll(user, course_id)
+
         finally:
             # Tabulate the action result of this email address
             results.append({

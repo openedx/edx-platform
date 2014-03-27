@@ -81,6 +81,19 @@
   </p>
 
   <div class="enroll-option">
+    <input type="checkbox" name="auto-enroll" value="Auto-Enroll" checked="yes">
+    <label for="auto-enroll-beta">${_("Auto Enroll")}</label>
+    <div class="hint auto-enroll-beta-hint">
+      <span class="hint-caret"></span>
+      <p>
+	${_("If this option is <em>checked</em>, users who have not enrolled in your course will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
+	<br /><br />
+	${_("Checking this box has no effect if 'Remove beta testers' is selected.")}
+      </p>
+    </div>
+  </div>
+
+  <div class="enroll-option">
     <input type="checkbox" name="email-students" value="Notify-students-by-email" checked="yes">
     <label for="email-students-beta">${_("Notify users by email")}</label>
     <div class="hint email-students-beta-hint">

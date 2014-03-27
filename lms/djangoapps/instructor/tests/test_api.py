@@ -702,9 +702,16 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         response = self.client.get(url, {'emails': self.beta_tester.email, 'action': action})
         self.assertEqual(response.status_code, 400)
 
-    def add_notenrolled(self, url, response, identifier):
-        self.assertEqual(response.status_code, 200)
+    def add_notenrolled(self, response, identifier):
+        """
+        Takes a client response from a call to bulk_beta_modify_access with 'email_students': False,
+        and the student identifier (email or username) given as 'emails' in the request.
 
+        Asserts the reponse returns cleanly, that the student was added as a beta tester, and the
+        response properly contains their identifier, 'error': False, and 'userDoesNotExist': False.
+        Additionally asserts no email was sent.
+        """
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(self.notenrolled_student))
         # test the response data
         expected = {
@@ -727,12 +734,26 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
     def test_add_notenrolled_email(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': False})
-        self.add_notenrolled(url, response, self.notenrolled_student.email)
+        self.add_notenrolled(response, self.notenrolled_student.email)
+        self.assertFalse(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
+
+    def test_add_notenrolled_email_autoenroll(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': False, 'auto_enroll': True})
+        self.add_notenrolled(response, self.notenrolled_student.email)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     def test_add_notenrolled_username(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'emails': self.notenrolled_student.username, 'action': 'add', 'email_students': False})
-        self.add_notenrolled(url, response, self.notenrolled_student.username)
+        self.add_notenrolled(response, self.notenrolled_student.username)
+        self.assertFalse(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
+
+    def test_add_notenrolled_username_autoenroll(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notenrolled_student.username, 'action': 'add', 'email_students': False, 'auto_enroll': True})
+        self.add_notenrolled(response, self.notenrolled_student.username)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     def test_add_notenrolled_with_email(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
