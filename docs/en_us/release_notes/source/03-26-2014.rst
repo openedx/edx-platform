@@ -1,0 +1,67 @@
+###################################
+March 27, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of March 27, 2014.  See previous pages in this document for a history of changes.
+
+**************************
+edX Documentation
+**************************
+
+You can access the public edX `roadmap <https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap>`_ for details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course. <http://edx.readthedocs.org/projects/ca/en/latest/>`_ You can also download the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include:
+
+  * An update to the `Add Pages <http://edx.readthedocs.org/projects/ca/en/latest/building_course/create_new_course.html#add-pages>`_ section to reflect the new Pages functionality.
+
+  * Updated the sections on `Beta Testing a Course <http://edx.readthedocs.org/projects/ca/en/latest/releasing_course/beta_testing.html#beta-testing>`_, `Discussions <http://edx.readthedocs.org/projects/ca/en/latest/running_course/discussions.html#discussions>`_, `Grades <http://edx.readthedocs.org/projects/ca/en/latest/running_course/course_grades.html>`_, and `Student Data <http://edx.readthedocs.org/projects/ca/en/latest/running_course/course_student.html#student-data>`_ with changes to the new Instructor Dashboard.
+
+
+* `edX Data Documentation <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
+
+  Recent changes include:
+
+  *  Addition of the ``user_api_usercoursetag`` table to the `Student Info and Progress Data <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/sql_schema.html#student-info>`_ chapter.
+
+  * Addition of the ``assigned_user_to_partition`` and ``child_render`` event types to the `Tracking Logs <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/tracking_logs.html#tracking-logs>`_ chapter.
+
+  * Alternative formatting for the examples in the `Discussion Forums Data <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/discussion_data.html#discussion-forums-data>`_ chapter.
+
+*************
+edX Studio
+*************
+
+* The previous Static Pages feature has been renamed Pages. You can now see the default pages and re-order custom pages in your course. For more information, see `Add Pages <http://edx.readthedocs.org/projects/ca/en/latest/building_course/create_new_course.html#add-pages>`_. (STUD-1193, STUD-1346)
+
+
+***************************************
+edX Learning Management System
+***************************************
+
+* You can now batch add beta testers to your course. The UI for adding beta testers has been expanded. See `Add the Beta Testers <http://edx.readthedocs.org/projects/ca/en/latest/releasing_course/beta_testing.html#add-testers>`_ for more information. (LMS-1287) 
+
+* When you enroll students, the process now checks that the email addresses are valid and gives you a message for those that are invalid. (LMS-2244)
+
+* In certain situations, the MatLab console tried to display malformed HTML, causing it stop functioning. This problem is resolved. (BLD-948)
+
+===========================
+Accessibility Improvements
+===========================
+
+* Problem response feedback is now accessible to screen readers. (LMS-2158)
+
+* The styles of all objects are now the same when the student hovers over the object with the mouse and when the student uses the tab key to focus on the object. (LMS-2352)
+
+
+
+***************************************
+edX Discussions
+***************************************
+
+* Students previously were able to pin and unpin discussion threads.  Privileges have been fixed and students can no longer pin and unpin threads. (FOR-499)
+
+* Students' discussion accounts were previously set to use the language EN-US by default. Accounts are now set to use students' language setting. (FOR-532)
