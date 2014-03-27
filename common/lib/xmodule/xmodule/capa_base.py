@@ -903,8 +903,8 @@ class CapaMixin(CapaFields):
         score = self.lcp.get_score()
         self.runtime.publish(
             self,
+            'grade',
             {
-                'event_name': 'grade',
                 'value': score['score'],
                 'max_value': score['total'],
             }
