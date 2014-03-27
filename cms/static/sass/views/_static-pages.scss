@@ -37,6 +37,7 @@
     width: flex-grid(3, 12);
   }
 
+
   .wrapper-actions-list {
     top: 6px;
 
@@ -120,7 +121,6 @@
     }
   }
 
-
   .unit-body {
     padding: 0;
 
@@ -180,7 +180,7 @@
   }
 
   .component,
-  .course-nav-tab {
+  .course-nav-item {
     position: relative;
     border: 1px solid $mediumGrey;
     border-top: none;
@@ -239,7 +239,7 @@
     }
 
     .component-actions,
-    .course-nav-tab-actions {
+    .course-nav-item-actions {
       display: inline-block;
       float: right;
       margin-right: ($baseline*2);
@@ -288,35 +288,43 @@
     }
   }
 
-  // basic course nav items - overrides from above
-  .course-nav-tab {
+
+  // course nav items - base
+  .course-nav-item {
     padding: ($baseline*.75) ($baseline/4) ($baseline*.75) $baseline;
+    background: $white;
 
+    // CASE: item is fixed (can't be moved/edited/deleted)
     &.fixed {
-      @include transition(opacity $tmg-f2 ease-in-out 0s);
-      opacity: .7;
+      opacity: 0.5;
 
-      &:hover {
-        opacity: 1;
+      .drag-handle {
+        cursor: default;
+        width: ($baseline*1.5);
+        background: $gray-l4 none;
       }
     }
 
-    .course-nav-tab-header {
+    .course-nav-item-header {
       display: inline-block;
       width:80%;
 
       .title {
         @extend %t-title4;
-        font-weight: 300;
-        color: $gray;
+      }
+
+      .title-sub {
+        @extend %t-title7;
+        color: $gray-l2;
       }
     }
 
-    .course-nav-tab-actions {
+    .course-nav-item-actions {
       display: inline-block;
       padding: ($baseline/10);
     }
   }
+
 
   .component.editing {
     border-left: 1px solid $mediumGrey;
@@ -335,7 +343,7 @@
     @include transition(background-color $tmg-s3 linear 0s);
     padding: 20px 20px 22px;
     font-size: 24px;
-    font-weight: 300;
+    // font-weight: 300;
     background: #fff;
   }
 
@@ -395,4 +403,3 @@
     outline: 0;
   }
 }
-
