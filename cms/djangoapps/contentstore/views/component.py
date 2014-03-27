@@ -60,6 +60,7 @@ else:
         'word_cloud',
         'graphical_slider_tool',
         'lti',
+        'concept',
         'openassessment',  # edx-ora2
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 

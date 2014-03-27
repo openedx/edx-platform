@@ -22,50 +22,6 @@ Feature: CMS.HTML Editor
 
   Scenario: TinyMCE image plugin sets urls correctly
     Given I have created a Blank HTML Page
-    When I edit the page
-    And I add an image with static link "/static/image.jpg" via the Image Plugin Icon
-    Then the src link is rewritten to "c4x/MITx/999/asset/image.jpg"
-    And the link is shown as "/static/image.jpg" in the Image Plugin
-
-  Scenario: TinyMCE link plugin sets urls correctly
-    Given I have created a Blank HTML Page
-    When I edit the page
-    And I add a link with static link "/static/image.jpg" via the Link Plugin Icon
-    Then the href link is rewritten to "c4x/MITx/999/asset/image.jpg"
-    And the link is shown as "/static/image.jpg" in the Link Plugin
-
-  Scenario: TinyMCE and CodeMirror preserve style tags
-    Given I have created a Blank HTML Page
-    When I edit the page
-    And type "<p class='title'>pages</p><style><!-- .title { color: red; } --></style>" in the code editor and press OK
-    And I save the page
-    Then the page text contains:
-      """
-      <p class="title">pages</p>
-      <style><!--
-      .title { color: red; }
-      --></style>
-      """
-
-  Scenario: TinyMCE toolbar buttons are as expected
-    Given I have created a Blank HTML Page
-    When I edit the page
-    Then the expected toolbar buttons are displayed
-
-  Scenario: Static links are converted when switching between code editor and WYSIWYG views
-    Given I have created a Blank HTML Page
-    When I edit the page
-    And type "<img src="/static/image.jpg">" in the code editor and press OK
-    Then the src link is rewritten to "c4x/MITx/999/asset/image.jpg"
-    And the code editor displays "<p><img src="/static/image.jpg" alt="" /></p>"
-
-  Scenario: Code format toolbar button wraps text with code tags
-    Given I have created a Blank HTML Page
-    When I edit the page
-    And I set the text to "display as code" and I select the text
-    And I select the code toolbar button
-    And I save the page
-    Then the page text contains:
-      """
-      <p><code>display as code</code></p>
-      """
+    When I edit the page and select the Visual Editor
+    And I add an image with a static link via the Image Plugin Icon
+    Then the image static link is rewritten to translate the path
