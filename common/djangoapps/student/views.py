@@ -928,7 +928,7 @@ def logout_user(request):
     if settings.FEATURES.get('AUTH_USE_CAS'):
         target = reverse('cas-logout')
     else:
-        target = '/'
+        target = 'https://ionisx.com'
     response = redirect(target)
     response.delete_cookie(
         settings.EDXMKTG_COOKIE_NAME,
