@@ -63,8 +63,8 @@ class @HTMLEditingDescriptor
     ed.on('EditImage', @editImage)
     ed.on('SaveLink', @saveLink)
     ed.on('EditLink', @editLink)
-    ed.on('ShowCodeMirror', @showCodeEditor)
-    ed.on('SaveCodeMirror', @saveCodeEditor)
+    ed.on('ShowCodeEditor', @showCodeEditor)
+    ed.on('SaveCodeEditor', @saveCodeEditor)
 
   editImage: (data) =>
     # Called when the image plugin will be shown. Input arg is the JSON version of the image data.
@@ -86,17 +86,17 @@ class @HTMLEditingDescriptor
     if data['href']
       data['href'] = rewriteStaticLinks(data['href'], '/static/', @base_asset_url)
 
-  showCodeEditor: (codeEditor) =>
+  showCodeEditor: (source) =>
     # Called when the CodeMirror Editor is displayed to convert links to show static prefix.
-    # The input argument is the CodeMirror instance.
-    content = rewriteStaticLinks(codeEditor.getValue(), @base_asset_url, '/static/')
-    codeEditor.setValue(content)
+    # The input argument is a dict with the text content.
+    content = rewriteStaticLinks(source.content, @base_asset_url, '/static/')
+    source.content = content
 
-  saveCodeEditor: (codeEditor) =>
+  saveCodeEditor: (source) =>
     # Called when the CodeMirror Editor is saved to convert links back to the full form.
-    # The input argument is the CodeMirror instance.
-    content = rewriteStaticLinks(codeEditor.getValue(), '/static/', @base_asset_url)
-    codeEditor.setValue(content)
+    # The input argument is a dict with the text content.
+    content = rewriteStaticLinks(source.content, '/static/', @base_asset_url)
+    source.content = content
 
   initInstanceCallback: (visualEditor) =>
     visualEditor.setContent(rewriteStaticLinks(visualEditor.getContent({no_events: 1}), '/static/', @base_asset_url))
