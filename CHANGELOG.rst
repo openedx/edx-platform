@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Transcript translations should be displayed in their source language (BLD-935).
+
 Blades: Create an upload modal for video transcript translations (BLD-751).
 
 Studio: Add ability to reorder Pages and hide the Wiki page. STUD-1375

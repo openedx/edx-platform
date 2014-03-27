@@ -53,7 +53,7 @@ class TestVideoYouTube(TestVideo):
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [{'display_name': 'SubRip (.srt) file', 'value': 'srt'}, {'display_name': 'Text (.txt) file', 'value': 'txt'}],
             'transcript_language': u'en',
-            'transcript_languages': '{"en": "English", "uk": "Ukrainian"}',
+            'transcript_languages': '{"en": "English", "uk":  u"Українська"}',
             'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
                 self.item_descriptor, 'transcript', 'translation'
             ).rstrip('/?'),
@@ -532,3 +532,10 @@ class VideoDescriptorTest(unittest.TestCase):
         ]
         rendered_context = self.descriptor.get_context()
         self.assertListEqual(rendered_context['tabs'], correct_tabs)
+
+    def test_editable_metadata_fields(self):
+        output = self.descriptor.editable_metadata_fields
+        self.assertEqual(
+            [d['label'] for d in output['transcripts']['languages'] if d['code'] == u'uk'][0],
+            u'Українська'
+        )
