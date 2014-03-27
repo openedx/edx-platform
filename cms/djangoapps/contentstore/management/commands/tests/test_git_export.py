@@ -150,7 +150,7 @@ class TestGitExport(CourseTestCase):
                                            '--format=%an|%ae'], cwd=cwd)
         self.assertEqual(expect_string, git_log)
 
-        # Make changes to course so there is something commit
+        # Make changes to course so there is something to commit
         self.populate_course()
         git_export_utils.export_to_git(
             self.course.id,

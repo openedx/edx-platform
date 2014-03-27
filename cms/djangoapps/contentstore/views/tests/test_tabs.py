@@ -48,14 +48,17 @@ class TabsPageTests(CourseTestCase):
         with self.assertRaises(NotImplementedError):
             self.client.ajax_post(
                 self.url,
-                data={'tab_id': WikiTab.type, 'unsupported_request': None}
+                data=json.dumps({
+                    'tab_id_locator': {'tab_id': WikiTab.type},
+                    'unsupported_request': None,
+                }),
             )
 
         # invalid JSON POST request
         with self.assertRaises(NotImplementedError):
             self.client.ajax_post(
                 self.url,
-                data={'invalid_request': None}
+                data={'invalid_request': None},
             )
 
     def test_view_index(self):
@@ -63,7 +66,7 @@ class TabsPageTests(CourseTestCase):
 
         resp = self.client.get_html(self.url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('course-nav-tab-list', resp.content)
+        self.assertIn('course-nav-list', resp.content)
 
     def test_reorder_tabs(self):
         """Test re-ordering of tabs"""
@@ -87,7 +90,7 @@ class TabsPageTests(CourseTestCase):
         # post the request
         resp = self.client.ajax_post(
             self.url,
-            data={'tabs': [{'tab_id': tab_id} for tab_id in tab_ids]}
+            data={'tabs': [{'tab_id': tab_id} for tab_id in tab_ids]},
         )
         self.assertEqual(resp.status_code, 204)
 
@@ -109,7 +112,7 @@ class TabsPageTests(CourseTestCase):
         # post the request
         resp = self.client.ajax_post(
             self.url,
-            data={'tabs': [{'tab_id': tab_id} for tab_id in tab_ids]}
+            data={'tabs': [{'tab_id': tab_id} for tab_id in tab_ids]},
         )
         self.assertEqual(resp.status_code, 400)
         resp_content = json.loads(resp.content)
@@ -123,7 +126,7 @@ class TabsPageTests(CourseTestCase):
         # post the request
         resp = self.client.ajax_post(
             self.url,
-            data={'tabs': [{'tab_id': tab_id} for tab_id in invalid_tab_ids]}
+            data={'tabs': [{'tab_id': tab_id} for tab_id in invalid_tab_ids]},
         )
         self.check_invalid_tab_id_response(resp)
 
@@ -141,7 +144,7 @@ class TabsPageTests(CourseTestCase):
             self.url,
             data=json.dumps({
                 'tab_id_locator': {'tab_id': old_tab.tab_id},
-                'is_hidden': new_is_hidden_setting
+                'is_hidden': new_is_hidden_setting,
             }),
         )
         self.assertEqual(resp.status_code, 204)

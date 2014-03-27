@@ -40,7 +40,10 @@
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         <li class="nav-item">
-        <a href="#" class="button new-button new-tab"><i class="icon-plus"></i> ${_("New Page")}</a>
+          <a href="#" class="button new-button new-tab"><i class="icon-plus"></i> ${_("New Page")}</a>
+        </li>
+        <li class="nav-item">
+          <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
         </li>
       </ul>
     </nav>
@@ -58,39 +61,34 @@
             <ol class="course-nav-list course components">
 
               % for tab in tabs_to_render:
+                <%
+                  css_class = "course-tab"
+                  if tab.is_movable:
+                    css_class = css_class + " is-movable"
+                  elif (not tab.is_movable) and (not tab.is_hideable):
+                    css_class = css_class + " is-fixed"
+                %>
+
                 % if isinstance(tab, StaticTab):
-                    <li class="component course-tab sortable-tab" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
+                    <li class="component ${css_class}" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
+
                 % else:
-
-                  <%
-                    tab_name = _(tab.name)
-                    item_names_formatted = ""
-                    item_names = []
-                    num_items = 0
-                    if tab.is_collection:
-                        item_names = [_(item.name) for item in tab.items(context_course)]
-                        num_items = sum(1 for item in tab.items(context_course))
-                    css_class = "course-nav-item course-nav-tab course-tab"
-                    if tab.is_movable:
-                        css_class = css_class + " sortable-tab"
-                   %>
-
-                    % if tab.is_hideable or tab.is_movable:
-                    <li class="${css_class}" data-tab-id="${tab.tab_id}">
+                    <li class="course-nav-item ${css_class}" data-tab-id="${tab.tab_id}">
                       <div class="course-nav-item-header">
-                        % if tab.is_collection:
-                          <h3 class="title-sub">${tab_name}</h3>
 
-                          <ul class="course-nav-item-children">
-                          % for item_name in item_names:
-                            <li class="course-nav-item-child title">
-                              ${item_name}
-                            </li>
-                          % endfor
-                          </ul>
+                        % if tab.is_collection:
+
+                          <h3 class="title-sub">${_(tab.name)}</h3>
+                            <ul class="course-nav-item-children">
+                            % for item in tab.items(context_course):
+                              <li class="course-nav-item-child title">
+                                ${_(item.name)}
+                              </li>
+                            % endfor
+                            </ul>
 
                         % else:
-                          <h3 class="title">${tab_name}</h3>
+                          <h3 class="title">${_(tab.name)}</h3>
                         % endif
                       </div>
 
@@ -99,13 +97,13 @@
 
                         % if tab.is_hideable:
                           <li class="action-item action-visible">
-                              <label><span class="sr">${_("Show this page")}</span></label>
-                              % if tab.is_hidden:
-                                <input type="checkbox" class="toggle-checkbox" data-tooltip="${_('Show/hide page')}" checked />
-                              % else:
-                                <input type="checkbox" class="toggle-checkbox" data-tooltip="${_('Show/hide page')}" />
-                              % endif
-                              <div class="action-button"><i class="icon-eye-open"></i><i class="icon-eye-close"></i></div>
+                            <label><span class="sr">${_("Show this page")}</span></label>
+                            % if tab.is_hidden:
+                              <input type="checkbox" class="toggle-checkbox" data-tooltip="${_('Show/hide page')}" checked />
+                            % else:
+                              <input type="checkbox" class="toggle-checkbox" data-tooltip="${_('Show/hide page')}" />
+                            % endif
+                            <div class="action-button"><i class="icon-eye-open"></i><i class="icon-eye-close"></i></div>
                           </li>
                         % endif
 
@@ -123,30 +121,7 @@
                       % endif
                     </li>
 
-                    % else:
-                    <li class="course-nav-item course_tab is-fixed" data-tab-id="${tab.tab_id}">
-                      <div class="course-nav-item-header">
-                        <h3 class="title">${tab_name}</h3>
-
-                        % if tab.is_collection:
-                          <ul class="course-nav-item-children">
-                          % for item_name in item_names:
-                            <li class="course-nav-item-child">
-                              ${item_name}
-                            </li>
-                          % endfor
-                          </ul>
-                        % endif
-                          </ul>
-                      </div>
-
-                      <div class="drag-handle is-fixed" data-tooltip="${_('This page cannot be reordered')}">
-                        <span class="sr">${_("This page cannot be reordered")}</span>
-                      </div>
-                    </li>
-                    % endif
-
-               % endif
+                 % endif
               % endfor
 
               <li class="new-component-item"></li>

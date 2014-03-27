@@ -27,26 +27,26 @@ Feature: CMS.Pages
     @skip_safari
     Scenario: Users can reorder static pages
         Given I have created two different static pages
-        When I reorder the static pages
-        Then the static pages are in the reverse order
+        When I drag the first static page to the last
+        Then the static pages are switched
         And I reload the page
-        Then the static pages are in the reverse order
+        Then the static pages are switched
 
     Scenario: Users can reorder built-in pages
         Given I have opened the pages page in a new course
         Then the built-in pages are in the default order
-        When I reorder the pages
-        Then the built-in pages are in the reverse order
+        When I drag the first page to the last
+        Then the built-in pages are switched
         And I reload the page
-        Then the built-in pages are in the reverse order
+        Then the built-in pages are switched
 
     Scenario: Users can reorder built-in pages amongst static pages
         Given I have created two different static pages
         Then the pages are in the default order
-        When I reorder the pages
-        Then the pages are in the reverse order
+        When I drag the first page to the last
+        Then the pages are switched
         And I reload the page
-        Then the pages are in the reverse order
+        Then the pages are switched
 
     Scenario: Users can toggle visibility on hideable pages
         Given I have opened the pages page in a new course

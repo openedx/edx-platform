@@ -16,7 +16,7 @@ from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.tabs import CourseTabList, StaticTab, CourseTab, InvalidTabsException
 
-from ..utils import get_modulestore
+from ..utils import get_modulestore, get_lms_link_for_item
 
 __all__ = ['tabs_handler']
 
@@ -69,16 +69,16 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             if isinstance(tab, StaticTab):
                 # static tab needs its locator information to render itself as an xmodule
                 static_tab_loc = old_location.replace(category='static_tab', name=tab.url_slug)
-                static_tab = modulestore('direct').get_item(static_tab_loc)
                 tab.locator = loc_mapper().translate_location(
-                    course_item.location.course_id, static_tab.location, False, True
+                    course_item.location.course_id, static_tab_loc, False, True
                 )
             tabs_to_render.append(tab)
 
         return render_to_response('edit-tabs.html', {
             'context_course': course_item,
             'tabs_to_render': tabs_to_render,
-            'course_locator': locator
+            'course_locator': locator,
+            'lms_link': get_lms_link_for_item(course_item.location),
         })
     else:
         return HttpResponseNotFound()
@@ -93,14 +93,14 @@ def reorder_tabs_handler(course_item, request):
     # The locators are used to identify static tabs since they are xmodules.
     # Although all tabs have tab_ids, newly created static tabs do not know
     # their tab_ids since the xmodule editor uses only locators to identify new objects.
-    ids_locators_of_new_tab_order = request.json['tabs']
+    requested_tab_id_locators = request.json['tabs']
 
     # original tab list in original order
     old_tab_list = course_item.tabs
 
     # create a new list in the new order
     new_tab_list = []
-    for tab_id_locator in ids_locators_of_new_tab_order:
+    for tab_id_locator in requested_tab_id_locators:
         tab = get_tab_by_tab_id_locator(old_tab_list, tab_id_locator)
         if tab is None:
             return JsonResponse(

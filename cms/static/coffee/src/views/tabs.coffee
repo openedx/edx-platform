@@ -19,7 +19,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       @options.mast.find('.new-tab').on('click', @addNewTab)
       $('.add-pages .new-tab').on('click', @addNewTab)
       $('.toggle-checkbox').on('click', @toggleVisibilityOfTab)
-      @$('.course-nav-tab-list').sortable(
+      @$('.course-nav-list').sortable(
         handle: '.drag-handle'
         update: @tabMoved
         helper: 'clone'
@@ -27,7 +27,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
         placeholder: 'component-placeholder'
         forcePlaceholderSize: true
         axis: 'y'
-        items: '> .sortable-tab'
+        items: '> .is-movable'
       )
 
     toggleVisibilityOfTab: (event, ui) =>
@@ -85,7 +85,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       )
 
       $('.new-component-item').before(editor.$el)
-      editor.$el.addClass('course-tab sortable-tab')
+      editor.$el.addClass('course-tab is-movable')
       editor.$el.addClass('new')
       setTimeout(=>
         editor.$el.removeClass('new')

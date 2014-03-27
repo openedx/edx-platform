@@ -17,7 +17,7 @@ class TabTestCase(unittest.TestCase):
         self.books = None
 
     def set_up_books(self, num_books):
-        """initializes the textbooks in the course and adds the given number of books to each textbook"""
+        """Initializes the textbooks in the course and adds the given number of books to each textbook"""
         self.books = [MagicMock() for _ in range(num_books)]
         for book_index, book in enumerate(self.books):
             book.title = 'Book{0}'.format(book_index)
@@ -76,7 +76,7 @@ class TabTestCase(unittest.TestCase):
         return tab
 
     def check_tab_equality(self, tab, dict_tab):
-        """tests the equality methods on the given tab"""
+        """Tests the equality methods on the given tab"""
         self.assertEquals(tab, dict_tab)  # test __eq__
         ne_dict_tab = dict_tab
         ne_dict_tab['type'] = 'fake_type'
@@ -84,13 +84,13 @@ class TabTestCase(unittest.TestCase):
         self.assertNotEquals(tab, {'fake_key': 'fake_value'})  # test __ne__: missing type
 
     def check_tab_json_methods(self, tab):
-        """tests the json from and to methods on the given tab"""
+        """Tests the json from and to methods on the given tab"""
         serialized_tab = tab.to_json()
         deserialized_tab = tab.from_json(serialized_tab)
         self.assertEquals(serialized_tab, deserialized_tab)
 
     def check_can_display_results(self, tab, expected_value=True, for_authenticated_users_only=False, for_staff_only=False):
-        """checks can display results for various users"""
+        """Checks can display results for various users"""
         if for_staff_only:
             self.assertEquals(
                 expected_value,
@@ -108,7 +108,7 @@ class TabTestCase(unittest.TestCase):
             )
 
     def check_get_and_set_methods(self, tab):
-        """test __getitem__ and __setitem__ calls"""
+        """Test __getitem__ and __setitem__ calls"""
         self.assertEquals(tab['type'], tab.type)
         self.assertEquals(tab['tab_id'], tab.tab_id)
         with self.assertRaises(KeyError):
@@ -120,7 +120,7 @@ class TabTestCase(unittest.TestCase):
             tab['invalid_key'] = 'New Value'
 
     def check_get_and_set_method_for_key(self, tab, key):
-        """test __getitem__ and __setitem__ for the given key"""
+        """Test __getitem__ and __setitem__ for the given key"""
         old_value = tab[key]
         new_value = 'New Value'
         tab[key] = new_value
@@ -540,7 +540,7 @@ class CourseTabListTestCase(TabListTestCase):
         )):
             self.assertEquals(tab.type, self.course.tabs[i].type)
 
-        # enumerate the tabs and verify textbooks and the instructor tab
+       # enumerate the tabs and verify textbooks and the instructor tab
         for i, tab in enumerate(tabs.CourseTabList.iterate_displayable(
             self.course,
             self.settings,
@@ -555,8 +555,21 @@ class CourseTabListTestCase(TabListTestCase):
                 # all other tabs must match the expected type
                 self.assertEquals(tab.type, self.course.tabs[i].type)
 
+        # test including non-empty collections
+        self.assertIn(
+            tabs.HtmlTextbookTabs(),
+            list(tabs.CourseTabList.iterate_displayable_cms(self.course, self.settings)),
+        )
+
+        # test not including empty collections
+        self.course.html_textbooks = []
+        self.assertNotIn(
+            tabs.HtmlTextbookTabs(),
+            list(tabs.CourseTabList.iterate_displayable_cms(self.course, self.settings)),
+        )
+
     def test_get_tab_by_methods(self):
-        """tests the get_tab methods in CourseTabList"""
+        """Tests the get_tab methods in CourseTabList"""
         self.course.tabs = self.all_valid_tab_list
         for tab in self.course.tabs:
 
@@ -587,7 +600,7 @@ class DiscussionLinkTestCase(TabTestCase):
 
     @staticmethod
     def _reverse(course):
-        """custom reverse function"""
+        """Custom reverse function"""
         def reverse_discussion_link(viewname, args):
             """reverse lookup for discussion link"""
             if viewname == "django_comment_client.forum.views.forum_form_discussion" and args == [course.id]:

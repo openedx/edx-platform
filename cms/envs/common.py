@@ -43,9 +43,11 @@ FEATURES = {
 
     'GITHUB_PUSH': False,
 
-    # for consistency in user-experience, keep the value of this setting in sync with the
-    # one in lms/envs/common.py
+    # for consistency in user-experience, keep the value of the following 3 settings
+    # in sync with the ones in lms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_TEXTBOOK': True,
+    'ENABLE_STUDENT_NOTES': True,
 
     'AUTH_USE_CERTIFICATES': False,
 
