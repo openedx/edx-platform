@@ -5,7 +5,7 @@ processor_name = settings.CC_PROCESSOR.keys()[0]
 module = __import__('shoppingcart.processors.' + processor_name,
                     fromlist=['render_purchase_form_html'
                               'process_postpay_callback',
-                              'process_purchase_callback',
+                              'start_payment_process',
                               ])
 
 
@@ -19,13 +19,13 @@ def render_purchase_form_html(*args, **kwargs):
     return module.render_purchase_form_html(*args, **kwargs)
 
 
-def process_purchase_callback(*args, **kwargs):
+def start_payment_process(*args, **kwargs):
     """
-    This top level function is for payment flow where the user clicks say a "buy" button
+    This top level function is for payment flow where the user clicks - say - a "buy" button
     and needs to call back to Open edX before moving onto payment processor workflows, e.g.
     redirect to different site
     """
-    return module.process_purchase_callback(*args, **kwargs)
+    return module.start_payment_process(*args, **kwargs)
 
 
 def process_postpay_callback(*args, **kwargs):

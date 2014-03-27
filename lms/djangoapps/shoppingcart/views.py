@@ -15,7 +15,7 @@ from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, Universit
 from student.models import CourseEnrollment
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException
 from .models import Order, PaidCourseRegistration, OrderItem
-from .processors import process_postpay_callback, render_purchase_form_html, process_purchase_callback
+from .processors import process_postpay_callback, render_purchase_form_html, start_payment_process
 
 log = logging.getLogger("shoppingcart")
 
@@ -93,14 +93,17 @@ def remove_item(request):
 
 
 @login_required
-def purchase_callback(request):
+def start_payment(request):
     """
-    This is the entry point that can be used when the user clicks 'Buy' (or something similar).
-    This simply turns around and calls the interface to the payment processor module
+    This is the entry point that *can* be used when the user clicks 'Buy' (or something similar).
+    Certain processor modules (such as CyberSource) will not use this entry point because they immediately
+    redirect to a 3rd party from the webform itself.
+    However, in other cases (such as SaferPay), we need to do some server-side setup before
+    control can be turned over to the 3rd party payment provider.
     """
     params = request.POST.dict()
 
-    result = process_purchase_callback(params)
+    result = start_payment_process(params)
     if result['success'] and 'redirect_url' in result:
         return HttpResponseRedirect(result['redirect_url'])
     else:
@@ -149,6 +152,15 @@ def show_receipt(request, ordernum):
     any_refunds = any(i.status == "refunded" for i in order_items)
     receipt_template = 'shoppingcart/receipt.html'
     __, instructions = order.generate_receipt_instructions()
+
+    # only show billed to information on receipt if we have any
+    # note, SaferPay does not capture Bill To information
+    show_billed_to_info = order.bill_to_cardtype or order.bill_to_ccnum or \
+                          order.bill_to_first or order.bill_to_last or \
+                          order.bill_to_street1 or order.bill_to_street2 or \
+                          order.bill_to_city or order.bill_to_state or order.bill_to_postalcode or \
+                          order.bill_to_country
+
     # we want to have the ability to override the default receipt page when
     # there is only one item in the order
     context = {
@@ -156,6 +168,7 @@ def show_receipt(request, ordernum):
         'order_items': order_items,
         'any_refunds': any_refunds,
         'instructions': instructions,
+        'show_billed_to_info': show_billed_to_info,
     }
 
     if order_items.count() == 1:

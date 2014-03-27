@@ -18,7 +18,7 @@ from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 
 
-def process_purchase_callback(params):
+def start_payment_process(params):
     """
     This is the implemention of this interface point, but this is not in use for CyberSource
     implementations, so we thrown a NotImplementedError as it should not be called
