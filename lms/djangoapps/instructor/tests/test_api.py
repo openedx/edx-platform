@@ -702,9 +702,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         response = self.client.get(url, {'emails': self.beta_tester.email, 'action': action})
         self.assertEqual(response.status_code, 400)
 
-    def test_add_notenrolled(self):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': False})
+    def add_notenrolled(self, url, response, identifier):
         self.assertEqual(response.status_code, 200)
 
         self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(self.notenrolled_student))
@@ -713,7 +711,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
             "action": "add",
             "results": [
                 {
-                    "email": self.notenrolled_student.email,
+                    "email": identifier,
                     "error": False,
                     "userDoesNotExist": False
                 }
@@ -725,6 +723,16 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
         # Check the outbox
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_add_notenrolled_email(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': False})
+        self.add_notenrolled(url, response, self.notenrolled_student.email)
+
+    def test_add_notenrolled_username(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notenrolled_student.username, 'action': 'add', 'email_students': False})
+        self.add_notenrolled(url, response, self.notenrolled_student.username)
 
     def test_add_notenrolled_with_email(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})

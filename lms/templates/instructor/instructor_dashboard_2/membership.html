@@ -73,11 +73,11 @@
   <h2> ${_("Batch Beta Testers")} </h2>
   <p>
     <label for="student-emails-for-beta">
-      ${_("Enter email addresses separated by new lines or commas.")}<br/>
+      ${_("Enter email addresses and/or usernames separated by new lines or commas.")}<br/>
       ${_("Note: Users must have an activated {platform_name} account before they can be enrolled as a beta tester.").format(platform_name=settings.PLATFORM_NAME)}
     </label>
 
-  <textarea rows="6" cols="50" name="student-emails-for-beta" placeholder="${_("Email Addresses")}" spellcheck="false"></textarea>
+  <textarea rows="6" cols="50" name="student-emails-for-beta" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
   </p>
 
   <div class="enroll-option">

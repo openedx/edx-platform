@@ -306,7 +306,7 @@ def students_update_enrollment(request, course_id):
 @require_level('instructor')
 @common_exceptions_400
 @require_query_params(
-    emails="stringified list of emails",
+    emails="stringified list of emails or usernames",
     action="add or remove",
 )
 def bulk_beta_modify_access(request, course_id):
@@ -314,7 +314,8 @@ def bulk_beta_modify_access(request, course_id):
     Enroll or unenroll users in beta testing program.
 
     Query parameters:
-    - emails is string containing a list of emails separated by anything split_input_list can handle.
+    - emails is string containing a list of emails or usernames separated by
+      anything split_input_list can handle.
     - action is one of ['add', 'remove']
     """
     action = request.GET.get('action')
@@ -333,7 +334,7 @@ def bulk_beta_modify_access(request, course_id):
         try:
             error = False
             user_does_not_exist = False
-            user = User.objects.get(email=email)
+            user = get_student_from_identifier(email)
 
             if action == 'add':
                 allow_access(course, user, rolename)
@@ -539,8 +540,9 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     student_data = analytics.basic.enrolled_students_features(course_id, query_features)
 
-    # Scrape the query features for i18n - can't translate here because it breaks further queries
-    # and how the coffeescript works. The actual translation will be done in data_download.coffee
+    # Provide human-friendly and translatable names for these features. These names
+    # will be displayed in the table generated in data_download.coffee. It is not (yet)
+    # used as the header row in the CSV, but could be in the future.
     query_features_names = {
         'username': _('Username'),
         'name': _('Name'),
@@ -1078,7 +1080,7 @@ def update_forum_role_membership(request, course_id):
     target_is_instructor = has_access(user, course, 'instructor')
     # cannot revoke instructor
     if target_is_instructor and action == 'revoke' and rolename == FORUM_ROLE_ADMINISTRATOR:
-        return HttpResponseBadRequest("Cannot revoke instructor forum admin privelages.")
+        return HttpResponseBadRequest("Cannot revoke instructor forum admin privileges.")
 
     try:
         update_forum_role(course_id, user, rolename, action)

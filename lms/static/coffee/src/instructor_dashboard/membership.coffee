@@ -250,8 +250,8 @@ class BetaTesterBulkAddition
 
     if no_users.length
       no_users.push gettext("Users must create and activate their account before they can be promoted to beta tester.")
-      `// Translators: A list of email addresses appears after this sentence`
-      render_list gettext("Could not find users associated with the following email addresses:"), (sr.email for sr in no_users)
+      `// Translators: A list of identifiers (which are email addresses and/or usernames) appears after this sentence`
+      render_list gettext("Could not find users associated with the following identifiers:"), (sr.email for sr in no_users)
 
 # Wrapper for the batch enrollment subsection.
 # This object handles buttons, success and failure reporting,
