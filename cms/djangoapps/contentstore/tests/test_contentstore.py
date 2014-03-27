@@ -409,9 +409,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             else:
                 built_in_tabs.append(tab)
 
-        tab_ids = [tab.tab_id for tab in (built_in_tabs + reverse_static_tabs)]
+        tab_ids = [{'tab_id': tab.tab_id} for tab in (built_in_tabs + reverse_static_tabs)]
 
-        self.client.ajax_post(new_location.url_reverse('tabs'), {'tab_ids': tab_ids})
+        self.client.ajax_post(new_location.url_reverse('tabs'), {'tabs': tab_ids})
 
         course = module_store.get_item(course_location)
 

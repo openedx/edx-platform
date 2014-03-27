@@ -59,7 +59,7 @@
 
               % for tab in tabs_to_render:
                 % if isinstance(tab, StaticTab):
-                    <li class="component course-tab" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
+                    <li class="component course-tab sortable-tab" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
                 % else:
 
                   <%
@@ -68,9 +68,12 @@
                         item_names = [_(item.name) for item in tab.items(context_course)]
                         num_items = sum(1 for item in tab.items(context_course))
                         tab_name = tab_name + " ({0}): {1}".format(num_items, ", ".join(item_names))
+                    css_class = "course-nav-tab course-tab"
+                    if tab.is_movable:
+                        css_class = css_class + " sortable-tab"
                    %>
 
-                    <li class="course-nav-tab course-tab" data-tab-id="${tab.tab_id}">
+                    <li class="${css_class}" data-tab-id="${tab.tab_id}">
                       <div class="course-nav-tab-header">
                         <h3 class="title">${tab_name}</h3>
                       </div>

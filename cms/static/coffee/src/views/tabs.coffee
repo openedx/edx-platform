@@ -27,7 +27,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
         placeholder: 'component-placeholder'
         forcePlaceholderSize: true
         axis: 'y'
-        items: '> .course-tab'
+        items: '> .sortable-tab'
       )
 
     toggleVisibilityOfTab: (event, ui) =>
@@ -85,7 +85,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       )
 
       $('.new-component-item').before(editor.$el)
-      editor.$el.addClass('course-tab')
+      editor.$el.addClass('course-tab sortable-tab')
       editor.$el.addClass('new')
       setTimeout(=>
         editor.$el.removeClass('new')
