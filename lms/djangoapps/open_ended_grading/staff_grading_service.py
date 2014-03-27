@@ -77,6 +77,8 @@ class StaffGradingService(GradingService):
     Interface to staff grading backend.
     """
 
+    METRIC_NAME = 'edxapp.open_ended_grading.staff_grading_service'
+
     def __init__(self, config):
         config['system'] = LmsModuleSystem(
             static_url='/static',
@@ -114,7 +116,14 @@ class StaffGradingService(GradingService):
             GradingServiceError: something went wrong with the connection.
         """
         params = {'course_id': course_id, 'grader_id': grader_id}
-        return self.get(self.get_problem_list_url, params).json()
+        result = self.get(self.get_problem_list_url, params).json()
+        tags = [u'course_id:{}'.format(course_id)]
+        self._record_result('get_problem_list', result, tags)
+        dog_stats_api.histogram(
+            self._metric_name('get_problem_list.result.length'),
+            len(result.get('problem_list', []))
+        )
+        return result
 
     def get_next(self, course_id, location, grader_id):
         """
@@ -137,7 +146,10 @@ class StaffGradingService(GradingService):
         response = self.get(self.get_next_url,
                             params={'location': location,
                                     'grader_id': grader_id})
-        return self._render_rubric(response.json())
+        result = self._render_rubric(response.json())
+        tags = [u'course_id:{}'.format(course_id)]
+        self._record_result('get_next', result, tags)
+        return result
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
                    submission_flagged):
@@ -163,11 +175,20 @@ class StaffGradingService(GradingService):
                 'submission_flagged': submission_flagged}
 
         response = self.post(self.save_grade_url, data=data)
-        return self._render_rubric(response.json())
+        result = self._render_rubric(response.json())
+        tags = [u'course_id:{}'.format(course_id)]
+        self._record_result('save_grade', result, tags)
+        return result
 
     def get_notifications(self, course_id):
         params = {'course_id': course_id}
-        return self.get(self.get_notifications_url, params).json()
+        result = self.get(self.get_notifications_url, params).json()
+        tags = [
+            u'course_id:{}'.format(course_id),
+            u'staff_needs_to_grade:{}'.format(result.get('staff_needs_to_grade'))
+        ]
+        self._record_result('get_notifications', result, tags)
+        return result
 
 
 # don't initialize until staff_grading_service() is called--means that just
