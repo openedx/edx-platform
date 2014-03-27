@@ -29,7 +29,7 @@ class PeerGradingService(GradingService):
     def get_data_for_location(self, problem_location, student_id):
         params = {'location': problem_location, 'student_id': student_id}
         response = self.get(self.get_data_for_location_url, params)
-        return self.try_to_decode(response)
+        return response.json()
 
     def get_next_submission(self, problem_location, grader_id):
         response = self.get(
@@ -39,43 +39,36 @@ class PeerGradingService(GradingService):
                 'grader_id': grader_id
             }
         )
-        return self.try_to_decode(self._render_rubric(response))
+        return self._render_rubric(response.json())
 
     def save_grade(self, **kwargs):
         data = kwargs
         data.update({'rubric_scores_complete': True})
-        return self.try_to_decode(self.post(self.save_grade_url, data))
+        return self.post(self.save_grade_url, data).json()
 
     def is_student_calibrated(self, problem_location, grader_id):
         params = {'problem_id': problem_location, 'student_id': grader_id}
-        return self.try_to_decode(self.get(self.is_student_calibrated_url, params))
+        return self.get(self.is_student_calibrated_url, params).json()
 
     def show_calibration_essay(self, problem_location, grader_id):
         params = {'problem_id': problem_location, 'student_id': grader_id}
         response = self.get(self.show_calibration_essay_url, params)
-        return self.try_to_decode(self._render_rubric(response))
+        return self._render_rubric(response.json())
 
     def save_calibration_essay(self, **kwargs):
         data = kwargs
         data.update({'rubric_scores_complete': True})
-        return self.try_to_decode(self.post(self.save_calibration_essay_url, data))
+        return self.post(self.save_calibration_essay_url, data).json()
 
     def get_problem_list(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
         response = self.get(self.get_problem_list_url, params)
-        return self.try_to_decode(response)
+        return response.json()
 
     def get_notifications(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
         response = self.get(self.get_notifications_url, params)
-        return self.try_to_decode(response)
-
-    def try_to_decode(self, text):
-        try:
-            text = json.loads(text)
-        except:
-            pass
-        return text
+        return response.json()
 
 
 """
