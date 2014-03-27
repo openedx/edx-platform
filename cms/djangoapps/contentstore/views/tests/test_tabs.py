@@ -42,6 +42,13 @@ class TabsPageTests(CourseTestCase):
         with self.assertRaises(NotImplementedError):
             self.client.get(self.url)
 
+        # JSON POST request not supported
+        with self.assertRaises(NotImplementedError):
+            self.client.ajax_post(
+                self.url,
+                data={'tab_id': WikiTab.type, 'unsupported_request': None}
+            )
+
         # invalid JSON POST request
         with self.assertRaises(NotImplementedError):
             self.client.ajax_post(

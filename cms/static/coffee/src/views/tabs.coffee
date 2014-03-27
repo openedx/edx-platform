@@ -37,9 +37,6 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       tab_id = $(tab_element).data('tab-id')
       is_hidden = $(checkbox_element).is(':checked')
 
-      analytics.track "Toggle Page Visibility",
-        course: course_location_analytics
-
       saving = new NotificationView.Mini({title: gettext("Saving&hellip;")})
       saving.show()
 
