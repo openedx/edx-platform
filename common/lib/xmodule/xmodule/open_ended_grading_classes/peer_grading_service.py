@@ -1,5 +1,6 @@
 import json
 import logging
+from dogapi import dog_stats_api
 
 from .grading_service_module import GradingService, GradingServiceError
 
@@ -10,6 +11,8 @@ class PeerGradingService(GradingService):
     """
     Interface with the grading controller for peer grading
     """
+
+    METRIC_NAME = 'edxapp.open_ended_grading.peer_grading_service'
 
     def __init__(self, config, system):
         config['system'] = system
@@ -29,7 +32,17 @@ class PeerGradingService(GradingService):
     def get_data_for_location(self, problem_location, student_id):
         params = {'location': problem_location, 'student_id': student_id}
         response = self.get(self.get_data_for_location_url, params)
-        return response.json()
+        result = response.json()
+        self._record_result('get_data_for_location', result)
+        for key in result.keys():
+            if key in ('success', 'error', 'version'):
+                continue
+
+            dog_stats_api.histogram(
+                self._metric_name('get_data_for_location.{}'.format(key)),
+                result[key],
+            )
+        return result
 
     def get_next_submission(self, problem_location, grader_id):
         response = self.get(
@@ -39,36 +52,62 @@ class PeerGradingService(GradingService):
                 'grader_id': grader_id
             }
         )
-        return self._render_rubric(response.json())
+        result = self._render_rubric(response.json())
+        self._record_result('get_next_submission', result)
+        return result
 
     def save_grade(self, **kwargs):
         data = kwargs
         data.update({'rubric_scores_complete': True})
-        return self.post(self.save_grade_url, data).json()
+        result = self.post(self.save_grade_url, data).json()
+        self._record_result('save_grade', result)
+        return result
 
     def is_student_calibrated(self, problem_location, grader_id):
         params = {'problem_id': problem_location, 'student_id': grader_id}
-        return self.get(self.is_student_calibrated_url, params).json()
+        result = self.get(self.is_student_calibrated_url, params).json()
+        self._record_result(
+            'is_student_calibrated',
+            result,
+            tags=['calibrated:{}'.format(result.get('calibrated'))]
+        )
+        return result
 
     def show_calibration_essay(self, problem_location, grader_id):
         params = {'problem_id': problem_location, 'student_id': grader_id}
         response = self.get(self.show_calibration_essay_url, params)
-        return self._render_rubric(response.json())
+        result = self._render_rubric(response.json())
+        self._record_result('show_calibration_essay', result)
+        return result
 
     def save_calibration_essay(self, **kwargs):
         data = kwargs
         data.update({'rubric_scores_complete': True})
-        return self.post(self.save_calibration_essay_url, data).json()
+        result = self.post(self.save_calibration_essay_url, data).json()
+        self._record_result('show_calibration_essay', result)
+        return result
 
     def get_problem_list(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
         response = self.get(self.get_problem_list_url, params)
-        return response.json()
+        result = response.json()
+        self._record_result('get_problem_list', result)
+        dog_stats_api.histogram(
+            self._metric_name('get_problem_list.result.length'),
+            len(result.get('problem_list',[]))
+        )
+        return result
 
     def get_notifications(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
         response = self.get(self.get_notifications_url, params)
-        return response.json()
+        result = response.json()
+        self._record_result(
+            'get_notifications',
+            result,
+            tags=['needs_to_peer_grade:{}'.format(result.get('student_needs_to_peer_grade'))]
+        )
+        return result
 
 
 """
