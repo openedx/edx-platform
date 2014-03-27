@@ -861,6 +861,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     max_score = module_attr('max_score')
     student_view = module_attr('student_view')
     get_child_descriptors = module_attr('get_child_descriptors')
+    get_content_titles = module_attr('get_content_titles')
     xmodule_handler = module_attr('xmodule_handler')
 
     # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
