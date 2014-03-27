@@ -20,6 +20,7 @@ To start this stub server on its own from Vagrant:
 from .http import StubHttpRequestHandler, StubHttpService
 import json
 import time
+import requests
 from urlparse import urlparse
 from collections import OrderedDict
 
@@ -74,6 +75,13 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             youtube_id = params.path.split('/').pop()
 
             self._send_video_response(youtube_id, "I'm youtube.")
+
+        elif 'get_youtube_api' in self.path:
+            if self.server.config.get('youtube_api_blocked'):
+                self.send_response(404, content='', headers={'Content-type': 'text/plain'})
+            else:
+                response = requests.get('http://www.youtube.com/iframe_api')
+                self.send_response(200, content=response.text, headers={'Content-type': 'text/html'})
 
         else:
             self.send_response(
