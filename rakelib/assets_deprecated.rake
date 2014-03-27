@@ -27,7 +27,7 @@ def deprecated(deprecated, deprecated_by,  *args)
     end
 end
 
-deprecated("assets:coffee", "paver update_assets")
+deprecated("assets:coffee", "paver update_assets --skip-collect")
 deprecated("assets:coffee:clobber", nil)
 deprecated("assets:coffee:debug", "paver update_assets --debug")
 deprecated("assets:coffee:watch", "paver update_assets")
