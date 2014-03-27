@@ -92,7 +92,7 @@
                         });
                         expect($.ajaxWithPrefix.mostRecentCall.args[0].data)
                             .toEqual({
-                                videoId: 'abcdefghijkl'
+                                videoId: 'cogebirgzzM'
                             });
                     });
                 });
@@ -237,73 +237,94 @@
 
             describe('when on a non touch-based device', function () {
                 beforeEach(function () {
-                    state = jasmine.initializePlayer();
+                    runs(function () {
+                        state = jasmine.initializePlayer();
+                    });
+
+                    waitsFor(function () {
+                        return state.videoCaption.rendered;
+                    }, 'Captions are not rendered', WAIT_TIMEOUT);
                 });
 
                 it('render the caption', function () {
-                    var captionsData;
+                    runs(function () {
+                        var captionsData;
 
-                    captionsData = jasmine.stubbedCaption;
-                    $('.subtitles li[data-index]').each(
-                        function (index, link) {
+                        captionsData = jasmine.stubbedCaption;
+                        $('.subtitles li[data-index]').each(
+                            function (index, link) {
 
-                        expect($(link)).toHaveData('index', index);
-                        expect($(link)).toHaveData(
-                            'start', captionsData.start[index]
-                        );
-                        expect($(link)).toHaveAttr('tabindex', 0);
-                        expect($(link)).toHaveText(captionsData.text[index]);
+                            expect($(link)).toHaveData('index', index);
+                            expect($(link)).toHaveData(
+                                'start', captionsData.start[index]
+                            );
+                            expect($(link)).toHaveAttr('tabindex', 0);
+                            expect($(link)).toHaveText(captionsData.text[index]);
+                        });
                     });
                 });
 
                 it('add a padding element to caption', function () {
-                    expect($('.subtitles li:first').hasClass('spacing'))
-                        .toBe(true);
-                    expect($('.subtitles li:last').hasClass('spacing'))
-                        .toBe(true);
+                    runs(function () {
+                        expect($('.subtitles li:first').hasClass('spacing'))
+                            .toBe(true);
+                        expect($('.subtitles li:last').hasClass('spacing'))
+                            .toBe(true);
+                    });
                 });
 
 
                 it('bind all the caption link', function () {
-                    var handlerList = ['captionMouseOverOut', 'captionClick',
-                        'captionMouseDown', 'captionFocus', 'captionBlur',
-                        'captionKeyDown'
-                    ];
+                    runs(function () {
+                        var handlerList = ['captionMouseOverOut', 'captionClick',
+                            'captionMouseDown', 'captionFocus', 'captionBlur',
+                            'captionKeyDown'
+                        ];
 
-                    $.each(handlerList, function(index, handler) {
-                        spyOn(state.videoCaption, handler);
-                    });
-                    $('.subtitles li[data-index]').each(
-                        function (index, link) {
+                        $.each(handlerList, function(index, handler) {
+                            spyOn(state.videoCaption, handler);
+                        });
+                        $('.subtitles li[data-index]').each(
+                            function (index, link) {
 
 
-                        $(link).trigger('mouseover');
-                        expect(state.videoCaption.captionMouseOverOut).toHaveBeenCalled();
+                            $(link).trigger('mouseover');
+                            expect(state.videoCaption.captionMouseOverOut).toHaveBeenCalled();
 
-                        state.videoCaption.captionMouseOverOut.reset();
-                        $(link).trigger('mouseout');
-                        expect(state.videoCaption.captionMouseOverOut).toHaveBeenCalled();
+                            state.videoCaption.captionMouseOverOut.reset();
+                            $(link).trigger('mouseout');
+                            expect(state.videoCaption.captionMouseOverOut).toHaveBeenCalled();
 
-                        $(this).click();
-                        expect(state.videoCaption.captionClick).toHaveBeenCalled();
+                            $(this).click();
+                            expect(state.videoCaption.captionClick).toHaveBeenCalled();
 
-                        $(this).trigger('mousedown');
-                        expect(state.videoCaption.captionMouseDown).toHaveBeenCalled();
+                            $(this).trigger('mousedown');
+                            expect(state.videoCaption.captionMouseDown).toHaveBeenCalled();
 
-                        $(this).trigger('focus');
-                        expect(state.videoCaption.captionFocus).toHaveBeenCalled();
+                            $(this).trigger('focus');
+                            expect(state.videoCaption.captionFocus).toHaveBeenCalled();
 
-                        $(this).trigger('blur');
-                        expect(state.videoCaption.captionBlur).toHaveBeenCalled();
+                            $(this).trigger('blur');
+                            expect(state.videoCaption.captionBlur).toHaveBeenCalled();
 
-                        $(this).trigger('keydown');
-                        expect(state.videoCaption.captionKeyDown).toHaveBeenCalled();
+                            $(this).trigger('keydown');
+                            expect(state.videoCaption.captionKeyDown).toHaveBeenCalled();
+                        });
                     });
                 });
 
                 it('set rendered to true', function () {
-                    state = jasmine.initializePlayer();
-                    expect(state.videoCaption.rendered).toBeTruthy();
+                    runs(function () {
+                        state = jasmine.initializePlayer();
+                    });
+
+                    waitsFor(function () {
+                        return state.videoCaption.rendered;
+                    }, 'Captions are not rendered', WAIT_TIMEOUT);
+
+                    runs(function () {
+                        expect(state.videoCaption.rendered).toBeTruthy();
+                    });
                 });
             });
 
@@ -345,49 +366,58 @@
             beforeEach(function () {
                 jasmine.Clock.useMock();
                 spyOn(window, 'clearTimeout');
-                state = jasmine.initializePlayer();
+
+                runs(function () {
+                    state = jasmine.initializePlayer();
+                    jasmine.Clock.tick(50);
+                });
+
+                waitsFor(function () {
+                    return state.videoCaption.rendered;
+                }, 'Captions are not rendered', WAIT_TIMEOUT);
             });
 
             describe('when cursor is outside of the caption box', function () {
-                beforeEach(function () {
-                    $(window).trigger(jQuery.Event('mousemove'));
-                    jasmine.Clock.tick(state.config.captionsFreezeTime);
-                });
-
                 it('does not set freezing timeout', function () {
-                    expect(state.videoCaption.frozen).toBeFalsy();
+                    runs(function () {
+                        expect(state.videoCaption.frozen).toBeFalsy();
+                    });
                 });
             });
 
             describe('when cursor is in the caption box', function () {
                 beforeEach(function () {
                     spyOn(state.videoCaption, 'onMouseLeave');
-                    $('.subtitles').trigger(jQuery.Event('mouseenter'));
-                    jasmine.Clock.tick(state.config.captionsFreezeTime);
+                    runs(function () {
+                        $(window).trigger(jQuery.Event('mousemove'));
+                        jasmine.Clock.tick(state.config.captionsFreezeTime);
+                        $('.subtitles').trigger(jQuery.Event('mouseenter'));
+                        jasmine.Clock.tick(state.config.captionsFreezeTime);
+                    });
                 });
 
                 it('set the freezing timeout', function () {
-                    expect(state.videoCaption.frozen).not.toBeFalsy();
-                    expect(state.videoCaption.onMouseLeave).toHaveBeenCalled();
+                    runs(function () {
+                        expect(state.videoCaption.frozen).not.toBeFalsy();
+                        expect(state.videoCaption.onMouseLeave).toHaveBeenCalled();
+                    });
                 });
 
                 describe('when the cursor is moving', function () {
-                    beforeEach(function () {
-                        $('.subtitles').trigger(jQuery.Event('mousemove'));
-                    });
-
                     it('reset the freezing timeout', function () {
-                        expect(window.clearTimeout).toHaveBeenCalled();
+                        runs(function () {
+                            $('.subtitles').trigger(jQuery.Event('mousemove'));
+                            expect(window.clearTimeout).toHaveBeenCalled();
+                        });
                     });
                 });
 
                 describe('when the mouse is scrolling', function () {
-                    beforeEach(function () {
-                        $('.subtitles').trigger(jQuery.Event('mousewheel'));
-                    });
-
                     it('reset the freezing timeout', function () {
-                        expect(window.clearTimeout).toHaveBeenCalled();
+                        runs(function () {
+                            $('.subtitles').trigger(jQuery.Event('mousewheel'));
+                            expect(window.clearTimeout).toHaveBeenCalled();
+                        });
                     });
                 });
             });
@@ -441,25 +471,6 @@
             });
         });
 
-        it('reRenderCaption', function () {
-            state = jasmine.initializePlayer();
-
-            var Caption = state.videoCaption,
-                li;
-
-            Caption.captions = ['test'];
-            Caption.start = [500];
-
-            spyOn(Caption, 'addPaddings');
-
-            Caption.reRenderCaption();
-            li = $('ol.subtitles li');
-
-            expect(Caption.addPaddings).toHaveBeenCalled();
-            expect(li.length).toBe(1);
-            expect(li).toHaveData('start', '500');
-        });
-
         describe('fetchCaption', function () {
             var Caption, msg;
 
@@ -467,7 +478,6 @@
                 state = jasmine.initializePlayer();
                 Caption = state.videoCaption;
                 spyOn($, 'ajaxWithPrefix').andCallThrough();
-                spyOn(Caption, 'reRenderCaption');
                 spyOn(Caption, 'renderCaption');
                 spyOn(Caption, 'bindHandlers');
                 spyOn(Caption, 'updatePlayTime');
@@ -511,7 +521,6 @@
                 expect(Caption.bindHandlers).toHaveBeenCalled();
                 expect(Caption.renderCaption).not.toHaveBeenCalled();
                 expect(Caption.updatePlayTime).not.toHaveBeenCalled();
-                expect(Caption.reRenderCaption).not.toHaveBeenCalled();
                 expect(Caption.loaded).toBeTruthy();
             });
 
@@ -527,7 +536,6 @@
                 expect(Caption.bindHandlers).not.toHaveBeenCalled();
                 expect(Caption.renderCaption).not.toHaveBeenCalled();
                 expect(Caption.updatePlayTime).not.toHaveBeenCalled();
-                expect(Caption.reRenderCaption).not.toHaveBeenCalled();
                 expect(Caption.loaded).toBeTruthy();
             });
 
@@ -539,9 +547,8 @@
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
                 expect(Caption.bindHandlers).not.toHaveBeenCalled();
-                expect(Caption.renderCaption).not.toHaveBeenCalled();
+                expect(Caption.renderCaption).toHaveBeenCalled();
                 expect(Caption.updatePlayTime).toHaveBeenCalled();
-                expect(Caption.reRenderCaption).toHaveBeenCalled();
                 expect(Caption.loaded).toBeTruthy();
             });
 
@@ -553,19 +560,18 @@
                 expect(Caption.bindHandlers).toHaveBeenCalled();
                 expect(Caption.renderCaption).toHaveBeenCalled();
                 expect(Caption.updatePlayTime).not.toHaveBeenCalled();
-                expect(Caption.reRenderCaption).not.toHaveBeenCalled();
                 expect(Caption.loaded).toBeTruthy();
             });
 
             it('on success: re-rendered correct', function () {
                 Caption.loaded = true;
+                Caption.rendered = true;
                 Caption.fetchCaption();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
                 expect(Caption.bindHandlers).not.toHaveBeenCalled();
-                expect(Caption.renderCaption).not.toHaveBeenCalled();
+                expect(Caption.renderCaption).toHaveBeenCalled();
                 expect(Caption.updatePlayTime).toHaveBeenCalled();
-                expect(Caption.reRenderCaption).toHaveBeenCalled();
                 expect(Caption.loaded).toBeTruthy();
             });
 
@@ -680,53 +686,57 @@
             });
         });
 
-        describe('search', function () {
-            it('return a correct caption index', function () {
-                state = jasmine.initializePlayer();
-                expect(state.videoCaption.search(0)).toEqual(-1);
-                expect(state.videoCaption.search(3120)).toEqual(1);
-                expect(state.videoCaption.search(6270)).toEqual(2);
-                expect(state.videoCaption.search(8490)).toEqual(2);
-                expect(state.videoCaption.search(21620)).toEqual(4);
-                expect(state.videoCaption.search(24920)).toEqual(5);
-            });
-        });
-
         describe('play', function () {
             describe('when the caption was not rendered', function () {
                 beforeEach(function () {
                     window.onTouchBasedDevice.andReturn(['iPad']);
-                    state = jasmine.initializePlayer();
-                    state.videoCaption.play();
+
+                    runs(function () {
+                        state = jasmine.initializePlayer();
+                        state.videoCaption.play();
+                    });
+
+                    waitsFor(function () {
+                        return state.videoCaption.rendered;
+                    }, 'Captions are not rendered', WAIT_TIMEOUT);
                 });
 
                 it('render the caption', function () {
-                    var captionsData;
+                    runs(function () {
+                        var captionsData;
 
-                    captionsData = jasmine.stubbedCaption;
-                    $('.subtitles li[data-index]').each(
-                        function (index, link) {
+                        captionsData = jasmine.stubbedCaption;
+                        $('.subtitles li[data-index]').each(
+                            function (index, link) {
 
-                        expect($(link)).toHaveData('index', index);
-                        expect($(link)).toHaveData(
-                            'start', captionsData.start[index]
-                        );
-                        expect($(link)).toHaveAttr('tabindex', 0);
-                        expect($(link)).toHaveText(captionsData.text[index]);
+                            expect($(link)).toHaveData('index', index);
+                            expect($(link)).toHaveData(
+                                'start', captionsData.start[index]
+                            );
+                            expect($(link)).toHaveAttr('tabindex', 0);
+                            expect($(link)).toHaveText(captionsData.text[index]);
+                        });
                     });
+
                 });
 
                 it('add a padding element to caption', function () {
-                    expect($('.subtitles li:first')).toBe('.spacing');
-                    expect($('.subtitles li:last')).toBe('.spacing');
+                    runs(function () {
+                        expect($('.subtitles li:first')).toBe('.spacing');
+                        expect($('.subtitles li:last')).toBe('.spacing');
+                    });
                 });
 
                 it('set rendered to true', function () {
-                    expect(state.videoCaption.rendered).toBeTruthy();
+                    runs(function () {
+                        expect(state.videoCaption.rendered).toBeTruthy();
+                    });
                 });
 
                 it('set playing to true', function () {
-                    expect(state.videoCaption.playing).toBeTruthy();
+                    runs(function () {
+                        expect(state.videoCaption.playing).toBeTruthy();
+                    });
                 });
             });
         });
@@ -745,219 +755,269 @@
 
         describe('updatePlayTime', function () {
             beforeEach(function () {
-                state = jasmine.initializePlayer();
+                runs(function () {
+                    state = jasmine.initializePlayer();
+                });
+
+                waitsFor(function () {
+                    return state.videoCaption.rendered;
+                }, 'Captions are not rendered', WAIT_TIMEOUT);
             });
 
             describe('when the video speed is 1.0x', function () {
-                beforeEach(function () {
-                    state.videoSpeedControl.currentSpeed = '1.0';
-                    state.videoCaption.updatePlayTime(25.000);
-                });
-
                 it('search the caption based on time', function () {
-                    expect(state.videoCaption.currentIndex).toEqual(5);
+                    runs(function () {
+                        state.videoCaption.updatePlayTime(25.000);
+                        expect(state.videoCaption.currentIndex).toEqual(5);
+
+                        // Flash mode
+                        spyOn(state, 'isFlashMode').andReturn(true);
+                        state.speed = '1.0';
+                        state.videoCaption.updatePlayTime(25.000);
+                        expect(state.videoCaption.currentIndex).toEqual(5);
+                    });
                 });
             });
 
             describe('when the video speed is not 1.0x', function () {
-                beforeEach(function () {
-                    state.videoSpeedControl.currentSpeed = '0.75';
-                    state.videoCaption.updatePlayTime(25.000);
-                });
-
                 it('search the caption based on 1.0x speed', function () {
-                    expect(state.videoCaption.currentIndex).toEqual(5);
+                    runs(function () {
+                        state.videoCaption.updatePlayTime(25.000);
+                        expect(state.videoCaption.currentIndex).toEqual(5);
+
+                        // Flash mode
+                        state.speed = '2.0';
+                        spyOn(state, 'isFlashMode').andReturn(true);
+                        state.videoCaption.updatePlayTime(25.000);
+                        expect(state.videoCaption.currentIndex).toEqual(9);
+                        state.speed = '0.75';
+                        state.videoCaption.updatePlayTime(25.000);
+                        expect(state.videoCaption.currentIndex).toEqual(3);
+                    });
                 });
             });
 
             describe('when the index is not the same', function () {
                 beforeEach(function () {
-                    state.videoCaption.currentIndex = 1;
-                    $('.subtitles li[data-index=5]').addClass('current');
-                    state.videoCaption.updatePlayTime(25.000);
+                    runs(function () {
+                        state.videoCaption.currentIndex = 1;
+                        $('.subtitles li[data-index=5]').addClass('current');
+                        state.videoCaption.updatePlayTime(25.000);
+                    });
                 });
 
                 it('deactivate the previous caption', function () {
-                    expect($('.subtitles li[data-index=1]'))
-                        .not.toHaveClass('current');
+                    runs(function () {
+                        expect($('.subtitles li[data-index=1]'))
+                            .not.toHaveClass('current');
+                    });
                 });
 
                 it('activate new caption', function () {
-                    expect($('.subtitles li[data-index=5]'))
-                        .toHaveClass('current');
+                    runs(function () {
+                        expect($('.subtitles li[data-index=5]'))
+                            .toHaveClass('current');
+                    });
                 });
 
                 it('save new index', function () {
-                    expect(state.videoCaption.currentIndex).toEqual(5);
+                    runs(function () {
+                        expect(state.videoCaption.currentIndex).toEqual(5);
+                    });
                 });
 
-                // Disabled 11/25/13 due to flakiness in master
-                xit('scroll caption to new position', function () {
-                    expect($.fn.scrollTo).toHaveBeenCalled();
+                it('scroll caption to new position', function () {
+                    runs(function () {
+                        expect($.fn.scrollTo).toHaveBeenCalled();
+                    });
                 });
             });
 
             describe('when the index is the same', function () {
-                beforeEach(function () {
-                    state.videoCaption.currentIndex = 1;
-                    $('.subtitles li[data-index=3]').addClass('current');
-                    state.videoCaption.updatePlayTime(15.000);
-                });
-
                 it('does not change current subtitle', function () {
-                    expect($('.subtitles li[data-index=3]'))
-                        .toHaveClass('current');
+                    runs(function () {
+                        state.videoCaption.currentIndex = 1;
+                        $('.subtitles li[data-index=3]').addClass('current');
+                        state.videoCaption.updatePlayTime(15.000);
+                        expect($('.subtitles li[data-index=3]'))
+                            .toHaveClass('current');
+                    });
                 });
             });
         });
 
         describe('resize', function () {
             beforeEach(function () {
-                state = jasmine.initializePlayer();
-                videoControl = state.videoControl;
-                $('.subtitles li[data-index=1]').addClass('current');
-                state.videoCaption.resize();
+                runs(function () {
+                    state = jasmine.initializePlayer();
+                });
+
+                waitsFor(function () {
+                    return state.videoCaption.rendered;
+                }, 'Captions are not rendered', WAIT_TIMEOUT);
+
+                runs(function () {
+                    videoControl = state.videoControl;
+                    $('.subtitles li[data-index=1]').addClass('current');
+                    state.videoCaption.resize();
+                });
             });
 
             describe('set the height of caption container', function () {
                 it('when CC button is enabled', function () {
-                    var realHeight = parseInt(
-                            $('.subtitles').css('maxHeight'), 10
-                        ),
-                        shouldBeHeight = $('.video-wrapper').height();
+                    runs(function () {
+                        var realHeight = parseInt(
+                                $('.subtitles').css('maxHeight'), 10
+                            ),
+                            shouldBeHeight = $('.video-wrapper').height();
 
-                    // Because of some problems with rounding on different
-                    // environments: Linux * Mac * FF * Chrome
-                    expect(realHeight).toBeCloseTo(shouldBeHeight, 2);
+                        // Because of some problems with rounding on different
+                        // environments: Linux * Mac * FF * Chrome
+                        expect(realHeight).toBeCloseTo(shouldBeHeight, 2);
+                    });
                 });
 
                 it('when CC button is disabled ', function () {
-                    var realHeight, videoWrapperHeight, progressSliderHeight,
-                        controlHeight, shouldBeHeight;
+                    runs(function () {
+                        var realHeight, videoWrapperHeight, progressSliderHeight,
+                            controlHeight, shouldBeHeight;
 
-                    state.captionsHidden = true;
-                    state.videoCaption.setSubtitlesHeight();
+                        state.captionsHidden = true;
+                        state.videoCaption.setSubtitlesHeight();
 
-                    realHeight = parseInt(
-                        $('.subtitles').css('maxHeight'), 10
-                    );
-                    videoWrapperHeight = $('.video-wrapper').height();
-                    progressSliderHeight = videoControl.sliderEl.height();
-                    controlHeight = videoControl.el.height();
-                    shouldBeHeight = videoWrapperHeight -
-                        0.5 * progressSliderHeight -
-                        controlHeight;
+                        realHeight = parseInt(
+                            $('.subtitles').css('maxHeight'), 10
+                        );
+                        videoWrapperHeight = $('.video-wrapper').height();
+                        progressSliderHeight = videoControl.sliderEl.height();
+                        controlHeight = videoControl.el.height();
+                        shouldBeHeight = videoWrapperHeight -
+                            0.5 * progressSliderHeight -
+                            controlHeight;
 
-                    expect(realHeight).toBe(shouldBeHeight);
+                        expect(realHeight).toBe(shouldBeHeight);
+                    });
                 });
             });
 
             it('set the height of caption spacing', function () {
-                var firstSpacing, lastSpacing;
+                runs(function () {
+                    var firstSpacing, lastSpacing;
 
-                firstSpacing = Math.abs(parseInt(
-                    $('.subtitles .spacing:first').css('height'), 10
-                ));
-                lastSpacing = Math.abs(parseInt(
-                    $('.subtitles .spacing:last').css('height'), 10
-                ));
+                    firstSpacing = Math.abs(parseInt(
+                        $('.subtitles .spacing:first').css('height'), 10
+                    ));
+                    lastSpacing = Math.abs(parseInt(
+                        $('.subtitles .spacing:last').css('height'), 10
+                    ));
 
-                expect(firstSpacing - state.videoCaption.topSpacingHeight())
-                    .toBeLessThan(1);
-                expect(lastSpacing - state.videoCaption.bottomSpacingHeight())
-                    .toBeLessThan(1);
+                    expect(firstSpacing - state.videoCaption.topSpacingHeight())
+                        .toBeLessThan(1);
+                    expect(lastSpacing - state.videoCaption.bottomSpacingHeight())
+                        .toBeLessThan(1);
+                });
             });
 
             it('scroll caption to new position', function () {
-                expect($.fn.scrollTo).toHaveBeenCalled();
+                runs(function () {
+                    expect($.fn.scrollTo).toHaveBeenCalled();
+                });
             });
         });
 
-        // Disabled 11/25/13 due to flakiness in master
         xdescribe('scrollCaption', function () {
             beforeEach(function () {
-                state = jasmine.initializePlayer();
+                runs(function () {
+                    state = jasmine.initializePlayer();
+                });
+
+                waitsFor(function () {
+                    return state.videoCaption.rendered;
+                }, 'Captions are not rendered', WAIT_TIMEOUT);
             });
 
             describe('when frozen', function () {
-                beforeEach(function () {
-                    state.videoCaption.frozen = true;
-                    $('.subtitles li[data-index=1]').addClass('current');
-                    state.videoCaption.scrollCaption();
-                });
-
                 it('does not scroll the caption', function () {
-                    expect($.fn.scrollTo).not.toHaveBeenCalled();
+                    runs(function () {
+                        state.videoCaption.frozen = true;
+                        $('.subtitles li[data-index=1]').addClass('current');
+                        state.videoCaption.scrollCaption();
+                        expect($.fn.scrollTo).not.toHaveBeenCalled();
+                    });
                 });
             });
 
             describe('when not frozen', function () {
                 beforeEach(function () {
-                    state.videoCaption.frozen = false;
+                    runs(function () {
+                        state.videoCaption.frozen = false;
+                    });
                 });
 
                 describe('when there is no current caption', function () {
-                    beforeEach(function () {
-                        state.videoCaption.scrollCaption();
-                    });
-
                     it('does not scroll the caption', function () {
-                        expect($.fn.scrollTo).not.toHaveBeenCalled();
+                        runs(function () {
+                            state.videoCaption.scrollCaption();
+                            expect($.fn.scrollTo).not.toHaveBeenCalled();
+                        });
                     });
                 });
 
                 describe('when there is a current caption', function () {
-                    beforeEach(function () {
-                        $('.subtitles li[data-index=1]').addClass('current');
-                        state.videoCaption.scrollCaption();
-                    });
-
                     it('scroll to current caption', function () {
-                        expect($.fn.scrollTo).toHaveBeenCalled();
+                        runs(function () {
+                            $('.subtitles li[data-index=1]').addClass('current');
+                            state.videoCaption.scrollCaption();
+                            expect($.fn.scrollTo).toHaveBeenCalled();
+                        });
                     });
                 });
             });
         });
 
-        // Disabled 10/9/13 due to flakiness in master
         xdescribe('seekPlayer', function () {
             beforeEach(function () {
-                state = jasmine.initializePlayer();
+                runs(function () {
+                    state = jasmine.initializePlayer();
+                });
+
+                waitsFor(function () {
+                    var duration = state.videoPlayer.duration(),
+                        isRendered = state.videoCaption.rendered;
+
+                    return isRendered && duration;
+                }, 'Captions are not rendered', WAIT_TIMEOUT);
             });
 
             describe('when the video speed is 1.0x', function () {
-                beforeEach(function () {
-                    state.videoSpeedControl.currentSpeed = '1.0';
-                    $('.subtitles li[data-start="14910"]').trigger('click');
-                });
-
                 it('trigger seek event with the correct time', function () {
-                    expect(state.videoPlayer.currentTime).toEqual(14.91);
+                    runs(function () {
+                        state.videoSpeedControl.currentSpeed = '1.0';
+                        $('.subtitles li[data-start="14910"]').trigger('click');
+                        expect(state.videoPlayer.currentTime).toEqual(14.91);
+                    });
                 });
             });
 
             describe('when the video speed is not 1.0x', function () {
-                beforeEach(function () {
-                    state.videoSpeedControl.currentSpeed = '0.75';
-                    $('.subtitles li[data-start="14910"]').trigger('click');
-                });
-
                 it('trigger seek event with the correct time', function () {
-                    expect(state.videoPlayer.currentTime).toEqual(14.91);
+                    runs(function () {
+                        state.videoSpeedControl.currentSpeed = '0.75';
+                        $('.subtitles li[data-start="14910"]').trigger('click');
+                        expect(state.videoPlayer.currentTime).toEqual(14.91);
+                    });
                 });
             });
 
             describe('when the player type is Flash at speed 0.75x',
                 function () {
-
-                beforeEach(function () {
-                    state.videoSpeedControl.currentSpeed = '0.75';
-                    state.currentPlayerMode = 'flash';
-                    $('.subtitles li[data-start="14910"]').trigger('click');
-                });
-
                 it('trigger seek event with the correct time', function () {
-                    expect(state.videoPlayer.currentTime).toEqual(15);
+                    runs(function () {
+                        state.videoSpeedControl.currentSpeed = '0.75';
+                        state.currentPlayerMode = 'flash';
+                        $('.subtitles li[data-start="14910"]').trigger('click');
+                        expect(state.videoPlayer.currentTime).toEqual(15);
+                    });
                 });
             });
         });
@@ -998,7 +1058,6 @@
                 beforeEach(function () {
                     state.el.addClass('closed');
                     state.videoCaption.toggle(jQuery.Event('click'));
-
                     jasmine.Clock.useMock();
                 });
 
@@ -1039,41 +1098,59 @@
 
         describe('caption accessibility', function () {
             beforeEach(function () {
-                state = jasmine.initializePlayer();
+                runs(function () {
+                    state = jasmine.initializePlayer();
+                });
+
+                waitsFor(function () {
+                    return state.videoCaption.rendered;
+                }, 'Captions are not rendered', WAIT_TIMEOUT);
             });
 
             describe('when getting focus through TAB key', function () {
                 beforeEach(function () {
-                    state.videoCaption.isMouseFocus = false;
-                    $('.subtitles li[data-index=0]').trigger(
-                        jQuery.Event('focus')
-                    );
+                    runs(function () {
+                        state.videoCaption.isMouseFocus = false;
+                        $('.subtitles li[data-index=0]').trigger(
+                            jQuery.Event('focus')
+                        );
+                    });
                 });
 
                 it('shows an outline around the caption', function () {
-                    expect($('.subtitles li[data-index=0]'))
-                        .toHaveClass('focused');
+                    runs(function () {
+                        expect($('.subtitles li[data-index=0]'))
+                            .toHaveClass('focused');
+                    });
                 });
 
                 it('has automatic scrolling disabled', function () {
-                    expect(state.videoCaption.autoScrolling).toBe(false);
+                    runs(function () {
+                        expect(state.videoCaption.autoScrolling).toBe(false);
+                    });
                 });
             });
 
             describe('when loosing focus through TAB key', function () {
                 beforeEach(function () {
-                    $('.subtitles li[data-index=0]').trigger(
-                        jQuery.Event('blur')
-                    );
+                    runs(function () {
+                        $('.subtitles li[data-index=0]').trigger(
+                            jQuery.Event('blur')
+                        );
+                    });
                 });
 
                 it('does not show an outline around the caption', function () {
-                    expect($('.subtitles li[data-index=0]'))
-                        .not.toHaveClass('focused');
+                    runs(function () {
+                        expect($('.subtitles li[data-index=0]'))
+                            .not.toHaveClass('focused');
+                    });
                 });
 
                 it('has automatic scrolling enabled', function () {
-                    expect(state.videoCaption.autoScrolling).toBe(true);
+                    runs(function () {
+                        expect(state.videoCaption.autoScrolling).toBe(true);
+                    });
                 });
             });
 
@@ -1083,20 +1160,26 @@
                 function () {
 
                 beforeEach(function () {
-                    state.videoCaption.isMouseFocus = false;
-                    $('.subtitles li[data-index=0]')
-                        .trigger(jQuery.Event('focus'));
-                    $('.subtitles li[data-index=0]')
-                        .trigger(jQuery.Event('mousedown'));
+                    runs(function () {
+                        state.videoCaption.isMouseFocus = false;
+                        $('.subtitles li[data-index=0]')
+                            .trigger(jQuery.Event('focus'));
+                        $('.subtitles li[data-index=0]')
+                            .trigger(jQuery.Event('mousedown'));
+                    });
                 });
 
                 it('does not show an outline around it', function () {
-                    expect($('.subtitles li[data-index=0]'))
-                        .not.toHaveClass('focused');
+                    runs(function () {
+                        expect($('.subtitles li[data-index=0]'))
+                            .not.toHaveClass('focused');
+                    });
                 });
 
                 it('has automatic scrolling enabled', function () {
-                    expect(state.videoCaption.autoScrolling).toBe(true);
+                    runs(function () {
+                        expect(state.videoCaption.autoScrolling).toBe(true);
+                    });
                 });
             });
 
@@ -1108,29 +1191,37 @@
                 var subDataLiIdx__0, subDataLiIdx__1;
 
                 beforeEach(function () {
-                    subDataLiIdx__0 = $('.subtitles li[data-index=0]');
-                    subDataLiIdx__1 = $('.subtitles li[data-index=1]');
+                    runs(function () {
+                        subDataLiIdx__0 = $('.subtitles li[data-index=0]');
+                        subDataLiIdx__1 = $('.subtitles li[data-index=1]');
 
-                    state.videoCaption.isMouseFocus = false;
+                        state.videoCaption.isMouseFocus = false;
 
-                    subDataLiIdx__0.trigger(jQuery.Event('focus'));
-                    subDataLiIdx__0.trigger(jQuery.Event('blur'));
+                        subDataLiIdx__0.trigger(jQuery.Event('focus'));
+                        subDataLiIdx__0.trigger(jQuery.Event('blur'));
 
-                    state.videoCaption.isMouseFocus = true;
+                        state.videoCaption.isMouseFocus = true;
 
-                    subDataLiIdx__1.trigger(jQuery.Event('mousedown'));
+                        subDataLiIdx__1.trigger(jQuery.Event('mousedown'));
+                    });
                 });
 
                 it('does not show an outline around the first', function () {
-                    expect(subDataLiIdx__0).not.toHaveClass('focused');
+                    runs(function () {
+                        expect(subDataLiIdx__0).not.toHaveClass('focused');
+                    });
                 });
 
                 it('does not show an outline around the second', function () {
-                    expect(subDataLiIdx__1).not.toHaveClass('focused');
+                    runs(function () {
+                        expect(subDataLiIdx__1).not.toHaveClass('focused');
+                    });
                 });
 
                 it('has automatic scrolling enabled', function () {
-                    expect(state.videoCaption.autoScrolling).toBe(true);
+                    runs(function () {
+                        expect(state.videoCaption.autoScrolling).toBe(true);
+                    });
                 });
             });
         });

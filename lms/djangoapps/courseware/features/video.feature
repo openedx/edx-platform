@@ -111,18 +111,18 @@ Feature: LMS Video component
 
   # 11
    Scenario: Language menu works correctly in Video component
-     Given I am registered for the course "test_course"
-     And I have a "chinese_transcripts.srt" transcript file in assets
-     And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-     And it has a video in "Youtube" mode:
+    Given I am registered for the course "test_course"
+    And I have a "chinese_transcripts.srt" transcript file in assets
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+    And it has a video in "Youtube" mode:
       | transcripts                       | sub         |
       | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM |
-     And I make sure captions are closed
-     And I see video menu "language" with correct items
-     And I select language with code "zh"
-     Then I see "好 各位同学" text in the captions
-     And I select language with code "en"
-     And I see "Hi, welcome to Edx." text in the captions
+    And I make sure captions are closed
+    And I see video menu "language" with correct items
+    And I select language with code "zh"
+    Then I see "好 各位同学" text in the captions
+    And I select language with code "en"
+    And I see "Hi, welcome to Edx." text in the captions
 
   # 12
   Scenario: CC button works correctly w/o english transcript in HTML5 mode of Video component
@@ -237,29 +237,31 @@ Feature: LMS Video component
 
   # 21
    Scenario: Download button works correctly for non-english transcript in Youtube mode of Video component
-     Given I am registered for the course "test_course"
-     And I have a "chinese_transcripts.srt" transcript file in assets
-     And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-     And it has a video in "Youtube" mode:
+    Given I am registered for the course "test_course"
+    And I have a "chinese_transcripts.srt" transcript file in assets
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+    And it has a video in "Youtube" mode:
       | transcripts                       | sub         | download_track |
       | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
-     Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
-     And I select language with code "zh"
-     And I see "好 各位同学" text in the captions
-     Then I can download transcript in "srt" format that has text "好 各位同学"
+    And I see "Hi, welcome to Edx." text in the captions
+    Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
+    And I select language with code "zh"
+    And I see "好 各位同学" text in the captions
+    Then I can download transcript in "srt" format that has text "好 各位同学"
 
   # 22
    Scenario: Download button works correctly for non-english transcript in HTML5 mode of Video component
-     Given I am registered for the course "test_course"
-     And I have a "chinese_transcripts.srt" transcript file in assets
-     And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-     And it has a video in "HTML5" mode:
+    Given I am registered for the course "test_course"
+    And I have a "chinese_transcripts.srt" transcript file in assets
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+    And it has a video in "HTML5" mode:
       | transcripts                       | sub         | download_track |
       | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
-     Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
-     And I select language with code "zh"
-     And I see "好 各位同学" text in the captions
-     Then I can download transcript in "srt" format that has text "好 各位同学"
+    And I see "Hi, welcome to Edx." text in the captions
+    Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
+    And I select language with code "zh"
+    And I see "好 各位同学" text in the captions
+    Then I can download transcript in "srt" format that has text "好 各位同学"
 
   # 23
   Scenario: Download button works correctly w/o english transcript in HTML5 mode of Video component
@@ -298,8 +300,10 @@ Feature: LMS Video component
     And a video "D" in "Youtube_HTML5" mode in position "3" of sequential
     And I open the section with videos
     Then videos have rendered in "HTML5" mode
-    And I see "Hi, welcome to Edx." text in the captions
-    And I see "Equal transcripts" text in the captions
+    And I see text in the captions:
+      | text                |
+      | Hi, welcome to Edx. |
+      | Equal transcripts   |
     When I open video "C"
     Then the video has rendered in "HTML5" mode
     And I make sure captions are opened

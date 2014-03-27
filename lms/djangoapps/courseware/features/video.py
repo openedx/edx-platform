@@ -240,25 +240,25 @@ def set_window_dimensions(width, height):
 
 
 def duration():
-        """
-        Total duration of the video, in seconds.
-        """
-        elapsed_time, duration = video_time()
-        return duration
+    """
+    Total duration of the video, in seconds.
+    """
+    elapsed_time, duration = video_time()
+    return duration
 
 
 def video_time():
-        """
-        Return a tuple `(elapsed_time, duration)`, each in seconds.
-        """
-        # The full time has the form "0:32 / 3:14"
-        full_time = world.css_text('div.vidtime')
+    """
+    Return a tuple `(elapsed_time, duration)`, each in seconds.
+    """
+    # The full time has the form "0:32 / 3:14"
+    full_time = world.css_text('div.vidtime')
 
-        # Split the time at the " / ", to get ["0:32", "3:14"]
-        elapsed_str, duration_str = full_time.split(' / ')
+    # Split the time at the " / ", to get ["0:32", "3:14"]
+    elapsed_str, duration_str = full_time.split(' / ')
 
-        # Convert each string to seconds
-        return (parse_time_str(elapsed_str), parse_time_str(duration_str))
+    # Convert each string to seconds
+    return (parse_time_str(elapsed_str), parse_time_str(duration_str))
 
 
 def parse_time_str(time_str):
@@ -316,13 +316,13 @@ def visit_video_section(_step):
 
 @step('I select the "([^"]*)" speed$')
 def i_select_video_speed(_step, speed):
-      change_video_speed(speed)
+    change_video_speed(speed)
 
 
 @step('I select the "([^"]*)" speed on video "([^"]*)"$')
 def change_video_speed_on_video(_step, speed, player_id):
-      navigate_to_an_item_in_a_sequence(world.video_sequences[player_id])
-      change_video_speed(speed)
+    navigate_to_an_item_in_a_sequence(world.video_sequences[player_id])
+    change_video_speed(speed)
 
 
 @step('I open video "([^"]*)"$')
@@ -419,7 +419,15 @@ def i_see_menu(_step, menu):
 
 @step('I see "([^"]*)" text in the captions$')
 def check_text_in_the_captions(_step, text):
-    assert world.browser.is_text_present(text.strip())
+    world.wait_for(lambda _: world.css_text('.subtitles'))
+    actual_text = world.css_text('.subtitles')
+    assert (text in actual_text)
+
+
+@step('I see text in the captions:')
+def check_captions(_step):
+    for index, video in enumerate(_step.hashes):
+        assert (video.get('text') in world.css_text('.subtitles', index=index))
 
 
 @step('I select language with code "([^"]*)"$')
@@ -441,13 +449,13 @@ def select_language(_step, code):
     # Make sure that all ajax requests that affects the display of captions are finished.
     # For example, request to get new translation etc.
     world.wait_for_ajax_complete()
-    assert world.css_visible('.subtitles')
-
+    world.wait_for_visible('.subtitles')
 
 
 @step('I click video button "([^"]*)"$')
 def click_button(_step, button):
     world.css_click(VIDEO_BUTTONS[button])
+
 
 @step('I see video starts playing from "([^"]*)" position$')
 def start_playing_video_from_n_seconds(_step, position):
@@ -504,9 +512,7 @@ def video_alignment(_step, transcript_visibility):
     height = abs(expected['height'] - real['height']) <= 5
 
     # Restore initial window size
-    set_window_dimensions(
-        initial['width'], initial['height']
-    )
+    set_window_dimensions(initial['width'], initial['height'])
 
     assert all([width, height])
 

@@ -72,6 +72,8 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
         'js': [
             resource_string(module, 'js/src/video/00_video_storage.js'),
             resource_string(module, 'js/src/video/00_resizer.js'),
+            resource_string(module, 'js/src/video/00_async_process.js'),
+            resource_string(module, 'js/src/video/00_sjson.js'),
             resource_string(module, 'js/src/video/01_initialize.js'),
             resource_string(module, 'js/src/video/025_focus_grabber.js'),
             resource_string(module, 'js/src/video/02_html5_video.js'),

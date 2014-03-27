@@ -1,10 +1,10 @@
-(function (requirejs, require, define) {
+(function (define) {
 
 // VideoCaption module.
 define(
 'video/09_video_caption.js',
-[],
-function () {
+['video/00_sjson.js', 'video/00_async_process.js'],
+function (Sjson, AsyncProcess) {
 
     /**
      * @desc VideoCaption module exports a function.
@@ -21,16 +21,11 @@ function () {
      * @returns {undefined}
      */
     return function (state) {
-        var dfd = $.Deferred();
-
         state.videoCaption = {};
-
         _makeFunctionsPublic(state);
-
         state.videoCaption.renderElements();
 
-        dfd.resolve();
-        return dfd.promise();
+        return $.Deferred().resolve().promise();
     };
 
     // ***************************************************************
@@ -65,10 +60,8 @@ function () {
             renderCaption: renderCaption,
             renderElements: renderElements,
             renderLanguageMenu: renderLanguageMenu,
-            reRenderCaption: reRenderCaption,
             resize: resize,
             scrollCaption: scrollCaption,
-            search: search,
             seekPlayer: seekPlayer,
             setSubtitlesHeight: setSubtitlesHeight,
             toggle: toggle,
@@ -133,19 +126,47 @@ function () {
     //     mousemove, etc.).
     function bindHandlers() {
         var self = this,
-            Caption = this.videoCaption;
+            Caption = this.videoCaption,
+            events = [
+                'mouseover', 'mouseout', 'mousedown', 'click', 'focus', 'blur',
+                'keydown'
+            ].join(' ');
 
         Caption.hideSubtitlesEl.on({
             'click': Caption.toggle
         });
 
-        Caption.subtitlesEl.on({
-            mouseenter: Caption.onMouseEnter,
-            mouseleave: Caption.onMouseLeave,
-            mousemove: Caption.onMovement,
-            mousewheel: Caption.onMovement,
-            DOMMouseScroll: Caption.onMovement
-        });
+        Caption.subtitlesEl
+            .on({
+                mouseenter: Caption.onMouseEnter,
+                mouseleave: Caption.onMouseLeave,
+                mousemove: Caption.onMovement,
+                mousewheel: Caption.onMovement,
+                DOMMouseScroll: Caption.onMovement
+            })
+            .on(events, 'li[data-index]', function (event) {
+                switch (event.type) {
+                    case 'mouseover':
+                    case 'mouseout':
+                        Caption.captionMouseOverOut(event);
+                        break;
+                    case 'mousedown':
+                        Caption.captionMouseDown(event);
+                        break;
+                    case 'click':
+                        Caption.captionClick(event);
+                        break;
+                    case 'focusin':
+                        Caption.captionFocus(event);
+                        break;
+                    case 'focusout':
+                        Caption.captionBlur(event);
+                        break;
+                    case 'keydown':
+                        Caption.captionKeyDown(event);
+                        break;
+                }
+            });
 
         if (Caption.showLanguageMenu) {
             Caption.container.on({
@@ -153,12 +174,6 @@ function () {
                 mouseleave: onContainerMouseLeave
             });
         }
-
-        this.el.on('speedchange', function () {
-            if (self.isFlashMode()) {
-                Caption.fetchCaption();
-            }
-        });
 
         if ((this.videoType === 'html5') && (this.config.autohideHtml5)) {
             Caption.subtitlesEl.on('scroll', this.videoControl.showControls);
@@ -241,7 +256,7 @@ function () {
 
         if (this.videoType === 'youtube') {
             data = {
-                videoId: this.youtubeId()
+                videoId: this.youtubeId('1.0')
             };
         }
 
@@ -251,13 +266,15 @@ function () {
             url: self.config.transcriptTranslationUrl + '/' + language,
             notifyOnError: false,
             data: data,
-            success: function (captions) {
-                Caption.captions = captions.text;
-                Caption.start = captions.start;
+            success: function (response) {
+                Caption.sjson = new Sjson(response);
+
+                var start = Caption.sjson.getStartTimes(),
+                    captions = Caption.sjson.getCaptions();
 
                 if (Caption.loaded) {
                     if (Caption.rendered) {
-                        Caption.reRenderCaption();
+                        Caption.renderCaption(start, captions);
                         Caption.updatePlayTime(self.videoPlayer.currentTime);
                     }
                 } else {
@@ -269,7 +286,7 @@ function () {
                             )
                         );
                     } else {
-                        Caption.renderCaption();
+                        Caption.renderCaption(start, captions);
                     }
 
                     Caption.bindHandlers();
@@ -334,7 +351,6 @@ function () {
             .height(this.videoCaption.bottomSpacingHeight());
 
         this.videoCaption.scrollCaption();
-
         this.videoCaption.setSubtitlesHeight();
     }
 
@@ -380,90 +396,53 @@ function () {
         });
     }
 
-    function buildCaptions (container, captions, start) {
-        var fragment = document.createDocumentFragment();
+    function buildCaptions (container, start, captions) {
+        var process = function(text, index) {
+                var liEl = $('<li>', {
+                    'data-index': index,
+                    'data-start': start[index],
+                    'tabindex': 0
+                }).html(text);
 
-        $.each(captions, function(index, text) {
-            var liEl = $('<li>');
+                return liEl[0];
+            };
 
-            liEl.html(text);
-
-            liEl.attr({
-                'data-index': index,
-                'data-start': start[index],
-                'tabindex': 0
-            });
-
-            fragment.appendChild(liEl[0]);
+        return AsyncProcess.array(captions, process).done(function (list) {
+            container.append(list);
         });
-
-        container.append([fragment]);
     }
 
-    function renderCaption() {
-        var Caption = this.videoCaption,
-            events = ['mouseover', 'mouseout', 'mousedown', 'click', 'focus',
-                'blur', 'keydown'].join(' ');
-
-        Caption.setSubtitlesHeight();
-
-        buildCaptions(Caption.subtitlesEl, Caption.captions, Caption.start);
-
-        Caption.subtitlesEl.on(events, 'li[data-index]', function (event) {
-            switch (event.type) {
-                case 'mouseover':
-                case 'mouseout':
-                    Caption.captionMouseOverOut(event);
-                    break;
-                case 'mousedown':
-                    Caption.captionMouseDown(event);
-                    break;
-                case 'click':
-                    Caption.captionClick(event);
-                    break;
-                case 'focusin':
-                    Caption.captionFocus(event);
-                    break;
-                case 'focusout':
-                    Caption.captionBlur(event);
-                    break;
-                case 'keydown':
-                    Caption.captionKeyDown(event);
-                    break;
-            }
-        });
-
-        // Enables or disables automatic scrolling of the captions when the
-        // video is playing. This feature has to be disabled when tabbing
-        // through them as it interferes with that action. Initially, have this
-        // flag enabled as we assume mouse use. Then, if the first caption
-        // (through forward tabbing) or the last caption (through backwards
-        // tabbing) gets the focus, disable that feature. Re-enable it if tabbing
-        // then cycles out of the the captions.
-        Caption.autoScrolling = true;
-        // Keeps track of where the focus is situated in the array of captions.
-        // Used to implement the automatic scrolling behavior and decide if the
-        // outline around a caption has to be hidden or shown on a mouseenter
-        // or mouseleave. Initially, no caption has the focus, set the
-        // index to -1.
-        Caption.currentCaptionIndex = -1;
-        // Used to track if the focus is coming from a click or tabbing. This
-        // has to be known to decide if, when a caption gets the focus, an
-        // outline has to be drawn (tabbing) or not (mouse click).
-        Caption.isMouseFocus = false;
-        Caption.addPaddings();
-        Caption.rendered = true;
-    }
-
-    function reRenderCaption() {
+    function renderCaption(start, captions) {
         var Caption = this.videoCaption;
 
-        Caption.currentIndex = null;
+        var onRender = function () {
+            Caption.addPaddings();
+            // Enables or disables automatic scrolling of the captions when the
+            // video is playing. This feature has to be disabled when tabbing
+            // through them as it interferes with that action. Initially, have
+            // this flag enabled as we assume mouse use. Then, if the first
+            // caption (through forward tabbing) or the last caption (through
+            // backwards tabbing) gets the focus, disable that feature.
+            // Re-enable it if tabbing then cycles out of the the captions.
+            Caption.autoScrolling = true;
+            // Keeps track of where the focus is situated in the array of
+            // captions. Used to implement the automatic scrolling behavior and
+            // decide if the outline around a caption has to be hidden or shown
+            // on a mouseenter or mouseleave. Initially, no caption has the
+            // focus, set the index to -1.
+            Caption.currentCaptionIndex = -1;
+            // Used to track if the focus is coming from a click or tabbing. This
+            // has to be known to decide if, when a caption gets the focus, an
+            // outline has to be drawn (tabbing) or not (mouse click).
+            Caption.isMouseFocus = false;
+            Caption.rendered = true;
+        };
+
+
         Caption.rendered = false;
         Caption.subtitlesEl.empty();
-        buildCaptions(Caption.subtitlesEl, Caption.captions, Caption.start);
-        Caption.addPaddings();
-        Caption.rendered = true;
+        Caption.setSubtitlesHeight();
+        buildCaptions(Caption.subtitlesEl, start, captions).done(onRender);
     }
 
     function addPaddings() {
@@ -529,7 +508,7 @@ function () {
             // off again as it may have been enabled in captionBlur.
             if (
                 captionIndex <= 1 ||
-                captionIndex >= this.videoCaption.captions.length - 2
+                captionIndex >= this.videoCaption.sjson.getSize() - 2
             ) {
                 this.videoCaption.autoScrolling = false;
             }
@@ -547,7 +526,7 @@ function () {
         // tabbing back out of the captions or on the last element and tabbing
         // forward out of the captions.
         if (captionIndex === 0 ||
-            captionIndex === this.videoCaption.captions.length - 1) {
+            captionIndex === this.videoCaption.sjson.getSize() - 1) {
 
             this.videoCaption.autoScrolling = true;
         }
@@ -579,38 +558,13 @@ function () {
         }
     }
 
-    function search(time) {
-        var index, max, min;
-
-        if (this.videoCaption.loaded) {
-            min = 0;
-            max = this.videoCaption.start.length - 1;
-
-            if (time < this.videoCaption.start[min]) {
-                return -1;
-            }
-            while (min < max) {
-                index = Math.ceil((max + min) / 2);
-
-                if (time < this.videoCaption.start[index]) {
-                    max = index - 1;
-                }
-
-                if (time >= this.videoCaption.start[index]) {
-                    min = index;
-                }
-            }
-
-            return min;
-        }
-
-        return undefined;
-    }
-
     function play() {
         if (this.videoCaption.loaded) {
             if (!this.videoCaption.rendered) {
-                this.videoCaption.renderCaption();
+                var start = this.videoCaption.sjson.getStartTimes(),
+                    captions = this.videoCaption.sjson.getCaptions();
+
+                this.videoCaption.renderCaption(start, captions);
             }
 
             this.videoCaption.playing = true;
@@ -627,20 +581,12 @@ function () {
         var newIndex;
 
         if (this.videoCaption.loaded) {
-            // Current mode === 'flash' can only be for YouTube videos. So, we
-            // don't have to also check for videoType === 'youtube'.
             if (this.isFlashMode()) {
-                // Total play time changes with speed change. Also there is
-                // a 250 ms delay we have to take into account.
-                time = Math.round(
-                    Time.convert(time, this.speed, '1.0') * 1000 + 100
-                );
-            } else {
-                // Total play time remains constant when speed changes.
-                time = Math.round(time * 1000 + 100);
+                time = Time.convert(time, this.speed, '1.0');
             }
 
-            newIndex = this.videoCaption.search(time);
+            time = Math.round(time * 1000 + 100);
+            newIndex = this.videoCaption.sjson.search(time);
 
             if (
                 typeof newIndex !== 'undefined' &&
@@ -658,39 +604,27 @@ function () {
                     .addClass('current');
 
                 this.videoCaption.currentIndex = newIndex;
-
                 this.videoCaption.scrollCaption();
             }
         }
     }
 
     function seekPlayer(event) {
-        var time;
+        var time = parseInt($(event.target).data('start'), 10);
 
-        event.preventDefault();
-
-        // Current mode === 'flash' can only be for YouTube videos. So, we
-        // don't have to also check for videoType === 'youtube'.
         if (this.isFlashMode()) {
-            // Total play time changes with speed change. Also there is
-            // a 250 ms delay we have to take into account.
-            time = Math.round(
-                Time.convert(
-                    $(event.target).data('start'), '1.0', this.speed
-                ) / 1000
-            );
-        } else {
-            // Total play time remains constant when speed changes.
-            time = parseInt($(event.target).data('start'), 10)/1000;
+            time = Math.round(Time.convert(time, '1.0', this.speed));
         }
 
         this.trigger(
             'videoPlayer.onCaptionSeek',
             {
                 'type': 'onCaptionSeek',
-                'time': time
+                'time': time/1000
             }
         );
+
+        event.preventDefault();
     }
 
     function calculateOffset(element) {
@@ -801,4 +735,4 @@ function () {
     }
 });
 
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+}(RequireJS.define));
