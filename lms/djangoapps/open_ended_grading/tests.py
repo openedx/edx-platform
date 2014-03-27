@@ -45,7 +45,7 @@ class EmptyStaffGradingService(object):
         """
         Return a staff grading response that is missing a problem list key.
         """
-        return json.dumps({'success': True, 'error': 'No problems found.'})
+        return {'success': True, 'error': 'No problems found.'}
 
 
 def make_instructor(course, user_email):

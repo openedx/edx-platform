@@ -44,28 +44,28 @@ class MockStaffGradingService(object):
 
     def get_next(self, course_id, location, grader_id):
         self.cnt += 1
-        return json.dumps({'success': True,
-                           'submission_id': self.cnt,
-                           'submission': 'Test submission {cnt}'.format(cnt=self.cnt),
-                           'num_graded': 3,
-                           'min_for_ml': 5,
-                           'num_pending': 4,
-                           'prompt': 'This is a fake prompt',
-                           'ml_error_info': 'ML info',
-                           'max_score': 2 + self.cnt % 3,
-                           'rubric': 'A rubric'})
+        return {'success': True,
+                'submission_id': self.cnt,
+                'submission': 'Test submission {cnt}'.format(cnt=self.cnt),
+                'num_graded': 3,
+                'min_for_ml': 5,
+                'num_pending': 4,
+                'prompt': 'This is a fake prompt',
+                'ml_error_info': 'ML info',
+                'max_score': 2 + self.cnt % 3,
+                'rubric': 'A rubric'}
 
     def get_problem_list(self, course_id, grader_id):
         self.cnt += 1
-        return json.dumps({'success': True,
-                           'problem_list': [
-                               json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
-                                           'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5,
-                                           'min_for_ml': 10}),
-                               json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
-                                           'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5,
-                                           'min_for_ml': 10})
-                           ]})
+        return {'success': True,
+                 'problem_list': [
+                     json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
+                                 'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5,
+                                 'min_for_ml': 10}),
+                     json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
+                                 'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5,
+                                 'min_for_ml': 10})
+                 ]}
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
                    submission_flagged):
@@ -106,7 +106,7 @@ class StaffGradingService(GradingService):
             grader_id: who is grading this?  The anonymous user_id of the grader.
 
         Returns:
-            json string with the response from the service.  (Deliberately not
+            dict with the response from the service.  (Deliberately not
             writing out the fields here--see the docs on the staff_grading view
             in the grading_controller repo)
 
@@ -114,7 +114,7 @@ class StaffGradingService(GradingService):
             GradingServiceError: something went wrong with the connection.
         """
         params = {'course_id': course_id, 'grader_id': grader_id}
-        return self.get(self.get_problem_list_url, params)
+        return self.get(self.get_problem_list_url, params).json()
 
     def get_next(self, course_id, location, grader_id):
         """
@@ -127,7 +127,7 @@ class StaffGradingService(GradingService):
             grader_id: who is grading this?  The anonymous user_id of the grader.
 
         Returns:
-            json string with the response from the service.  (Deliberately not
+            dict with the response from the service.  (Deliberately not
             writing out the fields here--see the docs on the staff_grading view
             in the grading_controller repo)
 
@@ -137,7 +137,7 @@ class StaffGradingService(GradingService):
         response = self.get(self.get_next_url,
                             params={'location': location,
                                     'grader_id': grader_id})
-        return json.dumps(self._render_rubric(response))
+        return self._render_rubric(response.json())
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
                    submission_flagged):
@@ -145,7 +145,7 @@ class StaffGradingService(GradingService):
         Save a score and feedback for a submission.
 
         Returns:
-            json dict with keys
+            dict with keys
                 'success': bool
                 'error': error msg, if something went wrong.
 
@@ -162,12 +162,12 @@ class StaffGradingService(GradingService):
                 'rubric_scores_complete': True,
                 'submission_flagged': submission_flagged}
 
-        return self.post(self.save_grade_url, data=data)
+        response = self.post(self.save_grade_url, data=data)
+        return self._render_rubric(response.json())
 
     def get_notifications(self, course_id):
         params = {'course_id': course_id}
-        response = self.get(self.get_notifications_url, params)
-        return response
+        return self.get(self.get_notifications_url, params).json()
 
 
 # don't initialize until staff_grading_service() is called--means that just
@@ -249,7 +249,7 @@ def get_next(request, course_id):
     p = request.POST
     location = p['location']
 
-    return HttpResponse(_get_next(course_id, grader_id, location),
+    return HttpResponse(json.dumps(_get_next(course_id, grader_id, location)),
                         mimetype="application/json")
 
 def get_problem_list(request, course_id):
@@ -278,7 +278,6 @@ def get_problem_list(request, course_id):
     _check_access(request.user, course_id)
     try:
         response = staff_grading_service().get_problem_list(course_id, unique_id_for_user(request.user))
-        response = json.loads(response)
 
         # If 'problem_list' is in the response, then we got a list of problems from the ORA server.
         # If it is not, then ORA could not find any problems.
@@ -373,14 +372,14 @@ def save_grade(request, course_id):
     location = p['location']
 
     try:
-        result_json = staff_grading_service().save_grade(course_id,
-                                                         grader_id,
-                                                         p['submission_id'],
-                                                         p['score'],
-                                                         p['feedback'],
-                                                         skipped,
-                                                         p.getlist('rubric_scores[]'),
-                                                         p['submission_flagged'])
+        result = staff_grading_service().save_grade(course_id,
+                                                    grader_id,
+                                                    p['submission_id'],
+                                                    p['score'],
+                                                    p['feedback'],
+                                                    skipped,
+                                                    p.getlist('rubric_scores[]'),
+                                                    p['submission_flagged'])
     except GradingServiceError:
         #This is a dev_facing_error
         log.exception(
@@ -388,9 +387,6 @@ def save_grade(request, course_id):
                 request, course_id))
         #This is a staff_facing_error
         return _err_response(STAFF_ERROR_MESSAGE)
-
-    try:
-        result = json.loads(result_json)
     except ValueError:
         #This is a dev_facing_error
         log.exception(
@@ -406,7 +402,7 @@ def save_grade(request, course_id):
         return _err_response(STAFF_ERROR_MESSAGE)
 
     # Ok, save_grade seemed to work.  Get the next submission to grade.
-    return HttpResponse(_get_next(course_id, grader_id, location),
+    return HttpResponse(json.dumps(_get_next(course_id, grader_id, location)),
                         mimetype="application/json")
 
 
