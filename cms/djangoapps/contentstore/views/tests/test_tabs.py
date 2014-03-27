@@ -77,7 +77,7 @@ class TabsPageTests(CourseTestCase):
         # post the request
         resp = self.client.ajax_post(
             self.url,
-            data={'tab_ids': tab_ids}
+            data={'tabs': [{'tab_id': tab_id} for tab_id in tab_ids]}
         )
         self.assertEqual(resp.status_code, 204)
 
@@ -97,9 +97,9 @@ class TabsPageTests(CourseTestCase):
 
         # post the request
         resp = self.client.ajax_post(
-                self.url,
-                data={'tab_ids': tab_ids}
-            )
+            self.url,
+            data={'tabs': [{'tab_id': tab_id} for tab_id in tab_ids]}
+        )
         self.assertEqual(resp.status_code, 400)
         resp_content = json.loads(resp.content)
         self.assertIn("error", resp_content)
@@ -110,9 +110,9 @@ class TabsPageTests(CourseTestCase):
 
         # post the request
         resp = self.client.ajax_post(
-                self.url,
-                data={'tab_ids': invalid_tab_ids}
-            )
+            self.url,
+            data={'tabs': [{'tab_id': tab_id} for tab_id in invalid_tab_ids]}
+        )
         self.check_invalid_tab_id_response(resp)
 
     def check_toggle_tab_visiblity(self, tab_type, new_is_hidden_setting):

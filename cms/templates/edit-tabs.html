@@ -59,7 +59,7 @@
 
               % for tab in tabs_to_render:
                 % if isinstance(tab, StaticTab):
-                    <li class="component course_tab" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
+                    <li class="component course-tab" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
                 % else:
 
                   <%
@@ -70,7 +70,7 @@
                         tab_name = tab_name + " ({0}): {1}".format(num_items, ", ".join(item_names))
                    %>
 
-                    <li class="course-nav-tab course_tab" data-tab-id="${tab.tab_id}">
+                    <li class="course-nav-tab course-tab" data-tab-id="${tab.tab_id}">
                       <div class="course-nav-tab-header">
                         <h3 class="title">${tab_name}</h3>
                       </div>

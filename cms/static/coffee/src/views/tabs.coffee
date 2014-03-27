@@ -27,12 +27,12 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
         placeholder: 'component-placeholder'
         forcePlaceholderSize: true
         axis: 'y'
-        items: '> .course_tab'
+        items: '> .course-tab'
       )
 
     toggleVisibilityOfTab: (event, ui) =>
       checkbox_element = event.srcElement
-      tab_element = $(checkbox_element).parents(".course_tab")[0]
+      tab_element = $(checkbox_element).parents(".course-tab")[0]
 
       tab_id = $(tab_element).data('tab-id')
       is_hidden = $(checkbox_element).is(':checked')
@@ -54,9 +54,14 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       }).success(=> saving.hide())
 
     tabMoved: (event, ui) =>
-      tab_ids = []
-      @$('.course_tab').each((idx, element) =>
-          tab_ids.push($(element).data('tab-id'))
+      tabs = []
+      @$('.course-tab').each((idx, element) =>
+          tabs.push(
+            {
+              tab_id: $(element).data('tab-id'),
+              tab_locator: $(element).data('locator')
+            }
+          )
       )
 
       analytics.track "Reordered Pages",
@@ -69,7 +74,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
         type:'POST',
         url: @model.url(),
         data: JSON.stringify({
-          tab_ids : tab_ids
+          tabs : tabs
         }),
         contentType: 'application/json'
       }).success(=> saving.hide())
@@ -83,7 +88,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       )
 
       $('.new-component-item').before(editor.$el)
-      editor.$el.addClass('course_tab')
+      editor.$el.addClass('course-tab')
       editor.$el.addClass('new')
       setTimeout(=>
         editor.$el.removeClass('new')

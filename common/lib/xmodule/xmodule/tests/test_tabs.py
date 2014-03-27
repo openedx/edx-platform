@@ -16,7 +16,7 @@ class TabTestCase(unittest.TestCase):
         self.reverse = lambda name, args: "name/{0}/args/{1}".format(name, ",".join(str(a) for a in args))
 
     def set_up_books(self, num_books):
-
+        """initializes the textbooks in the course and adds the given number of books to each textbook"""
         self.books = [MagicMock() for _ in range(num_books)]
         for book_index, book in enumerate(self.books):
             book.title = 'Book{0}'.format(book_index)
@@ -75,6 +75,7 @@ class TabTestCase(unittest.TestCase):
         return tab
 
     def check_tab_equality(self, tab, dict_tab):
+        """tests the equality methods on the given tab"""
         self.assertEquals(tab, dict_tab)  # test __eq__
         ne_dict_tab = dict_tab
         ne_dict_tab['type'] = 'fake_type'
@@ -82,12 +83,13 @@ class TabTestCase(unittest.TestCase):
         self.assertNotEquals(tab, {'fake_key': 'fake_value'})  # test __ne__: missing type
 
     def check_tab_json_methods(self, tab):
+        """tests the json from and to methods on the given tab"""
         serialized_tab = tab.to_json()
         deserialized_tab = tab.from_json(serialized_tab)
         self.assertEquals(serialized_tab, deserialized_tab)
 
     def check_can_display_results(self, tab, expected_value=True, for_authenticated_users_only=False, for_staff_only=False):
-        """Check can display results for various users"""
+        """checks can display results for various users"""
         if for_staff_only:
             self.assertEquals(
                 expected_value,
@@ -449,6 +451,9 @@ class TabListTestCase(TabTestCase):
                 {'type': tabs.WikiTab.type, 'name': 'fake_name'},
                 {'type': tabs.DiscussionTab.type, 'name': 'fake_name'},
                 {'type': tabs.ExternalLinkTab.type, 'name': 'fake_name', 'link': 'fake_link'},
+                {'type': tabs.TextbookTabs.type},
+                {'type': tabs.PDFTextbookTabs.type},
+                {'type': tabs.HtmlTextbookTabs.type},
                 {'type': tabs.ProgressTab.type, 'name': 'fake_name'},
                 {'type': tabs.StaticTab.type, 'name': 'fake_name', 'url_slug': 'schlug'},
                 {'type': tabs.PeerGradingTab.type},
@@ -456,9 +461,6 @@ class TabListTestCase(TabTestCase):
                 {'type': tabs.OpenEndedGradingTab.type},
                 {'type': tabs.NotesTab.type, 'name': 'fake_name'},
                 {'type': tabs.SyllabusTab.type},
-                {'type': tabs.TextbookTabs.type},
-                {'type': tabs.PDFTextbookTabs.type},
-                {'type': tabs.HtmlTextbookTabs.type},
             ],
             # with external discussion
             [
@@ -524,29 +526,40 @@ class CourseTabListTestCase(TabListTestCase):
         # create 1 book per textbook type
         self.set_up_books(1)
 
+        # initialize the course tabs to a list of all valid tabs
         self.course.tabs = self.all_valid_tab_list
 
+        # enumerate the tabs using the CMS call
         for i, tab in enumerate(tabs.CourseTabList.iterate_displayable_cms(
             self.course,
             self.settings,
         )):
             self.assertEquals(tab.type, self.course.tabs[i].type)
 
+        # enumerate the tabs and verify textbooks and the instructor tab
         for i, tab in enumerate(tabs.CourseTabList.iterate_displayable(
             self.course,
             self.settings,
         )):
             if getattr(tab, 'is_collection_item', False):
+                # a collection item was found as a result of a collection tab
                 self.assertTrue(getattr(self.course.tabs[i], 'is_collection', False))
             elif i == len(self.course.tabs):
+                # the last tab must be the Instructor tab
                 self.assertEquals(tab.type, tabs.InstructorTab.type)
             else:
+                # all other tabs must match the expected type
                 self.assertEquals(tab.type, self.course.tabs[i].type)
 
-    def test_find_methods(self):
+    def test_get_tab_by_methods(self):
+        """tests the get_tab methods in CourseTabList"""
         self.course.tabs = self.all_valid_tab_list
         for tab in self.course.tabs:
+
+            # get tab by type
             self.assertEquals(tabs.CourseTabList.get_tab_by_type(self.course.tabs, tab.type), tab)
+
+            # get tab by id
             self.assertEquals(tabs.CourseTabList.get_tab_by_id(self.course.tabs, tab.tab_id), tab)
 
 

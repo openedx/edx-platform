@@ -62,10 +62,6 @@ def change_name(step, new_name):
 
 @step(u'I reorder the static tabs')
 def reorder_static_tabs(_step):
-    tabs = world.css_find('.xmodule_StaticTabModule')
-    tab1_o = tabs[0].text
-    tab2_o = tabs[1].text
-
     # For some reason, the drag_and_drop method did not work in this case.
     draggables = world.css_find('.component .drag-handle')
     source = draggables.first
@@ -73,16 +69,6 @@ def reorder_static_tabs(_step):
     source.action_chains.click_and_hold(source._element).perform()  # pylint: disable=protected-access
     source.action_chains.move_to_element_with_offset(target._element, 0, 50).perform()  # pylint: disable=protected-access
     source.action_chains.release().perform()
-
-    tabs = world.css_find('.xmodule_StaticTabModule')
-    tab1 = tabs[0].text
-    tab2 = tabs[1].text
-    assert True
-
-# def move_grade_slider(step):
-#     moveable_css = '.ui-resizable-e'
-#     f = world.css_find(moveable_css).first
-#     f.action_chains.drag_and_drop_by_offset(f._element, 100, 0).perform()
 
 
 @step(u'I have created a static page')
@@ -118,9 +104,9 @@ def _verify_page_names(first, second):
         timeout=200,
         timeout_msg="Timed out waiting for two tabs to be present"
     )
-    # tabs = world.css_find('.xmodule_StaticTabModule')
-    # assert tabs[0].text == first
-    # assert tabs[1].text == second
+    tabs = world.css_find('.xmodule_StaticTabModule')
+    assert tabs[0].text == first
+    assert tabs[1].text == second
 
 
 @step(u'I should see the "([^"]*)" page as "(visible|hidden)"$')
@@ -145,3 +131,4 @@ def reorder_tabs(_step):
 @step(u'the tabs are in the reverse order')
 def tabs_in_reverse_order(step):
     pass
+

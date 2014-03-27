@@ -19,8 +19,6 @@ from xmodule.tabs import CourseTabList, StaticTab, CourseTab, InvalidTabsExcepti
 
 from ..utils import get_modulestore
 
-from django.utils.translation import ugettext as _
-
 __all__ = ['tabs_handler']
 
 @expect_json
@@ -53,7 +51,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         if request.method == 'GET':
             raise NotImplementedError('coming soon')
         else:
-            if 'tab_ids' in request.json:
+            if 'tabs' in request.json:
                 return reorder_tabs_handler(course_item, request)
             elif 'tab_id' in request.json:
                 return edit_tab_handler(course_item, request)
@@ -70,6 +68,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
                 settings,
         ):
             if isinstance(tab, StaticTab):
+                # static tab needs its locator information to render itself as an xmodule
                 static_tab_loc = old_location.replace(category='static_tab', name=tab.url_slug)
                 static_tab = modulestore('direct').get_item(static_tab_loc)
                 tab.locator = loc_mapper().translate_location(
@@ -93,24 +92,25 @@ def reorder_tabs_handler(course_item, request):
 
     old_tab_list = course_item.tabs
 
-    ids_of_new_tab_order = request.json['tab_ids']
+    ids_locators_of_new_tab_order = request.json['tabs']
 
     # create a new list in the new order
     new_tab_list = []
-    for tab_id in ids_of_new_tab_order:
-        tab = CourseTabList.get_tab_by_id(old_tab_list, tab_id)
+    for tab_id_locator in ids_locators_of_new_tab_order:
+        if 'tab_id' in tab_id_locator:
+            tab = CourseTabList.get_tab_by_id(old_tab_list, tab_id_locator['tab_id'])
+        elif 'tab_locator' in tab_id_locator:
+            tab = get_tab_by_locator(old_tab_list, tab_id_locator['tab_locator'])
         if tab is None:
             return JsonResponse(
-                {"error": "Tab with id '{0}' does not exist.".format(tab_id)}, status=400
+                {"error": "Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
             )
         new_tab_list.append(tab)
 
     # the old_tab_list may contain additional tabs that were not rendered in the UI because of
     # global or course settings.  so add those to the end of the list.
-    old_tab_ids = [tab.tab_id for tab in old_tab_list]
-    non_displayed_tab_ids = set(old_tab_ids) - set(ids_of_new_tab_order)
-    for non_displayed_tab_id in non_displayed_tab_ids:
-        new_tab_list.append(CourseTabList.get_tab_by_id(old_tab_list, non_displayed_tab_id))
+    non_displayed_tabs = set(old_tab_list) - set(new_tab_list)
+    new_tab_list.extend(non_displayed_tabs)
 
     # validate the tabs to make sure everything is Ok (e.g., did the client try to reorder unmovable tabs?)
     try:
@@ -143,6 +143,19 @@ def edit_tab_handler(course_item, request):
         modulestore('direct').update_item(course_item, request.user.id)
 
     return JsonResponse()
+
+
+def get_tab_by_locator(tab_list, tab_locator):
+    """
+    Look for a tab with the specified locator.  Returns the first matching tab.
+    """
+    tab_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(tab_locator))
+    item = modulestore('direct').get_item(tab_location)
+    static_tab = StaticTab(
+        name=item.display_name,
+        url_slug=item.location.name,
+    )
+    return CourseTabList.get_tab_by_id(tab_list, static_tab.tab_id)
 
 
 # "primitive" tab edit functions driven by the command line.
