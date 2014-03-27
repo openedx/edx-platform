@@ -36,18 +36,28 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
-  <header class="global ${"slim" if course else ""}" aria-label="${_('Global Navigation')}">
-    <nav>
-    <h1 class="logo">
-      <a href="${marketing_link('ROOT')}">
-        <%block name="navigation_logo">
-            <img src="${static.url(branding.get_logo_url())}" alt="${platform_name()}"/>
-        </%block>
-      </a>
-    </h1>
+<header class="global ${"slim" if course else ""}" aria-label="${_('Global Navigation')}">
+  <nav>
+
+  <h1 class="logo">
+    % if user.is_authenticated():
+    <a href="${marketing_link('ROOT')}">
+    % else:
+    <a href="https://courses.ionis-group.com">
+    % endif
+      <%block name="navigation_logo">
+          <img src="${static.url(branding.get_logo_url())}" alt="
+          % if course:
+          ${course.display_org_with_default | h}: ${course.display_number_with_default | h} ${course.display_name_with_default | h} @
+          % endif
+          ${platform_name()}
+          " />
+      </%block>
+    </a>
+  </h1>
 
     % if course:
-    <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+    <h2>${course.display_name_with_default}</h2>
     % endif
 
     % if user.is_authenticated():
