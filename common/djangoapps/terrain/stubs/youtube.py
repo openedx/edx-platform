@@ -1,5 +1,20 @@
 """
 Stub implementation of YouTube for acceptance tests.
+
+
+To start this stub server on its own from Vagrant:
+
+1.) Locally, modify your Vagrantfile so that it contains:
+
+    config.vm.network :forwarded_port, guest: 8031, host: 8031
+
+2.) From within Vagrant dev environment do:
+
+    cd common/djangoapps/terrain
+    python -m stubs.start youtube 8031
+
+3.) Locally, try accessing http://localhost:8031/ and see that
+    you get "Unused url" message inside the browser.
 """
 
 from .http import StubHttpRequestHandler, StubHttpService
