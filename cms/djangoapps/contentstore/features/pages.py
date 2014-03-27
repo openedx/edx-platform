@@ -3,7 +3,7 @@
 # pylint: disable=W0613
 
 from lettuce import world, step
-from nose.tools import assert_equal  # pylint: disable=E0611
+from nose.tools import assert_equal, assert_in  # pylint: disable=E0611
 
 
 @step(u'I go to the pages page$')
@@ -51,15 +51,10 @@ def change_name(step, new_name):
     world.css_click(save_button)
 
 
-@step(u'I reorder the static tabs')
-def reorder_static_tabs(_step):
+@step(u'I reorder the static pages')
+def reorder_static_pages(_step):
     # For some reason, the drag_and_drop method did not work in this case.
-    draggables = world.css_find('.component .drag-handle')
-    source = draggables.first
-    target = draggables.last
-    source.action_chains.click_and_hold(source._element).perform()  # pylint: disable=protected-access
-    source.action_chains.move_to_element_with_offset(target._element, 0, 50).perform()  # pylint: disable=protected-access
-    source.action_chains.release().perform()
+    reorder_pages_with_css_class('.component')
 
 
 @step(u'I have created a static page')
@@ -84,8 +79,8 @@ def create_two_pages(step):
     _verify_page_names('First', 'Empty')
 
 
-@step(u'the static tabs are in the reverse order')
-def static_tabs_in_reverse_order(step):
+@step(u'the static pages are in the reverse order')
+def static_pages_in_reverse_order(step):
     _verify_page_names('Empty', 'First')
 
 
@@ -93,22 +88,54 @@ def _verify_page_names(first, second):
     world.wait_for(
         func=lambda _: len(world.css_find('.xmodule_StaticTabModule')) == 2,
         timeout=200,
-        timeout_msg="Timed out waiting for two tabs to be present"
+        timeout_msg="Timed out waiting for two pages to be present"
     )
-    tabs = world.css_find('.xmodule_StaticTabModule')
-    assert tabs[0].text == first
-    assert tabs[1].text == second
+    pages = world.css_find('.xmodule_StaticTabModule')
+    assert pages[0].text == first
+    assert pages[1].text == second
 
 
-@step(u'I should see the default built-in pages')
-def see_default_built_in_pages(step):
+@step(u'the built-in pages are in the default order')
+def built_in_pages_in_default_order(step):
     expected_pages = ['Courseware', 'Course Info', 'Discussion', 'Wiki', 'Progress']
     see_pages_in_expected_order(expected_pages)
 
 
-@step(u'I reorder the tabs')
-def reorder_tabs(step):
-    draggables = world.css_find('.sortable-tab .drag-handle')
+@step(u'the built-in pages are in the reverse order')
+def built_in_pages_in_reverse_order(step):
+    expected_pages = ['Courseware', 'Course Info', 'Wiki', 'Progress', 'Discussion']
+    see_pages_in_expected_order(expected_pages)
+
+
+@step(u'the pages are in the default order')
+def pages_in_default_order(step):
+    expected_pages = ['Courseware', 'Course Info', 'Discussion', 'Wiki', 'Progress', 'First', 'Empty']
+    see_pages_in_expected_order(expected_pages)
+
+@step(u'the pages are in the reverse order')
+def pages_in_reverse_order(step):
+    expected_pages = ['Courseware', 'Course Info', 'Wiki', 'Progress', 'First', 'Empty', 'Discussion']
+    see_pages_in_expected_order(expected_pages)
+
+
+@step(u'I reorder the pages')
+def reorder_pages(step):
+    reorder_pages_with_css_class('.sortable-tab')
+
+
+@step(u'I should see the "([^"]*)" page as "(visible|hidden)"$')
+def page_is_visible_or_hidden(step, page_id, visible_or_hidden):
+    hidden = visible_or_hidden == "hidden"
+    assert world.css_find("li[data-tab-id='{0}'] input.toggle-checkbox".format(page_id)).checked == hidden
+
+
+@step(u'I toggle the visibility of the "([^"]*)" page')
+def page_toggle_visibility(step, page_id):
+    world.css_find("li[data-tab-id='{0}'] input.toggle-checkbox".format(page_id))[0].click()
+
+
+def reorder_pages_with_css_class(css_class):
+    draggables = world.css_find(css_class + ' .drag-handle')
     source = draggables.first
     target = draggables.last
     source.action_chains.click_and_hold(source._element).perform()  # pylint: disable=protected-access
@@ -116,26 +143,9 @@ def reorder_tabs(step):
     source.action_chains.release().perform()
 
 
-@step(u'the tabs are in the reverse order')
-def tabs_in_reverse_order(step):
-    expected_pages = ['Courseware', 'Course Info', 'Wiki', 'Progress', 'Discussion']
-    see_pages_in_expected_order(expected_pages)
-
-
-@step(u'I should see the "([^"]*)" page as "(visible|hidden)"$')
-def tab_is_visible_or_hidden(step, page_id, visible_or_hidden):
-    hidden = visible_or_hidden == "hidden"
-    assert world.css_find("li[data-tab-id='{0}'] input.toggle-checkbox".format(page_id)).checked == hidden
-
-
-@step(u'I toggle the visibility of the "([^"]*)" page')
-def tab_toggle_visibility(step, page_id):
-    world.css_find("li[data-tab-id='{0}'] input.toggle-checkbox".format(page_id))[0].click()
-
-
 def see_pages_in_expected_order(page_names_in_expected_order):
-    pages = world.css_find("div.course-nav-tab-header h3.title")
+    pages = world.css_find("li.course-tab")
     assert_equal(len(page_names_in_expected_order), len(pages))
     for i, page_name in enumerate(page_names_in_expected_order):
-        assert_equal(pages[i].text, page_name)
+        assert_in(page_name, pages[i].text)
 
