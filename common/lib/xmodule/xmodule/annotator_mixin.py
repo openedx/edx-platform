@@ -28,6 +28,7 @@ def getExtension(srcurl):
 ANNOTATOR_COMMON_JS = [
     resource_string(__name__, 'js/src/ova/annotator-full.js'),
     resource_string(__name__, 'js/src/ova/video.dev.js'),
+    resource_string(__name__, 'js/src/ova/vjs.youtube.js'),
     resource_string(__name__, 'js/src/ova/rangeslider.js'),
     resource_string(__name__, 'js/src/ova/share-annotator.js'),
     resource_string(__name__, 'js/src/ova/tinymce.min.js'),

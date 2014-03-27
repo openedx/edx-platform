@@ -796,7 +796,6 @@ main_vendor_js = [
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
-    'js/vendor/ova/vjs.youtube.js',
     'js/vendor/URI.min.js',
 ]
 
