@@ -13,6 +13,7 @@ Beta testers have early access to the course. Beta testers are not members of th
 * :ref:`What_Test`
 * :ref:`How_Testers_See_Course`
 * :ref:`Add_Testers`
+* :ref:`Add_Testers_Bulk`
 * :ref:`Issue_Reporting_During_Course`
 
 .. _Beta_Process:
@@ -85,7 +86,7 @@ Beta testers should interact with everything in the course.
 
 As they work, beta testers log issues and questions for the course team.
 
-**Note**: Beta testers can make discussion posts and wiki contributions. You may want to ask your testers not to make posts or contributions about unreleased courseware, and alert your discussion administration team to watch for posts from the beta testers.
+.. note:: Beta testers can make discussion posts and wiki contributions. You may want to ask your testers not to make posts or contributions about unreleased courseware, and alert your discussion administration team to watch for posts from the beta testers.
 
 .. _How_Testers_See_Course:
 
@@ -167,18 +168,16 @@ In this example, the beta testers cannot access all of the courseware when the b
 .. _Add_Testers:
 
 *********************************
-Add the Beta Testers
+Add Individual Beta Testers 
 *********************************
 
 Before you can add beta testers:
 
 * You need the email address or username of each beta tester. 
 
-* Each beta tester must register a user account for that email address and username, activate the account, and be enrolled in your course. 
+* Each beta tester must register and activate a user account for that email address and username. 
 
-**Note**: If the beta test starts before the **Enrollment Start Date**, testers cannot enroll themselves. To streamline this process, ask the beta testers to register and activate their accounts. Then, you can enroll the beta testers and select the **Auto Enroll** and **Notify students by email** options. See :ref:`Enrollment`.
-
-To add a beta tester:
+To add a single beta tester:
 
 #. View the live version of your course.
 
@@ -186,15 +185,56 @@ To add a beta tester:
 
 #. Click **Membership**.
 
-#. In the Administration List Management section, use the drop-down list to select **Beta Testers**.
+#. In the **Administration List Management** section, use the drop-down list to select **Beta Testers**.
 
 #. Under the list of users who currently have that role, enter an email address or username and click **Add Beta Tester**.
 
-  * If you add beta testers after the defined start of the beta test, they see your course on their dashboards when they log in. 
+  *  If the beta test starts before the course **Enrollment Start Date**, testers cannot enroll themselves in your course. You can enroll the beta testers prior to the **Enrollment Start Date**. See :ref:`Enrollment`.
 
-  * If you add beta testers before the test starts, they do not see your course. You may need to remind them when the test begins. 
+  * If you add the beta testers after the defined start of the beta test, and they are enrolled in the course, they see your course on their dashboards when they log in. 
 
-To remove the Beta Testers role, view the list of beta testers and then click **Revoke access**. 
+  * If you add beta testers before the test starts, or if they are not enrolled, they do not see your course on their dashboards. You may need to enroll them or send an email message to remind them when the test begins. 
+
+To remove the Beta Tester role from users individually, find the user in the list of beta testers, and then click **Revoke access** to the right of that user's email address. 
+
+.. _Add_Testers_Bulk:
+
+*********************************
+Add Multiple Beta Testers
+*********************************
+
+If you have a number of beta testers that you want to add, you can use a "batch add" option to add them all at once, rather than individually. With this feature, you can also send an email message to notify the beta testers that they have been added. 
+
+To use this feature:
+
+* You need the email address of each beta tester. 
+
+* Each beta tester must register and activate a user account for that email address. 
+
+To add multiple beta testers:
+
+#. View the live version of your course.
+
+#. Click **Instructor**, and then click **Try New Beta Dashboard**.
+
+#. Click **Membership**. 
+
+#. In the **Batch Beta Testers** section of the page, enter one or more addresses separated by commas or line feeds (the Enter key). You can also copy data from a CSV file of email addresses and paste it here. 
+
+#. Optionally, check the **Notify users by email** checkbox to send an email message to the beta testers. The text of the message is:
+
+.. image:: ../Images/Beta_tester_email.png
+  :alt: "You have been invited to be a beta tester for <course name> at <URL>. Visit <link> to join the course and begin the beta test."
+
+6. Click **Add beta testers**.
+
+  *  If the beta test starts before the course **Enrollment Start Date**, testers cannot enroll themselves in your course. You can enroll the beta testers prior to the **Enrollment Start Date**. See :ref:`Enrollment`.
+
+  * If you add the beta testers after the defined start of the beta test, and they are enrolled in the course, they see your course on their dashboards when they log in. 
+
+  * If you add beta testers before the test starts, or if they are not enrolled, they do not see your course on their dashboards. You may need to enroll them or send an email message to remind them when the test begins. 
+
+To remove the Beta Tester role from one or more users, enter their email addresses in the **Batch Add Beta Testers** field and then click **Remove beta testers**. 
 
 .. _Issue_Reporting_During_Course:
 
@@ -208,5 +248,5 @@ Despite the efforts of the course team and the beta testers, additional problems
 
 * To let students know the best way to report problems, you can post information on the Course Info page or post it in a discussion. 
 
-.. per Mark 19 Feb 14: eventually we want to provide more guidance for students:  course issues, use discussions, platform issues submit issue to edx.
+.. per Mark 19 Feb 14: eventually we want to provide more guidance for students:  course issues > use discussions, platform issues > submit issue to edx.
 
