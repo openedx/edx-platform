@@ -73,38 +73,38 @@ class GradingService(object):
 
     def post(self, url, data, allow_redirects=False):
         """
-        Make a post request to the grading controller
+        Make a post request to the grading controller. Returns the parsed json results of that request.
         """
         try:
             op = lambda: self.session.post(url, data=data,
                                            allow_redirects=allow_redirects)
-            r = self._try_with_login(op)
-        except (RequestException, ConnectionError, HTTPError) as err:
+            response_json = self._try_with_login(op)
+        except (RequestException, ConnectionError, HTTPError, ValueError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             #This is a dev_facing_error
             error_string = "Problem posting data to the grading controller.  URL: {0}, data: {1}".format(url, data)
             log.error(error_string)
             raise GradingServiceError(error_string)
 
-        return r.text
+        return response_json
 
     def get(self, url, params, allow_redirects=False):
         """
-        Make a get request to the grading controller
+        Make a get request to the grading controller. Returns the parsed json results of that request.
         """
         op = lambda: self.session.get(url,
                                       allow_redirects=allow_redirects,
                                       params=params)
         try:
-            r = self._try_with_login(op)
-        except (RequestException, ConnectionError, HTTPError) as err:
+            response_json = self._try_with_login(op)
+        except (RequestException, ConnectionError, HTTPError, ValueError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             #This is a dev_facing_error
             error_string = "Problem getting data from the grading controller.  URL: {0}, params: {1}".format(url, params)
             log.error(error_string)
             raise GradingServiceError(error_string)
 
-        return r.text
+        return response_json
 
     def _try_with_login(self, operation):
         """
@@ -128,7 +128,7 @@ class GradingService(object):
             response = operation()
             response.raise_for_status()
 
-        return response
+        return resp_json
 
     def _render_rubric(self, response, view_only=False):
         """
