@@ -386,6 +386,8 @@ class CourseEnrollment(models.Model):
     checking course dates, user permissions, etc.) This logic is currently
     scattered across our views.
     """
+    MODEL_TAGS = ['course_id', 'is_active', 'mode']
+
     user = models.ForeignKey(User)
     course_id = models.CharField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
