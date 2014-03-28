@@ -165,7 +165,7 @@ def fullstat(request = None):
     request = DummyRequest()
     
 
-    header = [u'ФИО', u'ФИО (измененное)', u'логин школы', u'email', u'email (измененное)', u'курс', u'зарегистрирован', u"дата регистрации на курс", u'2/3', u'100%', u'Задачи/Задания(Модули)']
+    header = [u'ФИО', u'ФИО (измененное)', u'логин школы', u'email', u'email (измененное)', u'курс', u'зарег. в пакет рег.', u"дата рег. на курс", u'2/3', u'100%', u'Задачи/Задания(Модули)']
     assignments = []
     datatablefull = {'header': header, 'assignments': assignments, 'students': []}
     datafull = []
@@ -282,12 +282,15 @@ def fullstat(request = None):
                 course = get_course(course_id)
                 datarow += [course_name]
 
+                if off_reg:
+                    datarow += [u'Да']
+                else:
+                    datarow += [u'Нет']
+
                 try:
                     courseenrollment = user.courseenrollment_set.filter(course_id = course_id)[0]
-                    datarow += [u'Да', courseenrollment.created.strftime('%d/%m/%Y')]
+                    datarow += [courseenrollment.created.strftime('%d/%m/%Y')]
                 except:
-                    datarow += [u'Нет', '']
-                    datafull.append(datarow)
                     continue
                 
                 #Raw statistic by problems
@@ -328,7 +331,8 @@ def fullstat(request = None):
         ).prefetch_related("groups").order_by('username')
         enrolled_students = [st for st in enrolled_students if not _has_staff_access_to_course_id(st, course.id)]
         
-
+        if len(enrolled_students) <= 0:
+            continue
 
         gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=True, use_offline=False)
         courseware_summary = grades.progress_summary(enrolled_students[0], request, course);
