@@ -45,7 +45,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     def test_get_static_tab_contents(self):
         course = get_course_by_id('edX/toy/2012_Fall')
         request = get_request_for_user(UserFactory.create())
-        tab = CourseTabList.get_tab_by_slug(course, 'resources')
+        tab = CourseTabList.get_tab_by_slug(course.tabs, 'resources')
 
         # Test render works okay
         tab_content = get_static_tab_contents(request, course, tab)

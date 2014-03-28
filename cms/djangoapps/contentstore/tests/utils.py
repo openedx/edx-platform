@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
+from contentstore.utils import get_modulestore
 from xmodule.modulestore.django import loc_mapper
 
 
@@ -95,8 +96,9 @@ class CourseTestCase(ModuleStoreTestCase):
         self.course_locator = loc_mapper().translate_location(
             self.course.location.course_id, self.course.location, False, True
         )
+        self.store = get_modulestore(self.course.location)
 
-    def createNonStaffAuthedUserClient(self):
+    def create_non_staff_authed_user_client(self):
         """
         Create a non-staff user, log them in, and return the client, user to use for testing.
         """
@@ -114,7 +116,7 @@ class CourseTestCase(ModuleStoreTestCase):
         client.login(username=uname, password=password)
         return client, nonstaff
 
-    def populateCourse(self):
+    def populate_course(self):
         """
         Add 2 chapters, 4 sections, 8 verticals, 16 problems to self.course (branching 2)
         """
@@ -126,3 +128,16 @@ class CourseTestCase(ModuleStoreTestCase):
                     descend(child, stack)
 
         descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])
+
+    def reload_course(self):
+        """
+        Reloads the course object from the database
+        """
+        self.course = self.store.get_item(self.course.location)
+
+    def save_course(self):
+        """
+        Updates the course object in the database
+        """
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)

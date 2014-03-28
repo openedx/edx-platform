@@ -76,10 +76,11 @@ FEATURES = {
     'FORCE_UNIVERSITY_DOMAIN': False,  # set this to the university domain to use, as an override to HTTP_HOST
                                         # set to None to do no university selection
 
-    'ENABLE_TEXTBOOK': True,
-
-    # for consistency in user-experience, keep the value of this setting in sync with the one in cms/envs/common.py
+    # for consistency in user-experience, keep the value of the following 3 settings
+    # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_TEXTBOOK': True,
+    'ENABLE_STUDENT_NOTES': True,  # enables the student notes API and UI.
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
@@ -145,9 +146,6 @@ FEATURES = {
 
     # segment.io for LMS--need to explicitly turn it on for production.
     'SEGMENT_IO_LMS': False,
-
-    # Enables the student notes API and UI.
-    'ENABLE_STUDENT_NOTES': True,
 
     # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
     'ENABLE_FEEDBACK_SUBMISSION': False,

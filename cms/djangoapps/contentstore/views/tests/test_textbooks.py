@@ -56,8 +56,7 @@ class TextbookIndexTestCase(CourseTestCase):
             }
         ]
         self.course.pdf_textbooks = content
-        store = get_modulestore(self.course.location)
-        store.update_item(self.course, self.user.id)
+        self.save_course()
 
         resp = self.client.get(
             self.url,
@@ -83,12 +82,10 @@ class TextbookIndexTestCase(CourseTestCase):
         )
         self.assertEqual(resp.status_code, 200)
 
-        # reload course
-        store = get_modulestore(self.course.location)
-        course = store.get_item(self.course.location)
         # should be the same, except for added ID
         no_ids = []
-        for textbook in course.pdf_textbooks:
+        self.reload_course()
+        for textbook in self.course.pdf_textbooks:
             del textbook["id"]
             no_ids.append(textbook)
         self.assertEqual(no_ids, textbooks)
@@ -193,9 +190,7 @@ class TextbookDetailTestCase(CourseTestCase):
         self.course.pdf_textbooks = [self.textbook1, self.textbook2]
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
-        self.course.save()
-        self.store = get_modulestore(self.course.location)
-        self.store.update_item(self.course, self.user.id)
+        self.save_course()
         self.url_nonexist = self.course_locator.url_reverse("textbooks", "20")
 
     def test_get_1(self):
@@ -221,15 +216,15 @@ class TextbookDetailTestCase(CourseTestCase):
         "Delete a textbook by ID"
         resp = self.client.delete(self.url1)
         self.assertEqual(resp.status_code, 204)
-        course = self.store.get_item(self.course.location)
-        self.assertEqual(course.pdf_textbooks, [self.textbook2])
+        self.reload_course()
+        self.assertEqual(self.course.pdf_textbooks, [self.textbook2])
 
     def test_delete_nonexistant(self):
         "Delete a textbook by ID, when the ID doesn't match an existing textbook"
         resp = self.client.delete(self.url_nonexist)
         self.assertEqual(resp.status_code, 404)
-        course = self.store.get_item(self.course.location)
-        self.assertEqual(course.pdf_textbooks, [self.textbook1, self.textbook2])
+        self.reload_course()
+        self.assertEqual(self.course.pdf_textbooks, [self.textbook1, self.textbook2])
 
     def test_create_new_by_id(self):
         "Create a textbook by ID"
@@ -249,9 +244,9 @@ class TextbookDetailTestCase(CourseTestCase):
         self.assertEqual(resp2.status_code, 200)
         compare = json.loads(resp2.content)
         self.assertEqual(compare, textbook)
-        course = self.store.get_item(self.course.location)
+        self.reload_course()
         self.assertEqual(
-            course.pdf_textbooks,
+            self.course.pdf_textbooks,
             [self.textbook1, self.textbook2, textbook]
         )
 

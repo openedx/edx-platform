@@ -102,7 +102,7 @@ class TestExportGit(CourseTestCase):
 
         subprocess.check_output(['git', '--bare', 'init', ], cwd=bare_repo_dir)
 
-        self.populateCourse()
+        self.populate_course()
         self.course_module.giturl = 'file://{}'.format(bare_repo_dir)
         get_modulestore(self.course_module.location).update_item(self.course_module)
 

@@ -797,7 +797,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             if xblock.category == 'static_tab':
                 course = self._get_course_for_item(xblock.location)
                 # find the course's reference to this tab and update the name.
-                static_tab = CourseTabList.get_tab_by_slug(course, xblock.location.name)
+                static_tab = CourseTabList.get_tab_by_slug(course.tabs, xblock.location.name)
                 # only update if changed
                 if static_tab and static_tab['name'] != xblock.display_name:
                     static_tab['name'] = xblock.display_name

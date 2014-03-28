@@ -400,23 +400,34 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         course = module_store.get_item(course_location)
 
-        # reverse the ordering
-        reverse_tabs = []
+        # reverse the ordering of the static tabs
+        reverse_static_tabs = []
+        built_in_tabs = []
         for tab in course.tabs:
             if tab['type'] == 'static_tab':
-                reverse_tabs.insert(0, unicode(self._get_tab_locator(course, tab)))
+                reverse_static_tabs.insert(0, tab)
+            else:
+                built_in_tabs.append(tab)
 
-        self.client.ajax_post(new_location.url_reverse('tabs'), {'tabs': reverse_tabs})
+        # create the requested tab_id_locators list
+        tab_id_locators = [
+            {
+                'tab_id': tab.tab_id
+            } for tab in built_in_tabs
+        ]
+        tab_id_locators.extend([
+            {
+                'tab_locator': unicode(self._get_tab_locator(course, tab))
+            } for tab in reverse_static_tabs
+        ])
+
+        self.client.ajax_post(new_location.url_reverse('tabs'), {'tabs': tab_id_locators})
 
         course = module_store.get_item(course_location)
 
         # compare to make sure that the tabs information is in the expected order after the server call
-        course_tabs = []
-        for tab in course.tabs:
-            if tab['type'] == 'static_tab':
-                course_tabs.append(unicode(self._get_tab_locator(course, tab)))
-
-        self.assertEqual(reverse_tabs, course_tabs)
+        new_static_tabs = [tab for tab in course.tabs if (tab['type'] == 'static_tab')]
+        self.assertEqual(reverse_static_tabs, new_static_tabs)
 
     def test_static_tab_deletion(self):
         module_store, course_location, _ = self._create_static_tabs()
