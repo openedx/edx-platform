@@ -112,6 +112,10 @@ if Backbone?
         @renderResponses()
 
     collapsePost: (event) ->
+      curScroll = $(window).scrollTop()
+      postTop = @$el.offset().top
+      if postTop < curScroll
+        $('html, body').animate({scrollTop: postTop})
       @expanded = false
       @$el.removeClass('expanded')
       @$el.find('.post-body').html(@model.get('abbreviatedBody'))
