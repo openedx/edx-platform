@@ -28,8 +28,7 @@ class ControllerQueryService(GradingService):
         params = {
             'location': location,
         }
-        response = self.get(self.check_eta_url, params)
-        data = response.json()
+        data = self.get(self.check_eta_url, params)
         self._record_result('check_for_eta', data)
         dog_stats_api.histogram(self._metric_name('check_for_eta.eta'), data.get('eta', 0))
 
@@ -43,8 +42,7 @@ class ControllerQueryService(GradingService):
             'last_time_viewed': last_time_viewed,
         }
         log.debug(self.combined_notifications_url)
-        response = self.get(self.combined_notifications_url, params)
-        data = response.json()
+        data = self.get(self.combined_notifications_url, params)
 
         tags = [u'course_id:{}'.format(course_id), u'user_is_staff:{}'.format(user_is_staff)]
         tags.extend(
@@ -61,8 +59,7 @@ class ControllerQueryService(GradingService):
             'course_id': course_id,
         }
 
-        response = self.get(self.grading_status_list_url, params)
-        data = response.json()
+        data = self.get(self.grading_status_list_url, params)
 
         tags = [u'course_id:{}'.format(course_id)]
         self._record_result('get_grading_status_list', data, tags)
@@ -78,8 +75,7 @@ class ControllerQueryService(GradingService):
             'course_id': course_id,
         }
 
-        response = self.get(self.flagged_problem_list_url, params)
-        data = response.json()
+        data = self.get(self.flagged_problem_list_url, params)
 
         tags = [u'course_id:{}'.format(course_id)]
         self._record_result('get_flagged_problem_list', data, tags)
@@ -97,8 +93,7 @@ class ControllerQueryService(GradingService):
             'action_type': action_type
         }
 
-        response = self.post(self.take_action_on_flags_url, params)
-        data = response.json()
+        data = self.post(self.take_action_on_flags_url, params)
 
         tags = [u'course_id:{}'.format(course_id), u'action_type:{}'.format(action_type)]
         self._record_result('take_action_on_flags', data, tags)

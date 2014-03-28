@@ -116,7 +116,7 @@ class StaffGradingService(GradingService):
             GradingServiceError: something went wrong with the connection.
         """
         params = {'course_id': course_id, 'grader_id': grader_id}
-        result = self.get(self.get_problem_list_url, params).json()
+        result = self.get(self.get_problem_list_url, params)
         tags = [u'course_id:{}'.format(course_id)]
         self._record_result('get_problem_list', result, tags)
         dog_stats_api.histogram(
@@ -143,10 +143,15 @@ class StaffGradingService(GradingService):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        response = self.get(self.get_next_url,
-                            params={'location': location,
-                                    'grader_id': grader_id})
-        result = self._render_rubric(response.json())
+        result = self._render_rubric(
+            self.get(
+                self.get_next_url,
+                params={
+                    'location': location,
+                    'grader_id': grader_id
+                }
+            )
+        )
         tags = [u'course_id:{}'.format(course_id)]
         self._record_result('get_next', result, tags)
         return result
@@ -174,15 +179,14 @@ class StaffGradingService(GradingService):
                 'rubric_scores_complete': True,
                 'submission_flagged': submission_flagged}
 
-        response = self.post(self.save_grade_url, data=data)
-        result = self._render_rubric(response.json())
+        result = self._render_rubric(self.post(self.save_grade_url, data=data))
         tags = [u'course_id:{}'.format(course_id)]
         self._record_result('save_grade', result, tags)
         return result
 
     def get_notifications(self, course_id):
         params = {'course_id': course_id}
-        result = self.get(self.get_notifications_url, params).json()
+        result = self.get(self.get_notifications_url, params)
         tags = [
             u'course_id:{}'.format(course_id),
             u'staff_needs_to_grade:{}'.format(result.get('staff_needs_to_grade'))

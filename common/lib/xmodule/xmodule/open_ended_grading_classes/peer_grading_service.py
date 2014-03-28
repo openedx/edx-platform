@@ -31,8 +31,7 @@ class PeerGradingService(GradingService):
 
     def get_data_for_location(self, problem_location, student_id):
         params = {'location': problem_location, 'student_id': student_id}
-        response = self.get(self.get_data_for_location_url, params)
-        result = response.json()
+        result = self.get(self.get_data_for_location_url, params)
         self._record_result('get_data_for_location', result)
         for key in result.keys():
             if key in ('success', 'error', 'version'):
@@ -45,27 +44,26 @@ class PeerGradingService(GradingService):
         return result
 
     def get_next_submission(self, problem_location, grader_id):
-        response = self.get(
+        result = self._render_rubric(self.get(
             self.get_next_submission_url,
             {
                 'location': problem_location,
                 'grader_id': grader_id
             }
-        )
-        result = self._render_rubric(response.json())
+        ))
         self._record_result('get_next_submission', result)
         return result
 
     def save_grade(self, **kwargs):
         data = kwargs
         data.update({'rubric_scores_complete': True})
-        result = self.post(self.save_grade_url, data).json()
+        result = self.post(self.save_grade_url, data)
         self._record_result('save_grade', result)
         return result
 
     def is_student_calibrated(self, problem_location, grader_id):
         params = {'problem_id': problem_location, 'student_id': grader_id}
-        result = self.get(self.is_student_calibrated_url, params).json()
+        result = self.get(self.is_student_calibrated_url, params)
         self._record_result(
             'is_student_calibrated',
             result,
@@ -75,22 +73,20 @@ class PeerGradingService(GradingService):
 
     def show_calibration_essay(self, problem_location, grader_id):
         params = {'problem_id': problem_location, 'student_id': grader_id}
-        response = self.get(self.show_calibration_essay_url, params)
-        result = self._render_rubric(response.json())
+        result = self._render_rubric(self.get(self.show_calibration_essay_url, params))
         self._record_result('show_calibration_essay', result)
         return result
 
     def save_calibration_essay(self, **kwargs):
         data = kwargs
         data.update({'rubric_scores_complete': True})
-        result = self.post(self.save_calibration_essay_url, data).json()
+        result = self.post(self.save_calibration_essay_url, data)
         self._record_result('show_calibration_essay', result)
         return result
 
     def get_problem_list(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
-        response = self.get(self.get_problem_list_url, params)
-        result = response.json()
+        result = self.get(self.get_problem_list_url, params)
         self._record_result('get_problem_list', result)
         dog_stats_api.histogram(
             self._metric_name('get_problem_list.result.length'),
@@ -100,8 +96,7 @@ class PeerGradingService(GradingService):
 
     def get_notifications(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
-        response = self.get(self.get_notifications_url, params)
-        result = response.json()
+        result = self.get(self.get_notifications_url, params)
         self._record_result(
             'get_notifications',
             result,
