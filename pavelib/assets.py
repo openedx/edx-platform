@@ -1,16 +1,95 @@
 """
 Asset compilation and collection.
 """
+from __future__ import print_function
 import argparse
-from paver.easy import *
+from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task
+from watchdog.observers import Observer
+from watchdog.events import PatternMatchingEventHandler
+import glob
+import traceback
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
-
 
 COFFEE_DIRS = ['lms', 'cms', 'common']
 SASS_LOAD_PATHS = ['./common/static/sass']
 SASS_UPDATE_DIRS = ['*/static']
 SASS_CACHE_PATH = '/tmp/sass-cache'
+
+
+class CoffeeScriptWatcher(PatternMatchingEventHandler):
+    """
+    Watches for coffeescript changes
+    """
+    ignore_directories = True
+    patterns = ['*.coffee']
+
+    def register(self, observer):
+        """
+        register files with observer
+        """
+        dirnames = set()
+        for filename in sh(coffeescript_files(), capture=True).splitlines():
+            dirnames.add(path(filename).dirname())
+        for dirname in dirnames:
+            observer.schedule(self, dirname)
+
+    def on_modified(self, event):
+        print('\tCHANGED:', event.src_path)
+        try:
+            compile_coffeescript(event.src_path)
+        except Exception:  # pylint: disable=W0703
+            traceback.print_exc()
+
+
+class SassWatcher(PatternMatchingEventHandler):
+    """
+    Watches for sass file changes
+    """
+    ignore_directories = True
+    patterns = ['*.scss']
+    ignore_patterns = ['common/static/xmodule/*']
+
+    def register(self, observer):
+        """
+        register files with observer
+        """
+        for dirname in SASS_LOAD_PATHS + SASS_UPDATE_DIRS + theme_sass_paths():
+            paths = []
+            if '*' in dirname:
+                paths.extend(glob.glob(dirname))
+            else:
+                paths.append(dirname)
+            for dirname in paths:
+                observer.schedule(self, dirname, recursive=True)
+
+    def on_modified(self, event):
+        print('\tCHANGED:', event.src_path)
+        try:
+            compile_sass()
+        except Exception:  # pylint: disable=W0703
+            traceback.print_exc()
+
+
+class XModuleSassWatcher(SassWatcher):
+    """
+    Watches for sass file changes
+    """
+    ignore_directories = True
+    ignore_patterns = []
+
+    def register(self, observer):
+        """
+        register files with observer
+        """
+        observer.schedule(self, 'common/lib/xmodule/', recursive=True)
+
+    def on_modified(self, event):
+        print('\tCHANGED:', event.src_path)
+        try:
+            process_xmodule_assets()
+        except Exception:  # pylint: disable=W0703
+            traceback.print_exc()
 
 
 def theme_sass_paths():
@@ -25,23 +104,30 @@ def theme_sass_paths():
         parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
         theme_root = parent_dir / "themes" / theme_name
         return [theme_root / "static" / "sass"]
-
     else:
         return []
 
 
-def compile_coffeescript():
+def coffeescript_files():
+    """
+    return find command for paths containing coffee files
+    """
+    dirs = " ".join([Env.REPO_ROOT / coffee_dir for coffee_dir in COFFEE_DIRS])
+    return cmd('find', dirs, '-type f', '-name \"*.coffee\"')
+
+
+def compile_coffeescript(*files):
     """
     Compile CoffeeScript to JavaScript.
     """
-    dirs = " ".join([Env.REPO_ROOT / coffee_dir for coffee_dir in COFFEE_DIRS])
+    if not files:
+        files = ["`{}`".format(coffeescript_files())]
     sh(cmd(
-        "node_modules/.bin/coffee", "--compile",
-        " `find {dirs} -type f -name \"*.coffee\"`".format(dirs=dirs)
+        "node_modules/.bin/coffee", "--compile", *files
     ))
 
 
-def compile_sass(debug):
+def compile_sass(debug=False):
     """
     Compile Sass to CSS.
     """
@@ -82,6 +168,31 @@ def collect_assets(systems, settings):
 
 
 @task
+@cmdopts([('background', 'b', 'Background mode')])
+def watch_assets(options):
+    """
+    Watch for changes to asset files, and regenerate js/css
+    """
+    observer = Observer()
+
+    CoffeeScriptWatcher().register(observer)
+    SassWatcher().register(observer)
+    XModuleSassWatcher().register(observer)
+
+    print("Starting asset watcher...")
+    observer.start()
+    if not getattr(options, 'background', False):
+        # when running as a separate process, the main thread needs to loop
+        # in order to allow for shutdown by contrl-c
+        try:
+            while True:
+                observer.join(2)
+        except KeyboardInterrupt:
+            observer.stop()
+        print("\nStopped asset watcher.")
+
+
+@task
 @needs('pavelib.prereqs.install_prereqs')
 @consume_args
 def update_assets(args):
@@ -105,6 +216,10 @@ def update_assets(args):
         '--skip-collect', dest='collect', action='store_false', default=True,
         help="Skip collection of static assets",
     )
+    parser.add_argument(
+        '--watch', action='store_true', default=False,
+        help="Watch files for changes",
+    )
     args = parser.parse_args(args)
 
     compile_templated_sass(args.system, args.settings)
@@ -114,3 +229,6 @@ def update_assets(args):
 
     if args.collect:
         collect_assets(args.system, args.settings)
+
+    if args.watch:
+        call_task('watch_assets', options={'background': not args.debug})
