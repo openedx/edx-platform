@@ -6,8 +6,7 @@ It can be called from other files by using the following:
 from xmodule.annotator_token import retrieve_token
 '''
 import datetime
-from xmodule.firebase_token_generator import create_token
-
+from firebase_token_generator import create_token
 
 def retrieve_token(userid, secret):
     '''
