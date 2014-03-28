@@ -782,12 +782,20 @@ hr.divide {
 // ====================
 
 // basic utility
+
+// UI - semantically hide text
 .sr {
   @extend %cont-text-sr;
 }
 
+// UI - faking a link's behavior
 .fake-link {
-  cursor: pointer;
+  @extend %ui-fake-link;
+}
+
+// UI - disabled
+.is-disabled {
+  @extend %ui-disabled;
 }
 
 .non-list {
