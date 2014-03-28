@@ -364,9 +364,8 @@ def index(request, course_id, chapter=None, section=None,
             raise
         else:
             log.exception(
-                "Error in index view: user={user}, course={course},"
-                " chapter={chapter} section={section}"
-                "position={position}".format(
+                u"Error in index view: user={user}, course={course}, chapter={chapter}"
+                u" section={section} position={position}".format(
                     user=user,
                     course=course,
                     chapter=chapter,
@@ -402,11 +401,15 @@ def jump_to_id(request, course_id, module_id):
     )
 
     if len(items) == 0:
-        raise Http404("Could not find id = {0} in course_id = {1}. Referer = {2}".
-                      format(module_id, course_id, request.META.get("HTTP_REFERER", "")))
+        raise Http404(
+            u"Could not find id: {0} in course_id: {1}. Referer: {2}".format(
+                module_id, course_id, request.META.get("HTTP_REFERER", "")
+            ))
     if len(items) > 1:
-        log.warning("Multiple items found with id = {0} in course_id = {1}. Referer = {2}. Using first found {3}...".
-                    format(module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.url()))
+        log.warning(
+            u"Multiple items found with id: {0} in course_id: {1}. Referer: {2}. Using first: {3}".format(
+                module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.url()
+            ))
 
     return jump_to(request, course_id, items[0].location.url())
 
@@ -795,9 +798,8 @@ def get_static_tab_contents(request, course, tab):
             html = tab_module.render('student_view').content
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
-            log.exception("Error rendering course={course}, tab={tab_url}".format(
-                course=course,
-                tab_url=tab['url_slug']
-            ))
+            log.exception(
+                u"Error rendering course={course}, tab={tab_url}".format(course=course,tab_url=tab['url_slug'])
+            )
 
     return html

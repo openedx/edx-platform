@@ -1519,7 +1519,7 @@ def get_and_clean_student_list(students):
     """
 
     students = split_by_comma_and_whitespace(students)
-    students = [str(s.strip()) for s in students]
+    students = [unicode(s.strip()) for s in students]
     students = [s for s in students if s != '']
     students_lc = [x.lower() for x in students]
 
