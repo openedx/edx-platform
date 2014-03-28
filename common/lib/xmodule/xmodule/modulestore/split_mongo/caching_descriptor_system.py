@@ -54,11 +54,14 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         self.local_modules = {}
 
     def _load_item(self, block_id, course_entry_override=None):
-        if isinstance(block_id, BlockUsageLocator) and isinstance(block_id.block_id, LocalId):
-            try:
-                return self.local_modules[block_id]
-            except KeyError:
-                raise ItemNotFoundError
+        if isinstance(block_id, BlockUsageLocator):
+            if isinstance(block_id.block_id, LocalId):
+                try:
+                    return self.local_modules[block_id]
+                except KeyError:
+                    raise ItemNotFoundError
+            else:
+                block_id = block_id.block_id
 
         json_data = self.module_data.get(block_id)
         if json_data is None:

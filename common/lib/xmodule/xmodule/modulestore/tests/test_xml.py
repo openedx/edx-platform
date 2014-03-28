@@ -7,13 +7,13 @@ import unittest
 from glob import glob
 from mock import patch
 
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
 from xmodule.modulestore.keys import CourseKey
 
 from .test_modulestore import check_path_to_location
 from xmodule.tests import DATA_DIR
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 def glob_tildes_at_end(path):
@@ -65,15 +65,10 @@ class TestXMLModuleStore(unittest.TestCase):
     @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)
     def test_tilde_files_ignored(self, _fake_glob):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['tilde'], load_error_modules=False)
-        course_module = modulestore.modules['edX/tilde/2012_Fall']
-        about_location = Location({
-            'tag': 'i4x',
-            'org': 'edX',
-            'course': 'tilde',
-            'category': 'about',
-            'name': 'index',
-        })
-        about_module = course_module[about_location]
+        about_location = SlashSeparatedCourseKey.from_string('edX/tilde/2012_Fall').make_usage_key(
+            'about', 'index',
+        )
+        about_module = modulestore.get_item(about_location)
         self.assertIn("GREEN", about_module.data)
         self.assertNotIn("RED", about_module.data)
 
@@ -85,7 +80,7 @@ class TestXMLModuleStore(unittest.TestCase):
         for course in store.get_courses():
             course_locations = store.get_courses_for_wiki(course.wiki_slug)
             self.assertEqual(len(course_locations), 1)
-            self.assertIn(Location('edX', course.location.course, 'course', '2012_Fall'), course_locations)
+            self.assertIn(course.location, course_locations)
 
         course_locations = store.get_courses_for_wiki('no_such_wiki')
         self.assertEqual(len(course_locations), 0)
@@ -100,4 +95,4 @@ class TestXMLModuleStore(unittest.TestCase):
         course_locations = store.get_courses_for_wiki('simple')
         self.assertEqual(len(course_locations), 2)
         for course_number in ['toy', 'simple']:
-            self.assertIn(Location('edX', course_number, 'course', '2012_Fall'), course_locations)
+            self.assertIn(Location('edX', course_number, '2012_Fall', 'course', '2012_Fall'), course_locations)

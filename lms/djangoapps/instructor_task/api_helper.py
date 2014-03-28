@@ -22,7 +22,9 @@ class AlreadyRunningError(Exception):
 
 def _task_is_running(course_id, task_type, task_key):
     """Checks if a particular task is already running"""
-    runningTasks = InstructorTask.objects.filter(course_id=course_id, task_type=task_type, task_key=task_key)
+    runningTasks = InstructorTask.objects.filter(
+        course_id=course_id.to_deprecated_string(), task_type=task_type, task_key=task_key
+    )
     # exclude states that are "ready" (i.e. not "running", e.g. failure, success, revoked):
     for state in READY_STATES:
         runningTasks = runningTasks.exclude(task_state=state)
@@ -69,7 +71,7 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
         )
 
     # Create log entry now, so that future requests will know it's running.
-    return InstructorTask.create(course_id, task_type, task_key, task_input, requester)
+    return InstructorTask.create(course_id.to_deprecated_string(), task_type, task_key, task_input, requester)
 
 
 def _get_xmodule_instance_args(request, task_id):

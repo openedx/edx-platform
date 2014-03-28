@@ -1,8 +1,6 @@
 """
 Test the publish code (primary causing orphans)
 """
-import random
-
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
 
@@ -16,13 +14,13 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         Create the course, publish all verticals
         * some detached items
         """
-        super(TestPublish, self)._create_course()
+        super(TestPublish, self)._create_course(split=False)
 
-        self._create_item('chapter', 'Chapter1', {}, {'display_name': 'Chapter 1'}, 'course', 'runid')
-        self._create_item('chapter', 'Chapter2', {}, {'display_name': 'Chapter 2'}, 'course', 'runid')
-        self._create_item('vertical', 'Vert1', {}, {'display_name': 'Vertical 1'}, 'chapter', 'Chapter1')
-        self._create_item('vertical', 'Vert2', {}, {'display_name': 'Vertical 2'}, 'chapter', 'Chapter1')
-        self._create_item('html', 'Html1', "<p>Goodbye</p>", {'display_name': 'Parented Html'}, 'vertical', 'Vert1')
+        self._create_item('chapter', 'Chapter1', {}, {'display_name': 'Chapter 1'}, 'course', 'runid', split=False)
+        self._create_item('chapter', 'Chapter2', {}, {'display_name': 'Chapter 2'}, 'course', 'runid', split=False)
+        self._create_item('vertical', 'Vert1', {}, {'display_name': 'Vertical 1'}, 'chapter', 'Chapter1', split=False)
+        self._create_item('vertical', 'Vert2', {}, {'display_name': 'Vertical 2'}, 'chapter', 'Chapter1', split=False)
+        self._create_item('html', 'Html1', "<p>Goodbye</p>", {'display_name': 'Parented Html'}, 'vertical', 'Vert1', split=False)
         self._create_item(
             'discussion', 'Discussion1',
             "discussion discussion_category=\"Lecture 1\" discussion_id=\"a08bfd89b2aa40fa81f2c650a9332846\" discussion_target=\"Lecture 1\"/>\n",
@@ -33,8 +31,8 @@ class TestPublish(SplitWMongoCourseBoostrapper):
                 "discussion_id": "a08bfd89b2aa40fa81f2c650a9332846"
             },
             'vertical', 'Vert1'
-        )
-        self._create_item('html', 'Html2', "<p>Hellow</p>", {'display_name': 'Hollow Html'}, 'vertical', 'Vert1')
+        , split=False)
+        self._create_item('html', 'Html2', "<p>Hellow</p>", {'display_name': 'Hollow Html'}, 'vertical', 'Vert1', split=False)
         self._create_item(
             'discussion', 'Discussion2',
             "discussion discussion_category=\"Lecture 2\" discussion_id=\"b08bfd89b2aa40fa81f2c650a9332846\" discussion_target=\"Lecture 2\"/>\n",
@@ -45,10 +43,10 @@ class TestPublish(SplitWMongoCourseBoostrapper):
                 "discussion_id": "b08bfd89b2aa40fa81f2c650a9332846"
             },
             'vertical', 'Vert2'
-        )
-        self._create_item('static_tab', 'staticuno', "<p>tab</p>", {'display_name': 'Tab uno'}, None, None)
-        self._create_item('about', 'overview', "<p>overview</p>", {}, None, None)
-        self._create_item('course_info', 'updates', "<ol><li><h2>Sep 22</h2><p>test</p></li></ol>", {}, None, None)
+        , split=False)
+        self._create_item('static_tab', 'staticuno', "<p>tab</p>", {'display_name': 'Tab uno'}, None, None, split=False)
+        self._create_item('about', 'overview', "<p>overview</p>", {}, None, None, split=False)
+        self._create_item('course_info', 'updates', "<ol><li><h2>Sep 22</h2><p>test</p></li></ol>", {}, None, None, split=False)
 
     def _xmodule_recurse(self, item, action):
         """

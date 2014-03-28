@@ -43,15 +43,14 @@ class SplitMigrator(object):
         original_course = self.direct_modulestore.get_course(course_key)
         new_course_root_locator = self.loc_mapper.translate_location(original_course.location)
         new_course = self.split_modulestore.create_course(
-            course_key,
-            user.id,
+            new_course_root_locator.org, new_course_root_locator.offering, user.id,
             fields=self._get_json_fields_translate_children(original_course, course_key, True),
             root_block_id=new_course_root_locator.block_id,
             master_branch=new_course_root_locator.branch
         )
 
         self._copy_published_modules_to_course(new_course, original_course.location, course_key, user)
-        self._add_draft_modules_to_course(new_course.id, original_course.location, course_key, user)
+        self._add_draft_modules_to_course(new_course.id, course_key, user)
 
         return new_course_locator
 
@@ -71,6 +70,9 @@ class SplitMigrator(object):
                 new_locator = self.loc_mapper.translate_location(
                     module.location, True, add_entry_if_missing=True
                 )
+                # NOTE: the below auto populates the children when it migrates the parent; so,
+                # it doesn't need the parent as the first arg. That is, it translates and populates
+                # the 'children' field as it goes.
                 _new_module = self.split_modulestore.create_item(
                     course_version_locator, module.category, user.id,
                     block_id=new_locator.block_id,
@@ -87,7 +89,7 @@ class SplitMigrator(object):
         # children which meant some pointers were to non-existent locations in 'direct'
         self.split_modulestore.internal_clean_children(course_version_locator)
 
-    def _add_draft_modules_to_course(self, published_course_key, old_course_loc, course_key, user):
+    def _add_draft_modules_to_course(self, published_course_key, course_key, user):
         """
         update each draft. Create any which don't exist in published and attach to their parents.
         """
@@ -139,7 +141,9 @@ class SplitMigrator(object):
                 for old_child_loc in old_parent.children:
                     if old_child_loc == draft_location:
                         break
-                    sibling_loc = self.loc_mapper.translate_location(Location.from_string(old_child_loc), False)
+                    sibling_loc = self.loc_mapper.translate_location(
+                        course_key.make_usage_key_from_deprecated_string(old_child_loc), False
+                    )
                     # sibling may move cursor
                     for idx in range(new_parent_cursor, len(new_parent.children)):
                         if new_parent.children[idx] == sibling_loc.block_id:
@@ -158,7 +162,8 @@ class SplitMigrator(object):
         if 'children' in fields:
             fields['children'] = [
                 self.loc_mapper.translate_location(
-                    Location(child), published, add_entry_if_missing=True
+                    old_course_id.make_usage_key_from_deprecated_string(child),
+                    published, add_entry_if_missing=True
                 ).block_id
                 for child in fields['children']]
         return fields

@@ -48,7 +48,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         Create a peer grading module from a test system
         @return:
         """
-        self.setup_modulestore(self.course_id)
+        self.setup_modulestore(self.course_id.course)
         self.peer_grading = self.get_module_from_location(self.problem_location)
         self.coe = self.get_module_from_location(self.coe_location)
 

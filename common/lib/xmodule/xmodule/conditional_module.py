@@ -219,6 +219,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         descriptors = []
         for location in self.sources_list:
             try:
+                location = self.location.course_key.make_usage_key_from_deprecated_string(location)
                 descriptor = self.system.load_item(location)
                 descriptors.append(descriptor)
             except ItemNotFoundError:

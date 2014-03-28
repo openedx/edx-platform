@@ -7,7 +7,6 @@ from path import path
 from django.http import Http404
 from django.conf import settings
 from .module_render import get_module
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
@@ -108,7 +107,7 @@ def course_image_url(course):
     if course.static_asset_path or modulestore().get_modulestore_type(course.id) == XML_MODULESTORE_TYPE:
         return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
     else:
-        loc = StaticContent.compute_location(course.location.org, course.location.course, course.course_image)
+        loc = StaticContent.compute_location(course.location.course_key, course.course_image)
         _path = StaticContent.get_url_path_from_location(loc)
         return _path
 

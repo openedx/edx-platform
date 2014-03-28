@@ -1,4 +1,3 @@
-from ast import literal_eval
 import json
 import unittest
 
@@ -55,7 +54,7 @@ class ConditionalFactory(object):
         descriptor_system = get_test_descriptor_system()
 
         # construct source descriptor and module:
-        source_location = Location("edX", "conditional_test", "2012_Fall", "problem", "SampleProblem", None)
+        source_location = Location("edX", "conditional_test", "test_run", "problem", "SampleProblem", None)
         if source_is_error_module:
             # Make an error descriptor and module
             source_descriptor = NonStaffErrorDescriptor.from_xml(
@@ -79,15 +78,19 @@ class ConditionalFactory(object):
         child_descriptor.runtime = descriptor_system
         child_descriptor.xmodule_runtime = get_test_system()
         child_descriptor.render = lambda view, context=None: descriptor_system.render(child_descriptor, view, context)
+        child_descriptor.location = source_location.replace(category='html', name='child')
 
-        descriptor_system.load_item = {'child': child_descriptor, 'source': source_descriptor}.get
+        descriptor_system.load_item = {
+            child_descriptor.location: child_descriptor,
+            source_location: source_descriptor
+        }.get
 
         # construct conditional module:
-        cond_location = Location("edX", "conditional_test", "2012_Fall", "conditional", "SampleConditional", None)
+        cond_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
         field_data = DictFieldData({
             'data': '<conditional/>',
             'xml_attributes': {'attempted': 'true'},
-            'children': ['child'],
+            'children': [child_descriptor.location.to_deprecated_string()],
         })
 
         cond_descriptor = ConditionalDescriptor(
@@ -206,7 +209,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
 
         # edx - HarvardX
         # cond_test - ER22x
-        location = Location(["i4x", "HarvardX", "ER22x", "conditional", "condone"])
+        location = Location("HarvardX", "ER22x", "2013_Spring", "conditional", "condone")
 
         def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
             return text
@@ -225,7 +228,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             'conditional_ajax.html',
             {
                 # Test ajax url is just usage-id / handler_name
-                'ajax_url': 'i4x://HarvardX/ER22x/conditional/condone/xmodule_handler',
+                'ajax_url': '{!r}/xmodule_handler'.format(location),
                 'element_id': u'i4x-HarvardX-ER22x-conditional-condone',
                 'id': u'i4x://HarvardX/ER22x/conditional/condone',
                 'depends': u'i4x-HarvardX-ER22x-problem-choiceprob'
@@ -243,7 +246,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         self.assertFalse(any(['This is a secret' in item for item in html]))
 
         # Now change state of the capa problem to make it completed
-        inner_module = inner_get_module(Location('i4x://HarvardX/ER22x/problem/choiceprob'))
+        inner_module = inner_get_module(location.replace(category="problem", name='choiceprob'))
         inner_module.attempts = 1
         # Save our modifications to the underlying KeyValueStore so they can be persisted
         inner_module.save()

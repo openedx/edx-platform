@@ -6,7 +6,6 @@ from courseware import models
 from django.db.models import Count
 from django.utils.translation import ugettext as _
 
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 
@@ -24,7 +23,7 @@ def get_problem_grade_distribution(course_id):
 
     # Aggregate query on studentmodule table for grade data for all problems in course
     db_query = models.StudentModule.objects.filter(
-        course_id__exact=course_id,
+        course_id__exact=course_id.to_deprecated_string(),
         grade__isnull=False,
         module_type__exact="problem",
     ).values('module_state_key', 'grade', 'max_grade').annotate(count_grade=Count('grade'))
@@ -63,7 +62,7 @@ def get_sequential_open_distrib(course_id):
 
     # Aggregate query on studentmodule table for "opening a subsection" data
     db_query = models.StudentModule.objects.filter(
-        course_id__exact=course_id,
+        course_id__exact=course_id.to_deprecated_string(),
         module_type__exact="sequential",
     ).values('module_state_key').annotate(count_sequential=Count('module_state_key'))
 
@@ -92,7 +91,7 @@ def get_problem_set_grade_distrib(course_id, problem_set):
 
     # Aggregate query on studentmodule table for grade data for set of problems in course
     db_query = models.StudentModule.objects.filter(
-        course_id__exact=course_id,
+        course_id__exact=course_id.to_deprecated_string(),
         grade__isnull=False,
         module_type__exact="problem",
         module_state_key__in=problem_set,

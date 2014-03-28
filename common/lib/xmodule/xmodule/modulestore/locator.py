@@ -20,8 +20,8 @@ from xmodule.modulestore.parsers import (
     parse_block_ref,
     BRANCH_PREFIX,
     BLOCK_PREFIX,
-    VERSION_PREFIX
-, ALLOWED_ID_CHARS, ALLOWED_ID_RE)
+    VERSION_PREFIX,
+    ALLOWED_ID_RE)
 
 log = logging.getLogger(__name__)
 

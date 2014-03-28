@@ -114,8 +114,8 @@ def export_to_xml(modulestore, contentstore, course_id, root_dir, course_dir, dr
                 # Don't try to export orphaned items.
                 if len(parent_locs) > 0:
                     logging.debug('parent_locs = {0}'.format(parent_locs))
-                    draft_vertical.xml_attributes['parent_sequential_url'] = Location(parent_locs[0]).url()
-                    sequential = modulestore.get_item(Location(parent_locs[0]))
+                    draft_vertical.xml_attributes['parent_sequential_url'] = parent_locs[0].url()
+                    sequential = modulestore.get_item(parent_locs[0])
                     index = sequential.children.index(draft_vertical.location.url())
                     draft_vertical.xml_attributes['index_in_children_list'] = str(index)
                     draft_vertical.runtime.export_fs = draft_course_dir

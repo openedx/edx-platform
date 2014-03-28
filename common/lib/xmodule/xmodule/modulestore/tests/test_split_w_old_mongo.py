@@ -49,6 +49,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
             self.db_config,
             **self.modulestore_options
         )
+        self.addCleanup(self.split_mongo.db.connection.close)
         self.addCleanup(self.tear_down_split)
         self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
         self.draft_mongo = DraftMongoModuleStore(self.db_config, **self.modulestore_options)
@@ -64,7 +65,6 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         split_db.drop_collection(split_db.course_index)
         split_db.drop_collection(split_db.structures)
         split_db.drop_collection(split_db.definitions)
-        split_db.connection.close()
 
     def tear_down_mongo(self):
         """
@@ -73,9 +73,8 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         split_db = self.split_mongo.db
         # old_mongo doesn't give a db attr, but all of the dbs are the same
         split_db.drop_collection(self.old_mongo.collection)
-        split_db.connection.close()
 
-    def _create_item(self, category, name, data, metadata, parent_category, parent_name, draft=True):
+    def _create_item(self, category, name, data, metadata, parent_category, parent_name, draft=True, split=True):
         """
         Create the item of the given category and block id in split and old mongo, add it to the optional
         parent. The parent category is only needed because old mongo requires it for the id.
@@ -108,9 +107,10 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
             )
         else:
             course_or_parent_locator = self.split_course_key
-        self.split_mongo.create_item(course_or_parent_locator, category, self.userid, block_id=name, fields=fields)
+        if split:
+            self.split_mongo.create_item(course_or_parent_locator, category, self.userid, block_id=name, fields=fields)
 
-    def _create_course(self):
+    def _create_course(self, split=True):
         """
         * some detached items
         * some attached children
@@ -125,10 +125,11 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         }
         fields = metadata.copy()
         fields.update(data)
-        # split requires the course to be created separately from creating items
-        self.split_mongo.create_course(
-            self.split_course_key.org, self.split_course_key.offering, self.userid, fields=fields, root_block_id='runid'
-        )
+        if split:
+            # split requires the course to be created separately from creating items
+            self.split_mongo.create_course(
+                self.split_course_key.org, self.split_course_key.offering, self.userid, fields=fields, root_block_id='runid'
+            )
         old_course = self.old_mongo.create_course(self.split_course_key.org, 'test_course/runid', fields=fields)
         self.old_course_key = old_course.id
         self.runtime = old_course.runtime

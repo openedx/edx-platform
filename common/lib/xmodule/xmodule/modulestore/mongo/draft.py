@@ -113,15 +113,8 @@ class DraftModuleStore(MongoModuleStore):
                 ``name`` is another commonly provided key (Location based stores)
         """
         draft_items = super(DraftModuleStore, self).get_items(course_key, revision='draft', **kwargs)
-        items = super(DraftModuleStore, self).get_items(course_key, **kwargs)
+        non_draft_items = super(DraftModuleStore, self).get_items(course_key, revision=None, **kwargs)
 
-        draft_locs_found = set(item.location.replace(revision=None) for item in draft_items)
-        non_draft_items = [
-            item
-            for item in items
-            if (item.location.revision != DRAFT
-                and item.location.replace(revision=None) not in draft_locs_found)
-        ]
         return [wrap_draft(item) for item in draft_items + non_draft_items]
 
     def convert_to_draft(self, source_location):
@@ -143,9 +136,8 @@ class DraftModuleStore(MongoModuleStore):
             raise DuplicateItemError(original['_id'])
 
         self.refresh_cached_metadata_inheritance_tree(draft_location)
-        self.fire_updated_modulestore_signal(draft_location)
 
-        return self._load_items([original])[0]
+        return self._load_items(source_location.course_key, [original])[0]
 
     def update_item(self, xblock, user=None, allow_not_found=False):
         """
@@ -179,14 +171,6 @@ class DraftModuleStore(MongoModuleStore):
 
         return
 
-    def get_parent_locations(self, location):
-        '''Find all locations that are the parents of this location.  Needed
-        for path_to_location().
-
-        returns an iterable of things that can be passed to Location.
-        '''
-        return super(DraftModuleStore, self).get_parent_locations(location)
-
     def publish(self, location, published_by_id):
         """
         Save a current draft to the underlying modulestore
@@ -202,14 +186,16 @@ class DraftModuleStore(MongoModuleStore):
         draft.published_by = published_by_id
         if draft.has_children:
             if original_published is not None:
+                course_key = location.course_key
                 # see if children were deleted. 2 reasons for children lists to differ:
                 #   1) child deleted
                 #   2) child moved
                 for child in original_published.children:
                     if child not in draft.children:
-                        rents = [Location(mom) for mom in self.get_parent_locations(child)]
-                        if (len(rents) == 1 and rents[0] == Location(location)):  # the 1 is this original_published
-                            self.delete_item(child, True)
+                        child_i4x = course_key.make_usage_key_from_deprecated_string(child)
+                        rents = self.get_parent_locations(child_i4x)
+                        if (len(rents) == 1 and rents[0] == location):  # the 1 is this original_published
+                            self.delete_item(child_i4x, True)
         super(DraftModuleStore, self).update_item(draft, '**replace_user**')
         self.delete_item(location)
 
@@ -226,7 +212,7 @@ class DraftModuleStore(MongoModuleStore):
 
         to_process_dict = {}
         for non_draft in to_process_non_drafts:
-            to_process_dict[Location(non_draft["_id"])] = non_draft
+            to_process_dict[self._location_from_id(non_draft["_id"], course_key.run)] = non_draft
 
         # now query all draft content in another round-trip
         query = {
@@ -241,7 +227,7 @@ class DraftModuleStore(MongoModuleStore):
         # with the draft. This is because the semantics of the DraftStore is to
         # always return the draft - if available
         for draft in to_process_drafts:
-            draft_loc = Location(draft["_id"])
+            draft_loc = self._location_from_id(draft["_id"], course_key.run)
             draft_as_non_draft_loc = draft_loc.replace(revision=None)
 
             # does non-draft exist in the collection

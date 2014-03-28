@@ -386,8 +386,9 @@ class ImportTestCase(BaseCourseTestCase):
         toy_id = "edX/toy/2012_Fall"
         two_toy_id = "edX/toy/TT_2012_Fall"
 
-        location = Location("i4x", "edX", "toy", "2012_Fall", "video", "Welcome", None)
+        location = Location("edX", "toy", "2012_Fall", "video", "Welcome", None)
         toy_video = modulestore.get_item(location)
+        location = Location("edX", "toy", "TT_2012_Fall", "video", "Welcome", None)
         two_toy_video = modulestore.get_item(location)
         self.assertEqual(toy_video.youtube_id_1_0, "p2Q6BrNhdh8")
         self.assertEqual(two_toy_video.youtube_id_1_0, "p2Q6BrNhdh9")
@@ -401,7 +402,6 @@ class ImportTestCase(BaseCourseTestCase):
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)
         course = courses[0]
-        course_id = course.id
 
         print("course errors:")
         for (msg, err) in modulestore.get_course_errors(course.id):
@@ -523,7 +523,7 @@ class ImportTestCase(BaseCourseTestCase):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['graphic_slider_tool'])
 
         sa_id = "edX/gst_test/2012_Fall"
-        location = Location("i4x", "edX", "gst_test", "2012_Fall", "graphical_slider_tool", "sample_gst", None)
+        location = Location("edX", "gst_test", "2012_Fall", "graphical_slider_tool", "sample_gst", None)
         gst_sample = modulestore.get_item(location)
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\

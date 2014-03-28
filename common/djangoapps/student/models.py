@@ -24,17 +24,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
-from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
-import django.dispatch
-from django.forms import ModelForm, forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
 from django_countries import CountryField
 from track import contexts
 from track.views import server_track
 from eventtracking import tracker
-from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode

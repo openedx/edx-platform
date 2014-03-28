@@ -107,7 +107,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 For some modulestores, ``name`` is another commonly provided key (Location based stores)
                 For some modulestores,
                 you can search by ``edited_by``, ``edited_on`` providing either a datetime for == (probably
-                useless) or a tuple (">"|"<" datetime) for after or before, etc.
+                useless) or a function accepting one arg to do inequality
         """
         if not isinstance(course_key, CourseKey):
             raise Exception("Must pass in a course_key when calling get_items()")

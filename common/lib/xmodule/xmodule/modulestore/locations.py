@@ -64,9 +64,16 @@ class SlashSeparatedCourseKey(CourseKey):
         Temporary mechanism for creating a UsageKey given a CourseKey and a serialized Location. NOTE:
         this prejudicially takes the tag, org, and course from the url not self.
 
+        Also, it tries to interpret the string as a new format url if the old i4x format parse fails.
+
+        It also checks whether for some reason the url is already a UsageKey and returns it w/o further
+        ado.
+
         Raises:
             InvalidKeyError: if the url does not parse
         """
+        if isinstance(location_url, UsageKey):
+            return location_url
         match = URL_RE.match(location_url)
         if match is None:
             # try seeing if it's a legitimate new form

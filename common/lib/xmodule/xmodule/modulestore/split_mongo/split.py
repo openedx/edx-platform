@@ -270,8 +270,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # and the one assoc'd w/ it by another fetch may not be the one relevant to this fetch; so,
         # add it in the envelope for the structure.
         envelope = {
-            'org': index['org'],
-            'offering': index['offering'],
+            'org': course_locator.org,
+            'offering': course_locator.offering,
             'branch': course_locator.branch,
             'structure': entry,
         }
@@ -393,10 +393,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
                 Substring matching pass a regex object.
-                For some modulestores, ``name`` is another commonly provided key (Location based stores)
-                For some modulestores,
-                you can search by ``edited_by``, ``edited_on`` providing either a datetime for == (probably
-                useless) or a tuple (">"|"<" datetime) for after or before, etc.
+                For split,
+                you can search by ``edited_by``, ``edited_on`` providing a function testing limits.
         """
         course = self._lookup_course(course_locator)
         items = []
@@ -407,7 +405,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             # do the checks which don't require loading any additional data
             if (
                 self._block_matches(block_json, kwargs) and
-                self._block_matches(block_json.get('fields', {}), settings or {})
+                self._block_matches(block_json.get('fields', {}), settings)
             ):
                 if content:
                     definition_block = self.db_connection.get_definition(block_json['definition'])
@@ -415,6 +413,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 else:
                     return True
 
+        if settings is None:
+            settings = {}
         if 'name' in kwargs:
             # odd case where we don't search just confirm
             block_id = kwargs.pop('name')
@@ -423,6 +423,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 return self._load_items(course, [block_id], lazy=True)
             else:
                 return []
+        # don't expect caller to know that children are in fields
+        if 'children' in kwargs:
+            settings['children'] = kwargs.pop('children')
         for block_id, value in course['structure']['blocks'].iteritems():
             if _block_matches_all(value):
                 items.append(block_id)
