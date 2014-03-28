@@ -9,6 +9,8 @@ from path import path
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
+
+
 sys.path.append('../../../../')
 
 from docs.shared.conf import *
@@ -22,6 +24,11 @@ templates_path.append('source/_templates')
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path.append('source/_static')
+
+if not on_rtd:  # only import and set the theme if we're building docs locally
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
