@@ -18,16 +18,6 @@ PYTHON_REQ_FILES = [
 ]
 
 
-def read_in_chunks(infile, chunk_size=1024 * 64):
-    """
-    Yield a chunk of size `chunksize` from `infile` (a file handle).
-    """
-    chunk = infile.read(chunk_size)
-    while chunk:
-        yield chunk
-        chunk = infile.read(chunk_size)
-
-
 def compute_fingerprint(path_list):
     """
     Hash the contents of all the files and directories in `path_list`.
@@ -38,17 +28,18 @@ def compute_fingerprint(path_list):
 
     for path in path_list:
 
-        # For directories, create a hash based on the filenames in the directory
+        # For directories, create a hash based on the modification times
+        # of first-level subdirectories
         if os.path.isdir(path):
-            for _, _, filenames in os.walk(path):
-                for name in filenames:
-                    hasher.update(name)
+            for dirname in sorted(os.listdir(path)):
+                p = os.path.join(path, dirname)
+                if os.path.isdir(p):
+                    hasher.update(str(os.stat(p).st_mtime))
 
         # For files, hash the contents of the file
         if os.path.isfile(path):
             with open(path, "rb") as file_handle:
-                for chunk in read_in_chunks(file_handle):
-                    hasher.update(chunk)
+                hasher.update(file_handle.read())
 
     return hasher.hexdigest()
 
