@@ -218,7 +218,7 @@ class CombinedOpenEndedFields(object):
     )
     graded = Boolean(
         display_name="Graded",
-        help='Defines whether the student gets credit for grading this problem.',
+        help='Defines whether the student gets credit for this problem. Credit is based on peer grades of this problem.',
         default=False,
         scope=Scope.settings
     )
