@@ -366,7 +366,6 @@ class @Problem
     alert_elem = "<div class='capa_alert'>" + msg + "</div>"
     @el.find('.action').after(alert_elem)
     @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
-    window.SR.readElts(msg)
 
   save: =>
     if not @check_save_waitfor(@save_internal)
