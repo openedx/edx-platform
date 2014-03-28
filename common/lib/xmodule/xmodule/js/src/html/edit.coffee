@@ -6,21 +6,30 @@ class @HTMLEditingDescriptor
     if @base_asset_url == undefined
       @base_asset_url = null
 
+    # Create an array of all content CSS links to use in and pass to Tiny MCE.
+    # We create this dynamically in order to support hashed files from our Django pipeline.
+    # CSS files that are to be used by Tiny MCE should contain the string "tinymce" so
+    # they can be found by the search below.
+    # We filter for only those files that are "content" files (as opposed to "skin" files).
+    tiny_mce_css_links = []
+    $("link[rel=stylesheet][href*='tinymce']").filter("[href*='content']").each ->
+        tiny_mce_css_links.push $(this).attr("href")
+        return
+
 #   This is a workaround for the fact that tinyMCE's baseURL property is not getting correctly set on AWS
 #   instances (like sandbox). It is not necessary to explicitly set baseURL when running locally.
-    tinyMCE.baseURL = "#{baseUrl}/js/vendor/tiny_mce"
+    tinyMCE.baseURL = "#{baseUrl}/js/vendor/tinymce/js/tinymce"
 #   This is necessary for the LMS bulk e-mail acceptance test. In that particular scenario,
 #   tinyMCE incorrectly decides that the suffix should be "", which means it fails to load files.
     tinyMCE.suffix = ".min"
     @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
-      script_url : "#{baseUrl}/js/vendor/tiny_mce/tinymce.min.js",
+      script_url : "#{baseUrl}/js/vendor/tinymce/js/tinymce/tinymce.full.min.js",
       theme : "modern",
       skin: 'studio-tmce4',
       schema: "html5",
       # Necessary to preserve relative URLs to our images.
       convert_urls : false,
-      # TODO: we should share this CSS with studio (and LMS)
-      content_css : "#{baseUrl}/css/tiny-mce.css",
+      content_css : tiny_mce_css_links.join(", "),
       formats : {
         # tinyMCE does block level for code by default
         code: {inline: 'code'}

@@ -310,9 +310,22 @@ PIPELINE_CSS = {
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
             'js/vendor/markitup/skins/simple/style.css',
-            'js/vendor/markitup/sets/wiki/style.css',
+            'js/vendor/markitup/sets/wiki/style.css'
         ],
         'output_filename': 'css/cms-style-vendor.css',
+    },
+    'style-vendor-tinymce-content': {
+        'source_filenames': [
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
+            'css/tinymce-studio-content.css'
+        ],
+        'output_filename': 'css/cms-style-vendor-tinymce-content.css',
+    },
+    'style-vendor-tinymce-skin': {
+        'source_filenames': [
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
+        ],
+        'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
     'style-app': {
         'source_filenames': [
