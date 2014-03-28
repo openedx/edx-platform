@@ -8,6 +8,7 @@ import logging
 import os
 import re
 import requests
+import itertools
 
 from collections import defaultdict, OrderedDict
 from markupsafe import escape
@@ -63,6 +64,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
 from django.utils.translation import ungettext
+from util.json_request import JsonResponse
 
 from microsite_configuration import microsite
 
@@ -1301,6 +1303,36 @@ def grade_summary(request, course_id):
                'staff_access': True, }
     return render_to_response('courseware/grade_summary.html', context)
 
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def grade_summary2(request, course_id):
+    """Display the grade summary for a course."""
+    course = get_course_with_access(request.user, course_id, 'staff')
+
+    f = open("/var/www/edx/" + course.id.replace('/','_') + ".csv")
+
+    if f is None:
+        return False;
+
+    ff = UnicodeDictReader(f, delimiter=',', quoting=csv.QUOTE_ALL, dialect="excel")
+
+    data = tuple(ff)
+
+    
+    if request.GET.get('page'):
+        currpage = request.GET.get('page')
+        recfrom = (int(currpage) - 1)  * 10
+        recto = int(currpage) * 10
+        return JsonResponse({'totalpages': len(data) / 10 ,'currpage': request.GET.get('page'), 'totalrecords' : len(data), 'data': data[recfrom:recto]})
+
+    # For now, just a static page
+    context = {'course': course,
+               'staff_access': True, }
+    return render_to_response('courseware/grade_summary2.html', context)
+
+def UnicodeDictReader(utf8_data, **kwargs):
+    csv_reader = csv.DictReader(utf8_data, **kwargs)
+    for row in csv_reader:
+        yield dict([(key, unicode(value, 'utf-8')) for key, value in row.iteritems()])  
 
 #-----------------------------------------------------------------------------
 # enrollment

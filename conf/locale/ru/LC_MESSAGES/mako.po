@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2014-03-26 10:56+0000\n"
-"PO-Revision-Date: 2014-03-25 16:33+0300\n"
+"PO-Revision-Date: 2014-03-28 13:13+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -2075,7 +2075,7 @@ msgstr "Включить полные рубрики"
 #. graded rubrics the user might have received
 #: lms/templates/combinedopenended/combined_open_ended_results.html:36
 msgid "{result_of_task} from grader {number}"
-msgstr ""
+msgstr "{result_of_task} от преподавателя {number}"
 
 #. Translators: "See full feedback" is the text of
 #. a link that allows a user to see more detailed
@@ -2157,9 +2157,9 @@ msgstr "Пропустить пост-оценку"
 #: lms/templates/combinedopenended/openended/open_ended_combined_rubric.html:10
 msgid "{num} point: {explanatory_text}"
 msgid_plural "{num} points: {explanatory_text}"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{num} балл: {text}"
+msgstr[1] "{num} балла: {text}"
+msgstr[2] "{num} баллов: {text}"
 
 #: lms/templates/combinedopenended/openended/open_ended_error.html:5
 msgid "There was an error with your submission.  Please contact course staff."
@@ -2180,9 +2180,9 @@ msgstr ""
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html:26
 msgid "{num} point: {text}"
 msgid_plural "{num} points: {text}"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{num} балл: {text}"
+msgstr[1] "{num} балла: {text}"
+msgstr[2] "{num} баллов: {text}"
 
 #: lms/templates/combinedopenended/selfassessment/self_assessment_hint.html:4
 msgid "Please enter a hint below:"
@@ -3638,7 +3638,7 @@ msgstr "Заголовок"
 #: lms/templates/discussion/mustache/_inline_discussion.mustache:14
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache:14
 msgid "Enter your question or comment…"
-msgstr ""
+msgstr "Введите ваш вопрос или комментарий..."
 
 #: lms/templates/discussion/_inline_new_post.html:46
 #: lms/templates/discussion/_new_post.html:77
@@ -3718,9 +3718,8 @@ msgstr "Посмотреть как {name}"
 #: lms/templates/discussion/_underscore_templates.html:12
 #: lms/templates/discussion/mustache/_inline_thread.mustache:8
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache:10
-#, fuzzy
 msgid "Add A Response"
-msgstr "Ответ"
+msgstr "Ответить"
 
 #: lms/templates/discussion/_underscore_templates.html:18
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache:25
@@ -3770,12 +3769,12 @@ msgstr "Прикрепить нить"
 #: lms/templates/discussion/_underscore_templates.html:71
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache:12
 msgid "Pinned"
-msgstr ""
+msgstr "Прикрепленно"
 
 #: lms/templates/discussion/_underscore_templates.html:80
 #, python-format
 msgid "(this post is about %(courseware_title_linked)s)"
-msgstr ""
+msgstr "(это сообщение о %(courseware_title_linked)s)"
 
 #: lms/templates/discussion/_underscore_templates.html:90
 #: lms/templates/discussion/_underscore_templates.html:148
@@ -3823,7 +3822,7 @@ msgstr "Удалить комментарий"
 #: lms/templates/discussion/_underscore_templates.html:181
 #, python-format
 msgid "-posted %(time_ago)s by"
-msgstr ""
+msgstr "-отправленно %(time_ago)s "
 
 #: lms/templates/discussion/_underscore_templates.html:197
 msgid "Editing comment"
@@ -3955,7 +3954,7 @@ msgstr "Активные темы"
 #: lms/templates/discussion/mustache/_inline_thread.mustache:12
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache:14
 msgid "Loading content"
-msgstr ""
+msgstr "Загружаем содержимое"
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache:24
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache:26
@@ -3970,12 +3969,12 @@ msgstr "Спрятать дискуссию"
 
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache:11
 msgid "This thread has been pinned by course staff."
-msgstr ""
+msgstr "Эта тема прикрепленна администратором курса."
 
 #: lms/templates/discussion/mustache/_pagination.mustache:12
 #: lms/templates/discussion/mustache/_pagination.mustache:24
 msgid "…"
-msgstr ""
+msgstr "..."
 
 #: lms/templates/instructor/staff_grading.html:12
 msgid "{course_number} Staff Grading"

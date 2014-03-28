@@ -1,0 +1,80 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="/main.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="js_extra">
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.csvToTable.js')}"></script>
+  <script type="text/javascript" src="//datatables.net/download/build/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.gradebook.js')}"></script>
+</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+
+<link rel="stylesheet" type="text/css" media="screen" href="css/ui-lightness/jquery-ui-1.7.1.custom.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="${static.url('css/vendor/jqGrid/ui.jqgrid.css')}" />
+<script src="${static.url('js/vendor/jqGrid/i18n/grid.locale-en.js')}" type="text/javascript"></script>
+<script src="${static.url('js/vendor/jqGrid/jquery.jqGrid.min.js')}" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+jQuery("#list2").jqGrid({
+    url:'${reverse('grade_summary2', kwargs=dict(course_id=course.id))}',
+  datatype: "json",
+    colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes'],
+    colModel:[
+      {name:'ФИО', width:150},
+      {name:'email', width:90},
+      {name:'логин школы', width:100},
+      {name:'amount', width:80, align:"right"},
+      {name:'tax', width:80, align:"right"},    
+      {name:'total', width:80,align:"right"},   
+      {name:'note',index:'note', width:150, sortable:false}   
+    ],
+    rowNum:10,
+    rowList:[10,20,30],
+    pager: '#pager2',
+    sortname: 'id',
+    viewrecords: true,
+    height:'auto',
+    sortorder: "desc",autowidth:true, shrinkToFit:false,
+    caption:"JSON Example",
+       jsonReader : {
+      root:"data",
+      page: "currpage",
+      total: "totalpages",
+      records: "totalrecords",
+      repeatitems: false,
+      id: "0"
+   }
+});
+    });
+  </script>
+
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page=''" />
+
+<section class="container">
+<div class="wrapper">
+  <section class="content">
+    <h1>${_("Grade summary")}</h1>
+    Таблица обновляется ежедневно в 5:00 (GMT+4)<br>
+    <a class="sr" href='https://edu.olimpiada.ru/edx/${course.id.replace('/','_')}.csv'> Таблица в CSV формате (кодировка UTF-8) </a><br>
+    <a href='https://edu.olimpiada.ru/edx/${course.id.replace('/','_')}.xls'> Таблица в CSV формате (разделитель табуляция, кодировка win1251) </a><br>
+
+<table id="list2"></table>
+<div id="pager2"></div>
+
+    <div id="CSVTable" class="grades">
+    </div>
+  </section>
+</div>
+</section>
+
+

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2014-03-26 10:56+0000\n"
-"PO-Revision-Date: 2014-03-25 21:06+0300\n"
+"PO-Revision-Date: 2014-03-28 16:16+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -276,23 +276,23 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js:276
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s час"
+msgstr[1] "%(value)s часа"
+msgstr[2] "%(value)s часов"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js:279
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s минута"
+msgstr[1] "%(value)s минуты"
+msgstr[2] "%(value)s минут"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js:282
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s секунда"
+msgstr[1] "%(value)s секунды"
+msgstr[2] "%(value)s секунд"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js:97
 msgid "Volume"
@@ -468,7 +468,7 @@ msgstr "Кликните, чтобы удалить все выбранные %s
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:90
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js:121
 msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
-msgstr ""
+msgstr "Жалоба отправлена%(start_sr_span)s, нажмите для удаления%(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:98
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js:120
@@ -481,11 +481,11 @@ msgstr "Пожаловаться"
 #. in most browsers but will be read by screen readers.
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:115
 msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
-msgstr ""
+msgstr "Прикрепленно%(start_sr_span)s, нажмите для открепления%(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:119
 msgid "Click to unpin"
-msgstr ""
+msgstr "Нажмите для открепления"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:122
 msgid "Pinned"
@@ -506,28 +506,28 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js:106
 msgid "%(numResponses)s response"
 msgid_plural "%(numResponses)s responses"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(numResponses)s ответ"
+msgstr[1] "%(numResponses)s ответа"
+msgstr[2] "%(numResponses)s ответов"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js:113
 msgid "Showing all responses"
-msgstr ""
+msgstr "Показать все ответы"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js:113
 msgid "Showing first response"
 msgid_plural "Showing first %(numResponses)s responses"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Показать первый ответ"
+msgstr[1] "Показать первые %(numResponses)s ответа"
+msgstr[2] "Показать первые %(numResponses)s ответов"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js:120
 msgid "Load all responses"
-msgstr ""
+msgstr "Загрузить все ответы"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js:123
 msgid "Load next %(numResponses)s responses"
-msgstr ""
+msgstr "Загрузать следующие %(numResponses)s ответов"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js:305
 #, fuzzy
@@ -571,76 +571,76 @@ msgstr "Вы уверены, что хотите удалить это обно�
 #: common/static/js/src/jquery.timeago.locale.js:2
 #, c-format
 msgid "%s ago"
-msgstr ""
+msgstr "%s назад"
 
 #: common/static/js/src/jquery.timeago.locale.js:3
 #, c-format
 msgid "%s from now"
-msgstr ""
+msgstr "%s от текущего мемента"
 
 #: common/static/js/src/jquery.timeago.locale.js:4
 msgid "less than a minute"
-msgstr ""
+msgstr "меньше минуты назад"
 
 #: common/static/js/src/jquery.timeago.locale.js:5
 msgid "about a minute"
-msgstr ""
+msgstr "минуту назад"
 
 #: common/static/js/src/jquery.timeago.locale.js:6
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d минута"
+msgstr[1] "%d минуты"
+msgstr[2] "%d минут"
 
 #: common/static/js/src/jquery.timeago.locale.js:7
 msgid "about an hour"
-msgstr ""
+msgstr "около часа"
 
 #: common/static/js/src/jquery.timeago.locale.js:8
 #, c-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "около %d часа"
+msgstr[1] "около %d часов"
+msgstr[2] "около %d часов"
 
 #: common/static/js/src/jquery.timeago.locale.js:9
 msgid "a day"
-msgstr ""
+msgstr "день"
 
 #: common/static/js/src/jquery.timeago.locale.js:10
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d день"
+msgstr[1] "%d дня"
+msgstr[2] "%d дней"
 
 #: common/static/js/src/jquery.timeago.locale.js:11
 msgid "about a month"
-msgstr ""
+msgstr "около месяца"
 
 #: common/static/js/src/jquery.timeago.locale.js:12
 #, c-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d месяц"
+msgstr[1] "%d месяца"
+msgstr[2] "%d месяцев"
 
 #: common/static/js/src/jquery.timeago.locale.js:13
 msgid "about a year"
-msgstr ""
+msgstr "год"
 
 #: common/static/js/src/jquery.timeago.locale.js:14
 #, c-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d год"
+msgstr[1] "%d года"
+msgstr[2] "%d лет"
 
 #: lms/static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -812,7 +812,7 @@ msgstr "Завтра"
 
 #: lms/static/coffee/src/calculator.js:36
 msgid "Open Calculator"
-msgstr ""
+msgstr "Открыть калькулятор"
 
 #: lms/static/coffee/src/calculator.js:42
 msgid "Close Calculator"
@@ -828,7 +828,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js:54
 msgid "Loading..."
-msgstr ""
+msgstr "Загрузка..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js:60
 msgid "Error getting student list."
@@ -1175,15 +1175,15 @@ msgstr ""
 
 #: lms/static/js/Markdown.Editor.js:1447
 msgid "Bold (Ctrl+B)"
-msgstr ""
+msgstr "Жирно (Ctrl+B)"
 
 #: lms/static/js/Markdown.Editor.js:1448
 msgid "Italic (Ctrl+I)"
-msgstr ""
+msgstr "Курсив (Ctrl+B)"
 
 #: lms/static/js/Markdown.Editor.js:1450
 msgid "Hyperlink (Ctrl+L)"
-msgstr ""
+msgstr "Ссылка (Ctrl+L)"
 
 #: lms/static/js/Markdown.Editor.js:1453
 msgid "Blockquote (Ctrl+Q)"
@@ -1215,15 +1215,15 @@ msgstr ""
 
 #: lms/static/js/Markdown.Editor.js:1468
 msgid "Undo (Ctrl+Z)"
-msgstr ""
+msgstr "Отменить (Ctrl+Z)"
 
 #: lms/static/js/Markdown.Editor.js:1472
 msgid "Redo (Ctrl+Y)"
-msgstr ""
+msgstr "Повторить (Ctrl+Y)"
 
 #: lms/static/js/Markdown.Editor.js:1473
 msgid "Redo (Ctrl+Shift+Z)"
-msgstr ""
+msgstr "Повторить (Ctrl+Shift+Z)"
 
 #: lms/static/js/Markdown.Editor.js:1540
 msgid "strong text"

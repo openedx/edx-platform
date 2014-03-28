@@ -295,6 +295,8 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.legacy.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
             'instructor.views.legacy.grade_summary', name='grade_summary'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary2$',
+            'instructor.views.legacy.grade_summary2', name='grade_summary2'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
             'open_ended_grading.views.staff_grading', name='staff_grading'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
