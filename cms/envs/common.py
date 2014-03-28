@@ -311,6 +311,10 @@ PIPELINE_CSS = {
             'css/vendor/jquery.qtip.min.css',
             'js/vendor/markitup/skins/simple/style.css',
             'js/vendor/markitup/sets/wiki/style.css',
+            'js/vendor/tiny_mce/skins/studio-tmce4/content.min.css',
+            'js/vendor/tiny_mce/skins/studio-tmce4/content.inline.min.css',
+            'js/vendor/tiny_mce/skins/studio-tmce4/skin.min.css',
+            'js/vendor/tiny_mce/skins/studio-tmce4/skin.ie7.min.css'
         ],
         'output_filename': 'css/cms-style-vendor.css',
     },
