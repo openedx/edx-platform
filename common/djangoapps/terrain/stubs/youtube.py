@@ -1,10 +1,26 @@
 """
 Stub implementation of YouTube for acceptance tests.
+
+
+To start this stub server on its own from Vagrant:
+
+1.) Locally, modify your Vagrantfile so that it contains:
+
+    config.vm.network :forwarded_port, guest: 8031, host: 8031
+
+2.) From within Vagrant dev environment do:
+
+    cd common/djangoapps/terrain
+    python -m stubs.start youtube 8031
+
+3.) Locally, try accessing http://localhost:8031/ and see that
+    you get "Unused url" message inside the browser.
 """
 
 from .http import StubHttpRequestHandler, StubHttpService
 import json
 import time
+import requests
 from urlparse import urlparse
 from collections import OrderedDict
 
@@ -59,6 +75,13 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             youtube_id = params.path.split('/').pop()
 
             self._send_video_response(youtube_id, "I'm youtube.")
+
+        elif 'get_youtube_api' in self.path:
+            if self.server.config.get('youtube_api_blocked'):
+                self.send_response(404, content='', headers={'Content-type': 'text/plain'})
+            else:
+                response = requests.get('http://www.youtube.com/iframe_api')
+                self.send_response(200, content=response.text, headers={'Content-type': 'text/html'})
 
         else:
             self.send_response(

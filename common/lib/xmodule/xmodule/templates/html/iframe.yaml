@@ -1,0 +1,12 @@
+---
+metadata:
+    display_name: IFrame
+data: |
+      <h2>IFrame</h2>
+      <p>An IFrame allows you to integrate ungraded exercises and tools from any Internet site into the body of your course. The IFrame appears inside an HTML component, and the exercise or tool appears inside the IFrame.</p>
+      <p>IFrames are well-suited for third-party tools that demonstrate a concept but that won't be graded or store student data. For example, the tool in this template allows students to experiment with the way the shape of a triangle affects a particular line that is derived from the triangle.</p>
+      <p>To add the exercise or tool in an IFrame, replace the URL in the example tool below with the URL of the page that contains the exercise or tool that you want. Note that the URL must start with https instead of http so that the IFrame will appear in all browsers.</p>
+      <p>For more information about IFrames and their attributes, <a href="http://www.w3.org/wiki/HTML/Elements/iframe">see the IFrame specification.</a></p>
+      <p>In the image below, drag any of the red points to a new location. As you drag the point, notice the way the point's position affects the triangle's Euler line.</p>
+      <iframe src="https://studio.edx.org/c4x/edX/DemoX/asset/eulerLineDemo.html" width="402" height="402" marginwidth="0" marginheight="0" frameborder="0" scrolling="no">You need an iFrame capable browser to view this.</iframe>
+

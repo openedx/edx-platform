@@ -10,6 +10,8 @@ Change Log
 
    * - Date
      - Change
+   * - 28 Mar 2014
+     - Added the :ref:'Data_Czar' chapter.
    * - 24 Mar 2014
      - Added the ``user_api_usercoursetag`` table to the :ref:`Student_Info` chapter and the ``assigned_user_to_partition`` and ``child_render`` event types to the :ref:`Tracking Logs` chapter.
    * - 19 Mar 2014

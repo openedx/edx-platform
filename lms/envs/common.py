@@ -76,10 +76,11 @@ FEATURES = {
     'FORCE_UNIVERSITY_DOMAIN': False,  # set this to the university domain to use, as an override to HTTP_HOST
                                         # set to None to do no university selection
 
-    'ENABLE_TEXTBOOK': True,
-
-    # for consistency in user-experience, keep the value of this setting in sync with the one in cms/envs/common.py
+    # for consistency in user-experience, keep the value of the following 3 settings
+    # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_TEXTBOOK': True,
+    'ENABLE_STUDENT_NOTES': True,  # enables the student notes API and UI.
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
@@ -145,9 +146,6 @@ FEATURES = {
 
     # segment.io for LMS--need to explicitly turn it on for production.
     'SEGMENT_IO_LMS': False,
-
-    # Enables the student notes API and UI.
-    'ENABLE_STUDENT_NOTES': True,
 
     # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
     'ENABLE_FEEDBACK_SUBMISSION': False,
@@ -236,6 +234,12 @@ FEATURES = {
     # Turn on third-party auth. Disabled for now because full implementations are not yet available. Remember to syncdb
     # if you enable this; we don't create tables by default.
     'ENABLE_THIRD_PARTY_AUTH': False,
+
+    # Toggle to enable alternate urls for marketing links
+    'ENABLE_MKTG_SITE': False,
+
+    # Prevent concurrent logins per user
+    'PREVENT_CONCURRENT_LOGINS': False,
 }
 
 # Used for A/B testing
@@ -471,10 +475,6 @@ CODE_JAIL = {
 #       r"Harvard/XY123.1/.*"
 #   ]
 COURSES_WITH_UNSAFE_CODE = []
-
-############################ SIGNAL HANDLERS ################################
-# This is imported to register the exception signal handling that logs exceptions
-import monitoring.exceptions  # noqa
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
@@ -1192,6 +1192,9 @@ INSTALLED_APPS = (
     'reverification',
 
     'embargo',
+
+    # Monitoring functionality
+    'monitoring',
 )
 
 ######################### MARKETING SITE ###############################

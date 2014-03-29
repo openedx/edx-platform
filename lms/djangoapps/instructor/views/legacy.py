@@ -1,6 +1,7 @@
 """
 Instructor Views
 """
+from contextlib import contextmanager
 import csv
 import json
 import logging
@@ -1154,6 +1155,74 @@ def remove_user_from_role(request, username_or_email, role, group_title, event_n
     return '<font color="green">Removed {0} from {1}</font>'.format(user, group_title)
 
 
+class GradeTable(object):
+    """
+    Keep track of grades, by student, for all graded assignment
+    components.  Each student's grades are stored in a list.  The
+    index of this list specifies the assignment component.  Not
+    all lists have the same length, because at the start of going
+    through the set of grades, it is unknown what assignment
+    compoments exist.  This is because some students may not do
+    all the assignment components.
+
+    The student grades are then stored in a dict, with the student
+    id as the key.
+    """
+    def __init__(self):
+        self.components = OrderedDict()
+        self.grades = {}
+        self._current_row = {}
+
+    def _add_grade_to_row(self, component, score):
+        """Creates component if needed, and assigns score
+
+        Args:
+            component (str): Course component being graded
+            score (float): Score of student on component
+
+        Returns:
+           None
+        """
+        component_index = self.components.setdefault(component, len(self.components))
+        self._current_row[component_index] = score
+
+    @contextmanager
+    def add_row(self, student_id):
+        """Context management for a row of grades
+
+        Uses a new dictionary to get all grades of a specified student
+        and closes by adding that dict to the internal table.
+
+        Args:
+            student_id (str): Student id that is having grades set
+
+        """
+        self._current_row = {}
+        yield self._add_grade_to_row
+        self.grades[student_id] = self._current_row
+
+    def get_grade(self, student_id):
+        """Retrieves padded list of grades for specified student
+
+        Args:
+            student_id (str): Student ID for desired grades
+
+        Returns:
+            list: Ordered list of grades for student
+
+        """
+        row = self.grades.get(student_id, [])
+        ncomp = len(self.components)
+        return [row.get(comp, None) for comp in range(ncomp)]
+
+    def get_graded_components(self):
+        """
+        Return a list of components that have been
+        discovered so far.
+        """
+        return self.components.keys()
+
+
 def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False, use_offline=False):
     '''
     Return data arrays with student identity and grades for specified course.
@@ -1178,19 +1247,11 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     ).prefetch_related("groups").order_by('username')
 
     header = [_('ID'), _('Username'), _('Full Name'), _('edX email'), _('External email')]
-    assignments = []
-    if get_grades and enrolled_students.count() > 0:
-        # just to construct the header
-        gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
-        # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
-        if get_raw_scores:
-            assignments += [score.section for score in gradeset['raw_scores']]
-        else:
-            assignments += [x['label'] for x in gradeset['section_breakdown']]
-    header += assignments
 
-    datatable = {'header': header, 'assignments': assignments, 'students': enrolled_students}
+    datatable = {'header': header, 'students': enrolled_students}
     data = []
+
+    gtab = GradeTable()
 
     for student in enrolled_students:
         datarow = [student.id, student.username, student.profile.name, student.email]
@@ -1202,15 +1263,31 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
         if get_grades:
             gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
             log.debug('student={0}, gradeset={1}'.format(student, gradeset))
-            if get_raw_scores:
-                # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
-                sgrades = [(getattr(score, 'earned', '') or score[0]) for score in gradeset['raw_scores']]
-            else:
-                sgrades = [x['percent'] for x in gradeset['section_breakdown']]
-            datarow += sgrades
-            student.grades = sgrades  	# store in student object
+            with gtab.add_row(student.id) as add_grade:
+                if get_raw_scores:
+                    # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
+                    for score in gradeset['raw_scores']:
+                        add_grade(score.section, getattr(score, 'earned', score[0]))
+                else:
+                    for grade_item in gradeset['section_breakdown']:
+                        add_grade(grade_item['label'], grade_item['percent'])
+            student.grades = gtab.get_grade(student.id)
 
         data.append(datarow)
+
+    # if getting grades, need to do a second pass, and add grades to each datarow;
+    # on the first pass we don't know all the graded components
+    if get_grades:
+        for datarow in data:
+            # get grades for student
+            sgrades = gtab.get_grade(datarow[0])
+            datarow += sgrades
+
+        # get graded components and add to table header
+        assignments = gtab.get_graded_components()
+        header += assignments
+        datatable['assignments'] = assignments
+
     datatable['data'] = data
     return datatable
 
@@ -1519,7 +1596,7 @@ def get_and_clean_student_list(students):
     """
 
     students = split_by_comma_and_whitespace(students)
-    students = [str(s.strip()) for s in students]
+    students = [unicode(s.strip()) for s in students]
     students = [s for s in students if s != '']
     students_lc = [x.lower() for x in students]
 

@@ -51,6 +51,7 @@ These documents describe how we store course structure, student state/progress, 
    :maxdepth: 2
 
    internal_data_formats/change_log.rst
+   internal_data_formats/data_czar.rst
    internal_data_formats/sql_schema.rst
    internal_data_formats/discussion_data.rst
    internal_data_formats/wiki_data.rst

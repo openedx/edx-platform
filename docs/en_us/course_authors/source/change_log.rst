@@ -10,6 +10,10 @@ Change Log
 
    * - Date
      - Change
+   * - 03/27/14
+     - Updated the :ref:`Add Pages` section to reflect feature changes.
+   * - 3/27/14
+     - Updated the section on :ref:`Beta_Testing` to include the new "batch add" feature.
    * - 3/19/14
      - Updated the sections on :ref:`Beta_Testing`, :ref:`Discussions`, :ref:`Grades`, and :ref:`Student Data` with changes to the new Instructor Dashboard.
    * - 03/17/14
