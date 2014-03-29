@@ -13,14 +13,32 @@ class Migration(SchemaMigration):
         db.alter_column('student_anonymoususerid', 'anonymous_user_id', self.gf('django.db.models.fields.CharField')(unique=True, max_length=32))
 
         # THIS SQL WAS HAND-CODED
-        db.execute("""
-            CREATE TABLE student_anonymoususerid_temp_archive
-            AS SELECT * FROM student_anonymoususerid WHERE LENGTH(anonymous_user_id) = 16
-        """)
-        db.execute("""
-            DELETE FROM student_anonymoususerid
-            WHERE LENGTH(anonymous_user_id) = 16
-        """)
+        if db.backend_name == 'pyodbc':
+            # For compatibility with Microsoft Azure's SQL database
+            db.execute("""
+                CREATE TABLE student_anonymoususerid_temp_archive(
+                    id int NOT NULL PRIMARY KEY,
+                    user_id int NOT NULL,
+                    anonymous_user_id varchar(32) NOT NULL,
+                    course_id varchar(255) NOT NULL)
+            """)
+            db.execute("""
+                INSERT INTO student_anonymoususerid_temp_archive(id, user_id, anonymous_user_id, course_id)
+                SELECT id, user_id, anonymous_user_id, course_id FROM student_anonymoususerid WHERE LEN(anonymous_user_id) = 16
+            """)
+            db.execute("""
+                DELETE FROM student_anonymoususerid
+                WHERE LEN(anonymous_user_id) = 16
+            """)
+        else:
+            db.execute("""
+                CREATE TABLE student_anonymoususerid_temp_archive
+                AS SELECT * FROM student_anonymoususerid WHERE LENGTH(anonymous_user_id) = 16
+            """)
+            db.execute("""
+                DELETE FROM student_anonymoususerid
+                WHERE LENGTH(anonymous_user_id) = 16
+            """)
 
     def backwards(self, orm):
 
