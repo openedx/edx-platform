@@ -280,11 +280,6 @@ def configure_youtube_api(_step, action):
         raise ValueError('Parameter `action` should be one of "proxies" or "blocks".')
 
 
-@step('We explicitly wait for YouTube API to not load$')
-def wait_for_youtube_api_fail(_step):
-    world.wait(3)
-
-
 @step('when I view the (.*) it does not have autoplay enabled$')
 def does_not_autoplay(_step, video_type):
     actual = world.css_find('.%s' % video_type)[0]['data-autoplay']
