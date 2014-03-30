@@ -64,10 +64,12 @@ class HTMLSnippet(object):
         # this means we need to make sure that all xmodules include this dependency which had been previously implicitly
         # fulfilled in a different area of code
         coffee = cls.js.setdefault('coffee', [])
-        fragment = resource_string(__name__, 'js/src/xmodule.coffee')
+        js = cls.js.setdefault('js', [])
 
-        if fragment not in coffee:
-            coffee.insert(0, fragment)
+        fragment = resource_string(__name__, 'js/src/xmodule.js')
+
+        if fragment not in js:
+            js.insert(0, fragment)
 
         return cls.js
 
