@@ -1518,6 +1518,6 @@ for app_name in OPTIONAL_APPS:
 # See common/djangoapps/third_party_auth/settings.py for configuration details.
 THIRD_PARTY_AUTH = {}
 
-EDX_TIM = {
+EDX_ORA2 = {
     "EVENT_LOGGER": "track.tracker.send"
 }
