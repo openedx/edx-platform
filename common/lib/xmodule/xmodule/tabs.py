@@ -691,14 +691,18 @@ class CourseTabList(List):
                 return tab
         return None
 
+    SNEAKPEEK_TAB_TYPES = [CoursewareTab, CourseInfoTab, StaticTab, SyllabusTab]
+
     @staticmethod
-    def iterate_displayable(course, settings, is_user_authenticated=True, is_user_staff=True, include_instructor_tab=False):
+    def iterate_displayable(course, settings, is_user_authenticated=True, is_user_staff=True, is_user_sneakpeek=False, include_instructor_tab=False):
         """
         Generator method for iterating through all tabs that can be displayed for the given course and
         the given user with the provided access settings.
         """
         for tab in course.tabs:
-            if tab.can_display(course, settings, is_user_authenticated, is_user_staff):
+            if (tab.can_display(course, settings, is_user_authenticated, is_user_staff) and
+                    (not is_user_sneakpeek or
+                     any([isinstance(tab, t) for t in CourseTabList.SNEAKPEEK_TAB_TYPES]))):
                 if isinstance(tab, TextbookTabsBase):
                     for book in tab.books(course):
                         yield book
