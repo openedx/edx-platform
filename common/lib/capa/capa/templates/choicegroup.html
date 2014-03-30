@@ -1,19 +1,23 @@
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
     <div class="indicator_container">
     % if input_type == 'checkbox' or not value:
-        % if status == 'unsubmitted' or show_correctness == 'never':
-        <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-        % elif status == 'correct':
-        <span class="correct" id="status_${id}"><span class="sr">Status: correct</span></span>
-        % elif status == 'incorrect':
-        <span class="incorrect" id="status_${id}"><span class="sr">Status: incorrect</span></span>
-        % elif status == 'incomplete':
-        <span class="incorrect" id="status_${id}"><span class="sr">Status: incomplete</span></span>
-        % endif
+        <span class="status ${status_class if show_correctness != 'never' else 'unanswered'}"
+            id="status_${id}"
+            aria-describedby="inputtype_${id}">
+            <span class="sr">
+                %for choice_id, choice_description in choices:
+                % if choice_id in value:
+                    ${choice_description}, 
+                %endif
+                %endfor
+                -
+                ${status_display}
+            </span>
+        </span>
     % endif
     </div>
 
-    <fieldset role="radiogroup" aria-label="${label}">
+    <fieldset role="${input_type}group" aria-label="${label}">
 
         % for choice_id, choice_description in choices:
         <label for="input_${id}_${choice_id}"
@@ -39,20 +43,15 @@
             % elif input_type != 'radio' and choice_id in value:
             checked="true"
             % endif
+            % if input_type != 'radio':
+            aria-multiselectable="true"
+            % endif
 
             /> ${choice_description}
 
             % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
-            <%
-                if status == 'correct':
-                    correctness = 'correct'
-                elif status == 'incorrect':
-                    correctness = 'incorrect'
-                else:
-                    correctness = None
-            %>
-            % if correctness and not show_correctness=='never':
-            <span class="sr" aria-describedby="input_${id}_${choice_id}">Status: ${correctness}</span>
+            % if status in ('correct', 'incorrect') and not show_correctness=='never':
+            <span class="sr status">${choice_description|h} - ${status_display}</span>
             % endif
             % endif
         </label>

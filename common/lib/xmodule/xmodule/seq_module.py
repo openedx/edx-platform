@@ -89,7 +89,6 @@ class SequenceModule(SequenceFields, XModule):
             fragment.add_frag_resources(rendered_child)
 
             titles = child.get_content_titles()
-            print titles
             childinfo = {
                 'content': rendered_child.content,
                 'title': "\n".join(titles),

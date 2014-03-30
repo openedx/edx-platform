@@ -184,10 +184,13 @@
   }
 
   .course-wrapper {
-    clear: both !important;
+    @include clearfix();
   }
 }
 
+// ====================
+
+// CASE: IE9
 .lte9 {
 
   .ie-banner {

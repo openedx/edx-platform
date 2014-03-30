@@ -20,22 +20,22 @@ class PrimitiveTabEdit(TestCase):
             tabs.primitive_delete(course, 6)
         tabs.primitive_delete(course, 2)
         self.assertFalse({u'type': u'textbooks'} in course.tabs)
-        # Check that discussion has shifted down
+        # Check that discussion has shifted up
         self.assertEquals(course.tabs[2], {'type': 'discussion', 'name': 'Discussion'})
 
     def test_insert(self):
         """Test primitive tab insertion."""
         course = CourseFactory.create(org='edX', course='999')
-        tabs.primitive_insert(course, 2, 'atype', 'aname')
-        self.assertEquals(course.tabs[2], {'type': 'atype', 'name': 'aname'})
+        tabs.primitive_insert(course, 2, 'notes', 'aname')
+        self.assertEquals(course.tabs[2], {'type': 'notes', 'name': 'aname'})
         with self.assertRaises(ValueError):
-            tabs.primitive_insert(course, 0, 'atype', 'aname')
+            tabs.primitive_insert(course, 0, 'notes', 'aname')
         with self.assertRaises(ValueError):
             tabs.primitive_insert(course, 3, 'static_tab', 'aname')
 
     def test_save(self):
         """Test course saving."""
         course = CourseFactory.create(org='edX', course='999')
-        tabs.primitive_insert(course, 3, 'atype', 'aname')
+        tabs.primitive_insert(course, 3, 'notes', 'aname')
         course2 = get_course_by_id(course.id)
-        self.assertEquals(course2.tabs[3], {'type': 'atype', 'name': 'aname'})
+        self.assertEquals(course2.tabs[3], {'type': 'notes', 'name': 'aname'})

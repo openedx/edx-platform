@@ -7,6 +7,10 @@ describe 'Problem', ->
     @stubbedJax = root: jasmine.createSpyObj('jax.root', ['toMathML'])
     MathJax.Hub.getAllJax.andReturn [@stubbedJax]
     window.update_schematics = ->
+    # mock the screen reader alert
+    window.SR = 
+      readElts: `function(){}`
+      readText: `function(){}`
 
     # Load this function from spec/helper.coffee
     # Note that if your test fails with a message like:
@@ -232,7 +236,7 @@ describe 'Problem', ->
       it 'toggle the show answer button', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
-        expect($('.show .show-label')).toHaveText 'Hide Answer(s)'
+        expect($('.show .show-label')).toHaveText 'Hide Answer'
 
       it 'add the showed class to element', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
@@ -310,41 +314,29 @@ describe 'Problem', ->
           expect($('input#1_2_1').attr('disabled')).not.toEqual('disabled')
 
       describe 'imageinput', ->
-        imageinput_html = readFixtures('imageinput.html')
-        states = [
-          {
-            desc: 'rectangle is drawn correctly',
-            data: {
-              'rectangle': '(10,10)-(30,30)',
-              'regions': null
-            }
-          },
-          {
-            desc: 'region is drawn correctly',
-            data: {
-              'rectangle': null,
-              'regions': '[[10,10],[30,30],[70,30],[20,30]]'
-            }
-          },
-          {
-            desc: 'mixed shapes are drawn correctly',
-            data: {
-              'rectangle': '(10,10)-(30,30);(5,5)-(20,20)',
-              'regions': '''[
-                [[50,50],[40,40],[70,30],[50,70]],
-                [[90,95],[95,95],[90,70],[70,70]]
-              ]'''
-            }
-          },
-        ]
+        imageinput_html = readFixtures('imageinput.underscore')
+
+        DEFAULTS =
+          id: '12345'
+          width: '300'
+          height: '400'
 
         beforeEach ->
           @problem = new Problem($('.xblock-student_view'))
-          @problem.el.prepend imageinput_html
+          @problem.el.prepend _.template(imageinput_html)(DEFAULTS)
+
+        assertAnswer = (problem, data) =>
+          stubRequest(data)
+          problem.show()
+
+          $.each data['answers'], (id, answer) =>
+            img = getImage(answer)
+            el = $('#inputtype_' + id)
+            expect(img).toImageDiffEqual(el.find('canvas')[0])
 
         stubRequest = (data) =>
           spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
-              callback answers: "12345": data
+            callback data
 
         getImage = (coords, c_width, c_height) =>
           types =
@@ -403,13 +395,56 @@ describe 'Problem', ->
 
           return canvas
 
-        $.each states, (index, state) =>
-          it state.desc, ->
-            stubRequest(state.data)
-            @problem.show()
-            img = getImage(state.data)
+        it 'rectangle is drawn correctly', ->
+          assertAnswer(@problem, {
+            'answers':
+              '12345':
+                'rectangle': '(10,10)-(30,30)',
+                'regions': null
+          })
 
-            expect(img).toImageDiffEqual($('canvas')[0])
+        it 'region is drawn correctly', ->
+          assertAnswer(@problem, {
+            'answers':
+              '12345':
+                'rectangle': null,
+                'regions': '[[10,10],[30,30],[70,30],[20,30]]'
+          })
+
+        it 'mixed shapes are drawn correctly', ->
+          assertAnswer(@problem, {
+            'answers':'12345':
+              'rectangle': '(10,10)-(30,30);(5,5)-(20,20)',
+              'regions': '''[
+                [[50,50],[40,40],[70,30],[50,70]],
+                [[90,95],[95,95],[90,70],[70,70]]
+              ]'''
+          })
+
+        it 'multiple image inputs draw answers on separate canvases', ->
+          data =
+            id: '67890'
+            width: '400'
+            height: '300'
+
+          @problem.el.prepend _.template(imageinput_html)(data)
+          assertAnswer(@problem, {
+            'answers':
+              '12345':
+                'rectangle': null,
+                'regions': '[[10,10],[30,30],[70,30],[20,30]]'
+              '67890':
+                'rectangle': '(10,10)-(30,30)',
+                'regions': null
+          })
+
+        it 'dictionary with answers doesn\'t contain answer for current id', ->
+          spyOn console, 'log'
+          stubRequest({'answers':{}})
+          @problem.show()
+          el = $('#inputtype_12345')
+          expect(el.find('canvas')).not.toExist()
+          expect(console.log).toHaveBeenCalledWith('Answer is absent for image input with id=12345')
 
     describe 'when the answers are already shown', ->
       beforeEach ->
@@ -431,7 +466,7 @@ describe 'Problem', ->
 
       it 'toggle the show answer button', ->
         @problem.show()
-        expect($('.show .show-label')).toHaveText 'Show Answer(s)'
+        expect($('.show .show-label')).toHaveText 'Show Answer'
 
       it 'remove the showed class from element', ->
         @problem.show()

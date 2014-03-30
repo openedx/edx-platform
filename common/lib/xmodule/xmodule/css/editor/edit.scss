@@ -20,7 +20,7 @@
       margin-left: 7px;
       border-radius: 2px;
 
-      &:hover {
+      &:hover, &:focus {
         background: rgba(255, 255, 255, .5);
       }
     }

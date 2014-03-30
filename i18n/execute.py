@@ -1,10 +1,16 @@
-import os, subprocess, logging
+"""
+Utility library file for executing shell commands
+"""
+import os
+import subprocess
+import logging
 
 from i18n.config import BASE_DIR
 
 LOG = logging.getLogger(__name__)
 
-def execute(command, working_directory=BASE_DIR):
+
+def execute(command, working_directory=BASE_DIR, stderr=subprocess.STDOUT):
     """
     Executes shell command in a given working_directory.
     Command is a string to pass to the shell.
@@ -12,7 +18,7 @@ def execute(command, working_directory=BASE_DIR):
     """
     LOG.info("Executing in %s ...", working_directory)
     LOG.info(command)
-    subprocess.check_call(command, cwd=working_directory, stderr=subprocess.STDOUT, shell=True)
+    subprocess.check_call(command, cwd=working_directory, stderr=stderr, shell=True)
 
 
 def call(command, working_directory=BASE_DIR):
@@ -26,12 +32,6 @@ def call(command, working_directory=BASE_DIR):
     p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_directory, shell=True)
     out, err = p.communicate()
     return (out, err)
-
-
-def create_dir_if_necessary(pathname):
-    dirname = os.path.dirname(pathname)
-    if not os.path.exists(dirname):
-        os.makedirs(dirname)
 
 
 def remove_file(filename, verbose=True):

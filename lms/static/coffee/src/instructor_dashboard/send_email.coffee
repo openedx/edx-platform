@@ -30,21 +30,25 @@ class SendEmail
     @$btn_send.click =>
       if @$subject.val() == ""
         alert gettext("Your message must have a subject.")
+
       else if @$emailEditor.save()['data'] == ""
         alert gettext("Your message cannot be blank.")
+
       else
         success_message = gettext("Your email was successfully queued for sending.")
         send_to = @$send_to.val().toLowerCase()
         if send_to == "myself"
-          send_to = gettext("yourself")
+          confirm_message = gettext("You are about to send an email titled '<%= subject %>' to yourself. Is this OK?")
         else if send_to == "staff"
-          send_to = gettext("everyone who is staff or instructor on this course")
+          confirm_message = gettext("You are about to send an email titled '<%= subject %>' to everyone who is staff or instructor on this course. Is this OK?")
         else
-          send_to = gettext("ALL (everyone who is enrolled in this course as student, staff, or instructor)")
+          confirm_message = gettext("You are about to send an email titled '<%= subject %>' to ALL (everyone who is enrolled in this course as student, staff, or instructor). Is this OK?")
           success_message = gettext("Your email was successfully queued for sending. Please note that for large classes, it may take up to an hour (or more, if other courses are simultaneously sending email) to send all emails.")
-        subject = gettext(@$subject.val())
-        confirm_message = gettext("You are about to send an email titled \"#{subject}\" to #{send_to}.  Is this OK?")
-        if confirm confirm_message
+
+        subject = @$subject.val()
+        full_confirm_message = _.template(confirm_message, {subject: subject})
+
+        if confirm full_confirm_message
 
           send_data =
             action: 'send'
@@ -87,7 +91,7 @@ class SendEmail
     console.warn msg
     @$task_response.empty()
     @$request_response_error.empty()
-    @$request_response_error.text gettext(msg)
+    @$request_response_error.text msg
     $(".msg-confirm").css({"display":"none"})
 
   display_response: (data_from_server) ->

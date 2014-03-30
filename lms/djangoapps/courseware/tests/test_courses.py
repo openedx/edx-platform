@@ -15,14 +15,19 @@ from xmodule.modulestore.django import modulestore
 
 import courseware.views as views
 from django.test.utils import override_settings
+from student.tests.factories import UserFactory
 from xmodule.modulestore.django import get_default_store_name_for_current_request
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 
-from courseware.courses import get_course_by_id, get_course, get_cms_course_link, course_image_url
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.courses import (
+    get_course_by_id, get_course, get_cms_course_link, course_image_url,
+    get_course_info_section, get_course_about_section
+)
+from courseware.tests.helpers import get_request_for_user
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
 
 
 CMS_BASE_TEST = 'testcms'
@@ -143,3 +148,43 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
         # XML Course images are always stored at /images/course_image.jpg
         course = self.process_xml(xml.CourseFactory.build(course_image=u'before after.jpg'))
         self.assertEquals(course_image_url(course), '/static/xml_test_course/images/course_image.jpg')
+
+
+class CoursesRenderTest(ModuleStoreTestCase):
+    """Test methods related to rendering courses content."""
+
+    @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+    def test_get_course_info_section_render(self):
+        course = get_course_by_id('edX/toy/2012_Fall')
+        request = get_request_for_user(UserFactory.create())
+
+        # Test render works okay
+        course_info = get_course_info_section(request, course, 'handouts')
+        self.assertEqual(course_info, "<a href='/static/toy/handouts/sample_handout.txt'>Sample</a>")
+
+        # Test when render raises an exception
+        with mock.patch('courseware.courses.get_module') as mock_module_render:
+            mock_module_render.return_value = mock.MagicMock(
+                render=mock.Mock(side_effect=Exception('Render failed!'))
+            )
+            course_info = get_course_info_section(request, course, 'handouts')
+            self.assertIn("this module is temporarily unavailable", course_info)
+
+    @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+    @mock.patch('courseware.courses.get_request_for_thread')
+    def test_get_course_about_section_render(self, mock_get_request):
+        course = get_course_by_id('edX/toy/2012_Fall')
+        request = get_request_for_user(UserFactory.create())
+        mock_get_request.return_value = request
+
+        # Test render works okay
+        course_about = get_course_about_section(course, 'short_description')
+        self.assertEqual(course_about, "A course about toys.")
+
+        # Test when render raises an exception
+        with mock.patch('courseware.courses.get_module') as mock_module_render:
+            mock_module_render.return_value = mock.MagicMock(
+                render=mock.Mock(side_effect=Exception('Render failed!'))
+            )
+            course_about = get_course_about_section(course, 'short_description')
+            self.assertIn("this module is temporarily unavailable", course_about)

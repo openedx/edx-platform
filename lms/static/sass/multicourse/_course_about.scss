@@ -67,7 +67,7 @@
               text-shadow: 0 1px rgba(255,255,255, 0.6);
               text-transform: none;
 
-              &:hover {
+              &:hover, &:focus {
                 color: $link-color;
               }
             }
@@ -84,7 +84,7 @@
               text-shadow: 0 1px rgba(255,255,255, 0.6);
               text-transform: none;
 
-              &:hover {
+              &:hover, &:focus {
                 color: $link-color;
               }
             }
@@ -112,13 +112,13 @@
             text-align: center;
             width: flex-grid(6);
 
-            &:hover {
+            &:hover, &:focus {
               color: rgb(255,255,255);
             }
           }
 
           a {
-            &:hover, &:visited {
+            &:hover, &:visited, &:focus {
               text-decoration: none;
             }
           }
@@ -136,7 +136,7 @@
             text-align: center;
             width: flex-grid(3, 8);
 
-            &:hover {
+            &:hover, &:focus {
               color: rgb(255,255,255);
             }
           }
@@ -263,7 +263,7 @@
           margin-left: 0px;
         }
 
-        &:hover, &.active, &:focus {
+        &:hover, &:active, &:focus {
           border-color: $border-color-2;
           color: $base-font-color;
           text-decoration: none;

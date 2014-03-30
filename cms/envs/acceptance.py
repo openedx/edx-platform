@@ -89,6 +89,10 @@ STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
+# For consistency in user-experience, keep the value of this setting in sync with
+# the one in lms/envs/acceptance.py
+FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+
 # HACK
 # Setting this flag to false causes imports to not load correctly in the lettuce python files
 # We do not yet understand why this occurs. Setting this to true is a stopgap measure
@@ -115,5 +119,6 @@ except ImportError:
     pass
 
 # Point the URL used to test YouTube availability to our stub YouTube server
-YOUTUBE_TEST_URL = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
-YOUTUBE_API['url'] = "http://127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
+YOUTUBE['API'] = 'youtube.com/iframe_api'
+YOUTUBE['TEST_URL'] = "127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
+YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)

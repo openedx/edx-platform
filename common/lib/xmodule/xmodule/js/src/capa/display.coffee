@@ -129,11 +129,13 @@ class @Problem
 
   render: (content) ->
     if content
+      @el.attr({'aria-busy': 'true', 'aria-live': 'off', 'aria-atomic': 'false'})
       @el.html(content)
       JavascriptLoader.executeModuleScripts @el, () =>
         @setupInputTypes()
         @bind()
         @queueing()
+      @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
@@ -226,7 +228,8 @@ class @Problem
             required_files.splice(required_files.indexOf(file.name), 1)
           if file.size > max_filesize
             file_too_large = true
-            errors.push 'Your file "' + file.name '" is too large (max size: ' + max_filesize/(1000*1000) + ' MB)'
+            max_size = max_filesize / (1000*1000)
+            errors.push "Your file #{file.name} is too large (max size: {max_size}MB)"
           fd.append(element.id, file)
         if element.files.length == 0
           file_not_selected = true
@@ -281,10 +284,12 @@ class @Problem
     $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
+          window.SR.readElts($(response.contents).find('.status'))
           @render(response.contents)
           @updateProgress response
           if @el.hasClass 'showed'
             @el.removeClass 'showed'
+          @$('div.action input.check').focus()            
         else
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
@@ -301,16 +306,23 @@ class @Problem
   show: =>
     if !@el.hasClass 'showed'
       Logger.log 'problem_show', problem: @id
+      answer_text = []
       $.postWithPrefix "#{@url}/problem_show", (response) =>
         answers = response.answers
         $.each answers, (key, value) =>
           if $.isArray(value)
             for choice in value
               @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
+              answer_text.push('<p>' + gettext('Answer:') + ' ' + value + '</p>')
           else
             answer = @$("#answer_#{key}, #solution_#{key}")
             answer.html(value)
             Collapsible.setCollapsibles(answer)
+            solution = $(value).find('.detailed-solution')
+            if solution.length
+              answer_text.push(solution)
+            else
+              answer_text.push('<p>' + gettext('Answer:') + ' ' + value + '</p>')
 
         # TODO remove the above once everything is extracted into its own
         # inputtype functions.
@@ -327,15 +339,19 @@ class @Problem
             MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
         `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
-        @$('.show-label').text gettext('Hide Answer(s)')
+        @$('.show-label').text gettext('Hide Answer')
+        @$('.show-label .sr').text gettext('Hide Answer')
         @el.addClass 'showed'
         @updateProgress response
+        window.SR.readElts(answer_text)
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
       @el.removeClass 'showed'
       `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
-      @$('.show-label').text gettext('Show Answer(s)')
+      @$('.show-label').text gettext('Show Answer')
+      @$('.show-label .sr').text gettext('Reveal Answer')
+      window.SR.readText(gettext('Answer hidden'))
 
       @el.find(".capa_inputtype").each (index, inputtype) =>
         display = @inputtypeDisplays[$(inputtype).attr('id')]
@@ -540,7 +556,7 @@ class @Problem
       #   'regions': '[[10,10], [30,30], [10, 30], [30, 10]]'
       # } }
       types =
-        rectangle: (coords) =>
+        rectangle: (ctx, coords) =>
           reg = /^\(([0-9]+),([0-9]+)\)-\(([0-9]+),([0-9]+)\)$/
           rects = coords.replace(/\s*/g, '').split(/;/)
 
@@ -556,7 +572,7 @@ class @Problem
           ctx.stroke()
           ctx.fill()
 
-        regions: (coords) =>
+        regions: (ctx, coords) =>
           parseCoords = (coords) =>
             reg = JSON.parse(coords)
 
@@ -601,11 +617,12 @@ class @Problem
       ctx.strokeStyle = "#FF0000";
       ctx.lineWidth = "2";
 
-      $.each answers, (key, answer) =>
-        $.each answer, (key, value) =>
-          types[key](value) if types[key]? and value
-
-      container.html(canvas)
+      if answers[id]
+        $.each answers[id], (key, value) =>
+          types[key](ctx, value) if types[key]? and value
+        container.html(canvas)
+      else
+        console.log "Answer is absent for image input with id=#{id}"
 
   inputtypeHideAnswerMethods:
     choicegroup: (element, display) =>

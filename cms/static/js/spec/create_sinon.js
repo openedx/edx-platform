@@ -1,4 +1,6 @@
 define(["sinon"], function(sinon) {
+    var fakeServer, fakeRequests, respondWithJson, respondWithError;
+
     /* These utility methods are used by Jasmine tests to create a mock server or
      * get reference to mock requests. In either case, the cleanup (restore) is done with
      * an after function.
@@ -15,7 +17,7 @@ define(["sinon"], function(sinon) {
      * Get a reference to the mocked server, and respond
      * to all requests with the specified statusCode.
      */
-    var fakeServer = function (statusCode, that) {
+    fakeServer = function (statusCode, that) {
         var server = sinon.fakeServer.create();
         that.after(function() {
             server.restore();
@@ -29,9 +31,9 @@ define(["sinon"], function(sinon) {
      * return a reference to the Array. This allows tests
      * to respond for individual requests.
      */
-    var fakeRequests = function (that) {
-        var requests = [];
-        var xhr = sinon.useFakeXMLHttpRequest();
+    fakeRequests = function (that) {
+        var requests = [],
+            xhr = sinon.useFakeXMLHttpRequest();
         xhr.onCreate = function(request) {
             requests.push(request);
         };
@@ -43,16 +45,24 @@ define(["sinon"], function(sinon) {
         return requests;
     };
 
-    var respondWithJson = function(requests, jsonResponse, requestIndex) {
+    respondWithJson = function(requests, jsonResponse, requestIndex) {
         requestIndex = requestIndex || requests.length - 1;
         requests[requestIndex].respond(200,
             { "Content-Type": "application/json" },
             JSON.stringify(jsonResponse));
     };
 
+    respondWithError = function(requests, requestIndex) {
+        requestIndex = requestIndex || requests.length - 1;
+        requests[requestIndex].respond(500,
+            { "Content-Type": "application/json" },
+            JSON.stringify({ }));
+    };
+
     return {
         "server": fakeServer,
         "requests": fakeRequests,
-        "respondWithJson": respondWithJson
+        "respondWithJson": respondWithJson,
+        "respondWithError": respondWithError
     };
 });

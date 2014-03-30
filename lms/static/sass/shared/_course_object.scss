@@ -71,7 +71,7 @@
         display: block;
       }
 
-      a:hover {
+      a:hover, a:focus {
         text-decoration: none;
       }
 
@@ -116,7 +116,7 @@
           display: block;
           height: 50px;
 
-          &:hover {
+          &:hover, &:focus {
             @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(255,255,255, 0.8)));
             text-decoration: none;
 

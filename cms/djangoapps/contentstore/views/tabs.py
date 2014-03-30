@@ -5,6 +5,7 @@ from access import has_course_access
 from util.json_request import expect_json, JsonResponse
 
 from django.http import HttpResponseNotFound
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
@@ -13,39 +14,13 @@ from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.tabs import CourseTabList, StaticTab, CourseTab
 
 from ..utils import get_modulestore
 
 from django.utils.translation import ugettext as _
 
 __all__ = ['tabs_handler']
-
-
-def initialize_course_tabs(course, user):
-    """
-    set up the default tabs
-    I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
-    at least a list populated with the minimal times
-    @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
-    place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
-    """
-
-    # This logic is repeated in xmodule/modulestore/tests/factories.py
-    # so if you change anything here, you need to also change it there.
-    course.tabs = [
-        # Translators: "Courseware" is the title of the page where you access a course's videos and problems.
-        {"type": "courseware", "name": _("Courseware")},
-        # Translators: "Course Info" is the name of the course's information and updates page
-        {"type": "course_info", "name": _("Course Info")},
-        # Translators: "Discussion" is the title of the course forum page
-        {"type": "discussion", "name": _("Discussion")},
-        # Translators: "Wiki" is the title of the course's wiki page
-        {"type": "wiki", "name": _("Wiki")},
-        # Translators: "Progress" is the title of the student's grade information page
-        {"type": "progress", "name": _("Progress")},
-    ]
-
-    modulestore('direct').update_item(course, user.id)
 
 @expect_json
 @login_required
@@ -108,12 +83,12 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
                 reordered_tabs = []
                 static_tab_idx = 0
                 for tab in course_item.tabs:
-                    if tab['type'] == 'static_tab':
+                    if isinstance(tab, StaticTab):
                         reordered_tabs.append(
-                            {'type': 'static_tab',
-                             'name': tab_items[static_tab_idx].display_name,
-                             'url_slug': tab_items[static_tab_idx].location.name,
-                            }
+                            StaticTab(
+                                name=tab_items[static_tab_idx].display_name,
+                                url_slug=tab_items[static_tab_idx].location.name,
+                            )
                         )
                         static_tab_idx += 1
                     else:
@@ -126,19 +101,19 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             else:
                 raise NotImplementedError('Creating or changing tab content is not supported.')
     elif request.method == 'GET':  # assume html
-        # see tabs have been uninitialized (e.g. supporting courses created before tab support in studio)
-        if course_item.tabs is None or len(course_item.tabs) == 0:
-            initialize_course_tabs(course_item, request.user)
-
-        # first get all static tabs from the tabs list
+        # get all tabs from the tabs list: static tabs (a.k.a. user-created tabs) and built-in tabs
         # we do this because this is also the order in which items are displayed in the LMS
-        static_tabs_refs = [t for t in course_item.tabs if t['type'] == 'static_tab']
 
         static_tabs = []
-        for static_tab_ref in static_tabs_refs:
-            static_tab_loc = old_location.replace(category='static_tab', name=static_tab_ref['url_slug'])
-            static_tabs.append(modulestore('direct').get_item(static_tab_loc))
+        built_in_tabs = []
+        for tab in CourseTabList.iterate_displayable(course_item, settings, include_instructor_tab=False):
+            if isinstance(tab, StaticTab):
+                static_tab_loc = old_location.replace(category='static_tab', name=tab.url_slug)
+                static_tabs.append(modulestore('direct').get_item(static_tab_loc))
+            else:
+                built_in_tabs.append(tab)
 
+        # create a list of components for each static tab
         components = [
             loc_mapper().translate_location(
                 course_item.location.course_id, static_tab.location, False, True
@@ -149,6 +124,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
 
         return render_to_response('edit-tabs.html', {
             'context_course': course_item,
+            'built_in_tabs': built_in_tabs,
             'components': components,
             'course_locator': locator
         })
@@ -183,7 +159,7 @@ def primitive_delete(course, num):
 def primitive_insert(course, num, tab_type, name):
     "Inserts a new tab at the given number (0 based)."
     validate_args(num, tab_type)
-    new_tab = {u'type': unicode(tab_type), u'name': unicode(name)}
+    new_tab = CourseTab.from_json({u'type': unicode(tab_type), u'name': unicode(name)})
     tabs = course.tabs
     tabs.insert(num, new_tab)
     modulestore('direct').update_item(course, '**replace_user**')

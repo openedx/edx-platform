@@ -3,7 +3,7 @@ High-level tab navigation.
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import Promise, EmptyPromise, fulfill_after, fulfill
+from bok_choy.promise import Promise, EmptyPromise
 
 
 class TabNavPage(PageObject):
@@ -14,12 +14,13 @@ class TabNavPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.is_css_present('ol.course-tabs')
+        return self.q(css='ol.course-tabs').present
 
     def go_to_tab(self, tab_name):
         """
         Navigate to the tab `tab_name`.
         """
+
         if tab_name not in ['Courseware', 'Course Info', 'Discussion', 'Wiki', 'Progress']:
             self.warning("'{0}' is not a valid tab name".format(tab_name))
 
@@ -27,11 +28,12 @@ class TabNavPage(PageObject):
         # so we find the tab with `tab_name` in its text.
         tab_css = self._tab_css(tab_name)
 
-        with fulfill_after(self._is_on_tab_promise(tab_name)):
-            if tab_css is not None:
-                self.css_click(tab_css)
-            else:
-                self.warning("No tabs found for '{0}'".format(tab_name))
+        if tab_css is not None:
+            self.q(css=tab_css).first.click()
+        else:
+            self.warning("No tabs found for '{0}'".format(tab_name))
+
+        self._is_on_tab_promise(tab_name).fulfill()
 
     def is_on_tab(self, tab_name):
         """
@@ -63,10 +65,10 @@ class TabNavPage(PageObject):
         if the tab names fail to load.
         """
         def _check_func():
-            tab_names = self.css_text('ol.course-tabs li a')
+            tab_names = self.q(css='ol.course-tabs li a').text
             return (len(tab_names) > 0, tab_names)
 
-        return fulfill(Promise(_check_func, "Get all tab names"))
+        return Promise(_check_func, "Get all tab names").fulfill()
 
     def _is_on_tab(self, tab_name):
         """
@@ -74,14 +76,13 @@ class TabNavPage(PageObject):
         This is a private method, so it does NOT enforce the page check,
         which is what we want when we're polling the DOM in a promise.
         """
-        current_tab_list = self.css_text('ol.course-tabs>li>a.active')
+        current_tab_list = self.q(css='ol.course-tabs > li > a.active').text
 
         if len(current_tab_list) == 0:
             self.warning("Could not find current tab")
             return False
-
         else:
-            return (current_tab_list[0].strip().split('\n')[0] == tab_name)
+            return current_tab_list[0].strip().split('\n')[0] == tab_name
 
 
     def _is_on_tab_promise(self, tab_name):

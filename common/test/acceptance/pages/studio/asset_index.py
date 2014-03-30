@@ -13,4 +13,4 @@ class AssetIndexPage(CoursePage):
     url_path = "assets"
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-uploads')
+        return self.q(css='body.view-uploads').present

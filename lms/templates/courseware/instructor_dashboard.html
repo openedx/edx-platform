@@ -256,7 +256,9 @@ function goto( mode)
     </p>
 
     <p>
+  %if not settings.FEATURES.get('ENABLE_ASYNC_ANSWER_DISTRIBUTION'):
     <input type="submit" name="action" value="Download CSV of answer distributions" class="${'is-disabled' if disable_buttons else ''}">
+  %endif
     <input type="submit" name="action" value="Dump description of graded assignments configuration">
     </p>
     <hr width="40%" style="align:left">
@@ -688,7 +690,7 @@ function goto( mode)
   <br/>
   %if analytics_results.get("ProblemGradeDistribution"):
     <p>
-      ${_("Answer distribution for problems")}
+      ${_("Score distribution for problems")}
       (${analytics_results["ProblemGradeDistribution"]['time']})
     </p>
     <div>

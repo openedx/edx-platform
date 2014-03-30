@@ -80,7 +80,16 @@ class User(models.Model):
         retrieve_params = self.default_retrieve_params
         if self.attributes.get('course_id'):
             retrieve_params['course_id'] = self.course_id
-        response = perform_request('get', url, retrieve_params)
+        try:
+            response = perform_request('get', url, retrieve_params)
+        except CommentClientRequestError as e:
+            if e.status_code == 404:
+                # attempt to gracefully recover from a previous failure
+                # to sync this user to the comments service.
+                self.save()
+                response = perform_request('get', url, retrieve_params)
+            else:
+                raise
         self.update_attributes(**response)
 
 

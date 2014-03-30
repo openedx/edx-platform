@@ -54,9 +54,9 @@ Assign staff roles
 
 Before you can assign the course staff or instructor role to a team member:
 
-* You need the email address of each team member. 
+* You need the email address or username of each team member. 
 
-* Each team member must register a user account for that email address and enroll in your course.
+* Each team member must register a user account for that email address/username and enroll in your course.
 
 To assign a staff role:
 
@@ -68,8 +68,7 @@ To assign a staff role:
 
 #. In the Administration List Management section, use the drop-down list to select **Course Staff** or **Instructors**.
 
-#. Under the list of users who currently have that role, enter an email address and click **Add** for the role type.
+#. Under the list of users who currently have that role, enter an email address or username and click **Add** for the role type.
 
-To remove an assigned role, view the list of users and then click revoke access (the **X**) next to that email address. 
-
+To remove an assigned role, view the list of users and then click **Revoke access**. 
 

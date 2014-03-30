@@ -80,6 +80,38 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         self.assertEqual(entry['prod_branch'], 'live')
         self.assertEqual(entry['block_map'], block_map)
 
+    def test_delete_course_map(self):
+        """
+        Test that course location is properly remove from loc_mapper and cache when course is deleted
+        """
+        org = u'foo_org'
+        course = u'bar_course'
+        run = u'baz_run'
+        course_location = Location('i4x', org, course, 'course', run)
+        course_locator = loc_mapper().translate_location(course_location.course_id, course_location)
+        loc_mapper().create_map_entry(course_location)
+        # pylint: disable=protected-access
+        entry = loc_mapper().location_map.find_one({
+            '_id': loc_mapper()._construct_location_son(org, course, run)
+        })
+        self.assertIsNotNone(entry, 'Entry not found in loc_mapper')
+        self.assertEqual(entry['course_id'], u'{0}.{1}.{2}'.format(org, course, run))
+
+        # now delete course location from loc_mapper and cache and test that course location no longer
+        # exists in loca_mapper and cache
+        loc_mapper().delete_course_mapping(course_location)
+        # pylint: disable=protected-access
+        entry = loc_mapper().location_map.find_one({
+            '_id': loc_mapper()._construct_location_son(org, course, run)
+        })
+        self.assertIsNone(entry, 'Entry found in loc_mapper')
+        # pylint: disable=protected-access
+        cached_value = loc_mapper()._get_location_from_cache(course_locator)
+        self.assertIsNone(cached_value, 'course_locator found in cache')
+        # pylint: disable=protected-access
+        cached_value = loc_mapper()._get_course_location_from_cache(course_locator.package_id)
+        self.assertIsNone(cached_value, 'Entry found in cache')
+
     def translate_n_check(self, location, old_style_course_id, new_style_package_id, block_id, branch, add_entry=False):
         """
         Request translation, check package_id, block_id, and branch
@@ -427,3 +459,10 @@ class TrivialCache(object):
         mock set
         """
         self.cache[key] = entry
+
+    def delete_many(self, entries):
+        """
+        mock delete_many
+        """
+        for entry in entries:
+            del self.cache[entry]

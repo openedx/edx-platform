@@ -6,15 +6,18 @@ import inspect
 from path import path
 from django.http import Http404
 from django.conf import settings
-from .module_render import get_module
+
+from edxmako.shortcuts import render_to_string
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
-from courseware.model_data import FieldDataCache
 from static_replace import replace_static_urls
+
 from courseware.access import has_access
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module
 import branding
 from student.models import CourseEnrollment
 
@@ -185,8 +188,14 @@ def get_course_about_section(course, section_key):
             html = ''
 
             if about_module is not None:
-                html = about_module.render('student_view').content
-
+                try:
+                    html = about_module.render('student_view').content
+                except Exception:  # pylint: disable=broad-except
+                    html = render_to_string('courseware/error-message.html', None)
+                    log.exception("Error rendering course={course}, section_key={section_key}".format(
+                        course=course,
+                        section_key=section_key
+                    ))
             return html
 
         except ItemNotFoundError:
@@ -231,7 +240,14 @@ def get_course_info_section(request, course, section_key):
     html = ''
 
     if info_module is not None:
-        html = info_module.render('student_view').content
+        try:
+            html = info_module.render('student_view').content
+        except Exception:  # pylint: disable=broad-except
+            html = render_to_string('courseware/error-message.html', None)
+            log.exception("Error rendering course={course}, section_key={section_key}".format(
+                course=course,
+                section_key=section_key
+            ))
 
     return html
 

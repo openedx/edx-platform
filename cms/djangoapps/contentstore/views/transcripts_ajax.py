@@ -115,29 +115,20 @@ def upload_transcripts(request):
     # Allow upload only if any video link is presented
     if video_list:
         sub_attr = source_subs_name
-
-        try:  # Generate and save for 1.0 speed, will create subs_sub_attr.srt.sjson subtitles file in storage.
+        try:
+            # Generate and save for 1.0 speed, will create subs_sub_attr.srt.sjson subtitles file in storage.
             generate_subs_from_source({1: sub_attr}, source_subs_ext, source_subs_filedata, item)
-        except TranscriptsGenerationException as e:
-            return error_response(response, e.message)
-        statuses = {}
-        for video_dict in video_list:
-            video_name = video_dict['video']
-            # We are creating transcripts for every video source,
-            # for the case that in future, some of video sources can be deleted.
-            statuses[video_name] = copy_or_rename_transcript(video_name, sub_attr, item, user=request.user)
-            try:
-                # updates item.sub with `video_name` if it is successful.
-                copy_or_rename_transcript(video_name, sub_attr, item, user=request.user)
-                selected_name = video_name  # name to write to item.sub field, chosen at random.
-            except NotFoundError:
-                # subtitles file `sub_attr` is not presented in the system. Nothing to copy or rename.
-                return error_response(response, "Can't find transcripts in storage for {}".format(sub_attr))
 
-        item.sub = selected_name  # write one of  new subtitles names to item.sub attribute.
-        item.save_with_metadata(request.user)
-        response['subs'] = item.sub
-        response['status'] = 'Success'
+            for video_dict in video_list:
+                video_name = video_dict['video']
+                # We are creating transcripts for every video source, if in future some of video sources would be deleted.
+                # Updates item.sub with `video_name` on success.
+                copy_or_rename_transcript(video_name, sub_attr, item, user=request.user)
+
+            response['subs'] = item.sub
+            response['status'] = 'Success'
+        except Exception as ex:
+            return error_response(response, ex.message)
     else:
         return error_response(response, 'Empty video sources.')
 
@@ -262,9 +253,9 @@ def check_transcripts(request):
             log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
 
         # youtube server
-        youtube_api = copy.deepcopy(settings.YOUTUBE_API)
-        youtube_api['params']['v'] = youtube_id
-        youtube_response = requests.get(youtube_api['url'], params=youtube_api['params'])
+        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
+        youtube_text_api['params']['v'] = youtube_id
+        youtube_response = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
 
         if youtube_response.status_code == 200 and youtube_response.text:
             transcripts_presence['youtube_server'] = True

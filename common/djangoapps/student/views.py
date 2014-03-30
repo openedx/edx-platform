@@ -38,7 +38,8 @@ from course_modes.models import CourseMode
 from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
-    CourseEnrollmentAllowed, UserStanding, LoginFailures
+    CourseEnrollmentAllowed, UserStanding, LoginFailures,
+    create_comments_service_user
 )
 from student.forms import PasswordResetFormNoActive
 from student.firebase_token_generator import create_token
@@ -1029,6 +1030,11 @@ def change_setting(request):
     })
 
 
+class AccountValidationError(Exception):
+    def __init__(self, message, field):
+        super(AccountValidationError, self).__init__(message)
+        self.field = field
+
 def _do_create_account(post_vars):
     """
     Given cleaned post variables, create the User and UserProfile objects, as well as the
@@ -1048,19 +1054,19 @@ def _do_create_account(post_vars):
     try:
         user.save()
     except IntegrityError:
-        js = {'success': False}
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
-            js['value'] = _("An account with the Public Username '{username}' already exists.").format(username=post_vars['username'])
-            js['field'] = 'username'
-            return JsonResponse(js, status=400)
-
-        if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = _("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
-            js['field'] = 'email'
-            return JsonResponse(js, status=400)
-
-        raise
+            raise AccountValidationError(
+                _("An account with the Public Username '{username}' already exists.").format(username=post_vars['username']),
+                field="username"
+                )
+        elif len(User.objects.filter(email=post_vars['email'])) > 0:
+            raise AccountValidationError(
+                _("An account with the Email '{email}' already exists.").format(email=post_vars['email']),
+                field="email"
+                )
+        else:
+            raise
 
     registration.register(user)
 
@@ -1083,6 +1089,7 @@ def _do_create_account(post_vars):
         profile.save()
     except Exception:
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+        raise
 
     UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
 
@@ -1231,10 +1238,16 @@ def create_account(request, post_override=None):
             return JsonResponse(js, status=400)
 
     # Ok, looks like everything is legit.  Create the account.
-    ret = _do_create_account(post_vars)
-    if isinstance(ret, HttpResponse):  # if there was an error then return that
-        return ret
+    try:
+        with transaction.commit_on_success():
+            ret = _do_create_account(post_vars)
+    except AccountValidationError as e:
+        return JsonResponse({'success': False, 'value': e.message, 'field': e.field}, status=400)
+
     (user, profile, registration) = ret
+
+    dog_stats_api.increment("common.student.account_created")
+    create_comments_service_user(user)
 
     context = {
         'name': post_vars['name'],
@@ -1294,8 +1307,6 @@ def create_account(request, post_override=None):
             login_user.is_active = True
             login_user.save()
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(login_user.username, login_user.email))
-
-    dog_stats_api.increment("common.student.account_created")
 
     response = JsonResponse({
         'success': True,
@@ -1365,20 +1376,16 @@ def auto_auth(request):
 
     # Attempt to create the account.
     # If successful, this will return a tuple containing
-    # the new user object; otherwise it will return an error
-    # message.
-    result = _do_create_account(post_data)
-
-    if isinstance(result, tuple):
-        user = result[0]
-
-    # If we did not create a new account, the user might already
-    # exist.  Attempt to retrieve it.
-    else:
+    # the new user object.
+    try:
+        user, profile, reg = _do_create_account(post_data)
+    except AccountValidationError:
+        # Attempt to retrieve the existing user.
         user = User.objects.get(username=username)
         user.email = email
         user.set_password(password)
         user.save()
+        reg = Registration.objects.get(user=user)
 
     # Set the user's global staff bit
     if is_staff is not None:
@@ -1386,7 +1393,6 @@ def auto_auth(request):
         user.save()
 
     # Activate the user
-    reg = Registration.objects.get(user=user)
     reg.activate()
     reg.save()
 
@@ -1402,6 +1408,8 @@ def auto_auth(request):
     # Log in as the user
     user = authenticate(username=username, password=password)
     login(request, user)
+
+    create_comments_service_user(user)
 
     # Provide the user with a valid CSRF token
     # then return a 200 response

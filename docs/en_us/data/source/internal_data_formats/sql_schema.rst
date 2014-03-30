@@ -100,6 +100,7 @@ The following tables store data gathered during site registration and course enr
 * :ref:`auth_user`
 * :ref:`auth_userprofile`
 * :ref:`student_courseenrollment`
+* :ref:`user_api_usercoursetag`
 * :ref:`user_id_map`
 
 .. _auth_user:
@@ -602,6 +603,71 @@ mode
 
   **History**: All enrollments prior to 20 Aug 2013 are "honor". 
 
+  .. _user_api_usercoursetag:
+
+============================================
+Columns in the user_api_usercoursetag Table
+============================================
+
+This table uses key-value pairs to store metadata about a specific student's involvement in a specific course. For example, for a course that assigns students to groups randomly for A/B testing, a row in this table identifies the student's assignment to a partition and group.
+
+**History**: Added 7 Mar 2014.
+
+.. need a sample header and row from a data package when available
+
+The ``user_api_usercoursetag`` table has the following columns: 
+
+.. list-table::
+     :widths: 15 15 15 15
+     :header-rows: 1
+
+     * - Column
+       - Type
+       - Null
+       - Key
+     * - user_id
+       - int(11)  
+       - NO
+       - PRI
+     * - course_id
+       - varchar(255)
+       - NO
+       -
+     * - key
+       - varchar(255)
+       - NO
+       -
+     * - value
+       - textfield
+       - NO
+       -
+
+.. need type, null, key for each one
+
+---------
+user_id
+---------
+  The student's ID in ``auth_user.id``.
+
+-----------
+course_id
+-----------
+  The course identifier, in the format {org}/{course}/{run} (for example, ``MITx/6.002x/2012_Fall``). 
+
+----
+key
+----
+  Identifies an attribute of the course. 
+
+  For example, for a course that includes modules that are set up to perform A/B testing, the value in this column identifies a partition, or type of experiment. The key for the partition is in the format ``xblock.partition_service.partition_ID``, where ID is an integer.
+
+------
+value
+------
+  The content for the key that is set for a student. 
+
+  For example, for a course that includes modules that are set up to perform A/B testing, this column stores the group ID of the particular group the student is assigned to within the partition.
+
 .. _user_id_map:
 
 ==================================
@@ -883,7 +949,7 @@ done
 -----------
 course_id
 -----------
-  The course that this row applies to, represented in the format org/course/run (for example, ``MITx/6.002x/2012_Fall``). The same course content (same ``module_id``) can be used in different courses, and a student's state needs to be tracked separately for each course.
+  The course that this row applies to, represented in the format {org}/{course}/{run} (for example, ``MITx/6.002x/2012_Fall``). The same course content (same ``module_id``) can be used in different courses, and a student's state needs to be tracked separately for each course.
 
 .. _Certificates:
 

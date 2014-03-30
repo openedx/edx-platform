@@ -5,6 +5,18 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Support for viewing built-in tabs on the Pages page. STUD-1193
+
+Blades: Fixed bug when image mapped input's Show Answer multiplies rectangles on
+ many inputtypes. BLD-810.
+
+LMS: Enabled screen reader feedback of problem responses.
+  LMS-2158
+
+Blades: Removed tooltip from captions. BLD-629.
+
+Blades: Fix problem with loading YouTube API is it is not available. BLD-531.
+
 Blades: Fix download subs for non youtube videos and non-en language. BLD-897.
 
 Blades: Fix issues related to videos that have separate YouTube IDs for the

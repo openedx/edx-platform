@@ -12,12 +12,12 @@ def url_class(is_active):
     return "active"
   return ""
 %>
-<%! from courseware.tabs import get_course_tabs %>
-<%!
-  from django.core.urlresolvers import reverse
-  from django.utils.translation import ugettext as _
-  from student.models import UserProfile
-%>
+<%! from xmodule.tabs import CourseTabList %>
+<%! from courseware.access import has_access %>
+<%! from django.conf import settings %>
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+<%! from courseware.views import notification_image_for_tab %>
 <% import waffle %>
 
 % if course and user.is_authenticated() and not UserProfile.has_registered(user):
@@ -38,19 +38,25 @@ def url_class(is_active):
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
     <ol class="course-tabs">
-      % for tab in get_course_tabs(user, course, active_page, request):
-        % if waffle.flag_is_active(request, 'visual_treatment') or waffle.flag_is_active(request, 'merge_course_tabs'):
+      % for tab in CourseTabList.iterate_displayable(course, settings, user.is_authenticated(), has_access(user, course, 'staff'), include_instructor_tab=True):
+        <%
+            tab_is_active = (tab.tab_id == active_page)
+            tab_image = notification_image_for_tab(tab, user, course)
+        %>
+        % if waffle.flag_is_active(request, 'visual_treatment'):
           <li class="${"prominent" if tab.name in ("Courseware", "Course Content") else ""}">
         % else:
           <li>
         % endif
-             <a href="${tab.link | h}" class="${url_class(tab.is_active)}">
+             <a href="${tab.link_func(course, reverse) | h}" class="${url_class(tab_is_active)}">
                  ${_(tab.name) | h}
-                 % if tab.is_active == True:
+                 % if tab_is_active:
                    <span class="sr">, current location</span>
                  %endif
-                 % if tab.has_img == True:
-                   <img src="${tab.img}"/>
+                 % if tab_image:
+                   ## Translators: 'needs attention' is an alternative string for the
+                   ## notification image that indicates the tab "needs attention".
+                   <img src="${tab_image}" alt="${_('needs attention')}" />
                  %endif
              </a>
           </li>

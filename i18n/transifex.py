@@ -1,13 +1,14 @@
 #!/usr/bin/env python
-
+from __future__ import print_function
 import sys
 from polib import pofile
+import argparse
 
 from i18n.config import CONFIGURATION
 from i18n.execute import execute
 from i18n.extract import EDX_MARKER
 
-TRANSIFEX_HEADER = 'edX community translations have been downloaded from %s'
+TRANSIFEX_HEADER = u'edX community translations have been downloaded from {}'
 TRANSIFEX_URL = 'https://www.transifex.com/projects/p/edx-platform/'
 
 
@@ -16,7 +17,7 @@ def push():
 
 
 def pull():
-    print "Pulling languages from transifex..."
+    print("Pulling languages from transifex...")
     execute('tx pull --mode=reviewed --all')
     clean_translated_locales()
 
@@ -57,18 +58,22 @@ def clean_file(filename):
 def get_new_header(po):
     team = po.metadata.get('Language-Team', None)
     if not team:
-        return TRANSIFEX_HEADER % TRANSIFEX_URL
+        return TRANSIFEX_HEADER.format(TRANSIFEX_URL)
     else:
-        return TRANSIFEX_HEADER % team
+        return TRANSIFEX_HEADER.format(team)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        raise Exception("missing argument: push or pull")
-    arg = sys.argv[1]
-    if arg == 'push':
+    # pylint: disable=invalid-name
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", help="push or pull")
+    parser.add_argument("--verbose", "-v")
+    args = parser.parse_args()
+    # pylint: enable=invalid-name
+
+    if args.command == "push":
         push()
-    elif arg == 'pull':
+    elif args.command == "pull":
         pull()
     else:
-        raise Exception("unknown argument: (%s)" % arg)
+        raise Exception("unknown command ({cmd})".format(cmd=args.command))

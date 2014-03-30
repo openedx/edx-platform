@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import os
+import sys
 import string
 import random
 import re
@@ -23,8 +24,13 @@ class TestGenerate(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        extract.main()
-        dummy.main()
+        sys.stderr.write(
+            "\nExtracting i18n strings and generating dummy translations; "
+            "this may take a few minutes\n"
+        )
+        sys.stderr.flush()
+        extract.main(verbosity=0)
+        dummy.main(verbosity=0)
 
     def setUp(self):
         # Subtract 1 second to help comparisons with file-modify time succeed,
@@ -50,7 +56,7 @@ class TestGenerate(TestCase):
         .mo files should exist, and be recently created (modified
         after start of test suite)
         """
-        generate.main()
+        generate.main(verbosity=0, strict=False)
         for locale in CONFIGURATION.translated_locales:
             for filename in ('django', 'djangojs'):
                 mofile = filename+'.mo'

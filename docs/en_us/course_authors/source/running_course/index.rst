@@ -7,11 +7,11 @@ Running Your Course
 .. toctree::
    :maxdepth: 2
    
-   checking_student_progress
+   course_staffing
+   course_enrollment
    discussions
    discussion_guidance_moderators
    course_data
-   course_enrollment
-   course_staffing
    course_student
    course_grades
+   checking_student_progress

@@ -2,6 +2,7 @@ import json
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
 
 from student.models import Registration
 
@@ -9,38 +10,49 @@ from django.test import TestCase
 
 
 def check_for_get_code(self, code, url):
-        """
-        Check that we got the expected code when accessing url via GET.
-        Returns the HTTP response.
+    """
+    Check that we got the expected code when accessing url via GET.
+    Returns the HTTP response.
 
-        `self` is a class that subclasses TestCase.
+    `self` is a class that subclasses TestCase.
 
-        `code` is a status code for HTTP responses.
+    `code` is a status code for HTTP responses.
 
-        `url` is a url pattern for which we have to test the response.
-        """
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, code,
-                         "got code %d for url '%s'. Expected code %d"
-                         % (resp.status_code, url, code))
-        return resp
+    `url` is a url pattern for which we have to test the response.
+    """
+    resp = self.client.get(url)
+    self.assertEqual(resp.status_code, code,
+                     "got code %d for url '%s'. Expected code %d"
+                     % (resp.status_code, url, code))
+    return resp
 
 
 def check_for_post_code(self, code, url, data={}):
-        """
-        Check that we got the expected code when accessing url via POST.
-        Returns the HTTP response.
-        `self` is a class that subclasses TestCase.
+    """
+    Check that we got the expected code when accessing url via POST.
+    Returns the HTTP response.
+    `self` is a class that subclasses TestCase.
 
-        `code` is a status code for HTTP responses.
+    `code` is a status code for HTTP responses.
 
-        `url` is a url pattern for which we want to test the response.
-        """
-        resp = self.client.post(url, data)
-        self.assertEqual(resp.status_code, code,
-                         "got code %d for url '%s'. Expected code %d"
-                         % (resp.status_code, url, code))
-        return resp
+    `url` is a url pattern for which we want to test the response.
+    """
+    resp = self.client.post(url, data)
+    self.assertEqual(resp.status_code, code,
+                     "got code %d for url '%s'. Expected code %d"
+                     % (resp.status_code, url, code))
+    return resp
+
+
+def get_request_for_user(user):
+    """Create a request object for user."""
+
+    request = RequestFactory()
+    request.user = user
+    request.META = {}
+    request.is_secure = lambda: True
+    request.get_host = lambda: "edx.org"
+    return request
 
 
 class LoginEnrollmentTestCase(TestCase):

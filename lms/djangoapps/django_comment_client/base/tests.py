@@ -10,6 +10,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from util.testing import UrlResetMixin
+from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles
 from django_comment_client.base import views
 from django_comment_client.tests.unicode import UnicodeTestMixin
@@ -518,6 +519,53 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         assert_equal(call_list, mock_request.call_args_list)
 
         assert_equal(response.status_code, 200)
+
+@patch("lms.lib.comment_client.utils.requests.request")
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase):
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(ViewPermissionsTestCase, self).setUp()
+        self.password = "test password"
+        self.course = CourseFactory.create()
+        seed_permissions_roles(self.course.id)
+        self.student = UserFactory.create(password=self.password)
+        self.moderator = UserFactory.create(password=self.password)
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+        CourseEnrollmentFactory(user=self.moderator, course_id=self.course.id)
+        self.moderator.roles.add(Role.objects.get(name="Moderator", course_id=self.course.id))
+
+    def test_pin_thread_as_student(self, mock_request):
+        mock_request.return_value.text = "{}"
+        self.client.login(username=self.student.username, password=self.password)
+        response = self.client.post(
+            reverse("pin_thread", kwargs={"course_id": self.course.id, "thread_id": "dummy"})
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_pin_thread_as_moderator(self, mock_request):
+        mock_request.return_value.text = "{}"
+        self.client.login(username=self.moderator.username, password=self.password)
+        response = self.client.post(
+            reverse("pin_thread", kwargs={"course_id": self.course.id, "thread_id": "dummy"})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_un_pin_thread_as_student(self, mock_request):
+        mock_request.return_value.text = "{}"
+        self.client.login(username=self.student.username, password=self.password)
+        response = self.client.post(
+            reverse("un_pin_thread", kwargs={"course_id": self.course.id, "thread_id": "dummy"})
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_un_pin_thread_as_moderator(self, mock_request):
+        mock_request.return_value.text = "{}"
+        self.client.login(username=self.moderator.username, password=self.password)
+        response = self.client.post(
+            reverse("un_pin_thread", kwargs={"course_id": self.course.id, "thread_id": "dummy"})
+        )
+        self.assertEqual(response.status_code, 200)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

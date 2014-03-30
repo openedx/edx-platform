@@ -94,6 +94,8 @@ BULK_EMAIL_DEFAULT_FROM_EMAIL = "test@test.org"
 
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
+# For consistency in user-experience, keep the value of this setting in sync with
+# the one in cms/envs/acceptance.py
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
 # Use the auto_auth workflow for creating users and logging them in
@@ -174,4 +176,6 @@ XQUEUE_INTERFACE = {
 }
 
 # Point the URL used to test YouTube availability to our stub YouTube server
-YOUTUBE_TEST_URL = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
+YOUTUBE['API'] = 'youtube.com/iframe_api'
+YOUTUBE['TEST_URL'] = "127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
+YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)

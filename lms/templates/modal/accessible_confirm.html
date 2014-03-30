@@ -5,7 +5,7 @@
       <i class="icon-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close Modal')}
+        ${_('Close')}
       </span>
     </button>
 
@@ -43,6 +43,5 @@ var accessible_confirm = function(message, callback) {
     accessible_modal("#accessibile-confirm-modal #confirm_open_button", "#accessibile-confirm-modal .close-modal", "#accessibile-confirm-modal", ".content-wrapper");
     $("#accessibile-confirm-modal #confirm_open_button").click();
     $("#accessibile-confirm-modal .message-title").html(message);
-    // SR.readText(message);
 };
 </script>

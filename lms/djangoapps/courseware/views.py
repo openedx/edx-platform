@@ -20,14 +20,14 @@ from markupsafe import escape
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import get_courses, get_course_with_access, sort_by_announcement
-import courseware.tabs as tabs
 from courseware.masquerade import setup_masquerade
 from courseware.models import CoursePreference
 from courseware.model_data import FieldDataCache
-from .module_render import toc_for_course, get_module_for_descriptor
+from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
+from open_ended_grading import open_ended_notifications
 from student.models import UserTestGroup, CourseEnrollment, UserProfile
 from student.views import course_from_id, single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
@@ -37,6 +37,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
+from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 import shoppingcart
 
 from microsite_configuration import microsite
@@ -97,10 +98,12 @@ def render_accordion(request, course, chapter, section, field_data_cache):
     request.user = user	# keep just one instance of User
     toc = toc_for_course(user, request, course, chapter, section, field_data_cache)
 
-    context = dict([('toc', toc),
-                    ('course_id', course.id),
-                    ('csrf', csrf(request)['csrf_token']),
-                    ('due_date_display_format', course.due_date_display_format)] + template_imports.items())
+    context = dict([
+        ('toc', toc),
+        ('course_id', course.id),
+        ('csrf', csrf(request)['csrf_token']),
+        ('due_date_display_format', course.due_date_display_format)
+    ] + template_imports.items())
     return render_to_string('courseware/accordion.html', context)
 
 
@@ -268,7 +271,7 @@ def index(request, course_id, chapter=None, section=None,
             'masquerade': masq,
             'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
             'reverifications': fetch_reverify_banner_info(request, course_id),
-            }
+        }
 
         # Only show the chat if it's enabled by the course and in the
         # settings.
@@ -360,19 +363,21 @@ def index(request, course_id, chapter=None, section=None,
         if settings.DEBUG:
             raise
         else:
-            log.exception("Error in index view: user={user}, course={course},"
-                          " chapter={chapter} section={section}"
-                          "position={position}".format(
-                              user=user,
-                              course=course,
-                              chapter=chapter,
-                              section=section,
-                              position=position
-                              ))
+            log.exception(
+                "Error in index view: user={user}, course={course},"
+                " chapter={chapter} section={section}"
+                "position={position}".format(
+                    user=user,
+                    course=course,
+                    chapter=chapter,
+                    section=section,
+                    position=position
+                ))
             try:
-                result = render_to_response('courseware/courseware-error.html',
-                                            {'staff_access': staff_access,
-                                            'course': course})
+                result = render_to_response('courseware/courseware-error.html', {
+                    'staff_access': staff_access,
+                    'course': course
+                })
             except:
                 # Let the exception propagate, relying on global config to at
                 # at least return a nice error message
@@ -477,11 +482,11 @@ def static_tab(request, course_id, tab_slug):
     """
     course = get_course_with_access(request.user, course_id, 'load')
 
-    tab = tabs.get_static_tab_by_slug(course, tab_slug)
+    tab = CourseTabList.get_tab_by_slug(course, tab_slug)
     if tab is None:
         raise Http404
 
-    contents = tabs.get_static_tab_contents(
+    contents = get_static_tab_contents(
         request,
         course,
         tab
@@ -489,12 +494,11 @@ def static_tab(request, course_id, tab_slug):
     if contents is None:
         raise Http404
 
-    staff_access = has_access(request.user, course, 'staff')
-    return render_to_response('courseware/static_tab.html',
-                              {'course': course,
-                               'tab': tab,
-                               'tab_contents': contents,
-                               'staff_access': staff_access, })
+    return render_to_response('courseware/static_tab.html', {
+        'course': course,
+        'tab': tab,
+        'tab_contents': contents,
+    })
 
 # TODO arjun: remove when custom tabs in place, see courseware/syllabus.py
 
@@ -509,8 +513,10 @@ def syllabus(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('courseware/syllabus.html', {'course': course,
-                                            'staff_access': staff_access, })
+    return render_to_response('courseware/syllabus.html', {
+        'course': course,
+        'staff_access': staff_access,
+    })
 
 
 def registered_for_course(course, user):
@@ -573,16 +579,17 @@ def course_about(request, course_id):
     # see if we have already filled up all allowed enrollments
     is_course_full = CourseEnrollment.is_course_full(course)
 
-    return render_to_response('courseware/course_about.html',
-                              {'course': course,
-                               'regularly_registered': regularly_registered,
-                               'sneakpeek_allowed': sneakpeek_allowed,
-                               'course_target': course_target,
-                               'registration_price': registration_price,
-                               'in_cart': in_cart,
-                               'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
-                               'show_courseware_link': show_courseware_link,
-                               'is_course_full': is_course_full})
+    return render_to_response('courseware/course_about.html', {
+        'course': course,
+        'regularly_registered': regularly_registered,
+        'sneakpeek_allowed': sneakpeek_allowed,
+        'course_target': course_target,
+        'registration_price': registration_price,
+        'in_cart': in_cart,
+        'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
+        'show_courseware_link': show_courseware_link,
+        'is_course_full': is_course_full
+    })
 
 
 @ensure_csrf_cookie
@@ -614,17 +621,14 @@ def mktg_course_about(request, course_id):
                             settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
     course_modes = CourseMode.modes_for_course(course.id)
 
-    return render_to_response(
-        'courseware/mktg_course_about.html',
-        {
-            'course': course,
-            'registered': registered,
-            'allow_registration': allow_registration,
-            'course_target': course_target,
-            'show_courseware_link': show_courseware_link,
-            'course_modes': course_modes,
-        }
-    )
+    return render_to_response('courseware/mktg_course_about.html', {
+        'course': course,
+        'registered': registered,
+        'allow_registration': allow_registration,
+        'course_target': course_target,
+        'show_courseware_link': show_courseware_link,
+        'course_modes': course_modes,
+    })
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -724,9 +728,11 @@ def submission_history(request, course_id, student_username, location):
 
     try:
         student = User.objects.get(username=student_username)
-        student_module = StudentModule.objects.get(course_id=course_id,
-                                                   module_state_key=location,
-                                                   student_id=student.id)
+        student_module = StudentModule.objects.get(
+            course_id=course_id,
+            module_state_key=location,
+            student_id=student.id
+        )
     except User.DoesNotExist:
         return HttpResponse(escape("User {0} does not exist.".format(student_username)))
     except StudentModule.DoesNotExist:
@@ -751,3 +757,56 @@ def submission_history(request, course_id, student_username, location):
     }
 
     return render_to_response('courseware/submission_history.html', context)
+
+
+def notification_image_for_tab(course_tab, user, course):
+    """
+    Returns the notification image path for the given course_tab if applicable, otherwise None.
+    """
+
+    tab_notification_handlers = {
+        StaffGradingTab.type: open_ended_notifications.staff_grading_notifications,
+        PeerGradingTab.type: open_ended_notifications.peer_grading_notifications,
+        OpenEndedGradingTab.type: open_ended_notifications.combined_notifications
+    }
+
+    if course_tab.type in tab_notification_handlers:
+        notifications = tab_notification_handlers[course_tab.type](course, user)
+        if notifications and notifications['pending_grading']:
+            return notifications['img_path']
+
+    return None
+
+
+def get_static_tab_contents(request, course, tab):
+    """
+    Returns the contents for the given static tab
+    """
+    loc = Location(
+        course.location.tag,
+        course.location.org,
+        course.location.course,
+        tab.type,
+        tab.url_slug,
+    )
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, modulestore().get_instance(course.id, loc), depth=0
+    )
+    tab_module = get_module(
+        request.user, request, loc, field_data_cache, course.id, static_asset_path=course.static_asset_path
+    )
+
+    logging.debug('course_module = {0}'.format(tab_module))
+
+    html = ''
+    if tab_module is not None:
+        try:
+            html = tab_module.render('student_view').content
+        except Exception:  # pylint: disable=broad-except
+            html = render_to_string('courseware/error-message.html', None)
+            log.exception("Error rendering course={course}, tab={tab_url}".format(
+                course=course,
+                tab_url=tab['url_slug']
+            ))
+
+    return html

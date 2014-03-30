@@ -1288,7 +1288,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
     file_text = "Hello, this is my amazing file."
     file_name = "Student file 1"
     answer_link = "http://www.edx.org"
-    autolink_tag = "<a href="
+    autolink_tag = '<a target="_blank" href='
 
     def get_module_system(self, descriptor):
         test_system = get_test_system()
@@ -1365,11 +1365,11 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
     script_dirty = u'<script>alert("xss!")</script>'
     script_clean = u'alert("xss!")'
     img_dirty = u'<img alt="cats" height="200" onclick="eval()" src="http://example.com/lolcats.jpg" width="200">'
-    img_clean = u'<img alt="cats" height="200" src="http://example.com/lolcats.jpg" width="200">'
+    img_clean = u'<img width="200" alt="cats" height="200" src="http://example.com/lolcats.jpg">'
     embed_dirty = u'<embed height="200" id="cats" onhover="eval()" src="http://example.com/lolcats.swf" width="200"/>'
-    embed_clean = u'<embed height="200" id="cats" src="http://example.com/lolcats.swf" width="200">'
+    embed_clean = u'<embed width="200" height="200" id="cats" src="http://example.com/lolcats.swf">'
     iframe_dirty = u'<iframe class="cats" height="200" onerror="eval()" src="http://example.com/lolcats" width="200"/>'
-    iframe_clean = u'<iframe class="cats" height="200" src="http://example.com/lolcats" width="200"></iframe>'
+    iframe_clean = u'<iframe height="200" class="cats" width="200" src="http://example.com/lolcats"></iframe>'
 
     text = u'I am a \u201c\xfcber student\u201d'
     text_lessthan_noencd = u'This used to be broken < by the other parser. 3>5'
@@ -1378,7 +1378,7 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
     text_brs = u"St\xfcdent submission:<br/>I like lamp."
 
     link_text = u'I love going to www.lolcatz.com'
-    link_atag = u'I love going to <a href="http://www.lolcatz.com" target="_blank">www.lolcatz.com</a>'
+    link_atag = u'I love going to <a target="_blank" href="http://www.lolcatz.com">www.lolcatz.com</a>'
 
     def test_script(self):
         """
