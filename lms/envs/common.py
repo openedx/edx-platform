@@ -1517,3 +1517,10 @@ for app_name in OPTIONAL_APPS:
 # Stub for third_party_auth options.
 # See common/djangoapps/third_party_auth/settings.py for configuration details.
 THIRD_PARTY_AUTH = {}
+
+# ORA2
+EDX_ORA2 = {
+    # Temp hack to log events from non-XBlock parts of ORA2 until it can
+    # switch over to using the event tracking API.
+    "EVENT_LOGGER": "track.tracker.send"
+}
