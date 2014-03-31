@@ -1,16 +1,16 @@
 define(
     [
         "jquery", "underscore",
-        "js/views/transcripts/utils", "js/views/transcripts/file_uploader",
+        "js/views/video/transcripts/utils", "js/views/video/transcripts/file_uploader",
         "xmodule", "jquery.form", "jasmine-jquery"
     ],
 function ($, _, Utils, FileUploader) {
     describe('Transcripts.FileUploader', function () {
         var videoListEntryTemplate = readFixtures(
-                'transcripts/metadata-videolist-entry.underscore'
+                'video/transcripts/metadata-videolist-entry.underscore'
             ),
             fileUploadTemplate = readFixtures(
-                'transcripts/file-upload.underscore'
+                'video/transcripts/file-upload.underscore'
             ),
             view;
 

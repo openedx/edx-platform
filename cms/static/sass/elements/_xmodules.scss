@@ -2,22 +2,21 @@
 // ====================
 
 // general - display mode (xblock-student_view or xmodule_display)
-.xmodule_display, .xblock-student_view {
-
+.xmodule_display,
+.xblock-student_view {
   // font styling
-  i, em {
+  i,
+  em {
     font-style: italic;
   }
 }
 
 // ====================
 
-// Video Alpha
+// Video
 .xmodule_VideoModule {
-
   // display mode
   &.xblock-student_view {
-
     // full screen
     .video-controls .add-fullscreen {
       display: none !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
@@ -35,190 +34,300 @@
 }
 
 .xmodule_VideoDescriptor {
-    .wrapper-comp-settings.basic_metadata_edit{
-        .list-input.settings-list {
-            .field.comp-setting-entry {
-
-                .setting-label {
-                    vertical-align: top;
-                    margin-top: ($baseline/2);
-                }
-
-                .setting-help{
-                    display: block;
-                    width: 45%;
-                    max-width: auto;
-                    margin-left: 25%;
-                    padding: 0 13px;
-                }
-
-                .collapse-setting {
-                    @extend %t-action3;
-                    display: block;
-                    width: 100%;
-                    padding: ($baseline/2);
-                    font-weight: 600;
-
-                    *[class^="icon-"] {
-                        margin-right: ($baseline/4);
-                    }
-                }
-                .videolist-url-tip.setting-help,
-                .videolist-extra-videos-tip.setting-help{
-                    margin-left: 0;
-                    width: 100%;
-                    padding: 0 10px 10px;
-                }
-
-                .videolist-url-tip.setting-help{
-                    padding: 0 0 10px;
-                }
-
-                .wrapper-comp-setting{
-                    width: 100%;
-                    display: block;
-                    max-width: auto;
-                }
-
-                // inputs and labels
-                .wrapper-videolist-settings {
-                    width: 45%;
-                    display: inline-block;
-                    min-width: ($baseline*5);
-
-
-                    // inputs
-                    .input {
-                        width: 100%;
-                        vertical-align: middle;
-
-                        &.is-disabled,
-                        &[disabled="disabled"]{
-                            opacity: .5;
-                        }
-                    }
-
-                    .wrapper-videolist-url{
-                        margin-bottom: ($baseline/2);
-                    }
-
-                    .wrapper-videolist-urls{
-                        background: $lightGrey;
-                        padding: ($baseline/3);
-
-                        // enumerated fields
-                        .videolist-extra-videos {
-                            display: none;
-
-                            &.is-visible{
-                                display: block;
-                            }
-
-                            .videolist-settings-item {
-                                margin-bottom: ($baseline/2);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        .transcripts-status{
-            margin-top: $baseline;
-
-            &.is-invisible{
-                display: none !important;
-            }
-
-            .wrapper-transcripts-message{
-                width: 60%;
-                display: inline-block;
-                vertical-align: top;
-                min-width: ($baseline*5);
-                margin-top: 10px;
-
-                .transcripts-message{
-                    @include font-size(12);
-                }
-
-                .transcripts-message-status{
-                    color: $green;
-                    font-weight: 700;
-
-                    &.status-error{
-                        color: $red;
-                    }
-
-                    [class^="icon-"],
-                    [class*=" icon-"]{
-                        margin-right: 5px;
-                        @include font-size(18);
-                    }
-                }
-
-                .transcripts-error-message{
-                    background: $red;
-                    color: $white;
-                    @include font-size(14);
-                    padding: ($baseline/3);
-
-                    &.is-invisible{
-                        display: none;
-                    }
-                }
-
-                .wrapper-transcripts-buttons{
-
-                    &.is-invisible{
-                        display: none;
-                    }
-                }
-            }
-            .action{
-                @extend %btn-primary-blue;
-                @extend %t-action3;
-                margin-bottom: ($baseline/2);
-            }
+  .wrapper-comp-settings.basic_metadata_edit {
+    .list-input.settings-list {
+      .field.comp-setting-entry {
+        .setting-label {
+          vertical-align: top;
+          margin-top: ($baseline/2);
         }
 
-        // TYPE: enumerated video lists of metadata sets
-        .metadata-videolist-enum {
-            * {
-                @include box-sizing(border-box);
-            }
+        .setting-help {
+          display: block;
+          width: 45%;
+          max-width: auto;
+          margin-left: 25%;
+          padding: 0 13px;
         }
 
-        .file-chooser{
-            display: none;
+        .collapse-setting {
+          @extend %t-action3;
+          display: block;
+          width: 100%;
+          padding: ($baseline/2);
+          font-weight: 600;
+
+          *[class^="icon-"] {
+            margin-right: ($baseline/4);
+          }
         }
 
-        .progress-bar{
-            display: block;
-            height: 30px;
-            margin: 10px 0;
-            border: 1px solid $blue;
-            text-align: center;
-            font-size: 1.14em;
+        .videolist-url-tip.setting-help,
+        .videolist-extra-videos-tip.setting-help {
+          margin-left: 0;
+          width: 100%;
+          padding: 0 10px 10px;
+        }
 
-            &.is-invisible {
-                display: none;
+        .videolist-url-tip.setting-help {
+          padding: 0 0 10px;
+        }
+
+        .wrapper-comp-setting {
+          width: 100%;
+          display: block;
+          max-width: auto;
+        }
+
+        // inputs and labels
+        .wrapper-videolist-settings {
+          width: 45%;
+          display: inline-block;
+          min-width: ($baseline*5);
+
+          // inputs
+          .input {
+            width: 100%;
+            vertical-align: middle;
+
+            &.is-disabled,
+            [disabled="disabled"] {
+              opacity: .5;
             }
+          }
 
-            &.loaded {
-                border-color: #66b93d;
+          .wrapper-videolist-url {
+            margin-bottom: ($baseline/2);
+          }
 
-                .progress-fill {
-                    background: #66b93d;
-                }
-            }
+          .wrapper-videolist-urls {
+            background: $lightGrey;
+            padding: ($baseline/3);
 
-            .progress-fill {
+            // enumerated fields
+            .videolist-extra-videos {
+              display: none;
+
+              &.is-visible {
                 display: block;
-                width: 0%;
-                height: 30px;
-                background: $blue;
-                color: #fff;
-                line-height: 28px;
+              }
+
+              .videolist-settings-item {
+                margin-bottom: ($baseline/2);
+              }
             }
+          }
         }
+      }
     }
+
+    .transcripts-status {
+      margin-top: $baseline;
+
+      &.is-invisible {
+        display: none !important;
+      }
+
+      .wrapper-transcripts-message {
+        width: 60%;
+        display: inline-block;
+        vertical-align: top;
+        min-width: ($baseline*5);
+        margin-top: 10px;
+
+        .transcripts-message {
+          @include font-size(12);
+        }
+
+        .transcripts-message-status {
+          color: $green;
+          font-weight: 700;
+
+          &.status-error {
+            color: $red;
+          }
+
+          [class^="icon-"],
+          [class*=" icon-"] {
+            margin-right: 5px;
+            @include font-size(18);
+          }
+        }
+
+        .transcripts-error-message {
+          background: $red;
+          color: $white;
+          @include font-size(14);
+          padding: ($baseline/3);
+
+          &.is-invisible {
+            display: none;
+          }
+        }
+
+        .wrapper-transcripts-buttons {
+          &.is-invisible {
+            display: none;
+          }
+        }
+      }
+
+      .action {
+        @extend %btn-primary-blue;
+        @extend %t-action3;
+        margin-bottom: ($baseline/2);
+      }
+    }
+
+    // TYPE: enumerated video lists of metadata sets
+    .metadata-videolist-enum {
+      * {
+        @include box-sizing(border-box);
+      }
+    }
+
+    .file-chooser {
+      display: none;
+    }
+
+    .progress-bar {
+      display: block;
+      height: 30px;
+      margin: 10px 0;
+      border: 1px solid $blue;
+      text-align: center;
+      font-size: 1.14em;
+
+      &.is-invisible {
+        display: none;
+      }
+
+      &.loaded {
+        border-color: #66b93d;
+
+        .progress-fill {
+          background: #66b93d;
+        }
+      }
+
+      .progress-fill {
+        display: block;
+        width: 0%;
+        height: 30px;
+        background: $blue;
+        color: #fff;
+        line-height: 28px;
+      }
+    }
+  }
+
+  .wrapper-comp-settings {
+    // TYPE: VideoTranslations
+    .list-input.settings-list {
+      .metadata-video-translations {
+        * {
+          @include box-sizing(border-box);
+        }
+
+        // label
+        .setting-label {
+          vertical-align: top;
+          margin-top: ($baseline*.25);
+        }
+
+        // inputs and labels
+        .wrapper-translations-settings {
+          width: 45%;
+          display: inline-block;
+          min-width: 240px;
+
+          // enumerated fields
+          .list-settings {
+            margin: 0;
+
+            .list-settings-item {
+              margin-bottom: ($baseline/2);
+
+              select {
+                width: 80%;
+                margin-right: ($baseline/2);
+              }
+
+              .list-settings-buttons {
+                @extend %cont-truncated;
+                padding: ($baseline/2) 0;
+                border-bottom: 1px solid $gray-l4;
+              }
+            }
+
+            // inputs
+            .input {
+              width: 43%;
+              margin-right: ($baseline/4);
+              vertical-align: middle;
+              display: inline-block;
+
+              &.input-value {
+                margin-right: ($baseline/2);
+              }
+            }
+          }
+        }
+
+        .setting-clear.action {
+          vertical-align: top;
+          margin: ($baseline*.25) ($baseline*.5) 0;
+        }
+
+        .create-setting {
+          @extend %ui-btn-flat-outline;
+          @extend %t-action3;
+          display: block;
+          padding: ($baseline/2);
+          font-weight: 600;
+
+          *[class^="icon-"] {
+            margin-right: ($baseline/4);
+          }
+        }
+
+        .upload-setting {
+          @extend %ui-btn-flat-outline;
+          @extend %t-action3;
+          display: inline-block;
+          padding: ($baseline/2);
+          font-weight: 600;
+          width: 49%;
+          margin-right: 2%;
+        }
+
+        .download-setting {
+          @extend %ui-btn-non;
+          @extend %t-action4;
+          display: inline-block;
+          padding: ($baseline/2);
+          font-weight: 600;
+          width: 49%;
+          text-align: center;
+          color: $blue;
+
+          &:hover {
+            background-color: $blue;
+          }
+        }
+
+        .remove-setting {
+          @include transition(color .25s ease-in-out);
+          @include font-size(20);
+          display: inline-block;
+          background: transparent;
+          color: $blue-l3;
+
+          &:hover {
+            color: $blue;
+          }
+        }
+      }
+    }
+  }
 }

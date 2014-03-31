@@ -1,7 +1,7 @@
 define(
     [
         "jquery", "backbone", "underscore",
-        "js/views/transcripts/utils", "js/views/transcripts/file_uploader",
+        "js/views/video/transcripts/utils", "js/views/video/transcripts/file_uploader",
         "gettext"
     ],
 function($, Backbone, _, Utils, FileUploader, gettext) {

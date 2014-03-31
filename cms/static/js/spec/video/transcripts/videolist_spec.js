@@ -1,14 +1,14 @@
 define(
     [
         "jquery", "underscore",
-        "js/views/transcripts/utils", "js/views/transcripts/metadata_videolist",
+        "js/views/video/transcripts/utils", "js/views/video/transcripts/metadata_videolist",
         "js/views/metadata", "js/models/metadata", "js/views/abstract_editor",
         "sinon", "xmodule", "jasmine-jquery"
     ],
 function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, sinon) {
     describe('CMS.Views.Metadata.VideoList', function () {
         var videoListEntryTemplate = readFixtures(
-                'transcripts/metadata-videolist-entry.underscore'
+                'video/transcripts/metadata-videolist-entry.underscore'
             ),
             abstractEditor = AbstractEditor.prototype,
             component_locator = 'component_locator',

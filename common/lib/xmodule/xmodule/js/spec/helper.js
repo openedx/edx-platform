@@ -144,7 +144,7 @@
                         }
                     };
                 }
-            } else if (settings.url == '/transcript/translation') {
+            } else if (settings.url.match(/transcript\/translation\/.+$/)) {
                 return settings.success(jasmine.stubbedCaption);
             } else if (settings.url == '/transcript/available_translations') {
                 return settings.success(['uk', 'de']);

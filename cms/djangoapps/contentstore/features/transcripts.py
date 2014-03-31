@@ -195,7 +195,7 @@ def i_enter_a_source(_step, link, index):
 def upload_file(_step, file_name):
     path = os.path.join(TEST_ROOT, 'uploads/', file_name.strip())
     world.browser.execute_script("$('form.file-chooser').show()")
-    world.browser.attach_file('file', os.path.abspath(path))
+    world.browser.attach_file('transcript-file', os.path.abspath(path))
     world.wait_for_ajax_complete()
 
 

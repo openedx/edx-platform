@@ -226,9 +226,8 @@ function () {
     function fetchCaption() {
         var self = this,
             Caption = self.videoCaption,
-            data = {
-                language: this.getCurrentLanguage()
-            };
+            language = this.getCurrentLanguage(),
+            data;
 
         if (Caption.loaded) {
             Caption.hideCaptions(false);
@@ -241,13 +240,15 @@ function () {
         }
 
         if (this.videoType === 'youtube') {
-            data.videoId = this.youtubeId();
+            data = {
+                videoId: this.youtubeId()
+            };
         }
 
         // Fetch the captions file. If no file was specified, or if an error
         // occurred, then we hide the captions panel, and the "CC" button
         Caption.fetchXHR = $.ajaxWithPrefix({
-            url: self.config.transcriptTranslationUrl,
+            url: self.config.transcriptTranslationUrl + '/' + language,
             notifyOnError: false,
             data: data,
             success: function (captions) {

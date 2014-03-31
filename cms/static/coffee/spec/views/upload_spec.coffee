@@ -16,6 +16,7 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec/c
             @dialogResponse = dialogResponse = []
             @view = new UploadDialog(
               model: @model,
+              url:  CMS.URL.UPLOAD_ASSET,
               onSuccess: (response) =>
                 dialogResponse.push(response.response)
             )

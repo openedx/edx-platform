@@ -1,7 +1,7 @@
 define(
     [
         "jquery", "backbone", "underscore",
-        "js/views/transcripts/utils"
+        "js/views/video/transcripts/utils"
     ],
 function($, Backbone, _, Utils) {
     var FileUploader = Backbone.View.extend({
