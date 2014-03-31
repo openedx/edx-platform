@@ -834,9 +834,9 @@ PIPELINE_CSS = {
     },
     'style-vendor-tinymce': {
         'source_filenames': [
-            'js/vendor/tiny_mce/skins/studio-tmce4/content.min.css',
-            'js/vendor/tiny_mce/skins/studio-tmce4/content.inline.min.css',
-            'js/vendor/tiny_mce/skins/studio-tmce4/skin.min.css'
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.inline.min.css',
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
         ],
         'output_filename': 'css/lms-style-vendor-tinymce.css',
     },
