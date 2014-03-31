@@ -269,6 +269,17 @@ def parse_time_str(time_str):
     return time_obj.tm_min * 60 + time_obj.tm_sec
 
 
+@step('youtube stub server (.*) YouTube API')
+def configure_youtube_api(_step, action):
+    action=action.strip()
+    if action == 'proxies':
+        world.youtube.config['youtube_api_blocked'] = False
+    elif action == 'blocks':
+        world.youtube.config['youtube_api_blocked'] = True
+    else:
+        raise ValueError('Parameter `action` should be one of "proxies" or "blocks".')
+
+
 @step('when I view the (.*) it does not have autoplay enabled$')
 def does_not_autoplay(_step, video_type):
     actual = world.css_find('.%s' % video_type)[0]['data-autoplay']
@@ -543,4 +554,3 @@ def shows_captions(_step, show_captions):
         assert world.is_css_present('div.video.closed')
     else:
         assert world.is_css_not_present('div.video.closed')
-
