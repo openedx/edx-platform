@@ -33,6 +33,8 @@ from sys import float_info
 from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
 
+from dogapi import dog_stats_api
+
 # specific library imports
 from calc import evaluator, UndefinedVariable
 from . import correctmap
@@ -1689,6 +1691,13 @@ class CodeResponse(LoncapaResponse):
         (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg)
 
         _ = self.capa_system.i18n.ugettext
+
+        dog_stats_api.increment(xqueue_interface.XQUEUE_METRIC_NAME, tags=[
+            'action:update_score',
+            'correct:{}'.format(correct)
+        ])
+
+        dog_stats_api.histogram(xqueue_interface.XQUEUE_METRIC_NAME + '.update_score.points_earned', points)
 
         if not valid_score_msg:
             # Translators: 'grader' refers to the edX automatic code grader.

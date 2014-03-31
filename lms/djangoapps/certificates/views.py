@@ -4,6 +4,8 @@ from certificates.models import CertificateStatuses as status
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 import json
+from dogapi import dog_stats_api
+from capa.xqueue_interface import XQUEUE_METRIC_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +74,12 @@ def update_certificate(request):
                             'return_code': 1,
                             'content': 'invalid cert status'}),
                              mimetype='application/json')
+
+        dog_stats_api.increment(XQUEUE_METRIC_NAME, tags=[
+            u'action:update_certificate',
+            u'course_id:{}'.format(cert.course_id)
+        ])
+
         cert.save()
         return HttpResponse(json.dumps({'return_code': 0}),
-                             mimetype='application/json')
+                            mimetype='application/json')
