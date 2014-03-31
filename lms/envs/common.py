@@ -578,8 +578,8 @@ LANGUAGES = (
     ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
     ('uk', u'Українська'),  # Uknranian
     ('vi', u'Tiếng Việt'),  # Vietnamese
-    ('zh-cn', u'大陆简体'),  # Chinese (China)
-    ('zh-tw', u'台灣正體'),  # Chinese (Taiwan)
+    ('zh-cn', u'中文(简体)'),  # Chinese (China)
+    ('zh-tw', u'中文(台灣)'),  # Chinese (Taiwan)
 )
 
 LANGUAGE_DICT = dict(LANGUAGES)
