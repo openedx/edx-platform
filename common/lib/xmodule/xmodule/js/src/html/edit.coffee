@@ -13,7 +13,7 @@ class @HTMLEditingDescriptor
 #   tinyMCE incorrectly decides that the suffix should be "", which means it fails to load files.
     tinyMCE.suffix = ".min"
     @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
-      script_url : "#{baseUrl}/js/vendor/tiny_mce/tinymce.min.js",
+      script_url : "#{baseUrl}/js/vendor/tiny_mce/tinymce.full.min.js",
       theme : "modern",
       skin: 'studio-tmce4',
       schema: "html5",
