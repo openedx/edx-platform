@@ -988,11 +988,7 @@ def _do_create_account(post_vars):
     except IntegrityError:
         js = {'success': False}
         # Figure out the cause of the integrity error
-        if len(User.objects.filter(username=post_vars['username'])) > 0:
-            js['value'] = _("An account with the Public Username '{username}' already exists.").format(username=post_vars['username'])
-            js['field'] = 'username'
-            return JsonResponse(js, status=400)
-
+        
         if len(User.objects.filter(email=post_vars['email'])) > 0:
             js['value'] = _("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
             js['field'] = 'email'
@@ -1602,7 +1598,6 @@ def confirm_email_change(request, key):
             meta['old_emails'] = []
         meta['old_emails'].append([user.email, datetime.datetime.now(UTC).isoformat()])
         up.set_meta(meta)
-        up.save()
         # Send it to the old email...
         try:
             user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
@@ -1614,6 +1609,7 @@ def confirm_email_change(request, key):
 
         user.email = pec.new_email
         user.save()
+        up.save()
         pec.delete()
         # And send it to the new email...
         try:

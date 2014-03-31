@@ -227,7 +227,7 @@ def fullstat(request = None):
             courseenrollment__course_id=course.id,
             courseenrollment__is_active=1,
         ).prefetch_related("groups").order_by('username')
-        enrolled_students = [st for st in enrolled_students if _has_staff_access_to_course_id(st, course.id)]
+        enrolled_students = [st for st in enrolled_students if not _has_staff_access_to_course_id(st, course.id)]
 
         idx = 0
         for user in enrolled_students:
@@ -260,13 +260,13 @@ def fullstat(request = None):
                                 off_reg = True
                                 break
                         if found:
-                            continue
+                            break
                 except:
                     pass
                 
 
                 #User
-                name = row['second-name'] + ' ' + row['first-name'] + ' ' + row['patronymic']
+                name = rows[0]['second-name'] + ' ' + rows[0]['first-name'] + ' ' + rows[0]['patronymic']
                 datarow += [name]
                 if user.profile.name != name:
                     datarow += [user.profile.name]
@@ -279,8 +279,7 @@ def fullstat(request = None):
                 else:
                     datarow += [u'']
                 #Course
-                course = get_course(course_id)
-                datarow += [course_name]
+                datarow += [course.display_name]
 
                 if off_reg:
                     datarow += [u'Да']
@@ -288,23 +287,23 @@ def fullstat(request = None):
                     datarow += [u'Нет']
 
                 try:
-                    courseenrollment = user.courseenrollment_set.filter(course_id = course_id)[0]
+                    courseenrollment = user.courseenrollment_set.filter(course_id = course.id)[0]
                     datarow += [courseenrollment.created.strftime('%d/%m/%Y')]
                 except:
                     continue
                 
                 #Raw statistic by problems
-                statprob = edxdata[course_id][user.email]["prob_info"]
+                statprob = edxdata[course.id][user.email]["prob_info"]
                 
                 #By subsection
-                statsec = edxdata[course_id][user.email]["sec_info"]
+                statsec = edxdata[course.id][user.email]["sec_info"]
 
-                if edxdata[course_id][user.email]["0.7"]:
+                if edxdata[course.id][user.email]["0.7"]:
                     datarow += [u"Да"]
                 else:
                     datarow += [u"Нет"]
                 
-                if edxdata[course_id][user.email]["1.0"]:
+                if edxdata[course.id][user.email]["1.0"]:
                     datarow += [u"Да"]
                 else:
                     datarow += [u"Нет"]
@@ -314,7 +313,7 @@ def fullstat(request = None):
                 
                 datafull.append(datarow)
             except:
-                pass
+                raise
     datatablefull['data'] = datafull
     return_csv('full_stat.csv',datatablefull, open("/var/www/edx/fullstat.csv", "wb"))
 
