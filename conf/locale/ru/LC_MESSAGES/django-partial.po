@@ -4250,9 +4250,8 @@ msgid ""
 msgstr "Извините, учетные записи {platform_name} в данный момент недоступны"
 
 #: lms/templates/registration/password_reset_confirm.html:86
-#, fuzzy
 msgid "The following errors occurred while processing your registration: "
-msgstr "При обработке Вашей регистрации возникли следующие ошибки:"
+msgstr "При обработке Вашей регистрации возникли следующие ошибки: "
 
 #: lms/templates/registration/password_reset_confirm.html:88
 msgid "You must complete all fields."

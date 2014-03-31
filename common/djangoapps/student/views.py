@@ -29,7 +29,6 @@ from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
-from django.utils.translation import ugettext_lazy
 from django.utils.functional import Promise
 from django.utils.encoding import force_unicode
 from django.utils.simplejson import JSONEncoder
@@ -834,7 +833,7 @@ def login_user(request, error=""):
         AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
-    not_activated_msg = ugettext_lazy("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
+    not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
     return JsonResponse({
         "success": False,
         "value": not_activated_msg,
@@ -995,7 +994,7 @@ def _do_create_account(post_vars):
             return JsonResponse(js, status=400)
 
         if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = ugettext_lazy("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
+            js['value'] = _("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
             js['field'] = 'email'
             return JsonResponse(js, status=400)
 
@@ -1079,13 +1078,13 @@ def create_account(request, post_override=None):
     # Confirm we have a properly formed request
     for a in ['email', 'password', "lastname", "firstname", "middlename"]:
         if a not in post_vars:
-            js['value'] = ugettext_lazy("Error (401 {field}). E-mail us.").format(field=a)
+            js['value'] = _("Error (401 {field}). E-mail us.").format(field=a)
             js['field'] = a
             return JsonResponse(js, status=400)
 
     if extra_fields.get('honor_code', 'required') == 'required' and \
             post_vars.get('honor_code', 'false') != u'true':
-        js['value'] = ugettext_lazy("To enroll, you must follow the honor code.").format(field=a)
+        js['value'] = _("To enroll, you must follow the honor code.").format(field=a)
         js['field'] = 'honor_code'
         return JsonResponse(js, status=400)
 
@@ -1101,7 +1100,7 @@ def create_account(request, post_override=None):
 
     if tos_required:
         if post_vars.get('terms_of_service', 'false') != u'true':
-            js['value'] = ugettext_lazy("You must accept the terms of service.").format(field=a)
+            js['value'] = _("You must accept the terms of service.").format(field=a)
             js['field'] = 'terms_of_service'
             return JsonResponse(js, status=400)
 
@@ -1111,14 +1110,15 @@ def create_account(request, post_override=None):
     # this is a good idea
     # TODO: Check password is sane
 
-    if "work_occupation" in required_post_vars and repost_var.get("work_occupation") == 'other' and "work_occupation2" in post_vars:
+    required_post_vars = ['email', 'firstname', 'lastname', 'password']
+    required_post_vars += [fieldname for fieldname, val in extra_fields.items()
+                           if val == 'required']
+    
+    if "work_occupation" in required_post_vars and post_vars.get("work_occupation") == 'other' and "work_occupation2" in post_vars:
         post_vars.post_vars["work_occupation"] = post_vars["work_occupation2"]
     if "work_occupation_other" in required_post_vars and  post_vars.get("work_occupation_other") == 'other' and "work_occupation_other2" in post_vars:
         post_vars.post_vars["work_occupation_other"] = post_vars["work_occupation_other2"]
 
-    required_post_vars = ['username', 'email', 'name', 'password']
-    required_post_vars += [fieldname for fieldname, val in extra_fields.items()
-                           if val == 'required']
     if tos_required:
         required_post_vars.append('terms_of_service')
 
@@ -1128,31 +1128,31 @@ def create_account(request, post_override=None):
         else:
             min_length = 2
 
-        if len(post_vars[field_name]) < min_length:
+        if len(post_vars.get(field_name, '')) < min_length:
             error_str = {
-                'username': ugettext_lazy('Username must be minimum of two characters long.'),
-                'email': ugettext_lazy('A properly formatted e-mail is required.'),
-                'name': ugettext_lazy('Your legal name must be a minimum of two characters long.'),
-                'password': ugettext_lazy('A valid password is required.'),
-                'terms_of_service': ugettext_lazy('Accepting Terms of Service is required.'),
-                'honor_code': ugettext_lazy('Agreeing to the Honor Code is required.'),
-                'lastname': ugettext_lazy('Lastname must be a minimum of two characters long.'),
-                'firstname': ugettext_lazy('Firstname must be a minimum of two characters long.'),
-                'middlename': ugettext_lazy('Middlename must be a minimum of two characters long.'),
-                'year_of_birth': ugettext_lazy('Year of birth is required'),
-                'level_of_education': ugettext_lazy('Education level is required'),
-                'education_place': ugettext_lazy('Education place is required'),
-                'education_year': ugettext_lazy('Education year is required'),
-                'work_type': ugettext_lazy('Work type is required'),
-                'work_number': ugettext_lazy('Work number is required'),
-                'work_name': ugettext_lazy('Work name is required'),
-                'work_login': ugettext_lazy('Work StatGrad login is required'),
-                'work_location': ugettext_lazy('Work location is required'),
-                'work_occupation': ugettext_lazy('Work occupation is required'),
-                'work_teaching_experience': ugettext_lazy('Work teaching experience is required'),
-                'work_qualification_category': ugettext_lazy('Work qualification category is required'),
-                'work_qualification_category_year': ugettext_lazy('Work qualification year is required'),
-                'contact_phone': ugettext_lazy('Contact phone is required'),
+                'username': _('Username must be minimum of two characters long.'),
+                'email': _('A properly formatted e-mail is required.'),
+                'name': _('Your legal name must be a minimum of two characters long.'),
+                'password': _('A valid password is required.'),
+                'terms_of_service': _('Accepting Terms of Service is required.'),
+                'honor_code': _('Agreeing to the Honor Code is required.'),
+                'lastname': _('Lastname must be a minimum of two characters long.'),
+                'firstname': _('Firstname must be a minimum of two characters long.'),
+                'middlename': _('Middlename must be a minimum of two characters long.'),
+                'year_of_birth': _('Year of birth is required'),
+                'level_of_education': _('Education level is required'),
+                'education_place': _('Education place is required'),
+                'education_year': _('Education year is required'),
+                'work_type': _('Work type is required'),
+                'work_number': _('Work number is required'),
+                'work_name': _('Work name is required'),
+                'work_login': _('Work StatGrad login is required'),
+                'work_location': _('Work location is required'),
+                'work_occupation': _('Work occupation is required'),
+                'work_teaching_experience': _('Work teaching experience is required'),
+                'work_qualification_category': _('Work qualification category is required'),
+                'work_qualification_category_year': _('Work qualification year is required'),
+                'contact_phone': _('Contact phone is required'),
                 'mailing_address': _('Your mailing address is required'),
                 'goals': _('A description of your goals is required'),
                 'city': _('A city is required'),
@@ -1178,15 +1178,8 @@ def create_account(request, post_override=None):
     try:
         validate_email(post_vars['email'])
     except ValidationError:
-        js['value'] = ugettext_lazy("Valid e-mail is required.").format(field=a)
+        js['value'] = _("Valid e-mail is required.").format(field=a)
         js['field'] = 'email'
-        return JsonResponse(js, status=400)
-
-    try:
-        validate_slug(post_vars['username'])
-    except ValidationError:
-        js['value'] = _("Username should only consist of A-Z and 0-9, with no spaces.").format(field=a)
-        js['field'] = 'username'
         return JsonResponse(js, status=400)
 
     # enforce password complexity as an optional feature
@@ -1887,7 +1880,7 @@ def import_users(request, post_override=None):
         transaction.commit()
         js['passwords'][row['email']] = password
 
-    return HttpResponse(json.dumps(js, cls=LazyEncoder))
+    return JsonResponse(js)
 
 
 @require_POST
@@ -1934,12 +1927,3 @@ def token(request):
     newtoken = create_token(secret, custom_data)
     response = HttpResponse(newtoken, mimetype="text/plain")
     return response
-class LazyEncoder(JSONEncoder):
-    """Encodes django's lazy i18n strings.
-    Used to serialize translated strings to JSON, because
-    simplejson chokes on it otherwise.
-    """
-    def default(self, obj):
-        if isinstance(obj, Promise):
-            return force_unicode(obj)
-        return super(LazyEncoder, self).default(obj)
