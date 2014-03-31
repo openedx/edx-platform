@@ -54,7 +54,7 @@ def start_payment_process(params):
 
     data = {
         'AMOUNT': int(order.total_cost * 100),
-        'CURRENCY': 'USD',
+        'CURRENCY': order.currency.upper(),
         'DESCRIPTION': description,
         'LANGID': 'en',
         'ALLOWCOLLECT': 'no',
