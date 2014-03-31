@@ -38,13 +38,14 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# sdfhjc, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-25 10:28-0400\n"
-"PO-Revision-Date: 2014-02-06 03:04+0000\n"
-"Last-Translator: nedbat <ned@edx.org>\n"
+"POT-Creation-Date: 2014-03-31 09:26-0400\n"
+"PO-Revision-Date: 2014-03-26 18:20+0000\n"
+"Last-Translator: sdfhjc\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1019,6 +1020,11 @@ msgstr ""
 msgid "Discussion"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/tabs.py cms/templates/textbooks.html
+#: cms/templates/textbooks.html cms/templates/widgets/header.html
+msgid "Textbooks"
+msgstr ""
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: "Staff grading" appears on a tab that allows
 #. staff to view open-ended problems that require staff grading
@@ -1335,6 +1341,14 @@ msgstr ""
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid "User {username} does not exist."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py
+msgid "User {username} has never accessed problem {location}"
 msgstr ""
 
 #: lms/djangoapps/courseware/features/video.py lms/templates/video.html
@@ -1797,24 +1811,25 @@ msgid "Couldn't find student with that email or username."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "List of students enrolled in {0}"
+msgid "List of students enrolled in {course_id}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Summary Grades of students enrolled in {0}"
+msgid "Summary Grades of students enrolled in {course_id}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Raw Grades of students enrolled in {0}"
+msgid "Raw Grades of students enrolled in {course_id}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Failed to create a background task for rescoring \"{0}\"."
+msgid "Failed to create a background task for rescoring \"{problem_url}\"."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
-"Failed to create a background task for rescoring \"{0}\": problem not found."
+"Failed to create a background task for rescoring \"{problem_url}\": problem "
+"not found."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
@@ -1822,12 +1837,13 @@ msgid "Failed to create a background task for rescoring \"{url}\": {message}."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Failed to create a background task for resetting \"{0}\"."
+msgid "Failed to create a background task for resetting \"{problem_url}\"."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
-"Failed to create a background task for resetting \"{0}\": problem not found."
+"Failed to create a background task for resetting \"{problem_url}\": problem "
+"not found."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
@@ -1974,37 +1990,39 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Error: unknown rolename \"{0}\""
+msgid "Error: unknown rolename \"{rolename}\""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Error: unknown username \"{0}\""
-msgstr ""
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Error: user \"{0}\" does not have rolename \"{1}\", cannot remove"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Removed \"{0}\" from \"{1}\" forum role = \"{2}\""
-msgstr ""
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Error: user \"{0}\" already has rolename \"{1}\", cannot add"
+msgid "Error: unknown username \"{username}\""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
-"Error: user \"{0}\" should first be added as staff before adding as a forum "
-"administrator, cannot add"
+"Error: user \"{username}\" does not have rolename \"{rolename}\", cannot "
+"remove"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Added \"{0}\" to \"{1}\" forum role = \"{2}\""
+msgid "Removed \"{username}\" from \"{course_id}\" forum role = \"{rolename}\""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "{0} in course {1}"
+msgid "Error: user \"{username}\" already has rolename \"{rolename}\", cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Error: user \"{username}\" should first be added as staff before adding as a"
+" forum administrator, cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Added \"{username}\" to \"{course_id}\" forum role = \"{rolename}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "{title} in course {course_id}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
@@ -2240,6 +2258,37 @@ msgstr ""
 
 #: lms/djangoapps/linkedin/templates/linkedin_email.html
 msgid "Add to profile"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Peer Grading" is a panel where peer can grade student-
+#. provided answers.
+#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
+#: lms/templates/peer_grading/peer_grading.html
+#: lms/templates/peer_grading/peer_grading_closed.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Peer Grading"
+msgstr ""
+
+#. Translators: "Staff Grading" is a panel where instructor can grade student-
+#. provided answers.
+#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
+msgid "Staff Grading"
+msgstr ""
+
+#. Translators: "Problems you have submitted" refers to the problems that the
+#. currently-logged-in
+#. student has provided an answer for.
+#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
+msgid "Problems you have submitted"
+msgstr ""
+
+#. Translators: "Flagged Submissions" refers to student-provided answers to a
+#. problem which are
+#. marked by instructor or peer graders as 'flagged' potentially
+#. inappropriate.
+#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
+msgid "Flagged Submissions"
 msgstr ""
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
@@ -3765,6 +3814,14 @@ msgstr ""
 #: lms/templates/navigation.html lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
+msgstr ""
+
+#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
+msgid "Visual"
+msgstr ""
+
+#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
+msgid "HTML"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -7027,6 +7084,254 @@ msgstr ""
 msgid "…"
 msgstr ""
 
+#: lms/templates/emails/activation_email.txt
+msgid ""
+"Thank you for signing up for {platform_name}! To activate your account, "
+"please copy and paste this address into your web browser's address bar:"
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/email_change.txt
+msgid ""
+"If you didn't request this, you don't need to do anything; you won't receive"
+" any more email from us. Please do not reply to this e-mail; if you require "
+"assistance, check the about section of the {platform_name} Courses web site."
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/email_change.txt
+msgid ""
+"If you didn't request this, you don't need to do anything; you won't receive"
+" any more email from us. Please do not reply to this e-mail; if you require "
+"assistance, check the help section of the {platform_name} web site."
+msgstr ""
+
+#: lms/templates/emails/activation_email_subject.txt
+msgid "Your account for {platform_name}"
+msgstr ""
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
+#: lms/templates/emails/enroll_email_enrolledmessage.txt
+#: lms/templates/emails/remove_beta_tester_email_message.txt
+#: lms/templates/emails/unenroll_email_enrolledmessage.txt
+msgid "Dear {full_name}"
+msgstr ""
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
+msgid ""
+"You have been invited to be a beta tester for {course_name} at {site_name} "
+"by a member of the course staff."
+msgstr ""
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
+msgid "Visit {course_about_url} to join the course and begin the beta test."
+msgstr ""
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+#: lms/templates/emails/remove_beta_tester_email_message.txt
+#: lms/templates/emails/unenroll_email_allowedmessage.txt
+msgid "This email was automatically sent from {site_name} to {email_address}"
+msgstr ""
+
+#: lms/templates/emails/add_beta_tester_email_subject.txt
+msgid "You have been invited to a beta test for {course_name}"
+msgstr ""
+
+#: lms/templates/emails/confirm_email_change.txt
+msgid ""
+"This is to confirm that you changed the e-mail associated with "
+"{platform_name} from {old_email} to {new_email}. If you did not make this "
+"request, please contact us at"
+msgstr ""
+
+#: lms/templates/emails/confirm_email_change.txt
+msgid ""
+"This is to confirm that you changed the e-mail associated with "
+"{platform_name} from {old_email} to {new_email}. If you did not make this "
+"request, please contact us immediately. Contact information is listed at:"
+msgstr ""
+
+#: lms/templates/emails/confirm_email_change.txt
+msgid ""
+"We keep a log of old e-mails, so if this request was unintentional, we can "
+"investigate."
+msgstr ""
+
+#: lms/templates/emails/email_change.txt
+msgid ""
+"We received a request to change the e-mail associated with your "
+"{platform_name} account from {old_email} to {new_email}. If this is correct,"
+" please confirm your new e-mail address by visiting:"
+msgstr ""
+
+#: lms/templates/emails/email_change_subject.txt
+msgid "Request to change {platform_name} account e-mail"
+msgstr ""
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid "Dear student,"
+msgstr ""
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid ""
+"You have been invited to join {course_name} at {site_name} by a member of "
+"the course staff."
+msgstr ""
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid "To access the course visit {course_url} and login."
+msgstr ""
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid ""
+"To access the course visit {course_about_url} and register for the course."
+msgstr ""
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid ""
+"To finish your registration, please visit {registration_url} and fill out "
+"the registration form making sure to use {email_address} in the E-mail "
+"field."
+msgstr ""
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid ""
+"Once you have registered and activated your account, you will see "
+"{course_name} listed on your dashboard."
+msgstr ""
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid ""
+"Once you have registered and activated your account, visit "
+"{course_about_url} to join the course."
+msgstr ""
+
+#: lms/templates/emails/enroll_email_allowedsubject.txt
+msgid "You have been invited to register for {course_name}"
+msgstr ""
+
+#: lms/templates/emails/enroll_email_enrolledmessage.txt
+msgid ""
+"You have been enrolled in {course_name} at {site_name} by a member of the "
+"course staff. The course should now appear on your {site_name} dashboard."
+msgstr ""
+
+#: lms/templates/emails/enroll_email_enrolledmessage.txt
+msgid "To start accessing course materials, please visit {course_url}"
+msgstr ""
+
+#: lms/templates/emails/enroll_email_enrolledmessage.txt
+#: lms/templates/emails/unenroll_email_enrolledmessage.txt
+msgid "This email was automatically sent from {site_name} to {full_name}"
+msgstr ""
+
+#: lms/templates/emails/enroll_email_enrolledsubject.txt
+msgid "You have been enrolled in {course_name}"
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Hi {name}"
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid ""
+"Your payment was successful. You will see the charge below on your next "
+"credit or debit card statement."
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid ""
+"The charge will show up on your statement under the company name "
+"{merchant_name}."
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid ""
+"If you have billing questions, please read the FAQ ({faq_url}) or contact "
+"{billing_email}."
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "If you have billing questions, please contact {billing_email}."
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "-The {platform_name} Team"
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Your order number is: {order_number}"
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "The items in your order are:"
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Quantity - Description - Price"
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Total billed to credit/debit card: {currency_symbol}{total_cost}"
+msgstr ""
+
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/shoppingcart/receipt.html
+msgid "#:"
+msgstr ""
+
+#: lms/templates/emails/reject_name_change.txt
+msgid ""
+"We are sorry. Our course staff did not approve your request to change your "
+"name from {old_name} to {new_name}. If you need further assistance, please "
+"e-mail the tech support at"
+msgstr ""
+
+#: lms/templates/emails/reject_name_change.txt
+msgid ""
+"We are sorry. Our course staff did not approve your request to change your "
+"name from {old_name} to {new_name}. If you need further assistance, please "
+"e-mail the course staff at ta@edx.org."
+msgstr ""
+
+#: lms/templates/emails/remove_beta_tester_email_message.txt
+msgid ""
+"You have been removed as a beta tester for {course_name} at {site_name} by a"
+" member of the course staff. The course will remain on your dashboard, but "
+"you will no longer be part of the beta testing group."
+msgstr ""
+
+#: lms/templates/emails/remove_beta_tester_email_message.txt
+#: lms/templates/emails/unenroll_email_enrolledmessage.txt
+msgid "Your other courses have not been affected."
+msgstr ""
+
+#: lms/templates/emails/remove_beta_tester_email_subject.txt
+msgid "You have been removed from a beta test for {course_name}"
+msgstr ""
+
+#: lms/templates/emails/unenroll_email_allowedmessage.txt
+msgid "Dear Student,"
+msgstr ""
+
+#: lms/templates/emails/unenroll_email_allowedmessage.txt
+msgid ""
+"You have been un-enrolled from course {course_name} by a member of the "
+"course staff. Please disregard the invitation previously sent."
+msgstr ""
+
+#: lms/templates/emails/unenroll_email_enrolledmessage.txt
+msgid ""
+"You have been un-enrolled in {course_name} at {site_name} by a member of the"
+" course staff. The course will no longer appear on your {site_name} "
+"dashboard."
+msgstr ""
+
+#: lms/templates/emails/unenroll_email_subject.txt
+msgid "You have been un-enrolled from {course_name}"
+msgstr ""
+
 #: lms/templates/instructor/staff_grading.html
 msgid "{course_number} Staff Grading"
 msgstr ""
@@ -7763,12 +8068,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
-#: lms/templates/peer_grading/peer_grading_closed.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Peer Grading"
-msgstr ""
-
-#: lms/templates/peer_grading/peer_grading.html
 msgid ""
 "Here are a list of problems that need to be peer graded for this course."
 msgstr ""
@@ -8036,10 +8335,6 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Billed To:"
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "#:"
 msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
@@ -9393,6 +9688,7 @@ msgid "Delete this component"
 msgstr ""
 
 #: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "Drag to reorder"
 msgstr ""
@@ -9446,20 +9742,22 @@ msgstr ""
 msgid "New Page"
 msgstr ""
 
+#: cms/templates/edit-tabs.html cms/templates/edit_subsection.html
+#: cms/templates/index.html cms/templates/overview.html
+#: cms/templates/unit.html
+msgid "View Live"
+msgstr ""
+
 #: cms/templates/edit-tabs.html
 msgid "Show this page"
 msgstr ""
 
-#: cms/templates/edit-tabs.html
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 msgid "Show/hide page"
 msgstr ""
 
-#: cms/templates/edit-tabs.html
-msgid "Cannot be reordered"
-msgstr ""
-
-#: cms/templates/edit-tabs.html
-msgid "Fixed page"
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
+msgid "This page cannot be reordered"
 msgstr ""
 
 #: cms/templates/edit-tabs.html
@@ -9594,11 +9892,6 @@ msgstr ""
 
 #: cms/templates/edit_subsection.html
 msgid "Preview Drafts"
-msgstr ""
-
-#: cms/templates/edit_subsection.html cms/templates/index.html
-#: cms/templates/overview.html cms/templates/unit.html
-msgid "View Live"
 msgstr ""
 
 #: cms/templates/error.html
@@ -11087,11 +11380,6 @@ msgstr ""
 #: cms/templates/studio_vertical_wrapper.html
 #: cms/templates/studio_vertical_wrapper.html
 msgid "Expand or Collapse"
-msgstr ""
-
-#: cms/templates/textbooks.html cms/templates/textbooks.html
-#: cms/templates/widgets/header.html
-msgid "Textbooks"
 msgstr ""
 
 #: cms/templates/textbooks.html

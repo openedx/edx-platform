@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-25 10:44-0400\n"
-"PO-Revision-Date: 2014-03-25 14:44:32.299109\n"
+"POT-Creation-Date: 2014-03-31 10:32-0400\n"
+"PO-Revision-Date: 2014-03-31 14:32:24.925796\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1078,6 +1078,11 @@ msgstr "Wïkï Ⱡ'σяєм#"
 msgid "Discussion"
 msgstr "Dïsçüssïön Ⱡ#"
 
+#: common/lib/xmodule/xmodule/tabs.py cms/templates/textbooks.html
+#: cms/templates/textbooks.html cms/templates/widgets/header.html
+msgid "Textbooks"
+msgstr "Téxtßööks #"
+
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: "Staff grading" appears on a tab that allows
 #. staff to view open-ended problems that require staff grading
@@ -1430,6 +1435,14 @@ msgstr "Wélçömé tö thé édX Wïkï Ⱡ'σяє#"
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
 msgstr "Vïsït ä çöürsé wïkï tö ädd än ärtïçlé. Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/courseware/views.py
+msgid "User {username} does not exist."
+msgstr "Ûsér {username} döés nöt éxïst. Ⱡ'σяє#"
+
+#: lms/djangoapps/courseware/views.py
+msgid "User {username} has never accessed problem {location}"
+msgstr "Ûsér {username} häs névér äççésséd prößlém {location} Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/courseware/features/video.py lms/templates/video.html
 msgid "ERROR: No playable video sources found!"
@@ -1928,28 +1941,30 @@ msgid "Couldn't find student with that email or username."
 msgstr "Çöüldn't fïnd stüdént wïth thät émäïl ör üsérnämé. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "List of students enrolled in {0}"
-msgstr "Lïst öf stüdénts énrölléd ïn {0} Ⱡ'σяєм ι#"
+msgid "List of students enrolled in {course_id}"
+msgstr "Lïst öf stüdénts énrölléd ïn {course_id} Ⱡ'σяєм ι#"
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Summary Grades of students enrolled in {0}"
-msgstr "Sümmärý Grädés öf stüdénts énrölléd ïn {0} Ⱡ'σяєм ιρѕυ#"
+msgid "Summary Grades of students enrolled in {course_id}"
+msgstr "Sümmärý Grädés öf stüdénts énrölléd ïn {course_id} Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Raw Grades of students enrolled in {0}"
-msgstr "Räw Grädés öf stüdénts énrölléd ïn {0} Ⱡ'σяєм ιρѕ#"
+msgid "Raw Grades of students enrolled in {course_id}"
+msgstr "Räw Grädés öf stüdénts énrölléd ïn {course_id} Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Failed to create a background task for rescoring \"{0}\"."
+msgid "Failed to create a background task for rescoring \"{problem_url}\"."
 msgstr ""
-"Fäïléd tö çréäté ä ßäçkgröünd täsk för résçörïng \"{0}\". Ⱡ'σяєм ιρѕυм ∂σł#"
+"Fäïléd tö çréäté ä ßäçkgröünd täsk för résçörïng \"{problem_url}\". Ⱡ'σяєм "
+"ιρѕυм ∂σł#"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
-"Failed to create a background task for rescoring \"{0}\": problem not found."
+"Failed to create a background task for rescoring \"{problem_url}\": problem "
+"not found."
 msgstr ""
-"Fäïléd tö çréäté ä ßäçkgröünd täsk för résçörïng \"{0}\": prößlém nöt föünd."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+"Fäïléd tö çréäté ä ßäçkgröünd täsk för résçörïng \"{problem_url}\": prößlém "
+"nöt föünd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Failed to create a background task for rescoring \"{url}\": {message}."
@@ -1958,16 +1973,18 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Failed to create a background task for resetting \"{0}\"."
+msgid "Failed to create a background task for resetting \"{problem_url}\"."
 msgstr ""
-"Fäïléd tö çréäté ä ßäçkgröünd täsk för réséttïng \"{0}\". Ⱡ'σяєм ιρѕυм ∂σł#"
+"Fäïléd tö çréäté ä ßäçkgröünd täsk för réséttïng \"{problem_url}\". Ⱡ'σяєм "
+"ιρѕυм ∂σł#"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
-"Failed to create a background task for resetting \"{0}\": problem not found."
+"Failed to create a background task for resetting \"{problem_url}\": problem "
+"not found."
 msgstr ""
-"Fäïléd tö çréäté ä ßäçkgröünd täsk för réséttïng \"{0}\": prößlém nöt föünd."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+"Fäïléd tö çréäté ä ßäçkgröünd täsk för réséttïng \"{problem_url}\": prößlém "
+"nöt föünd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Failed to create a background task for resetting \"{url}\": {message}."
@@ -2127,44 +2144,48 @@ msgstr "Lïst öf Förüm {name}s ïn çöürsé {id} Ⱡ'σяєм ι#"
 
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Error: unknown rolename \"{0}\""
-msgstr "Érrör: ünknöwn rölénämé \"{0}\" Ⱡ'σяєм #"
+msgid "Error: unknown rolename \"{rolename}\""
+msgstr "Érrör: ünknöwn rölénämé \"{rolename}\" Ⱡ'σяєм #"
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Error: unknown username \"{0}\""
-msgstr "Érrör: ünknöwn üsérnämé \"{0}\" Ⱡ'σяєм #"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Error: user \"{0}\" does not have rolename \"{1}\", cannot remove"
-msgstr ""
-"Érrör: üsér \"{0}\" döés nöt hävé rölénämé \"{1}\", çännöt rémövé Ⱡ'σяєм "
-"ιρѕυм ∂σłσя#"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Removed \"{0}\" from \"{1}\" forum role = \"{2}\""
-msgstr "Rémövéd \"{0}\" fröm \"{1}\" förüm rölé = \"{2}\" Ⱡ'σяєм ιρѕυм#"
-
-#: lms/djangoapps/instructor/views/legacy.py
-msgid "Error: user \"{0}\" already has rolename \"{1}\", cannot add"
-msgstr ""
-"Érrör: üsér \"{0}\" älréädý häs rölénämé \"{1}\", çännöt ädd Ⱡ'σяєм ιρѕυм "
-"∂σł#"
+msgid "Error: unknown username \"{username}\""
+msgstr "Érrör: ünknöwn üsérnämé \"{username}\" Ⱡ'σяєм #"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
-"Error: user \"{0}\" should first be added as staff before adding as a forum "
-"administrator, cannot add"
+"Error: user \"{username}\" does not have rolename \"{rolename}\", cannot "
+"remove"
 msgstr ""
-"Érrör: üsér \"{0}\" shöüld fïrst ßé äddéd äs stäff ßéföré äddïng äs ä förüm "
-"ädmïnïsträtör, çännöt ädd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+"Érrör: üsér \"{username}\" döés nöt hävé rölénämé \"{rolename}\", çännöt "
+"rémövé Ⱡ'σяєм ιρѕυм ∂σłσя#"
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "Added \"{0}\" to \"{1}\" forum role = \"{2}\""
-msgstr "Àddéd \"{0}\" tö \"{1}\" förüm rölé = \"{2}\" Ⱡ'σяєм ιρѕ#"
+msgid "Removed \"{username}\" from \"{course_id}\" forum role = \"{rolename}\""
+msgstr ""
+"Rémövéd \"{username}\" fröm \"{course_id}\" förüm rölé = \"{rolename}\" "
+"Ⱡ'σяєм ιρѕυм#"
 
 #: lms/djangoapps/instructor/views/legacy.py
-msgid "{0} in course {1}"
-msgstr "{0} ïn çöürsé {1} Ⱡ'σ#"
+msgid "Error: user \"{username}\" already has rolename \"{rolename}\", cannot add"
+msgstr ""
+"Érrör: üsér \"{username}\" älréädý häs rölénämé \"{rolename}\", çännöt ädd "
+"Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid ""
+"Error: user \"{username}\" should first be added as staff before adding as a"
+" forum administrator, cannot add"
+msgstr ""
+"Érrör: üsér \"{username}\" shöüld fïrst ßé äddéd äs stäff ßéföré äddïng äs ä"
+" förüm ädmïnïsträtör, çännöt ädd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "Added \"{username}\" to \"{course_id}\" forum role = \"{rolename}\""
+msgstr "Àddéd \"{username}\" tö \"{course_id}\" förüm rölé = \"{rolename}\" Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "{title} in course {course_id}"
+msgstr "{title} ïn çöürsé {course_id} Ⱡ'σ#"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "ID"
@@ -2428,6 +2449,37 @@ msgstr ""
 #: lms/djangoapps/linkedin/templates/linkedin_email.html
 msgid "Add to profile"
 msgstr "Àdd tö pröfïlé Ⱡ'#"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: "Peer Grading" is a panel where peer can grade student-
+#. provided answers.
+#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
+#: lms/templates/peer_grading/peer_grading.html
+#: lms/templates/peer_grading/peer_grading_closed.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Peer Grading"
+msgstr "Péér Grädïng Ⱡ#"
+
+#. Translators: "Staff Grading" is a panel where instructor can grade student-
+#. provided answers.
+#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
+msgid "Staff Grading"
+msgstr "Stäff Grädïng Ⱡ'#"
+
+#. Translators: "Problems you have submitted" refers to the problems that the
+#. currently-logged-in
+#. student has provided an answer for.
+#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
+msgid "Problems you have submitted"
+msgstr "Prößléms ýöü hävé süßmïttéd Ⱡ'σяєм#"
+
+#. Translators: "Flagged Submissions" refers to student-provided answers to a
+#. problem which are
+#. marked by instructor or peer graders as 'flagged' potentially
+#. inappropriate.
+#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
+msgid "Flagged Submissions"
+msgstr "Fläggéd Süßmïssïöns Ⱡ'σя#"
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
@@ -4212,6 +4264,14 @@ msgstr "Prïväçý Pölïçý Ⱡ'#"
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "Hélp Ⱡ'σяєм#"
+
+#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
+msgid "Visual"
+msgstr "Vïsüäl Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
+msgid "HTML"
+msgstr "HTML Ⱡ'σяєм#"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
@@ -7831,6 +7891,331 @@ msgstr "Thïs thréäd häs ßéén pïnnéd ßý çöürsé stäff. Ⱡ'σяє�
 msgid "…"
 msgstr "… #"
 
+#: lms/templates/emails/activation_email.txt
+msgid ""
+"Thank you for signing up for {platform_name}! To activate your account, "
+"please copy and paste this address into your web browser's address bar:"
+msgstr ""
+"Thänk ýöü för sïgnïng üp för {platform_name}! Tö äçtïväté ýöür äççöünt, "
+"pléäsé çöpý änd pästé thïs äddréss ïntö ýöür wéß ßröwsér's äddréss ßär: "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/email_change.txt
+msgid ""
+"If you didn't request this, you don't need to do anything; you won't receive"
+" any more email from us. Please do not reply to this e-mail; if you require "
+"assistance, check the about section of the {platform_name} Courses web site."
+msgstr ""
+"Ìf ýöü dïdn't réqüést thïs, ýöü dön't nééd tö dö änýthïng; ýöü wön't réçéïvé"
+" äný möré émäïl fröm üs. Pléäsé dö nöt réplý tö thïs é-mäïl; ïf ýöü réqüïré "
+"ässïstänçé, çhéçk thé äßöüt séçtïön öf thé {platform_name} Çöürsés wéß sïté."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυ#"
+
+#: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/email_change.txt
+msgid ""
+"If you didn't request this, you don't need to do anything; you won't receive"
+" any more email from us. Please do not reply to this e-mail; if you require "
+"assistance, check the help section of the {platform_name} web site."
+msgstr ""
+"Ìf ýöü dïdn't réqüést thïs, ýöü dön't nééd tö dö änýthïng; ýöü wön't réçéïvé"
+" äný möré émäïl fröm üs. Pléäsé dö nöt réplý tö thïs é-mäïl; ïf ýöü réqüïré "
+"ässïstänçé, çhéçk thé hélp séçtïön öf thé {platform_name} wéß sïté. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ #"
+
+#: lms/templates/emails/activation_email_subject.txt
+msgid "Your account for {platform_name}"
+msgstr "Ýöür äççöünt för {platform_name} Ⱡ'σя#"
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
+#: lms/templates/emails/enroll_email_enrolledmessage.txt
+#: lms/templates/emails/remove_beta_tester_email_message.txt
+#: lms/templates/emails/unenroll_email_enrolledmessage.txt
+msgid "Dear {full_name}"
+msgstr "Déär {full_name} #"
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
+msgid ""
+"You have been invited to be a beta tester for {course_name} at {site_name} "
+"by a member of the course staff."
+msgstr ""
+"Ýöü hävé ßéén ïnvïtéd tö ßé ä ßétä téstér för {course_name} ät {site_name} "
+"ßý ä mémßér öf thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
+msgid "Visit {course_about_url} to join the course and begin the beta test."
+msgstr ""
+"Vïsït {course_about_url} tö jöïn thé çöürsé änd ßégïn thé ßétä tést. Ⱡ'σяєм "
+"ιρѕυм ∂σ#"
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+#: lms/templates/emails/remove_beta_tester_email_message.txt
+#: lms/templates/emails/unenroll_email_allowedmessage.txt
+msgid "This email was automatically sent from {site_name} to {email_address}"
+msgstr ""
+"Thïs émäïl wäs äütömätïçällý sént fröm {site_name} tö {email_address} Ⱡ'σяєм"
+" ιρѕυм ∂#"
+
+#: lms/templates/emails/add_beta_tester_email_subject.txt
+msgid "You have been invited to a beta test for {course_name}"
+msgstr "Ýöü hävé ßéén ïnvïtéd tö ä ßétä tést för {course_name} Ⱡ'σяєм ιρѕυм#"
+
+#: lms/templates/emails/confirm_email_change.txt
+msgid ""
+"This is to confirm that you changed the e-mail associated with "
+"{platform_name} from {old_email} to {new_email}. If you did not make this "
+"request, please contact us at"
+msgstr ""
+"Thïs ïs tö çönfïrm thät ýöü çhängéd thé é-mäïl ässöçïätéd wïth "
+"{platform_name} fröm {old_email} tö {new_email}. Ìf ýöü dïd nöt mäké thïs "
+"réqüést, pléäsé çöntäçt üs ät Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
+
+#: lms/templates/emails/confirm_email_change.txt
+msgid ""
+"This is to confirm that you changed the e-mail associated with "
+"{platform_name} from {old_email} to {new_email}. If you did not make this "
+"request, please contact us immediately. Contact information is listed at:"
+msgstr ""
+"Thïs ïs tö çönfïrm thät ýöü çhängéd thé é-mäïl ässöçïätéd wïth "
+"{platform_name} fröm {old_email} tö {new_email}. Ìf ýöü dïd nöt mäké thïs "
+"réqüést, pléäsé çöntäçt üs ïmmédïätélý. Çöntäçt ïnförmätïön ïs lïstéd ät: "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,#"
+
+#: lms/templates/emails/confirm_email_change.txt
+msgid ""
+"We keep a log of old e-mails, so if this request was unintentional, we can "
+"investigate."
+msgstr ""
+"Wé kéép ä lög öf öld é-mäïls, sö ïf thïs réqüést wäs ünïnténtïönäl, wé çän "
+"ïnvéstïgäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/emails/email_change.txt
+msgid ""
+"We received a request to change the e-mail associated with your "
+"{platform_name} account from {old_email} to {new_email}. If this is correct,"
+" please confirm your new e-mail address by visiting:"
+msgstr ""
+"Wé réçéïvéd ä réqüést tö çhängé thé é-mäïl ässöçïätéd wïth ýöür "
+"{platform_name} äççöünt fröm {old_email} tö {new_email}. Ìf thïs ïs çörréçt,"
+" pléäsé çönfïrm ýöür néw é-mäïl äddréss ßý vïsïtïng: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg#"
+
+#: lms/templates/emails/email_change_subject.txt
+msgid "Request to change {platform_name} account e-mail"
+msgstr "Réqüést tö çhängé {platform_name} äççöünt é-mäïl Ⱡ'σяєм ιρ#"
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid "Dear student,"
+msgstr "Déär stüdént, Ⱡ'#"
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid ""
+"You have been invited to join {course_name} at {site_name} by a member of "
+"the course staff."
+msgstr ""
+"Ýöü hävé ßéén ïnvïtéd tö jöïn {course_name} ät {site_name} ßý ä mémßér öf "
+"thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid "To access the course visit {course_url} and login."
+msgstr "Tö äççéss thé çöürsé vïsït {course_url} änd lögïn. Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid ""
+"To access the course visit {course_about_url} and register for the course."
+msgstr ""
+"Tö äççéss thé çöürsé vïsït {course_about_url} änd régïstér för thé çöürsé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid ""
+"To finish your registration, please visit {registration_url} and fill out "
+"the registration form making sure to use {email_address} in the E-mail "
+"field."
+msgstr ""
+"Tö fïnïsh ýöür régïsträtïön, pléäsé vïsït {registration_url} änd fïll öüt "
+"thé régïsträtïön förm mäkïng süré tö üsé {email_address} ïn thé É-mäïl "
+"fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid ""
+"Once you have registered and activated your account, you will see "
+"{course_name} listed on your dashboard."
+msgstr ""
+"Önçé ýöü hävé régïstéréd änd äçtïvätéd ýöür äççöünt, ýöü wïll séé "
+"{course_name} lïstéd ön ýöür däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid ""
+"Once you have registered and activated your account, visit "
+"{course_about_url} to join the course."
+msgstr ""
+"Önçé ýöü hävé régïstéréd änd äçtïvätéd ýöür äççöünt, vïsït "
+"{course_about_url} tö jöïn thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/emails/enroll_email_allowedsubject.txt
+msgid "You have been invited to register for {course_name}"
+msgstr "Ýöü hävé ßéén ïnvïtéd tö régïstér för {course_name} Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/emails/enroll_email_enrolledmessage.txt
+msgid ""
+"You have been enrolled in {course_name} at {site_name} by a member of the "
+"course staff. The course should now appear on your {site_name} dashboard."
+msgstr ""
+"Ýöü hävé ßéén énrölléd ïn {course_name} ät {site_name} ßý ä mémßér öf thé "
+"çöürsé stäff. Thé çöürsé shöüld nöw äppéär ön ýöür {site_name} däshßöärd. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/emails/enroll_email_enrolledmessage.txt
+msgid "To start accessing course materials, please visit {course_url}"
+msgstr ""
+"Tö stärt äççéssïng çöürsé mätérïäls, pléäsé vïsït {course_url} Ⱡ'σяєм ιρѕυм "
+"∂σ#"
+
+#: lms/templates/emails/enroll_email_enrolledmessage.txt
+#: lms/templates/emails/unenroll_email_enrolledmessage.txt
+msgid "This email was automatically sent from {site_name} to {full_name}"
+msgstr ""
+"Thïs émäïl wäs äütömätïçällý sént fröm {site_name} tö {full_name} Ⱡ'σяєм "
+"ιρѕυм ∂#"
+
+#: lms/templates/emails/enroll_email_enrolledsubject.txt
+msgid "You have been enrolled in {course_name}"
+msgstr "Ýöü hävé ßéén énrölléd ïn {course_name} Ⱡ'σяєм #"
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Hi {name}"
+msgstr "Hï {name} Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid ""
+"Your payment was successful. You will see the charge below on your next "
+"credit or debit card statement."
+msgstr ""
+"Ýöür päýmént wäs süççéssfül. Ýöü wïll séé thé çhärgé ßélöw ön ýöür néxt "
+"çrédït ör déßït çärd stätémént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid ""
+"The charge will show up on your statement under the company name "
+"{merchant_name}."
+msgstr ""
+"Thé çhärgé wïll shöw üp ön ýöür stätémént ündér thé çömpäný nämé "
+"{merchant_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid ""
+"If you have billing questions, please read the FAQ ({faq_url}) or contact "
+"{billing_email}."
+msgstr ""
+"Ìf ýöü hävé ßïllïng qüéstïöns, pléäsé réäd thé FÀQ ({faq_url}) ör çöntäçt "
+"{billing_email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "If you have billing questions, please contact {billing_email}."
+msgstr ""
+"Ìf ýöü hävé ßïllïng qüéstïöns, pléäsé çöntäçt {billing_email}. Ⱡ'σяєм ιρѕυм "
+"∂#"
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "-The {platform_name} Team"
+msgstr "-Thé {platform_name} Téäm Ⱡ'#"
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Your order number is: {order_number}"
+msgstr "Ýöür ördér nümßér ïs: {order_number} Ⱡ'σяєм#"
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "The items in your order are:"
+msgstr "Thé ïtéms ïn ýöür ördér äré: Ⱡ'σяєм #"
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Quantity - Description - Price"
+msgstr "Qüäntïtý - Désçrïptïön - Prïçé Ⱡ'σяєм #"
+
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Total billed to credit/debit card: {currency_symbol}{total_cost}"
+msgstr ""
+"Tötäl ßïlléd tö çrédït/déßït çärd: {currency_symbol}{total_cost} Ⱡ'σяєм "
+"ιρѕυ#"
+
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/shoppingcart/receipt.html
+msgid "#:"
+msgstr "#: Ⱡ'#"
+
+#: lms/templates/emails/reject_name_change.txt
+msgid ""
+"We are sorry. Our course staff did not approve your request to change your "
+"name from {old_name} to {new_name}. If you need further assistance, please "
+"e-mail the tech support at"
+msgstr ""
+"Wé äré sörrý. Öür çöürsé stäff dïd nöt äpprövé ýöür réqüést tö çhängé ýöür "
+"nämé fröm {old_name} tö {new_name}. Ìf ýöü nééd fürthér ässïstänçé, pléäsé "
+"é-mäïl thé téçh süppört ät Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιη#"
+
+#: lms/templates/emails/reject_name_change.txt
+msgid ""
+"We are sorry. Our course staff did not approve your request to change your "
+"name from {old_name} to {new_name}. If you need further assistance, please "
+"e-mail the course staff at ta@edx.org."
+msgstr ""
+"Wé äré sörrý. Öür çöürsé stäff dïd nöt äpprövé ýöür réqüést tö çhängé ýöür "
+"nämé fröm {old_name} tö {new_name}. Ìf ýöü nééd fürthér ässïstänçé, pléäsé "
+"é-mäïl thé çöürsé stäff ät tä@édx.örg. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єł#"
+
+#: lms/templates/emails/remove_beta_tester_email_message.txt
+msgid ""
+"You have been removed as a beta tester for {course_name} at {site_name} by a"
+" member of the course staff. The course will remain on your dashboard, but "
+"you will no longer be part of the beta testing group."
+msgstr ""
+"Ýöü hävé ßéén rémövéd äs ä ßétä téstér för {course_name} ät {site_name} ßý ä"
+" mémßér öf thé çöürsé stäff. Thé çöürsé wïll rémäïn ön ýöür däshßöärd, ßüt "
+"ýöü wïll nö löngér ßé pärt öf thé ßétä téstïng gröüp. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, #"
+
+#: lms/templates/emails/remove_beta_tester_email_message.txt
+#: lms/templates/emails/unenroll_email_enrolledmessage.txt
+msgid "Your other courses have not been affected."
+msgstr "Ýöür öthér çöürsés hävé nöt ßéén äfféçtéd. Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/emails/remove_beta_tester_email_subject.txt
+msgid "You have been removed from a beta test for {course_name}"
+msgstr ""
+"Ýöü hävé ßéén rémövéd fröm ä ßétä tést för {course_name} Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/emails/unenroll_email_allowedmessage.txt
+msgid "Dear Student,"
+msgstr "Déär Stüdént, Ⱡ'#"
+
+#: lms/templates/emails/unenroll_email_allowedmessage.txt
+msgid ""
+"You have been un-enrolled from course {course_name} by a member of the "
+"course staff. Please disregard the invitation previously sent."
+msgstr ""
+"Ýöü hävé ßéén ün-énrölléd fröm çöürsé {course_name} ßý ä mémßér öf thé "
+"çöürsé stäff. Pléäsé dïsrégärd thé ïnvïtätïön prévïöüslý sént. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/emails/unenroll_email_enrolledmessage.txt
+msgid ""
+"You have been un-enrolled in {course_name} at {site_name} by a member of the"
+" course staff. The course will no longer appear on your {site_name} "
+"dashboard."
+msgstr ""
+"Ýöü hävé ßéén ün-énrölléd ïn {course_name} ät {site_name} ßý ä mémßér öf thé"
+" çöürsé stäff. Thé çöürsé wïll nö löngér äppéär ön ýöür {site_name} "
+"däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/emails/unenroll_email_subject.txt
+msgid "You have been un-enrolled from {course_name}"
+msgstr "Ýöü hävé ßéén ün-énrölléd fröm {course_name} Ⱡ'σяєм ιρ#"
+
 #: lms/templates/instructor/staff_grading.html
 msgid "{course_number} Staff Grading"
 msgstr "{course_number} Stäff Grädïng Ⱡ'σ#"
@@ -8726,12 +9111,6 @@ msgstr ""
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє м#\n"
 
 #: lms/templates/peer_grading/peer_grading.html
-#: lms/templates/peer_grading/peer_grading_closed.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Peer Grading"
-msgstr "Péér Grädïng Ⱡ#"
-
-#: lms/templates/peer_grading/peer_grading.html
 msgid ""
 "Here are a list of problems that need to be peer graded for this course."
 msgstr ""
@@ -9036,10 +9415,6 @@ msgstr " hävé ßéén réfündéd. Ⱡ'σя#"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Billed To:"
 msgstr "Bïlléd Tö: Ⱡ#"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "#:"
-msgstr "#: Ⱡ'#"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Receipt (Order"
@@ -10625,6 +11000,7 @@ msgid "Delete this component"
 msgstr "Délété thïs çömpönént Ⱡ'σя#"
 
 #: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "Drag to reorder"
 msgstr "Dräg tö réördér Ⱡ'#"
@@ -10686,21 +11062,23 @@ msgstr "Pägés Ⱡ'σяєм ι#"
 msgid "New Page"
 msgstr "Néw Pägé #"
 
+#: cms/templates/edit-tabs.html cms/templates/edit_subsection.html
+#: cms/templates/index.html cms/templates/overview.html
+#: cms/templates/unit.html
+msgid "View Live"
+msgstr "Vïéw Lïvé #"
+
 #: cms/templates/edit-tabs.html
 msgid "Show this page"
 msgstr "Shöw thïs pägé Ⱡ'#"
 
-#: cms/templates/edit-tabs.html
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 msgid "Show/hide page"
 msgstr "Shöw/hïdé pägé Ⱡ'#"
 
-#: cms/templates/edit-tabs.html
-msgid "Cannot be reordered"
-msgstr "Çännöt ßé réördéréd Ⱡ'σя#"
-
-#: cms/templates/edit-tabs.html
-msgid "Fixed page"
-msgstr "Fïxéd pägé Ⱡ#"
+#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
+msgid "This page cannot be reordered"
+msgstr "Thïs pägé çännöt ßé réördéréd Ⱡ'σяєм #"
 
 #: cms/templates/edit-tabs.html
 msgid "You can add additional custom pages to your course."
@@ -10853,11 +11231,6 @@ msgstr "Rémövé düé däté Ⱡ'#"
 #: cms/templates/edit_subsection.html
 msgid "Preview Drafts"
 msgstr "Prévïéw Dräfts Ⱡ'#"
-
-#: cms/templates/edit_subsection.html cms/templates/index.html
-#: cms/templates/overview.html cms/templates/unit.html
-msgid "View Live"
-msgstr "Vïéw Lïvé #"
 
 #: cms/templates/error.html
 msgid "Internal Server Error"
@@ -12636,11 +13009,6 @@ msgstr ""
 #: cms/templates/studio_vertical_wrapper.html
 msgid "Expand or Collapse"
 msgstr "Éxpänd ör Çölläpsé Ⱡ'σ#"
-
-#: cms/templates/textbooks.html cms/templates/textbooks.html
-#: cms/templates/widgets/header.html
-msgid "Textbooks"
-msgstr "Téxtßööks #"
 
 #: cms/templates/textbooks.html
 msgid "You have unsaved changes. Do you really want to leave this page?"

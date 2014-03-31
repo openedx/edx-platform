@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-25 10:27-0400\n"
+"POT-Creation-Date: 2014-03-31 09:26-0400\n"
 "PO-Revision-Date: 2014-03-24 14:25+0000\n"
 "Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
@@ -102,28 +102,28 @@ msgstr[0] "(%(num_points)s puan mümkün)"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer:"
-msgstr ""
+msgstr "Yanıt:"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Hide Answer"
-msgstr ""
+msgstr "Yanıtı Gizle:"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Show Answer"
-msgstr ""
+msgstr "Yanıtı Göster:"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Reveal Answer"
-msgstr ""
+msgstr "Yanıtı Açıkla:"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer hidden"
-msgstr ""
+msgstr "Gizlenmiş yanıt:"
 
 #. Translators: the word unanswered here is about answering a problem the
 #. student must solve.;
@@ -789,23 +789,23 @@ msgstr "Gönderi gövdesi"
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Error fetching distribution."
-msgstr ""
+msgstr "Dağılımı alırken hata."
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Unavailable metric display."
-msgstr ""
+msgstr "Bulunamayan metrik gösterim."
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Error fetching grade distributions."
-msgstr ""
+msgstr "Not dağılımlarını alırken hata."
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Last Updated: <%= timestamp %>"
-msgstr ""
+msgstr "Son Güncelleme: <%= timestamp %>"
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "<%= num_students %> students scored."
-msgstr ""
+msgstr "<%= num_students %> öğrenci notlandırıldı."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Loading..."
@@ -825,7 +825,7 @@ msgstr "Notları oluştururken hata. Lütfen tekrar deneyin."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "File Name"
-msgstr ""
+msgstr "Dosya İsmi"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
@@ -850,7 +850,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Enter username or email"
-msgstr ""
+msgstr "Kullanıcı adı veya e-posta giriniz"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
@@ -879,7 +879,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
-msgstr ""
+msgstr "Hata: Eğitmen grubundan kendinizi silemezsiniz!"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
@@ -893,12 +893,12 @@ msgstr "Bu kullanıcılar beta sınayıcıları olarak başarıyla eklendi:"
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
-msgstr ""
+msgstr "Bu kullanıcılar beta sınayıcıları olarak ayrıldı:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were not added as beta testers:"
-msgstr ""
+msgstr "Bu kullanıcılar beta sınayıcıları olarak eklenemedi:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -910,11 +910,13 @@ msgid ""
 "Users must create and activate their account before they can be promoted to "
 "beta tester."
 msgstr ""
+"Beta sınayıcısı olarak yükseltilmeden önce kullanıcılar kendi hesaplarını "
+"oluşturmalı ve aktiflmelidir."
 
 #. Translators: A list of email addresses appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Could not find users associated with the following email addresses:"
-msgstr ""
+msgstr "Aşağıdaki e-posta adresleriyle ilişkili kullanıcılar bulunamadı:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
@@ -926,7 +928,7 @@ msgstr "Aşağıdaki e-posta adresi geçersiz:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
-msgstr ""
+msgstr "Aşağıdaki kullanıcılar başarıyla kaydedildi ve e-posta gönderildi:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -1192,7 +1194,7 @@ msgstr ""
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task ID"
-msgstr ""
+msgstr "Görev No"
 
 #. Translators: a "Requester" is a username that requested a task such as
 #. sending email
@@ -1216,13 +1218,13 @@ msgstr ""
 #. appears after this.
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "State"
-msgstr ""
+msgstr "Durum"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task Status"
-msgstr ""
+msgstr "Görev Durumu"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
@@ -1427,7 +1429,8 @@ msgid "<em>Editing:</em> %s"
 msgstr "<em>Değiştiriyor:</em> %s"
 
 #: cms/static/coffee/src/views/module_edit.js
-#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
+#: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_handout.js
