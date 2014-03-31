@@ -306,7 +306,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         return (success, message)
 
-    def _update_score(self, score_msg, queuekey, system):
+    def _update_score(self, score_msg, queuekey, system, submission = None):
         """
         Called by xqueue to update the score
         @param score_msg: The message from xqueue
