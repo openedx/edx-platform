@@ -77,7 +77,7 @@ django-ratelimit-backend==0.6
 unicodecsv==0.9.4
 
 # Used for development operation
-watchdog==0.6.0
+watchdog==0.7.1
 
 # Metrics gathering and monitoring
 dogapi==1.2.1

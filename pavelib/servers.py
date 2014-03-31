@@ -27,7 +27,7 @@ def run_server(system, settings=None, port=None, skip_assets=False):
 
     if not skip_assets:
         # Local dev settings use staticfiles to serve assets, so we can skip the collecstatic step
-        args = [system, '--settings={}'.format(settings), '--skip-collect']
+        args = [system, '--settings={}'.format(settings), '--skip-collect', '--watch']
         call_task('pavelib.assets.update_assets', args=args)
 
     if port is None:
@@ -119,7 +119,7 @@ def run_all_servers(options):
 
     if not fast:
         for system in ['lms', 'studio']:
-            args = [system, '--settings={}'.format(settings), '--skip-collect']
+            args = [system, '--settings={}'.format(settings), '--skip-collect', '--watch']
             call_task('pavelib.assets.update_assets', args=args)
 
     run_multi_processes([
