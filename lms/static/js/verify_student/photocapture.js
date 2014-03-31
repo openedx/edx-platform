@@ -213,11 +213,6 @@ function initSnapshotHandler(names, hasHtml5CameraSupport) {
     navigator.getUserMedia({video: true}, function(stream) {
       video[0].src = window.URL.createObjectURL(stream);
       localMediaStream = stream;
-
-      // We do this in a recursive call on success because Firefox seems to
-      // simply eat the request if you stack up two on top of each other before
-      // the user has a chance to approve the first one.
-      initSnapshotHandler(names, hasHtml5CameraSupport);
     }, onVideoFail);
   }
   else {
