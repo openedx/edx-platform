@@ -122,9 +122,8 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             else:
                 transcript_language = sorted(self.transcripts.keys())[0]
 
-            native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
             languages = {
-                lang: native_languages.get(lang, display)
+                lang: display
                 for lang, display in settings.ALL_LANGUAGES
                 if lang in self.transcripts
             }
@@ -243,9 +242,7 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         else:
             editable_fields.pop('source')
 
-        native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
-        languages = [{'label': native_languages.get(lang, label), 'code': lang} for lang, label in settings.ALL_LANGUAGES if lang != u'en']
-
+        languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES if lang != u'en']
         languages.sort(key=lambda l: l['label'])
         editable_fields['transcripts']['languages'] = languages
         editable_fields['transcripts']['type'] = 'VideoTranslations'
