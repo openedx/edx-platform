@@ -87,7 +87,7 @@ def upload_transcripts(request):
     except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
         return error_response(response, "Can't find item by locator.")
 
-    if 'file' not in request.FILES:
+    if 'transcript-file' not in request.FILES:
         return error_response(response, 'POST data without "file" form data.')
 
     video_list = request.POST.get('video_list')
@@ -99,8 +99,8 @@ def upload_transcripts(request):
     except ValueError:
         return error_response(response, 'Invalid video_list JSON.')
 
-    source_subs_filedata = request.FILES['file'].read().decode('utf8')
-    source_subs_filename = request.FILES['file'].name
+    source_subs_filedata = request.FILES['transcript-file'].read().decode('utf8')
+    source_subs_filename = request.FILES['transcript-file'].name
 
     if '.' not in source_subs_filename:
         return error_response(response, "Undefined file extension.")

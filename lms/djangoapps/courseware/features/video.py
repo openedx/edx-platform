@@ -51,7 +51,7 @@ def setUp(scenario):
     world.video_sequences = {}
 
 
-class ReuqestHandlerWithSessionId(object):
+class RequestHandlerWithSessionId(object):
     def get(self, url):
         """
         Sends a request.
@@ -165,6 +165,7 @@ def add_video_to_course(course, parent_location=None, player_mode=None, data=Non
     world.scenario_dict['VIDEO'] = world.ItemFactory.create(**kwargs)
     world.wait_for_present('.is-initialized')
     world.wait_for_invisible('.video-wrapper .spinner')
+    world.wait_for_ajax_complete()
 
 
 def add_vertical_to_course(course_num):
@@ -268,9 +269,22 @@ def parse_time_str(time_str):
     return time_obj.tm_min * 60 + time_obj.tm_sec
 
 
+@step('youtube stub server (.*) YouTube API')
+def configure_youtube_api(_step, action):
+    action=action.strip()
+    if action == 'proxies':
+        world.youtube.config['youtube_api_blocked'] = False
+    elif action == 'blocks':
+        world.youtube.config['youtube_api_blocked'] = True
+    else:
+        raise ValueError('Parameter `action` should be one of "proxies" or "blocks".')
+
+
 @step('when I view the (.*) it does not have autoplay enabled$')
 def does_not_autoplay(_step, video_type):
-    assert(world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False')
+    actual = world.css_find('.%s' % video_type)[0]['data-autoplay']
+    expected = [u'False', u'false', False]
+    assert actual in expected
 
 
 @step('the course has a Video component in "([^"]*)" mode(?:\:)?$')
@@ -410,25 +424,30 @@ def check_text_in_the_captions(_step, text):
 
 @step('I select language with code "([^"]*)"$')
 def select_language(_step, code):
+    # Make sure that all ajax requests that affects the language menu are finished.
+    # For example, request to get new translation etc.
+    world.wait_for_ajax_complete()
+
     selector = VIDEO_MENUS["language"] + ' li[data-lang-code="{code}"]'.format(
         code=code
     )
 
-    world.wait_for_present(selector)
     world.css_find(VIDEO_BUTTONS["CC"])[0].mouse_over()
-    world.wait_for_visible(selector)
     world.css_click(selector)
 
     assert world.css_has_class(selector, 'active')
     assert len(world.css_find(VIDEO_MENUS["language"] + ' li.active')) == 1
-    assert world.css_visible('.subtitles')
+
+    # Make sure that all ajax requests that affects the display of captions are finished.
+    # For example, request to get new translation etc.
     world.wait_for_ajax_complete()
+    assert world.css_visible('.subtitles')
+
 
 
 @step('I click video button "([^"]*)"$')
 def click_button(_step, button):
     world.css_click(VIDEO_BUTTONS[button])
-
 
 @step('I see video starts playing from "([^"]*)" position$')
 def start_playing_video_from_n_seconds(_step, position):
@@ -502,7 +521,7 @@ def i_can_download_transcript(_step, format, text):
     }
 
     url = world.css_find(VIDEO_BUTTONS['download_transcript'])[0]['href']
-    request = ReuqestHandlerWithSessionId()
+    request = RequestHandlerWithSessionId()
     assert request.get(url).is_success()
     assert request.check_header('content-type', formats[format])
     assert (text.encode('utf-8') in request.content)
@@ -534,4 +553,3 @@ def shows_captions(_step, show_captions):
         assert world.is_css_present('div.video.closed')
     else:
         assert world.is_css_not_present('div.video.closed')
-

@@ -1059,11 +1059,13 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
         """
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
-    def publish(self, block, event):
+    def publish(self, block, event_type, event):
         """
         See :meth:`xblock.runtime.Runtime:publish` for documentation.
         """
-        raise NotImplementedError("edX Platform doesn't currently implement XBlock publish")
+        xmodule_runtime = getattr(block, 'xmodule_runtime', None)
+        if xmodule_runtime is not None:
+            return xmodule_runtime.publish(block, event_type, event)
 
     def add_block_as_child_node(self, block, node):
         child = etree.SubElement(node, "unknown")
@@ -1228,7 +1230,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
     def resource_url(self, resource):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
-    def publish(self, block, event):
+    def publish(self, block, event_type, event):
         pass
 
 

@@ -2,7 +2,6 @@
 
 locales:
     - en  # English - Source Language
-    - ach  # Acoli
     - ar  # Arabic
     - bg_BG  # Bulgarian (Bulgaria)
     - bn  # Bengali

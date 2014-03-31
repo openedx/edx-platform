@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-25 10:27-0400\n"
+"POT-Creation-Date: 2014-03-31 09:26-0400\n"
 "PO-Revision-Date: 2014-03-19 20:22+0000\n"
 "Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: Sinhala (http://www.transifex.com/projects/p/edx-platform/language/si/)\n"
@@ -1341,7 +1341,8 @@ msgid "<em>Editing:</em> %s"
 msgstr ""
 
 #: cms/static/coffee/src/views/module_edit.js
-#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
+#: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_handout.js

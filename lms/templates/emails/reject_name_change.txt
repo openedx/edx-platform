@@ -1,14 +1,15 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 (Not currently used)
 
 ## TODO: fix this ugly hack
 % if stanford_theme_enabled():
-  We are sorry. Our course staff did not approve your request to change
-  your name from ${old_name} to ${new_name}. If you need further
-  assistance, please e-mail the tech support at
+  ${_("We are sorry. Our course staff did not approve your request to change "
+      "your name from {old_name} to {new_name}. If you need further "
+      "assistance, please e-mail the tech support at").format(old_name=old_name, new_name=new_name)}
   ${settings.TECH_SUPPORT_EMAIL}.
 % else:
-  We are sorry. Our course staff did not approve your request to change
-  your name from ${old_name} to ${new_name}. If you need further
-  assistance, please e-mail the course staff at ta@edx.org.
+  ${_("We are sorry. Our course staff did not approve your request to change "
+      "your name from {old_name} to {new_name}. If you need further "
+      "assistance, please e-mail the course staff at ta@edx.org.").format(old_name=old_name, new_name=new_name)}
 % endif

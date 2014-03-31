@@ -220,6 +220,9 @@ def _accessible_courses_list_from_groups(request):
             raise ItemNotFoundError(course_id)
 
         course = modulestore('direct').get_course(course_location.course_id)
+        if course is None:
+            raise ItemNotFoundError(course_id)
+
         courses_list.append(course)
 
     return courses_list
@@ -918,9 +921,9 @@ def textbooks_detail_handler(request, tid, tag=None, package_id=None, branch=Non
         if not textbook:
             return JsonResponse(status=404)
         i = course.pdf_textbooks.index(textbook)
-        new_textbooks = course.pdf_textbooks[0:i]
-        new_textbooks.extend(course.pdf_textbooks[i + 1:])
-        course.pdf_textbooks = new_textbooks
+        remaining_textbooks = course.pdf_textbooks[0:i]
+        remaining_textbooks.extend(course.pdf_textbooks[i + 1:])
+        course.pdf_textbooks = remaining_textbooks
         store.update_item(course, request.user.id)
         return JsonResponse()
 

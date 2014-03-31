@@ -38,18 +38,22 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/xblock", "js/models/
                 var postXBlockRequest;
 
                 postXBlockRequest = function(requests, resources) {
+                    var promise;
                     $.ajax({
                         url: "test_url",
                         type: 'GET',
                         success: function(fragment) {
-                            xblockView.renderXBlockFragment(fragment, this.$el);
+                            promise = xblockView.renderXBlockFragment(fragment, this.$el);
                         }
                     });
+                    // Note: this mock response will call the AJAX success function synchronously
+                    // so the promise variable defined above will be available.
                     respondWithMockXBlockFragment(requests, {
                         html: mockXBlockHtml,
                         resources: resources
                     });
                     expect(xblockView.$el.select('.xblock-header')).toBeTruthy();
+                    return promise;
                 };
 
                 it('can render an xblock with no CSS or JavaScript', function() {
@@ -86,6 +90,17 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/xblock", "js/models/
                         ["hash4", { mimetype: "text/html", placement: "head", data: mockHeadTag }]
                     ]);
                     expect($('head').html()).toContain(mockHeadTag);
+                });
+
+                it('aborts rendering when a dependent script fails to load', function() {
+                    var requests = create_sinon.requests(this),
+                        mockJavaScriptUrl = "mock.js",
+                        promise;
+                    spyOn($, 'getScript').andReturn($.Deferred().reject().promise());
+                    promise = postXBlockRequest(requests, [
+                        ["hash5", { mimetype: "application/javascript", kind: "url", data: mockJavaScriptUrl }]
+                    ]);
+                    expect(promise.isRejected()).toBe(true);
                 });
             });
         });

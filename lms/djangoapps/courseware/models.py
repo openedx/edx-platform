@@ -23,6 +23,8 @@ class StudentModule(models.Model):
     """
     Keeps student state for a particular module in a particular course.
     """
+    MODEL_TAGS = ['course_id', 'module_type']
+
     # For a homework problem, contains a JSON
     # object consisting of state
     MODULE_TYPES = (('problem', 'problem'),

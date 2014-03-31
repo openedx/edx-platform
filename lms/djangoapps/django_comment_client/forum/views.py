@@ -196,12 +196,6 @@ def forum_form_discussion(request, course_id):
             'page': query_params['page'],
         })
     else:
-        #recent_active_threads = cc.search_recent_active_threads(
-        #    course_id,
-        #    recursive=False,
-        #    query_params={'follower_id': request.user.id},
-        #)
-
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
             cohorts = get_course_cohorts(course_id)
             cohorted_commentables = get_cohorted_commentables(course_id)
@@ -282,12 +276,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
                 thread["pinned"] = False
 
         threads = [utils.safe_content(thread) for thread in threads]
-
-        #recent_active_threads = cc.search_recent_active_threads(
-        #    course_id,
-        #    recursive=False,
-        #    query_params={'follower_id': request.user.id},
-        #)
 
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)

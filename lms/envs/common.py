@@ -76,10 +76,11 @@ FEATURES = {
     'FORCE_UNIVERSITY_DOMAIN': False,  # set this to the university domain to use, as an override to HTTP_HOST
                                         # set to None to do no university selection
 
-    'ENABLE_TEXTBOOK': True,
-
-    # for consistency in user-experience, keep the value of this setting in sync with the one in cms/envs/common.py
+    # for consistency in user-experience, keep the value of the following 3 settings
+    # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_TEXTBOOK': True,
+    'ENABLE_STUDENT_NOTES': True,  # enables the student notes API and UI.
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
@@ -145,9 +146,6 @@ FEATURES = {
 
     # segment.io for LMS--need to explicitly turn it on for production.
     'SEGMENT_IO_LMS': False,
-
-    # Enables the student notes API and UI.
-    'ENABLE_STUDENT_NOTES': True,
 
     # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
     'ENABLE_FEEDBACK_SUBMISSION': False,
@@ -236,6 +234,12 @@ FEATURES = {
     # Turn on third-party auth. Disabled for now because full implementations are not yet available. Remember to syncdb
     # if you enable this; we don't create tables by default.
     'ENABLE_THIRD_PARTY_AUTH': False,
+
+    # Toggle to enable alternate urls for marketing links
+    'ENABLE_MKTG_SITE': False,
+
+    # Prevent concurrent logins per user
+    'PREVENT_CONCURRENT_LOGINS': False,
 }
 
 # Used for A/B testing
@@ -472,10 +476,6 @@ CODE_JAIL = {
 #   ]
 COURSES_WITH_UNSAFE_CODE = []
 
-############################ SIGNAL HANDLERS ################################
-# This is imported to register the exception signal handling that logs exceptions
-import monitoring.exceptions  # noqa
-
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
 DEBUG = False
@@ -526,7 +526,6 @@ LANGUAGES = (
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
-    ('ach', u'Acholi'),  # Acoli
     ('ar', u'العربية'),  # Arabic
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
     ('bn', u'বাংলা'),  # Bengali
@@ -579,8 +578,8 @@ LANGUAGES = (
     ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
     ('uk', u'Українська'),  # Uknranian
     ('vi', u'Tiếng Việt'),  # Vietnamese
-    ('zh-cn', u'大陆简体'),  # Chinese (China)
-    ('zh-tw', u'台灣正體'),  # Chinese (Taiwan)
+    ('zh-cn', u'中文(简体)'),  # Chinese (China)
+    ('zh-tw', u'中文(台灣)'),  # Chinese (Taiwan)
 )
 
 LANGUAGE_DICT = dict(LANGUAGES)
@@ -1192,6 +1191,9 @@ INSTALLED_APPS = (
     'reverification',
 
     'embargo',
+
+    # Monitoring functionality
+    'monitoring',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1323,19 +1325,19 @@ ALL_LANGUAGES = (
     [u"br", u"Breton"],
     [u"bg", u"Bulgarian"],
     [u"my", u"Burmese"],
-    [u"ca", u"Catalan; Valencian"],
+    [u"ca", u"Catalan"],
     [u"ch", u"Chamorro"],
     [u"ce", u"Chechen"],
     [u"zh", u"Chinese"],
-    [u"cu", u"Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic"],
+    [u"cu", u"Church Slavic"],
     [u"cv", u"Chuvash"],
     [u"kw", u"Cornish"],
     [u"co", u"Corsican"],
     [u"cr", u"Cree"],
     [u"cs", u"Czech"],
     [u"da", u"Danish"],
-    [u"dv", u"Divehi; Dhivehi; Maldivian"],
-    [u"nl", u"Dutch; Flemish"],
+    [u"dv", u"Divehi"],
+    [u"nl", u"Dutch"],
     [u"dz", u"Dzongkha"],
     [u"en", u"English"],
     [u"eo", u"Esperanto"],
@@ -1349,14 +1351,14 @@ ALL_LANGUAGES = (
     [u"ff", u"Fulah"],
     [u"ka", u"Georgian"],
     [u"de", u"German"],
-    [u"gd", u"Gaelic; Scottish Gaelic"],
+    [u"gd", u"Gaelic"],
     [u"ga", u"Irish"],
     [u"gl", u"Galician"],
     [u"gv", u"Manx"],
-    [u"el", u"Greek, Modern (1453-)"],
+    [u"el", u"Greek"],
     [u"gn", u"Guarani"],
     [u"gu", u"Gujarati"],
-    [u"ht", u"Haitian; Haitian Creole"],
+    [u"ht", u"Haitian"],
     [u"ha", u"Hausa"],
     [u"he", u"Hebrew"],
     [u"hz", u"Herero"],
@@ -1367,36 +1369,36 @@ ALL_LANGUAGES = (
     [u"ig", u"Igbo"],
     [u"is", u"Icelandic"],
     [u"io", u"Ido"],
-    [u"ii", u"Sichuan Yi; Nuosu"],
+    [u"ii", u"Sichuan Yi"],
     [u"iu", u"Inuktitut"],
-    [u"ie", u"Interlingue; Occidental"],
-    [u"ia", u"Interlingua (International Auxiliary Language Association)"],
+    [u"ie", u"Interlingue"],
+    [u"ia", u"Interlingua"],
     [u"id", u"Indonesian"],
     [u"ik", u"Inupiaq"],
     [u"it", u"Italian"],
     [u"jv", u"Javanese"],
     [u"ja", u"Japanese"],
-    [u"kl", u"Kalaallisut; Greenlandic"],
+    [u"kl", u"Kalaallisut"],
     [u"kn", u"Kannada"],
     [u"ks", u"Kashmiri"],
     [u"kr", u"Kanuri"],
     [u"kk", u"Kazakh"],
     [u"km", u"Central Khmer"],
-    [u"ki", u"Kikuyu; Gikuyu"],
+    [u"ki", u"Kikuyu"],
     [u"rw", u"Kinyarwanda"],
-    [u"ky", u"Kirghiz; Kyrgyz"],
+    [u"ky", u"Kirghiz"],
     [u"kv", u"Komi"],
     [u"kg", u"Kongo"],
     [u"ko", u"Korean"],
-    [u"kj", u"Kuanyama; Kwanyama"],
+    [u"kj", u"Kuanyama"],
     [u"ku", u"Kurdish"],
     [u"lo", u"Lao"],
     [u"la", u"Latin"],
     [u"lv", u"Latvian"],
-    [u"li", u"Limburgan; Limburger; Limburgish"],
+    [u"li", u"Limburgan"],
     [u"ln", u"Lingala"],
     [u"lt", u"Lithuanian"],
-    [u"lb", u"Luxembourgish; Letzeburgesch"],
+    [u"lb", u"Luxembourgish"],
     [u"lu", u"Luba-Katanga"],
     [u"lg", u"Ganda"],
     [u"mk", u"Macedonian"],
@@ -1409,34 +1411,34 @@ ALL_LANGUAGES = (
     [u"mt", u"Maltese"],
     [u"mn", u"Mongolian"],
     [u"na", u"Nauru"],
-    [u"nv", u"Navajo; Navaho"],
-    [u"nr", u"Ndebele, South; South Ndebele"],
-    [u"nd", u"Ndebele, North; North Ndebele"],
+    [u"nv", u"Navajo"],
+    [u"nr", u"Ndebele, South"],
+    [u"nd", u"Ndebele, North"],
     [u"ng", u"Ndonga"],
     [u"ne", u"Nepali"],
-    [u"nn", u"Norwegian Nynorsk; Nynorsk, Norwegian"],
-    [u"nb", u"Bokmål, Norwegian; Norwegian Bokmål"],
+    [u"nn", u"Norwegian Nynorsk"],
+    [u"nb", u"Bokmål, Norwegian"],
     [u"no", u"Norwegian"],
-    [u"ny", u"Chichewa; Chewa; Nyanja"],
-    [u"oc", u"Occitan (post 1500); Provençal"],
+    [u"ny", u"Chichewa"],
+    [u"oc", u"Occitan"],
     [u"oj", u"Ojibwa"],
     [u"or", u"Oriya"],
     [u"om", u"Oromo"],
-    [u"os", u"Ossetian; Ossetic"],
-    [u"pa", u"Panjabi; Punjabi"],
+    [u"os", u"Ossetian"],
+    [u"pa", u"Panjabi"],
     [u"fa", u"Persian"],
     [u"pi", u"Pali"],
     [u"pl", u"Polish"],
     [u"pt", u"Portuguese"],
-    [u"ps", u"Pushto; Pashto"],
+    [u"ps", u"Pushto"],
     [u"qu", u"Quechua"],
     [u"rm", u"Romansh"],
-    [u"ro", u"Romanian; Moldavian; Moldovan"],
+    [u"ro", u"Romanian"],
     [u"rn", u"Rundi"],
     [u"ru", u"Russian"],
     [u"sg", u"Sango"],
     [u"sa", u"Sanskrit"],
-    [u"si", u"Sinhala; Sinhalese"],
+    [u"si", u"Sinhala"],
     [u"sk", u"Slovak"],
     [u"sl", u"Slovenian"],
     [u"se", u"Northern Sami"],
@@ -1445,7 +1447,7 @@ ALL_LANGUAGES = (
     [u"sd", u"Sindhi"],
     [u"so", u"Somali"],
     [u"st", u"Sotho, Southern"],
-    [u"es", u"Spanish; Castilian"],
+    [u"es", u"Spanish"],
     [u"sc", u"Sardinian"],
     [u"sr", u"Serbian"],
     [u"ss", u"Swati"],
@@ -1467,7 +1469,7 @@ ALL_LANGUAGES = (
     [u"tk", u"Turkmen"],
     [u"tr", u"Turkish"],
     [u"tw", u"Twi"],
-    [u"ug", u"Uighur; Uyghur"],
+    [u"ug", u"Uighur"],
     [u"uk", u"Ukrainian"],
     [u"ur", u"Urdu"],
     [u"uz", u"Uzbek"],
@@ -1480,7 +1482,7 @@ ALL_LANGUAGES = (
     [u"xh", u"Xhosa"],
     [u"yi", u"Yiddish"],
     [u"yo", u"Yoruba"],
-    [u"za", u"Zhuang; Chuang"],
+    [u"za", u"Zhuang"],
     [u"zu", u"Zulu"]
 )
 

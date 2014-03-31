@@ -1,9 +1,10 @@
 define(
     [
         "js/views/baseview", "underscore", "js/models/metadata", "js/views/abstract_editor",
-        "js/views/transcripts/metadata_videolist"
+        "js/views/video/transcripts/metadata_videolist",
+        "js/views/video/translations_editor"
     ],
-function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
+function(BaseView, _, MetadataModel, AbstractEditor, VideoList, VideoTranslations) {
     var Metadata = {};
 
     Metadata.Editor = BaseView.extend({
@@ -82,6 +83,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
     });
 
     Metadata.VideoList = VideoList;
+    Metadata.VideoTranslations = VideoTranslations;
 
     Metadata.String = AbstractEditor.extend({
 

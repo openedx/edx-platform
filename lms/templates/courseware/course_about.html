@@ -238,7 +238,7 @@
 
                 tweet_action = "http://twitter.com/intent/tweet?text=I+just+registered+for+{number}+{title}+through+{account}:+{url}".format(
                     number=course.number,
-                    title=get_course_about_section(course, 'title'),
+                    title=get_course_about_section(course, 'title').encode('utf-8'),
                     account=microsite.get_value('course_about_twitter_account', '@edxonline'),
                     url="http://{domain}{path}".format(
                         domain=site_domain,

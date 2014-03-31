@@ -64,6 +64,17 @@ def generate_subs(speed, source_speed, source_subs):
     return subs
 
 
+def save_to_store(content, name, mime_type, location):
+    """
+    Save named content to store by location.
+
+    Returns location of saved content.
+    """
+    content_location = Transcript.asset_location(location, name)
+    content = StaticContent(content_location, name, mime_type, content)
+    contentstore().save(content)
+    return content_location
+
 def save_subs_to_store(subs, subs_id, item, language='en'):
     """
     Save transcripts into `StaticContent`.
@@ -76,13 +87,8 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
     Returns: location of saved subtitles.
     """
     filedata = json.dumps(subs, indent=2)
-    mime_type = 'application/json'
     filename = subs_filename(subs_id, language)
-    content_location = Transcript.asset_location(item.location, filename)
-    content = StaticContent(content_location, filename, mime_type, filedata)
-    contentstore().save(content)
-    return content_location
-
+    return save_to_store(filedata, filename, 'application/json', item.location)
 
 def get_transcripts_from_youtube(youtube_id, settings, i18n):
     """
@@ -193,12 +199,8 @@ def remove_subs_from_store(subs_id, item, lang='en'):
     """
     Remove from store, if transcripts content exists.
     """
-    try:
-        content = Transcript.asset(item.location, subs_id, lang)
-        contentstore().delete(content.get_id())
-        log.info("Removed subs %s from store", subs_id)
-    except NotFoundError:
-        pass
+    filename = subs_filename(subs_id, lang)
+    Transcript.delete_asset(item.location, filename)
 
 
 def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, language='en'):
@@ -339,6 +341,8 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
         a new version of the SRT file with same name).
     """
 
+    _ = item.runtime.service(item, "i18n").ugettext
+
     # 1.
     html5_ids = get_html5_ids(item.html5_sources)
     possible_video_id_list = [item.youtube_id_1_0] + html5_ids
@@ -408,10 +412,9 @@ def subs_filename(subs_id, lang='en'):
     Generate proper filename for storage.
     """
     if lang == 'en':
-        return 'subs_{0}.srt.sjson'.format(subs_id)
+        return u'subs_{0}.srt.sjson'.format(subs_id)
     else:
-        return '{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
-
+        return u'{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
 
 
 def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
@@ -420,10 +423,15 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
 
     `item` is module object.
     """
+    _ = item.runtime.service(item, "i18n").ugettext
+
     try:
-        srt_transcript = contentstore().find(Transcript.asset_location(item.location, user_filename))
+        srt_transcripts = contentstore().find(Transcript.asset_location(item.location, user_filename))
     except NotFoundError as ex:
-        raise TranscriptException("{}: Can't find uploaded transcripts: {}".format(ex.message, user_filename))
+        raise TranscriptException(_("{exception_message}: Can't find uploaded transcripts: {user_filename}").format(
+            exception_message=ex.message,
+            user_filename=user_filename
+        ))
 
     if not lang:
         lang = item.transcript_language
@@ -431,7 +439,7 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
     generate_subs_from_source(
         result_subs_dict,
         os.path.splitext(user_filename)[1][1:],
-        srt_transcript.data.decode('utf8'),
+        srt_transcripts.data.decode('utf8'),
         item,
         lang
     )
@@ -464,6 +472,11 @@ class Transcript(object):
     """
     Container for transcript methods.
     """
+    mime_types = {
+        'srt': 'application/x-subrip; charset=utf-8',
+        'txt': 'text/plain; charset=utf-8',
+        'sjson': 'application/json',
+    }
 
     @staticmethod
     def convert(content, input_format, output_format):
@@ -504,21 +517,32 @@ class Transcript(object):
 
         `location` is module location.
         """
-        return contentstore().find(
-            Transcript.asset_location(
-                location,
-                subs_filename(subs_id, lang) if not filename else filename
-            )
-        )
+        asset_filename = subs_filename(subs_id, lang) if not filename else filename
+        return Transcript.get_asset(location, asset_filename)
 
+    @staticmethod
+    def get_asset(location, filename):
+        """
+        Return asset by location and filename.
+        """
+        return contentstore().find(Transcript.asset_location(location, filename))
 
     @staticmethod
     def asset_location(location, filename):
         """
-        Return asset location.
-
-        `location` is module location.
+        Return asset location. `location` is module location.
         """
-        return StaticContent.compute_location(
-            location.org, location.course, filename
-        )
+        return StaticContent.compute_location(location.org, location.course, filename)
+
+    @staticmethod
+    def delete_asset(location, filename):
+        """
+        Delete asset by location and filename.
+        """
+        try:
+            content = Transcript.get_asset(location, filename)
+            contentstore().delete(content.get_id())
+            log.info("Transcript asset %s was removed from store.", filename)
+        except NotFoundError:
+            pass
+

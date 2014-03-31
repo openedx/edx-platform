@@ -43,9 +43,11 @@ FEATURES = {
 
     'GITHUB_PUSH': False,
 
-    # for consistency in user-experience, keep the value of this setting in sync with the
-    # one in lms/envs/common.py
+    # for consistency in user-experience, keep the value of the following 3 settings
+    # in sync with the ones in lms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_TEXTBOOK': True,
+    'ENABLE_STUDENT_NOTES': True,
 
     'AUTH_USE_CERTIFICATES': False,
 
@@ -91,6 +93,9 @@ FEATURES = {
 
     # Allow creating courses with non-ascii characters in the course id
     'ALLOW_UNICODE_COURSE_ID': False,
+
+    # Prevent concurrent logins per user
+    'PREVENT_CONCURRENT_LOGINS': False,
 }
 ENABLE_JASMINE = False
 
@@ -235,10 +240,6 @@ XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin, XModuleMixin)
 # You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
 # xblocks can be added via advanced settings
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
-
-############################ SIGNAL HANDLERS ################################
-# This is imported to register the exception signal handling that logs exceptions
-import monitoring.exceptions  # noqa
 
 ############################ DJANGO_BUILTINS ################################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
@@ -504,6 +505,9 @@ INSTALLED_APPS = (
     'django_openid_auth',
 
     'embargo',
+
+    # Monitoring signals
+    'monitoring',
 )
 
 

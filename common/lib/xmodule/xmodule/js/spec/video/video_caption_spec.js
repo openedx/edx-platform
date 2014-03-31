@@ -60,16 +60,14 @@
 
                     runs(function () {
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
-                            url: '/transcript/translation',
+                            url: '/transcript/translation/en',
                             notifyOnError: false,
-                            data: jasmine.any(Object),
+                            data: void(0),
                             success: jasmine.any(Function),
                             error: jasmine.any(Function)
                         });
                         expect($.ajaxWithPrefix.mostRecentCall.args[0].data)
-                            .toEqual({
-                                language: 'en'
-                            });
+                            .toBeUndefined();
                     });
                 });
 
@@ -86,7 +84,7 @@
 
                     runs(function () {
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
-                            url: '/transcript/translation',
+                            url: '/transcript/translation/en',
                             notifyOnError: false,
                             data: jasmine.any(Object),
                             success: jasmine.any(Function),
@@ -94,7 +92,6 @@
                         });
                         expect($.ajaxWithPrefix.mostRecentCall.args[0].data)
                             .toEqual({
-                                language: 'en',
                                 videoId: 'abcdefghijkl'
                             });
                     });
@@ -111,7 +108,7 @@
 
                     runs(function () {
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
-                            url: '/transcript/translation',
+                            url: '/transcript/translation/en',
                             notifyOnError: false,
                             data: jasmine.any(Object),
                             success: jasmine.any(Function),
@@ -119,7 +116,6 @@
                         });
                         expect($.ajaxWithPrefix.mostRecentCall.args[0].data)
                             .toEqual({
-                                language: 'en',
                                 videoId: 'cogebirgzzM'
                             });
                     });

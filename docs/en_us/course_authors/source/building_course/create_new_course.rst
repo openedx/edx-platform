@@ -21,7 +21,7 @@ This chapter describes how to create and set up your course:
 #. :ref:`Add a Course Video`
 #. :ref:`Set Course Requirements`
 #. :ref:`Add Files to a Course`
-#. :ref:`Add Static Pages`
+#. :ref:`Add Pages`
 #. :ref:`Add a Course Update`
 #. :ref:`Add Course Handouts`
 #. :ref:`Add Textbooks`
@@ -434,49 +434,78 @@ To delete a file, click the **x** icon next to the file.  You are prompted to co
 
 .. warning:: If you have links to a file you delete, those links will be broken. Ensure you change those links before deleting the file.
  
-.. _Add Static Pages:
+
+.. _`Add Pages`:
 
 ****************
-Add Static Pages
+Add Pages
 ****************
-You can add static pages to your course. Each static page appears in your course's navigation bar. 
 
-For example, the following navigation bar includes a
-**Syllabus** and **Projects** static pages.
+By default, your course has the following pages:
 
-.. image:: ../Images/image157.png
+* Courseware
+* Course Info
+* Discussion
+* Wiki
+* Progress
 
-You can use static pages for a syllabus, grading policy, course handouts, or any other purpose.
+You cannot rename, reorder, or remove these pages.
 
-You can also add an instant hangout to a static page.  See :ref:`Using an Instant Hangout in Your Course` for more information.
+You can add pages to your course. Each page appears in your course's navigation bar. 
 
-.. note:: The Course Info, Discussion, Wiki, and Progress pages are displayed to students by default. You cannot delete these pages.   
+For example, the following navigation bar includes the default pages as well as the
+**Course Schedule** and **Supplements & Instructor's Blog** pages.
 
-To create a static page:
+.. image:: ../Images/page_bar_lms.png
+ :alt: Image of the page bar in the LMS
 
-#. From the **Content** menu, select **Static Pages**.
-#. Click **New Page**. The following screen opens:
+You can create other pages for the grading policy, course slides, or any other purpose. More examples of pages you can add are:
 
-  .. image:: ../Images/image161.png
-   :width: 800
+* A Google calendar, by embedding the code for it.  
 
-3. Click **Edit**. 
+* A dynamic HTML calendar, using the template in :ref:`Appendix B`.
 
-#. Enter text for your page. You can switch to HTML mode if needed.
-#. To edit the Display Name, click **Settings**.
-#. Click **Save**.
+* An instant hangout.  See :ref:`Using an Instant Hangout in Your Course` for more information.
 
-To delete a static page, click **Delete** in the row for the page.  Confirm the deletion.
+To create a page:
 
+#. From the **Content** menu, select **Pages**. 
+
+  .. image:: ../Images/pages_page.png
+   :alt: Image of the Pages screen
+
+
+2. Click **Add a New Page**. A page with the title **Empty** is added to the list:
+
+  .. image:: ../Images/pages_empty.png
+   :alt: Image of the Pages screen with a new Empty page
+
+3. Click **Edit**. The HTML editor opens.  
+
+  .. image:: ../Images/pages_editor.png
+   :alt: Image of the Page editor
+
+4. Enter text for your page. See :ref:`The User Interface` for more information about using the editor.
+#. Click **Settings** to edit the **Display Name**. The display name is the name of the page visible to students in the course.
+#. Click **Save**. 
+
+The new page is immediately available to students, if the course has started.
 
 ==================
-Add a Calendar
+Reorder Pages
 ==================
-You can also use a static page to show a course calendar.
 
-You can embed a Google calendar. Paste the embed code for the calendar in the static page. 
+You can reorder pages in your course by dragging and dropping the pages to different locations. 
 
-You can also create a dynamic HTML calendar. See :ref:`Appendix B`. 
+To move a page, hover over the element handle on the right side of the page row until the mouse pointer changes to a four-headed arrow. Then, click and drag the page to the location that you want.
+
+.. note:: You cannot reorder the Courseware, Course Info, Discussion, Wiki, and Progress pages that your course includes by default
+
+==================
+Delete a Page
+==================
+
+To delete a page that you previously added, click the trash can icon in the row for the page.  You are prompted to confirm the deletion.
 
 .. _Add a Course Update:
 
