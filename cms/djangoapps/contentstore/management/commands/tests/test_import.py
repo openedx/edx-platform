@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from django_comment_common.utils import are_permissions_roles_seeded
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -22,6 +23,7 @@ class TestImport(ModuleStoreTestCase):
     """
 
     COURSE_ID = ['EDx', '0.00x', '2013_Spring', ]
+    DIFF_TERM = ['EDx', '0.00x', '2014_Spring', ]
 
     def setUp(self):
         """
@@ -41,6 +43,16 @@ class TestImport(ModuleStoreTestCase):
         with open(os.path.join(self.good_dir, "course", "{0[2]}.xml".format(self.COURSE_ID)), "w+") as f:
             f.write('<course></course>')
 
+        # Create term changed course xml
+        self.dupe_dir = tempfile.mkdtemp(dir=self.content_dir)
+        os.makedirs(os.path.join(self.dupe_dir, "course"))
+        with open(os.path.join(self.dupe_dir, "course.xml"), "w+") as f:
+            f.write('<course url_name="{0[2]}" org="{0[0]}" '
+                    'course="{0[1]}"/>'.format(self.DIFF_TERM))
+
+        with open(os.path.join(self.dupe_dir, "course", "{0[2]}.xml".format(self.DIFF_TERM)), "w+") as f:
+            f.write('<course></course>')
+
     def test_forum_seed(self):
         """
         Tests that forum roles were created with import.
@@ -48,3 +60,17 @@ class TestImport(ModuleStoreTestCase):
         self.assertFalse(are_permissions_roles_seeded('/'.join(self.COURSE_ID)))
         call_command('import', self.content_dir, self.good_dir)
         self.assertTrue(are_permissions_roles_seeded('/'.join(self.COURSE_ID)))
+
+    def test_duplicate_with_url(self):
+        """
+        Check to make sure an import doesn't import courses that will
+        create find one duplicates
+        """
+        # Load up base course and verify it is available
+        call_command('import', self.content_dir, self.good_dir)
+        store = modulestore()
+        self.assertIsNotNone(store.get_course('/'.join(self.COURSE_ID)))
+
+        # Now load up duped course and verify it doesn't load
+        call_command('import', self.content_dir, self.dupe_dir)
+        self.assertIsNone(store.get_course('/'.join(self.DIFF_TERM)))
