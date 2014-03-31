@@ -31,6 +31,16 @@
         }
       }
     }
+
+    .notice-incontext {
+      padding: 0;
+      box-shadow: none;
+
+      .copy {
+        @extend %t-copy-base;
+        opacity: 1;
+      }
+    }
   }
 
   .content-supplementary {
