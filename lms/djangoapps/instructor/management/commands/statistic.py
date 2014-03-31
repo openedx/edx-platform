@@ -165,7 +165,7 @@ def fullstat(request = None):
     request = DummyRequest()
     
 
-    header = [u'ФИО', u'ФИО (измененное)', u'логин школы', u'email', u'email (измененное)', u'курс', u'зарегистрирован', u"дата регистрации на курс", u'2/3', u'100%', u'Задачи/Задания(Модули)']
+    header = [u'ФИО', u'ФИО (измененное)', u'логин школы', u'email', u'email (измененное)', u'курс', u'зарег. в пакет рег.', u"дата рег. на курс", u'2/3', u'100%', u'Задачи/Задания(Модули)']
     assignments = []
     datatablefull = {'header': header, 'assignments': assignments, 'students': []}
     datafull = []
@@ -215,76 +215,106 @@ def fullstat(request = None):
 
     ff = UnicodeDictReader(f, delimiter=';', quoting=csv.QUOTE_NONE)
 
+    usermap = {}
     idx = 0
     for row in ff:
-        try:
-            idx += 1
+        idx += 1
+        usermap.setdefault(row['email'],[]).append(row)
 
-            datarow = []
+    
+    for course in modulestore().get_courses():
+        enrolled_students = User.objects.filter(
+            courseenrollment__course_id=course.id,
+            courseenrollment__is_active=1,
+        ).prefetch_related("groups").order_by('username')
+        enrolled_students = [st for st in enrolled_students if _has_staff_access_to_course_id(st, course.id)]
 
+        idx = 0
+        for user in enrolled_students:
             try:
-                user = User.objects.filter(email=row['email'])[0];
-            except:
+                idx += 1
+
+                datarow = []
+
+                found = False
+                rows = []
                 try:
-                    user = User.objects.filter(profile__meta__contains = row['email'])[0];
+                    for elem in user.profile.get_meta()['old_emails'][::-1]:
+                        if usermap[elem[0]]:
+                            found = True
+                            rows = usermap[elem[0]]
+                            break
+                    if not found and usermap[user.email]:
+                        found = True
+                        rows = usermap[user.email]
                 except:
-                    print("No user found on line {0}".format(idx))
+                    pass
 
-            found = False
-            for course_id, course_name in coursemap.iteritems():
-                if course_name in row['subject']:
-                    found = True
-                    break
-            if not found:
-                continue
+                off_reg = False
+                try:
+                    for row in rows:
+                        found = False
+                        for course_id, course_name in coursemap.iteritems():
+                            if course_name in row['subject']:
+                                found = True
+                                off_reg = True
+                                break
+                        if found:
+                            continue
+                except:
+                    pass
+                
 
-            #User
-            name = row['second-name'] + ' ' + row['first-name'] + ' ' + row['patronymic']
-            datarow += [name]
-            if user.profile.name != name:
-                datarow += [user.profile.name]
-            else:
-                datarow += [u'']
-            datarow += [row['login']]
-            datarow += [row['email']]
-            if user.email != row['email']:
-                datarow += [user.email]
-            else:
-                datarow += [u'']
-            #Course
-            course = get_course(course_id)
-            datarow += [course_name]
+                #User
+                name = row['second-name'] + ' ' + row['first-name'] + ' ' + row['patronymic']
+                datarow += [name]
+                if user.profile.name != name:
+                    datarow += [user.profile.name]
+                else:
+                    datarow += [u'']
+                datarow += [row['login']]
+                datarow += [row['email']]
+                if user.email != row['email']:
+                    datarow += [user.email]
+                else:
+                    datarow += [u'']
+                #Course
+                course = get_course(course_id)
+                datarow += [course_name]
 
-            try:
-                courseenrollment = user.courseenrollment_set.filter(course_id = course.id)[0]
-                datarow += [u'Да', courseenrollment.created.strftime('%d/%m/%Y')]
-            except:
-                datarow += [u'Нет', '']
+                if off_reg:
+                    datarow += [u'Да']
+                else:
+                    datarow += [u'Нет']
+
+                try:
+                    courseenrollment = user.courseenrollment_set.filter(course_id = course_id)[0]
+                    datarow += [courseenrollment.created.strftime('%d/%m/%Y')]
+                except:
+                    continue
+                
+                #Raw statistic by problems
+                statprob = edxdata[course_id][user.email]["prob_info"]
+                
+                #By subsection
+                statsec = edxdata[course_id][user.email]["sec_info"]
+
+                if edxdata[course_id][user.email]["0.7"]:
+                    datarow += [u"Да"]
+                else:
+                    datarow += [u"Нет"]
+                
+                if edxdata[course_id][user.email]["1.0"]:
+                    datarow += [u"Да"]
+                else:
+                    datarow += [u"Нет"]
+
+                datarow += statprob
+                datarow += statsec
+                
                 datafull.append(datarow)
-                continue
-            
-            #Raw statistic by problems
-            statprob = edxdata[course_id][user.email]["prob_info"]
-            
-            #By subsection
-            statsec = edxdata[course_id][user.email]["sec_info"]
-
-            if edxdata[course_id][user.email]["0.7"]:
-                datarow += [u"Да"]
-            else:
-                datarow += [u"Нет"]
-            
-            if edxdata[course_id][user.email]["1.0"]:
-                datarow += [u"Да"]
-            else:
-                datarow += [u"Нет"]
-
-            datarow += statprob
-            datarow += statsec
-            
-            datafull.append(datarow)
-        except:
-            pass
+            except:
+                pass
     datatablefull['data'] = datafull
     return_csv('full_stat.csv',datatablefull, open("/var/www/edx/fullstat.csv", "wb"))
 
@@ -301,7 +331,8 @@ def fullstat(request = None):
         ).prefetch_related("groups").order_by('username')
         enrolled_students = [st for st in enrolled_students if not _has_staff_access_to_course_id(st, course.id)]
         
-
+        if len(enrolled_students) <= 0:
+            continue
 
         gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=True, use_offline=False)
         courseware_summary = grades.progress_summary(enrolled_students[0], request, course);
