@@ -1121,7 +1121,8 @@ define("tinymce/dom/DOMUtils", [
 
 			// Prevent inline from loading the same CSS file twice
 			if (self !== DOMUtils.DOM && doc === document) {
-			// NAATODO	DOMUtils.DOM.loadCSS(url);
+            // EDX - Disable dynamic loading of CSS files in favor of hashed files from our Django pipeline
+			// DOMUtils.DOM.loadCSS(url);
 				return;
 			}
 

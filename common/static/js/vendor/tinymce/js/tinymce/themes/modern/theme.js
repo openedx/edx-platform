@@ -565,7 +565,7 @@ tinymce.ThemeManager.add('modern', function(editor) {
 
 			// Load special skin for IE7
 			// TODO: Remove this when we drop IE7 support
-// NAATODO
+            // EDX - Disable dynamic loading of CSS files in favor of hashed files from our Django pipeline
 //			if (tinymce.Env.documentMode <= 7) {
 //				args.skinUiCss = skinUrl + '/skin.ie7.min.css';
 //			} else {

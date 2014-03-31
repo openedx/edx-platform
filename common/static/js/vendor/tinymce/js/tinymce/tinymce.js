@@ -6718,7 +6718,8 @@ define("tinymce/dom/DOMUtils", [
 
 			// Prevent inline from loading the same CSS file twice
 			if (self !== DOMUtils.DOM && doc === document) {
-			// NAATODO	DOMUtils.DOM.loadCSS(url);
+            // EDX - Disable dynamic loading of CSS files in favor of hashed files from our Django pipeline
+			// DOMUtils.DOM.loadCSS(url);
 				return;
 			}
 
@@ -26617,8 +26618,8 @@ define("tinymce/Editor", [
 			// Load the CSS by injecting them into the HTML this will reduce "flicker"
 			for (i = 0; i < self.contentCSS.length; i++) {
 				var cssUrl = self.contentCSS[i];
-// NAATODO - DISABLE THIS CODE to test
-//				self.iframeHTML += '<link type="text/css" rel="stylesheet" href="' + cssUrl + '" />';
+                // EDX - Disable dynamic insertion of css imports in favor of hashed files from our Django pipeline
+				// self.iframeHTML += '<link type="text/css" rel="stylesheet" href="' + cssUrl + '" />';
 				self.loadedCSS[cssUrl] = true;
 			}
 
@@ -26975,8 +26976,8 @@ define("tinymce/Editor", [
 			// Load specified content CSS last
 			each(self.contentCSS, function(cssUrl) {
 				if (!self.loadedCSS[cssUrl]) {
-// NAATODO
-// 					self.dom.loadCSS(cssUrl);
+                    // EDX - Disable dynamic loading of CSS files in favor of hashed files from our Django pipeline
+ 					// self.dom.loadCSS(cssUrl);
 					self.loadedCSS[cssUrl] = true;
 				}
 			});
