@@ -111,6 +111,9 @@ def install_prereqs():
     """
     Installs Ruby, Node and Python prerequisites
     """
+    if os.environ.get("NO_PREREQ_INSTALL", False):
+        return
+
     prereq_cache("Ruby prereqs", ["Gemfile"], install_ruby_prereqs)
     prereq_cache("Node prereqs", ["package.json"], install_node_prereqs)
     prereq_cache("Python prereqs", PYTHON_REQ_FILES + [sysconfig.get_python_lib()], install_python_prereqs)
