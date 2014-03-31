@@ -49,6 +49,18 @@
 
   <script type="text/javascript" src="/jsi18n/"></script>
 
+<script type="text/javascript"> 
+var $buoop = {vs:{i:9,f:15,o:15,s:5.1,n:9}, l:"ru", reminder: 0}; 
+$buoop.ol = window.onload; 
+window.onload=function(){ 
+ try {if ($buoop.ol) $buoop.ol();}catch (e) {} 
+ var e = document.createElement("script"); 
+ e.setAttribute("type", "text/javascript"); 
+ e.setAttribute("src", "//browser-update.org/update.js"); 
+ document.body.appendChild(e); 
+} 
+</script> 
+
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>

@@ -17,6 +17,11 @@
 <%static:css group='style-course'/>
 
   <style type="text/css">
+.dataTables_wrapper {
+	position: relative;
+	clear: both;
+	zoom: 1; /* Feeling sorry for IE */
+}
 .dataTables_length {
 width: 40%;
 float: left;
@@ -33,6 +38,12 @@ float: left;
 .dataTables_paginate {
 float: right;
 text-align: right;
+}
+.dataTables_paginate a {
+  padding-right:10px;
+}
+.grade-table {
+table-layout: auto;
 }
   </style>
 

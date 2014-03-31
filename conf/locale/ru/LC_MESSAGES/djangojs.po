@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 18:07+0400\n"
+"POT-Creation-Date: 2014-03-26 10:56+0000\n"
 "PO-Revision-Date: 2013-11-29 19:05+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -76,31 +76,30 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "(%(earned)s/%(possible)s point)"
 msgid_plural "(%(earned)s/%(possible)s points)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "(%(earned)s/%(possible)s балл)"
+msgstr[1] "(%(earned)s/%(possible)s балла)"
+msgstr[2] "(%(earned)s/%(possible)s баллов)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10). There will always be at least 1 point possible.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#, fuzzy
 msgid "(%(num_points)s point possible)"
 msgid_plural "(%(num_points)s points possible)"
-msgstr[0] "%s балл"
-msgstr[1] "%s балла"
-msgstr[2] "%s баллов"
+msgstr[0] "(%(num_points)s балл)"
+msgstr[1] "(%(num_points)s балла)"
+msgstr[2] "(%(num_points)s баллов)"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Hide Answer(s)"
-msgstr ""
+msgstr "Спрятать ответ(ы)"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Show Answer(s)"
-msgstr ""
+msgstr "Показать ответ(ы)"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: the word unanswered here is about answering a problem the
@@ -281,23 +280,23 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s час"
+msgstr[1] "%(value)s часа"
+msgstr[2] "%(value)s часов"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s минута"
+msgstr[1] "%(value)s минуты"
+msgstr[2] "%(value)s минут"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s секунда"
+msgstr[1] "%(value)s секунды"
+msgstr[2] "%(value)s секунд"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Volume"
@@ -452,12 +451,11 @@ msgid "We had some trouble loading more threads. Please try again."
 msgstr "Произошла ошибка при сохранении изменений. Попробуйте еще раз."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#, fuzzy
 msgid "%(unread_count)s new comment"
 msgid_plural "%(unread_count)s new comments"
-msgstr[0] "%s новый комментарий"
-msgstr[1] "%s новых комментария"
-msgstr[2] "%s новых комментариев"
+msgstr[0] "%(unread_count)s новый комментарий"
+msgstr[1] "%(unread_count)s новых комментария"
+msgstr[2] "%(unread_count)s новых комментариев"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #, fuzzy
@@ -474,7 +472,7 @@ msgstr "Кликните, чтобы удалить все выбранные %s
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
-msgstr ""
+msgstr "Жалоба отправлена%(start_sr_span)s, нажмите для удаления%(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
@@ -487,11 +485,11 @@ msgstr "Пожаловаться"
 #. in most browsers but will be read by screen readers.
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
-msgstr ""
+msgstr "Прикрепленно%(start_sr_span)s, нажмите для открепления%(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to unpin"
-msgstr ""
+msgstr "Нажмите для открепления"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pinned"
@@ -512,28 +510,28 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
 msgid_plural "%(numResponses)s responses"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(numResponses)s ответ"
+msgstr[1] "%(numResponses)s ответа"
+msgstr[2] "%(numResponses)s ответов"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
-msgstr ""
+msgstr "Показать все ответы"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first %(numResponses)s responses"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Показать первый ответ"
+msgstr[1] "Показать первые %(numResponses)s ответа"
+msgstr[2] "Показать первые %(numResponses)s ответов"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
-msgstr ""
+msgstr "Загрузить все ответы"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load next %(numResponses)s responses"
-msgstr ""
+msgstr "Загрузать следующие %(numResponses)s ответов"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #, fuzzy
@@ -576,70 +574,70 @@ msgstr "Вы уверены, что хотите удалить это обно�
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
-msgstr ""
+msgstr "%s назад"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
-msgstr ""
+msgstr "%s от текущего мемента"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr ""
+msgstr "меньше минуты назад"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr ""
+msgstr "минуту назад"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d минута"
+msgstr[1] "%d минуты"
+msgstr[2] "%d минут"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr ""
+msgstr "около часа"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "около %d часа"
+msgstr[1] "около %d часов"
+msgstr[2] "около %d часов"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
-msgstr ""
+msgstr "день"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d день"
+msgstr[1] "%d дня"
+msgstr[2] "%d дней"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr ""
+msgstr "около месяца"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d месяц"
+msgstr[1] "%d месяца"
+msgstr[2] "%d месяцев"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr ""
+msgstr "год"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d год"
+msgstr[1] "%d года"
+msgstr[2] "%d лет"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Available %s"
@@ -732,15 +730,12 @@ msgstr ""
 "Вы выбрали действие, и не сделали никаких изменений в отдельных полях. ВЫ, "
 "вероятно ищете кнопку \"Начать\", а не кнопку \"Сохранить\"."
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: the names of months, keep the pipe (|) separators.
 #: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
-#, fuzzy
 msgid ""
 "January|February|March|April|May|June|July|August|September|October|November|December"
 msgstr ""
-"Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь "
-"Декабрь"
+"Январь|Февраль|Март|Апрель|Май|Июнь|Июль|Август|Сентябрь|Октябрь|Ноябрь|Декабрь"
 
 #. Translators: abbreviations for days of the week, keep the pipe (|)
 #. separators.
@@ -757,12 +752,10 @@ msgstr "Показать"
 msgid "Hide"
 msgstr "Спрятать"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: the names of days, keep the pipe (|) separators.
 #: lms/static/admin/js/dateparse.js
-#, fuzzy
 msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr "Понедельник Вторник Среда Четверг Пятница Суббота Воскресенье"
+msgstr "Понедельник|Вторник|Среда|Четверг|Пятница|Суббота|Воскресенье"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
@@ -808,7 +801,7 @@ msgstr "Завтра"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
-msgstr ""
+msgstr "Открыть калькулятор"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Close Calculator"
@@ -824,7 +817,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Loading..."
-msgstr ""
+msgstr "Загрузка..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
@@ -1173,15 +1166,15 @@ msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
-msgstr ""
+msgstr "Жирно (Ctrl+B)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Italic (Ctrl+I)"
-msgstr ""
+msgstr "Курсив (Ctrl+B)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Hyperlink (Ctrl+L)"
-msgstr ""
+msgstr "Ссылка (Ctrl+L)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote (Ctrl+Q)"
@@ -1213,15 +1206,15 @@ msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Undo (Ctrl+Z)"
-msgstr ""
+msgstr "Отменить (Ctrl+Z)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Y)"
-msgstr ""
+msgstr "Повторить (Ctrl+Y)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Shift+Z)"
-msgstr ""
+msgstr "Повторить (Ctrl+Shift+Z)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "strong text"

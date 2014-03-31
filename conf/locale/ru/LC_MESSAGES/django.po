@@ -107,17 +107,25 @@ msgstr "Выбрано неправильное количество."
 msgid "No selected price or selected price is too low."
 msgstr ""
 
+#: common/djangoapps/django_comment_common/models.py
+msgid "Administrator"
+msgstr "Администратор"
+
+#: common/djangoapps/django_comment_common/models.py
+msgid "Moderator"
+msgstr "Модератор"
+
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Community TA"
 msgstr "Общественные ассистенты преподавателя"
 
 #: common/djangoapps/student/models.py
 msgid "Male"
-msgstr ""
+msgstr "Мужчина"
 
 #: common/djangoapps/student/models.py
 msgid "Female"
-msgstr ""
+msgstr "Женщина"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Other' refers to the student's gender
@@ -386,17 +394,9 @@ msgstr "Id курса не задан"
 msgid "Course id is invalid"
 msgstr "Id курса некорректен"
 
-#: common/djangoapps/student/views.py
 #: lms/templates/courseware/course_about.html
-#, fuzzy
 msgid "Course is full"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Id курса некорректен\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Учебный год\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Учебный год"
+msgstr "Курс полон"
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
@@ -599,13 +599,8 @@ msgid "Username should only consist of A-Z and 0-9, with no spaces."
 msgstr ""
 
 #: common/djangoapps/student/views.py
-#, fuzzy
 msgid "Password: "
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Форма сброса пароля\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Пароль"
+msgstr "Пароль:"
 
 #: common/djangoapps/student/views.py
 msgid "Could not send activation e-mail."
@@ -653,7 +648,7 @@ msgstr "Неверный ID"
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "LONG_DATE_FORMAT"
-msgstr ""
+msgstr "%d %B %Y, %A"
 
 #. Translators: the translation for "DATE_TIME_FORMAT" must be a format
 #. string for formatting dates with times.  For example, the American
@@ -661,7 +656,7 @@ msgstr ""
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "DATE_TIME_FORMAT"
-msgstr ""
+msgstr "%d %b %Y в %H:%M"
 
 #. Translators: the translation for "SHORT_DATE_FORMAT" must be a
 #. format string for formatting dates in a brief form.  For example,
@@ -669,14 +664,14 @@ msgstr ""
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "SHORT_DATE_FORMAT"
-msgstr ""
+msgstr "%d %b %Y"
 
 #. Translators: the translation for "TIME_FORMAT" must be a format
 #. string for formatting times.  For example, the American English
 #. form is "%H:%M:%S". See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "%H:%M:%S"
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
@@ -695,145 +690,335 @@ msgid "PM"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Monday Februrary 10, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Monday"
+msgstr "Понедельник"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Tuesday Februrary 11, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Tuesday"
+msgstr "Вторник"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Wednesday Februrary 12, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Wednesday"
+msgstr "Среда"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Thursday Februrary 13, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Thursday"
+msgstr "Четверг"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Friday Februrary 14, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Friday"
+msgstr "Пятница"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Saturday Februrary 15, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Saturday"
+msgstr "Суббота"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Sunday Februrary 16, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Sunday"
+msgstr "Воскресенье"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Mon Feb 10, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Mon"
+msgstr "Пн"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Tue Feb 11, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Tue"
+msgstr "Вт"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Wed Feb 12, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Wed"
+msgstr "Ср"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Thu Feb 13, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Thu"
+msgstr "Чт"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Fri Feb 14, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Fri"
+msgstr "Пт"
+
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sat Feb 15, 2014". It is used for the %a
 #. directive in date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
-#, fuzzy
 msgctxt "abbreviated weekday name"
 msgid "Sat"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Статус"
+msgstr "Сб"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sun Feb 16, 2014". It is used for the %a
 #. directive in date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
-#, fuzzy
 msgctxt "abbreviated weekday name"
 msgid "Sun"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Студент"
+msgstr "Вс"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jan 10, 2014". It is used for the %b
 #. directive in date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
-#, fuzzy
 msgctxt "abbreviated month name"
 msgid "Jan"
-msgstr "Заблокировать"
+msgstr "Янв"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Feb 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Feb"
+msgstr "Фев"
+
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Mar 10, 2014". It is used for the %b
 #. directive in date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
-#, fuzzy
 msgctxt "abbreviated month name"
 msgid "Mar"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Максимальный"
+msgstr "Мрт"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Apr 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Apr"
+msgstr "Апр"
+
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "May 10, 2014". It is used for the %b
 #. directive in date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
-#, fuzzy
 msgctxt "abbreviated month name"
 msgid "May"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"День"
+msgstr "Май"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Jun 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Jun"
+msgstr "Июн"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Jul 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Jul"
+msgstr "Июл"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Aug 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Aug"
+msgstr "Авг"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Sep 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Sep"
+msgstr "Сен"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Oct 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Oct"
+msgstr "Окт"
+
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Nov 10, 2014". It is used for the %b
 #. directive in date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
-#, fuzzy
 msgctxt "abbreviated month name"
 msgid "Nov"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Нет"
+msgstr "Нбр"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Dec 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Dec"
+msgstr "Дек"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "January 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "January"
+msgstr "Январь"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "February 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "February"
+msgstr "Февраль"
+
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "March 10, 2014". It is used for the %B directive in
 #. date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
-#, fuzzy
 msgctxt "month name"
 msgid "March"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Поиск сообщений\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Поиск"
+msgstr "Март"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "April 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "April"
+msgstr "Апрель"
+
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "May 10, 2014". It is used for the %B directive in
 #. date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
-#, fuzzy
 msgctxt "month name"
 msgid "May"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"День"
+msgstr "Май"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "June 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "June"
+msgstr "Июнь"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "July 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "July"
+msgstr "Июль"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "August 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "August"
+msgstr "Август"
+
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "September 10, 2014". It is used for the %B directive in
 #. date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
-#, fuzzy
 msgctxt "month name"
 msgid "September"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Запомнить меня"
+msgstr "Сентябрь"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "October 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "October"
+msgstr "Октябрь"
+
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "November 10, 2014". It is used for the %B directive in
 #. date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
-#, fuzzy
 msgctxt "month name"
 msgid "November"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Номер курса"
+msgstr "Ноябрь"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "December 10, 2014". It is used for the %B directive in
 #. date-time formats. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
-#, fuzzy
 msgctxt "month name"
 msgid "December"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Запомнить меня"
+msgstr "Декабрь"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, fuzzy
@@ -1156,17 +1341,15 @@ msgid "Problem needs to be reset prior to save."
 msgstr "Готова ли задача к очистке или нет."
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#, fuzzy
 msgid "Your answers have been saved."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Ваши изменения были сохранены."
+msgstr "Ваши ответы были сохранены."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
 "Your answers have been saved but not graded. Click 'Check' to grade them."
 msgstr ""
+"Ваши ответы были сохранены, но не проверены. Для проверки нажмите кнопку "
+"\"Проверка\""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Refresh the page and make an attempt before resetting."
@@ -2002,10 +2185,20 @@ msgid ""
 "enroll in your course."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/course_module.py
 #: lms/templates/courseware/info.html
 #: lms/templates/courseware/welcome-back.html
+#, fuzzy
 msgid "Course Handouts"
-msgstr "Раздаточные материалы курса"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"Информация о курсе\n"
+"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
+"Раздаточные материалы курса\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Раздаточные материалы курса\n"
+"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
+"Раздаточные материалы курса"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2382,17 +2575,12 @@ msgstr ""
 msgid "Peer"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: "Not started" is used to communicate to a student that their
 #. response
 #. has not yet been graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-#, fuzzy
 msgid "Not started."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Не оценивается"
+msgstr "Проверка не начата."
 
 #. Translators: "Being scored." is used to communicate to a student that their
 #. response
@@ -2484,17 +2672,33 @@ msgstr ""
 "Произошла рассинхронизация состояния задачи. Пожалуйста, перезагрузите "
 "страницу."
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: "Self-Assessment" refers to the self-assessed mode of
 #. openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-#, fuzzy
 msgid "Self-Assessment"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Перекрестная проверка\n"
-"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Оценки:"
+msgstr "Самопроверка"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Peer-Assessment" refers to the peer-assessed mode of
+#. openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Peer-Assessment"
+msgstr "Перекрестная проверка"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
+#. of openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Instructor-Assessment"
+msgstr "Проверка инструктором"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "AI-Assessment" refers to the machine-graded mode of openended
+#. evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "AI-Assessment"
+msgstr "Проверка ИИ"
 
 #. Translators: 'tag' is one of 'feedback', 'submission_id',
 #. 'grader_id', or 'score'. They are categories that a student
@@ -2577,6 +2781,38 @@ msgstr ""
 "Ваш ответ был отправлен. Пожалуйста, зайдите позже для просмотра вашей "
 "оценки."
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Not started" communicates to a student that their response
+#. has not yet been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+#, fuzzy
+msgid "Not started"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"Проверка не начата\n"
+"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
+"Не начат"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "In progress" communicates to a student that their response
+#. is currently in the grading process
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+#, fuzzy
+msgid "In progress"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"В процессе\n"
+"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
+"В процессе проверки"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: "Done" communicates to a student that their response
+#. has been fully graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "Done"
+msgstr "Проверено"
+
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
 msgid "The problem close date has passed, and this problem is now closed."
 msgstr "Дата сдачи данного задания прошла, задание закрыто для сдачи."
@@ -2637,9 +2873,8 @@ msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-#, fuzzy
 msgid "Navigation"
-msgstr "Глобальная навигация"
+msgstr "Навигация"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "About these documents"
@@ -2649,6 +2884,8 @@ msgstr ""
 msgid "Index"
 msgstr ""
 
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
+#: lms/templates/wiki/plugins/attachments/index.html
 #: lms/templates/courses_list.html
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search"
@@ -2683,6 +2920,19 @@ msgstr "Естествознание"
 #: lms/djangoapps/branding/views.py
 msgid "Computer Science"
 msgstr "Информатика"
+
+#: lms/djangoapps/branding/views.py lms/templates/wiki/history.html
+#, fuzzy
+msgid "History"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"Историю\n"
+"#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
+"История\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"История\n"
+"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
+"История"
 
 #: lms/djangoapps/branding/views.py
 msgid "Literature"
@@ -3688,6 +3938,23 @@ msgstr "Автоматическая проверка"
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Instructor Assessment"
 msgstr "Проверка инструктором"
+
+#: lms/djangoapps/open_ended_grading/utils.py
+msgid "Currently being Graded"
+msgstr "В текущий момент проверяется"
+
+#: lms/djangoapps/open_ended_grading/utils.py
+#: lms/djangoapps/open_ended_grading/utils.py
+msgid "Waiting to be Graded"
+msgstr "Ожидает проверки"
+
+#: lms/djangoapps/open_ended_grading/utils.py
+msgid "Finished"
+msgstr "Проверка завершена"
+
+#: lms/djangoapps/open_ended_grading/utils.py
+msgid "Flagged"
+msgstr "Отмеченно"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid ""
@@ -5221,13 +5488,11 @@ msgstr "Сохранить"
 msgid "Cancel"
 msgstr "Отмена"
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
 #: lms/templates/wiki/includes/article_menu.html
-#, fuzzy
 msgid "View"
-msgstr "Посмотреть все"
+msgstr "Просмотр"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -6386,13 +6651,11 @@ msgstr "Уже имеете учетную запись?"
 msgid "Login."
 msgstr "Учетная запись."
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: The 'Group' here refers to the group of users that has been
 #. sorted into group_id
 #: lms/templates/split_test_staff_view.html
-#, fuzzy
 msgid "Group {group_id}"
-msgstr "О курсе {course_id}"
+msgstr "Группа {group_id}"
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
@@ -6409,6 +6672,15 @@ msgstr "{platform_name} проверка качества контента"
 #: lms/templates/staff_problem_info.html
 msgid "Comment"
 msgstr "Комментарий"
+
+#: lms/templates/staff_problem_info.html
+#, fuzzy
+msgid "comment"
+msgstr ""
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"комментарий\n"
+"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
+"комментарий"
 
 #: lms/templates/staff_problem_info.html
 msgid "Tag"
@@ -6887,9 +7159,8 @@ msgid "About {course.display_number_with_default}"
 msgstr "О {course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html
-#, fuzzy
 msgid "You are registered for this course"
-msgstr "Вы зарегистрированы на:"
+msgstr "Вы зарегистрированы на этот курс"
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
@@ -7029,9 +7300,8 @@ msgid "Search students"
 msgstr "Поиск студента"
 
 #: lms/templates/courseware/info.html
-#, fuzzy
 msgid "{course_number} Course Info"
-msgstr "{course_number} курс"
+msgstr "{course_number} Информация о курсе"
 
 #: lms/templates/courseware/info.html lms/templates/courseware/info.html
 #: lms/templates/courseware/welcome-back.html
@@ -7082,9 +7352,8 @@ msgid "Manage Groups"
 msgstr "Управление группами"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#, fuzzy
 msgid "Metrics"
-msgstr "Психометрика"
+msgstr "Метрики"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
@@ -7398,9 +7667,8 @@ msgstr "Аналитика не доступна на данный момент.
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#, fuzzy
 msgid "Loading..."
-msgstr "Загружаю"
+msgstr "Загрузка..."
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -7512,9 +7780,8 @@ msgid "{course_number} Progress"
 msgstr "{course_number} Прогресс"
 
 #: lms/templates/courseware/progress.html
-#, fuzzy
 msgid "Course Progress"
-msgstr "Прогресс"
+msgstr "Прогресс Курса"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
@@ -7864,9 +8131,8 @@ msgstr "Посмотреть как {name}"
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-#, fuzzy
 msgid "Add A Response"
-msgstr "Ответ"
+msgstr "Ответить"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
@@ -7953,24 +8219,20 @@ msgstr "Обновить ответ"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
-#, fuzzy
 msgid "Delete Comment"
-msgstr "Удалить блок"
+msgstr "Удалить комментарий"
 
 #: lms/templates/discussion/_underscore_templates.html
-#, fuzzy
 msgid "Editing comment"
-msgstr "Дополнительные комментарии:"
+msgstr "Отредактировать комментарий"
 
 #: lms/templates/discussion/_underscore_templates.html
-#, fuzzy
 msgid "Update comment"
-msgstr "Добавить комментарий"
+msgstr "Обновить комментарий"
 
 #: lms/templates/discussion/_underscore_templates.html
-#, fuzzy
 msgid "DISCUSSION HOME:"
-msgstr "ДИСКУССИИ"
+msgstr "ДИСКУССИИ:"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Find discussions"
@@ -8019,20 +8281,18 @@ msgstr ""
 "информирующий об активности в постах, за которыми Вы следите. "
 
 #: lms/templates/discussion/_user_profile.html
-#, fuzzy
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] "начатая дискуссия"
-msgstr[1] "начатые дискуссии"
-msgstr[2] "начатых дискуссий"
+msgstr[0] "%s начатая дискуссия"
+msgstr[1] "%s начатые дискуссии"
+msgstr[2] "%s начатых дискуссий"
 
 #: lms/templates/discussion/_user_profile.html
-#, fuzzy
 msgid "%s comment"
 msgid_plural "%s comments"
-msgstr[0] "%s новый комментарий"
-msgstr[1] "%s новых комментария"
-msgstr[2] "%s новых комментариев"
+msgstr[0] "%s комментарий"
+msgstr[1] "%s комментария"
+msgstr[2] "%s комментариев"
 
 #: lms/templates/discussion/index.html
 #: lms/templates/discussion/user_profile.html
@@ -8061,15 +8321,13 @@ msgstr "Активные темы"
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 #: lms/templates/discussion/mustache/_profile_thread.mustache
-#, fuzzy
 msgid "View discussion"
-msgstr "дискуссии"
+msgstr "Просмотр дискуссии"
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-#, fuzzy
 msgid "Hide discussion"
-msgstr "Найти дискуссию"
+msgstr "Спрятать дискуссию"
 
 #: lms/templates/instructor/staff_grading.html
 msgid "{course_number} Staff Grading"
@@ -8110,6 +8368,10 @@ msgstr ""
 #: lms/templates/instructor/staff_grading.html
 msgid "Prompt"
 msgstr "Условие задачи"
+
+#: lms/templates/instructor/staff_grading.html
+msgid "(Hide)"
+msgstr "(скрыть)"
 
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -8790,14 +9052,12 @@ msgid "Download CSV Data"
 msgstr "CSV всех профилей студентов"
 
 #: lms/templates/shoppingcart/download_report.html
-#, fuzzy
 msgid "Start Date: "
-msgstr "Дата начала курса"
+msgstr "Дата начала:"
 
 #: lms/templates/shoppingcart/download_report.html
-#, fuzzy
 msgid "End Date: "
-msgstr "Дата окончания курса"
+msgstr "Дата окончанияЖ"
 
 #: lms/templates/shoppingcart/download_report.html
 #, fuzzy
@@ -9518,14 +9778,12 @@ msgstr "Верификация по документу"
 #: lms/templates/wiki/includes/article_menu.html
 #: lms/templates/wiki/includes/article_menu.html
 #: lms/templates/wiki/includes/article_menu.html
-#, fuzzy
 msgid "{span_start}(active){span_end}"
-msgstr "{span_start}активен{span_end}"
+msgstr "{span_start}(активен){span_end}"
 
 #: lms/templates/wiki/includes/article_menu.html
-#, fuzzy
 msgid "Changes"
-msgstr "замена"
+msgstr "Изменения"
 
 #: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}active{span_end}"
@@ -12679,21 +12937,21 @@ msgstr ""
 #. graded rubrics the user might have received
 #: lms/templates/combinedopenended/combined_open_ended_results.html
 msgid "{result_of_task} from grader {number}"
-msgstr ""
+msgstr "{result_of_task} от преподавателя {number}"
 
 #: lms/templates/combinedopenended/openended/open_ended_combined_rubric.html
 msgid "{num} point: {explanatory_text}"
 msgid_plural "{num} points: {explanatory_text}"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{num} балл: {text}"
+msgstr[1] "{num} балла: {text}"
+msgstr[2] "{num} баллов: {text}"
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html
 msgid "{num} point: {text}"
 msgid_plural "{num} points: {text}"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{num} балл: {text}"
+msgstr[1] "{num} балла: {text}"
+msgstr[2] "{num} баллов: {text}"
 
 #: lms/templates/courseware/course_about.html
 msgid ""
@@ -12931,20 +13189,20 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_discussion.mustache
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 msgid "Enter your question or comment…"
-msgstr ""
+msgstr "Введите ваш вопрос или комментарий..."
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Pinned"
-msgstr ""
+msgstr "Прикрепленно"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "(this post is about %(courseware_title_linked)s)"
-msgstr ""
+msgstr "(это сообщение о %(courseware_title_linked)s)"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "-posted %(time_ago)s by"
-msgstr ""
+msgstr "-отправленно %(time_ago)s "
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid ""
@@ -12975,16 +13233,16 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Loading content"
-msgstr ""
+msgstr "Загружаем содержимое"
 
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "This thread has been pinned by course staff."
-msgstr ""
+msgstr "Эта тема прикрепленна администратором курса."
 
 #: lms/templates/discussion/mustache/_pagination.mustache
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "…"
-msgstr ""
+msgstr "..."
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid ""
@@ -14561,12 +14819,6 @@ msgid ""
 "#%(r2)d"
 msgstr ""
 
-#~ msgid "Administrator"
-#~ msgstr "Администратор"
-
-#~ msgid "Moderator"
-#~ msgstr "Модератор"
-
 #~ msgid "Student"
 #~ msgstr "Студент"
 
@@ -14588,114 +14840,6 @@ msgstr ""
 
 #~ msgid "User with username {} does not exist"
 #~ msgstr "Пользователь с именем {} не существует."
-
-#~ msgctxt "weekday name"
-#~ msgid "Monday"
-#~ msgstr "Понедельник"
-
-#~ msgctxt "weekday name"
-#~ msgid "Tuesday"
-#~ msgstr "Вторник"
-
-#~ msgctxt "weekday name"
-#~ msgid "Wednesday"
-#~ msgstr "Среда"
-
-#~ msgctxt "weekday name"
-#~ msgid "Thursday"
-#~ msgstr "Четверг"
-
-#~ msgctxt "weekday name"
-#~ msgid "Friday"
-#~ msgstr "Пятница"
-
-#~ msgctxt "weekday name"
-#~ msgid "Saturday"
-#~ msgstr "Суббота"
-
-#~ msgctxt "weekday name"
-#~ msgid "Sunday"
-#~ msgstr "Воскресенье"
-
-#~ msgctxt "abbreviated weekday name"
-#~ msgid "Mon"
-#~ msgstr "Пн"
-
-#~ msgctxt "abbreviated weekday name"
-#~ msgid "Tue"
-#~ msgstr "Вт"
-
-#~ msgctxt "abbreviated weekday name"
-#~ msgid "Wed"
-#~ msgstr "Ср"
-
-#~ msgctxt "abbreviated weekday name"
-#~ msgid "Thu"
-#~ msgstr "Чт"
-
-#~ msgctxt "abbreviated weekday name"
-#~ msgid "Fri"
-#~ msgstr "Пт"
-
-#~ msgctxt "abbreviated month name"
-#~ msgid "Feb"
-#~ msgstr "Фев"
-
-#~ msgctxt "abbreviated month name"
-#~ msgid "Apr"
-#~ msgstr "Апр"
-
-#~ msgctxt "abbreviated month name"
-#~ msgid "Jun"
-#~ msgstr "Июн"
-
-#~ msgctxt "abbreviated month name"
-#~ msgid "Jul"
-#~ msgstr "Июл"
-
-#~ msgctxt "abbreviated month name"
-#~ msgid "Aug"
-#~ msgstr "Авг"
-
-#~ msgctxt "abbreviated month name"
-#~ msgid "Sep"
-#~ msgstr "Сен"
-
-#~ msgctxt "abbreviated month name"
-#~ msgid "Oct"
-#~ msgstr "Окт"
-
-#~ msgctxt "abbreviated month name"
-#~ msgid "Dec"
-#~ msgstr "Дек"
-
-#~ msgctxt "month name"
-#~ msgid "January"
-#~ msgstr "Январь"
-
-#~ msgctxt "month name"
-#~ msgid "February"
-#~ msgstr "Февраль"
-
-#~ msgctxt "month name"
-#~ msgid "April"
-#~ msgstr "Апрель"
-
-#~ msgctxt "month name"
-#~ msgid "June"
-#~ msgstr "Июнь"
-
-#~ msgctxt "month name"
-#~ msgid "July"
-#~ msgstr "Июль"
-
-#~ msgctxt "month name"
-#~ msgid "August"
-#~ msgstr "Август"
-
-#~ msgctxt "month name"
-#~ msgid "October"
-#~ msgstr "Октябрь"
 
 #~ msgid "Annotation"
 #~ msgstr "Аннотации"
@@ -14755,33 +14899,12 @@ msgstr ""
 #~ msgid "Word cloud"
 #~ msgstr "Облако слов"
 
-#~ msgid "Peer-Assessment"
-#~ msgstr "Перекрестная проверка"
-
-#~ msgid "Instructor-Assessment"
-#~ msgstr "Проверка инструктором"
-
-#~ msgid "AI-Assessment"
-#~ msgstr "Проверка ИИ"
-
 #~ msgid "No feedback available from grader."
 #~ msgstr "Обратная связь пока недоступнаю"
 
 #~ msgid "Error handling action. Please try again."
 #~ msgstr ""
 #~ "Произошла ошибка сохранения ваших изменений. Пожалуйста, попробуйте ещё раз."
-
-#~ msgid "Not started"
-#~ msgstr "Не начат"
-
-#~ msgid "In progress"
-#~ msgstr "В процессе проверки"
-
-#~ msgid "Done"
-#~ msgstr "Проверено"
-
-#~ msgid "History"
-#~ msgstr "История"
 
 #~ msgid "Social Studies"
 #~ msgstr "Обществознание"
@@ -15066,9 +15189,6 @@ msgstr ""
 #~ msgid "I agree to the {link_start}Honor Code{link_end}*"
 #~ msgstr "Я согласен с {link_start}Кодексом чести{link_end}*"
 
-#~ msgid "comment"
-#~ msgstr "комментарий"
-
 #~ msgid "Explore free courses from leading universities."
 #~ msgstr ""
 #~ "Изучите бесплатные курсы {span_start}{platform_name}{span_end} университетов"
@@ -15081,9 +15201,6 @@ msgstr ""
 
 #~ msgid "Are you sure you want to unregister from"
 #~ msgstr "Вы уверены что хотите удалить регистрацию с курса"
-
-#~ msgid "(Hide)"
-#~ msgstr "(скрыть)"
 
 #~ msgid "Your Location"
 #~ msgstr "Местонахождение подраздела "
