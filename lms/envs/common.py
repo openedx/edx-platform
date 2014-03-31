@@ -526,7 +526,6 @@ LANGUAGES = (
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
-    ('ach', u'Acholi'),  # Acoli
     ('ar', u'العربية'),  # Arabic
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
     ('bn', u'বাংলা'),  # Bengali
