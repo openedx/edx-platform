@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Video xmodule tests in mongo."""
-import json
 import unittest
-from collections import OrderedDict
 from mock import patch, PropertyMock, MagicMock
 
 from django.conf import settings
@@ -55,7 +53,7 @@ class TestVideoYouTube(TestVideo):
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [{'display_name': 'SubRip (.srt) file', 'value': 'srt'}, {'display_name': 'Text (.txt) file', 'value': 'txt'}],
             'transcript_language': u'en',
-            'transcript_languages': json.dumps(OrderedDict({"en": "English", "uk":  u"Українська"})),
+            'transcript_languages': '{"en": "English", "uk":  u"Українська"}',
             'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
                 self.item_descriptor, 'transcript', 'translation'
             ).rstrip('/?'),
@@ -99,7 +97,6 @@ class TestVideoNonYouTube(TestVideo):
         }
 
         context = self.item_descriptor.render('student_view').content
-
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'data_dir': getattr(self, 'data_dir', None),
@@ -242,7 +239,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
             expected_context.update({
                 'transcript_download_format': None if self.item_descriptor.track and self.item_descriptor.download_track else 'srt',
-                'transcript_languages': '{"en": "English"}' if not data['transcripts'] else json.dumps({"uk": u'Українська'}),
+                'transcript_languages': '{"en": "English"}' if not data['transcripts'] else '{"uk": "Ukrainian"}',
                 'transcript_language': u'en' if not data['transcripts'] or data.get('sub') else u'uk',
                 'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation'
@@ -255,6 +252,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'sub': data['sub'],
                 'id': self.item_descriptor.location.html_id(),
             })
+
             self.assertEqual(
                 context,
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context),
