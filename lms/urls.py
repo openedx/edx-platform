@@ -35,6 +35,7 @@ urlpatterns = ('',  # nopep8
         name='manage_user_standing'),
     url(r'^accounts/disable_account_ajax$', 'student.views.disable_account_ajax',
         name="disable_account_ajax"),
+    url(r'^disabled_account$', 'student.views.disabled_account', name="disabled_account"),
 
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),

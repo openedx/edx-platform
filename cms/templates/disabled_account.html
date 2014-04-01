@@ -1,0 +1,20 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="base.html" />
+<%block name="title">${_("Disabled Account")}</%block>
+<%block name="bodyclass">view-util</%block>
+
+<%block name="content">
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <header>
+      <h1 class="title title-1">${_("Disabled Account")}</h1>
+    </header>
+    <article class="content-primary" role="main">
+      <p>
+        ${_('Your account has been disabled. If you believe this was done in error, please contact us at {link_start}{support_email}{link_end}').format(
+              link_start=u'<a href="mailto:{address}?subject={subject_line}">'.format(address=settings.DEFAULT_FEEDBACK_EMAIL, subject_line=_("Disabled Account")), link_end=u'</a>', support_email=settings.DEFAULT_FEEDBACK_EMAIL)}
+      </p>
+    </article>
+  </section>
+</div>
+</%block>
