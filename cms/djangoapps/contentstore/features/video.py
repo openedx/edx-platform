@@ -32,11 +32,6 @@ def configure_youtube_api(_step, action):
         raise ValueError('Parameter `action` should be one of "proxies" or "blocks".')
 
 
-@step('We explicitly wait for YouTube API to not load$')
-def wait_for_youtube_api_fail(_step):
-    world.wait(3)
-
-
 @step('I have created a Video component$')
 def i_created_a_video_component(_step):
     world.create_course_with_unit()
@@ -51,7 +46,8 @@ def i_created_a_video_component(_step):
     world.wait_for_present('.is-initialized')
     world.wait(DELAY)
     world.wait_for_invisible(SELECTORS['spinner'])
-
+    if not world.youtube.config.get('youtube_api_blocked'):
+        world.wait_for_visible(SELECTORS['controls'])
 
 @step('I have created a Video component with subtitles$')
 def i_created_a_video_with_subs(_step):

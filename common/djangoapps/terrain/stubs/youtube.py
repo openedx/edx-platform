@@ -80,7 +80,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             if self.server.config.get('youtube_api_blocked'):
                 self.send_response(404, content='', headers={'Content-type': 'text/plain'})
             else:
-                response = requests.get('http://www.youtube.com/iframe_api')
+                response = self.server.config.get('youtube_api_response', '')
                 self.send_response(200, content=response.text, headers={'Content-type': 'text/html'})
 
         else:
