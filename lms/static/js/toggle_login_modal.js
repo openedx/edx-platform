@@ -102,7 +102,7 @@
       embed = $($(this).attr('href')).find('iframe')
       if (embed.length > 0 && embed.attr('src')) {
         var sep = (embed.attr('src').indexOf("?") > 0) ? '&' : '?';
-        embed.data('src', embed.attr('src') + sep + 'autoplay=1&rel=0');
+        embed.data('src', embed.attr('src') + sep + 'autoplay=0&rel=0');
         embed.attr('src', '');
       }
     });

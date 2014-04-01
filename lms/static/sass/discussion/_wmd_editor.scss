@@ -1,0 +1,188 @@
+@mixin discussion-wmd-input {
+  width: 100%;
+  height: 240px;
+  margin-top: 0;
+  padding: 10px;
+  border: 1px solid #aaa;
+  border-radius: 3px 3px 0 0;
+  background: #fff;
+  font-size: 13px;
+  line-height: 1.6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+}
+
+
+@mixin discussion-wmd-preview-container {
+  width: 100%;
+  border: 1px solid #aaa;
+  border-top: none;
+  border-radius: 0 0 3px 3px;
+  background: #eee;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+}
+
+@mixin discussion-wmd-preview-label {
+  width: 100%;
+  padding-top: 3px;
+  padding-left: 5px;
+  color: #bbb;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+@mixin discussion-wmd-preview {
+  width: 100%;
+  padding: 10px 20px;
+  color: #333;
+}
+
+
+.wmd-panel {
+  width: 100%;
+}
+
+
+.wmd-button-bar  {
+  width: 100%;
+}
+
+.wmd-input {
+  height: 150px;
+  width: 100%;
+  background-color: #e9e9e9;
+  border: 1px solid #c8c8c8;
+  font-style: normal;
+  font-size: 0.8em;
+  line-height: 1.6em;
+  border-radius: 3px 3px 0 0;
+
+  &::-webkit-input-placeholder {
+    color: #888;
+  }
+}
+
+.wmd-button-row {
+  position: relative;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  margin-top: $baseline/2;
+  padding: 0px;
+  height: 20px;
+  overflow: hidden;
+  /*      @include transition(all .2s ease-out 0s);*/
+}
+
+.wmd-spacer {
+  width: 1px;
+  height: 20px;
+  margin-left: 14px;
+
+  position: absolute;
+  background-color: Silver;
+  display: inline-block;
+  list-style: none;
+}
+
+.wmd-button {
+  width: 20px;
+  height: 20px;
+  padding-left: 2px;
+  padding-right: 3px;
+  position: absolute;
+  display: inline-block;
+  list-style: none;
+  cursor: pointer;
+  background: none;
+}
+
+.wmd-button > span {
+  display: inline-block;
+  background-image: url(/static/images/new-post-icons-full.png);
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  width: 20px;
+  height: 20px;
+}
+
+.wmd-preview-container{
+  @include discussion-wmd-preview-container;
+}
+
+.wmd-preview-label {
+  @include discussion-wmd-preview-label;
+}
+
+.wmd-preview {
+  @include discussion-wmd-preview;
+}
+
+.wmd-spacer1 {
+  left: 50px;
+}
+.wmd-spacer2 {
+  left: 175px;
+}
+
+.wmd-spacer3 {
+  left: 300px;
+}
+
+.wmd-prompt-background {
+  background-color: Black;
+}
+
+.wmd-prompt-dialog {
+  padding: $baseline;
+
+  > div {
+    font-size: 0.8em;
+  }
+
+  b {
+    font-size: 16px;
+  }
+
+  > form > input[type="text"] {
+    border-radius: 3px;
+    color: #333;
+  }
+
+  > form > input[type="button"] {
+    border: 1px solid #888;
+    font-size: 14px;
+  }
+
+  > form > input[type="file"] {
+    margin-bottom: 18px;
+  }
+}
+
+.wmd-button-row {
+  position: relative;
+  height: 20px;
+}
+
+.wmd-button {
+  span {
+    width: 20px;
+    height: 20px;
+    background-image: url("/static/images/wmd-buttons.png");
+    display: inline-block;
+  }
+}
+
+.wmd-spacer1 {
+  left: 50px;
+}
+
+.wmd-spacer2 {
+  left: 175px;
+}
+
+.wmd-spacer3 {
+  left: 300px;
+}
+
+
+

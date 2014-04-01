@@ -86,17 +86,61 @@
   </script>
 </%block>
 
-<section class="introduction">
-  <header>
-    <h1 class="title">
-      <span class="title-super">${_("Welcome!")}</span>
-      <span class="title-sub">${_("Register below to create your {platform_name} account").format(platform_name=platform_name)}</span>
-    </h1>
-  </header>
-</section>
+##<section class="introduction">
+##  <header>
+##    <h1 class="title">
+##      <span class="title-super">${_("Welcome!")}</span>
+##      <span class="title-sub">${_("Register below to create your {platform_name} account").format(platform_name=platform_name)}</span>
+##    </h1>
+##  </header>
+##</section>
+
+<!-- ▼SPのマゼラン▼ -->
+<div data-magellan-expedition="fixed" class="show-for-small-only" style>
+  <dl class="sub-nav">
+    <dd data-magellan-arrival="form" class="active"><a href="#form"><span class="f_label radius secondary">登録フォーム</span></a></dd>
+    <dd data-magellan-arrival="help" class=""><a href="#help"><span class="f_label radius secondary">よくある質問</span></a></dd>
+  </dl>
+</div>
+<!-- ▲SPのマゼラン▲ -->
+
+<div style="margin-top:4rem;"></div>
+
+<div class="row">
+  <div class="columns">
+    <h2>会員登録</h2>
+  </div>
+</div>
+<div style="width:100%; height:121px; margin-bottom:3rem; background-color:#ccc;">
+  <div class="row">
+    <div class="columns">
+      <h3 style="margin-top:1rem;">よこうそ！gaccoへ。</h3>
+      <h3>gaccoは誰でも無料で受講できるウェブサービスです。</h3>
+    </div>
+  </div>
+</div>
+
+<!-- ▼SPのログインボタン▼ -->
+  <div class="row show-for-small-only">
+     <p class="text-center" style="margin-top:20px;"><a href="/login" class="f_button small radius" style="width:80%;">す
+でに登録済の方はログイン</a></p>
+  </div>
+<!-- ▲SPのログインボタン▲ -->
+<!-- ▼Tabのログインボタン▼ -->
+  <div class="row show-for-medium-only">
+     <p class="text-center" style="margin-top:20px;"><a href="/login" class="f_button radius small" style="width:50%;">す
+でに登録済の方はログイン</a></p>
+  </div>
+<!-- ▲Tabのログインボタン▲ -->
+
+
+<div class="row">
+<div class="columns large-8 medium-8">
+
+<a name="form"></a>
 
 <section class="register container">
-  <section role="main" class="content">
+  <section role="main" class="">
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account" novalidate>
       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
 
@@ -305,12 +349,17 @@
 % endif
 
       <div class="form-actions">
-        <button name="submit" type="submit" id="submit" class="action action-primary action-update">${_('Register')} <span class="orn-plus">+</span> ${_('Create My Account')}</button>
+        <input name="submit" type="submit" id="submit" class="f_button radius success" style="width:100%; color:#fff;" value="${_('Create My Account')}">
+      <small>※未成年の方がお申し込みをいただく場合は、親権者の同意が必要となります。</small>
       </div>
     </form>
   </section>
 
+</div>
+
   <aside role="complementary">
+    <div class="columns large-4 medium-4">
+    <a name="help"></a>
 
 <%
   # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
@@ -319,5 +368,9 @@
 
     <%include file="${sidebar_file}" />
 
+    </div>
   </aside>
 </section>
+
+</div>
+

@@ -11,8 +11,10 @@
 
 {% block wiki_contents %}
 
+  <div class="row">
   <div class="article-wrapper">
 
+    <div class="columns small-12 medium-9 large-9">
     <article class="main-article" id="main-article">
         {% if selected_tab != "edit" %}
           <h1>{{ article.current_revision.title }}</h1>
@@ -23,13 +25,14 @@
         {% wiki_render article %}
         {% endblock %}
     </article>
+    </div>
 
-    <div class="article-functions">
+    <div class="article-functions show-for-medium-up columns medium-3 large-3">
       <ul class="nav nav-tabs">
         {% include "wiki/includes/article_menu.html" %}
       </ul>
       <div class="timestamp">
-        <span class="label">{% trans "Last modified:" %}</span><br />
+        <span class="">{% trans "Last modified:" %}</span><br />
         <span class="date">{{ article.current_revision.modified }}</span>
       </div>
 
@@ -39,6 +42,7 @@
       </div>
       {% endif %}
     </div>
+  </div>
   </div>
 
 

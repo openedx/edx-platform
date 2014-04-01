@@ -1,0 +1,1643 @@
+diff --git a/common/lib/xmodule/xmodule/css/sequence/display.scss b/common/lib/xmodule/xmodule/css/sequence/display.scss
+index eed30a9..06b5e27 100644
+--- a/common/lib/xmodule/xmodule/css/sequence/display.scss
++++ b/common/lib/xmodule/xmodule/css/sequence/display.scss
+@@ -47,8 +47,9 @@ nav.sequence-nav {
+     z-index: 9999;
+     width: 20px;
+     height: 46px;
+-    @include linear-gradient(left, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
+-    background-color: transparent;
++//    @include linear-gradient(left, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
++//    background-color: transparent;
++    background-color: #fafafa;
+     pointer-events: none;
+   }
+ 
+@@ -59,19 +60,21 @@ nav.sequence-nav {
+     z-index: 9999;
+     width: 20px;
+     height: 46px;
+-    @include linear-gradient(right, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
+-    background-color: transparent;
++//    @include linear-gradient(right, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
++//    background-color: transparent;
++    background-color: #fafafa;
+     pointer-events: none;
+   }
+ 
+   .sequence-list-wrapper {
+     position: relative;
+     z-index: 99;
+-    border: 1px solid #ccc;
++//    border: 1px solid #ccc;
+     height: 44px;
+     margin: 0 30px;
+-    @include linear-gradient(top, #ddd, #eee);
+-    box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset;
++//    @include linear-gradient(top, #ddd, #eee);
++    @include linear-gradient(top, #fafafa, #fafafa);
++//    box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset;
+   }
+ 
+   ol {
+@@ -99,7 +102,7 @@ nav.sequence-nav {
+         margin: 0;
+         background-position: center 14px;
+         background-repeat: no-repeat;
+-        border: 1px solid transparent;
++//        border: 1px solid transparent;
+         cursor: pointer;
+         display: block;
+         padding: 0;
+@@ -112,13 +115,13 @@ nav.sequence-nav {
+         }
+ 
+         &:hover, &:focus {
+-          background-color: #fff;
++          background-color: #eee;
+           background-repeat: no-repeat;
+           background-position: center 14px;
+         }
+ 
+         &.active {
+-          background-color: #fff;
++          background-color: #eee;
+           z-index: 9;
+ 
+           // &:after {
+@@ -133,7 +136,7 @@ nav.sequence-nav {
+           // }
+ 
+           &:hover {
+-            background-color: #fff;
++            background-color: #eee;
+             background-repeat: no-repeat;
+             background-position: center 14px;
+           }
+@@ -207,7 +210,7 @@ nav.sequence-nav {
+           padding: 6px;
+           position: absolute;
+           top: 48px;
+-          text-shadow: 0 -1px 0 #000;
++//          text-shadow: 0 -1px 0 #000;
+           @include transition(all .1s $ease-in-out-quart 0s);
+           white-space: pre;
+           z-index: 99;
+@@ -263,9 +266,10 @@ nav.sequence-nav {
+       margin-bottom: 0;
+       height: 44px;
+       width: 70px;
+-      border: 1px solid #ccc;
+-      @include linear-gradient(top, #eee, #ddd);
+-      box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
++//      border: 1px solid #ccc;
++//      @include linear-gradient(top, #eee, #ddd);
++      @include linear-gradient(top, #ccc, #ccc);
++//      box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
+       z-index: 1;
+ 
+       &.prev, &.next {
+@@ -339,9 +343,17 @@ nav.sequence-bottom {
+       float: left;
+       width: 50px;
+       height: 44px;
+-      border: 1px solid #ccc;
+-      @include linear-gradient(top, #eee, #ddd);
+-      box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
++//      border: 1px solid #ccc;
++//      @include linear-gradient(top, #eee, #ddd);
++      @include linear-gradient(top, #ccc, #ccc);
++//      box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
++
++      // add by wat ____
++      &.center-menu{
++      @include linear-gradient(top, #eee, #eee);
++      @include transition(all .2s $ease-in-out-quad 0s);
++      }
++      // that's all ^^^^
+ 
+       &.prev, &.next {
+         margin-bottom: 0;
+diff --git a/common/lib/xmodule/xmodule/css/video/display.scss b/common/lib/xmodule/xmodule/css/video/display.scss
+index 5fc6486..faef3c3 100644
+--- a/common/lib/xmodule/xmodule/css/video/display.scss
++++ b/common/lib/xmodule/xmodule/css/video/display.scss
+@@ -69,7 +69,7 @@ div.video {
+   article.video-wrapper {
+     float: left;
+     margin-right: flex-gutter(9);
+-    width: flex-grid(6, 9);
++    width: flex-grid(7, 9);
+     background-color: black;
+     position: relative;
+ 
+@@ -581,7 +581,7 @@ div.video {
+     float: left;
+     max-height: 460px;
+     overflow: auto;
+-    width: flex-grid(3, 9);
++    width: flex-grid(2, 9);
+     margin: 0;
+     font-size: 14px;
+     list-style: none;
+diff --git a/lms/envs/common.py b/lms/envs/common.py
+index 7a31bd6..4ec890f 100644
+--- a/lms/envs/common.py
++++ b/lms/envs/common.py
+@@ -776,6 +776,15 @@ main_vendor_js = [
+     'js/vendor/ova/catch/js/catch.js',
+     'js/vendor/ova/catch/js/handlebars-1.1.2.js',
+     'js/vendor/URI.min.js',
++    'js/vendor/modernizr.js',
++]
++
++foundation_js = [
++##    'js/vendor/jquery.min.js',
++    'js/vendor/fastclick.js',
++    'js/vendor/foundation.min.js',
++##    'js/vendor/foundation.js',
++##    'js/vendor/foundation.f_dropdown.js',
+ ]
+ 
+ discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+@@ -838,6 +847,12 @@ PIPELINE_CSS = {
+         ],
+         'output_filename': 'css/lms-style-course.css',
+     },
++    'style-gacco': {
++        'source_filenames': [
++            'sass/gacco/gacco.css',
++        ],
++        'output_filename': 'css/lms-style-gacco.css',
++    },
+ }
+ 
+ 
+@@ -910,6 +925,11 @@ PIPELINE_JS = {
+         'output_filename': 'js/instructor_dash.js',
+         'test_order': 9,
+     },
++    'foundation': {
++        'source_filenames': foundation_js,
++        'output_filename': 'js/foundation.js',
++        'test_order': 10,
++    },
+ }
+ 
+ PIPELINE_DISABLE_WRAPPER = True
+diff --git a/lms/static/sass/base/_base.scss b/lms/static/sass/base/_base.scss
+index 01d415e..d504fb7 100644
+--- a/lms/static/sass/base/_base.scss
++++ b/lms/static/sass/base/_base.scss
+@@ -1,162 +1,18 @@
+-// html {
+-//   overflow-y: scroll;
+-// }
+ 
+-html, body {
+-  background: $body-bg;
+-  font-family: $sans-serif;
+-  font-size: 1em;
+-  font-style: normal;
+-  line-height: 1em;
+-  //-webkit-font-smoothing: antialiased;
+-}
+-
+-h1, h2, h3, h4, h5, h6 {
+-  color: $base-font-color;
+-  font: normal 1.2em/1.2em $serif;
+-  margin: 0px;
+-}
+ 
+-h1 {
+-  color: $base-font-color;
+-  font: normal 2em/1.4em $sans-serif;
+-  letter-spacing: 1px;
+-  margin-bottom: 30px;
+-  text-align: center;
+-  //text-transform: uppercase;
+-}
+-
+-h2 {
+-  color: $lighter-base-font-color;
+-  font: normal 1.2em/1.2em $serif;
+-  letter-spacing: 1px;
+-  margin-bottom: 15px;
+-  text-transform: uppercase;
+-  -webkit-font-smoothing: antialiased;
+-}
+-
+-p + h2, ul + h2, ol + h2 {
+-  margin-top: 40px;
+-}
+-
+-p {
+-  color: $base-font-color;
+-  font: normal 1em/1.6em $serif;
+-  margin: 0px;
+-}
+-
+-span {
+-  font: normal 1em/1.6em $sans-serif;
+-  color: $base-font-color;
+-}
+ 
+ /* Fix for CodeMirror: prevent top-level span from affecting deeply-embedded span in CodeMirror */
+ .CodeMirror span {
+   font: inherit;
+ }
+ 
+-p + p, ul + p, ol + p {
+-  margin-top: 20px;
+-}
+-
+-p {
+-  a:link, a:visited {
+-    color: $link-color;
+-    font: normal 1em/1em $serif;
+-    text-decoration: none;
+-    @include transition(all 0.1s linear 0s);
+-
+-    &:hover, &:focus {
+-      color: $link-color;
+-      text-decoration: underline;
+-    }
+-  }
+-}
+-
+-a:link, a:visited {
+-  color: $link-color;
+-  font: normal 1em/1em $sans-serif;
+-  text-decoration: none;
+-  @include transition(all 0.1s linear 0s);
+-
+-  &:hover, &:focus {
+-    text-decoration: underline;
+-  }
+-
+-  &:disabled, &.is-disabled, &.disabled {
+-    pointer-events: none;
+-    opacity: 0.5;
+-    cursor: not-allowed;
+-  }
+-}
+-
+-a:focus {
+-  /**
+-   *  Add general focus styling here
+-   *  for example:
+-   *      outline: 3px groove $black;
+-   **/
+-}
+ 
+-.content-wrapper {
+-  width: flex-grid(12);
+-  margin: 0 auto;
+-  background: $content-wrapper-bg;
+-  padding-bottom: ($baseline*2);
+-}
+-
+-.container {
+-  @include clearfix;
+-  margin: 0 auto 0;
+-  padding: 0px 30px;
+-  max-width: grid-width(12);
+-  min-width: 760px;
+-  width: flex-grid(12);
+-}
+ 
+ span.edx {
+   text-transform: none;
+   font: inherit;
+ }
+ 
+-.static-container {
+-  @include clearfix;
+-  margin: 0 auto 0;
+-  max-width: 1200px;
+-  padding: 60px 0px 120px;
+-  width: flex-grid(12);
+-
+-  .inner-wrapper {
+-    margin: 0 auto 0;
+-    width: flex-grid(10);
+-  }
+-
+-  ol, ul {
+-    list-style: disc;
+-
+-    li {
+-      color: $base-font-color;
+-      font: normal 1em/1.4em $serif;
+-      margin: 0px;
+-    }
+-  }
+-
+-  h1 {
+-    margin-bottom: 30px;
+-  }
+-
+-  h1 + hr {
+-    margin-bottom: 60px;
+-  }
+-
+-  p + h2, ul + h2, ol + h2 {
+-    margin-top: 40px;
+-  }
+-
+-  ul + p, ol + p {
+-    margin-top: 20px;
+-  }
+-}
+ 
+ .loading-animation {
+   position: absolute;
+@@ -192,17 +48,6 @@ mark {
+     margin-right: 15px;
+     background: url(../images/large-white-error-icon.png) no-repeat;
+   }
+-
+-  .inner-wrapper {
+-    margin: auto;
+-    max-width: 1180px;
+-    min-width: 760px;
+-  }
+-
+-  p {
+-    line-height: 1.3;
+-    color: #fff;
+-  }
+ }
+ 
+ .ie-banner {
+diff --git a/lms/static/sass/base/_reset.scss b/lms/static/sass/base/_reset.scss
+index eac3ed9..37ab850 100644
+--- a/lms/static/sass/base/_reset.scss
++++ b/lms/static/sass/base/_reset.scss
+@@ -1,5 +1,8 @@
+ /* HTML5 Boilerplate  */
+ 
++
++/* edit by wat
++
+ article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block; }
+ audio, canvas, video { display: inline-block; *display: inline; *zoom: 1; }
+ audio:not([controls]) { display: none; }
+@@ -79,10 +82,15 @@ td { vertical-align: top; }
+ .visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
+ .visuallyhidden.focusable:active, .visuallyhidden.focusable:focus { clip: auto; height: auto; margin: 0; overflow: visible; position: static; width: auto; }
+ .invisible { visibility: hidden; }
++*/
++
++// no clearfix occurs sass error
+ .clearfix:before, .clearfix:after { content: ""; display: table; }
+ .clearfix:after { clear: both; }
+ .clearfix { *zoom: 1; }
+ 
++/*  edit by wat
++
+ @media print {
+   * { background: transparent !important; color: black !important; box-shadow:none !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; }
+   a, a:visited { text-decoration: underline; }
+@@ -97,3 +105,5 @@ td { vertical-align: top; }
+   p, h2, h3 { orphans: 3; widows: 3; }
+   h2, h3 { page-break-after: avoid; }
+ }
++
++*/
+diff --git a/lms/static/sass/base/_variables.scss b/lms/static/sass/base/_variables.scss
+index 369fe10..6e8ad31 100644
+--- a/lms/static/sass/base/_variables.scss
++++ b/lms/static/sass/base/_variables.scss
+@@ -281,10 +281,10 @@ $form-bg-color: #fff;
+ $modal-bg-color: rgb(245,245,245);
+ 
+ // MISC: sidebar
+-$sidebar-chapter-bg-top: rgba(255, 255, 255, .6);
++$sidebar-chapter-bg-top: rgba(255, 255, 255, 0);
+ $sidebar-chapter-bg-bottom: rgba(255, 255, 255, 0);
+ $sidebar-chapter-bg: #eee;
+-$sidebar-active-image: linear-gradient(top, #e6e6e6, #d6d6d6);
++$sidebar-active-image: linear-gradient(top, #074e68, #074e68);
+ 
+ // TOP HEADER IMAGE MARGIN
+ $header_image_margin: -69px;
+diff --git a/lms/static/sass/course.scss.mako b/lms/static/sass/course.scss.mako
+index 2cdd1c2..3509445 100644
+--- a/lms/static/sass/course.scss.mako
++++ b/lms/static/sass/course.scss.mako
+@@ -1,7 +1,7 @@
+ @import 'bourbon/bourbon';
+ 
+ @import 'base/reset';
+-@import 'base/font_face';
++##@import 'base/font_face';
+ @import 'base/variables';
+ @import 'base/mixins';
+ 
+diff --git a/lms/static/sass/course/base/_base.scss b/lms/static/sass/course/base/_base.scss
+index abbe82a..9291e4f 100644
+--- a/lms/static/sass/course/base/_base.scss
++++ b/lms/static/sass/course/base/_base.scss
+@@ -1,105 +1,3 @@
+-body {
+-  min-width: 980px;
+-  min-height: 100%;
+-  background-image: $course-bg-image;
+-  background-color: $course-bg-color;
+-}
+-
+-body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a, label {
+-  text-align: left;
+-  font-family: $sans-serif;
+-}
+-
+-table {
+-  table-layout: fixed;
+-}
+-
+-a {
+-  &:hover, &:focus {
+-    color: $pink;
+-    text-decoration: none !important;
+-  }
+-}
+-
+-.content-wrapper {
+-  background: none;
+-  border: none;
+-}
+-
+-.container {
+-  padding: 20px 0 0 0;
+-
+-  > div {
+-    display: table;
+-    table-layout: fixed;
+-    width: 100%;
+-    border-radius: 3px;
+-    border: 1px solid $outer-border-color;
+-    background: $container-bg;
+-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+-  }
+-}
+-
+-form {
+-  label {
+-    display: block;
+-  }
+-}
+-
+-form.choicegroup {
+-  label {
+-    clear: both;
+-    float: left;
+-  }
+-}
+-
+-textarea,
+-input[type="text"],
+-input[type="email"],
+-input[type="password"] {
+-  background: $white;
+-  border: 1px solid $border-color-2;
+-  border-radius: 0;
+-  box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6), inset 0 0 3px 0 rgba(0,0,0, 0.1);
+-  @include box-sizing(border-box);
+-  font: normal 1em $sans-serif;
+-  height: 35px;
+-  padding: 5px 12px;
+-  vertical-align: top;
+-  -webkit-font-smoothing: antialiased;
+-
+-  &:last-child {
+-    margin-right: 0px;
+-  }
+-
+-  &:focus {
+-    border-color: lighten($link-color, 20%);
+-    box-shadow: 0 0 6px 0 rgba($blue, 0.4), inset 0 0 4px 0 rgba(0,0,0, 0.15);
+-    outline: none;
+-  }
+-}
+-
+-label {
+-  font-weight: normal;
+-  font-style: normal;
+-}
+-
+-input[type="reset"],
+-input[type="submit"],
+-input[type="button"],
+-button,
+-.button {
+-  @extend .gray-button;
+-
+-  form & {
+-    @extend .gray-button;
+-  }
+-}
+-
+-
+-img {
+-  max-width: 100%;
+-}
+ 
+ .tooltip {
+   position: absolute;
+diff --git a/lms/static/sass/course/courseware/_courseware.scss b/lms/static/sass/course/courseware/_courseware.scss
+index 0e10292..85066af 100644
+--- a/lms/static/sass/course/courseware/_courseware.scss
++++ b/lms/static/sass/course/courseware/_courseware.scss
+@@ -15,7 +15,7 @@ div.course-wrapper {
+ 
+   section.course-content {
+     @extend .content;
+-    padding: 40px;
++    padding: 20px;
+     line-height: 1.6;
+ 
+     h1 {
+diff --git a/lms/static/sass/course/courseware/_sidebar.scss b/lms/static/sass/course/courseware/_sidebar.scss
+index 153e0c4..a7cedcb 100644
+--- a/lms/static/sass/course/courseware/_sidebar.scss
++++ b/lms/static/sass/course/courseware/_sidebar.scss
+@@ -2,7 +2,7 @@
+   @extend .sidebar;
+   @extend .tran;
+   border-radius: 3px 0 0 3px;
+-  border-right: 1px solid $border-color-2;
++//  border-right: 1px solid $border-color-2;
+ 
+   #open_close_accordion {
+     display: none;
+@@ -17,9 +17,13 @@
+   }
+ 
+   div#accordion {
+-    width: auto;
++//   width: auto;
+     font-size: 14px;
+ 
++    a{
++      color:#dd1144;
++    }
++
+     h3 {
+       border-radius: 0;
+       margin: 0;
+@@ -47,8 +51,9 @@
+         a {
+           border-radius: 0;
+           box-shadow: none;
+-          padding-left: 19px;
+-          color: $link-color;
++          padding-left: 5px;
++          //color: $link-color;
++          color:#777777;
+         }
+ 
+         &.ui-state-active {
+@@ -74,11 +79,13 @@
+       padding: 11px 14px;
+       @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
+       background-color: $sidebar-chapter-bg;
+-      box-shadow: 0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset;
++      //box-shadow: 0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset;
+       @include transition(background-color .1s linear 0s);
++      color:#dd1144;
+ 
+       &.is-open {
+-        background: #fff;
++        color:#333;
++        background: #fafafa;
+       }
+ 
+       &:first-child {
+@@ -87,11 +94,11 @@
+ 
+       &:last-child {
+         border-radius: 0 0 0 3px;
+-        box-shadow: 0 1px 0 #fff inset;
++        //box-shadow: 0 1px 0 #fff inset;
+       }
+ 
+       &:hover, &:focus {
+-        background-color: #fff
++        background-color: #fafafa;
+       }
+     }
+ 
+@@ -118,7 +125,7 @@
+           text-decoration: none;
+ 
+           p {
+-            font-weight: bold;
++            //font-weight: bold;
+             font-family: $sans-serif;
+             margin-bottom: 0;
+             line-height: 1.3;
+@@ -137,7 +144,8 @@
+           }
+ 
+           &:hover, &:focus {
+-            background: rgba(0, 0, 0, .1);
++            //background: rgba(0, 0, 0, .1);
++            background-color: #eee;
+ 
+             > a p {
+               color: #333;
+@@ -155,7 +163,7 @@
+         }
+ 
+         &.active {
+-          font-weight: bold;
++          //font-weight: bold;
+ 
+           &:after {
+             content: '›';
+@@ -171,9 +179,10 @@
+           }
+ 
+           > a {
+-            border: 1px solid $border-color-1;
++            //border: 1px solid $border-color-1;
+             box-shadow: 0 1px 0 rgba(255, 255, 255, .35) inset;
+-            background: $sidebar-active-image;
++            //background: $sidebar-active-image;
++            background-color: #eee;
+ 
+             &:after {
+               opacity: 1.0;
+diff --git a/lms/templates/courseware/course_navigation.html b/lms/templates/courseware/course_navigation.html
+index 05189ed..34d434e 100644
+--- a/lms/templates/courseware/course_navigation.html
++++ b/lms/templates/courseware/course_navigation.html
+@@ -16,19 +16,32 @@ def url_class(is_active):
+ <%! from django.utils.translation import ugettext as _ %>
+ <% import waffle %>
+ 
+-<nav class="${active_page} course-material">
+-  <div class="inner-wrapper">
+-    <ol class="course-tabs">
++
++<div style="background:#EEE; margin-bottom:2rem;">
++  <div class="row show-for-large-up" style="margin-top:1rem; padding-top:1.2rem;">
++    <div class="large-12 columns">
++      <ul class="f_button-group course-tabs" style="margin-left:1rem;">
++
++## |||||||||||||||||||||||||||||||
++
++##<nav class="${active_page} course-material">
++##  <div class="inner-wrapperi">
++##    <ul class="f_button-group course-tabs radius">
+       % for tab in get_course_tabs(user, course, active_page, request):
+         % if waffle.flag_is_active(request, 'visual_treatment') or waffle.flag_is_active(request, 'merge_course_tabs'):
+           <li class="${"prominent" if tab.name in ("Courseware", "Course Content") else ""}">
+         % else:
+           <li>
+         % endif
+-             <a href="${tab.link | h}" class="${url_class(tab.is_active)}">
++             <a href="${tab.link | h}" class="f_button small ${url_class(tab.is_active)}">
+                  ${_(tab.name) | h}
+                  % if tab.is_active == True:
+-                   <span class="sr">, current location</span>
++                   <span class="sr hide">, current location</span>
++		   <script>
++			$(document).ready(function(){ 
++				$("span.sr").parent("a").addClass("success");
++			});
++		   </script>
+                  %endif
+                  % if tab.has_img == True:
+                    <img src="${tab.img}"/>
+@@ -42,9 +55,75 @@ def url_class(is_active):
+           <li style="float:right"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
+           % endif
+         % endif
+-    </ol>
++##    </ul>
++##  </div>
++##</nav>
++
++## |||||||||||||||||||||||||||||||
++      </ul>
++    </div>
+   </div>
+-</nav>
++</div>
++
++## BLACK to main navigation
++<script>
++$(document).ready(function(){  
++        $("#black_target_cnavi1").append($("#black_move_cnavi1")); 
++        $("#black_move_cnavi1").removeClass("hide");
++        $("#black_move_cnavi1").contents().unwrap();
++});
++$(document).ready(function(){  
++        $("#black_target_cnavi2").append($("#black_move_cnavi2")); 
++        $("#black_move_cnavi2").removeClass("hide");
++        $("#black_move_cnavi2").contents().unwrap();
++});
++</script>
++
++
++
++## for main navigation BLACK call
++<div id="black_move_cnavi1" class="hide">
++      % for tab in get_course_tabs(user, course, active_page, request):
++        % if waffle.flag_is_active(request, 'visual_treatment') or waffle.flag_is_active(request, 'merge_course_tabs'):
++          <li class="${"prominent" if tab.name in ("Courseware", "Course Content") else ""}">
++        % else:
++          <li>
++        % endif
++             <a href="${tab.link | h}" class="${url_class(tab.is_active)}">
++                 ${_(tab.name) | h}
++                 % if tab.is_active == True:
++                   <span class="sr hide">, current location</span>
++                 %endif
++##                 % if tab.has_img == True:
++##                   <img src="${tab.img}"/>
++##                 %endif
++             </a>
++          </li>
++      % endfor
++</div>
++<div id="black_move_cnavi2" class="hide">
++      % for tab in get_course_tabs(user, course, active_page, request):
++        % if waffle.flag_is_active(request, 'visual_treatment') or waffle.flag_is_active(request, 'merge_course_tabs'):
++          <li class="${"prominent" if tab.name in ("Courseware", "Course Content") else ""}">
++        % else:
++          <li>
++        % endif
++             <a href="${tab.link | h}" class="${url_class(tab.is_active)}">
++                 ${_(tab.name) | h}
++                 % if tab.is_active == True:
++                   <span class="sr hide">, current location</span>
++                 %endif
++##                 % if tab.has_img == True:
++##                   <img src="${tab.img}"/>
++##                 %endif
++             </a>
++          </li>
++      % endfor
++</div>
++
++
++
++
+ 
+ % if masquerade is not UNDEFINED:
+   % if staff_access and masquerade is not None:
+@@ -76,3 +155,6 @@ masq = (function(){
+ </script>
+   % endif
+ % endif
++
++
++
+diff --git a/lms/templates/courseware/courseware.html b/lms/templates/courseware/courseware.html
+index d1ce55a..5e186dd 100644
+--- a/lms/templates/courseware/courseware.html
++++ b/lms/templates/courseware/courseware.html
+@@ -16,8 +16,9 @@ ${page_title_breadcrumbs(course_name())}
+ </title></%block>
+ 
+ <%block name="headextra">
+-<%static:css group='style-course-vendor'/>
++##<%static:css group='style-course-vendor'/>
+ <%static:css group='style-course'/>
++<%static:css group='style-gacco'/>
+ 
+ <%block name="nav_skip">#course-content</%block>
+ 
+@@ -188,29 +189,54 @@ ${fragment.foot_html()}
+ 
+ % if accordion:
+   <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
+- <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
++  <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
+ % endif
+ 
+-<div class="container">
+-  <div class="course-wrapper">
++<div class="container" style="min-width:0;">
++  <div class="course-wrapper row">
+ 
+ % if accordion:
+-    <div class="course-index">
++    <div class="columns large-2 show-for-large-up course-index" style="margin-top:3rem;">
+       <header id="open_close_accordion">
+         <a href="#">${_("close")}</a>
+       </header>
+ 
+-      <div id="accordion" style="display: none">
++      <div id="accordion" class="row" style="display:none; background-color:#fafafa;">
+         <nav aria-label="${_('Course Navigation')}">
+           ${accordion}
+         </nav>
+       </div>
+     </div>
++
++
++   ## Course NAvigation for SP/TAB
++   <div id="accordion_course_navigation_sp" class="hide-for-large-up reveal-modal" data-reveal>
++        <h2>単元リスト</h2>
++        ${accordion}
++      <a class="close-reveal-modal">&#215;</a>
++   </div>
++
++   ## BLACK Redesign for id="accordion_course_navigation_sp"
++   <script>
++   $(document).ready(function(){
++      var target = $('div#accordion_course_navigation_sp div.chapter');
++      target.wrap('<ul class="side-nav">').append('<hr>');
++      $('div#accordion_course_navigation_sp div.chapter h3.active').wrap('<li class="active circle">');
++      $('div#accordion_course_navigation_sp div.chapter h3 a').contents().unwrap();
++      var subtitle = $('div#accordion_course_navigation_sp div.chapter li.graded p.subtitle');
++      subtitle.contents().unwrap().wrap('<span class="f_label secondary">');
++      var chapter_p = $('div#accordion_course_navigation_sp div.chapter p');
++      chapter_p.contents().unwrap();
++   });
++   </script>
++
+ % endif
+ 
++    <div class="columns large-10 medium-12 small-12" style="">
+     <section class="course-content" id="course-content">
+       ${fragment.body_html()}
+     </section>
++    </div>
+   </div>
+ </div>
+ 
+@@ -352,3 +378,7 @@ ${fragment.foot_html()}
+         </div>
+     </div>
+ % endif
++
++
++
++
+diff --git a/lms/templates/courseware/info.html b/lms/templates/courseware/info.html
+index 9139684..58bde98 100644
+--- a/lms/templates/courseware/info.html
++++ b/lms/templates/courseware/info.html
+@@ -26,25 +26,46 @@ $(document).ready(function(){
+ 
+ <%block name="bodyclass">${course.css_class or ''}</%block>
+ <section class="container">
+-  <div class="info-wrapper">
++  <div class="info-wrapper row">
+     % if user.is_authenticated():
+-    <section class="updates">
++    <div id="black_updatenews" class="columns small-12 medium-9 large-9">
++    <section class="updates_">
+       <h1>${_("Course Updates &amp; News")}</h1>
+       ${get_course_info_section(request, course, 'updates')}
+     </section>
+-    <section aria-label="Handout Navigation" class="handouts">
++    </div>
++    <div class="columns small-12 medium-3 large-3">
++    <section aria-label="Handout Navigation" class="handouts_">
+       <h1>${course.info_sidebar_name}</h1>
+       ${get_course_info_section(request, course, 'handouts')}
+     </section>
++    </div>
+     % else:
+-    <section class="updates">
++    <div id="black_updatenews" class="columns small-12 medium-9 large-9">
++    <section class="updates_">
+       <h1>${_("Course Updates &amp; News")}</h1>
+       ${get_course_info_section(request, course, 'guest_updates')}
+     </section>
+-    <section aria-label="${_('Handout Navigation')}" class="handouts">
++    </div>
++    <div class="columns small-12 medium-3 large-3">
++    <section aria-label="${_('Handout Navigation')}" class="handouts_">
+       <h1>${_("Course Handouts")}</h1>
+       ${get_course_info_section(request, course, 'guest_handouts')}
+     </section>
++    </div>
+     % endif
+   </div>
+ </section>
++
++
++## Info_Update Wrapper 'no_black'
++<script>
++        ## no wrap with 'no_black', then ol/li tags to be unwraped
++        ## but wrap with <div class="no_black">, then ol/li tags are averable.
++        $("#black_updatenews ol").filter(function(){
++                return !$(this).parents(".no_black").length;
++        }).contents().unwrap();
++        $("#black_updatenews li").filter(function(){
++                return !$(this).parents(".no_black").length;
++        }).contents().unwrap();
++</script>
+diff --git a/lms/templates/courseware/progress.html b/lms/templates/courseware/progress.html
+index 6277e06..047e611 100644
+--- a/lms/templates/courseware/progress.html
++++ b/lms/templates/courseware/progress.html
+@@ -33,7 +33,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
+ <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
+ <%include file="/courseware/course_navigation.html" args="active_page='progress'" />
+ 
+-<div class="container">
++<div class="container row">
+   <div class="profile-wrapper">
+ 
+     <div class="course-info" id="course-info-progress" aria-label="${_('Course Progress')}">
+@@ -42,15 +42,18 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
+       </header>
+ 
+       %if not course.disable_progress_graph:
+-        <div id="grade-detail-graph" aria-hidden="true"></div>
++        <div id="grade-detail-graph" aria-hidden="true" class="columns"></div>
+       %endif
+ 
+       <div class="chapters">
+         %for chapter in courseware_summary:
+         %if not chapter['display_name'] == "hidden":
+         <section>
++          <div class="columns small-12 medium-3 large-3">
+           <h2>${ chapter['display_name'] }</h2>
++          </div>
+ 
++          <div class="columns small-12 medium-9 large-9">
+           <div class="sections">
+             %for section in chapter['sections']:
+             <div>
+@@ -102,7 +105,8 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
+ 
+             </div> <!--End section-->
+             %endfor
+-          </div> <!--End sections-->
++          </div>  <!--End sections  -->
++          </div> <!--End columns-->
+         </section> <!--End chapter-->
+         %endif
+         %endfor
+diff --git a/lms/templates/dashboard.html b/lms/templates/dashboard.html
+index cdf98d9..3be4fcf 100644
+--- a/lms/templates/dashboard.html
++++ b/lms/templates/dashboard.html
+@@ -187,14 +187,18 @@
+   </section>
+ % endif
+ 
++<div class="row">
+ <section class="container dashboard" id="dashboard-main" aria-hidden="false">
+ 
+   %if message:
++    <div class="columns">
+     <section class="dashboard-banner">
+       ${message}
+     </section>
++    </div>
+   %endif
+ 
++  <div class="columns large-4 medium-4 small-12">
+   <section class="profile-sidebar">
+     <header class="profile">
+       <h1 class="user-name">${ user.username }</h1>
+@@ -234,7 +238,9 @@
+     </section>
+ 
+   </section>
++  </div>
+ 
++  <div class="columns large-8 medium-8 small-12">
+   <section class="my-courses" id="my-courses">
+     <header>
+       <h2>${_("Current Courses")}</h2>
+@@ -281,7 +287,9 @@
+       % endfor
+     % endif
+   </section>
++  </div>
+ </section>
++</div>
+ 
+ <section id="email-settings-modal" class="modal" aria-hidden="true">
+   <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
+diff --git a/lms/templates/footer.html b/lms/templates/footer.html
+index b6bf2cd..e570ba7 100644
+--- a/lms/templates/footer.html
++++ b/lms/templates/footer.html
+@@ -3,90 +3,43 @@
+ <%! from django.utils.translation import ugettext as _ %>
+ <%namespace name='static' file='static_content.html'/>
+ <%! from microsite_configuration.templatetags.microsite import platform_name %>
++<section id="footer">
++        <hr style="width: 100%; margin-top:6rem;">
++		<div class="row show-for-large-up">
++			<div class="large-4 columns left" style="margin-top:10px;">
++				<p class="center" style="font-size:small;">
++					<a href="https://support.gacco.org/hc/ja/articles/200749224">利用規約</a>&nbsp;
++					<a href="https://support.gacco.org/hc/ja/articles/200749314">プライバシーポリシー</a>&nbsp;
++					<a href="https://support.gacco.org/hc/ja">よくある質問</a>
++				</p>
++			</div>
++			<div class="large-5 columns" style="margin-top:10px;"><p class="center" style="font-size:small;">Copyright (c) 2014 NTT Knowledge Square Inc., except where noted, all rights r
++eserved.</p></div>
++			<div class="large-3 columns right" style="margin-top:10px;"><small>株式会社NTTドコモ<br>NTTナレッジ・スクウェア株式会社</small></div>
++		</div>
++		<div class="row show-for-medium-only">
++			<div class="columns medium-7">
++				<p class="left">
++					<a href="https://support.gacco.org/hc/ja/articles/200749224">利用規約</a>
++					<a href="https://support.gacco.org/hc/ja/articles/200749314" style="margin-left:20px">プライバシーポリシー</a>
++					<a href="https://support.gacco.org/hc/ja" style="margin-left:20px">よくある質問</a>
++				</p>
++			</div>
++			<div class="columns medium-5"><small class="right">Copyright (c) 2014 NTT Knowledge Square Inc., except where noted, all rights reserved.</small><br><small>株式会社NTTドコモ<b
++r>NTTナレッジ・スクウェア株式会社</small></div>
++		</div>
++		<div class="row show-for-small-only">
++			<div class="columns">
++				<p class="text-center" style="font-size:small;">
++					<a href="https://support.gacco.org/hc/ja/articles/200749224">利用規約</a>
++					<a href="https://support.gacco.org/hc/ja/articles/200749314" style="margin-left:10px">プライバシーポリシー</a>
++					<a href="https://support.gacco.org/hc/ja" style="margin-left:10px">よくある質問</a>
++					<br>Copyright (c) 2014 NTT Knowledge Square Inc.,<br> except where noted, all rights reserved.<br>
++					<small>株式会社NTTドコモ<br>NTTナレッジ・スクウェア株式会社</small>
++				</p>
++			</div>
++		</div>
++	<div><p> </p></div>
++</section>
+ 
+-<div class="wrapper wrapper-footer">
+-  <footer>
+-    <div class="colophon">
+-      <nav class="nav-colophon">
+-      <ol>
+-          <li class="nav-colophon-01">
+-          <a id="about" href="${marketing_link('ABOUT')}">
+-              ${_("About")}
+-          </a>
+-          </li>
+-          <li class="nav-colophon-02">
+-          <a id="jobs" href="${marketing_link('JOBS')}">
+-              ${_("Jobs")}
+-          </a>
+-          </li>
+-          <li class="nav-colophon-03">
+-          <a id="press" href="${marketing_link('PRESS')}">
+-              ${_("Press")}
+-          </a>
+-          </li>
+-          <li class="nav-colophon-04">
+-          <a id="faq" href="${marketing_link('FAQ')}">
+-              ${_("FAQ")}
+-          </a>
+-          </li>
+-          <li class="nav-colophon-05">
+-          <a id="contact" href="${marketing_link('CONTACT')}">
+-              ${_("Contact")}
+-          </a>
+-          </li>
+-      </ol>
+-      </nav>
+ 
+-      <div class="colophon-about">
+-        <img src="${static.url('images/header-logo.png')}" alt="${_('{platform_name} Logo').format(platform_name=platform_name())}" />
+-
+-        <p>${_("{platform_name} is a non-profit created by founding partners {Harvard} and {MIT} whose mission is to bring the best of higher education to students of all ages anywhere in the world, wherever there is Internet access. {platform_name}'s free online MOOCs are interactive and subjects include computer science, public health, and artificial intelligence.").format(platform_name="EdX", Harvard="Harvard", MIT="MIT")}</p>
+-      </div>
+-    </div>
+-
+-    <div class="references">
+-      <nav class="nav-social">
+-        <ul>
+-          <li class="nav-social-01">
+-            <a href="http://www.meetup.com/edX-Global-Community/" rel="external">
+-              <img src="${static.url('images/social/ico-social-meetup.png')}" alt="edX on Meetup" />
+-            </a>
+-          </li>
+-          <li class="nav-social-02">
+-            <a href="http://www.facebook.com/EdxOnline" rel="external">
+-              <img src="${static.url('images/social/ico-social-facebook.png')}" alt="edX on Facebook" />
+-            </a>
+-          </li>
+-          <li class="nav-social-03">
+-            <a href="https://twitter.com/edXOnline" rel="external">
+-              <img src="${static.url('images/social/ico-social-twitter.png')}" alt="edX on Twitter" />
+-            </a>
+-          </li>
+-          <li class="nav-social-04">
+-            <a href="https://plus.google.com/108235383044095082735/posts" rel="external">
+-              <img src="${static.url('images/social/ico-social-google.png')}" alt="edX on Google+" />
+-            </a>
+-          </li>
+-          <li class="nav-social-05">
+-            <a href="http://youtube.com/user/edxonline" rel="external">
+-              <img src="${static.url('images/social/ico-social-youtube.png')}" alt="edX on YouTube" />
+-            </a>
+-          </li>
+-        </ul>
+-      </nav>
+-
+-      <p class="copyright">${_("&copy; 2014 {platform_name}, some rights reserved.").format(platform_name=settings.PLATFORM_NAME)}</p>
+-
+-      <nav class="nav-legal">
+-        <ul>
+-          <li class="nav-legal-01">
+-            <a href="${marketing_link('TOS')}">${_("Terms of Service and Honor Code")}</a>
+-          </li>
+-          <li class="nav-legal-02">
+-            <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+-          </li>
+-        </ul>
+-      </nav>
+-    </div>
+-  </footer>
+-</div>
+diff --git a/lms/templates/main.html b/lms/templates/main.html
+index f334e66..d336ce6 100644
+--- a/lms/templates/main.html
++++ b/lms/templates/main.html
+@@ -6,6 +6,7 @@
+ <head>
+     <meta charset="UTF-8">
+     <meta http-equiv="X-UA-Compatible" content="IE=edge">
++    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+ <%! from django.utils.translation import ugettext as _ %>
+ <%! from microsite_configuration.middleware import MicrositeConfiguration %>
+ <%! from microsite_configuration import page_title_breadcrumbs %>
+@@ -51,6 +52,7 @@
+ 
+   <link rel="icon" type="image/x-icon" href="${static.url(MicrositeConfiguration.get_microsite_configuration_value('favicon_path', settings.FAVICON_PATH))}" />
+ 
++  <%static:css group='style-gacco'/>
+   <%static:css group='style-vendor'/>
+   <%static:css group='style-app'/>
+   <%static:css group='style-app-extend1'/>
+@@ -103,13 +105,19 @@
+ </head>
+ 
+ <body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
+-  <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
++  <a class="nav-skip hide" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
++
++
++## Offcanvas START  --------------
++<div class="off-canvas-wrap">
++<div class="inner-wrap">
++## ------------------------------
+ 
+   <%include file="mathjax_accessible.html" />
+ 
+-% if not suppress_toplevel_navigation:
++ % if not suppress_toplevel_navigation:
+   <%include file="${header_file}" />
+-%endif
++ %endif
+ 
+   <div class="content-wrapper" id="content">
+     ${self.body()}
+@@ -120,11 +128,26 @@
+   <%include file="${footer_file}" />
+ % endif
+ 
++
++## -----------------------------
++<a class="exit-off-canvas"></a>
++</div>
++</div>
++## Offcanvas END  --------------
++
++
+   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
+   <%static:js group='application'/>
+   <%static:js group='module-js'/>
+ 
+   <%block name="js_extra"/>
++
++<%static:js group='foundation'/>
++
++<script>
++  $(document).foundation();
++</script>
++
+ </body>
+ </html>
+ 
+diff --git a/lms/templates/main_django.html b/lms/templates/main_django.html
+index ceef729..c6c66eb 100644
+--- a/lms/templates/main_django.html
++++ b/lms/templates/main_django.html
+@@ -13,6 +13,7 @@
+   {% compressed_css 'style-app-extend2' %}
+   {% compressed_css 'style-course-vendor' %}
+   {% compressed_css 'style-course' %}
++  {% compressed_css 'style-gacco' %}
+ 
+   {% block main_vendor_js %}
+   {% compressed_js 'main_vendor' %}
+diff --git a/lms/templates/navigation.html b/lms/templates/navigation.html
+index baec2b4..7141ae3 100644
+--- a/lms/templates/navigation.html
++++ b/lms/templates/navigation.html
+@@ -22,7 +22,7 @@ from status.status import get_site_status_msg
+ try:
+     course_id = course.id
+ except:
+-    # can't figure out a better way to get at a possibly-defined course var
++    # cannot figure out a better way to get at a possibly-defined course var
+     course_id = None
+ site_status_msg = get_site_status_msg(course_id)
+ %>
+@@ -38,67 +38,189 @@ site_status_msg = get_site_status_msg(course_id)
+ 
+ 
+ % if course:
+-  <header class="global slim" aria-label="${_('Global Navigation')}">
++## class="global slim"
++  <header class="" aria-label="${_('Global Navigation')}">
+ % else:
+-  <header class="global" aria-label="${_('Global Navigation')}">
++## class="global"
++  <header class="" aria-label="${_('Global Navigation')}">
+ % endif
+-  <nav>
+-
+-  <h1 class="logo">
+-    <a href="${marketing_link('ROOT')}">
+-      <%block name="navigation_logo">
+-          <img src="${static.url(branding.get_logo_url())}" alt="
+-          % if course:
+-          ${course.display_org_with_default | h}: ${course.display_number_with_default | h} ${course.display_name_with_default | h} @ 
+-          % endif
+-          ${platform_name()}
+-          " />
+-      </%block>
+-    </a>
+-  </h1>
+ 
++<nav class="top-bar hide-for-large-up" data-topbar>
++			<!-- Header || Tablet/SP -->
++			<ul class="title-area">
++				<li class="name show-for-medium">
++					<span class="tab-bar">
++						<a class="left-off-canvas-toggle menu-icon" style="display:inline;">
++						<span></span><h1><img src="http://gacco.org/images/vector/gacco_identity.svg" alt="gacco" width="75px" style="margin-left:1rem; margin-right:0.6rem; display:inline;"><small>Certified by </small><img src="http://gacco.org/images/jmooc.png" alt="JMOOC" width="50px" style="margin-bottom:0.2rem;"></h1>
++						</a>
++					</span>
++				</li>
++				<li class="name show-for-small">
++                                        <span class="tab-bar">
++                                                <a class="left-off-canvas-toggle menu-icon" style="display:inline;">                                                <span></span><h1><img src="http://gacco.org/images/vector/gacco_identity.svg" alt="gacco" width="75px" style="margin-left:1rem; margin-right:0.6rem; display:inline;"></h1>
++                                                </a>
++                                        </span>
++                                </li>
++				% if course:
++				<li class="toggle-topbar has-form"><a href="#" class="f_button">学習メニュー</a></li>
++				% endif
++			</ul>
++		<section class="top-bar-section">
++				<!-- Right Nav Section || Tablet -->
++				<ul id="black_target_cnavi1" class="right hide-for-medium-up">
++				</ul>
++				<!-- Right Nav Section || Smartphone -->
++				<ul class="right show-for-medium-up" style="z-index:2147483647;">
++					<li class="has-dropdown active" style="z-index:2147483647;">
++						% if course:
++						<a href="#">学習メニュー</a>
++						% endif
++						<ul id="black_target_cnavi2" class="dropdown">
++						</ul>
++					</li>
++				</ul>
++			</section>
++		</nav>
++		% if course:
++                <div id="black_coursetitle" class="hide-for-large-up" style="background-color:#eee; width:100%;">
++                <h2 style="display:inline; font-size:1rem; color:#333333; margin-left:0.5rem;">${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
++                </div>
++		% endif
++
++		<aside class="left-off-canvas-menu hide-for-large-up">
++			<ul id="black_target_offcanvas" class="off-canvas-list">
++                                <li id="black_target_offcanvas"><label>ナビメニュー</label></li>
++			% if course:
++                                 <!-- here can be something to add offcanvas menu -->
++			% else:
++                        ## for dashboard /login/register Offcanvas menu
++                                <li><a href="http://gacco.org/">トップページ</a></li>
++##				<li><a href="http://gacco.org/about.html">gaccoとは</a></li>
++##				<li><a href="http://gacco.org/list.html">講座一覧</a></li>
++##				<li><a href="http://gacco.org/about.html#aboutus">about us</a></li>
++				% if user.is_authenticated():
++				<li><a href="${reverse('dashboard')}" class="user-link">${_("Dashboard for:")} ${user.username}</a></li>
++				% else:
++				<li><a href="/register">会員登録</a></li>
++				<li><a href="/dashboard">ログイン</a></li>
++				% endif
++				<li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
++                                % if user.is_authenticated():
++				<li><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
++                                % endif
++			% endif
++			% if course:
++				 <!-- here can be something to add offcanvas menu -->
++			% endif
++			</ul>
++
++		</aside>
++
++
++
++
++	<nav>
++
++##  <h1 class="logo">
++##    <a href="${marketing_link('ROOT')}">
++##      <%block name="navigation_logo">
++##          <img src="${static.url(branding.get_logo_url())}" alt="
++##          % if course:
++##          ${course.display_org_with_default | h}: ${course.display_number_with_default | h} ${course.display_name_with_default | h} @ 
++##            ${course.display_number_with_default | h} ${course.display_name_with_default | h} @
++##          % endif
++##            ${platform_name()}
++##          " />
++##      </%block>
++##    </a>
++##  </h1>
++
++<div class="row show-for-large-up" style="margin-top:1rem;">
++  ## Sitename
++  <div class="columns large-9">
++  <a href="http://gacco.org/"><img src="http://gacco.org/images/vector/gacco_identity.svg" alt="gacco"></a>
++  <span style="margin-left:0.5rem;"> </span><span style="margin-bottom:3rem;"><small>Certified by </small></span><img src="http://gacco.org/images/jmooc.png" alt="JMOOC" width="70" style="margin-bottom:0.6rem;">
+     % if course:
+-      <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
++      <h2 style="display:inline; font-size:1rem; color:#333333;"><span style="font-size:1.2rem; margin-left:0.2rem; margin-right:0.2rem; ">|</span>${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+     % endif
++  </div>
++  ## navi button
++  <div class="columns large-3">
++
++
++
++##    % if course:
++##      <h2 id="black_course_name">
++##    <span class="provider">${course.display_org_with_default | h}:</span>
++##      ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
++##    % endif
+ 
+     % if user.is_authenticated():
+ 
+-    <ol class="left nav-global authenticated">
+-      <%block name="navigation_global_links_authenticated">
+-        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+-          <li class="nav-global-01">
+-            <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
+-          </li>
+-        % endif
+-      </%block>
+-    </ol>
+-    <ol class="user">
++##    <ol class="left nav-global authenticated">
++##      <%block name="navigation_global_links_authenticated">
++##        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
++##          <li class="nav-global-01">
++##            <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
++##          </li>
++##        % endif
++##      </%block>
++##    </ol>
++
++
++    <a href="#" data-dropdown="drop-menu" class="right f_button small radius secondary f_dropdown">ナビボタン</a><br>
++    <ul id="drop-menu" data-dropdown-content class="user f-f_dropdown">
+       <li class="primary">
+         <a href="${reverse('dashboard')}" class="user-link">
+-          <span class="avatar"></span>
+-          <span class="sr">${_("Dashboard for:")} </span> ${user.username}
++          ##<span class="avatar"></span>
++          ${_("Dashboard for:")} ${user.username}
+         </a>
+       </li>
+-      <li class="primary">
+-        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
+-        <ul class="dropdown-menu" aria-label="More Options" role="menu">
+-          <%block name="navigation_dropdown_menu_links" >
+-            <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
+-          </%block>
+-          <li><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
+-        </ul>
+-      </li>
+-    </ol>
+-      % if display_shopping_cart: # see shoppingcart.context_processor.user_has_cart_context_processor
+-        <ol class="user">
+-          <li class="primary">
+-            <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+-              <i class="icon-shopping-cart"></i> Shopping Cart
+-            </a>
++##      <li class="primary">
++##        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
++##        <ul class="dropdown-menu" aria-label="More Options" role="menu">
++##         <%block name="navigation_dropdown_menu_links" >
++            <li>
++            <a href="${marketing_link('FAQ')}">${_("Help")}</a>
++            </li>
++##          </%block>
++          <li>
++          <a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a>
+           </li>
+-        </ol>
+-      % endif
++##        </ul>
++##      </li>
++    </ul>
++
++
++	## black called in course_navigation
++	<ul id="black_move_offcanvas" class="off-canvas-list hide">
++	<li>
++	<a href="${reverse('dashboard')}" class="user-link">
++	${_("Dashboard for:")}${user.username}
++	</a>
++	</li>
++	<li>
++	<a href="${marketing_link('FAQ')}">${_("Help")}</a>
++	</li>
++	<li>
++	<a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a>
++	</li>
++	</ul>
++
++
++##      % if display_shopping_cart: # see shoppingcart.context_processor.user_has_cart_context_processor
++##        <ol class="user">
++##          <li class="primary">
++##            <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
++##              <i class="icon-shopping-cart"></i> Shopping Cart
++##            </a>
++##          </li>
++##        </ol>
++##      % endif
++
++
+     % else:
++
+     <ol class="left nav-global">
+       <%block name="navigation_global_links">
+         % if MicrositeConfiguration.get_microsite_configuration_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+@@ -138,8 +260,15 @@ site_status_msg = get_site_status_msg(course_id)
+     </li>
+     </ol>
+     % endif
++
++  </div>
++</div>
++
++
++
+   </nav>
+ </header>
++
+ % if course:
+ <!--[if IE]>
+ <div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}Firefox{ff_link_end}.').format(chrome_link_start='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">', chrome_link_end='</a>', ff_link_start='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">', ff_link_end='</a>')}</div>
+@@ -150,4 +279,21 @@ site_status_msg = get_site_status_msg(course_id)
+   <%include file="forgot_password_modal.html" />
+ %endif
+ 
++## BLACK offcanvas move
++% if course:
++<script>
++$(document).ready(function(){  
++        $("#black_target_offcanvas").after($("#black_move_offcanvas")); 
++        $("#black_move_offcanvas").removeClass("hide");
++});
++</script>
++% endif
++
++##<script>
++## $("drop-menu").on("opened", function(){});
++## $("drop-menu").on("closed", function(){});
++##</script>
++
+ <%include file="help_modal.html"/>
++
++
+diff --git a/lms/templates/seq_module.html b/lms/templates/seq_module.html
+index f5fe848..d14282b 100644
+--- a/lms/templates/seq_module.html
++++ b/lms/templates/seq_module.html
+@@ -1,8 +1,8 @@
+ <%! from django.utils.translation import ugettext as _ %>
+ 
+-<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" >
++<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" style="margin-top:0.8rem;">
+   <nav class="sequence-nav">
+-    <ul class="sequence-nav-buttons">
++    <ul class="sequence-nav-buttons" style="list-style-type:none;">
+       <li class="prev"><a role="button" href="#">${_('Previous')}</a></li>
+     </ul>
+ 
+@@ -46,8 +46,10 @@
+   <div id="seq_content" role="tabpanel"></div>
+ 
+   <nav class="sequence-bottom">
+-    <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons">
++    <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons" style="list-style-type:none;">
+       <li class="prev"><a role="button" href="#">${_("Previous")}</a></li>
++      <li class="show-for-medium center-menu" style="width:12rem; padding:0.6rem;"><a href="#" data-reveal-id="accordion_course_navigation_sp" role="button" style="color:#333333;">単元リスト</a></li>
++      <li class="show-for-small center-menu" style="width:8rem; padding:0.6rem;"><a href="#" data-reveal-id="accordion_course_navigation_sp" role="button" style="color:#333333;">単元リスト</a></li>
+       <li class="next"><a role="button" href="#">${_("Next")}</a></li>
+     </ul>
+   </nav>
+diff --git a/lms/templates/wiki/article.html b/lms/templates/wiki/article.html
+index bb1e53b..819121f 100644
+--- a/lms/templates/wiki/article.html
++++ b/lms/templates/wiki/article.html
+@@ -11,8 +11,10 @@
+ 
+ {% block wiki_contents %}
+ 
++  <div class="row">
+   <div class="article-wrapper">
+ 
++    <div class="columns small-12 medium-9 large-9">
+     <article class="main-article" id="main-article">
+         {% if selected_tab != "edit" %}
+           <h1>{{ article.current_revision.title }}</h1>
+@@ -23,13 +25,14 @@
+         {% wiki_render article %}
+         {% endblock %}
+     </article>
++    </div>
+ 
+-    <div class="article-functions">
++    <div class="article-functions show-for-medium-up columns medium-3 large-3">
+       <ul class="nav nav-tabs">
+         {% include "wiki/includes/article_menu.html" %}
+       </ul>
+       <div class="timestamp">
+-        <span class="label">{% trans "Last modified:" %}</span><br />
++        <span class="">{% trans "Last modified:" %}</span><br />
+         <span class="date">{{ article.current_revision.modified }}</span>
+       </div>
+ 
+@@ -40,6 +43,7 @@
+       {% endif %}
+     </div>
+   </div>
++  </div>
+ 
+ 
+ 
+diff --git a/lms/templates/wiki/base.html b/lms/templates/wiki/base.html
+index 73e91c4..2877d30 100644
+--- a/lms/templates/wiki/base.html
++++ b/lms/templates/wiki/base.html
+@@ -3,8 +3,11 @@
+ 
+ {% block title %}<title>{% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}</title>{% endblock %}
+ 
++
++
+ {% block headextra %}
+   {% compressed_css 'course' %}
++
+   
+   <script type="text/javascript">
+     function ajaxError(){}
+@@ -54,7 +57,7 @@
+   {% endif %}
+ 
+   <section class="container wiki {{ selected_tab }}" id="wiki-content">
+-    <div class="wiki-wrapper">
++    <div class="wiki-wrapper row">
+       {% block wiki_body %}
+         
+         {% block wiki_breadcrumbs %}{% endblock %}
+diff --git a/lms/templates/wiki/includes/breadcrumbs.html b/lms/templates/wiki/includes/breadcrumbs.html
+index f23916c..d84d8dc 100644
+--- a/lms/templates/wiki/includes/breadcrumbs.html
++++ b/lms/templates/wiki/includes/breadcrumbs.html
+@@ -5,8 +5,9 @@
+ %>
+ 
+ %if urlpath is not Undefined and urlpath:
+-<header>
++<header style="height:auto; padding: 0; border-bottom:none; border-radius:0 0 0 0; background-color:none;">
+   <ul class="breadcrumb pull-left" class="">
++
+     <%
+       # The create button links to the highest ancestor we have edit priveleges to
+       create_article_root = None
+@@ -30,7 +31,7 @@
+       <input type="search" placeholder="search wiki" />
+     </form> -->
+     %if create_article_root:
+-    <a class="add-article-btn btn pull-left" href="${reverse('wiki:create', kwargs={'path' : create_article_root.path})}" style="padding: 7px;">
++    <a class="f_button radius success pull-left" href="${reverse('wiki:create', kwargs={'path' : create_article_root.path})}" style="padding: 7px;">
+       <span class="icon-plus"></span>
+       ${_("Add article")}
+     </a>

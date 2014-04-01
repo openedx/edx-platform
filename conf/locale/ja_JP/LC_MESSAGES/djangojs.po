@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Japanese (Japan) (http://www.transifex.com/projects/p/edx-platform/language/ja_JP/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -19,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-24 16:00-0500\n"
+"POT-Creation-Date: 2014-02-27 15:42-0500\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: h_yoshida <h_yoshida@matsumo-sys.com>\n"
 "Language-Team: Japanese (Japan) (http://www.transifex.com/projects/p/edx-platform/language/ja_JP/)\n"
@@ -33,7 +33,7 @@ msgstr ""
 #: cms/static/js/views/course_info_update.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/asset.js
@@ -42,35 +42,35 @@ msgstr ""
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
-msgstr ""
+msgstr "キャンセル"
 
 #: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
 msgid "This link will open in a new browser window/tab"
-msgstr ""
+msgstr "新しいブラウザウィンドウまたはタブにこのリンクを開く"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
-msgstr ""
+msgstr "注釈を表示"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Hide Annotations"
-msgstr ""
+msgstr "注釈を隠す"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Expand Instructions"
-msgstr ""
+msgstr "解説を表示"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Collapse Instructions"
-msgstr ""
+msgstr "指示を消す"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Commentary"
-msgstr ""
+msgstr "解説"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Reply to Annotation"
-msgstr ""
+msgstr "注釈に返信する"
 
 #. Translators: %(earned)s is the number of points earned. %(total)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -79,43 +79,43 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "(%(earned)s/%(possible)s point)"
 msgid_plural "(%(earned)s/%(possible)s points)"
-msgstr[0] ""
+msgstr[0] "(%(earned)s/%(possible)s 点)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10). There will always be at least 1 point possible.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "(%(num_points)s point possible)"
 msgid_plural "(%(num_points)s points possible)"
-msgstr[0] ""
+msgstr[0] "(%(num_points)s 点 満点)"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Hide Answer(s)"
-msgstr ""
+msgstr "答えを隠す"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Show Answer(s)"
-msgstr ""
+msgstr "答えを見る"
 
 #. Translators: the word unanswered here is about answering a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unanswered"
-msgstr ""
+msgstr "未回答"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
-msgstr ""
+msgstr "ステータス：未投稿"
 
 #. Translators: A "rating" is a score a student gives to indicate how well
 #. they feel they were graded on this problem
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "You need to pick a rating before you can submit."
-msgstr ""
+msgstr "提出をするためには、その前に評価付けを行う必要があります。"
 
 #. Translators: this message appears when transitioning between openended
 #. grading
@@ -124,55 +124,56 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Your score did not meet the criteria to move to the next step."
-msgstr ""
+msgstr "あなたの獲得点数は、次のステップに移行するのに必要な基準を満たしていません。"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Submit"
-msgstr ""
+msgstr "提出"
 
 #. Translators: one clicks this button after one has finished filling out the
 #. grading
 #. form for an openended assessment
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Submit assessment"
-msgstr ""
+msgstr "課題を提出する"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Your response has been submitted. Please check back later for your grade."
-msgstr ""
+msgstr "回答は提出されました。後ほど採点結果をご確認ください。"
 
 #. Translators: this button is clicked to submit a student's rating of
 #. an evaluator's assessment
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Submit post-assessment"
-msgstr ""
+msgstr "投稿評価を提出"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Answer saved, but not yet submitted."
-msgstr ""
+msgstr "回答は保存されましたが、まだ提出されていません。"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Please confirm that you wish to submit your work. You will not be able to "
 "make any changes after submitting."
-msgstr ""
+msgstr "課題を提出したいとお考えかどうか、ご確認ください。提出後にはいかなる変更も受け付けることができません。"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "You are trying to upload a file that is too large for our system.  Please "
 "choose a file under 2MB or paste a link to it into the answer box."
 msgstr ""
+"アップロードしようとしているファイルサイズが大きすぎます。2MB以下のファイルを選択いただくか、回答ボックスに保存いただきそのURLをペーストしてください。"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Are you sure you want to remove your previous response to this question?"
-msgstr ""
+msgstr "この問題に対しての前回の回答を削除しますが、よろしいでしょうか？"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Moved to next step."
-msgstr ""
+msgstr "次のステップへ移行"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
@@ -181,6 +182,8 @@ msgid ""
 " uploaded the image to another website, you can paste a link to it into the "
 "answer box."
 msgstr ""
+"この問題はファイルのアップロードが求められています。しかしながら、お使いのブラウザではアップロードができないようです。最新バージョンのGoogle "
+"Chromeでお試し下さい。もしくは、別のウェブサイトに画像をアップロードをいただき、そのファイルへのリンクを回答ボックスへペーストしてください。"
 
 #. Translators: "Show Question" is some text that, when clicked, shows a
 #. question's
@@ -188,130 +191,131 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Show Question"
-msgstr ""
+msgstr "問題を表示"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Hide Question"
-msgstr ""
+msgstr "問題を隠す"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
 "Sequence error! Cannot navigate to tab %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
+"シーケンスエラー！このシーケンスモジュールでは「%(tab_name)s」タブを操作することが出来ません。コーススタッフに問い合わせください。"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
-msgstr ""
+msgstr "ビデオ操作バー"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Pause"
-msgstr ""
+msgstr "一時停止"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Play"
-msgstr ""
+msgstr "再生"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Fill browser"
-msgstr ""
+msgstr "ブラウザを満たせ"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Exit full browser"
-msgstr ""
+msgstr "フルブラウザをやめる"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
-msgstr ""
+msgstr "HDオン"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD off"
-msgstr ""
+msgstr "HDオフ"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
-msgstr ""
+msgstr "ビデオの位置"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
-msgstr ""
+msgstr "ビデオ終了"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] ""
+msgstr[0] "%(value)s 時間"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] ""
+msgstr[0] "%(value)s 分"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] ""
+msgstr[0] "%(value)s 秒"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Volume"
-msgstr ""
+msgstr "ボリューム"
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Muted"
-msgstr ""
+msgstr "ミュート"
 
 #. Translators: Volume level in range (0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Very low"
-msgstr ""
+msgstr "とても小さい"
 
 #. Translators: Volume level in range (20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Low"
-msgstr ""
+msgstr "小さい"
 
 #. Translators: Volume level in range (40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Average"
-msgstr ""
+msgstr "普通"
 
 #. Translators: Volume level in range (60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Loud"
-msgstr ""
+msgstr "大きい"
 
 #. Translators: Volume level in range (80,100)%
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Very loud"
-msgstr ""
+msgstr "とても大きい"
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Maximum"
-msgstr ""
+msgstr "最大"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
-msgstr ""
+msgstr "キャプション文は次の時、表示されるでしょう。"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on captions"
-msgstr ""
+msgstr "キャプションをオンにする"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off captions"
-msgstr ""
+msgstr "キャプションをオフにする"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
-msgstr ""
+msgstr "ディスカッションを隠す"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Show Discussion"
-msgstr ""
+msgstr "ディスカッションを表示"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
@@ -321,26 +325,30 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
-msgstr ""
+msgstr "申し訳ありません"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "We had some trouble loading the discussion. Please try again."
-msgstr ""
+msgstr "ディスカッションを読み込む際に問題が発生しました。再試行してください。"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid ""
 "We had some trouble loading the threads you requested. Please try again."
-msgstr ""
+msgstr "要求されたスレッドを読み込む際に問題が発生しました。再試行してください。"
 
 #: common/static/coffee/src/discussion/utils.js
 msgid "Loading content"
-msgstr ""
+msgstr "コンテンツ読み込み中"
 
 #: common/static/coffee/src/discussion/utils.js
 msgid ""
 "We had some trouble processing your request. Please ensure you have copied "
 "any unsaved work and then reload the page."
-msgstr ""
+msgstr "要求を処理する際に問題が発生しました。保存していない作業をコピーした上でページをリロードしてください。"
+
+#: common/static/coffee/src/discussion/utils.js
+msgid "We had some trouble processing your request. Please try again."
+msgstr "リクエストを処理する際に問題が発生しました。再試行してください。"
 
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
@@ -350,233 +358,241 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/new_post_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
 msgid "…"
-msgstr ""
+msgstr "..."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "Close"
-msgstr ""
+msgstr "閉じる"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "Open"
-msgstr ""
+msgstr "開く"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "remove vote"
-msgstr ""
+msgstr "投票を削除"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "vote"
-msgstr ""
+msgstr "投票"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid ""
 "%(voteNum)s%(startSrSpan)s vote (click to remove your vote)%(endSrSpan)s"
 msgid_plural ""
 "%(voteNum)s%(startSrSpan)s votes (click to remove your vote)%(endSrSpan)s"
-msgstr[0] ""
+msgstr[0] "%(voteNum)s%(startSrSpan)s の投票 (投票を削除するにはクリック)%(endSrSpan)s"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "%(voteNum)s%(startSrSpan)s vote (click to vote)%(endSrSpan)s"
 msgid_plural "%(voteNum)s%(startSrSpan)s votes (click to vote)%(endSrSpan)s"
-msgstr[0] ""
+msgstr[0] "%(voteNum)s%(startSrSpan)sの投票 (投票するにはクリック)%(endSrSpan)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
-msgstr ""
+msgstr "続きを読み込む"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
-msgstr ""
+msgstr "追加のスレッドを読み込み中"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "We had some trouble loading more threads. Please try again."
-msgstr ""
+msgstr "追加のスレッドを読み込む際に問題が発生しました。再試行してください。"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "%(unread_count)s new comment"
 msgid_plural "%(unread_count)s new comments"
-msgstr[0] ""
+msgstr[0] "%(unread_count)s の新しいコメント"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
-msgstr ""
+msgstr "スレッドリストを読み込み中"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to remove report"
-msgstr ""
+msgstr "レポートを削除するにはクリック"
 
+#. Translators: The text between start_sr_span and end_span is not shown
+#. in most browsers but will be read by screen readers.
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported, %(start_sr_span)s click to remove report%(end_span)s"
-msgstr ""
+msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
+msgstr "誤用が報告されました。%(start_sr_span)sレポートを削除するにはクリック%(end_span)s"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Report Misuse"
-msgstr ""
+msgstr "誤用を報告"
+
+#. Translators: The text between start_sr_span and end_span is not shown
+#. in most browsers but will be read by screen readers.
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
+msgstr "ピン%(start_sr_span)s, ピンを外すにはクリック%(end_span)s"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
+msgid "Click to unpin"
+msgstr "ピンを外すにはクリック"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pinned"
-msgstr ""
+msgstr "ピン"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pin Thread"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinning is not currently available"
-msgstr ""
+msgstr "着目スレッド"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
-msgstr ""
+msgstr "回答を読み込む際に問題が発生しました。ページをリロードしてください。"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
-msgstr ""
+msgstr "追加の回答を読み込む際に問題が発生しました。再試行してください。"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
 msgid_plural "%(numResponses)s responses"
-msgstr[0] ""
+msgstr[0] "%(numResponses)s の回答"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
-msgstr ""
+msgstr "すべての回答を表示中"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first %(numResponses)s responses"
-msgstr[0] ""
+msgstr[0] "はじめの %(numResponses)s の回答"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
-msgstr ""
+msgstr "すべての回答を表示"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load next %(numResponses)s responses"
-msgstr ""
+msgstr "次の %(numResponses)s の回答を表示"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
-msgstr ""
+msgstr "この投稿を削除してもよろしいですか？"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
-msgstr ""
+msgstr "匿名"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "staff"
-msgstr ""
+msgstr "スタッフ"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Community TA"
-msgstr ""
+msgstr "コミュニティTA"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js
 msgid "Misuse Reported, click to remove report"
-msgstr ""
+msgstr "誤用が報告されました。報告を削除するにはクリック"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
-msgstr ""
+msgstr "このコメントを削除してもよろしいですか？"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "We had some trouble deleting this comment. Please try again."
-msgstr ""
+msgstr "コメントを削除する際に問題が発生しました。再試行してください。"
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
-msgstr ""
+msgstr "この回答を削除してもよろしいですか？"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "%s ago"
-msgstr ""
+msgstr "%s 前"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "%s from now"
-msgstr ""
+msgstr "現在から %s 前"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr ""
+msgstr "１分以内"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr ""
+msgstr "約１分"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
+msgstr[0] "%d 分"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr ""
+msgstr "約１時間"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
+msgstr[0] "約 %d 時間"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
-msgstr ""
+msgstr "１日"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
+msgstr[0] "%d 日"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr ""
+msgstr "約１ヶ月"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
+msgstr[0] "%d ヶ月"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr ""
+msgstr "約１年"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, c-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
+msgstr[0] "%d 年"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
 msgid "Available %s"
-msgstr ""
+msgstr "利用可能な%s"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
+msgstr "これは利用可能な%sの一覧です．下のボックスの中で選択し，2つのボックスの間の「選ぶ」矢印をクリックします．"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "このボックスに入力し利用可能な%sの一覧をフィルタリングします．"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Filter"
@@ -584,52 +600,52 @@ msgstr "フィルタ"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Choose all"
-msgstr ""
+msgstr "すべて選ぶ"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "%sのすべてを一度に選択する場合はクリックします．"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Choose"
-msgstr ""
+msgstr "選択"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Remove"
-msgstr ""
+msgstr "削除"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "%sが選択されました"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
+msgstr "これは選択された%sの一覧です．下のボックスの中で選択し，2つのボックスの間の「削除」矢印をクリックします．"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Remove all"
-msgstr ""
+msgstr "すべて削除"
 
 #: lms/static/admin/js/SelectFilter2.js
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "選択された%sすべてを一度に削除する場合はクリックします．"
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
+msgstr[0] "%(sel) / %(cnt) が選択されました"
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
-msgstr ""
+msgstr "個々の編集可能なフィールドへの変更が保存されていません．アクションを実行すると，保存していない変更は失われます．"
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -637,6 +653,7 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"アクションを選択していますが個々のフィールドに対する変更が保存されていません．「OK」をクリックして保存して下さい．そのアクションを再度実行する必要があります．"
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -644,209 +661,210 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"アクションを選択していますが個々のフィールドには変更がなされていません．「保存」ボタンではなく，おそらく「Go」ボタンを探していると思われます．"
 
 #. Translators: the names of months, keep the pipe (|) separators.
 #: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
 msgid ""
 "January|February|March|April|May|June|July|August|September|October|November|December"
-msgstr ""
+msgstr "1月|2月|3月|4月|5月|6月|7月|8月|9月|10月|11月|12月"
 
 #. Translators: abbreviations for days of the week, keep the pipe (|)
 #. separators.
 #: lms/static/admin/js/calendar.js
 msgid "S|M|T|W|T|F|S"
-msgstr ""
+msgstr "日|月|火|水|木|金|土"
 
 #: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
 #: lms/static/admin/js/collapse.min.js
 msgid "Show"
-msgstr ""
+msgstr "表示"
 
 #: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
 msgid "Hide"
-msgstr ""
+msgstr "非表示"
 
 #. Translators: the names of days, keep the pipe (|) separators.
 #: lms/static/admin/js/dateparse.js
 msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr ""
+msgstr "日曜日|月曜日|火曜日|水曜日|木曜日|金曜日|土曜日"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Now"
-msgstr ""
+msgstr "現在"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Clock"
-msgstr ""
+msgstr "時計"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Choose a time"
-msgstr ""
+msgstr "時刻を選択"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Midnight"
-msgstr ""
+msgstr "深夜 0 時"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "6 a.m."
-msgstr ""
+msgstr "午前 6 時"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Noon"
-msgstr ""
+msgstr "正午"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Today"
-msgstr ""
+msgstr "今日"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Calendar"
-msgstr ""
+msgstr "カレンダ"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Yesterday"
-msgstr ""
+msgstr "昨日"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Tomorrow"
-msgstr ""
+msgstr "明日"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
-msgstr ""
+msgstr "計算機を開く"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Close Calculator"
-msgstr ""
+msgstr "計算機を閉じる"
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Preview"
-msgstr ""
+msgstr "プレビュー"
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
-msgstr ""
+msgstr "ボディを送信"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Loading..."
-msgstr ""
+msgstr "読み込み中..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
-msgstr ""
+msgstr "受講者リスト野読み込みに失敗しました。"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
-msgstr ""
+msgstr "評価設定の取得に失敗しました。"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating grades. Please try again."
-msgstr ""
+msgstr "評価生成に失敗しました。再試行してください。"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "File Name (Newest First)"
-msgstr ""
+msgstr "ファイル名 (最新が上)"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
 "sensitive nature of student grade information."
-msgstr ""
+msgstr "リンクは自動的に生成され、受講者の評価情報の機密性のため5分以内に期限が切れます。"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following students:"
-msgstr ""
+msgstr "履修登録が完了し次の受講者にメールが送信されます："
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following students:"
-msgstr ""
+msgstr "次の受講者の履修登録が完了しました："
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
 "allowed to enroll once they register:"
-msgstr ""
+msgstr "次の受講者へ履修登録メールの送信が完了しました。登録完了後に履修が許可されます。："
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be allowed to enroll once they register:"
-msgstr ""
+msgstr "次の受講者は登録完了後に履修が許可されます："
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following students. They will be "
 "enrolled once they register:"
-msgstr ""
+msgstr "次の受講者に履修登録メールの送信が完了しました。登録完了後に履修登録されます。："
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These students will be enrolled once they register:"
-msgstr ""
+msgstr "次の受講者は登録完了後に履修登録されます："
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Emails successfully sent. The following students are no longer enrolled in "
 "the course:"
-msgstr ""
+msgstr "メールの送信に成功しました。次の受講者は講座から履修解除されます。："
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following students are no longer enrolled in the course:"
-msgstr ""
+msgstr "次の受講者は講座から履修解除されました："
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These students were not affliliated with the course so could not be "
 "unenrolled:"
-msgstr ""
+msgstr "次の受講者は講座に参加していないため履修解除することが出来ません："
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message must have a subject."
-msgstr ""
+msgstr "メッセージには件名が必要です。"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message cannot be blank."
-msgstr ""
+msgstr "メッセージは空白であってはいけません。"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
-msgstr ""
+msgstr "メールは送信処理に送られました。"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "yourself"
-msgstr ""
+msgstr "自分自身"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "everyone who is staff or instructor on this course"
-msgstr ""
+msgstr "講座のすべてのスタッフまたは講師"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "ALL (everyone who is enrolled in this course as student, staff, or "
 "instructor)"
-msgstr ""
+msgstr "すべて(この講座に登録されたすべての受講者、スタッフ、講師)"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "Your email was successfully queued for sending. Please note that for large "
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
-msgstr ""
+msgstr "メールは送信処理に送られました。大きな講座ではメールを送るのに１時間程度(ほかの講座も同時にメールを送っている場合はそれ以上)かかります。"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "You are about to send an email titled \""
-msgstr ""
+msgstr "次のメールを送信しようとしています \""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Error sending email."
-msgstr ""
+msgstr "メールの送信に失敗しました。"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There is no email history for this course."
-msgstr ""
+msgstr "この講座のメール送信履歴はありません。"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email task history for this course."
-msgstr ""
+msgstr "この講座のメール送信履歴を取得する際にエラーが発生しました。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -854,13 +872,15 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
-msgstr ""
+msgstr "受講者のメールアドレスかユーザー名を入力してください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting student progress url for '<%= student_id %>'. Check that the "
 "student identifier is spelled correctly."
 msgstr ""
+"受講者： '<%= student_id %>' "
+"の履修者進捗URLを取得する際にエラーが発生しました。受講者の識別子が正しく入力されていることを確認してください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -870,13 +890,13 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a problem urlname."
-msgstr ""
+msgstr "問題のurl名を入力してください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Success! Problem attempts reset for problem '<%= problem_id %>' and student "
 "'<%= student_id %>'."
-msgstr ""
+msgstr "問題 '<%= problem_id %>' と受講者 '<%= student_id %>' に対する問題のリセットに成功しました。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -884,21 +904,25 @@ msgid ""
 " '<%= student_id %>'. Check that the problem and student identifiers are "
 "spelled correctly."
 msgstr ""
+"問題 '<%= problem_id %>' と受講者 '<%= student_id %>' "
+"に対する問題のリセットに失敗しました。問題と受講者の識別子が正しく入力されていることを確認してください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?"
-msgstr ""
+msgstr "受講者 '<%= student_id %>' の問題 '<%= problem_id %>' のステータスを削除しますか？"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error deleting student '<%= student_id %>'s state on problem '<%= problem_id"
 " %>'. Check that the problem and student identifiers are spelled correctly."
 msgstr ""
+"受講者 '<%= student_id %>' の問題 '<%= problem_id %>' "
+"のステータスを削除に失敗しました。問題と受講者の識別子が正しく入力されていることを確認してください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
-msgstr ""
+msgstr "モジュールの状態の削除に成功しました。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -906,6 +930,8 @@ msgid ""
 "'<%= student_id %>'. Click the 'Show Background Task History for Student' "
 "button to see the status of the task."
 msgstr ""
+"問題 '<%= problem_id %>' と受講者 '<%= student_id %>' "
+"の問題再採点タスクが開始されました。タスクの詳細を見るには「バックグラウンドで実施される学生向けのタスク履歴を表示」をクリックしてください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -913,6 +939,8 @@ msgid ""
 "'<%= student_id %>'. Check that the problem and student identifiers are "
 "spelled correctly."
 msgstr ""
+"問題 '<%= problem_id %>' と受講者 '<%= student_id %>' "
+"の問題再採点タスクの開始に失敗しました。問題と受講者の識別子が正しく入力されていることを確認してください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -920,10 +948,12 @@ msgid ""
 "student_id %>'. Check that the problem and student identifiers are spelled "
 "correctly."
 msgstr ""
+"問題 '<%= problem_id %>' と受講者 '<%= student_id %>' "
+"のタスク履歴の取得に失敗しました。問題と受講者の識別子が正しく入力されていることを確認してください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
-msgstr ""
+msgstr "問題 '<%= problem_id %>' に対するすべての受講者の試行のリセットをしますか？"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -931,16 +961,20 @@ msgid ""
 " Click the 'Show Background Task History for Problem' button to see the "
 "status of the task."
 msgstr ""
+"問題 '<%= problem_id %>' "
+"に対する試行のリセットのタスクを開始しました。タスクの詳細を見るには「バックグラウンドで実施される学生向けのタスク履歴を表示」をクリックしてください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to reset attempts for all students on problem '<%= "
 "problem_id %>'. Check that the problem identifier is spelled correctly."
 msgstr ""
+"問題 '<%= problem_id %>' "
+"に対する試行のリセットのタスクの開始に失敗しました。問題の識別子が正しく入力されていることを確認してください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%= problem_id %>' for all students?"
-msgstr ""
+msgstr "すべての受講者に対する問題 '<%= problem_id %>' の再採点を行いますか？"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -948,86 +982,89 @@ msgid ""
 "students. Click the 'Show Background Task History for Problem' button to see"
 " the status of the task."
 msgstr ""
+"問題 '<%= problem_id %>' "
+"に対する再採点のタスクを開始しました。タスクの詳細を見るには「バックグラウンドで実施される学生向けのタスク履歴を表示」をクリックしてください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore problem '<%= problem_id %>'. Check that the"
 " problem identifier is spelled correctly."
 msgstr ""
+"問題 '<%= problem_id %>' に対する再採点のタスクの開始に失敗しました。問題の識別子が正しく入力されていることを確認してください。"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Error listing task history for this student and problem."
-msgstr ""
+msgstr "この受講者と問題に対するタスク履歴のリスト表示でエラーが発生しました。"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Grades saved.  Fetching the next submission to grade."
-msgstr ""
+msgstr "評価が保存されました。次の評価対象を取得します。"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Problem Name"
-msgstr ""
+msgstr "問題名"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Graded"
-msgstr ""
+msgstr "採点済み"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Available to Grade"
-msgstr ""
+msgstr "評価可能"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Required"
-msgstr ""
+msgstr "必須"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Progress"
-msgstr ""
+msgstr "成績"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Back to problem list"
-msgstr ""
+msgstr "問題リストに戻る"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Try loading again"
-msgstr ""
+msgstr "再読み込み"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> available "
-msgstr ""
+msgstr "<%= num %>件が実施可能"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> graded "
-msgstr ""
+msgstr "<%= num %>件が採点済"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> more needed to start ML"
-msgstr ""
+msgstr " MLをはじめるまでにあと <%= num %> 人"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Re-check for submissions"
-msgstr ""
+msgstr "送信を再確認"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "System got into invalid state: <%= state %>"
-msgstr ""
+msgstr "システムが次の無効な状態になりました：<%= state %>"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "System got into invalid state for submission: "
-msgstr ""
+msgstr "システムが送信の無効な状態に入りました："
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Hide)"
-msgstr ""
+msgstr "(隠す)"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Show)"
-msgstr ""
+msgstr "(表示)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid ""
 "<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>"
-msgstr ""
+msgstr "<p><b>ハイパーリンクを入力</b></p><p>http://example.com/ \"追加の題目\"</p>"
 
 #: lms/static/js/Markdown.Editor.js
 msgid ""
@@ -1035,257 +1072,263 @@ msgid ""
 "url)</b></p><p>http://example.com/images/diagram.jpg \"optional "
 "title\"<br><br></p>"
 msgstr ""
+"<p><b>挿入画像 "
+"(アップロードするファイルかURLを記述)</b></p><p>http://example.com/images/diagram.jpg "
+"\"オプションの題目\"<br><br></p>"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
-msgstr ""
+msgstr "マークダウン編集ヘルプ"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
-msgstr ""
+msgstr "太字 (Ctrl+B)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Italic (Ctrl+I)"
-msgstr ""
+msgstr "斜体 (Ctrl+I)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Hyperlink (Ctrl+L)"
-msgstr ""
+msgstr "ハイパーリンク (Ctrl+L)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote (Ctrl+Q)"
-msgstr ""
+msgstr "引用 (Ctrl+Q)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Code Sample (Ctrl+K)"
-msgstr ""
+msgstr "コード (Ctrl+K)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Image (Ctrl+G)"
-msgstr ""
+msgstr "画像 (Ctrl+G)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Numbered List (Ctrl+O)"
-msgstr ""
+msgstr "数字の箇条書き (Ctrl+O)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bulleted List (Ctrl+U)"
-msgstr ""
+msgstr "点の箇条書き (Ctrl+U)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Heading (Ctrl+H)"
-msgstr ""
+msgstr "見出し (Ctrl+H)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Horizontal Rule (Ctrl+R)"
-msgstr ""
+msgstr "水平線 (Ctrl+R)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Undo (Ctrl+Z)"
-msgstr ""
+msgstr "取り消し (Ctrl+Z)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Y)"
-msgstr ""
+msgstr "やり直し (Ctrl+Y)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Shift+Z)"
-msgstr ""
+msgstr "やり直し (Ctrl+Shift+Z)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "strong text"
-msgstr ""
+msgstr "重要"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "emphasized text"
-msgstr ""
+msgstr "強調"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter image description here"
-msgstr ""
+msgstr "画像の説明をここに記述"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter link description here"
-msgstr ""
+msgstr "リンクの説明をここに記述"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote"
-msgstr ""
+msgstr "引用"
 
 #: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js
 msgid "enter code here"
-msgstr ""
+msgstr "コードをここに記述"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "List item"
-msgstr ""
+msgstr "リスト項目"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Heading"
-msgstr ""
+msgstr "見出し"
 
 #: cms/static/coffee/src/main.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
-msgstr ""
+msgstr "サーバーかあなたのインターネット接続に問題がある場合に発生します。ページの再読み込みをするか、インターネット接続を確認してください。"
 
 #: cms/static/coffee/src/main.js
 msgid "Studio's having trouble saving your work"
-msgstr ""
+msgstr "Studio は作業の保存に問題があります。"
 
 #: cms/static/coffee/src/views/module_edit.js
 #, c-format
 msgid "<em>Editing:</em> %s"
-msgstr ""
+msgstr "<em>編集中:</em> %s"
 
 #: cms/static/coffee/src/views/module_edit.js
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
 #: cms/static/js/views/overview.js.c
 msgid "Saving&hellip;"
-msgstr ""
+msgstr "保存中&hellip;"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid "Delete Component Confirmation"
-msgstr ""
+msgstr "コンポーネント削除の確認"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid ""
 "Are you sure you want to delete this component? This action cannot be "
 "undone."
-msgstr ""
+msgstr "このコンポーネントを削除してもよろしいですか？この動作は取り消すことが出来ません。"
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/course_info_update.js
 msgid "Deleting&hellip;"
-msgstr ""
+msgstr "削除中&hellip;"
 
 #: cms/static/coffee/src/views/unit.js
 msgid "Adding&hellip;"
-msgstr ""
+msgstr "追加中&hellip;"
 
 #: cms/static/coffee/src/views/unit.js
 msgid "Duplicating&hellip;"
-msgstr ""
+msgstr "複製中&hellip;"
 
 #: cms/static/coffee/src/views/unit.js
 msgid "Delete this component?"
-msgstr ""
+msgstr "このコンポーネントを削除しますか？"
 
 #: cms/static/coffee/src/views/unit.js
 msgid "Deleting this component is permanent and cannot be undone."
-msgstr ""
+msgstr "このコンポーネントの削除は恒久的で取り消すことができません。"
 
 #: cms/static/coffee/src/views/unit.js
 msgid "Yes, delete this component"
-msgstr ""
+msgstr "はい、このコンポーネントを削除します"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
-msgstr ""
+msgstr "モーダルウィンドウにこのリンクを開く"
 
 #: cms/static/js/base.js
 msgid "Delete this "
-msgstr ""
+msgstr "これを削除"
 
 #: cms/static/js/base.js
 msgid "Deleting this "
-msgstr ""
+msgstr "これを削除しています"
 
 #: cms/static/js/base.js
 msgid "Yes, delete this "
-msgstr ""
+msgstr "はい，これを削除します"
 
 #: cms/static/js/index.js
 msgid "Please do not use any spaces in this field."
-msgstr ""
+msgstr "このフィールドには空白を使用しないで下さい。"
 
 #: cms/static/js/index.js
 msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than 65 characters."
-msgstr ""
+msgstr "組織名、講座番号、開講日付枠の合計の文字数は65文字を超えることができません。"
 
 #: cms/static/js/index.js
 msgid "Required field."
-msgstr ""
+msgstr "必須フィールドです．"
 
 #: cms/static/js/sock.js
 msgid "Hide Studio Help"
-msgstr ""
+msgstr "Studio ヘルプを非表示"
 
 #: cms/static/js/sock.js
 msgid "Looking for Help with Studio?"
-msgstr ""
+msgstr "Studio 用ヘルプを検索しています"
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
-msgstr ""
+msgstr "名前を指定する必要があります"
 
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
 "<%= fileExtensions %> to upload."
 msgstr ""
+"ファイルアップロードが可能なファイル形式は「<%= fileTypes %>」となります。拡張子が「<%= fileExtensions "
+"%>」となるファイルを選択し、アップロードしてください。"
 
 #: cms/static/js/models/uploads.js
 msgid "or"
-msgstr ""
+msgstr "もしくは"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
-msgstr ""
+msgstr "各講座には、受講開始日を設定する必要があります。"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course end date cannot be before the course start date."
-msgstr ""
+msgstr "受講終了日は、受講開始日より前に設定することはできません。"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course start date cannot be before the enrollment start date."
-msgstr ""
+msgstr "受講開始日は、受講登録開始日より前に設定することはできません。"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
-msgstr ""
+msgstr "登録開始日時は登録終了日時よりも後にはできません．"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment end date cannot be after the course end date."
-msgstr ""
+msgstr "受講登録終了日は、受講終了日より後に設定することはできません。"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
-msgstr ""
+msgstr "キーには英数字，_ または - のみ利用できます"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
-msgstr ""
+msgstr "この名前の他の課題種別がすでに存在します．"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer between 0 and 100."
-msgstr ""
+msgstr "0 と 100 の間の整数を入力して下さい．"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer greater than 0."
-msgstr ""
+msgstr "0 より大きい整数を入力て下さい。"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter non-negative integer."
-msgstr ""
+msgstr "正の整数を入力してください。"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr ""
+msgstr "割り当てられる以上の <% attrs.types %> をドロップできません．"
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
-msgstr ""
+msgstr "猶予期間は「HH:MM」の形式で記入される必要があります。"
 
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
-msgstr ""
+msgstr "ファイル削除確認"
 
 #: cms/static/js/views/asset.js
 msgid ""
@@ -1293,81 +1336,84 @@ msgid ""
 "\n"
 "Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
 msgstr ""
+"このアイテムを削除してもよろしいですか? 元には戻せません．\n"
+"\n"
+"また，このアイテムにリンクまたは参照しているコンテンツはすべて機能しなくなります (例: 画像切れやリンク切れ)"
 
 #: cms/static/js/views/asset.js cms/static/js/views/show_textbook.js
 msgid "Delete"
-msgstr ""
+msgstr "削除"
 
 #: cms/static/js/views/asset.js
 msgid "Your file has been deleted."
-msgstr ""
+msgstr "ファイルは削除されました．"
 
 #: cms/static/js/views/assets.js
 msgid "Name"
-msgstr ""
+msgstr "名前"
 
 #: cms/static/js/views/assets.js
 msgid "Date Added"
-msgstr ""
+msgstr "追加日"
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
-msgstr ""
+msgstr "この変更を削除してもよろしいですか?"
 
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
-msgstr ""
+msgstr "このアクションは取り消しできません．"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
-msgstr ""
+msgstr "“<%= name %>” に新しい PDF をアップロード"
 
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
-msgstr ""
+msgstr "保存しています"
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
-msgstr ""
+msgstr "アップロード時にエラーが発生"
 
 #: cms/static/js/views/import.js
 msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
-msgstr ""
+msgstr "ファイル形式がサポートされていません．<code>tar.gz</code> 拡張子がついたファイルをアップロードして下さい．"
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
-msgstr ""
+msgstr "すべてのセクションを折り畳む"
 
 #: cms/static/js/views/overview.js
 msgid "Expand All Sections"
-msgstr ""
+msgstr "すべてのセクションを展開"
 
 #: cms/static/js/views/overview.js
 msgid "Release date:"
-msgstr ""
+msgstr "リリース日："
 
 #: cms/static/js/views/overview.js
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr ""
+msgstr "{year}年{month}月{day}日{hour}時{minute}分 UTC"
 
 #: cms/static/js/views/overview.js
 msgid "Edit section release date"
-msgstr ""
+msgstr "章のリリース日を編集"
 
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Not Graded"
-msgstr ""
+msgstr "未採点"
 
 #: cms/static/js/views/paging.js
 msgid "ascending"
-msgstr ""
+msgstr "昇順"
 
 #: cms/static/js/views/paging.js
 msgid "descending"
-msgstr ""
+msgstr "降順"
 
 #: cms/static/js/views/paging_header.js
 msgid ""
@@ -1375,79 +1421,82 @@ msgid ""
 "%(total_span)s%(total)s total%(end_span)s, sorted by "
 "%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
 msgstr ""
+"%(total_span)s%(total)s total%(end_span)s 中の "
+"%(current_span)s%(start)s-%(end)s%(end_span)s  sorted by "
+"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s を表示中"
 
 #: cms/static/js/views/section_edit.js
 msgid "Your change could not be saved"
-msgstr ""
+msgstr "変更を保存することができませんでした"
 
 #: cms/static/js/views/section_edit.js
 msgid "Return and resolve this issue"
-msgstr ""
+msgstr "この課題に戻り，解決する"
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
-msgstr ""
+msgstr "“<%= name %>” を削除しますか?"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in"
 " your courseware's navigation will also be removed."
-msgstr ""
+msgstr "テキストの削除は元に戻せません。削除すると講座メニューからも削除されます。"
 
 #: cms/static/js/views/show_textbook.js
 msgid "Deleting"
-msgstr ""
+msgstr "削除しています"
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
-msgstr ""
+msgstr "申し訳ありません，エラーがありました"
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes"
-msgstr ""
+msgstr "何らかの変更がなされました"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes will not take effect until you save your progress."
-msgstr ""
+msgstr "更新を保存するまで変更は反映されません．"
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes, but there are some errors"
-msgstr ""
+msgstr "変更がなされましたが，エラーがあります"
 
 #: cms/static/js/views/validation.js
 msgid ""
 "Please address the errors on this page first, and then save your progress."
-msgstr ""
+msgstr "このページのエラーをまず解決し，変更を保存して下さい．"
 
 #: cms/static/js/views/validation.js
 msgid "Save Changes"
-msgstr ""
+msgstr "変更を保存"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes have been saved."
-msgstr ""
+msgstr "変更は保存されました．"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
 "with key and value formatting, as validation is not implemented."
-msgstr ""
+msgstr "更新を保存するまで変更は反映されません．検証手段がないので，キーと値のフォーマッティングに気をつけて下さい．"
 
 #: cms/static/js/views/settings/advanced.js
 msgid "Your policy changes have been saved."
-msgstr ""
+msgstr "ポリシー変更が保存されました．"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Please note that validation of your policy key and value pairs is not "
 "currently in place yet. If you are having difficulties, please review your "
 "policy pairs."
-msgstr ""
+msgstr "キー・値ペアの方針の検証は現在はまだ準備が整っていないことにご注意下さい．問題があれば，ペアの方針を見直して下さい．"
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
-msgstr ""
+msgstr "本講座のイメージ画像をアップロードしてください。"
 
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
-msgstr ""
+msgstr "ファイル形式はJPEGもしくはPNG形式である必要があります。"

@@ -5,8 +5,9 @@
 %>
 
 %if urlpath is not Undefined and urlpath:
-<header>
+<header style="height:auto; padding: 0; border-bottom:none; border-radius:0 0 0 0; background-color:none;">
   <ul class="breadcrumb pull-left" class="">
+
     <%
       # The create button links to the highest ancestor we have edit priveleges to
       create_article_root = None
@@ -30,7 +31,7 @@
       <input type="search" placeholder="search wiki" />
     </form> -->
     %if create_article_root:
-    <a class="add-article-btn btn pull-left" href="${reverse('wiki:create', kwargs={'path' : create_article_root.path})}" style="padding: 7px;">
+    <a class="f_button radius success pull-left" href="${reverse('wiki:create', kwargs={'path' : create_article_root.path})}" style="padding: 7px;">
       <span class="icon-plus"></span>
       ${_("Add article")}
     </a>

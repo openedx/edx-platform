@@ -4,89 +4,50 @@
 <%namespace name='static' file='static_content.html'/>
 <%! from microsite_configuration.templatetags.microsite import platform_name %>
 
-<div class="wrapper wrapper-footer">
-  <footer>
-    <div class="colophon">
-      <nav class="nav-colophon">
-      <ol>
-          <li class="nav-colophon-01">
-          <a id="about" href="${marketing_link('ABOUT')}">
-              ${_("About")}
-          </a>
-          </li>
-          <li class="nav-colophon-02">
-          <a id="jobs" href="${marketing_link('JOBS')}">
-              ${_("Jobs")}
-          </a>
-          </li>
-          <li class="nav-colophon-03">
-          <a id="press" href="${marketing_link('PRESS')}">
-              ${_("Press")}
-          </a>
-          </li>
-          <li class="nav-colophon-04">
-          <a id="faq" href="${marketing_link('FAQ')}">
-              ${_("FAQ")}
-          </a>
-          </li>
-          <li class="nav-colophon-05">
-          <a id="contact" href="${marketing_link('CONTACT')}">
-              ${_("Contact")}
-          </a>
-          </li>
-      </ol>
-      </nav>
 
-      <div class="colophon-about">
-        <img src="${static.url('images/header-logo.png')}" alt="${_('{platform_name} Logo').format(platform_name=platform_name())}" />
+##<div class="row hide-for-medium-up">
+##  <div class="columns">
+##     <a href="#help-modal" class="f_button secondary small radius"  href="#help-modal" rel="" role="button"  style="width:90%; margin-left:5%; margin-right:5%;" data-reveal-id="help-modal">${_("Help")}</a>
+##  </div>
+##</div>
 
-        <p>${_("{platform_name} is a non-profit created by founding partners {Harvard} and {MIT} whose mission is to bring the best of higher education to students of all ages anywhere in the world, wherever there is Internet access. {platform_name}'s free online MOOCs are interactive and subjects include computer science, public health, and artificial intelligence.").format(platform_name="EdX", Harvard="Harvard", MIT="MIT")}</p>
-      </div>
-    </div>
+<section id="footer">
+        <hr style="width: 100%; margin-top:6rem;">
+		<div class="row show-for-large-up">
+			<div class="large-4 columns left" style="margin-top:10px;">
+				<p class="center" style="font-size:small;">
+					<a href="https://support.gacco.org/hc/ja/articles/200749224">利用規約</a>&nbsp;
+					<a href="https://support.gacco.org/hc/ja/articles/200749314">プライバシーポリシー</a>&nbsp;
+					<a href="https://support.gacco.org/hc/ja">よくある質問</a>
+				</p>
+			</div>
+			<div class="large-5 columns" style="margin-top:10px;"><p class="center" style="font-size:small;">Copyright (c) 2014 NTT Knowledge Square Inc., except where noted, all rights r
+eserved.</p></div>
+			<div class="large-3 columns right" style="margin-top:10px;"><small>株式会社NTTドコモ<br>NTTナレッジ・スクウェア株式会社</small></div>
+		</div>
+		<div class="row show-for-medium-only">
+			<div class="columns medium-7">
+				<p class="left">
+					<a href="https://support.gacco.org/hc/ja/articles/200749224">利用規約</a>
+					<a href="https://support.gacco.org/hc/ja/articles/200749314" style="margin-left:20px">プライバシーポリシー</a>
+					<a href="https://support.gacco.org/hc/ja" style="margin-left:20px">よくある質問</a>
+				</p>
+			</div>
+			<div class="columns medium-5"><small class="right">Copyright (c) 2014 NTT Knowledge Square Inc., except where noted, all rights reserved.</small><br><small>株式会社NTTドコモ<b
+r>NTTナレッジ・スクウェア株式会社</small></div>
+		</div>
+		<div class="row show-for-small-only">
+			<div class="columns">
+				<p class="text-center" style="font-size:small;">
+					<a href="https://support.gacco.org/hc/ja/articles/200749224">利用規約</a>
+					<a href="https://support.gacco.org/hc/ja/articles/200749314" style="margin-left:10px">プライバシーポリシー</a>
+					<a href="https://support.gacco.org/hc/ja" style="margin-left:10px">よくある質問</a>
+					<br>Copyright (c) 2014 NTT Knowledge Square Inc.,<br> except where noted, all rights reserved.<br>
+					<small>株式会社NTTドコモ<br>NTTナレッジ・スクウェア株式会社</small>
+				</p>
+			</div>
+		</div>
+	<div><p> </p></div>
+</section>
 
-    <div class="references">
-      <nav class="nav-social">
-        <ul>
-          <li class="nav-social-01">
-            <a href="http://www.meetup.com/edX-Global-Community/" rel="external">
-              <img src="${static.url('images/social/ico-social-meetup.png')}" alt="edX on Meetup" />
-            </a>
-          </li>
-          <li class="nav-social-02">
-            <a href="http://www.facebook.com/EdxOnline" rel="external">
-              <img src="${static.url('images/social/ico-social-facebook.png')}" alt="edX on Facebook" />
-            </a>
-          </li>
-          <li class="nav-social-03">
-            <a href="https://twitter.com/edXOnline" rel="external">
-              <img src="${static.url('images/social/ico-social-twitter.png')}" alt="edX on Twitter" />
-            </a>
-          </li>
-          <li class="nav-social-04">
-            <a href="https://plus.google.com/108235383044095082735/posts" rel="external">
-              <img src="${static.url('images/social/ico-social-google.png')}" alt="edX on Google+" />
-            </a>
-          </li>
-          <li class="nav-social-05">
-            <a href="http://youtube.com/user/edxonline" rel="external">
-              <img src="${static.url('images/social/ico-social-youtube.png')}" alt="edX on YouTube" />
-            </a>
-          </li>
-        </ul>
-      </nav>
 
-      <p class="copyright">${_("&copy; 2014 {platform_name}, some rights reserved.").format(platform_name=settings.PLATFORM_NAME)}</p>
-
-      <nav class="nav-legal">
-        <ul>
-          <li class="nav-legal-01">
-            <a href="${marketing_link('TOS')}">${_("Terms of Service and Honor Code")}</a>
-          </li>
-          <li class="nav-legal-02">
-            <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </footer>
-</div>

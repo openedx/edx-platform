@@ -12,16 +12,18 @@
 </%def>
 
 <%def name="render_entry(entries, entry)">
-    <li><a href="#" class="drop-menu-entry"><span class="board-name" data-discussion_id='${json.dumps(entries[entry])}' cohorted = "${entries[entry]['id'] in cohorted_commentables}">${entry}</span></a></li>
+    <dd><a href="#" class="drop-menu-entry"><span class="board-name" data-discussion_id='${json.dumps(entries[entry])}' cohorted = "${entries[entry]['id'] in cohorted_commentables}">${entry}</span></a></dd>
 </%def>
 
 <%def name="render_category(categories, category)">
-    <li>
+    <dd>
         <a href="#" class="drop-menu-parent-category"><span class="board-name">${category}</span></a>
-        <ul>
+	<div class="content">
+          <dl>
             ${render_dropdown(categories[category])}
-        </ul>
-    </li>
+          </dl>
+	</div>
+    </dd>
 </%def>
 
 <div class="browse-topic-drop-menu-wrapper">
@@ -29,25 +31,31 @@
         <label class="sr" for="browse-topic">${_("Filter Topics")}</label>
         <input type="text" id="browse-topic" class="browse-topic-drop-search-input" placeholder="${_('filter topics')}">
     </div>
-    <ul class="browse-topic-drop-menu">
-        <li>
+    <dl class="accordion browse-topic-drop-menu" data-accordion>
+        <dd>
             <a href="#" class="drop-menu-meta-category">
                 <span class="board-name" data-discussion_id='#all'>${_("Show All Discussions")}</span>
             </a>
-        </li>
+        </dd>
         %if flag_moderator:
-        <li>
+        <dd>
             <a href="#">
                 <span class="board-name" data-discussion_id='#flagged'><i class="icon-flag" style="padding-right:5px;"></i>${_("Show Flagged Discussions")}</span>
             </a>
-        </li>
+        </dd>
         
         %endif
-        <li>
+        <dd>
             <a href="#" class="drop-menu-meta-category">
                 <span class="board-name" data-discussion_id='#following'><i class="icon-star" style="padding-right:5px;"></i>${_("Posts I'm Following")}</span>
             </a>
-        </li>
+        </dd>
         ${render_dropdown(category_map)}
-    </ul>
+        <dd>
+            <a href="#" class="home">
+                <span class="board-name"><i class="icon icon-home" style="padding-right:5px;"></i>${_("Discussion Home")}</span>
+            </a>
+        </dd>
+
+    </dl>
 </div>

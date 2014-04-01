@@ -10,19 +10,24 @@ if Backbone?
           @topicId    = @$(".topic").first().data("discussion_id")
           @topicText  = @getFullTopicName(@$(".topic").first())
 
-          @maxNameWidth = 100
-          @setSelectedTopic()
+##          @maxNameWidth = 100;
+##          @setSelectedTopic()
+          ## load後に@setSelectedTopic()するよう変更。
+##          $(window).bind "load", @updateTopicbar
+
+          ## 画面リサイズ時にトピック名の長さを調整する
+##          $(window).bind "resize", @updateTopicbar
+##          @displayedCollection.on "reset", @updateTopicbar
 
           DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "new-post-body"
-          
+
           if @$($(".topic_menu li a")[0]).attr('cohorted') != "True"
-            $('.choose-cohort').hide();
-          
-            
+            $('.choose-cohort').hide();            
           
       events:
           "submit .new-post-form":            "createPost"
           "click  .topic_dropdown_button":    "toggleTopicDropdown"
+          "click .drop-menu-parent-category": "toggleAccordion"
           "click  .topic_menu_wrapper":       "setTopic"
           "click  .topic_menu_search":        "ignoreClick"
           "keyup .form-topic-drop-search-input": DiscussionFilter.filterDrop
@@ -33,12 +38,31 @@ if Backbone?
       ignoreClick: (event) ->
           event.stopPropagation()
 
+      ## トピック名の長さをdropdownButtonに合わせる
+      ## ドロップダウンエリアの幅調整も
+      updateTopicbar: =>
+          @maxNameWidth = @dropdownButton.width() - 10
+          @setSelectedTopic()
+          @topicMenu.css('width', @dropdownButton.outerWidth())
+        
       toggleTopicDropdown: (event) ->
           event.stopPropagation()
           if @menuOpen
               @hideTopicDropdown()
           else
+              @updateTopicbar()
               @showTopicDropdown()
+
+      ## トピックのアコーディオン化のために追加
+      toggleAccordion: (event) ->
+        if($(event.target).hasClass("board-name"))
+          target = $(event.target).parent()
+        else
+          target = $(event.target)
+        target.toggleClass("active")
+        target.siblings("div.content").toggleClass("active")
+        event.preventDefault()
+        event.stopPropagation()
 
       showTopicDropdown: () ->
           @menuOpen = true
@@ -152,6 +176,8 @@ if Backbone?
                   thread = new Thread response['content']
                   DiscussionUtil.clearFormErrors(@$(".new-post-form-errors"))
                   @$el.hide()
+                  ## close new post modal
+                  $('#discussion_new_post_modal').foundation('reveal', 'close');
                   @$(".new-post-title").val("").attr("prev-text", "")
                   @$(".new-post-body textarea").val("").attr("prev-text", "")
                   @$(".wmd-preview p").html("")

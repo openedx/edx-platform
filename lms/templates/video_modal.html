@@ -3,8 +3,10 @@
 %>
 <%namespace name='static' file='static_content.html'/>
 
-<section id="video-modal" class="modal video-modal">
-  <div class="inner-wrapper">
+<section id="video-modal" class="modal video-modal reveal-modal medium" data-reveal>
+  <div class="flex-video" style="margin-top:1rem;">
     ${get_course_about_section(course, "video")}
   </div>
+  <a class="close-reveal-modal">×</a>
 </section>
+

@@ -26,25 +26,46 @@ $(document).ready(function(){
 
 <%block name="bodyclass">${course.css_class or ''}</%block>
 <section class="container">
-  <div class="info-wrapper">
+  <div class="info-wrapper row">
     % if user.is_authenticated():
-    <section class="updates">
+    <div id="black_updatenews" class="columns small-12 medium-9 large-9">
+    <section class="updates_">
       <h1>${_("Course Updates &amp; News")}</h1>
       ${get_course_info_section(request, course, 'updates')}
     </section>
-    <section aria-label="Handout Navigation" class="handouts">
+    </div>
+    <div class="columns small-12 medium-3 large-3">
+    <section aria-label="Handout Navigation" class="handouts_">
       <h1>${course.info_sidebar_name}</h1>
       ${get_course_info_section(request, course, 'handouts')}
     </section>
+    </div>
     % else:
-    <section class="updates">
+    <div id="black_updatenews" class="columns small-12 medium-9 large-9">
+    <section class="updates_">
       <h1>${_("Course Updates &amp; News")}</h1>
       ${get_course_info_section(request, course, 'guest_updates')}
     </section>
-    <section aria-label="${_('Handout Navigation')}" class="handouts">
+    </div>
+    <div class="columns small-12 medium-3 large-3">
+    <section aria-label="${_('Handout Navigation')}" class="handouts_">
       <h1>${_("Course Handouts")}</h1>
       ${get_course_info_section(request, course, 'guest_handouts')}
     </section>
+    </div>
     % endif
   </div>
 </section>
+
+
+## Info_Update Wrapper 'no_black'
+<script>
+        ## no wrap with 'no_black', then ol/li tags to be unwraped
+        ## but wrap with <div class="no_black">, then ol/li tags are averable.
+        $("#black_updatenews ol").filter(function(){
+                return !$(this).parents(".no_black").length;
+        }).contents().unwrap();
+        $("#black_updatenews li").filter(function(){
+                return !$(this).parents(".no_black").length;
+        }).contents().unwrap();
+</script>

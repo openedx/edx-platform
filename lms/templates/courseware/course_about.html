@@ -16,6 +16,10 @@
 
 <%inherit file="../main.html" />
 
+<%block name="og">
+  <meta property="og:image" content="${course_image_url(course)}">
+</%block>
+
 <%block name="headextra">
 
   <%
@@ -31,6 +35,70 @@
   ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
   <meta property="og:title" content="${get_course_about_section(course, 'title')}" />
   <meta property="og:description" content="${get_course_about_section(course, 'short_description')}" />
+
+  <style type="text/css">
+    <!--
+div .videowrap{
+	margin: 0 auto;
+	width: auto;
+	height: auto;
+	position: relative;
+	z-index: 2;
+	background: #000;
+	filter: alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-webkit-opacity: 0.5;
+	-o-opacity: 0.5;
+	-ms-opacity: 0.5;
+	opacity: 0.5;
+}
+
+div .videoplaywrap{
+	width:75px;
+	height:75px;
+	position:absolute;
+	background-color:transparent;
+	margin:auto;
+	left:0;
+	right:0;
+	top:0;
+	bottom:0;
+}
+
+div .videoplaycircle {
+	z-index: 3;
+	border-color: #333;
+	border-style: solid;
+	border-width: 5px;
+	border-radius:52px;
+	-webkit-border-radius:52px;
+	-moz-border-radius:52px;
+	width: 70px;
+	height: 70px;
+	position: absolute;
+	##top: 30%;
+	##left: 115px;
+	box-shadow: 0 5px 5px -5px #000;
+	margin: 0 auto;
+}
+
+div .videoplaytriangle{
+	z-index: 4;
+	width: 0;
+	height: 0;
+	border-top: 20px solid transparent;
+	##border-right: 40px solid transparent;
+	border-right-width:0;
+	border-bottom: 20px solid transparent;
+	border-left: 40px solid #333;
+	position: absolute;
+	##top: 10px;
+	##left: 15px;
+	margin: 10px 15px auto;
+        ##box-shadow: 0 5px 5px -5px #000;
+}
+    -->
+  </style>
 </%block>
 
 <%block name="js_extra">
@@ -120,192 +188,129 @@
 
 <%block name="pagetitle">${_("About {course.display_number_with_default}").format(course=course) | h}</%block>
 
-<section class="course-info">
-  <header class="course-profile">
-    <div class="intro-inner-wrapper">
-      <div class="table">
-      <section class="intro">
-        <hgroup>
-          <h1>
-            ${course.display_number_with_default | h}: ${get_course_about_section(course, "title")}
-            % if not self.theme_enabled():
-              <a href="#">${get_course_about_section(course, "university")}</a>
-            % endif
-          </h1>
-        </hgroup>
 
-        <div class="main-cta">
-        %if user.is_authenticated() and registered:
-          %if show_courseware_link:
-            <a href="${course_target}">
-          %endif
 
-          <span class="register disabled">${_("You are registered for this course")}</span>
-          
-          %if show_courseware_link:
-            <strong>${_("View Courseware")}</strong>
-            </a>
-          %endif
-
-        %elif in_cart:
-          <span class="add-to-cart">
-            ${_('This course is in your <a href="{cart_link}">cart</a>.').format(cart_link=cart_link)}
-          </span>
-        %elif settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and registration_price:
-          <%
-          if user.is_authenticated():
-            reg_href = "#"
-            reg_element_id = "add_to_cart_post"
-          else:
-            reg_href = reg_then_add_to_cart_link
-            reg_element_id = "reg_then_add_to_cart"
-          %>
-          <a href="${reg_href}" class="add-to-cart" id="${reg_element_id}">
-            ${_("Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})")\
-              .format(course=course, currency_symbol=settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
-                      cost=registration_price)}
-          </a>
-          <div id="register_error"></div>
-        % elif is_course_full:
-          <span class="register disabled">
-            ${_("Course is full")}
-          </span>          
-        %else:
-          <a href="#" class="register">
-            ${_("Register for {course.display_number_with_default}").format(course=course) | h}
-          </a>
-          <div id="register_error"></div>
-        %endif
-        </div>
-
-      </section>
-      % if get_course_about_section(course, "video"):
-      <a href="#video-modal" class="media" rel="leanModal">
-        <div class="hero">
-          <img src="${course_image_url(course)}" alt="" />
-          <div class="play-intro"></div>
-        </div>
-      </a>
-      %else:
-      <div class="media">
-        <div class="hero">
-          <img src="${course_image_url(course)}" alt="" />
-        </div>
+## ------------------
+<div class="row" style="margin-top:5rem;">
+  <div class="columns">
+    <h1>${course.display_number_with_default | h}: ${get_course_about_section(course, "title")}</h1>
+    <hr>
+  </div>
+  <div class="columns hide-for-medium-up">
+    % if get_course_about_section(course, "video"):
+    <a href="#video-modal" class="media" rel="" data-reveal-id="video-modal">
+    <div class="videowrap">
+    <div class="videoplaywrap">
+      <div class="videoplaycircle">
+      <div class="videoplaytriangle"></div>
       </div>
-      % endif
     </div>
+    <img src="${course_image_url(course)}" alt="${get_course_about_section(course, "title")}" style="width:100%" />
+    </div>
+    </a>
+    % else:
+    <img src="${course_image_url(course)}" alt="${get_course_about_section(course, "title")}" style="width:100%" />
+    % endif
+    <ul class="pricing-table hide-for-medium-up">
+      <li class="bullet-item">${_("Course Number")}:${course.display_number_with_default | h}</li>
+      % if not course.start_date_is_still_default:
+      <li class="bullet-item">${_("Classes Start")}:${course.start_date_text}</li>
+      % endif
+      % if get_course_about_section(course, "end_date") or course.end:
+      <li class="bullet-item">${_("Classes End")}:
+        % if get_course_about_section(course, "end_date"):
+          ${get_course_about_section(course, "end_date")}
+        % else:
+          ${course.end_date_text}
+        % endif
+      </li>
+      % endif
+      % if get_course_about_section(course, "effort"):
+      <li class="bullet-item">${_("Estimated Effort")}:${get_course_about_section(course, "effort")}</li>
+      % endif
+      % if get_course_about_section(course, "prerequisites"):
+      <li class="bullet-item">${_("Prerequisites")}:${get_course_about_section(course, "prerequisites")}</li>
+      % endif
+    </ul>
+    <hr>
+  </div>
+  <div class="columns large-8 medium-8">
+     ## Course About from CMS
+     ${get_course_about_section(course, "overview")}
+  </div>
+  <div class="columns large-4 medium-4 show-for-medium-up">
+    % if get_course_about_section(course, "video"):
+    <a href="#video-modal" class="media" rel="" data-reveal-id="video-modal">
+    <div class="videowrap">
+    <div class="videoplaywrap">
+      <div class="videoplaycircle">
+      <div class="videoplaytriangle"></div>
       </div>
-  </header>
+    </div>
+    <img src="${course_image_url(course)}" alt="${get_course_about_section(course, "title")}" style="width:100%" />
+    </div>
+    </a>
+    % else:
+    <img src="${course_image_url(course)}" alt="${get_course_about_section(course, "title")}" style="width:100%" />
+    % endif
+    </div>
+    <div class="columns large-4 medium-4">
+    <div class="panel radius" style="margin-top:0.5rem;">
+      <h5>※受講登録するとお客様の利用者情報は講座提供者（講師）に共有されます。詳しくは<a href="https://support.gacco.org/hc/ja/articles/200749224" target="_blank">利用規約</a>と<a href
+="https://support.gacco.org/hc/ja/articles/200749314" target="_blank">プライバシーポリシー</a>をご覧ください。</h5>
+    </div>
+    %if user.is_authenticated() and registered:
+      %if show_courseware_link:
+      <a href="${course_target}" class="f_button small radius expand">
+        <span class>${_("View Courseware")}</span>
+      </a>
+      % endif
+      <p class="text-center" style="margin-bottom:0.5rem;"><span class="f_label success" style="line-height:1rem; margin-right:0.2rem;">登録状況</span>${_("You are registered for this course")}</p>
+    % elif is_course_full:
+      <span class="register f_button small expand radius disabled">${_("Course is full")}</span>
+    %else:
+      <a href="#" class="register f_button small radius expand">
+      ${_("Register for {course.display_number_with_default}").format(course=course) | h}
+      </a>
+      <div id="register_error"></div>
+    % endif
+    <ul class="pricing-table show-for-medium-up">
+      <li class="bullet-item">${_("Course Number")}:${course.display_number_with_default | h}</li>
+      % if not course.start_date_is_still_default:
+      <li class="bullet-item">${_("Classes Start")}:${course.start_date_text}</li>
+      % endif
+      % if get_course_about_section(course, "end_date") or course.end:
+      <li class="bullet-item">${_("Classes End")}:
+        % if get_course_about_section(course, "end_date"):
+          ${get_course_about_section(course, "end_date")}
+        % else:
+          ${course.end_date_text}
+        % endif
+      </li>
+      % endif
+      % if get_course_about_section(course, "effort"):
+      <li class="bullet-item">${_("Estimated Effort")}:${get_course_about_section(course, "effort")}</li>
+      % endif
+      % if get_course_about_section(course, "prerequisites"):
+      <li class="bullet-item">${_("Prerequisites")}:${get_course_about_section(course, "prerequisites")}</li>
+      % endif
+    </ul>
+    <div class="panel radius">
+      Social Link
+    </div>
+  </div>
+</div>
+## ------------------
 
-  <section class="container">
-    <section class="details">
-      <nav>
-        <a href="#" class="active">${_("Overview")}</a>
-      ##  <a href="#">${_("FAQ")}</a>
-      ##  <a href="#">${_("Requirements")}</a>
-      ##  <a href="#">${_("Text-book")}</a>
-      ##  <a href="#">${_("Syllabus")}</a>
-      ##  <a href="#">${_("Reviews")}</a>
-      </nav>
+## BLACK tab/sp STUDY MENU are to be hidden
+<script>
+$(document).ready(function(){  
+  $("li.has-form").remove();
+  $("li.has-dropdown").remove();
+});
+</script>
 
-      <div class="inner-wrapper">
-        ${get_course_about_section(course, "overview")}
-      </div>
-    </section>
-
-    <section class="course-sidebar">
-      <section class="course-summary">
-        <header>
-          % if MicrositeConfiguration.get_microsite_configuration_value('course_about_show_social_links', True):
-          <div class="social-sharing">
-            <div class="sharing-message">${_("Share with friends and family!")}</div>
-            ## TODO: this should probably be an overrideable block,
-            ##       or something allowing themes to do whatever they
-            ##       want here (and on this whole page, really).
-            % if self.stanford_theme_enabled():
-              <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
-                <img src="${static.url('images/social/twitter-sharing.png')}" alt="Tweet that you've registered for this course">
-              </a>
-              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
-                <img src="${static.url('images/social/email-sharing.png')}" alt="Email someone to say you've registered for this course">
-              </a>
-            % else:
-              <% 
-                site_domain = MicrositeConfiguration.get_microsite_configuration_value('site_domain', 'www.edx.org')
-                platform_name = MicrositeConfiguration.get_microsite_configuration_value('platform_name', 'edX')
-                
-                tweet_action = "http://twitter.com/intent/tweet?text=I+just+registered+for+"+course.number+"+"+get_course_about_section(course, 'title')+"+through+"+MicrositeConfiguration.get_microsite_configuration_value('course_about_twitter_account', '@edxonline')+":+http://"+site_domain+reverse('about_course', args=[course.id])
-
-                facebook_link = MicrositeConfiguration.get_microsite_configuration_value('course_about_facebook_link', 'http://www.facebook.com/EdxOnline')
-
-                email_subject = "mailto:?subject=Take%20a%20course%20with%20"+platform_name+"%20online&body=I%20just%20registered%20for%20"+course.number+"%20"+get_course_about_section(course, 'title')+"%20through%20"+platform_name+"%20http://"+site_domain+reverse('about_course', args=[course.id])
-              %>
-              <a href="${tweet_action}" class="share">
-                <img src="${static.url('images/social/twitter-sharing.png')}" alt="Tweet that you've registered for this course">
-              </a>
-              <a href="${facebook_link}" class="share">
-                <img src="${static.url('images/social/facebook-sharing.png')}" alt="Post a Facebook message to say you've registered for this course">
-              </a>
-              <a href="${email_subject}" class="share">
-                <img src="${static.url('images/social/email-sharing.png')}" alt="Email someone to say you've registered for this course">
-              </a>
-            % endif
-          </div>
-          % endif
-        </header>
-
-        <ol class="important-dates">
-          <li><div class="icon course-number"></div><p>${_("Course Number")}</p><span class="course-number">${course.display_number_with_default | h}</span></li>
-          % if not course.start_date_is_still_default:
-          <li><div class="icon start"></div><p>${_("Classes Start")}</p><span class="start-date">${course.start_date_text}</span></li>
-          % endif
-            ## We plan to ditch end_date (which is not stored in course metadata),
-            ## but for backwards compatibility, show about/end_date blob if it exists.
-            % if get_course_about_section(course, "end_date") or course.end:
-            <li>
-                <div class="icon end"></div>
-                <p>${_("Classes End")}</p><span class="final-date">
-                % if get_course_about_section(course, "end_date"):
-                    ${get_course_about_section(course, "end_date")}
-                % else:
-                    ${course.end_date_text}
-                % endif
-                </span>
-            </li>
-            % endif
-
-          % if get_course_about_section(course, "effort"):
-            <li><div class="icon effort"></div><p>${_("Estimated Effort")}</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>
-          % endif
-
-          ##<li><div class="icon length"></div><p>${_('Course Length')}</p><span class="course-length">${_('{number} weeks').format(number=15)}</span></li>
-
-          % if get_course_about_section(course, "prerequisites"):
-            <li class="prerequisites"><div class="icon prereq"></div><p>${_("Prerequisites")}</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
-          % endif
-        </ol>
-      </section>
-
-
-      ## For now, ocw links are the only thing that goes in additional resources
-      % if get_course_about_section(course, "ocw_links"):
-      <section class="additional-resources">
-        <header>
-          <h1>${_("Additional Resources")}</h1>
-        </header>
-
-        <section>
-          ## "MITOpenCourseware" should *not* be translated
-          <h2 class="opencourseware">MITOpenCourseware</h2>
-             ${get_course_about_section(course, "ocw_links")}
-        </section>
-      </section>
-      %endif
-    </section>
-
-  </section>
-</section>
-
+## I dont know why this is need??
 %if not registered:
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
@@ -321,3 +326,5 @@
 %endif
 
 <%include file="../video_modal.html" />
+
+

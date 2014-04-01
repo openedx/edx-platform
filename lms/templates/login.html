@@ -95,17 +95,47 @@
   </script>
 </%block>
 
-<section class="introduction">
-  <header>
-    <h1 class="title">
-      <span class="title-super">${_("Please log in")}</span>
-      <span class="title-sub">${_("to access your account and courses")}</span>
-    </h1>
-  </header>
-</section>
+##<section class="introduction">
+##  <header>
+##    <h1 class="title">
+##      <span class="title-super">${_("Please log in")}</span>
+##      <span class="title-sub">${_("to access your account and courses")}</span>
+##    </h1>
+##  </header>
+##</section>
+
+<div style="margin-top:4rem;"></div>
+
+<div class="row">
+  <div class="columns">
+    <h2>ログイン</h2>
+  </div>
+</div>
+<div style="width:100%; height:121px; margin-bottom:3rem; background-color:#ccc;">
+  <div class="row">
+    <div class="columns">
+      <h3 style="margin-top:1rem;">よこうそ！gaccoへ。</h3>
+      <h3>ログインして学習をはじめましょう。</h3>
+    </div>
+  </div>
+</div>
+
+<!-- ▼SPのレジスターボタン▼ -->
+  <div class="row show-for-small-only">
+     <p class="text-center" style="margin-top:20px;"><a href="/register" class="f_button small radius" style="width:80%;">会員登録はこちら</a></p>
+  </div>
+<!-- ▲SPのレジスターボタン▲ -->
+<!-- ▼Tabのレジスターボタン▼ -->
+  <div class="row show-for-medium-only">
+     <p class="text-center" style="margin-top:20px;"><a href="/register" class="f_button radius small" style="width:50%;">会員登録はこちら</a></p>
+  </div>
+<!-- ▲Tabのレジスターボタン▲ -->
+
+<div class="row">
+<div class="columns large-8 medium-8">
 
 <section class="login container">
-  <section role="main" class="content">
+  <section role="main" class="">
     <form role="form" id="login-form" method="post" data-remote="true" action="/login_ajax" novalidate>
 
       <!-- status messages -->
@@ -137,7 +167,7 @@
             <label for="password">${_('Password')}</label>
             <input id="password" type="password" name="password" value="" required aria-required="true" />
             <span class="tip tip-input">
-              <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw" id="forgot-password-link" tabindex="-1" role="button" aria-haspopup="true">${_('Forgot password?')}</a>
+              <a href="#forgot-password-modal" rel="" data-reveal-id="forgot-password-modal" class="pwd-reset action action-forgotpw" id="forgot-password-link" tabindex="-1" role="button" aria-haspopup="true">${_('Forgot password?')}</a>
             </span>
           </li>
         </ol>
@@ -160,12 +190,15 @@
 % endif
 
       <div class="form-actions">
-        <button name="submit" type="submit" id="submit" class="action action-primary action-update"></button>
+        <input name="submit" type="submit" id="submit" class="f_button radius success" style="width:100%; color:#fff;" value="ログインして学習をはじめる" />
       </div>
     </form>
   </section>
 
+</div>
+
   <aside role="complementary">
+    <div class="columns large-4 medium-4">
 
 <%
   # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
@@ -176,4 +209,6 @@
 
   </aside>
   </section>
+
+</div>
 

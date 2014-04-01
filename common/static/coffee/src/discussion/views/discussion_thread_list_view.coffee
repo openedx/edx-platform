@@ -3,11 +3,13 @@ if Backbone?
     events:
       "click .search": "showSearch"
       "click .home": "goHome"
-      "click .browse": "toggleTopicDrop"
+      "click .browse-dropdown": "toggleTopicDrop"
       "keydown .post-search-field": "performSearch"
       "focus .post-search-field": "showSearch"
       "click .sort-bar a": "sortThreads"
-      "click .browse-topic-drop-menu": "filterTopic"
+      "click .drop-menu-parent-category": "toggleAccordion"
+      "click .drop-menu-meta-category": "filterTopic"
+      "click .drop-menu-entry": "filterTopic"
       "click .browse-topic-drop-search-input": "ignoreClick"
       "click .post-list .list-item a": "threadSelected"
       "click .post-list .more-pages a": "loadMorePages"
@@ -29,12 +31,12 @@ if Backbone?
         # if target.length > 0
         #   @filterTopic($.Event("filter", {'target': target[0]}))
       @collection.on "add", @addAndSelectThread
-      @sidebar_padding = 10
-      @sidebar_header_height = 87
       @boardName
       @template = _.template($("#thread-list-template").html())
+      @templateTL = _.template($("#topic-list-template").html())
       @current_search = ""
       @mode = 'all'
+
 
     reloadDisplayedCollection: (thread) =>
       thread_id = thread.get('id')
@@ -55,35 +57,36 @@ if Backbone?
         @trigger "thread:created", thread.get('id')
 
     updateSidebar: =>
+      width = $(".sidebar").width()
+      $(".browse").css('width', width)
+      $(".f-dropdown").css('width', width)
+      $("topic-list").css('width', width)
 
-      scrollTop = $(window).scrollTop();
-      windowHeight = $(window).height();
-
-      discussionBody = $(".discussion-article")
-      discussionsBodyTop = if discussionBody[0] then discussionBody.offset().top
-      discussionsBodyBottom = discussionsBodyTop + discussionBody.outerHeight()
-
-      sidebar = $(".sidebar")
-      if scrollTop > discussionsBodyTop - @sidebar_padding
-        sidebar.css('top', scrollTop - discussionsBodyTop + @sidebar_padding);
+      if $(".hide-for-small").css('display') == "none"
+        $(".new-post-btn").eq(1).css({'width':'auto', 'line-height':'102px'})
       else
-        sidebar.css('top', '0');
+        $(".new-post-btn").eq(1).css({'width':'180px','line-height':'60px'})
 
-      sidebarWidth = .31 * $(".discussion-body").width();
-      sidebar.css('width', sidebarWidth + 'px');
+#      if scrollTop > discussionsBodyTop - @sidebar_padding
+#        sidebar.css('top', scrollTop - discussionsBodyTop + @sidebar_padding);
+#      else
+#        sidebar.css('top', '0');
+#
+#      sidebarWidth = .31 * $(".discussion-body").width();
+#      sidebar.css('width', sidebarWidth + 'px');
 
-      sidebarHeight = windowHeight - Math.max(discussionsBodyTop - scrollTop, @sidebar_padding)
+#      sidebarHeight = windowHeight - Math.max(discussionsBodyTop - scrollTop, @sidebar_padding)
 
-      topOffset = scrollTop + windowHeight
-      discussionBottomOffset = discussionsBodyBottom + @sidebar_padding
-      amount = Math.max(topOffset - discussionBottomOffset, 0)
+#      topOffset = scrollTop + windowHeight
+#      discussionBottomOffset = discussionsBodyBottom + @sidebar_padding
+#      amount = Math.max(topOffset - discussionBottomOffset, 0)
 
-      sidebarHeight = sidebarHeight - @sidebar_padding - amount
-      sidebarHeight = Math.min(sidebarHeight + 1, discussionBody.outerHeight())
-      sidebar.css 'height', sidebarHeight
+#      sidebarHeight = sidebarHeight - @sidebar_padding - amount
+#      sidebarHeight = Math.min(sidebarHeight + 1, discussionBody.outerHeight())
+#      sidebar.css 'height', sidebarHeight
 
-      postListWrapper = @$('.post-list-wrapper')
-      postListWrapper.css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px')
+#      postListWrapper = @$('.post-list-wrapper')
+#      postListWrapper.css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px')
 
 
     # Because we want the behavior that when the body is clicked the menu is
@@ -95,6 +98,7 @@ if Backbone?
     render: ->
       @timer = 0
       @$el.html(@template())
+      $(".topic-list").html(@templateTL())
 
       $(window).bind "load", @updateSidebar
       $(window).bind "scroll", @updateSidebar
@@ -205,6 +209,7 @@ if Backbone?
       thread_id = $(e.target).closest("a").attr("data-id")
       @setActiveThread(thread_id)
       @trigger("thread:selected", thread_id)  # This triggers a callback in the DiscussionRouter which calls the line above...
+      @hideTopicDrop($("#browse-topic-list"))
       false
 
     threadRemoved: (thread_id) =>
@@ -212,18 +217,18 @@ if Backbone?
 
     setActiveThread: (thread_id) ->
       @$(".post-list a[data-id!='#{thread_id}']").removeClass("active")
-      @$(".post-list a[data-id='#{thread_id}']").addClass("active")
+      target = @$(".post-list a[data-id='#{thread_id}']")
+      target.addClass("active")
+      $(".current-thread").html(target.children("span.title").html())
 
     showSearch: ->
-      @$(".browse").removeClass('is-dropped')
-      @hideTopicDrop()
+##      @$(".browse").removeClass('is-dropped')
 
-      @$(".search").addClass('is-open')
-      @$(".browse").removeClass('is-open')
       setTimeout (-> @$(".post-search-field").focus()), 200 unless @$(".post-search-field").is(":focus")
 
     goHome: ->
       @template = _.template($("#discussion-home").html())
+      @hideTopicDrop($("#browse-topic-filter-dropdown"))
       $(".discussion-column").html(@template)
       $(".post-list a").removeClass("active")
       $("input.email-setting").bind "click", @updateEmailNotifications
@@ -246,20 +251,28 @@ if Backbone?
       event.stopPropagation()
       if @current_search != ""
         @clearSearch()
-      @$(".search").removeClass('is-open')
-      @$(".browse").addClass('is-open')
-      @$(".browse").toggleClass('is-dropped')
+      if event.data && event.data.dst
+        if $(event.target).closest(".f-dropdown").length > 0
+          return false
+        else
+          target = $('#'+event.data.dst)
+      else
+        target_name = $(event.target).attr('data-dropdown')
+        target = $(event.target).closest(".browse").siblings("#"+target_name)
+      target.toggleClass('open')
 
-      if @$(".browse").hasClass('is-dropped')
-        @$(".browse-topic-drop-menu-wrapper").show()
+      if target.hasClass('open')
+        target.css({left:'0px'})
+##        @$(".browse-topic-drop-menu-wrapper").show()
         $(".browse-topic-drop-search-input").focus()
-        $("body").bind "click", @toggleTopicDrop
+        $("body").bind "click", {dst:target_name}, @toggleTopicDrop
         $("body").bind "keydown", @setActiveItem
       else
-        @hideTopicDrop()
+        @hideTopicDrop(target)
 
-    hideTopicDrop: ->
-      @$(".browse-topic-drop-menu-wrapper").hide()
+    hideTopicDrop: (el) ->
+      el.css({left:'-9999px'})
+      el.removeClass('open')
       $("body").unbind "click", @toggleTopicDrop
       $("body").unbind "keydown", @setActiveItem
 
@@ -267,15 +280,23 @@ if Backbone?
     setTopicHack: (boardNameContainer) ->
       item = $(boardNameContainer).closest('a')
       boardName = item.find(".board-name").html()
-      _.each item.parents('ul').not('.browse-topic-drop-menu'), (parent) ->
-        boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
+##      _.each item.parents('dl').not('.browse-topic-drop-menu'), (parent) ->
+##        boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
+      _.each item.parents('div.content'), (parent) ->
+        category = $(parent).siblings('a').find('.board-name')
+        if category
+          boardName = category.html() + '<br> > ' + boardName
       @$(".current-board").html(@fitName(boardName))
 
     setTopic: (event) ->
       item = $(event.target).closest('a')
       boardName = item.find(".board-name").html()
-      _.each item.parents('ul').not('.browse-topic-drop-menu'), (parent) ->
-        boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
+##      _.each item.parents('dl').not('.browse-topic-drop-menu'), (parent) ->
+##        boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
+      _.each item.parents('div.content'), (parent) ->
+        category = $(parent).siblings('a').find('.board-name')
+        if category
+          boardName = category.html() + '<br> > ' + boardName
       @$(".current-board").html(@fitName(boardName))
 
     setSelectedTopic: (name) ->
@@ -296,30 +317,41 @@ if Backbone?
       return width
 
     fitName: (name) ->
-      @maxNameWidth = (@$el.width() * .8) - 50
-      width = @getNameWidth(name)
-      if width < @maxNameWidth
-        return name
-      path = (x.replace /^\s+|\s+$/g, "" for x in name.split("/"))
-      while path.length > 1
-        path.shift()
-        partialName = gettext("…") + "/" + path.join("/")
-        if  @getNameWidth(partialName) < @maxNameWidth
-          return partialName
-      rawName = path[0]
-      name = gettext("…") + "/" + rawName
-      while @getNameWidth(name) > @maxNameWidth
-        rawName = rawName[0...rawName.length-1]
-        name =  gettext("…") + "/" + rawName + gettext("…")
+##      @maxNameWidth = (@$el.width() * .8) - 50
+##      width = @getNameWidth(name)
+##      if width < @maxNameWidth
+##        return name
+##      path = (x.replace /^\s+|\s+$/g, "" for x in name.split("/"))
+##      while path.length > 1
+##        path.shift()
+##        partialName = gettext("…") + "/" + path.join("/")
+##        if  @getNameWidth(partialName) < @maxNameWidth
+##          return partialName
+##      rawName = path[0]
+##      name = gettext("…") + "/" + rawName
+##      while @getNameWidth(name) > @maxNameWidth
+##        rawName = rawName[0...rawName.length-1]
+##        name =  gettext("…") + "/" + rawName + gettext("…")
       return name
 
+    toggleAccordion: (event) ->
+      if($(event.target).hasClass("board-name"))
+        target = $(event.target).parent()
+      else
+        target = $(event.target)
+      target.toggleClass("active")
+      target.siblings("div.content").toggleClass("active")
+      event.preventDefault()
+      event.stopPropagation()
+
     filterTopic: (event) ->
+      @hideTopicDrop($("#browse-topic-filter-dropdown"))
       if @current_search != ""
         @setTopic(event)
         @clearSearch @filterTopic, event
       else
         @setTopic(event)  # just sets the title for the dropdown
-        item = $(event.target).closest('li')
+        item = $(event.target).closest('dd')
         discussionId = item.find("span.board-name").data("discussion_id")
         if discussionId == "#all"
           @discussionIds = ""
@@ -384,13 +416,14 @@ if Backbone?
       @loadMorePages(event)
 
     sortThreads: (event) ->
-      activeSort = @$(".sort-bar a[class='active']")
+      activeSort = @$(".sort-bar dd[class='active']")
       activeSort.removeClass("active")
       activeSort.attr("aria-checked", "false")
-      newSort = $(event.target)
+      newSort = $(event.target).parent()
       newSort.addClass("active")
       newSort.attr("aria-checked", "true")
-      @sortBy = newSort.data("sort")
+##      @sortBy = newSort.data("sort")
+      @sortBy = newSort.find("a").data("sort")
 
       @displayedCollection.comparator = switch @sortBy
         when 'date' then @displayedCollection.sortByDateRecentFirst
@@ -401,7 +434,8 @@ if Backbone?
     performSearch: (event) ->
       if event.which == 13
         event.preventDefault()
-        text = @$(".post-search-field").val()
+##        text = @$(".post-search-field").val()
+        text = $(event.target).val()
         @searchFor(text)
 
     searchFor: (text, callback, value) ->

@@ -22,7 +22,7 @@ from status.status import get_site_status_msg
 try:
     course_id = course.id
 except:
-    # can't figure out a better way to get at a possibly-defined course var
+    # cannot figure out a better way to get at a possibly-defined course var
     course_id = None
 site_status_msg = get_site_status_msg(course_id)
 %>
@@ -38,68 +38,191 @@ site_status_msg = get_site_status_msg(course_id)
 
 
 % if course:
-  <header class="global slim" aria-label="${_('Global Navigation')}">
+## class="global slim"
+  <header class="" aria-label="${_('Global Navigation')}">
 % else:
-  <header class="global" aria-label="${_('Global Navigation')}">
+## class="global"
+  <header class="" aria-label="${_('Global Navigation')}">
 % endif
-  <nav>
 
-  <h1 class="logo">
-    <a href="${marketing_link('ROOT')}">
-      <%block name="navigation_logo">
-          <img src="${static.url(branding.get_logo_url())}" alt="
-          % if course:
-          ${course.display_org_with_default | h}: ${course.display_number_with_default | h} ${course.display_name_with_default | h} @ 
-          % endif
-          ${platform_name()}
-          " />
-      </%block>
-    </a>
-  </h1>
+<nav class="top-bar hide-for-large-up" data-topbar>
+			<!-- Header || Tablet/SP -->
+			<ul class="title-area">
+				<li class="name show-for-medium">
+					<span class="tab-bar">
+						<a class="left-off-canvas-toggle menu-icon" style="display:inline;">
+						<span></span><h1><img src="http://gacco.org/images/vector/gacco_identity.svg" alt="gacco" width="75px" style="margin-left:1rem; margin-right:0.6rem; display:inline;"><small>Certified by </small><img src="http://gacco.org/images/jmooc.png" alt="JMOOC" width="50px" style="margin-bottom:0.2rem;"></h1>
+						</a>
+					</span>
+				</li>
+				<li class="name show-for-small">
+                                        <span class="tab-bar">
+                                                <a class="left-off-canvas-toggle menu-icon" style="display:inline;">                                                <span></span><h1><img src="http://gacco.org/images/vector/gacco_identity.svg" alt="gacco" width="75px" style="margin-left:1rem; margin-right:0.6rem; display:inline;"></h1>
+                                                </a>
+                                        </span>
+                                </li>
+				% if course:
+				<li class="toggle-topbar has-form"><a href="#" class="f_button">学習メニュー</a></li>
+				% endif
+			</ul>
+		<section class="top-bar-section">
+				<!-- Right Nav Section || Tablet -->
+				<ul id="black_target_cnavi1" class="right hide-for-medium-up">
+				</ul>
+				<!-- Right Nav Section || Smartphone -->
+				<ul class="right show-for-medium-up" style="z-index:2147483647;">
+					<li class="has-dropdown active" style="z-index:2147483647;">
+						% if course:
+						<a href="#">学習メニュー</a>
+						% endif
+						<ul id="black_target_cnavi2" class="dropdown">
+						</ul>
+					</li>
+				</ul>
+			</section>
+		</nav>
+		% if course:
+                <div id="black_coursetitle" class="hide-for-large-up" style="background-color:#eee; width:100%;">
+                <h2 style="display:inline; font-size:1rem; color:#333333; margin-left:0.5rem;">${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+                </div>
+		% endif
 
+		<aside class="left-off-canvas-menu hide-for-large-up">
+			<ul id="black_target_offcanvas" class="off-canvas-list">
+                                <li id="black_target_offcanvas"><label>ナビメニュー</label></li>
+			% if course:
+                                 <!-- here can be something to add offcanvas menu -->
+			% else:
+                        ## for dashboard /login/register Offcanvas menu
+                                <li><a href="http://gacco.org/">トップページ</a></li>
+##				<li><a href="http://gacco.org/about.html">gaccoとは</a></li>
+##				<li><a href="http://gacco.org/list.html">講座一覧</a></li>
+##				<li><a href="http://gacco.org/about.html#aboutus">about us</a></li>
+				% if user.is_authenticated():
+				<li><a href="${reverse('dashboard')}" class="user-link">${_("Dashboard for:")} ${user.username}</a></li>
+				% else:
+				<li><a href="/register">会員登録</a></li>
+				<li><a href="/dashboard">ログイン</a></li>
+				% endif
+				<li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
+                                % if user.is_authenticated():
+				<li><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
+                                % endif
+			% endif
+			% if course:
+				 <!-- here can be something to add offcanvas menu -->
+			% endif
+			</ul>
+
+		</aside>
+
+
+
+
+	<nav>
+
+##  <h1 class="logo">
+##    <a href="${marketing_link('ROOT')}">
+##      <%block name="navigation_logo">
+##          <img src="${static.url(branding.get_logo_url())}" alt="
+##          % if course:
+##          ${course.display_org_with_default | h}: ${course.display_number_with_default | h} ${course.display_name_with_default | h} @ 
+##            ${course.display_number_with_default | h} ${course.display_name_with_default | h} @
+##          % endif
+##            ${platform_name()}
+##          " />
+##      </%block>
+##    </a>
+##  </h1>
+
+<div class="row show-for-large-up" style="margin-top:1rem;">
+  ## Sitename
+  <div class="columns large-8">
+  <a href="http://gacco.org/"><img src="http://gacco.org/images/vector/gacco_identity.svg" alt="gacco"></a>
+  <span style="margin-left:0.5rem;"> </span><span style="margin-bottom:3rem;"><small>Certified by </small></span><img src="http://gacco.org/images/jmooc.png" alt="JMOOC" width="70" style="margin-bottom:0.6rem;">
     % if course:
-      <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+      <h2 style="display:inline; font-size:1rem; color:#333333;"><span style="font-size:1.2rem; margin-left:0.2rem; margin-right:0.2rem; ">|</span>${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
     % endif
+  </div>
+  ## navi button
+  <div class="columns large-4">
+
+
+
+##    % if course:
+##      <h2 id="black_course_name">
+##    <span class="provider">${course.display_org_with_default | h}:</span>
+##      ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+##    % endif
 
     % if user.is_authenticated():
 
-    <ol class="left nav-global authenticated">
-      <%block name="navigation_global_links_authenticated">
-        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-          <li class="nav-global-01">
-            <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
-          </li>
-        % endif
-      </%block>
-    </ol>
-    <ol class="user">
+##    <ol class="left nav-global authenticated">
+##      <%block name="navigation_global_links_authenticated">
+##        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+##          <li class="nav-global-01">
+##            <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
+##          </li>
+##        % endif
+##      </%block>
+##    </ol>
+
+
+    <a href="#" data-dropdown="drop-menu" class="right f_button small radius secondary f_dropdown">ナビボタン</a><br>
+    <ul id="drop-menu" data-dropdown-content class="user f-f_dropdown">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
-          <span class="avatar"></span>
-          <span class="sr">${_("Dashboard for:")} </span> ${user.username}
+          ##<span class="avatar"></span>
+          ${_("Dashboard for:")} ${user.username}
         </a>
       </li>
-      <li class="primary">
-        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
-        <ul class="dropdown-menu" aria-label="More Options" role="menu">
-          <%block name="navigation_dropdown_menu_links" >
-            <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
-          </%block>
-          <li><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
-        </ul>
-      </li>
-    </ol>
-      % if display_shopping_cart: # see shoppingcart.context_processor.user_has_cart_context_processor
-        <ol class="user">
-          <li class="primary">
-            <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
-              <i class="icon-shopping-cart"></i> Shopping Cart
-            </a>
+##      <li class="primary">
+##        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
+##        <ul class="dropdown-menu" aria-label="More Options" role="menu">
+##         <%block name="navigation_dropdown_menu_links" >
+            <li>
+            <a href="${marketing_link('FAQ')}">${_("Help")}</a>
+            </li>
+##          </%block>
+          <li>
+          <a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a>
           </li>
-        </ol>
-      % endif
+##        </ul>
+##      </li>
+    </ul>
+
+
+	## black called in course_navigation
+	<ul id="black_move_offcanvas" class="off-canvas-list hide">
+	<li>
+	<a href="${reverse('dashboard')}" class="user-link">
+	${_("Dashboard for:")}${user.username}
+	</a>
+	</li>
+	<li>
+	<a href="${marketing_link('FAQ')}">${_("Help")}</a>
+	</li>
+	<li>
+	<a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a>
+	</li>
+	</ul>
+
+
+##      % if display_shopping_cart: # see shoppingcart.context_processor.user_has_cart_context_processor
+##        <ol class="user">
+##          <li class="primary">
+##            <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+##              <i class="icon-shopping-cart"></i> Shopping Cart
+##            </a>
+##          </li>
+##        </ol>
+##      % endif
+
+
     % else:
-    <ol class="left nav-global">
+
+##    <ol class="left nav-global">
+      <ul class="button-group radius">
       <%block name="navigation_global_links">
         % if MicrositeConfiguration.get_microsite_configuration_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
           <li class="nav-global-01">
@@ -119,27 +242,38 @@ site_status_msg = get_site_status_msg(course_id)
             <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id])}">${_("Register Now")}</a>
           </li>
           % else:
-          <li class="nav-global-04">
-            <a class="cta cta-register" href="/register">${_("Register Now")}</a>
-          </li>
+##          <li class="nav-global-04">
+##            <a class="cta cta-register" href="/register">${_("Register Now")}</a>
+##          </li>
+            <li><a href="/register" class="f_button small secondary">${_("Register Now")}</a></li>
           % endif
       % endif
-    </ol>
+##    </ol>
 
-    <ol class="right nav-courseware">
-    <li class="nav-courseware-01">
+##    <ol class="right nav-courseware">
+##    <li class="nav-courseware-01">
+      <li>
       % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
           % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
           <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id])}${login_query()}">${_("Log in")}</a>
           % else:
-          <a class="cta cta-login" href="/login${login_query()}">${_("Log in")}</a>
+##          <a class="cta cta-login" href="/login${login_query()}">${_("Log in")}</a>
+            <a href="/login${login_query()}" class="f_button small secondary">${_("Log in")}</a>
           % endif
       % endif
-    </li>
-    </ol>
+     </li>
+##    </ol>
+    </ul>
     % endif
+
+  </div>
+</div>
+
+
+
   </nav>
 </header>
+
 % if course:
 <!--[if IE]>
 <div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}Firefox{ff_link_end}.').format(chrome_link_start='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">', chrome_link_end='</a>', ff_link_start='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">', ff_link_end='</a>')}</div>
@@ -150,4 +284,21 @@ site_status_msg = get_site_status_msg(course_id)
   <%include file="forgot_password_modal.html" />
 %endif
 
+## BLACK offcanvas move
+% if course:
+<script>
+$(document).ready(function(){  
+        $("#black_target_offcanvas").after($("#black_move_offcanvas")); 
+        $("#black_move_offcanvas").removeClass("hide");
+});
+</script>
+% endif
+
+##<script>
+## $("drop-menu").on("opened", function(){});
+## $("drop-menu").on("closed", function(){});
+##</script>
+
 <%include file="help_modal.html"/>
+
+

@@ -1,3 +1,5 @@
+@charset "utf-8";
+
 // base
 $baseline: 20px;
 
@@ -281,10 +283,10 @@ $form-bg-color: #fff;
 $modal-bg-color: rgb(245,245,245);
 
 // MISC: sidebar
-$sidebar-chapter-bg-top: rgba(255, 255, 255, .6);
+$sidebar-chapter-bg-top: rgba(255, 255, 255, 0);
 $sidebar-chapter-bg-bottom: rgba(255, 255, 255, 0);
 $sidebar-chapter-bg: #eee;
-$sidebar-active-image: linear-gradient(top, #e6e6e6, #d6d6d6);
+$sidebar-active-image: linear-gradient(top, #074e68, #074e68);
 
 // TOP HEADER IMAGE MARGIN
 $header_image_margin: -69px;
@@ -314,8 +316,8 @@ $video-thumb-url: '../images/courses/video-thumb.jpg';
 // SPLINT: new standards
 
 // SPLINT: fonts
-$f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
-$f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
+$f-serif: "ヒラギノ明朝 ProN W6","HiraMinProN-W6","HG明朝E","ＭＳ Ｐ明朝","MS PMincho","MS 明朝", serif;
+$f-sans-serif: "メイリオ", "Meiryo", "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "ＭＳ Ｐゴシック",  "MS P Gothic", Verdana, Arial, Helvetica, sans-serif;
 $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 
 // SPLINT: colors

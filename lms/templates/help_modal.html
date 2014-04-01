@@ -6,26 +6,28 @@
 <%! from django.conf import settings %>
 <%! from courseware.tabs import get_discussion_link %>
 <%! from microsite_configuration.middleware import MicrositeConfiguration %>
+<%! platform_name = MicrositeConfiguration.get_microsite_configuration_value("platform_name", settings.PLATFORM_NAME) %>
 
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
 <div class="help-tab">
-  <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
+  <a href="#help-modal" rel="" role="button" data-reveal-id="help-modal">${_("Help")}</a>
 </div>
 
-<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=MicrositeConfiguration.get_microsite_configuration_value("platform_name", settings.PLATFORM_NAME))}">
-  <div class="inner-wrapper" id="help_wrapper">
-    ## TODO: find a way to refactor this
-    <button class="close-modal "tabindex="0">
-      &#10005;
-      <span class="sr">
-        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close Modal')}
-      </span>
-    </button>
+<section id="help-modal" class="modal reveal-modal medium " aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=platform_name)}" data-reveal>
+  <a class="close-reveal-modal">×</a>
+  <div class="inner-wrapper" id="help_wrapper" style="background-color:transparent;">
+##    ## TODO: find a way to refactor this
+##    <button class="close-modal "tabindex="0">
+##      &#10005;
+##      <span class="sr">
+##        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+##        ${_('Close Modal')}
+##      </span>
+##    </button>
 
     <header>
-      <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME))}</h2>
+      <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=platform_name)}</h2>
       <hr>
     </header>
 
@@ -34,39 +36,47 @@ discussion_link = get_discussion_link(course) if course else None
 %>
 
 % if discussion_link:
-    <p>${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the {link_start}course discussion forum{link_end}.').format(
+    <p style="color:#333;">${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the {link_start}course discussion forum{link_end}.').format(
       link_start='<a href="{url}" target="_blank">'.format(url=discussion_link),
       link_end='</a>',
       )}
     </p>
 % endif
 
-    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(
+    <p style="color:#333;">${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(
         link_start='<a href="{url}" target="_blank">'.format(
           url=marketing_link('FAQ')
         ),
         link_end='</a>',
-        platform_name=MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME))}
+        platform_name=platform_name)}
       </p>
 
-    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(platform_name=MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME))}</p>
+    <p style="color:#333;">${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(
+        platform_name=platform_name
+      )}</p>
+
     <hr>
 
     <div class="help-buttons">
-      <a href="#" id="feedback_link_problem">${_('Report a problem')}</a>
-      <a href="#" id="feedback_link_suggestion">${_('Make a suggestion')}</a>
-      <a href="#" id="feedback_link_question">${_('Ask a question')}</a>
+      <a href="#" class="f_button small radius" id="feedback_link_problem">${_('Report a problem')}</a>
+      <a href="#" class="f_button small radius" id="feedback_link_suggestion">${_('Make a suggestion')}</a>
+      <a href="#" class="f_button small radius" id="feedback_link_question">${_('Ask a question')}</a>
     </div>
+
+##    <p class="note">${_('Please note: The {platform_name} support team is English speaking. While we will do our best to address your inquiry in any language, our responses will be in English.').format(
+##        platform_name=platform_name
+##      )}</p>
+
   </div>
 
-  <div class="inner-wrapper" id="feedback_form_wrapper">
-    <button class="close-modal">
-      &#10005;
-      <span class="sr">
-        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close Modal')}
-      </span>
-    </button>
+  <div class="inner-wrapper" id="feedback_form_wrapper" style="background-color:transparent;">
+##    <button class="close-modal">
+##      &#10005;
+##      <span class="sr">
+##        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+##        ${_('Close Modal')}
+##      </span>
+##    </button>
 
     <header></header>
 
@@ -88,19 +98,19 @@ discussion_link = get_discussion_link(course) if course else None
       <input name="course_id" type="hidden" value="${course.id | h}">
 % endif
       <div class="submit">
-        <input name="submit" type="submit" value="${_('Submit')}" id="feedback_submit">
+        <input name="submit" class="f_button small radius"  type="submit" value="${_('Submit')}" id="feedback_submit">
       </div>
     </form>
   </div>
 
-  <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="0">
-    <button class="close-modal" tabindex="0">
-      &#10005;
-      <span class="sr">
-        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close Modal')}
-      </span>
-    </button>
+  <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="0" style="background-color:transparent;">
+##    <button class="close-modal" tabindex="0">
+##      &#10005;
+##      <span class="sr">
+##        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+##        ${_('Close Modal')}
+##      </span>
+##    </button>
 
     <header>
       <h2>${_('Thank You!')}</h2>
@@ -116,7 +126,10 @@ discussion_link = get_discussion_link(course) if course else None
         open_time = "14:00"
         close_time = "22:00"
     %>
-    <p>
+<p style="color:#333;"><strong>質問がありますか？</strong><a href="https://support.gacco.org/hc/ja">よくある質問</a>にて、探してみてください。</p>
+    <p><a href="https://support.gacco.org/hc/ja">よくある質問</a>で解決しない場合には、以下よりお問い合わせください。</p>
+<%doc>
+    <p style="color:#333;">
     ${_(
         'Thank you for your inquiry or feedback.  We typically respond to a request '
         'within one business day (Monday to Friday, {open_time} UTC to {close_time} UTC.) In the meantime, please '
@@ -129,8 +142,10 @@ discussion_link = get_discussion_link(course) if course else None
         link_end='</a>'
     )}
     </p>
+</%doc>
   </div>
 </section>
+
 
 <script type="text/javascript">
 (function() {
@@ -266,3 +281,4 @@ discussion_link = get_discussion_link(course) if course else None
 </script>
 
 %endif
+

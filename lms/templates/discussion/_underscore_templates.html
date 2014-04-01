@@ -37,7 +37,7 @@
       <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
               ${"<% }  %>"}
 
-          <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote populates this --></a>
+          <a href="#" class="vote-btn" style="box-shadow:none; background-color:#fafafa;" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote populates this --></a>
           <h1>${'<%- title %>'}</h1>
           <p class="posted-details">
               ${"<% if (obj.username) { %>"}
@@ -129,7 +129,7 @@
 
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
     <header class="response-local">
-        <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote() populates this --></a>
+        <a href="#" class="vote-btn" style="box-shadow:none; background-color:#fafafa;" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote() populates this --></a>
         <a href="javascript:void(0)" class="endorse-btn action-endorse" style="cursor: default; display: none;" data-tooltip="${_('endorse') | h}"><span class="check-icon" style="pointer-events: none; "></span></a>
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>
@@ -210,9 +210,11 @@
         print(interpolate(fmt, data, true));
         """.format(
                 ## Translators: 'comments_count' and 'unread_comments_count' are numerical placeholders for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'comments'.
-                markup_with_unread=escapejs(_('%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s')),
+##                markup_with_unread=escapejs(_('%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s')),
+                markup_with_unread=escapejs(_('%(comments_count)s %(span_sr_open)s (%(unread_comments_count)s %(span_close)s')),
                 ## Translators: 'comments_count' is a numerical placeholder for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'comments'.
-                markup_none_unread=escapejs(_('%(comments_count)s %(span_sr_open)scomments %(span_close)s'))
+##                markup_none_unread=escapejs(_('%(comments_count)s %(span_sr_open)scomments %(span_close)s'))
+                markup_none_unread=escapejs(_('%(comments_count)s %(span_sr_open)s %(span_close)s'))
             )
         %>
         <span class="comments-count">
@@ -227,7 +229,8 @@
                 )
         """.format(
                 ## Translators: 'votes_up_count' is a numerical placeholder for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'votes'.
-                escapejs( _('%(votes_up_count)s%(span_sr_open)s votes %(span_close)s'))
+##                escapejs( _('%(votes_up_count)s%(span_sr_open)s votes %(span_close)s'))
+                escapejs( _('%(votes_up_count)s%(span_sr_open)s %(span_close)s'))
             )
         %>
         <span class="votes-count">+${'<%='}${js_block}${'%>'}</span>
@@ -235,15 +238,15 @@
 </script>
 <script aria-hidden="true" type="text/template" id="discussion-home">
   <div class="discussion-article blank-slate">
-    <section class="home-header">
-      <span class="label">${_("DISCUSSION HOME:")}</span>
+    <section class="home-header" style="border-bottom:none;">
+      <span class="label" style="background-color:#b9b9b9; color:#333;">${_("DISCUSSION HOME:")}</span>
       % if course and course.display_name_with_default:
-        <h1 class="home-title">${course.display_name_with_default}</h1>
+        <h2 class="home-title">${course.display_name_with_default}</h2>
       % endif
     </section>
   
       % if settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL'):
-        <span class="label label-settings">${_("HOW TO USE EDX DISCUSSIONS")}</span>
+        <span class="label label-settings" style="background-color:#b9b9b9; color:#333; margin-top:2rem;">${_("HOW TO USE EDX DISCUSSIONS")}</span>
         <table class="home-helpgrid">
           <tr class="helpgrid-row helpgrid-row-navigation">
             <td class="row-title">${_("Find discussions")}</td>
@@ -289,7 +292,21 @@
             </td>
           </tr>
         </table>
+
+<span class="label" style="background-color:#b9b9b9; color:#333; margin-top:2.5rem;">ディスカッションガイドライン</span>
+<ul style="font-size:0.8rem;">
+<li>礼儀正しく発言しましょう。gaccoは教室と同じです。相手の人格を思いやった発言は、議論を健全化します。</li>
+<li>多様な仲間へ配慮をしましょう。gaccoは、あなたと異なる性別、世代、国籍、価値観をもつ仲間が利用しています。特に人種や宗教、政治問題などについて議論をする際には、他の受講生の人格を思いやり、誹謗中傷などはやめましょう。</li>
+<li>わかりやすいタイトルをつけましょう。タイトルで、あなたの投稿の内容を端的に表現してください。仲間があなたの投稿を見つけやすくなり、議論が深まります。</li>
+<li>良い発言、役立つ発言に投票（【＋】）ボタンを押しましょう。</li>
+<li>具体的に書きましょう。理由を簡潔かつ明快に。</li>
+<li>スレッドの乱立を避けましょう。掲示板の検索機能を活用してください。</li>
+<li>用途にそったスレッドを利用しましょう。</li>
+</ul>
+
       % endif
 
   </div>
+
 </script>
+

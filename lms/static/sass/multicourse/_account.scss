@@ -106,7 +106,7 @@
     @include box-sizing(border-box);
     @include clearfix;
     margin: 0 auto;
-    width: 960px;
+//    width: 960px;
     background: $container-bg;
   }
 
@@ -198,12 +198,12 @@
 
   .content {
     margin-right: ($baseline*2);
-    width: 600px;
+//    width: 600px;
     float: left;
   }
 
   aside {
-    width: 280px;
+//    width: 280px;
     float: left;
 
     p, ol, ul {

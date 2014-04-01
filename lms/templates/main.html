@@ -6,6 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <%! from django.utils.translation import ugettext as _ %>
 <%! from microsite_configuration.middleware import MicrositeConfiguration %>
 <%! from microsite_configuration import page_title_breadcrumbs %>
@@ -51,6 +52,7 @@
 
   <link rel="icon" type="image/x-icon" href="${static.url(MicrositeConfiguration.get_microsite_configuration_value('favicon_path', settings.FAVICON_PATH))}" />
 
+  <%static:css group='style-gacco'/>
   <%static:css group='style-vendor'/>
   <%static:css group='style-app'/>
   <%static:css group='style-app-extend1'/>
@@ -103,15 +105,22 @@
 </head>
 
 <body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-  <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
+  <a class="nav-skip hide" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
+
+
+## Offcanvas START  --------------
+<div class="off-canvas-wrap">
+<div class="inner-wrap">
+## ------------------------------
 
   <%include file="mathjax_accessible.html" />
 
-% if not suppress_toplevel_navigation:
+ % if not suppress_toplevel_navigation:
   <%include file="${header_file}" />
-%endif
+ %endif
 
-  <div class="content-wrapper" id="content">
+  ##<div class="content-wrapper" id="content">
+  <div id="content">
     ${self.body()}
     <%block name="bodyextra"/>
   </div>
@@ -120,11 +129,26 @@
   <%include file="${footer_file}" />
 % endif
 
+
+## -----------------------------
+<a class="exit-off-canvas"></a>
+</div>
+</div>
+## Offcanvas END  --------------
+
+
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   <%static:js group='application'/>
   <%static:js group='module-js'/>
 
   <%block name="js_extra"/>
+
+<%static:js group='foundation'/>
+
+<script>
+  $(document).foundation();
+</script>
+
 </body>
 </html>
 

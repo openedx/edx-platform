@@ -9,9 +9,12 @@
 <%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default) | h}</%block>
 <%block name="nav_skip">#discussion-container</%block>
 
+
 <%block name="headextra">
-<%static:css group='style-course-vendor'/>
+##<%static:css group='style-vendor'/>
 <%static:css group='style-course'/>
+<%static:css group='style-app-extend1'/>
+<%static:css group='style-app-extend2'/>
 
 <%include file="_js_head_dependencies.html" />
 </%block>
@@ -23,15 +26,25 @@
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
-<%include file="_new_post.html" />
-
+<div class="row">
 <section class="discussion container" id="discussion-container" data-roles="${roles}" data-course-id="${course_id}" data-user-info="${user_info}" data-threads="${threads}" data-thread-pages="${thread_pages}" data-content-info="${annotated_content_info}" data-flag-moderator="${flag_moderator}">
     <div class="discussion-body">
-        <div class="sidebar"></div>
-        <div class="discussion-column">
-        </div>
+      <div class="row">
+	<div class="columns large-3 medium-4 small-9" style="margin-top:3rem; margin-bottom:0px;">
+          <div class="sidebar"></div>
+	</div>
+	<div class="columns medium-8 small-3 end hide-for-large-up" style="margin-top:1px;">
+	  <a href="#" class="new-post-btn f_button small expand radius success" data-reveal-id="discussion_new_post_modal" style="float:right;">${_("New Post")}</a>
+	</div>
+	<div class="columns medium-8 large-9">
+	  <div class="discussion-column">
+	  </div>
+	</div>
+      </div>
     </div>
 </section>
+</div>
 
+<%include file="_new_post.html" />
 <%include file="_underscore_templates.html" />
 <%include file="_thread_list_template.html" />

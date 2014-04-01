@@ -16,19 +16,32 @@ def url_class(is_active):
 <%! from django.utils.translation import ugettext as _ %>
 <% import waffle %>
 
-<nav class="${active_page} course-material">
-  <div class="inner-wrapper">
-    <ol class="course-tabs">
+
+<div style="background:#EEE; margin-bottom:2rem;">
+  <div class="row show-for-large-up" style="margin-top:1rem; padding-top:1.2rem;">
+    <div class="large-12 columns">
+      <ul class="f_button-group course-tabs" style="margin-left:1rem;">
+
+## |||||||||||||||||||||||||||||||
+
+##<nav class="${active_page} course-material">
+##  <div class="inner-wrapperi">
+##    <ul class="f_button-group course-tabs radius">
       % for tab in get_course_tabs(user, course, active_page, request):
         % if waffle.flag_is_active(request, 'visual_treatment') or waffle.flag_is_active(request, 'merge_course_tabs'):
           <li class="${"prominent" if tab.name in ("Courseware", "Course Content") else ""}">
         % else:
           <li>
         % endif
-             <a href="${tab.link | h}" class="${url_class(tab.is_active)}">
+             <a href="${tab.link | h}" class="f_button small ${url_class(tab.is_active)}">
                  ${_(tab.name) | h}
                  % if tab.is_active == True:
-                   <span class="sr">, current location</span>
+                   <span class="sr hide">, current location</span>
+		   <script>
+			$(document).ready(function(){ 
+				$("span.sr").parent("a").addClass("success");
+			});
+		   </script>
                  %endif
                  % if tab.has_img == True:
                    <img src="${tab.img}"/>
@@ -39,12 +52,78 @@ def url_class(is_active):
     <%block name="extratabs" />
         % if masquerade is not UNDEFINED:
           % if staff_access and masquerade is not None:
-          <li style="float:right"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
+	  <li style="float:right; margin-right:-4rem;"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
           % endif
         % endif
-    </ol>
+##    </ul>
+##  </div>
+##</nav>
+
+## |||||||||||||||||||||||||||||||
+      </ul>
+    </div>
   </div>
-</nav>
+</div>
+
+## BLACK to main navigation
+<script>
+$(document).ready(function(){  
+        $("#black_target_cnavi1").append($("#black_move_cnavi1")); 
+        $("#black_move_cnavi1").removeClass("hide");
+        $("#black_move_cnavi1").contents().unwrap();
+});
+$(document).ready(function(){  
+        $("#black_target_cnavi2").append($("#black_move_cnavi2")); 
+        $("#black_move_cnavi2").removeClass("hide");
+        $("#black_move_cnavi2").contents().unwrap();
+});
+</script>
+
+
+
+## for main navigation BLACK call
+<div id="black_move_cnavi1" class="hide">
+      % for tab in get_course_tabs(user, course, active_page, request):
+        % if waffle.flag_is_active(request, 'visual_treatment') or waffle.flag_is_active(request, 'merge_course_tabs'):
+          <li class="${"prominent" if tab.name in ("Courseware", "Course Content") else ""}">
+        % else:
+          <li>
+        % endif
+             <a href="${tab.link | h}" class="${url_class(tab.is_active)}" style="padding-left:2.5rem;">
+                 ${_(tab.name) | h}
+                 % if tab.is_active == True:
+                   <span class="sr hide">, current location</span>
+                 %endif
+##                 % if tab.has_img == True:
+##                   <img src="${tab.img}"/>
+##                 %endif
+             </a>
+          </li>
+      % endfor
+</div>
+<div id="black_move_cnavi2" class="hide">
+      % for tab in get_course_tabs(user, course, active_page, request):
+        % if waffle.flag_is_active(request, 'visual_treatment') or waffle.flag_is_active(request, 'merge_course_tabs'):
+          <li class="${"prominent" if tab.name in ("Courseware", "Course Content") else ""}">
+        % else:
+          <li>
+        % endif
+             <a href="${tab.link | h}" class="${url_class(tab.is_active)}">
+                 ${_(tab.name) | h}
+                 % if tab.is_active == True:
+                   <span class="sr hide">, current location</span>
+                 %endif
+##                 % if tab.has_img == True:
+##                   <img src="${tab.img}"/>
+##                 %endif
+             </a>
+          </li>
+      % endfor
+</div>
+
+
+
+
 
 % if masquerade is not UNDEFINED:
   % if staff_access and masquerade is not None:
@@ -76,3 +155,6 @@ masq = (function(){
 </script>
   % endif
 % endif
+
+
+

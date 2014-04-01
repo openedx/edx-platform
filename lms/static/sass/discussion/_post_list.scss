@@ -1,0 +1,204 @@
+.discussion-body{
+  .post-list-wrapper {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    border-right: 1px solid transparent;
+  }
+
+  .post-list {
+    list-style : none;
+    list-style-type : none;
+    margin-left : 0;
+
+    .loading {
+      padding: 15px 0;
+      background: #f6f6f6;
+
+      .loading-animation {
+        background-image: url(/static/images/spinner-on-grey.gif) no-repeat;
+      }
+    }
+
+    .more-pages a {
+      background: #eee;
+      font-size: 12px;
+      line-height: 32px;
+      text-align: center;
+
+      &:hover, &:focus {
+        background-image: none;
+        background-color: #e6e6e6;
+      }
+    }
+
+    .list-item{
+	line-height : 32px;
+    }
+
+    a {
+      display: block;
+      position: relative;
+      float: left;
+      clear: both;
+      width: 100%;
+      height: 32px;
+      line-height: 32px;
+      background-color: #fff;
+      margin: 0 -1px 1px 0;
+      padding : 0 0 0 10px;
+
+      &:hover, &:focus {
+        background-color: #eee;
+      }
+
+      &.staff-post.staff-response {
+        .staff-post-icon {
+          top: 5px;
+        }
+
+        .staff-response-icon {
+          top: 18px;
+        }
+      }
+
+      .staff-post-icon,
+      .staff-response-icon {
+        position: absolute;
+        top: 11px;
+        left: 3px;
+        width: 13px;
+        height: 13px;
+        background: url(/static/images/staff-icons.png) no-repeat;
+      }
+
+      .staff-post-icon {
+        left: 2px;
+        background-position: 0 0;
+      }
+
+      .staff-response-icon {
+        background-position: -13px 0;
+      }
+
+      .title {
+        display: block;
+        float: left;
+        width: 60%;
+        font-size: 13px;
+        font-weight: 700;
+        color: #333;
+      }
+
+      &.read {
+        background: #f2f2f2;
+
+        .title {
+          font-weight: 400;
+          color: #737373;
+        }
+      }
+
+      &.resolved:before {
+        content: '';
+        position: absolute;
+        top: 12px;
+        right: 75px;
+        width: 9px;
+        height: 8px;
+        background: url(/static/images/sidebar-resolved-icons.png) no-repeat;
+      }
+
+      &.followed:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 10px;
+        height: 12px;
+        background: url(/static/images/following-flag.png) no-repeat;
+      }
+
+      &.active {
+        border-color: #4697c1;
+        //box-shadow: 0 1px 0 #4697c1, 0 -1px 0 #4697c1;
+        box-shadow: 0 1px 0 #ccc, 0 -1px 0 #ccc;
+
+        .title {
+          color: #333;
+          font-weight: bold;
+        }
+
+        .staff-post-icon {
+          background-position: 0 -13px;
+        }
+
+        .staff-response-icon {
+          background-position: -13px -13px;
+        }
+
+        .votes-count,
+        .comments-count {
+	  background-color : #43ac6a;
+	  color: #fff;
+
+          &:after {
+            background-position: 0 0;
+          }
+        }
+
+        &.followed:after {
+          background-position: 0 -12px;
+        }
+
+        &.resolved:before {
+          background-position: 0 -8px;
+        }
+      }
+    }
+
+    .votes-count,
+    .comments-count {
+      display: block;
+      position:relative;
+      float: right;
+      width: 32px;
+      height: 16px;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 16px;
+      text-align: center;
+      color: #767676;
+      border-radius: 2px;
+      background-color : #d4d4d4;
+      top: 8px;
+      margin-right: 4px; 
+    }
+
+    .comments-count {
+      width: 25px;
+      margin-left: 4px;
+
+      &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 16px;
+        right: 3px;
+        width: 5px;
+        height: 5px;
+        background: url(/static/images/comment-icon-bottoms.png) no-repeat;
+        background-position: 0 -5px;
+      }
+
+      &.unread {
+        color: #333;
+
+        &:after {
+          color: #99e0fe;
+          background-position: 0 0px;
+        }
+      }
+    }
+  }
+
+}

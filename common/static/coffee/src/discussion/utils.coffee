@@ -191,6 +191,7 @@ class @DiscussionUtil
     @wmdEditors["#{cls_identifier}-#{id}"] = editor
     if placeholder?
       elem.find("#wmd-input#{appended_id}").attr('placeholder', placeholder)
+    elem.find("div[id^=wmd-button-bar]").addClass("hide-for-medium-down")
     editor
 
   @getWmdEditor: ($content, $local, cls_identifier) ->

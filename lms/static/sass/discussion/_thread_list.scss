@@ -1,0 +1,147 @@
+.discussion-body{
+  .browse-search {
+    border-bottom: 1px solid #a3a3a3;
+
+    .browse {
+      background-color: #008cba;
+      color: #fff;
+      text-shadow: none;
+      margin:0px;
+
+      .split.button {
+        width: 100%;
+	height: 60px;
+      }
+      .split.button span{
+	width: 2rem;
+      }
+      .button{
+	margin: 0;
+	padding : 0.5rem 2rem 0.5rem 0.5rem;
+      }
+      .button p{
+	position: relative;
+	top: 50%;   
+	color: #fff;
+	font-size: 14px;
+	line-height: 1.5rem;
+	margin-bottom: 0;
+
+	-webkit-transform: translateY(-50%);	   
+	-ms-transform: translateY(-50%);	   
+	transform: translateY(-50%);	   
+      }
+
+      &.is-dropped {
+        .browse-topic-drop-btn {
+          background-color: #616161;
+        }
+      }
+    }
+ 
+    .browse-topic-drop-btn {
+      width: 100%;
+      height: 100%;
+
+      span {
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+      }
+    }
+    .f-dropdown{
+      z-index: 10000;
+      max-width: none;
+      margin-top: 0px;
+    }
+
+    .browse-topic-drop-menu-wrapper {
+      z-index: 9999;
+      color: #333;
+      background: #f2f2f2;
+      border-left: none;
+      border-radius: 0 0 3px 3px;
+
+      .browse-topic-drop-menu {
+        max-height: 400px;
+        overflow-y: scroll;
+      }
+      dd .content {
+        margin: 0px;
+	padding: 0px;
+      }
+
+      dd a {
+        border-top: 1px solid #e5e5e5;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 22px;
+        color: #333;
+	padding: 0.3rem;
+
+        &.hidden {
+          display: none;
+        }
+
+        &:hover, &:focus {
+          background-color: #dfdfdf;
+        }
+      }
+      .drop-menu-parent-category.active{
+        background-color: #e3e3e3;
+      } 
+      .drop-menu-entry{
+        background-color: #f5f5f5;
+	padding-left: 2rem;
+      }
+    }
+
+    .browse-topic-drop-search-input {
+      width: 100%;
+      height: 30px;
+      padding: 0 15px;
+      //border-radius: 30px;
+      font-size: 11px;
+      line-height: 16px;
+      color: #333;
+    }
+  }
+  .search {
+      cursor: pointer;
+      border-radius: 0 3px 0 0;
+
+      .post-search .post-search-field {
+        cursor: text;
+        pointer-events: auto;
+	margin: 0px;
+	padding: 0 0 0 25px;
+        //border-radius: 30px;
+        background: url(/static/images/search-icon.png) no-repeat 7px center #fff;
+      	cursor: pointer;
+
+        &::-webkit-input-placeholder,
+        &:-moz-placeholder,
+        &:-ms-input-placeholder {
+          opacity: 1.0;
+        }
+      }
+  }
+  .sort-bar {
+    height: 30px;
+    border-bottom: 1px solid #a3a3a3;
+    dt{
+	color:#333;
+    }
+    dd a{
+       padding: 0.1875rem 0.5rem;
+    }	
+
+    span,
+    a {
+      font-size: 9px;
+      font-weight: bold;
+     }
+
+  }
+
+}

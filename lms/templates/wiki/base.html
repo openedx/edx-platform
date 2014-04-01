@@ -3,8 +3,11 @@
 
 {% block title %}<title>{% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}</title>{% endblock %}
 
+
+
 {% block headextra %}
   {% compressed_css 'course' %}
+
   
   <script type="text/javascript">
     function ajaxError(){}
@@ -54,7 +57,7 @@
   {% endif %}
 
   <section class="container wiki {{ selected_tab }}" id="wiki-content">
-    <div class="wiki-wrapper">
+    <div class="wiki-wrapper row">
       {% block wiki_body %}
         
         {% block wiki_breadcrumbs %}{% endblock %}

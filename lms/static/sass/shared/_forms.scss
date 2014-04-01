@@ -41,8 +41,8 @@ textarea {
   height: 60px;
 }
 
-input[type="submit"],
-input[type="button"],
+//input[type="submit"],
+//input[type="button"],
 button,.button {
   border-radius: 3px;
   @include button(shiny, $button-color);

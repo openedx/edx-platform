@@ -21,14 +21,16 @@
         </ul>
     </li>
 </%def>
-<article class="new-post-article">
-    <div class="inner-wrapper">
+
+<div id="discussion_new_post_modal" class="reveal-modal medium" data-reveal>
+  <article class="new-post-article">
         <form class="new-post-form">
-            <div class="left-column">
+	  <div class="row">
+            <div class="large-4 small-12 columns">
                 <span class="topic-dropdown-label" id="topic-dropdown-label">${_("Create new post about:")}</span>
                 <div class="form-topic-drop">
-                    <a href="#" aria-labelledby="topic-dropdown-label" class="topic_dropdown_button">${_("Show All Discussions")}<span class="drop-arrow" aria-hidden="true">▾</span></a>
-                    <div class="topic_menu_wrapper">
+                    <a href="#" aria-labelledby="topic-dropdown-label" class="f_button topic_dropdown_button">${_("Show All Discussions")}<span class="drop-arrow" aria-hidden="true">▾</span></a>
+                    <div class="topic_menu_wrapper panel">
                         <div class="topic_menu_search" role="menu">
                             <label class="sr" for="browse-topic-newpost">${_("Filter List")}</label>
                             <input type="text" id="browse-topic-newpost" class="form-topic-drop-search-input" placeholder="${_("Filter discussion areas")}">
@@ -38,7 +40,20 @@
                         </ul>
                     </div>
                 </div>
-                <div class="options">
+            </div>
+
+            <div class="large-8 small-12 columns">
+                <ul class="new-post-form-errors"></ul>
+                <div class="form-row">
+                    <label class="sr" for="new-post-title">${_("new post title")}</label>
+                    <input type="text" id="new-post-title" class="new-post-title" name="title" placeholder="${_("Title")}">
+                </div>
+                <div class="form-row">
+                    <div class="new-post-body" name="body" placeholder="${_(u"Enter your question or comment…")}"></div>
+                    <!---<div class="new-post-preview"><span class="new-post-preview-label">Preview</span></div>-->
+                </div>
+
+                <div class="options left">
                     <input type="checkbox" name="follow" class="discussion-follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">${_("follow this post")}</label>
                     <br>
                     % if course.allow_anonymous:
@@ -63,20 +78,11 @@
                     </div>
                     %endif
                 </div>
+		<div class="button-area">
+                  <a href="#" class="new-post-cancel right">${_("Cancel")}</a>
+                  <input type="submit" id="new-post-submit" class="f_button right" value="${_("Add post")}">
+		</div>
             </div>
-            <div class="right-column">
-                <ul class="new-post-form-errors"></ul>
-                <div class="form-row">
-                    <label class="sr" for="new-post-title">${_("new post title")}</label>
-                    <input type="text" id="new-post-title" class="new-post-title" name="title" placeholder="${_("Title")}">
-                </div>
-                <div class="form-row">
-                    <div class="new-post-body" name="body" placeholder="${_(u"Enter your question or comment…")}"></div>
-                    <!---<div class="new-post-preview"><span class="new-post-preview-label">Preview</span></div>-->
-                </div>
-                <input type="submit" id="new-post-submit" class="submit" value="${_("Add post")}">
-                <a href="#" class="new-post-cancel">${_("Cancel")}</a>
-            </div>
+	  </div>
         </form>
-    </div>
 </article>

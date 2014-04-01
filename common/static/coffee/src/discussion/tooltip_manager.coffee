@@ -18,12 +18,18 @@ class @TooltipManager
     @$body.append(@$tooltip)
 
     tooltipCoords =
-      x: e.pageX - (@$tooltip.outerWidth() / 2)
-      y: e.pageY - (@$tooltip.outerHeight() + 15)
+##      x: e.pageX - (@$tooltip.outerWidth() / 2)
+##      y: e.pageY - (@$tooltip.outerHeight() + 15)
+      x: $(e.target).offset().x
+      y: $(e.target).offset().y - 30
+
+    if tooltipCoords.x + @$tooltip.outerWidth() > $(window).width() 
+      tooltipCoords.x = $(window).width - @$tooltip.outerWidth()
 
     @$tooltip.css
     'left': tooltipCoords.x,
     'top': tooltipCoords.y
+    'width': "auto"
 
     @tooltipTimer = setTimeout ()=>
 
@@ -35,12 +41,17 @@ class @TooltipManager
 
   moveTooltip: (e) =>
     tooltipCoords =
-      x: e.pageX - (@$tooltip.outerWidth() / 2)
-      y: e.pageY - (@$tooltip.outerHeight() + 15)
+##      x: e.pageX - (@$tooltip.outerWidth() / 2)
+##      y: e.pageY - (@$tooltip.outerHeight() + 15)
+      x: $(e.target).offset().left
+      y: $(e.target).offset().top - 30
 
+    if tooltipCoords.x + @$tooltip.outerWidth() > $(window).width() 
+      tooltipCoords.x = $(window).width - @$tooltip.outerWidth()
     @$tooltip.css
       'left': tooltipCoords.x
       'top': tooltipCoords.y
+      'width': "auto"
 
   hideTooltip: (e) =>
     @$tooltip.hide().css('opacity', 0)

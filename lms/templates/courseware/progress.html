@@ -33,7 +33,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
 <%include file="/courseware/course_navigation.html" args="active_page='progress'" />
 
-<div class="container">
+<div class="container row">
   <div class="profile-wrapper">
 
     <div class="course-info" id="course-info-progress" aria-label="${_('Course Progress')}">
@@ -42,15 +42,18 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
       </header>
 
       %if not course.disable_progress_graph:
-        <div id="grade-detail-graph" aria-hidden="true"></div>
+        <div id="grade-detail-graph" aria-hidden="true" class="columns"></div>
       %endif
 
       <div class="chapters">
         %for chapter in courseware_summary:
         %if not chapter['display_name'] == "hidden":
         <section>
+          <div class="columns small-12 medium-3 large-3">
           <h2>${ chapter['display_name'] }</h2>
+          </div>
 
+          <div class="columns small-12 medium-9 large-9">
           <div class="sections">
             %for section in chapter['sections']:
             <div>
@@ -102,7 +105,8 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
             </div> <!--End section-->
             %endfor
-          </div> <!--End sections-->
+          </div>  <!--End sections  -->
+          </div> <!--End columns-->
         </section> <!--End chapter-->
         %endif
         %endfor

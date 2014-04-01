@@ -1,8 +1,8 @@
 <%! from django.utils.translation import ugettext as _ %>
 
-<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" >
+<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" style="margin-top:0.8rem;">
   <nav class="sequence-nav">
-    <ul class="sequence-nav-buttons">
+    <ul class="sequence-nav-buttons" style="list-style-type:none;">
       <li class="prev"><a role="button" href="#">${_('Previous')}</a></li>
     </ul>
 
@@ -46,8 +46,10 @@
   <div id="seq_content" role="tabpanel"></div>
 
   <nav class="sequence-bottom">
-    <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons">
+    <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons" style="list-style-type:none;">
       <li class="prev"><a role="button" href="#">${_("Previous")}</a></li>
+      <li class="show-for-medium center-menu" style="width:12rem; padding:0.6rem;"><a href="#" data-reveal-id="accordion_course_navigation_sp" role="button" style="color:#333333;">単元リスト</a></li>
+      <li class="show-for-small center-menu" style="width:8rem; padding:0.6rem;"><a href="#" data-reveal-id="accordion_course_navigation_sp" role="button" style="color:#333333;">単元リスト</a></li>
       <li class="next"><a role="button" href="#">${_("Next")}</a></li>
     </ul>
   </nav>

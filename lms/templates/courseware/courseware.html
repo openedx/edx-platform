@@ -16,8 +16,9 @@ ${page_title_breadcrumbs(course_name())}
 </title></%block>
 
 <%block name="headextra">
-<%static:css group='style-course-vendor'/>
+##<%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
+<%static:css group='style-gacco'/>
 
 <%block name="nav_skip">#course-content</%block>
 
@@ -188,29 +189,54 @@ ${fragment.foot_html()}
 
 % if accordion:
   <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
- <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
+  <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 % endif
 
-<div class="container">
-  <div class="course-wrapper">
+<div class="container" style="min-width:0;">
+  <div class="course-wrapper row">
 
 % if accordion:
-    <div class="course-index">
+    <div class="columns large-2 show-for-large-up course-index" style="margin-top:3rem;">
       <header id="open_close_accordion">
         <a href="#">${_("close")}</a>
       </header>
 
-      <div id="accordion" style="display: none">
+      <div id="accordion" class="row" style="display:none; background-color:#fafafa;">
         <nav aria-label="${_('Course Navigation')}">
           ${accordion}
         </nav>
       </div>
     </div>
+
+
+   ## Course NAvigation for SP/TAB
+   <div id="accordion_course_navigation_sp" class="hide-for-large-up reveal-modal" data-reveal>
+        <h2>単元リスト</h2>
+        ${accordion}
+      <a class="close-reveal-modal">&#215;</a>
+   </div>
+
+   ## BLACK Redesign for id="accordion_course_navigation_sp"
+   <script>
+   $(document).ready(function(){
+      var target = $('div#accordion_course_navigation_sp div.chapter');
+      target.wrap('<ul class="side-nav">').append('<hr>');
+      $('div#accordion_course_navigation_sp div.chapter h3.active').wrap('<li class="active circle">');
+      $('div#accordion_course_navigation_sp div.chapter h3 a').contents().unwrap();
+      var subtitle = $('div#accordion_course_navigation_sp div.chapter li.graded p.subtitle');
+      subtitle.contents().unwrap().wrap('<span class="f_label secondary">');
+      var chapter_p = $('div#accordion_course_navigation_sp div.chapter p');
+      chapter_p.contents().unwrap();
+   });
+   </script>
+
 % endif
 
+    <div class="columns large-10 medium-12 small-12" style="">
     <section class="course-content" id="course-content">
       ${fragment.body_html()}
     </section>
+    </div>
   </div>
 </div>
 
@@ -352,3 +378,7 @@ ${fragment.foot_html()}
         </div>
     </div>
 % endif
+
+
+
+

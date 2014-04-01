@@ -13,6 +13,9 @@
 <%include file="/courseware/course_navigation.html" args="active_page='open_ended'" />
 
 
+<div class="row">
+<div class="columns">
+
 <section class="container">
     <div class="combined-notifications" data-ajax_url="${ajax_url}">
         <div class="error-container">${error_text}</div>
@@ -27,25 +30,36 @@
             </div>
             %else:
             <div class="notification-container">
+            <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-3">
                 %for notification in notification_list:
                  % if notification['alert']:
-                    <div class="notification alert">
+                    <li><hr>
+##                    <div class="notification alert">
                 % else:
-                    <div class="notification">
+                    <li><hr>
+##                    <div class="notification">
                 % endif
                     <a href="${notification['url']}" class="notification-link">
-                        <div class="notification-title">${notification['name']}</div>
+                        <div class="notification-title f_label success" style="font-size:1rem; margin-bottom:0.5rem;">${notification['name']}</div>
                         %if notification['alert']:
-                        <p class="alert-message"><img src="/static/images/grading_notification.png" /> ${notification['alert_message']}</p>
+                        <p class="alert-message" style="color:#dd1144"><img src="/static/images/grading_notification.png" /> ${notification['alert_message']}</p>
                         %endif
                     <div class="notification-description">
-                        <p>${notification['description']}</p>
+                        <p style="color:#333;">${notification['description']}</p>
                     </div>
                     </a>
-                </div>
+##                </div>
+                  </li>
                 %endfor
+            </ul>
             </div>
             %endif
         %endif
     </div>
 </section>
+
+
+</div>
+</div>
+
+

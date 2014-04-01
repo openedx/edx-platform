@@ -69,7 +69,7 @@ div.video {
   article.video-wrapper {
     float: left;
     margin-right: flex-gutter(9);
-    width: flex-grid(6, 9);
+    width: flex-grid(7, 9);
     background-color: black;
     position: relative;
 
@@ -581,7 +581,7 @@ div.video {
     float: left;
     max-height: 460px;
     overflow: auto;
-    width: flex-grid(3, 9);
+    width: flex-grid(2, 9);
     margin: 0;
     font-size: 14px;
     list-style: none;
