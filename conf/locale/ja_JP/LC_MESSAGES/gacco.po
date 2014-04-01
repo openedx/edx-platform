@@ -151,3 +151,15 @@ msgstr ""
 "\n"
 "退会手続きが完了しました。<br />\n"
 "何か不明な点がございましたら、<a href=\"mailto:%(support_email)s?subject=退会手続き\">%(support_email)s</a> へご連絡ください。"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "The following errors occurred while processing your password reset: "
+msgstr "パスワード変更処理をする際にエラーが発生しました："
+
+# common/djangoapps/student/forms.py
+msgid "New password is required."
+msgstr "新パスワードは必須です。"
+
+# common/djangoapps/student/forms.py
+msgid "New password confirmation is required."
+msgstr "新パスワード(再入力)は必須です。"
