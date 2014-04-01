@@ -44,7 +44,8 @@ from student.models import (
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures
 )
-from student.forms import PasswordResetFormNoActive, ResignForm, SetResignReasonForm
+from student.forms import (PasswordResetFormNoActive, ResignForm, SetResignReasonForm,
+                           SetPasswordFormErrorMessages)
 from student.firebase_token_generator import create_token
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
@@ -1366,9 +1367,16 @@ def password_reset_confirm_wrapper(
         pass
     # we also want to pass settings.PLATFORM_NAME in as extra_context
 
-    extra_context = {"platform_name": settings.PLATFORM_NAME}
+    extra_context = {
+        'platform_name': settings.PLATFORM_NAME,
+        'mktg_url_faq': marketing_link('FAQ'),
+    }
     return password_reset_confirm(
-        request, uidb36=uidb36, token=token, extra_context=extra_context
+        request,
+        uidb36=uidb36,
+        token=token,
+        set_password_form=SetPasswordFormErrorMessages,
+        extra_context=extra_context,
     )
 
 

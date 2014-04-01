@@ -6,7 +6,7 @@ from pytz import UTC
 
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.utils.translation import ugettext_lazy as _
 from student.models import UserStanding
@@ -28,6 +28,23 @@ class PasswordResetFormNoActive(PasswordResetForm):
                for user in self.users_cache):
             raise forms.ValidationError(self.error_messages['unusable'])
         return email
+
+
+class SetPasswordFormErrorMessages(SetPasswordForm):
+    """
+    A form to enter new password.
+    The only change from django.contrib.auth.forms.SetResignReasonForm is error_messages.
+    """
+    new_password1 = forms.CharField(
+        label=_("New password"),
+        widget=forms.PasswordInput,
+        error_messages={'required': _('New password is required.')},
+    )
+    new_password2 = forms.CharField(
+        label=_("New password confirmation"),
+        widget=forms.PasswordInput,
+        error_messages={'required': _('New password confirmation is required.')},
+    )
 
 
 class ResignForm(PasswordResetFormNoActive):
