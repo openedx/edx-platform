@@ -13,6 +13,7 @@ from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
 from path import path
+from uuid import uuid4
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
@@ -38,6 +39,7 @@ etree.set_default_parser(edx_xml_parser)
 
 log = logging.getLogger(__name__)
 
+INVALID_STATIC_TAB_SLUGS = ['static']
 
 # VS[compat]
 # TODO (cpennington): Remove this once all fall 2012 courses have been imported
@@ -651,6 +653,9 @@ class XMLModuleStore(ModuleStoreReadBase):
                             data_content = {'data': html, 'location': loc, 'category': category}
 
                     if module is None:
+                        if category == 'static_tab' and slug in INVALID_STATIC_TAB_SLUGS:
+                            loc = loc.replace(name = uuid4().hex)
+
                         module = system.construct_xblock(
                             category,
                             # We're loading a descriptor, so student_id is meaningless
@@ -665,6 +670,10 @@ class XMLModuleStore(ModuleStoreReadBase):
                         if category == "static_tab":
                             tab = CourseTabList.get_tab_by_slug(tab_list=course_descriptor.tabs, url_slug=slug)
                             if tab:
+                                if slug in INVALID_STATIC_TAB_SLUGS:
+                                    # Modify url_slug according to location
+                                    setattr(tab, 'url_slug', loc.name)
+
                                 module.display_name = tab.name
                         module.data_dir = course_dir
                         module.save()

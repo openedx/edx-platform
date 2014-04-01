@@ -42,6 +42,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.tabs import CourseTabList
 
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 from xmodule.exceptions import NotFoundError
@@ -393,6 +394,38 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         expected_tabs.append({u'type': u'progress', u'name': u'Progress'})
         expected_tabs.append({u'type': u'static_tab', u'name': u'Updated', u'url_slug': u'My_Tab'})
 
+        self.assertEqual(course.tabs, expected_tabs)
+
+    def test_invalid_static_tab_on_import(self):
+        """
+        Test that on import, url_slug of static tabs changes to some unique hex string if that tab
+        has invalid url slug, e.g. 'static'
+        """
+        module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['2014_static_tabs'])
+
+        course_location = CourseDescriptor.id_to_location('Edx/StaticTabs/2014_static_tabs')
+        course = module_store.get_item(course_location)
+
+        self.assertIsNotNone(course)
+
+        # test that static tab is properly imported and its url_slug is not 'static'
+        static_tab = None
+        for tab in course.tabs:
+            if tab.type == u'static_tab' and tab.name == u'Sample Static Page':
+                static_tab = tab
+
+        self.assertIsNotNone(static_tab)
+        self.assertNotEqual(static_tab.url_slug, u'static')
+
+        expected_tabs = []
+        expected_tabs.append({u'type': u'courseware'})
+        expected_tabs.append({u'type': u'course_info', u'name': u'Course Info'})
+        expected_tabs.append({u'type': u'textbooks'})
+        expected_tabs.append({u'type': u'discussion', u'name': u'Discussion'})
+        expected_tabs.append({u'type': u'wiki', u'name': u'Wiki'})
+        expected_tabs.append({u'type': u'progress', u'name': u'Progress'})
+        expected_tabs.append({u'type': u'static_tab', u'name': u'Sample Static Page', u"url_slug": static_tab.url_slug})
         self.assertEqual(course.tabs, expected_tabs)
 
     def test_static_tab_reordering(self):
