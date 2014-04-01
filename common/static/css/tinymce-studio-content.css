@@ -1,10 +1,9 @@
-@import url(//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700);
-
+/* NOTE: This file, which customizes mid-editing styling to match xmodule preview rendering, is 3 of 3 CSS files compiled in our production pipeline  */
 .mce-content-body {
     padding: 10px;
     background-color: #fff;
     font-family: 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.6;
     color: #3c3c3c;
     scrollbar-3dlight-color: #F0F0EE;
@@ -28,7 +27,7 @@
 
 .mce-content-body h2 {
     color: #646464;
-    font-weight: normal;
+    font-weight: 300;
     font-size: 1.2em;
     line-height: 1.2em;
     letter-spacing: 1px;

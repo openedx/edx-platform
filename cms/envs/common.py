@@ -316,6 +316,7 @@ PIPELINE_CSS = {
     },
     'style-vendor-tinymce-content': {
         'source_filenames': [
+            'css/tinymce-studio-content-fonts.css',
             'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
             'css/tinymce-studio-content.css'
         ],
