@@ -18,6 +18,7 @@ import logging
 from pytz import UTC
 import uuid
 from collections import defaultdict
+from dogapi import dog_stats_api
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -35,6 +36,8 @@ from track import contexts
 from track.views import server_track
 from eventtracking import tracker
 from importlib import import_module
+
+from xmodule.modulestore import Location
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -496,11 +499,30 @@ class CourseEnrollment(models.Model):
         if activation_changed or mode_changed:
             self.save()
         if activation_changed:
+            course_id_dict = Location.parse_course_id(self.course_id)
             if self.is_active:
                 self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
+
+                dog_stats_api.increment(
+                    "common.student.enrollment",
+                    tags=[u"org:{org}".format(**course_id_dict),
+                          u"course:{course}".format(**course_id_dict),
+                          u"run:{name}".format(**course_id_dict),
+                          u"mode:{}".format(self.mode)]
+                )
+
             else:
                 unenroll_done.send(sender=None, course_enrollment=self)
+
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
+
+                dog_stats_api.increment(
+                    "common.student.unenrollment",
+                    tags=[u"org:{org}".format(**course_id_dict),
+                          u"course:{course}".format(**course_id_dict),
+                          u"run:{name}".format(**course_id_dict),
+                          u"mode:{}".format(self.mode)]
+                )
 
     def emit_event(self, event_name):
         """
