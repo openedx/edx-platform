@@ -101,10 +101,10 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
         username = 'u2'
         for rolename in FORUM_ROLES:
             response = self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
-            self.assertTrue(response.content.find('Added "{0}" to "{1}" forum role = "{2}"'.format(username, course.id, rolename)) >= 0)
+            self.assertContains(response, 'Added "{0}" to "{1}" forum role = "{2}"'.format(username, course.id, rolename))
             self.assertTrue(has_forum_access(username, course.id, rolename))
             response = self.client.post(url, {'action': action_name('Remove', rolename), FORUM_ADMIN_USER[rolename]: username})
-            self.assertTrue(response.content.find('Removed "{0}" from "{1}" forum role = "{2}"'.format(username, course.id, rolename)) >= 0)
+            self.assertContains(response, 'Removed "{0}" from "{1}" forum role = "{2}"'.format(username, course.id, rolename))
             self.assertFalse(has_forum_access(username, course.id, rolename))
 
     def test_add_and_read_forum_admin_users(self):

@@ -17,6 +17,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from mock import patch
+from xmodule.modulestore.keys import UsageKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

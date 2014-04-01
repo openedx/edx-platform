@@ -910,10 +910,13 @@ def instructor_dashboard(request, course_id):
         html_module = HtmlDescriptor(
             course.system,
             DictFieldData({'data': html_message}),
-            ScopeIds(None, None, None, 'i4x://dummy_org/dummy_course/html/dummy_name')
+            ScopeIds(None, None, None, course_key.make_usage_key('html', 'dummy'))
         )
         fragment = html_module.render('studio_view')
-        fragment = wrap_xblock('LmsRuntime', html_module, 'studio_view', fragment, None, extra_data={"course-id": course_key})
+        fragment = wrap_xblock(
+            'LmsRuntime', html_module, 'studio_view', fragment, None,
+            extra_data={"course-id": course_key.to_deprecated_string()}
+        )
         email_editor = fragment.content
 
     # Enable instructor email only if the following conditions are met:

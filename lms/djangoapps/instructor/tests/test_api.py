@@ -1612,10 +1612,10 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(response.status_code, 200)
 
         # check request url
-        expected_url = "{url}get?aname={aname}&course_id={course_id}&apikey={api_key}".format(
+        expected_url = "{url}get?aname={aname}&course_id={course_id!s}&apikey={api_key}".format(
             url="http://robotanalyticsserver.netbot:900/",
             aname="ProblemGradeDistribution",
-            course_id=self.course.id,
+            course_id=self.course.id.to_deprecated_string(),
             api_key="robot_api_key",
         )
         act.assert_called_once_with(expected_url)

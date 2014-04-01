@@ -23,7 +23,7 @@ from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.keys import OpaqueKeyReader
+from xmodule.modulestore.keys import OpaqueKeyReader, UsageKey
 from xmodule.exceptions import UndefinedContext
 
 
@@ -165,6 +165,7 @@ class XModuleMixin(XBlockMixin):
 
     @location.setter
     def location(self, value):
+        assert isinstance(value, UsageKey)
         self.scope_ids = self.scope_ids._replace(
             def_id=value,
             usage_id=value,
