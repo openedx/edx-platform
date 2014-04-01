@@ -296,11 +296,11 @@ Entries are sorted by the value in each column, starting with the ModuleID on th
 
 Please note the following about the student answer distribution report:   
 
-* This report includes only problems that at least one student has answered since early March 2014. For those problems, this report only includes activity that occurred after October 2013. 
+* This report includes only problems that at least one student has answered since 6 March 2014. For those problems, this report only includes activity that occurred after October 2013. 
 
-* For checkboxes and multiple choice problems, the answer choices actually selected by a student after early March 2014 display as described above. Answer choices selected by at least one student after October 2013, but not selected since early March 2014, are included on the report but do not include an **AnswerValue**. The **ValueID** does display the internal identifiers, such as choice_1 and choice_2, for those answers. 
+* For checkboxes and multiple choice problems, the answer choices actually selected by a student after 6 March 2014 display as described above. Answer choices selected by at least one student after October 2013, but not selected since 6 March 2014, are included on the report but do not include an **AnswerValue**. The **ValueID** does display the internal identifiers, such as choice_1 and choice_2, for those answers. 
 
-* For problems that use the **Randomization** setting in Studio, if a particular answer has not been selected since early March 2014, the **Question** is blank for that answer.
+* For problems that use the **Randomization** setting in Studio, if a particular answer has not been selected since 6 March 2014, the **Question** is blank for that answer.
 
 * Problem **Count** values reflect the entire problem history. If you change a problem after it is released, it may not be possible for you to determine which answers were given before and after you made the change.
 

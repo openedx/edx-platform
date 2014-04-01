@@ -4,13 +4,18 @@
 Course Data
 ############################
 
-After you create a course, you can access information about it from the Instructor Dashboard. You can find:
+After you create a course, you can access information about it from the
+Instructor Dashboard. You can find:
 
 * Identifying information for the course.
 
 * Whether the course has started or ended.
 
 * The defined grade cutoff for passing or failing.
+
+*************************************************
+Review Course Data
+*************************************************
 
 To view course data:
 
@@ -20,7 +25,54 @@ To view course data:
 
 #. Click **Course Info** if necessary. 
 
-   The Basic Course Information section of the page that opens lists information for the course.
+   The **Basic Course Information** section of the page that opens lists
+   information about the course.
 
-.. You also use the Instructor Dashboard to set up the staff for your course, enroll students and access student data, and initiate, review, and adjust grades.
+    .. image:: ../Images/Instructor_Dash_Course_Info.png
+     :alt: The basic course information section of the Instructor Dashboard 
+
+*************************************************
+Sources in Studio of the Basic Course Information
+*************************************************
+
+The course data that displays on the Instructor Dashboard is defined in
+Studio, or derived from data that you define in Studio.
+
+* **Organization**: Specified in Studio when you create the course. Becomes
+  part of the course URL, and cannot be changed.
+
+* **Course Number**: Specified in Studio when you create the course. Becomes
+  part of the course URL, and cannot be changed.
+
+* **Course Name**: Specified in Studio when you create the course. Becomes
+  part of the course URL, and cannot be changed. In Studio, this field is
+  labeled **Course Run**.
+
+* **Course Display Name**: Specified in Studio when you create the course. In
+  Studio, this field is labeled **Course Name**. 
+
+  This name can be changed in Studio (not recommended if your course is live):
+  select **Settings** > **Advanced Settings** and scroll down to the policy key
+  labeled **display_name**. This setting changes the **Course Display Name** in the LMS only. 
+
+  The illustration that follows shows the information collected by Studio for
+  a new course side-by-side with the same information in the **Basic Course
+  Information** section of the Instructor Dashboard.
+
+.. image:: ../Images/Course_Info_Comparison.png
+   :alt: The Course Name in Studio and the Course Display Name in the LMS are boxed; the Course Run in Studio and the Course Name in the LMS are circled
+   :width: 800
+
+* **Has the course started**: Derived from the **Course Start Date** and the
+  current date. This date can be changed in Studio (not recommended if your
+  course is live): select **Settings** > **Schedule & Details**.
+
+* **Has the course ended**: Derived from the **Course End Date** and the
+  current date. This date can be changed in Studio (not recommended if your
+  course is live): select **Settings** > **Schedule & Details**.
+
+* **Grade Cutoffs**: Specified in Studio when you define the cutoff for a
+  failing grade. Students who earn exactly the cutoff value pass the course.
+  Grading can be changed in Studio (not recommended if your course is live):
+  select **Settings** > **Grading**.
 
