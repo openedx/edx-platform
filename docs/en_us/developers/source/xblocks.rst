@@ -21,7 +21,7 @@ These are properties and methods available on ``self.runtime`` when a view or ha
   that the block is being executed in. The same student in two different courses
   will have two different ids.
 
-* publish(event): Emit events to the surrounding system. Events are dictionaries that can contain arbitrary data.
+* publish(block, event_type, event): Emit events to the surrounding system. Events are dictionaries that can contain arbitrary data.
   XBlocks can publish events by calling ``self.runtime.publish(self, event_type, event)``. The ``event_type`` parameter
   enables downstream processing of the event since it uniquely identifies the schema. This call will cause the runtime
   to save the event data in the application event stream. XBlocks should publish events whenever a significant state
