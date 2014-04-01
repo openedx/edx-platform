@@ -74,9 +74,10 @@ class UserStandingTest(TestCase):
             UserStanding.ACCOUNT_DISABLED
         )
 
-    def test_disabled_account_403s(self):
+    def test_disabled_account_redirect_to_disabled_account_page(self):
         response = self.bad_user_client.get(self.some_url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("Disabled Account" in response.content)
 
     def test_reenable_account(self):
         try:

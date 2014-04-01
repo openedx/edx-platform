@@ -5,7 +5,9 @@ disabled accounts from accessing the site.
 from django.http import HttpResponseForbidden
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from edxmako.shortcuts import render_to_response
 from student.models import UserStanding
+import student.views
 
 class UserStandingMiddleware(object):
     """
@@ -34,4 +36,7 @@ class UserStandingMiddleware(object):
                             ),
                             link_end=u'</a>'
                         )
-                return HttpResponseForbidden(msg)
+                # logout
+                student.views.logout_user(request)
+                context = {'message': msg}
+                return render_to_response('disabled_account.html', context)
