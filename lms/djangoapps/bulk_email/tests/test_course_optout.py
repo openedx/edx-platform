@@ -70,7 +70,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         url = reverse('change_email_settings')
         # This is a checkbox, so on the post of opting out (that is, an Un-check of the box),
         # the Post that is sent will not contain 'receive_emails'
-        response = self.client.post(url, {'course_id': self.course.id})
+        response = self.client.post(url, {'course_id': self.course.id.to_deprecated_string()})
         self.assertEquals(json.loads(response.content), {'success': True})
 
         self.client.logout()
@@ -78,7 +78,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password="test")
         self.navigate_to_email_view()
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         test_email = {
             'action': 'Send email',
             'to_option': 'all',
@@ -97,7 +97,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         Make sure student receives course email after opting in.
         """
         url = reverse('change_email_settings')
-        response = self.client.post(url, {'course_id': self.course.id, 'receive_emails': 'on'})
+        response = self.client.post(url, {'course_id': self.course.id.to_deprecated_string(), 'receive_emails': 'on'})
         self.assertEquals(json.loads(response.content), {'success': True})
 
         self.client.logout()
@@ -107,7 +107,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password="test")
         self.navigate_to_email_view()
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         test_email = {
             'action': 'Send email',
             'to_option': 'all',

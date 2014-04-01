@@ -552,7 +552,7 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
     # Generate parts of the file name
     timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
-    course_id_prefix = urllib.quote(course_id.replace("/", "_"))
+    course_id_prefix = urllib.quote(course_id.to_deprecated_string().replace("/", "_"))
 
     # Perform the actual upload
     report_store = ReportStore.from_config()

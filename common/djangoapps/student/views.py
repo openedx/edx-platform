@@ -606,7 +606,7 @@ def change_enrollment(request):
         available_modes = CourseMode.modes_for_course(course_id)
         if len(available_modes) > 1:
             return HttpResponse(
-                reverse("course_modes_choose", kwargs={'course_id': course_id})
+                reverse("course_modes_choose", kwargs={'course_id': course_id.to_deprecated_string()})
             )
 
         current_mode = available_modes[0]
@@ -1278,7 +1278,7 @@ def auto_auth(request):
     email = request.GET.get('email', unique_name + "@example.com")
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
-    course_id = request.GET.get('course_id', None)
+    course_id = CourseKey.from_string(request.GET.get('course_id', None))
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object
@@ -1706,15 +1706,16 @@ def change_email_settings(request):
     user = request.user
 
     course_id = request.POST.get("course_id")
+    course_key = CourseKey.from_string(course_id)
     receive_emails = request.POST.get("receive_emails")
     if receive_emails:
-        optout_object = Optout.objects.filter(user=user, course_id=course_id)
+        optout_object = Optout.objects.filter(user=user, course_id=course_key)
         if optout_object:
             optout_object.delete()
         log.info(u"User {0} ({1}) opted in to receive emails from course {2}".format(user.username, user.email, course_id))
         track.views.server_track(request, "change-email-settings", {"receive_emails": "yes", "course": course_id}, page='dashboard')
     else:
-        Optout.objects.get_or_create(user=user, course_id=course_id)
+        Optout.objects.get_or_create(user=user, course_id=course_key)
         log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(user.username, user.email, course_id))
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
@@ -1730,7 +1731,7 @@ def token(request):
     the token was issued. This will be stored with the user along with
     the id for identification purposes in the backend.
     '''
-    course_id = request.GET.get("course_id")
+    course_id = CourseKey.from_string(request.GET.get("course_id"))
     course = course_from_id(course_id)
     dtnow = datetime.datetime.now()
     dtutcnow = datetime.datetime.utcnow()
