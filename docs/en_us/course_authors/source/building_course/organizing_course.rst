@@ -12,10 +12,10 @@ How a Course is Organized
 
 You organize your course in the following hierarchy:
 
-- :ref:`Sections`, which contain
-    - :ref:`subsections`, which contain
-        - :ref:`units`, which contain
-            - :ref:`components`, which contain your actual course content.
+* :ref:`Sections`, which contain
+* :ref:`subsections`, which contain
+* :ref:`units`, which contain
+* :ref:`components`, which contain your actual course content.
 
 
 Studio provides you with flexibility when organizing your course. A common course model is for sections to correspond to weeks or chapters, and for subsections to correspond to lessons.
