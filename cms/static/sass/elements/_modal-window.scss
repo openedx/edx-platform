@@ -3,7 +3,7 @@
 
 // start with the view/body
 [class*="view-"] {
-  overflow: auto;
+  overflow: initial;
 
   // modal-window backdrop covers the window
   .wrapper-modal-window {
