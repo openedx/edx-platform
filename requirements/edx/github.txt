@@ -29,4 +29,4 @@
 -e git+https://github.com/edx/edx-ora2.git@87fd72f9927cd37e553d7f68cfaf80d6c574eb55#egg=edx-ora2
 
 # Prototype XBlocks for limited roll-outs and user testing. These are not for general use. 
--e git+https://github.com/pmitros/ConceptXBlock.git@2376fde9ebdd83684b78dde77ef96361c3bd1aa0#egg=concept-xblock
+-e git+https://github.com/pmitros/ConceptXBlock.git@release#egg=concept-xblock
