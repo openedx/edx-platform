@@ -230,7 +230,7 @@ def save_changes(_step):
 def open_tab(_step, tab_name):
     editor_tabs = world.browser.find_by_css('.editor-tabs a')
     expected_tab_text = tab_name.strip().upper()
-    matching_tabs = [tab for tab in editor_tabs if tab.text == expected_tab_text]
+    matching_tabs = [tab for tab in editor_tabs if tab.text.upper() == expected_tab_text]
     assert len(matching_tabs) == 1
     tab = matching_tabs[0]
     tab.click()
