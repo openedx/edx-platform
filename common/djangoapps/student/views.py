@@ -1378,23 +1378,12 @@ def resign(request):
     if request.method != "POST":
         raise Http404
 
-    # Add some rate limiting here by re-using the RateLimitMixin as a helper class
-    limiter = BadRequestRateLimiter()
-    if limiter.is_rate_limit_exceeded(request):
-        AUDIT_LOG.warning("Rate limit exceeded in resign")
-        return HttpResponseForbidden()
-
     form = ResignForm(request.POST)
     if form.is_valid():
         form.save(use_https=request.is_secure(),
                   from_email=settings.DEFAULT_FROM_EMAIL,
                   request=request,
                   domain_override=request.get_host())
-    else:
-        # bad user? tick the rate limiter counter
-        AUDIT_LOG.info("Bad resign user passed in.")
-        limiter.tick_bad_request_counter(request)
-
     return JsonResponse({"success": True})
 
 

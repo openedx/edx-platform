@@ -182,22 +182,6 @@ class ResignTests(TestCase):
             'success': True,
         })
 
-    def test_resign_ratelimited(self):
-        """ Try (and fail) resigning 30 times in a row on an non-existant email address """
-        cache.clear()
-
-        for i in xrange(30):
-            good_req = self.request_factory.post('/resign/', {'email': 'thisdoesnotexist@foo.com'})
-            good_resp = resign(good_req)
-            self.assertEquals(good_resp.status_code, 200)
-
-        # then the rate limiter should kick in and give a HttpForbidden response
-        bad_req = self.request_factory.post('/resign/', {'email': 'thisdoesnotexist@foo.com'})
-        bad_resp = resign(bad_req)
-        self.assertEquals(bad_resp.status_code, 403)
-
-        cache.clear()
-
     @unittest.skipIf(
         settings.FEATURES.get('DISABLE_RESIGN_EMAIL_TEST', False),
         dedent("""
