@@ -83,6 +83,10 @@
              });
     });
 
+    $('#resign_button').click(function() {
+      $.post('${reverse("resign")}', {"email": $('#id_email').val()});
+    });
+
     $("#submit-lang").click(function(event, xhr) {
         event.preventDefault();
         $.post('/lang_pref/setlang/',
@@ -157,6 +161,8 @@
 
     accessible_modal("#pwd_reset_button", "#password_reset_complete .close-modal", "#password_reset_complete", "#dashboard-main");
 
+    accessible_modal("#resign_button", "#resign_complete .close-modal", "#resign_complete", "#dashboard-main");
+
 
     $(".email-settings").each(function(index){
       $(this).attr("id", "unenroll-" + index);
@@ -216,6 +222,12 @@
           <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
             <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
             <!-- <input type="submit" id="pwd_reset_button" value="${_('Reset Password')}" /> -->
+          </form>
+        </li>
+        <li class="controls--account">
+          <span class="title"><div class="icon"></div><a href="#resign_complete" rel="leanModal" id="resign_button">${_("Resign")}</a></span>
+          <form id="resign_form" method="post" data-remote="true" action="${reverse('resign')}">
+            <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
           </form>
         </li>
         % endif
@@ -332,6 +344,35 @@
       <form> <!-- Here for styling reasons -->
         <section>
           <p>${_('An email has been sent to {email}. Follow the link in the email to change your password.').format(email=user.email)}</p>
+        </section>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="resign_complete" class="modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="resign-email">
+    <button class="close-modal">&#10005;
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close Modal')}
+      </span>
+    </button>
+
+    <header>
+      <h2 id="resign-email">
+        ${_('Resign Email Sent')}
+        <span class="sr">,
+          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+          ${_("modal open")}
+        </span>
+      </h2>
+      <hr/>
+    </header>
+    <div>
+      <form> <!-- Here for styling reasons -->
+        <section>
+          <p>${_('An email has been sent to {email}. Follow the link in the email to resign.').format(email=user.email)}</p>
         </section>
       </form>
     </div>

@@ -1,0 +1,157 @@
+{% load i18n %}
+{% load compressed %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="{{LANGUAGE_CODE}}">
+<head>
+
+<title>
+  {% blocktrans with platform_name=platform_name %}
+      Resignation from {{ platform_name }}
+  {% endblocktrans %}
+</title>
+
+  {% compressed_css 'style-vendor' %}
+  {% compressed_css 'style-app' %}
+  {% compressed_css 'style-app-extend1' %}
+  {% compressed_css 'style-app-extend2' %}
+
+  {% block main_vendor_js %}
+  {% compressed_js 'main_vendor' %}
+  {% endblock %}
+
+  <!--[if lt IE 9]>
+  <script src="{% static 'js/html5shiv.js' %}"></script>
+  <![endif]-->
+
+  <script type="text/javascript">
+    $(function() {
+
+      // adding js class for styling with accessibility in mind
+      $('body').addClass('js');
+
+      // new window/tab opening
+      $('a[rel="external"], a[class="new-vp"]')
+      .click( function() {
+      window.open( $(this).attr('href') );
+      return false;
+      });
+
+      // form field label styling on focus
+      $("form :input").focus(function() {
+        $("label[for='" + this.id + "']").parent().addClass("is-focused");
+      }).blur(function() {
+        $("label").parent().removeClass("is-focused");
+      });
+    });
+  </script>
+
+</head>
+
+<body class="view-resign">
+
+<header class="global">
+  <nav>
+    <h1 class="logo">
+      <a href="{{MKTG_URL_ROOT}}"><img src="{% static 'images/header-logo.png' %}"></a>
+    </h1>
+  </nav>
+</header>
+
+<section class="content-wrapper">
+  <section class="resign container">
+    <section class="introduction">
+      <header>
+        <h1>
+          {% blocktrans with platform_name=platform_name %}
+          Resignation from {{ platform_name }}
+          {% endblocktrans %}
+        </h1>
+      </header>
+    </section>
+
+    <section role="main" class="content">
+      {% if validlink %}
+      <header>
+      <h2 class="sr">{% trans "Resign Form" %}</h2>
+      </header>
+
+      <form role="form" id="resign-form" method="post" data-remote="true" action="">{% csrf_token %}
+        <!-- status messages -->
+        <div role="alert" class="status message">
+          <h3 class="message-title">
+            {% blocktrans with platform_name=platform_name %}
+                We're sorry, {{ platform_name }} enrollment is not available in your region
+            {% endblocktrans %}
+          </h3>
+        </div>
+
+        <div role="alert" class="status message {% if form.errors %}is-shown{% endif %} submission-error">
+          <h3 class="message-title">{% trans "The following errors occurred while processing your resignation:" %}</h3>
+          <ul class="message-copy">
+            {% for field in form %}
+            {% if field.errors %}{{ field.errors|striptags }}{% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div role="alert" class="status message system-error">
+          <h3 class="message-title">{% trans "We're sorry, our systems seem to be having trouble processing your resignation" %}</h3>
+          <p class="message-copy">
+            {% blocktrans with start_link='<a href="{{MKTG_URL_CONTACT}}">' end_link='</a>' %}
+                Someone has been made aware of this issue. Please try again shortly. Please {{ start_link }}contact us{{ end_link }} about any concerns you have.
+            {% endblocktrans %}
+          </p>
+        </div>
+
+        <p class="instructions">
+        {% trans 'To resign, enter your reason for resignation and click the resign button. <br />Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>. <br />If you do not wish to resign, click the cancel button.' %}
+        </p>
+
+        <fieldset class="group group-form group-form-requiredinformation">
+          <legend class="sr">{% trans "Required Information" %}</legend>
+
+          <ol class="list-input">
+            <li class="field required" id="field-resign_reason">
+              <label for="id_resign_reason">{% trans "Resign Reason" %}</label>
+              {{ form.resign_reason }}
+            </li>
+          </ol>
+        </fieldset>
+
+        <div class="form-actions">
+          <button name="submit" type="submit" id="submit" class="action-primary">{% trans "Resign Now" %}</button>
+          <a href="{{MKTG_URL_ROOT}}" class="action-secondary action-cancel">{% trans "Cancel" %}</a>
+        </div>
+      </form>
+
+      {% else %}
+
+      <header>
+        <h2 class="sr">{% trans "Your Resignation Was Unsuccessful" %}</h2>
+      </header>
+      <p>
+        {% blocktrans with start_link='<a href="/login">' end_link='</a>' %}
+            The resignation link was invalid, possibly because the link has already been used.  Please return to the {{ start_link }}login page{{ end_link }} and start the resignation process again.
+        {% endblocktrans %}
+      </p>
+
+      {% endif %}
+    </section>
+
+    <aside role="complementary">
+      <header>
+      <h3 class="sr">{% trans "Resign Help" %}</h3>
+      </header>
+
+      <div class="cta cta-help">
+        <h3>{% trans "Need Help?" %}</h3>
+        <p>
+          {% blocktrans with mktg_url_faq=mktg_url_faq %}
+              View our <a href="{{ mktg_url_faq }}">help section for contact information and answers to commonly asked questions</a>
+          {% endblocktrans %}
+        </p>
+      </div>
+    </aside>
+  </section>
+</section>
