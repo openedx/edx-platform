@@ -17,7 +17,7 @@
     scrollbar-track-color: #F5F5F5;
 }
 
-h1 {
+.mce-content-body h1 {
     color: #3c3c3c;
     font-weight: normal;
     font-size: 2em;
@@ -26,7 +26,7 @@ h1 {
     margin: 0 0 1.416em 0;
 }
 
-h2 {
+.mce-content-body h2 {
     color: #646464;
     font-weight: normal;
     font-size: 1.2em;
@@ -37,74 +37,74 @@ h2 {
     -webkit-font-smoothing: antialiased;
 }
 
-h3, h4, h5, h6 {
+.mce-content-body h3, .mce-content-body h4, .mce-content-body h5, .mce-content-body h6 {
     margin: 0 0 10px 0;
     font-weight: 600;
 }
 
-h3 {
+.mce-content-body h3 {
     font-size: 1.2em;
 }
 
-h4 {
+.mce-content-body h4 {
     font-size: 1em;
 }
 
-h5 {
+.mce-content-body h5 {
     font-size: .83em;
 }
 
-h6 {
+.mce-content-body h6 {
     font-size: 0.75em;
 }
 
-p {
+.mce-content-body p {
     margin-bottom: 1.416em;
     font-size: 1em;
     line-height: 1.6em !important;
     color: #3c3c3c;
 }
 
-em, i {
+.mce-content-body em, .mce-content-body i {
     font-style: italic;
 }
 
-strong, b {
+.mce-content-body strong, .mce-content-body b {
     font-style: bold;
 }
 
-p + p, ul + p, ol + p {
+.mce-content-body p + p, .mce-content-body ul + p, .mce-content-body ol + p {
     margin-top: 20px;
 }
 
-ol, ul {
+.mce-content-body ol, .mce-content-body ul {
     margin: 1em 0;
     padding: 0 0 0 1em;
     color: #3c3c3c;
 
 }
 
-ol li, ul li {
+.mce-content-body ol li, .mce-content-body ul li {
     margin-bottom: 0.708em;
 }
 
-ol {
+.mce-content-body ol {
     list-style: decimal outside none;
 }
 
-ul {
+.mce-content-body ul {
     list-style: disc outside none;
 }
 
-a, a:link, a:visited, a:hover, a:active {
+.mce-content-body a, .mce-content-body a:link, .mce-content-body a:visited, .mce-content-body a:hover, .mce-content-body a:active {
     color: #1d9dd9;
 }
 
-img {
+.mce-content-body img {
     max-width: 100%;
 }
 
-pre {
+.mce-content-body pre {
   margin: 1em 0;
   color: #3c3c3c;
   font-family: monospace, serif;
@@ -113,25 +113,25 @@ pre {
   word-wrap: break-word;
 }
 
-code {
+.mce-content-body code {
     font-family: monospace, serif;
     background: none;
     color: #3c3c3c;
     padding: 0;
 }
 
-table {
+.mce-content-body table {
     width: 100%;
     border-collapse: collapse;
     font-size: 16px;
 }
 
-th {
+.mce-content-body th {
     background: #eee;
     font-weight: bold;
 }
 
-table td, th {
+.mce-content-body table td, .mce-content-body th {
     margin: 20px 0;
     padding: 10px;
     border: 1px solid #ccc !important;
@@ -139,14 +139,14 @@ table td, th {
     font-size: 14px;
 }
 
-table td.cont-justified-left, table th.cont-justified-left {
+.mce-content-body table td.cont-justified-left, .mce-content-body table th.cont-justified-left {
     text-align: left;
 }
 
-table td.cont-justified-right, table th.cont-justified-right {
+.mce-content-body table td.cont-justified-right, .mce-content-body table th.cont-justified-right {
     text-align: right;
 }
 
-table td.cont-justified-center, table th.cont-justified-center {
+.mce-content-body table td.cont-justified-center, .mce-content-body table th.cont-justified-center {
     text-align: center;
 }
