@@ -1,9 +1,103 @@
-     
-.. _Appendix B:
+.. _Adding Pages to a Course:
 
-===========================================
+###########################
+Adding Pages to a Course
+###########################
+
+
+*******************
+Overview
+*******************
+
+By default, your course has the following pages:
+
+* Courseware
+* Course Info
+* Discussion
+* Wiki
+* Progress
+
+You cannot rename, reorder, or remove these pages.
+
+You can add pages to your course. Each page appears in your course's navigation bar. 
+
+For example, the following navigation bar includes the default pages as well as the
+**Course Schedule** and **Supplements & Instructor's Blog** pages.
+
+.. image:: ../Images/page_bar_lms.png
+ :alt: Image of the page bar in the LMS
+
+You can create other pages for the grading policy, course slides, or any other purpose. More examples of pages you can add are:
+
+* A Google calendar, by embedding the code for it.  
+
+* A dynamic HTML calendar, using the template in :ref:`Code for Dynamic HTML Schedule`.
+
+* An instant hangout.  See :ref:`Using an Instant Hangout in Your Course` for more information.
+
+See:
+
+* :ref:`Add a Page`
+* :ref:`Reorder Pages`
+* :ref:`Delete a Page`
+* :ref:`Code for Dynamic HTML Schedule`
+
+
+.. _`Add a Page`:
+
+****************
+Add a Page
+****************
+
+#. In Studio, from the **Content** menu, select **Pages**. 
+
+  .. image:: ../Images/pages_page.png
+   :alt: Image of the Pages screen
+
+
+2. Click **Add a New Page**. A page with the title **Empty** is added to the list:
+
+  .. image:: ../Images/pages_empty.png
+   :alt: Image of the Pages screen with a new Empty page
+
+3. Click **Edit**. The HTML editor opens.  
+
+  .. image:: ../Images/pages_editor.png
+   :alt: Image of the Page editor
+
+4. Enter text for your page. See :ref:`The User Interface` for more information about using the editor.
+#. Click **Settings** to edit the **Display Name**. The display name is the name of the page visible to students in the course.
+#. Click **Save**. 
+
+The new page is immediately available to students, if the course has started.
+
+.. _Reorder Pages:
+
+****************
+Reorder Pages
+****************
+
+You can reorder pages in your course by dragging and dropping the pages to different locations. 
+
+To move a page, hover over the element handle on the right side of the page row until the mouse pointer changes to a four-headed arrow. Then, click and drag the page to the location that you want.
+
+.. note:: You cannot reorder the Courseware, Course Info, Discussion, Wiki, and Progress pages that your course includes by default
+
+.. _Delete a Page:
+
+****************
+Delete a Page
+****************
+
+To delete a page that you previously added, click the trash can icon in the row for the page.  You are prompted to confirm the deletion.
+
+.. _Code for Dynamic HTML Schedule:
+
+********************************
 Code for Dynamic HTML Schedule
-===========================================
+********************************
+
+You can use the following code in a page to provide a dynamic HTML schedule in your course.
 
 .. code-block:: html
 
