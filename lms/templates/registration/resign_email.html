@@ -1,0 +1,15 @@
+{% load i18n %}{% load url from future %}{% autoescape off %}
+{% blocktrans %}You're receiving this e-mail because you requested a resignation from {{ site_name }}.{% endblocktrans %}
+
+{% trans "Please go to the following page and click the resign button:" %}
+{% block reset_link %}
+https://{{domain}}{% url 'student.views.resign_confirm' uidb36=uid token=token %}
+{% endblock %}
+
+{% trans "If you didn't request this change, you can disregard this email - we have not yet resign your account." %}
+
+{% trans "Thanks for using our site!" %}
+
+{% blocktrans %}The edX Team{% endblocktrans %}
+
+{% endautoescape %}

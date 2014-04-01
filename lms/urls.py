@@ -56,6 +56,10 @@ urlpatterns = ('',  # nopep8
     url(r'^password_reset_done/$', django.contrib.auth.views.password_reset_done,
         name='auth_password_reset_done'),
 
+    url(r'^resign/$', 'student.views.resign', name='resign'),
+    url(r'^resign_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        'student.views.resign_confirm', name='resign_confirm'),
+
     url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^user_api/', include('user_api.urls')),

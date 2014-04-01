@@ -1,0 +1,153 @@
+# edX translation file
+# Copyright (C) 2014 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+#
+# Translators:
+# yokose-ks <ayokose.gacco@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: edx-platform\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2014-03-25 10:00+0900\n"
+"PO-Revision-Date: 2014-03-25 10:00+0900\n"
+"Last-Translator: yokose-ks <ayokose.gacco@gmail.com>\n"
+"Language-Team: Japanese (Japan) (http://www.transifex.com/projects/p/edx-platform/language/ja_JP/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lms/templates/dashboard.html
+msgid "Resign"
+msgstr "退会手続き"
+
+#: lms/templates/dashboard.html
+msgid "Resign Email Sent"
+msgstr "退会確認メールが送信されました"
+
+#: lms/templates/dashboard.html
+msgid "An email has been sent to {email}. Follow the link in the email to resign."
+msgstr "まだ退会手続きは完了していません。「{email}」宛に確認メールが送信されます。メール文中にある退会確認用のリンクをクリックをすることで、退会処理をすることができます。別途メールを確認いただき、メール文中の案内をご覧ください。"
+
+#: lms/templates/registration/resign_subject.txt
+msgid "Resignation from %(site_name)s"
+msgstr "%(site_name)s からの退会手続き"
+
+#: lms/templates/registration/resign_email.html
+msgid "You're receiving this e-mail because you requested a resignation from %(site_name)s."
+msgstr "このメールは退会処理をするために送信されています。"
+
+#: lms/templates/registration/resign_email.html
+msgid "Please go to the following page and click the resign button:"
+msgstr "次のページで退会するボタンをクリックしてください。"
+
+#: lms/templates/registration/resign_email.html
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet resign your account."
+msgstr "この処理を要求していない場合はこのメールは無視してください。退会処理はまだ行われていません。"
+
+#: lms/templates/registration/resign_confirm.html
+msgid ""
+"\n"
+"      Resignation from %(platform_name)s\n"
+"  "
+msgstr ""
+"\n"
+"%(platform_name)sからの退会手続き"
+
+#: lms/templates/registration/resign_confirm.html
+msgid ""
+"\n"
+"          Resignation from %(platform_name)s\n"
+"          "
+msgstr ""
+"\n"
+"%(platform_name)sからの退会手続き"
+
+# common/djangoapps/student/forms.py
+msgid "Resign reason is required."
+msgstr "退会理由は必須です。"
+
+# lms/templates/registration/resign_confirm.html
+msgid ""
+"To resign, enter your reason for resignation and click the resign button. <br />"
+"Required fields are noted by <strong class=\"indicator\">bold text and an asterisk (*)</strong>. <br />"
+"If you do not wish to resign, click the cancel button."
+msgstr ""
+"退会理由を記入し、退会するボタンをクリックすることで退会処理が行われます。<br />"
+"<strong class=\"indicator\">(*)付きの太字</strong>は必須項目となります。<br />"
+"退会を希望されない方は、キャンセルボタンをクリックしてください。"
+
+# lms/templates/registration/resign_confirm.html
+msgid "Resign Reason"
+msgstr "退会理由"
+
+#: lms/templates/resign_confirm.html
+msgid "The following errors occurred while processing your resignation:"
+msgstr "退会処理をする際にエラーが発生しました："
+
+#: lms/templates/resign_confirm.html
+msgid "We're sorry, our systems seem to be having trouble processing your resignation"
+msgstr "申し訳ございません。退会処理の途中で、システムに障害が発生したと考えられます。"
+
+#: lms/templates/resign_confirm.html
+msgid "Resign Now"
+msgstr "退会する"
+
+#: lms/templates/registration/resign_confirm.html
+msgid "Your Resignation Was Unsuccessful"
+msgstr "退会処理は失敗しました。"
+
+#: lms/templates/registration/resign_confirm.html
+msgid ""
+"\n"
+"            The resignation link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the resignation process again.\n"
+"        "
+msgstr ""
+"\n"
+"退会処理のリンクに異常が見られました。このリンクは既に利用された可能性があります。%(start_link)sログインページ%(end_link)sより、退会手続きを改めて行っていただけますでしょうか。"
+
+#: lms/templates/registration/resign_confirm.html
+msgid "Resign Help"
+msgstr "退会手続きに関するヘルプ"
+
+#: lms/templates/registration/resign_confirm.html
+msgid ""
+"\n"
+"              View our <a href=\"%(mktg_url_faq)s\">help section for contact information and answers to commonly asked questions</a>\n"
+"          "
+msgstr ""
+"\n"
+"<a href=\"%(mktg_url_faq)s\">連絡先情報、および、よくある質問</a>のページを見る"
+
+#: lms/templates/registration/resign_complete.html
+msgid ""
+"\n"
+"      Resignation from %(platform_name)s is Complete\n"
+"  "
+msgstr ""
+"\n"
+"%(platform_name)sからの退会手続き完了"
+
+#: lms/templates/registration/resign_complete.html
+msgid ""
+"\n"
+"          Resignation from %(platform_name)s is Complete\n"
+"          "
+msgstr ""
+"\n"
+"%(platform_name)sからの退会手続き完了"
+
+#: lms/templates/registration/resign_complete.html
+msgid ""
+"\n"
+"      Your resignation has been completed successfully. <br />\n"
+"      If you have any questions, please contact us at\n"
+"      <a href=\"mailto:%(support_email)s?subject=Resign\">%(support_email)s</a>.\n"
+"      "
+msgstr ""
+"\n"
+"退会手続きが完了しました。<br />\n"
+"何か不明な点がございましたら、<a href=\"mailto:%(support_email)s?subject=退会手続き\">%(support_email)s</a> へご連絡ください。"

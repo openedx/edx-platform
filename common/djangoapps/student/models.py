@@ -147,6 +147,7 @@ class UserStanding(models.Model):
     )
     changed_by = models.ForeignKey(User, blank=True)
     standing_last_changed_at = models.DateTimeField(auto_now=True)
+    resign_reason = models.TextField(blank=False, max_length=1000)
 
 
 class UserProfile(models.Model):

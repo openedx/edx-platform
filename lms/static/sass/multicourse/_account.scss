@@ -5,7 +5,7 @@
 // =====
 
 // page-level
-.view-register, .view-login, .view-passwordreset {
+.view-register, .view-login, .view-passwordreset, .view-resign {
   background: $container-bg;
 
 
@@ -159,7 +159,7 @@
 }
 
 // shared
-.login, .register, .passwordreset, #forgot-password-modal #password-reset {
+.login, .register, .passwordreset, .resign, #forgot-password-modal #password-reset {
 
   // reset - horrible, but necessary
   p, ol, ul, h1, h2, h3, h4, h5, h6, label, input, textarea {
@@ -497,7 +497,7 @@
     padding: 0 $baseline/4;
   }
 
-  #register-form, #login-form, #passwordreset-form {
+  #register-form, #login-form, #passwordreset-form, #resign-form {
 
     .status.message {
       display: none;
@@ -565,6 +565,45 @@
 
   .content {
     margin-top: 0;
+  }
+}
+
+// resign
+.view-resign {
+  background: $sidebar-color;
+
+  header.global {
+
+    h1 {
+      float: none;
+    }
+  }
+
+  .introduction {
+    width: auto;
+    padding: 0;
+
+    header h1 {
+      margin: 0;
+    }
+  }
+
+  .content {
+    margin-top: 0;
+  }
+
+  .form-actions {
+
+    .action-primary {
+      width: flex-grid(3,8);
+    }
+
+    .action-cancel {
+      @extend %m-btn-secondary;
+      width: flex-grid(3,8);
+      line-height: lh(1);
+      margin: 0;
+    }
   }
 }
 

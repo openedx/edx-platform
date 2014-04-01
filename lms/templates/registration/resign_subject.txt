@@ -1,0 +1,3 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}Resignation from {{ site_name }}{% endblocktrans %}
+{% endautoescape %}

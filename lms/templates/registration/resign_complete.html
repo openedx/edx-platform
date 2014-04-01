@@ -1,0 +1,83 @@
+{% load i18n %}
+{% load compressed %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="{{LANGUAGE_CODE}}">
+<head>
+
+<title>
+  {% blocktrans with platform_name=platform_name %}
+      Resignation from {{ platform_name }} is Complete
+  {% endblocktrans %}
+</title>
+
+  {% compressed_css 'style-vendor' %}
+  {% compressed_css 'style-app' %}
+  {% compressed_css 'style-app-extend1' %}
+  {% compressed_css 'style-app-extend2' %}
+
+  {% block main_vendor_js %}
+  {% compressed_js 'main_vendor' %}
+  {% endblock %}
+
+  <!--[if lt IE 9]>
+  <script src="{% static 'js/html5shiv.js' %}"></script>
+  <![endif]-->
+
+  <script type="text/javascript">
+    $(function() {
+
+      // adding js class for styling with accessibility in mind
+      $('body').addClass('js');
+
+      // new window/tab opening
+      $('a[rel="external"], a[class="new-vp"]')
+      .click( function() {
+      window.open( $(this).attr('href') );
+      return false;
+      });
+
+      // form field label styling on focus
+      $("form :input").focus(function() {
+        $("label[for='" + this.id + "']").parent().addClass("is-focused");
+      }).blur(function() {
+        $("label").parent().removeClass("is-focused");
+      });
+    });
+  </script>
+
+</head>
+
+<body class="view-resign">
+
+<header class="global">
+  <nav>
+    <h1 class="logo">
+      <a href="{{MKTG_URL_ROOT}}"><img src="{% static 'images/header-logo.png' %}"></a>
+    </h1>
+  </nav>
+</header>
+
+<div class="content-wrapper">
+  <div class="resign container">
+    <section class="introduction">
+      <header>
+        <h1>
+          {% blocktrans with platform_name=platform_name %}
+          Resignation from {{ platform_name }} is Complete
+          {% endblocktrans %}
+        </h1>
+      </header>
+    </section>
+
+    {% block content %}
+    <div role="main" class="content">
+      {% blocktrans with support_email=support_email %}
+      Your resignation has been completed successfully. <br />
+      If you have any questions, please contact us at
+      <a href="mailto:{{ support_email }}?subject=Resign">{{ support_email }}</a>.
+      {% endblocktrans %}
+    </div>
+    {% endblock %}
+  </div>
+</div>

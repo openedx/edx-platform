@@ -36,6 +36,7 @@ codekit-config.json
 !django.mo
 !djangojs.po
 !djangojs.mo
+!gacco.po
 conf/locale/en/LC_MESSAGES/*.po
 conf/locale/en/LC_MESSAGES/*.mo
 conf/locale/fake*/LC_MESSAGES/*.po
