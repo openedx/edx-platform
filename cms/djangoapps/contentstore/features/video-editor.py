@@ -114,7 +114,7 @@ def set_show_captions(step, setting):
 
     world.css_click('a.edit-button')
     world.wait_for(lambda _driver: world.css_visible('a.action-save'))
-    world.click_link_by_text('ADVANCED')
+    world.select_editor_tab('Advanced')
     world.browser.select('Transcript Display', setting)
     world.css_click('a.action-save')
 

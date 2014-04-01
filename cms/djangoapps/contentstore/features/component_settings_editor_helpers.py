@@ -116,6 +116,18 @@ def edit_component():
     world.css_click('a.edit-button')
 
 
+@world.absorb
+def select_editor_tab(tab_name):
+    editor_tabs = world.browser.find_by_css('.editor-tabs a')
+    expected_tab_text = tab_name.strip().upper()
+    matching_tabs = [tab for tab in editor_tabs if tab.text.upper() == expected_tab_text]
+    assert len(matching_tabs) == 1
+    tab = matching_tabs[0]
+    tab.click()
+    world.wait_for_ajax_complete()
+
+
+
 def enter_xml_in_advanced_problem(step, text):
     """
     Edits an advanced problem (assumes only on page),
