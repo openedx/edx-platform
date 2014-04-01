@@ -382,7 +382,7 @@ class EnrollInCourseTest(TestCase):
             sentinel.request,
             'edx.course.enrollment.activated',
             {
-                'course_id': course_key.to_string(),
+                'course_id': course_key._to_string(),
                 'user_id': user.pk,
                 'mode': 'honor'
             }
@@ -395,7 +395,7 @@ class EnrollInCourseTest(TestCase):
             sentinel.request,
             'edx.course.enrollment.deactivated',
             {
-                'course_id': course_key.to_string(),
+                'course_id': course_key._to_string(),
                 'user_id': user.pk,
                 'mode': 'honor'
             }
