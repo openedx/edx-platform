@@ -7,6 +7,8 @@
 # Python libraries to install directly from github
 
 # Third-party:
+git+https://github.com/mitocw/django-cas.git
+git+https://github.com/mfogel/django-settings-context-processor.git
 -e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
 -e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
 -e git+https://github.com/edx/django-wiki.git@cd0b2b31997afccde519fe5b3365e61a9edb143f#egg=django-wiki
