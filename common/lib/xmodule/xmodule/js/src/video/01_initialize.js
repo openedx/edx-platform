@@ -511,8 +511,10 @@ function (VideoPlayer, VideoStorage) {
             element: element,
             fadeOutTimeout:     1400,
             captionsFreezeTime: 10000,
-            availableQualities: ['hd720', 'hd1080', 'highres'],
-            mode: $.cookie('edX_video_player_mode')
+            mode: $.cookie('edX_video_player_mode'),
+            // Available HD qualities will only be accessible once the video has
+            // been played once, via player.getAvailableQualityLevels.
+            availableHDQualities: []
         });
 
         if (this.config.endTime < this.config.startTime) {

@@ -8,12 +8,16 @@
                     'getPlayerState', 'getVolume', 'setVolume',
                     'loadVideoById', 'getAvailablePlaybackRates', 'playVideo',
                     'pauseVideo', 'seekTo', 'getDuration', 'setPlaybackRate',
-                    'getPlaybackQuality', 'destroy'
+                    'getAvailableQualityLevels', 'getPlaybackQuality',
+                    'setPlaybackQuality', 'destroy'
                 ]
             );
 
             Player.getDuration.andReturn(60);
             Player.getAvailablePlaybackRates.andReturn([0.50, 1.0, 1.50, 2.0]);
+            Player.getAvailableQualityLevels.andReturn(
+                ['highres', 'hd1080', 'hd720', 'large', 'medium', 'small']
+            );
 
             return Player;
         },

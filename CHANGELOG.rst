@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Show the HD button only if there is an HD version available. BLD-937.
+
 Studio: Add edit button to leaf xblocks on the container page. STUD-1306.
 
 Blades: Add LTI context_id parameter. BLD-584.
