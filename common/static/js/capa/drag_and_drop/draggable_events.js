@@ -28,6 +28,7 @@ return {
             if (this.numDraggablesOnMe > 0) {
                 return;
             }
+            this.containerEl.attr('aria-grabbed', 'true');
 
             // If this draggable is just being dragged out of the
             // container, we must perform some additional tasks.
@@ -62,6 +63,7 @@ return {
                     'top': event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
                 });
                 this.iconEl.appendTo(this.state.baseImageEl.parent());
+
 
                 if (this.labelEl !== null) {
                     if (this.isOriginal === true) {
@@ -98,6 +100,7 @@ return {
     'mouseUp': function () {
         if (this.mousePressed === true) {
             this.state.currentMovingDraggable = null;
+            this.containerEl.attr('aria-grabbed', 'false');
 
             this.checkLandingElement();
         }

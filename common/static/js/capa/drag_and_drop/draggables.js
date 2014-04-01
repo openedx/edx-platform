@@ -64,7 +64,7 @@ define(['js/capa/drag_and_drop/draggable_events', 'js/capa/drag_and_drop/draggab
                                 'color: black; ' +
                                 'font-size: 0.95em; ' +
                             '" ' +
-                        '>' +
+                        'role="label">' +
                             draggableObj.originalConfigObj.label +
                         '</div>'
                     );
@@ -153,6 +153,8 @@ define(['js/capa/drag_and_drop/draggable_events', 'js/capa/drag_and_drop/draggab
             'mouseDown': draggableEvents.mouseDown,
             'mouseUp': draggableEvents.mouseUp,
             'mouseMove': draggableEvents.mouseMove,
+            'keydown': draggableEvents.keyDown,
+            'keyup': draggableEvents.keyDown,
 
             'checkLandingElement': draggableLogic.checkLandingElement,
             'checkIfOnTarget': draggableLogic.checkIfOnTarget,
@@ -181,8 +183,9 @@ define(['js/capa/drag_and_drop/draggable_events', 'js/capa/drag_and_drop/draggab
                     'border-right: 1px solid #CCC; ' +
                     'text-align: center; ' +
                     'position: relative; ' +
+                    'cursor: pointer; ' +
                 '" ' +
-                '></div>'
+                'tabindex="0" aria-grabbed="false" role="listitem"></div>'
         );
 
         draggableObj.containerEl.appendTo(state.sliderEl);

@@ -17,7 +17,7 @@ define([], function () {
             '></div>'
         );
 
-        state.baseImageEl = $('<img />');
+        state.baseImageEl = $('<img alt="drop target" />');
 
         state.baseImageEl.attr('src', state.config.baseImage);
         state.baseImageEl.load(function () {

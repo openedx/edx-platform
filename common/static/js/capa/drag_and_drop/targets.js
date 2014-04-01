@@ -117,7 +117,7 @@ define([], function () {
                         'color: #009fe2; ' +
                         'cursor: pointer; ' +
                     '" ' +
-                '>0</div>'
+                'aria-dropeffect="move">0</div>'
             );
         } else {
             numTextEl = null;
