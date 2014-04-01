@@ -1,5 +1,5 @@
 from django.db import models
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, UsageKey, Location
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
 
 
 class CourseKeyField(models.CharField):
