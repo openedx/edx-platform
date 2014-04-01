@@ -254,7 +254,10 @@ class LocatorTest(TestCase):
         """
         Test the url_reverse method
         """
-        locator = CourseLocator(org="a", offering="fancy_course-id", branch="branch_1.2-3")
+        locator = BlockUsageLocator(
+                        CourseLocator(org="a", offering="fancy_course-id", branch="branch_1.2-3"),
+                        block_id='element'
+                )
         self.assertEqual(
             '/expression/{}/format'.format(unicode(locator)),
             locator.url_reverse('expression', 'format')

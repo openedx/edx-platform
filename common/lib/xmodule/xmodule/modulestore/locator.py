@@ -197,25 +197,6 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         return (self.version_guid is not None or
             (self.org is not None and self.offering is not None and self.branch is not None))
 
-    def url_reverse(self, prefix, postfix=''):
-        """
-        Do what reverse is supposed to do but seems unable to do. Generate a url using prefix unicode(self) postfix
-        :param prefix: the beginning of the url (will be forced to begin and end with / if non-empty)
-        :param postfix: the part to append to the url (will be forced to begin w/ / if non-empty)
-        """
-        if prefix:
-            if not prefix.endswith('/'):
-                prefix += '/'
-            if not prefix.startswith('/'):
-                prefix = '/' + prefix
-        else:
-            prefix = '/'
-        if postfix and not postfix.startswith('/'):
-            postfix = '/' + postfix
-        elif postfix is None:
-            postfix = ''
-        return prefix + unicode(self) + postfix
-
     def html_id(self):
         """
         Generate a discussion group id based on course
@@ -439,6 +420,25 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         :param course_locator:
         """
         return BlockUsageLocator.make_relative(course_key, self.block_id)
+
+    def url_reverse(self, prefix, postfix=''):
+        """
+        Do what reverse is supposed to do but seems unable to do. Generate a url using prefix unicode(self) postfix
+        :param prefix: the beginning of the url (will be forced to begin and end with / if non-empty)
+        :param postfix: the part to append to the url (will be forced to begin w/ / if non-empty)
+        """
+        if prefix:
+            if not prefix.endswith('/'):
+                prefix += '/'
+            if not prefix.startswith('/'):
+                prefix = '/' + prefix
+        else:
+            prefix = '/'
+        if postfix and not postfix.startswith('/'):
+            postfix = '/' + postfix
+        elif postfix is None:
+            postfix = ''
+        return prefix + unicode(self) + postfix
 
     def _to_string(self):
         """
