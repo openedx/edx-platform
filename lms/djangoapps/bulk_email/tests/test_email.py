@@ -2,12 +2,14 @@
 """
 Unit tests for sending course email
 """
+from email import charset as Charset
 from mock import patch
 
 from django.conf import settings
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
+from django.test import TestCase
 from django.test.utils import override_settings
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
@@ -279,3 +281,20 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
                                 [s.email for s in self.students] +
                                 [s.email for s in added_users if s not in optouts])
         self.assertItemsEqual(outbox_contents, should_send_contents)
+
+
+class TestEmailEncoding(TestCase):
+    """
+    Test Content-Transfer encoding for emails.
+    """
+
+    def test_email_encoding(self):
+        """
+        Verify that the Content-Transfer encoding for utf-8 messages is base64.
+
+        Django (version <= 1.6) globally overrides python's default Content-Transfer-Encoding for UTF-8 messages from
+        base64 to 7bit. We set it to base64 again otherwise mail servers add newlines and exclamation marks when a line
+        is longer than 989 characters.
+        """
+        __, body_enc, __ = Charset.CHARSETS['utf-8']
+        self.assertEqual(body_enc, Charset.BASE64)
