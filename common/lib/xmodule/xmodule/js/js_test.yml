@@ -49,8 +49,8 @@ lib_paths:
     - common_static/js/vendor/backbone-min.js
     - common_static/js/vendor/jquery.leanModal.min.js
     - common_static/js/vendor/CodeMirror/codemirror.js
-    - common_static/js/vendor/tiny_mce/jquery.tinymce.js
-    - common_static/js/vendor/tiny_mce/tiny_mce.js
+    - common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js
+    - common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js
     - common_static/js/vendor/mathjax-MathJax-c9db6ac/MathJax.js
     - common_static/js/vendor/jquery.timeago.js
     - common_static/js/vendor/sinon-1.7.1.js
