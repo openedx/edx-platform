@@ -1,0 +1,50 @@
+{% load i18n %}{% load url from future %}{% autoescape off %}{% comment %}{% blocktrans %}You're receiving this e-mail because you requested a resignation from {{ site_name }}.{% endblocktrans %} #}{% endcomment %}━━━━━━━━━
+■gacco 退会のご案内
+━━━━━━━━━
+いつもgaccoをご利用いただきまして、ありがとうございます。
+
+
+下記のURLをクリックし、退会手続きページへとお進みください。
+
+─────────
+【退会手続き用ＵＲＬ】
+https://{{domain}}{% url 'student.views.resign_confirm' uidb36=uid token=token %}
+─────────
+
+※同じメールアドレスでの新規登録はできませんのでご注意ください。
+
+※アクセスしてもエラー画面が表示される場合は、
+　再度、退会の申込を行ってください。
+
+※上記手続き用URLが改行され、URLをクリックしても
+　ページが表示されない場合は、URLをすべてコピーして
+　ブラウザのアドレス欄に貼り付けてアクセスしてください。
+
+─────────
+
+このメールは自動送信しています。ご返信いただいてもお答えできかね
+ますのでご了承ください。
+==================
+・gaccoに関する「よくあるご質問」はコチラ
+https://support.gacco.org/
+
+・お問い合わせはマイページの「ヘルプ」ボタンよりお願いします
+https://lms.gacco.org/dashboard
+
+
+gacco運営チーム
+
+{% comment %}
+{% trans "Please go to the following page and click the resign button:" %}
+{% block reset_link %}
+https://{{domain}}{% url 'student.views.resign_confirm' uidb36=uid token=token %}
+{% endblock %}
+
+{% trans "If you didn't request this change, you can disregard this email - we have not yet resign your account." %}
+
+{% trans "Thanks for using our site!" %}
+
+{% blocktrans %}The edX Team{% endblocktrans %}
+{% endcomment %}
+
+{% endautoescape %}
