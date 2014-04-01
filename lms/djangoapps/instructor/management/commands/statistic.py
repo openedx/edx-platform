@@ -266,15 +266,27 @@ def fullstat(request = None):
                 
 
                 #User
-                name = rows[0]['second-name'] + ' ' + rows[0]['first-name'] + ' ' + rows[0]['patronymic']
+                name = ''
+                try:
+                    name = rows[0]['second-name'] + ' ' + rows[0]['first-name'] + ' ' + rows[0]['patronymic']
+                except:
+                    pass
                 datarow += [name]
                 if user.profile.name != name:
                     datarow += [user.profile.name]
                 else:
                     datarow += [u'']
-                datarow += [row['login']]
-                datarow += [row['email']]
-                if user.email != row['email']:
+                try:
+                    datarow += [rows[0]['login']]
+                except:
+                    datarow += ['']
+                email = ''
+                try:
+                    datarow += [rows[0]['email']]
+                    email = rows[0]['email']
+                except:
+                    datarow += ['']
+                if user.email != email:
                     datarow += [user.email]
                 else:
                     datarow += [u'']
