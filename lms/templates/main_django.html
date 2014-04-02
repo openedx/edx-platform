@@ -20,6 +20,7 @@
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
 
+  {% microsite_css_overrides_file %}
 
   <!--[if lt IE 9]>
   <script src="{% static 'js/html5shiv.js' %}"></script>
