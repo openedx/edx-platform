@@ -2,9 +2,10 @@
 
 import logging
 import re
-from opaque_keys import InvalidKeyError
+from opaque_keys import InvalidKeyError, OpaqueKey
 
 from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey, AssetKey
+import json
 
 log = logging.getLogger(__name__)
 
@@ -271,3 +272,17 @@ class AssetLocation(LocationBase, AssetKey):
     @property
     def path(self):
         return self.name
+
+
+class i4xEncoder(json.JSONEncoder):
+    """
+    If provided as the cls to json.dumps, will serialize and Locations as i4x strings and other
+    keys using the unicode strings.
+    """
+    def default(self, o):
+        if isinstance(o, OpaqueKey):
+            if isinstance(o, (LocationBase, SlashSeparatedCourseKey)):
+                return o.to_deprecated_string()
+            else:
+                return unicode(o)
+        super(i4xEncoder, self).default(o)
