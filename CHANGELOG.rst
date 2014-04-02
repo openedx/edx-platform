@@ -7,6 +7,10 @@ the top.  Include a label indicating the component affected.
 
 Blades: Create an upload modal for video transcript translations (BLD-751).
 
+Studio and LMS: Upgrade version of TinyMCE to 4.0.20. Switch from tabbed Visual/HTML
+Editor for HTML modules to showing the code editor as a plugin within TinyMCE (triggered
+from toolbar). STUD-1422
+
 Studio: Add ability to reorder Pages and hide the Wiki page. STUD-1375
 
 Blades: Added template for iFrames. BLD-611.
