@@ -195,13 +195,15 @@ def i_enter_a_source(_step, link, index):
 def upload_file(_step, file_name):
     path = os.path.join(TEST_ROOT, 'uploads/', file_name.strip())
     world.browser.execute_script("$('form.file-chooser').show()")
-    world.browser.attach_file('file', os.path.abspath(path))
+    world.browser.attach_file('transcript-file', os.path.abspath(path))
     world.wait_for_ajax_complete()
 
 
 @step('I see "([^"]*)" text in the captions')
 def check_text_in_the_captions(_step, text):
-    assert world.browser.is_text_present(text.strip(), 5)
+    world.wait_for(lambda _: world.css_text('.subtitles'))
+    actual_text = world.css_text('.subtitles')
+    assert (text in actual_text)
 
 
 @step('I see value "([^"]*)" in the field "([^"]*)"$')

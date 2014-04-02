@@ -51,7 +51,6 @@ class @DiscussionUtil
       follow_discussion       : "/courses/#{$$course_id}/discussion/#{param}/follow"
       unfollow_discussion     : "/courses/#{$$course_id}/discussion/#{param}/unfollow"
       create_thread           : "/courses/#{$$course_id}/discussion/#{param}/threads/create"
-      search_similar_threads  : "/courses/#{$$course_id}/discussion/#{param}/threads/search_similar"
       update_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/update"
       create_comment          : "/courses/#{$$course_id}/discussion/threads/#{param}/reply"
       delete_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"

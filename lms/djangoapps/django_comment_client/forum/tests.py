@@ -109,26 +109,18 @@ def make_mock_request_impl(text, thread_id=None):
     def mock_request_impl(*args, **kwargs):
         url = args[1]
         if url.endswith("threads"):
-            return Mock(
-                status_code=200,
-                text=json.dumps({
-                    "collection": [make_mock_thread_data(text, "dummy_thread_id", False)]
-                })
-            )
+            data = {
+                "collection": [make_mock_thread_data(text, "dummy_thread_id", False)]
+            }
         elif thread_id and url.endswith(thread_id):
-            return Mock(
-                status_code=200,
-                text=json.dumps(make_mock_thread_data(text, thread_id, True))
-            )
+            data = make_mock_thread_data(text, thread_id, True)
         else: # user query
-            return Mock(
-                status_code=200,
-                text=json.dumps({
-                    "upvoted_ids": [],
-                    "downvoted_ids": [],
-                    "subscribed_thread_ids": [],
-                })
-            )
+            data = {
+                "upvoted_ids": [],
+                "downvoted_ids": [],
+                "subscribed_thread_ids": [],
+            }
+        return Mock(status_code=200, text=json.dumps(data), json=Mock(return_value=data))
     return mock_request_impl
 
 

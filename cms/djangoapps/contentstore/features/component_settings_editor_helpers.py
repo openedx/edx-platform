@@ -145,7 +145,7 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
 
     # Check if the web object is a list type
     # If so, we use a slightly different mechanism for determining its value
-    if setting.has_class('metadata-list-enum') or setting.has_class('metadata-dict'):
+    if setting.has_class('metadata-list-enum') or setting.has_class('metadata-dict') or setting.has_class('metadata-video-translations'):
         list_value = ', '.join(ele.value for ele in setting.find_by_css('.list-settings-item'))
         assert_equal(value, list_value)
     elif setting.has_class('metadata-videolist-enum'):

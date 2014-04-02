@@ -61,7 +61,7 @@ class TestCourseIndex(CourseTestCase):
         """
         outline_url = self.course_locator.url_reverse('course/', '')
         # register a non-staff member and try to delete the course branch
-        non_staff_client, _ = self.createNonStaffAuthedUserClient()
+        non_staff_client, _ = self.create_non_staff_authed_user_client()
         response = non_staff_client.delete(outline_url, {}, HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 403)
 
@@ -69,7 +69,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Make and register an course_staff and ensure they can access the courses
         """
-        course_staff_client, course_staff = self.createNonStaffAuthedUserClient()
+        course_staff_client, course_staff = self.create_non_staff_authed_user_client()
         for course in [self.course, self.odd_course]:
             new_location = loc_mapper().translate_location(course.location.course_id, course.location, False, True)
             permission_url = new_location.url_reverse("course_team/", course_staff.email)

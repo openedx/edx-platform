@@ -334,7 +334,7 @@ Feature: CMS Transcripts
         Then I see status message "found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
-        And I upload the transcripts file "test_transcripts.srt"
+        And I upload the transcripts file "uk_transcripts.srt"
         Then I see status message "uploaded_successfully"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
@@ -345,7 +345,7 @@ Feature: CMS Transcripts
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
 
-        And I enter a "test_transcripts.webm" source to field number 3
+        And I enter a "uk_transcripts.webm" source to field number 3
         Then I see status message "found"
 
     #20
@@ -353,21 +353,21 @@ Feature: CMS Transcripts
         Given I have created a Video component with subtitles "t_not_exist"
         And I edit the component
 
-        And I enter a "test_transcripts.mp4" source to field number 1
+        And I enter a "uk_transcripts.mp4" source to field number 1
         Then I see status message "not found"
         And I see button "download_to_edit"
         And I see button "upload_new_timed_transcripts"
-        And I upload the transcripts file "test_transcripts.srt"
+        And I upload the transcripts file "uk_transcripts.srt"
         Then I see status message "uploaded_successfully"
-        And I see value "test_transcripts" in the field "Transcript (primary)"
+        And I see value "uk_transcripts" in the field "Transcript (primary)"
 
         And I enter a "t_not_exist.webm" source to field number 2
         Then I see status message "replace"
 
-        And I see choose button "test_transcripts.mp4" number 1
+        And I see choose button "uk_transcripts.mp4" number 1
         And I see choose button "t_not_exist.webm" number 2
         And I click transcript button "choose" number 2
-        And I see value "test_transcripts|t_not_exist" in the field "Transcript (primary)"
+        And I see value "uk_transcripts|t_not_exist" in the field "Transcript (primary)"
 
     # Flaky test fails occasionally in master. https://edx-wiki.atlassian.net/browse/BLD-927
     #21
@@ -456,7 +456,7 @@ Feature: CMS Transcripts
 
         And I enter a "video_name_1.mp4" source to field number 1
         And I see status message "not found"
-        And I upload the transcripts file "test_transcripts.srt"
+        And I upload the transcripts file "uk_transcripts.srt"
         Then I see status message "uploaded_successfully"
         And I see value "video_name_1" in the field "Transcript (primary)"
 
@@ -487,7 +487,7 @@ Feature: CMS Transcripts
 
         And I enter a "video_name_2.webm" source to field number 2
         And I see status message "not found"
-        And I upload the transcripts file "test_transcripts.srt"
+        And I upload the transcripts file "uk_transcripts.srt"
         Then I see status message "uploaded_successfully"
         And I see value "video_name_1|video_name_2" in the field "Transcript (primary)"
 
@@ -503,7 +503,7 @@ Feature: CMS Transcripts
         And I enter a "http://youtu.be/t_not_exist" source to field number 1
         Then I see status message "not found"
         And I see button "upload_new_timed_transcripts"
-        And I upload the transcripts file "test_transcripts.srt"
+        And I upload the transcripts file "uk_transcripts.srt"
         Then I see status message "uploaded_successfully"
 
         And I save changes
@@ -525,7 +525,7 @@ Feature: CMS Transcripts
         Then I see status message "not found"
         And I see button "upload_new_timed_transcripts"
 
-        And I upload the transcripts file "test_transcripts.srt"
+        And I upload the transcripts file "uk_transcripts.srt"
         Then I see status message "uploaded_successfully"
         And I clear field number 1
         Then I see status message "found"
@@ -690,7 +690,7 @@ Feature: CMS Transcripts
 
         And I enter a "video_name_1.1.2.mp4" source to field number 1
         And I see status message "not found"
-        And I upload the transcripts file "test_transcripts.srt"
+        And I upload the transcripts file "uk_transcripts.srt"
         Then I see status message "uploaded_successfully"
         And I see value "video_name_1.1.2" in the field "Transcript (primary)"
 

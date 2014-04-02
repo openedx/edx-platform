@@ -18,13 +18,14 @@
 # Translators:
 # anantvima <anant.vima@anu.edu.au>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
+# ria1234 <contactpayal@yahoo.com.au>, 2014
 # Chandra Shekhar Sharma <shekharsharma041@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-25 10:27-0400\n"
-"PO-Revision-Date: 2014-03-24 14:25+0000\n"
+"POT-Creation-Date: 2014-03-31 09:26-0400\n"
+"PO-Revision-Date: 2014-03-31 04:10+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
 "MIME-Version: 1.0\n"
@@ -274,7 +275,7 @@ msgstr "विडियो समाप्त"
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] "%(value)s घंटे"
+msgstr[0] "%(value)s घंटा"
 msgstr[1] "%(value)s घंटे"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
@@ -568,7 +569,7 @@ msgstr "क्या आप वाकई इस जवाब को हटान
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
-msgstr "अभी से पहले %s "
+msgstr "अभी से %s पहले "
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
@@ -595,8 +596,8 @@ msgstr "तकरीबन एक घंटा"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] "तकरीबन %d घंटे"
-msgstr[1] "तकरीबन %d घंटा"
+msgstr[0] "तकरीबन %d घंटा"
+msgstr[1] "तकरीबन %d घंटे"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
@@ -1083,7 +1084,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a problem urlname."
-msgstr "कृपया समस्या का यू आर एल नाम दर्ज करें"
+msgstr "कृपया समस्या का यू आर एल दर्ज करें"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -1259,7 +1260,7 @@ msgstr "ग्रेड सेव किए गए। ग्रेड करन�
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Problem Name"
-msgstr "प्रश्न का नाम"
+msgstr "समस्या का नाम"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Graded"
@@ -1449,7 +1450,8 @@ msgid "<em>Editing:</em> %s"
 msgstr "<em>संपादन:</em> %s "
 
 #: cms/static/coffee/src/views/module_edit.js
-#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
+#: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_handout.js
@@ -1679,7 +1681,7 @@ msgstr "सभी वर्गों का विस्तार करें"
 
 #: cms/static/js/views/overview.js
 msgid "Release date:"
-msgstr "रिलीज की तारीख:"
+msgstr "रीलीज़ की तारीख़:"
 
 #: cms/static/js/views/overview.js
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
@@ -1687,7 +1689,7 @@ msgstr "{month}/{day}/{year} को {hour}:{minute} UTC बजे"
 
 #: cms/static/js/views/overview.js
 msgid "Edit section release date"
-msgstr "अनुभाग की रिलीज की तारीख संपादित करें"
+msgstr "अनुभाग की रीलीज़ की तारीख़ बदलें"
 
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Not Graded"
@@ -1695,11 +1697,11 @@ msgstr "वर्गीकृत नहीं है"
 
 #: cms/static/js/views/paging.js
 msgid "ascending"
-msgstr "आरोही"
+msgstr "बड़ता हुआ"
 
 #: cms/static/js/views/paging.js
 msgid "descending"
-msgstr "अवरोही"
+msgstr "घटता हुआ"
 
 #: cms/static/js/views/paging_header.js
 msgid ""

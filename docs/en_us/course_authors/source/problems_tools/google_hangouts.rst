@@ -38,7 +38,7 @@ Instant Hangouts in Your Course
 
 You can add one or more instant hangouts in your course. For example, you can add an instant hangout:
 
-* In a static page, to provide students with a hangout for the entire course. See :ref:`Add Static Pages` for more information about static pages.
+* In a page, to provide students with a hangout for the entire course. See :ref:`Add Pages` for more information.
 
 * In an HTML component, to provide a hangout for students working on that specific course unit. See :ref:`Working with HTML Components` for more information about creating HTML components.
 
@@ -57,10 +57,10 @@ When you add the instant hangout to your course, a control for the hangout appea
 
 To start the hangout, the student clicks **Start the Hangout**. (After the first student clicks **Start the Hangout**, other students see a **Join the Hangout** button.)
 
-The following example shows the control in a static page when a hangout has already started. The control has a **Join the Hangout** button, and shows that one other student is already in the hangout.
+The following example shows the control in a page when a hangout has already started. The control has a **Join the Hangout** button, and shows that one other student is already in the hangout.
 
 .. image:: ../Images/hangout_static_page.png
- :alt: Image of the instant hangout control on a static page
+ :alt: Image of the instant hangout control on a page
 
 To join the hangout, the student clicks **Join the Hangout**.
 
@@ -102,7 +102,7 @@ To create an instant hangout in your course:
 
 #. Upload the JavaScript file to the **Files & Uploads** page in your course. See :ref:`Add Files to a Course` for more information.
 
-#. In either a static page or an HTML component, open the HTML editor.
+#. In either a page or an HTML component, open the HTML editor.
 
 #. On the first line, add the JavaScript file you uploaded in a <script> tag. For example, if your JavaScript file is named **instanthangouts-0.1.0.js**, you would enter the following::
   
@@ -131,4 +131,4 @@ Google will periodically update the instant hangouts JavaScript file.  To receiv
 
 To use an updated JavaScript file in your course, we recommend that you copy the JavaScript from the repository into a file that has the same name as the file that you uploaded to your course. When you upload the new file, the new file replaces the previous file.
 
-.. warning:: If you include version numbers in the file names of uploaded files, you will have to edit any HTML components or static pages that include an instant hangout control every time that you update the JavaScript file.
+.. warning:: If you include version numbers in the file names of uploaded files, you will have to edit any HTML components or pages that include an instant hangout control every time that you update the JavaScript file.
