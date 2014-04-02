@@ -18,18 +18,27 @@ from django.test.utils import override_settings
 TEST_API_KEY = str(uuid.uuid4())
 
 
+class SecureClient(Client):
+    """ Django test client using a "secure" connection. """
+    def __init__(self, *args, **kwargs):
+        kwargs = kwargs.copy()
+        kwargs.update({'SERVER_PORT': 443, 'wsgi.url_scheme': 'https'})
+        super(SecureClient, self).__init__(*args, **kwargs)
+
+
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 class SessionsApiTests(TestCase):
     """ Test suite for Sessions API views """
 
     def setUp(self):
+        self.test_server_prefix = 'https://testserver'
         self.test_username = str(uuid.uuid4())
         self.test_password = str(uuid.uuid4())
         self.test_email = str(uuid.uuid4()) + '@test.org'
         self.base_users_uri = '/api/users'
         self.base_sessions_uri = '/api/sessions'
 
-        self.client = Client()
+        self.client = SecureClient()
         cache.clear()
 
     def do_post(self, uri, data):
@@ -69,19 +78,12 @@ class SessionsApiTests(TestCase):
         data = {'username': local_username, 'password': self.test_password}
         response = self.do_post(self.base_sessions_uri, data)
         self.assertEqual(response.status_code, 201)
-        self.assertIsNotNone(response.data['token'])
         self.assertGreater(len(response.data['token']), 0)
-        self.assertIsNotNone(response.data['uri'])
-        self.assertGreater(len(response.data['uri']), 0)
-        confirm_uri = self.base_sessions_uri + '/' + response.data['token']
+        confirm_uri = self.test_server_prefix + self.base_sessions_uri + '/' + response.data['token']
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertIsNotNone(response.data['expires'])
         self.assertGreater(response.data['expires'], 0)
-        self.assertIsNotNone(response.data['user'])
         self.assertGreater(len(response.data['user']), 0)
-        self.assertIsNotNone(response.data['user']['username'])
         self.assertEqual(str(response.data['user']['username']), local_username)
-        self.assertIsNotNone(response.data['user']['id'])
         self.assertEqual(response.data['user']['id'], user_id)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -126,8 +128,6 @@ class SessionsApiTests(TestCase):
         post_token = response.data['token']
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.data['token'])
-        self.assertGreater(len(response.data['token']), 0)
         self.assertEqual(response.data['token'], post_token)
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
@@ -150,7 +150,7 @@ class SessionsApiTests(TestCase):
         data = {'username': local_username, 'password': self.test_password}
         response = self.do_post(self.base_sessions_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = response.data["uri"]
+        test_uri = self.base_users_uri + str(response.data['user']['id'])
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
         response = self.do_get(test_uri)

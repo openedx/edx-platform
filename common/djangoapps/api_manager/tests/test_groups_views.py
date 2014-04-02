@@ -18,11 +18,20 @@ from api_manager.models import GroupRelationship
 TEST_API_KEY = str(uuid.uuid4())
 
 
+class SecureClient(Client):
+    """ Django test client using a "secure" connection. """
+    def __init__(self, *args, **kwargs):
+        kwargs = kwargs.copy()
+        kwargs.update({'SERVER_PORT': 443, 'wsgi.url_scheme': 'https'})
+        super(SecureClient, self).__init__(*args, **kwargs)
+
+
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 class GroupsApiTests(TestCase):
     """ Test suite for Groups API views """
 
     def setUp(self):
+        self.test_server_prefix = 'https://testserver'
         self.test_username = str(uuid.uuid4())
         self.test_password = str(uuid.uuid4())
         self.test_email = str(uuid.uuid4()) + '@test.org'
@@ -30,7 +39,7 @@ class GroupsApiTests(TestCase):
         self.base_users_uri = '/api/users'
         self.base_groups_uri = '/api/groups'
 
-        self.client = Client()
+        self.client = SecureClient()
         cache.clear()
 
     def do_post(self, uri, data):
@@ -65,41 +74,35 @@ class GroupsApiTests(TestCase):
         data = {'name': self.test_group_name}
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
-        self.assertIsNotNone(response.data['id'])
         self.assertGreater(response.data['id'], 0)
-        self.assertGreater(len(response.data['uri']), 0)
-        confirm_uri = self.base_groups_uri + '/' + str(response.data['id'])
+        confirm_uri = self.test_server_prefix + self.base_groups_uri + '/' + str(response.data['id'])
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertIsNotNone(response.data['name'])
         self.assertGreater(len(response.data['name']), 0)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    def test_group_list_post_duplicate(self):
-        data = {'name': self.test_group_name}
-        response = self.do_post(self.base_groups_uri, data)
-        self.assertEqual(response.status_code, 201)
-        self.assertIsNotNone(response.data['id'])
-        self.assertGreater(response.data['id'], 0)
-        self.assertGreater(len(response.data['uri']), 0)
-        confirm_uri = self.base_groups_uri + '/' + str(response.data['id'])
-        self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertIsNotNone(response.data['name'])
-        self.assertGreater(len(response.data['name']), 0)
+    # @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    # def test_group_list_post_duplicate(self):
+    #     data = {'name': self.test_group_name}
+    #     response = self.do_post(self.base_groups_uri, data)
+    #     self.assertEqual(response.status_code, 201)
+    #     self.assertGreater(response.data['id'], 0)
+    #     confirm_uri = self.test_server_prefix + self.base_groups_uri + '/' + str(response.data['id'])
+    #     self.assertEqual(response.data['uri'], confirm_uri)
+    #     response = self.do_post(self.base_groups_uri, data)
+    #     self.assertEqual(response.status_code, 409)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_group_detail_get(self):
         data = {'name': self.test_group_name}
         response = self.do_post(self.base_groups_uri, data)
-        test_uri = self.base_groups_uri + '/' + str(response.data['id'])
+        self.assertGreater(response.data['id'], 0)
+        group_id = response.data['id']
+        test_uri = self.base_groups_uri + '/' + str(group_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.data['id'])
-        self.assertGreater(response.data['id'], 0)
-        self.assertIsNotNone(response.data['uri'])
-        self.assertGreater(len(response.data['uri']), 0)
-        self.assertEqual(response.data['uri'], test_uri)
-        self.assertIsNotNone(response.data['name'])
-        self.assertGreater(len(response.data['name']), 0)
+        self.assertEqual(response.data['id'], group_id)
+        confirm_uri = self.test_server_prefix + test_uri
+        self.assertEqual(response.data['uri'], confirm_uri)
+        self.assertEqual(response.data['name'], self.test_group_name)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_group_detail_get_undefined(self):
@@ -115,19 +118,17 @@ class GroupsApiTests(TestCase):
         user_id = response.data['id']
         data = {'name': 'Alpha Group'}
         response = self.do_post(self.base_groups_uri, data)
-        test_uri = self.base_groups_uri + '/' + str(response.data['id'])
+        group_id = response.data['id']
+        test_uri = self.base_groups_uri + '/' + str(group_id)
         response = self.do_get(test_uri)
         test_uri = test_uri + '/users'
         data = {'user_id': user_id}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
-        self.assertGreater(len(response.data['uri']), 0)
-        confirm_uri = test_uri + '/' + str(response.data['user_id'])
+        confirm_uri = self.test_server_prefix + test_uri + '/' + str(response.data['user_id'])
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertIsNotNone(response.data['group_id'])
-        self.assertGreater(response.data['group_id'], 0)
-        self.assertIsNotNone(response.data['user_id'])
-        self.assertGreater(response.data['user_id'], 0)
+        self.assertEqual(response.data['group_id'], str(group_id))
+        self.assertEqual(response.data['user_id'], str(user_id))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_group_users_list_post_duplicate(self):
@@ -172,12 +173,9 @@ class GroupsApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data['uri']), 0)
-        self.assertEqual(response.data['uri'], test_uri)
-        self.assertIsNotNone(response.data['group_id'])
-        self.assertGreater(response.data['group_id'], 0)
+        confirm_uri = self.test_server_prefix + test_uri
+        self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['group_id'], group_id)
-        self.assertIsNotNone(response.data['user_id'])
-        self.assertGreater(response.data['user_id'], 0)
         self.assertEqual(response.data['user_id'], user_id)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -249,11 +247,7 @@ class GroupsApiTests(TestCase):
         self.assertGreater(len(response.data['uri']), 0)
         confirm_uri = test_uri + '/' + str(response.data['group_id'])
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertIsNotNone(response.data['group_id'])
-        self.assertGreater(response.data['group_id'], 0)
         self.assertEqual(response.data['group_id'], str(group_id))
-        self.assertIsNotNone(response.data['relationship_type'])
-        self.assertGreater(len(response.data['relationship_type']), 0)
         self.assertEqual(response.data['relationship_type'], relationship_type)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -276,11 +270,7 @@ class GroupsApiTests(TestCase):
         self.assertGreater(len(response.data['uri']), 0)
         confirm_uri = test_uri + '/' + str(response.data['group_id'])
         self.assertEqual(response.data['uri'], confirm_uri)
-        self.assertIsNotNone(response.data['group_id'])
-        self.assertGreater(response.data['group_id'], 0)
         self.assertEqual(response.data['group_id'], str(group_id))
-        self.assertIsNotNone(response.data['relationship_type'])
-        self.assertGreater(len(response.data['relationship_type']), 0)
         self.assertEqual(response.data['relationship_type'], relationship_type)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -408,15 +398,10 @@ class GroupsApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data['uri']), 0)
-        self.assertEqual(response.data['uri'], test_uri)
-        self.assertIsNotNone(response.data['from_group_id'])
-        self.assertGreater(response.data['from_group_id'], 0)
+        confirm_uri = test_uri
+        self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['from_group_id'], str(alpha_group_id))
-        self.assertIsNotNone(response.data['to_group_id'])
-        self.assertGreater(response.data['to_group_id'], 0)
         self.assertEqual(response.data['to_group_id'], str(delta_group_id))
-        self.assertIsNotNone(response.data['relationship_type'])
-        self.assertGreater(len(response.data['relationship_type']), 0)
         self.assertEqual(response.data['relationship_type'], relationship_type)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -444,15 +429,10 @@ class GroupsApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data['uri']), 0)
-        self.assertEqual(response.data['uri'], test_uri)
-        self.assertIsNotNone(response.data['from_group_id'])
-        self.assertGreater(response.data['from_group_id'], 0)
+        confirm_uri = test_uri
+        self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['from_group_id'], str(alpha_group_id))
-        self.assertIsNotNone(response.data['to_group_id'])
-        self.assertGreater(response.data['to_group_id'], 0)
         self.assertEqual(response.data['to_group_id'], str(delta_group_id))
-        self.assertIsNotNone(response.data['relationship_type'])
-        self.assertGreater(len(response.data['relationship_type']), 0)
         self.assertEqual(response.data['relationship_type'], relationship_type)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

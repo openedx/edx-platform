@@ -15,17 +15,26 @@ from django.test.utils import override_settings
 TEST_API_KEY = str(uuid.uuid4())
 
 
+class SecureClient(Client):
+    """ Django test client using a "secure" connection. """
+    def __init__(self, *args, **kwargs):
+        kwargs = kwargs.copy()
+        kwargs.update({'SERVER_PORT': 443, 'wsgi.url_scheme': 'https'})
+        super(SecureClient, self).__init__(*args, **kwargs)
+
+
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 class SystemApiTests(TestCase):
     """ Test suite for base API views """
 
     def setUp(self):
+        self.test_server_prefix = "https://testserver/api"
         self.test_username = str(uuid.uuid4())
         self.test_password = str(uuid.uuid4())
         self.test_email = str(uuid.uuid4()) + '@test.org'
         self.test_group_name = str(uuid.uuid4())
 
-        self.client = Client()
+        self.client = SecureClient()
         cache.clear()
 
     def do_get(self, uri):
@@ -40,7 +49,7 @@ class SystemApiTests(TestCase):
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_system_detail_get(self):
         """ Ensure the system returns base data about the system """
-        test_uri = '/api/system'
+        test_uri = self.test_server_prefix + '/system'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.data['uri'])
@@ -56,7 +65,7 @@ class SystemApiTests(TestCase):
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_system_detail_api_get(self):
         """ Ensure the system returns base data about the API """
-        test_uri = '/api'
+        test_uri = self.test_server_prefix
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.data['uri'])

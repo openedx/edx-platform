@@ -1,7 +1,6 @@
 # pylint: disable=E1101
 
 """ Database ORM models managed by this Django app """
-from itertools import chain
 
 from django.contrib.auth.models import Group
 from django.db import models
@@ -49,9 +48,8 @@ class GroupRelationship(models.Model):
 
     def get_linked_group_relationships(self):
         """ Retrieve an existing group-group relationship """
-        # afferent_relationships = LinkedGroupRelationship.objects.filter(from_group_relationship__to_group_relationships=self)
         efferent_relationships = LinkedGroupRelationship.objects.filter(from_group_relationship=self)
-        matching_relationships = chain(efferent_relationships)
+        matching_relationships = efferent_relationships
         return matching_relationships
 
     def check_linked_group_relationship(self, relationship_to_check, symmetrical=False):

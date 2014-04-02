@@ -1,4 +1,4 @@
-""" API specification for Group-oriented interactions """
+""" API implementation for gourse-oriented interactions. """
 import uuid
 
 from django.contrib.auth.models import Group, User
@@ -15,12 +15,19 @@ from api_manager.models import GroupRelationship
 RELATIONSHIP_TYPES = {'hierarchical': 'h', 'graph': 'g'}
 
 
-def _serialize_group(group):
+def _generate_base_uri(request):
     """
-    Loads the object data into the response dict
-    This should probably evolve to use DRF serializers
+    Constructs the protocol:host:path component of the resource uri
     """
-    return {'name': group.name, 'id': group.id}
+    protocol = 'http'
+    if request.is_secure():
+        protocol = protocol + 's'
+    resource_uri = '{}://{}{}'.format(
+        protocol,
+        request.get_host(),
+        request.path
+    )
+    return resource_uri
 
 
 @api_view(['POST'])
@@ -29,21 +36,23 @@ def group_list(request):
     """
     POST creates a new group in the system
     """
-    if request.method == 'POST':
-        # Group name must be unique, but we need to support dupes
-        group = Group.objects.create(name=str(uuid.uuid4()))
-        original_group_name = request.DATA['name']
-        group.name = '{:04d}: {}'.format(group.id, original_group_name)
-        group.record_active = True
-        group.record_date_created = timezone.now()
-        group.record_date_modified = timezone.now()
-        group.save()
-        # Relationship model also allows us to use duplicate names
-        GroupRelationship.objects.create(name=original_group_name, group_id=group.id, parent_group=None)
-        response_data = _serialize_group(group)
-        response_data['uri'] = '{}/{}'.format(request.path, group.id)
-        response_status = status.HTTP_201_CREATED
-        return Response(response_data, status=response_status)
+    response_data = {}
+    base_uri = _generate_base_uri(request)
+    # Group name must be unique, but we need to support dupes
+    group = Group.objects.create(name=str(uuid.uuid4()))
+    original_group_name = request.DATA['name']
+    group.name = '{:04d}: {}'.format(group.id, original_group_name)
+    group.record_active = True
+    group.record_date_created = timezone.now()
+    group.record_date_modified = timezone.now()
+    group.save()
+    # Relationship model also allows us to use duplicate names
+    GroupRelationship.objects.create(name=original_group_name, group_id=group.id, parent_group=None)
+    response_data = {'id': group.id, 'name': original_group_name}
+    base_uri = _generate_base_uri(request)
+    response_data['uri'] = '{}/{}'.format(base_uri, group.id)
+    response_status = status.HTTP_201_CREATED
+    return Response(response_data, status=response_status)
 
 
 @api_view(['GET'])
@@ -52,27 +61,27 @@ def group_detail(request, group_id):
     """
     GET retrieves an existing group from the system
     """
-    if request.method == 'GET':
-        response_data = {}
-        try:
-            existing_group = Group.objects.get(id=group_id)
-            existing_group_relationship = GroupRelationship.objects.get(group_id=group_id)
-        except ObjectDoesNotExist:
-            existing_group = None
-            existing_group_relationship = None
-        if existing_group and existing_group_relationship:
-            response_data['name'] = existing_group_relationship.name
-            response_data['id'] = existing_group.id
-            response_data['uri'] = request.path
-            response_data['resources'] = []
-            resource_uri = '{}/users'.format(request.path)
-            response_data['resources'].append({'uri': resource_uri})
-            resource_uri = '{}/groups'.format(request.path)
-            response_data['resources'].append({'uri': resource_uri})
-            response_status = status.HTTP_200_OK
-        else:
-            response_status = status.HTTP_404_NOT_FOUND
-        return Response(response_data, status=response_status)
+    response_data = {}
+    base_uri = _generate_base_uri(request)
+    try:
+        existing_group = Group.objects.get(id=group_id)
+        existing_group_relationship = GroupRelationship.objects.get(group_id=group_id)
+    except ObjectDoesNotExist:
+        existing_group = None
+        existing_group_relationship = None
+    if existing_group and existing_group_relationship:
+        response_data['name'] = existing_group_relationship.name
+        response_data['id'] = existing_group.id
+        response_data['uri'] = base_uri
+        response_data['resources'] = []
+        resource_uri = '{}/users'.format(base_uri)
+        response_data['resources'].append({'uri': resource_uri})
+        resource_uri = '{}/groups'.format(base_uri)
+        response_data['resources'].append({'uri': resource_uri})
+        response_status = status.HTTP_200_OK
+    else:
+        response_status = status.HTTP_404_NOT_FOUND
+    return Response(response_data, status=response_status)
 
 
 @api_view(['POST'])
@@ -81,34 +90,34 @@ def group_users_list(request, group_id):
     """
     POST creates a new group-user relationship in the system
     """
-    if request.method == 'POST':
-        response_data = {}
-        group_id = group_id
-        user_id = request.DATA['user_id']
+    response_data = {}
+    group_id = group_id
+    user_id = request.DATA['user_id']
+    base_uri = _generate_base_uri(request)
+    try:
+        existing_group = Group.objects.get(id=group_id)
+        existing_user = User.objects.get(id=user_id)
+    except ObjectDoesNotExist:
+        existing_group = None
+        existing_user = None
+    if existing_group and existing_user:
         try:
-            existing_group = Group.objects.get(id=group_id)
-            existing_user = User.objects.get(id=user_id)
+            existing_relationship = Group.objects.get(user=existing_user)
         except ObjectDoesNotExist:
-            existing_group = None
-            existing_user = None
-        if existing_group and existing_user:
-            try:
-                existing_relationship = Group.objects.get(user=existing_user)
-            except ObjectDoesNotExist:
-                existing_relationship = None
-            if existing_relationship is None:
-                existing_group.user_set.add(existing_user.id)
-                response_data['uri'] = '{}/{}'.format(request.path, existing_user.id)
-                response_data['group_id'] = str(existing_group.id)
-                response_data['user_id'] = str(existing_user.id)
-                response_status = status.HTTP_201_CREATED
-            else:
-                response_data['uri'] = '{}/{}'.format(request.path, existing_user.id)
-                response_data['message'] = "Relationship already exists."
-                response_status = status.HTTP_409_CONFLICT
+            existing_relationship = None
+        if existing_relationship is None:
+            existing_group.user_set.add(existing_user.id)
+            response_data['uri'] = '{}/{}'.format(base_uri, existing_user.id)
+            response_data['group_id'] = str(existing_group.id)
+            response_data['user_id'] = str(existing_user.id)
+            response_status = status.HTTP_201_CREATED
         else:
-            response_status = status.HTTP_404_NOT_FOUND
-        return Response(response_data, status=response_status)
+            response_data['uri'] = '{}/{}'.format(base_uri, existing_user.id)
+            response_data['message'] = "Relationship already exists."
+            response_status = status.HTTP_409_CONFLICT
+    else:
+        response_status = status.HTTP_404_NOT_FOUND
+    return Response(response_data, status=response_status)
 
 
 @api_view(['GET', 'DELETE'])
@@ -120,6 +129,7 @@ def group_users_detail(request, group_id, user_id):
     """
     if request.method == 'GET':
         response_data = {}
+        base_uri = _generate_base_uri(request)
         try:
             existing_group = Group.objects.get(id=group_id)
             existing_relationship = existing_group.user_set.get(id=user_id)
@@ -129,7 +139,7 @@ def group_users_detail(request, group_id, user_id):
         if existing_group and existing_relationship:
             response_data['group_id'] = existing_group.id
             response_data['user_id'] = existing_relationship.id
-            response_data['uri'] = request.path
+            response_data['uri'] = base_uri
             response_status = status.HTTP_200_OK
         else:
             response_status = status.HTTP_404_NOT_FOUND
@@ -152,10 +162,11 @@ def group_groups_list(request, group_id):
     GET retrieves the existing group-group relationships for the specified group
     """
     if request.method == 'POST':
+        response_data = {}
         to_group_id = request.DATA['group_id']
         relationship_type = request.DATA['relationship_type']
-        response_data = {}
-        response_data['uri'] = '{}/{}'.format(request.path, to_group_id)
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = '{}/{}'.format(base_uri, to_group_id)
         response_data['group_id'] = str(to_group_id)
         response_data['relationship_type'] = relationship_type
         try:
@@ -185,13 +196,14 @@ def group_groups_list(request, group_id):
             from_group_relationship = None
         response_data = []
         if from_group_relationship:
+            base_uri = _generate_base_uri(request)
             child_groups = GroupRelationship.objects.filter(parent_group_id=group_id)
             if child_groups:
                 for group in child_groups:
                     response_data.append({
                                          "id": group.group_id,
                                          "relationship_type": RELATIONSHIP_TYPES['hierarchical'],
-                                         "uri": '{}/{}'.format(request.path, group.group.id)
+                                         "uri": '{}/{}'.format(base_uri, group.group.id)
                                          })
             linked_groups = from_group_relationship.get_linked_group_relationships()
             if linked_groups:
@@ -199,7 +211,7 @@ def group_groups_list(request, group_id):
                     response_data.append({
                                          "id": group.to_group_relationship_id,
                                          "relationship_type": RELATIONSHIP_TYPES['graph'],
-                                         "uri": '{}/{}'.format(request.path, group.to_group_relationship_id)
+                                         "uri": '{}/{}'.format(base_uri, group.to_group_relationship_id)
                                          })
             response_status = status.HTTP_200_OK
         else:
@@ -216,7 +228,8 @@ def group_groups_detail(request, group_id, related_group_id):
     """
     if request.method == 'GET':
         response_data = {}
-        response_data['uri'] = request.path
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = base_uri
         response_data['from_group_id'] = group_id
         response_data['to_group_id'] = related_group_id
         response_status = status.HTTP_404_NOT_FOUND
