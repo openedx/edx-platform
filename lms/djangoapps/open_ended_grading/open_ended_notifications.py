@@ -3,7 +3,6 @@ import json
 import logging
 
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
 
 from xmodule.open_ended_grading_classes import peer_grading_service
 from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
@@ -24,16 +23,10 @@ NOTIFICATION_CACHE_TIME = 300
 KEY_PREFIX = "open_ended_"
 
 NOTIFICATION_TYPES = (
-    # Translators: "Peer Grading" is a panel where peer can grade student-provided answers.
-    ('student_needs_to_peer_grade', 'peer_grading', _('Peer Grading')),
-    # Translators: "Staff Grading" is a panel where instructor can grade student-provided answers.
-    ('staff_needs_to_grade', 'staff_grading', _('Staff Grading')),
-    # Translators: "Problems you have submitted" refers to the problems that the currently-logged-in
-    # student has provided an answer for.
-    ('new_student_grading_to_view', 'open_ended_problems', _('Problems you have submitted')),
-    # Translators: "Flagged Submissions" refers to student-provided answers to a problem which are
-    # marked by instructor or peer graders as 'flagged' potentially inappropriate.
-    ('flagged_submissions_exist', 'open_ended_flagged_problems', _('Flagged Submissions'))
+    ('student_needs_to_peer_grade', 'peer_grading', 'Peer Grading'),
+    ('staff_needs_to_grade', 'staff_grading', 'Staff Grading'),
+    ('new_student_grading_to_view', 'open_ended_problems', 'Problems you have submitted'),
+    ('flagged_submissions_exist', 'open_ended_flagged_problems', 'Flagged Submissions')
 )
 
 
