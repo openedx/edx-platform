@@ -69,9 +69,11 @@ setup(
         ],
         'course_key': [
             'slashes = xmodule.modulestore.locations:SlashSeparatedCourseKey',
+            'course-locator = xmodule.modulestore.locator:CourseLocator',
         ],
         'usage_key': [
             'location = xmodule.modulestore.locations:Location',
+            'edx = xmodule.modulestore.locator:BlockUsageLocator',
         ]
     },
 )
