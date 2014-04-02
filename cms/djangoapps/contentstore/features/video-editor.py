@@ -112,11 +112,10 @@ def set_show_captions(step, setting):
     # Prevent cookies from overriding course settings
     world.browser.cookies.delete('hide_captions')
 
-    world.css_click('a.edit-button')
-    world.wait_for(lambda _driver: world.css_visible('a.action-save'))
+    world.edit_component()
     world.select_editor_tab('Advanced')
     world.browser.select('Transcript Display', setting)
-    world.css_click('a.action-save')
+    world.save_component()
 
 
 @step('when I view the video it (.*) show the captions$')
@@ -161,7 +160,7 @@ def correct_video_settings(_step):
 
 @step('my video display name change is persisted on save$')
 def video_name_persisted(step):
-    world.css_click('a.action-save')
+    world.save_component()
     reload_the_page(step)
     world.wait_for_xmodule()
     world.edit_component()

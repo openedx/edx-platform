@@ -218,9 +218,7 @@ def check_transcripts_field(_step, values, field_name):
 
 @step('I save changes$')
 def save_changes(_step):
-    save_css = 'a.action-save'
-    world.css_click(save_css)
-    world.wait_for_ajax_complete()
+    world.save_component()
 
 
 @step('I open tab "([^"]*)"$')

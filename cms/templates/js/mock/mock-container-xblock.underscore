@@ -1,4 +1,4 @@
-<section class="wrapper-xblock level-page" data-locator="AndyA.ABT101.2014/branch/draft/block/vertical131">
+<section class="wrapper-xblock level-page" data-locator="testCourse/branch/draft/block/vertical131">
 <header class="xblock-header">
     <div class="header-details">
         <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse collapse">
@@ -18,7 +18,7 @@
 <div class="vert-mod">
 <div class="vert vert-0" data-id="i4x://AndyA/ABT101/vertical/2758bbc495dd40d59050da15b40bd9a5">
 
-    <section class="wrapper-xblock level-nesting is-collapsible" data-locator="AndyA.ABT101.2014/branch/draft/block/vertical275">
+    <section class="wrapper-xblock level-nesting is-collapsible" data-locator="testCourse/branch/draft/block/vertical275">
         <header class="xblock-header">
             <div class="header-details">
                 <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse collapse">
@@ -38,7 +38,7 @@
                 <div class="vert-mod">
                     <div class="vert vert-0" data-id="i4x://AndyA/ABT101/html/4471618afafb45bfb86cbe511973e225">
 
-                        <section class="wrapper-xblock level-element" data-locator="AndyA.ABT101.2014/branch/draft/block/html447" data-display-name="" data-category="html">
+                        <section class="wrapper-xblock level-element" data-locator="testCourse/branch/draft/block/html447" data-display-name="" data-category="html">
                             <header class="xblock-header">
                                 <div class="header-details">
 
@@ -65,7 +65,7 @@
                     </div>
                     <div class="vert vert-1" data-id="i4x://AndyA/ABT101/video/fbd800d0bdbd4cb69ac70c47c9f699e1">
 
-                        <section class="wrapper-xblock level-element" data-locator="AndyA.ABT101.2014/branch/draft/block/videofbd" data-display-name="Video" data-category="video">
+                        <section class="wrapper-xblock level-element" data-locator="testCourse/branch/draft/block/videofbd" data-display-name="Video" data-category="video">
                             <header class="xblock-header">
                                 <div class="header-details">
                                     Video
@@ -163,7 +163,7 @@
 </div>
 <div class="vert vert-1" data-id="i4x://AndyA/ABT101/vertical/c5c8b27c2c5546e784432f3b2b6cf2ea">
 
-    <section class="wrapper-xblock level-nesting is-collapsible" data-locator="AndyA.ABT101.2014/branch/draft/block/verticalc5c">
+    <section class="wrapper-xblock level-nesting is-collapsible" data-locator="testCourse/branch/draft/block/verticalc5c">
         <header class="xblock-header">
             <div class="header-details">
                 <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse collapse">
@@ -183,7 +183,7 @@
                 <div class="vert-mod">
                     <div class="vert vert-0" data-id="i4x://AndyA/ABT101/html/dd6ef295fda74a639842e1a49c66b2c7">
 
-                        <section class="wrapper-xblock level-element" data-locator="AndyA.ABT101.2014/branch/draft/block/htmldd6" data-display-name="Text" data-category="html">
+                        <section class="wrapper-xblock level-element" data-locator="testCourse/branch/draft/block/htmldd6" data-display-name="Text" data-category="html">
                             <header class="xblock-header">
                                 <div class="header-details">
                                     Text
@@ -210,7 +210,7 @@
                     </div>
                     <div class="vert vert-1" data-id="i4x://AndyA/ABT101/problem/b40ecbe4ed1b4280ae93e2a158edae6f">
 
-                        <section class="wrapper-xblock level-element" data-locator="AndyA.ABT101.2014/branch/draft/block/problemb40" data-display-name="Checkboxes" data-category="problem">
+                        <section class="wrapper-xblock level-element" data-locator="testCourse/branch/draft/block/problemb40" data-display-name="Checkboxes" data-category="problem">
                             <header class="xblock-header">
                                 <div class="header-details">
                                     Checkboxes

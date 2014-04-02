@@ -38,6 +38,13 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 }
             },
 
+            getDefaultModes: function() {
+                return [
+                    { id: 'editor', name: gettext("Editor")},
+                    { id: 'settings', name: gettext("Settings")}
+                ];
+            },
+
             hasCustomTabs: function() {
                 return this.$('.editor-with-tabs').length > 0;
             },

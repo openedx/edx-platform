@@ -273,7 +273,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             'context_course': course,
             'unit': item,
             'unit_locator': locator,
-            'xblocks': [xblock for xblock in xblocks],
+            'xblocks': xblocks,
             'locators': locators,
             'component_templates': component_templates,
             'draft_preview_link': preview_lms_link,
@@ -320,8 +320,8 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
             parent = get_parent_xblock(parent)
         ancestor_xblocks.reverse()
 
-        unit = None if not ancestor_xblocks else ancestor_xblocks[0]
-        unit_publish_state = None if not unit else compute_publish_state(unit)
+        unit = ancestor_xblocks[0] if ancestor_xblocks else None
+        unit_publish_state = compute_publish_state(unit) if unit else None
 
         return render_to_response('container.html', {
             'context_course': course,

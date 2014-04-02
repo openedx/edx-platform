@@ -2,7 +2,7 @@ define(["jquery", "underscore", "js/views/modals/base_modal"],
     function ($, _, BaseModal) {
 
         describe("BaseModal", function() {
-            var baseViewPrototype, MockModal;
+            var baseViewPrototype, MockModal, modal;
 
             MockModal = BaseModal.extend({
                 initialize: function() {
@@ -14,8 +14,14 @@ define(["jquery", "underscore", "js/views/modals/base_modal"],
                 }
             });
 
+            afterEach(function() {
+                if (modal) {
+                    modal.hide();
+                }
+            });
+
             it('is visible after show is called', function () {
-                var modal = new MockModal();
+                modal = new MockModal();
                 modal.render();
                 modal.show();
                 expect($('body')).toHaveClass('modal-window-is-shown');
@@ -24,7 +30,7 @@ define(["jquery", "underscore", "js/views/modals/base_modal"],
             });
 
             it('is invisible after hide is called', function () {
-                var modal = new MockModal();
+                modal = new MockModal();
                 modal.render();
                 modal.show();
                 modal.hide();

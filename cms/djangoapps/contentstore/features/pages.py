@@ -50,8 +50,7 @@ def change_name(step, new_name):
     world.css_fill(input_css, new_name)
     if world.is_firefox():
         world.trigger_event(input_css)
-    save_button = 'a.action-save'
-    world.css_click(save_button)
+    world.save_component()
 
 
 @step(u'I drag the first static page to the last$')

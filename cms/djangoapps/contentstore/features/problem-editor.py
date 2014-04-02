@@ -286,5 +286,5 @@ def set_weight(weight):
 
 
 def open_high_level_source():
-    world.css_click('a.edit-button')
+    world.edit_component()
     world.css_click('.launch-latex-compiler > a')

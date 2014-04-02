@@ -13,6 +13,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/views/modals/edit_xblock",
             editorModeButtonTemplate = readFixtures('editor-mode-button.underscore'),
             installEditTemplates,
             showEditModal,
+            isShowingModal,
             cancelModal;
 
         installEditTemplates = function() {
@@ -39,6 +40,10 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/views/modals/edit_xblock",
             return modal;
         };
 
+        isShowingModal = function() {
+            return $('.wrapper-modal-window').length > 0;
+        };
+
         cancelModal = function(modal) {
             var modalElement, cancelButton;
             if (modal) {
@@ -51,10 +56,10 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/views/modals/edit_xblock",
             cancelButton.click();
         };
 
-
         return {
-            "installEditTemplates": installEditTemplates,
-            "showEditModal": showEditModal,
-            "cancelModal": cancelModal
+            'installEditTemplates': installEditTemplates,
+            'showEditModal': showEditModal,
+            'isShowingModal': isShowingModal,
+            'cancelModal': cancelModal
         };
     });

@@ -7,7 +7,7 @@
         <h1 class="page-header">
             <small class="navigation navigation-parents">
 
-                <a href="/unit/AndyA.ABT101.2014/branch/draft/block/vertical8eb" class="navigation-link navigation-parent">Unit 1</a>
+                <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-link navigation-parent">Unit 1</a>
                 <a href="#" class="navigation-link navigation-current">Nested Vertical Test</a>
             </small>
         </h1>
@@ -25,7 +25,7 @@
 <section class="content-area">
 
 <article class="content-primary window">
-<section class="wrapper-xblock level-page" data-locator="AndyA.ABT101.2014/branch/draft/block/vertical131">
+<section class="wrapper-xblock level-page" data-locator="TestCourse/branch/draft/block/vertical131">
 </section>
 <div class="no-container-content is-hidden">
     <p>This page has no content yet.</p>
@@ -39,8 +39,8 @@
         <h3 class="title-3">Publishing Status</h3>
         <p class="copy">
 
-            This content is published with unit <a href="/unit/AndyA.ABT101.2014/branch/draft/block/vertical8eb">Unit 1</a>.
-            Say something useful about <a href="/unit/AndyA.ABT101.2014/branch/draft/block/vertical8eb">Unit 1</a> being in draft or private mode.
+            This content is published with unit <a href="/unit/TestCourse/branch/draft/block/vertical8eb">Unit 1</a>.
+            Say something useful about <a href="/unit/TestCourse/branch/draft/block/vertical8eb">Unit 1</a> being in draft or private mode.
         </p>
     </div>
     <div class="bit">

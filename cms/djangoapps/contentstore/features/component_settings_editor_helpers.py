@@ -105,8 +105,7 @@ def click_component_from_menu(category, component_type, is_advanced):
 
 @world.absorb
 def edit_component_and_select_settings():
-    world.wait_for(lambda _driver: world.css_visible('a.edit-button'))
-    world.css_click('a.edit-button')
+    world.edit_component()
     world.css_click('.settings-button')
 
 
@@ -125,7 +124,6 @@ def select_editor_tab(tab_name):
     tab = matching_tabs[0]
     tab.click()
     world.wait_for_ajax_complete()
-
 
 
 def enter_xml_in_advanced_problem(step, text):

@@ -31,7 +31,7 @@ define(["jquery", "underscore", "js/views/baseview", "js/views/xblock", "js/view
                 noContentElement.addClass('is-hidden');
                 xblockView.$el.addClass('is-hidden');
 
-                // Add actions to any root buttons
+                // Add actions to any top level buttons, e.g. "Edit" of the container itself
                 self.addButtonActions(this.$el);
 
                 // Render the xblock

@@ -43,6 +43,8 @@ define(["jquery", "underscore", "backbone", "js/utils/handle_iframe_binding"],
 
             toggleExpandCollapse: function(event) {
                 var target = $(event.target);
+                // Don't propagate the event as it is possible that two views will both contain
+                // this element, e.g. clicking on the element of a child view container in a parent.
                 event.stopPropagation();
                 event.preventDefault();
                 target.closest('.expand-collapse').toggleClass('expand').toggleClass('collapse');

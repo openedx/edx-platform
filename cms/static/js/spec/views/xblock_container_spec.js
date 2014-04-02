@@ -40,6 +40,9 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
 
                 afterEach(function() {
                     window.MockXBlock = null;
+                    if (edit_helpers.isShowingModal()) {
+                        edit_helpers.cancelModal();
+                    }
                 });
 
                 mockContainerXBlockHtml = readFixtures('mock/mock-container-xblock.underscore');
@@ -66,14 +69,18 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                         "resources": []
                     });
                     editButtons = containerView.$('.edit-button');
+                    // The container renders four mock xblocks, so there should be four edit buttons
                     expect(editButtons.length).toBe(4);
                     editButtons.first().click();
+                    // Make sure that the correct xblock is requested to be edited
+                    expect(requests[requests.length - 1].url).toBe(
+                        '/xblock/testCourse/branch/draft/block/html447/studio_view'
+                    );
                     create_sinon.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
                         "resources": []
                     });
                     expect($('.wrapper-modal-window')).toHaveClass('is-shown');
-                    edit_helpers.cancelModal();
                 });
             });
         });

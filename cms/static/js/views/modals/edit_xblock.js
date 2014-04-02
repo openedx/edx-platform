@@ -20,9 +20,9 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
 
             /**
              * Show an edit modal for the specified xblock
-             * @param xblockElement The
-             * @param rootXBlockInfo
-             * @param options
+             * @param xblockElement The element that contains the xblock to be edited.
+             * @param rootXBlockInfo An XBlockInfo model that describes the root xblock on the page.
+             * @param options A standard options object.
              */
             edit: function(xblockElement, rootXBlockInfo, options) {
                 this.xblockElement = xblockElement;
@@ -36,20 +36,17 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             },
 
             render: function() {
-                var xblockInfo = this.xblockInfo;
                 this.$el.html(this.template({
-                    xblockInfo: xblockInfo
+                    xblockInfo: this.xblockInfo
                 }));
             },
 
             displayXBlock: function() {
-                var xblockInfo = this.xblockInfo,
-                    editorView = new XBlockEditorView({
-                        el: this.$('.xblock-editor'),
-                        model: xblockInfo
-                    });
-                this.editorView = editorView;
-                editorView.render({
+                this.editorView = new XBlockEditorView({
+                    el: this.$('.xblock-editor'),
+                    model: this.xblockInfo
+                });
+                this.editorView.render({
                     success: _.bind(this.onDisplayXBlock, this)
                 });
             },
@@ -69,10 +66,19 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 } else {
                     this.$('.modal-window-title').text(title);
                     if (editorView.getMetadataEditor()) {
-                        this.addModeButton('editor', gettext("Editor"));
-                        this.addModeButton('settings', gettext("Settings"));
+                        this.addDefaultModes();
                         this.selectMode(editorView.mode);
                     }
+                }
+            },
+
+            addDefaultModes: function() {
+                var defaultModes = this.editorView.getDefaultModes(),
+                    i,
+                    mode;
+                for (i = 0; i < defaultModes.length; i++) {
+                    mode = defaultModes[i];
+                    this.addModeButton(mode.id, mode.name);
                 }
             },
 
@@ -107,7 +113,6 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 this.editorView.save({
                     success: function() {
                         self.hide();
-                        self.$el.html("");
                         if (refresh) {
                             refresh(xblockInfo);
                         }
@@ -124,24 +129,11 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             },
 
             findXBlockInfo: function(xblockElement, defaultXBlockInfo) {
-                var xblockInfo = defaultXBlockInfo,
-                    locator,
-                    displayName,
-                    category;
+                var xblockInfo = defaultXBlockInfo;
                 if (xblockElement.length > 0) {
-                    locator = xblockElement.data('locator');
-                    displayName = xblockElement.data('display-name');
-                    category = xblockElement.data('category');
-                    if (!displayName) {
-                        displayName = category;
-                        if (!category) {
-                            displayName = gettext('Empty');
-                        }
-                    }
                     xblockInfo = new XBlockInfo({
-                        id: locator,
-                        display_name: displayName,
-                        category: category
+                        id: xblockElement.data('locator'),
+                        category: xblockElement.data('category')
                     });
                 }
                 return xblockInfo;
