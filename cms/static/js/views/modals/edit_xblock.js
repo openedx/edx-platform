@@ -53,10 +53,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
 
             onDisplayXBlock: function() {
                 var editorView = this.editorView,
-                    displayName,
-                    title;
-                displayName = editorView.getDisplayName();
-                title = interpolate(gettext("Editing: %(title)s"), { title: displayName }, true);
+                    title = this.getTitle();
                 if (editorView.hasCustomTabs()) {
                     // Hide the modal's header as the custom editor provides its own
                     this.$('.modal-header').hide();
@@ -70,6 +67,11 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                         this.selectMode(editorView.mode);
                     }
                 }
+            },
+
+            getTitle: function() {
+                var displayName = this.xblockElement.find('.component-header').text().trim();
+                return interpolate(gettext("Editing: %(title)s"), { title: displayName }, true);
             },
 
             addDefaultModes: function() {

@@ -117,14 +117,6 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 return data;
             },
 
-            getDisplayName: function() {
-                var metadataEditor = this.getMetadataEditor();
-                if (metadataEditor) {
-                    return metadataEditor.getDisplayName();
-                }
-                return "How do we get the display name now?";
-            },
-
             /**
              * Returns the metadata that has changed in the editor. This is a combination of the metadata
              * modified in the "Settings" editor, as well as any custom metadata provided by the component.
