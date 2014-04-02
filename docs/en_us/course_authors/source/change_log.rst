@@ -9,8 +9,10 @@ Change Log
    :header-rows: 1
 
    * - Date
-     - Change   
-   * - 3/31/14 
+     - Change  
+   * - 04/01/14 
+     - Update the :ref:`Establish a Grading Policy` chapter to emphasize that grading is applied to subsections only. 
+   * - 03/31/14 
      - Expanded the :ref:`Grades` chapter to include the new :ref:`Review_Answers` section.
    * - 03/27/14
      - Updated the :ref:`Add Pages` section to reflect feature changes.
