@@ -7,6 +7,7 @@ import datetime
 from textwrap import dedent
 from collections import namedtuple
 import requests
+from path import path
 from lazy import lazy
 from . import STUDIO_BASE_URL
 
@@ -185,6 +186,7 @@ class CourseFixture(StudioApiFixture):
         self._updates = []
         self._handouts = []
         self._children = []
+        self._assets = []
 
     def __str__(self):
         """
@@ -215,6 +217,12 @@ class CourseFixture(StudioApiFixture):
         """
         self._handouts.append(asset_name)
 
+    def add_asset(self, asset_name):
+        """
+        Add the asset to the list of assets to be uploaded when the install method is called.
+        """
+        self._assets.append(asset_name)
+
     def install(self):
         """
         Create the course and XBlocks within the course.
@@ -223,10 +231,10 @@ class CourseFixture(StudioApiFixture):
         conflicts between tests.
         """
         self._create_course()
-
         self._install_course_updates()
         self._install_course_handouts()
         self._configure_course()
+        self._upload_assets()
         self._create_xblock_children(self._course_loc, self._children)
 
     @property
@@ -242,6 +250,13 @@ class CourseFixture(StudioApiFixture):
         Return the locator string for the course updates
         """
         return "{org}.{number}.{run}/branch/draft/block/updates".format(**self._course_dict)
+
+    @property
+    def _assets_url(self):
+        """
+        Return the url string for the assets
+        """
+        return "/assets/{org}.{number}.{run}/branch/draft/block/{run}".format(**self._course_dict)
 
     @property
     def _handouts_loc(self):
@@ -358,6 +373,28 @@ class CourseFixture(StudioApiFixture):
                 raise CourseFixtureError(
                     "Could not add update to course: {0}.  Status was {1}".format(
                         update, response.status_code))
+
+    def _upload_assets(self):
+        url = STUDIO_BASE_URL + self._assets_url
+
+        test_dir = path(__file__).abspath().dirname().dirname().dirname()
+
+        for asset_name in self._assets:
+            srt_path = test_dir + '/data/uploads/' + asset_name
+
+            fd = open(srt_path)
+            files = {'file': (asset_name, fd)}
+
+            headers = {
+                'Accept': 'application/json',
+                'X-CSRFToken': self.session_cookies.get('csrftoken', '')
+            }
+
+            upload_response = self.session.post(url, files=files, headers=headers)
+
+            if not upload_response.ok:
+                raise CourseFixtureError('Could not upload {asset_name}. Status code: {code}'.format(
+                    asset_name=asset_name, code=upload_response.status_code))
 
     def _create_xblock_children(self, parent_loc, xblock_descriptions):
         """
