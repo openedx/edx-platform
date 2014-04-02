@@ -558,11 +558,11 @@ class ViewInStudioTest(ModuleStoreTestCase):
         Define the XML backed course to use.
         Toy courses are already loaded in XML and mixed modulestores.
         """
-        course_id = 'edX/toy/2012_Fall'
-        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        descriptor = modulestore().get_instance(course_id, location)
+        course_key = SlashSeparatedCourseKey.from_string('edX/toy/2012_Fall')
+        location = course_key.make_usage_key('chapter', 'Overview')
+        descriptor = modulestore().get_item(location)
 
-        self._get_module(course_id, descriptor, location)
+        self._get_module(course_key, descriptor, location)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

@@ -598,7 +598,7 @@ class CapaMixin(CapaFields):
 
         context = {
             'problem': content,
-            'id': self.id,
+            'id': self.location.to_deprecated_string(),
             'check_button': check_button,
             'check_button_checking': check_button_checking,
             'reset_button': self.should_show_reset_button(),
