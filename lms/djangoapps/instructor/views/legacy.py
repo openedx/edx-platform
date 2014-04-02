@@ -25,7 +25,7 @@ from django.utils import timezone
 
 from xmodule_modifiers import wrap_xblock
 import xmodule.graders as xmgraders
-from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -65,6 +65,7 @@ from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _
 
 from microsite_configuration import microsite
+from xmodule.modulestore.locations import i4xEncoder
 
 log = logging.getLogger(__name__)
 
@@ -128,7 +129,10 @@ def instructor_dashboard(request, course_id):
                 if getattr(field.scope, 'user', False):
                     continue
 
-                data.append([field.name, json.dumps(field.read_json(course))])
+                data.append([
+                    field.name,
+                    json.dumps(field.read_json(course), cls=i4xEncoder)
+                ])
         datatable['data'] = data
         return datatable
 
