@@ -1,6 +1,6 @@
 define(
     [
-        'jquery', 'underscore', 'js/spec/create_sinon', 'squire'
+        'jquery', 'underscore', 'js/spec_helpers/create_sinon', 'squire'
     ],
 function ($, _, create_sinon, Squire) {
     'use strict';
