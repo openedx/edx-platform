@@ -10,6 +10,7 @@ from student.tests.factories import AnonymousUserFactory
 
 from student.roles import GlobalStaff, CourseRole, CourseStaffRole
 from xmodule.modulestore.django import loc_mapper
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class RolesTestCase(TestCase):
