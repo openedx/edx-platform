@@ -9,13 +9,12 @@ from django.core.management.base import BaseCommand
 from optparse import make_option
 
 from xmodule.modulestore.django import modulestore
-from courseware.courses import get_course
 from courseware.access import _has_staff_access_to_course_id
 from django.contrib.auth.models import User
 
 from instructor.offline_gradecalc import student_grades
 from courseware import grades
-
+import logging
 
 
 
@@ -119,27 +118,28 @@ def gendata(request):
             
             #By subsection
             statsec = []
-
-            courseware_summary = grades.progress_summary(user, request, course);
-
-            if courseware_summary is None:
-                continue
-
             complition = 0
             complition_cnt = 0
-            for chapter in courseware_summary:
-                total = 0
-                flag = False
-                for section in chapter['sections']:
-                    if not section['graded'] or len(section['format']) < 1:
-                        continue
-                    flag = True
-                    statsec += [((section['section_total'].earned / section['section_total'].possible) if section['section_total'].possible else 0)]
-                    total += ((section['section_total'].earned / section['section_total'].possible) if section['section_total'].possible else 0) * category_weights.get(section['format'], 0.0)
-                statsec += [total]
-                if flag:
-                    complition += total
-                    complition_cnt += 1
+                
+            try:
+                courseware_summary = grades.progress_summary(user, request, course);
+
+                for chapter in courseware_summary:
+                    total = 0
+                    flag = False
+                    for section in chapter['sections']:
+                        if not section['graded'] or len(section['format']) < 1:
+                            continue
+                        flag = True
+                        statsec += [((section['section_total'].earned / section['section_total'].possible) if section['section_total'].possible else 0)]
+                        total += ((section['section_total'].earned / section['section_total'].possible) if section['section_total'].possible else 0) * category_weights.get(section['format'], 0.0)
+                    statsec += [total]
+                    if flag:
+                        complition += total
+                        complition_cnt += 1
+            except:
+                pass
+
             if complition_cnt == 0:
                 complition = 0
             else:
@@ -320,12 +320,14 @@ def fullstat(request = None):
                 else:
                     datarow += [u"Нет"]
 
-                datarow += statprob
-                datarow += statsec
+                if len(statsec) > 0 and len(statprob) > 0:
+                    datarow += statprob
+                    datarow += statsec
                 
                 datafull.append(datarow)
             except:
-                raise
+                logging.exception("Something awful happened in fullstat!")
+                pass
     datatablefull['data'] = datafull
     return_csv('full_stat.csv',datatablefull, open("/var/www/edx/fullstat.csv", "wb"))
 
@@ -396,12 +398,16 @@ def fullstat(request = None):
                 else:
                     datarow += [u"Нет"]
 
-                datarow += statprob
-                datarow += statsec
+
+                if len(statsec) > 0 and len(statprob) > 0:
+                    datarow += statprob
+                    datarow += statsec
+                else:
+                    datarow += [0] * len(assignments)
                 
                 data.append(datarow)
-            except Exception as e:
-                print e
+            except:
+                logging.exception("Something awful happened in {course_id}!".format(course_id = course.id))
                 pass
         datatable['data'] = data
         return_csv(course.id,datatable, open("/var/www/edx/" + course.id.replace('/','_') + ".xls", "wb"), encoding="cp1251", dialect="excel-tab")
