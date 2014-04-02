@@ -629,4 +629,3 @@ def click_on_the_caption(_step, index, expected_time):
     find_caption_line_by_data_index(int(index)).click()
     actual_time = elapsed_time()
     assert int(expected_time) == actual_time
-

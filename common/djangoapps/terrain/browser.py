@@ -163,6 +163,16 @@ def reset_data(scenario):
     world.absorb({}, 'scenario_dict')
 
 
+@before.each_scenario
+def configure_screenshots(scenario):
+    """
+    Before each scenario, turn off automatic screenshots.
+
+    Args: str, scenario. Name of current scenario.
+    """
+    world.auto_capture_screenshots = False
+
+
 @after.each_scenario
 def clear_data(scenario):
     world.spew('scenario_dict')
@@ -184,6 +194,23 @@ def reset_databases(scenario):
     xmodule.modulestore.django.clear_existing_modulestores()
 
 
+@world.absorb
+def capture_screenshot(image_name):
+    """
+    Capture a screenshot outputting it to a defined directory.
+    This function expects only the name of the file. It will generate
+    the full path of the output screenshot.
+
+    If the name contains spaces, they ill be converted to underscores.
+    """
+    output_dir = '{}/log/auto_screenshots'.format(settings.TEST_ROOT)
+    image_name = '{}/{}.png'.format(output_dir, image_name.replace(' ', '_'))
+    try:
+        world.browser.driver.save_screenshot(image_name)
+    except WebDriverException:
+        LOGGER.error("Could not capture a screenshot '{}'".format(image_name))
+
+
 @after.each_scenario
 def screenshot_on_error(scenario):
     """
@@ -196,6 +223,47 @@ def screenshot_on_error(scenario):
             world.browser.driver.save_screenshot(image_name)
         except WebDriverException:
             LOGGER.error('Could not capture a screenshot')
+
+
+def capture_screenshot_for_step(step, when):
+    """
+    Useful method for debugging acceptance tests that are run in Vagrant.
+    This method runs automatically before and after each step of an acceptance
+    test scenario. The variable:
+
+         world.auto_capture_screenshots
+
+    either enables or disabled the taking of screenshots. To change the
+    variable there is a convenient step defined:
+
+        I (enable|disable) auto screenshots
+
+    If you just want to capture a single screenshot at a desired point in code,
+    you should use the method:
+
+        world.capture_screenshot("image_name")
+    """
+    if world.auto_capture_screenshots:
+        scenario_num = step.scenario.feature.scenarios.index(step.scenario)
+        step_num = step.scenario.steps.index(step) + 1
+        step_func_name = step.defined_at.function.func_name
+        image_name = "{prefix:03d}__{num}__{name}__{postfix}".format(
+            prefix=scenario_num,
+            num=step_num,
+            name=step_func_name,
+            postfix=when
+        )
+        world.capture_screenshot(image_name)
+
+
+@before.each_step
+def before_each_step(step):
+    capture_screenshot_for_step(step, 'before')
+
+
+@after.each_step
+def after_each_step(step):
+    capture_screenshot_for_step(step, 'after')
 
 
 @after.harvest
