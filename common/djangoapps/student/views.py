@@ -1264,7 +1264,10 @@ def auto_auth(request):
     email = request.GET.get('email', unique_name + "@example.com")
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
-    course_id = CourseKey.from_string(request.GET.get('course_id', None))
+    course_id = request.GET.get('course_id', None)
+    course_key = None
+    if course_id:
+        course_key = CourseKey.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object
@@ -1300,12 +1303,12 @@ def auto_auth(request):
     reg.save()
 
     # Enroll the user in a course
-    if course_id is not None:
-        CourseEnrollment.enroll(user, course_id)
+    if course_key is not None:
+        CourseEnrollment.enroll(user, course_key)
 
     # Apply the roles
     for role_name in role_names:
-        role = Role.objects.get(name=role_name, course_id=course_id)
+        role = Role.objects.get(name=role_name, course_id=course_key)
         user.roles.add(role)
 
     # Log in as the user
