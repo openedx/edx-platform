@@ -1,7 +1,6 @@
 """Views for items (modules)."""
 from __future__ import absolute_import
 
-import hashlib
 import logging
 from uuid import uuid4
 
@@ -51,16 +50,6 @@ CREATE_IF_NOT_FOUND = ['course_info']
 # TODO: Remove this code when Runtimes are no longer created by modulestores
 xmodule.x_module.descriptor_global_handler_url = handler_url
 xmodule.x_module.descriptor_global_local_resource_url = local_resource_url
-
-
-def hash_resource(resource):
-    """
-    Hash a :class:`xblock.fragment.FragmentResource
-    """
-    md5 = hashlib.md5()
-    for data in resource:
-        md5.update(data)
-    return md5.hexdigest()
 
 
 # pylint: disable=unused-argument
@@ -255,7 +244,7 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
 
         hashed_resources = OrderedDict()
         for resource in fragment.resources:
-            hashed_resources[hash_resource(resource)] = resource
+            hashed_resources[resource] = resource
 
         return JsonResponse({
             'html': fragment.content,
