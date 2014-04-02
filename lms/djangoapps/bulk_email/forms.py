@@ -64,8 +64,8 @@ class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
             # If we can do that, it's a real course.
             get_course_by_id(course_id, depth=1)
         except Exception as exc:
-            msg = 'Error encountered ({0})'.format(str(exc).capitalize())
-            msg += u' --- Entered course id was: "{0}". '.format(course_id)
+            msg = u'Error encountered ({0})'.format(unicode(exc).capitalize())
+            msg += u' --- Entered course id was: "{0}". '.format(self.cleaned_data["course_id"])
             msg += 'Please recheck that you have supplied a course id in the format: ORG/COURSE/RUN'
             raise forms.ValidationError(msg)
 
