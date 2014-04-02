@@ -6,7 +6,11 @@
     'use strict';
 
     this.gettext = function (s) {
-        return s;
+        if (s) {
+            return 1;
+        }
+
+        return 0;
     };
 
     this.ngettext = function (singular, plural, num) {
