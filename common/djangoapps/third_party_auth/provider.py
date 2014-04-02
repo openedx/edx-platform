@@ -178,6 +178,11 @@ class Registry(object):
 
         Args:
             provider_names: list of string. The providers to configure.
+
+        Raises:
+            ValueError: if the registry has already been configured, or if any
+            of the passed provider_names does not have a corresponding
+            BaseProvider child implementation.
         """
         if cls._CONFIGURED:
             raise ValueError('Provider registry already configured')
@@ -211,6 +216,9 @@ class Registry(object):
             backend_name: string. The python-social-auth
                 backends.base.BaseAuth.name (for example, 'google-oauth2') to
                 try and get a provider for.
+
+        Raises:
+            RuntimeError: if the registry has not been configured.
         """
         cls._check_configured()
         for enabled in cls._ENABLED.values():

@@ -365,6 +365,9 @@ def signin_user(request):
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action'),
+        # Bool injected into JS to submit form if we're inside a running third-
+        # party auth pipeline; distinct from the actual instance of the running
+        # pipeline, if any.
         'pipeline_running': 'true' if pipeline.running(request) else 'false',
         'platform_name': microsite.get_value(
             'platform_name',
@@ -719,7 +722,7 @@ def accounts_login(request):
 
 # Need different levels of logging
 @ensure_csrf_cookie
-def login_user(request, error=""):
+def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,unused-argument
     """AJAX request to log in the user."""
 
     backend_name = None
@@ -748,7 +751,7 @@ def login_user(request, error=""):
             third_party_auth_successful = True
         except User.DoesNotExist:
             AUDIT_LOG.warning(
-                u'Login failed - user with id %s has no social auth with backend_name %s'.format(
+                u'Login failed - user with id {user_id} has no social auth with backend_name {backend_name}'.format(
                     user_id=user_id, backend_name=backend_name))
             return JsonResponse({
                 "success": False,
