@@ -221,7 +221,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
             "at edx.org by a member of the course staff. "
             "The course should now appear on your edx.org dashboard.\n\n"
             "To start accessing course materials, please visit "
-            "https://edx.org/courses/MITx/999/Robot_Super_Course\n\n"
+            "https://edx.org/courses/MITx/999/Robot_Super_Course/\n\n"
             "----\nThis email was automatically sent from edx.org to Autoenrolled Test"
         )
 
@@ -322,7 +322,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
             "at edx.org by a member of the course staff. "
             "The course should now appear on your edx.org dashboard.\n\n"
             "To start accessing course materials, please visit "
-            "https://edx.org/courses/MITx/999/Robot_Super_Course\n\n"
+            "https://edx.org/courses/MITx/999/Robot_Super_Course/\n\n"
             "----\nThis email was automatically sent from edx.org to ShibTest Enrolled"
         )
 
@@ -335,7 +335,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
             "Dear student,\n\nYou have been invited to join "
             "Robot Super Course at edx.org by a member of the "
             "course staff.\n\n"
-            "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course and login.\n\n"
+            "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course/ and login.\n\n"
             "----\nThis email was automatically sent from edx.org to "
             "student5_1@test.com"
         )
