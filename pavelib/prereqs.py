@@ -14,8 +14,14 @@ NPM_REGISTRY = "http://registry.npmjs.org/"
 PYTHON_REQ_FILES = [
     'requirements/edx/pre.txt',
     'requirements/edx/base.txt',
-    'requirements/edx/post.txt'
+    'requirements/edx/post.txt',
 ]
+
+# Developers can have private requirements, for local copies of github repos,
+# or favorite debugging tools, etc.
+PRIVATE_REQS = 'requirements/private.txt'
+if os.path.exists(PRIVATE_REQS):
+    PYTHON_REQ_FILES.append(PRIVATE_REQS)
 
 
 def compute_fingerprint(path_list):
