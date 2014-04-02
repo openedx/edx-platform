@@ -517,9 +517,10 @@
 
       .field {
         float: left;
-        margin-right: ($baseline/2);
+        margin: 0 ($baseline/2) ($baseline/2);
 
-        label, input {
+        label,
+        input {
           display: block;
           text-align: left;
         }
@@ -527,6 +528,11 @@
         label {
           @extend %t-copy-sub1;
           margin-bottom: ($baseline/4);
+          font-weight: 600;
+        }
+
+        input[type="text"] {
+          @extend %t-copy-sub1;
         }
       }
     }

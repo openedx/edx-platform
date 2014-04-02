@@ -104,7 +104,7 @@
     }
 
 
-    // small modals - editors and dialogs
+    // small modals - quick editors and dialogs
     .modal-sm {
       width: 30%;
       min-width: ($baseline*15);
@@ -184,6 +184,7 @@
 
   // component editor
   .modal-window {
+
     .wrapper-comp-settings {
 
       .list-input {

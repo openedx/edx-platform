@@ -60,6 +60,7 @@ textarea.text {
 form {
 
   input[type=file] {
+    @include font-size(14);
     line-height: 1;
   }
 

@@ -111,13 +111,13 @@ body.view-container  .content-primary {
 
     // CASE: nesting level xblock rendering
     &.level-nesting {
+      @include transition(all $tmg-f2 linear 0s);
       border: none;
       padding-bottom: $baseline;
       box-shadow: none;
 
       &:hover {
-        @include transition(all $tmg-f2 linear 0s);
-        background-color: $gray-l7;
+        background-color: $gray-l6;
         box-shadow: 0 0 1px $shadow-d2 inset;
       }
 
@@ -142,10 +142,10 @@ body.view-container  .content-primary {
 
     // CASE: element level xblock rendering
     &.level-element {
+      @include transition(all $tmg-f2 linear 0s);
       box-shadow: none;
 
       &:hover {
-        @include transition(all $tmg-f2 linear 0s);
         border-color: $blue;
       }
 

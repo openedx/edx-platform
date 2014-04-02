@@ -1342,7 +1342,6 @@ body.unit .xblock-type-container {
   box-shadow: none;
 
   &:hover {
-    @include transition(all $tmg-f2 linear 0s);
     border-color: $blue;
 
     .container-drag {
@@ -1352,10 +1351,8 @@ body.unit .xblock-type-container {
   }
 
   .xblock-header {
-    margin-bottom: 0;
     border-bottom: 0;
     border-radius: ($baseline/5);
-    padding: ($baseline/2);
 
     .xblock-details {
       font-size: .9em;
