@@ -59,7 +59,6 @@ Feature: CMS Video Component Editor
     And I open tab "Advanced"
     And I upload transcript file "1mb_transcripts.srt" for "uk" language code
     And I save changes
-    And I wait for "10" seconds
     Then when I view the video it does show the captions
     And I see "Привіт, edX вітає вас." text in the captions
 

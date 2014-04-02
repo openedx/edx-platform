@@ -201,7 +201,7 @@ def upload_file(_step, file_name):
 
 @step('I see "([^"]*)" text in the captions')
 def check_text_in_the_captions(_step, text):
-    world.wait_for(lambda _: world.css_text('.subtitles'))
+    world.wait_for(lambda _: world.css_text('.subtitles'), 30)
     actual_text = world.css_text('.subtitles')
     assert (text in actual_text)
 
