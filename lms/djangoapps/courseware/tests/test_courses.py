@@ -11,12 +11,11 @@ from xmodule.modulestore.django import get_default_store_name_for_current_reques
 from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.keys import CourseKey
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 
 from courseware.courses import (
-    get_course_by_id, get_course, get_cms_course_link, course_image_url,
+    get_course_by_id, get_cms_course_link, course_image_url,
     get_course_info_section, get_course_about_section
 )
 from courseware.tests.helpers import get_request_for_user
@@ -28,28 +27,6 @@ CMS_BASE_TEST = 'testcms'
 
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
-
-    def test_get_course_by_id_invalid_chars(self):
-        """
-        Test that `get_course_by_id` throws a 404, rather than
-        an exception, when faced with unexpected characters
-        (such as unicode characters, and symbols such as = and ' ')
-        """
-        with self.assertRaises(Http404):
-            get_course_by_id(CourseKey.from_string('MITx/foobar/statistics=introduction'))
-            get_course_by_id(CourseKey.from_string('MITx/foobar/business and management'))
-            get_course_by_id(CourseKey.from_string('MITx/foobar/NiñøJoséMaríáßç'))
-
-    def test_get_course_invalid_chars(self):
-        """
-        Test that `get_course` throws a ValueError, rather than
-        a 404, when faced with unexpected characters
-        (such as unicode characters, and symbols such as = and ' ')
-        """
-        with self.assertRaises(ValueError):
-            get_course(CourseKey.from_string('MITx/foobar/statistics=introduction'))
-            get_course(CourseKey.from_string('MITx/foobar/business and management'))
-            get_course(CourseKey.from_string('MITx/foobar/NiñøJoséMaríáßç'))
 
     @override_settings(
         MODULESTORE=TEST_DATA_MONGO_MODULESTORE, CMS_BASE=CMS_BASE_TEST
@@ -64,7 +41,7 @@ class CoursesTest(ModuleStoreTestCase):
         )
 
         self.assertEqual(
-            u"//{}/course/org.num.name/branch/draft/block/name".format(
+            u"//{}/course/edx:org+num.name/branch/draft/block/name".format(
                 CMS_BASE_TEST
             ),
             get_cms_course_link(self.course)
