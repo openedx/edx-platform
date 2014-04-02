@@ -133,7 +133,7 @@ def enter_xml_in_advanced_problem(step, text):
     """
     world.edit_component()
     type_in_codemirror(0, text)
-    world.save_component(step)
+    world.save_component()
 
 
 @world.absorb
@@ -183,14 +183,14 @@ def verify_all_setting_entries(expected_entries):
 
 
 @world.absorb
-def save_component(step):
+def save_component():
     world.css_click("a.action-save")
     world.wait_for_ajax_complete()
 
 
 @world.absorb
 def save_component_and_reopen(step):
-    save_component(step)
+    save_component()
     # We have a known issue that modifications are still shown within the edit window after cancel (though)
     # they are not persisted. Refresh the browser to make sure the changes WERE persisted after Save.
     reload_the_page(step)
