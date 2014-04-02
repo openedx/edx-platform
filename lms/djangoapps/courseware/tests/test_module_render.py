@@ -24,6 +24,7 @@ from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.x_module import XModuleDescriptor
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from courseware import module_render as render
 from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
