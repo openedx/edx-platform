@@ -11,6 +11,7 @@ define(["jquery", "underscore", "underscore.string", "gettext", "js/views/basevi
             }),
 
             show: function() {
+                this.lastPosition = $(document).scrollTop();
                 $('body').addClass('modal-window-is-shown');
                 this.$('.wrapper-modal-window').addClass('is-shown');
             },
@@ -18,6 +19,7 @@ define(["jquery", "underscore", "underscore.string", "gettext", "js/views/basevi
             hide: function() {
                 $('body').removeClass('modal-window-is-shown');
                 this.$('.wrapper-modal-window').removeClass('is-shown');
+                $(document).scrollTop(this.lastPosition);
             }
         });
 

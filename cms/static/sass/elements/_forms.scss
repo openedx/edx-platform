@@ -59,20 +59,6 @@ textarea.text {
 // forms - additional UI
 form {
 
-  .field {
-    margin-bottom: ($baseline/2);
-  }
-
-  label {
-    @include font-size(14);
-    display: block;
-    font-weight: bold;
-  }
-
-  input[type="text"] {
-    @extend %t-copy-sub1;
-  }
-
   .note {
     @include box-sizing(border-box);
 
