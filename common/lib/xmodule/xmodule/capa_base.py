@@ -876,7 +876,7 @@ class CapaMixin(CapaFields):
         answers_without_files = convert_files_to_filenames(answers)
         event_info['answers'] = answers_without_files
 
-        metric_name = 'capa.check_problem'
+        metric_name = u'capa.check_problem.{}'.format
 
         _ = self.runtime.service(self, "i18n").ugettext
 
@@ -885,7 +885,7 @@ class CapaMixin(CapaFields):
             event_info['failure'] = 'closed'
             self.runtime.track_function('problem_check_fail', event_info)
             if dog_stats_api:
-                dog_stats_api.increment(metric_name, [u'result:failed', u'failure:closed'])
+                dog_stats_api.increment(metric_name('checks'), [u'result:failed', u'failure:closed'])
             raise NotFoundError(_("Problem is closed."))
 
         # Problem submitted. Student should reset before checking again
@@ -893,7 +893,7 @@ class CapaMixin(CapaFields):
             event_info['failure'] = 'unreset'
             self.runtime.track_function('problem_check_fail', event_info)
             if dog_stats_api:
-                dog_stats_api.increment(metric_name, [u'result:failed', u'failure:unreset'])
+                dog_stats_api.increment(metric_name('checks'), [u'result:failed', u'failure:unreset'])
             raise NotFoundError(_("Problem must be reset before it can be checked again."))
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
@@ -962,13 +962,13 @@ class CapaMixin(CapaFields):
         self.runtime.track_function('problem_check', event_info)
 
         if dog_stats_api:
-            dog_stats_api.increment(metric_name, [u'result:success'])
+            dog_stats_api.increment(metric_name('checks'), [u'result:success'])
             dog_stats_api.histogram(
-                u'{}.correct_pct'.format(metric_name),
+                metric_name('correct_pct'),
                 float(published_grade['grade']) / published_grade['max_grade'],
             )
             dog_stats_api.histogram(
-                u'{}.attempts'.format(metric_name),
+                metric_name('attempts'),
                 self.attempts,
             )
 
