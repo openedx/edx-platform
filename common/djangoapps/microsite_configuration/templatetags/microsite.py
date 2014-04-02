@@ -5,6 +5,7 @@ based on the current micro site.
 from django import template
 from django.conf import settings
 from microsite_configuration import microsite
+from django.templatetags.static import static
 
 register = template.Library()
 
@@ -38,3 +39,12 @@ def platform_name():
     {% platform_name %}
     """
     return microsite.get_value('platform_name', settings.PLATFORM_NAME)
+
+
+@register.simple_tag(name="favicon_path")
+def favicon_path(default=settings.FAVICON_PATH):
+    """
+    Django template tag that outputs the configured favicon:
+    {% favicon_path %}
+    """
+    return static(microsite.get_value('favicon_path', default))
