@@ -52,8 +52,7 @@ def enable_theme():
 
     # Include the theme's templates in the template search paths
     settings.TEMPLATE_DIRS.insert(0, theme_root / 'templates')
-    settings.MAKO_TEMPLATES['main'].insert(0, theme_root / 'templates')
-    edxmako.startup.run()
+    edxmako.paths.add_lookup('main', theme_root / 'templates', prepend=True)
 
     # Namespace the theme's static files to 'themes/<theme_name>' to
     # avoid collisions with default edX static files
@@ -98,8 +97,7 @@ def enable_microsites():
     # if we have any valid microsites defined, let's wire in the Mako and STATIC_FILES search paths
     if microsite_config_dict:
         settings.TEMPLATE_DIRS.append(microsites_root)
-        settings.MAKO_TEMPLATES['main'].append(microsites_root)
-        edxmako.startup.run()
+        edxmako.paths.add_lookup('main', microsites_root)
 
         settings.STATICFILES_DIRS.insert(0, microsites_root)
 
