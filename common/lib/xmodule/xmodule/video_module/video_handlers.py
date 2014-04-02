@@ -11,6 +11,7 @@ from webob import Response
 
 from xblock.core import XBlock
 
+from xmodule.course_module import CourseDescriptor
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
 
@@ -22,6 +23,7 @@ from .transcripts_utils import (
     youtube_speed_dict,
     Transcript,
     save_to_store,
+    subs_filename
 )
 
 
@@ -171,6 +173,33 @@ class VideoStudentViewHandlers(object):
 
         return content, filename, Transcript.mime_types[transcript_format]
 
+    def get_static_transcript(self, request):
+        """
+        Return URL for static transcript if it isn't available in the content store
+        """
+        # Try to return static redirect to the transcript as a last
+        # resort, but return 404 if we don't
+        response = Response(status=404)
+        vid_id = request.GET.get('videoId', None)
+
+        if vid_id:
+            transcript_name = vid_id
+        else:
+            transcript_name = self.sub
+
+        if transcript_name:
+            course_location = CourseDescriptor.id_to_location(self.course_id)
+            course = self.descriptor.runtime.modulestore.get_item(course_location)
+            if course.static_asset_path:
+                response = Response(
+                    status=307,
+                    location='/static/{0}/{1}'.format(
+                        course.static_asset_path,
+                        subs_filename(transcript_name, self.transcript_language)
+                    )
+                )
+        return response
+
     @XBlock.handler
     def transcript(self, request, dispatch):
         """
@@ -206,6 +235,7 @@ class VideoStudentViewHandlers(object):
 
             if language != self.transcript_language:
                 self.transcript_language = language
+
             try:
                 transcript = self.translation(request.GET.get('videoId', None))
             except (
@@ -216,7 +246,8 @@ class VideoStudentViewHandlers(object):
                 TranscriptsGenerationException
             ) as ex:
                 log.info(ex.message)
-                response = Response(status=404)
+                # Try to return static URL redirection as last resort
+                return self.get_static_transcript(request)
             else:
                 response = Response(transcript, headerlist=[('Content-Language', language)])
                 response.content_type = Transcript.mime_types['sjson']
@@ -226,7 +257,8 @@ class VideoStudentViewHandlers(object):
                 transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(self.transcript_download_format)
             except (NotFoundError, ValueError, KeyError, UnicodeDecodeError):
                 log.debug("Video@download exception")
-                return Response(status=404)
+                # Return static URL or 404
+                return self.get_static_transcript(request)
             else:
                 response = Response(
                     transcript_content,
