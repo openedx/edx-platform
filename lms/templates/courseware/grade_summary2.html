@@ -7,54 +7,200 @@
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/jquery.csvToTable.js')}"></script>
-  <script type="text/javascript" src="//datatables.net/download/build/jquery.dataTables.min.js"></script>
-  <script type="text/javascript" src="${static.url('js/jquery.gradebook.js')}"></script>
+
+  <script type="text/javascript" src="${static.url('js/vendor/jqwidgets/jqxcore.js')}" type="text/javascript"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jqwidgets/jqxdata.js')}" type="text/javascript"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jqwidgets/jqxbuttons.js')}" type="text/javascript"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jqwidgets/jqxscrollbar.js')}" type="text/javascript"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jqwidgets/jqxmenu.js')}" type="text/javascript"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jqwidgets/jqxgrid.js')}" type="text/javascript"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jqwidgets/jqxgrid.selection.js')}" type="text/javascript"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jqwidgets/jqxgrid.columnsresize.js')}" type="text/javascript"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jqwidgets/jqxgrid.pager.js')}" type="text/javascript"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jqwidgets/jqxdropdownlist.js')}" type="text/javascript"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jqwidgets/jqxlistbox.js')}" type="text/javascript"></script>
+
+
 </%block>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 
-<link rel="stylesheet" type="text/css" media="screen" href="css/ui-lightness/jquery-ui-1.7.1.custom.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="${static.url('css/vendor/jqGrid/ui.jqgrid.css')}" />
-<script src="${static.url('js/vendor/jqGrid/i18n/grid.locale-en.js')}" type="text/javascript"></script>
-<script src="${static.url('js/vendor/jqGrid/jquery.jqGrid.min.js')}" type="text/javascript"></script>
 
   <script type="text/javascript">
     $(document).ready(function() {
-jQuery("#list2").jqGrid({
-    url:'${reverse('grade_summary2', kwargs=dict(course_id=course.id))}',
-  datatype: "json",
-    colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes'],
-    colModel:[
-      {name:'ФИО', width:150},
-      {name:'email', width:90},
-      {name:'логин школы', width:100},
-      {name:'amount', width:80, align:"right"},
-      {name:'tax', width:80, align:"right"},    
-      {name:'total', width:80,align:"right"},   
-      {name:'note',index:'note', width:150, sortable:false}   
+
+
+            var localizationobj = {};
+            localizationobj.pagergotopagestring = "Перейти на:";
+            localizationobj.pagershowrowsstring = "Показывать строк:";
+            localizationobj.pagerrangestring = " из ";
+            localizationobj.pagernextbuttonstring = "Следующая";
+            localizationobj.pagerpreviousbuttonstring = "Предыдущая";
+            localizationobj.loadtext = "Загрузка..."
+
+var source =
+{
+    datatype: "json",
+    datafields: [
+      % for idx, tab in enumerate(csv_header):
+        {name:'${idx}'},
+      % endfor
     ],
-    rowNum:10,
-    rowList:[10,20,30],
-    pager: '#pager2',
-    sortname: 'id',
-    viewrecords: true,
-    height:'auto',
-    sortorder: "desc",autowidth:true, shrinkToFit:false,
-    caption:"JSON Example",
-       jsonReader : {
-      root:"data",
-      page: "currpage",
-      total: "totalpages",
-      records: "totalrecords",
-      repeatitems: false,
-      id: "0"
-   }
-});
+    id: 'id',
+    url: '${reverse('grade_summary2', kwargs=dict(course_id=course.id))}',
+    cache: false,
+    root: 'data',
+                beforeprocessing: function (data) {
+                    source.totalrecords = data.totalrecords;
+                },
+};
+var dataAdapter = new $.jqx.dataAdapter(source,
+  {
+        formatData: function (data) {
+            $.extend(data, {
+                search: $("#searchField").val(),
+            });
+
+            return data;
+        }
+    });
+
+            $("#list3").on('bindingcomplete', function () {
+                $("#list3").jqxGrid('autoresizecolumns');
+                $("#list3").jqxGrid('localizestrings', localizationobj)
+                setTimeout(function () {
+                                    $("#list3").jqxGrid('autoresizecolumns');
+                                }, 100);
+            });
+
+$("#list3").jqxGrid(
+{
+    width: '100%',
+    source: dataAdapter,
+    pageable: true,
+    pagesize: 20,
+    virtualmode: true,
+    groupable:false,
+    enablebrowserselection: true,
+    selectionmode: 'none',
+    autoheight: true,
+        rendergridrows: function (params) {
+        return params.data;
+    },
+    columns: [
+      % for idx, tab in enumerate(csv_header):
+      { text:'${tab}', datafield: '${idx}', width:'auto'},
+      % endfor
+    ],
+    showtoolbar: true,
+                    rendertoolbar: function (toolbar) {
+                    var me = this;
+                    var container = $("<div style='float:right; margin: 5px;'></div>");
+                    var span = $("<span style='float: left; margin-top: 5px; margin-right: 4px;'>Поиск: </span>");
+                    var input = $("<input class='jqx-input jqx-widget-content jqx-rc-all' id='searchField' type='text' style='height: 23px; float: left; width: 223px;' />");
+                    toolbar.append(container);
+                    container.append(span);
+                    container.append(input);
+                    var oldVal = "";
+                    input.on('keydown', function (event) {
+                        if (input.val().length >= 2) {
+                            if (me.timer) {
+                                clearTimeout(me.timer);
+                            }
+                            if (oldVal != input.val()) {
+                                me.timer = setTimeout(function () {
+                                    $("#list3").jqxGrid('updatebounddata');
+                                }, 1000);
+                                oldVal = input.val();
+                            }
+                        }
+                    });
+                }
+
+}); 
+
     });
   </script>
+
+<link rel="stylesheet" href="${static.url('js/vendor/jqwidgets/styles/jqx.base.css')}" type="text/css" />
+
+<style>
+.jqx-input.jqx-widget-content.jqx-grid-pager-input.jqx-rc-all {
+-webkit-appearance: none;
+-webkit-background-clip: padding-box;
+-webkit-background-origin: padding-box;
+-webkit-background-size: auto;
+-webkit-rtl-ordering: logical;
+-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+-webkit-user-modify: read-only;
+-webkit-user-select: text;
+-webkit-writing-mode: horizontal-tb;
+background-attachment: scroll;
+background-clip: padding-box;
+background-color: rgb(255, 255, 255);
+background-image: none;
+background-origin: padding-box;
+background-size: auto;
+border-bottom-color: rgb(199, 199, 199);
+border-bottom-left-radius: 3px;
+border-bottom-right-radius: 3px;
+border-bottom-style: solid;
+border-bottom-width: 1px;
+border-image-outset: 0px;
+border-image-repeat: stretch;
+border-image-slice: 100%;
+border-image-source: none;
+border-image-width: 1;
+border-left-color: rgb(199, 199, 199);
+border-left-style: solid;
+border-left-width: 1px;
+border-right-color: rgb(199, 199, 199);
+border-right-style: solid;
+border-right-width: 1px;
+border-top-color: rgb(199, 199, 199);
+border-top-left-radius: 3px;
+border-top-right-radius: 3px;
+border-top-style: solid;
+border-top-width: 1px;
+box-sizing: content-box;
+color: rgb(0, 0, 0);
+cursor: auto;
+direction: ltr;
+display: inline-block;
+font-family: Verdana, Arial, sans-serif;
+font-size: 13px;
+font-style: normal;
+height: 16px;
+letter-spacing: normal;
+line-height: 16.00299835205078px;
+margin-bottom: 0px;
+margin-left: 0px;
+margin-right: 0px;
+margin-top: 0px;
+min-height: 16px;
+min-width: 16px;
+outline-color: rgb(0, 0, 0);
+outline-style: none;
+outline-width: 0px;
+overflow-x: hidden;
+overflow-y: hidden;
+padding-bottom: 0px;
+padding-left: 0px;
+padding-right: 0px;
+padding-top: 0px;
+text-align: right;
+text-indent: 0px;
+text-shadow: none;
+text-transform: none;
+width: 27px;
+word-spacing: 0px;
+writing-mode: lr-tb;
+zoom: 1;
+}
+</style>
+
 
 </%block>
 
@@ -69,6 +215,7 @@ jQuery("#list2").jqGrid({
     <a href='https://edu.olimpiada.ru/edx/${course.id.replace('/','_')}.xls'> Таблица в CSV формате (разделитель табуляция, кодировка win1251) </a><br>
 
 <table id="list2"></table>
+<div id="list3"></div>
 <div id="pager2"></div>
 
     <div id="CSVTable" class="grades">

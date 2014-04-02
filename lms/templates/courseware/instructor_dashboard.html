@@ -190,7 +190,7 @@ function goto( mode)
     </p>
 
     <p>
-    <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id))}" class="">${_("Grade summary")}</a>
+    <a href="${reverse('grade_summary2', kwargs=dict(course_id=course.id))}" class="">${_("Grade summary")}</a>
     </p>
     <div class="sr">
 
@@ -569,21 +569,22 @@ function goto( mode)
       <input type="submit" name="action" onclick="this.value='Send email'" value="${_("Send email")}">
     </div>
     <script type="text/javascript">
-      $(document).ready(function(){
-        var emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
-        document.idashform.onsubmit = function() {
-          this.message.value = emailEditor.save()['data'];
-          if (!this.subject.value) {
+    var emailEditor;
+      $(document).ready(function(event){
+        emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
+      });
+      function checkemail() {
+          this.idashform.message.value = emailEditor.save()['data'];
+          if (!this.idashform.subject.value) {
               alert("${_("Email subject can not be empty.")}");
               return false;
-          } else if (!this.message.value) {
+          } else if (!this.idashform.message.value) {
               alert("${_("Email body can not be empty.")}");
               return false;
           } else {
               return true;
           }
-        }
-      });
+        };
     </script>
 
     <br />

@@ -8,7 +8,7 @@ import logging
 import os
 import re
 import requests
-import itertools
+import math
 
 from collections import defaultdict, OrderedDict
 from markupsafe import escape
@@ -1309,30 +1309,42 @@ def grade_summary2(request, course_id):
     course = get_course_with_access(request.user, course_id, 'staff')
 
     f = open("/var/www/edx/" + course.id.replace('/','_') + ".csv")
+#    f = open("/tmp/CPM_Bi012013_2013-2014.csv")
+
 
     if f is None:
         return False;
 
-    ff = UnicodeDictReader(f, delimiter=',', quoting=csv.QUOTE_ALL, dialect="excel")
+    ff = UnicodeReader(f, delimiter=',', quoting=csv.QUOTE_ALL, dialect="excel")
 
-    data = tuple(ff)
+    data = list(ff)
 
+    csv_header = data[0]
+
+    data = data[1:]
     
-    if request.GET.get('page'):
-        currpage = request.GET.get('page')
-        recfrom = (int(currpage) - 1)  * 10
-        recto = int(currpage) * 10
-        return JsonResponse({'totalpages': len(data) / 10 ,'currpage': request.GET.get('page'), 'totalrecords' : len(data), 'data': data[recfrom:recto]})
+    if request.GET.get('pagenum'):
+        currpage = int(request.GET.get('pagenum')) + 1
+        rows = int(request.GET.get('pagesize'))
+        searchtext = request.GET.get('search')
+        recfrom = (currpage - 1)  * rows
+        recto = currpage * rows
+        if searchtext and len(searchtext) > 2:
+            searchtext = searchtext.lower()
+            data = [row for row in data if searchtext in row[0].lower() or searchtext in row[2].lower()]
+        filtereddata = [ dict(enumerate(row)) for row in data[recfrom:recto]]
+        return JsonResponse({'totalpages': int(math.ceil(float(len(data)) / rows)), 'currpage': request.GET.get('page'), 'totalrecords' : len(data), 'data': filtereddata})
 
     # For now, just a static page
     context = {'course': course,
-               'staff_access': True, }
+               'staff_access': True,
+               'csv_header': csv_header }
     return render_to_response('courseware/grade_summary2.html', context)
 
-def UnicodeDictReader(utf8_data, **kwargs):
-    csv_reader = csv.DictReader(utf8_data, **kwargs)
+def UnicodeReader(utf8_data, **kwargs):
+    csv_reader = csv.reader(utf8_data, **kwargs)
     for row in csv_reader:
-        yield dict([(key, unicode(value, 'utf-8')) for key, value in row.iteritems()])  
+        yield [unicode(cell, 'utf-8') for cell in row]  
 
 #-----------------------------------------------------------------------------
 # enrollment

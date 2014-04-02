@@ -239,7 +239,7 @@ def fullstat(request = None):
                 found = False
                 rows = []
                 try:
-                    for elem in user.profile.get_meta()['old_emails'][::-1]:
+                    for elem in user.profile.get_meta().get('old_emails',[])[::-1]:
                         if usermap[elem[0]]:
                             found = True
                             rows = usermap[elem[0]]
