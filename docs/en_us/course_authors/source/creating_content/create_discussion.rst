@@ -8,7 +8,7 @@ Working with Discussion Components
 Overview
 *******************
 
-You can add a Discussion component to a Unit, to pose a question related to the
+You can add a Discussion component to a unit, to pose a question related to the
 Unit and give students a chance to respond and interact.
 
 See the following topics:
@@ -39,8 +39,8 @@ Create a Discussion Component
  Discussion component is set to Private.
 
 
-To create a new Discussion component in an existing Unit, ensure the Unit is
-Private. For more information on Public and Private Units, see :ref:`Public and
+To create a new Discussion component in an existing unit, ensure the unit is
+Private. For more information, see :ref:`Public and
 Private Units`.
 
 #. Under **Add New Component**, click the **discussion** icon.

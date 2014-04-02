@@ -38,7 +38,7 @@ Instant Hangouts in Your Course
 
 You can add one or more instant hangouts in your course. For example, you can add an instant hangout:
 
-* In a page, to provide students with a hangout for the entire course. See :ref:`Add Pages` for more information.
+* In a page, to provide students with a hangout for the entire course. See :ref:`Adding Pages to a Course` for more information.
 
 * In an HTML component, to provide a hangout for students working on that specific course unit. See :ref:`Working with HTML Components` for more information about creating HTML components.
 

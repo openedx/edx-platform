@@ -121,17 +121,22 @@ You configure the following fields for each assignment type:
   
   The general category of the assignment. This name will be visible to students.
  
-  .. note:: All assignments of a particular type count the same toward the weight of that category. As a result, a homework assignment that contains 10 problems is worth the same percentage of a student's grade as a homework assignment that contains 20 problems. 
+  .. note:: All assignments of a particular type count the same toward the
+   weight of that category. As a result, a homework assignment that contains
+   10 problems is worth the same percentage of a student's grade as a homework
+   assignment that contains 20 problems.
   
   
 * **Abbreviation:** 
   
-  This is the short name that appears next to an assignment on a student's **Progress** tab.
+  This is the short name that appears next to an assignment on a student's
+  **Progress** tab.
       
 
 * **Weight of Total Grade:** 
   
-  The assignments of this type together account for the percent value set in **Weight of Total Grade**.
+  The assignments of this type together account for the percent value set in
+  **Weight of Total Grade**.
   
   The total weight of all assignment types must equal 100.
   
@@ -141,7 +146,8 @@ You configure the following fields for each assignment type:
   
 * **Total Number:** 
   
-  The number of assignments of this type that you plan to include in your course.
+  The number of assignments of this type that you plan to include in your
+  course.
   
   
   
