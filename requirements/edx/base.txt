@@ -70,6 +70,7 @@ Shapely==1.2.16
 singledispatch==3.4.0.2
 sorl-thumbnail==11.12
 South==0.7.6
+stevedore==0.14.1
 sure==1.2.3
 sympy==0.7.1
 xmltodict==0.4.1
