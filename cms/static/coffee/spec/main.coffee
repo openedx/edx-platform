@@ -207,16 +207,17 @@ define([
     "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",
     "js/spec/video/transcripts/file_uploader_spec",
 
-    "js/spec/models/explicit_url_spec"
+    "js/spec/models/explicit_url_spec",
 
+    "js/spec/utils/drag_and_drop_spec",
     "js/spec/utils/handle_iframe_binding_spec",
     "js/spec/utils/module_spec",
 
     "js/spec/views/baseview_spec",
     "js/spec/views/paging_spec",
 
-    "js/spec/views/unit_spec"
-    "js/spec/views/xblock_spec"
+    "js/spec/views/unit_spec",
+    "js/spec/views/xblock_spec",
 
     # these tests are run separate in the cms-squire suite, due to process
     # isolation issues with Squire.js
