@@ -62,7 +62,7 @@ class SlashSeparatedCourseKey(CourseKey):
 
     @classmethod
     def from_deprecated_string(cls, serialized):
-        return self._from_string(serialized)
+        return cls._from_string(serialized)
 
     def make_usage_key_from_deprecated_string(self, location_url):
         """
