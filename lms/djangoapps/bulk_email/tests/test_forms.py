@@ -88,7 +88,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         self.assertFalse(form.is_valid())
 
         msg = u'Error encountered (Course not found.)'
-        msg += u' --- Entered course id was: "{0}". '.format(bad_id)
+        msg += u' --- Entered course id was: "{0}". '.format(bad_id.to_deprecated_string())
         msg += 'Please recheck that you have supplied a course id in the format: ORG/COURSE/RUN'
         self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
 
