@@ -40,8 +40,17 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/views/modals/edit_xblock",
             return modal;
         };
 
-        isShowingModal = function() {
-            return $('.wrapper-modal-window').length > 0;
+        isShowingModal = function(modal) {
+            var modalElement;
+            if (modal) {
+                modalElement = modal.$el;
+            } else {
+                modalElement = $('.wrapper-modal-window');
+            }
+            if (modalElement) {
+                return modalElement.hasClass('is-shown');
+            }
+            return false;
         };
 
         cancelModal = function(modal) {

@@ -1,5 +1,5 @@
 define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
-        "js/views/modals/edit_xblock", "js/models/xblock_info"],
+    "js/views/modals/edit_xblock", "js/models/xblock_info"],
     function ($, _, create_sinon, edit_helpers, EditXBlockModal, XBlockInfo) {
 
         describe("EditXBlockModal", function() {
@@ -20,7 +20,13 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 });
             });
 
-            describe("Editing an xblock", function() {
+            afterEach(function() {
+                if (modal && edit_helpers.isShowingModal(modal)) {
+                    edit_helpers.cancelModal(modal);
+                }
+            });
+
+            describe("XBlock Editor", function() {
                 var mockXBlockEditorHtml;
 
                 mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
@@ -43,15 +49,20 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     expect(modal.$('.wrapper-modal-window')).not.toHaveClass('is-shown');
                 });
 
+                it('shows the correct title', function() {
+                    var requests = create_sinon.requests(this);
+                    modal = showModal(requests, mockXBlockEditorHtml);
+                    expect(modal.$('.modal-window-title').text()).toBe('Editing: Component');
+                });
+
                 it('does not show any editor mode buttons', function() {
                     var requests = create_sinon.requests(this);
                     modal = showModal(requests, mockXBlockEditorHtml);
                     expect(modal.$('.editor-modes a').length).toBe(0);
-                    edit_helpers.cancelModal(modal);
                 });
             });
 
-            describe("Editing an xmodule", function() {
+            describe("XModule Editor", function() {
                 var mockXModuleEditorHtml;
 
                 mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-editor.underscore');
@@ -67,12 +78,16 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
 
                 it('can render itself', function() {
                     var requests = create_sinon.requests(this);
-
-                    // Show the modal using a mock xblock response
                     modal = showModal(requests, mockXModuleEditorHtml);
                     expect(modal.$('.wrapper-modal-window')).toHaveClass('is-shown');
                     edit_helpers.cancelModal(modal);
                     expect(modal.$('.wrapper-modal-window')).not.toHaveClass('is-shown');
+                });
+
+                it('shows the correct title', function() {
+                    var requests = create_sinon.requests(this);
+                    modal = showModal(requests, mockXModuleEditorHtml);
+                    expect(modal.$('.modal-window-title').text()).toBe('Editing: Component');
                 });
 
                 it('shows the correct default buttons', function() {
@@ -87,7 +102,24 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     expect(editorButton).toHaveClass('is-set');
                     expect(settingsButton.length).toBe(1);
                     expect(settingsButton).not.toHaveClass('is-set');
-                    edit_helpers.cancelModal(modal);
+                });
+
+                describe("Custom Tabs", function() {
+                    var mockCustomTabsHtml;
+
+                    mockCustomTabsHtml = readFixtures('mock/mock-xmodule-editor-with-custom-tabs.underscore');
+
+                    it('hides the modal\'s header', function() {
+                        var requests = create_sinon.requests(this);
+                        modal = showModal(requests, mockCustomTabsHtml);
+                        expect(modal.$('.modal-header')).toBeHidden();
+                    });
+
+                    it('shows the correct title', function() {
+                        var requests = create_sinon.requests(this);
+                        modal = showModal(requests, mockCustomTabsHtml);
+                        expect(modal.$('.component-name').text()).toBe('Editing: Component');
+                    });
                 });
             });
         });

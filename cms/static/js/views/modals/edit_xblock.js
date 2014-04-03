@@ -70,7 +70,14 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             },
 
             getTitle: function() {
-                var displayName = this.xblockElement.find('.component-header').text().trim();
+                var displayName = this.xblockElement.find('.xblock-header .header-details').text().trim();
+                // If not found, try the old unit page style rendering
+                if (!displayName) {
+                    displayName = this.xblockElement.find('.component-header').text().trim();
+                    if (!displayName) {
+                        displayName = gettext('Component');
+                    }
+                }
                 return interpolate(gettext("Editing: %(title)s"), { title: displayName }, true);
             },
 

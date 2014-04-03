@@ -3,7 +3,7 @@ describe "TabsEditingDescriptor", ->
     @isInactiveClass = "is-inactive"
     @isCurrent = "current"
     loadFixtures 'tabs-edit.html'
-    @descriptor = new TabsEditingDescriptor($('.base_wrapper'))
+    @descriptor = new TabsEditingDescriptor($('.xblock'))
     @html_id = 'test_id'
     @tab_0_switch = jasmine.createSpy('tab_0_switch');
     @tab_0_modelUpdate = jasmine.createSpy('tab_0_modelUpdate');
@@ -63,16 +63,12 @@ describe "TabsEditingDescriptor", ->
         @descriptor.onSwitchEditor
       )
 
-  describe "editor/settings header", ->
-    it "is hidden", ->
-      expect(@descriptor.element.closest(".modal-editor").find(".modal-header")).toBeHidden()
-
 describe "TabsEditingDescriptor special save cases", ->
   beforeEach ->
     @isInactiveClass = "is-inactive"
     @isCurrent = "current"
     loadFixtures 'tabs-edit.html'
-    @descriptor = new window.TabsEditingDescriptor($('.base_wrapper'))
+    @descriptor = new window.TabsEditingDescriptor($('.xblock'))
     @html_id = 'test_id'
 
   describe "save", ->
@@ -92,4 +88,3 @@ describe "TabsEditingDescriptor special save cases", ->
       expect(@tab_0_modelUpdate).toHaveBeenCalled()
       data = @descriptor.save().data
       expect(data).toEqual(1)
-
