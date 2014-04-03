@@ -10,6 +10,7 @@ from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
+from xmodule_django.models import CourseKeyField
 
 FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
 FORUM_ROLE_MODERATOR = ugettext_noop('Moderator')
@@ -50,7 +51,7 @@ def assign_default_role(course_id, user):
 class Role(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False)
     users = models.ManyToManyField(User, related_name="roles")
-    course_id = models.CharField(max_length=255, blank=True, db_index=True)
+    course_id = CourseKeyField(max_length=255, blank=True, db_index=True)
 
     class Meta:
         # use existing table that was originally created from django_comment_client app
