@@ -18,6 +18,7 @@ from courseware.courses import (
 )
 from courseware.tests.helpers import get_request_for_user
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.keys import CourseKey
 
 
 CMS_BASE_TEST = 'testcms'
@@ -121,10 +122,11 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
 
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
+    toy_course_key = CourseKey.from_string('edX/toy/2012_Fall')
 
     @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
     def test_get_course_info_section_render(self):
-        course = get_course_by_id('edX/toy/2012_Fall')
+        course = get_course_by_id(self.toy_course_key)
         request = get_request_for_user(UserFactory.create())
 
         # Test render works okay
@@ -142,7 +144,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
     @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
     @mock.patch('courseware.courses.get_request_for_thread')
     def test_get_course_about_section_render(self, mock_get_request):
-        course = get_course_by_id('edX/toy/2012_Fall')
+        course = get_course_by_id(self.toy_course_key)
         request = get_request_for_user(UserFactory.create())
         mock_get_request.return_value = request
 
