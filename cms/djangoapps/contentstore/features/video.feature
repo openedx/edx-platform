@@ -5,7 +5,7 @@ Feature: CMS Video Component
   # 1
   Scenario: YouTube stub server proxies YouTube API correctly
     Given youtube stub server proxies YouTube API
-    Given I have created a Video component
+    And I have created a Video component
     Then I can see video button "play"
     And I click video button "play"
     Then I can see video button "pause"
@@ -13,8 +13,8 @@ Feature: CMS Video Component
   # 2
   Scenario: YouTube stub server can block YouTube API
     Given youtube stub server blocks YouTube API
-    Given I have created a Video component
-    Given We explicitly wait for YouTube API to not load
+    And I have created a Video component
+    And I wait for "3" seconds
     Then I do not see video button "play"
 
   # 3
