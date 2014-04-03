@@ -833,7 +833,6 @@
         outline: 0;
         height: auto;
         min-height: ($baseline*2.25);
-        max-height: ($baseline*10);
 
         &.CodeMirror-focused {
           @include linear-gradient($paleYellow, tint($paleYellow, 90%));
