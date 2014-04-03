@@ -119,9 +119,9 @@ def run_all_servers(options):
 
     if not fast:
         for system in ['lms', 'studio']:
-            args = [system, '--settings={}'.format(settings), '--skip-collect', '--watch']
+            args = [system, '--settings={}'.format(settings), '--skip-collect']
             call_task('pavelib.assets.update_assets', args=args)
-
+        call_task('pavelib.assets.watch_assets', options={'background': True})
     run_multi_processes([
         django_cmd('lms', settings, 'runserver', '--traceback', '--pythonpath=.', "0.0.0.0:{}".format(DEFAULT_PORT['lms'])),
         django_cmd('studio', settings, 'runserver', '--traceback', '--pythonpath=.', "0.0.0.0:{}".format(DEFAULT_PORT['studio'])),

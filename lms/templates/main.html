@@ -129,7 +129,7 @@
 </html>
 
 <%def name="login_query()">${
-  "?course_id={0}&enrollment_action={1}".format(
+  u"?course_id={0}&enrollment_action={1}".format(
     html.escape(course_id),
     html.escape(enrollment_action)
   ) if course_id and enrollment_action else ""

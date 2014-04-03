@@ -539,8 +539,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         error_text = ""
         problem_list = []
         try:
-            problem_list_json = self.peer_gs.get_problem_list(self.course_id, self.system.anonymous_student_id)
-            problem_list_dict = problem_list_json
+            problem_list_dict = self.peer_gs.get_problem_list(self.course_id, self.system.anonymous_student_id)
             success = problem_list_dict['success']
             if 'error' in problem_list_dict:
                 error_text = problem_list_dict['error']

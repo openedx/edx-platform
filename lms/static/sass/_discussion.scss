@@ -1,3 +1,7 @@
+// forums - main styling
+// ====================
+
+// mixins and extends
 @mixin blue-button {
   display: block;
   height: 35px;
@@ -107,7 +111,9 @@
   100% { opacity: 1.0; }
 }
 
+// ===============
 
+// main styling
 body.discussion {
 
   .new-post-form-errors {
@@ -1412,7 +1418,7 @@ body.discussion {
 
   .discussion-post {
     padding: $baseline*2 $baseline*2 $baseline $baseline*2;
-    box-shadow: 0 1px 3px $shadow;
+    box-shadow: 0 2px 2px $shadow;
 
     > header .vote-btn {
       position: relative;
@@ -1426,25 +1432,6 @@ body.discussion {
     .post-tools {
       @include clearfix;
       margin-top: 15px;
-
-      .ui-icon {
-        display: inline;
-        float: left;
-        width: 13px;
-        height: 13px;
-        margin-right: 4px;
-        background: url(../images/small-grey-arrows.png) no-repeat;
-
-        &.expand {
-          margin-top: 5px;
-          background-position: 0 0;
-        }
-
-        &.collapse {
-          margin-top: 6px;
-          background-position: -13px 0;
-        }
-      }
     }
   }
 
@@ -1888,18 +1875,7 @@ body.discussion {
     }
   }
 
-  .responses {
-    margin-top: $baseline*2;
-
-    > li {
-      padding: 26px 30px $baseline !important;
-    }
-  }
-
   div.add-response.post-extended-content {
-    margin-top: $baseline;
-    margin-bottom: 20px; 
-
     button.add-response-btn {
       @include white-button;
       position: relative;
@@ -1957,9 +1933,9 @@ body.discussion {
       margin-top: $baseline;
     }
 
-    /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
     .discussion-thread {
       padding: 0;
+      margin-bottom: $baseline;
       @include transition(all .25s linear 0s);
 
       .dogear {
@@ -1967,16 +1943,8 @@ body.discussion {
       }
 
       &.expanded {
-        padding: $baseline 0;
-
         .dogear{
           display: block;
-        }
-
-        .discussion-article {
-          border: 1px solid #b2b2b2;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-          border-radius: 3px;
         }
       }
 
@@ -1985,120 +1953,132 @@ body.discussion {
       }
 
       .discussion-article {
-        border: 1px solid #ddd;
-        border-bottom-width: 0;
-        background: $white;
-        min-height: 0;
-        padding: $baseline/2 $baseline/2 15px $baseline/2;
-        box-shadow: 0 1px 0 #ddd;
         @include transition(all .2s linear 0s);
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        min-height: 0;
+        background: $white;
 
-        .discussion-post {
-          padding: 12px 30px 0px;
-          @include clearfix;
+        .thread-wrapper {
+          position: relative;
+          overflow-x: hidden;
+          overflow-y: auto;
+          max-height: 600px;
 
-          .inline-comment-count {
-            position: relative;
-            z-index: 100;
-            float: right;
-            display: block;
-            height: 27px;
-            margin-top: 6px;
-            margin-right: 8px;
-            padding: 0 8px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-weight: 400;
-            line-height: 25px;
-            color: #888;
+          .group-visibility-label {
+            margin: $baseline ($baseline*1.5) ($baseline*-0.5);
           }
 
-          header {
-            padding-bottom: 0;
-            margin-bottom: 15px;
+          .discussion-post {
+            margin: $baseline 0 0;
+            padding: 0 ($baseline*1.5) $baseline;
+            @include clearfix;
 
-            .posted-details {
-              margin-top: 4px;
+            .inline-comment-count {
+              position: relative;
+              z-index: 100;
+              float: right;
+              display: block;
+              height: 27px;
+              margin-top: 6px;
+              margin-right: 8px;
+              padding: 0 8px;
+              border-radius: 5px;
+              font-size: 12px;
+              font-weight: 400;
+              line-height: 25px;
+              color: #888;
+            }
 
-              .username {
-                display: inline;
-                font-size: 14px;
+            header {
+              padding-bottom: 0;
+              margin-bottom: 15px;
+
+              .posted-details {
+                margin-top: 4px;
+
+                .username {
+                  display: inline;
+                  font-size: 14px;
+                  font-weight: 700;
+                }
+              }
+
+              h3 {
+                font-size: 19px;
                 font-weight: 700;
+                margin-bottom: 0px;
+              }
+
+              h4 {
+                font-size: 16px;
               }
             }
 
-            h3 {
-              font-size: 19px;
-              font-weight: 700;
-              margin-bottom: 0px;
-            }
-
-            h4 {
-              font-size: 16px;
+            .post-body {
+              font-size: 14px;
+              clear: both;
             }
           }
 
-          .post-body {
-            font-size: 14px;
-            clear: both;
+          .responses {
+            header {
+              padding-bottom: 0;
+              margin-bottom: 15px;
+
+              .posted-by {
+                float: left;
+                margin-right: 5px;
+                font-size: 16px;
+              }
+            }
+
+            .response-body {
+              margin-bottom: 0.2em;
+              font-size: 14px;
+            }
+          }
+
+          .discussion-reply-new {
+            .wmd-input {
+              height: 120px;
+            }
+          }
+
+          // Content that is hidden by default in the inline view
+          .post-extended-content{
+            display: none;
           }
         }
 
         .post-tools {
-          margin-left: $baseline;
-          margin-top: 5px;
+          box-shadow: 0 1px 1px $shadow inset;
+          background: #f6f6f6;
+
+          &:hover {
+            background: #fcfcfc;
+
+            .icon {
+              color: $link-hover;
+            }
+          }
 
           a {
             display: block;
+            padding: ($baseline*0.25) $baseline;
             font-size: 12px;
             line-height: 30px;
-
-            &.expand-post:before {
-              content: '▾ ';
-            }
-
-            &.collapse-post:before {
-              content: '▴ ';
-            }
 
             &.collapse-post {
               display: none;
             }
-          }
-        }
 
-        .responses {
-          margin-top: $baseline/2;
-
-          header {
-            padding-bottom: 0;
-            margin-bottom: 15px;
-
-            .posted-by {
-              float: left;
-              margin-right: 5px;
-              font-size: 16px;
+            .icon {
+              color: $link-color;
+              margin-right: ($baseline*0.25);
             }
           }
-
-          .response-body {
-            margin-bottom: 0.2em;
-            font-size: 14px;
-          }
         }
-
-        .discussion-reply-new {
-          .wmd-input {
-            height: 120px;
-          }
-        }
-
-        // Content that is hidden by default in the inline view
-        .post-extended-content{
-          display: none;
-        }
-
-
       }
     }
   }
@@ -2389,7 +2369,7 @@ body.discussion {
   .wmd-button-row {
     // this is being hidden now because the inline styles to position the icons are not being written
     position: relative;
-    height: 12px;
+    height: 25px;
   }
 
   .wmd-button {

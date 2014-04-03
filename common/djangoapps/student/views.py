@@ -609,15 +609,6 @@ def change_enrollment(request):
             )
 
         current_mode = available_modes[0]
-
-        course_id_dict = Location.parse_course_id(course_id)
-        dog_stats_api.increment(
-            "common.student.enrollment",
-            tags=[u"org:{org}".format(**course_id_dict),
-                  u"course:{course}".format(**course_id_dict),
-                  u"run:{name}".format(**course_id_dict)]
-        )
-
         CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
 
         return HttpResponse()
@@ -639,13 +630,6 @@ def change_enrollment(request):
         if not CourseEnrollment.is_enrolled(user, course_id):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
         CourseEnrollment.unenroll(user, course_id)
-        course_id_dict = Location.parse_course_id(course_id)
-        dog_stats_api.increment(
-            "common.student.unenrollment",
-            tags=[u"org:{org}".format(**course_id_dict),
-                  u"course:{course}".format(**course_id_dict),
-                  u"run:{name}".format(**course_id_dict)]
-        )
         return HttpResponse()
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))

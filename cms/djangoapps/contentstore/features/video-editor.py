@@ -10,7 +10,12 @@ from django.conf import settings
 from common import upload_file, attach_file
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
-LANGUAGES = {l[0]: l[1] for l in settings.ALL_LANGUAGES}
+
+NATIVE_LANGUAGES = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
+LANGUAGES = {
+    lang: NATIVE_LANGUAGES.get(lang, display)
+    for lang, display in settings.ALL_LANGUAGES
+}
 
 TRANSLATION_BUTTONS = {
     'add': '.metadata-video-translations .create-action',

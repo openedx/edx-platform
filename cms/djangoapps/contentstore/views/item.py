@@ -55,11 +55,10 @@ xmodule.x_module.descriptor_global_local_resource_url = local_resource_url
 
 def hash_resource(resource):
     """
-    Hash a :class:`xblock.fragment.FragmentResource
+    Hash a :class:`xblock.fragment.FragmentResource`.
     """
     md5 = hashlib.md5()
-    for data in resource:
-        md5.update(data)
+    md5.update(repr(resource))
     return md5.hexdigest()
 
 

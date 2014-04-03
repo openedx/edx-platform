@@ -3,7 +3,7 @@ Container page in Studio
 """
 
 from bok_choy.page_object import PageObject
-
+from bok_choy.promise import Promise
 from . import BASE_URL
 
 
@@ -22,11 +22,18 @@ class ContainerPage(PageObject):
         return "{}/container/{}".format(BASE_URL, self.unit_locator)
 
     def is_browser_on_page(self):
-        # Wait until all components have been loaded
+
+        def _is_finished_loading():
+            # Wait until all components have been loaded
+            is_done = len(self.q(css=XBlockWrapper.BODY_SELECTOR).results) == len(
+                self.q(css='{} .xblock'.format(XBlockWrapper.BODY_SELECTOR)).results)
+            return (is_done, is_done)
+
+        # First make sure that an element with the view-container class is present on the page,
+        # and then wait to make sure that the xblocks are all there.
         return (
             self.q(css='body.view-container').present and
-            len(self.q(css=XBlockWrapper.BODY_SELECTOR).results) == len(
-                self.q(css='{} .xblock'.format(XBlockWrapper.BODY_SELECTOR)).results)
+            Promise(_is_finished_loading, 'Finished rendering the xblock wrappers.').fulfill()
         )
 
     @property

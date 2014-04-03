@@ -5,7 +5,13 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Transcript translations should be displayed in their source language (BLD-935).
+
 Blades: Create an upload modal for video transcript translations (BLD-751).
+
+Studio and LMS: Upgrade version of TinyMCE to 4.0.20. Switch from tabbed Visual/HTML
+Editor for HTML modules to showing the code editor as a plugin within TinyMCE (triggered
+from toolbar). STUD-1422
 
 Studio: Add ability to reorder Pages and hide the Wiki page. STUD-1375
 

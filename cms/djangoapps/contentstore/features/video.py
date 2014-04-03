@@ -1,6 +1,7 @@
 # pylint: disable=C0111
 
 from lettuce import world, step
+from nose.tools import assert_less
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 from selenium.webdriver.common.keys import Keys
@@ -32,13 +33,11 @@ def configure_youtube_api(_step, action):
         raise ValueError('Parameter `action` should be one of "proxies" or "blocks".')
 
 
-@step('We explicitly wait for YouTube API to not load$')
-def wait_for_youtube_api_fail(_step):
-    world.wait(3)
-
-
 @step('I have created a Video component$')
 def i_created_a_video_component(_step):
+
+    assert_less(world.youtube.config['youtube_api_response'].status_code, 400,  "Real Youtube server is unavailable")
+
     world.create_course_with_unit()
     world.create_component_instance(
         step=_step,
@@ -51,7 +50,8 @@ def i_created_a_video_component(_step):
     world.wait_for_present('.is-initialized')
     world.wait(DELAY)
     world.wait_for_invisible(SELECTORS['spinner'])
-
+    if not world.youtube.config.get('youtube_api_blocked'):
+        world.wait_for_visible(SELECTORS['controls'])
 
 @step('I have created a Video component with subtitles$')
 def i_created_a_video_with_subs(_step):

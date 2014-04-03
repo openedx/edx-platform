@@ -6,6 +6,7 @@ import json
 import os
 import time
 import requests
+from nose.tools import assert_less
 from common import i_am_registered_for_the_course, visit_scenario_item
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -159,6 +160,9 @@ def add_videos_to_course(course, player_mode=None, display_names=None, hashes=No
 
 
 def add_video_to_course(course, parent_location=None, player_mode=None, data=None, display_name='Video'):
+
+    assert_less(world.youtube.config['youtube_api_response'].status_code, 400, "Real Youtube server is unavailable")
+
     if not parent_location:
         parent_location = add_vertical_to_course(course)
     kwargs = get_metadata(parent_location, player_mode, data, display_name=display_name)
@@ -390,12 +394,12 @@ def error_message_has_correct_text(_step):
 @step('I make sure captions are (.+)$')
 def set_captions_visibility_state(_step, captions_state):
     SELECTOR = '.closed .subtitles'
-    if world.is_css_not_present(SELECTOR):
+    if world.is_css_not_present(SELECTOR, wait_time=30):
         if captions_state == 'closed':
-            world.css_find('.hide-subtitles').click()
+            world.css_click('.hide-subtitles')
     else:
         if captions_state != 'closed':
-            world.css_find('.hide-subtitles').click()
+            world.css_click('.hide-subtitles')
 
 
 @step('I see video menu "([^"]*)" with correct items$')
@@ -469,7 +473,7 @@ def start_playing_video_from_n_seconds(_step, position):
 def i_see_duration(_step, position):
     world.wait_for(
         func=lambda _: duration() == parse_time_str(position),
-        timeout=5
+        timeout=30
     )
 
 
@@ -539,6 +543,10 @@ def select_transcript_format(_step, format):
     menu_selector = VIDEO_MENUS['download_transcript']
 
     button = world.css_find(button_selector).first
+
+    height = button._element.location_once_scrolled_into_view['y']
+    world.browser.driver.execute_script("window.scrollTo(0, {});".format(height))
+
     button.mouse_over()
     assert world.css_has_text(button_selector, '...', strip=True)
 
@@ -548,6 +556,8 @@ def select_transcript_format(_step, format):
             item.click()
             world.wait_for_ajax_complete()
             break
+
+    world.browser.driver.execute_script("window.scrollTo(0, 0);")
 
     assert world.css_find(menu_selector + ' .active a')[0]['data-value'] == format
     assert world.css_has_text(button_selector, '.' + format, strip=True)

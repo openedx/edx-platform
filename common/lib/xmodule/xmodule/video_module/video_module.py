@@ -124,8 +124,9 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             else:
                 transcript_language = sorted(self.transcripts.keys())[0]
 
+            native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
             languages = {
-                lang: display
+                lang: native_languages.get(lang, display)
                 for lang, display in settings.ALL_LANGUAGES
                 if lang in self.transcripts
             }
