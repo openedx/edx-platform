@@ -357,15 +357,19 @@
 
       .cover {
         @include box-sizing(border-box);
+        @include transition(all 0.15s linear 0s);
+        overflow: hidden;
+        position: relative;
         float: left;
         height: 100%;
         max-height: 100%;
-        margin: 0px;
-        overflow: hidden;
-        position: relative;
-        @include transition(all 0.15s linear 0s);
         width: 200px;
         height: 120px;
+        margin: 0px;
+        border-radius: ($baseline/10);
+        border: 1px solid $dashboard-course-cover-border;
+        border-bottom: 4px solid $dashboard-course-cover-border;
+        padding: ($baseline/10);
 
         img {
           width: 100%;
@@ -474,28 +478,43 @@
         }
       }
 
+      // "enrolled as" status
+      .sts-enrollment {
+        position: absolute;
+        top: 105px;
+        left: 0;
+        display: inline-block;
+        text-align: center;
+        width: 200px;
+
+        .label {
+          @extend %text-sr;
+        }
+
+        .sts-enrollment-value {
+          @extend %ui-depth1;
+          @extend %copy-badge;
+          border-radius: 0;
+          padding: ($baseline/4) ($baseline/2) ($baseline/4) ($baseline/2);
+        }
+      }
+
       // ====================
 
-      // STATE: course mode - verified
+      // CASE: "enrolled as" status - verified
       &.verified {
-        @extend %ui-depth2;
-        position: relative;
 
+        // changes to cover
         .cover {
-          border-radius: ($baseline/10);
-          border: 1px solid $verified-color-lvl3;
-          border-bottom: 4px solid $verified-color-lvl3;
+          border-color: $verified-color-lvl3;
           padding: ($baseline/10);
         }
 
         // course enrollment status message
         .sts-enrollment {
-          display: inline-block;
           position: absolute;
-          top: 105px;
           left: 55px;
-          bottom: ($baseline/2);
-          text-align: center;
+          width: auto;
 
           .label {
             @extend %text-sr;
@@ -509,14 +528,44 @@
             top: -10px;
           }
 
+          // status message
           .sts-enrollment-value {
-            @extend %ui-depth1;
-            @extend %copy-badge;
-            border-radius: 0;
             padding: ($baseline/4) ($baseline/2) ($baseline/4) $baseline;
             background: $verified-color-lvl3;
-            color: $white;
+            color: tint($verified-color-lvl1, 85%);
           }
+        }
+      }
+
+      // CASE: "enrolled as" status - honor code
+      &.honor {
+
+        // changes to cover
+        .cover {
+          border-color: $honorcode-color-lvl2;
+          padding: ($baseline/10);
+        }
+
+        // status message
+        .sts-enrollment-value {
+          background: $honorcode-color-lvl1;
+          color: tint($honorcode-color-lvl1, 85%);
+        }
+      }
+
+      // CASE: "enrolled as" status - auditing
+      &.audit {
+
+        // changes to cover
+        .cover {
+          border-color: $audit-color-lvl2;
+          padding: ($baseline/10);
+        }
+
+        // status message
+        .sts-enrollment-value {
+          background: $audit-color-lvl1;
+          color: shade($audit-color-lvl1, 33%);
         }
       }
     }
