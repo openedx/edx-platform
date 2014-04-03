@@ -406,7 +406,7 @@ class CourseFields(object):
                                               scope=Scope.settings)
     new_progress = Boolean(help=_("Use new chapter based progress render"), scope=Scope.settings, default=True)
 
-    duplicate_courses = String(help=_("List of course_id of courses which this course duplicates"),
+    duplicate_courses = List(help=_("List of course_id of courses which this course duplicates"),
                                   scope=Scope.settings)
 
     allow_public_wiki_access = Boolean(help="Whether to allow an unenrolled user to view the Wiki",
