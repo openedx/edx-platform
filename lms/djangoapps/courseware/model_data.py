@@ -141,7 +141,7 @@ class FieldDataCache(object):
         if scope == Scope.user_state:
             return self._chunked_query(
                 StudentModule,
-                'module_state_key__in',
+                'module_id__in',
                 (descriptor.scope_ids.usage_id for descriptor in self.descriptors),
                 course_id=self.course_id,
                 student=self.user.pk,
@@ -236,7 +236,7 @@ class FieldDataCache(object):
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
                 student=User.objects.get(id=key.user_id),
-                module_state_key=key.block_scope_id,
+                module_id=key.block_scope_id,
                 defaults={
                     'state': json.dumps({}),
                     'module_type': key.block_scope_id.category,

@@ -34,7 +34,9 @@ class LocationKeyField(models.CharField):
         super(LocationKeyField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
-        assert isinstance(value, basestring) or isinstance(value, Location)
+        assert isinstance(value, (NoneType, basestring, Location))
+        if not value:
+            return None
         if isinstance(value, basestring):
             return Location.from_deprecated_string(value)
         else:
@@ -42,4 +44,4 @@ class LocationKeyField(models.CharField):
 
     def get_prep_value(self, value):
         assert isinstance(value, Location)
-        return value.to_deprecated_string()
+        return value.to_deprecated_string() if value else ''

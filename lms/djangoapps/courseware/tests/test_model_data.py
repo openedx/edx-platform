@@ -11,12 +11,11 @@ from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
 
 from student.tests.factories import UserFactory
-from courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory
+from courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory, location, course_id
 from courseware.tests.factories import UserStateSummaryFactory
 from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory
 
 from xblock.fields import Scope, BlockScope, ScopeIds
-from xmodule.modulestore import Location
 from django.test import TestCase
 from django.db import DatabaseError
 from xblock.core import KeyValueMultiSaveError
@@ -37,9 +36,6 @@ def mock_descriptor(fields=[]):
     descriptor.module_class.__name__ = 'MockProblemModule'
     return descriptor
 
-location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
-course_id = 'edX/test_course/test'
-
 # The user ids here are 1 because we make a student in the setUp functions, and
 # they get an id of 1.  There's an assertion in setUp to ensure that assumption
 # is still true.
@@ -51,7 +47,7 @@ user_info_key = partial(DjangoKeyValueStore.Key, Scope.user_info, 1, None)
 
 
 class StudentModuleFactory(cmfStudentModuleFactory):
-    module_state_key = location('usage_id').url()
+    module_state_key = location('usage_id')
     course_id = course_id
 
 
@@ -204,7 +200,7 @@ class TestMissingStudentModule(TestCase):
         student_module = StudentModule.objects.all()[0]
         self.assertEquals({'a_field': 'a_value'}, json.loads(student_module.state))
         self.assertEquals(self.user, student_module.student)
-        self.assertEquals(location('usage_id').url(), student_module.module_state_key)
+        self.assertEquals(location('usage_id'), student_module.module_state_key)
         self.assertEquals(course_id, student_module.course_id)
 
     def test_delete_field_from_missing_student_module(self):
