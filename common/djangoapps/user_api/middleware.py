@@ -20,7 +20,7 @@ class UserTagsEventContextMiddleware(object):
         course_id = None
         if match:
             course_id = match.group('course_id')
-            course_key = SlashSeparatedCourseKey.from_string(course_id)
+            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
         context = {}
 

@@ -17,7 +17,7 @@ class CourseKeyField(models.CharField):
             # handle empty string for models being created w/o fields populated
             return None
         if isinstance(value, basestring):
-            return SlashSeparatedCourseKey.from_string(value)
+            return SlashSeparatedCourseKey.from_deprecated_string(value)
         else:
             return value
 

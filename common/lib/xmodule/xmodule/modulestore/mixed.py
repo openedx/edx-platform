@@ -240,7 +240,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
             if isinstance(course_or_parent_loc, basestring):
                 parent_loc = None
                 if location is None:
-                    course_key = SlashSeparatedCourseKey.from_string(course_id)
+                    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
                     location = course_key.make_usage_key(category, block_id)
             else:
                 parent_loc = course_or_parent_loc
@@ -258,7 +258,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
             if isinstance(course_or_parent_loc, basestring):  # course_id
                 course_or_parent_loc = loc_mapper().translate_location_to_course_locator(
                     # hardcode draft version until we figure out how we're handling branches from app
-                    SlashSeparatedCourseKey.from_string(course_or_parent_loc), published=False
+                    SlashSeparatedCourseKey.from_deprecated_string(course_or_parent_loc), published=False
                 )
             elif not isinstance(course_or_parent_loc, (CourseLocator, BlockUsageLocator)):
                 raise ValueError(u"Cannot create a child of {} in split. Wrong repr.".format(course_or_parent_loc))

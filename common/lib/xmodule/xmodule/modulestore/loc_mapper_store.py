@@ -554,7 +554,7 @@ class LocMapperStore(object):
         entry['schema'] = 0
         entry.pop('course_id', None)
         entry.pop('lower_course_id', None)
-        old_course_id = SlashSeparatedCourseKey.from_string(entry['_id'])
+        old_course_id = SlashSeparatedCourseKey.from_deprecated_string(entry['_id'])
         entry['org'] = old_course_id.org
         entry['lower_org'] = old_course_id.org.lower()
         entry['offering'] = old_course_id.offering

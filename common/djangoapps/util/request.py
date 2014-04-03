@@ -40,4 +40,4 @@ def course_id_from_url(url):
     if course_id is None:
         return None
 
-    return SlashSeparatedCourseKey.from_string(course_id)
+    return SlashSeparatedCourseKey.from_deprecated_string(course_id)
