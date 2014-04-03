@@ -234,6 +234,7 @@ function (Sjson, AsyncProcess) {
                 };
             }
 
+            state.el.removeClass('is-captions-rendered');
             // Fetch the captions file. If no file was specified, or if an error
             // occurred, then we hide the captions panel, and the "CC" button
             this.fetchXHR = $.ajaxWithPrefix({
@@ -447,8 +448,8 @@ function (Sjson, AsyncProcess) {
                 // outline has to be drawn (tabbing) or not (mouse click).
                 self.isMouseFocus = false;
                 self.rendered = true;
+                self.state.el.addClass('is-captions-rendered');
             };
-
 
             this.rendered = false;
             this.subtitlesEl.empty();

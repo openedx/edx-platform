@@ -197,11 +197,15 @@ def find_caption_line_by_data_index(index):
 
 @step('I focus on caption line with data-index "([^"]*)"$')
 def focus_on_caption_line(_step, index):
+    world.wait_for_present('.video.is-captions-rendered')
+    world.wait_for(lambda _: world.css_text('.subtitles'), timeout=30)
     find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.TAB)
 
 
 @step('I press "enter" button on caption line with data-index "([^"]*)"$')
 def click_on_the_caption(_step, index):
+    world.wait_for_present('.video.is-captions-rendered')
+    world.wait_for(lambda _: world.css_text('.subtitles'), timeout=30)
     find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.ENTER)
 
 
@@ -214,7 +218,6 @@ def caption_line_has_class(_step, index, className):
 @step('I see a range on slider$')
 def see_a_range_slider_with_proper_range(_step):
     world.wait_for_visible(VIDEO_BUTTONS['pause'])
-
     assert world.css_visible(".slider-range")
 
 

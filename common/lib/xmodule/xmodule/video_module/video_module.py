@@ -10,7 +10,6 @@ in-browser HTML5 video method (when in HTML5 mode).
 - Navigational subtitles can be disabled altogether via an attribute
 in XML.
 """
-import os
 import json
 import logging
 from operator import itemgetter
@@ -36,8 +35,6 @@ from .video_utils import create_youtube_string
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore
-from xblock.runtime import KvsFieldData
 from urlparse import urlparse
 
 def get_ext(filename):
