@@ -828,7 +828,7 @@
         border: 1px solid $mediumGrey;
         border-radius: 2px;
         background-color: $lightGrey;
-        font-family: 'Open Sans', sans-serif;
+        font-family: $f-monospace;
         color: $baseFontColor;
         outline: 0;
         height: auto;
@@ -837,6 +837,10 @@
         &.CodeMirror-focused {
           @include linear-gradient($paleYellow, tint($paleYellow, 90%));
           outline: 0;
+        }
+
+        .CodeMirror-sizer {
+          top: 4px; /* Vertical alignment for monospace font */
         }
 
         // editor color changes just for JSON
