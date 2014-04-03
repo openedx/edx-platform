@@ -54,7 +54,7 @@ define(["js/views/baseview", "underscore", "underscore.string", "jquery", "gette
             var msg = new FileUploadModel({
                 title: _.template(gettext("Upload a new PDF to “<%= name %>”"),
                     {name: course.escape('name')}),
-                message: "Files must be in PDF format.",
+                message: "Please select a PDF file to upload.",
                 mimeTypes: ['application/pdf']
             });
             var that = this;
@@ -69,7 +69,7 @@ define(["js/views/baseview", "underscore", "underscore.string", "jquery", "gette
                     that.model.set(options);
                 }
             });
-            $(".wrapper-view").after(view.show().el);
+            view.show();
         }
     });
 

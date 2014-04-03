@@ -72,7 +72,7 @@ class RequestHandlerWithSessionId(object):
 def success_upload_file(filename):
     upload_file(filename, sub_path="uploads/")
     world.css_has_text('#upload_confirm', 'Success!')
-    world.is_css_not_present('.wrapper-dialog-assetupload', wait_time=30)
+    world.is_css_not_present('.wrapper-modal-window-assetupload', wait_time=30)
 
 
 def get_translations_container():

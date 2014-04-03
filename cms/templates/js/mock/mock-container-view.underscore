@@ -54,11 +54,6 @@
 </div>
 </div>
 
-<div class="edit-xblock-modal">
-
-
-</div>
-
 <script type="text/javascript">
     require(['js/sock']);
 </script>

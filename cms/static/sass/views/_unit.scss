@@ -639,8 +639,8 @@ body.course.unit,.view-unit {
       background-color: $white;
       padding: $baseline ($baseline/2);
 
-      &:last-child {
-        //margin-bottom: 0;
+      &:first-child {
+        border-top: 0;
       }
 
       //no required component settings currently

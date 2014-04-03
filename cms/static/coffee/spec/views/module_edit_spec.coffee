@@ -1,4 +1,4 @@
-define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmodule"], ($, ModuleEdit, ModuleModel) ->
+define ["jquery", "js/spec_helpers/edit_helpers", "coffee/src/views/module_edit", "js/models/module_info", "xmodule"], ($, edit_helpers, ModuleEdit, ModuleModel) ->
 
     describe "ModuleEdit", ->
       beforeEach ->
@@ -27,6 +27,7 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
         </ul>
         <div class="edit-xblock-modal"/>
         """
+        edit_helpers.installEditTemplates(true);
         spyOn($, 'ajax').andReturn(@moduleData)
 
         @moduleEdit = new ModuleEdit(
@@ -103,10 +104,7 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
             expect(@moduleEdit.delegateEvents).toHaveBeenCalled()
 
           it "loads the editing view via ajax on demand", ->
-            editorTemplate = readFixtures('edit-xblock-modal.underscore');
-            feedbackTemplate = readFixtures('system-feedback.underscore')
-            appendSetFixtures($("<script>", { id: "edit-xblock-modal-tpl", type: "text/template", html: editorTemplate }));
-            appendSetFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template" , html: feedbackTemplate }));
+            edit_helpers.installEditTemplates(true);
             expect($.ajax).not.toHaveBeenCalledWith(
               url: "/xblock/#{@moduleEdit.model.id}/studio_view"
               type: "GET"

@@ -4,193 +4,184 @@
 // start with the view/body
 [class*="view-"] {
 
-  // modal-window backdrop covers the window
-  .wrapper-modal-window {
-    @extend %ui-depth4;
-    @include transition(all $tmg-f2 ease-in-out);
+  // basic modal content
+  .modal-window  {
+    @extend %ui-depth3;
+    @include box-sizing(border-box);
     position: absolute;
-    top: 0;
-    overflow: scroll;
-    background: $black-t2;
-    width: 100%;
-    height: 100%;
-    text-align: center;
+    width: 50%;
+    box-shadow: 0px 0px 7px $shadow-d1;
+    border-radius: ($baseline/5);
+    background-color: $gray-l4;
+    padding: 7px;
+    text-align: left;
 
-    &:before {
-      content: '';
-      display: inline-block;
-      height: 100%;
-      vertical-align: middle;
-      margin-right: -0.25em; /* Adjusts for spacing */
+    .modal-content {
+      box-shadow: 0 0 3px $shadow-d1;
+      background-color: $white;
+      padding: 5%;
     }
 
-    // basic modal content
-    .modal-window  {
-      @include box-sizing(border-box);
-      -webkit-transform: translate(-50%, -50%);
-      transform: translate(-50%, -50%);
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 50%;
-      box-shadow: 0px 0px 7px $shadow-d1;
-      border-radius: ($baseline/5);
-      background-color: $gray-l4;
-      padding: 7px;
-      text-align: left;
+    .title {
+      @extend %t-title5;
+      margin: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
+      font-weight: 600;
+      color: $black;
+    }
 
-      .modal-content {
-        box-shadow: 0 0 3px $shadow-d1;
+    .message {
+      @extend %t-copy-sub1;
+      margin: 0 0 $baseline 0;
+      color: $gray;
+    }
+
+    .message-status {
+      padding: 0;
+
+      &.error {
+        border: 0;
         background-color: $white;
-        padding: 5%;
+        color: $red;
       }
 
-      .title {
-        @extend %t-title5;
-        margin-bottom: ($baseline/2);
-        font-weight: 600;
-        color: $black;
-      }
-
-      .message {
-        @extend %t-copy-sub1;
-        margin: $baseline 0;
-        color: $gray;
-
-        &.error {
-          border: 0;
-          border-top: 3px solid $red-d2;
-          background-color: $red;
-          color: $white;
-        }
-
-        &.success {
-          border: 0;
-          border-top: 3px solid $green-d2;
-          background-color: $green;
-          color: $white;
-        }
-      }
-
-      .modal-chin,
-      .modal-actions {
-        padding: ($baseline*0.75) 2% ($baseline/2) 2%;
-
-        .action-item {
-          @extend %t-action3;
-          display: inline-block;
-          margin-right: ($baseline*0.75);
-
-          &:last-child {
-            margin-right: 0;
-          }
-        }
-
-        .action-primary {
-          @include blue-button();
-          @include font-size(14); // needed due to bad button mixins for now
-          border-color: $blue-d1;
-          color: $white;
-        }
-
-        a {
-          color: $blue;
-
-          &:hover {
-            color: $blue-s2;
-          }
-        }
+      &.success {
+        border: 0;
+        background-color: $white;
+        color: $green-d1;
       }
     }
 
+    .modal-chin,
+    .modal-actions {
+      padding: ($baseline*0.75) 2% ($baseline/2) 2%;
 
-    // small modals - quick editors and dialogs
-    .modal-sm {
-      width: 30%;
-      min-width: ($baseline*15);
+      .action-item {
+        @extend %t-action3;
+        display: inline-block;
+        margin-right: ($baseline*0.75);
 
-      .modal-content {
-        padding: 5% 4%;
-      }
-    }
-
-    // medium modals - forms and interactives
-    .modal-med {
-      width: 40%;
-      min-width: ($baseline*18);
-
-      .modal-content {
-        padding: 4%;
-      }
-    }
-
-    // large modals - component editors and interactives
-    .modal-lg {
-      -webkit-transform: translate(-50%, 0);
-      transform: translate(-50%, 0);
-      top: ($baseline*2);
-      width: 65%;
-      height: auto;
-      min-width: ($baseline*30);
-
-      &.modal-editor {
-
-        .modal-header {
-          margin: ($baseline/4) ($baseline/2);
-
-          .title {
-            width: 48%;
-            display: inline-block;
-          }
-
-          .editor-modes {
-            width: 49%;
-            display: inline-block;
-            text-align: right;
-
-            .action-item {
-              display: inline-block;
-              margin-left: ($baseline/2);
-
-              .editor-button,
-              .settings-button {
-                @extend %btn-secondary-gray;
-                @extend %t-copy-sub1;
-                border: 0;
-                padding: ($baseline/4) ($baseline/2);
-                text-transform: uppercase;
-
-                &:hover {
-                }
-
-                &.is-set {
-                  background-color: $gray-d1;
-                  color: $white;
-                }
-              }
-            }
-          }
+        &:last-child {
+          margin-right: 0;
         }
+      }
 
-        .modal-content {
-          padding: 0;
+      .action-primary {
+        @include blue-button();
+        @include font-size(14); // needed due to bad button mixins for now
+        border-color: $blue-d1;
+        color: $white;
+      }
+
+      a {
+        color: $blue;
+
+        &:hover {
+          color: $blue-s2;
         }
       }
     }
   }
 
 
+  // small modals - quick editors and dialogs
+  .modal-sm {
+    width: 30%;
+    min-width: ($baseline*15);
+
+    .modal-content {
+      padding: 5% 4%;
+    }
+  }
+
+  // medium modals - forms and interactives
+  .modal-med {
+    width: 40%;
+    min-width: ($baseline*18);
+
+    .modal-content {
+      padding: 4%;
+    }
+  }
+
+  // large modals - component editors and interactives
+  .modal-lg {
+    width: 75%;
+    height: auto;
+
+    &.modal-editor {
+
+      .modal-header {
+        margin: ($baseline/4) ($baseline/2);
+
+        .title {
+          width: 48%;
+          display: inline-block;
+        }
+
+        .editor-modes {
+          width: 49%;
+          display: inline-block;
+          text-align: right;
+
+          .action-item {
+            display: inline-block;
+            margin-left: ($baseline/2);
+
+            .editor-button,
+            .settings-button {
+              @extend %btn-secondary-gray;
+              @extend %t-copy-sub1;
+              border: 0;
+              padding: ($baseline/4) ($baseline/2);
+              text-transform: uppercase;
+
+              &:hover {
+              }
+
+              &.is-set {
+                background-color: $gray-d1;
+                color: $white;
+              }
+            }
+          }
+        }
+      }
+
+      .modal-content {
+        height: 435px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0;
+      }
+    }
+  }
+
+
+
   // specific modal overrides
+
+  // upload modal
+  .assetupload-modal {
+
+    .status-upload {
+      margin-top: $baseline;
+    }
+  }
+
 
   // component editor
   .modal-window {
+
+    .CodeMirror {
+      height: 100%;
+    }
 
     .wrapper-comp-settings {
 
       .list-input {
 
         &.settings-list {
-          height: ($baseline*21.25);
+          height: auto;
           max-height: none;
         }
       }
@@ -199,10 +190,45 @@
 
 
   // special overrides for video module editor/hidden tab editors
-  .wrapper-modal-window .modal-type-video {
+  .modal-lg.modal-type-video {
 
     .modal-content {
       box-shadow: none;
+      height: auto;
+      overflow-y: hidden;
+
+      // modal within a modal
+      .wrapper-modal-window-assetupload {
+
+        .modal-window {
+          top: 10% !important;
+          left: 10% !important;
+        }
+
+        .modal-content {
+          padding: 2%;
+
+          .title {
+            width: auto;
+          }
+
+          .editor-modes {
+            display: none;
+          }
+
+          input[type="file"] {
+            margin: $baseline 0;
+          }
+
+          .message {
+            margin: 0 0 $baseline 0;
+          }
+
+          .modal-actions {
+            padding: ($baseline/2) 0;
+          }
+        }
+      }
     }
 
     .xmodule_edit.xmodule_VideoDescriptor .editor-with-tabs {
@@ -259,39 +285,26 @@
       }
 
       .tabs-wrapper {
-        box-shadow: 0 0 3px $shadow-d1;
+        height: ($baseline*24);
+        overflow-y: scroll;
+        border: 1px solid $gray-l2;
 
         .component-tab {
-          border-top: 1px solid $gray-l3;
+          border-top: 0;
         }
       }
     }
   }
 
-
-  // modal-window set-up
-  .wrapper-modal-window {
-    visibility: hidden;
-    pointer-events: none;
-    display: none;
-
-    .modal-window {
-      opacity: 0;
-    }
-  }
-
-  // modal-window showing/hiding
-  &.modal-window-is-shown {
-    overflow: hidden;
-
-    .wrapper-modal-window.is-shown {
-      visibility: visible;
-      pointer-events: auto;
-      display: block;
-
-      .modal-window {
-        opacity: 1.0;
-      }
-    }
+  .modal-window-overlay {
+    @extend %ui-depth3;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
   }
 }

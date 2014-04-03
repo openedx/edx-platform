@@ -72,5 +72,34 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
                     expect(editor.getMode()).toEqual('editor');
                 });
             });
+
+            describe("Editing an xmodule (settings only)", function() {
+                var mockXModuleEditorHtml;
+
+                mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-settings-only-editor.underscore');
+
+                beforeEach(function() {
+                    edit_helpers.installEditTemplates();
+
+                    // Mock the VerticalDescriptor so that the module can be rendered
+                    window.VerticalDescriptor = XModule.Descriptor;
+                });
+
+                afterEach(function () {
+                    window.VerticalDescriptor = null;
+                });
+
+                it('can render itself', function() {
+                    var requests = create_sinon.requests(this);
+                    editor.render();
+                    create_sinon.respondWithJson(requests, {
+                        html: mockXModuleEditorHtml,
+                        "resources": []
+                    });
+
+                    expect(editor.$el.select('.xblock-header')).toBeTruthy();
+                    expect(editor.getMode()).toEqual('settings');
+                });
+            });
         });
     });

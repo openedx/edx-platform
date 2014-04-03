@@ -106,7 +106,15 @@ def click_component_from_menu(category, component_type, is_advanced):
 @world.absorb
 def edit_component_and_select_settings():
     world.edit_component()
-    world.css_click('.settings-button')
+    world.ensure_settings_visible()
+
+
+@world.absorb
+def ensure_settings_visible():
+    # Select the 'settings' tab if there is one (it isn't displayed if it is the only option)
+    settings_button = world.browser.find_by_css('.settings-button')
+    if len(settings_button) > 0:
+        world.css_click('.settings-button')
 
 
 @world.absorb

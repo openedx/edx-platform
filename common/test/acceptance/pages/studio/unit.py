@@ -105,18 +105,15 @@ class Component(PageObject):
     def edit(self):
         self.q(css=self._bounded_selector('.edit-button')).first.click()
         EmptyPromise(
-            lambda: all(
-                self.q(css=self._bounded_selector('.component-editor'))
-                .map(lambda el: el.is_displayed())
-                .results),
-            "Verify that the editor for component {} has been expanded".format(self.locator)
+            lambda: self.q(css='.xblock-studio_view').present,
+            'Wait for the Studio editor to be present'
         ).fulfill()
 
         return self
 
     @property
     def editor_selector(self):
-        return self._bounded_selector('.xblock-studio_view')
+        return '.xblock-studio_view'
 
     def go_to_container(self):
         """

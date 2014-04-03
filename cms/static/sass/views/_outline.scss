@@ -508,7 +508,56 @@
   }
 
 
+
   // modal to edit section publish settings
+  // basic non-backbone modal-window set-up
+  .wrapper-modal-window {
+    @extend %ui-depth4;
+    @include transition(all $tmg-f2 ease-in-out);
+    visibility: hidden;
+    pointer-events: none;
+    display: none;
+    position: absolute;
+    top: 0;
+    overflow: scroll;
+    background: $black-t2;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+
+    &:before {
+      content: '';
+      display: inline-block;
+      height: 100%;
+      vertical-align: middle;
+      margin-right: -0.25em; /* Adjusts for spacing */
+    }
+
+    .modal-window {
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      opacity: 0;
+    }
+  }
+
+  // modal-window showing/hiding
+  &.modal-window-is-shown {
+    overflow: hidden;
+
+    .wrapper-modal-window.is-shown {
+      visibility: visible;
+      pointer-events: auto;
+      display: block;
+
+      .modal-window {
+        opacity: 1.0;
+      }
+    }
+  }
+
   .edit-section-publish-settings {
 
     .picker {

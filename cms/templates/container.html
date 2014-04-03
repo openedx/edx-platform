@@ -14,7 +14,7 @@ from django.utils.translation import ugettext as _
 
 
 <%block name="header_extras">
-% for template_name in ["edit-xblock-modal", "editor-mode-button"]:
+% for template_name in ["basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>

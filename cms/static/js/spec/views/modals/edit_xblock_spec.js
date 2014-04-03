@@ -44,9 +44,9 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 it('can show itself', function() {
                     var requests = create_sinon.requests(this);
                     modal = showModal(requests, mockXBlockEditorHtml);
-                    expect(modal.$('.wrapper-modal-window')).toHaveClass('is-shown');
+                    expect(edit_helpers.isShowingModal(modal)).toBeTruthy();
                     edit_helpers.cancelModal(modal);
-                    expect(modal.$('.wrapper-modal-window')).not.toHaveClass('is-shown');
+                    expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
                 });
 
                 it('shows the correct title', function() {
@@ -79,9 +79,9 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 it('can render itself', function() {
                     var requests = create_sinon.requests(this);
                     modal = showModal(requests, mockXModuleEditorHtml);
-                    expect(modal.$('.wrapper-modal-window')).toHaveClass('is-shown');
+                    expect(edit_helpers.isShowingModal(modal)).toBeTruthy();
                     edit_helpers.cancelModal(modal);
-                    expect(modal.$('.wrapper-modal-window')).not.toHaveClass('is-shown');
+                    expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
                 });
 
                 it('shows the correct title', function() {
@@ -104,6 +104,21 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     expect(settingsButton).not.toHaveClass('is-set');
                 });
 
+                it('can switch tabs', function() {
+                    var requests = create_sinon.requests(this),
+                        editorButton,
+                        settingsButton;
+                    modal = showModal(requests, mockXModuleEditorHtml);
+                    expect(modal.$('.editor-modes a').length).toBe(2);
+                    editorButton = modal.$('.editor-button');
+                    settingsButton = modal.$('.settings-button');
+                    expect(modal.$('.metadata_edit')).toHaveClass('is-inactive');
+                    settingsButton.click();
+                    expect(modal.$('.metadata_edit')).toHaveClass('is-active');
+                    editorButton.click();
+                    expect(modal.$('.metadata_edit')).toHaveClass('is-inactive');
+                });
+
                 describe("Custom Tabs", function() {
                     var mockCustomTabsHtml;
 
@@ -120,6 +135,37 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                         modal = showModal(requests, mockCustomTabsHtml);
                         expect(modal.$('.component-name').text()).toBe('Editing: Component');
                     });
+                });
+            });
+
+            describe("XModule Editor (settings only)", function() {
+                var mockXModuleEditorHtml;
+
+                mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-settings-only-editor.underscore');
+
+                beforeEach(function() {
+                    // Mock the VerticalDescriptor so that the module can be rendered
+                    window.VerticalDescriptor = XModule.Descriptor;
+                });
+
+                afterEach(function () {
+                    window.VerticalDescriptor = null;
+                });
+
+                it('can render itself', function() {
+                    var requests = create_sinon.requests(this);
+                    modal = showModal(requests, mockXModuleEditorHtml);
+                    expect(edit_helpers.isShowingModal(modal)).toBeTruthy();
+                    edit_helpers.cancelModal(modal);
+                    expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
+                });
+
+                it('does not show any mode buttons', function() {
+                    var requests = create_sinon.requests(this),
+                        editorButton,
+                        settingsButton;
+                    modal = showModal(requests, mockXModuleEditorHtml);
+                    expect(modal.$('.editor-modes li').length).toBe(0);
                 });
             });
         });

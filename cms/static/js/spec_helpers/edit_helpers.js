@@ -1,9 +1,9 @@
 /**
  * Provides helper methods for invoking Studio editors in Jasmine tests.
  */
-define(["jquery", "js/spec_helpers/create_sinon", "js/views/modals/edit_xblock",
+define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers", "js/views/modals/edit_xblock",
         "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function($, create_sinon, EditXBlockModal) {
+    function($, create_sinon, modal_helpers, EditXBlockModal) {
 
         var editorTemplate = readFixtures('metadata-editor.underscore'),
             numberEntryTemplate = readFixtures('metadata-number-entry.underscore'),
@@ -12,12 +12,10 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/views/modals/edit_xblock",
             editXBlockModalTemplate = readFixtures('edit-xblock-modal.underscore'),
             editorModeButtonTemplate = readFixtures('editor-mode-button.underscore'),
             installEditTemplates,
-            showEditModal,
-            isShowingModal,
-            cancelModal;
+            showEditModal;
 
-        installEditTemplates = function() {
-            setFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template" }).text(feedbackTemplate));
+        installEditTemplates = function(append) {
+            modal_helpers.installModalTemplates(append);
 
             // Add templates needed by the edit XBlock modal
             appendSetFixtures($("<script>", { id: "edit-xblock-modal-tpl", type: "text/template" }).text(editXBlockModalTemplate));
@@ -29,7 +27,6 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/views/modals/edit_xblock",
             appendSetFixtures($("<script>", {id: "metadata-string-entry", type: "text/template"}).text(stringEntryTemplate));
         };
 
-
         showEditModal = function(requests, xblockElement, model, mockHtml) {
             var modal = new EditXBlockModal({});
             modal.edit(xblockElement, model);
@@ -40,35 +37,10 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/views/modals/edit_xblock",
             return modal;
         };
 
-        isShowingModal = function(modal) {
-            var modalElement;
-            if (modal) {
-                modalElement = modal.$el;
-            } else {
-                modalElement = $('.wrapper-modal-window');
-            }
-            if (modalElement) {
-                return modalElement.hasClass('is-shown');
-            }
-            return false;
-        };
-
-        cancelModal = function(modal) {
-            var modalElement, cancelButton;
-            if (modal) {
-                modalElement = modal.$el;
-            } else {
-                modalElement = $('.wrapper-modal-window');
-            }
-            cancelButton = modalElement.find('.action-cancel');
-            expect(cancelButton.length).toBe(1);
-            cancelButton.click();
-        };
-
         return {
             'installEditTemplates': installEditTemplates,
             'showEditModal': showEditModal,
-            'isShowingModal': isShowingModal,
-            'cancelModal': cancelModal
+            'isShowingModal': modal_helpers.isShowingModal,
+            'cancelModal': modal_helpers.cancelModal
         };
     });

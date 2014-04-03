@@ -60,9 +60,7 @@ define(["jquery", "underscore", "js/views/baseview", "js/views/xblock", "js/view
                         target = event.target,
                         xblockElement = self.findXBlockElement(target);
                     event.preventDefault();
-                    modal = new EditXBlockModal({
-                        el: $('.edit-xblock-modal')
-                    });
+                    modal = new EditXBlockModal({ });
                     modal.edit(xblockElement, self.model,
                         {
                             refresh: function(xblockInfo) {
