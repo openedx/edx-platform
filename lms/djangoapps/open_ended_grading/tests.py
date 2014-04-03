@@ -19,6 +19,7 @@ from xmodule import peer_grading_module
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule.tests import test_util_open_ended
@@ -115,7 +116,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        self.course_id = "edX/toy/2012_Fall"
+        self.course_id = SlashSeparatedCourseKey.from_string("edX/toy/2012_Fall")
         self.toy = modulestore().get_course(self.course_id)
 
         make_instructor(self.toy, self.instructor)

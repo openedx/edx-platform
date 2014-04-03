@@ -36,7 +36,7 @@ class LocationKeyField(models.CharField):
     def to_python(self, value):
         assert isinstance(value, basestring) or isinstance(value, Location)
         if isinstance(value, basestring):
-            return Location.from_string(value)
+            return Location.from_deprecated_string(value)
         else:
             return value
 

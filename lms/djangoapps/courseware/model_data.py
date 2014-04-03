@@ -142,7 +142,7 @@ class FieldDataCache(object):
             return self._chunked_query(
                 StudentModule,
                 'module_state_key__in',
-                (str(descriptor.scope_ids.usage_id) for descriptor in self.descriptors),
+                (descriptor.scope_ids.usage_id for descriptor in self.descriptors),
                 course_id=self.course_id,
                 student=self.user.pk,
             )
@@ -150,7 +150,7 @@ class FieldDataCache(object):
             return self._chunked_query(
                 XModuleUserStateSummaryField,
                 'usage_id__in',
-                (str(descriptor.scope_ids.usage_id) for descriptor in self.descriptors),
+                (descriptor.scope_ids.usage_id for descriptor in self.descriptors),
                 field_name__in=set(field.name for field in fields),
             )
         elif scope == Scope.preferences:

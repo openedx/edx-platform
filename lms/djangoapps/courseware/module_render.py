@@ -7,6 +7,7 @@ import static_replace
 from functools import partial
 from requests.auth import HTTPBasicAuth
 from dogapi import dog_stats_api
+from opaque_keys import InvalidKeyError
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -575,11 +576,10 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         user (User): The currently logged in user
 
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_id))
-
-    # Check parameters and fail fast if there's a problem
-    if not Location.is_valid(usage_key):
+    try:
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_id))
+    except InvalidKeyError:
         raise Http404("Invalid location")
 
     # Check submitted files
