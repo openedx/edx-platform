@@ -345,7 +345,7 @@ class PaidCourseRegistration(OrderItem):
                         .format(order.user.email, course_id, order.id))
             raise ItemAlreadyInCartException
 
-        if CourseEnrollment.is_enrolled(user=order.user, course_id=course_id):
+        if CourseEnrollment.is_enrolled(user=order.user, course_key=course_id):
             log.warning("User {} trying to add course {} to cart id {}, already registered"
                         .format(order.user.email, course_id, order.id))
             raise AlreadyEnrolledInCourseException

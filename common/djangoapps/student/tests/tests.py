@@ -486,14 +486,13 @@ class EnrollInCourseTest(TestCase):
 
         # Creating an enrollment doesn't actually enroll a student
         # (calling CourseEnrollment.enroll() would have)
-        course_key = CourseKey.from_string(course_id)
-        enrollment = CourseEnrollment.get_or_create_enrollment(user, course_key)
+        enrollment = CourseEnrollment.get_or_create_enrollment(user, course_id)
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
         self.assert_no_events_were_emitted()
 
         # Until you explicitly activate it
         enrollment.activate()
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_key))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
         self.assert_enrollment_event_was_emitted(user, course_id)
 
         # Activating something that's already active does nothing
@@ -537,7 +536,7 @@ class PaidRegistrationTest(ModuleStoreTestCase):
 
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     def test_change_enrollment_add_to_cart(self):
-        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course.id,
+        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course.id.to_deprecated_string(),
                                                                        'enrollment_action': 'add_to_cart'})
         request.user = self.user
         response = change_enrollment(request)
