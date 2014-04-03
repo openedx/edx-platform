@@ -98,7 +98,7 @@ def _upload_sjson_file(subs_file, location, default_filename='subs_{}.srt.sjson'
 def _upload_file(subs_file, location, filename):
     mime_type = subs_file.content_type
     content_location = StaticContent.compute_location(
-        location.org, location.course, filename
+        location.course_key, filename
     )
     content = StaticContent(content_location, filename, mime_type, subs_file.read())
     contentstore().save(content)

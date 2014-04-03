@@ -450,6 +450,6 @@ class ProgressPageTests(ModuleStoreTestCase):
     def test_pure_ungraded_xblock(self):
         ItemFactory(category='acid', parent_location=self.vertical.location)
 
-        resp = views.progress(self.request, self.course.id)
+        resp = views.progress(self.request, self.course.id.to_deprecated_string())
         self.assertEquals(resp.status_code, 200)
 

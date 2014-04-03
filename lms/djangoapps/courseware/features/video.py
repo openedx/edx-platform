@@ -188,7 +188,7 @@ def upload_file(filename, location):
     mime_type = "application/json"
 
     content_location = StaticContent.compute_location(
-        location.org, location.course, filename
+        location.course_key, filename
     )
     content = StaticContent(content_location, filename, mime_type, f.read())
     contentstore().save(content)
