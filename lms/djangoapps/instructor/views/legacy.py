@@ -521,7 +521,7 @@ def instructor_dashboard(request, course_id):
                 aidx = allgrades['assignments'].index(aname)
                 datatable = {'header': [_('External email'), aname]}
                 ddata = []
-                for x in allgrades['students']:	  # do one by one in case there is a student who has only partial grades
+                for x in allgrades['students']:  # do one by one in case there is a student who has only partial grades
                     try:
                         ddata.append([x.email, x.grades[aidx]])
                     except IndexError:
@@ -970,8 +970,8 @@ def instructor_dashboard(request, course_id):
         'email_msg': email_msg,            # email
         'show_email_tab': show_email_tab,  # email
 
-        'problems': problems,		# psychometrics
-        'plots': plots,			# psychometrics
+        'problems': problems,  # psychometrics
+        'plots': plots,  # psychometrics
         'course_errors': modulestore().get_course_errors(course.id),
         'instructor_tasks': instructor_tasks,
         'offline_grade_log': offline_grades_available(course_key),
@@ -1025,7 +1025,7 @@ def _do_remote_gradebook(user, course, action, args=None, files=None):
         return msg, {}
 
     msg = '<pre>{msg}</pre>'.format(msg = retdict['msg'].replace('\n', '<br/>'))
-    retdata = retdict['data']  	# a list of dicts
+    retdata = retdict['data']  # a list of dicts
 
     if retdata:
         datatable = {'header': retdata[0].keys()}
@@ -1432,7 +1432,7 @@ def _do_enroll_students(course, course_key, students, overload=False, auto_enrol
     new_students, new_students_lc = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in new_students)
 
-    if overload:  	# delete all but staff
+    if overload:  # delete all but staff
         todelete = CourseEnrollment.objects.filter(course_id=course_key.to_deprecated_string())
         for ce in todelete:
             if not has_access(ce.user, 'staff', course) and ce.user.email.lower() not in new_students_lc:
@@ -1721,13 +1721,13 @@ def compute_course_stats(course):
 
     def walk(module):
         children = module.get_children()
-        category = module.__class__.__name__ 	# HtmlDescriptor, CapaDescriptor, ...
+        category = module.__class__.__name__  # HtmlDescriptor, CapaDescriptor, ...
         counts[category] += 1
         for c in children:
             walk(c)
 
     walk(course)
-    stats = dict(counts)  	# number of each kind of module
+    stats = dict(counts)  # number of each kind of module
     return stats
 
 
