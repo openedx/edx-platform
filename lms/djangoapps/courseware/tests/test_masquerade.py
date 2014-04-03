@@ -20,6 +20,7 @@ from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from lms.lib.xblock.runtime import quote_slashes
+from xmodule.modulestore.keys import CourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -33,7 +34,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         # Clear out the modulestores, causing them to reload
         clear_existing_modulestores()
 
-        self.graded_course = modulestore().get_course("edX/graded/2012_Fall")
+        self.graded_course = modulestore().get_course(CourseKey.from_string("edX/graded/2012_Fall"))
 
         # Create staff account
         self.instructor = 'view2@test.com'
@@ -88,11 +89,11 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
     def get_problem(self):
         pun = 'H1P1'
-        problem_location = "i4x://edX/graded/problem/%s" % pun
+        problem_location = self.graded_course.id.make_usage_key("problem", pun)
 
         modx_url = reverse('xblock_handler',
-                           kwargs={'course_id': self.graded_course.id,
-                                   'usage_id': quote_slashes(problem_location),
+                           kwargs={'course_id': self.graded_course.id.to_deprecated_string(),
+                                   'usage_id': quote_slashes(problem_location.to_deprecated_string()),
                                    'handler': 'xmodule_handler',
                                    'suffix': 'problem_get'})
 

@@ -408,7 +408,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         ),
         replace_course_urls=partial(
             static_replace.replace_course_urls,
-            course_id=course_id
+            course_key=course_id
         ),
         replace_jump_to_id_urls=partial(
             static_replace.replace_jump_to_id_urls,
