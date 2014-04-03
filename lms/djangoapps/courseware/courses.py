@@ -64,7 +64,11 @@ def get_course_by_id(course_key, depth=0):
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
     try:
-        return modulestore().get_course(course_key, depth=depth)
+        course = modulestore().get_course(course_key, depth=depth)
+        if course:
+            return course
+        else:
+            raise Http404("Course not found.")
     except (KeyError, ItemNotFoundError):
         raise Http404("Course not found.")
     except InvalidLocationError:

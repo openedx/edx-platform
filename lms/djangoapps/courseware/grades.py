@@ -23,8 +23,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
 from .models import StudentModule
 from .module_render import get_module_for_descriptor
-from xmodule.modulestore.keys import UsageKey, CourseKey
-from xmodule.modulestore.locations import Location
 from opaque_keys import InvalidKeyError
 
 log = logging.getLogger("edx.courseware")
