@@ -54,11 +54,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                 static_content_store=self.contentstore, verbose=True)
 
         # A locked asset
-        self.locked_asset = course_id.get_asset_key('sample_static.txt')
+        self.locked_asset = course_id.make_asset_key('asset', 'sample_static.txt')
         self.url_locked = StaticContent.get_url_path_from_location(self.locked_asset)
 
         # An unlocked asset
-        self.unlocked_asset = course_id.get_asset_key('another_static.txt')
+        self.unlocked_asset = course_id.make_asset_key('asset', 'another_static.txt')
         self.url_unlocked = StaticContent.get_url_path_from_location(self.unlocked_asset)
 
         self.contentstore.set_attr(self.locked_asset, 'locked', True)
