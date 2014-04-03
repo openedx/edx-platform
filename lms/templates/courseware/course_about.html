@@ -299,6 +299,17 @@ div .videoplaytriangle{
       Social Link
     </div>
   </div>
+  ## SP/TAB login/register button
+  % if user.is_authenticated():
+  <div class="hide"></div>
+  % else:
+  <div class="row hide-for-large-up">
+    <div class="columns">
+      <p><a href="/login" class="f_button small radius success expand">すでに登録済の方はログイン</a><br/>
+      <a href="/register" class="f_button small radius success expand">会員登録（無料）はこちら</a></p>
+    </div>
+  </div>
+  % endif
 </div>
 ## ------------------
 
