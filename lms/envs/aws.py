@@ -221,6 +221,8 @@ LOGGING = get_logger_config(LOG_DIR,
                             debug=False,
                             service_variant=SERVICE_VARIANT)
 
+LOGGING['loggers'].setdefault('codejail.jail_code', {})['level'] = 'DEBUG'
+
 COURSE_LISTINGS = ENV_TOKENS.get('COURSE_LISTINGS', {})
 SUBDOMAIN_BRANDING = ENV_TOKENS.get('SUBDOMAIN_BRANDING', {})
 VIRTUAL_UNIVERSITIES = ENV_TOKENS.get('VIRTUAL_UNIVERSITIES', [])
