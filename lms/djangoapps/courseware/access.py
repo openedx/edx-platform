@@ -185,9 +185,10 @@ def _has_access_course_desc(user, course, action):
                 if _has_staff_access_to_descriptor(user, course):
                     return True
                 debug("Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic")
-                for course_id in course.duplicate_courses:
-                    if (user.courseenrollment_set.filter(course_id = course_id)):
-                        return False
+                if course.duplicate_courses:
+                    for course_id in course.duplicate_courses:
+                        if (user.courseenrollment_set.filter(course_id = course_id)):
+                            return False
                 return True
             return _has_staff_access_to_descriptor(user, course)
 
