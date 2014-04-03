@@ -42,6 +42,15 @@ class StaticContent(object):
 
     @staticmethod
     def compute_location(course_key, path, revision=None, is_thumbnail=False):
+        """
+        Constructs a location object for static content.
+
+        - course_key: the course that this asset belongs to
+        - path: is the name of the static asset
+        - revision: is the object's revision information
+        - is_tumbnail: is whether or not we want the thumbnail version of this
+            asset
+        """
         path = path.replace('/', '_')
         return AssetLocation(
             course_key.org, course_key.course, course_key.run,

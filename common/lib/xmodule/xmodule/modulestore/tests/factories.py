@@ -1,8 +1,10 @@
+import copy
 from factory import Factory, lazy_attribute_sequence, lazy_attribute
 from factory.containers import CyclicDefinitionError
 from uuid import uuid4
 
-from xmodule.modulestore import Location, prefer_xmodules
+from xmodule.modulestore import prefer_xmodules
+from xmodule.modulestore.locations import Location
 from xblock.core import XBlock
 
 
@@ -85,7 +87,14 @@ class ItemFactory(XModuleFactory):
         else:
             dest_name = self.display_name.replace(" ", "_")
 
-        return self.parent_location.replace(category=self.category, name=dest_name)
+        new_location = Location(
+            self.parent_location.org,
+            self.parent_location.course,
+            self.parent_location.run,
+            self.category,
+            dest_name
+        )
+        return new_location
 
     @lazy_attribute
     def parent_location(self):

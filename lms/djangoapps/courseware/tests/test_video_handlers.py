@@ -12,6 +12,7 @@ from webob import Request
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.keys import CourseKey
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
 from cache_toolbox.core import del_cached_content
@@ -46,7 +47,7 @@ def _check_asset(location, asset_name):
     Check that asset with asset_name exists in assets.
     """
     content_location = StaticContent.compute_location(
-        location.org, location.course, asset_name
+        location.course_key, asset_name
     )
     try:
         contentstore().find(content_location)
@@ -62,7 +63,7 @@ def _clear_assets(location):
     store = contentstore()
 
     content_location = StaticContent.compute_location(
-        location.org, location.course, location.name
+        location.course_key, location.name
     )
 
     assets, __ = store.get_all_content_for_course(content_location)
