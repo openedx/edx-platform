@@ -81,12 +81,7 @@ class SlashSeparatedCourseKey(CourseKey):
             return location_url
         match = URL_RE.match(location_url)
         if match is None:
-            # try seeing if it's a legitimate new form
-            try:
-                return UsageKey.from_string(location_url)
-            except InvalidKeyError:
-                log.debug(u"location %r doesn't match URL", location_url)
-                raise InvalidKeyError(Location, location_url)
+            raise InvalidKeyError(Location, location_url)
         groups = match.groupdict()
         if 'tag' in groups:
             del groups['tag']
@@ -198,6 +193,16 @@ class LocationBase(object):
         Return a string containing the URL for this location
         """
         return self.to_deprecated_string()
+
+    @classmethod
+    def from_deprecated_string(cls, serialized):
+        match = URL_RE.match(serialized)
+        if match is None:
+            raise InvalidKeyError(Location, location_url)
+        groups = match.groupdict()
+        if 'tag' in groups:
+            del groups['tag']
+        return Location(run=None, **groups)
 
     def to_deprecated_string(self):
         url = u"{0.DEPRECATED_TAG}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
