@@ -6,15 +6,34 @@
 <% active_flags = " + ".join(waffle.get_flags(request)) %>
 
 <script type="text/javascript">
-  var analytics=analytics||[];analytics.load=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+e+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);var r=function(e){return function(){analytics.push([e].concat(Array.prototype.slice.call(arguments,0)))}},i=["identify","track","trackLink","trackForm","trackClick","trackSubmit","pageview","ab","alias","ready"];for(var s=0;s<i.length;s++)analytics[i[s]]=r(i[s])};
-  analytics.load("${ settings.SEGMENT_IO_LMS_KEY }");
+  window.analytics||(window.analytics=[]),window.analytics.methods=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group","on","once","off"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var method=window.analytics.methods[i];window.analytics[method]=window.analytics.factory(method)}window.analytics.load=function(t){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)},window.analytics.SNIPPET_VERSION="2.0.8",
+  window.analytics.load("${ settings.SEGMENT_IO_LMS_KEY }");
+
+  path = window.location.href.split("/").slice(3)[0]
+  if (path == "") {
+    window.analytics.page("Home");
+  } else if (path == "register") {
+    window.analytics.page("Registration");
+  } else if (path == "login") {
+    window.analytics.page("Login");
+  } else if (path == "dashboard") {
+    window.analytics.page("Dashboard");
+  } else if (path == "course-list") {
+    window.analytics.page("Course Listing");
+  } else if (path == "course") {
+    window.analytics.page("Course About");
+  } else {
+    window.analytics.page("Other");
+  }
 
   % if user.is_authenticated():
 
     analytics.identify("${ user.id }", {
-      email          : "${ user.email }",
-      username       : "${ user.username }",
-      "Active Flags" : "${ active_flags }",
+      "Registered"      : true,
+      email             : "${ user.email }",
+      username          : "${ user.username }",
+      "Enrollment Count": ${ sum(1 for course in user.courseenrollment_set.values() if course['is_active'] == True) },
+      "Active Flags"    : "${ active_flags }",
     });
 
   % endif
