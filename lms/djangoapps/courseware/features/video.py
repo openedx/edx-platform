@@ -390,12 +390,12 @@ def error_message_has_correct_text(_step):
 @step('I make sure captions are (.+)$')
 def set_captions_visibility_state(_step, captions_state):
     SELECTOR = '.closed .subtitles'
-    if world.is_css_not_present(SELECTOR):
+    if world.is_css_not_present(SELECTOR, wait_time=30):
         if captions_state == 'closed':
-            world.css_find('.hide-subtitles').click()
+            world.css_click('.hide-subtitles')
     else:
         if captions_state != 'closed':
-            world.css_find('.hide-subtitles').click()
+            world.css_click('.hide-subtitles')
 
 
 @step('I see video menu "([^"]*)" with correct items$')
