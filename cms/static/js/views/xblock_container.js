@@ -75,7 +75,10 @@ define(["jquery", "underscore", "js/views/baseview", "js/views/xblock", "js/view
             refreshXBlock: function(xblockInfo, xblockElement) {
                 var self = this,
                     temporaryView;
-                // Create a temporary view to render the updated XBlock into
+                // There is only one Backbone view created on the container page, which is
+                // for the container xblock itself. Any child xblocks rendered inside the
+                // container do not get a Backbone view. Thus, create a temporary XBlock
+                // around the child element so that it can be refreshed.
                 temporaryView = new XBlockView({
                     el: xblockElement,
                     model: xblockInfo,

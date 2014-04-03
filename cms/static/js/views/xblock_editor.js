@@ -106,14 +106,11 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             getXBlockData: function() {
                 var xblock = this.xblock,
                     metadataEditor = this.getMetadataEditor(),
-                    metadata,
                     data;
                 data = xblock.save();
-                metadata = data.metadata;
                 if (metadataEditor) {
-                    metadata = _.extend(metadata || {}, this.getChangedMetadata());
+                    data.metadata = _.extend(data.metadata || {}, this.getChangedMetadata());
                 }
-                data.metadata = metadata;
                 return data;
             },
 
