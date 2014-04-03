@@ -469,7 +469,7 @@ def start_playing_video_from_n_seconds(_step, position):
 def i_see_duration(_step, position):
     world.wait_for(
         func=lambda _: duration() == parse_time_str(position),
-        timeout=5
+        timeout=30
     )
 
 
