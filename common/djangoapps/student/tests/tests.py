@@ -26,7 +26,7 @@ from django.http import HttpResponse
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.keys import CourseKey, SlashSeparatedCourseKey
 
 from mock import Mock, patch, sentinel
 from textwrap import dedent
@@ -480,7 +480,7 @@ class EnrollInCourseTest(TestCase):
 
     def test_activation(self):
         user = User.objects.create(username="jack", email="jack@fake.edx.org")
-        course_id = CourseKey.from_string("edX/Test101/2013")
+        course_id = SlashSeparatedCourseKey.from_string("edX/Test101/2013")
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
 
         # Creating an enrollment doesn't actually enroll a student
