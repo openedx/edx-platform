@@ -236,7 +236,7 @@ class FieldDataCache(object):
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
                 student=User.objects.get(id=key.user_id),
-                module_state_key=key.block_scope_id.url(),
+                module_state_key=key.block_scope_id,
                 defaults={
                     'state': json.dumps({}),
                     'module_type': key.block_scope_id.category,
@@ -245,7 +245,7 @@ class FieldDataCache(object):
         elif key.scope == Scope.user_state_summary:
             field_object, _ = XModuleUserStateSummaryField.objects.get_or_create(
                 field_name=key.field_name,
-                usage_id=key.block_scope_id.url()
+                usage_id=key.block_scope_id
             )
         elif key.scope == Scope.preferences:
             field_object, _ = XModuleStudentPrefsField.objects.get_or_create(
