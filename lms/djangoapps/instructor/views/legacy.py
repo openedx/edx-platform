@@ -813,7 +813,8 @@ def instructor_dashboard(request, course_id):
         students = request.POST.get('multiple_students', '')
         auto_enroll = bool(request.POST.get('auto_enroll'))
         email_students = bool(request.POST.get('email_students'))
-        ret = _do_enroll_students(course, course_key, students, auto_enroll=auto_enroll, email_students=email_students, is_shib_course=is_shib_course)
+        secure = request.is_secure()
+        ret = _do_enroll_students(course, course_key, students, secure=secure, auto_enroll=auto_enroll, email_students=email_students, is_shib_course=is_shib_course)
         datatable = ret['datatable']
 
     elif action == 'Unenroll multiple students':
@@ -839,7 +840,8 @@ def instructor_dashboard(request, course_id):
         if not 'List' in action:
             students = ','.join([x['email'] for x in datatable['retdata']])
             overload = 'Overload' in action
-            ret = _do_enroll_students(course, course_key, students, overload=overload)
+            secure = request.is_secure()
+            ret = _do_enroll_students(course, course_key, students, secure=secure, overload=overload)
             datatable = ret['datatable']
 
     #----------------------------------------
@@ -1439,7 +1441,7 @@ def grade_summary(request, course_key):
 #-----------------------------------------------------------------------------
 # enrollment
 
-def _do_enroll_students(course, course_key, students, overload=False, auto_enroll=False, email_students=False, is_shib_course=False):
+def _do_enroll_students(course, course_key, students, secure=False, overload=False, auto_enroll=False, email_students=False, is_shib_course=False):
     """
     Do the actual work of enrolling multiple students, presented as a string
     of emails separated by commas or returns
@@ -1468,26 +1470,30 @@ def _do_enroll_students(course, course_key, students, overload=False, auto_enrol
         ceaset.delete()
 
     if email_students:
+        protocol = 'https' if secure else 'http'
         stripped_site_name = microsite.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
-        # TODO: Use request.build_absolute_uri rather than 'https://{}{}'.format
+        # TODO: Use request.build_absolute_uri rather than '{proto}://{site}{path}'.format
         # and check with the Services team that this works well with microsites
-        registration_url = 'https://{}{}'.format(
-            stripped_site_name,
-            reverse('student.views.register_user')
+        registration_url = '{proto}://{site}{path}'.format(
+            proto=protocol,
+            site=stripped_site_name,
+            path=reverse('student.views.register_user')
         )
-        course_url = 'https://{}{}'.format(
-            stripped_site_name,
-            reverse('course_root', kwargs={'course_id': course_key.to_deprecated_string()})
+        course_url = '{proto}://{site}{path}'.format(
+            proto=protocol,
+            site=stripped_site_name,
+            path=reverse('course_root', kwargs={'course_id': course_key.to_deprecated_string()})
         )
         # We can't get the url to the course's About page if the marketing site is enabled.
         course_about_url = None
         if not settings.FEATURES.get('ENABLE_MKTG_SITE', False):
-            course_about_url = u'https://{}{}'.format(
-                stripped_site_name,
-                reverse('about_course', kwargs={'course_id': course_key.to_deprecated_string()})
+            course_about_url = u'{proto}://{site}{path}'.format(
+                proto=protocol,
+                site=stripped_site_name,
+                path=reverse('about_course', kwargs={'course_id': course_key.to_deprecated_string()})
             )
 
         # Composition of email
