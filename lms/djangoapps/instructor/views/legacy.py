@@ -30,6 +30,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
@@ -1369,16 +1370,17 @@ def get_student_grade_summary_data(request, course, course_key, get_grades=True,
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def gradebook(request, course_key):
+def gradebook(request, course_id):
     """
     Show the gradebook for this course:
     - only displayed to course staff
     - shows students who are enrolled.
     """
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'staff', course_key, depth=None)
 
     enrolled_students = User.objects.filter(
-        courseenrollment__course_id=course_key.to_deprecated_string(),
+        courseenrollment__course_id=course_key,
         courseenrollment__is_active=1
     ).order_by('username').select_related("profile")
 
