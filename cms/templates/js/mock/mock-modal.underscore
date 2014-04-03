@@ -1,6 +1,6 @@
 <div class="wrapper wrapper-modal-window wrapper-modal-window-mock">
-    <div class="modal-window confirm modal-editor modal-lg modal-type-<%= xblockInfo.get('category') %>">
-        <form class="edit-xblock-modal" action="#">
+    <div class="modal-window confirm modal-editor modal-lg modal-type-html %>">
+        <div class="edit-xblock-modal" action="#">
             <div class="modal-header">
                 <h2 class="title modal-window-title">Mock Modal Title</h2>
             </div>
@@ -17,6 +17,6 @@
                 </li>
                 </ul>
             </div>
-        </form>
+        </div>
     </div>
 </div>
