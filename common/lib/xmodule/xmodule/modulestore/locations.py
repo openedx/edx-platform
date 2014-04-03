@@ -60,6 +60,10 @@ class SlashSeparatedCourseKey(CourseKey):
     def to_deprecated_string(self):
         return '/'.join([self.org, self.course, self.run])
 
+    @classmethod
+    def from_deprecated_string(cls, serialized):
+        return self._from_string(serialized)
+
     def make_usage_key_from_deprecated_string(self, location_url):
         """
         Temporary mechanism for creating a UsageKey given a CourseKey and a serialized Location. NOTE:
