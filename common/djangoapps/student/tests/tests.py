@@ -26,7 +26,7 @@ from django.http import HttpResponse
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.keys import CourseKey, SlashSeparatedCourseKey
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from mock import Mock, patch, sentinel
 from textwrap import dedent
