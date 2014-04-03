@@ -654,11 +654,11 @@ def _get_course_enrollment_domain(course_id):
     @param course_id:
     @return:
     """
-    try:
-        course = course_from_id(course_id)
-        return course.enrollment_domain
-    except ItemNotFoundError:
+    course = course_from_id(course_id)
+    if course is None:
         return None
+
+    return course.enrollment_domain
 
 
 @ensure_csrf_cookie

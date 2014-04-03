@@ -324,7 +324,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         """
         Tests the _get_course_enrollment_domain utility function
         """
-        self.assertIsNone(_get_course_enrollment_domain("I/DONT/EXIST"))
+        self.assertIsNone(_get_course_enrollment_domain(SlashSeparatedCourseKey("I", "DONT", "EXIST")))
         self.assertIsNone(_get_course_enrollment_domain(self.course.id))
         self.assertEqual(self.shib_course.enrollment_domain, _get_course_enrollment_domain(self.shib_course.id))
 
@@ -344,7 +344,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         Tests the redirects when visiting course-specific URL with @login_required.
         Should vary by course depending on its enrollment_domain
         """
-        TARGET_URL = reverse('courseware', args=[self.course.id])            # pylint: disable=C0103
+        TARGET_URL = reverse('courseware', args=[self.course.id.to_deprecated_string()])            # pylint: disable=C0103
         noshib_response = self.client.get(TARGET_URL, follow=True)
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/accounts/login?next={url}'.format(url=TARGET_URL), 302))
@@ -352,7 +352,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 
-        TARGET_URL_SHIB = reverse('courseware', args=[self.shib_course.id])  # pylint: disable=C0103
+        TARGET_URL_SHIB = reverse('courseware', args=[self.shib_course.id.to_deprecated_string()])  # pylint: disable=C0103
         shib_response = self.client.get(**{'path': TARGET_URL_SHIB,
                                            'follow': True,
                                            'REMOTE_USER': self.extauth.external_id,

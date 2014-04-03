@@ -72,7 +72,7 @@ class RolesTestCase(TestCase):
         )
         # now try accessing something internal to the course
         vertical_locator = course_locator.course_key.make_usage_key('vertical', 'madeup')
-        vertical_location = self.replace(category='vertical', name='madeuptoo')
+        vertical_location = self.course_id.make_usage_key(block_type='vertical', name='madeuptoo')
         self.assertTrue(
             CourseStaffRole(self.course_id).has_user(self.student),
             "Student doesn't have access to {}".format(unicode(vertical_locator))
