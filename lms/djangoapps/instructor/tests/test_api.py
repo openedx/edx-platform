@@ -1745,7 +1745,7 @@ class TestInstructorAPIHelpers(TestCase):
         self.assertEqual(_split_input_list(scary_unistuff), [scary_unistuff])
 
     def test_msk_from_problem_urlname(self):
-        course_id = SlashSeparatedCourseKey('MITx', '6.002x' '2013_Spring'
+        course_id = SlashSeparatedCourseKey('MITx', '6.002x' '2013_Spring')
         name = 'L2Node1'
         output = 'i4x://MITx/6.002x/problem/L2Node1'
         self.assertEqual(_msk_from_problem_urlname(course_id, name), output)
