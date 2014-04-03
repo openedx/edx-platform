@@ -40,11 +40,6 @@
       vertical-align: top;
     }
   }
-
-  // UI: xblock render
-  .xblock-render {
-   // @extend %anim-fadeIn;
-  }
 }
 
 // ====================
@@ -66,10 +61,6 @@
     margin: 0 ($baseline/4);
     height: ($baseline*1.25);
     width: $baseline;
-  }
-
-  &.collapsed .xblock-render {
-    //display: none;
   }
 
   .action-view {

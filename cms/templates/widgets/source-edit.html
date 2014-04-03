@@ -45,8 +45,7 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
 
   $('#hls-trig-${hlskey}').click(function() {
 
-      ## this ought to be done using css instead
- //     hlsmodal.attr('style', function(i,s) { return s + ' margin-left:0px !important; left:5%' });
+      ## cannot do this with css or it gets overwritten
       var editorH = $( window ).height() - 100;
       var editorW = $( window ).innerWidth() - 70;
       hlsmodal.attr('style', function(i,s) { return s + 'margin: 2% 0 0 10% !important; left:0; height:' + editorH + 'px;'});
