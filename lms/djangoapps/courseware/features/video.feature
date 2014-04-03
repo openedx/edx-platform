@@ -219,23 +219,22 @@ Feature: LMS Video component
     When I open video "C"
     Then menu "download_transcript" doesn't exist
 
-  # BLD-971 - Test intermittently failing
-  # 20
-#  Scenario: Youtube video has correct transcript if fields for other speeds are filled.
-#    Given I am registered for the course "test_course"
-#    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-#    And I have a "subs_b7xgknqkQk8.srt.sjson" transcript file in assets
-#    And it has a video in "Youtube" mode:
-#      | sub         | youtube_id_1_5 |
-#      | OEoXaMPEzfM | b7xgknqkQk8    |
-#    And I make sure captions are opened
-#    Then I see "Hi, welcome to Edx." text in the captions
-#    And I select the "1.50" speed
-#    And I reload the page
-#    Then I see "Hi, welcome to Edx." text in the captions
-#    And I see duration "1:00"
-
   # 21
+  Scenario: Youtube video has correct transcript if fields for other speeds are filled.
+    Given I am registered for the course "test_course"
+    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+    And I have a "subs_b7xgknqkQk8.srt.sjson" transcript file in assets
+    And it has a video in "Youtube" mode:
+      | sub         | youtube_id_1_5 |
+      | OEoXaMPEzfM | b7xgknqkQk8    |
+    And I make sure captions are opened
+    Then I see "Hi, welcome to Edx." text in the captions
+    And I select the "1.50" speed
+    And I reload the page
+    Then I see "Hi, welcome to Edx." text in the captions
+    And I see duration "1:00"
+
+  # 22
    Scenario: Download button works correctly for non-english transcript in Youtube mode of Video component
     Given I am registered for the course "test_course"
     And I have a "chinese_transcripts.srt" transcript file in assets
@@ -249,7 +248,7 @@ Feature: LMS Video component
     And I see "好 各位同学" text in the captions
     Then I can download transcript in "srt" format that has text "好 各位同学"
 
-  # 22
+  # 23
    Scenario: Download button works correctly for non-english transcript in HTML5 mode of Video component
     Given I am registered for the course "test_course"
     And I have a "chinese_transcripts.srt" transcript file in assets
@@ -263,7 +262,7 @@ Feature: LMS Video component
     And I see "好 各位同学" text in the captions
     Then I can download transcript in "srt" format that has text "好 各位同学"
 
-  # 23
+  # 24
   Scenario: Download button works correctly w/o english transcript in HTML5 mode of Video component
     Given I am registered for the course "test_course"
     And I have a "chinese_transcripts.srt" transcript file in assets
@@ -273,7 +272,7 @@ Feature: LMS Video component
     And I see "好 各位同学" text in the captions
     Then I can download transcript in "srt" format that has text "好 各位同学"
 
-  # 24
+  # 25
   Scenario: Download button works correctly w/o english transcript in Youtube mode of Video component
     Given I am registered for the course "test_course"
     And I have a "chinese_transcripts.srt" transcript file in assets
@@ -283,7 +282,7 @@ Feature: LMS Video component
     And I see "好 各位同学" text in the captions
     Then I can download transcript in "srt" format that has text "好 各位同学"
 
-  # 25
+  # 26
   Scenario: Verify that each video in each sub-section includes a transcript for non-Youtube countries.
     Given youtube server is up and response time is 2 seconds
     And I am registered for the course "test_course"
