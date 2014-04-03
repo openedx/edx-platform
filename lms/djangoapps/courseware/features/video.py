@@ -539,6 +539,10 @@ def select_transcript_format(_step, format):
     menu_selector = VIDEO_MENUS['download_transcript']
 
     button = world.css_find(button_selector).first
+
+    height = button._element.location_once_scrolled_into_view['y']
+    world.browser.driver.execute_script("window.scrollTo(0, {});".format(height))
+
     button.mouse_over()
     assert world.css_has_text(button_selector, '...', strip=True)
 
@@ -548,6 +552,8 @@ def select_transcript_format(_step, format):
             item.click()
             world.wait_for_ajax_complete()
             break
+
+    world.browser.driver.execute_script("window.scrollTo(0, 0);")
 
     assert world.css_find(menu_selector + ' .active a')[0]['data-value'] == format
     assert world.css_has_text(button_selector, '.' + format, strip=True)
