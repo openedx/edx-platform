@@ -29,8 +29,6 @@ class CourseKeyField(models.CharField):
         # The default django CharField validator tries to call len() on SlashSeparatedCourseKey,
         # so we write custom validation that allows us to use SlashSeparatedCourseKeys
         assert isinstance(value, (NoneType, basestring, SlashSeparatedCourseKey))
-        if isinstance(value, basestring):
-            assert len(value.to_deprecated_string()) < 290
 
     def run_validators(self, value):
         # The default django CharField validator tries to call len() on SlashSeparatedCourseKey,
@@ -64,8 +62,6 @@ class LocationKeyField(models.CharField):
         # The default django CharField validator tries to call len() on Locations,
         # so we write custom validation that allows us to use Locations
         assert isinstance(value, (NoneType, basestring, Location))
-        if isinstance(value, basestring):
-            assert len(value.to_deprecated_string()) < 290
 
     def run_validators(self, value):
         # The default django CharField validator tries to call len() on Locations,
