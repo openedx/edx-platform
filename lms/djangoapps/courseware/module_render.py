@@ -365,7 +365,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     block_wrappers.append(partial(
         replace_jump_to_id_urls,
         course_id,
-        reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''}),
+        reverse('jump_to_id', kwargs={'course_id': course_id.to_deprecated_string(), 'module_id': ''}),
     ))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
