@@ -2,8 +2,8 @@
  * XBlockContainerView is used to display an xblock which has children, and allows the
  * user to interact with the children.
  */
-define(["jquery", "underscore", "js/views/baseview", "js/views/xblock", "js/views/modals/edit_xblock"],
-    function ($, _, BaseView, XBlockView, EditXBlockModal) {
+define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt", "js/views/baseview", "js/views/xblock", "js/views/modals/edit_xblock", "js/models/xblock_info"],
+    function ($, _, gettext, NotificationView, PromptView, BaseView, XBlockView, EditXBlockModal, XBlockInfo) {
 
         var XBlockContainerView = BaseView.extend({
             // takes XBlockInfo as a model
@@ -53,6 +53,10 @@ define(["jquery", "underscore", "js/views/baseview", "js/views/xblock", "js/view
                 return $(target).closest('[data-locator]');
             },
 
+            getURLRoot: function() {
+                return this.xblockView.model.urlRoot;
+            },
+
             addButtonActions: function(element) {
                 var self = this;
                 element.find('.edit-button').click(function(event) {
@@ -68,11 +72,98 @@ define(["jquery", "underscore", "js/views/baseview", "js/views/xblock", "js/view
                             }
                         });
                 });
+                element.find('.duplicate-button').click(function(event) {
+                    event.preventDefault();
+                    self.duplicateComponent(
+                        self.findXBlockElement(event.target)
+                    );
+                });
+                element.find('.delete-button').click(function(event) {
+                    event.preventDefault();
+                    self.deleteComponent(
+                        self.findXBlockElement(event.target)
+                    );
+                });
+            },
+
+            duplicateComponent: function(xblockElement) {
+                var self = this,
+                    parentElement = self.findXBlockElement(xblockElement.parent()),
+                    duplicating = new NotificationView.Mini({
+                        title: gettext('Duplicating&hellip;')
+                    });
+
+                duplicating.show();
+                return $.postJSON(self.getURLRoot(), {
+                    duplicate_source_locator: xblockElement.data('locator'),
+                    parent_locator: parentElement.data('locator')
+                }, function(data) {
+                    // copy the element
+                    var duplicatedElement = xblockElement.clone(false);
+
+                    // place it after the original element
+                    xblockElement.after(duplicatedElement);
+
+                    // update its locator id
+                    duplicatedElement.attr('data-locator', data.locator);
+
+                    // have it refresh itself
+                    self.refreshXBlockElement(duplicatedElement);
+
+                    // hide the notification
+                    duplicating.hide();
+                });
+            },
+
+
+            deleteComponent: function(xblockElement) {
+                var self = this, deleting;
+                return new PromptView.Warning({
+                    title: gettext('Delete this component?'),
+                    message: gettext('Deleting this component is permanent and cannot be undone.'),
+                    actions: {
+                        primary: {
+                            text: gettext('Yes, delete this component'),
+                            click: function(prompt) {
+                                prompt.hide();
+                                deleting = new NotificationView.Mini({
+                                    title: gettext('Deleting&hellip;')
+                                });
+                                deleting.show();
+                                return $.ajax({
+                                    type: 'DELETE',
+                                    url:
+                                        self.getURLRoot() + "/" +
+                                            xblockElement.data('locator') + "?" +
+                                            $.param({recurse: true, all_versions: true})
+                                }).success(function() {
+                                    deleting.hide();
+                                    xblockElement.remove();
+                                });
+                            }
+                        },
+                        secondary: {
+                            text: gettext('Cancel'),
+                            click: function(prompt) {
+                                return prompt.hide();
+                            }
+                        }
+                    }
+                }).show();
+            },
+
+            refreshXBlockElement: function(xblockElement) {
+                this.refreshXBlock(
+                    new XBlockInfo({
+                        id: xblockElement.data('locator')
+                    }),
+                    xblockElement
+                );
             },
 
             refreshXBlock: function(xblockInfo, xblockElement) {
-                var self = this,
-                    temporaryView;
+                var self = this, temporaryView;
+
                 // There is only one Backbone view created on the container page, which is
                 // for the container xblock itself. Any child xblocks rendered inside the
                 // container do not get a Backbone view. Thus, create a temporary XBlock
@@ -93,3 +184,4 @@ define(["jquery", "underscore", "js/views/baseview", "js/views/xblock", "js/view
 
         return XBlockContainerView;
     }); // end define();
+
