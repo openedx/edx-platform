@@ -41,6 +41,19 @@ class DateTest(unittest.TestCase):
             DateTest.date.from_json("2013-01-01T00:00:00+01:00"),
             datetime.timedelta(hours=1, seconds=1))
 
+    def test_enforce_type(self):
+        self.assertEqual(DateTest.date.enforce_type(None), None)
+        self.assertEqual(DateTest.date.enforce_type(""), None)
+        self.assertEqual(DateTest.date.enforce_type("2012-12-31T23:00:01"),
+            datetime.datetime(2012, 12, 31, 23, 0, 1, tzinfo=UTC()))
+        self.assertEqual(DateTest.date.enforce_type(1234567890000),
+            datetime.datetime(2009, 2, 13, 23, 31, 30, tzinfo=UTC()))
+        self.assertEqual(DateTest.date.enforce_type(
+            datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=UTC())),
+            datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=UTC()))
+        with self.assertRaises(TypeError):
+            DateTest.date.enforce_type([1])
+
     def test_return_None(self):
         self.assertIsNone(DateTest.date.from_json(""))
         self.assertIsNone(DateTest.date.from_json(None))
@@ -102,6 +115,16 @@ class TimedeltaTest(unittest.TestCase):
             datetime.timedelta(days=1, seconds=46799)
         )
 
+    def test_enforce_type(self):
+        self.assertEqual(TimedeltaTest.delta.enforce_type(None), None)
+        self.assertEqual(TimedeltaTest.delta.enforce_type(
+            datetime.timedelta(days=1, seconds=46799)),
+            datetime.timedelta(days=1, seconds=46799))
+        self.assertEqual(TimedeltaTest.delta.enforce_type('1 day 46799 seconds'),
+            datetime.timedelta(days=1, seconds=46799))
+        with self.assertRaises(TypeError):
+            TimedeltaTest.delta.enforce_type([1])
+
     def test_to_json(self):
         self.assertEqual(
             '1 days 46799 seconds',
@@ -142,6 +165,16 @@ class RelativeTimeTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             RelativeTimeTest.delta.from_json("77:77:77")
+
+    def test_enforce_type(self):
+        self.assertEqual(RelativeTimeTest.delta.enforce_type(None), None)
+        self.assertEqual(RelativeTimeTest.delta.enforce_type(
+            datetime.timedelta(days=1, seconds=46799)),
+            datetime.timedelta(days=1, seconds=46799))
+        self.assertEqual(RelativeTimeTest.delta.enforce_type('0:05:07'),
+            datetime.timedelta(seconds=307))
+        with self.assertRaises(TypeError):
+            RelativeTimeTest.delta.enforce_type([1])
 
     def test_to_json(self):
         self.assertEqual(
