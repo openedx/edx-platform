@@ -12,13 +12,11 @@ Introduction to Peer Assessments
 
 Peer assessments allow instructors to assign questions that may not have definite answers. Students submit a response to a question, and then compare their peers' responses to a rubric that you create. Peer assessment problems also include self assessments, in which students compare their own responses to the rubric.
 
-Student responses to peer assessment assignments can contain up to 10,000 words, or 20 single-spaced pages.
+Accessing Student Responses
+***********************************
 
+Student responses, along with other data for peer assessment assignments, are available from your course's `data czar <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/data_czar.html>`_.
 
-Peer Assessment Scoring
-***********************
-
-The score that students receive is the median of the individual peer assessment scores.
 
 .. _PA Elements:
 
@@ -42,10 +40,11 @@ Number of Responses and Assessments
 
 In the problem code, you'll indicate the **number of responses** each student has to assess and the **number of peer assessments** each response has to receive.
 
-.. note:: Because some students may submit a response but not complete peer assessments, some responses may not receive the required number of assessments. To increase the chance that all responses will receive enough assessments, we recommend that you set the number of responses that students must assess to be higher than the number of assessments that each response must undergo. For example, if you require each response to receive three assessments, you could require each student to assess five responses.
+.. note:: Because some students may submit a response but not complete peer assessments, some responses may not receive the required number of assessments. To increase the chance that all responses will receive enough assessments, you must set the number of responses that students have to assess to be higher than the number of assessments that each response must undergo. For example, if you require each response to receive three assessments, you could require each student to assess five responses.
 
 If all responses have received assessments, but some students haven't completed the required number of peer assessments, those students can assess responses that other students have already assessed. The student who submitted the response sees the additional peer assessments when he sees his score. However, the additional peer assessments do not count toward the score that the response receives.
 
+For more information, see :ref:`PA Specify Name and Assessment Types`.
 
 Assessment Type
 ********************
@@ -57,26 +56,31 @@ In your problem, you'll also specify the **assessment type or types**. You can s
 
 .. note:: In this initial release, the type and order of assessments cannot be changed. Students must complete peer assessments followed by a self assessment.
 
+For more information, see :ref:`PA Specify Name and Assessment Types`.
 
-Due Dates (optional)
-********************
+Start and Due Dates (optional)
+******************************
 
-You can specify **due dates** for students to submit responses, perform peer assessments, and perform self assessments.
+You can specify **start dates** and **due dates** for students to submit responses, perform peer assessments, and perform self assessments.
 
 You can set different dates for each step, and these dates can overlap. For example, you can allow students to submit responses and complete peer and self assessments starting on March 1. You can require all responses to be submitted by March 7, but allow students to continue peer and self assessments until March 14, a week after all responses are due.
 
-If you don't specify dates, the deadline for all elements--responses, peer assessments, and self assessments--is the due date that you set for the subsection that contains the peer assessment.
+If you don't specify dates, the deadline for all elements--responses, peer assessments, and self assessments--is the due date that you set for the subsection that contains the peer assessment. If you do specify dates, those dates take precedence over the subsection due date.
 
 .. note:: We don't recommend that you use the same due date and time for response submissions and assessments. If a student submits a response immediately before the due date, other students will have very little time to assess the response before peer assessment closes. In this case, a student's response may not receive a score.
 
+For more information, see :ref:`PA Add Due Dates`.
 
 Question
 ************
 
 You'll also specify the **question** that you want your students to answer. This appears near the top of the component, followed by a field where the student enters a response.
 
-When you write your question, you can include helpful information for your students, such as the approximate number of words or sentences that a student's response should have and what students can expect after they submit responses.
+When you write your question, you can include helpful information for your students, such as what students can expect after they submit responses and the approximate number of words or sentences that a student's response should have. (A response cannot have more than 10,000 words.) 
 
+For more information, see :ref:`PA Add Question`.
+
+.. _PA Rubric:
 
 Rubric
 *********
@@ -85,34 +89,98 @@ Your problem must include a **rubric** that you design. The same rubric is used 
 
 Rubrics are made of *criteria* and *options*.
 
-* Each criterion has a *name*, a *prompt*, and two or more *options*. The criterion name appears on the page that shows the student's final grade. The prompt is a description of the criterion.  
-* Each option has a a *name*, an *explanation*, and a *point value*.
+* Each criterion has a *name*, a *prompt*, and two or more *options*. 
 
-*Rubric that students use for peer assessment*:
+   * The name is a very short summary of the criterion, such as Ideas or Content. Criterion names generally have just one word. **The name for each criterion must be unique.** The system uses the criterion name for identification. Criterion names do not appear in the rubric that students see when they are completing peer assessments, but they do appear on the page that shows the student's final grade.
 
-.. image:: /Images/PA_Rubric_LMS.png
-   :alt: Image of a rubric in the LMS with call-outs for the criterion prompt and option names, explanations, and points
+     .. image :: /Images/PA_CriterionName.png
+        :alt: Image of a final score page with call-outs for the criterion names
 
-*Final grade page*:
+   * The prompt is a description of the criterion. 
 
-.. image:: /Images/PA_CriterionName.png
-   :alt: Image of a final score page with call-outs for the criterion names
+* Each option has a *name*, an *explanation*, and a *point value*.
+
+  .. image:: /Images/PA_Rubric_LMS.png
+     :alt: Image of a rubric in the LMS with call-outs for the criterion prompt and option names, explanations, and points
 
 When you create your rubric, decide how many points each option will receive, and make sure that the explanation for each option is as specific as possible. For example, one criterion and set of options may resemble the following.
 
-	Does this response address the origins of the Hundred Years' War?
+**Criterion**
 
-	* **Not at all (0 points)**: This response does not address the origins of the Hundred Years' War.
+Name: Origins
 
-	* **Dynastic disagreement (1 point)**: This response alludes to a dynastic disagreement between England and France, but doesn't reference Edward III of England and Philip VI of France.
+Prompt: Does this response explain the origins of the Hundred Years' War? (5 points possible)
 
-	* **Edward and Philip (2 points)**: This response mentions the dynastic disagreement between Edward III and Philip VI, but doesn't address the role of Salic law.
+**Options**
 
-	* **Salic law (3 points)**: This response explains the way that Salic law contributed to the dynastic disagreement between Edward III and Philip VI, leading to the Hundred Years' War.
+.. list-table::
+   :widths: 8 20 50
+   :stub-columns: 1
+   :header-rows: 1
+
+   * - Points
+     - Name
+     - Explanation
+   * - 0
+     - Not at all
+     - This response does not address the origins of the Hundred Years' War.
+   * - 1
+     - Dynastic disagreement
+     - This response alludes to a dynastic disagreement between England and France, but doesn't reference Edward III of England and Philip VI of France.
+   * - 3
+     - Edward and Philip
+     - This response mentions the dynastic disagreement between Edward III and Philip VI, but doesn't address the role of Salic law.
+   * - 5
+     - Salic law
+     - This response explains the way that Salic law contributed to the dynastic disagreement between Edward III and Philip VI, leading to the Hundred Years' War.
 
 For more information about writing effective rubrics, see Heidi Goodrich Andrade's `Understanding Rubrics <http://learnweb.harvard.edu/alps/thinking/docs/rubricar.htm>`_.
 
 Note that different criteria in the same assignment can have different numbers of options. For example, in the image above, the first criterion has three options and the second criterion has four options.
+
+For more information, see :ref:`PA Add Rubric`.
+
+***********************
+Peer Assessment Scoring
+***********************
+
+Peer assessments are scored by criteria. An individual criterion's score is the median of the scores that each peer assessor gave that criterion. For example, if the Ideas criterion in a peer assessment receives a 10 from one student, a 7 from a second student, and an 8 from a third student, the Ideas criterion's score is 8.
+
+A student's final score for a peer assessment is the sum of the median scores for each individual criterion. 
+
+For example, a response may receive the following scores from peer assessors:
+
+.. list-table::
+   :widths: 25 10 10 10 10
+   :stub-columns: 1
+   :header-rows: 1
+
+   * - Criterion Name
+     - Peer 1
+     - Peer 2
+     - Peer 3
+     - Median
+   * - Ideas (out of 10)
+     - 10
+     - 7
+     - 8
+     - **8**
+   * - Content (out of 10)
+     - 7
+     - 9
+     - 8
+     - **8**
+   * - Grammar (out of 5)
+     - 4
+     - 4
+     - 5
+     - **4**
+
+To calculate the final score, add the median scores for each criterion:
+
+  **Ideas median (8/10) + Content median (8/10) + Grammar median (4/5) = final score (20/25)**
+
+Note, again, that final scores are calculated by criteria, not by individual assessor. Thus the response's score is not the median of the scores that each individual peer assessor gave the response.
 
 .. _Create a PA Problem:
 
@@ -182,35 +250,44 @@ To specify your problem data, follow these steps.
 
 #. In the ``<assessment>`` tag that contains "**peer-assessment**", replace the values for **must_grade** and **must_be_graded_by** with the numbers that you want.
 
+.. note:: The value for **must_grade** must be greater than or equal to the value for **must_be_graded_by**.
+
 .. _PA Add Due Dates:
 
-Step 3. Add Due Dates (optional)
-********************************
+Step 3. Add Start and Due Dates (optional)
+******************************************
+
+.. note:: Setting start and due dates is optional. If you don't specify dates, the deadline for all student responses and assessments is the due date that you set for the subsection that contains the peer assessment. If you do specify dates, those dates take precedence over the subsection due date.
 
 To specify due dates and times, you'll add code that includes the date and time inside the XML tags for the problem and for each specific assessment. The date and time must be formatted as ``YYYY-MM-DDTHH:MM:SS``.
 
 .. note:: You must include the "T" between the date and the time, with no spaces. All times are in universal coordinated time (UTC).
 
-* To specify a due date for response submissions, add the ``submission_due`` attribute with the date and time to the opening ``<assessments>`` tag.
+* To specify a due date for response submissions, add the ``submission_due`` attribute with the date and time to the ``<openassessment>`` tag (this is the first tag in your problem).
 
-  ``<assessments submission_due="YYYY-MM-DDTHH:MM:SS">``
+  ``<openassessment submission_due="YYYY-MM-DDTHH:MM:SS">``
 
-* To specify start and end times for an assessment, add ``start`` and ``due`` attributes with the date and time to the ``<assessment>`` tag for the assessment.
+* To specify start and end times for an assessment, add ``start`` and ``due`` attributes with the date and time to the ``<assessment>`` tags for the assessment.
+
+  ``<assessment name="peer-assessment" must_grade="5" must_be_graded_by="3" start="YYYY-MM-DDTHH:MM:SS" due="YYYY-MM-DDTHH:MM:SS"/>``
+
+  ``<assessment name="self-assessment" start="YYYY-MM-DDTHH:MM:SS" due="YYYY-MM-DDTHH:MM:SS"/>``
 
 For example, the code for your problem may resemble the following.
 
 .. code-block:: xml
 
-  <assessments submissions_due="2014-03-01T00:00:00">
+  <openassessment submission_due="2014-03-01T00:00:00">
+  <assessments>
     <assessment name="peer-assessment" must_grade="5" must_be_graded_by="3" start="2014-02-24T00:00:00" due="2014-03-08T00:00:00"/>
     <assessment name="self-assessment" start="2014-02-24T00:00:00" due="2014-03-08T00:00:00"/>
   </assessments>
 
 In this example, the problem is set at the subsection level to open on February 24, 2014 at midnight UTC. (This information does not appear in the code.) Additionally, the code specifies the following:
 
-* Students must submit all responses before March 1, 2014 at midnight UTC:
+* Students must can begin submitting responses on February 24, 2014 at midnight UTC, and must submit all responses before March 1, 2014 at midnight UTC:
 
-  ``<assessments submissions_due="2014-03-01T00:00:00">``
+  ``<openassessment submission_due="2014-03-01T00:00:00">``
 
 * Students can begin peer assessments on February 24, 2014 at midnight UTC, and all peer assessments must be complete by March 8, 2014 at midnight UTC:
 
@@ -287,7 +364,7 @@ To add the rubric:
 
 #. Under the opening ``<criterion>`` tag, replace the text between the ``<name>`` tags with the name of your criterion. Then, replace the text between the ``<prompt>`` tags with the description of that criterion.
 
-   The criterion name doesn't appear in the student view, but the prompt text does. The system uses the criterion name for identification. 
+   Note that **every criterion must have a unique name.** The system uses the criterion name for identification. For more information about criteria, see :ref:`PA Rubric`.
 
 #. Inside the first ``<option>`` tag, replace the value for ``points`` with the number of points that you want this option to receive.
 

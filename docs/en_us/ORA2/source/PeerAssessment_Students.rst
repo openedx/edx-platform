@@ -34,6 +34,8 @@ Submit Your Response
 
 Read the question carefully. Some instructors include important information in the question, such as how long your response must be or specific topics your response must cover.
 
+.. note:: Your response must contain fewer than 10,000 words (approximately the equivalent of 20 pages of 8.5x11 paper, with text single-spaced).
+
 After you compose a response, type it into the response field under **Your Response**, and then click **Submit your response and move to the next step**. If you can't finish your response all at once, you can click **Save Your Progress** to save a draft of your response, and then come back and submit it later.
 
 After you submit your response, if no other students have submitted responses yet, you'll see the following message:
@@ -92,4 +94,46 @@ If you want to, you can provide feedback on the scores that you received under *
 Assess Additional Peer Responses (optional)
 *******************************************
 
-If you've assessed the required number of peer responses and completed your self assessment, and the you can assess additional peer responses. To do this, click the **Assess Peers** heading. If any responses remain to be assessed, a new response opens.
+If you've assessed the required number of peer responses and completed your self assessment, you can assess additional peer responses. To do this, click the **Assess Peers** heading. If any responses remain to be assessed, a new response opens.
+
+***********************
+Peer Assessment Scoring
+***********************
+
+Peer assessments are scored by criteria. An individual criterion's score is the median of the scores that each peer assessor gave that criterion. For example, if the Ideas criterion in a peer assessment receives a 10 from one student, a 7 from a second student, and an 8 from a third student, the Ideas criterion's score is 8.
+
+A student's final score for a peer assessment is the sum of the median scores for each individual criterion. 
+
+For example, a response may receive the following scores from peer assessors:
+
+.. list-table::
+   :widths: 25 10 10 10 10
+   :stub-columns: 1
+   :header-rows: 1
+
+   * - Criterion Name
+     - Peer 1
+     - Peer 2
+     - Peer 3
+     - Median
+   * - Ideas (out of 10)
+     - 10
+     - 7
+     - 8
+     - **8**
+   * - Content (out of 10)
+     - 7
+     - 9
+     - 8
+     - **8**
+   * - Grammar (out of 5)
+     - 4
+     - 4
+     - 5
+     - **4**
+
+To calculate the final score, the system adds the median scores for each criterion:
+
+  **Ideas median (8/10) + Content median (8/10) + Grammar median (4/5) = final score (20/25)**
+
+Note, again, that final scores are calculated by criteria, not by individual assessor. Thus the response's score is not the median of the scores that each individual peer assessor gave the response.
