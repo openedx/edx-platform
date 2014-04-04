@@ -7,7 +7,7 @@
 # Python libraries to install directly from github
 
 # Third-party:
--e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
+-e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b4d7db6ca10baa1c43c81ebfc70a#egg=django-staticfiles
 -e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
 -e git+https://github.com/edx/django-wiki.git@cd0b2b31997afccde519fe5b3365e61a9edb143f#egg=django-wiki
 -e git+https://github.com/gabrielfalcao/lettuce.git@cccc3978ad2df82a78b6f9648fe2e9baddd22f88#egg=lettuce
@@ -28,5 +28,5 @@
 -e git+https://github.com/edx/acid-block.git@459aff7b63db8f2c5decd1755706c1a64fb4ebb1#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@dfc5e4cb603708a627fbe407c20f80ff723205b8#egg=edx-ora2
 
-# Prototype XBlocks for limited roll-outs and user testing. These are not for general use. 
+# Prototype XBlocks for limited roll-outs and user testing. These are not for general use.
 -e git+https://github.com/pmitros/ConceptXBlock.git@2376fde9ebdd83684b78dde77ef96361c3bd1aa0#egg=concept-xblock
