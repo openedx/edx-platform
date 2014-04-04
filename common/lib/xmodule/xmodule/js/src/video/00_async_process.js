@@ -10,7 +10,7 @@ function() {
  * @param {array} list Array to process.
  * @param {function} process Calls this function on each item in the list.
  * @return {array} Returns a Promise object to observe when all actions of a
-                   certain type bound to the collection, queued or not, have finished.
+ *                 certain type bound to the collection, queued or not, have finished.
  */
     var AsyncProcess = {
         array: function (list, process) {

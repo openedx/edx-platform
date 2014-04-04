@@ -251,7 +251,7 @@ function (HTML5Video, Resizer) {
         // Remove from the page current iFrame with HTML5 video.
         state.videoPlayer.player.destroy();
 
-        state.currentPlayerMode = 'flash';
+        state.setPlayerMode('flash');
 
         console.log('[Video info]: Changing YouTube player mode to "flash".');
 
@@ -334,7 +334,7 @@ function (HTML5Video, Resizer) {
             methodName, youtubeId;
 
         if (
-            this.currentPlayerMode === 'html5' &&
+            this.isHtml5Mode() &&
             !(
                 this.browserIsFirefox &&
                 newSpeed === '1.0' &&
@@ -554,7 +554,7 @@ function (HTML5Video, Resizer) {
         // For more information, please see the PR that introduced this change:
         //     https://github.com/edx/edx-platform/pull/2841
         if (
-            (this.currentPlayerMode === 'html5' || availablePlaybackRates.length > 1) &&
+            (this.isHtml5Mode() || availablePlaybackRates.length > 1) &&
             this.videoType === 'youtube'
         ) {
             if (availablePlaybackRates.length === 1 && !this.isTouch) {
@@ -568,7 +568,7 @@ function (HTML5Video, Resizer) {
 
                 _restartUsingFlash(this);
             } else if (availablePlaybackRates.length > 1) {
-                this.currentPlayerMode = 'html5';
+                this.setPlayerMode('html5');
 
                 // We need to synchronize available frame rates with the ones
                 // that the user specified.
@@ -607,7 +607,7 @@ function (HTML5Video, Resizer) {
             this.trigger('videoSpeedControl.setSpeed', this.speed);
         }
 
-        if (this.currentPlayerMode === 'html5') {
+        if (this.isHtml5Mode()) {
             this.videoPlayer.player.setPlaybackRate(this.speed);
         }
 

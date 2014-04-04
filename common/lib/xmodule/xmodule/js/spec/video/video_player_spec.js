@@ -1070,6 +1070,9 @@ function (VideoPlayer) {
             beforeEach(function () {
                 state = {
                     youtubeId: jasmine.createSpy().andReturn('videoId'),
+                    isFlashMode: jasmine.createSpy().andReturn(false),
+                    isHtml5Mode: jasmine.createSpy().andReturn(true),
+                    setPlayerMode: jasmine.createSpy(),
                     videoPlayer: {
                         currentTime: 60,
                         isPlaying: jasmine.createSpy(),
@@ -1083,7 +1086,8 @@ function (VideoPlayer) {
             });
 
             it('in Flash mode and video is playing', function () {
-                state.currentPlayerMode = 'flash';
+                state.isFlashMode.andReturn(true);
+                state.isHtml5Mode.andReturn(false);
                 state.videoPlayer.isPlaying.andReturn(true);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
                 expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
@@ -1092,7 +1096,8 @@ function (VideoPlayer) {
             });
 
             it('in Flash mode and video not started', function () {
-                state.currentPlayerMode = 'flash';
+                state.isFlashMode.andReturn(true);
+                state.isHtml5Mode.andReturn(false);
                 state.videoPlayer.isPlaying.andReturn(false);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
                 expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
@@ -1101,13 +1106,11 @@ function (VideoPlayer) {
             });
 
             it('in HTML5 mode', function () {
-                state.currentPlayerMode = 'html5';
                 VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
                 expect(state.videoPlayer.player.setPlaybackRate).toHaveBeenCalledWith('0.75');
             });
 
             it('Youtube video in FF, with new speed equal 1.0', function () {
-                state.currentPlayerMode = 'html5';
                 state.videoType = 'youtube';
                 state.browserIsFirefox = true;
 
