@@ -6,7 +6,7 @@ import json
 import os
 import time
 import requests
-from nose.tools import assert_less
+from nose.tools import assert_less, assert_equal
 from common import i_am_registered_for_the_course, visit_scenario_item
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -183,9 +183,6 @@ def add_video_to_course(course, parent_location=None, player_mode=None, data=Non
         parent_location = add_vertical_to_course(course)
     kwargs = get_metadata(parent_location, player_mode, data, display_name=display_name)
     world.scenario_dict['VIDEO'] = world.ItemFactory.create(**kwargs)
-    world.wait_for_present('.is-initialized')
-    world.wait_for_invisible('.video-wrapper .spinner')
-    world.wait_for_ajax_complete()
 
 
 def add_vertical_to_course(course_num):
@@ -223,6 +220,7 @@ def navigate_to_an_item_in_a_sequence(number):
 def change_video_speed(speed):
     world.browser.execute_script("$('.speeds').addClass('open')")
     speed_css = 'li[data-speed="{0}"] a'.format(speed)
+    world.wait_for_visible('.speeds')
     world.css_click(speed_css)
 
 
@@ -302,6 +300,19 @@ def find_caption_line_by_data_index(index):
     return world.css_find(SELECTOR).first
 
 
+def wait_for_video():
+    world.wait_for_present('.is-initialized')
+    world.wait_for_present('div.vidtime')
+    world.wait_for_invisible('.video-wrapper .spinner')
+    world.wait_for_ajax_complete()
+
+
+@step("I reload the page with video$")
+def reload_the_page_with_video(_step):
+    _step.given('I reload the page')
+    wait_for_video()
+
+
 @step('youtube stub server (.*) YouTube API')
 def configure_youtube_api(_step, action):
     action=action.strip()
@@ -326,6 +337,7 @@ def view_video(_step, player_mode):
     data = _step.hashes[0] if _step.hashes else None
     add_video_to_course(coursenum, player_mode=player_mode.lower(), data=data)
     visit_scenario_item('SECTION')
+    wait_for_video()
 
 
 @step('a video in "([^"]*)" mode(?:\:)?$')
@@ -333,6 +345,7 @@ def add_video(_step, player_mode):
     data = _step.hashes[0] if _step.hashes else None
     add_video_to_course(coursenum, player_mode=player_mode.lower(), data=data)
     visit_scenario_item('SECTION')
+    wait_for_video()
 
 
 @step('video(?:s)? "([^"]*)" in "([^"]*)" mode in position "([^"]*)" of sequential(?:\:)?$')
@@ -345,6 +358,7 @@ def add_video_in_position(_step, video_ids, player_mode, position):
 @step('I open the section with videos$')
 def visit_video_section(_step):
     visit_scenario_item('SECTION')
+    wait_for_video()
 
 
 @step('I select the "([^"]*)" speed$')
@@ -493,14 +507,18 @@ def select_language(_step, code):
 @step('I click video button "([^"]*)"$')
 def click_button(_step, button):
     world.css_click(VIDEO_BUTTONS[button])
+    world.wait_for_ajax_complete()
 
 
-@step('I see video starts playing from "([^"]*)" position$')
+@step('I see video slider at "([^"]*)" seconds$')
 def start_playing_video_from_n_seconds(_step, position):
     world.wait_for(
-        func=lambda _: world.css_html('.vidtime')[:4] == position.strip(),
-        timeout=5
+        func=lambda _: elapsed_time() > 0,
+        timeout=30
     )
+
+    actual_position = elapsed_time()
+    assert_equal(actual_position, int(position), "Current position is {}, but should be {}".format(actual_position, position))
 
 
 @step('I see duration "([^"]*)"$')
@@ -518,6 +536,7 @@ def seek_video_to_n_seconds(_step, seconds):
     time = float(seconds.strip())
     jsCode = "$('.video').data('video-player-state').videoPlayer.onSlideSeek({{time: {0:f}}})".format(time)
     world.browser.execute_script(jsCode)
+    _step.given('I see video slider at "{}" seconds'.format(seconds))
 
 
 @step('I have a "([^"]*)" transcript file in assets$')
