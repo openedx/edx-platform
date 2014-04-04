@@ -226,18 +226,16 @@ def add_user_to_cohort(cohort, username_or_email):
         username_or_email: string.  Treated as email if has '@'
 
     Returns:
-        User object.
+        Tuple of User object and string (or None) indicating previous cohort
 
     Raises:
         User.DoesNotExist if can't find user.
 
         ValueError if user already present in this cohort.
-
-        CohortConflict if user already in another cohort.
     """
     user = get_user_by_username_or_email(username_or_email)
+    previous_cohort = None
 
-    # If user in any cohorts in this course already, complain
     course_cohorts = CourseUserGroup.objects.filter(
         course_id=cohort.course_id,
         users__id=user.id,
@@ -248,12 +246,11 @@ def add_user_to_cohort(cohort, username_or_email):
                 user.username,
                 cohort.name))
         else:
-            raise CohortConflict("User {0} is in another cohort {1} in course"
-                                 .format(user.username,
-                                         course_cohorts[0].name))
+            previous_cohort = course_cohorts[0].name
+            course_cohorts[0].users.remove(user)
 
     cohort.users.add(user)
-    return user
+    return (user, previous_cohort)
 
 
 def get_course_cohort_names(course_id):
