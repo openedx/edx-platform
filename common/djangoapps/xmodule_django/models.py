@@ -25,6 +25,19 @@ class CourseKeyField(models.CharField):
         assert isinstance(value, (NoneType, SlashSeparatedCourseKey))
         return value.to_deprecated_string() if value else ''
 
+    def validate(self, value, model_instance):
+        # The default django CharField validator tries to call len() on SlashSeparatedCourseKey,
+        # so we write custom validation that allows us to use SlashSeparatedCourseKeys
+        assert isinstance(value, (NoneType, basestring, SlashSeparatedCourseKey))
+        if isinstance(value, basestring):
+            assert len(value.to_deprecated_string()) < 290
+
+    def run_validators(self, value):
+        # The default django CharField validator tries to call len() on SlashSeparatedCourseKey,
+        # so we write custom validation that allows us to use SlashSeparatedCourseKeys
+        if isinstance(value, SlashSeparatedCourseKey):
+            assert len(value.to_deprecated_string()) <= self.max_length
+
 class LocationKeyField(models.CharField):
     description = "A Location object, saved to the DB in the form of a string"
 
@@ -45,3 +58,17 @@ class LocationKeyField(models.CharField):
     def get_prep_value(self, value):
         assert isinstance(value, Location)
         return value.to_deprecated_string() if value else ''
+
+
+    def validate(self, value, model_instance):
+        # The default django CharField validator tries to call len() on Locations,
+        # so we write custom validation that allows us to use Locations
+        assert isinstance(value, (NoneType, basestring, Location))
+        if isinstance(value, basestring):
+            assert len(value.to_deprecated_string()) < 290
+
+    def run_validators(self, value):
+        # The default django CharField validator tries to call len() on Locations,
+        # so we write custom validation that allows us to use Locations
+        if isinstance(value, Location):
+            assert len(value.to_deprecated_string()) <= self.max_length
