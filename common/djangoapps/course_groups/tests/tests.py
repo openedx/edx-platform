@@ -91,7 +91,7 @@ class TestCohorts(django.test.TestCase):
         Make sure get_cohort() does the right thing when the course is cohorted
         """
         course = modulestore().get_course(CourseKey.from_string("edX/toy/2012_Fall"))
-        self.assertEqual(course.id, "edX/toy/2012_Fall")
+        self.assertEqual(course.id, CourseKey.from_string("edX/toy/2012_Fall"))
         self.assertFalse(course.is_cohorted)
 
         user = User.objects.create(username="test", email="a@b.com")
@@ -122,7 +122,7 @@ class TestCohorts(django.test.TestCase):
         Make sure get_cohort() does the right thing when the course is auto_cohorted
         """
         course = modulestore().get_course(CourseKey.from_string("edX/toy/2012_Fall"))
-        self.assertEqual(course.id, "edX/toy/2012_Fall")
+        self.assertEqual(course.id, CourseKey.from_string("edX/toy/2012_Fall"))
         self.assertFalse(course.is_cohorted)
 
         user1 = User.objects.create(username="test", email="a@b.com")
@@ -170,7 +170,7 @@ class TestCohorts(django.test.TestCase):
         Make sure get_cohort() randomizes properly.
         """
         course = modulestore().get_course(CourseKey.from_string("edX/toy/2012_Fall"))
-        self.assertEqual(course.id, "edX/toy/2012_Fall")
+        self.assertEqual(course.id, CourseKey.from_string("edX/toy/2012_Fall"))
         self.assertFalse(course.is_cohorted)
 
         groups = ["group_{0}".format(n) for n in range(5)]
@@ -195,8 +195,8 @@ class TestCohorts(django.test.TestCase):
             self.assertLess(num_users, 50)
 
     def test_get_course_cohorts(self):
-        course1_id = 'a/b/c'
-        course2_id = 'e/f/g'
+        course1_id = CourseKey.from_string('a/b/c')
+        course2_id = CourseKey.from_string('e/f/g')
 
         # add some cohorts to course 1
         cohort = CourseUserGroup.objects.create(name="TestCohort",
