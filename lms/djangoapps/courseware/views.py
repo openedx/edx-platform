@@ -169,7 +169,7 @@ def save_child_position(seq_module, child_name):
     child_name: url_name of the child
     """
     for position, c in enumerate(seq_module.get_display_items(), start=1):
-        if c.url_name == child_name:
+        if c.location.name == child_name:
             # Only save if position changed
             if position != seq_module.position:
                 seq_module.position = position
@@ -285,13 +285,13 @@ def index(request, course_id, chapter=None, section=None,
 
         context['show_chat'] = show_chat
 
-        chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
+        chapter_descriptor = course.get_child_by(lambda m: m.location.name == chapter)
         if chapter_descriptor is not None:
             save_child_position(course_module, chapter)
         else:
             raise Http404('No chapter descriptor found with name {}'.format(chapter))
 
-        chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
+        chapter_module = course_module.get_child_by(lambda m: m.location.name == chapter)
         if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
             if masq=='student':  # if staff is masquerading as student be kinder, don't 404
@@ -300,7 +300,7 @@ def index(request, course_id, chapter=None, section=None,
             raise Http404
 
         if section is not None:
-            section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
+            section_descriptor = chapter_descriptor.get_child_by(lambda m: m.location.name == section)
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
                 if masq=='student':  # if staff is masquerading as student be kinder, don't 404

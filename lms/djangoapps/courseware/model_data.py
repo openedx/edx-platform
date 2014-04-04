@@ -236,7 +236,8 @@ class FieldDataCache(object):
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
                 student=User.objects.get(id=key.user_id),
-                module_id=key.block_scope_id,
+                # FIXME, breaking opaqueness
+                module_id=key.block_scope_id.replace(run=None),
                 defaults={
                     'state': json.dumps({}),
                     'module_type': key.block_scope_id.category,
