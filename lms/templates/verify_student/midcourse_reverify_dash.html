@@ -25,7 +25,8 @@
                       <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
                       <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
                     </div>
-                    <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': item.course_id})}">Re-verify for ${item.course_number}</a></p>
+                    <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': item.course_id})}">
+			${_("Re-verify for {course_number}").format(course_number=${item.course_number})}</a></p>
                   </li>
                 % endfor
                 </ul>
@@ -42,7 +43,8 @@
                       <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
                       <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
                     </div>
-                    <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': item.course_id})}">Re-verify for ${item.course_number}</a></p>
+                    <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': item.course_id})}">
+			${_("Re-verify for {course_number}").format(course_number=${item.course_number})}</a></p>
                   </li>
                 % endfor
                 </ul>
@@ -94,12 +96,14 @@
           % endif
 
           % if reverifications["must_reverify"]:
-            <p class="support">${_("Don't want to re-verify right now? {a_start}Return to where you left off{a_end}").format(
+            <p class="support">${_("Don't want to re-verify right now? ") + "{a_start}{text}{a_end}".format(
+	        text=_("Return to where you left off"),
                 a_start='<a href="{url}">'.format(url=referer),
                 a_end="</a>",
               )}</p>
           % else:
-          <p class="support">${_("{a_start}Return to where you left off{a_end}").format(
+          <p class="support">${"{a_start}{text}{a_end}".format(
+	        text=_("Return to where you left off"),
                 a_start='<a href="{url}">'.format(url=referer),
                 a_end="</a>",
               )}</p>
