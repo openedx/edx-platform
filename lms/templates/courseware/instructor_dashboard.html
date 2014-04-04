@@ -117,16 +117,16 @@ function goto( mode)
 <section class="container">
 <div class="instructor-dashboard-wrapper">
 
-  %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
-    <div class="beta-button-wrapper"><a href="${ beta_dashboard_url }">${_("Try New Beta Dashboard")}</a></div>
-  %endif
-  %if studio_url:
-    ## not checking access because if user can see this, they are at least course staff (with studio edit access)
-    <div class="studio-edit-link"><a href="${studio_url}" target="_blank">${_('Edit Course In Studio')}</a></div>
-  %endif
-
-
   <section class="instructor-dashboard-content" id="instructor-dashboard-content">
+    <div class="wrap-instructor-info studio-view beta-button-wrapper">
+      %if studio_url:
+        <a class="instructor-info-action" href="${studio_url}">${_("View Course in Studio")}</a>
+      %endif
+      %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+        <a class="instructor-info-action beta-button" href="${ beta_dashboard_url }">${_("Try New Beta Dashboard")}</a>
+      %endif
+    </div>
+    
     <h1>${_("Instructor Dashboard")}</h1>
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
