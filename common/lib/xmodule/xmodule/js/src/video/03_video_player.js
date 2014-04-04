@@ -167,6 +167,7 @@ function (HTML5Video, Resizer) {
             dfd.resolve();
         }
     }
+
     function _updateVcrAndRegion(state, isYoutube) {
         var update = function (state) {
             var duration = state.videoPlayer.duration(),
@@ -384,8 +385,6 @@ function (HTML5Video, Resizer) {
 
         this.setSpeed(newSpeed, true);
         this.videoPlayer.setPlaybackRate(newSpeed);
-        this.el.trigger('speedchange', arguments);
-
         this.saveState(true, { speed: newSpeed });
     }
 
@@ -522,6 +521,10 @@ function (HTML5Video, Resizer) {
 
         dfd.resolve();
 
+        this.el.on('speedchange', function (event, speed) {
+            _this.videoPlayer.onSpeedChange(speed);
+        });
+
         this.videoPlayer.log('load_video');
 
         availablePlaybackRates = this.videoPlayer.player
@@ -590,21 +593,14 @@ function (HTML5Video, Resizer) {
                     _this.speeds.push(key);
                 });
 
-                this.trigger(
-                    'videoSpeedControl.reRender',
-                    {
-                        newSpeeds: this.speeds,
-                        currentSpeed: this.speed
-                    }
-                );
                 this.setSpeed(this.speed);
-                this.trigger('videoSpeedControl.setSpeed', this.speed);
+                this.el.trigger('speed:render', [this.speeds, this.speed]);
             }
         }
 
         if (this.isFlashMode()) {
             this.setSpeed(this.speed);
-            this.trigger('videoSpeedControl.setSpeed', this.speed);
+            this.el.trigger('speed:set', [this.speed]);
         }
 
         if (this.isHtml5Mode()) {

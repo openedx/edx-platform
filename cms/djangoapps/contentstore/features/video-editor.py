@@ -102,7 +102,7 @@ def choose_new_lang(lang_code):
 
 
 def open_menu(menu):
-    world.browser.execute_script("$('{selector}').parent().addClass('open')".format(
+    world.browser.execute_script("$('{selector}').parent().addClass('is-opened')".format(
         selector=VIDEO_MENUS[menu]
     ))
 
