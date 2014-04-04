@@ -105,7 +105,7 @@ def answer_distributions(course_key):
     # Iterate through all problems submitted for this course in no particular
     # order, and build up our answer_counts dict that we will eventually return
     answer_counts = defaultdict(lambda: defaultdict(int))
-    for module in StudentModule.all_submitted_problems_read_only(course_key.to_string()):
+    for module in StudentModule.all_submitted_problems_read_only(course_key):
         try:
             state_dict = json.loads(module.state) if module.state else {}
             raw_answers = state_dict.get("student_answers", {})
@@ -209,7 +209,7 @@ def _grade(student, request, course, keep_raw_scores):
                 with manual_transaction():
                     should_grade_section = StudentModule.objects.filter(
                         student=student,
-                        module_state_key__in=[
+                        module_id__in=[
                             descriptor.location for descriptor in section['xmoduledescriptors']
                         ]
                     ).exists()
@@ -446,7 +446,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=
         student_module = StudentModule.objects.get(
             student=user,
             course_id=course_id,
-            module_state_key=problem_descriptor.location
+            module_id=problem_descriptor.location
         )
     except StudentModule.DoesNotExist:
         student_module = None

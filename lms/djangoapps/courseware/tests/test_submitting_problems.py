@@ -70,7 +70,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Returns the url of the problem given the problem's name
         """
 
-        return "i4x://" + self.course.org + "/{}/problem/{}".format(self.COURSE_SLUG, problem_url_name)
+        return self.course.id.make_usage_key('problem', problem_url_name)
 
     def modx_url(self, problem_location, dispatch):
         """
@@ -84,8 +84,8 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         return reverse(
             'xblock_handler',
             kwargs={
-                'course_id': self.course.id,
-                'usage_id': quote_slashes(problem_location),
+                'course_id': self.course.id.to_deprecated_string(),
+                'usage_id': quote_slashes(problem_location.to_deprecated_string()),
                 'handler': 'xmodule_handler',
                 'suffix': dispatch,
             }
@@ -946,7 +946,7 @@ class TestAnswerDistributions(TestSubmittingProblems):
         user2 = UserFactory.create()
         problems = StudentModule.objects.filter(
             course_id=self.course.id,
-            student_id=self.student_user.id
+            student=self.student_user
         )
         for problem in problems:
             problem.student_id = user2.id
@@ -981,7 +981,7 @@ class TestAnswerDistributions(TestSubmittingProblems):
         # Now fetch the state entry for that problem.
         student_module = StudentModule.objects.get(
             course_id=self.course.id,
-            student_id=self.student_user.id
+            student=self.student_user
         )
         for val in ('Correct', True, False, 0, 0.0, 1, 1.0, None):
             state = json.loads(student_module.state)
@@ -1008,9 +1008,9 @@ class TestAnswerDistributions(TestSubmittingProblems):
         # to a non-existent problem.
         student_module = StudentModule.objects.get(
             course_id=self.course.id,
-            student_id=self.student_user.id
+            student=self.student_user
         )
-        student_module.module_state_key += "_fake"
+        student_module.module_state_key.replace(name=student_module.module_state_key.name + "_fake")
         student_module.save()
 
         # It should be empty (ignored)
@@ -1027,7 +1027,7 @@ class TestAnswerDistributions(TestSubmittingProblems):
         # Now fetch the StudentModule entry for p1 so we can corrupt its state
         prb1 = StudentModule.objects.get(
             course_id=self.course.id,
-            student_id=self.student_user.id
+            student=self.student_user
         )
 
         # Submit p2
