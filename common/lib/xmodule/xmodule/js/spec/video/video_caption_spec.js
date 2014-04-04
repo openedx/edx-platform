@@ -123,28 +123,16 @@
 
                 it('bind the hide caption button', function () {
                     state = jasmine.initializePlayer();
-                    expect($('.hide-subtitles')).toHandleWith(
-                        'click', state.videoCaption.toggle
-                    );
+                    expect($('.hide-subtitles')).toHandle('click');
                 });
 
                 it('bind the mouse movement', function () {
                     state = jasmine.initializePlayer();
-                    expect($('.subtitles')).toHandleWith(
-                        'mouseover', state.videoCaption.onMouseEnter
-                    );
-                    expect($('.subtitles')).toHandleWith(
-                        'mouseout', state.videoCaption.onMouseLeave
-                    );
-                    expect($('.subtitles')).toHandleWith(
-                        'mousemove', state.videoCaption.onMovement
-                    );
-                    expect($('.subtitles')).toHandleWith(
-                        'mousewheel', state.videoCaption.onMovement
-                    );
-                    expect($('.subtitles')).toHandleWith(
-                        'DOMMouseScroll', state.videoCaption.onMovement
-                    );
+                    expect($('.subtitles')).toHandle('mouseover');
+                    expect($('.subtitles')).toHandle('mouseout');
+                    expect($('.subtitles')).toHandle('mousemove');
+                    expect($('.subtitles')).toHandle('mousewheel');
+                    expect($('.subtitles')).toHandle('DOMMouseScroll');
                  });
 
                  it('bind the scroll', function () {
@@ -859,7 +847,7 @@
                 runs(function () {
                     videoControl = state.videoControl;
                     $('.subtitles li[data-index=1]').addClass('current');
-                    state.videoCaption.resize();
+                    state.videoCaption.onResize();
                 });
             });
 
