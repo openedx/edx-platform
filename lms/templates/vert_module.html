@@ -1,7 +1,15 @@
+<%!
+from django.utils.translation import ugettext as _
+%>
 <div class="vert-mod">
-% for idx, item in enumerate(items):
-  <div class="vert vert-${idx}" data-id="${item['id']}">
-    ${item['content']}
-  </div>
-% endfor
+    <ol class="vertical-container">
+        % for idx, item in enumerate(items):
+        <li class="vertical-element">
+            <div class="vert vert-${idx}" data-id="${item['id']}">
+                <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
+                ${item['content']}
+            </div>
+        </li>
+        % endfor
+    </ol>
 </div>
