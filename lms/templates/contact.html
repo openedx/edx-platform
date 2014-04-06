@@ -28,8 +28,8 @@
 	'discussion on our {fb_link_start}facebook page{fb_link_end}. Though we may '
 	'not have a chance to respond to every email, we take all feedback into consideration.').format(
             platform_name=settings.PLATFORM_NAME,
-            contact_email='<a href="mailto:{0}">{0}</a>'.format(settings.CONTACT_EMAIL),
-            faq_link_start='<a href="{url}">'.format(url=reverse('faq_edx')),
+            contact_email=u'<a href="mailto:{0}">{0}</a>'.format(settings.CONTACT_EMAIL),
+            faq_link_start=u'<a href="{url}">'.format(url=reverse('faq_edx')),
             faq_link_end='</a>',
             fb_link_start='<a href="http://www.facebook.com/EdxOnline">',
             fb_link_end='</a>'
@@ -44,23 +44,23 @@
 	'please make sure you are using a current version of Firefox or Chrome, and include '
 	'browser and version in your e-mail, as well as screenshots or other pertinent details. '
 	'If you find a bug or other issues, you can reach us at the following: {bugs_email}.').format(
-            tech_email='<a href="mailto:{0}">{0}</a>'.format(settings.TECH_SUPPORT_EMAIL),
-            bug_email='<a href="mailto:{0}">{0}</a>'.format(settings.BUGS_EMAIL),
+            tech_email=u'<a href="mailto:{0}">{0}</a>'.format(settings.TECH_SUPPORT_EMAIL),
+            bug_email=u'<a href="mailto:{0}">{0}</a>'.format(settings.BUGS_EMAIL),
             platform_name=settings.PLATFORM_NAME
 	)}
       </p>
 
       <h2>${_("Media")}</h2>
       <p>${_('Please visit our {link_start}media/press page{link_end} for more information. For any media or press inquiries, please email {email}.').format(
-        link_start='<a href="{url}">'.format(url=reverse('faq_edx')),
+        link_start=u'<a href="{url}">'.format(url=reverse('faq_edx')),
         link_end='</a>',
-        email='<a href="mailto:press@edx.org">press@edx.org</a>',
+        email=u'<a href="mailto:press@edx.org">press@edx.org</a>',
         )}</p>
 
       <h2>${_("Universities")}</h2>
       <p>
 	${_('If you are a university wishing to collaborate with or if you have questions about {platform_name}, please email {email}.').format(
-	    email='<a href="mailto:university@edx.org">university@edx.org</a>',
+	    email=u'<a href="mailto:university@edx.org">university@edx.org</a>',
     	    platform_name=settings.PLATFORM_NAME
 	)}
       </p>

@@ -4,12 +4,12 @@
 <section class="outside-app">
   <h1>
     ${_("Currently the {platform_name} servers are down").format(
-        platform_name="<em>{}</em>".format(settings.PLATFORM_NAME)
+        platform_name=u"<em>{}</em>".format(settings.PLATFORM_NAME)
     )}
   </h1>
   <p>
     ${_("Our staff is currently working to get the site back up as soon as possible. "
     "Please email us at {tech_support_email} to report any problems or downtime.").format(
-        tech_support_email="<a href=\"mailto:{0}\">{0}</a>".format(settings.TECH_SUPPORT_EMAIL)
+        tech_support_email=u"<a href=\"mailto:{0}\">{0}</a>".format(settings.TECH_SUPPORT_EMAIL)
     )}</p>
 </section>
