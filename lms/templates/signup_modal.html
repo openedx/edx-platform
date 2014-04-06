@@ -20,7 +20,11 @@
 
     <div id="register">
       <header>
-        <h2>${_('Sign Up for {span_start}{platform_name}{span_end}').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
+        <h2>
+	  ${_('Sign Up for {platform_name}').format(
+	      platform_name='<span class="edx">{}</span>'.format(settings.PLATFORM_NAME)
+	  )}
+	</h2>
         <hr>
       </header>
 
@@ -123,17 +127,17 @@
         <div class="input-group">
           <label data-field="terms_of_service" class="terms-of-service" for="signup_tos">
             <input id="signup_tos" name="terms_of_service" type="checkbox" value="true">
-            ${_('I agree to the {link_start}Terms of Service{link_end}*').format(
+            ${_('I agree to the {link_start}Terms of Service{link_end}').format(
               link_start='<a href="{url}" target="_blank">'.format(url=reverse('tos')),
-              link_end='</a>')}
+              link_end='</a>') '*'}
           </label>
 
           % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
           <label data-field="honor_code" class="honor-code" for="signup_honor">
             <input id="signup_honor" name="honor_code" type="checkbox" value="true">
-            ${_('I agree to the {link_start}Honor Code{link_end}*').format(
+            ${_('I agree to the {link_start}Honor Code{link_end}').format(
               link_start='<a href="{url}" target="_blank">'.format(url=reverse('honor')),
-              link_end='</a>')}
+              link_end='</a>') '*'}
           </label>
           % endif
         </div>
