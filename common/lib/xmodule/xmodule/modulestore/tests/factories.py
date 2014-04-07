@@ -1,4 +1,3 @@
-import copy
 from factory import Factory, lazy_attribute_sequence, lazy_attribute
 from factory.containers import CyclicDefinitionError
 from uuid import uuid4
@@ -87,10 +86,7 @@ class ItemFactory(XModuleFactory):
         else:
             dest_name = self.display_name.replace(" ", "_")
 
-        new_location = Location(
-            self.parent_location.org,
-            self.parent_location.course,
-            self.parent_location.run,
+        new_location = self.parent_location.course_key.make_usage_key(
             self.category,
             dest_name
         )

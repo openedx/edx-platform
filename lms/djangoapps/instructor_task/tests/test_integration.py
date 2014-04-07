@@ -58,11 +58,12 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         # on the right problem:
         self.login_username(username)
         # make ajax call:
-        modx_url = reverse('xblock_handler',
-                           kwargs={'course_id': self.course.id.to_deprecated_string(),
-                                   'usage_id': InstructorTaskModuleTestCase.problem_location(problem_url_name).html_id(),
-                                   'handler': 'xmodule_handler',
-                                   'suffix': 'problem_check', })
+        modx_url = reverse('xblock_handler', kwargs={
+           'course_id': self.course.id.to_deprecated_string(),
+           'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string()),
+           'handler': 'xmodule_handler',
+           'suffix': 'problem_check',
+        })
 
         # we assume we have two responses, so assign them the correct identifiers.
         resp = self.client.post(modx_url, {
@@ -112,11 +113,12 @@ class TestRescoringTask(TestIntegrationTask):
         # on the right problem:
         self.login_username(username)
         # make ajax call:
-        modx_url = reverse('xblock_handler',
-                           kwargs={'course_id': self.course.id.to_deprecated_string(),
-                                   'usage_id': InstructorTaskModuleTestCase.problem_location(problem_url_name).html_id(),
-                                   'handler': 'xmodule_handler',
-                                   'suffix': 'problem_get', })
+        modx_url = reverse('xblock_handler', kwargs={
+            'course_id': self.course.id.to_deprecated_string(),
+            'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string()),
+            'handler': 'xmodule_handler',
+            'suffix': 'problem_get',
+        })
         resp = self.client.post(modx_url, {})
         return resp
 
@@ -437,10 +439,9 @@ class TestDeleteProblemTask(TestIntegrationTask):
             self.create_student(username)
         self.logout()
 
-    def delete_problem_state(self, instructor, problem_url_name):
+    def delete_problem_state(self, instructor, location):
         """Submits the current problem for deletion"""
-        return submit_delete_problem_state_for_all_students(self.create_task_request(instructor), self.course.id,
-                                                            InstructorTaskModuleTestCase.problem_location(problem_url_name))
+        return submit_delete_problem_state_for_all_students(self.create_task_request(instructor), location)
 
     def test_delete_problem_state(self):
         """Run delete-state scenario on option problem"""
@@ -456,7 +457,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
         for username in self.userlist:
             self.assertTrue(self.get_student_module(username, descriptor) is not None)
         # run delete task:
-        self.delete_problem_state('instructor', problem_url_name)
+        self.delete_problem_state('instructor', location)
         # confirm that no state can be found:
         for username in self.userlist:
             with self.assertRaises(StudentModule.DoesNotExist):
@@ -465,18 +466,19 @@ class TestDeleteProblemTask(TestIntegrationTask):
     def test_delete_failure(self):
         """Simulate a failure in deleting state of a problem"""
         problem_url_name = 'H1P1'
+        location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
         self.define_option_problem(problem_url_name)
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         expected_message = "bad things happened"
         with patch('courseware.models.StudentModule.delete') as mock_delete:
             mock_delete.side_effect = ZeroDivisionError(expected_message)
-            instructor_task = self.delete_problem_state('instructor', problem_url_name)
+            instructor_task = self.delete_problem_state('instructor', location)
         self._assert_task_failure(instructor_task.id, 'delete_problem_state', problem_url_name, expected_message)
 
     def test_delete_non_problem(self):
         """confirm that a non-problem can still be successfully deleted"""
-        problem_url_name = self.problem_section.location.url()
-        instructor_task = self.delete_problem_state('instructor', problem_url_name)
+        location = self.problem_section.location
+        instructor_task = self.delete_problem_state('instructor', location)
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         self.assertEqual(instructor_task.task_state, SUCCESS)

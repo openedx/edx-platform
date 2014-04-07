@@ -251,8 +251,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     module_descriptor = modulestore().get_item(usage_key)
 
     # find the module in question
-    modules_to_update = StudentModule.objects.filter(course_id=course_id,
-                                                     module_state_key=usage_key)
+    modules_to_update = StudentModule.objects.filter(course_id=course_id, module_id=usage_key)
 
     # give the option of updating an individual student. If not specified,
     # then updates all students who have responded to a problem so far
