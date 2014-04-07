@@ -11,6 +11,7 @@ import socket
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.keys import CourseKey
+from opaque_keys import InvalidKeyError
 
 
 class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
@@ -21,19 +22,28 @@ class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protoc
 
     def clean_course_id(self):
         """Validate the course id"""
-        course_id = CourseKey.from_string(self.cleaned_data["course_id"])
+        try:
+            course_id = CourseKey.from_string(self.cleaned_data["course_id"])
+
+        except InvalidKeyError:
+            msg = 'COURSE NOT FOUND'
+            msg += u' --- Entered course id was: "{0}". '.format(self.cleaned_data["course_id"])
+            msg += 'Please recheck that you have supplied a valid course id.'
+            raise forms.ValidationError(msg)
+
+            return self.cleaned_data["course_id"]
 
         # Try to get the course.  If this returns None, it's not a real course
         try:
             course = modulestore().get_course(course_id)
         except ValueError:
             msg = 'COURSE NOT FOUND'
-            msg += u' --- Entered course id was: "{0}". '.format(course_id)
+            msg += u' --- Entered course id was: "{0}". '.format(course_id.to_deprecated_string())
             msg += 'Please recheck that you have supplied a valid course id.'
             raise forms.ValidationError(msg)
         if not course:
             msg = 'COURSE NOT FOUND'
-            msg += u' --- Entered course id was: "{0}". '.format(course_id)
+            msg += u' --- Entered course id was: "{0}". '.format(course_id.to_deprecated_string())
             msg += 'Please recheck that you have supplied a valid course id.'
             raise forms.ValidationError(msg)
 

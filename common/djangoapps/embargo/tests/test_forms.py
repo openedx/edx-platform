@@ -62,7 +62,7 @@ class EmbargoCourseFormTest(ModuleStoreTestCase):
 
     def test_form_typo(self):
         # Munge course id
-        bad_id = self.course.id + '_typo'
+        bad_id = self.course.id.to_deprecated_string() + '_typo'
 
         form_data = {'course_id': bad_id, 'embargoed': True}
         form = EmbargoedCourseForm(data=form_data)
@@ -79,7 +79,7 @@ class EmbargoCourseFormTest(ModuleStoreTestCase):
 
     def test_invalid_location(self):
         # Munge course id
-        bad_id = self.course.id.split('/')[-1]
+        bad_id = self.course.id.to_deprecated_string().split('/')[-1]
 
         form_data = {'course_id': bad_id, 'embargoed': True}
         form = EmbargoedCourseForm(data=form_data)
