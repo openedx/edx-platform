@@ -123,7 +123,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-31 09:26-0400\n"
+"POT-Creation-Date: 2014-04-07 10:07-0400\n"
 "PO-Revision-Date: 2014-03-03 14:01+0000\n"
 "Last-Translator: antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -273,6 +273,13 @@ msgstr ""
 "d'échecs de connexion. Réessayer plus tard."
 
 #: common/djangoapps/student/views.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
 msgstr "Trop de tentatives de connexion échouées. Réessayez plus tard."
 
@@ -332,7 +339,7 @@ msgstr "Erreur (401 {field}). Contactez-nous par mail."
 
 #: common/djangoapps/student/views.py
 msgid "To enroll, you must follow the honor code."
-msgstr "Pour vous inscrire, vous devez adopter le code d'honneur."
+msgstr "Pour vous inscrire, vous devez adopter la charte utilisateur."
 
 #: common/djangoapps/student/views.py
 msgid "You must accept the terms of service."
@@ -408,7 +415,7 @@ msgstr ""
 "Le nom d'utilisateur ne peut être composé que des caractères A-Z et 0-9 et "
 "ne peut pas contenir d'espaces."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Password: "
 msgstr "Mot de passe : "
 
@@ -421,6 +428,22 @@ msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr ""
 "Erreur inconnue. Merci de nous envoyer un e-mail pour nous indiquer les "
 "circonstances du problème rencontré."
+
+#: common/djangoapps/student/views.py
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {0} "
+"day(s) must elapse between password resets"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Password reset unsuccessful"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
@@ -1437,6 +1460,10 @@ msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr ""
 "Une erreur est survenue pendant l'analyse du fichier de transcription "
 "SubRip."
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
@@ -2499,33 +2526,6 @@ msgstr ""
 #: lms/djangoapps/linkedin/templates/linkedin_email.html
 msgid "Add to profile"
 msgstr "Ajouter au profil"
-
-#: lms/templates/peer_grading/peer_grading.html
-#: lms/templates/peer_grading/peer_grading_closed.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Peer Grading"
-msgstr "Notation par les pairs"
-
-#. Translators: "Staff Grading" is a panel where instructor can grade student-
-#. provided answers.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Staff Grading"
-msgstr ""
-
-#. Translators: "Problems you have submitted" refers to the problems that the
-#. currently-logged-in
-#. student has provided an answer for.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Problems you have submitted"
-msgstr ""
-
-#. Translators: "Flagged Submissions" refers to student-provided answers to a
-#. problem which are
-#. marked by instructor or peer graders as 'flagged' potentially
-#. inappropriate.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Flagged Submissions"
-msgstr ""
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
@@ -4262,14 +4262,6 @@ msgstr "Politique de confidentialité"
 msgid "Help"
 msgstr "Aide"
 
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "Visual"
-msgstr ""
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "HTML"
-msgstr ""
-
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
 msgstr "Mettre à niveau votre inscription pour {} | Choisir votre parcours"
@@ -4718,6 +4710,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Unregister"
 msgstr "Se désinscrire"
+
+#: lms/templates/edit_unit_link.html
+msgid "View Unit in Studio"
+msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -6370,12 +6366,30 @@ msgid "Register for {course.display_number_with_default}"
 msgstr "S'inscrire à {course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html
+msgid "View About Page in studio"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
 msgid "Overview"
 msgstr "Présentation"
 
 #: lms/templates/courseware/course_about.html
 msgid "Share with friends and family!"
 msgstr "Partager avec ses amis et sa famille !"
+
+#. Translators: This text will be automatically posted to the student's
+#. Twitter account. {url} should appear at the end of the text.
+#: lms/templates/courseware/course_about.html
+msgid "I just registered for {number} {title} through {account}: {url}"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "Take a course with {platform} online"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "I just registered for {number} {title} through {platform} {url}"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
@@ -6568,6 +6582,10 @@ msgstr "Rechercher des étudiants"
 msgid "{course_number} Course Info"
 msgstr "Infos sur le {course_number}"
 
+#: lms/templates/courseware/info.html
+msgid "View Updates in Studio"
+msgstr ""
+
 #: lms/templates/courseware/info.html lms/templates/courseware/info.html
 msgid "Course Updates &amp; News"
 msgstr "Infos et actualités"
@@ -6588,13 +6606,13 @@ msgid "Instructor Dashboard"
 msgstr "Tableau de bord enseignant"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Try New Beta Dashboard"
-msgstr "Essayer le nouveau tableau de bord"
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid "View Course in Studio"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Edit Course In Studio"
-msgstr "Éditer le cours dans Studio"
+msgid "Try New Beta Dashboard"
+msgstr "Essayer le nouveau tableau de bord"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -7103,6 +7121,10 @@ msgstr "Progression {course_number}"
 #: lms/templates/courseware/progress.html
 msgid "Course Progress"
 msgstr "Progression dans le cours"
+
+#: lms/templates/courseware/progress.html
+msgid "View Grading in studio"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
@@ -7690,7 +7712,7 @@ msgstr "Effacer le commentaire"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "-posted %(time_ago)s by"
-msgstr "-posté il y a %(time_ago)s par"
+msgstr "– posté %(time_ago)s par"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing comment"
@@ -7819,14 +7841,13 @@ msgstr "Chargement"
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "View discussion"
-msgstr "Afficher la discussion"
+msgid "Expand discussion"
+msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Hide discussion"
-msgstr "Masquer la discussion"
+msgid "Collapse discussion"
+msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "This thread has been pinned by course staff."
@@ -7836,6 +7857,10 @@ msgstr "Ce sujet a été épinglé par un responsable du cours."
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "…"
 msgstr "…"
+
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "View discussion"
+msgstr "Afficher la discussion"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -8899,6 +8924,12 @@ msgstr ""
 "{li_tag} Il doit y avoir des soumissions en attente d'une évaluation.{end_li_tag}\n"
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
+
+#: lms/templates/peer_grading/peer_grading.html
+#: lms/templates/peer_grading/peer_grading_closed.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Peer Grading"
+msgstr "Notation par les pairs"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
@@ -10822,6 +10853,13 @@ msgid "View Live"
 msgstr "Aperçu réel"
 
 #: cms/templates/edit-tabs.html
+msgid ""
+"Note: Pages are publicly visible. If users know the URL of a page, they can "
+"view the page even if they are not registered for or logged in to your "
+"course."
+msgstr ""
+
+#: cms/templates/edit-tabs.html
 msgid "Show this page"
 msgstr ""
 
@@ -12727,17 +12765,16 @@ msgstr ""
 "ligne, vous devez {link_start}la remplacer avec ce brouillon{link_end}."
 
 #: cms/templates/unit.html
-msgid "This unit is scheduled to be released to <strong>students</strong>"
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> on "
+"<strong>{date}</strong> with the subsection {link_start}{name}{link_end}"
 msgstr ""
-"La publication de cette unité aux <strong>étudiants</strong> est planifiée"
 
 #: cms/templates/unit.html
-msgid "on {date}"
-msgstr "le {date}"
-
-#: cms/templates/unit.html
-msgid "with the subsection {link_start}{name}{link_end}"
-msgstr "avec la sous-section {link_start}{name}{link_end}"
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> with the "
+"subsection {link_start}{name}{link_end}"
+msgstr ""
 
 #: cms/templates/unit.html
 msgid "Delete Draft"
