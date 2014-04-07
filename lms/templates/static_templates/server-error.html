@@ -6,7 +6,7 @@
     platform_name=settings.PLATFORM_NAME
   )}</h1>
   <p>${_(u'Please wait a few seconds and then reload the page. If the problem persists, please email us at {email}.').format(
-        email=u'<a href="{email}">{email}</a>'.format(
+        email=u'<a href="mailto:{email}">{email}</a>'.format(
             email=settings.TECH_SUPPORT_EMAIL
         )
   )}</p>
