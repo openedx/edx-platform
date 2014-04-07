@@ -134,11 +134,13 @@ def add_users_to_cohort(request, course_id, cohort_id):
     Return json dict of:
 
     {'success': True,
-     'added': [{'username': username,
-                'name': name,
-                'email': email}, ...],
-     'conflict': [{'username_or_email': ...,
-                    'msg': ...}],  # in another cohort
+     'added': [{'username': ...,
+                'name': ...,
+                'email': ...}, ...],
+     'changed': [{'username': ...,
+                  'name': ...,
+                  'email': ...,
+                  'previous_cohort': ...}, ...],
      'present': [str1, str2, ...],    # already there
      'unknown': [str1, str2, ...]}
     """
@@ -148,29 +150,34 @@ def add_users_to_cohort(request, course_id, cohort_id):
 
     users = request.POST.get('users', '')
     added = []
+    changed = []
     present = []
-    conflict = []
     unknown = []
     for username_or_email in split_by_comma_and_whitespace(users):
+        if not username_or_email:
+            continue
+
         try:
-            user = cohorts.add_user_to_cohort(cohort, username_or_email)
-            added.append({'username': user.username,
-                          'name': "{0} {1}".format(user.first_name, user.last_name),
-                          'email': user.email,
-                          })
+            (user, previous_cohort) = cohorts.add_user_to_cohort(cohort, username_or_email)
+            info = {
+                'username': user.username,
+                'name': user.profile.name,
+                'email': user.email,
+            }
+            if previous_cohort:
+                info['previous_cohort'] = previous_cohort
+                changed.append(info)
+            else:
+                added.append(info)
         except ValueError:
             present.append(username_or_email)
         except User.DoesNotExist:
             unknown.append(username_or_email)
-        except cohorts.CohortConflict as err:
-            conflict.append({'username_or_email': username_or_email,
-                              'msg': str(err)})
-
 
     return json_http_response({'success': True,
                             'added': added,
+                            'changed': changed,
                             'present': present,
-                            'conflict': conflict,
                             'unknown': unknown})
 
 
