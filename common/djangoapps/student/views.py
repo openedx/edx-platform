@@ -1522,7 +1522,7 @@ def change_email_request(request):
     """ AJAX call from the profile page. User wants a new e-mail.
     """
     ## Make sure it checks for existing e-mail conflicts
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated():
         raise Http404
 
     user = request.user
