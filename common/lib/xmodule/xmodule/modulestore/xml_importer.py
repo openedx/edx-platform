@@ -6,6 +6,7 @@ import json
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
+from xmodule.x_module import XModuleDescriptor
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
@@ -488,11 +489,34 @@ def remap_namespace(module, target_location_namespace):
     # This looks a bit wonky as we need to also change the 'name' of the
     # imported course to be what the caller passed in
     if module.location.category != 'course':
+
+        # Retrieve the content and settings fields that have been explicitly set
+        # to ensure that they are properly re-keyed in the XBlock field data.
+        if isinstance(module, XModuleDescriptor):
+            rekey_fields = []
+        else:
+            rekey_fields = (
+                module.get_explicitly_set_fields_by_scope(Scope.content).keys() +
+                module.get_explicitly_set_fields_by_scope(Scope.settings).keys()
+            )
+
         module.location = module.location.replace(
             tag=target_location_namespace.tag,
             org=target_location_namespace.org,
             course=target_location_namespace.course
         )
+
+        # Native XBlocks store the field data in a key-value store
+        # in which one component of the key is the XBlock's location (equivalent to "scope_ids").
+        # Since we've changed the XBlock's location, we need to re-save
+        # all the XBlock's fields so they will be stored using the new location in the key.
+        # However, since XBlocks only save "dirty" fields, we need to first
+        # explicitly set each field to its current value before triggering the save.
+        if len(rekey_fields) > 0:
+            for rekey_field_name in rekey_fields:
+                setattr(module, rekey_field_name, getattr(module, rekey_field_name))
+            module.save()
+
     else:
         #
         # module is a course module
