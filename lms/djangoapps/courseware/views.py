@@ -773,15 +773,12 @@ def get_static_tab_contents(request, course, tab):
     """
     Returns the contents for the given static tab
     """
-    loc = Location(
-        course.location.tag,
-        course.location.org,
-        course.location.course,
+    loc = course.id.make_usage_key(
         tab.type,
         tab.url_slug,
     )
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course.id, request.user, modulestore().get_instance(course.id, loc), depth=0
+        course.id, request.user, modulestore().get_item(loc), depth=0
     )
     tab_module = get_module(
         request.user, request, loc, field_data_cache, course.id, static_asset_path=course.static_asset_path
