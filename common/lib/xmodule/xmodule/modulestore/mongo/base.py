@@ -278,6 +278,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
                     host=host,
                     port=port,
                     tz_aware=tz_aware,
+                    # deserialize dicts as SONs
+                    document_class=SON,
                     **kwargs
                 ),
                 db

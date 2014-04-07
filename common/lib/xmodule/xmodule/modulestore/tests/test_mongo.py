@@ -23,6 +23,7 @@ from IPython.testing.nose_assert_methods import assert_in
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 from git.test.lib.asserts import assert_not_none
+import bson.son
 
 log = logging.getLogger(__name__)
 
@@ -46,6 +47,7 @@ class TestMongoModuleStore(object):
             host=HOST,
             port=PORT,
             tz_aware=True,
+            document_class=bson.son.SON,
         )
         cls.connection.drop_database(DB)
 

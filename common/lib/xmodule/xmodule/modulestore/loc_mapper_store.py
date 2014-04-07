@@ -41,6 +41,7 @@ class LocMapperStore(object):
                 host=host,
                 port=port,
                 tz_aware=True,
+                document_class=bson.son.SON,
                 **kwargs
             ),
             db

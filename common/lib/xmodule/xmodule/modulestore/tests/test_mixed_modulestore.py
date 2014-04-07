@@ -16,6 +16,7 @@ from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDja
 from django.conf import settings
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.keys import CourseKey
+import bson.son
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -97,6 +98,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
             host=self.HOST,
             port=self.PORT,
             tz_aware=True,
+            document_class=bson.son.SON,
         )
         self.connection.drop_database(self.DB)
         self.addCleanup(self.connection.drop_database, self.DB)

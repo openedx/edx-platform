@@ -19,6 +19,7 @@ class MongoConnection(object):
                 host=host,
                 port=port,
                 tz_aware=tz_aware,
+                document_class=son.SON,
                 **kwargs
             ),
             db
