@@ -15,7 +15,7 @@ This section of the developers' documentation lists and explains the different w
    :header-rows: 1
 
    * - 
-     - :ref:`Custom JavaScript Display and Grading`
+     - :ref:`Custom JavaScript Applications`
      - LTI
      - External Graders
      - XBlocks
@@ -63,7 +63,7 @@ This section of the developers' documentation lists and explains the different w
      - Yes
      - Yes
    * - Server Side Grading
-     - No (See JavaScript)
+     - Possibly (See JavaScript)
      - Yes
      - Yes
      - Yes
