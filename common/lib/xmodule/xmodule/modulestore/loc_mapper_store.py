@@ -472,36 +472,27 @@ class LocMapperStore(object):
         setmany[unicode(location.course_key)] = (published_usage, draft_usage)
         self.cache.set_many(setmany)
 
-    def delete_course_mapping(self, course_location):
+    def delete_course_mapping(self, course_key):
         """
         Remove provided course location from loc_mapper and cache.
 
         :param course_location: a Location whose category is 'course'.
         """
-        course_locator = self.translate_location(course_location)
-        course_locator_draft = self.translate_location(
-            course_location, published=False
-        )
+        self.location_map.remove(self._interpret_location_course_id(course_key))
 
-        self.location_map.remove({'course_id': course_locator.course_key})
-        self._delete_cache_location_map_entry(
-            course_location, course_locator, course_locator_draft
-        )
-
-    def _delete_cache_location_map_entry(self, location, published_usage, draft_usage):
-        """
-        Remove the location of course (draft and published) from cache
-        """
-        delete_keys = []
-        if location.category == 'course':
-            delete_keys.append(u'courseId+{}'.format(published_usage.package_id))
-            delete_keys.append(u'courseIdLower+{}'.format(published_usage.package_id.lower()))
-
-        delete_keys.append(unicode(published_usage))
-        delete_keys.append(unicode(draft_usage))
-        delete_keys.append(unicode(location))
-        delete_keys.append(unicode(location.course_key))
-        self.cache.delete_many(delete_keys)
+        # Remove the location of course (draft and published) from cache
+        cached_key = self.cache.get(unicode(course_key))
+        if cached_key:
+            delete_keys = []
+            published_locator = unicode(cached_key[0].course_key)
+            course_location = self._course_location_from_cache(published_locator)
+            delete_keys.append(u'courseId+{}'.format(published_locator))
+            delete_keys.append(u'courseIdLower+{}'.format(unicode(cached_key[0].course_key).lower()))
+            delete_keys.append(published_locator)
+            delete_keys.append(unicode(cached_key[1].course_key))
+            delete_keys.append(unicode(course_location))
+            delete_keys.append(unicode(course_key))
+            self.cache.delete_many(delete_keys)
 
     def _migrate_if_necessary(self, entries):
         """

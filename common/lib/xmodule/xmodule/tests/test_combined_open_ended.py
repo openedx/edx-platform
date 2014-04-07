@@ -1364,7 +1364,7 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
     embed_dirty = u'<embed height="200" id="cats" onhover="eval()" src="http://example.com/lolcats.swf" width="200"/>'
     embed_clean = u'<embed width="200" height="200" id="cats" src="http://example.com/lolcats.swf">'
     iframe_dirty = u'<iframe class="cats" height="200" onerror="eval()" src="http://example.com/lolcats" width="200"/>'
-    iframe_clean = u'<iframe height="200" class="cats" width="200" src="http://example.com/lolcats"></iframe>'
+    iframe_clean = ur'<iframe (height="200" ?|class="cats" ?|width="200" ?|src="http://example.com/lolcats" ?)+></iframe>'
 
     text = u'I am a \u201c\xfcber student\u201d'
     text_lessthan_noencd = u'This used to be broken < by the other parser. 3>5'
@@ -1397,7 +1397,7 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
         """
         Basic test for passing through iframe, but stripping bad attr
         """
-        self.assertEqual(OpenEndedChild.sanitize_html(self.iframe_dirty), self.iframe_clean)
+        self.assertRegexpMatches(OpenEndedChild.sanitize_html(self.iframe_dirty), self.iframe_clean)
 
     def test_text(self):
         """

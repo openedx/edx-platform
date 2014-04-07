@@ -93,29 +93,28 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         org = u'foo_org'
         course = u'bar_course'
         run = u'baz_run'
-        course_location = Location('i4x', org, course, 'course', run)
-        course_locator = loc_mapper().translate_location(course_location.course_id, course_location)
+        course_location = SlashSeparatedCourseKey(org, course, run)
         loc_mapper().create_map_entry(course_location)
         # pylint: disable=protected-access
         entry = loc_mapper().location_map.find_one({
-            '_id': loc_mapper()._construct_location_son(org, course, run)
+            '_id': loc_mapper()._construct_course_son(course_location)
         })
         self.assertIsNotNone(entry, 'Entry not found in loc_mapper')
-        self.assertEqual(entry['course_id'], u'{0}.{1}.{2}'.format(org, course, run))
+        self.assertEqual(entry['offering'], u'{1}.{2}'.format(org, course, run))
 
         # now delete course location from loc_mapper and cache and test that course location no longer
         # exists in loca_mapper and cache
         loc_mapper().delete_course_mapping(course_location)
         # pylint: disable=protected-access
         entry = loc_mapper().location_map.find_one({
-            '_id': loc_mapper()._construct_location_son(org, course, run)
+            '_id': loc_mapper()._construct_course_son(course_location)
         })
         self.assertIsNone(entry, 'Entry found in loc_mapper')
         # pylint: disable=protected-access
-        cached_value = loc_mapper()._get_location_from_cache(course_locator)
+        cached_value = loc_mapper()._get_location_from_cache(course_location.make_usage_key('course', run))
         self.assertIsNone(cached_value, 'course_locator found in cache')
         # pylint: disable=protected-access
-        cached_value = loc_mapper()._get_course_location_from_cache(course_locator.package_id)
+        cached_value = loc_mapper()._get_course_location_from_cache(course_location)
         self.assertIsNone(cached_value, 'Entry found in cache')
 
     def translate_n_check(self, location, org, offering, block_id, branch, add_entry=False):

@@ -276,7 +276,7 @@ class LTIModuleTest(LogicTest):
         #this adds lti passports to system
         mocked_course = Mock(lti_passports = ['lti_id:test_client:test_secret'])
         modulestore = Mock()
-        modulestore.get_item.return_value = mocked_course
+        modulestore.get_course.return_value = mocked_course
         runtime = Mock(modulestore=modulestore)
         self.xmodule.descriptor.runtime = runtime
         self.xmodule.lti_id = "lti_id"
@@ -294,7 +294,7 @@ class LTIModuleTest(LogicTest):
         #this adds lti passports to system
         mocked_course = Mock(lti_passports = ['test_id:test_client:test_secret'])
         modulestore = Mock()
-        modulestore.get_item.return_value = mocked_course
+        modulestore.get_course.return_value = mocked_course
         runtime = Mock(modulestore=modulestore)
         self.xmodule.descriptor.runtime = runtime
         #set another lti_id
@@ -312,7 +312,7 @@ class LTIModuleTest(LogicTest):
         #this adds lti passports to system
         mocked_course = Mock(lti_passports = ['test_id_test_client_test_secret'])
         modulestore = Mock()
-        modulestore.get_item.return_value = mocked_course
+        modulestore.get_course.return_value = mocked_course
         runtime = Mock(modulestore=modulestore)
         self.xmodule.descriptor.runtime = runtime
         self.xmodule.lti_id = 'lti_id'
