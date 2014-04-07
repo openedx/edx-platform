@@ -28,7 +28,6 @@ return {
             if (this.numDraggablesOnMe > 0) {
                 return;
             }
-            this.containerEl.attr('aria-grabbed', 'true');
 
             // If this draggable is just being dragged out of the
             // container, we must perform some additional tasks.
@@ -84,6 +83,9 @@ return {
                 if (this.isOriginal === true) {
                     this.state.numDraggablesInSlider -= 1;
                 }
+                SR.readText(gettext('dragging out of slider'));
+            } else {
+                SR.readText(gettext('dragging'));
             }
 
             this.zIndex = 1000;
@@ -91,7 +93,8 @@ return {
             if (this.labelEl !== null) {
                 this.labelEl.css('z-index', '1000');
             }
-
+            this.iconEl.attr('aria-grabbed', 'true').focus();
+            this.toggleTargets(true);
             this.mousePressed = true;
             this.state.currentMovingDraggable = this;
         }
@@ -100,9 +103,15 @@ return {
     'mouseUp': function () {
         if (this.mousePressed === true) {
             this.state.currentMovingDraggable = null;
-            this.containerEl.attr('aria-grabbed', 'false');
+            this.iconEl.attr('aria-grabbed', 'false');
 
             this.checkLandingElement();
+            if (this.inContainer === true) {
+                SR.readText(gettext('dropped in slider'));
+            } else {
+                SR.readText(gettext('dropped on target'));
+            }
+            this.toggleTargets(false);
         }
     },
 

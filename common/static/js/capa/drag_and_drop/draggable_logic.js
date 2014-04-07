@@ -236,6 +236,17 @@ return {
         return false;
     },
 
+    'toggleTargets': function (onoff) {
+        var c1, target, effect;
+        effect = (onoff ? 'move' : undefined);
+        this.state.baseImageEl.attr('aria-dropeffect', effect);
+
+        for (c1 = 0; c1 < this.state.targets.length; c1 += 1) {
+            target = this.state.targets[c1];
+            target.targetEl.attr('aria-dropeffect', effect);
+        }
+    },
+
     'snapToTarget': function (target) {
         var offset;
 

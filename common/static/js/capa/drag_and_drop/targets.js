@@ -86,9 +86,8 @@ define([], function () {
                     'left: ' + obj.x + 'px; ' +
                     borderCss +
                 '" ' +
-            '></div>'
+            'aria-dropeffect=""></div>'
         );
-
         if (fromTargetField === true) {
             targetEl.appendTo(draggableObj.iconEl);
         } else {
@@ -115,9 +114,8 @@ define([], function () {
                         'background-color: white; ' +
                         'font-size: 0.95em; ' +
                         'color: #009fe2; ' +
-                        'cursor: pointer; ' +
                     '" ' +
-                'aria-dropeffect="move">0</div>'
+                '>0</div>'
             );
         } else {
             numTextEl = null;
