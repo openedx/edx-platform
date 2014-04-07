@@ -108,7 +108,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
 
     def test_set_roles(self):
 
-        seed_permissions_roles(self.course_id)
+        seed_permissions_roles(self.course_key)
         course_roles = dict((r.name, r) for r in Role.objects.filter(course_id=self.course_key))
         self.assertEqual(len(course_roles), 4)  # sanity check
 
