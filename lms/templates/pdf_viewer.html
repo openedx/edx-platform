@@ -23,14 +23,12 @@ http://sourceforge.net/adobe/cmap/wiki/License/
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="google" content="notranslate">
-    <title>PDF.js viewer</title>
+    <title>${current_chapter['title'] if current_chapter else '' |h}</title>
 
 
     <link rel="stylesheet" href="${static.url('/static/css/vendor/pdfjs/viewer.css')}"/>
 
     <script type="text/javascript" src="${static.url('/static/js/vendor/pdfjs/compatibility.js')}"></script>
-
-
 
 <!-- This snippet is used in production, see Makefile -->
 <link rel="resource" type="application/l10n" href="${static.url('/static/js/vendor/pdfjs/locale/locale.properties')}"/>
@@ -41,8 +39,11 @@ http://sourceforge.net/adobe/cmap/wiki/License/
 PDFJS.imageResourcesPath = '${static.url('/static/css/vendor/pdfjs/images/')}';
 PDFJS.workerSrc = '${static.url('/static/js/vendor/pdfjs/pdf.worker.js')}';
 PDFJS.cMapUrl = '${static.url('/static/css/vendor/pdfjs/cmaps/')}';
+PDF_URL = '${current_url | h}';
 </script>
-    <script type="text/javascript" src="${static.url('/static/js/vendor/pdfjs/viewer.js')}"></script>
+<%static:js group='main_vendor'/>
+<%static:js group='application'/>
+<%static:js group='courseware'/>
 
   </head>
 
@@ -401,7 +402,8 @@ PDFJS.cMapUrl = '${static.url('/static/css/vendor/pdfjs/cmaps/')}';
     </div>
   </div>
 </div>
-
+  <script type="text/javascript" src="${static.url('/static/js/pdf-analytics.js')}"></script>
+  <script type="text/javascript" src="${static.url('/static/js/vendor/pdfjs/viewer.js')}"></script>
   </body>
 </html>
 
