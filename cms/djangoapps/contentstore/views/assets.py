@@ -28,8 +28,6 @@ from django.http import HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from pymongo import ASCENDING, DESCENDING
 from .access import has_course_access
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.keys import AssetKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 __all__ = ['assets_handler']

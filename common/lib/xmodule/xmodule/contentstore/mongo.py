@@ -12,6 +12,7 @@ from xmodule.exceptions import NotFoundError
 from fs.osfs import OSFS
 import os
 import json
+import bson.son
 
 
 class MongoContentStore(ContentStore):
@@ -27,6 +28,7 @@ class MongoContentStore(ContentStore):
             pymongo.MongoClient(
                 host=host,
                 port=port,
+                document_class=bson.son.SON,
                 **kwargs
             ),
             db

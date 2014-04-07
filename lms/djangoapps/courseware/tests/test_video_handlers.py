@@ -10,9 +10,7 @@ from datetime import timedelta
 from webob import Request
 
 from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore import Location
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.keys import CourseKey
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
 from cache_toolbox.core import del_cached_content
@@ -22,6 +20,7 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
 )
+from xmodule.modulestore.mongo.base import MongoModuleStore
 
 SRT_content = textwrap.dedent("""
         0
@@ -68,10 +67,10 @@ def _clear_assets(location):
 
     assets, __ = store.get_all_content_for_course(content_location)
     for asset in assets:
-        asset_location = Location(asset["_id"])
+        asset_location = MongoModuleStore._location_from_id(asset["_id"], location.course_key.run)
         del_cached_content(asset_location)
-        id = StaticContent.get_id_from_location(asset_location)
-        store.delete(id)
+        mongo_id = StaticContent.get_id_from_location(asset_location)
+        store.delete(mongo_id)
 
 
 def _get_subs_id(filename):
