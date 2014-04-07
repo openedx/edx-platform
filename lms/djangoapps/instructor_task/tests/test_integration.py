@@ -59,8 +59,8 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.login_username(username)
         # make ajax call:
         modx_url = reverse('xblock_handler',
-                           kwargs={'course_id': self.course.id,
-                                   'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name)),
+                           kwargs={'course_id': self.course.id.to_deprecated_string(),
+                                   'usage_id': InstructorTaskModuleTestCase.problem_location(problem_url_name).html_id(),
                                    'handler': 'xmodule_handler',
                                    'suffix': 'problem_check', })
 
@@ -79,7 +79,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.assertEqual(instructor_task.task_type, task_type)
         task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
-        self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name))
+        self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string())
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
@@ -113,8 +113,8 @@ class TestRescoringTask(TestIntegrationTask):
         self.login_username(username)
         # make ajax call:
         modx_url = reverse('xblock_handler',
-                           kwargs={'course_id': self.course.id,
-                                   'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name)),
+                           kwargs={'course_id': self.course.id.to_deprecated_string(),
+                                   'usage_id': InstructorTaskModuleTestCase.problem_location(problem_url_name).html_id(),
                                    'handler': 'xmodule_handler',
                                    'suffix': 'problem_get', })
         resp = self.client.post(modx_url, {})
@@ -142,12 +142,12 @@ class TestRescoringTask(TestIntegrationTask):
 
     def submit_rescore_all_student_answers(self, instructor, problem_url_name):
         """Submits the particular problem for rescoring"""
-        return submit_rescore_problem_for_all_students(self.create_task_request(instructor), self.course.id,
+        return submit_rescore_problem_for_all_students(self.create_task_request(instructor),
                                                        InstructorTaskModuleTestCase.problem_location(problem_url_name))
 
     def submit_rescore_one_student_answer(self, instructor, problem_url_name, student):
         """Submits the particular problem for rescoring for a particular student"""
-        return submit_rescore_problem_for_student(self.create_task_request(instructor), self.course.id,
+        return submit_rescore_problem_for_student(self.create_task_request(instructor),
                                                   InstructorTaskModuleTestCase.problem_location(problem_url_name),
                                                   student)
 
@@ -375,10 +375,10 @@ class TestResetAttemptsTask(TestIntegrationTask):
         state = json.loads(module.state)
         return state['attempts']
 
-    def reset_problem_attempts(self, instructor, problem_url_name):
+    def reset_problem_attempts(self, instructor, location):
         """Submits the current problem for resetting"""
-        return submit_reset_problem_attempts_for_all_students(self.create_task_request(instructor), self.course.id,
-                                                              InstructorTaskModuleTestCase.problem_location(problem_url_name))
+        return submit_reset_problem_attempts_for_all_students(self.create_task_request(instructor),
+                                                              location)
 
     def test_reset_attempts_on_problem(self):
         """Run reset-attempts scenario on option problem"""
@@ -396,7 +396,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
         for username in self.userlist:
             self.assertEquals(self.get_num_attempts(username, descriptor), num_attempts)
 
-        self.reset_problem_attempts('instructor', problem_url_name)
+        self.reset_problem_attempts('instructor', location)
 
         for username in self.userlist:
             self.assertEquals(self.get_num_attempts(username, descriptor), 0)
@@ -404,19 +404,20 @@ class TestResetAttemptsTask(TestIntegrationTask):
     def test_reset_failure(self):
         """Simulate a failure in resetting attempts on a problem"""
         problem_url_name = 'H1P1'
+        location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
         self.define_option_problem(problem_url_name)
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         expected_message = "bad things happened"
         with patch('courseware.models.StudentModule.save') as mock_save:
             mock_save.side_effect = ZeroDivisionError(expected_message)
-            instructor_task = self.reset_problem_attempts('instructor', problem_url_name)
+            instructor_task = self.reset_problem_attempts('instructor', location)
         self._assert_task_failure(instructor_task.id, 'reset_problem_attempts', problem_url_name, expected_message)
 
     def test_reset_non_problem(self):
         """confirm that a non-problem can still be successfully reset"""
-        problem_url_name = self.problem_section.location.url()
-        instructor_task = self.reset_problem_attempts('instructor', problem_url_name)
+        location = self.problem_section.location
+        instructor_task = self.reset_problem_attempts('instructor', location)
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         self.assertEqual(instructor_task.task_state, SUCCESS)
 

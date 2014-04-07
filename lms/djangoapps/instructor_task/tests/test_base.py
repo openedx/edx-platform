@@ -17,7 +17,7 @@ from xmodule.modulestore.django import editable_modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore import Location
+from xmodule.modulestore.locations import Location
 
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from courseware.model_data import StudentModule
@@ -30,7 +30,7 @@ from instructor_task.views import instructor_task_status
 
 
 TEST_COURSE_ORG = 'edx'
-TEST_COURSE_NAME = 'test course'
+TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
 TEST_SECTION_NAME = "Problem"
 TEST_COURSE_KEY = CourseKey.from_string('edx/1.23x/test_course')
@@ -56,7 +56,7 @@ class InstructorTaskTestCase(TestCase):
         """
         Create an internal location for a test problem.
         """
-        return Location('edx', '1.23x', 'test_course', 'problem', problem_url_name)
+        return Location('edx', '1.23x', 'test_course', 'run', 'problem', problem_url_name)
 
     def _create_entry(self, task_state=QUEUING, task_output=None, student=None):
         """Creates a InstructorTask entry for testing."""
@@ -180,11 +180,10 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         Create an internal location for a test problem.
         """
         if "i4x:" in problem_url_name:
-            return problem_url_name
+            print problem_url_name
+            return Location.from_deprecated_string(problem_url_name)
         else:
-            return "i4x://{org}/{number}/problem/{problem_url_name}".format(org=TEST_COURSE_ORG,
-                                                                            number=TEST_COURSE_NUMBER,
-                                                                            problem_url_name=problem_url_name)
+            return Location(TEST_COURSE_ORG, TEST_COURSE_NUMBER, TEST_COURSE_NAME, 'problem', problem_url_name)
 
     def define_option_problem(self, problem_url_name):
         """Create the problem definition so the answer is Option 1"""
