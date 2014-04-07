@@ -397,7 +397,6 @@ def video_is_rendered(_step, mode):
     }
     html_tag = modes[mode.lower()]
     assert world.css_find('.video {0}'.format(html_tag)).first
-    assert world.is_css_present('.speed-link')
 
 
 @step('videos have rendered in "([^"]*)" mode$')
@@ -412,7 +411,6 @@ def videos_are_rendered(_step, mode):
     actual = len(world.css_find('.video {0}'.format(html_tag)))
     expected = len(world.css_find('.xmodule_VideoModule'))
     assert actual == expected
-    assert world.is_css_present('.speed-link')
 
 
 @step('all sources are correct$')

@@ -34,7 +34,7 @@ function() {
          * @desc Returns next element.
          *
          * @param {number} index If set, updates current index of iterator.
-         * @returns {DOM element}
+         * @returns {any}
          *
          */
         next: function (index) {
@@ -51,7 +51,7 @@ function() {
          * @desc Returns previous element.
          *
          * @param {number} index If set, updates current index of iterator.
-         * @returns {DOM element}
+         * @returns {any}
          *
          */
         prev: function (index) {
@@ -67,7 +67,7 @@ function() {
         /**
          * @desc Returns last element in the list.
          *
-         * @returns {DOM element}
+         * @returns {any}
          *
          */
         last: function () {
@@ -77,7 +77,7 @@ function() {
         /**
          * @desc Returns first element in the list.
          *
-         * @returns {DOM element}
+         * @returns {any}
          *
          */
         first: function () {

@@ -73,7 +73,7 @@ function (Iterator) {
                     expect(iterator.prev()).toBe('d');
                 });
 
-                it('returns previous item if index equal first item', function () {
+                it('returns last item if index equal first item', function () {
                     expect(iterator.prev()).toBe('e');
                 });
             });
