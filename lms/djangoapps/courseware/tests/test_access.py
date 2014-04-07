@@ -6,8 +6,8 @@ from mock import Mock
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from courseware.tests.factories import UserFactory, CourseEnrollmentAllowedFactory, StaffFactory, InstructorFactory
-from student.tests.factories import AnonymousUserFactory
+from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
+from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
 from xmodule.modulestore import Location
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 import pytz
