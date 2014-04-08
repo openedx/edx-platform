@@ -429,7 +429,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         if course_id not in self.ignore_write_events_on_courses:
             cached_metadata = self._get_cached_metadata_inheritance_tree(course_id, force_refresh=True)
-            runtime.cached_metadata = cached_metadata
+            if runtime:
+                runtime.cached_metadata = cached_metadata
 
     def _clean_item_data(self, item):
         """
