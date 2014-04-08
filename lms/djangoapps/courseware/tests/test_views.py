@@ -25,6 +25,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.tests.factories import ItemFactory
 from student.tests.factories import UserFactory
 
 import courseware.views as views
@@ -43,31 +44,30 @@ class TestJumpTo(TestCase):
 
     def setUp(self):
         # Use toy course from XML
-        self.course_name = 'edX/toy/2012_Fall'
+        self.course_key = SlashSeparatedCourseKey.from_string('edX/toy/2012_Fall')
 
     def test_jumpto_invalid_location(self):
-        location = Location('edX', 'toy', 'NoSuchPlace', None, None, None)
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location.to_deprecated_string())
+        location = self.course_key.make_usage_key(None, 'NoSuchPlace')
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
     def test_jumpto_from_chapter(self):
-        location = Location('edX', 'toy', 'chapter', 'Overview', None, None)
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location.to_deprecated_string())
+        location = self.course_key.make_usage_key('chapter', 'Overview')
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_id(self):
-        location = Location('edX', 'toy', 'chapter', 'Overview', None, None)
-        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_key.to_deprecated_string(), 'Overview')
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_id_invalid_location(self):
         location = Location('edX', 'toy', 'NoSuchPlace', None, None, None)
-        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
