@@ -265,7 +265,7 @@ class LTIModuleTest(LogicTest):
         with patch('xmodule.lti_module.LTIModule.location', new_callable=PropertyMock) as mock_location:
             self.xmodule.location.html_id = lambda: 'i4x-2-3-lti-31de800015cf4afb973356dbe81496df'
             expected_sourcedId = u':'.join(urllib.quote(i) for i in (
-                self.lti_id,
+                self.system.course_id,
                 urllib.quote(self.unquoted_resource_link_id),
                 self.user_id
             ))
@@ -407,4 +407,8 @@ class LTIModuleTest(LogicTest):
         self.xmodule.graded = False
         self.assertEqual(self.xmodule.max_score(), 100.0)
 
-
+    def test_context_id(self):
+        """
+        Tests that LTI parameter context_id is equal to course_id.
+        """
+        self.assertEqual(self.system.course_id, self.xmodule.context_id)
