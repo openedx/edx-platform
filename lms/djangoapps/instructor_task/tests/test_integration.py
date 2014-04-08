@@ -229,7 +229,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.assertEqual(instructor_task.task_type, 'rescore_problem')
         task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
-        self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name))
+        self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string())
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['attempted'], 1)
         self.assertEqual(status['succeeded'], 0)
