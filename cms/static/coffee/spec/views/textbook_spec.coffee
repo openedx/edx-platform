@@ -2,7 +2,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
     "js/collections/textbook", "js/views/show_textbook", "js/views/edit_textbook", "js/views/list_textbooks",
     "js/views/edit_chapter", "js/views/feedback_prompt", "js/views/feedback_notification",
     "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers", "jasmine-stealth"],
-(Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTexbook, EditChapter, Prompt, Notification, create_sinon) ->
+(Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTexbook, EditChapter, Prompt, Notification, create_sinon, modal_helpers) ->
     feedbackTpl = readFixtures('system-feedback.underscore')
 
     beforeEach ->
