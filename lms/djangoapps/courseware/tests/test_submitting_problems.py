@@ -46,6 +46,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def setUp(self):
 
+        super(TestSubmittingProblems, self).setUp()
         # Create course
         self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         assert self.course, "Couldn't load course %r" % self.COURSE_NAME
@@ -493,7 +494,7 @@ class TestCourseGrader(TestSubmittingProblems):
         # score read from StudentModule and our student gets an A instead.
         with patch('submissions.api.get_scores') as mock_get_scores:
             mock_get_scores.return_value = {
-                self.problem_location('p3'): (1, 1)
+                self.problem_location('p3').to_deprecated_string(): (1, 1)
             }
             self.check_grade_percent(1.0)
             self.assertEqual(self.get_grade_summary()['grade'], 'A')
@@ -509,12 +510,14 @@ class TestCourseGrader(TestSubmittingProblems):
 
         with patch('submissions.api.get_scores') as mock_get_scores:
             mock_get_scores.return_value = {
-                self.problem_location('p3'): (1, 1)
+                self.problem_location('p3').to_deprecated_string(): (1, 1)
             }
             self.get_grade_summary()
 
             # Verify that the submissions API was sent an anonymized student ID
-            mock_get_scores.assert_called_with(self.course.id, '99ac6730dc5f900d69fd735975243b31')
+            mock_get_scores.assert_called_with(
+                self.course.id.to_deprecated_string(), '99ac6730dc5f900d69fd735975243b31'
+            )
 
     def test_weighted_homework(self):
         """
