@@ -1,0 +1,37 @@
+<section
+    class="course-utility"
+    id="<%= 'course-uility' + utilityIndex %>">
+    <header>
+        <h3 class="utility-title title-2 is-selectable" title="Collapse/Expand this utility">
+            <i class="icon-caret-down ui-toggle-expansion"></i>
+            <%= utilityShortDescription %></h3>
+    </header>
+
+    <ul class="list list-tasks">
+        <% var taskIndex = 0; %>
+        <% _.each(items, function(item) { %>
+            <li class="task">
+                <% var taskId = 'course-utility' + utilityIndex + '-task' + taskIndex; %>
+
+                <label class="task-details" for="<%= taskId %>">
+                    <h4 class="task-name title title-3"><%= item['short_description'] %></h4>
+                    <p class="task-description"><%= item['long_description'] %></p>
+                </label>
+
+                <% if (item['action_text'] !== '' && item['action_url'] !== '') { %>
+                <ul class="list-actions task-actions">
+                    <li class="action-item">
+                        <a href="<%= item['action_url'] %>" class="action action-primary"
+                        <% if (item['action_external']) { %>
+                        rel="external" title="<%= gettext("This link will open in a new browser window/tab") %>"
+                        <% } %>
+                        ><%= item['action_text'] %></a>
+                    </li>
+                </ul>
+                <% } %>
+            </li>
+
+        <% taskIndex+=1; }) %>
+
+    </ul>
+</section>
