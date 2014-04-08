@@ -2,12 +2,16 @@
 <%inherit file="../main.html" />
 
 <section class="outside-app">
-  <h1>${_(u"There has been a 500 error on the <em>{platform_name}</em> servers").format(
-    platform_name=settings.PLATFORM_NAME
-  )}</h1>
-  <p>${_(u'Please wait a few seconds and then reload the page. If the problem persists, please email us at {email}.').format(
+  <h1>
+    ${_(u"There has been a 500 error on the {platform_name} servers").format(
+        platform_name=u"<em>{}</em>".format(platform_name=settings.PLATFORM_NAME)
+    )}
+  </h1>
+  <p>
+    ${_(u'Please wait a few seconds and then reload the page. If the problem persists, please email us at {email}.').format(
         email=u'<a href="mailto:{email}">{email}</a>'.format(
             email=settings.TECH_SUPPORT_EMAIL
         )
-  )}</p>
+    )}
+  </p>
 </section>

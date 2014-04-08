@@ -20,7 +20,11 @@
 
     <div id="register">
       <header>
-        <h2>${_('Sign Up for {span_start}{platform_name}{span_end}').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
+        <h2>
+	  ${_('Sign Up for {platform_name}').format(
+	      platform_name=u'<span class="edx">{}</span>'.format(settings.PLATFORM_NAME)
+	  )}
+	</h2>
         <hr>
       </header>
 
@@ -31,26 +35,26 @@
 
         <div class="input-group">
 	  % if has_extauth_info is UNDEFINED:
-          <label data-field="email" for="signup_email">${_('E-mail *')}</label>
+          <label data-field="email" for="signup_email">${_('E-mail')} + ' *'</label>
 	    <input id="signup_email" type="email" name="email" placeholder="${_('e.g. yourname@domain.com')}" required />
 
-          <label data-field="password" for="signup_password">${_('Password *')}</label>
+          <label data-field="password" for="signup_password">${_('Password')} + ' *'</label>
 	    <input id="signup_password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required />
 
-	  <label data-field="username" for="signup_username">${_('Public Username *')}</label>
+	  <label data-field="username" for="signup_username">${_('Public Username')} + ' *'</label>
 	    <input id="signup_username" type="text" name="username" placeholder="${_('e.g. yourname (shown on forums)')}" required />
 
-          <label data-field="name" for="signup_fullname">${_('Full Name *')}</label>
+          <label data-field="name" for="signup_fullname">${_('Full Name')} + ' *'</label>
 	    <input id="signup_fullname" type="text" name="name" placeholder="${_('e.g. Your Name (for certificates)')}" required />
 	  % else:
 	  <p>${_('<i>Welcome</i> {name}').format(name=extauth_id)}</p><br/>
 	  <p><i>${_('Enter a public username:')}</i></p>
 
-          <label data-field="username" for="signup_username">${_('Public Username *')}</label>
+          <label data-field="username" for="signup_username">${_('Public Username')} + ' *'</label>
 	      <input id="signup_username" type="text" name="username" value="${extauth_username}" placeholder="${_('e.g. yourname (shown on forums)')}" required />
 
           % if ask_for_email:
-            <label data-field="email" for="signup_email">${_('E-mail *')}</label>
+            <label data-field="email" for="signup_email">${_('E-mail')} + ' *'</label>
             <input id="signup_email" type="email" name="email" placeholder="${_('e.g. yourname@domain.com')}" required />
           % endif
 
@@ -123,17 +127,17 @@
         <div class="input-group">
           <label data-field="terms_of_service" class="terms-of-service" for="signup_tos">
             <input id="signup_tos" name="terms_of_service" type="checkbox" value="true">
-            ${_('I agree to the {link_start}Terms of Service{link_end}*').format(
+            ${_('I agree to the {link_start}Terms of Service{link_end}').format(
               link_start='<a href="{url}" target="_blank">'.format(url=reverse('tos')),
-              link_end='</a>')}
+              link_end='</a>') + ' *'}
           </label>
 
           % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
           <label data-field="honor_code" class="honor-code" for="signup_honor">
             <input id="signup_honor" name="honor_code" type="checkbox" value="true">
-            ${_('I agree to the {link_start}Honor Code{link_end}*').format(
+            ${_('I agree to the {link_start}Honor Code{link_end}').format(
               link_start='<a href="{url}" target="_blank">'.format(url=reverse('honor')),
-              link_end='</a>')}
+              link_end='</a>') + ' *'}
           </label>
           % endif
         </div>
