@@ -5,7 +5,7 @@
 Problem and Tool XML
 ################################
 
-This guide provides information about the XML tags for most problem and tool types in Studio:
+This section provides information about the XML tags for most problem and tool types in Studio:
 
 * :ref:`General`
 * :ref:`Checkbox Problem XML`
