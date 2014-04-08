@@ -34,8 +34,8 @@ class TestLTI(BaseTestXmodule):
 
         sourcedId = "{context}:{resource_link}:{user_id}".format(
             context=urllib.quote(context_id),
-            resource_link=urllib.quote(resource_link_id),
-            user_id=urllib.quote(user_id)
+            resource_link=resource_link_id,
+            user_id=user_id
         )
 
         lis_outcome_service_url = 'https://{host}{path}'.format(
