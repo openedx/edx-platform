@@ -324,7 +324,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
     'sekizai.context_processors.sekizai',
-    'course_wiki.course_nav.context_processor',
 
     # Hack to get required link URLs to password reset templates
     'edxmako.shortcuts.marketing_link_context_processor',
@@ -736,8 +735,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'splash.middleware.SplashMiddleware',
 
-    'course_wiki.course_nav.Middleware',
-
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
     'embargo.middleware.EmbargoMiddleware',
@@ -768,6 +765,8 @@ MIDDLEWARE_CLASSES = (
 
     # use Django built in clickjacking protection
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'course_wiki.middleware.WikiAccessMiddleware',
 )
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
