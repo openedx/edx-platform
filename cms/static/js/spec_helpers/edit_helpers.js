@@ -2,13 +2,12 @@
  * Provides helper methods for invoking Studio editors in Jasmine tests.
  */
 define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers", "js/views/modals/edit_xblock",
-        "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+    "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
     function($, create_sinon, modal_helpers, EditXBlockModal) {
 
         var editorTemplate = readFixtures('metadata-editor.underscore'),
             numberEntryTemplate = readFixtures('metadata-number-entry.underscore'),
             stringEntryTemplate = readFixtures('metadata-string-entry.underscore'),
-            feedbackTemplate = readFixtures('system-feedback.underscore'),
             editXBlockModalTemplate = readFixtures('edit-xblock-modal.underscore'),
             editorModeButtonTemplate = readFixtures('editor-mode-button.underscore'),
             installEditTemplates,
@@ -37,10 +36,8 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers
             return modal;
         };
 
-        return {
+        return $.extend(modal_helpers, {
             'installEditTemplates': installEditTemplates,
-            'showEditModal': showEditModal,
-            'isShowingModal': modal_helpers.isShowingModal,
-            'cancelModal': modal_helpers.cancelModal
-        };
+            'showEditModal': showEditModal
+        });
     });

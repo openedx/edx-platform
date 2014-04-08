@@ -11,7 +11,7 @@ define(["js/views/baseview", "underscore", "codemirror", "js/views/feedback_noti
         },
 
         initialize: function() {
-            this.template = _.template($("#course_info_handouts-tpl").text());
+            this.template = this.loadTemplate('course_info_handouts');
             var self = this;
             this.model.fetch({
                 complete: function() {

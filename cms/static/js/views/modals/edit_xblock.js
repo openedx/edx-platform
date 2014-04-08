@@ -20,8 +20,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             initialize: function() {
                 BaseModal.prototype.initialize.call(this);
                 this.events = _.extend({}, BaseModal.prototype.events, this.events);
-                this.template = _.template($("#edit-xblock-modal-tpl").text());
-                this.editorModeButtonTemplate = _.template($("#editor-mode-button-tpl").text());
+                this.template = this.loadTemplate('edit-xblock-modal');
+                this.editorModeButtonTemplate = this.loadTemplate('editor-mode-button');
             },
 
             /**

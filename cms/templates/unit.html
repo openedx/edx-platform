@@ -1,6 +1,7 @@
 <%inherit file="base.html" />
 <%!
 from django.core.urlresolvers import reverse
+from contentstore.views.helpers import EDITING_TEMPLATES
 from django.utils.translation import ugettext as _
 from xmodule.modulestore.django import loc_mapper
 %>
@@ -10,7 +11,7 @@ from xmodule.modulestore.django import loc_mapper
 <%block name="bodyclass">is-signedin course unit view-unit feature-upload</%block>
 
 <%block name="header_extras">
-% for template_name in ["image-modal", "basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button", "upload-dialog"]:
+% for template_name in EDITING_TEMPLATES:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>

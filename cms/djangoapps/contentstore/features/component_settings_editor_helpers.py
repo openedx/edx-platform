@@ -6,6 +6,7 @@ from nose.tools import assert_equal, assert_in  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 from common import type_in_codemirror
 from selenium.webdriver.common.keys import Keys
+from cms.envs.common import FEATURES
 
 
 @world.absorb
@@ -53,6 +54,11 @@ def click_new_component_button(step, component_button_css):
     step.given('I have clicked the new unit button')
 
     world.css_click(component_button_css)
+
+    if FEATURES['USE_CONTAINER_PAGE_FOR_TESTING']:
+        unit_url = world.browser.url
+        container_url = unit_url.replace('/unit/', '/container/')
+        world.visit(container_url)
 
 
 def _click_advanced():

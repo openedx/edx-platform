@@ -13,7 +13,7 @@ define(["js/views/baseview", "underscore", "codemirror", "js/models/course_updat
         },
 
         initialize: function() {
-            this.template = _.template($("#course_info_update-tpl").text());
+            this.template = this.loadTemplate('course_info_update');
             this.render();
             // when the client refetches the updates as a whole, re-render them
             this.listenTo(this.collection, 'reset', this.render);

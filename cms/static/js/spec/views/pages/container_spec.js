@@ -1,22 +1,22 @@
 define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
-    "js/views/xblock_container", "js/models/xblock_info"],
-    function ($, create_sinon, edit_helpers, XBlockContainerView, XBlockInfo) {
+    "js/views/pages/container", "js/models/xblock_info"],
+    function ($, create_sinon, edit_helpers, XBlockContainerPage, XBlockInfo) {
 
         describe("XBlockContainerView", function() {
-            var model, containerView, respondWithMockXBlockEditorFragment, mockContainerView;
+            var model, containerView, respondWithMockXBlockEditorFragment, mockContainerPage;
 
-            mockContainerView = readFixtures('mock/mock-container-view.underscore');
+            mockContainerPage = readFixtures('mock/mock-container-page.underscore');
 
             beforeEach(function () {
                 edit_helpers.installEditTemplates();
-                appendSetFixtures(mockContainerView);
+                appendSetFixtures(mockContainerPage);
 
                 model = new XBlockInfo({
-                    id: 'testCourse/branch/published/block/verticalFFF',
+                    id: 'testCourse/branch/draft/block/verticalFFF',
                     display_name: 'Test Unit',
                     category: 'vertical'
                 });
-                containerView = new XBlockContainerView({
+                containerView = new XBlockContainerPage({
                     model: model,
                     el: $('#content')
                 });
@@ -59,7 +59,8 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
             describe("Editing an xblock", function() {
                 var mockContainerXBlockHtml,
                     mockXBlockEditorHtml,
-                    saved;
+                    saved,
+                    newDisplayName = 'New Display Name';
 
                 beforeEach(function () {
                     saved = false;
@@ -67,6 +68,12 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                         return {
                             save: function() {
                                 saved = true;
+                                return {
+                                    data: "<p>Some HTML</p>",
+                                    metadata: {
+                                        display_name: newDisplayName
+                                    }
+                                };
                             }
                         };
                     };
@@ -74,9 +81,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
 
                 afterEach(function() {
                     window.MockXBlock = null;
-                    if (edit_helpers.isShowingModal()) {
-                        edit_helpers.cancelModal();
-                    }
+                    edit_helpers.cancelModalIfShowing();
                 });
 
                 mockContainerXBlockHtml = readFixtures('mock/mock-container-xblock.underscore');

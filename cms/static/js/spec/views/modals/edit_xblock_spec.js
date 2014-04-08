@@ -14,16 +14,14 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 edit_helpers.installEditTemplates();
                 appendSetFixtures('<div class="xblock" data-locator="mock-xblock" data-display-name="Mock XBlock"></div>');
                 model = new XBlockInfo({
-                    id: 'testCourse/branch/published/block/verticalFFF',
+                    id: 'testCourse/branch/draft/block/verticalFFF',
                     display_name: 'Test Unit',
                     category: 'vertical'
                 });
             });
 
             afterEach(function() {
-                if (modal && edit_helpers.isShowingModal(modal)) {
-                    edit_helpers.cancelModal(modal);
-                }
+                edit_helpers.cancelModalIfShowing();
             });
 
             describe("XBlock Editor", function() {
@@ -161,9 +159,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 });
 
                 it('does not show any mode buttons', function() {
-                    var requests = create_sinon.requests(this),
-                        editorButton,
-                        settingsButton;
+                    var requests = create_sinon.requests(this);
                     modal = showModal(requests, mockXModuleEditorHtml);
                     expect(modal.$('.editor-modes li').length).toBe(0);
                 });

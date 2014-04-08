@@ -7,7 +7,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/xblock", "js
 
             beforeEach(function () {
                 model = new XBlockInfo({
-                    id: 'testCourse/branch/published/block/verticalFFF',
+                    id: 'testCourse/branch/draft/block/verticalFFF',
                     display_name: 'Test Unit',
                     category: 'vertical'
                 });

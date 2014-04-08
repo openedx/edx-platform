@@ -11,7 +11,7 @@ define(["jquery", "underscore", "gettext", "js/views/paging", "js/views/asset", 
             initialize : function() {
                 PagingView.prototype.initialize.call(this);
                 var collection = this.collection;
-                this.template = _.template($("#asset-library-tpl").text());
+                this.template = this.loadTemplate("asset-library");
                 this.listenTo(collection, 'destroy', this.handleDestroy);
                 this.registerSortableColumn('js-asset-name-col', gettext('Name'), 'display_name', 'asc');
                 this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'date_added', 'desc');

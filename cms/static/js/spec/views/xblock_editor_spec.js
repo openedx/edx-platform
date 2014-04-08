@@ -6,8 +6,9 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
             var model, editor;
 
             beforeEach(function () {
+                edit_helpers.installEditTemplates();
                 model = new XBlockInfo({
-                    id: 'testCourse/branch/published/block/verticalFFF',
+                    id: 'testCourse/branch/draft/block/verticalFFF',
                     display_name: 'Test Unit',
                     category: 'vertical'
                 });
@@ -50,8 +51,6 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
                 mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-editor.underscore');
 
                 beforeEach(function() {
-                    edit_helpers.installEditTemplates();
-
                     // Mock the VerticalDescriptor so that the module can be rendered
                     window.VerticalDescriptor = XModule.Descriptor;
                 });

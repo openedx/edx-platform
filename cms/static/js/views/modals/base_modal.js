@@ -5,24 +5,24 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
     function($, _, gettext, BaseView) {
         var BaseModal = BaseView.extend({
             events : {
-                "click .action-cancel": "cancel"
+                'click .action-cancel': 'cancel'
             },
 
             options: $.extend({}, BaseView.prototype.options, {
-                type: "prompt",
+                type: 'prompt',
                 closeIcon: false,
                 icon: false,
                 modalName: 'basic',
                 modalType: 'generic',
                 modalSize: 'lg',
-                title: ""
+                title: ''
             }),
 
             initialize: function() {
                 var parent = this.options.parent,
                     parentElement = this.options.parentElement;
-                this.modalTemplate = _.template($("#basic-modal-tpl").text());
-                this.buttonTemplate = _.template($("#modal-button-tpl").text());
+                this.modalTemplate = this.loadTemplate('basic-modal');
+                this.buttonTemplate = this.loadTemplate('modal-button');
                 if (parent) {
                     parentElement = parent.$el;
                 } else if (!parentElement) {
@@ -55,19 +55,16 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
              * Returns the content to be shown in the modal.
              */
             getContentHtml: function() {
-                return "";
+                return '';
             },
 
             show: function() {
                 this.render();
                 this.resize();
-                this.lastPosition = $(document).scrollTop();
                 $(window).resize(_.bind(this.resize, this));
             },
 
             hide: function() {
-                $(document).scrollTop(this.lastPosition);
-
                 // Completely remove the modal from the DOM
                 this.undelegateEvents();
                 this.$el.html('');
@@ -84,9 +81,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
              */
             addActionButtons: function() {
                 if (this.options.addSaveButton) {
-                    this.addActionButton('save', gettext("Save"), true);
+                    this.addActionButton('save', gettext('Save'), true);
                 }
-                this.addActionButton('cancel', gettext("Cancel"));
+                this.addActionButton('cancel', gettext('Cancel'));
             },
 
             /**
@@ -119,8 +116,6 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                 left = (availableWidth - modalWidth) / 2;
                 top = (availableHeight - modalHeight) / 2;
 
-                // modalWindow.width(modalWidth);
-                // modalWindow.height(modalHeight);
                 modalWindow.css({
                     top: top + $(window).scrollTop(),
                     left: left + $(window).scrollLeft()

@@ -48,11 +48,7 @@ define(["js/views/baseview", "underscore", "underscore.string", "jquery"], funct
                 throw "SystemFeedback: intent required (given " +
                     JSON.stringify(this.options) + ")";
             }
-            var tpl = $("#system-feedback-tpl").text();
-            if(!tpl) {
-                console.error("Couldn't load system-feedback template");
-            }
-            this.template = _.template(tpl);
+            this.template = this.loadTemplate("system-feedback");
             this.setElement($("#page-"+this.options.type));
             // handle single "secondary" action
             if (this.options.actions && this.options.actions.secondary &&

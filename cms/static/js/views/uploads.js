@@ -15,7 +15,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
             initialize: function() {
                 BaseModal.prototype.initialize.call(this);
                 this.events = _.extend({}, BaseModal.prototype.events, this.events);
-                this.template = _.template($("#upload-dialog-tpl").text());
+                this.template = this.loadTemplate("upload-dialog");
                 this.listenTo(this.model, "change", this.renderContents);
                 this.options.title = this.model.get('title');
             },
@@ -81,7 +81,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
                 });
             },
 
-            progress: function(event, position, total, percentComplete) {
+            progress: function(event, position, total) {
                 this.model.set({
                     "uploadedBytes": position,
                     "totalBytes": total

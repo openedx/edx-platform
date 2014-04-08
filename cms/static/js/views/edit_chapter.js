@@ -3,7 +3,7 @@ define(["js/views/baseview", "underscore", "underscore.string", "jquery", "gette
     _.str = str; // used in template
     var EditChapter = BaseView.extend({
         initialize: function() {
-            this.template = _.template($("#edit-chapter-tpl").text());
+            this.template = this.loadTemplate('edit-chapter');
             this.listenTo(this.model, "change", this.render);
         },
         tagName: "li",
@@ -54,7 +54,7 @@ define(["js/views/baseview", "underscore", "underscore.string", "jquery", "gette
             var msg = new FileUploadModel({
                 title: _.template(gettext("Upload a new PDF to “<%= name %>”"),
                     {name: course.escape('name')}),
-                message: "Please select a PDF file to upload.",
+                message: gettext("Please select a PDF file to upload."),
                 mimeTypes: ['application/pdf']
             });
             var that = this;

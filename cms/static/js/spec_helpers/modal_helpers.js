@@ -7,8 +7,11 @@ define(["jquery"],
             modalButtonTemplate = readFixtures('modal-button.underscore'),
             feedbackTemplate = readFixtures('system-feedback.underscore'),
             installModalTemplates,
+            getModalElement,
             isShowingModal,
-            cancelModal;
+            hideModalIfShowing,
+            cancelModal,
+            cancelModalIfShowing;
 
         installModalTemplates = function(append) {
             if (append) {
@@ -20,31 +23,46 @@ define(["jquery"],
             appendSetFixtures($("<script>", { id: "modal-button-tpl", type: "text/template" }).text(modalButtonTemplate));
         };
 
-        isShowingModal = function(modal) {
+        getModalElement = function(modal) {
             var modalElement;
             if (modal) {
                 modalElement = modal.$('.wrapper-modal-window');
             } else {
                 modalElement = $('.wrapper-modal-window');
             }
+            return modalElement;
+        };
+
+        isShowingModal = function(modal) {
+            var modalElement = getModalElement(modal);
             return modalElement.length > 0;
+        };
+
+        hideModalIfShowing = function(modal) {
+            if (isShowingModal(modal)) {
+                modal.hide();
+            }
         };
 
         cancelModal = function(modal) {
             var modalElement, cancelButton;
-            if (modal) {
-                modalElement = modal.$('.wrapper-modal-window');
-            } else {
-                modalElement = $('.wrapper-modal-window');
-            }
+            modalElement = getModalElement(modal);
             cancelButton = modalElement.find('.action-cancel');
             expect(cancelButton.length).toBe(1);
             cancelButton.click();
         };
 
+        cancelModalIfShowing = function(modal) {
+            if (isShowingModal(modal)) {
+                cancelModal(modal);
+            }
+        };
+
         return {
             'installModalTemplates': installModalTemplates,
             'isShowingModal': isShowingModal,
-            'cancelModal': cancelModal
+            'hideModalIfShowing': hideModalIfShowing,
+            'cancelModal': cancelModal,
+            'cancelModalIfShowing': cancelModalIfShowing
         };
     });

@@ -22,9 +22,7 @@ define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/m
             });
 
             afterEach(function() {
-                if (modal && modal_helpers.isShowingModal(modal)) {
-                    modal.hide();
-                }
+                modal_helpers.hideModalIfShowing(modal);
             });
 
             describe("Single Modal", function() {

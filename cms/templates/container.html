@@ -3,7 +3,7 @@
 import json
 
 from contentstore.utils import PublishState
-from contentstore.views.helpers import xblock_studio_url
+from contentstore.views.helpers import xblock_studio_url, EDITING_TEMPLATES
 from django.utils.translation import ugettext as _
 %>
 <%block name="title">${_("Container")}</%block>
@@ -14,7 +14,7 @@ from django.utils.translation import ugettext as _
 
 
 <%block name="header_extras">
-% for template_name in ["basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button"]:
+% for template_name in EDITING_TEMPLATES:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
@@ -30,14 +30,14 @@ main_xblock_info = {
 };
 %>
 <script type='text/javascript'>
-    require(["domReady!", "jquery", "js/models/xblock_info", "js/views/xblock_container",
+    require(["domReady!", "jquery", "js/models/xblock_info", "js/views/pages/container",
             "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-            function(doc, $, XBlockInfo, XBlockContainerView) {
+            function(doc, $, XBlockInfo, XBlockContainerPage) {
                 var view, mainXBlockInfo;
 
                 mainXBlockInfo = new XBlockInfo(${json.dumps(main_xblock_info) | n});
 
-                view = new XBlockContainerView({
+                view = new XBlockContainerPage({
                     el: $('#content'),
                     model: mainXBlockInfo
                 });
