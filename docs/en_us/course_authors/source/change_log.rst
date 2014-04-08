@@ -12,7 +12,9 @@ April, 2014
 
    * - Date
      - Change  
-   * - 4/23/14
+    * - 04/24/14
+     - Expanded the :ref:`Grades` chapter to include topics on interpreting the grade reports and student progress page.
+   * - 04/23/14
      - Reorganized info about problems into :ref:`Exercises and Tools Index` section  
    * - 04/22/14
      - Updated the :ref:`Bulk Email` section with information about the dashboard option to opt out of course email. 
@@ -70,7 +72,8 @@ March, 2014
      - Updated the :ref:`Adding Pages to a Course` section to reflect feature
        changes.
    * - 03/27/14
-     - Updated the section on :ref:`Beta_Testing` to include the new "batch add" feature.
+     - Updated the section on :ref:`Beta_Testing` to include the new "batch add"
+       feature.
    * - 03/19/14
      - Updated the sections on :ref:`Beta_Testing`, :ref:`Discussions`,
        :ref:`Grades`, and :ref:`Student Data` with changes to the new Instructor Dashboard.
