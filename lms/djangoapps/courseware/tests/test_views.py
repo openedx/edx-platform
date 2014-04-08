@@ -46,27 +46,27 @@ class TestJumpTo(TestCase):
         self.course_name = 'edX/toy/2012_Fall'
 
     def test_jumpto_invalid_location(self):
-        location = Location('edX', 'toy', 'NoSuchPlace', None)
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
+        location = Location('edX', 'toy', 'NoSuchPlace', None, None, None)
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location.to_deprecated_string())
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
     def test_jumpto_from_chapter(self):
-        location = Location('edX', 'toy', 'chapter', 'Overview')
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
+        location = Location('edX', 'toy', 'chapter', 'Overview', None, None)
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location.to_deprecated_string())
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_id(self):
-        location = Location('edX', 'toy', 'chapter', 'Overview')
+        location = Location('edX', 'toy', 'chapter', 'Overview', None, None)
         jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_id_invalid_location(self):
-        location = Location('edX', 'toy', 'NoSuchPlace', None)
+        location = Location('edX', 'toy', 'NoSuchPlace', None, None, None)
         jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
@@ -151,11 +151,11 @@ class ViewsTestCase(TestCase):
         self.assertTrue(views.registered_for_course(mock_course, self.user))
 
     def test_jump_to_invalid(self):
+        # TODO add a test for invalid location
+        # TODO add a test for no data *
         request = self.request_factory.get(self.chapter_url)
-        self.assertRaisesRegexp(Http404, 'Invalid location', views.jump_to,
+        self.assertRaisesRegexp(Http404, 'Invalid course_key or usage_key', views.jump_to,
                                 request, 'bar', ())
-        self.assertRaisesRegexp(Http404, 'No data*', views.jump_to, request,
-                                'dummy', self.location)
 
     def test_no_end_on_about_page(self):
         # Toy course has no course end date or about/end_date blob
