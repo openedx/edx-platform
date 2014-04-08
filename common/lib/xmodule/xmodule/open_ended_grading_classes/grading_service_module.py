@@ -119,14 +119,15 @@ class GradingService(object):
         if (resp_json
                 and resp_json.get('success') is False
                 and resp_json.get('error') == 'login_required'):
-            # apparrently we aren't logged in.  Try to fix that.
+            # apparently we aren't logged in.  Try to fix that.
             r = self._login()
             if r and not r.get('success'):
-                log.warning("Couldn't log into staff_grading backend. Response: %s",
+                log.warning("Couldn't log into ORA backend. Response: %s",
                             r)
-                # try again
+            # try again
             response = operation()
             response.raise_for_status()
+            resp_json = response.json()
 
         return resp_json
 
