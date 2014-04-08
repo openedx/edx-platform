@@ -1,7 +1,7 @@
-.. _Using an Instant Hangout in Your Course:
+.. _Google Instant Hangout:
 
 ###########################################
-Using an Instant Hangout in Your Course
+Google Instant Hangout Tool
 ###########################################
 
 This chapter describes how you can use instant hangouts in your course. See:
@@ -52,28 +52,28 @@ The Student Experience
 
 When you add the instant hangout to your course, a control for the hangout appears on that page. The following example shows the control in a course unit. The control shows that the student can start the hangout and be the first participant.
 
-.. image:: ../Images/hangout_unit.png
+.. image:: /Images/hangout_unit.png
  :alt: Image of the instant hangout control on a unit
 
 To start the hangout, the student clicks **Start the Hangout**. (After the first student clicks **Start the Hangout**, other students see a **Join the Hangout** button.)
 
 The following example shows the control in a page when a hangout has already started. The control has a **Join the Hangout** button, and shows that one other student is already in the hangout.
 
-.. image:: ../Images/hangout_static_page.png
+.. image:: /Images/hangout_static_page.png
  :alt: Image of the instant hangout control on a page
 
 To join the hangout, the student clicks **Join the Hangout**.
 
 If not already logged in, the student is prompted to log in to Google:
 
-.. image:: ../Images/google_login.png
+.. image:: /Images/google_login.png
  :alt: Image of the Google login page
 
 Students who do not have a Google account can create one from the login page.
 
 After the student has logged in to Google, the hangout opens in a separate browser window:
 
-.. image:: ../Images/hangout.png
+.. image:: /Images/GoogleHangout_WithPeople.png
  :alt: Image of the instant hangout
 
 .. _Limitations:

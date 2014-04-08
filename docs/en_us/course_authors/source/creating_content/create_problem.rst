@@ -17,32 +17,29 @@ toward a student's grade. If you want the problems to count toward the
 student's grade, change the assignment type of the subsection that contains the
 problems.
 
+This section covers the basics of Problem components--what they look like to you and your students, and the options that every problem component has. For more information about individual problem types, see :ref:`Create Exercises`.
+
 For more information, see the following topics.
 
-* :ref:`Components and the User Interface`
+* :ref:`Problem Student View`
+* :ref:`Problem Studio View`
 * :ref:`Problem Settings`
-* :ref:`Multiple Problems in One Component`
-* :ref:`Problem Randomization`
 * :ref:`Modifying a Released Problem`
+* :ref:`Additional Work with Problems`
 
+  * :ref:`Multiple Problems in One Component`
+  * :ref:`Problem Randomization`
+  
 
-.. _Components and the User Interface:
+.. _Problem Student View:
 
 ************************************
-Components and the User Interface
-************************************
-
-This section contains a description of the various components of a
-problem as students see it in the LMS, as well as an introduction to the
-Studio user interface for course creators.
-
-==============================
 The Student View of a Problem
-==============================
+************************************
 
 All problems on the edX platform have several component parts.
 
-.. image:: ../Images//AnatomyOfExercise1.png
+.. image:: ../Images/AnatomyOfExercise1.png
  :alt: Image of a problem from a student's point of view, with callouts for elements of the problem
 
 #. **Problem text.** The problem text can contain any standard HTML formatting.
@@ -120,32 +117,29 @@ visible. You can set these attributes in Studio.
    given different weights.
 -  **Label.** To improve accessibility for students who have disabilities, each problem needs a descriptive label. The label typically contains part or all of the text of the question in the problem. Most templates include a space for a label. You can find example labels in the documentation for each problem or tool type. 
 
-.. _Studio UI:
+.. _Problem Studio View:
 
-==============================
-The Studio User Interface
-==============================
+************************************
+The Studio View of a Problem
+************************************
 
-Studio offers two interfaces for editing problem components: the Simple
-Editor and the Advanced Editor.
+All problems are written in XML. However, Studio offers two interfaces for editing problem components: the Simple Editor and the Advanced Editor.
 
 -  The **Simple Editor** allows you to edit problems visually, without
    having to work with XML.
 -  The **Advanced Editor** converts the problem to edX’s XML standard
    and allows you to edit that XML directly.
 
-.. note:: You can switch at any time from the Simple Editor to the
-          Advanced Editor by clicking **Advanced Editor** in the top right corner
-          of the Simple Editor interface. However, it is not possible to switch from
-          the Advanced Editor to the Simple Editor.
-
+You can switch at any time from the Simple Editor to the Advanced Editor by clicking **Advanced Editor** in the top right corner of the Simple Editor interface. However, it is not possible to switch from the Advanced Editor to the Simple Editor.
 
 .. _Simple Editor:
 
 The Simple Editor
-~~~~~~~~~~~~~~~~~
-The Common Problem templates, including multiple choice, open in the Simple Editor. The
-following image shows a multiple choice problem in the Simple Editor.
+=================
+Several problem templates, including multiple choice and text input problem templates, open in the Simple Editor. The following image shows a multiple choice problem in the Simple Editor.
+
+.. image:: ../Images//MultipleChoice_SimpleEditor.png
+ :alt: Image of a problem in the simple editor
 
 The Simple Editor includes a toolbar that helps you format the text of your problem.
 When you select text and then click the formatting buttons, the Simple Editor formats
@@ -161,19 +155,29 @@ the text for you automatically. The toolbar buttons are the following:
 8. Open the problem in the Advanced Editor.
 9. Open a list of formatting hints.
 
-The following image shows a multiple choice problem in the Simple Editor.
+The following problem templates open in the Simple Editor.
 
-.. image:: ../Images//MultipleChoice_SimpleEditor.png
- :alt: Image of a problem in the simple editor
+-  :ref:`Checkbox` In checkbox problems, students select one or more options
+   from a list of possible answers.
+-  :ref:`Dropdown` In dropdown problems, students select one answer from a
+   dropdown list.
+-  :ref:`Multiple Choice` Multiple choice problems require students to
+   select one answer from a list of choices that appear directly below
+   the question.
+-  :ref:`Numerical Input` Numerical input problems require answers that
+   include only integers, fractions, and a few common constants and
+   operators.
+-  :ref:`Text Input` In text input problems, students enter a short text
+   answer to a question.
+
 
 .. _Advanced Editor:
 
+===================
 The Advanced Editor
-~~~~~~~~~~~~~~~~~~~
-The **Advanced Editor** opens a problem in XML. The Advanced Problem templates,
-such as the circuit schematic builder, open directly in the Advanced Editor.
-
-For more information about the XML for different problem types, see :ref:`Appendix E`.
+===================
+The **Advanced Editor** opens a problem in XML. Templates for problems such as
+such as drag and drop and math expression input open directly in the Advanced Editor.
 
 The following image shows the multiple choice problem above in the Advanced Editor
 instead of the Simple Editor.
@@ -181,14 +185,34 @@ instead of the Simple Editor.
 .. image:: ../Images//MultipleChoice_AdvancedEditor.png
  :alt: Image of a problem in the advanced editor
 
+The following problem templates open in the Advanced Editor.
+
+-  :ref:`Circuit Schematic Builder` In circuit schematic problems, students
+   create and modify circuits on an interactive grid and submit
+   computer-generated analyses of the circuits for grading.
+-  :ref:`Custom JavaScript` With custom JavaScript display
+   and grading problems, you can incorporate problem types that you've created
+   in HTML into Studio via an IFrame.
+-  :ref:`Drag and Drop` Drag and drop problems require students to drag text
+   or objects to a specific location on an image.
+-  :ref:`Image Mapped Input` Image mapped input problems require students to
+   click a specific location on an image.
+-  :ref:`Math Expression Input` Math expression input problems require
+   students to enter a mathematical expression as text, such as
+   e=m\*c^2.
+-  :ref:`Problem with Adaptive Hint` These problems can give students
+   feedback or hints based on their responses. Problems with adaptive
+   hints can be text input or multiple choice problems.
+- :ref:`Problem Written in LaTeX` This problem type allows you to convert problems that you’ve already written in LaTeX into the edX format. Note that this problem type is still a prototype, however, and may not be supported in the future.
+-  :ref:`Write Your Own Grader` Custom Python-evaluated input (also called "write-your-own-grader" problems evaluate students' responses using an embedded Python script that you create. These problems can be any type.
+
 .. _Problem Settings:
 
 ******************
 Problem Settings
 ******************
 
-Most problems have the following settings. These settings appear on the **Settings** tab in
-the component editor. 
+In addition to the text of the problem, problems that you create using a Problem component have the following settings. These settings appear on the **Settings** tab in the component editor. 
 
 -  **Display Name**
 -  **Maximum Attempts**
@@ -196,7 +220,7 @@ the component editor.
 -  **Randomization**
 -  **Show Answer**
 
-.. image:: ../Images//ProbComponent_Attributes.png
+.. image:: ../Images/ProbComponent_Attributes.png
  :alt: Image of the Settings tab in a Problem component
 
 ===============
@@ -207,7 +231,7 @@ This setting indicates the name of your problem. The display name
 appears as a heading over the problem in the LMS and in the course
 ribbon at the top of the page.
 
-.. image:: ../Images//ProbComponent_LMS_DisplayName.png
+.. image:: ../Images/ProbComponent_LMS_DisplayName.png
  :alt: Image of the problem in a unit page from a student's point of view
 
 ==============================
@@ -230,7 +254,7 @@ Problem Weight
 This setting specifies the maximum number of points possible for the
 problem. The problem weight appears next to the problem title.
 
-.. image:: ../Images//ProblemWeight_DD.png
+.. image:: ../Images/ProblemWeight_DD.png
  :alt: Image of a problem from a student's point of view, with the possible points circled
 
 By default, each response field, or “answer space,” in a Problem
@@ -242,11 +266,11 @@ to answer, and thus has three response fields.
 The following Problem component contains one text input problem,
 and has just one response field.
 
-.. image:: ../Images//ProblemWeight_TI.png
+.. image:: ../Images/ProblemWeight_TI.png
  :alt: Image of a text input problem from a student's point of view
 
 Computing Scores
-~~~~~~~~~~~~~~~~
+****************
 
 The score that a student earns for a problem is the result of the
 following formula:
@@ -297,12 +321,14 @@ This setting specifies whether certain values in your problem change each time a
 
 
 
-.. image:: ../Images//Rerandomize.png
+.. image:: ../Images/Rerandomize.png
 
 If you want to change, or "randomize," specific values in your problem, you have to do both the following:
 
 - Make sure that your problem contains a Python script that randomizes the values that you want. 
 - Enable randomization in the Problem component. 
+
+.. note:: Note that specifying this **Randomization** setting is different from *problem randomization*. The **Randomization** setting randomizes variables within a single problem. Problem randomization offers different problems or problem versions to different students. For more information, see :ref:`Problem Randomization`.
 
 To enable randomization, select an option for the **Randomization** setting. This setting has four options.
 
@@ -365,36 +391,63 @@ This setting has seven options.
 |                   | or in the LMS.                       |
 +-------------------+--------------------------------------+
 
+.. _Modifying a Released Problem:
+
+*********************************
+Modifying a Released Problem
+*********************************
+
+.. warning:: Be careful when you modify problems after they have been released!
+
+After a student submits a response to a problem, Studio stores the
+student’s response, the score that the student received, and the maximum
+score for the problem. Studio updates these values when a student
+submits a new response to a problem. However, if an instructor changes a
+problem or its attributes, Studio does not automatically update existing
+student information for that problem.
+
+For example, you may release a problem and specify that its answer is 3.
+After some students have submitted responses, you notice that the answer
+should be 2 instead of 3. When you update the problem with the correct
+answer, Studio doesn’t update scores for students who answered 2 for the
+original problem and thus received the wrong score.
+
+For another example, you may change the number of response fields to
+three. Students who submitted answers before the change have a score of
+0, 1, or 2 out of 2.0 for that problem. Students who submitted answers
+after the change have scores of 0, 1, 2, or 3 out of 3.0 for the same
+problem.
+
+If you change the weight of the problem, however, the existing scores
+update when you refresh the **Progress** page.
+
 ===============
-Problem Types
+Workarounds
 ===============
 
-Studio includes templates for many different types of problems, from
-simple multiple choice problems to advanced problems that require the
-student to “build” a virtual circuit. Details about each problem type,
-including information about how to create the problem, appears in the
-page for the problem type.
+If you have to modify a released problem in a way that affects grading,
+you have two options. Note that both options require you to ask your
+students to go back and resubmit a problem.
 
--  :ref:`Common Problems` appear on the **Common Problem Types** tab when you
-   create a new Problem component in Studio. You create these problems
-   using the Simple Editor.
--  :ref:`Advanced Problems` appear on the **Advanced** tab when you create a
-   new Problem component. You create these problems using the Advanced
-   Editor.
--  :ref:`Specialized Problems` are advanced problems that aren’t available by
-   default. To add these problems, you first have to modify the advanced
-   settings in your course. The Advanced component then appears under
-   **Add New Component** in each unit, and these problems are available
-   in the Advanced component.
--  :ref:`Open Response Assessment Problems` are a new kind of problem that allow you, the
-   students in your course, or a computer algorithm to grade responses in the form
-   of essays, files such as computer code, and ../Images/.
+-  In the Problem component, increase the number of attempts for the
+   problem. Then ask all your students to redo the problem.
+-  Delete the entire Problem component in Studio and create a new
+   Problem component with the content and settings that you want. Then
+   ask all your students to complete the new problem.
+
+.. _Additional Work with Problems:
+
+************************************
+Additional Work with Problems
+************************************
+
+You have some further options when you work with problems. You can include more than one problem in a single problem component, or you can set up a problem that presents different versions to different students. 
 
 .. _Multiple Problems in One Component:
 
-************************************
+====================================
 Multiple Problems in One Component
-************************************
+====================================
 
 You may want to create a problem that has more than one response type.
 For example, you may want to create a numerical input problem, and then
@@ -404,7 +457,7 @@ many problems at one time. To do this, you can include multiple problems
 inside a single Problem component. The problems can be different types.
 
 To create multiple problems in one component, create a new Blank
-Advanced Problem component, and then paste the XML for each problem in
+Advanced Problem component, and then add the XML for each problem in
 the component editor. You only need to include the XML for the problem
 and its answers. You don’t have to include the code for other elements,
 such as the **Check** button.
@@ -421,9 +474,9 @@ the component appear.
 
 .. _Problem Randomization:
 
-*********************
+===========================
 Problem Randomization
-*********************
+===========================
 
 You may want to present different students with different problems, or different versions of the same problem. To do this, you'll create a Problem component for each problem or version in Studio, and then edit your course outside of Studio to randomize the problem that students see.
 
@@ -431,9 +484,8 @@ Note that *problem randomization* is different from the **Randomization** settin
 
 .. note:: Creating problems with versions that can be randomized requires you to export your course, edit some of your course's XML files in a text editor, and then re-import your course. We recommend that you create a backup copy of your course before you do this. We also recommend that you only edit the files that will contain polls in the text editor if you're very familiar with editing XML.
 
-===========
 Terminology
-===========
+************
 
 Sections, subsections, units, and components have different names in the **Course Outline** view and in the list of files that you'll see after you export your course and open the .xml files for editing. The following table lists the names of these elements in the **Course Outline** view and in a list of files.
 
@@ -456,9 +508,8 @@ For example, when you want to find a specific section in your course, you'll loo
 
 .. _Create Randomized Problems:
 
-==========================
 Create Randomized Problems
-==========================
+****************************
 
 #. In the unit where you want to create a randomized problem, create a separate Problem component for each version or problem that you want to randomize. For example, if you want to offer four versions or problems, you'll create four separate Problem components. Make a note of the 32-digit unit ID that appears in the **Unit Identifier** field under **Unit Location**.
 
@@ -515,79 +566,3 @@ Create Randomized Problems
   * Once you've implemented randomization, you can only see one of the versions or problems in Studio. You can edit that single problem directly in Studio, but to edit any of the other problems, you'll have to export your course, edit the problems in a text editor, and then re-import the course. This is true for instructors as well as course teams.
   
   * A .csv file for student responses contains the responses to each of the problems in the problem bank. 
-
-
-  .. _Modifying a Released Problem:
-
-************************************
-Modifying a Released Problem
-************************************
-
-.. warning:: Be careful when you modify problems after they have been released!
-
-After a student submits a response to a problem, Studio stores the
-student’s response, the score that the student received, and the maximum
-score for the problem. Studio updates these values when a student
-submits a new response to a problem. However, if an instructor changes a
-problem or its attributes, Studio does not automatically update existing
-student information for that problem.
-
-For example, you may release a problem and specify that its answer is 3.
-After some students have submitted responses, you notice that the answer
-should be 2 instead of 3. When you update the problem with the correct
-answer, Studio doesn’t update scores for students who answered 2 for the
-original problem and thus received the wrong score.
-
-For another example, you may change the number of response fields to
-three. Students who submitted answers before the change have a score of
-0, 1, or 2 out of 2.0 for that problem. Students who submitted answers
-after the change have scores of 0, 1, 2, or 3 out of 3.0 for the same
-problem.
-
-If you change the weight of the problem, however, the existing scores
-update when you refresh the **Progress** page.
-
-===============
-Workarounds
-===============
-
-If you have to modify a released problem in a way that affects grading,
-you have two options. Note that both options require you to ask your
-students to go back and resubmit a problem.
-
--  In the Problem component, increase the number of attempts for the
-   problem. Then ask all your students to redo the problem.
--  Delete the entire Problem component in Studio and create a new
-   Problem component with the content and settings that you want. Then
-   ask all your students to complete the new problem.
-
-.. _Problem XML:
-
-***********
-Problem XML
-***********
-
-XML tags are generally specific to a problem type. For example, only multiple choice problems contain the ``<multiplechoiceresponse>`` tag, and only drag and drop problems use the ``<draggable>`` tag. However, the following tags are common to most problems.
-
-.. list-table::
-   :widths: 20 80
-
-   * - ``<problem> </problem>``
-     - These must be the first and last tags for any content created in the Advanced
-       Editor in a Problem component.
-   * - ``<startouttext/>``
-     - The ``<startouttext />`` tag indicates the beginning of a line or block of text.
-   * - ``<endouttext/>``
-     - The ``<endouttext />`` tag indicates the end of a line or block of text.
-   * - ``<solution> <div class="detailed-solution"> </div> </solution>`` (optional)
-     - If you want to include more information in the problem, such as a detailed explanation of the problem's answer, you'll enter the text between the two ``<div>`` tags, which are inside the ``<solution>`` tags. (These tags do not have to be on the same line.)
-
-Additionally, several different problem types use the following tags.
-
-.. list-table::
-   :widths: 20 80
-
-   * - ``<textline>``
-     - Creates an answer space where students enter a response. Must contain a **size** attribute; may contain **label**, **math**, **correct_answer**. Used in text input and some custom Python-evaluated input problems.
-   * - ``<customresponse> </customresponse>``
-     - 

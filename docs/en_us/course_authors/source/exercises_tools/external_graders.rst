@@ -1,7 +1,7 @@
-.. _Using External Graders:
+.. _External Grader:
 
 ###########################
-Using External Graders
+External Grader
 ###########################
 
 
@@ -31,13 +31,13 @@ An external grader is particularly useful for software programming courses where
 
 For example, you define a problem that requires students to submit Python code, and create a set of tests that an external grader can run to verify the submissions. When a student enters Python code for the problem and clicks **Check**, the code is sent to the grader for testing.  If the code passes all tests, the grader returns the score and a string indicating that the solution is correct.
 
-.. image:: ../Images/external-grader-correct.png
+.. image:: /Images/external-grader-correct.png
  :alt: Image of a students view of a programming problem that uses an external grader, with a correct result 
 
 
 The external grader can return a string with results, which the student can see by clicking **See full output**. This can be particularly useful when the solution is not correct and you want to return information about the failed tests. For example:
 
-.. image:: ../Images/external-grader-incorrect.png
+.. image:: /Images/external-grader-incorrect.png
  :alt: Image of a students view of a programming problem that uses an external grader, with a correct result 
 
 .. _External Graders and XQueue:
