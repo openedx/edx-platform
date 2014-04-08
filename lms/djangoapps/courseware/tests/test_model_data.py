@@ -318,7 +318,7 @@ class TestContentStorage(StorageTestBase, TestCase):
     factory = UserStateSummaryFactory
     scope = Scope.user_state_summary
     key_factory = user_state_summary_key
-    storage_class = XModuleUserStateSummaryField
+    storage_class = factory.FACTORY_FOR
 
 
 class TestStudentPrefsStorage(OtherUserFailureTestMixin, StorageTestBase, TestCase):

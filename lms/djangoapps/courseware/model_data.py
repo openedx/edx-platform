@@ -185,9 +185,9 @@ class FieldDataCache(object):
         Return the key used in the FieldDataCache for the specified KeyValueStore key
         """
         if key.scope == Scope.user_state:
-            return (key.scope, key.block_scope_id.url())
+            return (key.scope, key.block_scope_id)
         elif key.scope == Scope.user_state_summary:
-            return (key.scope, key.block_scope_id.url(), key.field_name)
+            return (key.scope, key.block_scope_id, key.field_name)
         elif key.scope == Scope.preferences:
             return (key.scope, key.block_scope_id, key.field_name)
         elif key.scope == Scope.user_info:
