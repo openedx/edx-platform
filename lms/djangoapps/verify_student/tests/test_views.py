@@ -23,6 +23,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from mock import sentinel
 
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
@@ -130,6 +131,7 @@ class TestMidCourseReverifyView(TestCase):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
         self.course_id = 'Robot/999/Test_Course'
+        self.course_key = SlashSeparatedCourseKey.from_string(self.course_id)
         CourseFactory.create(org='Robot', number='999', display_name='Test Course')
 
         patcher = patch('student.models.server_track')
@@ -209,7 +211,7 @@ class TestMidCourseReverifyView(TestCase):
         # not enrolled in any courses
         self.assertEquals(response.status_code, 200)
 
-        enrollment = CourseEnrollment.get_or_create_enrollment(self.user, self.course_id)
+        enrollment = CourseEnrollment.get_or_create_enrollment(self.user, self.course_key)
         enrollment.update_enrollment(mode="verified", is_active=True)
         MidcourseReverificationWindowFactory(course_id=self.course_id)
         response = self.client.get(url)
