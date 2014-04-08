@@ -244,7 +244,7 @@ def index(request, course_id, chapter=None, section=None,
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.url())
-        return redirect(reverse('about_course', args=[course.id]))
+        return redirect(reverse('about_course', args=[course.id.to_deprecated_string()]))
 
     masq = setup_masquerade(request, staff_access)
 
@@ -256,7 +256,7 @@ def index(request, course_id, chapter=None, section=None,
         if course_module is None:
             log.warning(u'If you see this, something went wrong: if we got this'
                         u' far, should have gotten a course module for this user')
-            return redirect(reverse('about_course', args=[course.id]))
+            return redirect(reverse('about_course', args=[course.id.to_deprecated_string()]))
 
         if chapter is None:
             return redirect_to_course_position(course_module)
@@ -297,7 +297,7 @@ def index(request, course_id, chapter=None, section=None,
             # User may be trying to access a chapter that isn't live yet
             if masq=='student':  # if staff is masquerading as student be kinder, don't 404
                 log.debug('staff masq as student: no chapter %s' % chapter)
-                return redirect(reverse('courseware', args=[course.id]))
+                return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
             raise Http404
 
         if section is not None:
@@ -306,7 +306,7 @@ def index(request, course_id, chapter=None, section=None,
                 # Specifically asked-for section doesn't exist
                 if masq=='student':  # if staff is masquerading as student be kinder, don't 404
                     log.debug('staff masq as student: no section %s' % section)
-                    return redirect(reverse('courseware', args=[course.id]))
+                    return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
                 raise Http404
 
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
@@ -544,9 +544,9 @@ def course_about(request, course_id):
     registered = registered_for_course(course, request.user)
 
     if has_access(request.user, 'load', course):
-        course_target = reverse('info', args=[course.id])
+        course_target = reverse('info', args=[course.id.to_deprecated_string()])
     else:
-        course_target = reverse('about_course', args=[course.id])
+        course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
     show_courseware_link = (has_access(request.user, 'load', course) or
                             settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
@@ -601,9 +601,9 @@ def mktg_course_about(request, course_id):
     registered = registered_for_course(course, request.user)
 
     if has_access(request.user, 'load', course):
-        course_target = reverse('info', args=[course.id])
+        course_target = reverse('info', args=[course.id.to_deprecated_string()])
     else:
-        course_target = reverse('about_course', args=[course.id])
+        course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
     allow_registration = has_access(request.user, 'enroll', course)
 

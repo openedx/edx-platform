@@ -334,6 +334,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # call out to the DB
         resultset = self.collection.find(query, record_filter)
 
+        # it's ok to keep these as urls b/c the overall cache is indexed by course_key and this
+        # is a dictionary relative to that course
         results_by_url = {}
         root = None
 
@@ -344,6 +346,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
             location_url = location.url()
             if location_url in results_by_url:
+                # found either draft or live to complement the other revision
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
                 additional_children = result.get('definition', {}).get('children', [])
                 total_children = existing_children + additional_children
@@ -416,13 +419,17 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         return tree
 
-    def refresh_cached_metadata_inheritance_tree(self, course_id):
+    def refresh_cached_metadata_inheritance_tree(self, course_id, runtime=None):
         """
         Refresh the cached metadata inheritance tree for the org/course combination
         for location
+
+        If given a runtime, it replaces the cached_metadata in that runtime. NOTE: failure to provide
+        a runtime may mean that some objects report old values for inherited data.
         """
         if course_id not in self.ignore_write_events_on_courses:
-            self._get_cached_metadata_inheritance_tree(course_id, force_refresh=True)
+            cached_metadata = self._get_cached_metadata_inheritance_tree(course_id, force_refresh=True)
+            runtime.cached_metadata = cached_metadata
 
     def _clean_item_data(self, item):
         """
@@ -864,8 +871,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                     self.update_item(course, user)
 
             # recompute (and update) the metadata inheritance tree which is cached
-            # was conditional on children or metadata having changed before dhm made one update to rule them all
-            self.refresh_cached_metadata_inheritance_tree(xblock.location.course_key)
+            self.refresh_cached_metadata_inheritance_tree(xblock.location.course_key, xblock.runtime)
             # fire signal that we've written to DB
         except ItemNotFoundError:
             if not allow_not_found:

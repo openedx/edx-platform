@@ -135,7 +135,7 @@ class DraftModuleStore(MongoModuleStore):
         except pymongo.errors.DuplicateKeyError:
             raise DuplicateItemError(original['_id'])
 
-        self.refresh_cached_metadata_inheritance_tree(draft_location)
+        self.refresh_cached_metadata_inheritance_tree(draft_location.course_key)
 
         return self._load_items(source_location.course_key, [original])[0]
 
