@@ -2,10 +2,10 @@
 .. _Appendix E:
 
 ################################
-APPENDIX E: Problem and Tool XML
+Problem and Tool XML
 ################################
 
-This appendix provides information about the XML tags for most problem and tool types in Studio:
+This guide provides information about the XML tags for most problem and tool types in Studio:
 
 * :ref:`General`
 * :ref:`Checkbox Problem XML`
