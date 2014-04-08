@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from edxmako.shortcuts import render_to_response
 
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from notes.utils import notes_enabled_for_course
@@ -17,7 +18,8 @@ def index(request, course_id, book_index, page=None):
     """
     Serve static image-based textbooks.
     """
-    course = get_course_with_access(request.user, 'load', course_id)
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     staff_access = has_access(request.user, 'staff', course)
 
     book_index = int(book_index)
@@ -72,7 +74,8 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
 
     page:  (optional) one-based page number to display within the PDF.  Defaults to first page.
     """
-    course = get_course_with_access(request.user, 'load', course_id)
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     staff_access = has_access(request.user, 'staff', course)
 
     book_index = int(book_index)
@@ -114,7 +117,8 @@ def html_index(request, course_id, book_index, chapter=None):
         Defaults to first chapter.  Specifying this assumes that there are separate HTML files for
         each chapter in a textbook.
     """
-    course = get_course_with_access(request.user, 'load', course_id)
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     staff_access = has_access(request.user, 'staff', course)
     notes_enabled = notes_enabled_for_course(course)
 
