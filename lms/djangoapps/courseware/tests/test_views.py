@@ -24,6 +24,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from student.tests.factories import UserFactory
 
 import courseware.views as views
@@ -80,7 +81,7 @@ class ViewsTestCase(TestCase):
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
         self.date = datetime(2013, 1, 22, tzinfo=UTC)
-        self.course_id = 'edX/toy/2012_Fall'
+        self.course_id = SlashSeparatedCourseKey.from_string('edX/toy/2012_Fall')
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_id)
         self.enrollment.created = self.date
         self.enrollment.save()
@@ -399,7 +400,7 @@ class StartDateTests(ModuleStoreTestCase):
         """
         Get the text of the /about page for the course.
         """
-        text = views.course_about(self.request, course_id).content
+        text = views.course_about(self.request, course_id.to_deprecated_string()).content
         return text
 
     @patch('util.date_utils.pgettext', fake_pgettext(translations={
@@ -421,7 +422,7 @@ class StartDateTests(ModuleStoreTestCase):
         "SHORT_DATE_FORMAT": "%Y-%b-%d",
     }))
     def test_format_localized_in_xml_course(self):
-        text = self.get_about_text('edX/toy/TT_2012_Fall')
+        text = self.get_about_text(SlashSeparatedCourseKey.from_string('edX/toy/TT_2012_Fall'))
         # The start date is set in common/test/data/two_toys/policies/TT_2012_Fall/policy.json
         self.assertIn("2015-JULY-17", text)
 
