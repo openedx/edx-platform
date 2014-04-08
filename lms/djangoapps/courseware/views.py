@@ -37,8 +37,11 @@ from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+from xmodule.modulestore import Location
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 import shoppingcart
+from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
 
@@ -422,8 +425,11 @@ def jump_to(request, course_id, location):
     Otherwise, delegates to the index view to figure out whether this user
     has access, and what they should see.
     """
-    course_key = CourseKey.from_string(course_id)
-    usage_key = course_key.make_usage_key_from_deprecated_string(location)
+    try:
+        course_key = CourseKey.from_string(course_id)
+        usage_key = course_key.make_usage_key_from_deprecated_string(location)
+    except InvalidKeyError:
+        raise Http404(u"Invalid course_key or usage_key")
     try:
         (course_key, chapter, section, position) = path_to_location(modulestore(), usage_key)
     except ItemNotFoundError:
@@ -705,8 +711,16 @@ def submission_history(request, course_id, student_username, location):
     Right now this only works for problems because that's all
     StudentModuleHistory records.
     """
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except (InvalidKeyError, AssertionError):
+        return HttpResponse(escape(_(u'Invalid course id.')))
 
-    course_key = CourseKey.from_string(course_id)
+    try:
+        usage_key = course_key.make_usage_key_from_deprecated_string(location)  # TODO make someone sanity-check this
+    except (InvalidKeyError, AssertionError):
+        return HttpResponse(escape(_(u'Invalid location.')))
+
     course = get_course_with_access(request.user, 'load', course_key)
     staff_access = has_access(request.user, 'staff', course)
 
@@ -717,19 +731,19 @@ def submission_history(request, course_id, student_username, location):
 
     try:
         student = User.objects.get(username=student_username)
+        from nose.tools import set_trace; set_trace()
         student_module = StudentModule.objects.get(
             course_id=course_key,
-            module_state_key=location,
+            module_id=usage_key,
             student_id=student.id
         )
     except User.DoesNotExist:
         return HttpResponse(escape(_(u'User {username} does not exist.').format(username=student_username)))
-    except StudentModule.DoesNotExist:
+    except (StudentModule.DoesNotExist):  #TODO ugh is this too broad
         return HttpResponse(escape(_(u'User {username} has never accessed problem {location}').format(
             username=student_username,
             location=location
         )))
-
     history_entries = StudentModuleHistory.objects.filter(
         student_module=student_module
     ).order_by('-id')
