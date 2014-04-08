@@ -1,9 +1,9 @@
 define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
     "js/views/pages/container", "js/models/xblock_info"],
-    function ($, create_sinon, edit_helpers, XBlockContainerPage, XBlockInfo) {
+    function ($, create_sinon, edit_helpers, ContainerPage, XBlockInfo) {
 
-        describe("XBlockContainerView", function() {
-            var model, containerView, respondWithMockXBlockEditorFragment, mockContainerPage;
+        describe("ContainerPage", function() {
+            var model, containerPage, respondWithMockXBlockEditorFragment, mockContainerPage;
 
             mockContainerPage = readFixtures('mock/mock-container-page.underscore');
 
@@ -16,7 +16,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     display_name: 'Test Unit',
                     category: 'vertical'
                 });
-                containerView = new XBlockContainerPage({
+                containerPage = new ContainerPage({
                     model: model,
                     el: $('#content')
                 });
@@ -32,26 +32,26 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
 
                 it('can render itself', function() {
                     var requests = create_sinon.requests(this);
-                    containerView.render();
+                    containerPage.render();
                     respondWithMockXBlockEditorFragment(requests, {
                         html: mockContainerXBlockHtml,
                         "resources": []
                     });
 
-                    expect(containerView.$el.select('.xblock-header')).toBeTruthy();
-                    expect(containerView.$('.wrapper-xblock')).not.toHaveClass('is-hidden');
-                    expect(containerView.$('.no-container-content')).toHaveClass('is-hidden');
+                    expect(containerPage.$el.select('.xblock-header')).toBeTruthy();
+                    expect(containerPage.$('.wrapper-xblock')).not.toHaveClass('is-hidden');
+                    expect(containerPage.$('.no-container-content')).toHaveClass('is-hidden');
                 });
 
                 it('shows a loading indicator', function() {
                     var requests = create_sinon.requests(this);
-                    containerView.render();
-                    expect(containerView.$('.ui-loading')).not.toHaveClass('is-hidden');
+                    containerPage.render();
+                    expect(containerPage.$('.ui-loading')).not.toHaveClass('is-hidden');
                     respondWithMockXBlockEditorFragment(requests, {
                         html: mockContainerXBlockHtml,
                         "resources": []
                     });
-                    expect(containerView.$('.ui-loading')).toHaveClass('is-hidden');
+                    expect(containerPage.$('.ui-loading')).toHaveClass('is-hidden');
                 });
             });
 
@@ -59,28 +59,19 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
             describe("Editing an xblock", function() {
                 var mockContainerXBlockHtml,
                     mockXBlockEditorHtml,
-                    saved,
                     newDisplayName = 'New Display Name';
 
                 beforeEach(function () {
-                    saved = false;
-                    window.MockXBlock = function(runtime, element) {
-                        return {
-                            save: function() {
-                                saved = true;
-                                return {
-                                    data: "<p>Some HTML</p>",
-                                    metadata: {
-                                        display_name: newDisplayName
-                                    }
-                                };
-                            }
-                        };
-                    };
+                    edit_helpers.installMockXBlock({
+                        data: "<p>Some HTML</p>",
+                        metadata: {
+                            display_name: newDisplayName
+                        }
+                    });
                 });
 
                 afterEach(function() {
-                    window.MockXBlock = null;
+                    edit_helpers.uninstallMockXBlock();
                     edit_helpers.cancelModalIfShowing();
                 });
 
@@ -90,12 +81,12 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                 it('can show an edit modal for a child xblock', function() {
                     var requests = create_sinon.requests(this),
                         editButtons;
-                    containerView.render();
+                    containerPage.render();
                     respondWithMockXBlockEditorFragment(requests, {
                         html: mockContainerXBlockHtml,
                         "resources": []
                     });
-                    editButtons = containerView.$('.edit-button');
+                    editButtons = containerPage.$('.edit-button');
                     // The container renders four mock xblocks, so there should be four edit buttons
                     expect(editButtons.length).toBe(4);
                     editButtons.first().click();
@@ -111,14 +102,15 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                 });
 
                 it('can save changes to settings', function() {
-                    var requests, editButtons, modal;
+                    var requests, editButtons, modal, mockUpdatedXBlockHtml;
+                    mockUpdatedXBlockHtml = readFixtures('mock/mock-updated-xblock.underscore');
                     requests = create_sinon.requests(this);
-                    containerView.render();
+                    containerPage.render();
                     respondWithMockXBlockEditorFragment(requests, {
                         html: mockContainerXBlockHtml,
                         "resources": []
                     });
-                    editButtons = containerView.$('.edit-button');
+                    editButtons = containerPage.$('.edit-button');
                     // The container renders four mock xblocks, so there should be four edit buttons
                     expect(editButtons.length).toBe(4);
                     editButtons.first().click();
@@ -131,10 +123,21 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     // Click on the settings tab
                     modal.find('.settings-button').click();
                     // Change the display name's text
-                    modal.find('.setting-input').text("New display name");
+                    modal.find('.setting-input').text("Mock Update");
                     // Press the save button
                     modal.find('.action-save').click();
-                    expect(saved).toBe(true);
+                    // Respond to the save
+                    create_sinon.respondWithJson(requests, {
+                        id: model.id
+                    });
+                    // Respond to the request to refresh
+                    respondWithMockXBlockEditorFragment(requests, {
+                        html: mockUpdatedXBlockHtml,
+                        "resources": []
+                    });
+                    // Verify that the xblock was updated
+                    expect(containerPage.$('.mock-updated-content').text()).toBe('Mock Update');
+                    expect(edit_helpers.hasSavedMockXBlock()).toBe(true);
                 });
             });
 
@@ -143,14 +146,14 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
 
                 it('shows the "no children" message', function() {
                     var requests = create_sinon.requests(this);
-                    containerView.render();
+                    containerPage.render();
                     respondWithMockXBlockEditorFragment(requests, {
                         html: mockContainerXBlockHtml,
                         "resources": []
                     });
 
-                    expect(containerView.$('.no-container-content')).not.toHaveClass('is-hidden');
-                    expect(containerView.$('.wrapper-xblock')).toHaveClass('is-hidden');
+                    expect(containerPage.$('.no-container-content')).not.toHaveClass('is-hidden');
+                    expect(containerPage.$('.wrapper-xblock')).toHaveClass('is-hidden');
                 });
             });
         });

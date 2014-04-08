@@ -85,8 +85,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             },
 
             save: function(options) {
-                var xblock = this.xblock,
-                    xblockInfo = this.model,
+                var xblockInfo = this.model,
                     data,
                     saving;
                 data = this.getXBlockData();
@@ -131,14 +130,14 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 // Walk through the set of elements which have the 'data-metadata_name' attribute and
                 // build up an object to pass back to the server on the subsequent POST.
                 // Note that these values will always be sent back on POST, even if they did not actually change.
-                var metadata = {},
-                    metadataNameElements;
+                var metadata, metadataNameElements, i, element, metadataName;
+                metadata = {};
                 metadataNameElements = this.$('[data-metadata-name]');
-                metadataNameElements.each(function (element) {
-                    var key = $(element).data("metadata-name"),
-                        value = element.value;
-                    metadata[key] = value;
-                });
+                for (i = 0; i < metadataNameElements.length; i++) {
+                    element = metadataNameElements[i];
+                    metadataName = $(element).data("metadata-name");
+                    metadata[metadataName] = element.value;
+                }
                 return metadata;
             },
 

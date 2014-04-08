@@ -30,13 +30,11 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
 
                 beforeEach(function () {
-                    window.MockXBlock = function(runtime, element) {
-                        return { };
-                    };
+                    edit_helpers.installMockXBlock();
                 });
 
                 afterEach(function() {
-                    window.MockXBlock = null;
+                    edit_helpers.uninstallMockXBlock();
                 });
 
                 it('can show itself', function() {

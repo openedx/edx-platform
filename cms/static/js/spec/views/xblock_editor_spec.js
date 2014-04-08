@@ -1,9 +1,17 @@
-define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
-        "js/views/xblock_editor", "js/models/xblock_info"],
-    function ($, create_sinon, edit_helpers, XBlockEditorView, XBlockInfo) {
+define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+    "js/views/xblock_editor", "js/models/xblock_info"],
+    function ($, _, create_sinon, edit_helpers, XBlockEditorView, XBlockInfo) {
 
         describe("XBlockEditorView", function() {
-            var model, editor;
+            var model, editor, testDisplayName, mockSaveResponse;
+
+            testDisplayName = 'Test Display Name';
+            mockSaveResponse = {
+                data: "<p>Some HTML</p>",
+                metadata: {
+                    display_name: testDisplayName
+                }
+            };
 
             beforeEach(function () {
                 edit_helpers.installEditTemplates();
@@ -21,13 +29,11 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
                 var mockXBlockEditorHtml;
 
                 beforeEach(function () {
-                    window.MockXBlock = function(runtime, element) {
-                        return { };
-                    };
+                    edit_helpers.installMockXBlock(mockSaveResponse);
                 });
 
                 afterEach(function() {
-                    window.MockXBlock = null;
+                    edit_helpers.uninstallMockXBlock();
                 });
 
                 mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
@@ -41,7 +47,22 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
                     });
 
                     expect(editor.$el.select('.xblock-header')).toBeTruthy();
-                    expect(editor.getMode()).toEqual('editor');
+                    expect(editor.getMode()).toEqual('settings');
+                });
+
+                it('saves any custom metadata', function() {
+                    var requests = create_sinon.requests(this), request, response;
+                    editor.render();
+                    create_sinon.respondWithJson(requests, {
+                        html: mockXBlockEditorHtml,
+                        "resources": []
+                    });
+                    editor.save();
+                    request = requests[requests.length - 1];
+                    response = JSON.parse(request.requestBody);
+                    expect(edit_helpers.hasSavedMockXBlock()).toBeTruthy();
+                    expect(response.metadata.display_name).toBe(testDisplayName);
+                    expect(response.metadata.custom_field).toBe('Custom Value');
                 });
             });
 
@@ -51,12 +72,11 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
                 mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-editor.underscore');
 
                 beforeEach(function() {
-                    // Mock the VerticalDescriptor so that the module can be rendered
-                    window.VerticalDescriptor = XModule.Descriptor;
+                    edit_helpers.installMockXModule(mockSaveResponse);
                 });
 
                 afterEach(function () {
-                    window.VerticalDescriptor = null;
+                    edit_helpers.uninstallMockXModule();
                 });
 
                 it('can render itself', function() {
@@ -70,26 +90,28 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
                     expect(editor.$el.select('.xblock-header')).toBeTruthy();
                     expect(editor.getMode()).toEqual('editor');
                 });
-            });
 
-            describe("Editing an xmodule (settings only)", function() {
-                var mockXModuleEditorHtml;
-
-                mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-settings-only-editor.underscore');
-
-                beforeEach(function() {
-                    edit_helpers.installEditTemplates();
-
-                    // Mock the VerticalDescriptor so that the module can be rendered
-                    window.VerticalDescriptor = XModule.Descriptor;
+                it('saves any custom metadata', function() {
+                    var requests = create_sinon.requests(this), request, response;
+                    editor.render();
+                    create_sinon.respondWithJson(requests, {
+                        html: mockXModuleEditorHtml,
+                        "resources": []
+                    });
+                    // Give the mock xblock a save method...
+                    editor.xblock.save = window.MockDescriptor.save;
+                    editor.save();
+                    request = requests[requests.length - 1];
+                    response = JSON.parse(request.requestBody);
+                    expect(edit_helpers.hasSavedMockXModule()).toBeTruthy();
+                    expect(response.metadata.display_name).toBe(testDisplayName);
+                    expect(response.metadata.custom_field).toBe('Custom Value');
                 });
 
-                afterEach(function () {
-                    window.VerticalDescriptor = null;
-                });
+                it('can render a module with only settings', function() {
+                    var requests = create_sinon.requests(this), mockXModuleEditorHtml;
+                    mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-settings-only-editor.underscore');
 
-                it('can render itself', function() {
-                    var requests = create_sinon.requests(this);
                     editor.render();
                     create_sinon.respondWithJson(requests, {
                         html: mockXModuleEditorHtml,

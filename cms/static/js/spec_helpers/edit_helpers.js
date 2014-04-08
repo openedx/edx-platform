@@ -10,8 +10,54 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers
             stringEntryTemplate = readFixtures('metadata-string-entry.underscore'),
             editXBlockModalTemplate = readFixtures('edit-xblock-modal.underscore'),
             editorModeButtonTemplate = readFixtures('editor-mode-button.underscore'),
+            xblockSaved,
+            installMockXBlock,
+            uninstallMockXBlock,
+            hasSavedMockXBlock,
+            xmoduleSaved,
+            installMockXModule,
+            uninstallMockXModule,
+            hasSavedMockXModule,
             installEditTemplates,
             showEditModal;
+
+        installMockXBlock = function(mockResult) {
+            xblockSaved = false;
+            window.MockXBlock = function(runtime, element) {
+                return {
+                    save: function() {
+                        xblockSaved = true;
+                        return mockResult;
+                    }
+                };
+            };
+        };
+
+        uninstallMockXBlock = function() {
+            window.MockXBlock = null;
+        };
+
+        hasSavedMockXBlock = function() {
+            return xblockSaved;
+        };
+
+        installMockXModule = function(mockResult) {
+            xmoduleSaved = false;
+            window.MockDescriptor = _.extend(XModule.Descriptor, {
+                save: function() {
+                    xmoduleSaved = true;
+                    return mockResult;
+                }
+            });
+        };
+
+        uninstallMockXModule = function() {
+            window.MockDescriptor = null;
+        };
+
+        hasSavedMockXModule = function() {
+            return xmoduleSaved;
+        };
 
         installEditTemplates = function(append) {
             modal_helpers.installModalTemplates(append);
@@ -37,6 +83,12 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers
         };
 
         return $.extend(modal_helpers, {
+            'installMockXBlock': installMockXBlock,
+            'hasSavedMockXBlock': hasSavedMockXBlock,
+            'uninstallMockXBlock': uninstallMockXBlock,
+            'installMockXModule': installMockXModule,
+            'hasSavedMockXModule': hasSavedMockXModule,
+            'uninstallMockXModule': uninstallMockXModule,
             'installEditTemplates': installEditTemplates,
             'showEditModal': showEditModal
         });

@@ -32,12 +32,12 @@ main_xblock_info = {
 <script type='text/javascript'>
     require(["domReady!", "jquery", "js/models/xblock_info", "js/views/pages/container",
             "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-            function(doc, $, XBlockInfo, XBlockContainerPage) {
+            function(doc, $, XBlockInfo, ContainerPage) {
                 var view, mainXBlockInfo;
 
                 mainXBlockInfo = new XBlockInfo(${json.dumps(main_xblock_info) | n});
 
-                view = new XBlockContainerPage({
+                view = new ContainerPage({
                     el: $('#content'),
                     model: mainXBlockInfo
                 });
