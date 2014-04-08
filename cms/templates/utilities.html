@@ -1,0 +1,77 @@
+<%inherit file="base.html" />
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
+<%block name="title">Course Utilities</%block>
+<%block name="bodyclass">is-signedin course view-utilities</%block>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+% for template_name in ["utility"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+require(["domReady!", "jquery", "js/collections/utility", "js/views/utility"],
+        function(doc, $, UtilityCollection, UtilityView) {
+    var utilityCollection = new UtilityCollection();
+    utilityCollection.url = "${handler_url}";
+
+    var editor = new UtilityView({
+        el: $('.course-utilities'),
+        collection: utilityCollection
+    });
+    utilityCollection.fetch({reset: true});
+});
+</script>
+</%block>
+
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions has-subtitle">
+    <h1 class="page-header">
+      <small class="subtitle">${_("Tools")}</small>
+      <span class="sr">&gt; </span>${_("Course Utilities")}
+    </h1>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+      <form id="course-utilities" class="course-utilities" method="post" action="">
+        <h2 class="title title-3 sr">${_("Current Utilities")}</h2>
+      </form>
+    </article>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title title-3">${_("What are course utilities?")}</h3>
+        <p>
+          ${_("The utilities section provides a gateway to self-service tasks or  bulk operations to course instructors. The utilities are meant to provide services that makes it easier for the instructors to manage their courses.")}
+        </p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title title-3">Studio utilities</h3>
+        <nav class="nav-page utilities-current">
+          <ol>
+            % for utility in utilities:
+            <li class="nav-item">
+              <a rel="view" href="${'#course-utilities' + str(loop.index)}">${utility['short_description']}</a>
+            </li>
+            % endfor
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </section>
+</div>
+</%block>

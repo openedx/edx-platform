@@ -1,0 +1,42 @@
+<!--
+This def will enumerate through a passed in video components and list them all.
+-->
+<%def name="enum_components(unit_components, actions=True, selected=None, sortable=True)">
+  % for component in unit_components:
+
+  <li class="courseware-unit unit is-draggable" data-locator=${component['location']}>
+
+    <%include file="_ui-dnd-indicator-before.html" />
+
+    <label class="section-item">
+
+      <input type="checkbox" class="selectedId" name=${component['location']} value="" onclick="captionUtils.resetSelectAll();" />
+      <span class="component-name">${component['name']}</span>
+
+      <div class="popup">
+        <i class="icon-youtube icon-large platform"></i>
+        <span class="icon-stack local">
+          <i class="icon-folder-close icon-stack-base"></i>
+          <i class="icon-ok icon-light local"></i>
+        </span>
+        <span class="icon-stack remote">
+          <i class="icon-cloud icon-stack-base"></i>
+          <i class="icon-ok icon-light remote"></i>
+        </span>
+        <span class="icon-stack sync">
+          <i class="icon-sign-blank icon-stack-base"></i>
+          <i class="icon-link icon-light icon-large sync"></i>
+        </span>
+      </div>
+
+      <div class="item-actions">
+        <i class="icon-spinner icon-spin icon-large"></i>
+      </div>
+
+    </label>
+
+    <%include file="_ui-dnd-indicator-after.html" />
+  </li>
+  % endfor
+</%def>
+

@@ -1,0 +1,294 @@
+<%inherit file="base.html" />
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
+<%block name="title">${_("Update Video Captions")}</%block>
+<%block name="bodyclass">is-signedin course view-captions</%block>
+
+
+<%namespace name="components" file="widgets/utility-captions-components.html" />
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="content">
+<div class="main-wrapper">
+  <div class="inner-wrapper">
+    <ul class="list-actions">
+      <li class="action-item">
+        <a title="Update captions for the selected components" href="#" class="update-button action-primary action">Update</a>
+      </li>
+    </ul>
+    <div class="main-column">
+      <article class="subsection-body window">
+        <div class="wrapper-dnd">
+          <label class="selectall-label">
+            <input type="checkbox" id="selectall"/>
+            Select all
+          </label>
+            <div class="sortable-unit-list">
+              <ol class="sortable-unit-list">
+                ${components.enum_components(unit_components=videos)}
+              </ol>
+            </div>
+        </div>
+      </article>
+    </div>
+
+
+    <div class="sidebar">
+      <div class="captions-legend window">
+        <h4 class="header">Legend</h4>
+        <div class="window-contents">
+          <table class="legend-table">
+            <tr>
+              <td><i class="icon-ok-sign icon-large green"></i></td>
+              <td>Local captions are up to date</td>
+            </tr>
+            <tr>
+              <td><i class="icon-time icon-large yellow"></i></td>
+              <td>Local captions are out of date but remote captions are available</td>
+            </tr>
+            <tr>
+              <td><i class="icon-exclamation-sign icon-large red"></i></td>
+              <td>Local captions are out of date but remote captions are unavailable</td>
+            </tr>
+            <tr>
+              <td><i class="icon-youtube icon-2x"></i></td>
+              <td>Video is from YouTube</td>
+            </tr>
+            <tr>
+              <td><i class="icon-html5 icon-2x"></i></td>
+              <td>Video is not from YouTube</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="icon-stack green">
+                  <i class="icon-folder-close icon-stack-base"></i>
+                  <i class="icon-ok icon-light"></i>
+                </span>
+              </td>
+              <td>Local captions exist</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="icon-stack red">
+                  <i class="icon-folder-close icon-stack-base"></i>
+                  <i class="icon-exclamation icon-light"></i>
+                </span>
+              </td>
+              <td>Local captions do not exist</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="icon-stack green">
+                  <i class="icon-cloud icon-stack-base"></i>
+                  <i class="icon-ok icon-light"></i>
+                </span>
+              </td>
+              <td>Remote captions exist</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="icon-stack red">
+                  <i class="icon-cloud icon-stack-base"></i>
+                  <i class="icon-exclamation icon-light"></i>
+                </span>
+              </td>
+              <td>Remote captions do not exist</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="icon-stack green">
+                  <i class="icon-sign-blank icon-stack-base"></i>
+                  <i class="icon-link icon-light icon-large"></i>
+                </span>
+              </td>
+              <td>Local and remote captions are identical</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="icon-stack red">
+                  <i class="icon-sign-blank icon-stack-base"></i>
+                  <i class="icon-unlink icon-light icon-large"></i>
+                </span>
+              </td>
+              <td>Local and remote captions are different</td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+</%block>
+
+<%block name="jsextra">
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+
+<script type="text/javascript">
+require(["domReady!", "jquery"],
+  function(doc, $) {
+    $('#selectall').click(function () {
+      $('.selectedId').prop('checked', captionUtils.isChecked('selectall'));
+    });
+
+    $('.update-button').on('click',function() {
+      var selected = new Array();
+      $('input:checkbox.selectedId:checked').each(function() {
+        if ((typeof $(this).attr('disabled')) == 'undefined') {
+          selected.push($(this).attr('name'));
+        }
+      });
+
+      if(selected.length == 0) {
+        $('input:checkbox.selectedId:checked').prop('checked', false);
+        $('#selectall').prop('checked', false);
+        return;
+      }
+
+      // changed the checked items to spinners
+      $.each(selected, function(idx, elem){
+        $('li.courseware-unit[data-locator="' + elem + '"]').removeClass('green red yellow');
+        v = $('li.courseware-unit[data-locator="' + elem + '"] div.item-actions');
+        v.html('<i class="icon-spinner icon-spin icon-large"></i>');
+      });
+
+      $.ajax({
+        url: '${request.get_full_path()}',
+        type: 'post',
+        dataType: 'json',
+        data: {
+                csrfmiddlewaretoken: '${csrf_token}',
+                update_array: JSON.stringify(selected)
+              },
+        success: function (data) {
+          $.each(data, function(index, val){
+            captionUtils.handleResponse(val);
+          });
+        }
+      });
+    });
+
+    $('li.courseware-unit').each(function(i, el) {
+      var video = {};
+      video.location = $(this).attr('data-locator');
+      $.ajax({
+        url: '${ request.get_full_path()}',
+        type: 'get',
+        dataType: 'json',
+        data: {
+                csrfmiddlewaretoken: '${csrf_token}',
+                video: JSON.stringify(video)
+              },
+        success: function (data) {
+            captionUtils.handleResponse(data);
+        }
+      });
+    });
+
+});
+
+var captionUtils = {
+  handleResponse: function(data) {
+    // clear all the checkboxes
+    $('input:checkbox.selectedId:checked').prop('checked', false);
+    $('#selectall').prop('checked', false);
+
+    var icon, itemStatus;
+    if (data.command == 'found' || data.command == 'choose') {
+      // if local copy exists and is up to date
+      icon ='<i class="icon-ok-sign green icon-large"></i>';
+      itemStatus = 'green';
+    } else if (data.command == 'replace' || data.command == 'import') {
+      // if local copy exists and is not up to date
+      icon ='<i class="icon-time yellow icon-large"></i>';
+      itemStatus = 'yellow';
+    } else {
+      // if local copy does not exist
+      icon ='<i class="icon-exclamation-sign red icon-large"></i>';
+      itemStatus = 'red';
+    }
+
+    if(data.is_youtube_mode) {
+      $('li.courseware-unit[data-locator="' + data.location + '"] .popup .platform').removeClass().addClass('icon-youtube icon-large');
+      var youtubeLocalSpan = $('li.courseware-unit[data-locator="' + data.location + '"] .popup span.local');
+      var youtubeLocalIcon = $(youtubeLocalSpan).find('i.local');
+      if (data.youtube_local) {
+        youtubeLocalSpan.removeClass('red').addClass('green');
+        youtubeLocalIcon.removeClass('icon-exclamation').addClass('icon-ok');
+      } else {
+        youtubeLocalSpan.removeClass('green').addClass('red');
+        youtubeLocalIcon.removeClass('icon-ok').addClass('icon-exclamation');
+      }
+
+      var youtubeServerSpan = $('li.courseware-unit[data-locator="' + data.location + '"] .popup span.remote');
+      var youtubeServerIcon = $(youtubeServerSpan).find('i.remote');
+      if (data.youtube_server) {
+        youtubeServerSpan.removeClass('red').addClass('green');
+        youtubeServerIcon.removeClass('icon-exclamation').addClass('icon-ok');
+      } else {
+        youtubeServerSpan.removeClass('green').addClass('red');
+        youtubeServerIcon.removeClass('icon-ok').addClass('icon-exclamation');
+      }
+
+      var youtubeDiffSpan = $('li.courseware-unit[data-locator="' + data.location + '"] .popup span.sync');
+      var youtubeDiffIcon = $(youtubeDiffSpan).find('i.sync');
+      if (!data.youtube_diff) {
+        youtubeDiffSpan.removeClass('red').addClass('green');
+        youtubeDiffIcon.removeClass('icon-unlink').addClass('icon-link');
+      } else {
+        youtubeDiffSpan.removeClass('green').addClass('red');
+        youtubeDiffIcon.removeClass('icon-link').addClass('icon-unlink');
+      }
+    } else {
+      $('li.courseware-unit[data-locator="' + data.location + '"] .popup .platform').removeClass().addClass('icon-html5 icon-large');
+
+      var html5LocalSpan = $('li.courseware-unit[data-locator="' + data.location + '"] .popup span.local');
+      var html5LocalIcon = $(html5LocalSpan).find('i.local');
+      if (data.html5_local.length > 0) {
+        html5LocalSpan.removeClass('red');
+        html5LocalIcon.removeClass('icon-exclamation').addClass('icon-ok');
+      } else {
+        html5LocalSpan.addClass('red');
+        html5LocalIcon.removeClass('icon-ok').addClass('icon-exclamation');
+      }
+
+      var html5ServerSpan = $('li.courseware-unit[data-locator="' + data.location + '"] .popup span.remote');
+      var html5ServerIcon = $(html5ServerSpan).find('i.remote');
+      html5ServerSpan.addClass('red');
+      html5ServerIcon.removeClass('icon-ok').addClass('icon-exclamation');
+
+      var html5DiffSpan = $('li.courseware-unit[data-locator="' + data.location + '"] .popup span.sync');
+      var html5DiffIcon = $(html5DiffSpan).find('i.sync');
+      html5DiffSpan.addClass('red');
+      html5DiffIcon.removeClass('icon-link').addClass('icon-unlink');
+
+    }
+    // disable checkboxes when status is green or red
+    $('li.courseware-unit[data-locator="' + data.location + '"] input:checkbox').prop('disabled', itemStatus !== 'yellow');
+
+
+    $('li.courseware-unit[data-locator="' + data.location + '"]').removeClass('red yellow green').addClass(itemStatus);
+    $('li.courseware-unit[data-locator="' + data.location + '"] div.item-actions').html(icon);
+  },
+
+  isChecked: function(checkboxId) {
+    var id = '#' + checkboxId;
+    return $(id).is(':checked');
+  },
+
+  resetSelectAll: function() {
+    // if all checkbox are selected, check the selectall checkbox
+    // and viceversa
+    if ($('.selectedId').length == $('.selectedId:checked').length) {
+      $('#selectall').attr('checked', 'checked');
+    } else {
+      $('#selectall').removeAttr('checked');
+    }
+  }
+};
+</script>
+</%block>
