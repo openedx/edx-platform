@@ -224,6 +224,16 @@ def check_transcripts(request):
     except TranscriptsRequestValidationException as e:
         return error_response(transcripts_presence, e.message)
 
+    transcripts_presence = get_transcripts_presence(videos, item, transcripts_presence)
+    return JsonResponse(transcripts_presence)
+
+
+def get_transcripts_presence(videos, item, transcripts_presence):
+    """ fills in the transcripts_presence dictionary after for a given component
+    with its list of videos.
+
+    Returns transcripts_presence: dictionary containing the status of the video
+    """
     transcripts_presence['status'] = 'Success'
 
     filename = 'subs_{0}.srt.sjson'.format(item.sub)
@@ -292,8 +302,7 @@ def check_transcripts(request):
         'command': command,
         'subs': subs_to_use,
     })
-    return JsonResponse(transcripts_presence)
-
+    return transcripts_presence
 
 def _transcripts_logic(transcripts_presence, videos):
     """
@@ -384,7 +393,7 @@ def choose_transcripts(request):
     if item.sub != html5_id:  # update sub value
         item.sub = html5_id
         item.save_with_metadata(request.user)
-    response = {'status': 'Success',  'subs': item.sub}
+    response = {'status': 'Success', 'subs': item.sub}
     return JsonResponse(response)
 
 
@@ -415,7 +424,7 @@ def replace_transcripts(request):
 
     item.sub = youtube_id
     item.save_with_metadata(request.user)
-    response = {'status': 'Success',  'subs': item.sub}
+    response = {'status': 'Success', 'subs': item.sub}
     return JsonResponse(response)
 
 

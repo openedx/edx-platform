@@ -1,0 +1,180 @@
+<%inherit file="base.html" />
+<%!
+  from django.utils.translation import ugettext as _
+%>
+<%block name="title">${_("Update Video Captions")}</%block>
+<%block name="bodyclass">is-signedin course view-captions</%block>
+
+
+<%namespace name="components" file="widgets/components.html" />
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="content">
+<div class="main-wrapper">
+  <div class="inner-wrapper">
+    <div class="main-column">
+      <form id="update-components" action="#" method="post">
+      <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+      <ul class="list-actions">
+        <li class="action-item">
+          <a title="Update captions for the selected components" href="#" class="update-button action-primary action">Update</a>
+        </li>
+      </ul>
+
+      <article class="subsection-body window" data-locator="${locator}">
+        <div class="wrapper-dnd">
+          <label class="selectall-label">
+            <input type="checkbox" id="selectall"/>
+            Select all
+          </label>
+            <div class="sortable-unit-list">
+              <ol class="sortable-unit-list">
+                ${components.enum_components(unit_components=videos)}
+              </ol>
+            </div>
+        </div>
+      </article>
+      </form>
+    </div>
+  </div>
+</div>
+</%block>
+
+<%block name="jsextra">
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+
+<script type="text/javascript">
+require(["domReady!", "jquery"],
+  function(doc, $) {
+    $('#selectall').click(function () {
+      $('.selectedId').prop('checked', isChecked('selectall'));
+    });
+
+    $('.update-button').on('click',function() {
+      var selected = new Array();
+      $('input:checkbox.selectedId:checked').each(function() {
+         selected.push($(this).attr('name'));
+      });
+
+      // changed the checked icons to spinners
+      $.each(selected, function(idx, elem){
+        $('li.courseware-unit[data-locator="' + elem + '"]').removeClass('green red yellow');
+        v = $('li.courseware-unit[data-locator="' + elem + '"] div.item-actions');
+        v.html('<i class="icon-spinner icon-spin icon-large"></i>');
+      });
+
+      $.ajax({
+        url: '${request.get_full_path()}',
+        type: 'post',
+        dataType: 'json',
+        data: {
+                csrfmiddlewaretoken: '${csrf_token}',
+                action: 'update',
+                update_array: JSON.stringify(selected)
+              },
+        success: function (data) {
+          $.each(data, function(index, val){
+            handleResponse(val);
+          });
+        }
+      });
+    });
+
+    $('li.courseware-unit').each(function(i, el) {
+      var video = {};
+      video.location = $(this).attr('data-locator');
+      $.ajax({
+        url: '${ request.get_full_path()}',
+        type: 'post',
+        dataType: 'json',
+        data: {
+                csrfmiddlewaretoken: '${csrf_token}',
+                action: 'get',
+                video: JSON.stringify(video)
+              },
+        success: function (data) {
+            handleResponse(data);
+        }
+      });
+    });
+
+});
+
+function handleResponse(data) {
+  var icon, to_class;
+  if (data.command == 'found' || data.command == 'choose') {
+    icon ='<i class="icon-ok-sign green icon-large"></i>';
+    to_class = 'green';
+  } else if (data.command == 'replace' || data.command == 'import') {
+    icon ='<i class="icon-time yellow icon-large"></i>';
+    to_class = 'yellow';
+  } else {
+    icon ='<i class="icon-exclamation-sign red icon-large"></i>';
+    to_class = 'red';
+  }
+
+  if(data.is_youtube_mode) {
+    $('li.courseware-unit[data-locator="' + data.location + '"] .popup #platform').removeClass().addClass('icon-youtube icon-large');
+    youtube_local = $('li.courseware-unit[data-locator="' + data.location + '"] .popup #local');
+    if (data.youtube_local) {
+      youtube_local.removeClass().addClass('icon-thumbs-up icon-large');
+    } else {
+      youtube_local.removeClass().addClass('icon-thumbs-down icon-large');
+    }
+
+    youtube_server = $('li.courseware-unit[data-locator="' + data.location + '"] .popup #remote');
+    if (data.youtube_server) {
+      youtube_server.removeClass().addClass('icon-thumbs-up icon-large');
+    } else {
+      youtube_server.removeClass().addClass('icon-thumbs-down icon-large');
+    }
+
+    youtube_diff = $('li.courseware-unit[data-locator="' + data.location + '"] .popup #sync');
+    if (!data.youtube_diff) {
+      youtube_diff.removeClass().addClass('icon-thumbs-up icon-large');
+    } else {
+      youtube_diff.removeClass().addClass('icon-thumbs-down icon-large');
+    }
+  } else {
+    $('li.courseware-unit[data-locator="' + data.location + '"] .popup #platform').removeClass().addClass('icon-cloud icon-large');
+
+    html5_local = $('li.courseware-unit[data-locator="' + data.location + '"] .popup #local');
+    if (data.html5_local.length > 0) {
+      html5_local.removeClass().addClass('icon-thumbs-up icon-large');
+    } else {
+      html5_local.removeClass().addClass('icon-thumbs-down icon-large');
+    }
+
+    html5_server = $('li.courseware-unit[data-locator="' + data.location + '"] .popup #remote');
+    html5_server.removeClass().addClass('icon-thumbs-down icon-large');
+
+    html5_diff= $('li.courseware-unit[data-locator="' + data.location + '"] .popup #sync');
+    html5_diff.removeClass().addClass('icon-thumbs-down icon-large');
+
+  }
+  $('li.courseware-unit[data-locator="' + data.location + '"]').removeClass('red yellow green').addClass(to_class);
+  v = $('li.courseware-unit[data-locator="' + data.location + '"] div.item-actions');
+  v.html(icon);
+}
+function isChecked(checkboxId) {
+  var id = '#' + checkboxId;
+  return $(id).is(':checked');
+}
+
+function resetSelectAll() {
+  // if all checkbox are selected, check the selectall checkbox
+  // and viceversa
+  if ($('.selectedId').length == $('.selectedId:checked').length) {
+    $('#selectall').attr('checked', 'checked');
+  } else {
+    $('#selectall').removeAttr('checked');
+  }
+
+  if ($('.selectedId:checked').length > 0) {
+    $('#edit').attr('disabled', false);
+  } else {
+    $('#edit').attr('disabled', true);
+  }
+}
+</script>
+</%block>

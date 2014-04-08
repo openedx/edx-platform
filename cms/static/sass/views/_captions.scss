@@ -1,0 +1,150 @@
+// studio - views - course subsection
+// ====================
+
+.view-captions {
+
+  .main-wrapper {
+    margin-top: ($baseline*2);
+
+    .list-actions {
+      padding:  ($baseline/2);
+      background: $gray-l5;
+
+      .action-primary {
+        @include blue-button();
+        @extend %t-action3;
+        font-weight: 600;
+
+        [class^="icon-"] {
+          @extend %t-icon5;
+          display: inline-block;
+          vertical-align: middle;
+          margin-top: -3px;
+        }
+      }
+    }
+  }
+
+  .subsection-body {
+    padding: 32px 40px;
+    @include clearfix;
+
+    > div {
+      margin-bottom: 40px;
+    }
+    .selectall-label {
+      font-weight: normal;
+    }
+
+    input {
+      font-size: 14px;
+      margin-right: 10px;
+    }
+  }
+
+  .sortable-unit-list {
+    .green {
+      background: $green-l5;
+    }
+
+    .red {
+      background: $red-l5;
+    }
+
+    .yellow {
+      background: $yellow-l5;
+    }
+
+    .courseware-unit {
+      @include font-size(13);
+      @include clearfix();
+      margin: -1px 0 0 0;
+
+      .section-item {
+        @include transition(background $tmg-avg ease-in-out 0);
+        @include font-size(13);
+        position: relative;
+        display: block;
+        padding: 6px 8px 8px;
+        margin: 0;
+        font-weight: normal;
+
+        .green {
+          color: $green;
+        }
+
+        .red {
+          color: $red;
+        }
+
+        .yellow {
+          background: $yellow;
+        }
+
+        &:hover {
+          background: $blue-l5;
+          .popup {
+            display: block;
+          }
+        }
+
+        .popup {
+          position: absolute;
+          height: 25px;
+          top: 3px;
+          width: 100px;
+          background: rgba(255,255,255, .75);
+          border: 1px solid #aaa;
+          border-radius: 3px;
+          padding: 2px 5px;
+          right: 25px;
+          display: none;
+
+          #platform, #local, #remote {
+            padding-right: 8px;
+          }
+        }
+      }
+    }
+
+    .actions-list {
+      display: inline-block;
+      margin-bottom: 0;
+    }
+
+    .actions-item {
+      @include font-size(13);
+      display: inline-block;
+      padding: 0 4px;
+      vertical-align: middle;
+
+      .action {
+        min-width: ($baseline*.75);
+        color: $gray-l2;
+
+        &:hover,
+        &.is-set {
+          color: $blue;
+          visibility: visible;
+        }
+      }
+    }
+  }
+
+  // UI: DnD - specific elems/cases - units
+  .courseware-unit {
+
+    .draggable-drop-indicator-before {
+      top: 0;
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: 0;
+    }
+  }
+
+  // UI: DnD - specific elems/cases - empty parents initial drop indicator
+  .draggable-drop-indicator-initial {
+    display: none;
+  }
+}
