@@ -34,6 +34,7 @@ from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
@@ -538,7 +539,7 @@ def course_about(request, course_id):
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     ):
         raise Http404
-    course_key = CourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'see_exists', course_key)
     registered = registered_for_course(course, request.user)
 
