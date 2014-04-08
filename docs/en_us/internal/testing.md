@@ -254,6 +254,8 @@ to your scenario. This step can be added anywhere, and will enable automatic scr
     
 to turn off auto screenshots for all steps following it.
 
+Screenshots will be placed in the folder '{TEST_ROOT}/log/auto_screenshots'. Each time you launch acceptance tests, this folder will be cleaned.
+
 Another approach is to redirect Vagrant X11 session to your local machine. Please see https://github.com/edx/edx-platform/wiki/Test-engineering-FAQ .
 
 ## Viewing Test Coverage
