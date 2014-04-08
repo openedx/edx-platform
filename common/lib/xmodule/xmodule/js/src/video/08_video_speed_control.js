@@ -4,6 +4,12 @@ define(
 ['video/00_iterator.js'],
 function (Iterator) {
     "use strict";
+    /**
+     * Video speed control module.
+     * @exports video/08_video_speed_control.js
+     * @constructor
+     * @param {object} state The object containing the state of the video player.
+     */
     var SpeedControl = function (state) {
         if (!(this instanceof SpeedControl)) {
             return new SpeedControl(state);
@@ -17,10 +23,7 @@ function (Iterator) {
     };
 
     SpeedControl.prototype = {
-        /**
-         * @desc Initializes the module.
-         *
-         */
+        /** Initializes the module. */
         initialize: function () {
             var state = this.state;
 
@@ -44,12 +47,10 @@ function (Iterator) {
         },
 
         /**
-         * @desc Create any necessary DOM elements, attach them, and set their,
+         * Creates any necessary DOM elements, attach them, and set their,
          * initial configuration.
-         *
          * @param {array} speeds List of speeds available for the player.
          * @param {string|number} currentSpeed Current speed for the player.
-         *
          */
         render: function (speeds, currentSpeed) {
             var self = this,
@@ -71,9 +72,8 @@ function (Iterator) {
         },
 
         /**
-         * @desc Bind any necessary function callbacks to DOM events (click,
-         *     mousemove, etc.).
-         *
+         * Bind any necessary function callbacks to DOM events (click,
+         * mousemove, etc.).
          */
         bindHandlers: function () {
             var self = this;
@@ -104,18 +104,15 @@ function (Iterator) {
         },
 
         /**
-         * @desc Check if playbackRate supports by browser.
-         *     If browser supports, 1.0 should be returned by playbackRate
-         *     property. In this case, function return True. Otherwise, False will
-         *     be returned.
-         *     iOS doesn't support speed change.
-         *
-         * @param {string} videoType Type of the video player
-         *
-         * @returns {boolean}
-         *       true: Browser support playbackRate functionality.
-         *       false: Browser doesn't support playbackRate functionality.
-         *
+         * Check if playbackRate supports by browser. If browser supports, 1.0
+         * should be returned by playbackRate property. In this case, function
+         * return True. Otherwise, False will be returned.
+         * iOS doesn't support speed change.
+         * @param {object} state The object containing the state of the video
+         * player.
+         * @return {boolean}
+         *   true: Browser support playbackRate functionality.
+         *   false: Browser doesn't support playbackRate functionality.
          */
         isPlaybackRatesSupported: function (state) {
             var isHtml5 = state.videoType === 'html5',
@@ -126,10 +123,8 @@ function (Iterator) {
         },
 
         /**
-         * @desc Opens speed menu.
-         *
-         * @param {boolean} bindEvent If set, attaches click event on window.
-         *
+         * Opens speed menu.
+         * @param {boolean} [bindEvent] Click event will be attached on window.
          */
         openMenu: function (bindEvent) {
             // When speed entries have focus, the menu stays open on
@@ -145,10 +140,8 @@ function (Iterator) {
         },
 
         /**
-         * @desc Closes speed menu.
-         *
-         * @param {boolean} unBindEvent If set, detaches click event from window.
-         *
+         * Closes speed menu.
+         * @param {boolean} [unBindEvent] Click event will be detached from window.
          */
         closeMenu: function (unBindEvent) {
             // Remove the previously added clickHandler from window element.
@@ -161,15 +154,13 @@ function (Iterator) {
         },
 
         /**
-         * @desc Sets new current speed for the speed control and triggers
-         *     `speedchange` event if needed.
-         *
+         * Sets new current speed for the speed control and triggers `speedchange`
+         * event if needed.
          * @param {string|number} speed Speed to be set.
-         * @param {boolean} silent If set, sets new speed without triggering
-         *                         `speedchange` event.
-         * @param {boolean} forceUpdate If set, updates the speed even if it's
-         *                              not differs from current speed.
-         *
+         * @param {boolean} [silent] Sets the new speed without triggering
+         * `speedchange` event.
+         * @param {boolean} [forceUpdate] Updates the speed even if it's
+         * not differs from current speed.
          */
         setSpeed: function (speed, silent, forceUpdate) {
             if (speed !== this.currentSpeed || forceUpdate) {
@@ -189,10 +180,8 @@ function (Iterator) {
         },
 
         /**
-         * @desc Click event handler for the menu.
-         *
+         * Click event handler for the menu.
          * @param {jquery Event} event
-         *
          */
         clickMenuHandler: function (event) {
             this.closeMenu();
@@ -201,10 +190,8 @@ function (Iterator) {
         },
 
         /**
-         * @desc Click event handler for speed links.
-         *
+         * Click event handler for speed links.
          * @param {jquery Event} event
-         *
          */
         clickLinkHandler: function (event) {
             var speed = $(event.currentTarget).parent().data('speed');
@@ -216,10 +203,8 @@ function (Iterator) {
         },
 
         /**
-         * @desc Mouseenter event handler for the menu.
-         *
+         * Mouseenter event handler for the menu.
          * @param {jquery Event} event
-         *
          */
         mouseEnterHandler: function (event) {
             this.openMenu();
@@ -228,10 +213,8 @@ function (Iterator) {
         },
 
         /**
-         * @desc Mouseleave event handler for the menu.
-         *
+         * Mouseleave event handler for the menu.
          * @param {jquery Event} event
-         *
          */
         mouseLeaveHandler: function (event) {
             // Only close the menu is no speed entry has focus.
@@ -243,10 +226,8 @@ function (Iterator) {
         },
 
         /**
-         * @desc Keydown event handler for the menu.
-         *
+         * Keydown event handler for the menu.
          * @param {jquery Event} event
-         *
          */
         keyDownMenuHandler: function (event) {
             var KEY = $.ui.keyCode,
@@ -271,10 +252,8 @@ function (Iterator) {
         },
 
         /**
-         * @desc Keydown event handler for speed links.
-         *
+         * Keydown event handler for speed links.
          * @param {jquery Event} event
-         *
          */
         keyDownLinkHandler: function (event) {
             // ALT key is used to change (alternate) the function of

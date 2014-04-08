@@ -5,10 +5,10 @@ define(
 function() {
 "use strict";
     /**
-     * @desc Provides convenient way to work with iterate able data.
-     *
+     * Provides convenient way to work with iterable data.
+     * @exports video/00_iterator.js
+     * @constructor
      * @param {array} list Array to be iterated.
-     *
      */
     var Iterator = function (list) {
             this.list = list;
@@ -20,22 +20,19 @@ function() {
     Iterator.prototype = {
 
         /**
-         * @desc Returns `true` if current index is valid for the iterator.
-         *
+         * Checks validity of provided index for the iterator.
          * @access protected
-         * @returns {boolean}
-         *
+         * @param {numebr} index
+         * @return {boolean}
          */
         _isValid: function (index) {
             return _.isNumber(index) && index < this.size && index >= 0;
         },
 
         /**
-         * @desc Returns next element.
-         *
-         * @param {number} index If set, updates current index of iterator.
-         * @returns {any}
-         *
+         * Returns next element.
+         * @param {number} [index] Updates current position.
+         * @return {any}
          */
         next: function (index) {
             if (!(this._isValid(index))) {
@@ -48,11 +45,9 @@ function() {
         },
 
         /**
-         * @desc Returns previous element.
-         *
-         * @param {number} index If set, updates current index of iterator.
-         * @returns {any}
-         *
+         * Returns previous element.
+         * @param {number} [index] Updates current position.
+         * @return {any}
          */
         prev: function (index) {
             if (!(this._isValid(index))) {
@@ -65,30 +60,24 @@ function() {
         },
 
         /**
-         * @desc Returns last element in the list.
-         *
-         * @returns {any}
-         *
+         * Returns last element in the list.
+         * @return {any}
          */
         last: function () {
             return this.list[this.lastIndex];
         },
 
         /**
-         * @desc Returns first element in the list.
-         *
-         * @returns {any}
-         *
+         * Returns first element in the list.
+         * @return {any}
          */
         first: function () {
             return this.list[0];
         },
 
         /**
-         * @desc Returns `true` if current position is last for the iterator.
-         *
-         * @returns {boolean}
-         *
+         * Returns `true` if current position is last for the iterator.
+         * @return {boolean}
          */
         isEnd: function () {
             return this.index === this.lastIndex;
