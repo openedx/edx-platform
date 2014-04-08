@@ -178,7 +178,9 @@ def _grade(student, request, course, keep_raw_scores):
     # Dict of item_ids -> (earned, possible) point tuples. This *only* grabs
     # scores that were registered with the submissions API, which for the moment
     # means only openassessment (edx-ora2)
-    submissions_scores = sub_api.get_scores(course.id, anonymous_id_for_user(student, course.id))
+    submissions_scores = sub_api.get_scores(
+        course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id)
+    )
 
     totaled_scores = {}
     # This next complicated loop is just to collect the totaled_scores, which is
@@ -345,7 +347,7 @@ def _progress_summary(student, request, course):
             # This student must not have access to the course.
             return None
 
-    submissions_scores = sub_api.get_scores(course.id, anonymous_id_for_user(student, course.id))
+    submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
 
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)

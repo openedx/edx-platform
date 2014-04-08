@@ -247,7 +247,7 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': self.course.id})
+            reverse('progress', kwargs={'course_id': self.course.id.to_deprecated_string()})
         )
 
         return grades.grade(self.student_user, fake_request, self.course)
@@ -265,7 +265,7 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': self.course.id})
+            reverse('progress', kwargs={'course_id': self.course.id.to_deprecated_string()})
         )
 
         progress_summary = grades.progress_summary(
@@ -1010,7 +1010,9 @@ class TestAnswerDistributions(TestSubmittingProblems):
             course_id=self.course.id,
             student=self.student_user
         )
-        student_module.module_state_key.replace(name=student_module.module_state_key.name + "_fake")
+        student_module.module_state_key = student_module.module_state_key.replace(
+            name=student_module.module_state_key.name + "_fake"
+        )
         student_module.save()
 
         # It should be empty (ignored)

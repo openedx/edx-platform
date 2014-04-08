@@ -865,7 +865,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
             # recompute (and update) the metadata inheritance tree which is cached
             # was conditional on children or metadata having changed before dhm made one update to rule them all
-            self.refresh_cached_metadata_inheritance_tree(xblock.location)
+            self.refresh_cached_metadata_inheritance_tree(xblock.location.course_key)
             # fire signal that we've written to DB
         except ItemNotFoundError:
             if not allow_not_found:
@@ -894,7 +894,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # from overriding our default value set in the init method.
         self.collection.remove({'_id': location_to_son(location)}, safe=self.collection.safe)
         # recompute (and update) the metadata inheritance tree which is cached
-        self.refresh_cached_metadata_inheritance_tree(location)
+        self.refresh_cached_metadata_inheritance_tree(location.course_key)
 
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location in this
