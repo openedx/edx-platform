@@ -99,20 +99,20 @@ class ViewsTestCase(TestCase):
         course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
         request = self.request_factory.get(reverse('about_course', args=[course.id]))
         request.user = AnonymousUser()
-        response = views.course_about(request, course.id)
+        response = views.course_about(request, course.id.to_deprecated_string())
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
 
         # authenticated user with nothing in cart
         request.user = self.user
-        response = views.course_about(request, course.id)
+        response = views.course_about(request, course.id.to_deprecated_string())
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
 
         # now add the course to the cart
         cart = shoppingcart.models.Order.get_cart_for_user(self.user)
         shoppingcart.models.PaidCourseRegistration.add_to_order(cart, course.id)
-        response = views.course_about(request, course.id)
+        response = views.course_about(request, course.id.to_deprecated_string())
         self.assertEqual(response.status_code, 200)
         self.assertIn(in_cart_span, response.content)
 
@@ -357,7 +357,7 @@ class TestProgressDueDate(BaseDueDateTests):
 
     def get_text(self, course):
         """ Returns the HTML for the progress page """
-        return views.progress(self.request, course.id, self.user.id).content
+        return views.progress(self.request, course.id.to_deprecated_string(), self.user.id).content
 
 
 class TestAccordionDueDate(BaseDueDateTests):
