@@ -14,15 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* globals VBArray, PDFJS */
+/* globals VBArray */
 
 'use strict';
-
-// Initializing PDFJS global object here, it case if we need to change/disable
-// some PDF.js features, e.g. range requests
-if (typeof PDFJS === 'undefined') {
-  (typeof window !== 'undefined' ? window : this).PDFJS = {};
-}
 
 // Checking if the typed arrays are supported
 (function checkTypedArrayCompatibility() {
@@ -38,9 +32,9 @@ if (typeof PDFJS === 'undefined') {
     }
 
     // some mobile version might not support Float64Array
-    if (typeof Float64Array === 'undefined') {
+    if (typeof Float64Array === 'undefined')
       window.Float64Array = Float32Array;
-    }
+
     return;
   }
 
@@ -49,38 +43,29 @@ if (typeof PDFJS === 'undefined') {
   }
 
   function setArrayOffset(array, offset) {
-    if (arguments.length < 2) {
+    if (arguments.length < 2)
       offset = 0;
-    }
-    for (var i = 0, n = array.length; i < n; ++i, ++offset) {
+    for (var i = 0, n = array.length; i < n; ++i, ++offset)
       this[offset] = array[i] & 0xFF;
-    }
   }
 
   function TypedArray(arg1) {
     var result;
     if (typeof arg1 === 'number') {
       result = [];
-      for (var i = 0; i < arg1; ++i) {
+      for (var i = 0; i < arg1; ++i)
         result[i] = 0;
-      }
-    } else if ('slice' in arg1) {
+    } else
       result = arg1.slice(0);
-    } else {
-      result = [];
-      for (var i = 0, n = arg1.length; i < n; ++i) {
-        result[i] = arg1[i];
-      }
-    }
 
     result.subarray = subarray;
     result.buffer = result;
     result.byteLength = result.length;
     result.set = setArrayOffset;
 
-    if (typeof arg1 === 'object' && arg1.buffer) {
+    if (typeof arg1 === 'object' && arg1.buffer)
       result.buffer = arg1.buffer;
-    }
+
     return result;
   }
 
@@ -95,18 +80,10 @@ if (typeof PDFJS === 'undefined') {
   window.Float64Array = TypedArray;
 })();
 
-// URL = URL || webkitURL
-(function normalizeURLObject() {
-  if (!window.URL) {
-    window.URL = window.webkitURL;
-  }
-})();
-
 // Object.create() ?
 (function checkObjectCreateCompatibility() {
-  if (typeof Object.create !== 'undefined') {
+  if (typeof Object.create !== 'undefined')
     return;
-  }
 
   Object.create = function objectCreate(proto) {
     function Constructor() {}
@@ -131,19 +108,15 @@ if (typeof PDFJS === 'undefined') {
     } catch (e) {
       definePropertyPossible = false;
     }
-    if (definePropertyPossible) {
-      return;
-    }
+    if (definePropertyPossible) return;
   }
 
   Object.defineProperty = function objectDefineProperty(obj, name, def) {
     delete obj[name];
-    if ('get' in def) {
+    if ('get' in def)
       obj.__defineGetter__(name, def['get']);
-    }
-    if ('set' in def) {
+    if ('set' in def)
       obj.__defineSetter__(name, def['set']);
-    }
     if ('value' in def) {
       obj.__defineSetter__(name, function objectDefinePropertySetter(value) {
         this.__defineGetter__(name, function objectDefinePropertyGetter() {
@@ -158,16 +131,14 @@ if (typeof PDFJS === 'undefined') {
 
 // Object.keys() ?
 (function checkObjectKeysCompatibility() {
-  if (typeof Object.keys !== 'undefined') {
+  if (typeof Object.keys !== 'undefined')
     return;
-  }
 
   Object.keys = function objectKeys(obj) {
     var result = [];
     for (var i in obj) {
-      if (obj.hasOwnProperty(i)) {
+      if (obj.hasOwnProperty(i))
         result.push(i);
-      }
     }
     return result;
   };
@@ -175,14 +146,12 @@ if (typeof PDFJS === 'undefined') {
 
 // No readAsArrayBuffer ?
 (function checkFileReaderReadAsArrayBuffer() {
-  if (typeof FileReader === 'undefined') {
+  if (typeof FileReader === 'undefined')
     return; // FileReader is not implemented
-  }
   var frPrototype = FileReader.prototype;
   // Older versions of Firefox might not have readAsArrayBuffer
-  if ('readAsArrayBuffer' in frPrototype) {
+  if ('readAsArrayBuffer' in frPrototype)
     return; // readAsArrayBuffer is implemented
-  }
   Object.defineProperty(frPrototype, 'readAsArrayBuffer', {
     value: function fileReaderReadAsArrayBuffer(blob) {
       var fileReader = new FileReader();
@@ -192,9 +161,8 @@ if (typeof PDFJS === 'undefined') {
         var buffer = new ArrayBuffer(data.length);
         var uint8Array = new Uint8Array(buffer);
 
-        for (var i = 0, ii = data.length; i < ii; i++) {
+        for (var i = 0, ii = data.length; i < ii; i++)
           uint8Array[i] = data.charCodeAt(i);
-        }
 
         Object.defineProperty(originalReader, 'result', {
           value: buffer,
@@ -224,9 +192,8 @@ if (typeof PDFJS === 'undefined') {
   if ('response' in xhrPrototype ||
       'mozResponseArrayBuffer' in xhrPrototype ||
       'mozResponse' in xhrPrototype ||
-      'responseArrayBuffer' in xhrPrototype) {
+      'responseArrayBuffer' in xhrPrototype)
     return;
-  }
   // IE9 ?
   if (typeof VBArray !== 'undefined') {
     Object.defineProperty(xhrPrototype, 'response', {
@@ -250,9 +217,8 @@ if (typeof PDFJS === 'undefined') {
     var text = this.responseText;
     var i, n = text.length;
     var result = new Uint8Array(n);
-    for (i = 0; i < n; ++i) {
+    for (i = 0; i < n; ++i)
       result[i] = text.charCodeAt(i) & 0xFF;
-    }
     return result;
   }
   Object.defineProperty(xhrPrototype, 'response', { get: responseGetter });
@@ -260,9 +226,8 @@ if (typeof PDFJS === 'undefined') {
 
 // window.btoa (base64 encode function) ?
 (function checkWindowBtoaCompatibility() {
-  if ('btoa' in window) {
+  if ('btoa' in window)
     return;
-  }
 
   var digits =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
@@ -284,78 +249,69 @@ if (typeof PDFJS === 'undefined') {
   };
 })();
 
-// window.atob (base64 encode function) ?
-(function checkWindowAtobCompatibility() {
-  if ('atob' in window) {
-    return;
-  }
-
-  // https://github.com/davidchambers/Base64.js
-  var digits =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-  window.atob = function (input) {
-    input = input.replace(/=+$/, '');
-    if (input.length % 4 == 1) {
-      throw new Error('bad atob input');
-    }
-    for (
-      // initialize result and counters
-      var bc = 0, bs, buffer, idx = 0, output = '';
-      // get next character
-      buffer = input.charAt(idx++);
-      // character found in table?
-      // initialize bit storage and add its ascii value
-      ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer,
-        // and if not first of each 4 characters,
-        // convert the first 8 bits to one ascii character
-        bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0
-    ) {
-      // try to find character in table (0-63, not found => -1)
-      buffer = digits.indexOf(buffer);
-    }
-    return output;
-  };
-})();
-
 // Function.prototype.bind ?
 (function checkFunctionPrototypeBindCompatibility() {
-  if (typeof Function.prototype.bind !== 'undefined') {
+  if (typeof Function.prototype.bind !== 'undefined')
     return;
-  }
 
   Function.prototype.bind = function functionPrototypeBind(obj) {
     var fn = this, headArgs = Array.prototype.slice.call(arguments, 1);
     var bound = function functionPrototypeBindBound() {
-      var args = headArgs.concat(Array.prototype.slice.call(arguments));
+      var args = Array.prototype.concat.apply(headArgs, arguments);
       return fn.apply(obj, args);
     };
     return bound;
   };
 })();
 
+// IE9/10 text/html data URI
+(function checkDataURICompatibility() {
+  if (!('documentMode' in document) ||
+      document.documentMode !== 9 && document.documentMode !== 10)
+    return;
+  // overriding the src property
+  var originalSrcDescriptor = Object.getOwnPropertyDescriptor(
+    HTMLIFrameElement.prototype, 'src');
+  Object.defineProperty(HTMLIFrameElement.prototype, 'src', {
+    get: function htmlIFrameElementPrototypeSrcGet() { return this.$src; },
+    set: function htmlIFrameElementPrototypeSrcSet(src) {
+      this.$src = src;
+      if (src.substr(0, 14) != 'data:text/html') {
+        originalSrcDescriptor.set.call(this, src);
+        return;
+      }
+      // for text/html, using blank document and then
+      // document's open, write, and close operations
+      originalSrcDescriptor.set.call(this, 'about:blank');
+      setTimeout((function htmlIFrameElementPrototypeSrcOpenWriteClose() {
+        var doc = this.contentDocument;
+        doc.open('text/html');
+        doc.write(src.substr(src.indexOf(',') + 1));
+        doc.close();
+      }).bind(this), 0);
+    },
+    enumerable: true
+  });
+})();
+
 // HTMLElement dataset property
 (function checkDatasetProperty() {
   var div = document.createElement('div');
-  if ('dataset' in div) {
+  if ('dataset' in div)
     return; // dataset property exists
-  }
 
   Object.defineProperty(HTMLElement.prototype, 'dataset', {
     get: function() {
-      if (this._dataset) {
+      if (this._dataset)
         return this._dataset;
-      }
 
       var dataset = {};
       for (var j = 0, jj = this.attributes.length; j < jj; j++) {
         var attribute = this.attributes[j];
-        if (attribute.name.substring(0, 5) != 'data-') {
+        if (attribute.name.substring(0, 5) != 'data-')
           continue;
-        }
         var key = attribute.name.substring(5).replace(/\-([a-z])/g,
-          function(all, ch) {
-            return ch.toUpperCase();
-          });
+          function(all, ch) { return ch.toUpperCase(); });
         dataset[key] = attribute.value;
       }
 
@@ -373,33 +329,24 @@ if (typeof PDFJS === 'undefined') {
 // HTMLElement classList property
 (function checkClassListProperty() {
   var div = document.createElement('div');
-  if ('classList' in div) {
+  if ('classList' in div)
     return; // classList property exists
-  }
 
   function changeList(element, itemName, add, remove) {
     var s = element.className || '';
     var list = s.split(/\s+/g);
-    if (list[0] === '') {
-      list.shift();
-    }
+    if (list[0] === '') list.shift();
     var index = list.indexOf(itemName);
-    if (index < 0 && add) {
+    if (index < 0 && add)
       list.push(itemName);
-    }
-    if (index >= 0 && remove) {
+    if (index >= 0 && remove)
       list.splice(index, 1);
-    }
     element.className = list.join(' ');
-    return (index >= 0);
   }
 
   var classListPrototype = {
     add: function(name) {
       changeList(this.element, name, true, false);
-    },
-    contains: function(name) {
-      return changeList(this.element, name, false, false);
     },
     remove: function(name) {
       changeList(this.element, name, false, true);
@@ -411,9 +358,8 @@ if (typeof PDFJS === 'undefined') {
 
   Object.defineProperty(HTMLElement.prototype, 'classList', {
     get: function() {
-      if (this._classList) {
+      if (this._classList)
         return this._classList;
-      }
 
       var classList = Object.create(classListPrototype, {
         element: {
@@ -433,13 +379,12 @@ if (typeof PDFJS === 'undefined') {
   });
 })();
 
-// Check console compatibility
+// Check console compatability
 (function checkConsoleCompatibility() {
   if (!('console' in window)) {
     window.console = {
       log: function() {},
-      error: function() {},
-      warn: function() {}
+      error: function() {}
     };
   } else if (!('bind' in console.log)) {
     // native functions in IE9 might not have bind
@@ -449,9 +394,6 @@ if (typeof PDFJS === 'undefined') {
     console.error = (function(fn) {
       return function(msg) { return fn(msg); };
     })(console.error);
-    console.warn = (function(fn) {
-      return function(msg) { return fn(msg); };
-    })(console.warn);
   }
 })();
 
@@ -473,66 +415,16 @@ if (typeof PDFJS === 'undefined') {
   }
 })();
 
-// Checks if possible to use URL.createObjectURL()
-(function checkOnBlobSupport() {
-  // sometimes IE loosing the data created with createObjectURL(), see #3977
-  if (navigator.userAgent.indexOf('Trident') >= 0) {
-    PDFJS.disableCreateObjectURL = true;
-  }
-})();
-
 // Checks if navigator.language is supported
 (function checkNavigatorLanguage() {
-  if ('language' in navigator &&
-      /^[a-z]+(-[A-Z]+)?$/.test(navigator.language)) {
+  if ('language' in navigator)
     return;
-  }
-  function formatLocale(locale) {
-    var split = locale.split(/[-_]/);
-    split[0] = split[0].toLowerCase();
-    if (split.length > 1) {
-      split[1] = split[1].toUpperCase();
-    }
-    return split.join('-');
-  }
-  var language = navigator.language || navigator.userLanguage || 'en-US';
-  PDFJS.locale = formatLocale(language);
-})();
-
-(function checkRangeRequests() {
-  // Safari has issues with cached range requests see:
-  // https://github.com/mozilla/pdf.js/issues/3260
-  // Last tested with version 6.0.4.
-  var isSafari = Object.prototype.toString.call(
-                  window.HTMLElement).indexOf('Constructor') > 0;
-
-  // Older versions of Android (pre 3.0) has issues with range requests, see:
-  // https://github.com/mozilla/pdf.js/issues/3381.
-  // Make sure that we only match webkit-based Android browsers,
-  // since Firefox/Fennec works as expected.
-  var regex = /Android\s[0-2][^\d]/;
-  var isOldAndroid = regex.test(navigator.userAgent);
-
-  if (isSafari || isOldAndroid) {
-    PDFJS.disableRange = true;
-  }
-})();
-
-// Check if the browser supports manipulation of the history.
-(function checkHistoryManipulation() {
-  if (!window.history.pushState) {
-    PDFJS.disableHistory = true;
-  }
-})();
-
-(function checkSetPresenceInImageData() {
-  if (window.CanvasPixelArray) {
-    if (typeof window.CanvasPixelArray.prototype.set !== 'function') {
-      window.CanvasPixelArray.prototype.set = function(arr) {
-        for (var i = 0, ii = this.length; i < ii; i++) {
-          this[i] = arr[i];
-        }
-      };
-    }
-  }
+  Object.defineProperty(navigator, 'language', {
+    get: function navigatorLanguage() {
+      var language = navigator.userLanguage || 'en-US';
+      return language.substring(0, 2).toLowerCase() +
+        language.substring(2).toUpperCase();
+    },
+    enumerable: true
+  });
 })();
