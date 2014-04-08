@@ -242,6 +242,20 @@ During acceptance test execution, Django log files are written to `test_root/log
 
 **Note**: The acceptance tests can *not* currently run in parallel.
 
+### Debugging Acceptance Tests on Vagrant
+
+If you are using a local Vagrant dev environment, then you will only get console text output. To actually see what is happening, you can turn on automatic screenshots. For each step two screenshots will be taken - before, and after. To do this, simply add the step:
+
+    Given I enable capturing of screenshots before and after each step
+    
+to your scenario. This step can be added anywhere, and will enable automatic screenshots for all following steps for that scenario only. You can also use the step
+
+    Given I disable capturing of screenshots before and after each step
+    
+to turn off auto screenshots for all steps following it.
+
+Another approach is to redirect Vagrant X11 session to your local machine. Please see https://github.com/edx/edx-platform/wiki/Test-engineering-FAQ .
+
 ## Viewing Test Coverage
 
 We currently collect test coverage information for Python unit/integration tests.
