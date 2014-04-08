@@ -132,7 +132,7 @@ class StaticContent(object):
         Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
         """
         matched = StaticContent.ASSET_URL_RE.match(path)
-        return Location(matched['org'], matched['course'], None, matched['category'], matched['name'])
+        return Location(matched.group('org'), matched.group('course'), None, matched.group('category'), matched.group('name'))
 
     @staticmethod
     def convert_legacy_static_url_with_course_id(path, course_id):

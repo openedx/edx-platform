@@ -40,7 +40,6 @@ from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
-from IPython.external.decorators._decorators import deprecated
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -663,7 +662,6 @@ class CourseEnrollment(models.Model):
             return False
 
     @classmethod
-    @deprecated
     def is_enrolled_by_partial(cls, user, course_id_partial):
         """
         Returns `True` if the user is enrolled in a course that starts with
@@ -680,7 +678,8 @@ class CourseEnrollment(models.Model):
         """
         assert isinstance(course_id_partial, SlashSeparatedCourseKey)
         assert not course_id_partial.run  # None or empty string
-        querystring = unicode(course_id_partial).replace('None', '')
+        course_key = SlashSeparatedCourseKey(course_id_partial.org, course_id_partial.course, '')
+        querystring = unicode(course_key.to_deprecated_string())
         try:
             return CourseEnrollment.objects.filter(
                 user=user,

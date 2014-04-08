@@ -48,17 +48,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client = Client()
         self.contentstore = contentstore()
 
-        course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        self.course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
         import_from_xml(modulestore('direct'), 'common/test/data/', ['toy'],
                 static_content_store=self.contentstore, verbose=True)
 
         # A locked asset
-        self.locked_asset = course_id.make_asset_key('asset', 'sample_static.txt')
+        self.locked_asset = self.course_id.make_asset_key('asset', 'sample_static.txt')
         self.url_locked = StaticContent.get_url_path_from_location(self.locked_asset)
 
         # An unlocked asset
-        self.unlocked_asset = course_id.make_asset_key('asset', 'another_static.txt')
+        self.unlocked_asset = self.course_id.make_asset_key('asset', 'another_static.txt')
         self.url_unlocked = StaticContent.get_url_path_from_location(self.unlocked_asset)
 
         self.contentstore.set_attr(self.locked_asset, 'locked', True)
@@ -118,9 +118,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         and registered for the course.
         """
         # pylint: disable=E1101
-        course_id = "/".join([self.loc_locked.org, self.loc_locked.course, '2012_Fall'])
-        CourseEnrollment.enroll(self.user, course_id)
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
+        CourseEnrollment.enroll(self.user, self.course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
 
         self.client.login(username=self.usr, password=self.pwd)
         resp = self.client.get(self.url_locked)
@@ -131,8 +130,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         Test that locked assets behave appropriately in case user is staff.
         """
         # pylint: disable=E1101
-        course_id = "/".join([self.loc_locked.org, self.loc_locked.course, '2012_Fall'])
-
         self.client.login(username=self.staff_usr, password=self.staff_pwd)
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200) # pylint: disable=E1103

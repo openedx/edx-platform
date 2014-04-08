@@ -49,9 +49,9 @@ class StaticContentServer(object):
             if getattr(content, "locked", False):
                 if not hasattr(request, "user") or not request.user.is_authenticated():
                     return HttpResponseForbidden('Unauthorized')
-                if not request.user.is_staff and not CourseEnrollment.is_enrolled_in_partial(
+                if not request.user.is_staff and not CourseEnrollment.is_enrolled_by_partial(
                         request.user, loc.course_key
-                    ):
+                ):
                     return HttpResponseForbidden('Unauthorized')
 
             # convert over the DB persistent last modified timestamp to a HTTP compatible

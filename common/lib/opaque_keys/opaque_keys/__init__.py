@@ -163,6 +163,12 @@ class OpaqueKey(object):
             key: deepcopy(getattr(self, key), memo) for key in self.KEY_FIELDS
         })
 
+    def __setstate__(self, state_dict):
+        # used by pickle to set fields on an unpickled object
+        for key in state_dict:
+            if key in self.KEY_FIELDS:
+                setattr(self, key, state_dict[key])
+
     @property
     def _key(self):
         return tuple(getattr(self, field) for field in self.KEY_FIELDS)
