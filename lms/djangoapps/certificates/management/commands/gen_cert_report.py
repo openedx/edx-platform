@@ -61,8 +61,8 @@ class Command(BaseCommand):
             # find students who are enrolled
             print "Looking up certificate states for {0}".format(course_id)
             enrolled_students = User.objects.filter(
-                    courseenrollment__course_id=course_id).prefetch_related(
-                            "groups").order_by('username')
+                    courseenrollment__course_id=course_id,
+                    courseenrollment__is_active=True)
             cert_data[course_id] = {'enrolled': enrolled_students.count()}
 
             tallies = GeneratedCertificate.objects.filter(
