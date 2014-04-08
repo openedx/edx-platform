@@ -1,0 +1,77 @@
+###################################
+April 9, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of April
+9, 2014.  See previous pages in this document for a history of changes.
+
+**************************
+edX Documentation
+**************************
+
+You can access the public edX `roadmap <https://edx-
+wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap>`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course.
+  <http://edx.readthedocs.org/projects/ca/en/latest/>`_ You can also download
+  the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include:
+
+  * Expanded the `Course Data <http://edx.readthedocs.org/projects/ca/en/latest/running_course/course_data.html#course-data>`_, `Enrollment <http://edx.readthedocs.org/projects/ca/en/latest/running_course/course_enrollment.html#enrollment>`_, and `Staffing <http://edx.readthedocs.org/projects/ca/en/latest/running_course/course_staffing.html#course-staffing>`_ sections.
+
+  * Updated `Working with HTML Components <http://edx.readthedocs.org/projects/ca/en/latest/creating_content/create_html_component.html>`_ to reflect the new HTML editor. 
+
+
+* `edX Data Documentation
+  <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
+
+  Recent changes include:
+
+  *  
+
+* `edX Platform Developer Documentation
+  <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
+
+  Recent changes include:
+
+  *  Added the `Custom JavaScript Display and Grading <http://edx.readthedocs.or
+     g/projects/userdocs/en/latest/extending_platform/javascript.html>`_
+     chapter.
+
+
+
+*************
+edX Studio
+*************
+
+* **HTML Editor Upgrade**
+
+  The HTML editor you use for HTML components, as well as Pages, was upgraded to improve usability.
+
+  .. image:: images/HTMLEditor.png
+   :alt: Image of the new HTML Editor
+
+  For instructions on using the new editor to add text, images, and links, see `Working with HTML Components <http://edx.readthedocs.org/projects/ca/en/latest/creating_content/create_html_component.html>`_.
+
+***************************************
+edX Learning Management System
+***************************************
+
+* A problem that prevented course staff from deleting the student's state for an XBlock in the Beta Instructor Dashboard is now resolved. (LMS-2491)
+
+* (LMS-2474)
+
+* Video transcripts are now displayed in their source language. (BLD-935)
+
+* (BLD-958)
+
+
+***************************************
+edX Discussions
+***************************************
+
+* (FOR-542)
