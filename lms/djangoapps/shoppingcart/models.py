@@ -332,10 +332,9 @@ class PaidCourseRegistration(OrderItem):
         Returns the order item
         """
         # First a bunch of sanity checks
-        try:
-            course = course_from_id(course_id)  # actually fetch the course to make sure it exists, use this to
+        course = course_from_id(course_id)  # actually fetch the course to make sure it exists, use this to
                                                 # throw errors if it doesn't
-        except ItemNotFoundError:
+        if not course:
             log.error("User {} tried to add non-existent course {} to cart id {}"
                       .format(order.user.email, course_id, order.id))
             raise CourseDoesNotExistException
@@ -385,17 +384,12 @@ class PaidCourseRegistration(OrderItem):
         in CourseEnrollmentAllowed will the user be allowed to enroll.  Otherwise requiring payment
         would in fact be quite silly since there's a clear back door.
         """
-        try:
-            course_exists = modulestore().has_course(self.course_id)
-        except ValueError:
+        course = course_from_id(self.course_id)
+        if not course:
             raise PurchasedCallbackException(
                 "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
 
-        if not course_exists:
-            raise PurchasedCallbackException(
-                "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
-
-        CourseEnrollment.enroll(user=self.user, course_id=self.course_id, mode=self.mode)
+        CourseEnrollment.enroll(user=self.user, course_key=self.course_id, mode=self.mode)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=E1101
