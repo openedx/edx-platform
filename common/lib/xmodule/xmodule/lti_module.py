@@ -42,7 +42,6 @@ import hashlib
 import base64
 import urllib
 import textwrap
-import json
 from lxml import etree
 from webob import Response
 import mock
@@ -226,8 +225,11 @@ class LTIModule(LTIFields, XModule):
             try:
                 param_name, param_value = [p.strip() for p in custom_parameter.split('=', 1)]
             except ValueError:
-                raise LTIError('Could not parse custom parameter: {0!r}. \
-                    Should be "x=y" string.'.format(custom_parameter))
+                _ = self.runtime.service(self, "i18n").ugettext
+                msg = _('Could not parse custom parameter: {custom_parameter}. Should be "x=y" string.').format(
+                    custom_parameter="{0!r}".format(custom_parameter)
+                )
+                raise LTIError(msg)
 
             # LTI specs: 'custom_' should be prepended before each custom parameter, as pointed in link above.
             if param_name not in PARAMETERS:
@@ -655,8 +657,12 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             try:
                 lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
             except ValueError:
-                raise LTIError('Could not parse LTI passport: {0!r}. \
-                    Should be "id:key:secret" string.'.format(lti_passport))
+                _ = self.runtime.service(self, "i18n").ugettext
+                msg = _('Could not parse LTI passport: {lti_passport}. Should be "id:key:secret" string.').format(
+                    lti_passport='{0!r}'.format(lti_passport)
+                )
+                raise LTIError(msg)
+
             if lti_id == self.lti_id.strip():
                 return key, secret
         return '', ''
