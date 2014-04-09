@@ -66,13 +66,14 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                             oldParent = parent;
                         }
                     },
-                    helper: "clone",
+                    helper: "original",
                     opacity: '0.5',
                     placeholder: 'component-placeholder',
                     forcePlaceholderSize: true,
                     axis: 'y',
                     items: '> .vertical-element',
-                    connectWith: ".vertical-container"
+                    connectWith: ".vertical-container",
+                    tolerance: "pointer"
 
                 });
             },
