@@ -8,6 +8,7 @@ import logging
 from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.utils.translation import ugettext as _
+from dogapi import dog_stats_api
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
