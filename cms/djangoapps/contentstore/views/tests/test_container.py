@@ -5,6 +5,7 @@ Unit tests for the container view.
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import compute_publish_state, PublishState
 from contentstore.views.helpers import xblock_studio_url
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
 
 
@@ -47,13 +48,33 @@ class ContainerViewTestCase(CourseTestCase):
         Create the scenario of an xblock with children (non-vertical) on the container page.
         This should create a container page that is a child of another container page.
         """
-        xblock_with_child = ItemFactory.create(parent_location=self.child_vertical.location,
-                                               category="wrapper", display_name="Wrapper")
-        ItemFactory.create(parent_location=xblock_with_child.location,
-                           category="html", display_name="Child HTML")
+        published_xblock_with_child = ItemFactory.create(
+            parent_location=self.child_vertical.location,
+            category="wrapper", display_name="Wrapper"
+        )
+        ItemFactory.create(
+            parent_location=published_xblock_with_child.location,
+            category="html", display_name="Child HTML"
+        )
+        draft_xblock_with_child = modulestore('draft').convert_to_draft(published_xblock_with_child.location)
         branch_name = "MITx.999.Robot_Super_Course/branch/draft/block"
         self._test_html_content(
-            xblock_with_child,
+            published_xblock_with_child,
+            branch_name=branch_name,
+            expected_section_tag=(
+                '<section class="wrapper-xblock level-page is-hidden" '
+                'data-locator="{branch_name}/Wrapper">'.format(branch_name=branch_name)
+            ),
+            expected_breadcrumbs=(
+                r'<a href="/unit/{branch_name}/Unit"\s*'
+                r'class="navigation-link navigation-parent">Unit</a>\s*'
+                r'<a href="/container/{branch_name}/Child_Vertical"\s*'
+                r'class="navigation-link navigation-parent">Child Vertical</a>\s*'
+                r'<a href="#" class="navigation-link navigation-current">Wrapper</a>'
+            ).format(branch_name=branch_name)
+        )
+        self._test_html_content(
+            draft_xblock_with_child,
             branch_name=branch_name,
             expected_section_tag=(
                 '<section class="wrapper-xblock level-page is-hidden" '

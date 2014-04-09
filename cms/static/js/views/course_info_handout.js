@@ -1,5 +1,5 @@
-define(["js/views/baseview", "underscore", "codemirror", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal"],
-    function(BaseView, _, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils) {
+define(["js/views/baseview", "codemirror", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal"],
+    function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils) {
 
     // the handouts view is dumb right now; it needs tied to a model and all that jazz
     var CourseInfoHandoutsView = BaseView.extend({

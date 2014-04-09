@@ -28,7 +28,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/xblock", "js
                 xblockView.render();
                 respondWithMockXBlockFragment(requests, {
                     html: mockXBlockHtml,
-                    "resources": []
+                    resources: []
                 });
 
                 expect(xblockView.$el.select('.xblock-header')).toBeTruthy();

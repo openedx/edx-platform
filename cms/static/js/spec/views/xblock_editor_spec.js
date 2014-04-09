@@ -43,7 +43,7 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                     editor.render();
                     create_sinon.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
-                        "resources": []
+                        resources: []
                     });
 
                     expect(editor.$el.select('.xblock-header')).toBeTruthy();
@@ -55,12 +55,11 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                     editor.render();
                     create_sinon.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
-                        "resources": []
+                        resources: []
                     });
                     editor.save();
                     request = requests[requests.length - 1];
                     response = JSON.parse(request.requestBody);
-                    expect(edit_helpers.hasSavedMockXBlock()).toBeTruthy();
                     expect(response.metadata.display_name).toBe(testDisplayName);
                     expect(response.metadata.custom_field).toBe('Custom Value');
                 });
@@ -84,7 +83,7 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                     editor.render();
                     create_sinon.respondWithJson(requests, {
                         html: mockXModuleEditorHtml,
-                        "resources": []
+                        resources: []
                     });
 
                     expect(editor.$el.select('.xblock-header')).toBeTruthy();
@@ -96,14 +95,13 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                     editor.render();
                     create_sinon.respondWithJson(requests, {
                         html: mockXModuleEditorHtml,
-                        "resources": []
+                        resources: []
                     });
                     // Give the mock xblock a save method...
                     editor.xblock.save = window.MockDescriptor.save;
                     editor.save();
                     request = requests[requests.length - 1];
                     response = JSON.parse(request.requestBody);
-                    expect(edit_helpers.hasSavedMockXModule()).toBeTruthy();
                     expect(response.metadata.display_name).toBe(testDisplayName);
                     expect(response.metadata.custom_field).toBe('Custom Value');
                 });
@@ -115,7 +113,7 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                     editor.render();
                     create_sinon.respondWithJson(requests, {
                         html: mockXModuleEditorHtml,
-                        "resources": []
+                        resources: []
                     });
 
                     expect(editor.$el.select('.xblock-header')).toBeTruthy();

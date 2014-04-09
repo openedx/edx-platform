@@ -35,7 +35,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     containerPage.render();
                     respondWithMockXBlockEditorFragment(requests, {
                         html: mockContainerXBlockHtml,
-                        "resources": []
+                        resources: []
                     });
 
                     expect(containerPage.$el.select('.xblock-header')).toBeTruthy();
@@ -49,7 +49,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     expect(containerPage.$('.ui-loading')).not.toHaveClass('is-hidden');
                     respondWithMockXBlockEditorFragment(requests, {
                         html: mockContainerXBlockHtml,
-                        "resources": []
+                        resources: []
                     });
                     expect(containerPage.$('.ui-loading')).toHaveClass('is-hidden');
                 });
@@ -84,19 +84,17 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     containerPage.render();
                     respondWithMockXBlockEditorFragment(requests, {
                         html: mockContainerXBlockHtml,
-                        "resources": []
+                        resources: []
                     });
                     editButtons = containerPage.$('.edit-button');
-                    // The container renders four mock xblocks, so there should be four edit buttons
-                    expect(editButtons.length).toBe(4);
+                    // The container renders six mock xblocks, so there should be an equal number of edit buttons
+                    expect(editButtons.length).toBe(6);
                     editButtons.first().click();
                     // Make sure that the correct xblock is requested to be edited
-                    expect(requests[requests.length - 1].url).toBe(
-                        '/xblock/testCourse/branch/draft/block/html447/studio_view'
-                    );
+                    expect(requests[requests.length - 1].url).toBe('/xblock/locator-component-A1/studio_view');
                     create_sinon.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
-                        "resources": []
+                        resources: []
                     });
                     expect(edit_helpers.isShowingModal()).toBeTruthy();
                 });
@@ -108,15 +106,15 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     containerPage.render();
                     respondWithMockXBlockEditorFragment(requests, {
                         html: mockContainerXBlockHtml,
-                        "resources": []
+                        resources: []
                     });
                     editButtons = containerPage.$('.edit-button');
-                    // The container renders four mock xblocks, so there should be four edit buttons
-                    expect(editButtons.length).toBe(4);
+                    // The container renders six mock xblocks, so there should be an equal number of edit buttons
+                    expect(editButtons.length).toBe(6);
                     editButtons.first().click();
                     create_sinon.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
-                        "resources": []
+                        resources: []
                     });
 
                     modal = $('.edit-xblock-modal');
@@ -133,11 +131,10 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     // Respond to the request to refresh
                     respondWithMockXBlockEditorFragment(requests, {
                         html: mockUpdatedXBlockHtml,
-                        "resources": []
+                        resources: []
                     });
                     // Verify that the xblock was updated
                     expect(containerPage.$('.mock-updated-content').text()).toBe('Mock Update');
-                    expect(edit_helpers.hasSavedMockXBlock()).toBe(true);
                 });
             });
 
@@ -149,7 +146,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     containerPage.render();
                     respondWithMockXBlockEditorFragment(requests, {
                         html: mockContainerXBlockHtml,
-                        "resources": []
+                        resources: []
                     });
 
                     expect(containerPage.$('.no-container-content')).not.toHaveClass('is-hidden');

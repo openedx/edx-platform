@@ -60,8 +60,8 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
         <article class="unit-body window">
         <p class="unit-name-input"><label for="unit-display-name-input">${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" id="unit-display-name-input" class="unit-display-name-input" /></p>
           <ol class="components">
-            % for (locator, xblock) in zip(locators, xblocks):
-            <li class="component" data-locator="${locator}" data-display-name="${xblock.display_name_with_default |h}" data-category="${xblock.category}"/>
+            % for locator in locators:
+            <li class="component" data-locator="${locator}"/>
             % endfor
             <li class="new-component-item adding">
               <div class="new-component">

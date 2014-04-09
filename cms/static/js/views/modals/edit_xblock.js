@@ -139,12 +139,14 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 this.$el.html("");
             },
 
-            findXBlockInfo: function(xblockElement, defaultXBlockInfo) {
-                var xblockInfo = defaultXBlockInfo;
-                if (xblockElement.length > 0) {
+            findXBlockInfo: function(xblockWrapperElement, defaultXBlockInfo) {
+                var xblockInfo = defaultXBlockInfo,
+                    xblockElement;
+                if (xblockWrapperElement.length > 0) {
+                    xblockElement = xblockWrapperElement.find('.xblock');
                     xblockInfo = new XBlockInfo({
-                        id: xblockElement.data('locator'),
-                        category: xblockElement.data('category')
+                        id: xblockWrapperElement.data('locator'),
+                        category: xblockElement.data('block-type')
                     });
                 }
                 return xblockInfo;

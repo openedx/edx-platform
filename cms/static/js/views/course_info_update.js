@@ -1,6 +1,6 @@
-define(["js/views/baseview", "underscore", "codemirror", "js/models/course_update",
+define(["js/views/baseview", "codemirror", "js/models/course_update",
     "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal"],
-    function(BaseView, _, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
+    function(BaseView, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
 
     var CourseInfoUpdateView = BaseView.extend({
         // collection is CourseUpdateCollection

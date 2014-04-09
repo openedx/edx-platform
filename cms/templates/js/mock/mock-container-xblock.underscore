@@ -1,300 +1,127 @@
-<section class="wrapper-xblock level-page" data-locator="testCourse/branch/draft/block/vertical131">
-<header class="xblock-header">
-    <div class="header-details">
-        <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse collapse">
-            <i class="icon-caret-down ui-toggle-expansion"></i>
-            <span class="sr">Expand or Collapse</span>
-        </a>
-        <span>Nested Vertical Test</span>
-    </div>
-    <div class="header-actions">
-        <ul class="actions-list">
-            <li class="sr action-item">No Actions</li>
-        </ul>
-    </div>
-</header>
+<header class="xblock-header"></header>
+
 <article class="xblock-render">
-<div class="xblock xblock-student_view xmodule_display xmodule_VerticalModule xblock-initialized" data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_vertical;_131a499ddaa3474194c1aa2eced34455" data-type="None" data-block-type="vertical">
-<div class="vert-mod">
-<div class="vert vert-0" data-id="i4x://AndyA/ABT101/vertical/2758bbc495dd40d59050da15b40bd9a5">
+    <div class="xblock" data-block-type="vertical">
+        <div class="vert-mod">
+            <div class="vert vert-0">
 
-    <section class="wrapper-xblock level-nesting is-collapsible" data-locator="testCourse/branch/draft/block/vertical275">
-        <header class="xblock-header">
-            <div class="header-details">
-                <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse collapse">
-                    <i class="icon-caret-down ui-toggle-expansion"></i>
-                    <span class="sr">Expand or Collapse</span>
-                </a>
-                <span>Group A</span>
-            </div>
-            <div class="header-actions">
-                <ul class="actions-list">
-                    <li class="sr action-item">No Actions</li>
-                </ul>
-            </div>
-        </header>
-        <article class="xblock-render">
-            <div class="xblock xblock-student_view xmodule_display xmodule_VerticalModule xblock-initialized" data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_vertical;_2758bbc495dd40d59050da15b40bd9a5" data-type="None" data-block-type="vertical">
-                <div class="vert-mod">
-                    <div class="vert vert-0" data-id="i4x://AndyA/ABT101/html/4471618afafb45bfb86cbe511973e225">
+                <div class="xblock" data-block-type="vertical">
+                    <div class="vert-mod">
+                        <div class="vert vert-0">
 
-                        <section class="wrapper-xblock level-element" data-locator="testCourse/branch/draft/block/html447" data-display-name="" data-category="html">
-                            <header class="xblock-header">
-                                <div class="header-details">
+                            <section class="wrapper-xblock level-nesting" data-locator="locator-group-A">
+                                <header class="xblock-header"></header>
 
-                                </div>
-                                <div class="header-actions">
-                                    <ul class="actions-list">
-                                        <li class="action-item action-edit">
-                                            <a href="#" class="edit-button action-button">
-                                                <i class="icon-edit"></i>
-                                                <span class="action-button-text">Edit</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </header>
-                            <article class="xblock-render">
-                                <div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule xblock-initialized" data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_html;_4471618afafb45bfb86cbe511973e225" data-type="HTMLModule" data-block-type="html">
-                                    <p>This is group A.</p>
-                                </div>
+                                <article class="xblock-render">
+                                    <div class="xblock" data-block-type="vertical">
+                                        <div class="vert-mod">
+                                            <div class="vert vert-0">
 
-                            </article>
-                        </section>
+                                                <section class="wrapper-xblock level-element" data-locator="locator-component-A1">
 
-                    </div>
-                    <div class="vert vert-1" data-id="i4x://AndyA/ABT101/video/fbd800d0bdbd4cb69ac70c47c9f699e1">
-
-                        <section class="wrapper-xblock level-element" data-locator="testCourse/branch/draft/block/videofbd" data-display-name="Video" data-category="video">
-                            <header class="xblock-header">
-                                <div class="header-details">
-                                    Video
-                                </div>
-                                <div class="header-actions">
-                                    <ul class="actions-list">
-                                        <li class="action-item action-edit">
-                                            <a href="#" class="edit-button action-button">
-                                                <i class="icon-edit"></i>
-                                                <span class="action-button-text">Edit</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </header>
-                            <article class="xblock-render">
-                                <div class="xblock xblock-student_view xmodule_display xmodule_VideoModule xblock-initialized" data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_video;_fbd800d0bdbd4cb69ac70c47c9f699e1" data-type="Video" data-block-type="video">
-
-
-                                    <h2>Video</h2>
-
-                                    <div id="video_i4x-AndyA-ABT101-video-fbd800d0bdbd4cb69ac70c47c9f699e1" class="video closed is-initialized" data-streams="1.00:OEoXaMPEzfM" data-save-state-url="/preview/xblock/i4x:;_;_AndyA;_ABT101;_video;_fbd800d0bdbd4cb69ac70c47c9f699e1/handler/xmodule_handler/save_user_state" data-caption-data-dir="None" data-show-captions="true" data-general-speed="1.0" data-speed="null" data-saved-video-position="0.0" data-start="0.0" data-end="0.0" data-transcript-language="en" data-transcript-languages="{&quot;en&quot;: &quot;English&quot;}" data-autoplay="False" data-yt-test-timeout="1500" data-yt-api-url="www.youtube.com/iframe_api" data-yt-test-url="gdata.youtube.com/feeds/api/videos/" data-transcript-translation-url="/preview/xblock/i4x:;_;_AndyA;_ABT101;_video;_fbd800d0bdbd4cb69ac70c47c9f699e1/handler/transcript/translation" data-transcript-available-translations-url="/preview/xblock/i4x:;_;_AndyA;_ABT101;_video;_fbd800d0bdbd4cb69ac70c47c9f699e1/handler/transcript/available_translations" data-autohide-html5="False" tabindex="-1">
-                                        <div class="focus_grabber first" tabindex="-1"></div>
-
-                                        <div class="tc-wrapper">
-                                            <a href="#before-transcript_i4x-AndyA-ABT101-video-fbd800d0bdbd4cb69ac70c47c9f699e1" class="nav-skip sr">Skip to a navigable version of this video's transcript.</a>
-
-                                            <article class="video-wrapper">
-                                                <span tabindex="-1" class="spinner" aria-hidden="true" aria-label="Loading video player"></span>
-                                                <span tabindex="-1" class="btn-play is-hidden" aria-hidden="true" aria-label="Play video"></span>
-                                                <div class="video-player-pre"></div>
-                                                <section class="video-player">
-                                                    <iframe id="i4x-AndyA-ABT101-video-fbd800d0bdbd4cb69ac70c47c9f699e1" frameborder="0" allowfullscreen="1" title="YouTube video player" width="640" height="360" src="https://www.youtube.com/embed/OEoXaMPEzfM?controls=0&amp;wmode=transparent&amp;rel=0&amp;showinfo=0&amp;enablejsapi=1&amp;modestbranding=1&amp;html5=1&amp;origin=http%3A%2F%2Flocalhost%3A8001" style="height: 476.4375px; width: 847px; top: -31.71875px; left: 0px;"></iframe>
-                                                    <h3 class="hidden">ERROR: No playable video sources found!</h3>
-                                                </section>
-                                                <div class="video-player-post"></div>
-                                                <section class="video-controls" style="">
-                                                    <div class="slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" title="Video position" aria-disabled="false" tabindex="-1" style=""><div class="ui-slider-range ui-widget-header ui-slider-range-min" style="width: 0%;"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" role="slider" title="Video position" aria-disabled="false" aria-valuetext="0 seconds" style="left: 0%;"></a></div>
-                                                    <div>
-                                                        <ul class="vcr">
-                                                            <li><a class="video_control play" href="#" title="Play" role="button" aria-disabled="false"></a></li>
-                                                            <li><div class="vidtime">0:00 / 1:56</div></li>
-                                                        </ul>
-                                                        <div class="secondary-controls"><div class="speeds menu-container">
-                                                            <a href="#" title="Speeds" role="button" aria-disabled="false">
-                                                                <h3>Speed</h3>
-                                                                <p class="active">1.0x</p>
-                                                            </a>
-                                                            <ol class="video_speeds menu" role="menu"><li data-speed="2.0" role="presentation"><a class="speed_link" href="#" role="menuitem">2.0x</a></li><li data-speed="1.50" role="presentation"><a class="speed_link" href="#" role="menuitem">1.50x</a></li><li data-speed="1.0" role="presentation" class="active"><a class="speed_link" href="#" role="menuitem">1.0x</a></li><li data-speed="0.50" role="presentation"><a class="speed_link" href="#" role="menuitem">0.50x</a></li></ol>
-                                                        </div><div class="volume">
-                                                            <a href="#" title="Volume" role="button" aria-disabled="false" aria-label="Volume"></a>
-                                                            <div class="volume-slider-container">
-                                                                <div class="volume-slider ui-slider ui-slider-vertical ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-range ui-widget-header ui-slider-range-min" style="height: 100%;"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" role="slider" title="Volume" aria-disabled="false" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="Maximum" style="bottom: 100%;"></a></div>
-                                                            </div>
+                                                    <header class="xblock-header">
+                                                        <div class="header-actions">
+                                                            <ul class="actions-list">
+                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
+                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
+                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                            </ul>
                                                         </div>
-
-
-                                                            <a href="#" class="add-fullscreen" title="Fill browser" role="button" aria-disabled="false">Fill browser</a>
-                                                            <a href="#" class="quality_control" title="HD off" role="button" aria-disabled="false" style="display: inline;">HD off</a>
-
-                                                            <div class="lang menu-container">
-                                                                <a href="#" class="hide-subtitles" title="Turn on captions" role="button" aria-="" disabled="false" style="display: none;">Turn on captions</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    </header>
+                                                    <article class="xblock-render"></article>
                                                 </section>
-                                                <a class="nav-skip sr" id="before-transcript_i4x-AndyA-ABT101-video-fbd800d0bdbd4cb69ac70c47c9f699e1" href="#after-transcript_i4x-AndyA-ABT101-video-fbd800d0bdbd4cb69ac70c47c9f699e1">Skip to end of transcript.</a>
-                                            </article>
 
-                                            <ol id="transcript-captions" class="subtitles" tabindex="0" role="group" aria-label="Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item." style="max-height: 476px;">
-                                                <li style=""></li>
-                                            </ol>
-                                        </div>
+                                                <section class="wrapper-xblock level-element" data-locator="locator-component-A2">
 
-                                        <a class="nav-skip sr" id="after-transcript_i4x-AndyA-ABT101-video-fbd800d0bdbd4cb69ac70c47c9f699e1" href="#before-transcript_i4x-AndyA-ABT101-video-fbd800d0bdbd4cb69ac70c47c9f699e1">Go back to start of transcript.</a>
+                                                    <header class="xblock-header">
+                                                        <div class="header-actions">
+                                                            <ul class="actions-list">
+                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
+                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
+                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </header>
+                                                    <article class="xblock-render"></article>
+                                                </section>
 
-                                        <div class="focus_grabber last" tabindex="-1"></div>
-                                        <ul class="wrapper-downloads">
-                                        </ul>
-                                    </div>
+                                                <section class="wrapper-xblock level-element" data-locator="locator-component-A3">
 
-                                </div>
-
-                            </article>
-                        </section>
-
-                    </div>
-                </div>
-
-            </div>
-
-        </article>
-    </section>
-
-</div>
-<div class="vert vert-1" data-id="i4x://AndyA/ABT101/vertical/c5c8b27c2c5546e784432f3b2b6cf2ea">
-
-    <section class="wrapper-xblock level-nesting is-collapsible" data-locator="testCourse/branch/draft/block/verticalc5c">
-        <header class="xblock-header">
-            <div class="header-details">
-                <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse collapse">
-                    <i class="icon-caret-down ui-toggle-expansion"></i>
-                    <span class="sr">Expand or Collapse</span>
-                </a>
-                <span>Group B</span>
-            </div>
-            <div class="header-actions">
-                <ul class="actions-list">
-                    <li class="sr action-item">No Actions</li>
-                </ul>
-            </div>
-        </header>
-        <article class="xblock-render">
-            <div class="xblock xblock-student_view xmodule_display xmodule_VerticalModule xblock-initialized" data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_vertical;_c5c8b27c2c5546e784432f3b2b6cf2ea" data-type="None" data-block-type="vertical">
-                <div class="vert-mod">
-                    <div class="vert vert-0" data-id="i4x://AndyA/ABT101/html/dd6ef295fda74a639842e1a49c66b2c7">
-
-                        <section class="wrapper-xblock level-element" data-locator="testCourse/branch/draft/block/htmldd6" data-display-name="Text" data-category="html">
-                            <header class="xblock-header">
-                                <div class="header-details">
-                                    Text
-                                </div>
-                                <div class="header-actions">
-                                    <ul class="actions-list">
-                                        <li class="action-item action-edit">
-                                            <a href="#" class="edit-button action-button">
-                                                <i class="icon-edit"></i>
-                                                <span class="action-button-text">Edit</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </header>
-                            <article class="xblock-render">
-                                <div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule xblock-initialized" data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_html;_dd6ef295fda74a639842e1a49c66b2c7" data-type="HTMLModule" data-block-type="html">
-                                    <p>This is group B.</p>
-                                </div>
-
-                            </article>
-                        </section>
-
-                    </div>
-                    <div class="vert vert-1" data-id="i4x://AndyA/ABT101/problem/b40ecbe4ed1b4280ae93e2a158edae6f">
-
-                        <section class="wrapper-xblock level-element" data-locator="testCourse/branch/draft/block/problemb40" data-display-name="Checkboxes" data-category="problem">
-                            <header class="xblock-header">
-                                <div class="header-details">
-                                    Checkboxes
-                                </div>
-                                <div class="header-actions">
-                                    <ul class="actions-list">
-                                        <li class="action-item action-edit">
-                                            <a href="#" class="edit-button action-button">
-                                                <i class="icon-edit"></i>
-                                                <span class="action-button-text">Edit</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </header>
-                            <article class="xblock-render">
-                                <div class="xblock xblock-student_view xmodule_display xmodule_CapaModule xblock-initialized" data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_problem;_b40ecbe4ed1b4280ae93e2a158edae6f" data-type="Problem" data-block-type="problem">
-                                    <div id="problem_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f" class="problems-wrapper" data-problem-id="i4x://AndyA/ABT101/problem/b40ecbe4ed1b4280ae93e2a158edae6f" data-url="/preview/xblock/i4x:;_;_AndyA;_ABT101;_problem;_b40ecbe4ed1b4280ae93e2a158edae6f/handler/xmodule_handler" data-progress_status="none" data-progress_detail="0/1">
-
-
-                                        <h2 class="problem-header">
-                                            Checkboxes
-                                        </h2>
-
-                                        <div class="problem-progress">(1 point possible)</div>
-
-                                        <div class="problem" role="application">
-                                            <div>
-                                                <p>A checkboxes problem presents checkbox buttons for student input. Students can select more than one option presented.</p>
-  <span><form class="choicegroup capa_inputtype" id="inputtype_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1">
-      <div class="indicator_container">
-        <span class="status unanswered" id="status_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1" aria-describedby="inputtype_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1">
-            <span class="sr">
-                -
-                unanswered
-            </span>
-        </span>
-      </div>
-
-      <fieldset role="checkboxgroup" aria-label="Select the answer that matches">
-
-          <label for="input_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1_choice_0">
-              <input type="checkbox" name="input_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1[]" id="input_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1_choice_0" aria-role="radio" aria-describedby="answer_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1" value="choice_0" aria-multiselectable="true"> correct
-
-          </label>
-          <label for="input_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1_choice_1">
-              <input type="checkbox" name="input_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1[]" id="input_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1_choice_1" aria-role="radio" aria-describedby="answer_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1" value="choice_1" aria-multiselectable="true"> incorrect
-
-          </label>
-          <label for="input_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1_choice_2">
-              <input type="checkbox" name="input_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1[]" id="input_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1_choice_2" aria-role="radio" aria-describedby="answer_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1" value="choice_2" aria-multiselectable="true"> correct
-
-          </label>
-          <span id="answer_i4x-AndyA-ABT101-problem-b40ecbe4ed1b4280ae93e2a158edae6f_2_1"></span>
-      </fieldset>
-
-  </form></span>
-                                            </div>
-
-                                            <div class="action">
-                                                <input type="hidden" name="problem_id" value="Checkboxes">
-
-                                                <input class="check Check" type="button" value="Check">
+                                                    <header class="xblock-header">
+                                                        <div class="header-actions">
+                                                            <ul class="actions-list">
+                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
+                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
+                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </header>
+                                                    <article class="xblock-render"></article>
+                                                </section>
                                             </div>
                                         </div>
                                     </div>
+                                </article>
+                            </section>
 
-                                </div>
+                            <section class="wrapper-xblock level-nesting" data-locator="locator-group-B">
+                                <header class="xblock-header"></header>
 
-                            </article>
-                        </section>
+                                <article class="xblock-render">
+                                    <div class="xblock" data-block-type="vertical">
+                                        <div class="vert-mod">
+                                            <div class="vert vert-0">
 
+                                                <section class="wrapper-xblock level-element" data-locator="locator-component-B1">
+
+                                                    <header class="xblock-header">
+                                                        <div class="header-actions">
+                                                            <ul class="actions-list">
+                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
+                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
+                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </header>
+                                                    <article class="xblock-render"></article>
+                                                </section>
+
+                                                <section class="wrapper-xblock level-element" data-locator="locator-component-B2">
+
+                                                    <header class="xblock-header">
+                                                        <div class="header-actions">
+                                                            <ul class="actions-list">
+                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
+                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
+                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </header>
+                                                    <article class="xblock-render"></article>
+                                                </section>
+
+                                                <section class="wrapper-xblock level-element" data-locator="locator-component-B3">
+
+                                                    <header class="xblock-header">
+                                                        <div class="header-actions">
+                                                            <ul class="actions-list">
+                                                                <li class="action-item action-edit"><a href="#" class="edit-button action-button"></a></li>
+                                                                <li class="action-item action-duplicate"><a href="#" class="duplicate-button action-button"></a></li>
+                                                                <li class="action-item action-delete"><a href="#" class="delete-button action-button"></a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </header>
+                                                    <article class="xblock-render"></article>
+                                                </section>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </section>
+                        </div>
                     </div>
                 </div>
-
             </div>
-
-        </article>
-    </section>
-
-</div>
-</div>
-
-</div>
-
+        </div>
+    </div>
 </article>
-</section>

@@ -10,7 +10,7 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
             var view = options.view,
                 collection = view.collection;
             this.view = view;
-            this.template = this.loadTemplate("paging-header");
+            this.template = this.loadTemplate('paging-header');
             collection.bind('add', _.bind(this.render, this));
             collection.bind('remove', _.bind(this.render, this));
             collection.bind('reset', _.bind(this.render, this));

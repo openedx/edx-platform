@@ -11,7 +11,7 @@ define(["underscore", "js/views/baseview"], function(_, BaseView) {
             var view = options.view,
                 collection = view.collection;
             this.view = view;
-            this.template = this.loadTemplate("paging-footer");
+            this.template = this.loadTemplate('paging-footer');
             collection.bind('add', _.bind(this.render, this));
             collection.bind('remove', _.bind(this.render, this));
             collection.bind('reset', _.bind(this.render, this));
