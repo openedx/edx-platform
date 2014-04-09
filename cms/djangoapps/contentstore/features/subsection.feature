@@ -38,6 +38,14 @@ Feature: CMS.Create Subsection
     Then I see the subsection release date is 12/25/2011 03:00
     And I see the subsection due date is 01/02/2012 04:00
 
+  Scenario: Set release and due dates of subsection on enter
+    Given I have opened a new subsection in Studio
+    And I set the subsection release date on enter to 04/04/2014 03:00
+    And I set the subsection due date on enter to 04/04/2014 04:00
+    And I reload the page
+    Then I see the subsection release date is 04/04/2014 03:00
+    And I see the subsection due date is 04/04/2014 04:00
+
   Scenario: Delete a subsection
     Given I have opened a new course section in Studio
     And I have added a new subsection

@@ -55,26 +55,28 @@ def i_see_complete_subsection_name_with_quote_in_editor(step):
 
 @step('I set the subsection release date to ([0-9/-]+)( [0-9:]+)?')
 def set_subsection_release_date(_step, datestring, timestring):
-    if hasattr(timestring, "strip"):
-        timestring = timestring.strip()
-    if not timestring:
-        timestring = "00:00"
-    set_date_and_time(
-        'input#start_date', datestring,
-        'input#start_time', timestring)
+    set_subsection_date('input#start_date', datestring, 'input#start_time', timestring)
+
+
+@step('I set the subsection release date on enter to ([0-9/-]+)( [0-9:]+)?')
+def set_subsection_release_date_on_enter(_step, datestring, timestring):  # pylint: disable-msg=invalid-name
+    set_subsection_date('input#start_date', datestring, 'input#start_time', timestring, 'ENTER')
 
 
 @step('I set the subsection due date to ([0-9/-]+)( [0-9:]+)?')
 def set_subsection_due_date(_step, datestring, timestring):
-    if hasattr(timestring, "strip"):
-        timestring = timestring.strip()
-    if not timestring:
-        timestring = "00:00"
     if not world.css_visible('input#due_date'):
         world.css_click('.due-date-input .set-date')
-    set_date_and_time(
-        'input#due_date', datestring,
-        'input#due_time', timestring)
+
+    set_subsection_date('input#due_date', datestring, 'input#due_time', timestring)
+
+
+@step('I set the subsection due date on enter to ([0-9/-]+)( [0-9:]+)?')
+def set_subsection_due_date_on_enter(_step, datestring, timestring):  # pylint: disable-msg=invalid-name
+    if not world.css_visible('input#due_date'):
+        world.css_click('.due-date-input .set-date')
+
+    set_subsection_date('input#due_date', datestring, 'input#due_time', timestring, 'ENTER')
 
 
 @step('I mark it as Homework$')
@@ -147,3 +149,12 @@ def see_subsection_name(name):
     assert world.is_css_present(css)
     css = 'span.subsection-name-value'
     assert world.css_has_text(css, name)
+
+
+def set_subsection_date(date_css, datestring, time_css, timestring, key=None):
+    if hasattr(timestring, "strip"):
+        timestring = timestring.strip()
+    if not timestring:
+        timestring = "00:00"
+
+    set_date_and_time(date_css, datestring, time_css, timestring, key)

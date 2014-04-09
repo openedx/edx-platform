@@ -1,5 +1,6 @@
-define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "tzAbbr", "js/models/uploads", "js/views/uploads", "jquery.timepicker", "date"],
-    function(ValidatingView, CodeMirror, _, $, ui, tzAbbr, FileUploadModel, FileUploadDialog) {
+define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "tzAbbr", "js/models/uploads",
+    "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date"],
+    function(ValidatingView, CodeMirror, _, $, ui, tzAbbr, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -121,7 +122,7 @@ var DetailsView = ValidatingView.extend({
 
         // Using the change event causes setfield to be triggered twice, but it is necessary
         // to pick up when the date is typed directly in the field.
-        datefield.change(setfield);
+        datefield.change(setfield).keyup(TriggerChangeEventOnEnter);
         timefield.on('changeTime', setfield);
         timefield.on('input', setfield);
 
