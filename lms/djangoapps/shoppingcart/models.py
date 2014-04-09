@@ -427,7 +427,7 @@ class PaidCourseRegistrationAnnotation(models.Model):
     annotation = models.TextField(null=True)
 
     def __unicode__(self):
-        return u"{} : {}".format(self.course_id, self.annotation)
+        return u"{} : {}".format(self.course_id.to_deprecated_string(), self.annotation)
 
 
 class CertificateItem(OrderItem):

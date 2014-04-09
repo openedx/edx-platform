@@ -622,7 +622,7 @@ def change_enrollment(request):
         # the user to the shopping cart page always, where they can reasonably discern the status of their cart,
         # whether things got added, etc
 
-        shoppingcart.views.add_course_to_cart(request, course_id)
+        shoppingcart.views.add_course_to_cart(request, course_id.to_deprecated_string())
         return HttpResponse(
             reverse("shoppingcart.views.show_cart")
         )

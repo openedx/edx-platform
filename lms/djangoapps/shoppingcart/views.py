@@ -45,6 +45,8 @@ def add_course_to_cart(request, course_id):
     Adds course specified by course_id to the cart.  The model function add_to_order does all the
     heavy lifting (logging, error checking, etc)
     """
+
+    assert isinstance(course_id, basestring)
     if not request.user.is_authenticated():
         log.info("Anon user trying to add course {} to cart".format(course_id))
         return HttpResponseForbidden(_('You must be logged-in to add to a shopping cart'))
