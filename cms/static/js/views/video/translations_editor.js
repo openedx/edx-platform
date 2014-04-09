@@ -145,7 +145,7 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
                 target = $(event.currentTarget),
                 lang = target.data('lang'),
                 model = new FileUpload({
-                    title: gettext('Upload translation.'),
+                    title: gettext('Upload translation'),
                     fileFormats: ['srt']
                 }),
                 view = new VideoUploadDialog({

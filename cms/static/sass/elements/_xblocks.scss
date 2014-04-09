@@ -61,6 +61,10 @@
     margin: 0 ($baseline/4);
     height: ($baseline*1.25);
     width: $baseline;
+
+    &:focus {
+      outline: 0;
+    }
   }
 
   .action-view {

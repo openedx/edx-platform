@@ -30,6 +30,8 @@ body.view-container {
   .content-primary {
     margin-right: flex-gutter();
     width: flex-grid(9,12);
+    box-shadow: none;
+    border: 0;
 
     .no-container-content {
       @extend %ui-well;

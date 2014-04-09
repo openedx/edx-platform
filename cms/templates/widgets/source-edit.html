@@ -48,7 +48,7 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
       ## cannot do this with css or it gets overwritten
       var editorH = $( window ).height() - 100;
       var editorW = $( window ).innerWidth() - 70;
-      hlsmodal.attr('style', function(i,s) { return s + 'margin: 2% 0 0 10% !important; left:0; height:' + editorH + 'px;'});
+      hlsmodal.attr('style', function(i,s) { return s + 'margin: 2% 0 0 10% !important; left:10%; height:' + editorH + 'px;'});
 
       ## setup file input
       ## need to insert this only after hls triggered, because otherwise it
