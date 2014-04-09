@@ -244,10 +244,10 @@ def capture_screenshot_for_step(step, when):
         world.capture_screenshot("image_name")
     """
     if world.auto_capture_screenshots:
-        scenario_num = step.scenario.feature.scenarios.index(step.scenario)
+        scenario_num = step.scenario.feature.scenarios.index(step.scenario) + 1
         step_num = step.scenario.steps.index(step) + 1
         step_func_name = step.defined_at.function.func_name
-        image_name = "{prefix:03d}__{num}__{name}__{postfix}".format(
+        image_name = "{prefix:03d}__{num:03d}__{name}__{postfix}".format(
             prefix=scenario_num,
             num=step_num,
             name=step_func_name,
@@ -258,12 +258,12 @@ def capture_screenshot_for_step(step, when):
 
 @before.each_step
 def before_each_step(step):
-    capture_screenshot_for_step(step, 'before')
+    capture_screenshot_for_step(step, '1_before')
 
 
 @after.each_step
 def after_each_step(step):
-    capture_screenshot_for_step(step, 'after')
+    capture_screenshot_for_step(step, '2_after')
 
 
 @after.harvest
