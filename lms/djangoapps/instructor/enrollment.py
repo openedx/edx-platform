@@ -24,7 +24,7 @@ SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 class EmailEnrollmentState(object):
     """ Store the complete enrollment state of an email in a class """
     def __init__(self, course_id, email):
-        course_id = CourseKey.from_string(course_id)
+        course_id = course_id
         exists_user = User.objects.filter(email=email).exists()
         if exists_user:
             user = User.objects.get(email=email)
@@ -83,9 +83,6 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
     returns two EmailEnrollmentState's
         representing state before and after the action.
     """
-    # TODO eventually move some stuff so that this thing takes course_key as an arg instead of course_id
-    course_key = CourseKey.from_string(course_id)
-
     previous_state = EmailEnrollmentState(course_id, student_email)
 
     if previous_state.user:
@@ -120,7 +117,6 @@ def unenroll_email(course_id, student_email, email_students=False, email_params=
     returns two EmailEnrollmentState's
         representing state before and after the action.
     """
-
     previous_state = EmailEnrollmentState(course_id, student_email)
 
     if previous_state.enrollment:
@@ -183,7 +179,7 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
     """
     module_to_reset = StudentModule.objects.get(student_id=student.id,
                                                 course_id=course_id,
-                                                module_state_key=module_state_key)
+                                                module_id=module_state_key)
 
     if delete_module:
         module_to_reset.delete()
