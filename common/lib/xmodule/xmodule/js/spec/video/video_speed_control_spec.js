@@ -73,16 +73,6 @@
                         return $.Event('keydown', {keyCode: key});
                     },
 
-                    tabBackPressEvent = function() {
-                        return $.Event('keydown',
-                                       {keyCode: KEY.TAB, shiftKey: true});
-                    },
-
-                    tabForwardPressEvent = function() {
-                        return $.Event('keydown',
-                                       {keyCode: KEY.TAB, shiftKey: false});
-                    },
-
                     // Get previous element in array or cyles back to the last
                     // if it is the first.
                     previousSpeed = function(index) {
@@ -159,8 +149,6 @@
 
                 it('UP and DOWN keydown function as expected on speed entries',
                    function () {
-                    // Iterate through list in both directions and check if
-                    // things wrap up correctly.
                     var lastEntry = speedEntries.length-1,
                         speed_0_75 = speedEntries.filter(':contains("0.75x")'),
                         speed_1_0 = speedEntries.filter(':contains("1.0x")');
@@ -169,11 +157,9 @@
                     speedControl.trigger(keyPressEvent(KEY.UP));
                     expect(speed_0_75).toBeFocused();
 
-                    // Iterate with UP key until we have looped.
                     speed_0_75.trigger(keyPressEvent(KEY.UP));
                     expect(speed_1_0).toBeFocused();
 
-                    // // Iterate with DOWN key until we have looped.
                     speed_1_0.trigger(keyPressEvent(KEY.DOWN));
                     expect(speed_0_75).toBeFocused();
                 });
