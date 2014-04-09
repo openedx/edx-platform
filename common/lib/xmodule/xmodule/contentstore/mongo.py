@@ -118,21 +118,20 @@ class MongoContentStore(ContentStore):
         with disk_fs.open(content.name, 'wb') as asset_file:
             asset_file.write(content.data)
 
-    def export_all_for_course(self, course_location, output_directory, assets_policy_file):
+    def export_all_for_course(self, course_key, output_directory, assets_policy_file):
         """
         Export all of this course's assets to the output_directory. Export all of the assets'
         attributes to the policy file.
 
-        :param course_location: the Location of type 'course'
         :param output_directory: the directory under which to put all the asset files
         :param assets_policy_file: the filename for the policy file which should be in the same
         directory as the other policy files.
         """
         policy = {}
-        assets, __ = self.get_all_content_for_course(course_location)
+        assets, __ = self.get_all_content_for_course(course_key)
 
         for asset in assets:
-            asset_location = MongoModuleStore._location_from_id(asset['_id'], course_location.run)
+            asset_location = MongoModuleStore._location_from_id(asset['_id'], course_key.run)
             self.export(asset_location, output_directory)
             for attr, value in asset.iteritems():
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
@@ -141,15 +140,15 @@ class MongoContentStore(ContentStore):
         with open(assets_policy_file, 'w') as f:
             json.dump(policy, f)
 
-    def get_all_content_thumbnails_for_course(self, location):
-        return self._get_all_content_for_course(location, get_thumbnails=True)[0]
+    def get_all_content_thumbnails_for_course(self, course_key):
+        return self._get_all_content_for_course(course_key, get_thumbnails=True)[0]
 
-    def get_all_content_for_course(self, location, start=0, maxresults=-1, sort=None):
+    def get_all_content_for_course(self, course_key, start=0, maxresults=-1, sort=None):
         return self._get_all_content_for_course(
-            location, start=start, maxresults=maxresults, get_thumbnails=False, sort=sort
+            course_key, start=start, maxresults=maxresults, get_thumbnails=False, sort=sort
         )
 
-    def _get_all_content_for_course(self, location, get_thumbnails=False, start=0, maxresults=-1, sort=None):
+    def _get_all_content_for_course(self, course_key, get_thumbnails=False, start=0, maxresults=-1, sort=None):
         '''
         Returns a list of all static assets for a course. The return format is a list of dictionary elements. Example:
 
@@ -169,7 +168,7 @@ class MongoContentStore(ContentStore):
 
             ]
         '''
-        course_filter = location.course_key.make_asset_key(
+        course_filter = course_key.make_asset_key(
             "asset" if not get_thumbnails else "thumbnail",
             None
         )
@@ -243,3 +242,12 @@ class MongoContentStore(ContentStore):
         if item is None:
             raise NotFoundError()
         return item
+
+    def delete_all_course_assets(self, course_key):
+        """
+        Delete all assets identified via this course_key. Dangerous operation which may remove assets
+        referenced by other runs or other courses.
+        :param course_key:
+        """
+        course_query = MongoModuleStore._course_key_to_son(course_key, tag=XASSET_LOCATION_TAG)
+        self.fs.delete(course_query)

@@ -583,6 +583,14 @@ class MongoModuleStore(ModuleStoreWriteBase):
         except ItemNotFoundError:
             return None
 
+    def has_course(self, course_key):
+        """
+        Is the given course in this modulestore
+        """
+        assert(isinstance(course_key, SlashSeparatedCourseKey))
+        course_query = self._course_key_to_son(course_key)
+        return self.collection.find_one(course_query, fields={'_id': True}) is not None
+
     def has_item(self, usage_key):
         """
         Returns True if location exists in this ModuleStore.
@@ -612,12 +620,13 @@ class MongoModuleStore(ModuleStoreWriteBase):
         module = self._load_items(usage_key.course_key, [item], depth)[0]
         return module
 
-    def _course_key_to_son(self, course_id):
+    @staticmethod
+    def _course_key_to_son(course_id, tag='i4x'):
         """
         Generate the partial key to look up items relative to a given course
         """
         return SON([
-            ('_id.tag', 'i4x'),
+            ('_id.tag', tag),
             ('_id.org', course_id.org),
             ('_id.course', course_id.course),
         ])
@@ -724,6 +733,15 @@ class MongoModuleStore(ModuleStoreWriteBase):
         )
 
         return course
+
+    def delete_course(self, course_key, user_id=None):
+        """
+        The impl removes all of the db records for the course.
+        :param course_key:
+        :param user_id:
+        """
+        course_query = self._course_key_to_son(course_key)
+        self.collection.remove(course_query, multi=True)
 
     def create_xmodule(self, location, definition_data=None, metadata=None, system=None, fields={}):
         """

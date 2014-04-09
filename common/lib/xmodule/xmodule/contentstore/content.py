@@ -188,7 +188,7 @@ class ContentStore(object):
     def find(self, filename):
         raise NotImplementedError
 
-    def get_all_content_for_course(self, location, start=0, maxresults=-1, sort=None):
+    def get_all_content_for_course(self, course_iey, start=0, maxresults=-1, sort=None):
         '''
         Returns a list of static assets for a course, followed by the total number of assets.
         By default all assets are returned, but start and maxresults can be provided to limit the query.
@@ -211,6 +211,13 @@ class ContentStore(object):
 
             ]
         '''
+        raise NotImplementedError
+
+    def delete_all_course_assets(self, course_key):
+        """
+        Delete all of the assets which use this course_key as an identifier
+        :param course_key:
+        """
         raise NotImplementedError
 
     def generate_thumbnail(self, content, tempfile_path=None):

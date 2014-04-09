@@ -22,6 +22,7 @@ from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import dashboard.git_import as git_import
 from dashboard.git_import import GitImportError
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 TEST_MONGODB_LOG = {
     'host': 'localhost',
@@ -163,14 +164,14 @@ class TestGitAddCourse(ModuleStoreTestCase):
 
         # Delete to test branching back to master
         delete_course(def_ms, contentstore(),
-                      def_ms.get_course(self.TEST_BRANCH_COURSE).id,
+                      self.TEST_BRANCH_COURSE,
                       True)
         self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
         git_import.add_repo(self.TEST_REPO,
                             repo_dir / 'edx4edx_lite',
                             'master')
         self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
-        self.assertIsNotNone(def_ms.get_course(self.TEST_COURSE))
+        self.assertIsNotNone(def_ms.get_course(SlashSeparatedCourseKey.from_deprecated_string(self.TEST_COURSE)))
 
     def test_branch_exceptions(self):
         """

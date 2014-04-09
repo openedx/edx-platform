@@ -113,7 +113,7 @@ def _clone_modules(modulestore, modules, source_course_id, dest_course_id):
         if module.has_children:
             new_children = []
             for child_loc_url in module.children:
-                child_loc = Location(child_loc_url)
+                child_loc = original_loc.course_key.make_usage_key_from_deprecated_string(child_loc_url)
                 child_loc = child_loc.map_into_course(dest_course_id)
                 new_children.append(child_loc.url())
 
@@ -184,65 +184,26 @@ def clone_course(modulestore, contentstore, source_course_id, dest_course_id, de
     return True
 
 
-def _delete_modules_except_course(modulestore, modules, source_location, commit):
-    """
-    This helper method will just enumerate through a list of modules and delete them, except for the
-    top-level course module
-    """
-    for module in modules:
-        if module.category != 'course':
-            logging.warning("Deleting {0}...".format(module.location))
-            if commit:
-                # sanity check. Make sure we're not deleting a module in the incorrect course
-                if module.location.org != source_location.org or module.location.course != source_location.course:
-                    raise Exception('Module {0} is not in same namespace as {1}. This should not happen! Aborting...'.format(module.location, source_location))
-                modulestore.delete_item(module.location)
-
-
-def _delete_assets(contentstore, assets, commit):
-    """
-    This helper method will enumerate through a list of assets and delete them
-    """
-    for asset in assets:
-        asset_loc = Location(asset["_id"])
-        id = StaticContent.get_id_from_location(asset_loc)
-        logging.warning("Deleting {0}...".format(id))
-        if commit:
-            contentstore.delete(id)
-
-
-def delete_course(modulestore, contentstore, source_location, commit=False):
+def delete_course(modulestore, contentstore, course_key, commit=False):
     """
     This method will actually do the work to delete all content in a course in a MongoDB backed
     courseware store. BE VERY CAREFUL, this is not reversable.
     """
 
     # check to see if the source course is actually there
-    if not modulestore.has_course(source_location.course_key):
-        raise Exception("Cannot find a course at {0}. Aborting".format(source_location))
+    if not modulestore.has_course(course_key):
+        raise Exception("Cannot find a course at {0}. Aborting".format(course_key))
 
-    # first delete all of the thumbnails
-    thumbs = contentstore.get_all_content_thumbnails_for_course(source_location)
-    _delete_assets(contentstore, thumbs, commit)
-
-    # then delete all of the assets
-    assets, __ = contentstore.get_all_content_for_course(source_location)
-    _delete_assets(contentstore, assets, commit)
-
-    # then delete all course modules
-    modules = module.store.get_items(source_location.course_key)
-    _delete_modules_except_course(modulestore, modules, source_location, commit)
-
-    # then delete all draft course modules
-    modules = module.store.get_items(source_location.course_key, revision='draft')
-    _delete_modules_except_course(modulestore, modules, source_location, commit)
-
-    # finally delete the top-level course module itself
-    print "Deleting {0}...".format(source_location)
     if commit:
-        modulestore.delete_item(source_location)
+        print "Deleting assets and thumbnails {}".format(course_key)
+        contentstore.delete_all_course_assets(course_key)
+
+    # finally delete the course
+    print "Deleting {0}...".format(course_key)
+    if commit:
+        modulestore.delete_course(course_key, '**replace-user**')
 
         # remove location of this course from loc_mapper and cache
-        loc_mapper().delete_course_mapping(source_location)
+        loc_mapper().delete_course_mapping(course_key)
 
     return True

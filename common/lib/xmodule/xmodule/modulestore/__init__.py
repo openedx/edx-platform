@@ -165,6 +165,13 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
+    def has_course(self, course_id):
+        '''
+        Look for a specific course id.  Returns whether it exists.
+        '''
+        pass
+
+    @abstractmethod
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
@@ -255,6 +262,18 @@ class ModuleStoreWrite(ModuleStoreRead):
         """
         pass
 
+    @abstractmethod
+    def delete_course(self, course_key, user_id=None):
+        """
+        Deletes the course. It may be a soft or hard delete. It may or may not remove the xblock definitions
+        depending on the persistence layer and how tightly bound the xblocks are to the course.
+
+        Args:
+            course_key (CourseKey): which course to delete
+            user_id: id of the user creating the course
+        """
+        pass
+
 
 class ModuleStoreReadBase(ModuleStoreRead):
     '''
@@ -308,6 +327,11 @@ class ModuleStoreReadBase(ModuleStoreRead):
             if c.id == course_id:
                 return c
         return None
+
+    def has_course(self, course_id):
+        """Default impl--linear search through course list"""
+        assert(isinstance(course_id, CourseKey))
+        return any(c.id == course_id for c in self.get_courses())
 
     def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
         """

@@ -61,11 +61,7 @@ def _clear_assets(location):
     """
     store = contentstore()
 
-    content_location = StaticContent.compute_location(
-        location.course_key, location.name
-    )
-
-    assets, __ = store.get_all_content_for_course(content_location)
+    assets, __ = store.get_all_content_for_course(location.course_key)
     for asset in assets:
         asset_location = MongoModuleStore._location_from_id(asset["_id"], location.course_key.run)
         del_cached_content(asset_location)

@@ -105,7 +105,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         _, content_store, course = self.load_test_import_course()
 
         # make sure we have ONE asset in our contentstore ("should_be_imported.html")
-        all_assets, count = content_store.get_all_content_for_course(course.location)
+        all_assets, count = content_store.get_all_content_for_course(course.id)
         print "len(all_assets)=%d" % len(all_assets)
         self.assertEqual(len(all_assets), 1)
         self.assertEqual(count, 1)
@@ -137,7 +137,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         course = module_store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
 
         # make sure we have NO assets in our contentstore
-        all_assets, count = content_store.get_all_content_for_course(course.location)
+        all_assets, count = content_store.get_all_content_for_course(course.id)
         self.assertEqual(len(all_assets), 0)
         self.assertEqual(count, 0)
 

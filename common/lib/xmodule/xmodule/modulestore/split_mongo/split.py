@@ -332,6 +332,14 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         result = self._load_items(course_entry, [root], 0, lazy=True)
         return result[0]
 
+    def has_course(self, course_id):
+        '''
+        Does this course exist in this modulestore.
+        '''
+        assert(isinstance(course_id, CourseLocator))
+        course_entry = self.db_connection.get_course_index(course_id)
+        return course_entry is not None
+
     def has_item(self, usage_key):
         """
         Returns True if location exists in its course. Returns false if
@@ -1324,7 +1332,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         return result
 
-    def delete_course(self, course_key):
+    def delete_course(self, course_key, user_id=None):
         """
         Remove the given course from the course index.
 

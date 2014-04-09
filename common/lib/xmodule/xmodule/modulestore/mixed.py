@@ -164,6 +164,25 @@ class MixedModuleStore(ModuleStoreWriteBase):
         except ItemNotFoundError:
             return None
 
+    def has_course(self, course_id):
+        """
+        returns whether the course exists
+
+        Args:
+        * course_id (CourseKey)
+        """
+        assert(isinstance(course_id, CourseKey))
+        store = self._get_modulestore_for_courseid(course_id)
+        return store.has_course(course_id)
+
+    def delete_course(self, course_key, user_id=None):
+        """
+        Remove the given course from its modulestore.
+        """
+        assert(isinstance(course_key, CourseKey))
+        store = self._get_modulestore_for_courseid(course_key)
+        return store.delete_course(course_key, user_id)
+
     def get_parent_locations(self, location):
         """
         returns the parent locations for a given location and course_id
