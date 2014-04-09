@@ -186,12 +186,12 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
             state='{}',
             student_id=user.id,
             course_id=course.id,
-            module_state_key=week1.location.url()).save()
+            module_state_key=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user.id,
             course_id=course.id,
-            module_state_key=homework.location.url()).save()
+            module_state_key=homework.location).save()
 
         self.course = course
         self.week1 = week1
@@ -243,46 +243,46 @@ class TestDataDumps(ModuleStoreTestCase):
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week1.location.url()).save()
+            module_state_key=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week2.location.url()).save()
+            module_state_key=week2.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week3.location.url()).save()
+            module_state_key=week3.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=homework.location.url()).save()
+            module_state_key=homework.location).save()
 
         user2 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=week1.location.url()).save()
+            module_state_key=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=homework.location.url()).save()
+            module_state_key=homework.location).save()
 
         user3 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=week1.location.url()).save()
+            module_state_key=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=homework.location.url()).save()
+            module_state_key=homework.location).save()
 
         self.course = course
         self.week1 = week1
