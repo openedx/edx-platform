@@ -64,7 +64,7 @@ class User(models.Model):
             metric_action='user.vote',
             metric_tags=self._metric_tags + ['target.type:{}'.format(voteable.type)],
         )
-        voteable.update_attributes(request)
+        voteable._update_attributes(request)
 
     def unvote(self, voteable):
         if voteable.type == 'thread':
@@ -81,7 +81,7 @@ class User(models.Model):
             metric_action='user.unvote',
             metric_tags=self._metric_tags + ['target.type:{}'.format(voteable.type)],
         )
-        voteable.update_attributes(request)
+        voteable._update_attributes(request)
 
     def active_threads(self, query_params={}):
         if not self.course_id:
@@ -142,7 +142,7 @@ class User(models.Model):
                 )
             else:
                 raise
-        self.update_attributes(**response)
+        self._update_attributes(**response)
 
 
 def _url_for_vote_comment(comment_id):
