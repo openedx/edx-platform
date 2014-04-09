@@ -15,8 +15,9 @@ from edxmako import lookup_template
 import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
 from django.utils.timezone import UTC
+from xmodule.modulestore.locations import i4xEncoder
+import json
 
 log = logging.getLogger(__name__)
 
@@ -195,7 +196,7 @@ def get_discussion_category_map(course):
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
-        content = simplejson.dumps(data)
+        content = json.dumps(data, cls=i4xEncoder)
         super(JsonResponse, self).__init__(content,
                                            mimetype='application/json; charset=utf-8')
 
