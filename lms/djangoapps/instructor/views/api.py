@@ -65,6 +65,7 @@ from .tools import (
 )
 from xmodule.modulestore import Location
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -509,7 +510,7 @@ def get_grading_config(request, course_id):
     Respond with json which contains a html formatted grade summary.
     """
     course = get_course_with_access(
-        request.user, 'staff', course_id, depth=None
+        request.user, 'staff', SlashSeparatedCourseKey.from_string(course_id), depth=None
     )
     grading_config_summary = analytics.basic.dump_grading_context(course)
 
@@ -1164,7 +1165,7 @@ def change_due_date(request, course_id):
     """
     Grants a due date extension to a student for a particular unit.
     """
-    course = get_course_by_id(course_id)
+    course = get_course_by_id(SlashSeparatedCourseKey.from_string(course_id))
     student = get_student_from_identifier(request.GET.get('student'))
     unit = find_unit(course, request.GET.get('url'))
     due_date = parse_datetime(request.GET.get('due_datetime'))
@@ -1185,7 +1186,7 @@ def reset_due_date(request, course_id):
     """
     Rescinds a due date extension for a student on a particular unit.
     """
-    course = get_course_by_id(course_id)
+    course = get_course_by_id(SlashSeparatedCourseKey.from_string(course_id))
     student = get_student_from_identifier(request.GET.get('student'))
     unit = find_unit(course, request.GET.get('url'))
     set_due_date_extension(course, unit, student, None)
@@ -1205,7 +1206,7 @@ def show_unit_extensions(request, course_id):
     """
     Shows all of the students which have due date extensions for the given unit.
     """
-    course = get_course_by_id(course_id)
+    course = get_course_by_id(SlashSeparatedCourseKey.from_string(course_id))
     unit = find_unit(course, request.GET.get('url'))
     return JsonResponse(dump_module_extensions(course, unit))
 
@@ -1221,7 +1222,7 @@ def show_student_extensions(request, course_id):
     particular course.
     """
     student = get_student_from_identifier(request.GET.get('student'))
-    course = get_course_by_id(course_id)
+    course = get_course_by_id(SlashSeparatedCourseKey.from_string(course_id))
     return JsonResponse(dump_student_extensions(course, student))
 
 
