@@ -191,7 +191,7 @@ $('#fileupload').fileupload({
                     window.onbeforeunload = null;
                     if (xhr.status != 200) {
                         if (!result.responseText) {
-                            alert(gettext("Your import may have failed. Please check your course and try again if necessary."));
+                            alert(gettext("Your browser has timed out, but the server is still processing your import. Please wait 5 min and verify that the new content has appeared."));
                             return;
                         }
                         var serverMsg = $.parseJSON(result.responseText);
