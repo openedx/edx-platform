@@ -972,7 +972,7 @@ def list_forum_members(request, course_id):
     course = get_course_by_id(course_id)
     has_instructor_access = has_access(request.user, 'instructor', course)
     has_forum_admin = has_forum_access(
-        request.user, course_id.to_deprecated_string(), FORUM_ROLE_ADMINISTRATOR
+        request.user, course_id, FORUM_ROLE_ADMINISTRATOR
     )
 
     rolename = request.GET.get('rolename')
@@ -1029,7 +1029,7 @@ def send_email(request, course_id):
     - 'subject' specifies email's subject
     - 'message' specifies email's content
     """
-    course_id = SlashSeparatedCourseKey.to_deprecated_string()
+    course_id = SlashSeparatedCourseKey.from_string(course_id)
     send_to = request.POST.get("send_to")
     subject = request.POST.get("subject")
     message = request.POST.get("message")
@@ -1107,7 +1107,7 @@ def update_forum_role_membership(request, course_id):
         return HttpResponseBadRequest("Role does not exist.")
 
     response_payload = {
-        'course_id': course_id,
+        'course_id': course_id.to_deprecated_string(),
         'action': action,
     }
     return JsonResponse(response_payload)

@@ -10,6 +10,7 @@ from courseware.module_render import get_xqueue_callback_url_prefix
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.locations import Location
 from instructor_task.models import InstructorTask, PROGRESS
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 log = logging.getLogger(__name__)
