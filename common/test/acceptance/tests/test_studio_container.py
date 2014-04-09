@@ -29,6 +29,15 @@ class ContainerBase(UniqueCourseTest):
             self.course_info['run']
         )
 
+        self.container_title = ""
+        self.group_a = "Expand or Collapse\nGroup A"
+        self.group_b = "Expand or Collapse\nGroup B"
+        self.group_empty = "Expand or Collapse\nGroup Empty"
+        self.group_a_item_1 = "Group A Item 1"
+        self.group_a_item_2 = "Group A Item 2"
+        self.group_b_item_1 = "Group B Item 1"
+        self.group_b_item_2 = "Group B Item 2"
+
         self.setup_fixtures()
 
         self.auth_page.visit()
@@ -47,12 +56,13 @@ class ContainerBase(UniqueCourseTest):
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
                         XBlockFixtureDesc('vertical', 'Test Container').add_children(
                             XBlockFixtureDesc('vertical', 'Group A').add_children(
-                                XBlockFixtureDesc('html', 'Group A Item 1'),
-                                XBlockFixtureDesc('html', 'Group A Item 2')
+                                XBlockFixtureDesc('html', self.group_a_item_1),
+                                XBlockFixtureDesc('html', self.group_a_item_2)
                             ),
+                            XBlockFixtureDesc('vertical', 'Group Empty'),
                             XBlockFixtureDesc('vertical', 'Group B').add_children(
-                                XBlockFixtureDesc('html', 'Group B Item 1'),
-                                XBlockFixtureDesc('html', 'Group B Item 2')
+                                XBlockFixtureDesc('html', self.group_b_item_1),
+                                XBlockFixtureDesc('html', self.group_b_item_2)
                             )
                         )
                     )
@@ -76,23 +86,77 @@ class DragAndDropTest(ContainerBase):
     """
     __test__ = True
 
-    def verify_ordering(self, container, expected_ordering):
+    def verify_ordering(self, container, expected_orderings):
         xblocks = container.xblocks
-        for xblock in xblocks:
-            print xblock.name
-        # TODO: need to verify parenting structure on page. Just checking
-        # the order of the xblocks is not sufficient.
+        for expected_ordering in expected_orderings:
+            for xblock in xblocks:
+                parent = expected_ordering.keys()[0]
+                if xblock.name == parent:
+                    children = xblock.children
+                    expected_length = len(expected_ordering.get(parent))
+                    self.assertEqual(
+                        expected_length, len(children),
+                        "Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))
+                    for idx, expected in enumerate(expected_ordering.get(parent)):
+                        self.assertEqual(expected, children[idx].name)
 
-
-    def test_reorder_in_group(self):
+    def drag_and_verify(self, source, target, expected_ordering, after=True):
         container = self.go_to_container_page(make_draft=True)
-        # Swap Group A Item 1 and Group A Item 2.
-        container.drag(1, 2)
+        container.drag(source, target, after)
 
-        expected_ordering = [{"Group A": ["Group A Item 2", "Group A Item 1"]},
-                             {"Group B": ["Group B Item 1", "Group B Item 2"]}]
         self.verify_ordering(container, expected_ordering)
 
         # Reload the page to see that the reordering was saved persisted.
         container = self.go_to_container_page()
         self.verify_ordering(container, expected_ordering)
+
+    def test_reorder_in_group(self):
+        """
+        Drag Group B Item 2 before Group B Item 1.
+        """
+        expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
+                             {self.group_a: [self.group_a_item_1, self.group_a_item_2]},
+                             {self.group_b: [self.group_b_item_2, self.group_b_item_1]},
+                             {self.group_empty: []}]
+        self.drag_and_verify(6, 4, expected_ordering)
+
+    def test_drag_to_top(self):
+        """
+        Drag Group A Item 1 to top level (outside of Group A).
+        """
+        expected_ordering = [{self.container_title: [self.group_a_item_1, self.group_a, self.group_empty, self.group_b]},
+                             {self.group_a: [self.group_a_item_2]},
+                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
+                             {self.group_empty: []}]
+        self.drag_and_verify(1, 0, expected_ordering, False)
+
+    def test_drag_into_different_group(self):
+        """
+        Drag Group A Item 1 into Group B (last element).
+        """
+        expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
+                             {self.group_a: [self.group_a_item_2]},
+                             {self.group_b: [self.group_b_item_1, self.group_b_item_2, self.group_a_item_1]},
+                             {self.group_empty: []}]
+        self.drag_and_verify(1, 6, expected_ordering)
+
+    def test_drag_group_into_group(self):
+        """
+        Drag Group B into Group A (last element).
+        """
+        expected_ordering = [{self.container_title: [self.group_a, self.group_empty]},
+                             {self.group_a: [self.group_a_item_1, self.group_a_item_2, self.group_b]},
+                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
+                             {self.group_empty: []}]
+        self.drag_and_verify(4, 2, expected_ordering)
+
+    # Not able to drag into the empty group with automation (difficult even outside of automation).
+    # def test_drag_into_empty(self):
+    #     """
+    #     Drag Group B Item 1 to Group Empty.
+    #     """
+    #     expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
+    #                          {self.group_a: [self.group_a_item_1, self.group_a_item_2]},
+    #                          {self.group_b: [self.group_b_item_2]},
+    #                          {self.group_empty: [self.group_b_item_1]}]
+    #     self.drag_and_verify(6, 4, expected_ordering, False)
