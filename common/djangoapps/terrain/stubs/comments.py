@@ -14,6 +14,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
             "/api/v1/threads$": self.do_threads,
             "/api/v1/threads/(?P<thread_id>\\w+)$": self.do_thread,
             "/api/v1/comments/(?P<comment_id>\\w+)$": self.do_comment,
+            "/api/v1/(?P<commentable_id>\\w+)/threads$": self.do_commentable,
         }
         path = urlparse.urlparse(self.path).path
         for pattern in pattern_handlers:
@@ -62,6 +63,17 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
         if comment_id in self.server.config.get('comments', {}):
             comment = self.server.config['comments'][comment_id]
             self.send_json_response(comment)
+
+    def do_commentable(self, commentable_id):
+        self.send_json_response({
+            "collection": [
+                thread
+                for thread in self.server.config.get('threads', {}).values()
+                if thread.get('commentable_id') == commentable_id
+            ],
+            "page": 1,
+            "num_pages": 1,
+        })
 
 
 class StubCommentsService(StubHttpService):
