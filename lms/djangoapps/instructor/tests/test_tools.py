@@ -337,7 +337,7 @@ def get_extended_due(course, unit, student):
     student_module = StudentModule.objects.get(
         student_id=student.id,
         course_id=course.id,
-        module_state_key=unit.location.url()
+        module_id=unit.location
     )
 
     state = json.loads(student_module.state)

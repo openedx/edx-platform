@@ -291,7 +291,7 @@ def submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
     """
     # check to see if task is already running, and reserve it otherwise:
-    instructor_task = _reserve_task(course_id, task_type, task_key, task_input, request.user)
+    instructor_task = _reserve_task(SlashSeparatedCourseKey.from_string(course_id), task_type, task_key, task_input, request.user)
 
     # submit task:
     task_id = instructor_task.task_id

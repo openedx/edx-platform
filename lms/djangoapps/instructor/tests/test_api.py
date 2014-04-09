@@ -37,6 +37,7 @@ from instructor.access import allow_access
 import instructor.views.api
 from instructor.views.api import _split_input_list, _msk_from_problem_urlname, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from .test_tools import get_extended_due
 
@@ -1785,46 +1786,46 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week1.location.url()).save()
+            module_state_key=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week2.location.url()).save()
+            module_state_key=week2.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week3.location.url()).save()
+            module_state_key=week3.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=homework.location.url()).save()
+            module_state_key=homework.location).save()
 
         user2 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=week1.location.url()).save()
+            module_state_key=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=homework.location.url()).save()
+            module_state_key=homework.location).save()
 
         user3 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=week1.location.url()).save()
+            module_state_key=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=homework.location.url()).save()
+            module_state_key=homework.location).save()
 
         self.course = course
         self.week1 = week1
