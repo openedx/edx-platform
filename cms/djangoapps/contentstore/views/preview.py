@@ -82,6 +82,10 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     An XModule ModuleSystem for use in Studio previews
     """
+    # xmodules can check for this attribute during rendering to determine if
+    # they are being rendered for preview (i.e. in Studio)
+    is_author_mode = True
+
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
             'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),

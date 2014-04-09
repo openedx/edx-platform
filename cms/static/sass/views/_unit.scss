@@ -1389,6 +1389,10 @@ body.unit .component {
   .xmodule_DiscussionModule, .xmodule_HtmlModule, .xblock {
     margin-top: ($baseline*1.5);
   }
+  .discussion-preview {
+    font-style: italic;
+    color: $mediumGrey;
+  }
 }
 
 body.unit .component.editing {
