@@ -318,19 +318,23 @@ def i_am_shown_a_notification(step):
     assert world.is_css_present('.wrapper-prompt')
 
 
-def type_in_codemirror(index, text):
+def type_in_codemirror(index, text, find_prefix="$"):
     script = """
-    var cm = $('div.CodeMirror:eq({})').get(0).CodeMirror;
+    var cm = {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror;
     cm.getInputField().focus();
     cm.setValue(arguments[0]);
-    cm.getInputField().blur();""".format(index)
+    cm.getInputField().blur();""".format(index=index, find_prefix=find_prefix)
     world.browser.driver.execute_script(script, str(text))
     world.wait_for_ajax_complete()
 
-def get_codemirror_value(index=0):
-    return world.browser.driver.execute_script("""
-        return $('div.CodeMirror:eq({})').get(0).CodeMirror.getValue();
-        """.format(index))
+
+def get_codemirror_value(index=0, find_prefix="$"):
+    return world.browser.driver.execute_script(
+        """
+        return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();
+        """.format(index=index, find_prefix=find_prefix)
+    )
+
 
 
 def attach_file(filename, sub_path):

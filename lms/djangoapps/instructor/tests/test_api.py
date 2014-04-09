@@ -1745,9 +1745,26 @@ class TestInstructorAPIHelpers(TestCase):
         self.assertEqual(_split_input_list(scary_unistuff), [scary_unistuff])
 
     def test_msk_from_problem_urlname(self):
-        args = ('MITx/6.002x/2013_Spring', 'L2Node1')
-        output = 'i4x://MITx/6.002x/problem/L2Node1'
-        self.assertEqual(_msk_from_problem_urlname(*args), output)
+        course_id = 'RobotU/Robots101/3001_Spring'
+        capa_urlname = 'capa_urlname'
+        capa_urlname_xml = 'capa_urlname.xml'
+        xblock_urlname = 'notaproblem/someothername'
+        xblock_urlname_xml = 'notaproblem/someothername.xml'
+
+        capa_msk = 'i4x://RobotU/Robots101/problem/capa_urlname'
+        xblock_msk = 'i4x://RobotU/Robots101/notaproblem/someothername'
+
+        for urlname in [capa_urlname, capa_urlname_xml]:
+            self.assertEqual(
+                _msk_from_problem_urlname(course_id, urlname),
+                capa_msk
+            )
+
+        for urlname in [xblock_urlname, xblock_urlname_xml]:
+            self.assertEqual(
+                _msk_from_problem_urlname(course_id, urlname),
+                xblock_msk
+            )
 
     @raises(ValueError)
     def test_msk_from_problem_urlname_error(self):

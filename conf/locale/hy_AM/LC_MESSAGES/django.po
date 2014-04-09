@@ -10,6 +10,7 @@
 # NarekDshkhunyan <ndshkhunyan@gmail.com>, 2014
 # pgayane <pgayane@gmail.com>, 2014
 # pgayane <pgayane@gmail.com>, 2014
+# sarina <sarina@edx.org>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
@@ -46,7 +47,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-31 09:26-0400\n"
+"POT-Creation-Date: 2014-04-07 10:07-0400\n"
 "PO-Revision-Date: 2014-03-18 02:31+0000\n"
 "Last-Translator: nedbat <ned@edx.org>\n"
 "Language-Team: Armenian (Armenia) (http://www.transifex.com/projects/p/edx-platform/language/hy_AM/)\n"
@@ -196,6 +197,13 @@ msgstr ""
 "համար: Փորձե՛ք ավելի ուշ:"
 
 #: common/djangoapps/student/views.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
 msgstr "Անհաջող մուտքի չափազանց շատ  փորձեր։ Կրկին փորձեք ավելի ուշ։"
 
@@ -325,7 +333,7 @@ msgstr ""
 "Օգտագործողի անունը պետք է բաղկացած լինի A-Z տառերից, 0-9 թվանշաններից և "
 "չպարունակի բացակներ։"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Password: "
 msgstr "Գաղտնաբառ:"
 
@@ -338,6 +346,22 @@ msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr ""
 "Անհայտ սխալ։ Խնդրում ենք մեզ էլետրոնային նամակ ուղարկել` նշելով, թե սխալն "
 "ինչպես պատահեց։"
+
+#: common/djangoapps/student/views.py
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {0} "
+"day(s) must elapse between password resets"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Password reset unsuccessful"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
@@ -989,8 +1013,6 @@ msgstr "Ձեր պատասխանները պահպանվել են:"
 msgid ""
 "Your answers have been saved but not graded. Click 'Check' to grade them."
 msgstr ""
-"Ձեր պատասխանները պահպանվել են, բայց չեն գնահատվել: Սեղմե՛ք <<Ստուգել>> դրանք"
-" գնահատելու համար:"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Refresh the page and make an attempt before resetting."
@@ -1313,6 +1335,10 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr "Ինչ-որ բան սխալ է SubRip տեքստի ֆայլի հետ մշակման ժամանակ:"
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
@@ -2314,37 +2340,6 @@ msgstr ""
 msgid "Add to profile"
 msgstr "Ավելացնել պրոֆայլին"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: "Peer Grading" is a panel where peer can grade student-
-#. provided answers.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-#: lms/templates/peer_grading/peer_grading.html
-#: lms/templates/peer_grading/peer_grading_closed.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Peer Grading"
-msgstr ""
-
-#. Translators: "Staff Grading" is a panel where instructor can grade student-
-#. provided answers.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Staff Grading"
-msgstr ""
-
-#. Translators: "Problems you have submitted" refers to the problems that the
-#. currently-logged-in
-#. student has provided an answer for.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Problems you have submitted"
-msgstr ""
-
-#. Translators: "Flagged Submissions" refers to student-provided answers to a
-#. problem which are
-#. marked by instructor or peer graders as 'flagged' potentially
-#. inappropriate.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Flagged Submissions"
-msgstr ""
-
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
 "Could not contact the external grading server. Please contact the "
@@ -3098,7 +3093,7 @@ msgid ""
 "class=\"indicator\">bold text and an asterisk (*)</strong>."
 msgstr ""
 "Խնդրում ենք մուտքագրել Ձեր նոր գաղտնաբառը երկու անգամ, որպեսզի կարողանանք "
-"ստուգել` արդյոք այն ճիշտ եք մուտքագրել։ <br/> Պահանջվող դաշտերը նշված են "
+"ստուգել` արդյոք այն ճիշտ եք մուտքագրել։ <br /> Պահանջվող դաշտերը նշված են "
 "<strong class=\"indicator\"> թավատառ տեքստով և աստղանիշով (*) </strong>."
 
 #: lms/templates/registration/password_reset_confirm.html
@@ -3283,10 +3278,6 @@ msgid ""
 " can change to a particular revision or merge an old revision with the "
 "current one."
 msgstr ""
-"Սեղմե՛ք տարբերակի վրա փոփոխված տողերի ցուցակը տեսնելու համար։ Սեղմե՛ք "
-"<<Նախադիտում>> կոճակը հոդվածը այս փուլում տեսնելու համար։ Այս էջի ներքևում "
-"Դուք կարող եք անցնել որոշակի տարբերակի կամ միավորել հին տարբերակը ընթացիկի "
-"հետ։"
 
 #: lms/templates/wiki/history.html
 msgid "(no log message)"
@@ -3963,14 +3954,6 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "Visual"
-msgstr ""
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "HTML"
-msgstr ""
-
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
 msgstr ""
@@ -4351,6 +4334,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Unregister"
+msgstr ""
+
+#: lms/templates/edit_unit_link.html
+msgid "View Unit in Studio"
 msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
@@ -5877,11 +5864,29 @@ msgid "Register for {course.display_number_with_default}"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+msgid "View About Page in studio"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
 msgid "Overview"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Share with friends and family!"
+msgstr ""
+
+#. Translators: This text will be automatically posted to the student's
+#. Twitter account. {url} should appear at the end of the text.
+#: lms/templates/courseware/course_about.html
+msgid "I just registered for {number} {title} through {account}: {url}"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "Take a course with {platform} online"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "I just registered for {number} {title} through {platform} {url}"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
@@ -6067,6 +6072,10 @@ msgstr ""
 msgid "{course_number} Course Info"
 msgstr ""
 
+#: lms/templates/courseware/info.html
+msgid "View Updates in Studio"
+msgstr ""
+
 #: lms/templates/courseware/info.html lms/templates/courseware/info.html
 msgid "Course Updates &amp; News"
 msgstr ""
@@ -6087,12 +6096,12 @@ msgid "Instructor Dashboard"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Try New Beta Dashboard"
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid "View Course in Studio"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Edit Course In Studio"
+msgid "Try New Beta Dashboard"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6544,6 +6553,10 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "View Grading in studio"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -7213,13 +7226,12 @@ msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "View discussion"
+msgid "Expand discussion"
 msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Hide discussion"
+msgid "Collapse discussion"
 msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
@@ -7229,6 +7241,10 @@ msgstr ""
 #: lms/templates/discussion/mustache/_pagination.mustache
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "…"
+msgstr ""
+
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "View discussion"
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
@@ -8212,6 +8228,12 @@ msgid ""
 "{li_tag}There must be submissions that are waiting for grading.{end_li_tag}\n"
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
+msgstr ""
+
+#: lms/templates/peer_grading/peer_grading.html
+#: lms/templates/peer_grading/peer_grading_closed.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Peer Grading"
 msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
@@ -9893,6 +9915,13 @@ msgstr ""
 #: cms/templates/index.html cms/templates/overview.html
 #: cms/templates/unit.html
 msgid "View Live"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid ""
+"Note: Pages are publicly visible. If users know the URL of a page, they can "
+"view the page even if they are not registered for or logged in to your "
+"course."
 msgstr ""
 
 #: cms/templates/edit-tabs.html
@@ -11617,15 +11646,15 @@ msgid ""
 msgstr ""
 
 #: cms/templates/unit.html
-msgid "This unit is scheduled to be released to <strong>students</strong>"
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> on "
+"<strong>{date}</strong> with the subsection {link_start}{name}{link_end}"
 msgstr ""
 
 #: cms/templates/unit.html
-msgid "on {date}"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "with the subsection {link_start}{name}{link_end}"
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> with the "
+"subsection {link_start}{name}{link_end}"
 msgstr ""
 
 #: cms/templates/unit.html

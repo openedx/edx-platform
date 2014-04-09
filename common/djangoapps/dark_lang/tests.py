@@ -208,3 +208,15 @@ class DarkLangMiddlewareTests(TestCase):
             'rel',
             self.process_request(preview_lang='unrel', django_language='rel')
         )
+
+    def test_accept_chinese_language_codes(self):
+        DarkLangConfig(
+            released_languages=('zh-cn, zh-tw'),
+            changed_by=self.user,
+            enabled=True
+        ).save()
+
+        self.assertAcceptEquals(
+            'zh-CN;q=1.0, zh-TW;q=0.5, zh-TW;q=0.3',
+            self.process_request(accept='zh-Hans;q=1.0, zh-Hant-TW;q=0.5, zh-hk;q=0.3')
+        )

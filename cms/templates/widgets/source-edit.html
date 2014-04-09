@@ -123,7 +123,16 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
               if (xml.length == 0) {
                   alert('Conversion failed!  error:' + data.message);
               } else {
-                  el.closest('.component').find('.CodeMirror-wrap')[0].CodeMirror.setValue(xml);
+                  // If a parent CodeMirror editor is open (LaTeX problem being edited), set the text
+                  // there. Otherwise, set the text in the active TinyMCE Editor for the case
+                  // of an HTML component being edited.
+                  var parentCodemirrorEditor = el.closest('.component').find('.CodeMirror-wrap');
+                  if (parentCodemirrorEditor.length > 0) {
+                      parentCodemirrorEditor[0].CodeMirror.setValue(xml);
+                  }
+                  else if (window.tinyMCE !== undefined && window.tinyMCE.activeEditor !== undefined) {
+                      window.tinyMCE.activeEditor.setContent(xml);
+                  }
                   save_hls(el);
               }
           },

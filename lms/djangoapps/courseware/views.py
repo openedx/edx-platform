@@ -1,3 +1,7 @@
+"""
+Courseware views functions
+"""
+
 import logging
 import urllib
 
@@ -20,7 +24,8 @@ from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access
-from courseware.courses import get_courses, get_course_with_access, sort_by_announcement
+from courseware.courses import get_courses, get_course_with_access, get_studio_url, sort_by_announcement
+
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
@@ -45,6 +50,7 @@ from microsite_configuration import microsite
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
+
 
 def user_groups(user):
     """
@@ -95,7 +101,7 @@ def render_accordion(request, course, chapter, section, field_data_cache):
 
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
-    request.user = user	# keep just one instance of User
+    request.user = user	 # keep just one instance of User
     toc = toc_for_course(user, request, course, chapter, section, field_data_cache)
 
     context = dict([
@@ -257,6 +263,8 @@ def index(request, course_id, chapter=None, section=None,
                         u' far, should have gotten a course module for this user')
             return redirect(reverse('about_course', args=[course.id]))
 
+        studio_url = get_studio_url(course_id, 'course')
+
         if chapter is None:
             return redirect_to_course_position(course_module)
 
@@ -268,6 +276,7 @@ def index(request, course_id, chapter=None, section=None,
             'init': '',
             'fragment': Fragment(),
             'staff_access': staff_access,
+            'studio_url': studio_url,
             'masquerade': masq,
             'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
             'reverifications': fetch_reverify_banner_info(request, course_id),
@@ -294,7 +303,7 @@ def index(request, course_id, chapter=None, section=None,
         chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
         if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
-            if masq=='student':  # if staff is masquerading as student be kinder, don't 404
+            if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
                 log.debug('staff masq as student: no chapter %s' % chapter)
                 return redirect(reverse('courseware', args=[course.id]))
             raise Http404
@@ -303,7 +312,7 @@ def index(request, course_id, chapter=None, section=None,
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
-                if masq=='student':  # if staff is masquerading as student be kinder, don't 404
+                if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
                     log.debug('staff masq as student: no section %s' % section)
                     return redirect(reverse('courseware', args=[course.id]))
                 raise Http404
@@ -317,7 +326,8 @@ def index(request, course_id, chapter=None, section=None,
             section_field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course_id, user, section_descriptor, depth=None)
 
-            section_module = get_module_for_descriptor(request.user,
+            section_module = get_module_for_descriptor(
+                request.user,
                 request,
                 section_descriptor,
                 section_field_data_cache,
@@ -336,6 +346,7 @@ def index(request, course_id, chapter=None, section=None,
             context['section_title'] = section_descriptor.display_name_with_default
         else:
             # section is none, so display a message
+            studio_url = get_studio_url(course_id, 'course')
             prev_section = get_current_child(chapter_module)
             if prev_section is None:
                 # Something went wrong -- perhaps this chapter has no sections visible to the user
@@ -347,6 +358,7 @@ def index(request, course_id, chapter=None, section=None,
                 'courseware/welcome-back.html',
                 {
                     'course': course,
+                    'studio_url': studio_url,
                     'chapter_module': chapter_module,
                     'prev_section': prev_section,
                     'prev_section_url': prev_section_url
@@ -461,6 +473,7 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
+    studio_url = get_studio_url(course_id, 'course_info')
     reverifications = fetch_reverify_banner_info(request, course_id)
 
     context = {
@@ -470,6 +483,7 @@ def course_info(request, course_id):
         'course': course,
         'staff_access': staff_access,
         'masquerade': masq,
+        'studio_url': studio_url,
         'reverifications': reverifications,
     }
 
@@ -537,6 +551,11 @@ def registered_for_course(course, user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
+    """
+    Display the course's about page.
+
+    Assumes the course_id is in a valid format.
+    """
 
     if microsite.get_value(
         'ENABLE_MKTG_SITE',
@@ -546,6 +565,8 @@ def course_about(request, course_id):
 
     course = get_course_with_access(request.user, course_id, 'see_exists')
     registered = registered_for_course(course, request.user)
+    staff_access = has_access(request.user, course, 'staff')
+    studio_url = get_studio_url(course_id, 'settings/details')
 
     if has_access(request.user, course, 'load'):
         course_target = reverse('info', args=[course.id])
@@ -575,6 +596,8 @@ def course_about(request, course_id):
 
     return render_to_response('courseware/course_about.html', {
         'course': course,
+        'staff_access': staff_access,
+        'studio_url': studio_url,
         'registered': registered,
         'course_target': course_target,
         'registration_price': registration_price,
@@ -664,7 +687,7 @@ def _progress(request, course_id, student_id):
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
     courseware_summary = grades.progress_summary(student, request, course)
-
+    studio_url = get_studio_url(course_id, 'settings/grading')
     grade_summary = grades.grade(student, request, course)
 
     if courseware_summary is None:
@@ -674,6 +697,7 @@ def _progress(request, course_id, student_id):
     context = {
         'course': course,
         'courseware_summary': courseware_summary,
+        'studio_url': studio_url,
         'grade_summary': grade_summary,
         'staff_access': staff_access,
         'student': student,
@@ -700,6 +724,7 @@ def fetch_reverify_banner_info(request, course_id):
     if info:
         reverifications[info.status].append(info)
     return reverifications
+
 
 @login_required
 def submission_history(request, course_id, student_username, location):

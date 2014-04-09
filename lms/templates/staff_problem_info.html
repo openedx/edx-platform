@@ -4,24 +4,26 @@
 ${block_content}
 %if location.category in ['problem','video','html','combinedopenended','graphical_slider_tool']:
 %  if edit_link:
-<div>
-    <a href="${edit_link}">Edit</a>
-    % if xqa_key:
-        / <a href="#${element_id}_xqa-modal" onclick="javascript:getlog('${element_id}', {
-        'location': '${location}',
-        'xqa_key': '${xqa_key}',
-        'category': '${category}',
-        'user': '${user}'
-     })" id="${element_id}_xqa_log">QA</a>
-    % endif
-</div>
+  <div>
+      <a href="${edit_link}">Edit</a>
+      % if xqa_key:
+          / <a href="#${element_id}_xqa-modal" onclick="javascript:getlog('${element_id}', {
+          'location': '${location}',
+          'xqa_key': '${xqa_key}',
+          'category': '${category}',
+          'user': '${user}'
+       })" id="${element_id}_xqa_log">QA</a>
+      % endif
+  </div>
 %  endif
-<div aria-hidden="true"><a href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a></div>
+<div aria-hidden="true" class="wrap-instructor-info">
+  <a class="instructor-info-action" href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a>
 
-%  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
-      location.category == 'problem':
-<div aria-hidden="true"><a href="#${element_id}_history" id="${element_id}_history_trig">${_("Submission history")}</a></div>
-%  endif
+  %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
+    location.category == 'problem':
+    <a class="instructor-info-action" href="#${element_id}_history" id="${element_id}_history_trig">${_("Submission history")}</a>
+  %  endif
+</div>
 
 <section aria-hidden="true" id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
   <div class="inner-wrapper">

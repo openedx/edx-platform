@@ -26,11 +26,11 @@ For more information, see the following:
 * :ref:`ORA Notes`
 * :ref:`ORA Components`
 * :ref:`ORA Types`
-* :ref:`Effective Questions`
-* :ref:`Rubrics`
-* :ref:`Create an ORA Problem`
-* :ref:`Grade an ORA`
-* :ref:`Access Scores`
+* :ref:`ORA Effective Questions`
+* :ref:`ORA Rubrics`
+* :ref:`ORA Create an ORA Problem`
+* :ref:`ORA Grade an ORA`
+* :ref:`ORA Access Scores`
 
 .. _ORA Notes:
 
@@ -113,7 +113,7 @@ also set thresholds within the problem for each assessment, so that a
 response with a low score in one assessment does not move on to the next
 assessment.
 
-.. _Effective Questions:
+.. _ORA Effective Questions:
 
 Effective Questions
 ~~~~~~~~~~~~~~~~~~~
@@ -127,7 +127,7 @@ upload and submit their files. You can let students know what to expect
 after they submit responses. You can also mention the number of times
 that a student will be able to submit a response for the problem.
 
-.. _Rubrics:
+.. _ORA Rubrics:
 
 Rubrics
 ~~~~~~~
@@ -147,7 +147,7 @@ each category.
 Different categories in the same problem can have different numbers of
 options.
 
-.. _Create an ORA Problem:
+.. _ORA Create an ORA Problem:
 
 Create an Open Response Assessment Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -156,19 +156,19 @@ Create an Open Response Assessment Problem
 
 Creating an open response assessment is a multi-step process.
 
-* :ref:`Step 1`
-* :ref:`Step 2`
-* :ref:`Step 3`
-* :ref:`Step 4`
-* :ref:`Step 5`
-* :ref:`Step 6`
-* :ref:`Step 7`
-* :ref:`Step 8`
-* :ref:`Step 9`
+* :ref:`ORA Step 1`
+* :ref:`ORA Step 2`
+* :ref:`ORA Step 3`
+* :ref:`ORA Step 4`
+* :ref:`ORA Step 5`
+* :ref:`ORA Step 6`
+* :ref:`ORA Step 7`
+* :ref:`ORA Step 8`
+* :ref:`ORA Step 9`
 
 Each of these steps is described in detail below.
 
-.. _Step 1:
+.. _ORA Step 1:
 
 Step 1. Create the ORA Component
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -187,7 +187,7 @@ Step 1. Create the ORA Component
 .. image:: ../Images/ORAComponentEditor.png
    :alt: Image of component editor with prompt, rubric, and assessment type highlighted
   
-.. _Step 2:
+.. _ORA Step 2:
 
 Step 2. Add the Question
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -204,7 +204,7 @@ Step 2. Add the Question
    -  Leave the **[prompt]** tags in place.
    -  Enclose all text in HTML tags.
 
-.. _Step 3:
+.. _ORA Step 3:
 
 Step 3. Add the Rubric
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -243,7 +243,7 @@ Step 3. Add the Rubric
 
     [rubric]
 
-.. _Step 4:
+.. _ORA Step 4:
 
 Step 4. Set the Assessment Type and Scoring
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -304,7 +304,7 @@ Set the Assessment Type and Scoring
 
 #. Replace the sample code with the code for your problem.
 
-.. _Step 5:
+.. _ORA Step 5:
 
 Step 5. Set the Problem Name
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -333,7 +333,7 @@ To change the name:
 #. In the **Display Name** field, replace **Open Response Assessment**
    with the name of your problem.
 
-.. _Step 6:
+.. _ORA Step 6:
 
 Step 6. Set Other Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -438,7 +438,7 @@ Open response assessments include the following settings.
 |                                             | previously graded responses.)                                      |
 +---------------------------------------------+--------------------------------------------------------------------+
 
-.. _Step 7:
+.. _ORA Step 7:
 
 Step 7. Save the Problem
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -453,7 +453,7 @@ Step 7. Save the Problem
    .. image:: ../Images/ORA_Component.png
       :alt: Image of ORA component with assessment types circled
 
-.. _Step 8:
+.. _ORA Step 8:
 
 Step 8. Add the Peer Grading Interface (for peer assessments only)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -463,7 +463,7 @@ can add a separate peer grading interface for each individual problem.
 
 .. warning:: In peer assessments, the **due date** that you set for the subsection that contains the ORA problem is the date by which students must not only submit their own responses, but finish grading the required number of peer responses.
 
-.. _Add a Single PGI:
+.. _ORA Add a Single PGI:
 
 Add a Single Peer Grading Interface for the Course
 ##################################################
@@ -492,7 +492,7 @@ the ORA problems for the course through this peer grading interface.
    When students submit responses for peer assessments in your course,
    the names of the problems appear in this interface.
 
-.. _Add an Individual PGI:
+.. _ORA Add an Individual PGI:
 
 Add the Peer Grading Interface to an Individual Problem
 #######################################################
@@ -537,7 +537,7 @@ week).
 
 #. Click **Save** to close the component editor.
 
-.. _Step 9:
+.. _ORA Step 9:
 
 Step 9. Test the Problem
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -587,7 +587,7 @@ responses, including the "low-quality" responses, disable the quality filter.
 To disable the quality filter, open the problem component, click the **Settings** tab,
 and then set the **Disable Quality Filter** setting to **True**.
 
-.. _Grade an ORA:
+.. _ORA Grade an ORA:
 
 Grade an Open Response Assessment Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -710,7 +710,7 @@ to see if any other students have submitted responses.
           the grading pool until 30 minutes have passed. When the response returns to the 
           grading pool, you can grade it. 
 
-.. _Access Scores:
+.. _ORA Access Scores:
 
 Access Scores and Feedback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

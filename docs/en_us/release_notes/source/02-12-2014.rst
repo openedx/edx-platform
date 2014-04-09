@@ -26,7 +26,7 @@ edX Studio
 
 * The new Full Screen Image tool allows students to enlarge an image, so they can see all the detail in context. You can create a full screen image with a new HTML component template. For more information, see the `updated documentation <http://edx.readthedocs.org/projects/ca/en/latest/tools.html#full-screen-image>`_.
 
-* If you do not change the default course start date (01/01/2030), and the advertised_start policy value is null, then the student dashboard does not now list a start date for the course. Students just see that the course has not yet started. For more information, see the `updated documentation <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#set-the-advertised-start-date>`_.
+* If you do not change the default course start date (01/01/2030), and the advertised_start policy value is null, then the student dashboard does not now list a start date for the course. Students just see that the course has not yet started. For more information, see the `documentation <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#set-the-advertised-start-date>`_.
 
 
 ***************************************

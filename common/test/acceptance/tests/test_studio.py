@@ -25,7 +25,7 @@ from ..pages.studio.textbooks import TextbooksPage
 from ..pages.xblock.acid import AcidView
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
-from .helpers import UniqueCourseTest, load_data_str
+from .helpers import UniqueCourseTest
 
 
 class LoggedOutTest(WebAppTest):
@@ -170,7 +170,6 @@ class XBlockAcidBase(WebAppTest):
         acid_block = AcidView(self.browser, unit.components[0].preview_selector)
         self.validate_acid_block_preview(acid_block)
 
-    @skip('Temporarily diabling because it is failing in Jenkins. TE-369')
     def test_acid_block_editor(self):
         """
         Verify that all expected acid block tests pass in studio editor
@@ -225,7 +224,6 @@ class XBlockAcidParentBase(XBlockAcidBase):
         super(XBlockAcidParentBase, self).validate_acid_block_preview(acid_block)
         self.assertTrue(acid_block.child_tests_passed)
 
-    @skip('Intermittently failing, needs a better page definition that waits until the unit is fully rendered')
     def test_acid_block_preview(self):
         """
         Verify that all expected acid block tests pass in studio preview

@@ -98,7 +98,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-31 09:26-0400\n"
+"POT-Creation-Date: 2014-04-07 10:07-0400\n"
 "PO-Revision-Date: 2014-03-01 15:39+0000\n"
 "Last-Translator: ovnicraft <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -167,21 +167,21 @@ msgstr "Cuenta deshabilitada"
 
 #: common/djangoapps/student/models.py
 msgid "Male"
-msgstr ""
+msgstr "Hombre"
 
 #: common/djangoapps/student/models.py
 msgid "Female"
-msgstr ""
+msgstr "Mujer"
 
 #. Translators: 'Other' refers to the student's gender
 #. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py common/djangoapps/student/models.py
 msgid "Other"
-msgstr ""
+msgstr "Otro"
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
-msgstr ""
+msgstr "Doctorado"
 
 #: common/djangoapps/student/models.py
 msgid "Master's or professional degree"
@@ -205,7 +205,7 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Elementary/primary school"
-msgstr ""
+msgstr "Primaria"
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
@@ -246,6 +246,13 @@ msgid ""
 msgstr ""
 "Esta cuenta ha sido bloqueada temporalmente debido a un exceso de intentos "
 "fallidos de ingreso. Intente nuevamente más tarde."
+
+#: common/djangoapps/student/views.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
@@ -380,7 +387,7 @@ msgstr ""
 "El nombre de usuario solo debe contener los caracteres A-Z y 0-9, sin "
 "espacios."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Password: "
 msgstr "Contraseña:"
 
@@ -393,6 +400,22 @@ msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr ""
 "Error desconocido. Por favor escríbanos al correo electrónico con "
 "información de este error."
+
+#: common/djangoapps/student/views.py
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {0} "
+"day(s) must elapse between password resets"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Password reset unsuccessful"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
@@ -830,11 +853,11 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "correct"
-msgstr ""
+msgstr "Correcto"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "incorrect"
-msgstr ""
+msgstr "incorrecto"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
@@ -1400,6 +1423,10 @@ msgstr ""
 msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr "Algo falló con las transcripciones SubRip durante su lectura."
 
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
@@ -1532,7 +1559,7 @@ msgstr "El 'module store' correspondiente no soporta el comando import."
 #. available from the remote source they specified
 #: lms/djangoapps/dashboard/git_import.py
 msgid "The specified remote branch is not available."
-msgstr ""
+msgstr "La rama remota especificada no está disponible."
 
 #. Translators: Error message shown when they have asked for a git
 #. repository branch, a specific version within a repository, that
@@ -1862,7 +1889,7 @@ msgstr "La tarea ya se está ejecutando."
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: lms/templates/help_modal.html
+#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Name"
 msgstr "Nombre"
@@ -1877,11 +1904,11 @@ msgstr "Correo electrónico"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Language"
-msgstr ""
+msgstr "Idioma"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
-msgstr ""
+msgstr "Ubicación"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Birth Year"
@@ -2440,33 +2467,6 @@ msgstr ""
 #: lms/djangoapps/linkedin/templates/linkedin_email.html
 msgid "Add to profile"
 msgstr "Añadir al perfil"
-
-#: lms/templates/peer_grading/peer_grading.html
-#: lms/templates/peer_grading/peer_grading_closed.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Peer Grading"
-msgstr "Calificación de pares"
-
-#. Translators: "Staff Grading" is a panel where instructor can grade student-
-#. provided answers.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Staff Grading"
-msgstr ""
-
-#. Translators: "Problems you have submitted" refers to the problems that the
-#. currently-logged-in
-#. student has provided an answer for.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Problems you have submitted"
-msgstr ""
-
-#. Translators: "Flagged Submissions" refers to student-provided answers to a
-#. problem which are
-#. marked by instructor or peer graders as 'flagged' potentially
-#. inappropriate.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Flagged Submissions"
-msgstr ""
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
@@ -3502,17 +3502,10 @@ msgstr "Cerrar"
 msgid "Wiki Preview"
 msgstr "Vista previa de la Wiki"
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this text gives status on if the modal interface (a menu or
-#. piece of UI that takes the full focus of the screen) is open or not
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
-#: lms/templates/dashboard.html lms/templates/dashboard.html
-#: lms/templates/dashboard.html lms/templates/dashboard.html
-#: lms/templates/dashboard.html
-#: lms/templates/modal/_modal-settings-language.html
 msgid "window open"
-msgstr ""
+msgstr "ventana abierta"
 
 #: lms/templates/wiki/edit.html
 msgid "Back to editor"
@@ -4214,14 +4207,6 @@ msgstr "Política de privacidad"
 msgid "Help"
 msgstr "Ayuda"
 
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "Visual"
-msgstr ""
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "HTML"
-msgstr ""
-
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
 msgstr "Actualice su registro para {} | Elija su ruta"
@@ -4670,6 +4655,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Unregister"
 msgstr "Borrar su inscripción"
+
+#: lms/templates/edit_unit_link.html
+msgid "View Unit in Studio"
+msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -6321,12 +6310,30 @@ msgid "Register for {course.display_number_with_default}"
 msgstr "Registrarse en {course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html
+msgid "View About Page in studio"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
 msgid "Overview"
 msgstr "Visión general"
 
 #: lms/templates/courseware/course_about.html
 msgid "Share with friends and family!"
 msgstr "Compartir con amigos y familiares!"
+
+#. Translators: This text will be automatically posted to the student's
+#. Twitter account. {url} should appear at the end of the text.
+#: lms/templates/courseware/course_about.html
+msgid "I just registered for {number} {title} through {account}: {url}"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "Take a course with {platform} online"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "I just registered for {number} {title} through {platform} {url}"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
@@ -6519,6 +6526,10 @@ msgstr "Buscar estudiantes"
 msgid "{course_number} Course Info"
 msgstr "{course_number} Información del curso"
 
+#: lms/templates/courseware/info.html
+msgid "View Updates in Studio"
+msgstr ""
+
 #: lms/templates/courseware/info.html lms/templates/courseware/info.html
 msgid "Course Updates &amp; News"
 msgstr "Novedades y noticias del curso"
@@ -6539,13 +6550,13 @@ msgid "Instructor Dashboard"
 msgstr "Panel de control del instructor"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Try New Beta Dashboard"
-msgstr "Pruebe el nuevo Panel de Control beta"
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid "View Course in Studio"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Edit Course In Studio"
-msgstr "Editar el curso en Studio"
+msgid "Try New Beta Dashboard"
+msgstr "Pruebe el nuevo Panel de Control beta"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -7054,6 +7065,10 @@ msgid "Course Progress"
 msgstr "Progreso en el Curso"
 
 #: lms/templates/courseware/progress.html
+msgid "View Grading in studio"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Progreso del curso para el estudiante '{username}' ({email})"
 
@@ -7216,7 +7231,7 @@ msgstr "Plantee un desafío personal!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Take this course as an ID-verified student."
-msgstr "Tomar este curso como un estudiante con identidad verificada."
+msgstr "Toma este curso como estudiante con identidad verificada."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -7766,14 +7781,13 @@ msgstr "Cargando contenido"
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "View discussion"
-msgstr "Ver discusión"
+msgid "Expand discussion"
+msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Hide discussion"
-msgstr "Ocultar discusión"
+msgid "Collapse discussion"
+msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "This thread has been pinned by course staff."
@@ -7783,6 +7797,10 @@ msgstr "Esta conversación ha sido marcada por el personal del curso."
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "…"
 msgstr "..."
+
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "View discussion"
+msgstr "Ver discusión"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -8847,6 +8865,12 @@ msgstr ""
 "{li_tag}Debe haber envíos que estén pendientes de ser calificados.{end_li_tag}\n"
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
+
+#: lms/templates/peer_grading/peer_grading.html
+#: lms/templates/peer_grading/peer_grading_closed.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Peer Grading"
+msgstr "Calificación de pares"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
@@ -10771,6 +10795,13 @@ msgstr "Nueva página"
 #: cms/templates/unit.html
 msgid "View Live"
 msgstr "Ver en vivo"
+
+#: cms/templates/edit-tabs.html
+msgid ""
+"Note: Pages are publicly visible. If users know the URL of a page, they can "
+"view the page even if they are not registered for or logged in to your "
+"course."
+msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "Show this page"
@@ -12753,18 +12784,16 @@ msgstr ""
 "publicada, debe {link_start}reemplazarla con este borrador{link_end}."
 
 #: cms/templates/unit.html
-msgid "This unit is scheduled to be released to <strong>students</strong>"
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> on "
+"<strong>{date}</strong> with the subsection {link_start}{name}{link_end}"
 msgstr ""
-"Esta unidad ya está programada para ser liberada a los "
-"<strong>estudiantes</strong>"
 
 #: cms/templates/unit.html
-msgid "on {date}"
-msgstr "el {date}"
-
-#: cms/templates/unit.html
-msgid "with the subsection {link_start}{name}{link_end}"
-msgstr "con la subsección {link_start}{name}{link_end}"
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> with the "
+"subsection {link_start}{name}{link_end}"
+msgstr ""
 
 #: cms/templates/unit.html
 msgid "Delete Draft"
