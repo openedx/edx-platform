@@ -1,5 +1,5 @@
 @shard_2
-Feature: LMS Video component
+Feature: LMS.Video component
   As a student, I want to view course videos in LMS
 
   # 1 Disabled 4/8/14 after intermittent failures in master
