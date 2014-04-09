@@ -99,9 +99,6 @@ FEATURES = {
 
     # Turn off Advanced Security by default
     'ADVANCED_SECURITY': False,
-
-    # Switch acceptance tests to use the container page instead of the unit page
-    'USE_CONTAINER_PAGE_FOR_TESTING': False,
 }
 ENABLE_JASMINE = False
 

@@ -55,11 +55,6 @@ def click_new_component_button(step, component_button_css):
 
     world.css_click(component_button_css)
 
-    if FEATURES['USE_CONTAINER_PAGE_FOR_TESTING']:
-        unit_url = world.browser.url
-        container_url = unit_url.replace('/unit/', '/container/')
-        world.visit(container_url)
-
 
 def _click_advanced():
     css = 'ul.problem-type-tabs a[href="#tab2"]'
