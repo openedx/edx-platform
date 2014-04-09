@@ -68,6 +68,7 @@ function (VideoPlayer, VideoStorage) {
         initialize: initialize,
         isHtml5Mode: isHtml5Mode,
         isFlashMode: isFlashMode,
+        isYoutubeType: isYoutubeType,
         parseSpeed: parseSpeed,
         parseVideoSources: parseVideoSources,
         parseYoutubeStreams: parseYoutubeStreams,
@@ -845,6 +846,10 @@ function (VideoPlayer, VideoStorage) {
      */
     function isHtml5Mode() {
         return this.getPlayerMode() === 'html5';
+    }
+
+    function isYoutubeType() {
+        return this.videoType === 'youtube';
     }
 
     function speedToString(speed) {

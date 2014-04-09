@@ -177,15 +177,26 @@ function () {
     }
 
     function onSlide(event, ui) {
+        var time = ui.value,
+            duration = this.videoPlayer.duration();
+
         this.videoProgressSlider.frozen = true;
 
         // Remember the seek to value so that we don't repeat ourselves on the
         // 'stop' slider event.
-        this.videoProgressSlider.lastSeekValue = ui.value;
+        this.videoProgressSlider.lastSeekValue = time;
+
+        this.trigger(
+            'videoControl.updateVcrVidTime',
+            {
+                time: time,
+                duration: duration
+            }
+        );
 
         this.trigger(
             'videoPlayer.onSlideSeek',
-            {'type': 'onSlideSeek', 'time': ui.value}
+            {'type': 'onSlideSeek', 'time': time}
         );
 
         // ARIA

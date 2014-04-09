@@ -35,7 +35,7 @@ def configure_screenshots_for_all_steps(_step, action):
     else:
         raise ValueError('Parameter `action` should be one of "enable" or "disable".')
 
-
+@world.absorb
 def capture_screenshot_before_after(func):
     """
     A decorator that will take a screenshot before and after the applied
