@@ -9,6 +9,7 @@ from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
 from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
@@ -85,6 +86,7 @@ def get_course_with_access(user, action, course_id, depth=0):
 
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
+    assert isinstance(course_id, CourseKey)
     course = get_course_by_id(course_id, depth=depth)
 
     if course is None:

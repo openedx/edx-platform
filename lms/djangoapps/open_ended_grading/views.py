@@ -16,7 +16,7 @@ import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
-from xmodule.modulestore import Location
+from xmodule.modulestore import Location, SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import NoPathToItem
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
@@ -28,7 +28,7 @@ from open_ended_grading.utils import (STAFF_ERROR_MESSAGE, STUDENT_ERROR_MESSAGE
 
 log = logging.getLogger(__name__)
 
-def _reverse_with_slash(url_name, course_id):
+def _reverse_with_slash(url_name, course_key):
     """
     Reverses the URL given the name and the course id, and then adds a trailing slash if
     it does not exist yet.
@@ -36,6 +36,7 @@ def _reverse_with_slash(url_name, course_id):
     @param course_id: The id of the course object (eg course.id).
     @returns: The reversed url with a trailing slash.
     """
+    course_id = course_key.to_deprecated_string()
     ajax_url = _reverse_without_slash(url_name, course_id)
     if not ajax_url.endswith('/'):
         ajax_url += '/'
@@ -93,7 +94,7 @@ def find_peer_grading_module(course):
     # Get the course id and split it.
     peer_grading_query = course.location.replace(category='peergrading', name=None)
     # Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
-    items = modulestore().get_items(peer_grading_query, course_id=course.id)
+    items = modulestore().get_items(course.id, category='peergrading')
     #See if any of the modules are centralized modules (ie display info from multiple problems)
     items = [i for i in items if not getattr(i, "use_for_single_location", True)]
     # Loop through all potential peer grading modules, and find the first one that has a path to it.
@@ -143,16 +144,17 @@ def student_problem_list(request, course_id):
     @param course_id: The id of the course to get the problem list for.
     @return: Renders an HTML problem list table.
     """
-
+    assert isinstance(course_id, basestring)
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
     # Load the course.  Don't catch any errors here, as we want them to be loud.
-    course = get_course_with_access(request.user, 'load', course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
 
     # The anonymous student id is needed for communication with ORA.
     student_id = unique_id_for_user(request.user)
     base_course_url = reverse('courses')
     error_text = ""
 
-    student_problem_list = StudentProblemList(course_id, student_id)
+    student_problem_list = StudentProblemList(course_key, student_id)
     # Get the problem list from ORA.
     success = student_problem_list.fetch_from_grading_service()
     # If we fetched the problem list properly, add in additional problem data.
@@ -164,11 +166,11 @@ def student_problem_list(request, course_id):
         valid_problems = []
         error_text = student_problem_list.error_text
 
-    ajax_url = _reverse_with_slash('open_ended_problems', course_id)
+    ajax_url = _reverse_with_slash('open_ended_problems', course_key)
 
     context = {
         'course': course,
-        'course_id': course_id,
+        'course_id': course_key.to_deprecated_string(),
         'ajax_url': ajax_url,
         'success': success,
         'problem_list': valid_problems,
@@ -184,7 +186,8 @@ def flagged_problem_list(request, course_id):
     '''
     Show a student problem list
     '''
-    course = get_course_with_access(request.user, 'staff', course_id)
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'staff', course_key)
     student_id = unique_id_for_user(request.user)
 
     # call problem list service
@@ -196,7 +199,7 @@ def flagged_problem_list(request, course_id):
     # Make a service that can query edX ORA.
     controller_qs = create_controller_query_service()
     try:
-        problem_list_dict = controller_qs.get_flagged_problem_list(course_id)
+        problem_list_dict = controller_qs.get_flagged_problem_list(course_key)
         success = problem_list_dict['success']
         if 'error' in problem_list_dict:
             error_text = problem_list_dict['error']
@@ -218,7 +221,7 @@ def flagged_problem_list(request, course_id):
         log.error("Could not parse problem list from external grading service response.")
         success = False
 
-    ajax_url = _reverse_with_slash('open_ended_flagged_problems', course_id)
+    ajax_url = _reverse_with_slash('open_ended_flagged_problems', course_key)
     context = {
         'course': course,
         'course_id': course_id,
@@ -237,7 +240,8 @@ def combined_notifications(request, course_id):
     """
     Gets combined notifications from the grading controller and displays them
     """
-    course = get_course_with_access(request.user, 'load', course_id)
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     user = request.user
     notifications = open_ended_notifications.combined_notifications(course, user)
     response = notifications['response']
@@ -249,7 +253,7 @@ def combined_notifications(request, course_id):
         if tag in response:
             url_name = notification_tuples[response_num][1]
             human_name = notification_tuples[response_num][2]
-            url = _reverse_without_slash(url_name, course_id)
+            url = _reverse_without_slash(url_name, course_key)
             has_img = response[tag]
 
             # check to make sure we have descriptions and alert messages
@@ -281,7 +285,7 @@ def combined_notifications(request, course_id):
             else:
                 notification_list.append(notification_item)
 
-    ajax_url = _reverse_with_slash('open_ended_notifications', course_id)
+    ajax_url = _reverse_with_slash('open_ended_notifications', course_key)
     combined_dict = {
         'error_text': "",
         'notification_list': notification_list,
@@ -299,6 +303,7 @@ def take_action_on_flags(request, course_id):
     Takes action on student flagged submissions.
     Currently, only support unflag and ban actions.
     """
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
     if request.method != 'POST':
         raise Http404
 
@@ -323,7 +328,7 @@ def take_action_on_flags(request, course_id):
     # Make a service that can query edX ORA.
     controller_qs = create_controller_query_service()
     try:
-        response = controller_qs.take_action_on_flags(course_id, student_id, submission_id, action_type)
+        response = controller_qs.take_action_on_flags(course_key, student_id, submission_id, action_type)
         return HttpResponse(json.dumps(response), mimetype="application/json")
     except GradingServiceError:
         log.exception(

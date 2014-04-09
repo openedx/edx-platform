@@ -133,14 +133,14 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # both get and post should return 404
         for view_name in ('staff_grading_get_next', 'staff_grading_save_grade'):
-            url = reverse(view_name, kwargs={'course_id': self.course_id})
+            url = reverse(view_name, kwargs={'course_id': self.course_id.to_deprecated_string()})
             check_for_get_code(self, 404, url)
             check_for_post_code(self, 404, url)
 
     def test_get_next(self):
         self.login(self.instructor, self.password)
 
-        url = reverse('staff_grading_get_next', kwargs={'course_id': self.course_id})
+        url = reverse('staff_grading_get_next', kwargs={'course_id': self.course_id.to_deprecated_string()})
         data = {'location': self.location}
 
         response = check_for_post_code(self, 200, url, data)
@@ -161,7 +161,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def save_grade_base(self, skip=False):
         self.login(self.instructor, self.password)
 
-        url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id})
+        url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id.to_deprecated_string()})
 
         data = {'score': '12',
                 'feedback': 'great!',
@@ -209,7 +209,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
             user=instructor,
         )
         # Get the response and load its content.
-        response = json.loads(staff_grading_service.get_problem_list(request, self.course_id).content)
+        response = json.loads(staff_grading_service.get_problem_list(request, self.course_id.to_deprecated_string()).content)
 
         # A valid response will have an "error" key.
         self.assertTrue('error' in response)
@@ -222,7 +222,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.login(self.instructor, self.password)
 
-        url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id})
+        url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id.to_deprecated_string()})
 
         data = {
             'score': '12',
@@ -473,7 +473,7 @@ class TestPanel(ModuleStoreTestCase):
         @return:
         """
         request = Mock(user=self.user)
-        response = views.student_problem_list(request, self.course.id)
+        response = views.student_problem_list(request, self.course.id.to_deprecated_string())
         self.assertRegexpMatches(response.content, "Here is a list of open ended problems for this course.")
 
 
@@ -505,7 +505,7 @@ class TestStudentProblemList(ModuleStoreTestCase):
 
     def setUp(self):
         # Load an open ended course with several problems.
-        self.course_name = 'edX/open_ended/2012_Fall'
+        self.course_name = CourseKey.from_string('edX/open_ended/2012_Fall')
         self.course = modulestore().get_course(self.course_name)
         self.user = factories.UserFactory()
         # Enroll our user in our course and make them an instructor.
