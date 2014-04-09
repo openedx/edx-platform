@@ -42,6 +42,7 @@ from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 log = logging.getLogger(__name__)
@@ -489,9 +490,7 @@ class Courses(SysadminDashboardView):
         courses = self.get_courses()
 
         for (cdir, course) in courses.items():
-            gdir = cdir
-            if '/' in cdir:
-                gdir = cdir.rsplit('/', 1)[1]
+            gdir = cdir.run
             data.append([course.display_name, cdir]
                         + self.git_info_for_course(gdir))
 
@@ -666,6 +665,8 @@ class GitLogs(TemplateView):
         """Shows logs of imports that happened as a result of a git import"""
 
         course_id = kwargs.get('course_id')
+        if course_id:
+            course_id = SlashSeparatedCourseKey.from_string(course_id)
 
         # Set mongodb defaults even if it isn't defined in settings
         mongo_db = {
@@ -717,7 +718,7 @@ class GitLogs(TemplateView):
             log.debug('cilset length={0}'.format(len(cilset)))
         mdb.disconnect()
         context = {'cilset': cilset,
-                   'course_id': course_id,
+                   'course_id': course_id.to_deprecated_string() if course_id else None,
                    'error_msg': error_msg}
 
         return render_to_response(self.template_name, context)

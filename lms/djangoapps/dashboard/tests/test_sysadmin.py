@@ -13,7 +13,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
-from django.utils.html import escape
 from django.utils.translation import ugettext as _
 import mongoengine
 
@@ -84,7 +83,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
 
         # Delete git loaded course
         response = self.client.post(reverse('sysadmin_courses'),
-                                {'course_id': course.id,
+                                {'course_id': course.id.to_deprecated_string(),
                                  'action': 'del_course', })
         self.addCleanup(self._rm_glob, '{0}_deleted_*'.format(course_path))
 

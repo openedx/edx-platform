@@ -18,6 +18,7 @@ import mongoengine
 
 from dashboard.models import CourseImportLog
 from xmodule.modulestore import Location
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
@@ -222,7 +223,7 @@ def add_repo(repo, rdir_in, branch=None):
         logger.setLevel(logging.NOTSET)
         logger.removeHandler(import_log_handler)
 
-    course_id = 'unknown'
+    course_id = None
     location = 'unknown'
 
     # extract course ID from output of import-command-run and make symlink
@@ -265,8 +266,8 @@ def add_repo(repo, rdir_in, branch=None):
         log.exception('Unable to connect to mongodb to save log, please '
                       'check MONGODB_LOG settings')
     cil = CourseImportLog(
-        course_id=course_id,
-        location=unicode(location),
+        course_id=SlashSeparatedCourseKey.from_deprecated_string(course_id),
+        location=location,
         repo_dir=rdir,
         created=timezone.now(),
         import_log=ret_import,
