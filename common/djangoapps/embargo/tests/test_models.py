@@ -20,7 +20,7 @@ class EmbargoModelsTest(TestCase):
         self.assertTrue(EmbargoedCourse.is_embargoed(course_id))
         self.assertEquals(
             cauth.__unicode__(),
-            "Course 'slashes:abc/123/doremi' is Embargoed"
+            "Course 'abc/123/doremi' is Embargoed"
         )
 
         # Unauthorize by explicitly setting email_enabled to False
@@ -30,7 +30,7 @@ class EmbargoModelsTest(TestCase):
         self.assertFalse(EmbargoedCourse.is_embargoed(course_id))
         self.assertEquals(
             cauth.__unicode__(),
-            "Course 'slashes:abc/123/doremi' is Not Embargoed"
+            "Course 'abc/123/doremi' is Not Embargoed"
         )
 
     def test_state_embargo(self):
