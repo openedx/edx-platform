@@ -97,7 +97,7 @@ class ViewsTestCase(TestCase):
         in_cart_span = '<span class="add-to-cart">'
         # don't mock this course due to shopping cart existence checking
         course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
-        request = self.request_factory.get(reverse('about_course', args=[course.id]))
+        request = self.request_factory.get(reverse('about_course', args=[course.id.to_deprecated_string()]))
         request.user = AnonymousUser()
         response = views.course_about(request, course.id.to_deprecated_string())
         self.assertEqual(response.status_code, 200)
@@ -244,7 +244,7 @@ class ViewsTestCase(TestCase):
 
         # try it with an existing user and a malicious location
         url = reverse('submission_history', kwargs={
-            'course_id': self.course_id,
+            'course_id': self.course_id.to_deprecated_string(),
             'student_username': 'dummy',
             'location': '<script>alert("hello");</script>'
         })
@@ -253,7 +253,7 @@ class ViewsTestCase(TestCase):
 
         # try it with a malicious user and a non-existent location
         url = reverse('submission_history', kwargs={
-            'course_id': self.course_id,
+            'course_id': self.course_id.to_deprecated_string(),
             'student_username': '<script>alert("hello");</script>',
             'location': 'dummy'
         })

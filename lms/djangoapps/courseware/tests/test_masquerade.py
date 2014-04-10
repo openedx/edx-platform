@@ -53,7 +53,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
     def get_cw_section(self):
         url = reverse('courseware_section',
-                      kwargs={'course_id': self.graded_course.id,
+                      kwargs={'course_id': self.graded_course.id.to_deprecated_string(),
                               'chapter': 'GradedChapter',
                               'section': 'Homework1'})
 
