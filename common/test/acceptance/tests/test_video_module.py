@@ -11,15 +11,16 @@ from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.lms.course_info import CourseInfoPage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
+VIDEO_SOURCE_PORT = 8777
 
 HTML5_SOURCES = [
-    'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp4',
-    'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm',
-    'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv',
+    'http://localhost:{0}/gizmo.mp4'.format(VIDEO_SOURCE_PORT),
+    'http://localhost:{0}/gizmo.webm'.format(VIDEO_SOURCE_PORT),
+    'http://localhost:{0}/gizmo.ogv'.format(VIDEO_SOURCE_PORT),
 ]
 
 HTML5_SOURCES_INCORRECT = [
-    'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp99',
+    'http://localhost:{0}/gizmo.mp99'.format(VIDEO_SOURCE_PORT),
 ]
 
 HTML5_METADATA = {

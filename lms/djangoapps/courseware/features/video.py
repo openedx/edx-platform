@@ -16,14 +16,14 @@ from xmodule.contentstore.django import contentstore
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 LANGUAGES = settings.ALL_LANGUAGES
-
+VIDEO_SOURCE_PORT = settings.VIDEO_SOURCE_PORT
 
 ############### ACTIONS ####################
 
 HTML5_SOURCES = [
-    'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp4',
-    'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm',
-    'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv',
+    'http://localhost:{0}/gizmo.mp4'.format(VIDEO_SOURCE_PORT),
+    'http://localhost:{0}/gizmo.webm'.format(VIDEO_SOURCE_PORT),
+    'http://localhost:{0}/gizmo.ogv'.format(VIDEO_SOURCE_PORT),
 ]
 
 FLASH_SOURCES = {
@@ -34,7 +34,7 @@ FLASH_SOURCES = {
 }
 
 HTML5_SOURCES_INCORRECT = [
-    'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp99',
+    'http://localhost:{0}/gizmo.mp99'.format(VIDEO_SOURCE_PORT),
 ]
 
 VIDEO_BUTTONS = {
