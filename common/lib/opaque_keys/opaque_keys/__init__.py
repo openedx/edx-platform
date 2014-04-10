@@ -169,6 +169,13 @@ class OpaqueKey(object):
             if key in self.KEY_FIELDS:
                 setattr(self, key, state_dict[key])
 
+    def __getstate__(self):
+        # used by pickle to get fields on an unpickled object
+        pickleable_dict = {}
+        for key in self.KEY_FIELDS:
+            pickleable_dict[key] = getattr(self, key)
+        return pickleable_dict
+
     @property
     def _key(self):
         return tuple(getattr(self, field) for field in self.KEY_FIELDS)
