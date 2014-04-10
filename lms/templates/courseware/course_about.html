@@ -82,7 +82,7 @@
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
       } else if (xhr.status == 403) {
-        location.href = "${reverse('course-specific-register', args=[course.id])}?course_id=${course.id}&enrollment_action=enroll";
+        location.href = "${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}?course_id=${course.id.to_deprecated_string()}&enrollment_action=enroll";
       } else if (xhr.status == 400) { //This means the user did not have permission
         $('#register_error').html("${perms_error}").css("display", "block");
       } else {
