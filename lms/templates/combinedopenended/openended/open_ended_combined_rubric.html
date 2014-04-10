@@ -8,12 +8,12 @@
             <% option = category['options'][j] %>
             <%
                 points_earned_msg = ungettext(
-                    "{num} point: {explanatory_text}",
-                    "{num} points: {explanatory_text}",
+                    "{num} point: {explanatory}",
+                    "{num} points: {explanatory}",
                     option['points']
                 ).format(
                     num=option['points'],
-                    explanatory_text=option['text'],
+                    explanatory=option['text'],
                 )
             %>
             %if len(category['options'][j]['grader_types'])>0:
