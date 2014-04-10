@@ -271,11 +271,11 @@ def encode_problem_and_student_input(usage_key, student=None):
     return task_input, task_key
 
 
-def submit_task(request, task_type, task_class, course_id, task_input, task_key):
+def submit_task(request, task_type, task_class, course_key, task_input, task_key):
     """
     Helper method to submit a task.
 
-    Reserves the requested task, based on the `course_id`, `task_type`, and `task_key`,
+    Reserves the requested task, based on the `course_key`, `task_type`, and `task_key`,
     checking to see if the task is already running.  The `task_input` is also passed so that
     it can be stored in the resulting InstructorTask entry.  Arguments are extracted from
     the `request` provided by the originating server request.  Then the task is submitted to run
@@ -292,7 +292,7 @@ def submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
     """
     # check to see if task is already running, and reserve it otherwise:
-    instructor_task = _reserve_task(SlashSeparatedCourseKey.from_string(course_id), task_type, task_key, task_input, request.user)
+    instructor_task = _reserve_task(course_key, task_type, task_key, task_input, request.user)
 
     # submit task:
     task_id = instructor_task.task_id

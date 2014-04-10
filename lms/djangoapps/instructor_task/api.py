@@ -170,12 +170,12 @@ def submit_delete_problem_state_for_all_students(request, usage_key):
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
-def submit_bulk_course_email(request, course_id, email_id):
+def submit_bulk_course_email(request, course_key, email_id):
     """
     Request to have bulk email sent as a background task.
 
     The specified CourseEmail object will be sent be updated for all students who have enrolled
-    in a course.  Parameters are the `course_id` and the `email_id`, the id of the CourseEmail object.
+    in a course.  Parameters are the `course_key` and the `email_id`, the id of the CourseEmail object.
 
     AlreadyRunningError is raised if the same recipients are already being emailed with the same
     CourseEmail object.
@@ -204,10 +204,10 @@ def submit_bulk_course_email(request, course_id, email_id):
     task_key_stub = "{email_id}_{to_option}".format(email_id=email_id, to_option=to_option)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
-    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_calculate_grades_csv(request, course_id):
+def submit_calculate_grades_csv(request, course_key):
     """
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
@@ -216,4 +216,4 @@ def submit_calculate_grades_csv(request, course_id):
     task_input = {}
     task_key = ""
 
-    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)

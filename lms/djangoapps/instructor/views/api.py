@@ -941,9 +941,9 @@ def calculate_grades_csv(request, course_id):
     """
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
-    course_id = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
     try:
-        instructor_task.api.submit_calculate_grades_csv(request, course_id.to_deprecated_string())
+        instructor_task.api.submit_calculate_grades_csv(request, course_key)
         success_status = _("Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
@@ -1040,7 +1040,7 @@ def send_email(request, course_id):
     email = CourseEmail.create(course_id, request.user, send_to, subject, message)
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    instructor_task.api.submit_bulk_course_email(request, course_id.to_deprecated_string(), email.id)  # pylint: disable=E1101
+    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
 
     response_payload = {'course_id': course_id.to_deprecated_string()}
     return JsonResponse(response_payload)
