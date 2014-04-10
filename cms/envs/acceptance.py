@@ -19,11 +19,20 @@ import logging
 logging.basicConfig(filename=TEST_ROOT / "log" / "cms_acceptance.log", level=logging.ERROR)
 
 import os
-from random import choice, randint
 
 
 def seed():
     return os.getppid()
+
+# Suppress error message "Cannot determine primary key of logged in user"
+# from track.middleware that gets triggered when using an auto_auth workflow
+# This is an ERROR level warning so we need to set the threshold at CRITICAL
+logging.getLogger('track.middleware').setLevel(logging.CRITICAL)
+
+# Suppress warning message "Cannot find corresponding link for name: <foo>"
+# from edxmako.shortcuts. We have no appropriate pages in the platform to
+# use, so these are not set up for TOS and PRIVACY
+logging.getLogger('edxmako.shortcuts').setLevel(logging.ERROR)
 
 DOC_STORE_CONFIG = {
     'host': 'localhost',

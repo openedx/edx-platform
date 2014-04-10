@@ -27,6 +27,11 @@ import string
 def seed():
     return os.getppid()
 
+# Suppress error message "Cannot determine primary key of logged in user"
+# from track.middleware that gets triggered when using an auto_auth workflow
+# This is an ERROR level warning so we need to set the threshold at CRITICAL
+logging.getLogger('track.middleware').setLevel(logging.CRITICAL)
+
 # Use the mongo store for acceptance tests
 DOC_STORE_CONFIG = {
     'host': 'localhost',
