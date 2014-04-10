@@ -10,9 +10,10 @@ VERSION_PREFIX = r"version/"
 ALLOWED_ID_CHARS = r'[\w\-~.:]'
 ALLOWED_ID_RE = re.compile(r'^' + ALLOWED_ID_CHARS + '+$', re.UNICODE)
 
+# NOTE: if we need to support period in place of +, make it aggressive (take the first period in the string)
 URL_RE_SOURCE = r"""
     (?P<tag>edx:)?
-    ((?P<org>{ALLOWED_ID_CHARS}+)[+.](?P<offering>{ALLOWED_ID_CHARS}+)/?)?
+    ((?P<org>{ALLOWED_ID_CHARS}+)\+(?P<offering>{ALLOWED_ID_CHARS}+)/?)?
     ({BRANCH_PREFIX}(?P<branch>{ALLOWED_ID_CHARS}+)/?)?
     ({VERSION_PREFIX}(?P<version_guid>[A-F0-9]+)/?)?
     ({BLOCK_PREFIX}(?P<block_id>{ALLOWED_ID_CHARS}+))?

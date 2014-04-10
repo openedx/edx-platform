@@ -23,8 +23,8 @@ class TestLocations(TestCase):
     Tests of :class:`.Location`
     """
     @ddt.data(
-        "org/course/run/category/name",
-        "org/course/run/category/name@revision"
+        "org+course+run+category+name",
+        "org+course+run+category+name@revision"
     )
     def test_string_roundtrip(self, url):
         self.assertEquals(url, Location._from_string(url)._to_string())
