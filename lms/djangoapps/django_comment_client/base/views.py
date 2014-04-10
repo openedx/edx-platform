@@ -91,7 +91,7 @@ def create_thread(request, course_id, commentable_id):
         'anonymous': anonymous,
         'anonymous_to_peers': anonymous_to_peers,
         'commentable_id': commentable_id,
-        'course_id': course_id,
+        'course_id': course_id.to_deprecated_string(),
         'user_id': request.user.id,
     })
 

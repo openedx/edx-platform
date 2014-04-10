@@ -16,7 +16,7 @@ import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
 from django.utils.timezone import UTC
-from xmodule.modulestore.locations import i4xEncoder
+from xmodule.modulestore.locations import i4xEncoder, SlashSeparatedCourseKey
 import json
 
 log = logging.getLogger(__name__)
@@ -309,12 +309,16 @@ def render_mustache(template_name, dictionary, *args, **kwargs):
 
 
 def permalink(content):
+    if isinstance(content['course_id'], SlashSeparatedCourseKey):
+        course_id = content['course_id'].to_deprecated_string()
+    else:
+        course_id = content['course_id']
     if content['type'] == 'thread':
         return reverse('django_comment_client.forum.views.single_thread',
-                       args=[content['course_id'], content['commentable_id'], content['id']])
+                       args=[course_id, content['commentable_id'], content['id']])
     else:
         return reverse('django_comment_client.forum.views.single_thread',
-                       args=[content['course_id'], content['commentable_id'], content['thread_id']]) + '#' + content['id']
+                       args=[course_id, content['commentable_id'], content['thread_id']]) + '#' + content['id']
 
 
 def extend_content(content):
@@ -345,7 +349,7 @@ def add_courseware_context(content_list, course):
             location = id_map[commentable_id]["location"].url()
             title = id_map[commentable_id]["title"]
 
-            url = reverse('jump_to', kwargs={"course_id": course.id,
+            url = reverse('jump_to', kwargs={"course_id": course.id.to_deprecated_string(),
                           "location": location})
 
             content.update({"courseware_url": url, "courseware_title": title})
