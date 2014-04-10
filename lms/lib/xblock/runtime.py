@@ -86,7 +86,7 @@ class LmsHandlerUrls(object):
             view_name = 'xblock_handler_noauth'
 
         url = reverse(view_name, kwargs={
-            'course_id': self.course_id,
+            'course_id': self.course_id.to_deprecated_string(),
             'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
             'handler': handler_name,
             'suffix': suffix,
