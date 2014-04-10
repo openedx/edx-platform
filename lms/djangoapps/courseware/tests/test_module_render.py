@@ -54,7 +54,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.dispatch = 'score_update'
 
         # Construct a 'standard' xqueue_callback url
-        self.callback_url = reverse('xqueue_callback', kwargs=dict(course_id=self.course_id,
+        self.callback_url = reverse('xqueue_callback', kwargs=dict(course_id=self.course_id.to_deprecated_string(),
                                                                    userid=str(self.mock_user.id),
                                                                    mod_id=self.mock_module.id,
                                                                    dispatch=self.dispatch))
