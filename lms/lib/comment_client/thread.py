@@ -98,7 +98,7 @@ class Thread(models.Model):
             metric_action='model.retrieve',
             metric_tags=self._metric_tags
         )
-        self.update_attributes(**response)
+        self._update_attributes(**response)
 
     def flagAbuse(self, user, voteable):
         if voteable.type == 'thread':
@@ -115,7 +115,7 @@ class Thread(models.Model):
             metric_action='thread.abuse.flagged',
             metric_tags=self._metric_tags
         )
-        voteable.update_attributes(request)
+        voteable._update_attributes(request)
 
     def unFlagAbuse(self, user, voteable, removeAll):
         if voteable.type == 'thread':
@@ -136,7 +136,7 @@ class Thread(models.Model):
             metric_tags=self._metric_tags,
             metric_action='thread.abuse.unflagged'
         )
-        voteable.update_attributes(request)
+        voteable._update_attributes(request)
 
     def pin(self, user, thread_id):
         url = _url_for_pin_thread(thread_id)
@@ -148,7 +148,7 @@ class Thread(models.Model):
             metric_tags=self._metric_tags,
             metric_action='thread.pin'
         )
-        self.update_attributes(request)
+        self._update_attributes(request)
 
     def un_pin(self, user, thread_id):
         url = _url_for_un_pin_thread(thread_id)
@@ -160,7 +160,7 @@ class Thread(models.Model):
             metric_tags=self._metric_tags,
             metric_action='thread.unpin'
         )
-        self.update_attributes(request)
+        self._update_attributes(request)
 
 
 def _url_for_flag_abuse_thread(thread_id):

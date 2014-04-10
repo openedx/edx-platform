@@ -59,7 +59,7 @@ class Comment(models.Model):
             metric_tags=self._metric_tags,
             metric_action='comment.abuse.flagged'
         )
-        voteable.update_attributes(request)
+        voteable._update_attributes(request)
 
     def unFlagAbuse(self, user, voteable, removeAll):
         if voteable.type == 'thread':
@@ -80,7 +80,7 @@ class Comment(models.Model):
             metric_tags=self._metric_tags,
             metric_action='comment.abuse.unflagged'
         )
-        voteable.update_attributes(request)
+        voteable._update_attributes(request)
 
 
 def _url_for_thread_comments(thread_id):

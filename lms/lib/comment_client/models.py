@@ -1,4 +1,9 @@
+import logging
+
 from .utils import extract, perform_request, CommentClientRequestError
+
+
+log = logging.getLogger(__name__)
 
 
 class Model(object):
@@ -70,7 +75,7 @@ class Model(object):
             metric_tags=self._metric_tags,
             metric_action='model.retrieve'
         )
-        self.update_attributes(**response)
+        self._update_attributes(**response)
 
     @property
     def _metric_tags(self):
@@ -93,12 +98,17 @@ class Model(object):
     def find(cls, id):
         return cls(id=id)
 
-    def update_attributes(self, *args, **kwargs):
+    def _update_attributes(self, *args, **kwargs):
         for k, v in kwargs.items():
             if k in self.accessible_fields:
                 self.__setattr__(k, v)
             else:
-                raise AttributeError("Field {0} does not exist".format(k))
+                log.warning(
+                    "Unexpected field {field_name} in model {model_name}".format(
+                        field_name=k,
+                        model_name=self.__class__.__name__
+                    )
+                )
 
     def updatable_attributes(self):
         return extract(self.attributes, self.updatable_fields)
@@ -135,14 +145,14 @@ class Model(object):
                 metric_action='model.insert'
             )
         self.retrieved = True
-        self.update_attributes(**response)
+        self._update_attributes(**response)
         self.after_save(self)
 
     def delete(self):
         url = self.url(action='delete', params=self.attributes)
         response = perform_request('delete', url, metric_tags=self._metric_tags, metric_action='model.delete')
         self.retrieved = True
-        self.update_attributes(**response)
+        self._update_attributes(**response)
 
     @classmethod
     def url_with_id(cls, params={}):
