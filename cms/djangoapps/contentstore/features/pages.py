@@ -44,14 +44,13 @@ def click_edit_or_delete(step, edit_or_delete):
 
 @step(u'I change the name to "([^"]*)"$')
 def change_name(step, new_name):
-    settings_css = '#settings-mode a'
+    settings_css = '.settings-button'
     world.css_click(settings_css)
     input_css = 'input.setting-input'
     world.css_fill(input_css, new_name)
     if world.is_firefox():
         world.trigger_event(input_css)
-    save_button = 'a.save-button'
-    world.css_click(save_button)
+    world.save_component()
 
 
 @step(u'I drag the first static page to the last$')

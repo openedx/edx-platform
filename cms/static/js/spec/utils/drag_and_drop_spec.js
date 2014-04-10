@@ -1,4 +1,4 @@
-define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec/create_sinon", "jquery"],
+define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_helpers/create_sinon", "jquery"],
     function (ContentDragger, Notification, create_sinon, $) {
         describe("Overview drag and drop functionality", function () {
             beforeEach(function () {

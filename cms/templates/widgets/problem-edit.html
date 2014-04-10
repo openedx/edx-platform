@@ -1,7 +1,13 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='../static_content.html'/>
 
+<% isLaTexProblem='source_code' in editable_metadata_fields and editable_metadata_fields['source_code']['explicitly_set'] and enable_latex_compiler %>
+
+% if isLaTexProblem:
+<div class="wrapper-comp-editor latex-problem" id="editor-tab">
+% else:
 <div class="wrapper-comp-editor" id="editor-tab">
+% endif
 <section class="problem-editor editor">
     <div class="row">
         %if enable_markdown:

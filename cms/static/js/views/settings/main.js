@@ -276,7 +276,7 @@ var DetailsView = ValidatingView.extend({
                 $('#course-image').attr('src', self.model.get('course_image_asset_path'));
             }
         });
-        $('.wrapper-view').after(modal.show().el);
+        modal.show();
     }
 });
 

@@ -59,6 +59,11 @@ textarea.text {
 // forms - additional UI
 form {
 
+  input[type=file] {
+    @include font-size(14);
+    line-height: 1;
+  }
+
   .note {
     @include box-sizing(border-box);
 

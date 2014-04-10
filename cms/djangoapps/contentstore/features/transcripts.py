@@ -209,24 +209,21 @@ def check_text_in_the_captions(_step, text):
 
 @step('I see value "([^"]*)" in the field "([^"]*)"$')
 def check_transcripts_field(_step, values, field_name):
-    world.click_link_by_text('Advanced')
+    world.select_editor_tab('Advanced')
     field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
     values_list = [i.strip() == world.css_value(field_id) for i in values.split('|')]
     assert any(values_list)
-    world.click_link_by_text('Basic')
+    world.select_editor_tab('Basic')
 
 
 @step('I save changes$')
 def save_changes(_step):
-    save_css = 'a.save-button'
-    world.css_click(save_css)
-    world.wait_for_ajax_complete()
+    world.save_component()
 
 
 @step('I open tab "([^"]*)"$')
 def open_tab(_step, tab_name):
-    world.click_link_by_text(tab_name.strip())
-    world.wait_for_ajax_complete()
+    world.select_editor_tab(tab_name)
 
 
 @step('I set value "([^"]*)" to the field "([^"]*)"$')

@@ -31,7 +31,7 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
         initialize: function () {
             _.bindAll(this);
 
-            this.component_locator = this.$el.closest('.component').data('locator');
+            this.component_locator = this.$el.closest('[data-locator]').data('locator');
 
             this.fileUploader = new FileUploader({
                 el: this.$el,

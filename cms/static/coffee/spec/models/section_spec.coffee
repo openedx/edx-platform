@@ -1,4 +1,4 @@
-define ["js/models/section", "js/spec/create_sinon", "js/utils/module"], (Section, create_sinon, ModuleUtils) ->
+define ["js/models/section", "js/spec_helpers/create_sinon", "js/utils/module"], (Section, create_sinon, ModuleUtils) ->
     describe "Section", ->
         describe "basic", ->
             beforeEach ->

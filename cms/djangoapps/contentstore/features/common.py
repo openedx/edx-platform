@@ -350,7 +350,7 @@ def attach_file(filename, sub_path):
 
 def upload_file(filename, sub_path=''):
     attach_file(filename, sub_path)
-    button_css = '.upload-dialog .action-upload'
+    button_css = '.wrapper-modal-window-assetupload .action-upload'
     world.css_click(button_css)
 
 
