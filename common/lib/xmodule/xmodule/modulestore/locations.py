@@ -39,7 +39,7 @@ class SlashSeparatedCourseKey(CourseKey):
 
     @classmethod
     def _from_string(cls, serialized):
-        serialized = urllib.unquote(serialized.encode('utf8')).decode('utf8')
+        serialized = serialized.replace("+", "/")
         if serialized.count('/') != 2:
             raise InvalidKeyError(cls, serialized)
 
@@ -47,8 +47,8 @@ class SlashSeparatedCourseKey(CourseKey):
         return cls(*serialized.split('/'))
 
     def _to_string(self):
-        # Turns slashes into encoded slashes
-        return urllib.quote(self.to_deprecated_string().encode('utf8'), '')
+        # Turns slashes into pluses
+        return self.to_deprecated_string().replace("/", "+")
 
     @property
     def offering(self):
@@ -250,11 +250,11 @@ class LocationBase(object):
         )
         if self.revision:
             output += u'@{}'.format(self.revision)
-        return urllib.quote(output.encode('utf8'), '')
+        return output.replace("/", "+")
 
     @classmethod
     def _from_string(cls, serialized):
-        serialized = urllib.unquote(serialized.encode('utf8')).decode('utf8')
+        serialized = serialized.replace("+", "/")
         pattern = """
             (?P<org>[^/]+)/
             (?P<course>[^/]+)/
