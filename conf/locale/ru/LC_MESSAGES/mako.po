@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2014-03-26 10:56+0000\n"
-"PO-Revision-Date: 2014-03-28 13:13+0300\n"
+"PO-Revision-Date: 2014-04-10 16:45+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -783,8 +783,8 @@ msgid ""
 "To uphold the credibility of your {platform} {cert_name_short}, all name "
 "changes will be logged and recorded."
 msgstr ""
-"Для сохранения доверия к сертификатам ЦПМ все изменения имени "
-"сохраняются в истории."
+"Для сохранения доверия к сертификатам ЦПМ все изменения имени сохраняются в "
+"истории."
 
 #. Translators: note that {platform} {cert_name_short} will look something
 #. like: "edX certificate". Please do not change the order of these
@@ -793,8 +793,7 @@ msgstr ""
 msgid ""
 "Enter your desired full name, as it will appear on your {platform} "
 "{cert_name_short}:"
-msgstr ""
-"Введите Ваше полное имя, как оно будет напечатано на сертификате ЦПМ:"
+msgstr "Введите Ваше полное имя, как оно будет напечатано на сертификате ЦПМ:"
 
 #: lms/templates/dashboard.html:459
 #: lms/templates/verify_student/_modal_editname.html:21
@@ -1775,19 +1774,16 @@ msgid ""
 msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html:113
-#, fuzzy
 msgid "Manage course staff and instructors"
-msgstr "Персонал и инструкторы"
+msgstr "Персонал и Администраторы"
 
 #: lms/templates/sysadmin_dashboard.html:116
-#, fuzzy
 msgid "Download staff and instructor list (csv file)"
-msgstr "Все (студенты, персонал и инструкторы)"
+msgstr "Скачать список персонала и администраторов (CSV - файл)"
 
 #: lms/templates/sysadmin_dashboard.html:122
-#, fuzzy
 msgid "Administer Courses"
-msgstr "Администратор"
+msgstr "Администрирование курса"
 
 #. Translators: Repo is short for git repository or source of
 #. courseware
@@ -2731,15 +2727,15 @@ msgstr "Добавить члена персонала курса"
 
 #: lms/templates/courseware/instructor_dashboard.html:363
 msgid "List course instructors"
-msgstr "Инструкторы курса"
+msgstr "Администраторы курса"
 
 #: lms/templates/courseware/instructor_dashboard.html:365
 msgid "Remove instructor"
-msgstr "Удалить инструктора"
+msgstr "Удалить администратора"
 
 #: lms/templates/courseware/instructor_dashboard.html:366
 msgid "Add instructor"
-msgstr "Добавить инструктора"
+msgstr "Добавить администратора"
 
 #: lms/templates/courseware/instructor_dashboard.html:372
 msgid "Reload course from XML files"
@@ -2791,7 +2787,7 @@ msgid ""
 "tasks.  See instructor."
 msgstr ""
 "У пользователя должны быть административные привилегии для выполнения "
-"административных задач. Обратитесь к инструктору."
+"административных задач. Обратитесь к администратору."
 
 #: lms/templates/courseware/instructor_dashboard.html:405
 #, fuzzy
@@ -2940,14 +2936,14 @@ msgstr "Себе"
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:13
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:15
 msgid "Staff and instructors"
-msgstr "Персонал и инструкторы"
+msgstr "Персонал и Администраторы"
 
 #: lms/templates/courseware/instructor_dashboard.html:531
 #: lms/templates/courseware/instructor_dashboard.html:533
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:18
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:20
 msgid "All (students, staff and instructors)"
-msgstr "Все (студенты, персонал и инструкторы)"
+msgstr "Все (студенты, персонал и администраторы)"
 
 #: lms/templates/courseware/instructor_dashboard.html:539
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:26
@@ -4084,7 +4080,7 @@ msgstr "Информация о регистрациях"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:6
 msgid "Total number of enrollees (instructors, staff members, and students)"
-msgstr "Общее количество регистраций (инструкторы, преподаватели, студенты)"
+msgstr "Общее количество регистраций (администраторы, преподаватели, студенты)"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:14
 msgid "Basic Course Information"
@@ -4356,15 +4352,14 @@ msgid "Getting available lists..."
 msgstr "Получение доступных списков..."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:72
-#, fuzzy
 msgid ""
 "Staff cannot modify staff or beta tester lists. To modify these lists, "
 "contact your instructor and ask them to add you as an instructor for staff "
 "and beta lists, or a discussion admin for discussion management."
 msgstr ""
 "Персонал не может изменять списки персонала или бета-тестеров. Для изменения "
-"этих списков обратитесь к инструктору и попросите его добавить Вас как "
-"инструктора для персонала или списков бета-тестеров, или как администратора "
+"этих списков обратитесь к администратору и попросите его добавить Вас как "
+"администратора для персонала и списков бета-тестеров, или как администратора "
 "форума для управления форумом."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:81
@@ -4389,20 +4384,20 @@ msgstr "Добавить персонал"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:94
 msgid "Instructors"
-msgstr "Инструктор"
+msgstr "Администраторы"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:96
-#, fuzzy
 msgid ""
 "Instructors are the core administration of your course. Instructors can add "
 "and remove course staff, as well as administer discussion access."
 msgstr ""
-"Инструкторы составляют ядро администрации вашего курса. Инструкторы могут "
-"добавлять или удалять персонал курса и администрировать доступ к форумам."
+"Администраторы составляют ядро администрации вашего курса. Администраторы "
+"могут добавлять или удалять персонал курса и администрировать доступ к "
+"форумам."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:100
 msgid "Add Instructor"
-msgstr "Добавить инструктора"
+msgstr "Добавить администратора"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:105
 msgid "Beta Testers"
@@ -4421,9 +4416,8 @@ msgid "Beta Tester"
 msgstr "Бета-тестер"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:117
-#, fuzzy
 msgid "Discussion Admins"
-msgstr "Темы дискуссий"
+msgstr "Администраторы Дискуссий"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:119
 msgid ""
@@ -4433,9 +4427,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:124
-#, fuzzy
 msgid "Discussion Admin"
-msgstr "Дискуссии"
+msgstr "Администратор ДискуссиЙ"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:131
 #, fuzzy
@@ -4568,7 +4561,6 @@ msgid "Delete Student State for Problem"
 msgstr "Удалить состояние студента для задачи"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:68
-#, fuzzy
 msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in "
 "the 'Pending Instructor Tasks' table. To see status for all tasks submitted "
@@ -4583,7 +4575,6 @@ msgid "Then select an action"
 msgstr "Потом выберите действие:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:102
-#, fuzzy
 msgid ""
 "The above actions run in the background, and status for active tasks will "
 "appear in a table on the Course Info tab. To see status for all tasks "
@@ -5335,8 +5326,8 @@ msgid ""
 "To uphold the credibility of {platform} certificates, all name changes will "
 "be logged and recorded."
 msgstr ""
-"Для сохранения доверия к сертификатам ЦПСМ все изменения имени "
-"сохраняются в истории."
+"Для сохранения доверия к сертификатам ЦПСМ все изменения имени сохраняются в "
+"истории."
 
 #: lms/templates/verify_student/_modal_editname.html:26
 msgid "Change my name"

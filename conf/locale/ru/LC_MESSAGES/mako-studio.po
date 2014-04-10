@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2014-03-24 18:07+0400\n"
-"PO-Revision-Date: 2014-02-12 15:32+0300\n"
+"PO-Revision-Date: 2014-04-10 16:53+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -239,6 +239,8 @@ msgid ""
 "Any changes you make to these checklists are saved automatically and are "
 "immediately visible to other course team members."
 msgstr ""
+"Любые измения в контрольных списках сохраняются автоматически и немодленно "
+"отображаются остальному персоналу курса."
 
 #: cms/templates/component.html:10
 msgid "Editor"
@@ -334,7 +336,6 @@ msgid "Preview of Static Pages in your course"
 msgstr "Просмотр дополнительных страниц, которые используются в вашем курсе"
 
 #: cms/templates/edit-tabs.html:87
-#, fuzzy
 msgid ""
 "The names of your Static Pages appear in your course's main navigation bar, "
 "along with Courseware, Course Info, Discussion, Wiki, and Progress."
@@ -1466,12 +1467,16 @@ msgid ""
 "Course team members, or staff, are course co-authors. They have full writing "
 "and editing privileges on all course content."
 msgstr ""
+"Члены курса, или персонал - авторы курса. Они имеют полные привилегии для "
+"редактирования всего наполнения курса."
 
 #: cms/templates/manage_users.html:146
 msgid ""
 "Admins are course team members who can add and remove other course team "
 "members."
 msgstr ""
+"Администраторы это члены команды курса, которые могут добавлять и удалять "
+"других членов команды курса."
 
 #: cms/templates/manage_users.html:151
 #, fuzzy
@@ -1479,7 +1484,6 @@ msgid "Transferring Ownership"
 msgstr "Передача прав владения"
 
 #: cms/templates/manage_users.html:152
-#, fuzzy
 msgid ""
 "Every course must have an Admin. If you're the Admin and you want transfer "
 "ownership of the course, click Add admin access to make another user the "
