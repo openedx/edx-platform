@@ -6,17 +6,15 @@ import re
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from django_comment_common.utils import unseed_permissions_roles
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore.store_utilities import delete_course
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
-from xmodule.modulestore.keys import CourseKey
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 
@@ -65,15 +63,14 @@ def get_modulestore(category_or_location):
         return modulestore()
 
 
-def get_lms_link_for_item(location, course_id, preview=False):
+def get_lms_link_for_item(location, preview=False):
     """
     Returns an LMS link to the course with a jump_to to the provided location.
 
     :param location: the location to jump to
-    :param course_id: the course_id within which the location lives.
     :param preview: True if the preview version of LMS should be returned. Default value is false.
     """
-    assert(isinstance(course_id, SlashSeparatedCourseKey))
+    assert(isinstance(location, Location))
 
     if settings.LMS_BASE is None:
         return None
@@ -85,7 +82,7 @@ def get_lms_link_for_item(location, course_id, preview=False):
 
     return u"//{lms_base}/courses/{course_id}/jump_to/{location}".format(
         lms_base=lms_base,
-        course_id=course_id.to_deprecated_string(),
+        course_id=location.course_key.to_deprecated_string(),
         location=location.to_deprecated_string(),
     )
 
@@ -202,3 +199,28 @@ def remove_extra_panel_tab(tab_type, course):
         course_tabs = [ct for ct in course_tabs if ct != tab_panel]
         changed = True
     return changed, course_tabs
+
+
+def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
+    """
+    Creates the URL for the given handler.
+    The optional key_name and key_value are passed in as kwargs to the handler.
+    """
+    kwargs_for_reverse = {key_name: unicode(key_value)} if key_name else None
+    if kwargs:
+        kwargs_for_reverse.update(kwargs)
+    return reverse('contentstore.views.' + handler_name, kwargs=kwargs_for_reverse)
+
+
+def reverse_course_url(handler_name, course_key, kwargs=None):
+    """
+    Creates the URL for handlers that use course_keys as URL parameters.
+    """
+    return reverse_url(handler_name, 'course_key_string', course_key, kwargs)
+
+
+def reverse_usage_url(handler_name, usage_key, kwargs=None):
+    """
+    Creates the URL for handlers that use usage_keys as URL parameters.
+    """
+    return reverse_url(handler_name, 'usage_key_string', usage_key, kwargs)

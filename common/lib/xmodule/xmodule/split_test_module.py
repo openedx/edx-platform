@@ -182,7 +182,7 @@ class SplitTestModule(SplitTestFields, XModule):
             fragment.add_frag_resources(rendered_child)
 
             contents.append({
-                'id': child.id,
+                'id': child.location.to_deprecated_string(),
                 'content': rendered_child.content
             })
 

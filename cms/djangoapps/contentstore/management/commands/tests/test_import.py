@@ -13,6 +13,7 @@ from django.test.utils import override_settings
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)
@@ -21,7 +22,7 @@ class TestImport(ModuleStoreTestCase):
     Unit tests for importing a course from command line
     """
 
-    COURSE_ID = ['EDx', '0.00x', '2013_Spring', ]
+    COURSE_USAGE_KEY = SlashSeparatedCourseKey('edX', 'test_import_course', '2013_Spring')
 
     def setUp(self):
         """
@@ -35,16 +36,15 @@ class TestImport(ModuleStoreTestCase):
         self.good_dir = tempfile.mkdtemp(dir=self.content_dir)
         os.makedirs(os.path.join(self.good_dir, "course"))
         with open(os.path.join(self.good_dir, "course.xml"), "w+") as f:
-            f.write('<course url_name="{0[2]}" org="{0[0]}" '
-                    'course="{0[1]}"/>'.format(self.COURSE_ID))
+            f.write('<course url_name="2013_Spring" org="edx" course="test_import_course"/>')
 
-        with open(os.path.join(self.good_dir, "course", "{0[2]}.xml".format(self.COURSE_ID)), "w+") as f:
+        with open(os.path.join(self.good_dir, "course", "2013_Spring.xml"), "w+") as f:
             f.write('<course></course>')
 
     def test_forum_seed(self):
         """
         Tests that forum roles were created with import.
         """
-        self.assertFalse(are_permissions_roles_seeded('/'.join(self.COURSE_ID)))
+        self.assertFalse(are_permissions_roles_seeded(self.COURSE_USAGE_KEY))
         call_command('import', self.content_dir, self.good_dir)
-        self.assertTrue(are_permissions_roles_seeded('/'.join(self.COURSE_ID)))
+        self.assertTrue(are_permissions_roles_seeded(self.COURSE_USAGE_KEY))

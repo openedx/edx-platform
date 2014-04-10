@@ -48,7 +48,7 @@ class CourseFactory(XModuleFactory):
         # because the factory provides a default 'number' arg, prefer the non-defaulted 'course' arg if any
         number = kwargs.pop('course', kwargs.pop('number', None))
         store = kwargs.pop('modulestore')
-        name = kwargs.get('name', Location.clean(kwargs.get('display_name')))
+        name = kwargs.get('name', kwargs.get('run', Location.clean(kwargs.get('display_name'))))
         run = kwargs.get('run', name)
 
         location = Location(org, number, run, 'course', name)
@@ -174,7 +174,7 @@ class ItemFactory(XModuleFactory):
         store.update_item(module)
 
         if 'detached' not in module._class_tags:
-            parent.children.append(location.url())
+            parent.children.append(location)
             store.update_item(parent, '**replace_user**')
 
         return store.get_item(location)

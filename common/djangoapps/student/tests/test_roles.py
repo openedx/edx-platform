@@ -82,3 +82,24 @@ class RolesTestCase(TestCase):
             CourseStaffRole(self.course_id).has_user(self.student),
             "Student doesn't have access to {}".format(unicode(vertical_location.url()))
         )
+
+    def test_get_user_for_role(self):
+        """
+        test users_for_role
+        """
+        role = CourseStaffRole(self.course_id)
+        role.add_users(self.student)
+        self.assertGreater(len(role.users_with_role()), 0)
+
+    def test_add_users_doesnt_add_duplicate_entry(self):
+        """
+        Tests that calling add_users multiple times before a single call
+        to remove_users does not result in the user remaining in the group.
+        """
+        role = CourseStaffRole(self.course_id)
+        role.add_users(self.student)
+        self.assertTrue(role.has_user(self.student))
+        # Call add_users a second time, then remove just once.
+        role.add_users(self.student)
+        role.remove_users(self.student)
+        self.assertFalse(role.has_user(self.student))

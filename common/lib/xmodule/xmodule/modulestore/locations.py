@@ -2,6 +2,8 @@
 
 import logging
 import re
+import urllib
+
 from opaque_keys import InvalidKeyError, OpaqueKey
 
 from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey, AssetKey
@@ -37,6 +39,7 @@ class SlashSeparatedCourseKey(CourseKey):
 
     @classmethod
     def _from_string(cls, serialized):
+        serialized = serialized.replace("+", "/")
         if serialized.count('/') != 2:
             raise InvalidKeyError(cls, serialized)
 
@@ -44,8 +47,8 @@ class SlashSeparatedCourseKey(CourseKey):
         return cls(*serialized.split('/'))
 
     def _to_string(self):
-        # Turns slashes into encoded slashes
-        return self.to_deprecated_string()
+        # Turns slashes into pluses
+        return self.to_deprecated_string().replace("/", "+")
 
     @property
     def offering(self):
@@ -217,11 +220,11 @@ class LocationBase(object):
         )
         if self.revision:
             output += u'@{}'.format(self.revision)
-        return output
+        return output.replace("/", "+")
 
     @classmethod
     def _from_string(cls, serialized):
-
+        serialized = serialized.replace("+", "/")
         pattern = """
             (?P<org>[^/]+)/
             (?P<course>[^/]+)/
@@ -266,12 +269,15 @@ class AssetLocation(LocationBase, AssetKey):
     DEPRECATED_TAG = 'c4x'
     __slots__ = LocationBase.KEY_FIELDS
 
-    def __init__(self, org, course, run, asset_type, path, revision=None):
-        super(AssetLocation, self).__init__(org, course, run, asset_type, path, revision)
+    def __init__(self, org, course, run, category, name, revision=None):
+        super(AssetLocation, self).__init__(org, course, run, category, name, revision)
 
     @property
     def path(self):
         return self.name
+
+    def map_into_course(self, course_key):
+        return AssetLocation(course_key.org, course_key.course, course_key.run, self.category, self.name, self.revision)
 
 
 class i4xEncoder(json.JSONEncoder):

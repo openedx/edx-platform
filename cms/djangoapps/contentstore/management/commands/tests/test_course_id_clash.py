@@ -35,6 +35,6 @@ class ClashIdTestCase(TestCase):
         sys.stdout = old_stdout
         result = mystdout.getvalue()
         for courseid in expected:
-            self.assertIn(courseid, result)
+            self.assertIn(courseid.to_deprecated_string(), result)
         for courseid in not_expected:
-            self.assertNotIn(courseid, result)
+            self.assertNotIn(courseid.to_deprecated_string(), result)

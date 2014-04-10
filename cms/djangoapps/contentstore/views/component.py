@@ -14,8 +14,6 @@ from edxmako.shortcuts import render_to_response
 
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -30,6 +28,7 @@ from contentstore.utils import get_lms_link_for_item, compute_publish_state, Pub
 from contentstore.views.helpers import get_parent_xblock
 
 from models.settings.course_grading import CourseGradingModel
+from xmodule.modulestore.keys import UsageKey
 
 from .access import has_course_access
 
@@ -70,7 +69,7 @@ ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
 @require_GET
 @login_required
-def subsection_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
+def subsection_handler(request, usage_key_string):
     """
     The restful handler for subsection-specific requests.
 
@@ -79,13 +78,13 @@ def subsection_handler(request, tag=None, org=None, offering=None, branch=None, 
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
+        usage_key = UsageKey.from_string(usage_key_string)
         try:
-            old_location, course, item, lms_link = _get_item_in_course(request, locator)
+            course, item, lms_link = _get_item_in_course(request, usage_key)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        preview_link = get_lms_link_for_item(old_location, course_id=course.id, preview=True)
+        preview_link = get_lms_link_for_item(usage_key, preview=True)
 
         # make sure that location references a 'sequential', otherwise return
         # BadRequest
@@ -114,8 +113,6 @@ def subsection_handler(request, tag=None, org=None, offering=None, branch=None, 
                 can_view_live = True
                 break
 
-        course_locator = loc_mapper().translate_location(course.location, False, True)
-
         return render_to_response(
             'edit_subsection.html',
             {
@@ -124,9 +121,9 @@ def subsection_handler(request, tag=None, org=None, offering=None, branch=None, 
                 'new_unit_category': 'vertical',
                 'lms_link': lms_link,
                 'preview_link': preview_link,
-                'course_graders': json.dumps(CourseGradingModel.fetch(course_locator).graders),
+                'course_graders': json.dumps(CourseGradingModel.fetch(usage_key.course_key).graders),
                 'parent_item': parent,
-                'locator': locator,
+                'locator': usage_key,
                 'policy_metadata': policy_metadata,
                 'subsection_units': subsection_units,
                 'can_view_live': can_view_live
@@ -147,7 +144,7 @@ def _load_mixed_class(category):
 
 @require_GET
 @login_required
-def unit_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
+def unit_handler(request, usage_key_string):
     """
     The restful handler for unit-specific requests.
 
@@ -156,9 +153,9 @@ def unit_handler(request, tag=None, org=None, offering=None, branch=None, versio
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
+        usage_key = UsageKey.from_string(usage_key_string)
         try:
-            old_location, course, item, lms_link = _get_item_in_course(request, locator)
+            course, item, lms_link = _get_item_in_course(request, usage_key)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
@@ -228,10 +225,6 @@ def unit_handler(request, tag=None, org=None, offering=None, branch=None, versio
             )
 
         xblocks = item.get_children()
-        locators = [
-            loc_mapper().translate_location(xblock.location, False, True)
-            for xblock in xblocks
-        ]
 
         # TODO (cpennington): If we share units between courses,
         # this will need to change to check permissions correctly so as
@@ -268,8 +261,8 @@ def unit_handler(request, tag=None, org=None, offering=None, branch=None, versio
         return render_to_response('unit.html', {
             'context_course': course,
             'unit': item,
-            'unit_locator': locator,
-            'locators': locators,
+            'unit_locator': usage_key,
+            'xblocks': xblocks,
             'component_templates': component_templates,
             'draft_preview_link': preview_lms_link,
             'published_preview_link': lms_link,
@@ -293,7 +286,7 @@ def unit_handler(request, tag=None, org=None, offering=None, branch=None, versio
 # pylint: disable=unused-argument
 @require_GET
 @login_required
-def container_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
+def container_handler(request, usage_key_string):
     """
     The restful handler for container xblock requests.
 
@@ -302,9 +295,9 @@ def container_handler(request, tag=None, org=None, offering=None, branch=None, v
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
+        usage_key = UsageKey.from_string(usage_key_string)
         try:
-            __, course, xblock, __ = _get_item_in_course(request, locator)
+            course, xblock, __ = _get_item_in_course(request, usage_key)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
@@ -319,11 +312,10 @@ def container_handler(request, tag=None, org=None, offering=None, branch=None, v
         unit_publish_state = compute_publish_state(unit) if unit else None
 
         return render_to_response('container.html', {
-            'context_course': course,
             'xblock': xblock,
-            'xblock_locator': locator,
-            'unit': unit,
             'unit_publish_state': unit_publish_state,
+            'xblock_locator': usage_key,
+            'unit': None if not ancestor_xblocks else ancestor_xblocks[0],
             'ancestor_xblocks': ancestor_xblocks,
         })
     else:
@@ -331,24 +323,23 @@ def container_handler(request, tag=None, org=None, offering=None, branch=None, v
 
 
 @login_required
-def _get_item_in_course(request, locator):
+def _get_item_in_course(request, usage_key):
     """
     Helper method for getting the old location, containing course,
     item, and lms_link for a given locator.
 
     Verifies that the caller has permission to access this item.
     """
-    old_location = loc_mapper().translate_locator_to_location(locator)
-    course_location = old_location.course_key
+    course_key = usage_key.course_key
 
-    if not has_course_access(request.user, course_location):
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
-    course = modulestore().get_item(course_location)
-    item = modulestore().get_item(old_location, depth=1)
-    lms_link = get_lms_link_for_item(old_location, course_id=course.id)
+    course = modulestore().get_course(course_key)
+    item = modulestore().get_item(usage_key, depth=1)
+    lms_link = get_lms_link_for_item(usage_key)
 
-    return old_location, course, item, lms_link
+    return course, item, lms_link
 
 
 @login_required

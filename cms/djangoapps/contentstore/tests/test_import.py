@@ -88,10 +88,10 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             module_store,
             'common/test/data/',
             ['2014_Uni'],
-            target_location_namespace=target_location
+            target_course_id=course_id
         )
 
-        course = module_store.get_item(target_location)
+        course = module_store.get_course(course_id)
         self.assertIsNotNone(course)
 
         # test that course 'display_name' same as imported course 'display_name'
@@ -168,17 +168,18 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             Location('testX', 'conditional_copy', 'copy_run', 'conditional', 'condone')
         )
         self.assertIsNotNone(conditional_module)
+        different_course_id = SlashSeparatedCourseKey('edX', 'different_course', 'copy_run')
         self.assertListEqual(
             [
-                u'i4x://testX/conditional_copy/problem/choiceprob',
-                u'i4x://edX/different_course/html/for_testing_import_rewrites'
+                target_course_id.make_usage_key('problem', 'choiceprob'),
+                different_course_id.make_usage_key('html', 'for_testing_import_rewrites')
             ],
             conditional_module.sources_list
         )
         self.assertListEqual(
             [
-                u'i4x://testX/conditional_copy/html/congrats',
-                u'i4x://testX/conditional_copy/html/secret_page'
+                target_course_id.make_usage_key('html', 'congrats'),
+                target_course_id.make_usage_key('html', 'secret_page')
             ],
             conditional_module.show_tag_list
         )
@@ -193,11 +194,11 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             target_course_id=target_course_id
         )
         peergrading_module = module_store.get_item(
-            Location('testX', 'peergrading_copy', 'copy_run', 'peergrading', 'PeerGradingLinked')
+            target_course_id.make_usage_key('peergrading', 'PeerGradingLinked')
         )
         self.assertIsNotNone(peergrading_module)
         self.assertEqual(
-            u'i4x://testX/peergrading_copy/combinedopenended/SampleQuestion',
+            target_course_id.make_usage_key('combinedopenended', 'SampleQuestion'),
             peergrading_module.link_to_location
         )
 
@@ -211,13 +212,13 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             target_course_id=target_course_id
         )
         split_test_module = module_store.get_item(
-            Location('testX', 'split_test_copy', 'copy_run', 'split_test', 'split1'])
+            target_course_id.make_usage_key('split_test', 'split1')
         )
         self.assertIsNotNone(split_test_module)
         self.assertEqual(
             {
-                "0": "i4x://testX/split_test_copy/vertical/sample_0",
-                "2": "i4x://testX/split_test_copy/vertical/sample_2",
+                "0": target_course_id.make_usage_key('vertical', 'sample_0'),
+                "2": target_course_id.make_usage_key('vertical', 'sample_2'),
             },
             split_test_module.group_id_to_child,
         )

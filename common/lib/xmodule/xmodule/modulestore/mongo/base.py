@@ -16,6 +16,7 @@ import pymongo
 import sys
 import logging
 import copy
+import re
 
 from bson.son import SON
 from fs.osfs import OSFS
@@ -156,8 +157,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         """
         Return an XModule instance for the specified location
         """
-        if isinstance(location, basestring):
-            location = Location.from_string(location)
+        assert isinstance(location, Location)
         json_data = self.module_data.get(location)
         if json_data is None:
             module = self.modulestore.get_item(location)
@@ -171,6 +171,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 category = json_data['location']['category']
                 class_ = self.load_block_type(category)
 
+
                 definition = json_data.get('definition', {})
                 metadata = json_data.get('metadata', {})
                 for old_name, new_name in getattr(class_, 'metadata_translations', {}).items():
@@ -183,8 +184,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     for childloc in definition.get('children', [])
                 ]
                 data = definition.get('data', {})
-                data = self._convert_reference_fields(class_, location.course_key, data)
-                metadata = self._convert_reference_fields(class_, location.course_key, metadata)
+                mixed_class = self.mixologist.mix(class_)
+                data = self._convert_reference_fields_to_keys(mixed_class, location.course_key, data)
+                metadata = self._convert_reference_fields_to_keys(mixed_class, location.course_key, metadata)
                 kvs = MongoKeyValueStore(
                     data,
                     children,
@@ -211,11 +213,11 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 return ErrorDescriptor.from_json(
                     json_data,
                     self,
-                    json_data['location'],
+                    location,
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
 
-    def _convert_reference_fields(self, class_, course_key, jsonfields):
+    def _convert_reference_fields_to_keys(self, class_, course_key, jsonfields):
         """
         Find all fields of type reference and convert the payload into UsageKeys
         :param class_: the XBlock class
@@ -223,6 +225,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         """
         for field_name, value in jsonfields.iteritems():
             if value:
+                if field_name not in class_.fields:
+                    pass
                 if isinstance(class_.fields[field_name], Reference):
                     jsonfields[field_name] = course_key.make_usage_key_from_deprecated_string(value)
                 elif isinstance(class_.fields[field_name], ReferenceList):
@@ -469,7 +473,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # first get non-draft in a round-trip
         query = {
             '_id': {'$in': [
-                location_to_son(item) for item in items
+                location_to_son(course_key.make_usage_key_from_deprecated_string(item)) for item in items
             ]}
         }
         return list(self.collection.find(query))
@@ -607,12 +611,15 @@ class MongoModuleStore(ModuleStoreWriteBase):
         except ItemNotFoundError:
             return None
 
-    def has_course(self, course_key):
+    def has_course(self, course_key, ignore_case=False):
         """
         Is the given course in this modulestore
         """
         assert(isinstance(course_key, SlashSeparatedCourseKey))
         course_query = self._course_key_to_son(course_key)
+        if ignore_case:
+            for key in course_query.iterkeys():
+                course_query[key] = re.compile(r"(?i)^{}$".format(course_query[key]))
         return self.collection.find_one(course_query, fields={'_id': True}) is not None
 
     def has_item(self, usage_key):
@@ -890,13 +897,13 @@ class MongoModuleStore(ModuleStoreWriteBase):
         data: A nested dictionary of problem data
         """
         try:
-            definition_data = self._convert_reference_fields(xblock, self.get_xblock_explicitly_set_fields_by_scope(xblock))
+            definition_data = self._convert_reference_fields_to_strings(xblock, xblock.get_explicitly_set_fields_by_scope())
             payload = {
                 'definition.data': definition_data,
-                'metadata': self._convert_reference_fields(xblock, own_metadata(xblock)),
+                'metadata': self._convert_reference_fields_to_strings(xblock, own_metadata(xblock)),
             }
             if xblock.has_children:
-                children = self._convert_reference_fields(xblock, {'children': xblock.children})
+                children = self._convert_reference_fields_to_strings(xblock, {'children': xblock.children})
                 payload.update({'definition.children': children['children']})
             self._update_single_item(xblock.scope_ids.usage_id, payload)
             # for static tabs, their containing course also records their display name
@@ -916,7 +923,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             if not allow_not_found:
                 raise
 
-    def _convert_reference_fields(self, xblock, jsonfields):
+    def _convert_reference_fields_to_strings(self, xblock, jsonfields):
         """
         Find all fields of type reference and convert the payload from UsageKeys to deprecated strings
         :param xblock: the XBlock class
@@ -986,7 +993,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
     def get_orphans(self, course_key):
         """
-        Return an array all of the locations for orphans in the course.
+        Return an array all of the locations (deprecated string format) for orphans in the course.
         """
         detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
         query = self._course_key_to_son(course_key)
@@ -996,6 +1003,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         item_locs = set()
         for item in all_items:
             if item['_id']['category'] != 'course':
+                # It would be nice to change this method to return UsageKeys instead of the deprecated string.
                 item_locs.add(
                     self._location_from_id(item['_id'], course_key.run).replace(revision=None).to_deprecated_string()
                 )

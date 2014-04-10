@@ -28,7 +28,6 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
 from django.dispatch import receiver, Signal
-import django.dispatch
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
 from django_countries import CountryField
@@ -962,7 +961,31 @@ class CourseEnrollmentAllowed(models.Model):
     def __unicode__(self):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
 
-# cache_relation(User.profile)
+
+class CourseAccessRole(models.Model):
+    """
+    Maps users to org, courses, and roles. Used by student.roles.CourseRole and OrgRole.
+    To establish a user as having a specific role over all courses in the org, create an entry
+    without a course_id.
+    """
+    user = models.ForeignKey(User)
+    # blank org is for global group based roles such as course creator (may be deprecated)
+    org = models.CharField(max_length=64, db_index=True, blank=True, null=True)
+    # blank course_id implies org wide role
+    course_id = CourseKeyField(max_length=255, db_index=True, blank=True, null=True)
+    role = models.CharField(max_length=64, db_index=True)
+
+    def __eq__(self, other):
+        return self.user == other.user and self.role == other.role and self.org == other.org and self.course_id == other.course_id
+
+
+    def __ne__(self, other):
+        return self.user != other.user or self.role != other.role or self.org != other.org or self.course_id != other.course_id
+
+
+    def __hash__(self):
+        return hash(self.user) + hash(self.role) + hash(self.org) + hash(self.course_id)
+
 
 #### Helper methods for use from python manage.py shell and other classes.
 

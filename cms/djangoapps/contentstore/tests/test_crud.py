@@ -6,7 +6,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper, clear_existing_modulestores
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, LocalId
+from xmodule.modulestore.locator import BlockUsageLocator, LocalId
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -155,15 +155,15 @@ class TemplateTests(unittest.TestCase):
 
         id_locator = test_course.id.for_branch('draft')
         guid_locator = test_course.location.course_agnostic()
-        # verify it can be retireved by id
+        # verify it can be retrieved by id
         self.assertIsInstance(modulestore('split').get_course(id_locator), CourseDescriptor)
         # and by guid
-        self.assertIsInstance(modulestore('split').get_course(guid_locator), CourseDescriptor)
+        self.assertIsInstance(modulestore('split').get_item(guid_locator), CourseDescriptor)
         modulestore('split').delete_course(id_locator)
         # test can no longer retrieve by id
         self.assertRaises(ItemNotFoundError, modulestore('split').get_course, id_locator)
         # but can by guid
-        self.assertIsInstance(modulestore('split').get_course(guid_locator), CourseDescriptor)
+        self.assertIsInstance(modulestore('split').get_item(guid_locator), CourseDescriptor)
 
     def test_block_generations(self):
         """

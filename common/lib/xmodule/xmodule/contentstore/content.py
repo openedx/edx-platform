@@ -10,7 +10,7 @@ import logging
 import StringIO
 from urlparse import urlparse, urlunparse
 
-from xmodule.modulestore.locations import AssetLocation, SlashSeparatedCourseKey, Location
+from xmodule.modulestore.locations import AssetLocation, SlashSeparatedCourseKey
 from .django import contentstore
 from PIL import Image
 
@@ -64,6 +64,13 @@ class StaticContent(object):
 
     def get_url_path(self):
         return StaticContent.get_url_path_from_location(self.location)
+
+    def get_deprecated_loc_list(self, location):
+        """
+        Thumbnail locations stored as lists [c4x, org, course, thumbnail, path, None]
+        :param location:
+        """
+        return ['c4x', location.org, location.course, 'thumbnail', location.name, None] if location is not None else None
 
     @property
     def data(self):
@@ -132,7 +139,7 @@ class StaticContent(object):
         Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
         """
         matched = StaticContent.ASSET_URL_RE.match(path)
-        return Location(matched.group('org'), matched.group('course'), None, matched.group('category'), matched.group('name'))
+        return AssetLocation(matched.group('org'), matched.group('course'), None, matched.group('category'), matched.group('name'))
 
     @staticmethod
     def convert_legacy_static_url_with_course_id(path, course_id):

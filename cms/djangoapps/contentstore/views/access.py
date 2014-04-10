@@ -2,7 +2,7 @@ from student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole
 from student import auth
 
 
-def has_course_access(user, course_id, role=CourseStaffRole):
+def has_course_access(user, course_key, role=CourseStaffRole):
     """
     Return True if user allowed to access this course_id
     Note that the CMS permissions model is with respect to courses
@@ -14,7 +14,7 @@ def has_course_access(user, course_id, role=CourseStaffRole):
     """
     if GlobalStaff().has_user(user):
         return True
-    return auth.has_access(user, role(course_id))
+    return auth.has_access(user, role(course_key))
 
 
 def get_user_role(user, course_id):

@@ -9,7 +9,6 @@ and otherwise returns i4x://org/course/cat/name).
 from datetime import datetime
 
 from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
 from xmodule.modulestore.mongo.base import location_to_query, location_to_son, MongoModuleStore
 import pymongo
@@ -112,10 +111,18 @@ class DraftModuleStore(MongoModuleStore):
                 Substring matching pass a regex object.
                 ``name`` is another commonly provided key (Location based stores)
         """
-        draft_items = super(DraftModuleStore, self).get_items(course_key, revision='draft', **kwargs)
-        non_draft_items = super(DraftModuleStore, self).get_items(course_key, revision=None, **kwargs)
-
-        return [wrap_draft(item) for item in draft_items + non_draft_items]
+        draft_items = [
+            wrap_draft(item) for item in
+            super(DraftModuleStore, self).get_items(course_key, revision='draft', **kwargs)
+        ]
+        draft_items_locations = {item.location for item in draft_items}
+        non_draft_items = [
+            item for item in
+            super(DraftModuleStore, self).get_items(course_key, revision=None, **kwargs)
+            # filter out items that are not already in draft
+            if item.location not in draft_items_locations
+        ]
+        return draft_items + non_draft_items
 
     def convert_to_draft(self, source_location):
         """
@@ -217,8 +224,7 @@ class DraftModuleStore(MongoModuleStore):
         # now query all draft content in another round-trip
         query = {
             '_id': {'$in': [
-                location_to_son(as_draft(course_key.make_usage_key_from_deprecated_string(item)))
-                for item in items
+                location_to_son(as_draft(course_key.make_usage_key_from_deprecated_string(item))) for item in items
             ]}
         }
         to_process_drafts = list(self.collection.find(query))

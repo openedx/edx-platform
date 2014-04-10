@@ -332,12 +332,12 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         result = self._load_items(course_entry, [root], 0, lazy=True)
         return result[0]
 
-    def has_course(self, course_id):
+    def has_course(self, course_id, ignore_case=False):
         '''
         Does this course exist in this modulestore.
         '''
         assert(isinstance(course_id, CourseLocator))
-        course_entry = self.db_connection.get_course_index(course_id)
+        course_entry = self.db_connection.get_course_index(course_id, ignore_case)
         return course_entry is not None
 
     def has_item(self, usage_key):
@@ -1345,7 +1345,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             raise ItemNotFoundError(course_key)
         # this is the only real delete in the system. should it do something else?
         log.info(u"deleting course from split-mongo: %s", course_key)
-        self.db_connection.delete_course_index(index['_id'])
+        self.db_connection.delete_course_index(index)
 
     def get_errored_courses(self):
         """

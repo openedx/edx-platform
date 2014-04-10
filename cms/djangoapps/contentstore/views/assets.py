@@ -9,6 +9,7 @@ from django.views.decorators.http import require_http_methods
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from edxmako.shortcuts import render_to_response
 from cache_toolbox.core import del_cached_content
@@ -16,11 +17,9 @@ from cache_toolbox.core import del_cached_content
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore import InvalidLocationError
 from xmodule.exceptions import NotFoundError
 from django.core.exceptions import PermissionDenied
-from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
+from xmodule.modulestore.keys import CourseKey, AssetKey
 
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse
@@ -36,7 +35,7 @@ __all__ = ['assets_handler']
 # pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
-def assets_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None, asset_id=None):
+def assets_handler(request, course_key_string=None, asset_key_string=None):
     """
     The restful handler for assets.
     It allows retrieval of all the assets (as an HTML page), as well as uploading new assets,
@@ -58,24 +57,24 @@ def assets_handler(request, tag=None, org=None, offering=None, branch=None, vers
         json: delete an asset
     """
     # translate merely to do auth check
-    location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-    sscourse_key = loc_mapper().translate_locator_to_location(location, get_course=True)
-    if not has_course_access(request.user, sscourse_key):
+    course_key = CourseKey.from_string(course_key_string)
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
     response_format = request.REQUEST.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
-            return _assets_json(request, sscourse_key)
+            return _assets_json(request, course_key)
         else:
-            return _update_asset(request, sscourse_key, asset_id)
+            asset_key = AssetKey.from_string(asset_key_string) if asset_key_string else None
+            return _update_asset(request, course_key, asset_key)
     elif request.method == 'GET':  # assume html
-        return _asset_index(request, location, sscourse_key)
+        return _asset_index(request, course_key)
     else:
         return HttpResponseNotFound()
 
 
-def _asset_index(request, location, course_key):
+def _asset_index(request, course_key):
     """
     Display an editable asset library.
 
@@ -85,7 +84,7 @@ def _asset_index(request, location, course_key):
 
     return render_to_response('asset_index.html', {
         'context_course': course_module,
-        'asset_callback_url': location.url_reverse('assets/', '')
+        'asset_callback_url': reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)})
     })
 
 
@@ -126,7 +125,11 @@ def _assets_json(request, course_key):
         asset_id = asset['_id']
         asset_location = StaticContent.compute_location(course_key, asset_id['name'])
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
+        # Note also that we are ignoring the value of the thumbnail_location-- we only care whether
+        # or not a thumbnail has been stored, and we can now easily create the correct path.
         thumbnail_location = asset.get('thumbnail_location', None)
+        if thumbnail_location:
+            thumbnail_location = course_key.make_asset_key('thumbnail', thumbnail_location[4])
 
         asset_locked = asset.get('locked', False)
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
@@ -221,22 +224,13 @@ def _upload_asset(request, course_key):
 @require_http_methods(("DELETE", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
-def _update_asset(request, course_key, asset_path_encoding):
+def _update_asset(request, course_key, asset_key):
     """
     restful CRUD operations for a course asset.
     Currently only DELETE, POST, and PUT methods are implemented.
 
     asset_path_encoding: the odd /c4x/org/course/category/name repr of the asset (used by Backbone as the id)
     """
-    def get_asset_location(asset_id):
-        """ Helper method to get the location (and verify it is valid). """
-        try:
-            return StaticContent.get_location_from_path(asset_id)
-        except InvalidLocationError as err:
-            # return a 'Bad Request' to browser as we have a malformed Location
-            return JsonResponse({"error": err.message}, status=400)
-
-    asset_key = get_asset_location(asset_path_encoding)
     if request.method == 'DELETE':
         # Make sure the item to delete actually exists.
         try:
@@ -249,15 +243,18 @@ def _update_asset(request, course_key, asset_path_encoding):
 
         # see if there is a thumbnail as well, if so move that as well
         if content.thumbnail_location is not None:
+            # We are ignoring the value of the thumbnail_location-- we only care whether
+            # or not a thumbnail has been stored, and we can now easily create the correct path.
+            thumbnail_location = course_key.make_asset_key('thumbnail', asset_key.name)
             try:
-                thumbnail_content = contentstore().find(content.thumbnail_location)
+                thumbnail_content = contentstore().find(thumbnail_location)
                 contentstore('trashcan').save(thumbnail_content)
                 # hard delete thumbnail from origin
                 contentstore().delete(thumbnail_content.get_id())
                 # remove from any caching
-                del_cached_content(thumbnail_content.location)
+                del_cached_content(thumbnail_location)
             except:
-                logging.warning('Could not delete thumbnail: %s', content.thumbnail_location)
+                logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
         # delete the original
         contentstore().delete(content.get_id())
@@ -295,5 +292,5 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
         'thumbnail': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None,
         'locked': locked,
         # Needed for Backbone delete/update.
-        'id': asset_url
+        'id': unicode(location)
     }

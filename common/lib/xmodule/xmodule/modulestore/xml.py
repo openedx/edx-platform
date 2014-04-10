@@ -20,10 +20,8 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.tabs import CourseTabList
-from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
-from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore, IdGenerator
 
@@ -31,6 +29,8 @@ from . import ModuleStoreReadBase, Location, XML_MODULESTORE_TYPE
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata, inheriting_field_data
+
+from xblock.fields import ScopeIds, Reference, ReferenceList, ReferenceValueDict
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
@@ -308,6 +308,9 @@ def create_block_from_xml(xml_data, system, id_generator):
 
     scope_ids = ScopeIds(None, block_type, def_id, usage_id)
     xblock = xblock_class.parse_xml(node, system, scope_ids, id_generator)
+
+    _convert_reference_fields_to_keys(xblock)
+
     return xblock
 
 

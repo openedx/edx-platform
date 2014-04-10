@@ -46,10 +46,10 @@ class MongoContentStore(ContentStore):
 
         # Seems like with the GridFS we can't update existing ID's we have to do a delete/add pair
         self.delete(content_id)
-        thumbnail_loc_string = content.thumbnail_location.to_deprecated_string() if content.thumbnail_location else None
 
         with self.fs.new_file(_id=content_id, filename=content.get_url_path(), content_type=content.content_type,
-                              displayname=content.name, thumbnail_location=thumbnail_loc_string,
+                              displayname=content.name,
+                              thumbnail_location=content.get_deprecated_loc_list(content.thumbnail_location),
                               import_path=content.import_path,
                               # getattr b/c caching may mean some pickled instances don't have attr
                               locked=getattr(content, 'locked', False)) as fp:
@@ -64,15 +64,26 @@ class MongoContentStore(ContentStore):
     def delete(self, content_id):
         if self.fs.exists({"_id": content_id}):
             self.fs.delete(content_id)
+            assert not self.fs.exists({"_id": content_id})
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
         content_id = StaticContent.get_id_from_location(location)
+        # Use slow attr based lookup
+        content_id = {u'_id.{}'.format(key): value for key, value in content_id.iteritems()}
+        fs_pointer = self.fs_files.find_one(content_id, fields={'_id': 1})
+        if fs_pointer is None:
+            if throw_on_not_found:
+                raise NotFoundError()
+            else:
+                return None
+        content_id = fs_pointer['_id']
+
         try:
             if as_stream:
                 fp = self.fs.get(content_id)
                 thumbnail_location = getattr(fp, 'thumbnail_location', None)
                 if thumbnail_location:
-                    thumbnail_location = location.course_key.make_usage_key_from_deprecated_string(thumbnail_location)
+                    thumbnail_location = location.course_key.make_asset_key('thumbnail', thumbnail_location[4])
                 return StaticContentStream(
                     location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
                     thumbnail_location=thumbnail_location,
@@ -83,7 +94,7 @@ class MongoContentStore(ContentStore):
                 with self.fs.get(content_id) as fp:
                     thumbnail_location = getattr(fp, 'thumbnail_location', None)
                     if thumbnail_location:
-                        thumbnail_location = location.course_key.make_usage_key_from_deprecated_string(thumbnail_location)
+                        thumbnail_location = location.course_key.make_asset_key('thumbnail', thumbnail_location[4])
                     return StaticContent(
                         location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
                         thumbnail_location=thumbnail_location,
@@ -98,8 +109,12 @@ class MongoContentStore(ContentStore):
 
     def get_stream(self, location):
         content_id = StaticContent.get_id_from_location(location)
+        # use slow attr based lookup
+        content_id = {u'_id.{}'.format(key): value for key, value in content_id.iteritems()}
+        fs_pointer = self.fs_files.find_one(content_id, fields={'_id': 1})
+
         try:
-            handle = self.fs.get(content_id)
+            handle = self.fs.get(fs_pointer['_id'])
         except NoFile:
             raise NotFoundError()
 
@@ -257,4 +272,6 @@ class MongoContentStore(ContentStore):
         :param course_key:
         """
         course_query = MongoModuleStore._course_key_to_son(course_key, tag=XASSET_LOCATION_TAG)
-        self.fs.delete(course_query)
+        matching_assets = self.fs_files.find(course_query)
+        for asset in matching_assets:
+            self.fs.delete(asset['_id'])

@@ -164,7 +164,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def has_course(self, course_id):
+    def has_course(self, course_id, ignore_case=False):
         '''
         Look for a specific course id.  Returns whether it exists.
         '''
@@ -327,10 +327,16 @@ class ModuleStoreReadBase(ModuleStoreRead):
                 return c
         return None
 
-    def has_course(self, course_id):
+    def has_course(self, course_id, ignore_case=False):
         """Default impl--linear search through course list"""
         assert(isinstance(course_id, CourseKey))
-        return any(c.id == course_id for c in self.get_courses())
+        if ignore_case:
+            return any(
+                (c.id.org.lower() == course_id.org.lower() and c.id.offering.lower() == course_id.offering.lower())
+                for c in self.get_courses()
+            )
+        else:
+            return any(c.id == course_id for c in self.get_courses())
 
     def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
         """

@@ -154,11 +154,7 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def course_id(self):
-        return self.runtime.course_id
-
-    @property
-    def id(self):
-        return self.location.url()
+        return self.location.course_key
 
     @property
     def category(self):

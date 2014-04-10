@@ -27,10 +27,10 @@ class ContentTest(unittest.TestCase):
 
     def test_generate_thumbnail_image(self):
         contentStore = ContentStore()
-        content = Content(AssetLocation(u'c4x', u'mitX', u'800', u'asset', u'monsters__.jpg'), None)
+        content = Content(AssetLocation(u'mitX', u'800', u'ignore_run', u'asset', u'monsters__.jpg'), None)
         (thumbnail_content, thumbnail_file_location) = contentStore.generate_thumbnail(content)
         self.assertIsNone(thumbnail_content)
-        self.assertEqual(AssetLocation(u'c4x', u'mitX', u'800', u'thumbnail', u'monsters__.jpg'), thumbnail_file_location)
+        self.assertEqual(AssetLocation(u'mitX', u'800', u'ignore_run', u'thumbnail', u'monsters__.jpg'), thumbnail_file_location)
 
     def test_compute_location(self):
         # We had a bug that __ got converted into a single _. Make sure that substitution of INVALID_CHARS (like space)
@@ -39,3 +39,10 @@ class ContentTest(unittest.TestCase):
             SlashSeparatedCourseKey('mitX', '400', 'ignore'), 'subs__1eo_jXvZnE .srt.sjson'
         )
         self.assertEqual(AssetLocation(u'mitX', u'400', u'ignore', u'asset', u'subs__1eo_jXvZnE_.srt.sjson', None), asset_location)
+
+    def test_get_location_from_path(self):
+        asset_location = StaticContent.get_location_from_path(u'/c4x/foo/bar/asset/images_course_image.jpg')
+        self.assertEqual(
+            AssetLocation(u'foo', u'bar', u'ignore_run', u'asset', u'images_course_image.jpg', None),
+            asset_location
+        )

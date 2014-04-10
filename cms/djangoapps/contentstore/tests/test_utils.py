@@ -7,7 +7,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from contentstore import utils
-from xmodule.modulestore import Location
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
@@ -67,7 +66,7 @@ class LMSLinksTestCase(TestCase):
         location = course_key.make_usage_key('vertical', 'contacting_us')
         link = utils.get_lms_link_for_item(location, False)
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
-        link = utils.get_lms_link_for_item(location, "mitX/101/test", True)
+        link = utils.get_lms_link_for_item(location, True)
         self.assertEquals(
             link,
             "//preview/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"
