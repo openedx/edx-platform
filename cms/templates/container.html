@@ -56,7 +56,7 @@ main_xblock_info = {
             <small class="navigation navigation-parents">
                 % for ancestor in ancestor_xblocks:
                     <%
-                    ancestor_url = xblock_studio_url(ancestor, context_course)
+                    ancestor_url = xblock_studio_url(ancestor)
                     %>
                     % if ancestor_url:
                     <a href="${ancestor_url}"

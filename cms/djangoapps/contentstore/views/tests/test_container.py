@@ -94,8 +94,8 @@ class ContainerViewTestCase(CourseTestCase):
         Get the HTML for a container page and verify the section tag is correct
         and the breadcrumbs trail is correct.
         """
-        url = xblock_studio_url(xblock, self.course)
         publish_state = compute_publish_state(xblock)
+        url = xblock_studio_url(xblock)
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, 200)
         html = resp.content

@@ -2,8 +2,9 @@ import logging
 
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_string, render_to_response
-from xmodule.modulestore.django import loc_mapper, modulestore
+from xmodule.modulestore.django import modulestore
 
 __all__ = ['edge', 'event', 'landing']
 
@@ -79,7 +80,7 @@ def _xblock_has_studio_page(xblock):
         return False
 
 
-def xblock_studio_url(xblock, course=None):
+def xblock_studio_url(xblock):
     """
     Returns the Studio editing URL for the specified xblock.
     """
@@ -92,10 +93,19 @@ def xblock_studio_url(xblock, course=None):
     else:
         parent_category = None
     if category == 'course':
-        prefix = 'course'
+        return reverse(
+            "contentstore.views.course_handler",
+            kwargs={'course_key_string': unicode(xblock.location)}
+        )
     elif category == 'vertical' and parent_category == 'sequential':
-        prefix = 'unit'     # only show the unit page for verticals directly beneath a subsection
+        # only show the unit page for verticals directly beneath a subsection
+        return reverse(
+            "contentstore.views.unit_handler",
+            kwargs={'usage_key_string': unicode(xblock.location)}
+        )
     else:
-        prefix = 'container'
-    locator = loc_mapper().translate_location(xblock.location)
-    return locator.url_reverse(prefix)
+        return reverse(
+            "contentstore.views.container_handler",
+            kwargs={'usage_key_string': unicode(xblock.location)}
+        )
+

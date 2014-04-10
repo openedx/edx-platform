@@ -7,8 +7,8 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from contentstore import utils
-from xmodule.modulestore import Location
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.keys import CourseKey
 
 
 class LMSLinksTestCase(TestCase):
@@ -57,15 +57,16 @@ class LMSLinksTestCase(TestCase):
 
     def get_about_page_link(self):
         """ create mock course and return the about page link """
-        location = Location('mitX', '101', 'course', 'test')
-        return utils.get_lms_link_for_about_page(location)
+        course_key = CourseKey.from_string('mitX/101/test')
+        return utils.get_lms_link_for_about_page(course_key)
 
     def lms_link_test(self):
         """ Tests get_lms_link_for_item. """
-        location = Location('mitX', '101', 'vertical', 'contacting_us')
-        link = utils.get_lms_link_for_item(location, "mitX/101/test", False)
+        course_key = CourseKey.from_string('mitX/101/test')
+        location = course_key.make_usage_key('vertical', 'contacting_us')
+        link = utils.get_lms_link_for_item(location, False)
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
-        link = utils.get_lms_link_for_item(location, "mitX/101/test", True)
+        link = utils.get_lms_link_for_item(location, True)
         self.assertEquals(
             link,
             "//preview/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"

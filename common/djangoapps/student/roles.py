@@ -86,7 +86,7 @@ class GroupBasedRole(AccessRole):
 
         If a user is a member of any of the groups in the list, then
         they will be consider a member of the Role
-        """
+                """
         self._group_names = [name.lower() for name in group_names]
 
     def has_user(self, user):

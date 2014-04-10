@@ -11,12 +11,9 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from django_comment_common.utils import unseed_permissions_roles
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore.store_utilities import delete_course
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
-from xmodule.modulestore.keys import CourseKey
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 
@@ -65,15 +62,14 @@ def get_modulestore(category_or_location):
         return modulestore()
 
 
-def get_lms_link_for_item(location, course_id, preview=False):
+def get_lms_link_for_item(location, preview=False):
     """
     Returns an LMS link to the course with a jump_to to the provided location.
 
     :param location: the location to jump to
-    :param course_id: the course_id within which the location lives.
     :param preview: True if the preview version of LMS should be returned. Default value is false.
     """
-    assert(isinstance(course_id, SlashSeparatedCourseKey))
+    assert(isinstance(location, Location))
 
     if settings.LMS_BASE is None:
         return None
@@ -85,7 +81,7 @@ def get_lms_link_for_item(location, course_id, preview=False):
 
     return u"//{lms_base}/courses/{course_id}/jump_to/{location}".format(
         lms_base=lms_base,
-        course_id=course_id.to_deprecated_string(),
+        course_id=location.course_key.to_deprecated_string(),
         location=location.to_deprecated_string(),
     )
 

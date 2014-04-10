@@ -13,8 +13,8 @@ from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from xmodule.tabs import CourseTabList, StaticTab, CourseTab, InvalidTabsException
+from xmodule.modulestore.keys import CourseKey
 
 from ..utils import get_modulestore, get_lms_link_for_item
 
@@ -24,7 +24,7 @@ __all__ = ['tabs_handler']
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
-def tabs_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
+def tabs_handler(request, course_key_string):
     """
     The restful handler for static tabs.
 
@@ -38,13 +38,11 @@ def tabs_handler(request, tag=None, org=None, offering=None, branch=None, versio
     Creating a tab, deleting a tab, or changing its contents is not supported through this method.
     Instead use the general xblock URL (see item.xblock_handler).
     """
-    locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-    old_location = loc_mapper().translate_locator_to_location(locator)
-    if not has_course_access(request.user, old_location.course_key):
+    course_key = CourseKey.from_string(course_key_string)
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
-    store = get_modulestore(old_location)
-    course_item = store.get_item(old_location)
+    course_item = modulestore().get_course(course_key)
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
@@ -68,7 +66,7 @@ def tabs_handler(request, tag=None, org=None, offering=None, branch=None, versio
         ):
             if isinstance(tab, StaticTab):
                 # static tab needs its locator information to render itself as an xmodule
-                static_tab_loc = old_location.replace(category='static_tab', name=tab.url_slug)
+                static_tab_loc = course_key.make_usage_key('static_tab', tab.url_slug)
                 tab.locator = loc_mapper().translate_location(
                     static_tab_loc, False, True
                 )
@@ -77,7 +75,6 @@ def tabs_handler(request, tag=None, org=None, offering=None, branch=None, versio
         return render_to_response('edit-tabs.html', {
             'context_course': course_item,
             'tabs_to_render': tabs_to_render,
-            'course_locator': locator,
             'lms_link': get_lms_link_for_item(course_item.location),
         })
     else:

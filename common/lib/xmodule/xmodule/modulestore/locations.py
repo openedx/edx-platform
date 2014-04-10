@@ -2,6 +2,8 @@
 
 import logging
 import re
+import urllib
+
 from opaque_keys import InvalidKeyError, OpaqueKey
 
 from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey, AssetKey
@@ -37,6 +39,7 @@ class SlashSeparatedCourseKey(CourseKey):
 
     @classmethod
     def _from_string(cls, serialized):
+        serialized = serialized.replace("+", "/")
         if serialized.count('/') != 2:
             raise InvalidKeyError(cls, serialized)
 
@@ -44,8 +47,8 @@ class SlashSeparatedCourseKey(CourseKey):
         return cls(*serialized.split('/'))
 
     def _to_string(self):
-        # Turns slashes into encoded slashes
-        return self.to_deprecated_string()
+        # Turns slashes into pluses
+        return self.to_deprecated_string().replace("/", "+")
 
     @property
     def offering(self):
@@ -247,11 +250,11 @@ class LocationBase(object):
         )
         if self.revision:
             output += u'@{}'.format(self.revision)
-        return output
+        return output.replace("/", "+")
 
     @classmethod
     def _from_string(cls, serialized):
-
+        serialized = serialized.replace("+", "/")
         pattern = """
             (?P<org>[^/]+)/
             (?P<course>[^/]+)/

@@ -148,11 +148,8 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       </div>
 
       <%
-        ctx_loc = context_course.location
-        index_url = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True).url_reverse('course')
-        subsection_url = loc_mapper().translate_location(
-            ctx_loc.course_id, subsection.location, False, True
-        ).url_reverse('subsection')
+        index_url = reverse('course_handler', kwargs={'course_key_string': unicode(context_course.id)})
+        subsection_url = reverse('subsection_handler', kwargs={'usage_key_string': unicode(subsection.location)})
       %>
       <div class="sidebar">
         <div class="unit-settings window">

@@ -74,6 +74,10 @@ setup(
         'usage_key': [
             'location = xmodule.modulestore.locations:Location',
             'edx = xmodule.modulestore.locator:BlockUsageLocator',
-        ]
+        ],
+        'asset_key': [
+            'asset-location = xmodule.modulestore.locations:AssetLocation',
+            'edx = xmodule.modulestore.locator:BlockUsageLocator',
+        ],
     },
 )

@@ -9,8 +9,8 @@ from django.contrib.auth.models import User, Group
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from contentstore.tests.utils import AjaxEnabledTestClient
-from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore import Location
+from xmodule.modulestore.keys import CourseKey
+from django.core.urlresolvers import reverse
 from student.roles import CourseInstructorRole, CourseStaffRole
 from contentstore.views.access import has_course_access
 from student import auth
@@ -46,15 +46,16 @@ class TestCourseAccess(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
         # create a course via the view handler which has a different strategy for permissions than the factory
-        self.course_location = Location(['i4x', 'myu', 'mydept.mycourse', 'course', 'myrun'])
-        self.course_locator = loc_mapper().translate_location(self.course_location, False, True)
-        self.client.ajax_post(
-            self.course_locator.url_reverse('course'),
+        self.course_key = CourseKey.from_string('myu/mydept.mycourse/myrun')
+        course_url = reverse(
+             'contentstore.views.course_handler'
+        )
+        self.client.ajax_post(course_url,
             {
-                'org': self.course_location.org,
-                'number': self.course_location.course,
+                'org': 'myu',
+                'number': 'mydept.mycourse',
                 'display_name': 'My favorite course',
-                'run': self.course_location.name,
+                'run': 'myrun',
             }
         )
 
@@ -89,7 +90,7 @@ class TestCourseAccess(ModuleStoreTestCase):
         # first check the course creator.has explicit access (don't use has_access as is_staff
         # will trump the actual test)
         self.assertTrue(
-            CourseInstructorRole(self.course_location.course_key).has_user(self.user),
+            CourseInstructorRole(self.course_key).has_user(self.user),
             "Didn't add creator as instructor."
         )
         users = copy.copy(self.users)
@@ -99,8 +100,8 @@ class TestCourseAccess(ModuleStoreTestCase):
         for role in [CourseInstructorRole, CourseStaffRole]:
             user_by_role[role] = []
             # pylint: disable=protected-access
-            groupnames = role(self.course_location.course_key)._group_names
-            self.assertGreater(len(groupnames), 1, "Only 0 or 1 groupname for {}".format(role.ROLE))
+            groupnames = role(self.course_key)._group_names
+            self.assertEqual(len(groupnames), 1)
             # NOTE: this loop breaks the roles.py abstraction by purposely assigning
             # users to one of each possible groupname in order to test that has_course_access
             # and remove_user work
@@ -110,21 +111,24 @@ class TestCourseAccess(ModuleStoreTestCase):
                 user_by_role[role].append(user)
                 user.groups.add(group)
                 user.save()
-                self.assertTrue(has_course_access(user, self.course_location.course_key), "{} does not have access".format(user))
+                self.assertTrue(has_course_access(user, self.course_key), "{} does not have access".format(user))
 
-        response = self.client.get_html(self.course_locator.url_reverse('course_team'))
+        course_team_url = reverse(
+             'contentstore.views.course_team_handler',
+             kwargs={'course_key_string': unicode(self.course_key)}
+        )
+        response = self.client.get_html(course_team_url)
         for role in [CourseInstructorRole, CourseStaffRole]:
             for user in user_by_role[role]:
                 self.assertContains(response, user.email)
 
         # test copying course permissions
-        copy_course_location = Location(['i4x', 'copyu', 'copydept.mycourse', 'course', 'myrun'])
-        copy_course_locator = loc_mapper().translate_location(copy_course_location, False, True)
+        copy_course_key = CourseKey.from_string('copyu/copydept.mycourse/myrun')
         for role in [CourseInstructorRole, CourseStaffRole]:
             auth.add_users(
                 self.user,
-                role(copy_course_location.course_key),
-                *role(self.course_location.course_key).users_with_role()
+                role(copy_course_key),
+                *role(self.course_key).users_with_role()
             )
         # verify access in copy course and verify that removal from source course w/ the various
         # groupnames works
@@ -136,6 +140,6 @@ class TestCourseAccess(ModuleStoreTestCase):
                 if hasattr(user, '_groups'):
                     del user._groups
 
-                self.assertTrue(has_course_access(user, copy_course_location.course_key), "{} no copy access".format(user))
-                auth.remove_users(self.user, role(self.course_location.course_key), user)
-                self.assertFalse(has_course_access(user, self.course_location.course_key), "{} remove didn't work".format(user))
+                self.assertTrue(has_course_access(user, copy_course_key), "{} no copy access".format(user))
+                auth.remove_users(self.user, role(self.course_key), user)
+                self.assertFalse(has_course_access(user, self.course_key), "{} remove didn't work".format(user))

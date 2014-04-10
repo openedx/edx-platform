@@ -20,10 +20,10 @@ from xblock.fields import Scope
 from xblock.fragment import Fragment
 
 import xmodule
-from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
+from xmodule.modulestore.keys import UsageKey
 from xmodule.video_module import manage_video_subtitles_save
 
 from util.json_request import expect_json, JsonResponse
@@ -66,7 +66,7 @@ def hash_resource(resource):
 @require_http_methods(("DELETE", "GET", "PUT", "POST"))
 @login_required
 @expect_json
-def xblock_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
+def xblock_handler(request, usage_key_string):
     """
     The restful handler for xblock requests.
 
@@ -101,10 +101,8 @@ def xblock_handler(request, tag=None, org=None, offering=None, branch=None, vers
               The locator (and old-style id) for the created xblock (minus children) is returned.
     """
     if offering is not None:
-        locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-        old_location = loc_mapper().translate_locator_to_location(locator)
-
-        if not has_course_access(request.user, old_location.course_key):
+        usage_key = UsageKey.from_string(usage_key_string)
+        if not has_course_access(request.user, usage_key.course_key):
             raise PermissionDenied()
 
         if request.method == 'GET':
