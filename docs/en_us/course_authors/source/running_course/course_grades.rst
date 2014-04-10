@@ -338,6 +338,30 @@ To download the most recent file of student answer data:
 
 #. At the bottom of the page, click the ``{course_id}_answer_distribution.csv`` file name.
 
+==========================================================================
+Interpret the Student Answer Distribution Report
+==========================================================================
+
+You can use the Student Answer Distribution report to review student responses to assignments, which can then help you evaluate the structure and completeness of your courseware and problem components.
+
+As an example, you define a text input question in Studio to have a single correct answer, "Warfarin". When you produce the Student Answer Distribution report, you verify that this answer was in fact marked correct: there is a 1 in the **Correct Answer** column for this **AnswerValue**. 
+
+.. image:: ../Images/SAD_Answer_Review.png
+    :alt: In Excel, 5 rows show 5 answer values, 4 of which show comprehension of the question, but only 1 answer is marked as correct
+
+However, as you view the report you notice other student answers that you did not set up to be marked as correct in Studio, but that you might (or might not) also consider to be correct, such as "Warfarin or Coumadin". The **Correct Answer** column shows that the other answers were marked incorrect (0), but for future iterations of your course you may want to revise the question or update the problem to evaluate additional variations of the answer as correct.
+
+Many spreadsheet applications offer data visualization options, such as charts or graphs. Charts can help make your students' common misconceptions  easier to identify. 
+
+.. image:: ../Images/SAD_Column_Chart.png
+    :alt: In Excel, AnswerValue and Count columns next to each other, values for 4 rows selected, and a column chart of the count for the 4 answers
+
+In this example, the Student Answer Distribution report is open in Microsoft Excel. To create a chart that shows how many of your students chose various answers to a multiple choice question, you move the **AnswerValue** and **Count** columns next to each other. After you click and drag to select the report cells that contain the data you want to chart, you click the Charts toolbar and then click the type of chart you want.
+
+.. note:: Refer to the help for the spreadsheet application that you use for information on using these options. You may have to make changes to your spreadsheet, such as reordering columns. Save a copy of the file you originally downloaded as a backup before you begin. 
+
+You can adjust your course content based on common student mistakes. While most students in this example selected the correct answer, the number of incorrect answer(s) can guide future changes to the courseware. 
+
 ===================================================
 View a Histogram of Scores for a Single Problem
 ===================================================
@@ -361,4 +385,4 @@ To display the distribution of scores for a problem:
    .. image:: ../Images/score_histogram.png
      :alt: Graph of the numbers of students who got different scores for a selected problem
 
-..  **Question**: (sent to Olga 31 Jan 14) this is a tough UI to use: how do they correlate the codes in this drop-down with actual constructed problems? the copy-and-paste UI on the Student Admin page actually works a little better imo.
+..  **Question**: (sent to Olga 31 Jan 14) this is a tough UI to use: how do they correlate the codes in this drop-down with actual constructed problems? the copy-and-paste UI on the Student Admin page actually works a little better imo. LMS-2522
