@@ -34,7 +34,7 @@ from django.core.urlresolvers import reverse
 
 from bulk_email.models import (
     CourseEmail, Optout, CourseEmailTemplate,
-    SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS,
+    SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS, SEND_TO_LIST
 )
 from courseware.courses import get_course, course_image_url
 from student.roles import CourseStaffRole, CourseInstructorRole
@@ -93,7 +93,7 @@ BULK_EMAIL_FAILURE_ERRORS = (
 )
 
 
-def _get_recipient_queryset(user_id, to_option, course_id, course_location):
+def _get_recipient_queryset(email_obj, user_id, to_option, course_id, course_location):
     """
     Returns a query set of email recipients corresponding to the requested to_option category.
 
@@ -108,6 +108,8 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
 
     if to_option == SEND_TO_MYSELF:
         recipient_qset = User.objects.filter(id=user_id)
+    if to_option == SEND_TO_LIST:
+        recipient_qset = User.objects.filter(email__in=email_obj.to_list)    
     else:
         staff_qset = CourseStaffRole(course_location).users_with_role()
         instructor_qset = CourseInstructorRole(course_location).users_with_role()
@@ -221,7 +223,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         )
         return new_subtask
 
-    recipient_qset = _get_recipient_queryset(user_id, to_option, course_id, course.location)
+    recipient_qset = _get_recipient_queryset(email_obj, user_id, to_option, course_id, course.location)
     recipient_fields = ['profile__name', 'email']
 
     log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s, to_option %s",

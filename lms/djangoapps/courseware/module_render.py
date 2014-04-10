@@ -4,6 +4,8 @@ import mimetypes
 
 import static_replace
 
+from bulk_email.models import CourseEmail
+
 from functools import partial
 from requests.auth import HTTPBasicAuth
 from dogapi import dog_stats_api
@@ -433,6 +435,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor.runtime,
+        bulkmail=CourseEmail
     )
 
     # pass position specified in URL to module through ModuleSystem
