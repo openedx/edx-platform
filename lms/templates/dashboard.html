@@ -295,7 +295,7 @@ text-transform: capitalize;
       <section class="empty-dashboard-message">
         % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
           <p>${_("Looks like you haven't registered for any courses yet.")}</p>
-          <a href="${marketing_link('COURSES')}">
+          <a href="${reverse('courses_list')}">
             ${_("Find courses now!")}
           </a>
         % else:
