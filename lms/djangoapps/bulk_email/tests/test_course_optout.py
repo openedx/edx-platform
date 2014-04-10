@@ -17,7 +17,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from mock import patch
-from xmodule.modulestore.keys import UsageKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -48,7 +47,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
     def navigate_to_email_view(self):
         """Navigate to the instructor dash's email view"""
         # Pull up email view on instructor dashboard
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url)
         email_link = '<a href="#" onclick="goto(\'Email\')" class="None">Email</a>'
         # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False

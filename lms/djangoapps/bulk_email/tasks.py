@@ -129,7 +129,7 @@ def _get_course_email_context(course):
     """
     Returns context arguments to apply to all emails, independent of recipient.
     """
-    course_id = course.id
+    course_id = course.id.to_deprecated_string()
     course_title = course.display_name
     course_url = 'https://{}{}'.format(
         settings.SITE_NAME,
