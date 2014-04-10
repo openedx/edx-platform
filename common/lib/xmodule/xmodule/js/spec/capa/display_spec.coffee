@@ -142,6 +142,10 @@ describe 'Problem', ->
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_check event', ->
+      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
+        promise =
+          always: (callable) -> callable()
+          done: (callable) -> callable()
       @problem.check()
       expect(Logger.log).toHaveBeenCalledWith 'problem_check', 'foo=1&bar=2'
 
@@ -151,11 +155,17 @@ describe 'Problem', ->
           success: 'correct'
           contents: 'mock grader response'
         callback(response)
+        promise =
+          always: (callable) -> callable()
+          done: (callable) -> callable()
       @problem.check()
       expect(Logger.log).toHaveBeenCalledWith 'problem_graded', ['foo=1&bar=2', 'mock grader response'], @problem.id
 
     it 'submit the answer for check', ->
-      spyOn $, 'postWithPrefix'
+      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
+        promise =
+          always: (callable) -> callable()
+          done: (callable) -> callable()
       @problem.check()
       expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_check',
           'foo=1&bar=2', jasmine.any(Function)
@@ -164,6 +174,9 @@ describe 'Problem', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
           callback(success: 'correct', contents: 'Correct!')
+          promise =
+            always: (callable) -> callable()
+            done: (callable) -> callable()
         @problem.check()
         expect(@problem.el.html()).toEqual 'Correct!'
         expect(window.SR.readElts).toHaveBeenCalled()
@@ -172,6 +185,9 @@ describe 'Problem', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
           callback(success: 'incorrect', contents: 'Incorrect!')
+          promise =
+            always: (callable) -> callable()
+            done: (callable) -> callable()
         @problem.check()
         expect(@problem.el.html()).toEqual 'Incorrect!'
         expect(window.SR.readElts).toHaveBeenCalled()

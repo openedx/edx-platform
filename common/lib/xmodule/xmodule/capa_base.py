@@ -390,6 +390,24 @@ class CapaMixin(CapaFields):
         else:
             return check
 
+    def check_button_checking_name(self):
+        """
+        Return the "checking..." text for the "check" button.
+
+        After the user presses the "check" button, the button will briefly
+        display the value returned by this function until a response is
+        received by the server.
+
+        The text can be customized by the text_customization setting.
+
+        """
+        # Apply customizations if present
+        if 'custom_checking' in self.text_customization:
+            return self.text_customization.get('custom_checking')
+
+        _ = self.runtime.service(self, "i18n").ugettext
+        return _('Checking...')
+
     def should_show_check_button(self):
         """
         Return True/False to indicate whether to show the "Check" button.
@@ -548,13 +566,16 @@ class CapaMixin(CapaFields):
         except Exception as err:  # pylint: disable=broad-except
             html = self.handle_problem_html_error(err)
 
-        # The convention is to pass the name of the check button
-        # if we want to show a check button, and False otherwise
-        # This works because non-empty strings evaluate to True
+        # The convention is to pass the name of the check button if we want
+        # to show a check button, and False otherwise This works because
+        # non-empty strings evaluate to True.  We use the same convention
+        # for the "checking" state text.
         if self.should_show_check_button():
             check_button = self.check_button_name()
+            check_button_checking = self.check_button_checking_name()
         else:
             check_button = False
+            check_button_checking = False
 
         content = {
             'name': self.display_name_with_default,
@@ -566,6 +587,7 @@ class CapaMixin(CapaFields):
             'problem': content,
             'id': self.id,
             'check_button': check_button,
+            'check_button_checking': check_button_checking,
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
             'answer_available': self.answer_available(),
