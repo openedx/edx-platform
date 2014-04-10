@@ -11,12 +11,9 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from django_comment_common.utils import unseed_permissions_roles
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore.store_utilities import delete_course
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
-from xmodule.modulestore.keys import CourseKey
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 

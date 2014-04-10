@@ -5,6 +5,7 @@ import json
 import lxml
 
 from contentstore.tests.utils import CourseTestCase
+from django.core.urlresolvers import reverse
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore import parsers
@@ -67,12 +68,14 @@ class TestCourseIndex(CourseTestCase):
 
     def test_course_staff_access(self):
         """
-        Make and register an course_staff and ensure they can access the courses
+        Make and register course_staff and ensure they can access the courses
         """
         course_staff_client, course_staff = self.create_non_staff_authed_user_client()
         for course in [self.course, self.odd_course]:
-            new_location = loc_mapper().translate_location(course.location, False, True)
-            permission_url = new_location.url_reverse("course_team/", course_staff.email)
+            permission_url = reverse('course_team', kwargs={
+                "course_key_string": unicode(course.id),
+                "email": course_staff.email
+            })
 
             self.client.post(
                 permission_url,

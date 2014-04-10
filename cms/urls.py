@@ -68,7 +68,7 @@ urlpatterns += patterns(
     url(r'^request_course_creator$', 'request_course_creator'),
 
     # (?ix) == ignore case and verbose (multiline regex)
-    url(r'(?ix)^course_team/{}(/)?(?P<email>.+)?$'.format(parsers.URL_RE_SOURCE), 'course_team_handler'),
+    url(r'^course_team/(?P<course_key_string>[^/]+)/(?P<email>.+)$', 'course_team_handler', name='course_team'),
     url(r'(?ix)^course_info/{}$'.format(parsers.URL_RE_SOURCE), 'course_info_handler'),
     url(
         r'(?ix)^course_info_update/{}(/)?(?P<provided_id>\d+)?$'.format(parsers.URL_RE_SOURCE),
@@ -92,7 +92,7 @@ urlpatterns += patterns(
     url(r'(?ix)^settings/grading/{}(/)?(?P<grader_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'grading_handler'),
     url(r'(?ix)^settings/advanced/{}$'.format(parsers.URL_RE_SOURCE), 'advanced_settings_handler'),
     url(r'(?ix)^textbooks/{}$'.format(parsers.URL_RE_SOURCE), 'textbooks_list_handler'),
-    url(r'(?ix)^textbooks/(?P<course_key_string>[^/]+)/(?P<textbook_id>\d[^/]*)$', 'textbooks_detail_handler'),
+    url(r'(?i)^textbooks/(?P<course_key_string>[^/]+)/(?P<textbook_id>\d[^/]*)$', 'textbooks_detail_handler'),
 )
 
 js_info_dict = {
