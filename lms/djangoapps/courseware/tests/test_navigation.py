@@ -99,7 +99,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         }))
 
         resp = self.client.get(reverse('courseware',
-                               kwargs={'course_id': self.course.id}))
+                               kwargs={'course_id': self.course.id.to_deprecated_string()}))
 
         self.assertRedirects(resp, reverse('courseware_chapter',
                kwargs={

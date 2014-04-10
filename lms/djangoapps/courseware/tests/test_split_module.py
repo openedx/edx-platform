@@ -113,7 +113,7 @@ class SplitTestBase(ModuleStoreTestCase):
 
         resp = self.client.get(reverse(
             'courseware_section',
-            kwargs={'course_id': self.course.id,
+            kwargs={'course_id': self.course.id.to_deprecated_string(),
                     'chapter': self.chapter.url_name,
                     'section': self.sequential.url_name}
         ))
