@@ -20,7 +20,11 @@ class CourseKeyField(mongoengine.StringField):
         For now saves the course key in the deprecated form
         """
         assert isinstance(course_key, (NoneType, SlashSeparatedCourseKey))
-        return super(CourseKeyField, self).to_mongo(course_key.to_deprecated_string())
+        if course_key:
+            # don't call super as it calls to_python() for some odd reason
+            return course_key.to_deprecated_string()
+        else:
+            return None
 
     def to_python(self, course_key):
         """
@@ -28,7 +32,12 @@ class CourseKeyField(mongoengine.StringField):
         """
         course_key = super(CourseKeyField, self).to_python(course_key)
         assert isinstance(course_key, (NoneType, basestring, SlashSeparatedCourseKey))
-        return SlashSeparatedCourseKey.from_deprecated_string(course_key)
+        if course_key is None:
+            return None
+        if isinstance(course_key, basestring):
+            return SlashSeparatedCourseKey.from_deprecated_string(course_key)
+        else:
+            return course_key
 
     def validate(self, value):
         assert isinstance(value, (NoneType, basestring, SlashSeparatedCourseKey))
@@ -50,6 +59,8 @@ class UsageKeyField(mongoengine.StringField):
         For now saves the usage key in the deprecated location i4x/c4x form
         """
         assert isinstance(location, (NoneType, SlashSeparatedCourseKey))
+        if location is None:
+            return location
         return super(UsageKeyField, self).to_mongo(location.to_deprecated_string())
 
     def to_python(self, location):

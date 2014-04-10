@@ -534,13 +534,14 @@ class Courses(SysadminDashboardView):
 
         elif action == 'del_course':
             course_id = request.POST.get('course_id', '').strip()
+            course_key = SlashSeparatedCourseKey.from_string(course_id)
             course_found = False
-            if course_id in courses:
+            if course_key in courses:
                 course_found = True
-                course = courses[course_id]
+                course = courses[course_key]
             else:
                 try:
-                    course = get_course_by_id(course_id)
+                    course = get_course_by_id(course_key)
                     course_found = True
                 except Exception, err:   # pylint: disable=broad-except
                     self.msg += _('Error - cannot get course with ID '
@@ -548,7 +549,7 @@ class Courses(SysadminDashboardView):
                                       course_id, escape(str(err))
                                   )
 
-            is_xml_course = (modulestore().get_modulestore_type(course_id) == XML_MODULESTORE_TYPE)
+            is_xml_course = (modulestore().get_modulestore_type(course_key) == XML_MODULESTORE_TYPE)
             if course_found and is_xml_course:
                 cdir = course.data_dir
                 self.def_ms.courses.pop(cdir)
@@ -571,8 +572,8 @@ class Courses(SysadminDashboardView):
                 delete_course(self.def_ms, content_store, course.id, commit)
                 # don't delete user permission groups, though
                 self.msg += \
-                    u"<font color='red'>{0} {2} ({3})</font>".format(
-                        _('Deleted'), course.id, course.display_name)
+                    u"<font color='red'>{0} {1} ({2})</font>".format(
+                        _('Deleted'), course.id.to_deprecated_string(), course.display_name)
             datatable = self.make_datatable()
 
         context = {
@@ -713,8 +714,7 @@ class GitLogs(TemplateView):
                     CourseStaffRole(course.id).has_user(request.user)):
                 raise Http404
             log.debug('course_id={0}'.format(course_id))
-            cilset = CourseImportLog.objects.filter(
-                course_id=course_id).order_by('-created')
+            cilset = CourseImportLog.objects.filter(course_id=course_id).order_by('-created')
             log.debug('cilset length={0}'.format(len(cilset)))
         mdb.disconnect()
         context = {'cilset': cilset,

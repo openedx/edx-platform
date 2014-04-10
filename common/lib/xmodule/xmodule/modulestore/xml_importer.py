@@ -175,7 +175,7 @@ def import_from_xml(
                     course_data_path = path(data_dir) / module.data_dir
 
                     log.debug('======> IMPORTING course {course_id}'.format(
-                        course_id=module.id,
+                        course_id=module.id.to_deprecated_string(),
                     ))
 
                     module = remap_namespace(module, target_course_id)

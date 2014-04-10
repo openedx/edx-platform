@@ -321,7 +321,7 @@ class TestSysadmin(SysadminBaseTestCase):
         course = def_ms.courses.get('{0}/edx4edx_lite'.format(
             os.path.abspath(settings.DATA_DIR)), None)
         self.assertIsNotNone(course)
-        self.assertIn(self.TEST_BRANCH_COURSE, course.id)
+        self.assertEqual(self.TEST_BRANCH_COURSE, course.id)
         self._rm_edx4edx()
 
         # Try and delete a non-existent course
@@ -472,7 +472,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'MITx/edx4edx/edx4edx'}))
 
-        self.assertIn('======&gt; IMPORTING course to location',
+        self.assertIn('======&gt; IMPORTING course',
                       response.content)
 
         self._rm_edx4edx()
@@ -521,7 +521,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'MITx/edx4edx/edx4edx'}))
-        self.assertIn('======&gt; IMPORTING course to location',
+        self.assertIn('======&gt; IMPORTING course',
                       response.content)
 
         self._rm_edx4edx()
