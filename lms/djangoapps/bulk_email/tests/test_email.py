@@ -68,7 +68,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password="test")
 
         # Pull up email view on instructor dashboard
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(self.url)
         email_link = '<a href="#" onclick="goto(\'Email\')" class="None">Email</a>'
         # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
