@@ -58,7 +58,7 @@ class Role(models.Model):
         db_table = 'django_comment_client_role'
 
     def __unicode__(self):
-        return self.name + " for " + (self.course_id if self.course_id else "all courses")
+        return self.name + " for " + (self.course_id.to_deprecated_string() if self.course_id.to_deprecated_string() else "all courses")
 
     def inherit_permissions(self, role):   # TODO the name of this method is a little bit confusing,
                                          # since it's one-off and doesn't handle inheritance later
