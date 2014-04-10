@@ -46,9 +46,10 @@ class MongoContentStore(ContentStore):
 
         # Seems like with the GridFS we can't update existing ID's we have to do a delete/add pair
         self.delete(content_id)
+        thumbnail_loc_string = content.thumbnail_location.to_deprecated_string() if content.thumbnail_location else None
 
         with self.fs.new_file(_id=content_id, filename=content.get_url_path(), content_type=content.content_type,
-                              displayname=content.name, thumbnail_location=content.thumbnail_location,
+                              displayname=content.name, thumbnail_location=thumbnail_loc_string,
                               import_path=content.import_path,
                               # getattr b/c caching may mean some pickled instances don't have attr
                               locked=getattr(content, 'locked', False)) as fp:
@@ -69,17 +70,23 @@ class MongoContentStore(ContentStore):
         try:
             if as_stream:
                 fp = self.fs.get(content_id)
+                thumbnail_location = getattr(fp, 'thumbnail_location', None)
+                if thumbnail_location:
+                    thumbnail_location = location.course_key.make_usage_key_from_deprecated_string(thumbnail_location)
                 return StaticContentStream(
                     location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
-                    thumbnail_location=getattr(fp, 'thumbnail_location', None),
+                    thumbnail_location=thumbnail_location,
                     import_path=getattr(fp, 'import_path', None),
                     length=fp.length, locked=getattr(fp, 'locked', False)
                 )
             else:
                 with self.fs.get(content_id) as fp:
+                    thumbnail_location = getattr(fp, 'thumbnail_location', None)
+                    if thumbnail_location:
+                        thumbnail_location = location.course_key.make_usage_key_from_deprecated_string(thumbnail_location)
                     return StaticContent(
                         location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
-                        thumbnail_location=getattr(fp, 'thumbnail_location', None),
+                        thumbnail_location=thumbnail_location,
                         import_path=getattr(fp, 'import_path', None),
                         length=fp.length, locked=getattr(fp, 'locked', False)
                     )

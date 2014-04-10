@@ -266,7 +266,7 @@ def add_repo(repo, rdir_in, branch=None):
         log.exception('Unable to connect to mongodb to save log, please '
                       'check MONGODB_LOG settings')
     cil = CourseImportLog(
-        course_id=SlashSeparatedCourseKey.from_deprecated_string(course_id),
+        course_id=SlashSeparatedCourseKey.from_deprecated_string(course_id) if course_id else None,
         location=location,
         repo_dir=rdir,
         created=timezone.now(),
