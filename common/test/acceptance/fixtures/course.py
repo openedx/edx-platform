@@ -221,7 +221,7 @@ class CourseFixture(StudioApiFixture):
         """
         Add the asset to the list of assets to be uploaded when the install method is called.
         """
-        self._assets.append(asset_name)
+        self._assets.extend(asset_name)
 
     def install(self):
         """
