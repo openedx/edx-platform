@@ -73,25 +73,20 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'textbooks_list_handler', 'textbooks_detail_handler']
 
 
-def _get_locator_and_course(org, offering, branch, version_guid, block_id, user, depth=0):
+def _get_course_module(course_key, user, depth=0):
     """
     Internal method used to calculate and return the locator and course module
     for the view functions in this file.
     """
-    locator = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block_id)
-    course_location = loc_mapper().translate_locator_to_location(locator)
-    if course_location is None:
+    if not has_course_access(user, course_key):
         raise PermissionDenied()
-
-    if not has_course_access(user, course_location.course_key):
-        raise PermissionDenied()
-    course_module = modulestore().get_item(course_location, depth=depth)
-    return locator, course_module
+    course_module = modulestore().get_course(course_key, depth=depth)
+    return course_module
 
 
 # pylint: disable=unused-argument
 @login_required
-def course_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
+def course_handler(request, course_key_string=None):
     """
     The restful handler for course specific requests.
     It provides the course tree with the necessary information for identifying and labeling the parts. The root
@@ -115,17 +110,12 @@ def course_handler(request, tag=None, org=None, offering=None, branch=None, vers
     """
     response_format = request.REQUEST.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+        course_key = CourseKey.from_string(course_key_string)
         if request.method == 'GET':
-            return JsonResponse(_course_json(request, org, offering, branch, version_guid, block))
+            return JsonResponse(_course_json(request, course_key))
         elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
             return create_new_course(request)
-        elif not has_course_access(
-            request.user,
-            loc_mapper().translate_locator_to_location(
-                CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid),
-                get_course=True
-            )
-        ):
+        elif not has_course_access(request.user, course_key):
             raise PermissionDenied()
         elif request.method == 'PUT':
             raise NotImplementedError()
@@ -134,23 +124,22 @@ def course_handler(request, tag=None, org=None, offering=None, branch=None, vers
         else:
             return HttpResponseBadRequest()
     elif request.method == 'GET':  # assume html
-        if offering is None:
+        if course_key_string is None:
             return course_listing(request)
         else:
-            return course_index(request, org, offering, branch, version_guid, block)
+            course_key = CourseKey.from_string(course_key_string)
+            return course_index(request, course_key)
     else:
         return HttpResponseNotFound()
 
 
 @login_required
-def _course_json(request, org, offering, branch, version_guid, block):
+def _course_json(request, course_key):
     """
     Returns a JSON overview of a course
     """
-    __, course = _get_locator_and_course(
-        org, offering, branch, version_guid, block, request.user, depth=None
-    )
-    return _xmodule_json(course, course.id)
+    course_module = _get_course_module(course_key, request.user, depth=None)
+    return _xmodule_json(course_module, course_module.id)
 
 
 def _xmodule_json(xmodule, course_id):
@@ -204,7 +193,7 @@ def _accessible_courses_list_from_groups(request):
     List all courses available to the logged in user by reversing access group names
     """
     courses_list = []
-    course_ids = set()
+    course_keys = set()
 
     user_staff_group_names = request.user.groups.filter(
         Q(name__startswith='instructor_') | Q(name__startswith='staff_')
@@ -221,15 +210,13 @@ def _accessible_courses_list_from_groups(request):
             # strip starting text "staff_"
             course_id = user_staff_group_name[6:]
 
-        course_id = CourseKey.from_string(course_id)
-        if isinstance(CourseKey, CourseLocator):
-            course_id = loc_mapper().translate_locator_to_location(course_id, get_course=True, lower_only=True)
-        course_ids.add(course_id)
+        course_key = CourseKey.from_string(course_id)
+        course_keys.add(course_key)
 
-    for course_id in course_ids:
-        course = modulestore('direct').get_course(course_id)
+    for course_key in course_keys:
+        course = modulestore('direct').get_course(course_key)
         if course is None:
-            raise ItemNotFoundError(course_id)
+            raise ItemNotFoundError(course_key)
         courses_list.append(course)
 
     return courses_list
@@ -295,7 +282,7 @@ def course_index(request, org, offering, branch, version_guid, block):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    locator, course = _get_locator_and_course(
+    locator, course = _get_course_module(
         org, offering, branch, version_guid, block, request.user, depth=3
     )
     lms_link = get_lms_link_for_item(course.location, course.id)
@@ -464,7 +451,7 @@ def course_info_handler(request, tag=None, org=None, offering=None, branch=None,
     GET
         html: return html for editing the course info handouts and updates.
     """
-    __, course_module = _get_locator_and_course(
+    __, course_module = _get_course_module(
         org, offering, branch, version_guid, block, request.user
     )
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
@@ -556,7 +543,7 @@ def settings_handler(request, tag=None, org=None, offering=None, branch=None, ve
     PUT
         json: update the Course and About xblocks through the CourseDetails model
     """
-    locator, course_module = _get_locator_and_course(
+    locator, course_module = _get_course_module(
         org, offering, branch, version_guid, block, request.user
     )
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
@@ -611,7 +598,7 @@ def grading_handler(request, tag=None, org=None, offering=None, branch=None, ver
         json no grader_index: update the Course through the CourseGrading model
         json w/ grader_index: create or update the specific grader (create if index out of range)
     """
-    locator, course_module = _get_locator_and_course(
+    locator, course_module = _get_course_module(
         org, offering, branch, version_guid, block, request.user
     )
 
@@ -716,7 +703,7 @@ def advanced_settings_handler(request, org=None, offering=None, branch=None, ver
             metadata dicts. The dict can include a "unsetKeys" entry which is a list
             of keys whose values to unset: i.e., revert to default
     """
-    locator, course_module = _get_locator_and_course(
+    locator, course_module = _get_course_module(
         org, offering, branch, version_guid, block, request.user
     )
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
@@ -820,7 +807,7 @@ def textbooks_list_handler(request, tag=None, org=None, offering=None, branch=No
     PUT
         json: overwrite all textbooks in the course with the given list
     """
-    locator, course = _get_locator_and_course(
+    locator, course = _get_course_module(
         org, offering, branch, version_guid, block, request.user
     )
     store = get_modulestore(course.location)
@@ -880,7 +867,7 @@ def textbooks_list_handler(request, tag=None, org=None, offering=None, branch=No
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
-def textbooks_detail_handler(request, tid, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
+def textbooks_detail_handler(request, course_key_string, textbook_id):
     """
     JSON API endpoint for manipulating a textbook via its internal ID.
     Used by the Backbone application.
@@ -892,12 +879,11 @@ def textbooks_detail_handler(request, tid, tag=None, org=None, offering=None, br
     DELETE
         json: remove textbook
     """
-    __, course = _get_locator_and_course(
-        org, offering, branch, version_guid, block, request.user
-    )
-    store = get_modulestore(course.location)
-    matching_id = [tb for tb in course.pdf_textbooks
-                   if unicode(tb.get("id")) == unicode(tid)]
+    course_key = CourseKey.from_string(course_key_string)
+    course_module = _get_course_module(course_key, request.user)
+    store = get_modulestore(course_module.location)
+    matching_id = [tb for tb in course_module.pdf_textbooks
+                   if unicode(tb.get("id")) == unicode(textbook_id)]
     if matching_id:
         textbook = matching_id[0]
     else:
@@ -913,25 +899,25 @@ def textbooks_detail_handler(request, tid, tag=None, org=None, offering=None, br
             new_textbook = validate_textbook_json(request.body)
         except TextbookValidationError as err:
             return JsonResponse({"error": err.message}, status=400)
-        new_textbook["id"] = tid
+        new_textbook["id"] = textbook_id
         if textbook:
-            i = course.pdf_textbooks.index(textbook)
-            new_textbooks = course.pdf_textbooks[0:i]
+            i = course_module.pdf_textbooks.index(textbook)
+            new_textbooks = course_module.pdf_textbooks[0:i]
             new_textbooks.append(new_textbook)
-            new_textbooks.extend(course.pdf_textbooks[i + 1:])
-            course.pdf_textbooks = new_textbooks
+            new_textbooks.extend(course_module.pdf_textbooks[i + 1:])
+            course_module.pdf_textbooks = new_textbooks
         else:
-            course.pdf_textbooks.append(new_textbook)
-        store.update_item(course, request.user.id)
+            course_module.pdf_textbooks.append(new_textbook)
+        store.update_item(course_module, request.user.id)
         return JsonResponse(new_textbook, status=201)
     elif request.method == 'DELETE':
         if not textbook:
             return JsonResponse(status=404)
-        i = course.pdf_textbooks.index(textbook)
-        remaining_textbooks = course.pdf_textbooks[0:i]
-        remaining_textbooks.extend(course.pdf_textbooks[i + 1:])
-        course.pdf_textbooks = remaining_textbooks
-        store.update_item(course, request.user.id)
+        i = course_module.pdf_textbooks.index(textbook)
+        remaining_textbooks = course_module.pdf_textbooks[0:i]
+        remaining_textbooks.extend(course_module.pdf_textbooks[i + 1:])
+        course_module.pdf_textbooks = remaining_textbooks
+        store.update_item(course_module, request.user.id)
         return JsonResponse()
 
 
