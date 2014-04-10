@@ -24,14 +24,16 @@ from instructor.management.commands.openended_post import post_submission_for_st
 from instructor.management.commands.openended_stats import calculate_task_statistics
 from instructor.utils import get_module_for_student
 
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class OpenEndedPostTest(ModuleStoreTestCase):
     """Test the openended_post management command."""
 
     def setUp(self):
-        self.course_id = "edX/open_ended/2012_Fall"
-        self.problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
+        self.course_id = SlashSeparatedCourseKey.from_string("edX/open_ended/2012_Fall")
+        self.problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
         self.self_assessment_task_number = 0
         self.open_ended_task_number = 1
 
@@ -84,7 +86,7 @@ class OpenEndedPostTest(ModuleStoreTestCase):
         with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
             mock_send_to_queue.return_value = (0, "Successfully queued")
 
-            module = get_module_for_student(self.student_on_accessing, course, self.problem_location)
+            module = get_module_for_student(self.student_on_accessing, self.problem_location)
             task = module.child_module.get_task_number(self.open_ended_task_number)
 
             student_response = "Here is an answer."
@@ -126,8 +128,8 @@ class OpenEndedStatsTest(ModuleStoreTestCase):
     """Test the openended_stats management command."""
 
     def setUp(self):
-        self.course_id = "edX/open_ended/2012_Fall"
-        self.problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
+        self.course_id = SlashSeparatedCourseKey.from_string("edX/open_ended/2012_Fall")
+        self.problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
         self.task_number = 1
         self.invalid_task_number = 3
 

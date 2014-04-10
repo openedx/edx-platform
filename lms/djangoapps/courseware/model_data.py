@@ -59,7 +59,7 @@ class FieldDataCache(object):
         self.cache = {}
         self.descriptors = descriptors
         self.select_for_update = select_for_update
-        self.course_id = course_id
+        self.course_id = course_id  # TODO do we want to assert this is always handed in as a SSCourseKey
         self.user = user
 
         if user.is_authenticated():

@@ -38,7 +38,7 @@ class Command(BaseCommand):
         task_number = options['task_number']
 
         if len(args) == 4:
-            course_id = CourseKey.from_string(args[0])
+            course_id = SlashSeparatedCourseKey.from_string(args[0])
             location = UsageKey.from_string(args[1])
             students_ids = [line.strip() for line in open(args[2])]
             hostname = args[3]
@@ -77,7 +77,7 @@ def post_submission_for_student(student, course, location, task_number, dry_run=
     request.host = hostname
 
     try:
-        module = get_module_for_student(student, course, location, request=request)
+        module = get_module_for_student(student, location, request=request)
         if module is None:
             print "  WARNING: No state found."
             return False
