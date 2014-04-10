@@ -186,7 +186,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_get_problem_list(self):
         self.login(self.instructor, self.password)
 
-        url = reverse('staff_grading_get_problem_list', kwargs={'course_id': self.course_id})
+        url = reverse('staff_grading_get_problem_list', kwargs={'course_id': self.course_id.to_deprecated_string()})
         data = {}
 
         response = check_for_post_code(self, 200, url, data)
