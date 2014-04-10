@@ -22,6 +22,7 @@ from dogapi import dog_stats_api
 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
@@ -393,6 +394,16 @@ class PasswordHistory(models.Model):
             )
 
     @classmethod
+    def is_password_reset_time_defined(cls):
+        """
+        Returns whether on not a time is defined for how old a password can be.
+        """
+        return settings.FEATURES['ADVANCED_SECURITY'] and \
+            settings.ADVANCED_SECURITY_CONFIG.get(
+                'OLDEST_VALID_PASSWORD_TIME', None
+            )
+
+    @classmethod
     def should_user_reset_password_now(cls, user):
         """
         Returns whether a password has 'expired' and should be reset. Note there are two different
@@ -410,7 +421,7 @@ class PasswordHistory(models.Model):
             days_before_password_reset = \
                 settings.ADVANCED_SECURITY_CONFIG['MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS']
 
-        if days_before_password_reset:
+        if days_before_password_reset or cls.is_password_reset_time_defined():
             history = PasswordHistory.objects.filter(user=user).order_by('-time_set')
             time_last_reset = None
 
@@ -422,6 +433,12 @@ class PasswordHistory(models.Model):
                 time_last_reset = user.date_joined
 
             now = timezone.now()
+
+            if cls.is_password_reset_time_defined():
+                naive_time = parse_datetime(settings.ADVANCED_SECURITY_CONFIG['OLDEST_VALID_PASSWORD_TIME'])
+                oldest_valid = timezone.get_current_timezone().localize(naive_time)
+                delta = time_last_reset - oldest_valid
+                return delta.days < 0
 
             delta = now - time_last_reset
 
