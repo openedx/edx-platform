@@ -243,7 +243,7 @@
                     account=microsite.get_value('course_about_twitter_account', '@edxonline'),
                     url=u"http://{domain}{path}".format(
                         domain=site_domain,
-                        path=reverse('about_course', args=[course.id])
+                        path=reverse('about_course', args=[course.id.to_deprecated_string()])
                     )
                 ).replace(u" ", u"+")
                 tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
@@ -258,7 +258,7 @@
                         platform=platform_name,
                         url=u"http://{domain}{path}".format(
                             domain=site_domain,
-                            path=reverse('about_course', args=[course.id]),
+                            path=reverse('about_course', args=[course.id.to_deprecated_string()]),
                         )
                     )
                 ).replace(u" ", u"%20")
