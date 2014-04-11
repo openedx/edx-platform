@@ -63,6 +63,7 @@ import string  # pylint: disable-msg=deprecated-module
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
+from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
 
@@ -97,16 +98,16 @@ def get(request):
     return request.session.get('partial_pipeline')
 
 
-def get_authenticated_user(user_id, backend_name):
+def get_authenticated_user(username, backend_name):
     """Gets a saved user authenticated by a particular backend.
 
-    Between pipeline steps User objects are not saved -- only the id. We need
-    to reconstitute the user and set its .backend, which is ordinarily monkey-
-    patched on by Django during authenticate(), so it will function like a
-    user returned by authenticate().
+    Between pipeline steps User objects are not saved. We need to reconstitute
+    the user and set its .backend, which is ordinarily monkey-patched on by
+    Django during authenticate(), so it will function like a user returned by
+    authenticate().
 
     Args:
-        user_id: long. Id of the user to get.
+        username: string. Username of user to get.
         backend_name: string. The name of the third-party auth backend from
             the running pipeline.
 
@@ -115,17 +116,16 @@ def get_authenticated_user(user_id, backend_name):
         backend_name.
 
     Raises:
-        User.DoesNotExist: if no user matching user_id is found.
+        User.DoesNotExist: if no user matching user is found, or the matching
+        user has no social auth associated with the given backend.
         AssertionError: if the user is not authenticated.
     """
-    match = False
-    user = User.objects.get(id=user_id)
-    assert user.is_authenticated()
+    user = models.DjangoStorage.user.user_model().objects.get(username=username)
 
-    for association in user.social_auth.all():
-        if association.provider == backend_name:
-            match = True
-            break
+    if not user:
+        raise User.DoesNotExist
+
+    match = models.DjangoStorage.user.get_social_auth_for_user(user, provider=backend_name)
 
     if not match:
         raise User.DoesNotExist
@@ -154,7 +154,15 @@ def get_complete_url(backend_name):
 
     Returns:
         String. URL that finishes the auth pipeline for a provider.
+
+    Raises:
+        ValueError: if no provider is enabled with the given backend_name.
     """
+    enabled_provider = provider.Registry.get_by_backend_name(backend_name)
+
+    if not enabled_provider:
+        raise ValueError('Provider with backend %s not enabled' % backend_name)
+
     return _get_url('social:complete', backend_name)
 
 
@@ -170,6 +178,9 @@ def get_login_url(provider_name, auth_entry):
 
     Returns:
         String. URL that starts the auth pipeline for a provider.
+
+    Raises:
+        ValueError: if no provider is enabled with the given provider_name.
     """
     assert auth_entry in _AUTH_ENTRY_CHOICES
     enabled_provider = provider.Registry.get(provider_name)

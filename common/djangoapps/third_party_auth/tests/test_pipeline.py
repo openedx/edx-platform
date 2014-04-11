@@ -1,6 +1,4 @@
-"""
-Unit tests for third_party_auth/pipeline.py.
-"""
+"""Unit tests for third_party_auth/pipeline.py."""
 
 import random
 
@@ -16,7 +14,7 @@ class MakeRandomPasswordTest(testutil.TestCase):
     """Tests formation of random placeholder passwords."""
 
     def setUp(self):
-        super(MakeRandomPasswordTest, self).tearDown()
+        super(MakeRandomPasswordTest, self).setUp()
         self.seed = 1
 
     def test_default_args(self):

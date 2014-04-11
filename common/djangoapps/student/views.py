@@ -556,6 +556,7 @@ def dashboard(request):
         'language_options': language_options,
         'current_language': current_language,
         'current_language_code': cur_lang_code,
+        'user': user,
     }
 
     return render_to_response('dashboard.html', context)
@@ -742,24 +743,24 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
         # now want to put them through the same logging and cookie calculation
         # logic as with first-party auth.
         running_pipeline = pipeline.get(request)
-        user_id = running_pipeline['kwargs'].get('user')
+        username = running_pipeline['kwargs'].get('username')
         backend_name = running_pipeline['backend']
         requested_provider = provider.Registry.get_by_backend_name(backend_name)
 
         try:
-            user = pipeline.get_authenticated_user(user_id, backend_name)
+            user = pipeline.get_authenticated_user(username, backend_name)
             third_party_auth_successful = True
         except User.DoesNotExist:
             AUDIT_LOG.warning(
-                u'Login failed - user with id {user_id} has no social auth with backend_name {backend_name}'.format(
-                    user_id=user_id, backend_name=backend_name))
+                u'Login failed - user with username {username} has no social auth with backend_name {backend_name}'.format(
+                    username=username, backend_name=backend_name))
             return JsonResponse({
                 "success": False,
                 ## Translators: provider_name is the name of an external, third-party user authentication service (like
                 ## Google or LinkedIn).
                 "value": _('There is no {platform_name} account associated with your {provider_name} account. Please use your {platform_name} credentials or pick another provider.').format(
                     platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME)
-            })  # TODO: this should be status code 401  # pylint: disable=fixme
+            })  # TODO: this should be a status code 401  # pylint: disable=fixme
 
     else:
 

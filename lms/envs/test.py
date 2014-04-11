@@ -312,3 +312,6 @@ FEATURES['USE_MICROSITES'] = True
 
 ######### LinkedIn ########
 LINKEDIN_API['COMPANY_ID'] = '0000000'
+
+######### Third-party auth ##########
+FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True

@@ -1,6 +1,4 @@
-"""
-Unit tests for settings code.
-"""
+"""Unit tests for settings.py."""
 
 from third_party_auth import provider, settings
 from third_party_auth.tests import testutil

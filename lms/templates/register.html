@@ -132,28 +132,11 @@
 
         % else:
 
-          % if running_pipeline['kwargs'].get('is_login'):
-
-            ## Translators: selected_provider is the name of an external, third-party user authentication servie (like Google or LinkedIn). platform_name is the name of the Open edX deployment (for example, 'edX' for edx.org).
-            <p class="instructions">
-              ${_("You've successfully signed in with <strong>{selected_provider}</strong>, but we couldn't find your <strong>{platform_name}</strong> account.").format(platform_name=platform_name, selected_provider=selected_provider)}
-            </p>
-            <p class="instructions">
-              ${_("If you already have an account with <strong>{platform_name}</strong> and you want to sign into it with <strong>{selected_provider}</strong>, please <a href='/login'>sign in</a> and associate your account with <strong>{selected_provider}</strong>.").format(platform_name=platform_name, selected_provider=selected_provider)}
-            </p>
-            <p class="instructions">
-              ${_("If you do not have an account with <strong>{platform_name}</strong>, please register below:").format(platform_name=platform_name)}
-            </p>
-
-          % else:
-
-          <p class="instructions">
-            ## Translators: selected_provider is the name of an external, third-party user authentication service (like Google or LinkedIn).
-            ${_("You've successfully signed in with <strong>{selected_provider}</strong>.").format(selected_provider=selected_provider)}<br />
-            ${_("Finish your account registration below to start learning.")}
-          </p>
-
-          % endif
+        <p class="instructions">
+          ## Translators: selected_provider is the name of an external, third-party user authentication service (like Google or LinkedIn).
+          ${_("You've successfully signed in with <strong>{selected_provider}</strong>.").format(selected_provider=selected_provider)}<br />
+          ${_("Finish your account registration below to start learning.")}
+        </p>
 
         % endif
 
