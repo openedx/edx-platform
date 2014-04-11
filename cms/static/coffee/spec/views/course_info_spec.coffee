@@ -1,4 +1,4 @@
-define ["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info", "js/collections/course_update", "js/spec/create_sinon"],
+define ["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info", "js/collections/course_update", "js/spec_helpers/create_sinon"],
 (CourseInfoHandoutsView, CourseInfoUpdateView, ModuleInfo, CourseUpdateCollection, create_sinon) ->
 
     describe "Course Updates and Handouts", ->

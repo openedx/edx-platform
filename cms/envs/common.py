@@ -96,6 +96,15 @@ FEATURES = {
 
     # Prevent concurrent logins per user
     'PREVENT_CONCURRENT_LOGINS': False,
+
+    # Turn off Advanced Security by default
+    'ADVANCED_SECURITY': False,
+
+    # Temporary feature flag for duplicating xblock leaves
+    'ENABLE_DUPLICATE_XBLOCK_LEAF_COMPONENT': False,
+
+    # Temporary feature flag for deleting xblock leaves
+    'ENABLE_DELETE_XBLOCK_LEAF_COMPONENT': False,
 }
 ENABLE_JASMINE = False
 
@@ -310,9 +319,23 @@ PIPELINE_CSS = {
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
             'js/vendor/markitup/skins/simple/style.css',
-            'js/vendor/markitup/sets/wiki/style.css',
+            'js/vendor/markitup/sets/wiki/style.css'
         ],
         'output_filename': 'css/cms-style-vendor.css',
+    },
+    'style-vendor-tinymce-content': {
+        'source_filenames': [
+            'css/tinymce-studio-content-fonts.css',
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
+            'css/tinymce-studio-content.css'
+        ],
+        'output_filename': 'css/cms-style-vendor-tinymce-content.css',
+    },
+    'style-vendor-tinymce-skin': {
+        'source_filenames': [
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
+        ],
+        'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
     'style-app': {
         'source_filenames': [
@@ -566,6 +589,7 @@ OPTIONAL_APPS = (
     'openassessment.xblock'
 )
 
+
 for app_name in OPTIONAL_APPS:
     # First attempt to only find the module rather than actually importing it,
     # to avoid circular references - only try to import if it can't be found
@@ -578,3 +602,7 @@ for app_name in OPTIONAL_APPS:
         except ImportError:
             continue
     INSTALLED_APPS += (app_name,)
+
+### ADVANCED_SECURITY_CONFIG
+# Empty by default
+ADVANCED_SECURITY_CONFIG = {}

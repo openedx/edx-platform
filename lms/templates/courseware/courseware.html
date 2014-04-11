@@ -15,6 +15,15 @@ ${page_title_breadcrumbs(course_name())}
     %endif
 </title></%block>
 
+<%block name="header_extras">
+% for template_name in ["image-modal"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
@@ -154,10 +163,6 @@ ${page_title_breadcrumbs(course_name())}
     });
   </script>
 % endif
-
-<script type="text/template" id="image-modal-tpl">
-  <%static:include path="js/imageModal.underscore" />
-</script>
 
 ${fragment.foot_html()}
 

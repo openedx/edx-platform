@@ -10,7 +10,7 @@ define(["js/views/baseview", "underscore", "jquery"], function(BaseView, _, $) {
 
         initialize : function() {
             var self = this;
-            this.template = _.template($("#checklist-tpl").text());
+            this.template = this.loadTemplate('checklist');
             this.collection.fetch({
                 reset: true,
                 complete: function() {

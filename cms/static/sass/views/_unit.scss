@@ -485,6 +485,7 @@ body.course.unit,.view-unit {
 
       .row {
         margin-bottom: 0px;
+        overflow: hidden;
       }
 
       // Module Actions, also used for Pages
@@ -632,13 +633,14 @@ body.course.unit,.view-unit {
 
     //component-setting-entry
     .field.comp-setting-entry {
-      background-color: $white;
-      padding: $baseline;
-      border-bottom: 1px solid $gray-l2;
       opacity: 0.7;
+      margin: 0 $baseline;
+      border-top: 1px solid $gray-l4;
+      background-color: $white;
+      padding: $baseline ($baseline/2);
 
-      &:last-child {
-        //margin-bottom: 0;
+      &:first-child {
+        border-top: 0;
       }
 
       //no required component settings currently
@@ -1084,6 +1086,7 @@ body.unit {
 
   .delete-draft {
     display: inline-block;
+    vertical-align: top;
   }
 
   .delete-button,
@@ -1310,17 +1313,18 @@ body.unit {
 // ====================
 
 // Latex Compiler
+
+.wrapper-comp-editor.latex-problem {
+  margin-top: ($baseline*2.5);
+}
+
 .launch-latex-compiler {
+  position: absolute;
+  width: 100%;
+  top: 0;
   background-color: $white;
   padding: $baseline/2 0 $baseline/2 $baseline;
   border-bottom: 1px solid $gray-l2;
-  opacity: 0.8;
-
-
-  &:hover {
-    @include transition(opacity $tmg-f2 ease-in-out 0s);
-    opacity: 1.0s;
-  }
 }
 
 //  hides latex compiler button if settings mode is-active
@@ -1339,7 +1343,6 @@ body.unit .xblock-type-container {
   box-shadow: none;
 
   &:hover {
-    @include transition(all $tmg-f2 linear 0s);
     border-color: $blue;
 
     .container-drag {
@@ -1349,7 +1352,6 @@ body.unit .xblock-type-container {
   }
 
   .xblock-header {
-    margin-bottom: 0;
     border-bottom: 0;
     border-radius: ($baseline/5);
 
@@ -1386,6 +1388,10 @@ body.unit .xblock-type-container {
 body.unit .component {
   .xmodule_DiscussionModule, .xmodule_HtmlModule, .xblock {
     margin-top: ($baseline*1.5);
+  }
+  .discussion-preview {
+    font-style: italic;
+    color: $mediumGrey;
   }
 }
 

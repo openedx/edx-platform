@@ -9,6 +9,13 @@ import traceback
 import struct
 import sys
 
+# We don't want to force a dependency on datadog, so make the import conditional
+try:
+    from dogapi import dog_stats_api
+except ImportError:
+    # pylint: disable=invalid-name
+    dog_stats_api = None
+
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
@@ -383,6 +390,24 @@ class CapaMixin(CapaFields):
         else:
             return check
 
+    def check_button_checking_name(self):
+        """
+        Return the "checking..." text for the "check" button.
+
+        After the user presses the "check" button, the button will briefly
+        display the value returned by this function until a response is
+        received by the server.
+
+        The text can be customized by the text_customization setting.
+
+        """
+        # Apply customizations if present
+        if 'custom_checking' in self.text_customization:
+            return self.text_customization.get('custom_checking')
+
+        _ = self.runtime.service(self, "i18n").ugettext
+        return _('Checking...')
+
     def should_show_check_button(self):
         """
         Return True/False to indicate whether to show the "Check" button.
@@ -541,13 +566,16 @@ class CapaMixin(CapaFields):
         except Exception as err:  # pylint: disable=broad-except
             html = self.handle_problem_html_error(err)
 
-        # The convention is to pass the name of the check button
-        # if we want to show a check button, and False otherwise
-        # This works because non-empty strings evaluate to True
+        # The convention is to pass the name of the check button if we want
+        # to show a check button, and False otherwise This works because
+        # non-empty strings evaluate to True.  We use the same convention
+        # for the "checking" state text.
         if self.should_show_check_button():
             check_button = self.check_button_name()
+            check_button_checking = self.check_button_checking_name()
         else:
             check_button = False
+            check_button_checking = False
 
         content = {
             'name': self.display_name_with_default,
@@ -559,6 +587,7 @@ class CapaMixin(CapaFields):
             'problem': content,
             'id': self.id,
             'check_button': check_button,
+            'check_button_checking': check_button_checking,
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
             'answer_available': self.answer_available(),
@@ -869,18 +898,24 @@ class CapaMixin(CapaFields):
         answers_without_files = convert_files_to_filenames(answers)
         event_info['answers'] = answers_without_files
 
+        metric_name = u'capa.check_problem.{}'.format
+
         _ = self.runtime.service(self, "i18n").ugettext
 
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'
             self.runtime.track_function('problem_check_fail', event_info)
+            if dog_stats_api:
+                dog_stats_api.increment(metric_name('checks'), [u'result:failed', u'failure:closed'])
             raise NotFoundError(_("Problem is closed."))
 
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
             self.runtime.track_function('problem_check_fail', event_info)
+            if dog_stats_api:
+                dog_stats_api.increment(metric_name('checks'), [u'result:failed', u'failure:unreset'])
             raise NotFoundError(_("Problem must be reset before it can be checked again."))
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
@@ -947,6 +982,17 @@ class CapaMixin(CapaFields):
         event_info['attempts'] = self.attempts
         event_info['submission'] = self.get_submission_metadata_safe(answers_without_files, correct_map)
         self.runtime.track_function('problem_check', event_info)
+
+        if dog_stats_api:
+            dog_stats_api.increment(metric_name('checks'), [u'result:success'])
+            dog_stats_api.histogram(
+                metric_name('correct_pct'),
+                float(published_grade['grade']) / published_grade['max_grade'],
+            )
+            dog_stats_api.histogram(
+                metric_name('attempts'),
+                self.attempts,
+            )
 
         if hasattr(self.runtime, 'psychometrics_handler'):  # update PsychometricsData using callback
             self.runtime.psychometrics_handler(self.get_state_for_lcp())

@@ -15,7 +15,10 @@
             <ul class="reverify-list">
               % for item in reverifications["must_reverify"]:
                 <li class="item">
-                  ${_('{course_name}: Re-verify by {date}').format(course_name="<strong>item.course_name</strong>", date=item.date)}
+                  ${_('{course_name}: Re-verify by {date}').format(
+		      course_name=u"<strong>{0}</strong>".format(item.course_name),
+		      date=item.date
+		  )}
                 </li>
               % endfor
             </ul>
@@ -39,7 +42,10 @@
           % for item in reverifications["must_reverify"]:
           <div class="copy">
             <p class='activation-message'>
-              ${_('To continue in the ID Verified track in {course_name}, you need to re-verify your identity by {date}.').format(course_name="<strong>" + item.course_name + "</strong>", date=item.date)}
+              ${_('To continue in the ID Verified track in {course_name}, you need to re-verify your identity by {date}.').format(
+	          course_name=u"<strong>{}</strong>".format(item.course_name),
+	          date=item.date
+	      )}
             </p>
           </div>
         </div>
@@ -65,9 +71,12 @@
         % if item.display:
         <div class="copy">
           <p class='activation-message'>
-            ${_('Your re-verification for {course_name} failed and you are no longer eligible for a Verified Certificate.  If you think this is in error, please contact us at {email}.').format(course_name="<strong>" + item.course_name+ "</strong>", email='<a class="contact-link" href="mailto:{email}">{email}</a>'.format(
-                email=billing_email
-              ))}
+            ${_('Your re-verification for {course_name} failed and you are no longer eligible for a Verified Certificate.  If you think this is in error, please contact us at {email}.').format(
+	        course_name=u"<strong>{}</strong>".format(item.course_name),
+	        email=u'<a class="contact-link" href="mailto:{email}">{email}</a>'.format(
+                    email=billing_email
+	        )
+	    )}
           </p>
         </div>
       </div>

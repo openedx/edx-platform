@@ -1,6 +1,8 @@
 require(["domReady", "jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
-    "js/utils/get_date", "js/utils/module", "js/utils/handle_iframe_binding", "jquery.ui", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
-    function(domReady, $, _, gettext, NotificationView, PromptView, DateUtils, ModuleUtils, IframeUtils) {
+    "js/utils/get_date", "js/utils/module", "js/utils/handle_iframe_binding", "js/utils/change_on_enter", "jquery.ui",
+    "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
+    function(domReady, $, _, gettext, NotificationView, PromptView, DateUtils, ModuleUtils, IframeUtils, TriggerChangeEventOnEnter)
+{
 
 var $body;
 var $newComponentItem;
@@ -89,7 +91,7 @@ domReady(function() {
     $('.subsection-display-name-input').each(function() {
         this.val = $(this).val();
     });
-    $("#start_date, #start_time, #due_date, #due_time").bind('change', autosaveInput);
+    $("#start_date, #start_time, #due_date, #due_time").change(autosaveInput).keyup(TriggerChangeEventOnEnter)
     $('.sync-date, .remove-date').bind('click', autosaveInput);
 
     // expand/collapse methods for optional date setters

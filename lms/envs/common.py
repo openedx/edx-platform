@@ -240,6 +240,9 @@ FEATURES = {
 
     # Prevent concurrent logins per user
     'PREVENT_CONCURRENT_LOGINS': False,
+
+    # Turn off Advanced Security by default
+    'ADVANCED_SECURITY': False,
 }
 
 # Used for A/B testing
@@ -321,7 +324,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
     'sekizai.context_processors.sekizai',
-    'course_wiki.course_nav.context_processor',
 
     # Hack to get required link URLs to password reset templates
     'edxmako.shortcuts.marketing_link_context_processor',
@@ -521,62 +523,68 @@ TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
+# Languages that don't have any reviewed strings are commented out;
+# see https://www.transifex.com/projects/p/edx-platform/
 LANGUAGES = (
     ('en', u'English'),
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
     ('ar', u'العربية'),  # Arabic
-    ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
-    ('bn', u'বাংলা'),  # Bengali
-    ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+#    ('az', u'azərbaycanca'),  # Azerbaijani
+#    ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
+#    ('bn', u'বাংলা'),  # Bengali
+#    ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+#    ('bs', u'bosanski'),  # Bosnian
     ('ca', u'Català'),  # Catalan
-    ('ca@valencia', u'Català (València)'),  # Catalan (Valencia)
+#    ('ca@valencia', u'Català (València)'),  # Catalan (Valencia)
     ('cs', u'Čeština'),  # Czech
-    ('cy', u'Cymraeg'),  # Welsh
+#    ('cy', u'Cymraeg'),  # Welsh
     ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
-    ('el', u'Ελληνικά'),  # Greek
+#    ('el', u'Ελληνικά'),  # Greek
     ('en@lolcat', u'LOLCAT English'),  # LOLCAT English
     ('en@pirate', u'Pirate English'),  # Pirate English
     ('es-419', u'Español (Latinoamérica)'),  # Spanish (Latin America)
-    ('es-ar', u'Español (Argentina)'),  # Spanish (Argentina)
-    ('es-ec', u'Español (Ecuador)'),  # Spanish (Ecuador)
-    ('es-es', u'Español (España)'),  # Spanish (Spain)
-    ('es-mx', u'Español (México)'),  # Spanish (Mexico)
-    ('es-pe', u'Español (Perú)'),  # Spanish (Peru)
-    ('es-us', u'Español (Estados Unidos)'),  # Spanish (United States)
-    ('et-ee', u'Eesti (Eesti)'),  # Estonian (Estonia)
-    ('fa', u'فارسی'),  # Persian
-    ('fa-ir', u'فارسی (ایران)'),  # Persian (Iran)
-    ('fi-fi', u'Suomi (Suomi)'),  # Finnish (Finland)
+#    ('es-ar', u'Español (Argentina)'),  # Spanish (Argentina)
+#    ('es-ec', u'Español (Ecuador)'),  # Spanish (Ecuador)
+#    ('es-es', u'Español (España)'),  # Spanish (Spain)
+#    ('es-mx', u'Español (México)'),  # Spanish (Mexico)
+#    ('es-pe', u'Español (Perú)'),  # Spanish (Peru)
+#    ('es-us', u'Español (Estados Unidos)'),  # Spanish (United States)
+#    ('et-ee', u'Eesti (Eesti)'),  # Estonian (Estonia)
+#    ('eu-es', u'euskara (Espainia)'),  # Basque (Spain)
+#    ('fa', u'فارسی'),  # Persian
+#    ('fa-ir', u'فارسی (ایران)'),  # Persian (Iran)
+#    ('fi-fi', u'Suomi (Suomi)'),  # Finnish (Finland)
     ('fr', u'Français'),  # French
-    ('gl', u'Galego'),  # Galician
-    ('he', u'עברית'),  # Hebrew
+#    ('gl', u'Galego'),  # Galician
+#    ('he', u'עברית'),  # Hebrew
     ('hi', u'हिन्दी'),  # Hindi
-    ('hu', u'magyar'),  # Hungarian
+#    ('hu', u'magyar'),  # Hungarian
     ('hy-am', u'Հայերէն (Հայաստանի Հանրապետութիւն)'),  # Armenian (Armenia)
     ('id', u'Bahasa Indonesia'),  # Indonesian
     ('it-it', u'Italiano (Italia)'),  # Italian (Italy)
     ('ja-jp', u'日本語(日本)'),  # Japanese (Japan)
-    ('km-kh', u'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
+#    ('km-kh', u'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
     ('ko-kr', u'한국어(대한민국)'),  # Korean (Korea)
     ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
-    ('ml', u'മലയാളം'),  # Malayalam
-    ('mn', u'Монгол хэл'),  # Mongolian
-    ('ms', u'Bahasa Melayu'),  # Malay
+#    ('ml', u'മലയാളം'),  # Malayalam
+#    ('mn', u'Монгол хэл'),  # Mongolian
+#    ('ms', u'Bahasa Melayu'),  # Malay
     ('nb', u'Norsk bokmål'),  # Norwegian Bokmål
-    ('ne', u'नेपाली'),  # Nepali
+#    ('ne', u'नेपाली'),  # Nepali
     ('nl-nl', u'Nederlands (Nederland)'),  # Dutch (Netherlands)
     ('pl', u'Polski'),  # Polish
     ('pt-br', u'Português (Brasil)'),  # Portuguese (Brazil)
-    ('pt-pt', u'Português (Portugal)'),  # Portuguese (Portugal)
-    ('ru', u'Русский'),  # Russian
-    ('si', u'සිංහල'),  # Sinhala
-    ('sk', u'Slovenčina'),  # Slovak
+#    ('pt-pt', u'Português (Portugal)'),  # Portuguese (Portugal)
+#    ('ru', u'Русский'),  # Russian
+#    ('si', u'සිංහල'),  # Sinhala
+#    ('sk', u'Slovenčina'),  # Slovak
     ('sl', u'Slovenščina'),  # Slovenian
-    ('th', u'ไทย'),  # Thai
+#    ('th', u'ไทย'),  # Thai
     ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
-    ('uk', u'Українська'),  # Uknranian
+    ('uk', u'Українська'),  # Ukranian
+#    ('ur', u'اردو'),  # Urdu
     ('vi', u'Tiếng Việt'),  # Vietnamese
     ('zh-cn', u'中文(简体)'),  # Chinese (China)
     ('zh-tw', u'中文(台灣)'),  # Chinese (Taiwan)
@@ -727,8 +735,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'splash.middleware.SplashMiddleware',
 
-    'course_wiki.course_nav.Middleware',
-
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
     'embargo.middleware.EmbargoMiddleware',
@@ -759,6 +765,8 @@ MIDDLEWARE_CLASSES = (
 
     # use Django built in clickjacking protection
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'course_wiki.middleware.WikiAccessMiddleware',
 )
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
@@ -793,7 +801,7 @@ main_vendor_js = [
     'js/vendor/ova/vjs.youtube.js',
     'js/vendor/ova/rangeslider.js',
     'js/vendor/ova/share-annotator.js',
-    'js/vendor/ova/tinymce.min.js',
+    'js/vendor/ova/tinymce.full.min.js',
     'js/vendor/ova/richText-annotator.js',
     'js/vendor/ova/reply-annotator.js',
     'js/vendor/ova/tags-annotator.js',
@@ -830,6 +838,18 @@ PIPELINE_CSS = {
             'js/vendor/ova/catch/css/main.css'
         ],
         'output_filename': 'css/lms-style-vendor.css',
+    },
+    'style-vendor-tinymce-content': {
+        'source_filenames': [
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css'
+        ],
+        'output_filename': 'css/lms-style-vendor-tinymce-content.css',
+    },
+    'style-vendor-tinymce-skin': {
+        'source_filenames': [
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
+        ],
+        'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
     },
     'style-app': {
         'source_filenames': [
@@ -1516,3 +1536,7 @@ for app_name in OPTIONAL_APPS:
 # Stub for third_party_auth options.
 # See common/djangoapps/third_party_auth/settings.py for configuration details.
 THIRD_PARTY_AUTH = {}
+
+### ADVANCED_SECURITY_CONFIG
+# Empty by default
+ADVANCED_SECURITY_CONFIG = {}

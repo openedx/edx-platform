@@ -159,8 +159,6 @@ if settings.WIKI_ENABLED:
     from wiki.urls import get_pattern as wiki_pattern
     from django_notify.urls import get_pattern as notify_pattern
 
-    # Note that some of these urls are repeated in course_wiki.course_nav. Make sure to update
-    # them together.
     urlpatterns += (
         # First we include views from course_wiki that we use to override the default views.
         # They come first in the urlpatterns so they get resolved first

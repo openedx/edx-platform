@@ -268,7 +268,7 @@ The file includes a row for each problem-answer combination selected by your stu
 The CSV file contains the following columns:
 
 .. list-table::
-   :widths: 20 75
+   :widths: 20 65
    :header-rows: 1
 
    * - Column
@@ -296,15 +296,29 @@ Entries are sorted by the value in each column, starting with the ModuleID on th
 
 Please note the following about the student answer distribution report:   
 
-  * This report includes only problems that at least one student has answered since early March 2014. For those problems, this report only includes activity that occurred after October 2013. 
+* This report includes only problems that at least one student has answered since 6 March 2014. For those problems, this report only includes activity that occurred after October 2013. 
 
-  * For checkboxes and multiple choice problems, the answer choices actually selected by a student after early March 2014 display as described above. Answer choices selected by at least one student after October 2013, but not selected since early March 2014, are included on the report but do not include an **AnswerValue**. The **ValueID** does display the internal identifiers, such as choice_1 and choice_2, for those answers. 
+* For checkboxes and multiple choice problems, the answer choices actually selected by a student after 6 March 2014 display as described above. Answer choices selected by at least one student after October 2013, but not selected since 6 March 2014, are included on the report but do not include an **AnswerValue**. The **ValueID** does display the internal identifiers, such as choice_1 and choice_2, for those answers. 
 
-  * For problems that use the **Randomization** setting in Studio, if a particular answer has not been selected since early March 2014, the **Question** is blank for that answer.
+* For problems that use the **Randomization** setting in Studio, if a particular answer has not been selected since 6 March 2014, the **Question** is blank for that answer.
 
-  * Problem **Count** values reflect the entire problem history. If you change a problem after it is released, it may not be possible for you to determine which answers were given before and after you made the change.
+* Problem **Count** values reflect the entire problem history. If you change a problem after it is released, it may not be possible for you to determine which answers were given before and after you made the change.
 
-  * Spreadsheet applications such as Microsoft Excel can alter the data in the CSV report for display purposes. For example, for different student answers of "0.5" and ".5" Excel correctly includes two different lines, but displays the **AnswerValue** on both of them as "0.5". If you notice answers that appear to be the same on separate lines with separate counts, you can review the actual, unaltered data by opening the CSV file in a text editor.
+* Some spreadsheet applications can alter the data in the CSV report for display purposes. For example, for different student answers of "0.5" and ".5" Excel correctly includes the two different lines from the CSV, but displays the **AnswerValue** on both of them as "0.5". If you notice answers that appear to be the same on separate lines with separate counts, you can review the actual, unaltered data by opening the CSV file in a text editor.
+
+* The CSV file is UTF-8 encoded, but not all spreadsheet applications interpret and render UTF-8 encoded characters correctly. For example, a student answer distribution report with answer values in French displays differently in Microsoft Excel for Mac than in OpenOffice Calc. 
+
+  Answer Values in Microsoft Excel for Mac:
+
+   .. image:: ../Images/student_answer_excel.png
+     :alt: A spreadsheet that replaces accented French characters with underscores
+
+  Answer Values in OpenOffice Calc:
+
+   .. image:: ../Images/student_answer_calc.png
+     :alt: A spreadsheet that displays accented French characters correctly
+
+  If you notice characters that do not display as expected in a spreadsheet, try a different spreadsheet application such as LibreOffice or Apache OpenOffice to open the CSV file. (These applications are open-source office suites that are available for download online.)
 
 .. _Download_Answer_Distributions:
 

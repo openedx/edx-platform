@@ -1,4 +1,4 @@
-describe 'Crowdsourced hinter', ->  
+describe 'Crowdsourced hinter', ->
   beforeEach ->
     window.update_schematics = ->
     jasmine.stubRequests()
@@ -13,10 +13,13 @@ describe 'Crowdsourced hinter', ->
       spyOn($, 'postWithPrefix').andCallFake( ->
         last_argument = arguments[arguments.length - 1]
         if typeof last_argument == 'function'
-          response = 
+          response =
             success: 'incorrect'
             contents: 'mock grader response'
           last_argument(response)
+          promise =
+            always: (callable) -> callable()
+            done: (callable) -> callable()
       )
       @problem = new Problem($('#problem'))
       @problem.bind()
@@ -28,7 +31,7 @@ describe 'Crowdsourced hinter', ->
 
     it 'knows when a capa problem is graded usig check_fd.', ->
       spyOn($, 'ajaxWithPrefix').andCallFake((url, settings) ->
-        response = 
+        response =
           success: 'incorrect'
           contents: 'mock grader response'
         settings.success(response)
@@ -50,5 +53,3 @@ describe 'Crowdsourced hinter', ->
       data = ['some answers', '<thing class="correct">']
       @hinter.capture_problem('problem_graded', data, 'fake element')
       expect($.postWithPrefix).toHaveBeenCalledWith("#{@hinter.url}/get_feedback", 'some answers', jasmine.any(Function))
-
-

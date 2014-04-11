@@ -5,6 +5,13 @@ class @Problem
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @url = @el.data('url')
+
+    # has_timed_out and has_response are used to ensure that are used to
+    # ensure that we wait a minimum of ~ 1s before transitioning the check
+    # button from disabled to enabled
+    @has_timed_out = false
+    @has_response = false
+
     @render()
 
   $: (selector) ->
@@ -20,7 +27,10 @@ class @Problem
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^=input_#{problem_prefix}_]")
     @$('div.action input:button').click @refreshAnswers
-    @$('div.action input.check').click @check_fd
+    @checkButton = @$('div.action input.check')
+    @checkButtonCheckText = @checkButton.val()
+    @checkButtonCheckingText = @checkButton.data('checking')
+    @checkButton.click @check_fd
     @$('div.action input.reset').click @reset
     @$('div.action button.show').click @show
     @$('div.action input.save').click @save
@@ -201,9 +211,14 @@ class @Problem
       @check()
       return
 
+    @enableCheckButton false
+
     if not window.FormData
       alert "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads."
+      @enableCheckButton true
       return
+
+    timeout_id = @enableCheckButtonAfterTimeout()
 
     fd = new FormData()
 
@@ -251,12 +266,17 @@ class @Problem
     @gentle_alert error_html
 
     abort_submission = file_too_large or file_not_selected or unallowed_file_submitted or required_files_not_submitted
+    if abort_submission
+      window.clearTimeout(timeout_id)
+      @enableCheckButton true
+      return
 
     settings =
       type: "POST"
       data: fd
       processData: false
       contentType: false
+      complete: @enableCheckButtonAfterResponse
       success: (response) =>
         switch response.success
           when 'incorrect', 'correct'
@@ -266,14 +286,17 @@ class @Problem
             @gentle_alert response.success
         Logger.log 'problem_graded', [@answers, response.contents], @id
 
-    if not abort_submission
-      $.ajaxWithPrefix("#{@url}/problem_check", settings)
+    $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
     if not @check_save_waitfor(@check_internal)
       @check_internal()
 
   check_internal: =>
+    @enableCheckButton false
+
+    timeout_id = @enableCheckButtonAfterTimeout()
+
     Logger.log 'problem_check', @answers
 
     # Segment.io
@@ -281,7 +304,7 @@ class @Problem
       problem_id: @id
       answers: @answers
 
-    $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
+    $.postWithPrefix("#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
           window.SR.readElts($(response.contents).find('.status'))
@@ -289,10 +312,11 @@ class @Problem
           @updateProgress response
           if @el.hasClass 'showed'
             @el.removeClass 'showed'
-          @$('div.action input.check').focus()            
+          @$('div.action input.check').focus()
         else
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
+    ).always(@enableCheckButtonAfterResponse)
 
   reset: =>
     Logger.log 'problem_reset', @answers
@@ -366,6 +390,7 @@ class @Problem
     alert_elem = "<div class='capa_alert'>" + msg + "</div>"
     @el.find('.action').after(alert_elem)
     @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
+    window.SR.readElts @el.find('.capa_alert')
 
   save: =>
     if not @check_save_waitfor(@save_internal)
@@ -635,3 +660,29 @@ class @Problem
     choicetextgroup: (element, display) =>
       element = $(element)
       element.find("section[id^='forinput']").removeClass('choicetextgroup_show_correct')
+
+  enableCheckButton: (enable) =>
+    # Used to disable check button to reduce chance of accidental double-submissions.
+    if enable
+      @checkButton.removeClass 'is-disabled'
+      @checkButton.val(@checkButtonCheckText)
+    else
+      @checkButton.addClass 'is-disabled'
+      @checkButton.val(@checkButtonCheckingText)
+
+  enableCheckButtonAfterResponse: =>
+    @has_response = true
+    if not @has_timed_out
+      # Server has returned response before our timeout
+      @enableCheckButton false
+    else
+      @enableCheckButton true
+
+  enableCheckButtonAfterTimeout: =>
+    @has_timed_out = false
+    @has_response = false
+    enableCheckButton = () =>
+      @has_timed_out = true
+      if @has_response
+        @enableCheckButton true
+    window.setTimeout(enableCheckButton, 750)

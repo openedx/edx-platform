@@ -1,4 +1,5 @@
 import json
+from django.http import Http404
 from django.test.utils import override_settings
 from django.test.client import Client, RequestFactory
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -108,19 +109,22 @@ def make_mock_thread_data(text, thread_id, include_children):
 def make_mock_request_impl(text, thread_id=None):
     def mock_request_impl(*args, **kwargs):
         url = args[1]
+        data = None
         if url.endswith("threads"):
             data = {
                 "collection": [make_mock_thread_data(text, "dummy_thread_id", False)]
             }
         elif thread_id and url.endswith(thread_id):
             data = make_mock_thread_data(text, thread_id, True)
-        else: # user query
+        elif "/users/" in url:
             data = {
                 "upvoted_ids": [],
                 "downvoted_ids": [],
                 "subscribed_thread_ids": [],
             }
-        return Mock(status_code=200, text=json.dumps(data), json=Mock(return_value=data))
+        if data:
+            return Mock(status_code=200, text=json.dumps(data), json=Mock(return_value=data))
+        return Mock(status_code=404)
     return mock_request_impl
 
 
@@ -232,6 +236,20 @@ class SingleThreadTestCase(ModuleStoreTestCase):
             "dummy_thread_id"
         )
         self.assertEquals(response.status_code, 405)
+
+    def test_not_found(self, mock_request):
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        # Mock request to return 404 for thread request
+        mock_request.side_effect = make_mock_request_impl("dummy", thread_id=None)
+        self.assertRaises(
+            Http404,
+            views.single_thread,
+            request,
+            self.course.id,
+            "test_discussion_id",
+            "test_thread_id"
+        )
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

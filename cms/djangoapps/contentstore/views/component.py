@@ -317,14 +317,17 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
         while parent and parent.category != 'sequential':
             ancestor_xblocks.append(parent)
             parent = get_parent_xblock(parent)
-
         ancestor_xblocks.reverse()
+
+        unit = ancestor_xblocks[0] if ancestor_xblocks else None
+        unit_publish_state = compute_publish_state(unit) if unit else None
 
         return render_to_response('container.html', {
             'context_course': course,
             'xblock': xblock,
             'xblock_locator': locator,
-            'unit': None if not ancestor_xblocks else ancestor_xblocks[0],
+            'unit': unit,
+            'unit_publish_state': unit_publish_state,
             'ancestor_xblocks': ancestor_xblocks,
         })
     else:

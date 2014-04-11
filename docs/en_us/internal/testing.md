@@ -242,6 +242,32 @@ During acceptance test execution, Django log files are written to `test_root/log
 
 **Note**: The acceptance tests can *not* currently run in parallel.
 
+### Debugging Acceptance Tests on Vagrant
+
+If you are using a local Vagrant dev environment to run acceptance tests, then you will only get console text output. To actually see what is happening, you can turn on automatic screenshots. For each step two screenshots will be taken - before, and after. To do this, simply add the step:
+
+    Given I enable capturing of screenshots before and after each step
+
+to your scenario. This step can be added anywhere, and will enable automatic screenshots for all following steps for that scenario only. You can also use the step
+
+    Given I disable capturing of screenshots before and after each step
+
+to turn off auto screenshots for all steps following it.
+
+Screenshots will be placed in the folder `{TEST_ROOT}/log/auto_screenshots`. Each time you launch acceptance tests, this folder will be cleaned. Each screenshot will be named according to the template string `{scenario_number}__{step_number}__{step_function_name}__{"1_before"|"2_after"}`.
+
+If you don't want to have screenshots be captured for all steps, but rather want fine grained control, you can use the decorator
+
+    @capture_screenshot_before_after
+
+before any Python function in `feature_name.py` file. The decorator will capture two screenshots - one before the decorated function runs, and one after. Also, the function
+
+    from lettuce import world; world.capture_screenshot("image_name")
+
+is available, and can be inserted at any point in code to capture a screenshot specifically in that place. In both cases the captured screenshots will go to the same folder as when using the step method - `{TEST_ROOT}/log/auto_screenshot`.
+
+A totally different approach to visually seeing acceptance tests run in Vagrant is to redirect Vagrant X11 session to your local machine. Please see https://github.com/edx/edx-platform/wiki/Test-engineering-FAQ for instruction on how to achieve this.
+
 ## Viewing Test Coverage
 
 We currently collect test coverage information for Python unit/integration tests.

@@ -25,7 +25,7 @@ from ..pages.studio.textbooks import TextbooksPage
 from ..pages.xblock.acid import AcidView
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
-from .helpers import UniqueCourseTest, load_data_str
+from .helpers import UniqueCourseTest
 
 
 class LoggedOutTest(WebAppTest):
@@ -112,6 +112,45 @@ class CoursePagesTest(UniqueCourseTest):
             page.visit()
 
 
+class DiscussionPreviewTest(UniqueCourseTest):
+    """
+    Tests that Inline Discussions are rendered with a custom preview in Studio
+    """
+
+    def setUp(self):
+        super(DiscussionPreviewTest, self).setUp()
+        CourseFixture(**self.course_info).add_children(
+            XBlockFixtureDesc("chapter", "Test Section").add_children(
+                XBlockFixtureDesc("sequential", "Test Subsection").add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit").add_children(
+                        XBlockFixtureDesc(
+                            "discussion",
+                            "Test Discussion",
+                        )
+                    )
+                )
+            )
+        ).install()
+
+        AutoAuthPage(self.browser, staff=True).visit()
+        cop = CourseOutlinePage(
+                self.browser,
+                self.course_info['org'],
+                self.course_info['number'],
+                self.course_info['run']
+                )
+        cop.visit()
+        self.unit = cop.section('Test Section').subsection('Test Subsection').toggle_expand().unit('Test Unit')
+        self.unit.go_to()
+
+    def test_is_preview(self):
+        """
+        Ensure that the preview version of the discussion is rendered.
+        """
+        self.assertTrue(self.unit.q(css=".discussion-preview").present)
+        self.assertFalse(self.unit.q(css=".discussion-show").present)
+
+
 class XBlockAcidBase(WebAppTest):
     """
     Base class for tests that verify that XBlock integration is working correctly
@@ -170,7 +209,6 @@ class XBlockAcidBase(WebAppTest):
         acid_block = AcidView(self.browser, unit.components[0].preview_selector)
         self.validate_acid_block_preview(acid_block)
 
-    @skip('Temporarily diabling because it is failing in Jenkins. TE-369')
     def test_acid_block_editor(self):
         """
         Verify that all expected acid block tests pass in studio editor
@@ -225,7 +263,6 @@ class XBlockAcidParentBase(XBlockAcidBase):
         super(XBlockAcidParentBase, self).validate_acid_block_preview(acid_block)
         self.assertTrue(acid_block.child_tests_passed)
 
-    @skip('Intermittently failing, needs a better page definition that waits until the unit is fully rendered')
     def test_acid_block_preview(self):
         """
         Verify that all expected acid block tests pass in studio preview

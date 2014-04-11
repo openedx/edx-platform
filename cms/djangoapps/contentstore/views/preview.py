@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 import logging
-import hashlib
 from functools import partial
 
 from django.conf import settings
@@ -83,6 +82,10 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     An XModule ModuleSystem for use in Studio previews
     """
+    # xmodules can check for this attribute during rendering to determine if
+    # they are being rendered for preview (i.e. in Studio)
+    is_author_mode = True
+
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
             'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
@@ -170,7 +173,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     """
     # Only add the Studio wrapper when on the container page. The unit page will remain as is for now.
     if context.get('container_view', None) and view == 'student_view':
-        locator = loc_mapper().translate_location(xblock.course_id, xblock.location)
+        locator = loc_mapper().translate_location(xblock.course_id, xblock.location, published=False)
         template_context = {
             'xblock_context': context,
             'xblock': xblock,

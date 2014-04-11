@@ -16,7 +16,7 @@ A
 
   The course page that provides potential students with a course summary, prerequisites, a course video and image, and important dates.
 
-  See :ref:`Setting up a New Course` for more information.
+  See :ref:`The Course Summary Page` for more information.
 
 .. _Advanced Editor-g:
  
@@ -231,7 +231,7 @@ G
  
   List of the items that a student's response should cover in an open response assessment.
 
-  See :ref:`Rubrics` for more information.
+  See :ref:`ORA Rubrics` for more information.
 
 
 .. _H:
@@ -383,7 +383,7 @@ P
 
   Pages that supplement the courseware for a course. Each page appears in your course's navigation bar. 
 
-  See :ref:`Add Pages` for more information.
+  See :ref:`Adding Pages to a Course` for more information.
 
 .. _Preview Mode:
  
@@ -443,7 +443,7 @@ R
 
   List of the items that a student's response should cover in an open response assessment.
 
-  See :ref:`Rubrics` for more information.
+  See :ref:`ORA Rubrics` for more information.
 
 
 

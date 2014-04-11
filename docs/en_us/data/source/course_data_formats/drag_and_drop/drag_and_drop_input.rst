@@ -235,12 +235,12 @@ Rules are: exact, anyof, unordered_equal, anyof+number, unordered_equal+number
         {
             'draggables': ['a', 'a', 'a'],
             'targets': ['target1',  'target4', 'target7'],
-            'rule': 'unordered_equal+numbers'
+            'rule': 'unordered_equal+number'
         },
         {
             'draggables': ['b', 'b'],
             'targets': ['target2', 'target5', 'target8'],
-            'rule': 'anyof+numbers'
+            'rule': 'anyof+number'
         },
         {
             'draggables': ['c'],

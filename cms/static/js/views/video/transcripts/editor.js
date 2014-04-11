@@ -20,7 +20,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
             this.collection = new MetadataCollection(models);
 
             // initialize MetadataView.Editor
-            this.metadataEditor = new MetadataView.Editor({
+            this.settingsView = new MetadataView.Editor({
                 el: this.$el,
                 collection: this.collection
             });
@@ -72,7 +72,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
         syncBasicTab: function (metadataCollection, metadataView) {
             var result = [],
                 getField = Utils.getField,
-                component_locator = this.$el.closest('.component').data('locator'),
+                component_locator = this.$el.closest('[data-locator]').data('locator'),
                 subs = getField(metadataCollection, 'sub'),
                 values = {},
                 videoUrl, metadata, modifiedValues;

@@ -1,4 +1,4 @@
-require ["jquery", "backbone", "coffee/src/main", "js/spec/create_sinon", "jasmine-stealth", "jquery.cookie"],
+require ["jquery", "backbone", "coffee/src/main", "js/spec_helpers/create_sinon", "jasmine-stealth", "jquery.cookie"],
 ($, Backbone, main, create_sinon) ->
     describe "CMS", ->
         it "should initialize URL", ->

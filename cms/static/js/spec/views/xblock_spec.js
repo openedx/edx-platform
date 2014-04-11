@@ -1,4 +1,4 @@
-define([ "jquery", "js/spec/create_sinon", "URI", "js/views/xblock", "js/models/xblock_info",
+define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/xblock", "js/models/xblock_info",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
     function ($, create_sinon, URI, XBlockView, XBlockInfo) {
 
@@ -7,7 +7,7 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/xblock", "js/models/
 
             beforeEach(function () {
                 model = new XBlockInfo({
-                    id: 'testCourse/branch/published/block/verticalFFF',
+                    id: 'testCourse/branch/draft/block/verticalFFF',
                     display_name: 'Test Unit',
                     category: 'vertical'
                 });
@@ -28,7 +28,7 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/xblock", "js/models/
                 xblockView.render();
                 respondWithMockXBlockFragment(requests, {
                     html: mockXBlockHtml,
-                    "resources": []
+                    resources: []
                 });
 
                 expect(xblockView.$el.select('.xblock-header')).toBeTruthy();

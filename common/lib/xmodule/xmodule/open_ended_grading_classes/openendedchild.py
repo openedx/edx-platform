@@ -533,10 +533,6 @@ class OpenEndedChild(object):
     def get_eta(self):
         if self.controller_qs:
             response = self.controller_qs.check_for_eta(self.location_string)
-            try:
-                response = json.loads(response)
-            except:
-                pass
         else:
             return ""
 

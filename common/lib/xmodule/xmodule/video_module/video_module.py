@@ -10,7 +10,6 @@ in-browser HTML5 video method (when in HTML5 mode).
 - Navigational subtitles can be disabled altogether via an attribute
 in XML.
 """
-import os
 import json
 import logging
 from operator import itemgetter
@@ -36,8 +35,6 @@ from .video_utils import create_youtube_string
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore
-from xblock.runtime import KvsFieldData
 from urlparse import urlparse
 
 def get_ext(filename):
@@ -74,6 +71,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             resource_string(module, 'js/src/video/00_resizer.js'),
             resource_string(module, 'js/src/video/00_async_process.js'),
             resource_string(module, 'js/src/video/00_sjson.js'),
+            resource_string(module, 'js/src/video/00_iterator.js'),
             resource_string(module, 'js/src/video/01_initialize.js'),
             resource_string(module, 'js/src/video/025_focus_grabber.js'),
             resource_string(module, 'js/src/video/02_html5_video.js'),
@@ -124,8 +122,9 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             else:
                 transcript_language = sorted(self.transcripts.keys())[0]
 
+            native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
             languages = {
-                lang: display
+                lang: native_languages.get(lang, display)
                 for lang, display in settings.ALL_LANGUAGES
                 if lang in self.transcripts
             }

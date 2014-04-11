@@ -39,7 +39,7 @@ class ImageExtension(markdown.Extension):
 
     def extendMarkdown(self, md, md_globals):
         self.add_inline(md, 'image', ImageLink,
-        r'^(?P<proto>([^:/?#])+://)?(?P<domain>([^/?#]*)/)?(?P<path>[^?#]*\.(?P<ext>[^?#]{3,4}))(?:\?([^#]*))?(?:#(.*))?$')
+                        r'^(?P<proto>([^:/?#])+://)?(?P<domain>([^/?#]*)/)?(?P<path>[^?#]*\.(?P<ext>[^?#]{3,4}))(?:\?([^#]*))?(?:#(.*))?$')
 
 
 class ImageLink(markdown.inlinepatterns.Pattern):

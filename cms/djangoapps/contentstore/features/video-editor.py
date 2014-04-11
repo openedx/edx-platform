@@ -10,7 +10,12 @@ from django.conf import settings
 from common import upload_file, attach_file
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
-LANGUAGES = {l[0]: l[1] for l in settings.ALL_LANGUAGES}
+
+NATIVE_LANGUAGES = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
+LANGUAGES = {
+    lang: NATIVE_LANGUAGES.get(lang, display)
+    for lang, display in settings.ALL_LANGUAGES
+}
 
 TRANSLATION_BUTTONS = {
     'add': '.metadata-video-translations .create-action',
@@ -67,7 +72,7 @@ class RequestHandlerWithSessionId(object):
 def success_upload_file(filename):
     upload_file(filename, sub_path="uploads/")
     world.css_has_text('#upload_confirm', 'Success!')
-    world.is_css_not_present('.wrapper-dialog-assetupload', wait_time=30)
+    world.is_css_not_present('.wrapper-modal-window-assetupload', wait_time=30)
 
 
 def get_translations_container():
@@ -97,7 +102,7 @@ def choose_new_lang(lang_code):
 
 
 def open_menu(menu):
-    world.browser.execute_script("$('{selector}').parent().addClass('open')".format(
+    world.browser.execute_script("$('{selector}').parent().addClass('is-opened')".format(
         selector=VIDEO_MENUS[menu]
     ))
 
@@ -107,11 +112,10 @@ def set_show_captions(step, setting):
     # Prevent cookies from overriding course settings
     world.browser.cookies.delete('hide_captions')
 
-    world.css_click('a.edit-button')
-    world.wait_for(lambda _driver: world.css_visible('a.save-button'))
-    world.click_link_by_text('Advanced')
+    world.edit_component()
+    world.select_editor_tab('Advanced')
     world.browser.select('Transcript Display', setting)
-    world.css_click('a.save-button')
+    world.save_component()
 
 
 @step('when I view the video it (.*) show the captions$')
@@ -156,7 +160,7 @@ def correct_video_settings(_step):
 
 @step('my video display name change is persisted on save$')
 def video_name_persisted(step):
-    world.css_click('a.save-button')
+    world.save_component()
     reload_the_page(step)
     world.wait_for_xmodule()
     world.edit_component()

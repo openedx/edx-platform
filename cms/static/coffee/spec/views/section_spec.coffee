@@ -1,4 +1,4 @@
-define ["js/models/section", "js/views/section_show", "js/views/section_edit", "js/spec/create_sinon"], (Section, SectionShow, SectionEdit, create_sinon) ->
+define ["js/models/section", "js/views/section_show", "js/views/section_edit", "js/spec_helpers/create_sinon"], (Section, SectionShow, SectionEdit, create_sinon) ->
 
     describe "SectionShow", ->
         describe "Basic", ->

@@ -4,20 +4,26 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Diana Huang <dkh@edx.org>, 2014
+# flowerhack <julia@edx.org>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# flowerhack <julia@edx.org>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Pirate English (http://www.transifex.com/projects/p/edx-platform/language/en@pirate/)
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Diana Huang <dkh@edx.org>, 2014
+# flowerhack <julia@edx.org>, 2014
 # nedbat <ned@edx.org>, 2014
 # nedbat <ned@edx.org>, 2014
+# sarina <sarina@edx.org>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -30,6 +36,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# flowerhack <julia@edx.org>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -40,7 +47,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-31 09:26-0400\n"
+"POT-Creation-Date: 2014-04-07 10:07-0400\n"
 "PO-Revision-Date: 2014-02-06 03:04+0000\n"
 "Last-Translator: nedbat <ned@edx.org>\n"
 "Language-Team: Pirate English (http://www.transifex.com/projects/p/edx-platform/language/en@pirate/)\n"
@@ -107,11 +114,11 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Male"
-msgstr ""
+msgstr "Lad"
 
 #: common/djangoapps/student/models.py
 msgid "Female"
-msgstr ""
+msgstr "Lass"
 
 #. Translators: 'Other' refers to the student's gender
 #. Translators: 'Other' refers to the student's level of education
@@ -154,7 +161,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
-msgstr ""
+msgstr "Ye course id be not specified"
 
 #: common/djangoapps/student/views.py
 msgid "Course id is invalid"
@@ -167,7 +174,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
-msgstr ""
+msgstr "Ye not be enrolled in this course"
 
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
@@ -176,6 +183,8 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
+"Thar be an error receivin' yer login information.  Please be sendin' us an "
+"email."
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -184,12 +193,19 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/student/views.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py lms/templates/provider_login.html
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
-msgstr ""
+msgstr "Ye email or password be full o' blather"
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -235,7 +251,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "To enroll, you must follow the honor code."
-msgstr ""
+msgstr "To be enlistin', ye must be followin' the Pirate code."
 
 #: common/djangoapps/student/views.py
 msgid "You must accept the terms of service."
@@ -263,7 +279,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Agreeing to the Honor Code is required"
-msgstr ""
+msgstr "Ye must be agreein' to th' Pirate Code"
 
 #: common/djangoapps/student/views.py
 msgid "A level of education is required"
@@ -309,7 +325,7 @@ msgstr ""
 msgid "Username should only consist of A-Z and 0-9, with no spaces."
 msgstr ""
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Password: "
 msgstr ""
 
@@ -319,6 +335,22 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {0} "
+"day(s) must elapse between password resets"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Password reset unsuccessful"
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -988,7 +1020,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/tabs.py
 #: lms/templates/courseware/courseware-error.html
 msgid "Courseware"
-msgstr ""
+msgstr "Ye Coursewaaarrre"
 
 #. Translators: "Course Info" is the name of the course's information and
 #. updates page
@@ -1036,12 +1068,9 @@ msgstr ""
 msgid "Peer grading"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: "Syllabus" appears on a tab that, when clicked, opens the
-#. syllabus of the course.
-#: common/lib/xmodule/xmodule/tabs.py lms/templates/courseware/syllabus.html
+#: lms/templates/courseware/syllabus.html
 msgid "Syllabus"
-msgstr ""
+msgstr "List 'o' Course Content"
 
 #. Translators: 'Instructor' appears on the tab that leads to the instructor
 #. dashboard, which is
@@ -1266,17 +1295,21 @@ msgstr ""
 msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
-msgstr ""
+msgstr "Naaarrrvigation"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "About these documents"
-msgstr ""
+msgstr "About these bits o' parchment"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Index"
@@ -1286,7 +1319,7 @@ msgstr ""
 #: lms/templates/wiki/plugins/attachments/index.html
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search"
-msgstr ""
+msgstr "Scour"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/static_templates/copyright.html
@@ -1473,7 +1506,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Total number of users"
-msgstr ""
+msgstr "Total number o' mateys"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Courses loaded in the modulestore"
@@ -1705,13 +1738,11 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Language"
@@ -1728,7 +1759,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py lms/templates/register.html
 #: lms/templates/signup_modal.html
 msgid "Gender"
-msgstr ""
+msgstr "Ye' Gender"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
@@ -1907,7 +1938,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of Staff"
-msgstr ""
+msgstr "List o' Captains"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of Instructors"
@@ -2257,37 +2288,6 @@ msgstr ""
 msgid "Add to profile"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: "Peer Grading" is a panel where peer can grade student-
-#. provided answers.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-#: lms/templates/peer_grading/peer_grading.html
-#: lms/templates/peer_grading/peer_grading_closed.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Peer Grading"
-msgstr ""
-
-#. Translators: "Staff Grading" is a panel where instructor can grade student-
-#. provided answers.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Staff Grading"
-msgstr ""
-
-#. Translators: "Problems you have submitted" refers to the problems that the
-#. currently-logged-in
-#. student has provided an answer for.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Problems you have submitted"
-msgstr ""
-
-#. Translators: "Flagged Submissions" refers to student-provided answers to a
-#. problem which are
-#. marked by instructor or peer graders as 'flagged' potentially
-#. inappropriate.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Flagged Submissions"
-msgstr ""
-
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
 "Could not contact the external grading server. Please contact the "
@@ -2303,11 +2303,11 @@ msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "AI Assessment"
-msgstr ""
+msgstr "Assessment by Th' Fool's Intelligence"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Peer Assessment"
-msgstr ""
+msgstr "Assessment by Yer Mateys"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Not yet available"
@@ -2341,6 +2341,7 @@ msgstr ""
 msgid ""
 "View all problems that require peer assessment in this particular course."
 msgstr ""
+"Spy all th' problems that require matey assessment in this here course"
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
@@ -2403,7 +2404,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Certificate of Achievement, {mode_name} for course {course}"
-msgstr ""
+msgstr "Parchment o' Achievement, {mode_name} for course {course}"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
@@ -2578,7 +2579,7 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "You are already registered in course {0}."
-msgstr ""
+msgstr "Ye already be enlisted in course {0}"
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "Course added to cart."
@@ -2586,7 +2587,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
-msgstr ""
+msgstr "Ye be forbidden from viewin' the contents o' this page!"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor did not return a required parameter: {0}"
@@ -2892,11 +2893,11 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Selected price is not valid number."
-msgstr ""
+msgstr "Th' number of dubloons ye chose is a nonsense number!"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "This course doesn't support verified certificates"
-msgstr ""
+msgstr "Yarrr, this course has no support for verified parchments"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "No selected price or selected price is below minimum."
@@ -2935,7 +2936,7 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Form"
-msgstr ""
+msgstr "Secret Code Changin' Form"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -2954,7 +2955,7 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The two password fields didn't match."
-msgstr ""
+msgstr "Th' two secret codes didn't match"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -2984,19 +2985,19 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password"
-msgstr ""
+msgstr "Yer new secret code"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password Again"
-msgstr ""
+msgstr "Yer new secret code, again"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Change My Password"
-msgstr ""
+msgstr "Change me Secret Code"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your Password Reset Was Unsuccessful"
-msgstr ""
+msgstr "Arr, Yer Secret Code Reset Was Unsuccessful"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -3044,7 +3045,7 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
 msgid "The edX Team"
-msgstr ""
+msgstr "Th' edX Crew"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -3111,7 +3112,7 @@ msgstr ""
 
 #: lms/templates/wiki/delete.html
 msgid "You are deleting an article. Please confirm."
-msgstr ""
+msgstr "Ye be discardin' a piece o' parchment.  Ye be sure?"
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
 #: cms/templates/studio_xblock_wrapper.html
@@ -3474,12 +3475,16 @@ msgid ""
 "Non writable git url provided. Expecting something like: "
 "git@github.com:mitocw/edx4edx_lite.git"
 msgstr ""
+"Th' git url cannot be scribbled upon.  Expected a scribblin' like: "
+"git@github.com:mitocw/edx4edx_lite.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "If using http urls, you must provide the username and password in the url. "
 "Similar to https://user:pass@github.com/user/course."
 msgstr ""
+"If ye be usin' http urls, ye must be providin' th' pirate name 'n' secret "
+"code in the url. Similar to https://user:pass@github.com/user/course"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to determine branch, repo in detached HEAD mode"
@@ -3532,7 +3537,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
 msgid "My Notes"
-msgstr ""
+msgstr "Me Notes"
 
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
@@ -3542,7 +3547,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
-msgstr ""
+msgstr "Yer files be uploaded"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -3577,6 +3582,8 @@ msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change at least one field to be unique."
 msgstr ""
+"There already be a ship defined with the same flag 'n' ship number.  Please "
+"be changin' th' flag or the ship number to be unique."
 
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
@@ -3584,11 +3591,11 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
-msgstr ""
+msgstr "We only be supportin' uploads o' files o' type .tar.gz here, matey."
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
-msgstr ""
+msgstr "Aaarrrgh, th' parchment upload has been thwarted!  Try again, matey."
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Could not find the course.xml file in the package."
@@ -3625,18 +3632,19 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/user.py
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
+"Th' feller {email} has set sail, but has yet to validate their vessel."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "`role` is required"
-msgstr ""
+msgstr "`role` be required, arrgh"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Only instructors may create other instructors"
-msgstr ""
+msgstr "Only captains may be nominatin' other captains, aaarrrgh"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "You may not remove the last instructor from a course"
-msgstr ""
+msgstr "Y' can't be removin' the last captain from th' ship"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
@@ -3671,6 +3679,8 @@ msgid ""
 "Optional notes about this user (for example, why course creation access was "
 "denied)"
 msgstr ""
+"Optional scribblin's about this matey (fer instance, why their ship-buildin'"
+" request was denied)"
 
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
@@ -3701,7 +3711,7 @@ msgstr ""
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Save"
-msgstr ""
+msgstr "Bury Treasure"
 
 #: cms/templates/component.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/overview.html
@@ -3715,7 +3725,7 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 #: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
-msgstr ""
+msgstr "Belay"
 
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
@@ -3751,7 +3761,7 @@ msgstr ""
 #: cms/templates/login.html lms/templates/login.html
 #: lms/templates/university_profile/edge.html
 msgid "Forgot password?"
-msgstr ""
+msgstr "Forgot yer secret code?"
 
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/provider_login.html
@@ -3794,7 +3804,7 @@ msgstr ""
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
-msgstr ""
+msgstr "Board yer {link_start}main deck{link_end} to see yer courses."
 
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: lms/templates/static_templates/tos.html
@@ -3813,21 +3823,13 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "Visual"
-msgstr ""
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "HTML"
-msgstr ""
-
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Register for {} | Choose Your Track"
-msgstr ""
+msgstr "Set sail with {} | Be Choosin' yer Track"
 
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to register you"
@@ -3856,7 +3858,7 @@ msgstr ""
 #: common/templates/course_modes/choose.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "):"
-msgstr ""
+msgstr "):"
 
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay? What if I don't meet all the requirements?"
@@ -3901,7 +3903,7 @@ msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
-msgstr ""
+msgstr "Be Selectin' th' Pirate Code Certificate"
 
 #: common/templates/course_modes/choose.html
 msgid "Explain your situation: "
@@ -3966,7 +3968,7 @@ msgstr ""
 
 #: lms/templates/admin_dashboard.html
 msgid "{platform_name}-wide Summary"
-msgstr ""
+msgstr "Be Summarizin' Th' {platform_name}"
 
 #: lms/templates/annotatable.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -3976,39 +3978,39 @@ msgstr ""
 #: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
-msgstr ""
+msgstr "Instructin' for ye, Matey"
 
 #: lms/templates/annotatable.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
 msgid "Collapse Instructions"
-msgstr ""
+msgstr "Fold Ye Instructions Here"
 
 #: lms/templates/annotatable.html
 msgid "Guided Discussion"
-msgstr ""
+msgstr "We Be Directin' Th' Scuttlebutt"
 
 #: lms/templates/annotatable.html
 msgid "Hide Annotations"
-msgstr ""
+msgstr "Hide Ye Annotations"
 
 #: lms/templates/contact.html lms/templates/static_templates/about.html
 #: lms/templates/static_templates/about.html
 msgid "Vision"
-msgstr ""
+msgstr "Where We Be Sailin'"
 
 #: lms/templates/contact.html
 msgid "Faq"
-msgstr ""
+msgstr "Yer Common Questions Be Answered Here"
 
 #: lms/templates/contact.html lms/templates/footer.html
 msgid "Press"
-msgstr ""
+msgstr "Foul rumors be spread 'bout us"
 
 #: lms/templates/contact.html lms/templates/footer.html
 #: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
-msgstr ""
+msgstr "Let Us Be Hearin' Yer Thoughts"
 
 #: lms/templates/contact.html
 msgid "Class Feedback"
@@ -4021,10 +4023,14 @@ msgid ""
 " issues specific to a particular class, please post on the discussion forums"
 " of that&nbsp;class."
 msgstr ""
+"We always be seekin' out feedback to be improvin' our courses. If ye be a "
+"studyin' lad or lass and have us any questions, feedback, suggestions, or "
+"any such issues pertainin' to a particular class, please be postin' on the "
+"discussion forums of that there class."
 
 #: lms/templates/contact.html
 msgid "General Inquiries and Feedback"
-msgstr ""
+msgstr "Yer Run O' Th' Mill Inquiries 'n' Feedback"
 
 #: lms/templates/contact.html
 msgid ""
@@ -4035,10 +4041,17 @@ msgid ""
 "{fb_link_start}facebook page{fb_link_end}. Though we may not have a chance "
 "to respond to every email, we take all feedback into consideration."
 msgstr ""
+"If ye have any queries about {platform_name} please be sendin' a letter to "
+"<a href=\"mailto:{contact_email}\">{contact_email}</a>.  To be seein' if yer"
+" query already has an answer, visit the {faq_link_start}page o' questions we"
+" be frequently pestered about{faq_link_end}.  Ye can also blather on our "
+"{fb_link_start}facebook page{fb_link_end}.  Though we may not have the time "
+"to be respondin' to e'ry letter, we bend an ear to all ye feedback for "
+"consideration."
 
 #: lms/templates/contact.html
 msgid "Technical Inquiries and Feedback"
-msgstr ""
+msgstr "Yer Technical Inquiries 'n' Feedback"
 
 #: lms/templates/contact.html
 msgid ""
@@ -4061,10 +4074,13 @@ msgid ""
 "Please visit our {link_start}media/press page{link_end} for more "
 "information. For any media or press inquiries, please email {email}."
 msgstr ""
+"Please be visitin' our {link_start}media/press parchment{link_end} if ye be "
+"wantin' more information. If ye be doin' media or press inquires, please be "
+"sendin' us an email to {email}."
 
 #: lms/templates/contact.html
 msgid "Universities"
-msgstr ""
+msgstr "Institutions o' Learnin'"
 
 #: lms/templates/contact.html
 msgid ""
@@ -4074,11 +4090,11 @@ msgstr ""
 
 #: lms/templates/course.html
 msgid "New"
-msgstr ""
+msgstr "New"
 
 #: lms/templates/dashboard.html
 msgid "Dashboard"
-msgstr ""
+msgstr "Main Deck"
 
 #: lms/templates/dashboard.html lms/templates/courseware/course_about.html
 #: lms/templates/courseware/course_about.html
@@ -4093,23 +4109,23 @@ msgstr ""
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
-msgstr ""
+msgstr "correctin' meself"
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 msgid "Reset Password"
-msgstr ""
+msgstr "Reset Me Secret Code"
 
 #: lms/templates/dashboard.html
 msgid "Current Courses"
-msgstr ""
+msgstr "Courses at th' Present"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't registered for any courses yet."
-msgstr ""
+msgstr "It be seemin' like you haven't got any courses yet."
 
 #: lms/templates/dashboard.html
 msgid "Find courses now!"
-msgstr ""
+msgstr "Scour fer courses, me matey!"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't been enrolled in any courses yet."
@@ -4117,7 +4133,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
-msgstr ""
+msgstr "Errors we be seein' while loadin' yer course"
 
 #: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -4129,39 +4145,43 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Save Settings"
-msgstr ""
+msgstr "Stow Changes to ye Riggin's"
 
 #: lms/templates/dashboard.html
 msgid "Password Reset Email Sent"
-msgstr ""
+msgstr "Sent Away Th' Secret Code"
 
 #: lms/templates/dashboard.html
 msgid ""
 "An email has been sent to {email}. Follow the link in the email to change "
 "your password."
 msgstr ""
+"A letter's been sent to ye at {email}.  Follow the link in yer letter to be "
+"changin' yer secret code."
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 msgid "Change Email"
-msgstr ""
+msgstr "Be Changin' Me Email"
 
 #: lms/templates/dashboard.html
 msgid "Please enter your new email address:"
-msgstr ""
+msgstr "Please be enterin' yer new email address:"
 
 #: lms/templates/dashboard.html
 msgid "Please confirm your password:"
-msgstr ""
+msgstr "Please be confirmin' yer secret code:"
 
 #: lms/templates/dashboard.html
 msgid ""
 "We will send a confirmation to both {email} and your new email as part of "
 "the process."
 msgstr ""
+"Ye'll be gettin' a confirmation to yer old email {email} and yer new email "
+"as part o' the process."
 
 #: lms/templates/dashboard.html
 msgid "Change your name"
-msgstr ""
+msgstr "Be Changin' Yer Name, Matey"
 
 #. Translators: note that {platform} {cert_name_short} will look something
 #. like: "edX certificate". Please do not change the order of these
@@ -4184,11 +4204,11 @@ msgstr ""
 #: lms/templates/dashboard.html
 #: lms/templates/verify_student/_modal_editname.html
 msgid "Reason for name change:"
-msgstr ""
+msgstr "Why ye be changin' yer name:"
 
 #: lms/templates/dashboard.html
 msgid "Change My Name"
-msgstr ""
+msgstr "Be Changin' Me Name"
 
 #: lms/templates/dashboard.html
 msgid ""
@@ -4201,74 +4221,80 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Unregister"
+msgstr "Disembark"
+
+#: lms/templates/edit_unit_link.html
+msgid "View Unit in Studio"
 msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
-msgstr ""
+msgstr "Yer E-mail change be goin' overboard, matey."
 
 #: lms/templates/email_change_failed.html
 msgid "We were unable to send a confirmation email to {email}"
-msgstr ""
+msgstr "We were unable to send a letter o' confirmation to {email}."
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 #: lms/templates/invalid_email_key.html
 msgid "Go back to the {link_start}home page{link_end}."
-msgstr ""
+msgstr "Return to the {link_start}waters o' the home port{link_end}."
 
 #: lms/templates/email_change_successful.html
 #: lms/templates/emails_change_successful.html
 msgid "E-mail change successful!"
-msgstr ""
+msgstr "Yer E-mail change be above board, matey."
 
 #: lms/templates/email_change_successful.html
 #: lms/templates/emails_change_successful.html
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
 msgstr ""
+"Ye should be seeing yer new email on yer {link_start}main deck{link_end}."
 
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
 msgstr ""
+"Thar be a matey holdin' an account with yer new email address already."
 
 #: lms/templates/enroll_students.html
 msgid "Student Enrollment Form"
-msgstr ""
+msgstr "Crewmen Enlistment Form"
 
 #: lms/templates/enroll_students.html
 msgid "Course: "
-msgstr ""
+msgstr "Course:"
 
 #: lms/templates/enroll_students.html
 msgid "Add new students"
-msgstr ""
+msgstr "Enlist new crewmen"
 
 #: lms/templates/enroll_students.html
 msgid "Existing students:"
-msgstr ""
+msgstr "Existin' crewmen:"
 
 #: lms/templates/enroll_students.html
 msgid "New students added: "
-msgstr ""
+msgstr "New crewmen added:"
 
 #: lms/templates/enroll_students.html
 msgid "Students rejected: "
-msgstr ""
+msgstr "Crewmen rejected:"
 
 #: lms/templates/enroll_students.html
 msgid "Debug: "
-msgstr ""
+msgstr "Fer Removin' Bugs:"
 
 #: lms/templates/enroll_students.html
 msgid "foo"
-msgstr ""
+msgstr "foo"
 
 #: lms/templates/enroll_students.html
 msgid "bar"
-msgstr ""
+msgstr "bar"
 
 #: lms/templates/enroll_students.html
 msgid "biff"
-msgstr ""
+msgstr "biff"
 
 #: lms/templates/extauth_failure.html lms/templates/extauth_failure.html
 msgid "External Authentication failed"
@@ -4284,11 +4310,11 @@ msgstr ""
 
 #: lms/templates/folditbasic.html
 msgid "You have successfully gotten to level {goal_level}."
-msgstr ""
+msgstr "Ye have successfully scaled the mast to level {goal_level}."
 
 #: lms/templates/folditbasic.html
 msgid "You have not yet gotten to level {goal_level}."
-msgstr ""
+msgstr "Ye have not yet scaled the mast to level {goal_level}."
 
 #: lms/templates/folditbasic.html
 msgid "Completed puzzles"
@@ -4322,12 +4348,12 @@ msgstr ""
 #: lms/templates/footer.html lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
-msgstr ""
+msgstr "Be Joinin' Our Crew"
 
 #: lms/templates/footer.html lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
-msgstr ""
+msgstr "Yer Common Questions Be Answered Here"
 
 #: lms/templates/footer.html
 msgid "{platform_name} Logo"
@@ -4341,6 +4367,11 @@ msgid ""
 "{platform_name}'s free online MOOCs are interactive and subjects include "
 "computer science, public health, and artificial intelligence."
 msgstr ""
+"{platform_name} be an armada assembled by th' scallywags {Harvard} 'n' {MIT}"
+" whose mission is to bring th' best o' the high seas to mateys of all ages "
+"anywhere in the world, wherever there be a port o' call.  {platform_name}'s "
+"free vessels o' learnin' be boardable, and topics o' interest include 'puter"
+" science, health o' the public, and fool's intelligence."
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved."
@@ -4353,7 +4384,7 @@ msgstr ""
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
-msgstr ""
+msgstr "Reset Secret Code"
 
 #: lms/templates/forgot_password_modal.html
 msgid ""
@@ -4375,7 +4406,7 @@ msgstr ""
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
-msgstr ""
+msgstr "Th' email be wrong, matey."
 
 #: lms/templates/help_modal.html
 msgid "{platform_name} Help"
@@ -4383,7 +4414,7 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "{span_start}{platform_name}{span_end} Help"
-msgstr ""
+msgstr "{span_start}{platform_name}{span_end} Helpin' Ye"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -4404,6 +4435,8 @@ msgid ""
 "Have a <strong>question about something specific</strong>? You can contact "
 "the {platform_name} general support team directly:"
 msgstr ""
+"Have ye a <strong>query regardin' somethin' particular</strong>? You can "
+"contact the {platform_name} supportin' crew directly:"
 
 #: lms/templates/help_modal.html
 msgid "Report a problem"
@@ -4411,11 +4444,11 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Make a suggestion"
-msgstr ""
+msgstr "Be makin' a suggestion"
 
 #: lms/templates/help_modal.html
 msgid "Ask a question"
-msgstr ""
+msgstr "Be askin' a query"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -4459,7 +4492,7 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
-msgstr ""
+msgstr "Thank Ye, Matey!"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -4495,7 +4528,7 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Make a Suggestion"
-msgstr ""
+msgstr "Be Makin' a Suggestion"
 
 #: lms/templates/help_modal.html
 msgid "Brief description of your suggestion"
@@ -4536,15 +4569,15 @@ msgstr ""
 
 #: lms/templates/index.html
 msgid "The Future of Online Education"
-msgstr ""
+msgstr "Th' Future o' Seaworthy Education"
 
 #: lms/templates/index.html
 msgid "For anyone, anywhere, anytime"
-msgstr ""
+msgstr "Fer any matey, anywhere, anytime"
 
 #: lms/templates/index.html
 msgid "Stay up to date with all {platform_name} has to offer!"
-msgstr ""
+msgstr "Keep abreast of all {platform_name} be offerin'!"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -4552,7 +4585,7 @@ msgstr ""
 
 #: lms/templates/invalid_email_key.html
 msgid "This e-mail key is not valid. Please check:"
-msgstr ""
+msgstr "Yaaarrrgh!  Th' e-mail key be invalid, matey. Please check:"
 
 #: lms/templates/invalid_email_key.html
 msgid ""
@@ -4574,7 +4607,7 @@ msgstr ""
 
 #: lms/templates/login-sidebar.html lms/templates/login-sidebar.html
 msgid "Login via OpenID"
-msgstr ""
+msgstr "Set sail via OpenID"
 
 #: lms/templates/login-sidebar.html
 msgid ""
@@ -4584,11 +4617,11 @@ msgstr ""
 
 #: lms/templates/login-sidebar.html
 msgid "Not Enrolled?"
-msgstr ""
+msgstr "Not Enlisted?"
 
 #: lms/templates/login-sidebar.html
 msgid "Sign up for {platform_name} today!"
-msgstr ""
+msgstr "Enlist in {platform_name} t'day!"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
@@ -4600,15 +4633,15 @@ msgstr ""
 
 #: lms/templates/login.html
 msgid "Log into your {platform_name} Account"
-msgstr ""
+msgstr "Board yer {platform_name} Ship"
 
 #: lms/templates/login.html
 msgid "Log into My {platform_name} Account"
-msgstr ""
+msgstr "Board me {platform_name} Ship"
 
 #: lms/templates/login.html
 msgid "Access My Courses"
-msgstr ""
+msgstr "Be Gettin' To Me Courses"
 
 #: lms/templates/login.html lms/templates/register.html
 msgid "Processing your account information…"
@@ -4625,6 +4658,7 @@ msgstr ""
 #: lms/templates/login.html
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
 msgstr ""
+"We're Sorry, {platform_name} not be acceptin' new crewmen at th' moment"
 
 #: lms/templates/login.html
 msgid "The following errors occurred while logging you in:"
@@ -4632,7 +4666,7 @@ msgstr ""
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
-msgstr ""
+msgstr "Ye email or password be full o' blather"
 
 #: lms/templates/login.html
 msgid ""
@@ -4652,7 +4686,7 @@ msgstr ""
 
 #: lms/templates/login.html
 msgid "Remember me"
-msgstr ""
+msgstr "Keep me afloat"
 
 #: lms/templates/lti.html
 msgid "External resource"
@@ -4711,7 +4745,7 @@ msgstr ""
 
 #: lms/templates/module-error.html
 msgid "There has been an error on the <em>{platform_name}</em> servers"
-msgstr ""
+msgstr "We's been havin' an error on the <em>{platform_name}</em> servers."
 
 #: lms/templates/module-error.html
 msgid ""
@@ -4720,6 +4754,10 @@ msgid ""
 "href=\"mailto:{tech_support_email}\">{tech_support_email}</a> to report any "
 "problems or downtime."
 msgstr ""
+"We be sorry, this deck be flooded at th' moment.  Our crew be scramblin' to "
+"restore it quick as can be.  Please be sendin' a message to <a "
+"href=\"mailto:{tech_support_email}\">{tech_support_email}</a> to report any "
+"men overboard or cannonfire."
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
@@ -4752,11 +4790,11 @@ msgstr ""
 
 #: lms/templates/navigation.html
 msgid "Global Navigation"
-msgstr ""
+msgstr "Global Naaarrrghvigation"
 
 #: lms/templates/navigation.html
 msgid "Find Courses"
-msgstr ""
+msgstr "Scour fer Courses"
 
 #: lms/templates/navigation.html
 msgid "Dashboard for:"
@@ -4782,7 +4820,7 @@ msgstr ""
 
 #: lms/templates/navigation.html
 msgid "Schools"
-msgstr ""
+msgstr "Institutions o' Learnin'"
 
 #: lms/templates/navigation.html lms/templates/navigation.html
 msgid "Register Now"
@@ -4802,7 +4840,7 @@ msgstr ""
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
 msgid "You do not have any notes."
-msgstr ""
+msgstr "Ye have no notes to speak of."
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -4818,12 +4856,12 @@ msgstr ""
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
-msgstr ""
+msgstr "Matey, ye have used {num_used} of ye {num_total} submissions"
 
 #: lms/templates/provider_login.html
 #: lms/templates/university_profile/edge.html
 msgid "Log In"
-msgstr ""
+msgstr "Board Yer Vessel"
 
 #: lms/templates/provider_login.html
 msgid ""
@@ -4855,6 +4893,8 @@ msgstr ""
 msgid ""
 "We're sorry, {platform_name} enrollment is not available in your region"
 msgstr ""
+"Our apologies, ye can't be enlistin' in {platform_name} from yer port o' "
+"call"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "The following errors occurred while processing your registration:"
@@ -4879,6 +4919,8 @@ msgstr ""
 #: lms/templates/register.html
 msgid "Will be shown in any discussions or forums you participate in"
 msgstr ""
+"Will be put on display fer any disscusin' or sharin' o' scuttlebutt ye be "
+"don'"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "Account Acknowledgements"
@@ -4886,11 +4928,11 @@ msgstr ""
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr ""
+msgstr "I be agreein' to the {link_start}Terms o' Service{link_end}"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr ""
+msgstr "I be agreein' to the {link_start}Pirate Code{link_end}"
 
 #: lms/templates/register-shib.html
 msgid "Update My Account"
@@ -4906,7 +4948,7 @@ msgstr ""
 
 #: lms/templates/register-sidebar.html
 msgid "Click here to log in."
-msgstr ""
+msgstr "Affix yer clicker here to climb aboard."
 
 #: lms/templates/register-sidebar.html
 msgid "Welcome to {platform_name}"
@@ -4955,7 +4997,7 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Register for {platform_name}"
-msgstr ""
+msgstr "Set sail fer {platform_name}"
 
 #: lms/templates/register.html
 msgid "Create My {platform_name} Account"
@@ -4963,7 +5005,7 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Welcome!"
-msgstr ""
+msgstr "Ahoy, matey!"
 
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
@@ -4987,7 +5029,7 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Welcome {username}"
-msgstr ""
+msgstr "Ahoy, {username}"
 
 #: lms/templates/register.html
 msgid "Enter a Public Display Name:"
@@ -5020,11 +5062,12 @@ msgstr ""
 #: lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Year of Birth"
-msgstr ""
+msgstr "Year o' Birth"
 
 #: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
+"Please be tellin' us yer reasonin' for climbin' aboard with {platform_name}"
 
 #: lms/templates/register.html lms/templates/university_profile/edge.html
 msgid "Register"
@@ -5088,7 +5131,7 @@ msgstr ""
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. Your Name (for certificates)"
-msgstr ""
+msgstr "Yer Name (fer parchments o' achievement)"
 
 #: lms/templates/signup_modal.html
 msgid "<i>Welcome</i> {name}"
@@ -5100,7 +5143,7 @@ msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Year of birth"
-msgstr ""
+msgstr "Year o' birth"
 
 #: lms/templates/signup_modal.html
 msgid "Mailing address"
@@ -5116,7 +5159,7 @@ msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Honor Code{link_end}*"
-msgstr ""
+msgstr "I be agreein' to the {link_start}Pirate Code{link_end}*"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
@@ -5138,7 +5181,7 @@ msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "Submission history"
-msgstr ""
+msgstr "Log o' submissions"
 
 #: lms/templates/staff_problem_info.html
 msgid "{platform_name} Content Quality Assessment"
@@ -5146,11 +5189,11 @@ msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "Comment"
-msgstr ""
+msgstr "Remark"
 
 #: lms/templates/staff_problem_info.html
 msgid "comment"
-msgstr ""
+msgstr "remark"
 
 #: lms/templates/staff_problem_info.html
 msgid "Tag"
@@ -5166,7 +5209,7 @@ msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "Add comment"
-msgstr ""
+msgstr "Add yer remarks"
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug"
@@ -5190,7 +5233,7 @@ msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "View History"
-msgstr ""
+msgstr "View Ship's Log"
 
 #: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
 #: lms/templates/staticbook.html
@@ -5200,7 +5243,7 @@ msgstr ""
 #: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
 #: lms/templates/staticbook.html
 msgid "Textbook Navigation"
-msgstr ""
+msgstr "Textbook Naaarrrghvigation"
 
 #: lms/templates/static_pdfbook.html
 msgid "Page:"
@@ -5236,16 +5279,16 @@ msgstr ""
 
 #: lms/templates/static_pdfbook.html lms/templates/staticbook.html
 msgid "Previous page"
-msgstr ""
+msgstr "Turn Back, Ye Fool"
 
 #: lms/templates/static_pdfbook.html lms/templates/staticbook.html
 msgid "Next page"
-msgstr ""
+msgstr "Forge Ahead, Matey!"
 
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Sysadmin Dashboard"
-msgstr ""
+msgstr "Sysadmin Main Deck"
 
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -5292,6 +5335,8 @@ msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
 msgstr ""
+"Hop aboard each course's main deck o' instruction t' be managin' th' "
+"course's enlistment."
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Manage course staff and instructors"
@@ -5407,12 +5452,17 @@ msgid ""
 "Clicking the subtitles is a fast way to skip forwards and backwards by small"
 " amounts."
 msgstr ""
+"Whilst the movin' picture be playin', use the subtitles 'n' scrollbar to "
+"navigate.  Clickin' the subtitles be a swift way to sail forward and back by"
+" wee amounts."
 
 #: lms/templates/using.html
 msgid ""
 "If you are on a low-resolution display, the left navigation bar can be "
 "hidden by clicking on the set of three left arrows next to it."
 msgstr ""
+"If ye be usin' a low-resolution telescope, th' left naaarrrghvigation bar "
+"can be hidden away by clickin' on th' set o' three left arrows beside it."
 
 #: lms/templates/using.html
 msgid ""
@@ -5420,6 +5470,9 @@ msgid ""
 "them up or down. Under Google Chrome, this is done by pressing ctrl-plus, or"
 " ctrl-minus at the same time."
 msgstr ""
+"If ye be needin' bigger or smaller letters, use th' settings o'  yer browser"
+" to scale 'em up or down. Usin' Google Chrome, this be done by pressin' "
+"ctrl-plus, or ctrl-minus at th' same time."
 
 #: lms/templates/video.html
 msgid "Skip to a navigable version of this video's transcript."
@@ -5463,7 +5516,7 @@ msgstr ""
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Turn off captions"
-msgstr ""
+msgstr "Be turnin' off me captions"
 
 #: lms/templates/video.html
 msgid "Skip to end of transcript."
@@ -5493,11 +5546,11 @@ msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "Your words:"
-msgstr ""
+msgstr "Yer words:"
 
 #: lms/templates/word_cloud.html
 msgid "Total number of words:"
-msgstr ""
+msgstr "Total number o' words:"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Open Response"
@@ -5575,7 +5628,7 @@ msgstr ""
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "How accurate do you find this feedback?"
-msgstr ""
+msgstr "How precise d'ye find this feedback to be?"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
@@ -5590,7 +5643,7 @@ msgstr ""
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "No Opinion"
-msgstr ""
+msgstr "Got No Thoughts on th' Matter"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
@@ -5639,6 +5692,8 @@ msgstr[1] ""
 #: lms/templates/combinedopenended/openended/open_ended_error.html
 msgid "There was an error with your submission.  Please contact course staff."
 msgstr ""
+"There be a problem with yer submission.  Please be contactin' yer captains "
+"to see what's afoot."
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html
 msgid "Rubric"
@@ -5711,7 +5766,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
-msgstr ""
+msgstr "View Ye Coursewaaarrre"
 
 #: lms/templates/courseware/course_about.html
 msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
@@ -5727,11 +5782,29 @@ msgid "Register for {course.display_number_with_default}"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+msgid "View About Page in studio"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
 msgid "Overview"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Share with friends and family!"
+msgstr ""
+
+#. Translators: This text will be automatically posted to the student's
+#. Twitter account. {url} should appear at the end of the text.
+#: lms/templates/courseware/course_about.html
+msgid "I just registered for {number} {title} through {account}: {url}"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "Take a course with {platform} online"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "I just registered for {number} {title} through {platform} {url}"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
@@ -5792,19 +5865,19 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "{course_number} Courseware"
-msgstr ""
+msgstr "{course_number} Coursewaaarrre"
 
 #: lms/templates/courseware/courseware.html
 msgid "Return to Exam"
-msgstr ""
+msgstr "Back to yer Examination"
 
 #: lms/templates/courseware/courseware.html
 msgid "Course Navigation"
-msgstr ""
+msgstr "Course Naaarrrghvigation"
 
 #: lms/templates/courseware/courseware.html
 msgid "Open Calculator"
-msgstr ""
+msgstr "Be Openin' yer Electric Abacus"
 
 #: lms/templates/courseware/courseware.html
 msgid "Calculator Input Field"
@@ -5858,7 +5931,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Euler's number"
-msgstr ""
+msgstr "Number o' Euler"
 
 #: lms/templates/courseware/courseware.html
 msgid "ratio of a circle's circumference to it's diameter"
@@ -5894,6 +5967,9 @@ msgid ""
 " fix it as soon as possible. Please email us at {link_to_support_email} to "
 "report any problems or downtime."
 msgstr ""
+"We be sorry, this deck be flooded at th' moment. Our crew be scramblin' to "
+"restore it quick as can be. Please be sendin' a message to "
+"{link_to_support_email} to report any men overboard or cannonfire."
 
 #: lms/templates/courseware/grade_summary.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -5917,13 +5993,17 @@ msgstr ""
 msgid "{course_number} Course Info"
 msgstr ""
 
+#: lms/templates/courseware/info.html
+msgid "View Updates in Studio"
+msgstr ""
+
 #: lms/templates/courseware/info.html lms/templates/courseware/info.html
 msgid "Course Updates &amp; News"
 msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
-msgstr ""
+msgstr "Handout Naaarrrghvigation"
 
 #: lms/templates/courseware/info.html
 msgid "Course Handouts"
@@ -5934,16 +6014,16 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
+msgstr "Captain's Deck"
+
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid "View Course in Studio"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Try New Beta Dashboard"
-msgstr ""
-
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Edit Course In Studio"
-msgstr ""
+msgstr "Be Tryin' th' New Beta Main Deck"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -6154,7 +6234,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Myself"
-msgstr ""
+msgstr "Meself"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6241,7 +6321,7 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students"
-msgstr ""
+msgstr "Crew"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Score distribution for problems"
@@ -6272,6 +6352,8 @@ msgid ""
 "Loading the latest graphs for you; depending on your class size, this may "
 "take a few minutes."
 msgstr ""
+"Pullin' up th' latest charts for ye; depending on yer crew size, this may be"
+" takin' a few minutes o' yer time."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Count of Students that Opened a Subsection"
@@ -6295,7 +6377,7 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students answering correctly"
-msgstr ""
+msgstr "Crewmen answerin' correctly"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Number of students"
@@ -6366,7 +6448,7 @@ msgstr ""
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Access Courseware"
-msgstr ""
+msgstr "Get To Ye Coursewaaarrre"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "You Are Registered"
@@ -6394,6 +6476,10 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "View Grading in studio"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -6431,10 +6517,12 @@ msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
 msgstr ""
+"The last bit o' mangling for the course is happenin' at the moment.  Yer "
+"final standin' will be posted quick as can be."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
-msgstr ""
+msgstr "Yer final score:"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
@@ -6467,6 +6555,7 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "This link will open/download a PDF document"
 msgstr ""
+"Yaaarrrgh!  This here link will be openin'/downloadin' a PDF parchment"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -6492,12 +6581,12 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
-msgstr ""
+msgstr "Be completin' our course feedback survey"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Cover Image"
-msgstr ""
+msgstr "{course_number} {course_name} Image 'o' th' Course"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
@@ -6513,11 +6602,11 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
-msgstr ""
+msgstr "Course Be Return' To Shore - {end_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Started - {start_date}"
-msgstr ""
+msgstr "Course Been Settin' Sail - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course has not yet started"
@@ -6525,7 +6614,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Starts - {start_date}"
-msgstr ""
+msgstr "Course Be Settin' Sail - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Document your accomplishment!"
@@ -6553,11 +6642,11 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
-msgstr ""
+msgstr "Be Viewin' th' Stowed Away Course"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Course"
-msgstr ""
+msgstr "Take Stock O' Yer Course"
 
 #. Translators: The course's name will be added to the end of this sentence.
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -6679,12 +6768,12 @@ msgstr ""
 
 #: lms/templates/discussion/_blank_slate.html
 msgid "There are no posts here yet. Be the first one to post!"
-msgstr ""
+msgstr "There be no postin's over here yet.  Be th' first matey to post!"
 
 #: lms/templates/discussion/_discussion_course_navigation.html
 #: lms/templates/discussion/_discussion_module.html
 msgid "New Post"
-msgstr ""
+msgstr "New Postin'"
 
 #: lms/templates/discussion/_discussion_module.html
 msgid "Show Discussion"
@@ -6702,7 +6791,7 @@ msgstr ""
 #: lms/templates/discussion/_new_post.html
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Show All Discussions"
-msgstr ""
+msgstr "Display All th' Scuttlebutt"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Show Flagged Discussions"
@@ -6710,7 +6799,7 @@ msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
-msgstr ""
+msgstr "Postings I Be Followin'"
 
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
@@ -6800,7 +6889,7 @@ msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion Home"
-msgstr ""
+msgstr "Home o' Discussions"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion Topics"
@@ -6812,7 +6901,7 @@ msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search all discussions"
-msgstr ""
+msgstr "Scour all scuttlebutt"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Sort by:"
@@ -6858,7 +6947,7 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Post a response:"
-msgstr ""
+msgstr "Be postin' a response:"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -6870,7 +6959,7 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "&bull; This thread is closed."
-msgstr ""
+msgstr "&bull; Yaaarrrgh! This here set o' postin' be closed, matey."
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "follow"
@@ -6910,7 +6999,7 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Update post"
-msgstr ""
+msgstr "Update th' postin'"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Add a comment"
@@ -7019,7 +7108,7 @@ msgstr ""
 
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
-msgstr ""
+msgstr ","
 
 #: lms/templates/discussion/_user_profile.html
 msgid "%s discussion started"
@@ -7040,7 +7129,7 @@ msgstr ""
 
 #: lms/templates/discussion/maintenance.html
 msgid "We're sorry"
-msgstr ""
+msgstr "Apologies, matey"
 
 #: lms/templates/discussion/maintenance.html
 msgid ""
@@ -7063,13 +7152,12 @@ msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "View discussion"
+msgid "Expand discussion"
 msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Hide discussion"
+msgid "Collapse discussion"
 msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
@@ -7081,11 +7169,17 @@ msgstr ""
 msgid "…"
 msgstr ""
 
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "View discussion"
+msgstr ""
+
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "Thank you for signing up for {platform_name}! To activate your account, "
 "please copy and paste this address into your web browser's address bar:"
 msgstr ""
+"Thank ye fer settin' sail with {platform_name}!  To confirm yer enlistment, "
+"please copy 'n' paste this bit o' scrawl into yer browser's address bar:"
 
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/email_change.txt
@@ -7094,6 +7188,9 @@ msgid ""
 " any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the about section of the {platform_name} Courses web site."
 msgstr ""
+"If ye didn't ask fer this, ye need not do anything; you'll hear no more word"
+" from us.  Please don't be replyin' to this message; if ye be needin' "
+"assistance, please inquire upon the {platform_name} Courses isle.  Aaarrrgh!"
 
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/email_change.txt
@@ -7225,7 +7322,7 @@ msgstr ""
 
 #: lms/templates/emails/enroll_email_enrolledsubject.txt
 msgid "You have been enrolled in {course_name}"
-msgstr ""
+msgstr "Ye have been enlisted in the crew of {course_name}"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Hi {name}"
@@ -7252,10 +7349,12 @@ msgstr ""
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "If you have billing questions, please contact {billing_email}."
 msgstr ""
+"If ye have inquiries about the state o' yer dubloons, please inquire at "
+"{billing_email}."
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "-The {platform_name} Team"
-msgstr ""
+msgstr "-The {platform_name} Crew"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
@@ -7409,7 +7508,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Gender Distribution"
-msgstr ""
+msgstr "Distribution o' Genders"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
@@ -7686,11 +7785,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Enroll"
-msgstr ""
+msgstr "Enlist"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Unenroll"
-msgstr ""
+msgstr "Unenlist"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Beta Testers"
@@ -7736,7 +7835,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Staff"
-msgstr ""
+msgstr "Captains"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -7943,7 +8042,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore ALL students' problem submissions"
-msgstr ""
+msgstr "Rescore ALL yer crewmen's problem submissions"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -7977,6 +8076,8 @@ msgid ""
 "Don't see your preferred language? {link_start}Volunteer to become a "
 "translator!{link_end}"
 msgstr ""
+"Not be seein' yer preferred tongue? {link_start}Volunteer yerself to be an "
+"interpreter!{link_end}"
 
 #. Translators: this text gives status on if the modal interface (a menu or
 #. piece of UI that takes the full focus of the screen) is open or not
@@ -7994,11 +8095,11 @@ msgstr ""
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "Here are items that could potentially need your attention."
-msgstr ""
+msgstr "Here be some items that may be needin' yer attentions."
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "No items require attention at the moment."
-msgstr ""
+msgstr "No items be requirin' yer attention fer the moment."
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "{course_number} Flagged Open Ended Problems"
@@ -8036,7 +8137,7 @@ msgstr ""
 
 #: lms/templates/open_ended_problems/open_ended_problems.html
 msgid "Here is a list of open ended problems for this course."
-msgstr ""
+msgstr "Here be the listin' o' open ended problems fer this here course."
 
 #: lms/templates/open_ended_problems/open_ended_problems.html
 msgid "You have not attempted any open ended problems yet."
@@ -8065,9 +8166,17 @@ msgid ""
 msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
+#: lms/templates/peer_grading/peer_grading_closed.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Peer Grading"
+msgstr "Gradin' o' yer Crewmen"
+
+#: lms/templates/peer_grading/peer_grading.html
 msgid ""
 "Here are a list of problems that need to be peer graded for this course."
 msgstr ""
+"Here be the list o' problems that be needin' grades from crewmen for this "
+"course."
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Due date"
@@ -8130,6 +8239,8 @@ msgid ""
 "You have finished learning to grade, which means that you are now ready to "
 "start grading."
 msgstr ""
+"Ye have finished learnin' the ropes o' gradin', which means ye be ready to "
+"start gradin'."
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Start Grading!"
@@ -8142,6 +8253,7 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "You have not yet finished learning to grade this problem."
 msgstr ""
+"Ye have yet to finish learnin' the ropes o' gradin' this here problem."
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid ""
@@ -8157,7 +8269,7 @@ msgstr ""
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Start learning to grade"
-msgstr ""
+msgstr "Start learnin' the ropes o' gradin'"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Are you sure that you want to flag this submission?"
@@ -8185,7 +8297,7 @@ msgstr ""
 
 #: lms/templates/registration/activate_account_notice.html
 msgid "Thanks For Registering!"
-msgstr ""
+msgstr "Thank Ye Fer Enlisting!"
 
 #: lms/templates/registration/activate_account_notice.html
 msgid ""
@@ -8195,13 +8307,11 @@ msgstr ""
 
 #: lms/templates/registration/activation_complete.html
 msgid "Activation Complete!"
-msgstr ""
+msgstr "Yer on-board!"
 
 #: lms/templates/registration/activation_complete.html
 msgid "Account already active!"
-msgstr ""
-"Arrgh, account already active, Matey!  This is more text that isn't ready "
-"yet. I'm not sure of this text."
+msgstr "Arrgh, account already active, Matey!"
 
 #: lms/templates/registration/activation_complete.html
 msgid "You can now {link_start}log in{link_end}."
@@ -8209,7 +8319,7 @@ msgstr ""
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Activation Invalid"
-msgstr ""
+msgstr "Yer activation ain't quite thar yet."
 
 #: lms/templates/registration/activation_invalid.html
 msgid ""
@@ -8217,10 +8327,15 @@ msgid ""
 "e-mail programs will sometimes split it into two lines. If you still have "
 "issues, e-mail us to let us know what happened at {email}."
 msgstr ""
+"We be encounterin' some rough waters, matey. Check ye URL to make sure it "
+"was all above deck.  Some of them thar e-mail programs will be splittin' "
+"URLs into two lines. If ye still be havin' issues, e-mail us at {email} to "
+"be lettin' us know what happened."
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Or you can go back to the {link_start}home page{link_end}."
 msgstr ""
+"Or ye can turn yer back and return to {link_start}safer waters{link_end}."
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -8338,7 +8453,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Receipt (Order"
-msgstr ""
+msgstr "Proof o' Purchasin' (Order"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "You are now registered for: "
@@ -8442,7 +8557,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Go to your Dashboard"
-msgstr ""
+msgstr "Be Goin' to yer Main Deck"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Verified Status"
@@ -8513,7 +8628,7 @@ msgstr ""
 
 #: lms/templates/static_templates/embargo.html
 msgid "This Course Unavailable In Your Country"
-msgstr ""
+msgstr "This Course Be Unavailable In Yer Port o' Call"
 
 #: lms/templates/static_templates/embargo.html
 msgid ""
@@ -8570,7 +8685,7 @@ msgstr ""
 #: lms/templates/university_profile/edge.html
 #: lms/templates/university_profile/edge.html
 msgid "edX edge"
-msgstr ""
+msgstr "edX edge"
 
 #: lms/templates/university_profile/edge.html
 msgid "Log in to your courses"
@@ -8598,6 +8713,8 @@ msgid ""
 "To uphold the credibility of {platform} certificates, all name changes will "
 "be logged and recorded."
 msgstr ""
+"To uphold th' honor o' {platform} parchments, all changes to yer name will "
+"be noted in our captain's logs."
 
 #: lms/templates/verify_student/_modal_editname.html
 msgid "Change my name"
@@ -8648,7 +8765,7 @@ msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
-msgstr ""
+msgstr "Ye be registerin' fer"
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Upgrading to:"
@@ -8779,7 +8896,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Looks good"
-msgstr ""
+msgstr "Lookin' grand"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -8849,7 +8966,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Why do you need my photo?"
-msgstr ""
+msgstr "Why ye be needin' me picture?"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -8890,7 +9007,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Edit your name"
-msgstr ""
+msgstr "Be editin' yer name"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 msgid ""
@@ -8936,7 +9053,7 @@ msgstr ""
 
 #: lms/templates/verify_student/midcourse_reverification_confirmation.html
 msgid "Return to where you left off"
-msgstr ""
+msgstr "Sail back to yer last port o' call"
 
 #: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "Reverification Status"
@@ -9745,6 +9862,13 @@ msgstr ""
 #: cms/templates/index.html cms/templates/overview.html
 #: cms/templates/unit.html
 msgid "View Live"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid ""
+"Note: Pages are publicly visible. If users know the URL of a page, they can "
+"view the page even if they are not registered for or logged in to your "
+"course."
 msgstr ""
 
 #: cms/templates/edit-tabs.html
@@ -11469,15 +11593,15 @@ msgid ""
 msgstr ""
 
 #: cms/templates/unit.html
-msgid "This unit is scheduled to be released to <strong>students</strong>"
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> on "
+"<strong>{date}</strong> with the subsection {link_start}{name}{link_end}"
 msgstr ""
 
 #: cms/templates/unit.html
-msgid "on {date}"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "with the subsection {link_start}{name}{link_end}"
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> with the "
+"subsection {link_start}{name}{link_end}"
 msgstr ""
 
 #: cms/templates/unit.html
@@ -11743,7 +11867,7 @@ msgstr ""
 
 # empty
 msgid "This is a key string."
-msgstr ""
+msgstr "'tis be a key string"
 
 #: wiki/admin.py wiki/models/article.py
 msgid "created"

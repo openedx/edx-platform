@@ -12,6 +12,15 @@ function ($, _, IframeBinding) {
         iframe_html += '<embed type="application/x-shockwave-flash" src="http://www.youtube.com/embed/NHd27UvY-lw" height="315" width="560">';
         doc.body.innerHTML = iframe_html;
 
+        var verify_no_modification = function (src) {
+            iframe_html = '<iframe width="618" height="350" src="' + src + '" frameborder="0" allowfullscreen></iframe>';
+            doc.body.innerHTML = iframe_html;
+
+            IframeBinding.iframeBinding(doc);
+
+            expect($(doc).find("iframe")[0].src).toEqual(src);
+        };
+
         it("modifies src url of DOM iframe and embed elements when iframeBinding function is executed", function () {
             expect($(doc).find("iframe")[0].src).toEqual("http://www.youtube.com/embed/NHd27UvY-lw");
             expect($(doc).find("iframe")[1].src).toEqual("http://www.youtube.com/embed/NHd27UvY-lw?allowFullScreen=false");
@@ -35,12 +44,11 @@ function ($, _, IframeBinding) {
         });
 
         it("does not modify src url of DOM iframe if it is empty", function () {
-            iframe_html = '<iframe width="618" height="350" src="" frameborder="0" allowfullscreen></iframe>';
-            doc.body.innerHTML = iframe_html;
+            verify_no_modification("");
+        });
 
-            IframeBinding.iframeBinding(doc);
-
-            expect($(doc).find("iframe")[0].src).toEqual("");
+        it("does nothing on tinymce iframe", function () {
+            verify_no_modification("javascript:");
         });
     });
 });

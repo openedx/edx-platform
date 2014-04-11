@@ -7,10 +7,8 @@ describe 'Problem', ->
     @stubbedJax = root: jasmine.createSpyObj('jax.root', ['toMathML'])
     MathJax.Hub.getAllJax.andReturn [@stubbedJax]
     window.update_schematics = ->
-    # mock the screen reader alert
-    window.SR = 
-      readElts: `function(){}`
-      readText: `function(){}`
+    spyOn SR, 'readElts'
+    spyOn SR, 'readText'
 
     # Load this function from spec/helper.coffee
     # Note that if your test fails with a message like:
@@ -144,6 +142,10 @@ describe 'Problem', ->
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_check event', ->
+      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
+        promise =
+          always: (callable) -> callable()
+          done: (callable) -> callable()
       @problem.check()
       expect(Logger.log).toHaveBeenCalledWith 'problem_check', 'foo=1&bar=2'
 
@@ -153,11 +155,17 @@ describe 'Problem', ->
           success: 'correct'
           contents: 'mock grader response'
         callback(response)
+        promise =
+          always: (callable) -> callable()
+          done: (callable) -> callable()
       @problem.check()
       expect(Logger.log).toHaveBeenCalledWith 'problem_graded', ['foo=1&bar=2', 'mock grader response'], @problem.id
 
     it 'submit the answer for check', ->
-      spyOn $, 'postWithPrefix'
+      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
+        promise =
+          always: (callable) -> callable()
+          done: (callable) -> callable()
       @problem.check()
       expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_check',
           'foo=1&bar=2', jasmine.any(Function)
@@ -166,15 +174,23 @@ describe 'Problem', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
           callback(success: 'correct', contents: 'Correct!')
+          promise =
+            always: (callable) -> callable()
+            done: (callable) -> callable()
         @problem.check()
         expect(@problem.el.html()).toEqual 'Correct!'
+        expect(window.SR.readElts).toHaveBeenCalled()
 
     describe 'when the response is incorrect', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
           callback(success: 'incorrect', contents: 'Incorrect!')
+          promise =
+            always: (callable) -> callable()
+            done: (callable) -> callable()
         @problem.check()
         expect(@problem.el.html()).toEqual 'Incorrect!'
+        expect(window.SR.readElts).toHaveBeenCalled()
 
     # TODO: figure out why failing
     xdescribe 'when the response is undetermined', ->
@@ -237,11 +253,24 @@ describe 'Problem', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
         expect($('.show .show-label')).toHaveText 'Hide Answer'
+        expect(window.SR.readElts).toHaveBeenCalled()
 
       it 'add the showed class to element', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
         expect(@problem.el).toHaveClass 'showed'
+
+      it 'reads the answers', ->
+        runs ->
+          spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: 'answers')
+          @problem.show()
+
+        waitsFor (->
+          return jQuery.active == 0
+        ), "jQuery requests finished", 1000
+
+        runs ->
+          expect(window.SR.readElts).toHaveBeenCalled()
 
       describe 'multiple choice question', ->
         beforeEach ->
@@ -486,6 +515,17 @@ describe 'Problem', ->
       @problem.save()
       expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_save',
           'foo=1&bar=2', jasmine.any(Function)
+
+    it 'reads the save message', ->
+      runs ->
+        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback(success: 'OK')
+        @problem.save()
+      waitsFor (->
+        return jQuery.active == 0
+      ), "jQuery requests finished", 1000
+
+      runs ->
+        expect(window.SR.readElts).toHaveBeenCalled()
 
     # TODO: figure out why failing
     xit 'alert to the user', ->
