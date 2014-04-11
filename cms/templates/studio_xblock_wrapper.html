@@ -1,11 +1,11 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.conf import settings %>
+
 % if xblock.location != xblock_context['root_xblock'].location:
-  % if xblock.has_children:
-<section class="wrapper-xblock level-nesting" data-locator="${locator}" data-display-name="${xblock.display_name_with_default | h}" data-category="${xblock.category | h}">
-  % else:
-<section class="wrapper-xblock level-element" data-locator="${locator}" data-display-name="${xblock.display_name_with_default | h}" data-category="${xblock.category | h}">
-  % endif
+  <% section_class = "level-nesting" if xblock.has_children else "level-element" %>
+<section class="wrapper-xblock ${section_class}" data-locator="${locator}" data-display-name="${xblock.display_name_with_default | h}" data-category="${xblock.category | h}">
 % endif
+
     <header class="xblock-header">
         <div class="header-details">
             ${xblock.display_name_with_default | h}
@@ -13,12 +13,28 @@
         <div class="header-actions">
             <ul class="actions-list">
                 % if not xblock_context['read_only']:
-                <li class="action-item action-edit">
-                    <a href="#" class="edit-button action-button">
-                        <i class="icon-pencil"></i>
-                        <span class="action-button-text">${_("Edit")}</span>
-                    </a>
-                </li>
+                    <li class="action-item action-edit">
+                        <a href="#" class="edit-button action-button">
+                            <i class="icon-pencil"></i>
+                            <span class="action-button-text">${_("Edit")}</span>
+                        </a>
+                    </li>
+                % endif
+                %if settings.FEATURES.get('ENABLE_DUPLICATE_XBLOCK_LEAF_COMPONENT'):
+                    <li class="action-item action-duplicate">
+                        <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
+                            <i class="icon-copy"></i>
+                            <span class="sr">${_("Duplicate")}</span>
+                        </a>
+                    </li>
+                % endif
+                %if settings.FEATURES.get('ENABLE_DELETE_XBLOCK_LEAF_COMPONENT'):
+                    <li class="action-item action-delete">
+                        <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
+                            <i class="icon-trash"></i>
+                            <span class="sr">${_("Delete")}</span>
+                        </a>
+                    </li>
                 % endif
             </ul>
         </div>
@@ -26,6 +42,7 @@
     <article class="xblock-render">
 ${content}
     </article>
+
 % if xblock.location != xblock_context['root_xblock'].location:
 </section>
 % endif
