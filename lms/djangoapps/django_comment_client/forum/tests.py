@@ -80,7 +80,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         mock_from_django_user.return_value = Mock()
 
         url = reverse('django_comment_client.forum.views.followed_threads',
-                      kwargs={'course_id': self.course.id, 'user_id': '12345'})  # There is no user 12345
+                      kwargs={'course_id': self.course.id.to_deprecated_string(), 'user_id': '12345'})  # There is no user 12345
         self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 404)
 
@@ -273,7 +273,7 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
             reverse(
                 "django_comment_client.forum.views.single_thread",
                 kwargs={
-                    "course_id": self.course.id,
+                    "course_id": self.course.id.to_deprecated_string(),
                     "discussion_id": "dummy",
                     "thread_id": thread_id,
                 }
@@ -289,7 +289,7 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.client.get(
             reverse(
                 "django_comment_client.forum.views.forum_form_discussion",
-                kwargs={"course_id": self.course.id}
+                kwargs={"course_id": self.course.id.to_deprecated_string()}
             ),
         )
         self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
