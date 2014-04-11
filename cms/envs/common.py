@@ -321,6 +321,7 @@ PIPELINE_CSS = {
             'js/vendor/markitup/skins/simple/style.css',
             'js/vendor/markitup/sets/wiki/style.css',
             'css/vendor/ova/video-js.min.css',
+            'css/vendor/ova/token-input.css',
         ],
         'output_filename': 'css/cms-style-vendor.css',
     },

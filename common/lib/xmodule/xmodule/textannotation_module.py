@@ -7,7 +7,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 from xmodule.annotator_token import retrieve_token
-from xmodule.annotator_mixin import getInstructions, getExtension, ANNOTATOR_COMMON_JS, ANNOTATOR_COMMON_CSS
+from xmodule.annotator_mixin import get_instructions, ANNOTATOR_COMMON_JS, ANNOTATOR_COMMON_CSS
 import textwrap
 
 
@@ -73,10 +73,11 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
-        return getInstructions(xmltree)
+        return get_instructions(xmltree)
 
     def get_html(self):
         """ Renders parameters to template. """
+        print self
         context = {
             'display_name': self.display_name_with_default,
             'tag': self.instructor_tags,

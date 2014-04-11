@@ -1,5 +1,9 @@
 <%! from django.utils.translation import ugettext as _ %>
-
+<%namespace name='static' file='/static_content.html'/>
+  <%static:css group='style-vendor-tinymce-content'/>
+  <%static:css group='style-vendor-tinymce-skin'/>
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js')}">
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}">
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
 		% if display_name is not UNDEFINED and display_name is not None:
@@ -160,7 +164,6 @@
         },
     };
     
-    tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
 	var startova = function(){
     

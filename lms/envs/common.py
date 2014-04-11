@@ -813,6 +813,7 @@ PIPELINE_CSS = {
             'css/vendor/responsive-carousel/responsive-carousel.css',
             'css/vendor/responsive-carousel/responsive-carousel.slide.css',
             'css/vendor/ova/video-js.min.css',
+            'css/vendor/ova/token-input.css',
         ],
         'output_filename': 'css/lms-style-vendor.css',
     },

@@ -121,7 +121,6 @@ var KEY = {
 var methods = {
     init: function(url_or_data_or_function, options) {
         var settings = $.extend({}, DEFAULT_SETTINGS, options || {});
-
         return this.each(function () {
             $(this).data("tokenInputObject", new $.TokenList(this, url_or_data_or_function, settings));
         });
@@ -1092,7 +1091,7 @@ Annotator.Plugin.HighlightTags = (function(_super) {
     //The following allows you to edit the annotation popup when the viewer has already
     //hit submit and is just viewing the annotation.
 	HighlightTags.prototype.updateViewer = function(field, annotation) {
-		if (typeof annotation.tags != "undefined") {
+        if (typeof annotation.tags != "undefined") {
 			if (annotation.tags.length == 0) {
 				$(field).remove();
 				return;

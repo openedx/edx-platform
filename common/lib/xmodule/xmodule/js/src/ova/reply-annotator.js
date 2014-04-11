@@ -82,6 +82,7 @@ Annotator.Plugin.Reply = (function(_super) {
 				return self;
 			});
 		this.annotation = annotation;
+		$(field).remove();
 		//Create the actions for the buttons
 		return ret;
 	};
