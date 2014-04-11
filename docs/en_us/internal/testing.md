@@ -199,6 +199,74 @@ To run JavaScript tests in your default browser:
 These rake commands call through to a custom test runner.  For more info, see [js-test-tool](https://github.com/edx/js-test-tool).
 
 
+### Running Acceptance Tests (Bok Choy)
+
+We use [Bok Choy](http://bok-choy.readthedocs.org/en/latest/tutorial.html) for acceptance testing.
+Bok Choy is a UI-level acceptance test framework for writing robust [Selenium](http://docs.seleniumhq.org/) tests in [Python](https://www.python.org/).
+Bok Choy makes your acceptance tests reliable and maintainable by utilizing the Page Object and Promise design patterns.
+
+**Prerequisite**: You must have [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver) installed to run the tests in Chrome. The tests are confirmed to run with Chrome (not Chromium) version 28.0.1500.71 with ChromeDriver version 2.1.210398.
+
+To run all the acceptance tests:
+
+    rake test:bok_choy
+
+To run tests faster by not collecting static files, you can use:
+
+    rake test:bok_choy:fast
+
+To run single test:
+
+    rake test:bok_choy[TEST_FILE_NAME]
+    example
+    rake test:bok_choy[test_lms.py]
+
+To run single test faster by not collecting static files:
+
+    rake test:bok_choy:fast[TEST_FILE_NAME]
+    rake test:bok_choy:fast[test_lms.py]
+
+To test only specific feature:
+
+    rake test:bok_choy:fast[TEST_FILE_NAME:CLASS_NAME]
+    example
+    rake test:bok_choy[test_lms.py:RegistrationTest]
+
+To test only specific feature faster by not collecting static files:
+
+    rake test:bok_choy:fast[TEST_FILE_NAME:CLASS_NAME]
+    example
+    rake test:bok_choy:fast[test_lms.py:RegistrationTest]
+
+To test only specific scenario:
+
+    rake test:bok_choy:fast[TEST_FILE_NAME:CLASS_NAME.FUNCTION_NAME]
+    example
+    rake test:bok_choy[test_lms.py:RegistrationTest.test_register]
+
+To test only specific scenario faster by not collecting static files:
+
+    rake test:bok_choy:fast[TEST_FILE_NAME:CLASS_NAME.FUNCTION_NAME]
+    example
+    rake test:bok_choy:fast[test_lms.py:RegistrationTest.test_register]
+
+During acceptance test execution, log files are written to
+
+    test_root/log/bok_choy_lms.log
+    test_root/log/bok_choy_ora.log
+    test_root/log/bok_choy_studio.log
+    test_root/log/bok_choy_xqueue.log
+    test_root/log/bok_choy_comments.log
+
+Failed test's screenshots are saved to:
+
+    test_root/log
+
+To put a debugging breakpoint in a test use:
+
+    from nose.tools import set_trace; set_trace()
+
+
 ### Running Acceptance Tests
 
 We use [Lettuce](http://lettuce.it/) for acceptance testing.
