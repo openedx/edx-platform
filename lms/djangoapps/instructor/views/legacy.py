@@ -1056,14 +1056,14 @@ def _list_course_forum_members(course_key, rolename, datatable):
     )
     datatable['data'] = []
     try:
-        role = Role.objects.get(name=rolename, course_id=course_key.to_deprecated_string())
+        role = Role.objects.get(name=rolename, course_id=course_key)
     except Role.DoesNotExist:
         return '<font color="red">' + _('Error: unknown rolename "{rolename}"').format(rolename=rolename) + '</font>'
     uset = role.users.all().order_by('username')
     msg = 'Role = {0}'.format(rolename)
     log.debug('role={0}'.format(rolename))
     datatable['data'] = [[x.username, x.profile.name, ', '.join([
-        r.name for r in x.roles.filter(course_id=course_key.to_deprecated_string()).order_by('name')
+        r.name for r in x.roles.filter(course_id=course_key).order_by('name')
     ])] for x in uset]
     return msg
 
@@ -1099,7 +1099,7 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
             msg = '<font color="red">' + _('Error: user "{username}" does not have rolename "{rolename}", cannot remove').format(username=uname, rolename=rolename) + '</font>'
         else:
             user.roles.remove(role)
-            msg = '<font color="green">' + _('Removed "{username}" from "{course_id}" forum role = "{rolename}"').format(username=user, course_id=course.id, rolename=rolename) + '</font>'
+            msg = '<font color="green">' + _('Removed "{username}" from "{course_id}" forum role = "{rolename}"').format(username=user, course_id=course.id.to_deprecated_string(), rolename=rolename) + '</font>'
     else:
         if alreadyexists:
             msg = '<font color="red">' + _('Error: user "{username}" already has rolename "{rolename}", cannot add').format(username=uname, rolename=rolename) + '</font>'
@@ -1108,7 +1108,7 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
                 msg = '<font color="red">' + _('Error: user "{username}" should first be added as staff before adding as a forum administrator, cannot add').format(username=uname) + '</font>'
             else:
                 user.roles.add(role)
-                msg = '<font color="green">' + _('Added "{username}" to "{course_id}" forum role = "{rolename}"').format(username=user, course_id=course.id, rolename=rolename) + '</font>'
+                msg = '<font color="green">' + _('Added "{username}" to "{course_id}" forum role = "{rolename}"').format(username=user, course_id=course.id.to_deprecated_string(), rolename=rolename) + '</font>'
 
     return msg
 
