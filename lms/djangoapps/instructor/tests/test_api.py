@@ -413,7 +413,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_enroll_with_email_not_registered(self):
         registration_url = self.request.build_absolute_uri(reverse('student.views.register_user'))
-        about_url = self.request.build_absolute_uri(reverse('about_course', args=[course.id.to_deprecated_string()]))
+        about_url = self.request.build_absolute_uri(reverse('about_course', args=[self.course.id.to_deprecated_string()]))
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
         print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
@@ -440,6 +440,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True})
         print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
         self.assertEqual(response.status_code, 200)
+        registration_url = self.request.build_absolute_uri(reverse('student.views.register_user'))
 
         # Check the outbox
         self.assertEqual(len(mail.outbox), 1)
@@ -449,11 +450,11 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To finish your registration, please visit https://edx.org/register and fill out the registration form "
+            ("Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "To finish your registration, please visit {registration_url} and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, you will see Robot Super Course listed on your dashboard.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org").format(registration_url=registration_url)
         )
 
     def test_unenroll_without_email(self):
@@ -766,7 +767,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         response = self.client.get(url, {'emails': self.beta_tester.email, 'action': 'remove', 'email_students': False})
         self.assertEqual(response.status_code, 200)
 
-        self.assertFalse(CourseBetaTesterRole(self.course.location).has_user(self.beta_tester))
+        self.assertFalse(CourseBetaTesterRole(self.course.id).has_user(self.beta_tester))
 
         # test the response data
         expected = {
@@ -790,7 +791,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         response = self.client.get(url, {'emails': self.beta_tester.email, 'action': 'remove', 'email_students': True})
         self.assertEqual(response.status_code, 200)
 
-        self.assertFalse(CourseBetaTesterRole(self.course.location).has_user(self.beta_tester))
+        self.assertFalse(CourseBetaTesterRole(self.course.id).has_user(self.beta_tester))
 
         # test the response data
         expected = {
