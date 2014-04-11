@@ -74,8 +74,8 @@ urlpatterns += patterns(
         r'(?ix)^course_info_update/{}(/)?(?P<provided_id>\d+)?$'.format(parsers.URL_RE_SOURCE),
         'course_info_update_handler'
         ),
-    url(r'(?i)^course$', 'course_handler'),
-    url(r'(?i)^course($|/)(?P<course_key_string>[^/]+)$', 'course_handler'),
+    url(r'^course$', 'course_handler'),
+    url(r'^course/(?P<course_key_string>[^/]+)$', 'course_handler', name='course_detail'),
     url(r'(?ix)^subsection($|/){}$'.format(parsers.URL_RE_SOURCE), 'subsection_handler'),
     url(r'(?ix)^unit($|/){}$'.format(parsers.URL_RE_SOURCE), 'unit_handler'),
     url(r'(?ix)^container($|/){}$'.format(parsers.URL_RE_SOURCE), 'container_handler'),

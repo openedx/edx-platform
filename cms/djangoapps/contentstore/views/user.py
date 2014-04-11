@@ -118,7 +118,7 @@ def _course_team_user(request, course_key, email):
             "role": None,
         }
         # what's the highest role that this user has? (How should this report global staff?)
-        for role in [CourseInstructorRole(locator.course_key), CourseStaffRole(locator.course_key)]:
+        for role in [CourseInstructorRole(course_key), CourseStaffRole(course_key)]:
             if role.has_user(user):
                 msg["role"] = role.ROLE
                 break
@@ -133,11 +133,11 @@ def _course_team_user(request, course_key, email):
 
     if request.method == "DELETE":
         try:
-            try_remove_instructor(request, locator, user)
+            try_remove_instructor(request, course_key, user)
         except CannotOrphanCourse as oops:
             return JsonResponse(oops.msg, 400)
 
-        auth.remove_users(request.user, CourseStaffRole(locator.course_key), user)
+        auth.remove_users(request.user, CourseStaffRole(course_key), user)
         return JsonResponse()
 
     # all other operations require the requesting user to specify a role
@@ -146,25 +146,25 @@ def _course_team_user(request, course_key, email):
         return JsonResponse({"error": _("`role` is required")}, 400)
 
     if role == "instructor":
-        if not has_course_access(request.user, locator.course_key, role=CourseInstructorRole):
+        if not has_course_access(request.user, course_key, role=CourseInstructorRole):
             msg = {
                 "error": _("Only instructors may create other instructors")
             }
             return JsonResponse(msg, 400)
-        auth.add_users(request.user, CourseInstructorRole(locator.course_key), user)
+        auth.add_users(request.user, CourseInstructorRole(course_key), user)
         # auto-enroll the course creator in the course so that "View Live" will work.
-        CourseEnrollment.enroll(user, locator.course_key)
+        CourseEnrollment.enroll(user, course_key)
     elif role == "staff":
         # add to staff regardless (can't do after removing from instructors as will no longer
         # be allowed)
-        auth.add_users(request.user, CourseStaffRole(locator.course_key), user)
+        auth.add_users(request.user, CourseStaffRole(course_key), user)
         try:
-            try_remove_instructor(request, locator, user)
+            try_remove_instructor(request, course_key, user)
         except CannotOrphanCourse as oops:
             return JsonResponse(oops.msg, 400)
 
         # auto-enroll the course creator in the course so that "View Live" will work.
-        CourseEnrollment.enroll(user, locator.course_key)
+        CourseEnrollment.enroll(user, course_key)
 
     return JsonResponse()
 
@@ -178,11 +178,11 @@ class CannotOrphanCourse(Exception):
         Exception.__init__(self)
 
 
-def try_remove_instructor(request, locator, user):
+def try_remove_instructor(request, course_key, user):
 
     # remove all roles in this course from this user: but fail if the user
     # is the last instructor in the course team
-    instructors = CourseInstructorRole(locator.course_key)
+    instructors = CourseInstructorRole(course_key)
     if instructors.has_user(user):
         if instructors.users_with_role().count() == 1:
             msg = {"error": _("You may not remove the last instructor from a course")}

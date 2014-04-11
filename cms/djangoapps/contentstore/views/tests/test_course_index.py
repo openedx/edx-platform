@@ -73,8 +73,8 @@ class TestCourseIndex(CourseTestCase):
         course_staff_client, course_staff = self.create_non_staff_authed_user_client()
         for course in [self.course, self.odd_course]:
             permission_url = reverse('course_team', kwargs={
-                "course_key_string": unicode(course.id),
-                "email": course_staff.email
+                'course_key_string': unicode(course.id),
+                'email': course_staff.email
             })
 
             self.client.post(

@@ -4,8 +4,6 @@ Views related to operations on course objects
 import json
 import random
 import string  # pylint: disable=W0402
-import re
-import bson
 
 from django.db.models import Q
 from django.utils.translation import ugettext as _
@@ -23,10 +21,8 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
-from xmodule.modulestore.keys import CourseKey
 
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
-from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
@@ -57,7 +53,7 @@ from student.models import CourseEnrollment
 from student.roles import CourseRole
 
 from xmodule.html_module import AboutDescriptor
-from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
+from xmodule.modulestore.locator import CourseLocator
 from xmodule.modulestore.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
@@ -241,24 +237,15 @@ def course_listing(request):
             # so fallback to iterating through all courses
             courses = _accessible_courses_list(request)
 
-            # update location entry in "loc_mapper" for user courses (add keys 'lower_id' and 'lower_course_id')
-            for course in courses:
-                loc_mapper().create_map_entry(course.id)
-
     def format_course_for_view(course):
         """
         return tuple of the data which the view requires for each course
         """
-        # published = false b/c studio manipulates draft versions not b/c the course isn't pub'd
-        course_loc = loc_mapper().translate_location(
-            course.location,
-            published=False,
-            add_entry_if_missing=True,
-        )
         return (
             course.display_name,
-            # note, couldn't get django reverse to work; so, wrote workaround
-            course_loc.url_reverse('course/', ''),
+            reverse('course_detail', kwargs={
+                'course_key_string': unicode(course.id),
+                }),
             get_lms_link_for_item(course.location, course.id),
             course.display_org_with_default,
             course.display_number_with_default,
