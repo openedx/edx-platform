@@ -1270,6 +1270,8 @@ def _msk_from_problem_urlname(course_id, urlname):
     Convert a 'problem urlname' (name that instructor's input into dashboard)
     to a module state key (db field)
     """
+    if not isinstance(course_id, CourseKey):
+        raise ValueError
     if urlname.endswith(".xml"):
         urlname = urlname[:-4]
 
