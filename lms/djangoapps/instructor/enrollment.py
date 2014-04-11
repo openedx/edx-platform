@@ -221,8 +221,8 @@ def get_email_params(course, auto_enroll):
         'registration_url': registration_url,
         'course': course,
         'auto_enroll': auto_enroll,
-        'course_url': 'https://' + stripped_site_name + '/courses/' + course.id,
-        'course_about_url': 'https://' + stripped_site_name + '/courses/' + course.id + '/about',
+        'course_url': reverse('course_root', kwargs={'course_id': course.id.to_deprecated_string()}),
+        'course_about_url': reverse('about_course', args=[course.id.to_deprecated_string()]),
         'is_shib_course': is_shib_course,
     }
     return email_params
