@@ -36,19 +36,21 @@
   </p>
 
   <div class="enroll-option">
-    <input type="checkbox" name="auto-enroll" value="Auto-Enroll">
+    <input type="checkbox" name="auto-enroll" value="Auto-Enroll" checked="yes">
     <label for="auto-enroll">${_("Auto Enroll")}</label>
     <div class="hint auto-enroll-hint">
       <span class="hint-caret"></span>
       <p> 
 	${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
 	${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
+	<br /><br />
+	${_("Checking this box has no effect if 'Unenroll' is selected.")}
       </p>
     </div>
   </div>
 
   <div class="enroll-option">
-    <input type="checkbox" name="email-students" value="Notify-students-by-email">
+    <input type="checkbox" name="email-students" value="Notify-students-by-email" checked="yes">
     <label for="email-students">${_("Notify users by email")}</label>
     <div class="hint email-students-hint">
       <span class="hint-caret"></span>
@@ -79,7 +81,7 @@
   </p>
 
   <div class="enroll-option">
-    <input type="checkbox" name="email-students" value="Notify-students-by-email">
+    <input type="checkbox" name="email-students" value="Notify-students-by-email" checked="yes">
     <label for="email-students-beta">${_("Notify users by email")}</label>
     <div class="hint email-students-beta-hint">
       <span class="hint-caret"></span>
