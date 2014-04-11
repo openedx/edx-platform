@@ -18,6 +18,7 @@ from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from django_comment_common.utils import seed_permissions_roles
 from django.core import mail
 from django.utils.timezone import utc
+from django.test import RequestFactory
 
 from django.contrib.auth.models import User
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -258,6 +259,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     job of test_enrollment. This tests the response and action switch.
     """
     def setUp(self):
+        self.request = RequestFactory().request()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -365,6 +367,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # test that the user is now enrolled
         user = User.objects.get(email=self.notenrolled_student.email)
         self.assertTrue(CourseEnrollment.is_enrolled(user, self.course.id))
+        course_url = self.request.build_absolute_uri(reverse('course_root', kwargs={'course_id': self.course.id.to_deprecated_string()}))
 
         # test the response data
         expected = {
@@ -400,15 +403,17 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear NotEnrolled Student\n\nYou have been enrolled in Robot Super Course "
+            ("Dear NotEnrolled Student\n\nYou have been enrolled in Robot Super Course "
             "at edx.org by a member of the course staff. "
             "The course should now appear on your edx.org dashboard.\n\n"
             "To start accessing course materials, please visit "
-            "https://edx.org/courses/MITx/999/Robot_Super_Course\n\n----\n"
-            "This email was automatically sent from edx.org to NotEnrolled Student"
+            "{site_url}\n\n----\n"
+            "This email was automatically sent from edx.org to NotEnrolled Student").format(site_url=course_url)
         )
 
     def test_enroll_with_email_not_registered(self):
+        registration_url = self.request.build_absolute_uri(reverse('student.views.register_user'))
+        about_url = self.request.build_absolute_uri(reverse('about_course', args=[course.id.to_deprecated_string()]))
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
         print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
@@ -422,12 +427,12 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To finish your registration, please visit https://edx.org/register and fill out the registration form "
+            ("Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "To finish your registration, please visit {registration_url} and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, "
-            "visit https://edx.org/courses/MITx/999/Robot_Super_Course/about to join the course.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+            "visit {about_url} to join the course.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org").format(registration_url=registration_url, about_url=about_url)
         )
 
     def test_enroll_with_email_not_registered_autoenroll(self):
@@ -605,7 +610,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course/about and register for the course.\n\n----\n"
+            "To access the course visit " + self.request.build_absolute_uri(reverse('about_course', args=[self.course.id.to_deprecated_string()])) + " and register for the course.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
         )
 
@@ -628,7 +633,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course and login.\n\n----\n"
+            "To access the course visit " + self.request.build_absolute_uri(reverse('course_root', kwargs={'course_id': self.course.id.to_deprecated_string()})) + " and login.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
         )
 
