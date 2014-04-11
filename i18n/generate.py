@@ -47,6 +47,12 @@ def merge(locale, target='django.po', sources=('django-partial.po',), fail_if_mi
             return
         raise e
 
+    for sourse in sources:
+        clean_cmd = 'msgattrib --translated -o clean-' + sourse + ' ' + sourse
+        execute(clean_cmd, working_directory=locale_directory)
+
+    sources = ['clean-' + source for source in sources]
+
     # merged file is merged.po
     merge_cmd = 'msgcat -o merged.po ' + ' '.join(sources)
     execute(merge_cmd, working_directory=locale_directory)
