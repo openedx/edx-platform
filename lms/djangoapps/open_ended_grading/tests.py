@@ -446,8 +446,8 @@ class TestPanel(ModuleStoreTestCase):
 
     def setUp(self):
         # Toy courses should be loaded
-        self.course_name = CourseKey.from_string('edX/open_ended/2012_Fall')
-        self.course = modulestore().get_course(self.course_name)
+        self.course_key = CourseKey.from_string('edX/open_ended/2012_Fall')
+        self.course = modulestore().get_course(self.course_key)
         self.user = factories.UserFactory()
 
     def test_open_ended_panel(self):
@@ -484,8 +484,8 @@ class TestPeerGradingFound(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        self.course_name = CourseKey.from_string('edX/open_ended_nopath/2012_Fall')
-        self.course = modulestore().get_course(self.course_name)
+        self.course_key = CourseKey.from_string('edX/open_ended_nopath/2012_Fall')
+        self.course = modulestore().get_course(self.course_key)
 
     def test_peer_grading_nopath(self):
         """
@@ -505,8 +505,8 @@ class TestStudentProblemList(ModuleStoreTestCase):
 
     def setUp(self):
         # Load an open ended course with several problems.
-        self.course_name = CourseKey.from_string('edX/open_ended/2012_Fall')
-        self.course = modulestore().get_course(self.course_name)
+        self.course_key = CourseKey.from_string('edX/open_ended/2012_Fall')
+        self.course = modulestore().get_course(self.course_key)
         self.user = factories.UserFactory()
         # Enroll our user in our course and make them an instructor.
         make_instructor(self.course, self.user.email)
