@@ -44,8 +44,8 @@ VIDEO_MENUS = {
     'download_transcript': '.video-tracks .a11y-menu-list',
 }
 
-WAIT_TIMEOUT = 60
-WAIT_TRY_LIMIT = 10
+WAIT_TIMEOUT = 300
+WAIT_TRY_LIMIT = None
 WAIT_TRY_INTERVAL = 20
 
 
@@ -210,8 +210,6 @@ class VideoPage(PageObject):
 
         captions_css = CSS_CLASS_NAMES['captions']
 
-        # from nose.tools import set_trace; set_trace()
-
         def _captions_text():
             """
             Extract captions text.
@@ -336,7 +334,6 @@ class VideoPage(PageObject):
         :param text_to_search: str
         :return: bool
         """
-        from nose.tools import set_trace; set_trace()
         # check if we have a transcript with correct format
         if '.' + transcript_format not in self.q(css='.video-tracks .a11y-menu-button').text[0]:
             return False
