@@ -113,6 +113,9 @@ FEATURES = {
     # with Shib.  Feature was requested by Stanford's office of general counsel
     'SHIB_DISABLE_TOS': False,
 
+    # Allows to configure the LMS to provide CORS headers to serve requests from other domains
+    'ENABLE_CORS_HEADERS': False,
+
     # Can be turned off if course lists need to be hidden. Effects views and templates.
     'COURSES_ARE_BROWSABLE': True,
 
@@ -1242,6 +1245,14 @@ if FEATURES.get('AUTH_USE_CAS'):
     )
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+
+############# CORS headers for cross-domain requests #################
+
+if FEATURES.get('ENABLE_CORS_HEADERS'):
+    INSTALLED_APPS += ('corsheaders',)
+    MIDDLEWARE_CLASSES += ('corsheaders.middleware.CorsMiddleware',)
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ORIGIN_WHITELIST = ('')
 
 ###################### Registration ##################################
 
