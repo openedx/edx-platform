@@ -138,7 +138,7 @@ function (Sjson, AsyncProcess) {
         onContainerMouseEnter: function (event) {
             event.preventDefault();
 
-            $(event.currentTarget).addClass('open');
+            $(event.currentTarget).addClass('is-opened');
         },
 
         /**
@@ -149,7 +149,7 @@ function (Sjson, AsyncProcess) {
         onContainerMouseLeave: function (event) {
             event.preventDefault();
 
-            $(event.currentTarget).removeClass('open');
+            $(event.currentTarget).removeClass('is-opened');
         },
 
         /**
@@ -364,7 +364,7 @@ function (Sjson, AsyncProcess) {
                     link = $('<a href="javascript:void(0);">' + label + '</a>');
 
                 if (currentLang === code) {
-                    li.addClass('active');
+                    li.addClass('is-active');
                 }
 
                 li.append(link);
@@ -381,9 +381,9 @@ function (Sjson, AsyncProcess) {
                 if (state.lang !== langCode) {
                     state.lang = langCode;
                     state.storage.setItem('language', langCode);
-                    el  .addClass('active')
+                    el  .addClass('is-active')
                         .siblings('li')
-                        .removeClass('active');
+                        .removeClass('is-active');
 
                     self.fetchCaption();
                 }
