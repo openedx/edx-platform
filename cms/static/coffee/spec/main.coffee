@@ -25,8 +25,8 @@ requirejs.config({
         "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
-        "tinymce": "xmodule_js/common_static/js/vendor/tiny_mce/tiny_mce",
-        "jquery.tinymce": "xmodule_js/common_static/js/vendor/tiny_mce/jquery.tinymce",
+        "tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min",
+        "jquery.tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce",
         "xmodule": "xmodule_js/src/xmodule",
         "xblock/cms.runtime.v1": "coffee/src/xblock/cms.runtime.v1",
         "xblock": "xmodule_js/common_static/coffee/src/xblock",
@@ -207,16 +207,17 @@ define([
     "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",
     "js/spec/video/transcripts/file_uploader_spec",
 
-    "js/spec/models/explicit_url_spec"
+    "js/spec/models/explicit_url_spec",
 
+    "js/spec/utils/drag_and_drop_spec",
     "js/spec/utils/handle_iframe_binding_spec",
     "js/spec/utils/module_spec",
 
     "js/spec/views/baseview_spec",
     "js/spec/views/paging_spec",
 
-    "js/spec/views/unit_spec"
-    "js/spec/views/xblock_spec"
+    "js/spec/views/unit_spec",
+    "js/spec/views/xblock_spec",
 
     # these tests are run separate in the cms-squire suite, due to process
     # isolation issues with Squire.js

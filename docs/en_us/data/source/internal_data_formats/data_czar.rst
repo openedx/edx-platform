@@ -25,8 +25,7 @@ making a secure transfer of the data to the research team. Typically, the data
 team includes members in the following roles (or a data czar with these skill
 sets):
 
-* Database administrators work with the SQL and NoSQL data files and write
- queries on the data.
+* Database administrators work with the SQL and NoSQL data files and write queries on the data.
 
 * Statisticians and data analysts mine the data.
 

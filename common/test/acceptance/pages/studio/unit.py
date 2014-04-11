@@ -3,7 +3,7 @@ Unit page in Studio
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise
+from bok_choy.promise import EmptyPromise, Promise
 
 from . import BASE_URL
 from .container import ContainerPage
@@ -24,12 +24,19 @@ class UnitPage(PageObject):
         return "{}/unit/{}".format(BASE_URL, self.unit_locator)
 
     def is_browser_on_page(self):
-        # Wait until all components have been loaded
-        number_of_leaf_xblocks = len(self.q(css='{} .xblock-student_view'.format(Component.BODY_SELECTOR)).results)
-        number_of_container_xblocks = len(self.q(css='{} .wrapper-xblock'.format(Component.BODY_SELECTOR)).results)
+
+        def _is_finished_loading():
+            # Wait until all components have been loaded
+            number_of_leaf_xblocks = len(self.q(css='{} .xblock-student_view'.format(Component.BODY_SELECTOR)).results)
+            number_of_container_xblocks = len(self.q(css='{} .wrapper-xblock'.format(Component.BODY_SELECTOR)).results)
+            is_done = len(self.q(css=Component.BODY_SELECTOR).results) == number_of_leaf_xblocks + number_of_container_xblocks
+            return (is_done, is_done)
+
+        # First make sure that an element with the view-unit class is present on the page,
+        # and then wait to make sure that the xblocks are all there
         return (
             self.q(css='body.view-unit').present and
-            len(self.q(css=Component.BODY_SELECTOR).results) == number_of_leaf_xblocks + number_of_container_xblocks
+            Promise(_is_finished_loading, 'Finished rendering the xblocks in the unit.').fulfill()
         )
 
     @property

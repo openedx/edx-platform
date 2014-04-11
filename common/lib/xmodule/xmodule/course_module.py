@@ -224,6 +224,7 @@ class CourseFields(object):
                           scope=Scope.content)
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", default="Empty", display_name="Display Name", scope=Scope.settings)
+    course_edit_method = String(help="Method with which this course is edited.", default="Studio", scope=Scope.settings)
     show_chat = Boolean(help="Whether to show the chat widget in this course", default=False, scope=Scope.settings)
     tabs = CourseTabList(help="List of tabs to enable in this course", scope=Scope.settings, default=[])
     end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)

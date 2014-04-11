@@ -1252,9 +1252,9 @@ def _msk_from_problem_urlname(course_id, urlname):
         urlname = urlname[:-4]
 
     # Combined open ended problems also have state that can be deleted.  However,
-    # appending "problem" will only allow capa problems to be reset.
-    # Get around this for combinedopenended problems.
-    if "combinedopenended" not in urlname:
+    # prepending "problem" will only allow capa problems to be reset.
+    # Get around this for xblock problems.
+    if "/" not in urlname:
         urlname = "problem/" + urlname
 
     parts = Location.parse_course_id(course_id)

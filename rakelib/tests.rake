@@ -33,6 +33,10 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
         default_test_id += " #{system}/lib/*"
     end
 
+    if system == :lms
+        default_test_id += " #{system}/tests.py"
+    end
+
     if test_id.nil?
         test_id = default_test_id
 

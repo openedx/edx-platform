@@ -221,6 +221,8 @@ LOGGING = get_logger_config(LOG_DIR,
                             debug=False,
                             service_variant=SERVICE_VARIANT)
 
+LOGGING['loggers'].setdefault('codejail.jail_code', {})['level'] = 'DEBUG'
+
 COURSE_LISTINGS = ENV_TOKENS.get('COURSE_LISTINGS', {})
 SUBDOMAIN_BRANDING = ENV_TOKENS.get('SUBDOMAIN_BRANDING', {})
 VIRTUAL_UNIVERSITIES = ENV_TOKENS.get('VIRTUAL_UNIVERSITIES', [])
@@ -391,5 +393,9 @@ TIME_ZONE_DISPLAYED_FOR_DEADLINES = ENV_TOKENS.get("TIME_ZONE_DISPLAYED_FOR_DEAD
 ##### X-Frame-Options response header settings #####
 X_FRAME_OPTIONS = ENV_TOKENS.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)
 
+
 ##### Third-party auth options ################################################
 THIRD_PARTY_AUTH = AUTH_TOKENS.get('THIRD_PARTY_AUTH', THIRD_PARTY_AUTH)
+
+##### ADVANCED_SECURITY_CONFIG #####
+ADVANCED_SECURITY_CONFIG = ENV_TOKENS.get('ADVANCED_SECURITY_CONFIG', {})

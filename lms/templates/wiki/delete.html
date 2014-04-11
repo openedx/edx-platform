@@ -7,24 +7,24 @@
 {% block wiki_contents %}
   <section class="delete">
   <h1 class="page-header">{% trans "Delete" %} "{{ article.current_revision.title }}"</h1>
-  
+
   {% if cannot_delete_root %}
     <p class="lead">{% trans "You cannot delete a root article." %}</p>
     <p><a href="{% url 'wiki:get' path=urlpath.path article_id=article.id %}">{% trans "Go back" %}</a></p>
   {% else %}
-  
+
     {% if cannot_delete_children %}
-      
+
       <p class="alert alert-error"><strong>{% trans "You cannot delete this article because you do not have permission to delete articles with children. Try to remove the children manually one-by-one." %}</strong></p>
-      
+
     {% endif %}
-      
+
     {% if delete_children %}
 
       <p class="lead">{% trans "You are deleting an article. This means that its children will be deleted as well. If you choose to purge, children will also be purged!" %}</p>
-      
+
       <h2>{% trans "Articles that will be deleted" %}</h2>
-      
+
       <ul>
         {% for child in delete_children %}
         <li><a href="{% url 'wiki:get' article_id=child.article.id %}" target="_blank">{{ child.article }}</a></li>
@@ -33,9 +33,9 @@
         {% endif %}
         {% endfor %}
       </ul>
-    
+
     {% endif %}
-    
+
     {% if not cannot_delete_children %}
     <p class="lead">{% trans "You are deleting an article. Please confirm." %}</p>
 
@@ -46,17 +46,17 @@
       </script>
       <div class="form-actions">
           <button type="submit" name="save_changes" class="btn btn-danger btn-large">
-            <span class="icon-plus"></span>
+            <i class="icon-remove"></i>
             {% trans "Delete article" %}
           </button>
           <a href="{% url 'wiki:get' path=urlpath.path article_id=article.id %}" class="btn btn-large back">
-            <span class="icon-circle-arrow-left"></span>
+            <i class="icon-circle-arrow-left"></i>
             {% trans "Go back" %}
           </a>
-      </div>  
+      </div>
     </form>
     {% endif %}
- 
+
   {% endif %}
   </section>
 

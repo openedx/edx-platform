@@ -36,6 +36,10 @@ class InheritanceMixin(XBlockMixin):
         default=None,
         scope=Scope.user_state,
     )
+    course_edit_method = String(
+        help="Method with which this course is edited.",
+        default="Studio", scope=Scope.settings
+    )
     giturl = String(
         help="url root for course data git repository",
         scope=Scope.settings,

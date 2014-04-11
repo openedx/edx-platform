@@ -8,6 +8,7 @@
 # gianlorenzo <gianlo86@gmail.com>, 2013
 # gimbo <gianmarco.bonavolonta@tlc.uniroma3.it>, 2014
 # gimbo <gianmarco.bonavolonta@tlc.uniroma3.it>, 2014
+# caesar2164, 2014
 # marcore <mrc.re@tiscali.it>, 2014
 # Monica Crapanzano <m.crapanzano@estartup.it>, 2013
 # Monica Crapanzano <m.crapanzano@estartup.it>, 2013
@@ -29,8 +30,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-31 09:26-0400\n"
-"PO-Revision-Date: 2014-03-24 14:25+0000\n"
+"POT-Creation-Date: 2014-04-07 10:06-0400\n"
+"PO-Revision-Date: 2014-04-01 20:11+0000\n"
 "Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: Italian (Italy) (http://www.transifex.com/projects/p/edx-platform/language/it_IT/)\n"
 "MIME-Version: 1.0\n"
@@ -267,14 +268,14 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value)s ora"
+msgstr[1] "%(value)s ore"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value)s minuto"
+msgstr[1] "%(value)s minuti"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
@@ -284,7 +285,7 @@ msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Volume"
-msgstr ""
+msgstr "Volume"
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
@@ -553,57 +554,57 @@ msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr ""
+msgstr "meno di un minuto"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr ""
+msgstr "circa un minuto"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minuto"
+msgstr[1] "%d minuti"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr ""
+msgstr "circa un ora"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "circa %d ora"
+msgstr[1] "circa %d ore"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
-msgstr ""
+msgstr "un giorno"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d giorno"
+msgstr[1] "%d giorni"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr ""
+msgstr "circa un mese"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d mese"
+msgstr[1] "%d mesi"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr ""
+msgstr "circa un anno"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d anno"
+msgstr[1] "%d anni"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Available %s"
@@ -688,12 +689,13 @@ msgstr ""
 msgid ""
 "January|February|March|April|May|June|July|August|September|October|November|December"
 msgstr ""
+"Gennaio|Febbraio|Marzo|Aprile|Maggio|Giugno|Luglio|Agosto|Settembre|Ottobre|Novembre|Dicembre"
 
 #. Translators: abbreviations for days of the week, keep the pipe (|)
 #. separators.
 #: lms/static/admin/js/calendar.js
 msgid "S|M|T|W|T|F|S"
-msgstr ""
+msgstr "D|L|M|M|G|V|S"
 
 #: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
 #: lms/static/admin/js/collapse.min.js
@@ -707,7 +709,7 @@ msgstr ""
 #. Translators: the names of days, keep the pipe (|) separators.
 #: lms/static/admin/js/dateparse.js
 msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr ""
+msgstr "Domenica|Lunedì|Martedì|Mercoledì|Giovedì|Venerdì|Sabato"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
@@ -1359,10 +1361,9 @@ msgstr ""
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
 #: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
-#: cms/static/js/models/section.js cms/static/js/views/asset.js
-#: cms/static/js/views/course_info_handout.js
+#: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
+#: cms/static/js/views/asset.js cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
-#: cms/static/js/views/overview.js.c
 msgid "Saving&hellip;"
 msgstr "Salvataggio in Corso&hellip;"
 
@@ -1696,3 +1697,13 @@ msgstr "Carica l'immagine del tuo corso"
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
 msgstr "I file devono essere in formato JPEG o PNG."
+
+#: cms/static/js/views/video/translations_editor.js
+msgid ""
+"Sorry, there was an error parsing the subtitles that you uploaded. Please "
+"check the format and try again."
+msgstr ""
+
+#: cms/static/js/views/video/translations_editor.js
+msgid "Upload translation."
+msgstr ""

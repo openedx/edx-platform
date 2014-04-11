@@ -26,6 +26,7 @@
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # tosti <tosti.chiang@gmail.com>, 2013
+# Xaver Y.R. Chen  <yrchen@atcity.org>, 2014
 # Xaver Y.R. Chen  <yrchen@atcity.org>, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)
@@ -36,6 +37,7 @@
 # tosti <tosti.chiang@gmail.com>, 2013
 # JoeyChiou <Joeyc0916@gmail.com>, 2013
 # JoeyChiou <Joeyc0916@gmail.com>, 2013
+# lin31504 <lin31504@gmail.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # TSHIH <timothykshih@gmail.com>, 2013
@@ -53,6 +55,7 @@
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # tosti <tosti.chiang@gmail.com>, 2013
 # TSHIH <timothykshih@gmail.com>, 2013
+# Xaver Y.R. Chen  <yrchen@atcity.org>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -69,14 +72,16 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# lin31504 <lin31504@gmail.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2014
+# Xaver Y.R. Chen  <yrchen@atcity.org>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-31 09:26-0400\n"
-"PO-Revision-Date: 2014-02-24 17:06+0000\n"
-"Last-Translator: okalright <iftwoplustwoequalsfive@gmail.com>\n"
+"POT-Creation-Date: 2014-04-07 10:07-0400\n"
+"PO-Revision-Date: 2014-04-06 10:20+0000\n"
+"Last-Translator: lin31504 <lin31504@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -91,7 +96,7 @@ msgstr ""
 #. needs to grade
 #: cms/djangoapps/contentstore/utils.py common/lib/xmodule/xmodule/tabs.py
 msgid "Open Ended Panel"
-msgstr ""
+msgstr "開放性問題面板"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -133,11 +138,11 @@ msgstr ""
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {link_start}{support_email}{link_end}"
-msgstr ""
+msgstr "您的帳戶已經被停用。若有疑問，請於 {link_start}{support_email}{link_end} 聯繫我們"
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
-msgstr ""
+msgstr "已停用帳號"
 
 #: common/djangoapps/student/models.py
 msgid "Male"
@@ -218,6 +223,13 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/student/views.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
 msgstr "登入失敗太多次，請稍後再試！"
 
@@ -238,27 +250,27 @@ msgstr "該帳戶尚未啟動！我們已經給您寄送了關於帳戶啟動的
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
-msgstr ""
+msgstr "請輸入一個使用者名稱"
 
 #: common/djangoapps/student/views.py
 msgid "Please choose an option"
-msgstr ""
+msgstr "請選擇一個選項"
 
 #: common/djangoapps/student/views.py
 msgid "User with username {} does not exist"
-msgstr ""
+msgstr "不存在名為 {} 的使用者"
 
 #: common/djangoapps/student/views.py
 msgid "Successfully disabled {}'s account"
-msgstr ""
+msgstr "成功停用 {} 的帳號"
 
 #: common/djangoapps/student/views.py
 msgid "Successfully reenabled {}'s account"
-msgstr ""
+msgstr "成功再啟用 {} 的帳號"
 
 #: common/djangoapps/student/views.py
 msgid "Unexpected account status"
-msgstr ""
+msgstr "非預期的帳戶狀態"
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Public Username '{username}' already exists."
@@ -348,7 +360,7 @@ msgstr "需要有效的電子郵件地址。"
 msgid "Username should only consist of A-Z and 0-9, with no spaces."
 msgstr "用戶名應當包含英文字母A到Z，阿拉伯數字0到9，並且不能包含空格。"
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Password: "
 msgstr ""
 
@@ -359,6 +371,22 @@ msgstr "無法寄送啟動帳號的信件。"
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr "未知錯誤。請給我們發電子郵件，告知錯誤是如何發生的。"
+
+#: common/djangoapps/student/views.py
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {0} "
+"day(s) must elapse between password resets"
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "Password reset unsuccessful"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
@@ -414,7 +442,7 @@ msgstr ""
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "SHORT_DATE_FORMAT"
-msgstr ""
+msgstr "%Y %b %d"
 
 #. Translators: the translation for "TIME_FORMAT" must be a format
 #. string for formatting times.  For example, the American English
@@ -1021,16 +1049,20 @@ msgstr ""
 msgid "TBD"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: 'Courseware' refers to the tab in the courseware that leads to
+#. the content of a course
+#: common/lib/xmodule/xmodule/tabs.py
 #: lms/templates/courseware/courseware-error.html
 msgid "Courseware"
-msgstr "教材"
+msgstr "課程"
 
 #. Translators: "Course Info" is the name of the course's information and
 #. updates page
 #: common/lib/xmodule/xmodule/tabs.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
-msgstr ""
+msgstr "課程資訊"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Progress"
@@ -1040,7 +1072,7 @@ msgstr "進度"
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
-msgstr ""
+msgstr "Wiki"
 
 #. Translators: "Discussion" is the title of the course forum page
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -1074,7 +1106,7 @@ msgstr "教學大綱"
 #. their course
 #: common/lib/xmodule/xmodule/tabs.py
 msgid "Instructor"
-msgstr ""
+msgstr "教師"
 
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
@@ -1156,7 +1188,7 @@ msgstr ""
 #. of openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
 msgid "Instructor-Assessment"
-msgstr ""
+msgstr "授課教師評分"
 
 #. Translators: "AI-Assessment" refers to the machine-graded mode of openended
 #. evaluation
@@ -1291,9 +1323,13 @@ msgstr ""
 msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
-msgstr ""
+msgstr "一個YouTube網址或是位於網路上的檔案連結。"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
@@ -1348,7 +1384,7 @@ msgstr ""
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
 msgid "This is the wiki for **{organization}**'s _{course_name}_."
-msgstr ""
+msgstr "這是給 **{organization}**'s _{course_name}_使用的Wiki."
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Course page automatically created."
@@ -1356,7 +1392,7 @@ msgstr ""
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Welcome to the edX Wiki"
-msgstr ""
+msgstr "歡迎來到edX Wiki"
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
@@ -1383,7 +1419,7 @@ msgstr ""
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
 " GIT_REPO_DIR"
-msgstr ""
+msgstr "路徑{0}不存在，請創建它，或者用GIT_REPO_DIR配置不同的路徑"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
@@ -1393,19 +1429,19 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to get git log"
-msgstr ""
+msgstr "無法取得Git日誌"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "git clone or pull failed!"
-msgstr ""
+msgstr "git clone命令或pull命令失敗！"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to run import command."
-msgstr ""
+msgstr "無法執行匯入指令。"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "The underlying module store does not support import."
-msgstr ""
+msgstr "相關模組不支援匯入。"
 
 #. Translators: This is an error message when they ask for a
 #. particular version of a git repository and that version isn't
@@ -1423,114 +1459,121 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed in authenticating {0}, error {1}\n"
-msgstr ""
+msgstr "認證失敗 {0}, 錯誤 {1}\n"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed in authenticating {0}\n"
-msgstr ""
+msgstr "認證失敗 {0}\n"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "fixed password"
-msgstr ""
+msgstr "固定的密碼。"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "All ok!"
-msgstr ""
+msgstr "全部 OK！"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide username"
-msgstr ""
+msgstr "必須提供使用者名稱"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Must provide full name"
-msgstr ""
+msgstr "必須提供完整姓名"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email must end in"
-msgstr ""
+msgstr "電子郵件必須結束以"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed - email {0} already exists as external_id"
-msgstr ""
+msgstr "失敗 - email {0} 已經以external_id存在"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied if not using certificates"
-msgstr ""
+msgstr "如果不使用證書，必須提供密碼"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email address required (not username)"
-msgstr ""
+msgstr "需要電子郵件位置(非使用者名稱)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Oops, failed to create user {0}, IntegrityError"
-msgstr ""
+msgstr "糟糕，創建使用者失敗 {0}, IntegrityError"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "User {0} created successfully!"
-msgstr ""
+msgstr "使用者 {0} 創建成功！"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Cannot find user with email address {0}"
-msgstr ""
+msgstr "無法透過 email {0} 找到使用者"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Cannot find user with username {0} - {1}"
-msgstr ""
+msgstr "無法透過使用者名稱 {0} - {1} 找到使用者"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Deleted user {0}"
-msgstr ""
+msgstr "已刪除用戶 {0}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Statistic"
-msgstr ""
+msgstr "統計"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Value"
-msgstr ""
+msgstr "值"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Site statistics"
-msgstr ""
+msgstr "站台統計"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Total number of users"
-msgstr ""
+msgstr "總用戶數"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Courses loaded in the modulestore"
-msgstr ""
+msgstr "Modulestore 中載入的課程"
 
+#: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 #: lms/templates/tracking_log.html
+#, fuzzy
 msgid "username"
-msgstr "用戶名"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"使用者名稱\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"用戶名"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "email"
-msgstr ""
+msgstr "電子郵件"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Repair Results"
-msgstr ""
+msgstr "修復結果"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Create User Results"
-msgstr ""
+msgstr "創建使用者結果"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Delete User Results"
-msgstr ""
+msgstr "刪除使用者結果"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "The git repo location should end with '.git', and be a valid url"
-msgstr ""
+msgstr "Git 資源庫位置必須以 '.git' 結尾並為有效之網址"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Added Course"
@@ -1548,7 +1591,7 @@ msgstr ""
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
-msgstr ""
+msgstr "課程 {0} 已存在於資料目錄！(強制重新載入中)"
 
 #. Translators: unable to download the course content from
 #. the source git repository. Clone occurs if this is brand
@@ -1561,7 +1604,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed to clone repository to {0}"
-msgstr ""
+msgstr "clone資源庫到{0}失敗"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Successfully switched to branch: {branch_name}"
@@ -1569,45 +1612,44 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Loaded course {0} {1}<br/>Errors:"
-msgstr ""
+msgstr "載入課程 {0} {1}<br/>失敗："
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: cms/templates/index.html cms/templates/settings.html
 msgid "Course Name"
-msgstr ""
+msgstr "課程名稱"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Directory/ID"
-msgstr ""
+msgstr "目錄/ID"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Git Commit"
-msgstr ""
+msgstr "Git 提交"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Last Change"
-msgstr ""
+msgstr "最後修改"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Last Editor"
-msgstr ""
+msgstr "最後使用的編輯器"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Information about all courses"
-msgstr ""
+msgstr "所有課程的資訊"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
-msgstr ""
+msgstr "錯誤 - 無法取得ID為 {0}的課程<br/><pre>{1}</pre>"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Deleted"
-msgstr ""
+msgstr "已刪除"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "course_id"
-msgstr ""
+msgstr "course_id"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "# enrolled"
@@ -1619,21 +1661,21 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "instructors"
-msgstr ""
+msgstr "教師"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Enrollment information for all courses"
-msgstr ""
+msgstr "所有課程的註冊資訊"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "role"
-msgstr ""
+msgstr "角色"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "full_name"
-msgstr ""
+msgstr "full_name"
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
 msgid ""
@@ -1643,23 +1685,23 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Cannot find user with email address"
-msgstr ""
+msgstr "無法透過 email 找到使用者"
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Cannot find user with username"
-msgstr ""
+msgstr "無法透過使用者名稱找到使用者"
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Failed in authenticating"
-msgstr ""
+msgstr "認證失敗"
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Unable to clone or pull repository"
-msgstr ""
+msgstr "無法clone或pull資源庫"
 
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 msgid "Error - cannot get course with ID"
-msgstr ""
+msgstr "錯誤 - 無法透過ID取得課程"
 
 #: lms/djangoapps/django_comment_client/mustache_helpers.py
 msgid "Re-open thread"
@@ -1729,6 +1771,8 @@ msgstr ""
 msgid "Name"
 msgstr "名稱"
 
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/university_profile/edge.html
@@ -1764,26 +1808,25 @@ msgid "Goals"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "Complete"
-msgstr ""
+msgstr "完成"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Incomplete"
-msgstr ""
+msgstr "未完成"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your grade report is being generated! You can view the status of the "
 "generation task in the 'Pending Instructor Tasks' section."
-msgstr ""
+msgstr "您的成績報告正在產生中！您可以在“待處理教師工作”查看工作的狀態。"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A grade report generation task is already in progress. Check the 'Pending "
 "Instructor Tasks' table for the status of the task. When completed, the "
 "report will be available for download in the table below."
-msgstr ""
+msgstr "成績報告產生任務已在進行中。選取“待處理教師工作”表取得任務的狀態。完成後，可於報告表格下方找到下載的連結。"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
@@ -1936,7 +1979,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of Instructors"
-msgstr ""
+msgstr "教師列表"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Student profile data for course {course_id}"
@@ -2114,69 +2157,75 @@ msgstr ""
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "rescored"
-msgstr ""
+msgstr "重新評分"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "reset"
-msgstr ""
+msgstr "重置"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
-#: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
+#, fuzzy
 msgid "deleted"
-msgstr "刪除"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"刪除\n"
+"#-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#\n"
+"已刪除"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "emailed"
-msgstr ""
+msgstr "電子郵件已寄出"
 
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
-msgstr ""
+msgstr "已評分"
 
 #: lms/djangoapps/instructor_task/views.py
 #: lms/djangoapps/instructor_task/views.py
 msgid "No status information available"
-msgstr ""
+msgstr "無狀態資訊可檢視"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No task_output information found for instructor_task {0}"
-msgstr ""
+msgstr "發現instructor_task{0}沒有task_output信息"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No parsable task_output information found for instructor_task {0}: {1}"
-msgstr ""
+msgstr "instructor_task{0}：{1}沒有發現可解析的task_output信息"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No parsable status information available"
-msgstr ""
+msgstr "沒有可解析狀態資訊可檢視"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No message provided"
-msgstr ""
+msgstr "無訊息可提供"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "Invalid task_output information found for instructor_task {0}: {1}"
-msgstr ""
+msgstr "發現instructor_task{0}：{1}的無效task_output信息"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No progress status information available"
-msgstr ""
+msgstr "無進度狀態資訊可檢視"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No parsable task_input information found for instructor_task {0}: {1}"
-msgstr ""
+msgstr "沒有發現instructor_task{0}：{1}的可解析task_input信息"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} and {succeeded} are counts.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Progress: {action} {succeeded} of {attempted} so far"
-msgstr ""
+msgstr "進度：距今{attempted}的{action}{succeeded}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
@@ -2281,33 +2330,6 @@ msgstr ""
 msgid "Add to profile"
 msgstr ""
 
-#: lms/templates/peer_grading/peer_grading.html
-#: lms/templates/peer_grading/peer_grading_closed.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-msgid "Peer Grading"
-msgstr "相互評分"
-
-#. Translators: "Staff Grading" is a panel where instructor can grade student-
-#. provided answers.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Staff Grading"
-msgstr ""
-
-#. Translators: "Problems you have submitted" refers to the problems that the
-#. currently-logged-in
-#. student has provided an answer for.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Problems you have submitted"
-msgstr ""
-
-#. Translators: "Flagged Submissions" refers to student-provided answers to a
-#. problem which are
-#. marked by instructor or peer graders as 'flagged' potentially
-#. inappropriate.
-#: lms/djangoapps/open_ended_grading/open_ended_notifications.py
-msgid "Flagged Submissions"
-msgstr ""
-
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
 "Could not contact the external grading server. Please contact the "
@@ -2360,22 +2382,22 @@ msgstr "對於課程{0}和學生{1}。"
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
 "View all problems that require peer assessment in this particular course."
-msgstr "查看所有在這個特殊課程中需要同儕互評的問題。"
+msgstr "檢視所有在這個特殊課程中需要同儕互評的問題。"
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
 "View ungraded submissions submitted by students for the open ended problems "
 "in the course."
-msgstr "查看學生在課程中未批改的開放式問題所提交的意見。"
+msgstr "檢視學生在課程中未批改的開放式問題所提交的意見。"
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
 "View open ended problems that you have previously submitted for grading."
-msgstr "查看您過去提交要批改的開放式問題。"
+msgstr "檢視您過去提交要批改的開放式問題。"
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "View submissions that have been flagged by students as inappropriate."
-msgstr "查看已經被學生標記為不適當的提交意見 。"
+msgstr "檢視已經被學生標記為不適當的提交意見 。"
 
 #: lms/djangoapps/open_ended_grading/views.py
 #: lms/djangoapps/open_ended_grading/views.py
@@ -2400,7 +2422,7 @@ msgid ""
 msgstr ""
 "\n"
 "同儕評分初始化時發生錯誤。\n"
-"此教材中的同儕互評機制未被創建，所以未核准您對他人進行評級。\n"
+"此課程中的同儕互評機制未被創建，所以未核准您對他人進行評級。\n"
 "請稍後再回來檢查此處。"
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -2437,7 +2459,7 @@ msgid ""
 "Please do NOT include your credit card information."
 msgstr ""
 "注意 - 您有長達2週的進入課程取消註冊認證書選項，並獲得全額退款。\n"
-"要收到您的退款，聯繫 {billing_email}。在您的信件中需包含您的訂單號碼。但請不要包含您的信用卡資訊。"
+"要收到您的退款，聯繫 {billing_email}。在您的信件中需包含您的訂單號碼，但請不要包含您的信用卡資訊。"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order Number"
@@ -2610,7 +2632,7 @@ msgstr "增加課程到購物車。"
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
-msgstr ""
+msgstr "您沒有權限檢視此頁面。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor did not return a required parameter: {0}"
@@ -2926,10 +2948,9 @@ msgstr "這個課程並不支援認證書。"
 msgid "No selected price or selected price is below minimum."
 msgstr "沒有選擇價格或是選擇價格低於最小值。"
 
-#: lms/templates/main_django.html cms/templates/base.html
-#: lms/templates/main.html
+#: cms/templates/base.html lms/templates/main.html
 msgid "Skip to this view's content"
-msgstr ""
+msgstr "跳過這次檢視的內容"
 
 #: lms/templates/registration/password_reset_complete.html
 #: lms/templates/registration/password_reset_complete.html
@@ -3048,6 +3069,8 @@ msgid "Password Reset Help"
 msgstr "密碼重設説明"
 
 #: lms/templates/registration/password_reset_confirm.html
+#: cms/templates/login.html lms/templates/login-sidebar.html
+#: lms/templates/register-sidebar.html
 msgid "Need Help?"
 msgstr "需要幫助？"
 
@@ -3155,7 +3178,7 @@ msgstr "編輯"
 msgid "Save changes"
 msgstr "儲存修改"
 
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html cms/templates/unit.html
 msgid "Preview"
 msgstr "預覽"
 
@@ -3176,7 +3199,7 @@ msgstr "關閉"
 
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"
-msgstr ""
+msgstr "Wiki預覽"
 
 #. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this text gives status on if the modal interface (a menu or
@@ -3205,7 +3228,7 @@ msgid ""
 " can change to a particular revision or merge an old revision with the "
 "current one."
 msgstr ""
-"點擊每一個版本，您將會看到被編輯行的列表。點擊預覽按鈕，您可以看到這篇文章目前的狀態。在頁面的底部，您可以指定一個版本，或者合併兩個現存的版本生成新版本。"
+"點擊每一個修訂版，您將會看到被編輯行的列表。點擊預覽按鈕，您可以看到這篇文章目前的狀態。在頁面的底部，您可以指定一個版本，或者合併兩個現存的版本生成新版本。"
 
 #: lms/templates/wiki/history.html
 msgid "(no log message)"
@@ -3213,7 +3236,7 @@ msgstr ""
 
 #: lms/templates/wiki/history.html
 msgid "Preview this revision"
-msgstr "預覽本次修改"
+msgstr "預覽本次修訂"
 
 #: lms/templates/wiki/history.html
 msgid "Auto log:"
@@ -3233,7 +3256,7 @@ msgstr "切換到選擇的版本"
 
 #: lms/templates/wiki/history.html
 msgid "Wiki Revision Preview"
-msgstr ""
+msgstr "預覽Wiki修訂版"
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Back to history view"
@@ -3245,7 +3268,7 @@ msgstr "切換到這個版本"
 
 #: lms/templates/wiki/history.html
 msgid "Merge Revision"
-msgstr ""
+msgstr "合併修訂"
 
 #: lms/templates/wiki/history.html
 msgid "Merge with current"
@@ -3255,7 +3278,7 @@ msgstr "和當前的版本合併"
 msgid ""
 "When you merge a revision with the current, all data will be retained from "
 "both versions and merged at its approximate location from each revision."
-msgstr "當您給當前版本加入一個修改，所有的資料都會被保留。修改資訊將會合併到系統擇優選擇的位置。"
+msgstr "當您給當前修訂版加入一個修改，所有的資料都會被保留。修改資訊將會合併到系統選擇適合的位置。"
 
 #: lms/templates/wiki/history.html
 msgid "After this, it's important to do a manual review."
@@ -3267,19 +3290,19 @@ msgstr "創建新的已合併後的版本"
 
 #: lms/templates/wiki/preview_inline.html
 msgid "Previewing revision:"
-msgstr ""
+msgstr "預覽修訂版："
 
 #: lms/templates/wiki/preview_inline.html
 msgid "Previewing a merge between two revisions:"
-msgstr ""
+msgstr "預覽合併兩次修訂的結果："
 
 #: lms/templates/wiki/preview_inline.html
 msgid "This revision has been deleted."
-msgstr "這次修改已被刪除。"
+msgstr "這份修訂已被刪除。"
 
 #: lms/templates/wiki/preview_inline.html
 msgid "Restoring to this revision will mark the article as deleted."
-msgstr "復原這項修改可能會讓這篇文章標記為刪除狀態。"
+msgstr "復原這份修訂可能會讓這篇文章標記為刪除狀態。"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid ""
@@ -3300,13 +3323,13 @@ msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Wiki Syntax Help"
-msgstr "維基百科語法編寫説明"
+msgstr "Wiki語法編寫説明"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid ""
 "This wiki uses <strong>Markdown</strong> for styling. There are several "
 "useful guides online. See any of the links below for in-depth details:"
-msgstr "這個維基百科使用 <strong>Markdown</strong> 語法來排版，網路上有許多有用的指南，如果想熟練使用，請點擊以下連結："
+msgstr "這個Wiki使用 <strong>Markdown</strong> 語法來排版，網路上有許多有用的指南，如果想熟練使用，請點擊以下連結："
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Markdown: Basics"
@@ -3324,7 +3347,7 @@ msgstr "簡明 Markdown 語法指南"
 msgid ""
 "To create a new wiki article, create a link to it. Clicking the link gives "
 "you the creation page."
-msgstr "要創建一篇新的維基百科條目，先為它創建連結。點擊連結後，會導向自動創建頁面。"
+msgstr "要創建一篇新的Wiki條目，先為它創建連結。點擊連結後，會導向自動創建頁面。"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "[Article Name](wiki:ArticleName)"
@@ -3345,11 +3368,11 @@ msgstr "實用的例子："
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Wikipedia"
-msgstr ""
+msgstr "維基百科"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "edX Wiki"
-msgstr ""
+msgstr "edX Wiki"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Huge Header"
@@ -3399,6 +3422,8 @@ msgid ""
 "        Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
 "    "
 msgstr ""
+"\n"
+"Markdown語法是允許的。請參閱 %(start_link)scheatsheet%(end_link)s 以尋求幫助。"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Attachments"
@@ -3474,7 +3499,7 @@ msgstr "檔案歷史"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "revisions"
-msgstr "修改"
+msgstr "修訂版"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "There are no attachments for this article."
@@ -3483,80 +3508,82 @@ msgstr "這篇文章沒有附件"
 #: cms/djangoapps/contentstore/course_info_model.py
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
-msgstr ""
+msgstr "無效課程更新ID。"
 
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Course update not found."
-msgstr ""
+msgstr "沒有找到課程更新。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
 "configure a different path with GIT_REPO_EXPORT_DIR"
 msgstr ""
+"未設定GIT_REPO_EXPORT_DIR或者路徑 {0} 不存在，請創建它，或者對GIT_REPO_EXPORT_DIR配置一個不同的路徑 "
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Non writable git url provided. Expecting something like: "
 "git@github.com:mitocw/edx4edx_lite.git"
-msgstr ""
+msgstr "您所提供的 Git URL 是唯讀的，正常的範例像是 git@github.com:mitocw/edx4edx_lite.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "If using http urls, you must provide the username and password in the url. "
 "Similar to https://user:pass@github.com/user/course."
 msgstr ""
+"如果使用http urls，您必須在URL中提供用戶名和密碼。例如 https://user:pass@github.com/user/course."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to determine branch, repo in detached HEAD mode"
-msgstr ""
+msgstr "在分離 HEAD 模式下，無法確認所在的分支(branch)及repo"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to update or clone git repository."
-msgstr ""
+msgstr "無法更新或複製Git資源庫"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to export course to xml."
-msgstr ""
+msgstr "無法匯出課程到 XML。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to configure git username and password"
-msgstr ""
+msgstr "無法設定Git使用者帳號和密碼"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to commit changes. This is usually because there are no changes to be"
 " committed"
-msgstr ""
+msgstr "無法提交變更，通常的原因是因為沒有任何變更需要提交"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to push changes.  This is usually because the remote repository "
 "cannot be contacted"
-msgstr ""
+msgstr "無法push更改，通常是因為無法聯繫遠端的資源庫"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Bad course location provided"
-msgstr ""
+msgstr "您提供的課程位置是錯的"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Missing branch on fresh clone"
-msgstr ""
+msgstr "在新的副本中漏失了分支資訊"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Command was: {0!r}. Working directory was: {1!r}"
-msgstr ""
+msgstr "指令為：{0!r}. 工作目錄為：{1!r}"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Command output was: {0!r}"
-msgstr ""
+msgstr "指令輸出為：{0!r}"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Directory already exists, doing a git reset and pull instead of git clone."
-msgstr ""
+msgstr "目錄已存在，請以重置(reset)或是pull取代clone"
 
-#: lms/templates/notes.html
+#: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "我的筆記"
 
@@ -3568,13 +3595,13 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
-msgstr ""
+msgstr "上傳完成"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
 "run."
-msgstr ""
+msgstr "機構和課號以及課程名稱中不允許使用特殊字元"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -3582,13 +3609,16 @@ msgid ""
 "\n"
 "{err}"
 msgstr ""
+"無法建立課程'{name}'.\n"
+"\n"
+"{err}"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "There is already a course defined with the same organization, course number,"
 " and course run. Please change either organization or course number to be "
 "unique."
-msgstr ""
+msgstr "已經有一個具有相同機構、課號和課程單元的課程存在，請更改機構或是課號以確保與其他課程不同。"
 
 #: cms/djangoapps/contentstore/views/course.py
 #: cms/djangoapps/contentstore/views/course.py
@@ -3596,107 +3626,107 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Please change either the organization or course number so that it is unique."
-msgstr ""
+msgstr "請更改機構或是課號，讓它有別於其他課程。"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change at least one field to be unique."
-msgstr ""
+msgstr "已經有相同機構和課號的課程存在，請至少更動其中一個欄位，讓它有別於其他課程。"
 
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
-msgstr ""
+msgstr "課程成功匯出到Git資源庫"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
-msgstr ""
+msgstr "我們僅支援上傳 .tar.gz 格式的檔案。"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
-msgstr ""
+msgstr "檔案上傳毀損，請再試一遍。"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Could not find the course.xml file in the package."
-msgstr ""
+msgstr "在課程封裝中無法找到 course.xml 檔案。"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of {0}"
-msgstr ""
+msgstr "與{0}重複"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of '{0}'"
-msgstr ""
+msgstr "與'{0}'重複"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
-msgstr ""
+msgstr "新進的影像資料為空。"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Can't find item by locator."
-msgstr ""
+msgstr "定位器找不到項目。"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" modules."
-msgstr ""
+msgstr "只有影音模組支援字幕"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
-msgstr ""
+msgstr "權限不足"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Could not find user by email address '{email}'."
-msgstr ""
+msgstr "無法透過 email '{email}' 找到使用者"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "User {email} has registered but has not yet activated his/her account."
-msgstr ""
+msgstr "使用者 {email} 已經註冊但尚未啟用他/她的帳號"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "`role` is required"
-msgstr ""
+msgstr "`role` 為必填"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Only instructors may create other instructors"
-msgstr ""
+msgstr "只有教師可以加入其他教師。"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "You may not remove the last instructor from a course"
-msgstr ""
+msgstr "您不可以移除課程的最後一位教師。"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
-msgstr ""
+msgstr "未經請求的"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "pending"
-msgstr ""
+msgstr "等待中"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "granted"
-msgstr ""
+msgstr "已授權"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "denied"
-msgstr ""
+msgstr "已拒絕"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Studio user"
-msgstr ""
+msgstr "Studio使用者"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "The date when state was last updated"
-msgstr ""
+msgstr "上次修改狀態的日期"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Current course creator state"
-msgstr ""
+msgstr "目前課程創建者的狀態"
 
 #: cms/djangoapps/course_creators/models.py
 msgid ""
 "Optional notes about this user (for example, why course creation access was "
 "denied)"
-msgstr ""
+msgstr "關於使用者的可選提示訊息 (例如：課程創建被拒絕的原因)"
 
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
@@ -3747,7 +3777,7 @@ msgstr ""
 #: cms/templates/container_xblock_component.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "View"
-msgstr ""
+msgstr "檢視"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -3837,15 +3867,7 @@ msgstr ""
 #: lms/templates/navigation.html lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
-msgstr ""
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "Visual"
-msgstr ""
-
-#: cms/templates/widgets/html-edit.html lms/templates/widgets/html-edit.html
-msgid "HTML"
-msgstr ""
+msgstr "幫助"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
@@ -4232,6 +4254,8 @@ msgid ""
 "<span id=\"track-info\"></span> {course_number}?  <span id=\"refund-"
 "info\"></span>"
 msgstr ""
+"<span id=\"track-info\"></span> {course_number}? <span id=\"refund-"
+"info\"></span>"
 
 #: lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -4239,6 +4263,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Unregister"
 msgstr "取消註冊"
+
+#: lms/templates/edit_unit_link.html
+msgid "View Unit in Studio"
+msgstr "在Studio中檢視單元"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -4446,7 +4474,7 @@ msgstr ""
 msgid ""
 "Have a <strong>question about something specific</strong>? You can contact "
 "the {platform_name} general support team directly:"
-msgstr ""
+msgstr " <strong>關於一些細節有疑問</strong>？您可以直接聯繫 {platform_name} 的維護團隊："
 
 #: lms/templates/help_modal.html
 msgid "Report a problem"
@@ -4709,7 +4737,7 @@ msgstr ""
 
 #: lms/templates/lti.html
 msgid "View resource in a new window"
-msgstr ""
+msgstr "在新視窗檢視資源"
 
 #: lms/templates/lti.html
 msgid ""
@@ -5033,7 +5061,7 @@ msgstr "請在下面註冊創建您的 {platform_name} 帳號"
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
-msgstr "請將這些欄位補充完整以註冊帳戶。"
+msgstr "請完整填寫下列欄位以註冊帳戶。"
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "cannot be changed later"
@@ -5252,7 +5280,7 @@ msgstr "用戶："
 
 #: lms/templates/staff_problem_info.html
 msgid "View History"
-msgstr "查看歷史記錄"
+msgstr "檢視歷史記錄"
 
 #: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
 #: lms/templates/staticbook.html
@@ -5353,15 +5381,15 @@ msgstr ""
 msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
-msgstr ""
+msgstr "進入每個單獨的課程教師主頁來管理課程報名"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Manage course staff and instructors"
-msgstr ""
+msgstr "管理課程工作人員與教師"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Download staff and instructor list (csv file)"
-msgstr ""
+msgstr "下載工作人員與教師列表(CSV 格式檔案)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -5762,6 +5790,8 @@ msgid ""
 " register button again. Please visit the {start_help_tag}help page{end_tag} "
 "for a possible solution."
 msgstr ""
+"目前登入的用戶帳戶沒有存取該課程的權限。您可能需要 {start_logout_tag} 登出{end_tag}，然後再次嘗試登入。請到 "
+"{start_help_tag} 幫助頁面{end_tag} 尋找可能的解決方案。"
 
 #: lms/templates/courseware/course_about.html
 msgid "About {course.display_number_with_default}"
@@ -5773,7 +5803,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
-msgstr "查看教材"
+msgstr "檢視課程"
 
 #: lms/templates/courseware/course_about.html
 msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
@@ -5790,12 +5820,30 @@ msgid "Register for {course.display_number_with_default}"
 msgstr "註冊{course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html
+msgid "View About Page in studio"
+msgstr "在Studio中檢視關於頁面"
+
+#: lms/templates/courseware/course_about.html
 msgid "Overview"
 msgstr "概述"
 
 #: lms/templates/courseware/course_about.html
 msgid "Share with friends and family!"
 msgstr "與朋友和家人分享！"
+
+#. Translators: This text will be automatically posted to the student's
+#. Twitter account. {url} should appear at the end of the text.
+#: lms/templates/courseware/course_about.html
+msgid "I just registered for {number} {title} through {account}: {url}"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "Take a course with {platform} online"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "I just registered for {number} {title} through {platform} {url}"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
@@ -5826,11 +5874,11 @@ msgstr ""
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/course_navigation.html
 msgid "Staff view"
-msgstr "員工視圖"
+msgstr "員工身分檢視"
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Student view"
-msgstr "學生觀點"
+msgstr "學生身分檢視"
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from leading universities."
@@ -5857,7 +5905,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "{course_number} Courseware"
-msgstr "{course_number}教材"
+msgstr "{course_number}課程"
 
 #: lms/templates/courseware/courseware.html
 msgid "Return to Exam"
@@ -5980,11 +6028,15 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
-msgstr ""
+msgstr "{course_number} 課程資訊"
+
+#: lms/templates/courseware/info.html
+msgid "View Updates in Studio"
+msgstr "在Studio中檢視更新"
 
 #: lms/templates/courseware/info.html lms/templates/courseware/info.html
 msgid "Course Updates &amp; News"
-msgstr "課程更新&amp;與新聞"
+msgstr "課程更新&amp;新聞"
 
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
@@ -6002,13 +6054,13 @@ msgid "Instructor Dashboard"
 msgstr "教師控制面板"
 
 #: lms/templates/courseware/instructor_dashboard.html
-msgid "Try New Beta Dashboard"
-msgstr "試試新測試視窗"
+#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
+msgid "View Course in Studio"
+msgstr "在Studio中檢視課程"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "Edit Course In Studio"
-msgstr "在 Studio 中編輯課程"
+msgid "Try New Beta Dashboard"
+msgstr "試試新測試視窗"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -6142,7 +6194,7 @@ msgstr "選擇問題和操作："
 msgid ""
 "User requires forum administrator privileges to perform administration "
 "tasks.  See instructor."
-msgstr "使用者需要論壇管理員許可權來完成管理任務。查看教師。"
+msgstr "使用者需要論壇管理員許可權來完成管理任務，請查看教師分頁。"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Explanation of Roles:"
@@ -6154,19 +6206,20 @@ msgid ""
 "and re-open threads, endorse responses, and see posts from all cohorts (if "
 "the course is cohorted). Moderators' posts are marked as 'staff'."
 msgstr ""
+"論壇版主：可以編輯或刪除任何討論串、移除誤用標誌、關閉或重新打開討論串、贊同回應、看到所有世代的討論串(如果課程是同一世代)。版主的討論串被標記為'員工'。"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "Forum Admins: have moderator privileges, as well as the ability to edit the "
 "list of forum moderators (e.g. to appoint a new moderator). Admins' posts "
 "are marked as 'staff'."
-msgstr ""
+msgstr "論壇管理員：具有板主權限，以及編輯論壇的板主列表的能力(如任命一名新的板主)。管理員的討論串被標記為'員工'。"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "Community TAs: have forum moderator privileges, and their posts are labelled"
 " 'Community TA'."
-msgstr ""
+msgstr "社群助教：有論壇版主權限，並且他們的討論串被標記為\"社群助教”。"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Enrollment Data"
@@ -6191,7 +6244,7 @@ msgstr "批次招生"
 msgid ""
 "Enroll or un-enroll one or many students: enter emails, separated by new "
 "lines or commas;"
-msgstr "註冊或未註冊的一個或多個學生：輸入電子郵件地址，用逗號或隔行來分隔；"
+msgstr "註冊或取消註冊一個或多個學生：請輸入電子郵件地址，用逗號或隔行來分隔；"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Notify students by email"
@@ -6230,14 +6283,14 @@ msgstr "我自己"
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Staff and instructors"
-msgstr "員工與導師"
+msgstr "員工與教師"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "All (students, staff and instructors)"
-msgstr "所有人（學生，員工和導師）"
+msgstr "所有人(學生，員工和教師)"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -6382,7 +6435,7 @@ msgstr "每個國家的學生分佈，所有課程，9月12日到10月17日，�
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Instructor Tasks"
-msgstr "待定教師任務"
+msgstr "待處理教師工作"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task Type"
@@ -6435,7 +6488,7 @@ msgstr "關於{course_number}"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Access Courseware"
-msgstr "存取教材"
+msgstr "存取課程"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "You Are Registered"
@@ -6464,6 +6517,10 @@ msgstr "{course_number}進度"
 #: lms/templates/courseware/progress.html
 msgid "Course Progress"
 msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "View Grading in studio"
+msgstr "在Studio中檢視評分"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
@@ -6820,14 +6877,9 @@ msgstr "我的同伴"
 msgid "new post title"
 msgstr "新文章標題"
 
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 #: wiki/forms.py wiki/forms.py wiki/forms.py
 msgid "Title"
-msgstr ""
+msgstr "標題"
 
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
@@ -6905,11 +6957,11 @@ msgstr "顯示："
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "View All"
-msgstr "查看所有"
+msgstr "檢視全部"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "View as {name}"
-msgstr "以{name}查看"
+msgstr "以{name}檢視"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread.mustache
@@ -7130,13 +7182,12 @@ msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "View discussion"
+msgid "Expand discussion"
 msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Hide discussion"
+msgid "Collapse discussion"
 msgstr ""
 
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
@@ -7147,6 +7198,10 @@ msgstr ""
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "…"
 msgstr ""
+
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "View discussion"
+msgstr "檢視討論"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -7486,11 +7541,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Total number of enrollees (instructors, staff members, and students)"
-msgstr ""
+msgstr "總參與人數(教師、助教和學生)"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
-msgstr ""
+msgstr "基本課程資訊"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Name:"
@@ -7526,7 +7581,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "The status for any active tasks appears in a table below."
-msgstr "任活動任務的狀態在一個表中顯示如下。"
+msgstr "所有進行中的工作狀態如下表所示。"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Warnings"
@@ -7536,7 +7591,7 @@ msgstr "課程警告"
 msgid ""
 "Click to generate a CSV file of all students enrolled in this course, along "
 "with profile information such as email address and username:"
-msgstr ""
+msgstr "點選以產生以CSV格式表示的所有課程參與學生，包含了電子郵件信箱與使用者名稱等個人資訊。"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download profile information as a CSV"
@@ -7546,7 +7601,7 @@ msgstr ""
 msgid ""
 "For smaller courses, click to list profile information for enrolled students"
 " directly on this page:"
-msgstr ""
+msgstr "對於小型課程，點選個人資訊清單以直接加入學生至課程中。"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "List enrolled students' profile information"
@@ -7627,7 +7682,7 @@ msgstr ""
 msgid ""
 "<b>Note</b>: To keep student data secure, you cannot save or email these "
 "links for direct access. Copies of links expire within 5 minutes."
-msgstr ""
+msgstr "<b>注意</b>：為了確保學生資料的安全，您不能儲存或通過電子郵件發送這些連結並直接訪問，複製的連結將於5分鐘後失效。"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Individual due date extensions"
@@ -7802,6 +7857,7 @@ msgid ""
 "contact your instructor and ask them to add you as an instructor for staff "
 "and beta lists, or a discussion admin for discussion management."
 msgstr ""
+"工作人員無法修改工作人員或測試人員名單。要修改這些列表，請聯繫您的教師，並要求他們將您加入成為教師和測試人員的一分子，或管理討論區的討論管理員。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Staff"
@@ -7822,17 +7878,17 @@ msgstr "添加員工"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Instructors"
-msgstr "導師"
+msgstr "教師"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Instructors are the core administration of your course. Instructors can add "
 "and remove course staff, as well as administer discussion access."
-msgstr ""
+msgstr "教師是您課程的核心管理員。教師可以新增和刪除工作人員，並管理討論區的存取。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Instructor"
-msgstr "添加導師"
+msgstr "增加教師"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Beta Testers"
@@ -7890,6 +7946,7 @@ msgid ""
 "misuse flags, close and re-open threads, endorse responses, and see posts "
 "from all cohorts. Their posts are marked 'Community TA'."
 msgstr ""
+"社群助教是社群的一份子，在討論板中特別有幫助。他們可以編輯或刪除任何文章、清除濫用標誌、關閉並重新打開討論串、贊同回應和看到所有的討論串。他們的文章將標有“社群助教”。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Community TA"
@@ -7998,7 +8055,7 @@ msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in"
 " the 'Pending Instructor Tasks' table. To see status for all tasks submitted"
 " for this problem and student, click on this button:"
-msgstr ""
+msgstr "後台正在重新評分工作，進行中的工作狀態會出現在'待處理教師工作'表格中。如果您要查看關於這個問題所有提交的狀態，點擊這個按鈕："
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Student"
@@ -8021,7 +8078,7 @@ msgid ""
 "The above actions run in the background, and status for active tasks will "
 "appear in a table on the Course Info tab. To see status for all tasks "
 "submitted for this problem, click on this button"
-msgstr ""
+msgstr "以上任務正在後台運行中，而進行中任務狀態會出現在「課程資訊」標籤頁的表格中。要查看關於這個問題所有提交的任務狀態，點擊這個按鈕。"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"
@@ -8134,6 +8191,22 @@ msgid ""
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
 msgstr ""
+"\n"
+"{p_tag}您目前沒有互評要做。若要參與互評：\n"
+"{ul_tag}\n"
+"{li_tag}您需要提交一個互評問題的作業。 {end_li_tag}\n"
+"{li_tag}教師需要提供一些評分樣本以幫助您更好的理解\n"
+"評分\n"
+"原則。 {end_li_tag}\n"
+"{li_tag}必須有人提交等待評分的作業。 {end_li_tag}\n"
+"{end_ul_tag}\n"
+"{end_p_tag}\n"
+
+#: lms/templates/peer_grading/peer_grading.html
+#: lms/templates/peer_grading/peer_grading_closed.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+msgid "Peer Grading"
+msgstr "相互評分"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
@@ -8218,13 +8291,13 @@ msgstr "您尚未完成學習以針對此問題評分。"
 msgid ""
 "You will now be shown a series of instructor-scored essays, and will be "
 "asked to score them yourself."
-msgstr "一系列由導師打分的文章將展示給您，您將被要求自行給它們打分。"
+msgstr "以下將展示給您一系列由教師評分完成的文章，您將被要求自行為它們評分。"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid ""
 "Once you can score the essays similarly to an instructor, you will be ready "
 "to grade your peers."
-msgstr "一旦您能夠像導師一樣給文章打分，您就可以給您的同學評分了。"
+msgstr "一旦您能夠像教師一樣給文章評分，您就可以給您的同學評分了。"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Start learning to grade"
@@ -8304,7 +8377,7 @@ msgstr "我們已經給您的郵箱發送郵件，您應該能夠很快收到，
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Data"
-msgstr ""
+msgstr "下載CSV數據"
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "These reports are delimited by start and end dates."
@@ -8997,7 +9070,7 @@ msgid ""
 "We have received your re-verification details and submitted them for review."
 " Your dashboard will show the notification status once the review is "
 "complete."
-msgstr ""
+msgstr "我們已收到您重新驗證的細節並且提交以供審查。審查完成後您的主頁面會顯示通知狀態。"
 
 #: lms/templates/verify_student/midcourse_reverification_confirmation.html
 msgid ""
@@ -9374,7 +9447,7 @@ msgid ""
 "your identity shortly. You should receive an update to your veriication "
 "status within 1-2 days. In the meantime, you still have access to all of "
 "your course content."
-msgstr ""
+msgstr "我們收到了您重新提交的資訊，並將稍後進行審查以核對您的身份。您將會在1-2日內收到驗證狀態的更新。期間您仍可以存取課程的全部內容。"
 
 #: lms/templates/verify_student/reverification_confirmation.html
 #: lms/templates/verify_student/reverification_window_expired.html
@@ -9550,122 +9623,122 @@ msgstr ""
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
-msgstr ""
+msgstr "無法找到您所搜尋的頁面。"
 
 #: cms/templates/404.html
 msgid ""
 "Go back to the {homepage} or let us know about any pages that may have been "
 "moved at {email}."
-msgstr ""
+msgstr "回到 {homepage} 或發電子郵件至 {email} 告訴我們被移動的頁面。"
 
 #: cms/templates/500.html
 msgid "Studio Server Error"
-msgstr ""
+msgstr "Studio伺服器發生錯誤"
 
 #: cms/templates/500.html
 msgid "The <em>Studio</em> servers encountered an error"
-msgstr ""
+msgstr "<em>Studio</em>伺服器出現一個錯誤"
 
 #: cms/templates/500.html
 msgid ""
 "An error occurred in Studio and the page could not be loaded. Please try "
 "again in a few moments."
-msgstr ""
+msgstr "Studio出現錯誤，頁面無法載入，請稍後再試。"
 
 #: cms/templates/500.html
 msgid ""
 "We've logged the error and our staff is currently working to resolve this "
 "error as soon as possible."
-msgstr ""
+msgstr "我們已經記錄下這個錯誤，同時技術人員正試圖儘快解決這個問題。"
 
 #: cms/templates/500.html
 msgid "If the problem persists, please email us at {email_link}."
-msgstr ""
+msgstr "如果問題仍然存在，請寄電子郵件至 {email_link}."
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
 msgid "Studio Account Activation"
-msgstr ""
+msgstr "Studio帳戶啟動"
 
 #: cms/templates/activation_active.html
 msgid "Your account is already active"
-msgstr ""
+msgstr "您的帳戶已經啟動"
 
 #: cms/templates/activation_active.html
 msgid ""
 "This account, set up using {0}, has already been activated. Please sign in "
 "to start working within edX Studio."
-msgstr ""
+msgstr "這個利用{0}建立的帳戶已經被啟動。請登入以開始使用edX Studio工作。"
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 msgid "Sign into Studio"
-msgstr ""
+msgstr "登入Studio"
 
 #: cms/templates/activation_complete.html
 msgid "Your account activation is complete!"
-msgstr ""
+msgstr "您的帳戶已經完成啟動！"
 
 #: cms/templates/activation_complete.html
 msgid ""
 "Thank you for activating your account. You may now sign in and start using "
 "edX Studio to author courses."
-msgstr ""
+msgstr "感謝您啟動您的帳戶，現在您可以登入並且開始使用edX Studio來製作課程。"
 
 #: cms/templates/activation_invalid.html
 msgid "Your account activation is invalid"
-msgstr ""
+msgstr "您的帳戶啟動無效"
 
 #: cms/templates/activation_invalid.html
 msgid ""
 "We're sorry. Something went wrong with your activation. Check to make sure "
 "the URL you went to was correct &mdash; e-mail programs will sometimes split"
 " it into two lines."
-msgstr ""
+msgstr "很抱歉，您的啟動出現了一些錯誤。請核對以確保您進入的網址是正確的 &mdash；郵箱程式有時候會將它分割成兩行。"
 
 #: cms/templates/activation_invalid.html
 msgid ""
 "If you still have issues, contact edX Support. In the meatime, you can also "
 "return to"
-msgstr ""
+msgstr "如果您還有問題，請聯繫edX技術支援團隊。這期間您也可以返回至"
 
 #: cms/templates/activation_invalid.html
 msgid "Contact edX Support"
-msgstr ""
+msgstr "聯繫edX技術支援團隊"
 
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 #: cms/templates/widgets/header.html
 msgid "Files &amp; Uploads"
-msgstr ""
+msgstr "檔案及上傳"
 
 #: cms/templates/asset_index.html
 msgid "Uploading…"
-msgstr ""
+msgstr "上傳中……"
 
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 msgid "Choose File"
-msgstr ""
+msgstr "選擇檔案"
 
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 #: cms/templates/asset_index.html
 msgid "Upload New File"
-msgstr ""
+msgstr "上傳新檔案"
 
 #: cms/templates/asset_index.html
 msgid "Load Another File"
-msgstr ""
+msgstr "載入另一個檔案"
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/edit-tabs.html cms/templates/overview.html
 #: cms/templates/textbooks.html cms/templates/widgets/header.html
 msgid "Content"
-msgstr ""
+msgstr "內容"
 
 #: cms/templates/asset_index.html cms/templates/container.html
 #: cms/templates/course_info.html cms/templates/edit-tabs.html
 #: cms/templates/index.html cms/templates/manage_users.html
 #: cms/templates/overview.html cms/templates/textbooks.html
 msgid "Page Actions"
-msgstr ""
+msgstr "頁面功能"
 
 #: cms/templates/asset_index.html
 msgid "Loading&hellip;"
@@ -9673,7 +9746,7 @@ msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "What files are listed here?"
-msgstr ""
+msgstr "這裡包含那些檔案？"
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -9681,6 +9754,7 @@ msgid ""
 "the course appear in this list. These files include your course image, "
 "textbook chapters, and files that appear on your Course Handouts sidebar."
 msgstr ""
+"除了您上傳到此頁面的檔案以外，任何您新增至這個課程的檔案都會出現在這個列表。這些檔案包括您的課程圖片、教科書章節，以及出現在您的課程講義側邊攔的檔案。"
 
 #: cms/templates/asset_index.html
 msgid "File URLs"
@@ -9690,7 +9764,7 @@ msgstr ""
 msgid ""
 "You use the Embed URL value to link to the file or image from a component, a"
 " course update, or a course handout."
-msgstr ""
+msgstr "您可以使用嵌入網址來連結一個元件、一個課程更新或一個課程講義中的檔案或圖片。"
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -9702,56 +9776,56 @@ msgstr ""
 #: cms/templates/asset_index.html cms/templates/container.html
 #: cms/templates/overview.html cms/templates/settings_graders.html
 msgid "What can I do on this page?"
-msgstr ""
+msgstr "我可以在此頁做甚麼事情？"
 
 #: cms/templates/asset_index.html
 msgid ""
 "You can upload new files or view, download, or delete existing files. You "
 "can lock a file so that people who are not enrolled in your course cannot "
 "access that file."
-msgstr ""
+msgstr "您可以上傳新的檔案或者視圖、下載或者刪除現有檔案。您可以鎖住一個檔案，如此一來沒有報名參加您課程的人就不能存取這些檔案。"
 
 #: cms/templates/asset_index.html
 msgid "Your file has been deleted."
-msgstr ""
+msgstr "您的檔案已經被刪除。"
 
 #: cms/templates/asset_index.html
 msgid "close alert"
-msgstr ""
+msgstr "關閉警告"
 
 #: cms/templates/checklists.html cms/templates/export.html
 #: cms/templates/export_git.html cms/templates/import.html
 #: cms/templates/widgets/header.html
 msgid "Tools"
-msgstr ""
+msgstr "工具"
 
 #: cms/templates/checklists.html
 msgid "Course Checklists"
-msgstr ""
+msgstr "課程檢查表"
 
 #: cms/templates/checklists.html
 msgid "Current Checklists"
-msgstr ""
+msgstr "目前的檢查表"
 
 #: cms/templates/checklists.html
 msgid "What are course checklists?"
-msgstr ""
+msgstr "甚麼是課程檢查表?"
 
 #: cms/templates/checklists.html
 msgid ""
 "Course checklists are tools to help you understand and keep track of all the"
 " steps necessary to get your course ready for students."
-msgstr ""
+msgstr "課程檢查表是幫助您了解以及持續追蹤所有您課程準備必要步驟的工具。"
 
 #: cms/templates/checklists.html
 msgid ""
 "Any changes you make to these checklists are saved automatically and are "
 "immediately visible to other course team members."
-msgstr ""
+msgstr "任何您在這檢查表做出的更改將會自動儲存，並且立刻顯示給其他課程團隊成員。"
 
 #: cms/templates/component.html
 msgid "Editor"
-msgstr ""
+msgstr "編輯器"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
@@ -9769,7 +9843,7 @@ msgstr ""
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "Drag to reorder"
-msgstr ""
+msgstr "拖動以重新排序"
 
 #: cms/templates/container.html
 msgid "Container"
@@ -9796,35 +9870,42 @@ msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
 msgid "Course Updates"
-msgstr ""
+msgstr "課程更新"
 
 #: cms/templates/course_info.html
 msgid "New Update"
-msgstr ""
+msgstr "新增更新"
 
 #: cms/templates/course_info.html
 msgid ""
 "Use course updates to notify students of important dates or exams, highlight"
 " particular discussions in the forums, announce schedule changes, and "
 "respond to student questions. You add or edit updates in HTML."
-msgstr ""
+msgstr "使用課程更新以提醒學生重要日期或考試、強調論壇中特定的討論內容、公告時間表的改變和回答學生問題。以HTML新增或編輯更新。"
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
 #. each course.
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/export.html cms/templates/widgets/header.html
 msgid "Pages"
-msgstr ""
+msgstr "靜態頁面"
 
 #: cms/templates/edit-tabs.html
 msgid "New Page"
-msgstr ""
+msgstr "新增頁面"
 
 #: cms/templates/edit-tabs.html cms/templates/edit_subsection.html
 #: cms/templates/index.html cms/templates/overview.html
 #: cms/templates/unit.html
 msgid "View Live"
-msgstr ""
+msgstr "線上檢視"
+
+#: cms/templates/edit-tabs.html
+msgid ""
+"Note: Pages are publicly visible. If users know the URL of a page, they can "
+"view the page even if they are not registered for or logged in to your "
+"course."
+msgstr "注意：靜態介面是公開可見的，如果使用者知道靜態頁面的URL，就算使用者並未註冊或是登入您的課程，依然可以看見其內容。"
 
 #: cms/templates/edit-tabs.html
 msgid "Show this page"
@@ -9848,18 +9929,18 @@ msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "What are pages?"
-msgstr ""
+msgstr "什麼是靜態頁面？"
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages are listed horizontally at the top of your course. Default pages "
 "(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
 "textbooks and custom pages that you create."
-msgstr ""
+msgstr "靜態頁面會水平列在課程上方。預設頁面(課程、課程訊息、討論區、Wiki和進度)會接在教材和自訂的靜態頁面之前。"
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
-msgstr ""
+msgstr "自訂靜態頁面"
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -9888,14 +9969,14 @@ msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "Preview of Pages in your course"
-msgstr ""
+msgstr "在課程中預覽靜態頁面"
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages appear in your course's top navigation bar. The default pages "
 "(Courseware, Course Info, Discussion, Wiki, and Progress) are followed by "
 "textbooks and custom pages."
-msgstr ""
+msgstr "靜態頁面會出現在在課程上方的導覽列。預設頁面(課程、課程訊息、討論區、Wiki和進度)會接在教材和自訂的靜態頁面之前。"
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 #: cms/templates/howitworks.html cms/templates/howitworks.html
@@ -9904,36 +9985,36 @@ msgstr ""
 
 #: cms/templates/edit_subsection.html
 msgid "CMS Subsection"
-msgstr ""
+msgstr "小節管理"
 
 #: cms/templates/edit_subsection.html cms/templates/unit.html
 msgid "Display Name:"
-msgstr ""
+msgstr "顯示名稱："
 
 #: cms/templates/edit_subsection.html
 msgid "Units:"
-msgstr ""
+msgstr "單元："
 
 #: cms/templates/edit_subsection.html
 msgid "Subsection Settings"
-msgstr ""
+msgstr "小節設定"
 
 #: cms/templates/edit_subsection.html cms/templates/overview.html
 msgid "Release Day"
-msgstr ""
+msgstr "發佈日期"
 
 #: cms/templates/edit_subsection.html cms/templates/overview.html
 msgid "Release Time"
-msgstr ""
+msgstr "發佈時間"
 
 #: cms/templates/edit_subsection.html cms/templates/edit_subsection.html
 #: cms/templates/overview.html
 msgid "Coordinated Universal Time"
-msgstr ""
+msgstr "世界標準時間"
 
 #: cms/templates/edit_subsection.html
 msgid "UTC"
-msgstr ""
+msgstr "國際標準時間"
 
 #: cms/templates/edit_subsection.html
 msgid ""
@@ -9942,43 +10023,43 @@ msgstr ""
 
 #: cms/templates/edit_subsection.html
 msgid "The date above differs from the release date of {name} - {start_time}"
-msgstr ""
+msgstr "上述日期與 '{name}' 的發佈日期 '{start_time}'不同"
 
 #: cms/templates/edit_subsection.html
 msgid "Sync to {name}."
-msgstr ""
+msgstr "同步至 '{name}'。"
 
 #: cms/templates/edit_subsection.html
 msgid "Graded as:"
-msgstr ""
+msgstr "當前評分方式："
 
 #: cms/templates/edit_subsection.html
 msgid "Set a due date"
-msgstr ""
+msgstr "設定截止日期"
 
 #: cms/templates/edit_subsection.html
 msgid "Due Day"
-msgstr ""
+msgstr "截止日期"
 
 #: cms/templates/edit_subsection.html
 msgid "Due Time"
-msgstr ""
+msgstr "截止時間"
 
 #: cms/templates/edit_subsection.html
 msgid "Remove due date"
-msgstr ""
+msgstr "移除截止日期"
 
 #: cms/templates/edit_subsection.html
 msgid "Preview Drafts"
-msgstr ""
+msgstr "預覽草稿"
 
 #: cms/templates/error.html
 msgid "Internal Server Error"
-msgstr ""
+msgstr "內部伺服器錯誤"
 
 #: cms/templates/error.html
 msgid "The Page You Requested Page Cannot be Found"
-msgstr ""
+msgstr "無法找到您請求的頁面"
 
 #: cms/templates/error.html
 msgid ""
@@ -9987,16 +10068,18 @@ msgid ""
 "having problems accessing things, please feel free to {link_start}contact "
 "Studio support{link_end} for further help."
 msgstr ""
+"很抱歉，我們無法找到您查詢的Studio頁面。您可能需要返回至Studio控制台重新嘗試。如果您仍遇到問題，請與 "
+"'{link_start}'Studio技術支援團隊'{link_end}'聯繫。"
 
 #: cms/templates/error.html cms/templates/error.html
 #: cms/templates/widgets/footer.html cms/templates/widgets/header.html
 #: cms/templates/widgets/sock.html
 msgid "Use our feedback tool, Tender, to share your feedback"
-msgstr ""
+msgstr "請使用我們的回饋工具Tender來分享您的回饋"
 
 #: cms/templates/error.html
 msgid "The Server Encountered an Error"
-msgstr ""
+msgstr "伺服器發生錯誤"
 
 #: cms/templates/error.html
 msgid ""
@@ -10006,18 +10089,19 @@ msgid ""
 "please feel free to {link_start}contact Studio support{link_end} for further"
 " help."
 msgstr ""
+"很抱歉，伺服器在處理您的上一個請求時出現錯誤。您可能需要返回至Studio控制台或重新提交請求。如果您仍遇到問題，請與'{link_start}'Studio技術支援團隊'{link_end}'聯繫以尋求幫助。"
 
 #: cms/templates/error.html
 msgid "Back to dashboard"
-msgstr ""
+msgstr "回到控制面板"
 
 #: cms/templates/export.html cms/templates/export.html
 msgid "Course Export"
-msgstr ""
+msgstr "匯出課程"
 
 #: cms/templates/export.html
 msgid "About Exporting Courses"
-msgstr ""
+msgstr "關於匯出課程"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -10027,62 +10111,64 @@ msgid ""
 " the course structure and content. You can also re-import courses that "
 "you've exported."
 msgstr ""
+"您可以在Studio之外匯出課程並且編輯它們。匯出的檔案會是一個 .tar.gz 的檔案 (即 .tar 檔案再以 GNU Zip "
+"壓縮)，其中包含的課程結構以及內容。您也可以重新匯入已經匯出的課程。"
 
 #: cms/templates/export.html
 msgid "Export My Course Content"
-msgstr ""
+msgstr "匯出我的課程內容"
 
 #: cms/templates/export.html
 msgid "Export Course Content"
-msgstr ""
+msgstr "匯出課程內容"
 
 #: cms/templates/export.html
 msgid "Data {em_start}exported with{em_end} your course:"
-msgstr ""
+msgstr "資料 {em_start} 匯出 {em_end} 您的課程："
 
 #: cms/templates/export.html
 msgid "Course Content (all Sections, Sub-sections, and Units)"
-msgstr ""
+msgstr "課程內容 (所有章節、小節以及單元)"
 
 #: cms/templates/export.html
 msgid "Course Structure"
-msgstr ""
+msgstr "課程架構"
 
 #: cms/templates/export.html
 msgid "Individual Problems"
-msgstr ""
+msgstr "個別問題"
 
 #: cms/templates/export.html
 msgid "Course Assets"
-msgstr ""
+msgstr "課程資源"
 
 #: cms/templates/export.html
 msgid "Course Settings"
-msgstr ""
+msgstr "課程設定"
 
 #: cms/templates/export.html
 msgid "Data {em_start}not exported{em_end} with your course:"
-msgstr ""
+msgstr "資料 {em_start} 並沒有與課程一起匯出 {em_end} ："
 
 #: cms/templates/export.html
 msgid "User Data"
-msgstr ""
+msgstr "用戶資料"
 
 #: cms/templates/export.html
 msgid "Course Team Data"
-msgstr ""
+msgstr "課程團隊資料"
 
 #: cms/templates/export.html
 msgid "Forum/discussion Data"
-msgstr ""
+msgstr "論壇/討論資料"
 
 #: cms/templates/export.html
 msgid "Certificates"
-msgstr ""
+msgstr "證書"
 
 #: cms/templates/export.html
 msgid "Why export a course?"
-msgstr ""
+msgstr "為何匯出課程?"
 
 #: cms/templates/export.html
 msgid ""
@@ -10091,10 +10177,12 @@ msgid ""
 " a copy of your course that you can later import into another course "
 "instance and customize."
 msgstr ""
+"您或許想要直接地在Studio之外修改一個在您課程中的XML檔案。您或許想要創建一個您課程的備份。\n"
+"或者，您可能想要建立一份您的課程副本，之後您就可用來匯入至另一門課程的實體並客制。"
 
 #: cms/templates/export.html
 msgid "What content is exported?"
-msgstr ""
+msgstr "什麼內容被匯出?"
 
 #: cms/templates/export.html
 msgid ""
@@ -10102,11 +10190,11 @@ msgid ""
 "units) are exported. Other data, including student data, grading "
 "information, discussion forum data, course settings, and course team "
 "information, is not exported."
-msgstr ""
+msgstr "只有課程內容和架構(包括章節、小節、單元)被匯出。其他的資料，包括學生資料、評分資訊、討論區資料、課程設定或者課程團隊資訊將不會被匯出。"
 
 #: cms/templates/export.html
 msgid "Opening the downloaded file"
-msgstr ""
+msgstr "開啟下載的檔案"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -10115,6 +10203,8 @@ msgid ""
 "data includes the course.xml file, as well as subfolders that contain course"
 " content."
 msgstr ""
+"使用一個壓縮程式從 .tar.gz 檔案提取資料。\n"
+"提取後的資料包括課程的 .xml 檔案，還有一些存放課程內容的子目錄。"
 
 #: cms/templates/export_git.html
 msgid "Export Course to Git"
@@ -10167,28 +10257,28 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
-msgstr ""
+msgstr "歡迎"
 
 #: cms/templates/howitworks.html
 msgid "Welcome to"
-msgstr ""
+msgstr "歡迎來到"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Studio helps manage your courses online, so you can focus on teaching them"
-msgstr ""
+msgstr "Studio幫您做好了線上課程的管理，讓您可以專注於課程的教學。"
 
 #: cms/templates/howitworks.html
 msgid "Studio's Many Features"
-msgstr ""
+msgstr "Studio 的許多特性"
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 msgid "Studio Helps You Keep Your Courses Organized"
-msgstr ""
+msgstr "Studio幫助您維持課程井然有序"
 
 #: cms/templates/howitworks.html
 msgid "Keeping Your Course Organized"
-msgstr ""
+msgstr "維持您的課程井然有序"
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -10196,41 +10286,42 @@ msgid ""
 "<strong>Outline</strong> editor, providing a simple hierarchy and easy drag "
 "and drop to help you and your students stay organized."
 msgstr ""
+"課程的骨幹是其組織形式。Studio為您提供了<strong>大綱</strong>編輯器，通過簡單的層次組織和拖放操作來幫助您和您的學生井然有序。"
 
 #: cms/templates/howitworks.html
 msgid "Simple Organization For Content"
-msgstr ""
+msgstr "簡單的內容組織"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Studio uses a simple hierarchy of <strong>sections</strong> and "
 "<strong>subsections</strong> to organize your content."
-msgstr ""
+msgstr "Studio使用一個簡單的包括<strong>章節</strong> 和<strong>小節</strong>的層次結構來組織您的內容。"
 
 #: cms/templates/howitworks.html
 msgid "Change Your Mind Anytime"
-msgstr ""
+msgstr "隨時改變您的想法"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Draft your outline and build content anywhere. Simple drag and drop tools "
 "let your reorganize quickly."
-msgstr ""
+msgstr "在任何地方起草您的大綱和創建內容。簡單的拖放工具讓您快速重新組織課程內容。"
 
 #: cms/templates/howitworks.html
 msgid "Go A Week Or A Semester At A Time"
-msgstr ""
+msgstr "去一個星期或一個學期的時間"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Build and release <strong>sections</strong> to your students incrementally. "
 "You don't have to have it all done at once."
-msgstr ""
+msgstr "定期設置和發佈<strong>章節</strong>給您的學生。您不需要一次發佈所有的章節內容。"
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 #: cms/templates/howitworks.html
 msgid "Learning is More than Just Lectures"
-msgstr ""
+msgstr "學習不僅僅是聽課"
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -10239,45 +10330,46 @@ msgid ""
 "Insert videos and author a wide variety of exercise types with just a few "
 "clicks."
 msgstr ""
+"Studio 以一種能提升教學效果的方式幫您組織內容&mdash;短影片教程和練習等交錯出現。插入影片和各種各樣的練習類型都可以通過幾次點擊操作完成。"
 
 #: cms/templates/howitworks.html
 msgid "Create Learning Pathways"
-msgstr ""
+msgstr "創建學習途徑"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Help your students understand a small interactive piece at a time with "
 "multimedia, HTML, and exercises."
-msgstr ""
+msgstr "透過多媒體、超文字標記語言和練習，幫助您的學生理解。"
 
 #: cms/templates/howitworks.html
 msgid "Work Visually, Organize Quickly"
-msgstr ""
+msgstr "視覺化地工作，快速地組織"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Work visually and see exactly what your students will see. Reorganize all "
 "your content with drag and drop."
-msgstr ""
+msgstr "視覺化地工作並且準確地看到您的學生將要看的內容。透過拖放操作重新組織您的課程內容。"
 
 #: cms/templates/howitworks.html
 msgid "A Broad Library of Problem Types"
-msgstr ""
+msgstr "關於問題類型的豐富知識庫"
 
 #: cms/templates/howitworks.html
 msgid ""
 "It's more than just multiple choice. Studio has nearly a dozen types of "
 "problems to challenge your learners."
-msgstr ""
+msgstr "這不僅僅是多重選擇。Studio有多種問題類型可用來挑戰學習者。"
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 msgid ""
 "Studio Gives You Simple, Fast, and Incremental Publishing. With Friends."
-msgstr ""
+msgstr "Studio提供您和您的朋友簡單、快速和增量式的內容發佈。"
 
 #: cms/templates/howitworks.html
 msgid "Simple, Fast, and Incremental Publishing. With Friends."
-msgstr ""
+msgstr "與其他人一起合作，體驗簡單、快速、增量式的內容發佈過程"
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -10286,92 +10378,94 @@ msgid ""
 "incremental release when it makes sense. And with co-authors, you can have a"
 " whole team building a course, together."
 msgstr ""
+"Studio的運行機制與您熟悉的網路應用類似，但還是需要瞭解一下如何創建課程。您可以在需要時在網站上即時發佈，或是根據情況增量發佈資訊。您還可以和合作者一起，以一個團隊的形式來創建課程。"
 
 #: cms/templates/howitworks.html
 msgid "Instant Changes"
-msgstr ""
+msgstr "即時修改"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Caught a bug? No problem. When you want, your changes to live when you hit "
 "Save."
-msgstr ""
+msgstr "遇到了一個程式錯誤？沒有問題。當您需要的時候，您可以點擊保存按鈕隨時保存修改。"
 
 #: cms/templates/howitworks.html
 msgid "Release-On Date Publishing"
-msgstr ""
+msgstr "公開發佈日期"
 
 #: cms/templates/howitworks.html
 msgid ""
 "When you've finished a <strong>section</strong>, pick when you want it to go"
 " live and Studio takes care of the rest. Build your course incrementally."
 msgstr ""
+"當您完成了一個<strong>章節</strong>，請先確定發佈時間，然後Studio會完成後面的工作。這樣便可以實現增量式地創建您的課程。"
 
 #: cms/templates/howitworks.html
 msgid "Work in Teams"
-msgstr ""
+msgstr "以團隊合作"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Co-authors have full access to all the same authoring tools. Make your "
 "course better through a team effort."
-msgstr ""
+msgstr "合作者擁有完整存取相同的創作工具的權限。團隊協作將提高您的課程品質。"
 
 #: cms/templates/howitworks.html
 msgid "Sign Up for Studio Today!"
-msgstr ""
+msgstr "馬上註冊加入Studio！"
 
 #: cms/templates/howitworks.html
 msgid "Sign Up &amp; Start Making an edX Course"
-msgstr ""
+msgstr "註冊並開始創建一門edX線上課程"
 
 #: cms/templates/howitworks.html
 msgid "Already have a Studio Account? Sign In"
-msgstr ""
+msgstr "已擁有Studio帳戶了嗎？即刻登入"
 
 #: cms/templates/howitworks.html
 msgid "Outlining Your Course"
-msgstr ""
+msgstr "概述您的課程大綱"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Simple two-level outline to organize your couse. Drag and drop, and see your"
 " course at a glance."
-msgstr ""
+msgstr "使用簡單的二層大綱形式來組織您的課程。通過拖放操作大致瀏覽您的課程。"
 
 #: cms/templates/howitworks.html
 msgid "More than Just Lectures"
-msgstr ""
+msgstr "不僅僅是講座"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Quickly create videos, text snippets, inline discussions, and a variety of "
 "problem types."
-msgstr ""
+msgstr "快速創建影片、文件片段、內部討論和各種問題類型。"
 
 #: cms/templates/howitworks.html
 msgid "Publishing on Date"
-msgstr ""
+msgstr "出版日期"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Simply set the date of a section or subsection, and Studio will publish it "
 "to your students for you."
-msgstr ""
+msgstr "請設置章節或小節的發佈時間，系統會按照設定時間發佈這些內容。"
 
 #: cms/templates/html_error.html
 msgid "We're having trouble rendering your component"
-msgstr ""
+msgstr "渲染元件時遇到問題"
 
 #: cms/templates/html_error.html
 msgid ""
 "Students will not be able to access this component. Re-edit your component "
 "to fix the error."
-msgstr ""
+msgstr "學生將不能夠存取這個元件。請重新編輯您的元件來修正這個錯誤。"
 
 #: cms/templates/import.html cms/templates/import.html
 msgid "Course Import"
-msgstr ""
+msgstr "匯入課程"
 
 #: cms/templates/import.html
 msgid ""
@@ -10380,6 +10474,8 @@ msgid ""
 "cannot undo a course import{em_end}. We recommend that you first export the "
 "current course, so you have a backup copy of it."
 msgstr ""
+"在繼續之前請確認您想要匯入一門課程。目前匯入課程將取代這個課程的所有內容。{em_start} 您不能夠取消課程匯入 "
+"{em_end}。我們推薦您先匯出目前的課程，如此一來就可以您就擁有一份現有課程的備份。"
 
 #. Translators: ".tar.gz" is a file extension, and files with that extension
 #. are called "gzipped tar files": these terms should not be translated
@@ -10389,6 +10485,8 @@ msgid ""
 "compressed with GNU Zip). This .tar.gz file must contain a course.xml file. "
 "It may also contain other files."
 msgstr ""
+"這個您匯入的課程必須是一個 .tar.gz 檔案 (也就是一個以 GNU Zip 壓縮的 .tar 檔案)。這個 .tar.gz 檔案必須包含一個課程 "
+".xml 檔案，也可能包含其他檔案。"
 
 #: cms/templates/import.html
 msgid ""
@@ -10397,40 +10495,41 @@ msgid ""
 "completed. We recommend, however, that you don't make important changes to "
 "your course until the import operation has completed."
 msgstr ""
+"匯入的過程有五個步驟。前兩個步驟，您必須停留在這個頁面。您可以在解壓縮步驟完成後離開這個頁面。不過，我們建議您在匯入操作結束前，不要對課程做什麼重要更改。"
 
 #. Translators: ".tar.gz" is a file extension, and files with that extension
 #. are called "gzipped tar files": these terms should not be translated
 #: cms/templates/import.html
 msgid "Select a .tar.gz File to Replace Your Course Content"
-msgstr ""
+msgstr "選擇一個 .tar.gz 檔案來取代您的課程內容"
 
 #: cms/templates/import.html
 msgid "Choose a File to Import"
-msgstr ""
+msgstr "選擇一個檔案來匯入"
 
 #: cms/templates/import.html
 msgid "File Chosen:"
-msgstr ""
+msgstr "選擇的檔案："
 
 #: cms/templates/import.html
 msgid "Replace my course with the one above"
-msgstr ""
+msgstr "用上面的課程替換我的課程"
 
 #: cms/templates/import.html
 msgid "Course Import Status"
-msgstr ""
+msgstr "課程匯入狀態"
 
 #: cms/templates/import.html
 msgid "Uploading"
-msgstr ""
+msgstr "上傳中"
 
 #: cms/templates/import.html
 msgid "Transferring your file to our servers"
-msgstr ""
+msgstr "將您的檔案傳送到我們的伺服器上"
 
 #: cms/templates/import.html
 msgid "Unpacking"
-msgstr ""
+msgstr "打開中"
 
 #: cms/templates/import.html
 msgid ""
@@ -10467,7 +10566,7 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "View Updated Outline"
-msgstr ""
+msgstr "檢視更新後的大鋼"
 
 #: cms/templates/import.html
 msgid "Why import a course?"
@@ -10491,6 +10590,7 @@ msgid ""
 "information, discussion forum data, course settings, and course team "
 "information, remains the same as it was in the existing course."
 msgstr ""
+"只有課程內容和架構(包括章節、小節、單元)被匯入。其他的資料，包括學生資料、評分資訊、討論區資料、課程設定或者課程團隊資訊繼續保持於先前存在於課程中的樣子。"
 
 #: cms/templates/import.html
 msgid "Warning: Importing while a course is running"
@@ -10567,7 +10667,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Required Information to Create a New Course"
-msgstr ""
+msgstr "創建一個新課程的必要資訊"
 
 #: cms/templates/index.html
 msgid "e.g. Introduction to Computer Science"
@@ -10713,17 +10813,17 @@ msgstr ""
 msgid ""
 "Your request is currently being reviewed by edX staff and should be updated "
 "shortly."
-msgstr ""
+msgstr "您的請求正在被edX員工檢視，預期很快就會更新。"
 
 #: cms/templates/index.html cms/templates/index.html
 msgid "Need help?"
-msgstr ""
+msgstr "需要幫助？"
 
 #: cms/templates/index.html
 msgid ""
 "If you are new to Studio and having trouble getting started, there are a few"
 " things that may be of help:"
-msgstr ""
+msgstr "如果您對Studio不瞭解，同時開始使用時遇到困難，那麼這些東西可能對您有所幫助。"
 
 #: cms/templates/index.html
 msgid "Get started by reading Studio's Documentation"
@@ -10731,7 +10831,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Request help with Studio"
-msgstr ""
+msgstr "向Studio請求幫助"
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Can I create courses in Studio?"
@@ -10743,7 +10843,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "contact edX staff to help you create a course"
-msgstr ""
+msgstr "聯繫edX員工來幫助您創建一個課程"
 
 #: cms/templates/index.html
 msgid ""
@@ -11101,6 +11201,7 @@ msgid ""
 "technical background would be helpful. As always, we are here to help, so "
 "don't hesitate to dive right in."
 msgstr ""
+"對幾乎所有熟悉線上編輯環境(WordPress、Moodle之類)的人而言，Studio是很容易使用的。它無需任何程式設計知識，不過擁有技術背景會對使用一些進階功能有所幫助。我們會一如既往地為您提供幫助，不要猶豫趕快加入吧。"
 
 #: cms/templates/register.html
 msgid "I've never authored a course online before. Is there help?"
@@ -11161,6 +11262,8 @@ msgid ""
 "announced. To provide content for the page and preview it, follow the "
 "instructions provided by your <abbr title=\"Program Manager\">PM</abbr>."
 msgstr ""
+"您的課程總結頁面直到您的課程發布之後才會可見。為了向該頁面提供內容並預覽頁面，請遵循您的 <abbr title=\"Program "
+"Manager\">PM</abbr>. 提供的說明。"
 
 #: cms/templates/settings.html
 msgid "Course Schedule"
@@ -11168,7 +11271,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Dates that control when your course can be viewed"
-msgstr ""
+msgstr "日期決定了您的課程何時可以被瀏覽。"
 
 #: cms/templates/settings.html
 msgid "First day the course begins"
@@ -11248,7 +11351,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Overview"
-msgstr ""
+msgstr "課程概述"
 
 #: cms/templates/settings.html
 msgid "your course summary page"
@@ -11331,6 +11434,7 @@ msgid ""
 "video, and estimated time requirements. Students use About pages to choose "
 "new courses to take."
 msgstr ""
+"本頁面的其他資訊將會出現在您課程的關於頁面上。這些資訊包括課程概述、課程圖片、介紹影片，以及預估的時間要求。學生們可以使用關於頁面來選擇要上的課程。"
 
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html
@@ -11478,7 +11582,7 @@ msgid ""
 "students, especially those with slow Internet connections. Breaking up "
 "textbooks into chapters can also help students more easily find topic-based "
 "information."
-msgstr ""
+msgstr "將您的課程教材拆分成章節有助於降低學生的載入時間，特別是網路速度較慢的學生。同時可以幫助學生更容易根據主題找到他們所需的資訊。"
 
 #: cms/templates/textbooks.html
 msgid "What if my book isn't divided into chapters?"
@@ -11505,7 +11609,7 @@ msgstr ""
 
 #: cms/templates/unit.html
 msgid "View the Live Version"
-msgstr ""
+msgstr "檢視線上版本"
 
 #: cms/templates/unit.html
 msgid "Add New Component"
@@ -11548,15 +11652,15 @@ msgid ""
 msgstr ""
 
 #: cms/templates/unit.html
-msgid "This unit is scheduled to be released to <strong>students</strong>"
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> on "
+"<strong>{date}</strong> with the subsection {link_start}{name}{link_end}"
 msgstr ""
 
 #: cms/templates/unit.html
-msgid "on {date}"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "with the subsection {link_start}{name}{link_end}"
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> with the "
+"subsection {link_start}{name}{link_end}"
 msgstr ""
 
 #: cms/templates/unit.html
@@ -11582,7 +11686,7 @@ msgid ""
 "If you didn't request this, you don't need to do anything; you won't receive"
 " any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the help section of the edX web site."
-msgstr ""
+msgstr "如果您並未發出請求，則您不需要做做任何事，也將不會再收到我們的郵件。請不要直接回復此郵件。如果您需要幫助，請點擊edX網站的説明頁面。"
 
 #: cms/templates/emails/activation_email_subject.txt
 msgid "Your account for edX Studio"
@@ -11677,7 +11781,7 @@ msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Help &amp; Account Navigation"
-msgstr ""
+msgstr "幫助 &amp; 帳戶導航"
 
 #: cms/templates/widgets/header.html cms/templates/widgets/sock.html
 msgid "This is a PDF Document"
@@ -11710,7 +11814,7 @@ msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Studio Help"
-msgstr ""
+msgstr "Studio幫助"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"
@@ -11769,7 +11873,7 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "edX Studio Help"
-msgstr ""
+msgstr "edX Studio幫助"
 
 #: cms/templates/widgets/sock.html
 msgid ""
@@ -11777,6 +11881,7 @@ msgid ""
 "Take advantage of our documentation, help center, as well as our edX101 "
 "introduction course for course authors."
 msgstr ""
+"需要關於Studio的説明嗎？由於創建課程比較複雜，因此我們在此提供幫助。請仔細閱讀我們的文件，幫助中心以及面向課程作者的edX101入門課程。"
 
 #: cms/templates/widgets/sock.html
 msgid "Download Studio Documentation"
@@ -11826,58 +11931,58 @@ msgstr "這是一個關鍵字符串"
 
 #: wiki/admin.py wiki/models/article.py
 msgid "created"
-msgstr ""
+msgstr "創建"
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"
-msgstr ""
+msgstr "只有本地主機... muahahaha"
 
 #: wiki/forms.py
 msgid "Initial title of the article. May be overridden with revision titles."
-msgstr ""
+msgstr "文章的初始標題，可能被修訂後的標題覆蓋。"
 
 #: wiki/forms.py
 msgid "Type in some contents"
-msgstr ""
+msgstr "輸入一些內容"
 
 #: wiki/forms.py
 msgid ""
 "This is just the initial contents of your article. After creating it, you "
 "can use more complex features like adding plugins, meta data, related "
 "articles etc..."
-msgstr ""
+msgstr "這只是您文章的初始內容。創建後，您可以使用更複雜的功能，例如新增外掛元件，後設資料，相關文章等.."
 
 #: wiki/forms.py wiki/forms.py
 msgid "Contents"
-msgstr ""
+msgstr "內容"
 
 #: wiki/forms.py wiki/forms.py
 msgid "Summary"
-msgstr ""
+msgstr "總結"
 
 #: wiki/forms.py
 msgid ""
 "Give a short reason for your edit, which will be stated in the revision log."
-msgstr ""
+msgstr "請對您的修改給一個簡短的原因，這將會被註明在修訂日誌中。"
 
 #: wiki/forms.py
 msgid ""
 "While you were editing, someone else changed the revision. Your contents "
 "have been automatically merged with the new contents. Please review the text"
 " below."
-msgstr ""
+msgstr "當您在編輯的同時，若其他人也正在修改這個修訂版，則您的內容會被自動合併到新的內容。請仔細閱讀下面的文字。"
 
 #: wiki/forms.py
 msgid "No changes made. Nothing to save."
-msgstr ""
+msgstr "沒有任何變更。沒有東西可以儲存。"
 
 #: wiki/forms.py
 msgid "Select an option"
-msgstr ""
+msgstr "選擇一個選項"
 
 #: wiki/forms.py
 msgid "Slug"
-msgstr ""
+msgstr "縮略名"
 
 #: wiki/forms.py
 msgid ""
@@ -11888,27 +11993,27 @@ msgstr ""
 
 #: wiki/forms.py
 msgid "Write a brief message for the article's history log."
-msgstr ""
+msgstr "為文章的歷史記錄寫一條簡短的訊息。"
 
 #: wiki/forms.py
 msgid "A slug may not begin with an underscore."
-msgstr ""
+msgstr "一個縮略名不得以下劃線開頭。"
 
 #: wiki/forms.py
 msgid "A deleted article with slug \"%s\" already exists."
-msgstr ""
+msgstr "已經存在一篇縮略名為\"%s\"的已刪除文章。"
 
 #: wiki/forms.py
 msgid "A slug named \"%s\" already exists."
-msgstr ""
+msgstr "縮略名\"%s\"已存在。"
 
 #: wiki/forms.py
 msgid "Yes, I am sure"
-msgstr ""
+msgstr "是的，我確定"
 
 #: wiki/forms.py
 msgid "Purge"
-msgstr ""
+msgstr "清除"
 
 #: wiki/forms.py
 msgid ""
@@ -11916,110 +12021,111 @@ msgid ""
 " Purging is a good idea if you want to free the slug such that users can "
 "create new articles in its place."
 msgstr ""
+"清除文章：徹底刪除它(和它所有的內容)同時沒有復原功能。如果您想釋放特硬的縮略名 ，使得用戶可以在其位置創建新的文章的話，清除是一個好主意。"
 
 #: wiki/forms.py wiki/plugins/attachments/forms.py
 #: wiki/plugins/images/forms.py
 msgid "You are not sure enough!"
-msgstr ""
+msgstr "您不夠確定！"
 
 #: wiki/forms.py
 msgid "While you tried to delete this article, it was modified. TAKE CARE!"
-msgstr ""
+msgstr "當您試圖刪除這篇文章的同時，文章被修改。保重！"
 
 #: wiki/forms.py
 msgid "Lock article"
-msgstr ""
+msgstr "鎖定文章"
 
 #: wiki/forms.py
 msgid "Deny all users access to edit this article."
-msgstr ""
+msgstr "拒絕所有用戶存取編輯這篇文章。"
 
 #: wiki/forms.py
 msgid "Permissions"
-msgstr ""
+msgstr "權限"
 
 #: wiki/forms.py
 msgid "Owner"
-msgstr ""
+msgstr "擁有者"
 
 #: wiki/forms.py
 msgid "Enter the username of the owner."
-msgstr ""
+msgstr "輸入擁有者的用戶名。"
 
 #: wiki/forms.py
 msgid "(none)"
-msgstr ""
+msgstr "(none)"
 
 #: wiki/forms.py
 msgid "Inherit permissions"
-msgstr ""
+msgstr "繼承權限"
 
 #: wiki/forms.py
 msgid ""
 "Check here to apply the above permissions recursively to articles under this"
 " one."
-msgstr ""
+msgstr "點選此處來確認將上述權限遞迴設定到此篇文章之下。"
 
 #: wiki/forms.py
 msgid "Permission settings for the article were updated."
-msgstr ""
+msgstr "文章的權限設定已更新。"
 
 #: wiki/forms.py
 msgid "Your permission settings were unchanged, so nothing saved."
-msgstr ""
+msgstr "您的權限設定並未改變，所以並未儲存。"
 
 #: wiki/forms.py
 msgid "No user with that username"
-msgstr ""
+msgstr "沒有用戶使用這個使用者名稱"
 
 #: wiki/forms.py
 msgid "Article locked for editing"
-msgstr ""
+msgstr "已鎖定文章編輯功能"
 
 #: wiki/forms.py
 msgid "Article unlocked for editing"
-msgstr ""
+msgstr "文章編輯鎖定已解除"
 
 #: wiki/forms.py
 msgid "Filter..."
-msgstr ""
+msgstr "過濾..."
 
 #: wiki/core/plugins/base.py
 msgid "Settings for plugin"
-msgstr ""
+msgstr "外掛設定"
 
 #: wiki/models/article.py wiki/models/pluginbase.py
 #: wiki/plugins/attachments/models.py
 msgid "current revision"
-msgstr ""
+msgstr "使用中的修訂版"
 
 #: wiki/models/article.py
 msgid ""
 "The revision being displayed for this article. If you need to do a roll-"
 "back, simply change the value of this field."
-msgstr ""
+msgstr "正在顯示這篇文章的修訂版。如果您需要復原，簡單地改變欄位中的值。"
 
 #: wiki/models/article.py
 msgid "modified"
-msgstr ""
+msgstr "修改"
 
 #: wiki/models/article.py
 msgid "Article properties last modified"
-msgstr ""
+msgstr "最後修改的文章屬性"
 
 #: wiki/models/article.py
 msgid "owner"
-msgstr ""
+msgstr "擁有者"
 
 #: wiki/models/article.py
 msgid ""
 "The owner of the article, usually the creator. The owner always has both "
 "read and write access."
-msgstr ""
+msgstr "文章的擁有者通常是作者，擁有者永遠擁有讀取和寫入權限。"
 
 #: wiki/models/article.py
 msgid "group"
-msgstr ""
+msgstr "群組"
 
 #: wiki/models/article.py
 msgid ""
@@ -12029,91 +12135,91 @@ msgstr ""
 
 #: wiki/models/article.py
 msgid "group read access"
-msgstr ""
+msgstr "群組閱讀權限"
 
 #: wiki/models/article.py
 msgid "group write access"
-msgstr ""
+msgstr "群組寫入權限"
 
 #: wiki/models/article.py
 msgid "others read access"
-msgstr ""
+msgstr "其他人讀取權限"
 
 #: wiki/models/article.py
 msgid "others write access"
-msgstr ""
+msgstr "其他人寫入權限"
 
 #: wiki/models/article.py
 msgid "Article without content (%(id)d)"
-msgstr ""
+msgstr "文章沒有內容 (%(id)d)"
 
 #: wiki/models/article.py
 msgid "content type"
-msgstr ""
+msgstr "內容種類"
 
 #: wiki/models/article.py
 msgid "object ID"
-msgstr ""
+msgstr "物件ID"
 
 #: wiki/models/article.py
 msgid "Article for object"
-msgstr ""
+msgstr "物件的文章"
 
 #: wiki/models/article.py
 msgid "Articles for object"
-msgstr ""
+msgstr "物件的文章們"
 
 #: wiki/models/article.py
 msgid "revision number"
-msgstr ""
+msgstr "修訂版編號"
 
 #: wiki/models/article.py
 msgid "IP address"
-msgstr ""
+msgstr "IP位置"
 
 #: wiki/models/article.py
 msgid "user"
-msgstr ""
+msgstr "使用者"
 
 #: wiki/models/article.py
 msgid "locked"
-msgstr ""
+msgstr "已鎖定"
 
 #: wiki/models/article.py wiki/models/pluginbase.py
 msgid "article"
-msgstr ""
+msgstr "文章"
 
 #: wiki/models/article.py
 msgid "article contents"
-msgstr ""
+msgstr "文章內容"
 
 #: wiki/models/article.py
 msgid "article title"
-msgstr ""
+msgstr "文章標題"
 
 #: wiki/models/article.py
 msgid ""
 "Each revision contains a title field that must be filled out, even if the "
 "title has not changed"
-msgstr ""
+msgstr "即使標題沒有改變，每個修訂版都必須填寫標題欄位"
 
 #: wiki/models/pluginbase.py
 msgid "original article"
-msgstr ""
+msgstr "原始文章"
 
 #: wiki/models/pluginbase.py
 msgid "Permissions are inherited from this article"
-msgstr ""
+msgstr "權限是繼承自這篇文章"
 
 #: wiki/models/pluginbase.py
 msgid "A plugin was changed"
-msgstr ""
+msgstr "外掛已改變"
 
 #: wiki/models/pluginbase.py
 msgid ""
 "The revision being displayed for this plugin.If you need to do a roll-back, "
 "simply change the value of this field."
-msgstr ""
+msgstr "正在顯示這個外掛的所有修訂版本。如果您需要復原回去，簡單地改變這個欄位的值。"
 
 #: wiki/models/urlpath.py
 msgid "Cache lookup value for articles"
@@ -12175,7 +12281,7 @@ msgstr ""
 msgid ""
 "The revision of this attachment currently in use (on all articles using the "
 "attachment)"
-msgstr ""
+msgstr "正在使用此附件的修訂版 (包含所有使用這個附件的文章)"
 
 #: wiki/plugins/attachments/models.py
 msgid "original filename"
@@ -12195,11 +12301,11 @@ msgstr ""
 
 #: wiki/plugins/attachments/models.py
 msgid "attachment revision"
-msgstr ""
+msgstr "附件修訂版本"
 
 #: wiki/plugins/attachments/models.py
 msgid "attachment revisions"
-msgstr ""
+msgstr "附件修訂版本"
 
 #: wiki/plugins/attachments/views.py
 msgid "%s was successfully added."
@@ -12227,7 +12333,7 @@ msgstr ""
 
 #: wiki/plugins/attachments/views.py
 msgid "Current revision changed for %s."
-msgstr ""
+msgstr "目前修訂版改變為 %s 。"
 
 #: wiki/plugins/attachments/views.py
 msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
@@ -12273,15 +12379,15 @@ msgstr ""
 
 #: wiki/plugins/images/models.py
 msgid "Current revision not set!!"
-msgstr ""
+msgstr "沒有設定目前修訂版！"
 
 #: wiki/plugins/images/models.py
 msgid "image revision"
-msgstr ""
+msgstr "圖片修訂版"
 
 #: wiki/plugins/images/models.py
 msgid "image revisions"
-msgstr ""
+msgstr "圖片修訂版"
 
 #: wiki/plugins/images/models.py
 msgid "Image Revsion: %d"
@@ -12297,7 +12403,7 @@ msgstr ""
 
 #: wiki/plugins/images/views.py
 msgid "%(file)s has been changed to revision #%(revision)d"
-msgstr ""
+msgstr "%(file)s已經修改成#%(revision)d修訂版"
 
 #: wiki/plugins/images/views.py
 msgid "%(file)s has been saved."
@@ -12397,7 +12503,7 @@ msgstr ""
 
 #: wiki/views/article.py
 msgid "A new revision of the article was succesfully added."
-msgstr ""
+msgstr "已成功新增一個修訂版"
 
 #: wiki/views/article.py
 msgid "Restoring article"
@@ -12409,7 +12515,7 @@ msgstr ""
 
 #: wiki/views/article.py
 msgid "The article %s is now set to display revision #%d"
-msgstr ""
+msgstr "%s 這篇文章現在被設定為顯示版本 #%d"
 
 #: wiki/views/article.py
 msgid "New title"
@@ -12417,10 +12523,10 @@ msgstr ""
 
 #: wiki/views/article.py
 msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
-msgstr ""
+msgstr "合併版本 #%(r1)d 及版本 #%(r2)d"
 
 #: wiki/views/article.py
 msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"
-msgstr ""
+msgstr "一個新的修訂版被創建：合併自版本 #%(r1)d 以及版本 #%(r2)d"

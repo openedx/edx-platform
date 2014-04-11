@@ -22,6 +22,8 @@
 
 <%block name="headextra">
   <%static:css group='style-course-vendor'/>
+  <%static:css group='style-vendor-tinymce-content'/>
+  <%static:css group='style-vendor-tinymce-skin'/>
   <%static:css group='style-course'/>
   <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/mustache.js')}"></script>
@@ -37,8 +39,8 @@
   <link rel="stylesheet" href="${static.url('css/vendor/slickgrid/smoothness/jquery-ui-1.8.16.custom.css')}">
   <link rel="stylesheet" href="${static.url('css/vendor/slickgrid/slick.grid.css')}">
   <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/tiny_mce.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/jquery.tinymce.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
   <%static:js group='module-descriptor-js'/>
   <%static:js group='instructor_dash'/>
 </%block>
@@ -51,34 +53,35 @@
 <script language="JavaScript" type="text/javascript"></script>
 
 <section class="container">
-<div class="instructor-dashboard-wrapper-2">
-<div class="olddash-button-wrapper"><a href="${ old_dashboard_url }"> ${_("Back to Standard Dashboard")} </a></div>
-%if studio_url:
-  ## not checking access because if user can see this, they are at least course staff (with studio edit access)
-  <div class="studio-edit-link"><a href="${studio_url}" target="_blank">${_('Edit Course In Studio')}</a></div>
-%endif
-<section class="instructor-dashboard-content-2" id="instructor-dashboard-content">
-
-  <h1>${_("Instructor Dashboard")}</h1>
-  <hr />
-  ## links which are tied to idash-sections below.
-  ## the links are acativated and handled in instructor_dashboard.coffee
-  ## when the javascript loads, it clicks on the first section
-  <h2 class="instructor-nav">
-    % for section_data in sections:
-      <a href="" data-section="${ section_data['section_key'] }">${_(section_data['section_display_name'])}</a>
-    % endfor
-  </h2>
-
-  ## each section corresponds to a section_data sub-dictionary provided by the view
-  ## to keep this short, sections can be pulled out into their own files
-
-  % for section_data in sections:
-    <section id="${ section_data['section_key'] }" class="idash-section">
-      <%include file="${ section_data['section_key'] }.html" args="section_data=section_data" />
+  <div class="instructor-dashboard-wrapper-2">
+    <section class="instructor-dashboard-content-2" id="instructor-dashboard-content">
+      <div class="wrap-instructor-info studio-view">
+        %if studio_url:
+          <a class="instructor-info-action" href="${studio_url}">${_("View Course in Studio")}</a>
+        %endif
+        <a class="instructor-info-action" href="${ old_dashboard_url }"> ${_("Back to Standard Dashboard")} </a>
+      </div>
+    
+      <h1>${_("Instructor Dashboard")}</h1>
+      <hr />
+      ## links which are tied to idash-sections below.
+      ## the links are acativated and handled in instructor_dashboard.coffee
+      ## when the javascript loads, it clicks on the first section
+      <h2 class="instructor-nav">
+        % for section_data in sections:
+          <a href="" data-section="${ section_data['section_key'] }">${_(section_data['section_display_name'])}</a>
+        % endfor
+      </h2>
+    
+      ## each section corresponds to a section_data sub-dictionary provided by the view
+      ## to keep this short, sections can be pulled out into their own files
+    
+      % for section_data in sections:
+        <section id="${ section_data['section_key'] }" class="idash-section">
+          <%include file="${ section_data['section_key'] }.html" args="section_data=section_data" />
+        </section>
+      % endfor
+    
     </section>
-  % endfor
-
-</section>
-</div>
+  </div>
 </section>
