@@ -375,6 +375,10 @@ class CourseFixture(StudioApiFixture):
                         update, response.status_code))
 
     def _upload_assets(self):
+        """
+        Upload assets
+        :raise CourseFixtureError:
+        """
         url = STUDIO_BASE_URL + self._assets_url
 
         test_dir = path(__file__).abspath().dirname().dirname().dirname()
@@ -382,8 +386,8 @@ class CourseFixture(StudioApiFixture):
         for asset_name in self._assets:
             srt_path = test_dir + '/data/uploads/' + asset_name
 
-            fd = open(srt_path)
-            files = {'file': (asset_name, fd)}
+            asset_file = open(srt_path)
+            files = {'file': (asset_name, asset_file)}
 
             headers = {
                 'Accept': 'application/json',

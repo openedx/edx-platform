@@ -65,18 +65,6 @@ class VideoBaseTest(UniqueCourseTest):
         self._install_course_fixture()
         self._navigate_to_courseware_video_no_render()
 
-    # def _install_course_fixture(self):
-    #     """ Install the course fixture that has been defined """
-    #     if self.assets:
-    #         self.course_fixture.add_asset(self.assets)
-    #
-    #     self.course_fixture.add_children(
-    #         XBlockFixtureDesc('chapter', 'Test Chapter').add_children(
-    #             XBlockFixtureDesc('sequential', 'Test Section').add_children(
-    #                 XBlockFixtureDesc('vertical', 'Test Vertical-0').add_children(
-    #                     XBlockFixtureDesc('video', 'Video', metadata=self.metadata)
-    #     )))).install()
-
     def _install_course_fixture(self):
         """ Install the course fixture that has been defined """
         if self.assets:
@@ -98,7 +86,7 @@ class VideoBaseTest(UniqueCourseTest):
 
         # there must be atleast single vertical with a single video
         if not verticals:
-            verticals = [[['Video', self.metadata]]]
+            verticals = [[{'display_name': 'Video', 'metadata': self.metadata}]]
 
         for vertical_index, vertical in enumerate(verticals):
             xblock_verticals.append(self._create_single_vertical(vertical, vertical_index))
@@ -109,17 +97,15 @@ class VideoBaseTest(UniqueCourseTest):
         """
         Create a single course vertical of type XBlockFixtureDesc with category `vertical`, a single course vertical
         can contain single or multiple video modules
-        :param vertical: vertical data list, [[`video display name`, `metadata`], ...]
+        :param vertical: vertical data list
         :param vertical_index: index for the vertical display name
         :return: XBlockFixtureDesc
         """
         xblock_course_vertical = XBlockFixtureDesc('vertical', 'Test Vertical-{0}'.format(vertical_index))
 
-        for videos in vertical:
-            if len(videos) == 1:
-                xblock_course_vertical.add_children(XBlockFixtureDesc('video', videos[0]))
-            else:
-                xblock_course_vertical.add_children(XBlockFixtureDesc('video', videos[0], metadata=videos[1]))
+        for video in vertical:
+            xblock_course_vertical.add_children(
+                XBlockFixtureDesc('video', video['display_name'], metadata=video.get('metadata')))
 
         return xblock_course_vertical
 
@@ -177,18 +163,6 @@ class VideoBaseTest(UniqueCourseTest):
         #     world.browser.cookies.add({'edX_video_player_mode': 'flash'})
 
         if data:
-            conversions = {
-                'sub': json.loads,
-                'track': json.loads,
-                'transcripts': json.loads,
-                'download_track': json.loads,
-                'download_video': json.loads
-            }
-
-            for key in data:
-                if key in conversions:
-                    data[key] = conversions[key](data[key])
-
             metadata.update(data)
 
         return metadata
@@ -266,6 +240,169 @@ class YouTubeVideoTest(VideoBaseTest):
         # check if video aligned correctly without enabled transcript
         self.assertTrue(self.video.is_aligned(False))
 
+    def test_download_button_works_correctly_without_english_transcript_youtube_mode(self):
+        """
+        Scenario: Download button works correctly w/o english transcript in Youtube mode of Video component
+        Given
+            I have a "chinese_transcripts.srt" transcript file in assets
+            And it has a video in "Youtube" mode
+        """
+        data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}}
+        self.metadata = self.get_metadata('youtube', data=data)
+        self.assets.append('chinese_transcripts.srt')
+
+        # go to video
+        self.navigate_to_video()
+
+        # check if we see "好 各位同学" text in the captions
+        unicode_text = "好 各位同学".decode('utf-8')
+        self.assertIn(unicode_text, self.video.captions_text)
+
+        # check if we can download transcript in "srt" format that has text "好 各位同学"
+        unicode_text = "好 各位同学".decode('utf-8')
+        self.assertTrue(self.video.can_we_download_transcript('srt', unicode_text))
+
+    def test_download_button_works_correctly_non_english_transcript_youtube_mode(self):
+        """
+        Scenario: Download button works correctly for non-english transcript in Youtube mode of Video component
+        Given
+            I have a "chinese_transcripts.srt" transcript file in assets
+            And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+            And it has a video in "Youtube" mode
+        """
+        self.assets.extend(['chinese_transcripts.srt', 'subs_OEoXaMPEzfM.srt.sjson'])
+        data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}, 'sub': 'OEoXaMPEzfM'}
+        self.metadata = self.get_metadata('youtube', data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        # check if "Hi, welcome to Edx." text in the captions
+        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+
+        # check if we can download transcript in "srt" format that has text "Hi, welcome to Edx."
+        self.assertTrue(self.video.can_we_download_transcript('srt', 'Hi, welcome to Edx.'))
+
+        # select language with code "zh"
+        self.assertTrue(self.video.select_language('zh'))
+
+        # check if we see "好 各位同学" text in the captions
+        unicode_text = "好 各位同学".decode('utf-8')
+        self.assertIn(unicode_text, self.video.captions_text)
+
+        # check if we can download transcript in "srt" format that has text "好 各位同学"
+        unicode_text = "好 各位同学".decode('utf-8')
+        self.assertTrue(self.video.can_we_download_transcript('srt', unicode_text))
+
+    def test_video_aligned_correctly_on_transcript_toggle_in_fullscreen(self):
+        """
+        Tests that Video is aligned correctly on transcript toggle in fullscreen mode Given I have a
+        "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets And it has a video in "Youtube" mode.
+        """
+        self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
+        data = {'sub': 'OEoXaMPEzfM'}
+        self.metadata = self.get_metadata('youtube', data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        # make sure captions are opened
+        self.video.show_captions()
+
+        # click video button "fullscreen"
+        self.video.click_player_button('fullscreen')
+
+        # check if video aligned correctly with enabled transcript
+        self.assertTrue(self.video.is_aligned(True))
+
+        # click video button "CC"
+        self.video.click_player_button('CC')
+
+        # check if video aligned correctly without enabled transcript
+        self.assertTrue(self.video.is_aligned(False))
+
+    def test_download_transcript_button_works_correctly(self):
+        """
+        Scenario: Download Transcript button works correctly in Video component
+        Given
+           I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+           it has a video "A" in "Youtube" mode in position "1" of sequential
+           And a video "B" in "Youtube" mode in position "2" of sequential
+           And a video "C" in "Youtube" mode in position "3" of sequential
+        """
+
+        data_ab = {'sub': 'OEoXaMPEzfM', 'download_track': True}
+        youtube_ab_metadata = self.get_metadata('youtube', data=data_ab)
+
+        self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
+
+        data_c = {'track': 'http://example.org/', 'download_track': True}
+        youtube_c_metadata = self.get_metadata('youtube', data=data_c)
+
+        self.verticals = [
+            [{'display_name': 'A', 'metadata': youtube_ab_metadata}],
+            [{'display_name': 'B', 'metadata': youtube_ab_metadata}],
+            [{'display_name': 'C', 'metadata': youtube_c_metadata}]
+        ]
+
+        # open the section with videos
+        self.navigate_to_video()
+
+        # check if we can download transcript in "srt" format that has text "00:00:00,270"
+        self.assertTrue(self.video.can_we_download_transcript('srt', '00:00:00,270'))
+
+        # select the transcript format "txt"
+        self.assertTrue(self.video.select_transcript_format('txt'))
+
+        # check if wwe can download transcript in "txt" format that has text "Hi, welcome to Edx."
+        self.assertTrue(self.video.can_we_download_transcript('txt', 'Hi, welcome to Edx.'))
+
+        # open video "B"
+        self.course_nav.go_to_sequential('B')
+
+        # check if we can download transcript in "txt" format that has text "Hi, welcome to Edx."
+        self.assertTrue(self.video.can_we_download_transcript('txt', 'Hi, welcome to Edx.'))
+
+        # open video "C"
+        self.course_nav.go_to_sequential('C')
+
+        # menu "download_transcript" doesn't exist
+        self.assertFalse(self.video.is_menu_exist('download_transcript'))
+
+    def test_youtube_video_has_correct_transcript(self):
+        """
+        Scenario: Youtube video has correct transcript if fields for other speeds are filled.
+        Given
+             I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+             I have a "subs_b7xgknqkQk8.srt.sjson" transcript file in assets
+             it has a video in "Youtube" mode
+        """
+        self.assets.extend(['subs_OEoXaMPEzfM.srt.sjson', 'subs_b7xgknqkQk8.srt.sjson'])
+        data = {'youtube_id_1_5': 'b7xgknqkQk8', 'sub': 'OEoXaMPEzfM'}
+        youtube_metadata = self.get_metadata('youtube', data=data)
+        self.verticals = self.verticals = [[{'display_name': 'Video', 'metadata': youtube_metadata}]]
+
+        # go to video
+        self.navigate_to_video()
+
+        # make sure captions are opened
+        self.video.show_captions()
+
+        # check if "Hi, welcome to Edx." text in the captions
+        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+
+        # select the "1.50" speed
+        self.video.speed = '1.50'
+
+        # reload the page
+        self.video.reload_page()
+
+        # check if "Hi, welcome to Edx." text in the captions
+        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+
+        # check if duration is "1:56"
+        self.assertTrue(self.video.is_duration_matches('1:56'))
+
 
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
@@ -294,7 +431,8 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
             And a video "C" in "HTML5" mode in position "3" of sequential
         """
         self.verticals = [
-            [['A']], [['B']], [['C', self.get_metadata('html5')]]
+            [{'display_name': 'A'}], [{'display_name': 'B'}],
+            [{'display_name': 'C', 'metadata': self.get_metadata('html5')}]
         ]
 
         self.navigate_to_video()
@@ -309,8 +447,6 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
 
         # open video "C"
         self.course_nav.go_to_sequential('C')
-
-        #from nose.tools import set_trace; set_trace()
 
         # check if video "C" should start playing at speed "0.75"
         self.assertEqual(self.video.speed, '0.75x')
@@ -344,6 +480,63 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
 
         # check if video "C" should start playing at speed "1.0"
         self.assertEqual(self.video.speed, '1.0x')
+
+    def test_multiple_videos_in_sequentials_load_and_work(self):
+        """
+        Scenario: Multiple videos in sequentials all load and work, switching between sequentials
+        Given
+            And it has a video "A" in "Youtube" mode in position "1" of sequential
+            And a video "B" in "HTML5" mode in position "1" of sequential
+            And a video "C" in "Youtube" mode in position "1" of sequential
+            And a video "D" in "Youtube" mode in position "1" of sequential
+            And a video "E" in "Youtube" mode in position "2" of sequential
+            And a video "F" in "Youtube" mode in position "2" of sequential
+            And a video "G" in "Youtube" mode in position "2" of sequential
+        """
+
+        self.verticals = [
+            [{'display_name': 'A'}, {'display_name': 'B', 'metadata': self.get_metadata('html5')},
+             {'display_name': 'C'}, {'display_name': 'D'}],
+            [{'display_name': 'E'}], [{'display_name': 'F'}]
+        ]
+
+        # go to video
+        self.navigate_to_video()
+
+        # check if video "A" should start playing at speed "1.0"
+        self.assertEqual(self.video.speed, '1.0x')
+
+        # select the "2.0" speed on video "B"
+        self.course_nav.go_to_sequential('B')
+        self.video.speed = '2.0'
+
+        # select the "2.0" speed on video "C"
+        self.course_nav.go_to_sequential('C')
+        self.video.speed = '2.0'
+
+        # select the "2.0" speed on video "D"
+        self.course_nav.go_to_sequential('D')
+        self.video.speed = '2.0'
+
+        # open video "E"
+        self.course_nav.go_to_sequential('E')
+
+        # check if video "E" should start playing at speed "2.0"
+        self.assertEqual(self.video.speed, '2.0x')
+
+        # select the "1.0" speed on video "F"
+        self.course_nav.go_to_sequential('F')
+        self.video.speed = '1.0'
+
+        # select the "1.0" speed on video "G"
+        self.course_nav.go_to_sequential('G')
+        self.video.speed = '1.0'
+
+        # open video "A"
+        self.course_nav.go_to_sequential('A')
+
+        # check if video "A" should start playing at speed "2.0"
+        self.video.speed = '2.0'
 
 
 class Html5VideoTest(VideoBaseTest):
@@ -381,3 +574,137 @@ class Html5VideoTest(VideoBaseTest):
         # Verify that error message has correct text
         correct_error_message_text = 'ERROR: No playable video sources found!'
         self.assertIn(correct_error_message_text, self.video.error_message_text)
+
+    def test_download_button_works_correctly_without_english_transcript_html5_mode(self):
+        """
+        Scenario: Download button works correctly w/o english transcript in HTML5 mode of Video component
+        Given
+            I have a "chinese_transcripts.srt" transcript file in assets
+            And it has a video in "HTML5" mode
+        """
+        data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}}
+        self.metadata = self.get_metadata('html5', data=data)
+        self.assets.append('chinese_transcripts.srt')
+
+        # go to video
+        self.navigate_to_video()
+
+        # check if we see "好 各位同学" text in the captions
+        unicode_text = "好 各位同学".decode('utf-8')
+        self.assertIn(unicode_text, self.video.captions_text)
+
+        # check if we can download transcript in "srt" format that has text "好 各位同学"
+        unicode_text = "好 各位同学".decode('utf-8')
+        self.assertTrue(self.video.can_we_download_transcript('srt', unicode_text))
+
+    def test_download_button_works_correctly_non_english_transcript_html5_mode(self):
+        """
+        Scenario: Download button works correctly for non-english transcript in HTML5 mode of Video component
+        Given
+            I have a "chinese_transcripts.srt" transcript file in assets
+            And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+            And it has a video in "HTML5" mode
+        """
+        self.assets.extend(['chinese_transcripts.srt', 'subs_OEoXaMPEzfM.srt.sjson'])
+        data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}, 'sub': 'OEoXaMPEzfM'}
+        self.metadata = self.get_metadata('html5', data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        # check if "Hi, welcome to Edx." text in the captions
+        self.assertIn('Hi, welcome to Edx.', self.video.captions_text)
+
+        # check if we can download transcript in "srt" format that has text "Hi, welcome to Edx."
+        self.assertTrue(self.video.can_we_download_transcript('srt', 'Hi, welcome to Edx.'))
+
+        # select language with code "zh"
+        self.assertTrue(self.video.select_language('zh'))
+
+        # check if we see "好 各位同学" text in the captions
+        unicode_text = "好 各位同学".decode('utf-8')
+        self.assertIn(unicode_text, self.video.captions_text)
+
+        #Then I can download transcript in "srt" format that has text "好 各位同学"
+        unicode_text = "好 各位同学".decode('utf-8')
+        self.assertTrue(self.video.can_we_download_transcript('srt', unicode_text))
+
+    def test_video_aligned_correctly_if_transcript_visible_in_full_screen(self):
+        """
+        Scenario: Video is aligned correctly if transcript is visible in fullscreen mode
+        Given
+            I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+            And it has a video in "HTML5" mode
+        """
+        self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
+        data = {'sub': 'OEoXaMPEzfM'}
+        self.metadata = self.get_metadata('html5', data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        # make sure captions are opened
+        self.video.show_captions()
+
+        # click video button "fullscreen"
+        self.video.click_player_button('fullscreen')
+
+        # check if video aligned correctly with enabled transcript
+        self.assertTrue(self.video.is_aligned(True))
+
+    def test_cc_button_works_correctly_only_with_english_transcript(self):
+        """
+        Scenario: CC button works correctly only w/ english transcript in HTML5 mode of Video component
+        Given
+            I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+            And it has a video in "HTML5" mode
+        """
+        self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
+        data = {'sub': 'OEoXaMPEzfM'}
+        self.metadata = self.get_metadata('html5', data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        # make sure captions are opened
+        self.video.show_captions()
+
+        # check if we see "Hi, welcome to Edx." text in the captions
+        self.assertIn("Hi, welcome to Edx.", self.video.captions_text)
+
+    def test_cc_button_works_correctly_without_english_transcript_html5_mode(self):
+        """
+        Scenario: CC button works correctly w/o english transcript in HTML5 mode of Video component
+        Given
+            I have a "chinese_transcripts.srt" transcript file in assets
+            And it has a video in "HTML5" mode
+        """
+        self.assets.append('chinese_transcripts.srt')
+        data = {'transcripts': {'zh': 'chinese_transcripts.srt'}}
+        self.metadata = self.get_metadata('html5', data=data)
+
+        # go to video
+        self.navigate_to_video()
+
+        # make sure captions are opened
+        self.video.show_captions()
+
+        # check if we see "好 各位同学" text in the captions
+        unicode_text = "好 各位同学".decode('utf-8')
+        self.assertIn(unicode_text, self.video.captions_text)
+
+    def test_video_component_fully_rendered_in_html5_mode(self):
+        """
+        Scenario: Video component is fully rendered in the LMS in HTML5 mode
+        Given the course has a Video component in "HTML5" mode
+        """
+        self.metadata = self.get_metadata('html5')
+
+        # Navigate to a video
+        self.navigate_to_video()
+
+        # check if video has rendered in "HTML5" mode
+        self.assertTrue(self.video.is_video_rendered('html5'))
+
+        # check if all sources are correct. It means page has video source urls that match exactly with `HTML5_SOURCES`
+        self.assertEqual(self.video.all_video_sources, HTML5_SOURCES)
