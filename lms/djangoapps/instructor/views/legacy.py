@@ -1317,7 +1317,7 @@ def get_student_grade_summary_data(request, course, course_key, get_grades=True,
 
     '''
     enrolled_students = User.objects.filter(
-        courseenrollment__course_id=course_key.to_deprecated_string(),
+        courseenrollment__course_id=course_key,
         courseenrollment__is_active=1,
     ).prefetch_related("groups").order_by('username')
 

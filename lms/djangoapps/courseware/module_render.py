@@ -235,7 +235,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         relative_xqueue_callback_url = reverse(
             'xqueue_callback',
             kwargs=dict(
-                course_id=course_id,
+                course_id=course_id.to_deprecated_string(),
                 userid=str(user.id),
                 mod_id=descriptor.location.url(),
                 dispatch=dispatch
