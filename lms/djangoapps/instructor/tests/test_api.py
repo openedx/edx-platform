@@ -660,6 +660,8 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.notregistered_email = 'robot-not-an-email-yet@robot.org'
         self.assertEqual(User.objects.filter(email=self.notregistered_email).count(), 0)
 
+        self.request = RequestFactory().request()
+
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
         # (comment because pylint C0103)
@@ -683,7 +685,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': False})
         self.assertEqual(response.status_code, 200)
 
-        self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(self.notenrolled_student))
+        self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(self.notenrolled_student))
         # test the response data
         expected = {
             "action": "add",
@@ -704,10 +706,11 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
     def test_add_notenrolled_with_email(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        about_url = self.request.build_absolute_uri(reverse('about_course', args=[self.course.id.to_deprecated_string()]))
         response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
         self.assertEqual(response.status_code, 200)
 
-        self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(self.notenrolled_student))
+        self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(self.notenrolled_student))
         # test the response data
         expected = {
             "action": "add",
@@ -732,10 +735,11 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
             mail.outbox[0].body,
             u"Dear {0}\n\nYou have been invited to be a beta tester "
             "for Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "Visit https://edx.org/courses/MITx/999/Robot_Super_Course/about to join "
+            "Visit {1} to join "
             "the course and begin the beta test.\n\n----\n"
-            "This email was automatically sent from edx.org to {1}".format(
+            "This email was automatically sent from edx.org to {2}".format(
                 self.notenrolled_student.profile.name,
+                about_url,
                 self.notenrolled_student.email
             )
         )
@@ -1756,7 +1760,7 @@ class TestInstructorAPIHelpers(TestCase):
         course_id = SlashSeparatedCourseKey('MITx', '6.002x', '2013_Spring')
         name = 'L2Node1'
         output = 'i4x://MITx/6.002x/problem/L2Node1'
-        self.assertEqual(_msk_from_problem_urlname(course_id, name), output)
+        self.assertEqual(_msk_from_problem_urlname(course_id, name).to_deprecated_string(), output)
 
     @raises(ValueError)
     def test_msk_from_problem_urlname_error(self):
