@@ -43,7 +43,7 @@ class OpenEndedPostTest(ModuleStoreTestCase):
 
         StudentModuleFactory.create(
             course_id=self.course_id,
-            module_state_key=self.problem_location,
+            module_id=self.problem_location,
             student=self.student_on_initial,
             grade=0,
             max_grade=1,
@@ -52,7 +52,7 @@ class OpenEndedPostTest(ModuleStoreTestCase):
 
         StudentModuleFactory.create(
             course_id=self.course_id,
-            module_state_key=self.problem_location,
+            module_id=self.problem_location,
             student=self.student_on_accessing,
             grade=0,
             max_grade=1,
@@ -61,7 +61,7 @@ class OpenEndedPostTest(ModuleStoreTestCase):
 
         StudentModuleFactory.create(
             course_id=self.course_id,
-            module_state_key=self.problem_location,
+            module_id=self.problem_location,
             student=self.student_on_post_assessment,
             grade=0,
             max_grade=1,
@@ -139,7 +139,7 @@ class OpenEndedStatsTest(ModuleStoreTestCase):
 
         StudentModuleFactory.create(
             course_id=self.course_id,
-            module_state_key=self.problem_location,
+            module_id=self.problem_location,
             student=self.student_on_initial,
             grade=0,
             max_grade=1,
@@ -148,7 +148,7 @@ class OpenEndedStatsTest(ModuleStoreTestCase):
 
         StudentModuleFactory.create(
             course_id=self.course_id,
-            module_state_key=self.problem_location,
+            module_id=self.problem_location,
             student=self.student_on_accessing,
             grade=0,
             max_grade=1,
@@ -157,7 +157,7 @@ class OpenEndedStatsTest(ModuleStoreTestCase):
 
         StudentModuleFactory.create(
             course_id=self.course_id,
-            module_state_key=self.problem_location,
+            module_id=self.problem_location,
             student=self.student_on_post_assessment,
             grade=0,
             max_grade=1,

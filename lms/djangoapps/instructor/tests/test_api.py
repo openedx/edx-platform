@@ -114,7 +114,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         _module = StudentModule.objects.create(
             student=self.user,
             course_id=self.course.id,
-            module_state_key=_msk_from_problem_urlname(
+            module_id=_msk_from_problem_urlname(
                 self.course.id,
                 self.problem_urlname
             ),
@@ -1284,7 +1284,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.module_to_reset = StudentModule.objects.create(
             student=self.student,
             course_id=self.course.id,
-            module_state_key=_msk_from_problem_urlname(
+            module_id=_msk_from_problem_urlname(
                 self.course.id,
                 self.problem_urlname
             ),
@@ -1356,7 +1356,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
             StudentModule.objects.filter(
                 student=self.module_to_reset.student,
                 course_id=self.module_to_reset.course_id,
-                # module_state_key=self.module_to_reset.module_state_key,
+                # module_id=self.module_to_reset.module_id,
             ).count(),
             0
         )
@@ -1550,7 +1550,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.module = StudentModule.objects.create(
             student=self.student,
             course_id=self.course.id,
-            module_state_key=_msk_from_problem_urlname(
+            module_id=_msk_from_problem_urlname(
                 self.course.id,
                 self.problem_urlname
             ),
@@ -1797,46 +1797,46 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week1.location).save()
+            module_id=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week2.location).save()
+            module_id=week2.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=week3.location).save()
+            module_id=week3.location).save()
         StudentModule(
             state='{}',
             student_id=user1.id,
             course_id=course.id,
-            module_state_key=homework.location).save()
+            module_id=homework.location).save()
 
         user2 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=week1.location).save()
+            module_id=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user2.id,
             course_id=course.id,
-            module_state_key=homework.location).save()
+            module_id=homework.location).save()
 
         user3 = UserFactory.create()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=week1.location).save()
+            module_id=week1.location).save()
         StudentModule(
             state='{}',
             student_id=user3.id,
             course_id=course.id,
-            module_state_key=homework.location).save()
+            module_id=homework.location).save()
 
         self.course = course
         self.week1 = week1

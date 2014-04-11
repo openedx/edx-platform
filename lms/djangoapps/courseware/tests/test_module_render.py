@@ -611,7 +611,7 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
 
         StudentModuleFactory.create(
             course_id=self.course.id,
-            module_state_key=self.location,
+            module_id=self.location,
             student=UserFactory(),
             grade=1,
             max_grade=1,
