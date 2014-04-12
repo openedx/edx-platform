@@ -466,7 +466,9 @@ function (Initialize) {
             it('regiter callback for videoPlayer.update method - direct function call', function () {
                 var state = {
                         methodCallbacks: {
-                            update: []
+                            videoPlayer: {
+                                update: []
+                            }
                         }
                     },
                     registerCallback = Initialize.prototype.registerCallback;
