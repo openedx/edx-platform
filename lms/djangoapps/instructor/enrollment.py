@@ -211,8 +211,27 @@ def get_email_params(course, auto_enroll):
     Returns a dict of parameters
     """
 
-    stripped_site_name = settings.SITE_NAME
-    registration_url = 'https://' + stripped_site_name + reverse('student.views.register_user')
+    stripped_site_name = microsite.get_value(
+        'SITE_NAME',
+        settings.SITE_NAME
+    )
+    registration_url = u'https://{}{}'.format(
+        stripped_site_name,
+        reverse('student.views.register_user')
+    )
+    course_url = u'https://{}{}'.format(
+        stripped_site_name,
+        reverse('course_root', kwargs={'course_id': course.id})
+    )
+
+    # We can't get the url to the course's About page if the marketing site is enabled.
+    course_about_url = None
+    if not settings.FEATURES.get('ENABLE_MKTG_SITE', False):
+        course_about_url = u'https://{}{}'.format(
+            stripped_site_name,
+            reverse('about_course', kwargs={'course_id': course.id})
+        )
+
     is_shib_course = uses_shib(course)
 
     # Composition of email
@@ -221,8 +240,8 @@ def get_email_params(course, auto_enroll):
         'registration_url': registration_url,
         'course': course,
         'auto_enroll': auto_enroll,
-        'course_url': 'https://' + stripped_site_name + '/courses/' + course.id,
-        'course_about_url': 'https://' + stripped_site_name + '/courses/' + course.id + '/about',
+        'course_url': course_url,
+        'course_about_url': course_about_url,
         'is_shib_course': is_shib_course,
     }
     return email_params

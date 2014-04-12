@@ -403,14 +403,13 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "at edx.org by a member of the course staff. "
             "The course should now appear on your edx.org dashboard.\n\n"
             "To start accessing course materials, please visit "
-            "https://edx.org/courses/MITx/999/Robot_Super_Course\n\n----\n"
+            "https://edx.org/courses/MITx/999/Robot_Super_Course/\n\n----\n"
             "This email was automatically sent from edx.org to NotEnrolled Student"
         )
 
     def test_enroll_with_email_not_registered(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
-        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -426,6 +425,22 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, "
             "visit https://edx.org/courses/MITx/999/Robot_Super_Course/about to join the course.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+        )
+
+    def test_enroll_email_not_registered_mktgsite(self):
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        # Try with marketing site enabled
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "To finish your registration, please visit https://edx.org/register and fill out the registration form "
+            "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
+            "You can then enroll in Robot Super Course.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
         )
 
@@ -587,12 +602,10 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @patch('instructor.enrollment.uses_shib')
     def test_enroll_with_email_not_registered_with_shib(self, mock_uses_shib):
-
         mock_uses_shib.return_value = True
 
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
-        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -601,10 +614,27 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             mail.outbox[0].subject,
             'You have been invited to register for Robot Super Course'
         )
+
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
             "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course/about and register for the course.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+        )
+
+    @patch('instructor.enrollment.uses_shib')
+    def test_enroll_email_not_registered_shib_mktgsite(self, mock_uses_shib):
+        mock_uses_shib.return_value = True
+
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        # Try with marketing site enabled
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
         )
 
@@ -624,10 +654,11 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             mail.outbox[0].subject,
             'You have been invited to register for Robot Super Course'
         )
+
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course and login.\n\n----\n"
+            "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course/ and login.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
         )
 
@@ -721,12 +752,31 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
             mail.outbox[0].subject,
             'You have been invited to a beta test for Robot Super Course'
         )
+
         self.assertEqual(
             mail.outbox[0].body,
             u"Dear {0}\n\nYou have been invited to be a beta tester "
             "for Robot Super Course at edx.org by a member of the course staff.\n\n"
             "Visit https://edx.org/courses/MITx/999/Robot_Super_Course/about to join "
             "the course and begin the beta test.\n\n----\n"
+            "This email was automatically sent from edx.org to {1}".format(
+                self.notenrolled_student.profile.name,
+                self.notenrolled_student.email
+            )
+        )
+
+    def test_add_notenrolled_email_mktgsite(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        # Try with marketing site enabled
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+            response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            mail.outbox[0].body,
+            u"Dear {0}\n\nYou have been invited to be a beta tester "
+            "for Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Visit edx.org to enroll in the course and begin the beta test.\n\n----\n"
             "This email was automatically sent from edx.org to {1}".format(
                 self.notenrolled_student.profile.name,
                 self.notenrolled_student.email
