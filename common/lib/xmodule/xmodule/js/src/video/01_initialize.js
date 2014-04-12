@@ -938,8 +938,8 @@ function (VideoPlayer, VideoStorage) {
      *     `state` object. Since the `state` object is accessible via the
      *     video DOM element data attribute "video-player-state", this function
      *     can be used by external JavaScript code on the page to synchronize
-     *     with the video player by attaching callbacks to methods which are configured
-     *     to have attached callbacks. For a list of available methods see the
+     *     with the video player by attaching callbacks to methods (which are configured
+     *     to have attached callbacks). For a list of available methods see the
      *     definition of `methodCallbacks` in `initialize()` function in this file.
      *
      * Parameters:
@@ -953,9 +953,9 @@ function (VideoPlayer, VideoStorage) {
      *
      * Returns:
      *     -1, -2, -3, -4, -5 [number]:
-     *         In case of error. For example if objName refers to a not defined object, or
-     *         if method named methodName does not support attaching of callbacks. See
-     *         function implementation for exact details.
+     *         In case of error. For example if `objName` refers to an undefined object, or
+     *         if method named `methodName` does not support attaching of callbacks. See
+     *         function implementation for case-by-case return error values.
      *     0 [number]:
      *         In case the function is successful.
      */
