@@ -73,7 +73,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-07 10:07-0400\n"
+"POT-Creation-Date: 2014-04-12 15:41-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: Hakan Senel <hgsenel@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
@@ -391,7 +391,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Şifre sıfırlama işlemi başarısız"
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
@@ -982,6 +982,10 @@ msgid "Final Check"
 msgstr "Son Kontrol"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+msgid "Checking..."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Warning: The problem has been reset to its initial state!"
 msgstr "Uyarı: Bu problem ilk durumuna sıfırlandı!"
 
@@ -1074,6 +1078,18 @@ msgstr "Genel"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "TBD"
 msgstr "DSB"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
+"string."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
+"string."
+msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Courseware' refers to the tab in the courseware that leads to
@@ -2168,6 +2184,8 @@ msgstr ""
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Error: user \"{username}\" already has rolename \"{rolename}\", cannot add"
 msgstr ""
+"Hata: \"{username}\" kullanıcısı zaten \"{rolename}\" rol adına sahip, bu "
+"nedenle eklenemez"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
@@ -2191,7 +2209,7 @@ msgstr "No"
 #: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
 #: lms/templates/dashboard.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/register.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/verify_student/_modal_editname.html
 #: lms/templates/verify_student/face_upload.html
 #, fuzzy
@@ -3362,6 +3380,7 @@ msgstr "Yazıyı sil"
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
@@ -4051,6 +4070,13 @@ msgstr "Kaydet"
 msgid "Cancel"
 msgstr "İptal"
 
+#: cms/templates/container.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Loading..."
+msgstr "Yüklüyor..."
+
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
 #: lms/templates/wiki/includes/article_menu.html
@@ -4090,7 +4116,7 @@ msgstr "Şifremi unuttum"
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/provider_login.html lms/templates/register.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Password"
 msgstr "Şifre"
@@ -4106,7 +4132,8 @@ msgid "Sign Up"
 msgstr "Kayıt ol"
 
 #: cms/templates/register.html lms/templates/register-shib.html
-#: lms/templates/register.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 msgid "Public Username"
 msgstr "Görüntü ismi"
 
@@ -4383,21 +4410,12 @@ msgstr "Genel Sorunlar ve Geribildirimler"
 
 #: lms/templates/contact.html
 msgid ""
-"If you have a general question about {platform_name} please email <a "
-"href=\"mailto:{contact_email}\">{contact_email}</a>. To see if your question"
-" has already been answered, visit our {faq_link_start}FAQ "
-"page{faq_link_end}. You can also join the discussion on our "
-"{fb_link_start}facebook page{fb_link_end}. Though we may not have a chance "
-"to respond to every email, we take all feedback into consideration."
+"If you have a general question about {platform_name} please email "
+"{contact_email}. To see if your question has already been answered, visit "
+"our {faq_link_start}FAQ page{faq_link_end}. You can also join the discussion"
+" on our {fb_link_start}facebook page{fb_link_end}. Though we may not have a "
+"chance to respond to every email, we take all feedback into consideration."
 msgstr ""
-"Eğer {platform_name} hakkında genel bir sorunuz varsa, lütfen şu e-posta "
-"adresine <a href=\"mailto:{contact_email}\">{contact_email}</a> mesaj atın. "
-"Sorunuza daha önce bir cevap verilmiş olduğunu görmek için,  "
-"{faq_link_start}FAQ page{faq_link_end} sayfasına giderek sık sorulan "
-"sorulara bakabilirsiniz. Ayrıca, Facebook'ta  {fb_link_start}facebook "
-"page{fb_link_end} adresinden tartışmalara katılabilirsiniz. Her ne kadar her"
-" e-postaya yanıt veremesek de bildirdiğiniz konuları dikkate aldığımızı "
-"bilmenizi isteriz."
 
 #: lms/templates/contact.html
 msgid "Technical Inquiries and Feedback"
@@ -4407,22 +4425,12 @@ msgstr "Teknik Sorunlar ve Geribildirimler"
 msgid ""
 "If you have suggestions/feedback about the overall {platform_name} platform,"
 " or are facing general technical issues with the platform (e.g., issues with"
-" email addresses and passwords), you can reach us at <a "
-"href=\"mailto:{tech_email}\">{tech_email}</a>. For technical questions, "
-"please make sure you are using a current version of Firefox or Chrome, and "
-"include browser and version in your e-mail, as well as screenshots or other "
-"pertinent details. If you find a bug or other issues, you can reach us at "
-"the following: <a href=\"mailto:{bugs_email}\">{bugs_email}</a>."
+" email addresses and passwords), you can reach us at {tech_email}. For "
+"technical questions, please make sure you are using a current version of "
+"Firefox or Chrome, and include browser and version in your e-mail, as well "
+"as screenshots or other pertinent details. If you find a bug or other "
+"issues, you can reach us at the following: {bugs_email}."
 msgstr ""
-"{platform_name} plaformunun tamamıyla ilgili önerileriniz veya "
-"değerlendirmeleriniz varsa, veya platformla ilgili olarak teknik sorunlarla "
-"karşılaşıyorsanız (örneğin, eposta adresleriyle veya şifrelerle ilgili "
-"olarak), bize <a href=\"mailto:{tech_email}\">{tech_email}</a> adresinden "
-"olaşabilirsiniz. Teknik sorular için, Firefox'un veya Chrome'un en son "
-"sürümünü kullandığınıza emin olunuz ve mesajınıza web izleyicisinin sürümü "
-"ve ayrıntılarla ilgili ekran görüntülerini ekleyiniz. Eğer bir hatayla "
-"karşılaştıysanız veya diğer konularla ilgili sorularınız varsa, şuaraya "
-"e-posta <a href=\"mailto:{bugs_email}\">{bugs_email}</a> atınız."
 
 #: lms/templates/contact.html
 msgid "Media"
@@ -4592,7 +4600,7 @@ msgstr "Kaydı sil"
 
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
-msgstr ""
+msgstr "Stüdyo'da Birim Görüntüle"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -4649,18 +4657,6 @@ msgstr "Öğrenciler reddedildi:"
 #: lms/templates/enroll_students.html
 msgid "Debug: "
 msgstr "Debug:"
-
-#: lms/templates/enroll_students.html
-msgid "foo"
-msgstr "foo"
-
-#: lms/templates/enroll_students.html
-msgid "bar"
-msgstr "bar"
-
-#: lms/templates/enroll_students.html
-msgid "biff"
-msgstr "biff"
 
 #: lms/templates/extauth_failure.html lms/templates/extauth_failure.html
 msgid "External Authentication failed"
@@ -4775,13 +4771,9 @@ msgstr "Parolamı Sıfırla"
 msgid "Email is incorrect."
 msgstr "E-posta hatalı"
 
-#: lms/templates/help_modal.html
+#: lms/templates/help_modal.html lms/templates/help_modal.html
 msgid "{platform_name} Help"
 msgstr "{platform_name} Yardım"
-
-#: lms/templates/help_modal.html
-msgid "{span_start}{platform_name}{span_end} Help"
-msgstr "{span_start}{platform_name}{span_end} Yardım"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -4836,7 +4828,8 @@ msgstr ""
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/provider_login.html
 #: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/register.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 msgid "E-mail"
 msgstr "E-posta"
 
@@ -5092,6 +5085,10 @@ msgstr ""
 "başlama_url'ini veriniz. \"Değiştir\" butonuna basınız ve gerekli alanları "
 "doldurunuz."
 
+#: lms/templates/lti_form.html
+msgid "Press to Launch"
+msgstr ""
+
 #: lms/templates/manage_user_standing.html
 msgid "Disable or Reenable student accounts"
 msgstr "Öğrenci hesaplarını Hizmet dışına veya Hizmet içine alın"
@@ -5143,20 +5140,16 @@ msgstr ""
 "kullanın."
 
 #: lms/templates/module-error.html
-msgid "There has been an error on the <em>{platform_name}</em> servers"
-msgstr "<em>{platform_name}</em> serverlarında bir hata ile karşılaşıldı."
+#: lms/templates/courseware/courseware-error.html
+msgid "There has been an error on the {platform_name} servers"
+msgstr ""
 
 #: lms/templates/module-error.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at <a "
-"href=\"mailto:{tech_support_email}\">{tech_support_email}</a> to report any "
-"problems or downtime."
+" fix it as soon as possible. Please email us at {tech_support_email} to "
+"report any problems or downtime."
 msgstr ""
-"Üzgünüz, bu modüle şu an ulaşılamıyor. Ekibimiz bu hatayı en kısa zamanda "
-"düzeltmek için çalışıyor. Lütfen her türlü probleminizden bizi email atarak "
-"<a href=\"mailto:{tech_support_email}\">{tech_support_email}</a> haberdar "
-"edin."
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
@@ -5250,11 +5243,11 @@ msgstr "Sıfırla"
 
 #: lms/templates/problem.html
 msgid "Show Answer"
-msgstr ""
+msgstr "Yanıtı Göster:"
 
 #: lms/templates/problem.html
 msgid "Reveal Answer"
-msgstr ""
+msgstr "Yanıtı Göster"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
@@ -5267,11 +5260,10 @@ msgstr "Giriş Yap"
 
 #: lms/templates/provider_login.html
 msgid ""
-"Please note that we will be sending your user name, email, and full name to "
-"this third party site."
+"Your username, email, and full name will be sent to {destination}, where the"
+" collection and use of this information will be governed by their terms of "
+"service and privacy policy."
 msgstr ""
-"Lütfen, kullanıcı adınızı, e-posta adresinizi ve tam isminizi bu üçüncü "
-"parti siteye gönderdiğimize dikkat ediniz."
 
 #: lms/templates/provider_login.html
 msgid "Return To %s"
@@ -5329,10 +5321,12 @@ msgid "Account Acknowledgements"
 msgstr "Hesap Onayları"
 
 #: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Terms of Service{link_end}"
 msgstr "{link_start}Hizmet Koşullarını{link_end} kabul ediyorum"
 
 #: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Honor Code{link_end}"
 msgstr " {link_start}Onur Kodu Şartlarını{link_end} kabul ediyorum"
 
@@ -5519,32 +5513,16 @@ msgid "Next"
 msgstr "Sonraki"
 
 #: lms/templates/signup_modal.html
-msgid "Sign Up for {span_start}{platform_name}{span_end}"
-msgstr "{span_start}{platform_name}{span_end} İçin Kaydolun"
-
-#: lms/templates/signup_modal.html lms/templates/signup_modal.html
-msgid "E-mail *"
-msgstr "E-posta *"
+msgid "Sign Up for {platform_name}"
+msgstr ""
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. yourname@domain.com"
 msgstr "Ör. adınız@domain.com"
 
-#: lms/templates/signup_modal.html
-msgid "Password *"
-msgstr "Şifre *"
-
-#: lms/templates/signup_modal.html lms/templates/signup_modal.html
-msgid "Public Username *"
-msgstr "Genel Kullanıcı Adı*"
-
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. yourname (shown on forums)"
 msgstr "ör. isminiz (forumlarda gözükecek)"
-
-#: lms/templates/signup_modal.html lms/templates/signup_modal.html
-msgid "Full Name *"
-msgstr "Tam İsim *"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. Your Name (for certificates)"
@@ -5553,6 +5531,10 @@ msgstr "ör. İsminiz (sertifikada gözükecek)"
 #: lms/templates/signup_modal.html
 msgid "<i>Welcome</i> {name}"
 msgstr "<i>Hoşgeldiniz</i> {name}"
+
+#: lms/templates/signup_modal.html
+msgid "Full Name *"
+msgstr "Tam İsim *"
 
 #: lms/templates/signup_modal.html
 msgid "Ed. Completed"
@@ -5569,14 +5551,6 @@ msgstr "Posta Adresi"
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
 msgstr "{platform_name}'e kaydolmanın amaçları"
-
-#: lms/templates/signup_modal.html
-msgid "I agree to the {link_start}Terms of Service{link_end}*"
-msgstr "{link_start}Koşulları{link_end}* kabul ediyorum"
-
-#: lms/templates/signup_modal.html
-msgid "I agree to the {link_start}Honor Code{link_end}*"
-msgstr " {link_start}Onur Kodunu{link_end}* kabul ediyorum"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
@@ -5617,8 +5591,8 @@ msgid "Tag"
 msgstr "Etiket"
 
 #: lms/templates/staff_problem_info.html
-msgid "Optional tag (eg \"done\" or \"broken\"):&nbsp; "
-msgstr "Tercihe bağlı etiket (örn:\"tamamlandı ya da\"eksik\"):&nbsp;"
+msgid "Optional tag (eg \"done\" or \"broken\"):"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "tag"
@@ -5662,43 +5636,11 @@ msgstr "{course_number} Ders kitabı"
 msgid "Textbook Navigation"
 msgstr "Ders kitabı Navigasyonu"
 
-#: lms/templates/static_pdfbook.html
-msgid "Page:"
-msgstr "Sayfa:"
-
-#: lms/templates/static_pdfbook.html lms/templates/static_pdfbook.html
-msgid "Zoom Out"
-msgstr "Küçült"
-
-#: lms/templates/static_pdfbook.html lms/templates/static_pdfbook.html
-msgid "Zoom In"
-msgstr "Büyüt"
-
-#: lms/templates/static_pdfbook.html
-msgid "Zoom"
-msgstr "Büyütme"
-
-#: lms/templates/static_pdfbook.html
-msgid "Automatic Zoom"
-msgstr "Otomatik Büyütme"
-
-#: lms/templates/static_pdfbook.html
-msgid "Actual Size"
-msgstr "Gerçek Boyut"
-
-#: lms/templates/static_pdfbook.html
-msgid "Fit Page"
-msgstr "Sayfaya sığdır"
-
-#: lms/templates/static_pdfbook.html
-msgid "Full Width"
-msgstr "Tam Genişlik"
-
-#: lms/templates/static_pdfbook.html lms/templates/staticbook.html
+#: lms/templates/staticbook.html
 msgid "Previous page"
 msgstr "Önceki sayfa"
 
-#: lms/templates/static_pdfbook.html lms/templates/staticbook.html
+#: lms/templates/staticbook.html
 msgid "Next page"
 msgstr "Sonraki sayfa"
 
@@ -6262,7 +6204,7 @@ msgstr "Ek Kaynaklar"
 #. notification image that indicates the tab "needs attention".
 #: lms/templates/courseware/course_navigation.html
 msgid "needs attention"
-msgstr ""
+msgstr "dikkat gerekiyor"
 
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/course_navigation.html
@@ -6283,20 +6225,10 @@ msgstr "{university_name} üniversitesinden ücretsiz dersleri görüntüle"
 
 #: lms/templates/courseware/courseware-error.html
 msgid ""
-"There has been an error on the {span_start}{platform_name}{span_end} servers"
-msgstr "{span_start}{platform_name}{span_end} sunucularında hata oldu"
-
-#: lms/templates/courseware/courseware-error.html
-msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at '<a "
-"href=\"mailto:{tech_support_email}\">{tech_support_email}</a>' to report any"
-" problems or downtime."
+" fix it as soon as possible. Please email us at {tech_support_email}' to "
+"report any problems or downtime."
 msgstr ""
-"Özür dileriz, bu modül geçici bir süre devredışı. Personelimiz bunu en kısa "
-"sürede düzeltmek için çalışıyor. Lütfen  '<a "
-"href=\"mailto:{tech_support_email}\">{tech_support_email}</a>' adresine "
-"yazarak sorunları ve site çökmelerini bildirin."
 
 #: lms/templates/courseware/courseware.html
 msgid "{course_number} Courseware"
@@ -6845,12 +6777,6 @@ msgid "Count of Students that Opened a Subsection"
 msgstr "Bir Altbölüm Açmış Öğrencilerin Sayısı"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Loading..."
-msgstr "Yüklüyor..."
-
-#: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Grade Distribution per Problem"
 msgstr "Her Problem için Not Dağılımı"
@@ -7302,6 +7228,10 @@ msgstr "Yeni İleti"
 msgid "Show Discussion"
 msgstr "Tartışmayı Göster"
 
+#: lms/templates/discussion/_discussion_module_studio.html
+msgid "To view live discussions, click Preview or View Live in Unit Settings."
+msgstr ""
+
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Filter Topics"
 msgstr "Konuları Filtrele"
@@ -7672,11 +7602,6 @@ msgstr "Aktif Tehlikeler"
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Loading content"
-msgstr "İçerik yükleniyor"
-
-#: lms/templates/discussion/mustache/_inline_thread.mustache
-#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Expand discussion"
 msgstr ""
 
@@ -7739,6 +7664,10 @@ msgstr ""
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid "Visit {course_about_url} to join the course and begin the beta test."
+msgstr ""
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
+msgid "Visit {site_name} to enroll in the course and begin the beta test."
 msgstr ""
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
@@ -7819,6 +7748,10 @@ msgstr ""
 msgid ""
 "Once you have registered and activated your account, visit "
 "{course_about_url} to join the course."
+msgstr ""
+
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid "You can then enroll in {course_name}."
 msgstr ""
 
 #: lms/templates/emails/enroll_email_allowedsubject.txt
@@ -8325,9 +8258,13 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Checking this box has no effect if 'Unenroll' is selected."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Notify users by email"
-msgstr ""
+msgstr "Kullanıcıları eposta ile bildirim yap"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -8356,11 +8293,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add beta testers"
-msgstr ""
+msgstr "Beta sınayıcısı ekle"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Remove beta testers"
-msgstr ""
+msgstr "Beta sınayıcılarını sil"
 
 #. Translators: an "Administration List" is a list, such as Course Staff, that
 #. users can be added to.
@@ -9298,25 +9235,19 @@ msgid "In the Press"
 msgstr "Basında"
 
 #: lms/templates/static_templates/server-down.html
-msgid "Currently the <em>{platform_name}</em> servers are down"
-msgstr "Şu anda <em>{platform_name}</em> sunucuları çalışmıyor"
+msgid "Currently the {platform_name} servers are down"
+msgstr ""
 
 #: lms/templates/static_templates/server-down.html
 #: lms/templates/static_templates/server-overloaded.html
 msgid ""
 "Our staff is currently working to get the site back up as soon as possible. "
-"Please email us at <a "
-"href=\"mailto:{tech_support_email}\">{tech_support_email}</a> to report any "
-"problems or downtime."
+"Please email us at {tech_support_email} to report any problems or downtime."
 msgstr ""
-"Personelimiz siteyi en kısa sürede aktif duruma getirmek için çalışıyor. "
-"Lütfen herhangi bir problem veya çalışmama durumu olduğunda <a "
-"href=\"mailto:{tech_support_email}\">{tech_support_email}</a> adresi "
-"üzerinden bize bildiriniz."
 
 #: lms/templates/static_templates/server-error.html
-msgid "There has been a 500 error on the <em>{platform_name}</em> servers"
-msgstr "<em>{platform_name}</em> sunucularında 500 hatası oldu."
+msgid "There has been a 500 error on the {platform_name} servers"
+msgstr ""
 
 #: lms/templates/static_templates/server-error.html
 msgid ""
@@ -9325,8 +9256,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/static_templates/server-overloaded.html
-msgid "Currently the <em>{platform_name}</em> servers are overloaded"
-msgstr "Şu an için <em>{platform_name}</em> sunucuları aşırı yüklendi"
+msgid "Currently the {platform_name} servers are overloaded"
+msgstr ""
 
 #: lms/templates/university_profile/edge.html
 #: lms/templates/university_profile/edge.html
@@ -9737,6 +9668,8 @@ msgid "Complete your other re-verifications"
 msgstr "Diğer yeniden doğrulamalarınızı tamamlayın"
 
 #: lms/templates/verify_student/midcourse_reverification_confirmation.html
+#: lms/templates/verify_student/midcourse_reverify_dash.html
+#: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "Return to where you left off"
 msgstr "Nerede kaldıysanız oraya dönün"
 
@@ -9777,16 +9710,8 @@ msgid "Failed"
 msgstr "Başarısız"
 
 #: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid ""
-"Don't want to re-verify right now? {a_start}Return to where you left "
-"off{a_end}"
+msgid "Don't want to re-verify right now?"
 msgstr ""
-"Şu anda kimliğinizi onaylamak istemiyor musunuz? {a_start}Nerede kaldıysanız"
-" oraya dönün{a_end}"
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "{a_start}Return to where you left off{a_end}"
-msgstr "{a_start}Kaldığınız yere geri dönün{a_end}"
 
 #: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "Why do I need to re-verify?"
@@ -10580,14 +10505,15 @@ msgid "Editor"
 msgstr "Editör"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr "Kopyasını Çıkar"
 
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html
 msgid "Duplicate this component"
 msgstr "Bu bileşenin kopyasını çıkarın"
 
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html
 msgid "Delete this component"
 msgstr "Bu bileşeni silin"
 
@@ -10601,27 +10527,41 @@ msgstr "Tekrar düzenlemek için sürükle"
 msgid "Container"
 msgstr "Taşıyıcı"
 
-#: cms/templates/container.html cms/templates/studio_vertical_wrapper.html
-msgid "No Actions"
-msgstr "Aksiyon Yok"
-
 #: cms/templates/container.html
+msgid "This page has no content yet."
+msgstr ""
+
+#: cms/templates/container.html cms/templates/container.html
 msgid "Publishing Status"
 msgstr "Yayınlanma Durumu"
 
 #: cms/templates/container.html
-msgid "This content is published with unit {unit_name}."
-msgstr "Bu içerik {unit_name} birimi ile yayınlanmıştır. "
+msgid "Published"
+msgstr ""
 
 #: cms/templates/container.html
 msgid ""
-"You can view course components that contain other components on this page. "
-"In the case of experiment blocks, this allows you to confirm that you have "
-"properly configured your experiment groups."
+"To make changes to the content of this page, you need to edit unit "
+"{unit_link} as a draft."
 msgstr ""
-"Bu sayfada diğer bileşenleri içeren ders bileşenlerini görebilirsiniz. Denet"
-" blokları durumunda, bu deney gruplarınızı uygun şekilde kurmanızı "
-"onaylamanızı sağlar."
+
+#: cms/templates/container.html
+msgid "Draft"
+msgstr ""
+
+#: cms/templates/container.html
+msgid ""
+"You can edit the content of this page, and your changes will be published "
+"with unit {unit_link}."
+msgstr ""
+
+#: cms/templates/container.html
+msgid ""
+"You can view and edit course components that contain other components on "
+"this page. In the case of experiment blocks, this allows you to confirm that"
+" you have properly configured your experiment groups and make changes to "
+"existing content."
+msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
 msgid "Course Updates"
@@ -12529,6 +12469,10 @@ msgstr ""
 #: cms/templates/studio_vertical_wrapper.html
 msgid "Expand or Collapse"
 msgstr "Genişlet veya Daralt"
+
+#: cms/templates/studio_vertical_wrapper.html
+msgid "No Actions"
+msgstr "Aksiyon Yok"
 
 #: cms/templates/textbooks.html
 msgid "You have unsaved changes. Do you really want to leave this page?"
