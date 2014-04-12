@@ -459,18 +459,29 @@ function (Initialize) {
         });
 
         describe('Registering callbacks', function () {
-            it('regiter callback for videoPlayer.update method direct function call', function () {
+            var callback = function (t) {
+                var x = 1; return x + t;
+            };
+
+            it('regiter callback for videoPlayer.update method - direct function call', function () {
                 var state = {
                         methodCallbacks: {
                             update: []
                         }
                     },
-                    callback = function (t) {
-                        var x = 1; return x + t;
-                    },
                     registerCallback = Initialize.prototype.registerCallback;
 
-                registerCallback('videoPlayer', 'update', callback);
+                registerCallback.call(state, 'videoPlayer', 'update', callback);
+                expect(state.methodCallbacks.videoPlayer.update[0]).toBe(callback);
+            });
+
+            it('regiter callback for videoPlayer.update method - call through DOM element', function () {
+                var state;
+
+                jasmine.initializePlayer();
+                state = $('.video').data('video-player-state');
+
+                state.registerCallback('videoPlayer', 'update', callback);
                 expect(state.methodCallbacks.videoPlayer.update[0]).toBe(callback);
             });
         });
