@@ -735,6 +735,9 @@ MIDDLEWARE_CLASSES = (
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'student.middleware.UserStandingMiddleware',
+
+    # sneakpeek deeplinks
+    'sneakpeek_deeplink.middleware.SneakPeekDeepLinkMiddleware',
     'contentserver.middleware.StaticContentServer',
     'crum.CurrentRequestUserMiddleware',
 
@@ -779,6 +782,7 @@ MIDDLEWARE_CLASSES = (
 
     # use Django built in clickjacking protection
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 )
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
@@ -1215,6 +1219,8 @@ INSTALLED_APPS = (
     'reverification',
 
     'embargo',
+
+    'sneakpeek_deeplink',
 )
 
 ######################### MARKETING SITE ###############################
