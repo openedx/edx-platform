@@ -57,7 +57,7 @@ class _ZendeskApi(object):
             settings.ZENDESK_URL,
             settings.ZENDESK_USER,
             settings.ZENDESK_API_KEY,
-            use_api_token=True,
+            use_api_token=False,
             api_version=2,
             # As of 2012-05-08, Zendesk is using a CA that is not
             # installed on our servers
@@ -131,7 +131,7 @@ DATADOG_FEEDBACK_METRIC = "lms_feedback_submissions"
 
 
 def _record_feedback_in_datadog(tags):
-    datadog_tags = [u"{k}:{v}".format(k=k, v=v) for k, v in tags.items()]
+    datadog_tags = ["{k}:{v}".format(k=k.encode('utf-8'), v=v.encode('utf-8')) for k, v in tags.items()]
     dog_stats_api.increment(DATADOG_FEEDBACK_METRIC, tags=datadog_tags)
 
 
