@@ -14,7 +14,7 @@ from django.dispatch import receiver
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
+from mail import send_mail
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.db import transaction
@@ -294,31 +294,47 @@ class Order(models.Model):
                 'email_from_address',
                 settings.PAYMENT_SUPPORT_EMAIL
             )
+            context = {
+                'order': self,
+                'recipient_name': recipient[0],
+                'recipient_type': recipient[2],
+                'site_name': site_name,
+                'order_items': orderitems,
+                'course_names': ", ".join([course_info[0] for course_info in courses_info]),
+                'dashboard_url': dashboard_url,
+                'order_placed_by': '{username} ({email})'.format(username=self.user.username, email=getattr(self.user, 'email')),  # pylint: disable=E1101
+                'has_billing_info': settings.FEATURES['STORE_BILLING_INFO'],
+                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+                'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL),
+                'payment_email_signature': microsite.get_value('payment_email_signature'),
+            }
+            message_html = None
+
             # send a unique email for each recipient, don't put all email addresses in a single email
             for recipient in recipient_list:
                 message = render_to_string(
                     'emails/business_order_confirmation_email.txt' if is_order_type_business else 'emails/order_confirmation_email.txt',
-                    {
-                        'order': self,
-                        'recipient_name': recipient[0],
-                        'recipient_type': recipient[2],
-                        'site_name': site_name,
-                        'order_items': orderitems,
-                        'course_names': ", ".join([course_info[0] for course_info in courses_info]),
-                        'dashboard_url': dashboard_url,
-                        'order_placed_by': '{username} ({email})'.format(username=self.user.username, email=getattr(self.user, 'email')),  # pylint: disable=E1101
-                        'has_billing_info': settings.FEATURES['STORE_BILLING_INFO'],
-                        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
-                        'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL),
-                        'payment_email_signature': microsite.get_value('payment_email_signature'),
-                    }
+                    context
                 )
-                email = EmailMessage(
-                    subject=subject,
-                    body=message,
-                    from_email=from_address,
-                    to=[recipient[1]]
-                )
+                if (settings.FEATURES.get('ENABLE_MULTIPART_EMAIL')):
+                    message_html = render_to_string(
+                        'emails/html/business_order_confirmation_email.html' if is_order_type_business else 'emails/html/order_confirmation_email.html',
+                        context
+                    )
+                    email = EmailMessage(
+                        subject=subject,
+                        body=message,
+                        from_email=from_address,
+                        to=[recipient[1]],
+                        html_message=message_html,
+                    )
+                else:
+                    email = EmailMessage(
+                        subject=subject,
+                        body=message,
+                        from_email=from_address,
+                        to=[recipient[1]],
+                    )
 
                 # only the business order is HTML formatted
                 # the single seat is simple text
