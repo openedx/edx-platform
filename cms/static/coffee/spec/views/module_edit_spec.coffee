@@ -25,7 +25,6 @@ define ["jquery", "js/spec_helpers/edit_helpers", "coffee/src/views/module_edit"
           </section>
         </li>
         </ul>
-        <div class="edit-xblock-modal"/>
         """
         edit_helpers.installEditTemplates(true);
         spyOn($, 'ajax').andReturn(@moduleData)

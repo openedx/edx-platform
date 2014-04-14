@@ -49,20 +49,6 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                     expect(editor.$el.select('.xblock-header')).toBeTruthy();
                     expect(editor.getMode()).toEqual('settings');
                 });
-
-                it('saves any custom metadata', function() {
-                    var requests = create_sinon.requests(this), request, response;
-                    editor.render();
-                    create_sinon.respondWithJson(requests, {
-                        html: mockXBlockEditorHtml,
-                        resources: []
-                    });
-                    editor.save();
-                    request = requests[requests.length - 1];
-                    response = JSON.parse(request.requestBody);
-                    expect(response.metadata.display_name).toBe(testDisplayName);
-                    expect(response.metadata.custom_field).toBe('Custom Value');
-                });
             });
 
             describe("Editing an xmodule", function() {

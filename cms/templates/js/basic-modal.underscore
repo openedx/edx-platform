@@ -5,7 +5,7 @@
      role="dialog">
     <div class="modal-window-overlay"></div>
     <div class="modal-window confirm modal-editor modal-<%= size %> modal-type-<%= type %>">
-        <div class="<%= name %>-modal" action="#">
+        <div class="<%= name %>-modal">
             <div class="modal-header">
                 <h2 class="title modal-window-title"><%= title %></h2>
                 <ul class="editor-modes action-list action-modes">

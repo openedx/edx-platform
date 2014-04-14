@@ -47,7 +47,7 @@ define(["jquery"],
         cancelModal = function(modal) {
             var modalElement, cancelButton;
             modalElement = getModalElement(modal);
-            cancelButton = modalElement.find('.action-cancel');
+            cancelButton = modalElement.find('.action-cancel:visible');
             expect(cancelButton.length).toBe(1);
             cancelButton.click();
         };

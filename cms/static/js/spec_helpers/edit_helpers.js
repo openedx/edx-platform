@@ -1,9 +1,9 @@
 /**
  * Provides helper methods for invoking Studio editors in Jasmine tests.
  */
-define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers", "js/views/modals/edit_xblock",
-    "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function($, create_sinon, modal_helpers, EditXBlockModal) {
+define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers",
+    "js/views/modals/edit_xblock", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+    function($, _, create_sinon, modal_helpers, EditXBlockModal) {
 
         var editorTemplate = readFixtures('metadata-editor.underscore'),
             numberEntryTemplate = readFixtures('metadata-number-entry.underscore'),
@@ -12,19 +12,15 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers
             editorModeButtonTemplate = readFixtures('editor-mode-button.underscore'),
             installMockXBlock,
             uninstallMockXBlock,
-            hasSavedMockXBlock,
             installMockXModule,
             uninstallMockXModule,
-            hasSavedMockXModule,
             installEditTemplates,
             showEditModal;
 
         installMockXBlock = function(mockResult) {
             window.MockXBlock = function(runtime, element) {
                 return {
-                    save: function() {
-                        return mockResult;
-                    }
+                    runtime: runtime
                 };
             };
         };
@@ -58,9 +54,9 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers
             appendSetFixtures($("<script>", {id: "metadata-string-entry", type: "text/template"}).text(stringEntryTemplate));
         };
 
-        showEditModal = function(requests, xblockElement, model, mockHtml) {
+        showEditModal = function(requests, xblockElement, model, mockHtml, options) {
             var modal = new EditXBlockModal({});
-            modal.edit(xblockElement, model);
+            modal.edit(xblockElement, model, options);
             create_sinon.respondWithJson(requests, {
                 html: mockHtml,
                 "resources": []
