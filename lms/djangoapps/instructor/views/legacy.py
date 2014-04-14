@@ -1308,16 +1308,20 @@ def grade_summary2(request, course_id):
     """Display the grade summary for a course."""
     course = get_course_with_access(request.user, course_id, 'staff')
 
-    f = open("/var/www/edx/" + course.id.replace('/','_') + ".csv")
 #    f = open("/tmp/CPM_Bi012013_2013-2014.csv")
 
+    try:
+        f = open("/var/www/edx/" + course.id.replace('/','_') + ".csv")
+    
+        if f is None:
+            return False;
 
-    if f is None:
-        return False;
+        ff = UnicodeReader(f, delimiter=',', quoting=csv.QUOTE_ALL, dialect="excel")
 
-    ff = UnicodeReader(f, delimiter=',', quoting=csv.QUOTE_ALL, dialect="excel")
-
-    data = list(ff)
+        data = list(ff)
+    except:
+        log.exception("No file for course")
+        data = [[]]
 
     csv_header = data[0]
 
