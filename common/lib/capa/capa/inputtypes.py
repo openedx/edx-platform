@@ -1078,6 +1078,7 @@ class ChemicalEquationInput(InputTypeBase):
            'error' : 'the-error' or ''
         }
         """
+        _ = self.capa_system.i18n.ugettext
 
         result = {'preview': '',
                   'error': ''}
@@ -1166,7 +1167,8 @@ class FormulaEquationInput(InputTypeBase):
            'request_start' : <time sent with request>
         }
         """
-
+        _ = self.capa_system.i18n.ugettext
+        
         result = {'preview': '',
                   'error': ''}
 
