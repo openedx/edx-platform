@@ -220,15 +220,13 @@
                 beforeEach(function () {
                     state = jasmine.initializePlayer();
                     state.videoSpeedControl.setSpeed(1.0);
-                    spyOn($.fn, 'trigger').andCallThrough();
-
-                    $('li[data-speed="0.75"] a').click();
                 });
 
                 it('trigger speedChange event', function () {
-                    expect($.fn.trigger.mostRecentCall.args[0]).toEqual(
-                        'speedchange', ['0.75']
-                    );
+                    spyOnEvent(state.el, 'speedchange');
+
+                    $('li[data-speed="0.75"] a').click();
+                    expect('speedchange').toHaveBeenTriggeredOn(state.el);
                     expect(state.videoSpeedControl.currentSpeed).toEqual('0.75');
                 });
             });
