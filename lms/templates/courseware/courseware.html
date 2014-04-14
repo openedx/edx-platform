@@ -37,6 +37,15 @@ ${page_title_breadcrumbs(course_name())}
   <script type="text/javascript" src="${static.url('js/vendor/jquery.scrollTo-1.4.2-min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery.ui.datepicker-ru.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/tiny_mce.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/jquery.tinymce.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/htmlmixed.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
+  <script type="text/javascript">
+    (function() {window.baseUrl = "${settings.STATIC_URL}";})(this);
+  </script>
+  <%static:js group='module-descriptor-js'/>
+
 
   ## codemirror
   <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>

@@ -5,16 +5,6 @@ from util.date_utils import get_time_display
 from django.conf import settings
 %>
 
-<%namespace name='static' file='/static_content.html'/>
-  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/tiny_mce.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/jquery.tinymce.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/htmlmixed.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
-  <script type="text/javascript">
-    (function() {window.baseUrl = "${settings.STATIC_URL}";})(this);
-  </script>
-  <%static:js group='module-descriptor-js'/>
-
 <style>
 .xmodule_edit ul {
 margin: 0 !important;
