@@ -56,7 +56,7 @@ pycrypto>=2.6
 pygments==1.6
 pygraphviz==1.1
 pymongo==2.4.1
-pyparsing==1.5.6
+pyparsing==2.0.1
 python-memcached==1.48
 python-openid==2.2.5
 python-dateutil==2.1
@@ -106,7 +106,7 @@ chrono==1.0.2
 coverage==3.7
 ddt==0.7.1
 django-crum==0.5
-django_nose==1.1
+django_nose==1.2
 factory_boy==2.2.1
 freezegun==0.1.11
 mock==1.0.1

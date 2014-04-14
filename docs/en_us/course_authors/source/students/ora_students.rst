@@ -58,7 +58,7 @@ see :ref:`ORA Self Assessment`, :ref:`ORA Peer Assessment`, and :ref:`ORA AI Ass
 
 After you submit your response, your score will be available shortly - sometimes within a few
 minutes. For information about how to access your score after your response has been graded,
-see :ref:`ORA Access Scores`.
+see :ref:`ORA Access Scores Students`.
 
 If you want to experiment with open response assessments, you can try out the open
 assessment problems in the `EdX Demo <https://courses.edx.org/courses/edX/DemoX/Demo_Course/info>`_
@@ -291,7 +291,7 @@ student who submitted the response.
    .. image:: ../Images/DoneGrading.png
 
    When you see this message, you can access the score for your own
-   response. For more information, see :ref:`ORA Access Scores`.
+   response. For more information, see :ref:`ORA Access Scores Students`.
 
 If you want to grade additional responses at any time, you can go back
 to the **Peer Grading** page and click the name of the problem that you want
@@ -339,9 +339,9 @@ responses, you may receive your grade within minutes, or you may have to wait
 a few days. You won't receive a notification when your score is ready, so keep
 checking back.
 
-For more information about accessing your scores, see :ref:`ORA Access Scores`.
+For more information about accessing your scores, see :ref:`ORA Access Scores Students`.
 
-.. _ORA Access Scores:
+.. _ORA Access Scores Students:
 
 Access Scores and Feedback
 --------------------------

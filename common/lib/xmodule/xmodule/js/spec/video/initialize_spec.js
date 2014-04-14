@@ -396,6 +396,89 @@ function (Initialize) {
                 });
             });
         });
+
+        describe('setPlayerMode', function () {
+            beforeEach(function () {
+                state = {
+                    currentPlayerMode: 'flash',
+                };
+            });
+
+            it('updates player mode', function () {
+                var setPlayerMode = Initialize.prototype.setPlayerMode;
+
+                setPlayerMode.call(state, 'html5');
+                expect(state.currentPlayerMode).toBe('html5');
+                setPlayerMode.call(state, 'flash');
+                expect(state.currentPlayerMode).toBe('flash');
+            });
+
+            it('sets default mode if passed is not supported', function () {
+                var setPlayerMode = Initialize.prototype.setPlayerMode;
+
+                setPlayerMode.call(state, '77html77');
+                expect(state.currentPlayerMode).toBe('html5');
+            });
+        });
+
+        describe('getPlayerMode', function () {
+            beforeEach(function () {
+                state = {
+                    currentPlayerMode: 'flash',
+                };
+            });
+
+            it('returns current player mode', function () {
+                var getPlayerMode = Initialize.prototype.getPlayerMode,
+                    actual = getPlayerMode.call(state);
+
+                expect(actual).toBe(state.currentPlayerMode);
+            });
+        });
+
+        describe('isFlashMode', function () {
+            it('returns `true` if player in `flash` mode', function () {
+                var state = {
+                        getPlayerMode: jasmine.createSpy().andReturn('flash'),
+                    },
+                    isFlashMode = Initialize.prototype.isFlashMode,
+                    actual = isFlashMode.call(state);
+
+                expect(actual).toBeTruthy();
+            });
+
+            it('returns `false` if player is not in `flash` mode', function () {
+                var state = {
+                        getPlayerMode: jasmine.createSpy().andReturn('html5'),
+                    },
+                    isFlashMode = Initialize.prototype.isFlashMode,
+                    actual = isFlashMode.call(state);
+
+                expect(actual).toBeFalsy();
+            });
+        });
+
+        describe('isHtml5Mode', function () {
+            it('returns `true` if player in `html5` mode', function () {
+                var state = {
+                        getPlayerMode: jasmine.createSpy().andReturn('html5'),
+                    },
+                    isHtml5Mode = Initialize.prototype.isHtml5Mode,
+                    actual = isHtml5Mode.call(state);
+
+                expect(actual).toBeTruthy();
+            });
+
+            it('returns `false` if player is not in `html5` mode', function () {
+                var state = {
+                        getPlayerMode: jasmine.createSpy().andReturn('flash'),
+                    },
+                    isHtml5Mode = Initialize.prototype.isHtml5Mode,
+                    actual = isHtml5Mode.call(state);
+
+                expect(actual).toBeFalsy();
+            });
+        });
     });
 });
 

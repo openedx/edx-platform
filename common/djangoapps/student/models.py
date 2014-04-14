@@ -18,16 +18,18 @@ import logging
 from pytz import UTC
 import uuid
 from collections import defaultdict
+from dogapi import dog_stats_api
 
 from django.conf import settings
+from django.utils import timezone
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
 from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
 import django.dispatch
-from django.forms import ModelForm, forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
 from django_countries import CountryField
@@ -35,6 +37,8 @@ from track import contexts
 from track.views import server_track
 from eventtracking import tracker
 from importlib import import_module
+
+from xmodule.modulestore import Location
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -79,8 +83,8 @@ def anonymous_id_for_user(user, course_id):
     # include the secret key as a salt, and to make the ids unique across different LMS installs.
     hasher = hashlib.md5()
     hasher.update(settings.SECRET_KEY)
-    hasher.update(str(user.id))
-    hasher.update(course_id)
+    hasher.update(unicode(user.id))
+    hasher.update(course_id.encode('utf-8'))
     digest = hasher.hexdigest()
 
     try:
@@ -312,6 +316,185 @@ EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 
 
+class PasswordHistory(models.Model):
+    """
+    This model will keep track of past passwords that a user has used
+    as well as providing contraints (e.g. can't reuse passwords)
+    """
+    user = models.ForeignKey(User)
+    password = models.CharField(max_length=128)
+    time_set = models.DateTimeField(default=timezone.now)
+
+    def create(self, user):
+        """
+        This will copy over the current password, if any of the configuration has been turned on
+        """
+
+        if not (PasswordHistory.is_student_password_reuse_restricted() or
+                PasswordHistory.is_staff_password_reuse_restricted() or
+                PasswordHistory.is_password_reset_frequency_restricted() or
+                PasswordHistory.is_staff_forced_password_reset_enabled() or
+                PasswordHistory.is_student_forced_password_reset_enabled()):
+
+            return
+
+        self.user = user
+        self.password = user.password
+        self.save()
+
+    @classmethod
+    def is_student_password_reuse_restricted(cls):
+        """
+        Returns whether the configuration which limits password reuse has been turned on
+        """
+        return settings.FEATURES['ADVANCED_SECURITY'] and \
+            settings.ADVANCED_SECURITY_CONFIG.get(
+                'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE', 0
+            ) > 0
+
+    @classmethod
+    def is_staff_password_reuse_restricted(cls):
+        """
+        Returns whether the configuration which limits password reuse has been turned on
+        """
+        return settings.FEATURES['ADVANCED_SECURITY'] and \
+            settings.ADVANCED_SECURITY_CONFIG.get(
+                'MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE', 0
+            ) > 0
+
+    @classmethod
+    def is_password_reset_frequency_restricted(cls):
+        """
+        Returns whether the configuration which limits the password reset frequency has been turned on
+        """
+        return settings.FEATURES['ADVANCED_SECURITY'] and \
+            settings.ADVANCED_SECURITY_CONFIG.get(
+                'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS', None
+            )
+
+    @classmethod
+    def is_staff_forced_password_reset_enabled(cls):
+        """
+        Returns whether the configuration which forces password resets to occur has been turned on
+        """
+        return settings.FEATURES['ADVANCED_SECURITY'] and \
+            settings.ADVANCED_SECURITY_CONFIG.get(
+                'MIN_DAYS_FOR_STAFF_ACCOUNTS_PASSWORD_RESETS', None
+            )
+
+    @classmethod
+    def is_student_forced_password_reset_enabled(cls):
+        """
+        Returns whether the configuration which forces password resets to occur has been turned on
+        """
+        return settings.FEATURES['ADVANCED_SECURITY'] and \
+            settings.ADVANCED_SECURITY_CONFIG.get(
+                'MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS', None
+            )
+
+    @classmethod
+    def should_user_reset_password_now(cls, user):
+        """
+        Returns whether a password has 'expired' and should be reset. Note there are two different
+        expiry policies for staff and students
+        """
+        if not settings.FEATURES['ADVANCED_SECURITY']:
+            return False
+
+        days_before_password_reset = None
+        if user.is_staff:
+            if cls.is_staff_forced_password_reset_enabled():
+                days_before_password_reset = \
+                    settings.ADVANCED_SECURITY_CONFIG['MIN_DAYS_FOR_STAFF_ACCOUNTS_PASSWORD_RESETS']
+        elif cls.is_student_forced_password_reset_enabled():
+            days_before_password_reset = \
+                settings.ADVANCED_SECURITY_CONFIG['MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS']
+
+        if days_before_password_reset:
+            history = PasswordHistory.objects.filter(user=user).order_by('-time_set')
+            time_last_reset = None
+
+            if history:
+                # first element should be the last time we reset password
+                time_last_reset = history[0].time_set
+            else:
+                # no history, then let's take the date the user joined
+                time_last_reset = user.date_joined
+
+            now = timezone.now()
+
+            delta = now - time_last_reset
+
+            return delta.days >= days_before_password_reset
+
+        return False
+
+    @classmethod
+    def is_password_reset_too_soon(cls, user):
+        """
+        Verifies that the password is not getting reset too frequently
+        """
+        if not cls.is_password_reset_frequency_restricted():
+            return False
+
+        history = PasswordHistory.objects.filter(user=user).order_by('-time_set')
+
+        if not history:
+            return False
+
+        now = timezone.now()
+
+        delta = now - history[0].time_set
+
+        return delta.days < settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
+
+    @classmethod
+    def is_allowable_password_reuse(cls, user, new_password):
+        """
+        Verifies that the password adheres to the reuse policies
+        """
+        if not settings.FEATURES['ADVANCED_SECURITY']:
+            return True
+
+        if user.is_staff and cls.is_staff_password_reuse_restricted():
+                min_diff_passwords_required = \
+                    settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
+        elif cls.is_student_password_reuse_restricted():
+            min_diff_passwords_required = \
+                settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
+        else:
+            min_diff_passwords_required = 0
+
+        # just limit the result set to the number of different
+        # password we need
+        history = PasswordHistory.objects.filter(user=user).order_by('-time_set')[:min_diff_passwords_required]
+
+        for entry in history:
+
+            # be sure to re-use the same salt
+            # NOTE, how the salt is serialized in the password field is dependent on the algorithm
+            # in pbkdf2_sha256 [LMS] it's the 3rd element, in sha1 [unit tests] it's the 2nd element
+            hash_elements = entry.password.split('$')
+            algorithm = hash_elements[0]
+            if algorithm == 'pbkdf2_sha256':
+                hashed_password = make_password(new_password, hash_elements[2])
+            elif algorithm == 'sha1':
+                hashed_password = make_password(new_password, hash_elements[1])
+            else:
+                # This means we got something unexpected. We don't want to throw an exception, but
+                # log as an error and basically allow any password reuse
+                AUDIT_LOG.error('''
+                                Unknown password hashing algorithm "{0}" found in existing password
+                                hash, password reuse policy will not be enforced!!!
+                                '''.format(algorithm))
+                return True
+
+            if entry.password == hashed_password:
+                return False
+
+        return True
+
+
 class LoginFailures(models.Model):
     """
     This model will keep track of failed login attempts
@@ -496,11 +679,30 @@ class CourseEnrollment(models.Model):
         if activation_changed or mode_changed:
             self.save()
         if activation_changed:
+            course_id_dict = Location.parse_course_id(self.course_id)
             if self.is_active:
                 self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
+
+                dog_stats_api.increment(
+                    "common.student.enrollment",
+                    tags=[u"org:{org}".format(**course_id_dict),
+                          u"course:{course}".format(**course_id_dict),
+                          u"run:{name}".format(**course_id_dict),
+                          u"mode:{}".format(self.mode)]
+                )
+
             else:
                 unenroll_done.send(sender=None, course_enrollment=self)
+
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
+
+                dog_stats_api.increment(
+                    "common.student.unenrollment",
+                    tags=[u"org:{org}".format(**course_id_dict),
+                          u"course:{course}".format(**course_id_dict),
+                          u"run:{name}".format(**course_id_dict),
+                          u"mode:{}".format(self.mode)]
+                )
 
     def emit_event(self, event_name):
         """

@@ -20,7 +20,7 @@ from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
 from xmodule.modulestore.tests.test_modulestore import check_path_to_location
-from IPython.testing.nose_assert_methods import assert_in
+from nose.tools import assert_in
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 

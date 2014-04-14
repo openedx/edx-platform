@@ -223,20 +223,20 @@ function (HTML5Video, Resizer) {
                 container: state.container
             })
             .callbacks.once(function() {
-                state.trigger('videoCaption.resize', null);
+                state.el.trigger('caption:resize');
             })
             .setMode('width');
 
         // Update captions size when controls becomes visible on iPad or Android
         if (/iPad|Android/i.test(state.isTouch[0])) {
             state.el.on('controls:show', function () {
-                state.trigger('videoCaption.resize', null);
+                state.el.trigger('caption:resize');
             });
         }
 
         $(window).on('resize', _.debounce(function () {
             state.trigger('videoControl.updateControlsHeight', null);
-            state.trigger('videoCaption.resize', null);
+            state.el.trigger('caption:resize');
             state.resizer.align();
         }, 100));
     }
@@ -251,7 +251,7 @@ function (HTML5Video, Resizer) {
         // Remove from the page current iFrame with HTML5 video.
         state.videoPlayer.player.destroy();
 
-        state.currentPlayerMode = 'flash';
+        state.setPlayerMode('flash');
 
         console.log('[Video info]: Changing YouTube player mode to "flash".');
 
@@ -271,7 +271,7 @@ function (HTML5Video, Resizer) {
         });
 
         _updateVcrAndRegion(state, true);
-        state.trigger('videoCaption.fetchCaption', null);
+        state.el.trigger('caption:fetch');
         state.resizer.setElement(state.el.find('iframe')).align();
     }
 
@@ -334,7 +334,7 @@ function (HTML5Video, Resizer) {
             methodName, youtubeId;
 
         if (
-            this.currentPlayerMode === 'html5' &&
+            this.isHtml5Mode() &&
             !(
                 this.browserIsFirefox &&
                 newSpeed === '1.0' &&
@@ -447,10 +447,6 @@ function (HTML5Video, Resizer) {
             end: true
         });
 
-        if (this.config.showCaptions) {
-            this.trigger('videoCaption.pause', null);
-        }
-
         if (this.videoPlayer.skipOnEndedStartEndReset) {
             this.videoPlayer.skipOnEndedStartEndReset = undefined;
         }
@@ -475,11 +471,6 @@ function (HTML5Video, Resizer) {
         delete this.videoPlayer.updateInterval;
 
         this.trigger('videoControl.pause', null);
-
-        if (this.config.showCaptions) {
-            this.trigger('videoCaption.pause', null);
-        }
-
         this.saveState(true);
         this.el.trigger('pause', arguments);
     }
@@ -501,17 +492,10 @@ function (HTML5Video, Resizer) {
         }
 
         this.trigger('videoControl.play', null);
-
         this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
             end: false
         });
-
-        if (this.config.showCaptions) {
-            this.trigger('videoCaption.play', null);
-        }
-
         this.videoPlayer.ready();
-
         this.el.trigger('play', arguments);
     }
 
@@ -570,7 +554,7 @@ function (HTML5Video, Resizer) {
         // For more information, please see the PR that introduced this change:
         //     https://github.com/edx/edx-platform/pull/2841
         if (
-            (this.currentPlayerMode === 'html5' || availablePlaybackRates.length > 1) &&
+            (this.isHtml5Mode() || availablePlaybackRates.length > 1) &&
             this.videoType === 'youtube'
         ) {
             if (availablePlaybackRates.length === 1 && !this.isTouch) {
@@ -584,7 +568,7 @@ function (HTML5Video, Resizer) {
 
                 _restartUsingFlash(this);
             } else if (availablePlaybackRates.length > 1) {
-                this.currentPlayerMode = 'html5';
+                this.setPlayerMode('html5');
 
                 // We need to synchronize available frame rates with the ones
                 // that the user specified.
@@ -623,7 +607,7 @@ function (HTML5Video, Resizer) {
             this.trigger('videoSpeedControl.setSpeed', this.speed);
         }
 
-        if (this.currentPlayerMode === 'html5') {
+        if (this.isHtml5Mode()) {
             this.videoPlayer.player.setPlaybackRate(this.speed);
         }
 
@@ -803,7 +787,7 @@ function (HTML5Video, Resizer) {
             }
         );
 
-        this.trigger('videoCaption.updatePlayTime', time);
+        this.el.trigger('caption:update', [time]);
     }
 
     function isEnded() {

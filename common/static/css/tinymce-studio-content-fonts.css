@@ -1,0 +1,2 @@
+/* NOTE: This file, which loads all necessary fonts for rendering Studio UI, is 1 of 3 CSS files compiled in our production pipeline  */
+@import url(//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700);

@@ -1,6 +1,7 @@
 # pylint: disable=C0111
 
 from lettuce import world, step
+from nose.tools import assert_less
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 from selenium.webdriver.common.keys import Keys
@@ -32,13 +33,11 @@ def configure_youtube_api(_step, action):
         raise ValueError('Parameter `action` should be one of "proxies" or "blocks".')
 
 
-@step('We explicitly wait for YouTube API to not load$')
-def wait_for_youtube_api_fail(_step):
-    world.wait(3)
-
-
 @step('I have created a Video component$')
 def i_created_a_video_component(_step):
+
+    assert_less(world.youtube.config['youtube_api_response'].status_code, 400,  "Real Youtube server is unavailable")
+
     world.create_course_with_unit()
     world.create_component_instance(
         step=_step,
@@ -51,7 +50,8 @@ def i_created_a_video_component(_step):
     world.wait_for_present('.is-initialized')
     world.wait(DELAY)
     world.wait_for_invisible(SELECTORS['spinner'])
-
+    if not world.youtube.config.get('youtube_api_blocked'):
+        world.wait_for_visible(SELECTORS['controls'])
 
 @step('I have created a Video component with subtitles$')
 def i_created_a_video_with_subs(_step):
@@ -197,11 +197,15 @@ def find_caption_line_by_data_index(index):
 
 @step('I focus on caption line with data-index "([^"]*)"$')
 def focus_on_caption_line(_step, index):
+    world.wait_for_present('.video.is-captions-rendered')
+    world.wait_for(lambda _: world.css_text('.subtitles'), timeout=30)
     find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.TAB)
 
 
 @step('I press "enter" button on caption line with data-index "([^"]*)"$')
 def click_on_the_caption(_step, index):
+    world.wait_for_present('.video.is-captions-rendered')
+    world.wait_for(lambda _: world.css_text('.subtitles'), timeout=30)
     find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.ENTER)
 
 
@@ -214,7 +218,6 @@ def caption_line_has_class(_step, index, className):
 @step('I see a range on slider$')
 def see_a_range_slider_with_proper_range(_step):
     world.wait_for_visible(VIDEO_BUTTONS['pause'])
-
     assert world.css_visible(".slider-range")
 
 
