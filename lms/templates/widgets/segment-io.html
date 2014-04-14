@@ -13,10 +13,7 @@
   // Get current page URL and pull out the path
   path = window.location.href.split("/")[3]
   // Match on the current path and fire the appropriate pageview event
-  if (path == "") {
-    // Home page viewed (path empty)
-    window.analytics.page("Home");
-  } else if (path == "register") {
+  if (path == "register") {
     // Registration page viewed
     window.analytics.page("Registration");
   } else if (path == "login") {
@@ -25,12 +22,6 @@
   } else if (path == "dashboard") {
     // Dashboard viewed
     window.analytics.page("Dashboard");
-  } else if (path == "course-list") {
-    // Course listing page viewed
-    window.analytics.page("Course Listing");
-  } else if (path == "course") {
-    // Course about page viewed
-    window.analytics.page("Course About");
   } else {
     // This event serves as a catch-all, firing when any other page is viewed
     window.analytics.page("Other");
