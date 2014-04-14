@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2014-03-26 10:56+0000\n"
-"PO-Revision-Date: 2014-04-10 16:45+0300\n"
+"PO-Revision-Date: 2014-04-11 17:00+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -2727,7 +2727,7 @@ msgstr "Добавить члена персонала курса"
 
 #: lms/templates/courseware/instructor_dashboard.html:363
 msgid "List course instructors"
-msgstr "Администраторы курса"
+msgstr "Список администраторов курса"
 
 #: lms/templates/courseware/instructor_dashboard.html:365
 msgid "Remove instructor"
