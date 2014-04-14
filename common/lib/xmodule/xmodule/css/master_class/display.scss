@@ -51,3 +51,28 @@ input[type="checkbox"].unregister-button + label span {
 input[type="checkbox"].unregister-button:checked + label span {
     background:url(/static/images/vote-minus-icon.png) -10px top no-repeat;
 }
+
+h3 {
+    padding-top: 20px;
+    padding-bottom: 10px;
+    font-weight: bolder;
+    color: #646464;
+}
+
+.list-fields .field .tip {
+display: block;
+margin-top: 5px;
+color: #bfbfbf;
+font-size: 12px;
+}
+.list-fields .field {
+margin-bottom: 20px;
+padding: 0;
+}
+.list-fields {
+list-style: none !important;
+}
+section.email-sender {
+    border: dashed lightgray 2px;
+padding: 5px;
+}

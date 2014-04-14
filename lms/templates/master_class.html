@@ -5,6 +5,25 @@ from util.date_utils import get_time_display
 from django.conf import settings
 %>
 
+<%namespace name='static' file='/static_content.html'/>
+  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/tiny_mce.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/jquery.tinymce.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/htmlmixed.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
+  <script type="text/javascript">
+    (function() {window.baseUrl = "${settings.STATIC_URL}";})(this);
+  </script>
+  <%static:js group='module-descriptor-js'/>
+
+<style>
+.xmodule_edit ul {
+margin: 0 !important;
+padding: 0 !important;
+margin-bottom: 10px !important;
+list-style: none !important;
+}
+</style>
+
 <section
     id="master_class_${element_id}"
     class="${element_class}"
@@ -32,8 +51,8 @@ from django.conf import settings
     <p>
     <section id="result_class_section_${element_id}" class="result_class_section">
         <p><span class="message"></span></p>
-        <h3>${_('Passed registration:')} <span class="total_register"></span></h3>
-        <h3>${_('Total places:')} <span class="total_places"></span></h3>
+        <h4>${_('Passed registration:')} <span class="total_register"></span></h4>
+        <h4>${_('Total places:')} <span class="total_places"></span></h4>
         <div class="master_class"></div>
     </section>
     <p>
@@ -52,7 +71,44 @@ from django.conf import settings
     </section>
 
     <section>
-        <input class="email-send" type="button" value="Скачать CSV файл с регистрациями" />
+        <input class="csv-download" type="button" value="Скачать CSV файл с регистрациями" />
+    </section>
+
+    <h3>Отправка писем прошедшим регистрацию</h3>
+    <section class="email-sender">
+    <ul class="list-fields">
+      <li class="field">
+        <label for="id_subject">${_("Subject: ")}</label>
+          <input type="text" id="id_subject" name="subject" maxlength="128" size="50">
+        <span class="tip">${_("(Max 128 characters)")}</span>
+      </li>
+
+      <li class="field">
+        <label>${_("Message:")}</label>
+        <div class="email-editor">
+            <div class="xblock xblock-studio_view xmodule_edit xmodule_HtmlDescriptor" data-runtime-class="LmsRuntime" data-init="XBlockToXModuleShim" data-block-type="None" data-runtime-version="1" data-usage-id="i4x:;_;_dummy_org;_dummy_course;_html;_dummy_name" data-type="HTMLEditingDescriptor" data-course-id="CPM/1/123" tabindex="0">
+    
+
+                <section class="html-editor editor">
+                  <ul class="editor-tabs">
+                    <li><a href="#" class="visual-tab tab current" data-tab="visual">Визуальный</a></li>
+                    <li><a href="#" class="html-tab tab" data-tab="advanced">HTML</a></li>
+                  </ul>
+
+                  <div class="row">
+                    <textarea class="tiny-mce"></textarea>
+                    <textarea name="" class="edit-box"></textarea>
+                  </div>
+                </section>
+
+                </div>
+        </div>
+        <input type="hidden" name="message" value="">
+      </li>
+    </ul>
+    <div class="submit-email-action"> 
+        <input type="button" class="email-send" value="Отослать письмо">
+    </div>
     </section>
     % endif
 

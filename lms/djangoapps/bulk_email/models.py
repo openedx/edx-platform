@@ -15,8 +15,10 @@ import logging
 from django.db import models, transaction
 from django.contrib.auth.models import User
 from html_to_text import html_to_text
+import hashlib
 
 from django.conf import settings
+from .fields import SeparatedValuesField
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +27,8 @@ log = logging.getLogger(__name__)
 SEND_TO_MYSELF = 'myself'
 SEND_TO_STAFF = 'staff'
 SEND_TO_ALL = 'all'
-TO_OPTIONS = [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_ALL]
+SEND_TO_LIST = 'list'
+TO_OPTIONS = [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LIST, SEND_TO_ALL]
 
 
 class Email(models.Model):
@@ -42,7 +45,6 @@ class Email(models.Model):
 
     class Meta:  # pylint: disable=C0111
         abstract = True
-
 
 class CourseEmail(Email):
     """
@@ -63,13 +65,15 @@ class CourseEmail(Email):
         (SEND_TO_ALL, 'All')
     )
     course_id = models.CharField(max_length=255, db_index=True)
+    location = models.CharField(max_length=255, db_index=True, null=True, blank=True)
     to_option = models.CharField(max_length=64, choices=TO_OPTION_CHOICES, default=SEND_TO_MYSELF)
+    to_list = SeparatedValuesField(null=True)
 
     def __unicode__(self):
         return self.subject
 
     @classmethod
-    def create(cls, course_id, sender, to_option, subject, html_message, text_message=None):
+    def create(cls, course_id, sender, to_option, subject, html_message, text_message=None, location=None, to_list=None):
         """
         Create an instance of CourseEmail.
 
@@ -98,6 +102,8 @@ class CourseEmail(Email):
             subject=subject,
             html_message=html_message,
             text_message=text_message,
+            location=location,
+            to_list=to_list,
         )
         course_email.save_now()
 
@@ -116,6 +122,29 @@ class CourseEmail(Email):
         separate transaction.
         """
         self.save()
+
+    def send(self):
+        from instructor_task.tasks import send_bulk_course_email
+        from instructor_task.api_helper import submit_task
+        from instructor.utils import DummyRequest
+
+        request = DummyRequest()
+        request.user = self.sender
+
+        email_obj = self
+        to_option = email_obj.to_option
+
+        task_type = 'bulk_course_email'
+        task_class = send_bulk_course_email
+        # Pass in the to_option as a separate argument, even though it's (currently)
+        # in the CourseEmail.  That way it's visible in the progress status.
+        # (At some point in the future, we might take the recipient out of the CourseEmail,
+        # so that the same saved email can be sent to different recipients, as it is tested.)
+        task_input = {'email_id': self.id, 'to_option': to_option}
+        task_key_stub = "{email_id}_{to_option}".format(email_id=self.id, to_option=to_option)
+        # create the key value by using MD5 hash:
+        task_key = hashlib.md5(task_key_stub).hexdigest()
+        return submit_task(request, task_type, task_class, self.course_id, task_input, task_key)
 
 
 class Optout(models.Model):

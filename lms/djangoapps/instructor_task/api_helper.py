@@ -82,9 +82,9 @@ def _get_xmodule_instance_args(request, task_id):
     The `task_id` is also passed to the tracking log function.
     """
     request_info = {'username': request.user.username,
-                    'ip': request.META['REMOTE_ADDR'],
+                    'ip': request.META.get('REMOTE_ADDR', '127.0.0.1'),
                     'agent': request.META.get('HTTP_USER_AGENT', ''),
-                    'host': request.META['SERVER_NAME'],
+                    'host': request.META.get('SERVER_NAME', ''),
                     }
 
     xmodule_instance_args = {'xqueue_callback_url_prefix': get_xqueue_callback_url_prefix(request),
