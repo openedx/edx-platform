@@ -22,6 +22,7 @@ $(function(){
         'title': $(this).text()
         });
     $('#viewer-frame').focus();
+    Logger.log("textbook.pdf.chapter.navigated", {"name": "textbook.pdf.chapter.navigated", "chapter": url, "chapter_title": $(this).text()});
     });
 });
 </script>
@@ -39,26 +40,11 @@ $(function(){
     </section>
     %endif
 
-<%
-params = '&file='
-label = ""
-if 'url' in textbook:
-  params += textbook['url']
-elif chapter is not None:
-  chap = textbook['chapters'][int(chapter) - 1]
-else:
-  chap = textbook['chapters'][0]
-params += chap['url']
-label = chap['title']
-
-if page is not None:
-  params += '&amp;page={}'.format(page)
-%>
 <div class="book">
 <iframe
-  title="${label}"
+  title="${current_chapter['title']|h}"
   id="viewer-frame"
-  src="${request.path}?viewer=true${params}#zoom=page-fit"
+  src="${request.path}?viewer=true${viewer_params}#zoom=page-fit"
   width="856"
   height="1108"
   frameborder="0"
