@@ -12,6 +12,19 @@ padding: 0 !important;
 margin-bottom: 10px !important;
 list-style: none !important;
 }
+.msg-confirm {
+border-top: 2px solid #008801;
+background: #f2f9f2;
+}
+.msg-confirm .copy {
+color: #008801;
+}
+.msg {
+border-radius: 1px;
+padding: 10px 15px;
+margin-bottom: 20px;
+margin-top: 20px;
+}
 </style>
 
 <section
@@ -99,6 +112,7 @@ list-style: none !important;
     <div class="submit-email-action"> 
         <input type="button" class="email-send" value="Отослать письмо">
     </div>
+    <div class="msg msg-confirm" style="display:none"><p class="copy"></p></div>
     </section>
     % endif
 

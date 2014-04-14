@@ -123,6 +123,8 @@ define('MasterClassMain', [], function (logme) {
         data.body = this.emailEditor.save()['data'];
         data.subject = this.masterClassEl.find('#id_subject').val();
 
+        _this.masterClassEl.find('.msg-confirm').hide()
+
       if (!data.subject) {
           alert(gettext("Email subject can not be empty."));
           return false;
@@ -141,6 +143,9 @@ define('MasterClassMain', [], function (logme) {
 
                     return;
                 }
+
+                _this.masterClassEl.find('.msg-confirm .copy').html(response.msg)
+                _this.masterClassEl.find('.msg-confirm').show()
 
                 _this.showMasterClass(response);
             }
