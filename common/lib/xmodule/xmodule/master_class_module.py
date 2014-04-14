@@ -241,6 +241,10 @@ class MasterClassModule(MasterClassFields, XModule):
             body =  data.get('body')
             mail = self.runtime.bulkmail.create(self.course_id, self.runtime.user, 'list', subject, body, location=self.id, to_list=self.passed_registrations)
             mail.send()
+            return json.dumps({
+                    'status': 'success',
+                    'msg': _('Your email was successfully queued for sending.')
+                })
         else:
             return json.dumps({
                 'status': 'fail',
