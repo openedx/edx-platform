@@ -47,7 +47,6 @@ define ["jquery", "underscore", "gettext", "xblock/runtime.v1",
     clickEditButton: (event) ->
       event.preventDefault()
       modal = new EditXBlockModal({
-        el: $('.edit-xblock-modal'),
         view: 'student_view'
       });
       modal.edit(this.$el, self.model, { refresh: _.bind(@render, this) })

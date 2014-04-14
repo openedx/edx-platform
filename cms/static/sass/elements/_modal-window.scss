@@ -18,7 +18,6 @@
 
     .modal-content {
       position: relative;
-      box-shadow: 0 0 3px $shadow-d1;
       background-color: $white;
       padding: 5%;
     }
@@ -52,7 +51,9 @@
       }
     }
 
+    // TODO: need to sync up (alongside general editing mode) with xblocks.scss UI
     .modal-chin,
+    .xblock-actions,
     .modal-actions {
       padding: ($baseline*0.75) 2% ($baseline/2) 2%;
 
@@ -188,6 +189,22 @@
         }
       }
     }
+  }
+
+  // xblock custom actions
+  .modal-window .editor-with-buttons {
+    margin-bottom: ($baseline*3);
+
+    // TODO: need to sync up (alongside general editing mode) with xblocks.scss UI
+    .xblock-actions {
+      background-color: $gray-l4;
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+    }
+
+
+
   }
 
 
