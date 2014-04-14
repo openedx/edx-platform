@@ -15,8 +15,9 @@ class VideoFields(object):
         default="Video",
         scope=Scope.settings
     )
+
     saved_video_position = RelativeTime(
-        help="Current position in the video",
+        help="Current position in the video.",
         scope=Scope.user_state,
         default=datetime.timedelta(seconds=0)
     )
@@ -105,13 +106,13 @@ class VideoFields(object):
     )
     # Data format: {'de': 'german_translation', 'uk': 'ukrainian_translation'}
     transcripts = Dict(
-        help="Add additional transcripts in other languages",
+        help="Add additional transcripts in other languages.",
         display_name="Transcript Translations",
         scope=Scope.settings,
         default={}
     )
     transcript_language = String(
-        help="Preferred language for transcript",
+        help="Preferred language for transcript.",
         display_name="Preferred language for transcript",
         scope=Scope.preferences,
         default="en"
@@ -130,12 +131,18 @@ class VideoFields(object):
         scope=Scope.user_state,
     )
     global_speed = Float(
-        help="Default speed in cases when speed wasn't explicitly for specific video",
+        help="Default speed in cases when speed wasn't explicitly for specific video.",
         scope=Scope.preferences,
         default=1.0
     )
     youtube_is_available = Boolean(
-        help="The availaibility of YouTube API for the user",
+        help="The availaibility of YouTube API for the user.",
         scope=Scope.user_info,
         default=True
+    )
+
+    handout = String(
+        help="Upload a handout to accompany this video. Students can download the handout by clicking Download Handout under the video.",
+        display_name="Upload Handout",
+        scope=Scope.settings,
     )

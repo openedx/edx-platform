@@ -107,12 +107,12 @@
     <div class="focus_grabber last"></div>
   <ul class="wrapper-downloads">
     % if sources.get('main'):
-        <li class="video-sources">
+        <li class="video-sources video-download-button">
             ${('<a href="%s">' + _('Download video') + '</a>') % sources.get('main')}
         </li>
     % endif
     % if track:
-        <li class="video-tracks">
+        <li class="video-tracks video-download-button">
           % if transcript_download_format:
             ${('<a href="%s">' + _('Download transcript') + '</a>') % track
             }
@@ -136,6 +136,11 @@
             ${('<a href="%s" class="external-track">' + _('Download transcript') + '</a>') % track
             }
           % endif
+        </li>
+    % endif
+    % if handout:
+        <li class="video-handout video-download-button">
+            ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
         </li>
     % endif
   </ul>

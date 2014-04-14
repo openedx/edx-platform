@@ -42,8 +42,7 @@ div.video {
     margin: 0;
     padding: 0;
 
-    .video-sources,
-    .video-tracks {
+    .video-download-button{
       display: inline-block;
       vertical-align: top;
       margin: ($baseline*.75) ($baseline/2) 0 0;

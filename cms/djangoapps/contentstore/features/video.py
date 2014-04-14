@@ -11,6 +11,7 @@ VIDEO_BUTTONS = {
     'volume': '.volume',
     'play': '.video_control.play',
     'pause': '.video_control.pause',
+    'handout': '.video-handout.video-download-button a',
 }
 
 SELECTORS = {
