@@ -20,6 +20,7 @@ from student.models import unique_id_for_user
 from util.json_request import expect_json
 
 from open_ended_grading.utils import does_location_exist
+from dogapi import dog_stats_api
 
 log = logging.getLogger(__name__)
 

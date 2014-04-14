@@ -2,7 +2,31 @@ div.book-wrapper {
   max-width: 1150px;
   margin: 0 auto;
   width: 100%;
-  /*background-color: $white;*/
+  background-color: $white;
+
+  #toolbarViewer {
+    padding: 0 ($baseline/2);
+
+    #toolbarViewerLeft {
+      display: inline-block;
+    }
+
+    .outerCenter {
+      display: inline-block;
+      position: absolute;
+      right: ($baseline/2);
+
+      .innerCenter {
+        right: auto;
+      }
+
+      .dropdownToolbarButton {
+        margin: 3px 2px 4px 0;
+      }
+    }
+
+
+  }
 
   #open_close_accordion {
     display: none;
@@ -25,7 +49,7 @@ div.book-wrapper {
     border-radius: 3px 0 0 3px;
     border: 1px solid #ccc;
     border-right: none;
-    width: 180px;
+    width: 250px;
 
     ul#booknav {
       font-size: em(14);
@@ -101,7 +125,7 @@ div.book-wrapper {
     }
   }
 
-  .book {
+  section.book {
     @extend .content;
     padding: 0;
     width:76%;
