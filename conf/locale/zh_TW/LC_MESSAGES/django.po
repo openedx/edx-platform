@@ -12,9 +12,9 @@
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # tosti <tosti.chiang@gmail.com>, 2013
 # 毅 歐陽 <wishnoblog@gmail.com>, 2014
-# Xaver Y.R. Chen  <yrchen@atcity.org>, 2013-2014
-# Xaver Y.R. Chen  <yrchen@atcity.org>, 2013
-# Xaver Y.R. Chen  <yrchen@atcity.org>, 2013
+# Yu-Ren Chen <yrchen@atcity.org>, 2013-2014
+# Yu-Ren Chen <yrchen@atcity.org>, 2013
+# Yu-Ren Chen <yrchen@atcity.org>, 2013
 # christtabris <christtabris@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -26,8 +26,8 @@
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # tosti <tosti.chiang@gmail.com>, 2013
-# Xaver Y.R. Chen  <yrchen@atcity.org>, 2014
-# Xaver Y.R. Chen  <yrchen@atcity.org>, 2013
+# Yu-Ren Chen <yrchen@atcity.org>, 2014
+# Yu-Ren Chen <yrchen@atcity.org>, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)
 # Copyright (C) 2014 edX
@@ -43,7 +43,7 @@
 # TSHIH <timothykshih@gmail.com>, 2013
 # tosti <tosti.chiang@gmail.com>, 2013
 # TSHIH <timothykshih@gmail.com>, 2013
-# Xaver Y.R. Chen  <yrchen@atcity.org>, 2013-2014
+# Yu-Ren Chen <yrchen@atcity.org>, 2013-2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -55,7 +55,7 @@
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # tosti <tosti.chiang@gmail.com>, 2013
 # TSHIH <timothykshih@gmail.com>, 2013
-# Xaver Y.R. Chen  <yrchen@atcity.org>, 2014
+# Yu-Ren Chen <yrchen@atcity.org>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -74,14 +74,14 @@
 # Translators:
 # lin31504 <lin31504@gmail.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2014
-# Xaver Y.R. Chen  <yrchen@atcity.org>, 2014
+# Yu-Ren Chen <yrchen@atcity.org>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-07 10:07-0400\n"
-"PO-Revision-Date: 2014-04-06 10:20+0000\n"
-"Last-Translator: lin31504 <lin31504@gmail.com>\n"
+"POT-Creation-Date: 2014-04-12 15:41-0400\n"
+"PO-Revision-Date: 2014-04-10 20:10+0000\n"
+"Last-Translator: Yu-Ren Chen <yrchen@atcity.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -124,15 +124,15 @@ msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Moderator"
-msgstr ""
+msgstr "板主"
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Community TA"
-msgstr ""
+msgstr "社群助教"
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Student"
-msgstr ""
+msgstr "學生"
 
 #: common/djangoapps/student/middleware.py
 msgid ""
@@ -228,6 +228,7 @@ msgid ""
 "reset your password before you can log in again. Please click the Forgot "
 "Password\" link on this page to reset your password before logging in again."
 msgstr ""
+"您的帳戶密碼應許久未更換，已超過密碼原則設定的期限。在您重新設定密碼前系統將拒絕您登入系統。再次嘗試登入前，請點選\"忘記密碼\"的連結以重新設定您的密碼。"
 
 #: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
@@ -258,7 +259,7 @@ msgstr "請選擇一個選項"
 
 #: common/djangoapps/student/views.py
 msgid "User with username {} does not exist"
-msgstr "不存在名為 {} 的使用者"
+msgstr "不存在使用者名稱為 {} 的使用者"
 
 #: common/djangoapps/student/views.py
 msgid "Successfully disabled {}'s account"
@@ -274,7 +275,7 @@ msgstr "非預期的帳戶狀態"
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Public Username '{username}' already exists."
-msgstr "用戶名'{username}'對應的帳戶已經存在。"
+msgstr "使用者名稱'{username}'對應的帳戶已經存在。"
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
@@ -294,7 +295,7 @@ msgstr "您必須接受本服務條款。"
 
 #: common/djangoapps/student/views.py
 msgid "Username must be minimum of two characters long"
-msgstr ""
+msgstr "使用者名稱必須是至少有兩個字符長"
 
 #: common/djangoapps/student/views.py
 msgid "A properly formatted e-mail is required"
@@ -346,11 +347,11 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Username cannot be more than {0} characters long"
-msgstr ""
+msgstr "使用者名稱不能超過 {0} 個字符長"
 
 #: common/djangoapps/student/views.py
 msgid "Email cannot be more than {0} characters long"
-msgstr ""
+msgstr "電子郵件不能超過 {0} 個字符長"
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail is required."
@@ -358,7 +359,7 @@ msgstr "需要有效的電子郵件地址。"
 
 #: common/djangoapps/student/views.py
 msgid "Username should only consist of A-Z and 0-9, with no spaces."
-msgstr "用戶名應當包含英文字母A到Z，阿拉伯數字0到9，並且不能包含空格。"
+msgstr "使用者名稱應當包含英文字母A-Z，阿拉伯數字0-9，並且不能包含空格。"
 
 #: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Password: "
@@ -825,7 +826,7 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "incorrect"
-msgstr ""
+msgstr "錯誤"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
@@ -964,6 +965,10 @@ msgid "Final Check"
 msgstr "最後檢查"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+msgid "Checking..."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Warning: The problem has been reset to its initial state!"
 msgstr ""
 
@@ -1016,7 +1021,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Your answers have been saved."
-msgstr ""
+msgstr "您的答案已經儲存"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
@@ -1047,6 +1052,18 @@ msgstr ""
 #. does not yet have an announced start date.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "TBD"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
+"string."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
+"string."
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -1081,10 +1098,10 @@ msgstr "Wiki"
 msgid "Discussion"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/tabs.py cms/templates/textbooks.html
-#: cms/templates/textbooks.html cms/templates/widgets/header.html
+#: cms/templates/textbooks.html cms/templates/textbooks.html
+#: cms/templates/widgets/header.html
 msgid "Textbooks"
-msgstr ""
+msgstr "教材"
 
 #: lms/templates/instructor/staff_grading.html
 msgid "Staff grading"
@@ -1251,7 +1268,7 @@ msgstr ""
 #. graded.
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "No feedback available from grader."
-msgstr ""
+msgstr "評分程式無回應"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Error handling action. Please try again."
@@ -1262,7 +1279,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid ""
 "Your response has been submitted. Please check back later for your grade."
-msgstr ""
+msgstr "您的答案已送出，請稍後再回來檢視評分"
 
 #. Translators: "Not started" communicates to a student that their response
 #. has not yet been graded
@@ -1345,10 +1362,13 @@ msgstr "索引"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/discussion/_thread_list_template.html
 msgid "Search"
 msgstr "搜尋"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
+#: lms/templates/static_templates/copyright.html
+#: lms/templates/static_templates/copyright.html
 msgid "Copyright"
 msgstr "版權"
 
@@ -1400,7 +1420,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views.py
 msgid "User {username} does not exist."
-msgstr ""
+msgstr "使用者 {username} 並不存在。"
 
 #: lms/djangoapps/courseware/views.py
 msgid "User {username} has never accessed problem {location}"
@@ -1545,13 +1565,8 @@ msgstr "Modulestore 中載入的課程"
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
 #: lms/templates/tracking_log.html
-#, fuzzy
 msgid "username"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"使用者名稱\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"用戶名"
+msgstr "使用者名稱"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
@@ -1577,7 +1592,7 @@ msgstr "Git 資源庫位置必須以 '.git' 結尾並為有效之網址"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Added Course"
-msgstr ""
+msgstr "已新增課程"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid ""
@@ -1615,6 +1630,7 @@ msgid "Loaded course {0} {1}<br/>Errors:"
 msgstr "載入課程 {0} {1}<br/>失敗："
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
+#: cms/templates/index.html cms/templates/settings.html
 msgid "Course Name"
 msgstr "課程名稱"
 
@@ -1705,11 +1721,11 @@ msgstr "錯誤 - 無法透過ID取得課程"
 
 #: lms/djangoapps/django_comment_client/mustache_helpers.py
 msgid "Re-open thread"
-msgstr ""
+msgstr "重新開啟討論串"
 
 #: lms/djangoapps/django_comment_client/mustache_helpers.py
 msgid "Close thread"
-msgstr ""
+msgstr "關閉討論串"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 #: lms/djangoapps/django_comment_client/base/views.py
@@ -1726,7 +1742,7 @@ msgstr ""
 #: lms/djangoapps/django_comment_client/base/views.py
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Comment level too deep"
-msgstr ""
+msgstr "評論深度過深"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "allowed file types are '%(file_types)s'"
@@ -1743,12 +1759,18 @@ msgstr "上傳文件出現問題，請聯絡網站管理員，謝謝。"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Good"
-msgstr ""
+msgstr "好"
 
+#: lms/djangoapps/django_comment_client/forum/views.py
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
+#, fuzzy
 msgid "All Groups"
-msgstr "所有群"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"全部群組\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"所有群"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
@@ -1764,7 +1786,7 @@ msgstr "任務已在進行中。"
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Username"
-msgstr ""
+msgstr "使用者名稱"
 
 #: lms/templates/help_modal.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
@@ -1781,7 +1803,7 @@ msgstr "電子郵件"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Language"
-msgstr ""
+msgstr "語言"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
@@ -1805,7 +1827,7 @@ msgstr "郵寄地址"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Goals"
-msgstr ""
+msgstr "目標"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Complete"
@@ -1873,7 +1895,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Couldn't find student with that email or username."
-msgstr ""
+msgstr "無法透過電子郵件或是使用者名稱找到學生。"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of students enrolled in {course_id}"
@@ -1950,7 +1972,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Progress page for username: {username} with email address: {email}"
-msgstr ""
+msgstr "使用者名稱：{username} 電子郵件地址：{email} 的進度頁"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Assignment Name"
@@ -1967,7 +1989,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "External email"
-msgstr ""
+msgstr "外部電子郵件"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades for assignment \"{name}\""
@@ -1975,7 +1997,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of Staff"
-msgstr ""
+msgstr "工作人員名單"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of Instructors"
@@ -2060,7 +2082,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Error: unknown username \"{username}\""
-msgstr ""
+msgstr "錯誤：不明的使用者名稱 \"{username}\""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
@@ -2095,14 +2117,9 @@ msgid "ID"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
-#: lms/templates/dashboard.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/register.html
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/_modal_editname.html
-#: lms/templates/verify_student/face_upload.html
+#: lms/djangoapps/instructor/views/tools.py
 msgid "Full Name"
-msgstr ""
+msgstr "全名"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "edX email"
@@ -2130,7 +2147,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unable to parse date: "
-msgstr ""
+msgstr "無法分析日期："
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Couldn't find module for url: {0}"
@@ -2139,7 +2156,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Extended Due Date"
-msgstr ""
+msgstr "延長截止日期"
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Users with due date extensions for {0}"
@@ -2147,7 +2164,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unit"
-msgstr ""
+msgstr "單元"
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Due date extensions for {0} {1} ({2})"
@@ -2334,7 +2351,7 @@ msgstr ""
 msgid ""
 "Could not contact the external grading server. Please contact the "
 "development team at {email}."
-msgstr ""
+msgstr "無法聯繫負責外部評分工作的伺服器，請以{email}聯繫開發團隊。"
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
@@ -2402,11 +2419,11 @@ msgstr "檢視已經被學生標記為不適當的提交意見 。"
 #: lms/djangoapps/open_ended_grading/views.py
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "New submissions to grade"
-msgstr "新的提交到級別"
+msgstr "提交新的評分工作"
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "New grades have been returned"
-msgstr "已回傳新的級別"
+msgstr "已回傳新的評分"
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "Submissions have been flagged for review"
@@ -2463,60 +2480,61 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order Number"
-msgstr ""
+msgstr "訂單編號"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Customer Name"
-msgstr ""
+msgstr "消費者名稱"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Date of Original Transaction"
-msgstr ""
+msgstr "原交易日期"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Date of Refund"
-msgstr ""
+msgstr "退款日期"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Amount of Refund"
-msgstr ""
+msgstr "退款金額"
 
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Service Fees (if any)"
-msgstr ""
+msgstr "服務費 (如果有的話)"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Purchase Time"
-msgstr ""
+msgstr "購買時間"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order ID"
-msgstr ""
+msgstr "訂單ID"
 
+#: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Status"
 msgstr "狀態"
 
-#: lms/templates/shoppingcart/list.html
+#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
 msgid "Quantity"
 msgstr "數量"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
-msgstr ""
+msgstr "單位價格"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Total Cost"
-msgstr ""
+msgstr "總價格"
 
-#: lms/templates/shoppingcart/list.html
+#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Currency"
 msgstr "貨幣"
 
-#: lms/templates/shoppingcart/list.html
+#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
@@ -2525,51 +2543,49 @@ msgstr "敘述"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Comments"
-msgstr ""
+msgstr "評論"
 
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "University"
-msgstr ""
+msgstr "大學"
 
 #: lms/djangoapps/shoppingcart/reports.py
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: cms/templates/widgets/header.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/djangoapps/shoppingcart/reports.py
 msgid "Course"
-msgstr ""
+msgstr "課程"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Course Announce Date"
-msgstr ""
+msgstr "課程公佈日期"
 
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
 msgid "Course Start Date"
-msgstr ""
+msgstr "開課日期"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Course Registration Close Date"
-msgstr ""
+msgstr "課程註冊截止日期"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Course Registration Period"
-msgstr ""
+msgstr "課程註冊期間"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Total Enrolled"
-msgstr ""
+msgstr "全部註冊"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Audit Enrollment"
-msgstr ""
+msgstr "註冊審查"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Honor Code Enrollment"
-msgstr ""
+msgstr "註冊榮譽準則"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Verified Enrollment"
-msgstr ""
+msgstr "註冊已驗證"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Gross Revenue"
@@ -2585,27 +2601,27 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Number of Refunds"
-msgstr ""
+msgstr "退費數"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Dollars Refunded"
-msgstr ""
+msgstr "退費"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Number of Transactions"
-msgstr ""
+msgstr "交易數量"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Total Payments Collected"
-msgstr ""
+msgstr "累計總支出"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Number of Successful Refunds"
-msgstr ""
+msgstr "成功退費的數目"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Total Amount of Refunds"
-msgstr ""
+msgstr "退費總金額"
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "You must be logged-in to add to a shopping cart"
@@ -2903,7 +2919,7 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/tests/test_views.py
 #: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Reports"
-msgstr ""
+msgstr "下載CSV報告"
 
 #: lms/djangoapps/shoppingcart/tests/test_views.py
 #: lms/templates/shoppingcart/download_report.html
@@ -3097,7 +3113,7 @@ msgstr "請到下面的頁面並選擇一個新的密碼："
 msgid ""
 "If you didn't request this change, you can disregard this email - we have "
 "not yet reset your password."
-msgstr ""
+msgstr "如果您並未要求這項變更，請忽略此郵件 - 我們尚未重設您的密碼。"
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Thanks for using our site!"
@@ -3532,7 +3548,8 @@ msgid ""
 "If using http urls, you must provide the username and password in the url. "
 "Similar to https://user:pass@github.com/user/course."
 msgstr ""
-"如果使用http urls，您必須在URL中提供用戶名和密碼。例如 https://user:pass@github.com/user/course."
+"如果使用http urls，您必須在URL中提供使用者名稱和密碼。例如 "
+"https://user:pass@github.com/user/course."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to determine branch, repo in detached HEAD mode"
@@ -3548,7 +3565,7 @@ msgstr "無法匯出課程到 XML。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to configure git username and password"
-msgstr "無法設定Git使用者帳號和密碼"
+msgstr "無法設定Git使用者名稱和密碼"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -3676,7 +3693,7 @@ msgstr "權限不足"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Could not find user by email address '{email}'."
-msgstr "無法透過 email '{email}' 找到使用者"
+msgstr "無法透過電子郵件地址 '{email}' 找到使用者"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "User {email} has registered but has not yet activated his/her account."
@@ -3773,6 +3790,13 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#: cms/templates/container.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Loading..."
+msgstr ""
+
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
 #: lms/templates/wiki/includes/article_menu.html
@@ -3812,7 +3836,7 @@ msgstr ""
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/provider_login.html lms/templates/register.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Password"
 msgstr ""
@@ -3828,9 +3852,10 @@ msgid "Sign Up"
 msgstr ""
 
 #: cms/templates/register.html lms/templates/register-shib.html
-#: lms/templates/register.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 msgid "Public Username"
-msgstr ""
+msgstr "公開使用者名稱"
 
 #: cms/templates/register.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -3840,7 +3865,7 @@ msgstr ""
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
 msgid "Thanks for activating your account."
-msgstr ""
+msgstr "感謝您啟用帳號。"
 
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
@@ -3861,7 +3886,7 @@ msgstr ""
 #: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
-msgstr ""
+msgstr "隱私權保護政策"
 
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/navigation.html lms/templates/static_templates/help.html
@@ -3871,7 +3896,7 @@ msgstr "幫助"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
-msgstr ""
+msgstr "更新您的註冊到 {} |  選擇您的追蹤"
 
 #: common/templates/course_modes/choose.html
 msgid "Register for {} | Choose Your Track"
@@ -3967,7 +3992,7 @@ msgstr "請寫下幾句話描述一下有關於為什麼您喜歡以選擇出付
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
-msgstr ""
+msgstr "更新您的註冊"
 
 #: common/templates/course_modes/choose.html
 msgid "Select Certificate"
@@ -4081,15 +4106,12 @@ msgstr "一般諮詢和回饋"
 
 #: lms/templates/contact.html
 msgid ""
-"If you have a general question about {platform_name} please email <a "
-"href=\"mailto:{contact_email}\">{contact_email}</a>. To see if your question"
-" has already been answered, visit our {faq_link_start}FAQ "
-"page{faq_link_end}. You can also join the discussion on our "
-"{fb_link_start}facebook page{fb_link_end}. Though we may not have a chance "
-"to respond to every email, we take all feedback into consideration."
+"If you have a general question about {platform_name} please email "
+"{contact_email}. To see if your question has already been answered, visit "
+"our {faq_link_start}FAQ page{faq_link_end}. You can also join the discussion"
+" on our {fb_link_start}facebook page{fb_link_end}. Though we may not have a "
+"chance to respond to every email, we take all feedback into consideration."
 msgstr ""
-"如果您對{platform_name}有任何疑問，請發送郵件到<a "
-"href=\"mailto:{contact_email}\">{contact_email}</a>。您可以訪問我們的{faq_link_start}FAQ頁面{faq_link_end}，以查看您的問題是否已經有答案。您也可以加入我們在{fb_link_start}Facebook頁面{fb_link_end}進行討論。雖然我們不一定會回覆每一封郵件，但我們會認真考慮您的建議。"
 
 #: lms/templates/contact.html
 msgid "Technical Inquiries and Feedback"
@@ -4099,16 +4121,12 @@ msgstr "技術諮詢和回饋"
 msgid ""
 "If you have suggestions/feedback about the overall {platform_name} platform,"
 " or are facing general technical issues with the platform (e.g., issues with"
-" email addresses and passwords), you can reach us at <a "
-"href=\"mailto:{tech_email}\">{tech_email}</a>. For technical questions, "
-"please make sure you are using a current version of Firefox or Chrome, and "
-"include browser and version in your e-mail, as well as screenshots or other "
-"pertinent details. If you find a bug or other issues, you can reach us at "
-"the following: <a href=\"mailto:{bugs_email}\">{bugs_email}</a>."
+" email addresses and passwords), you can reach us at {tech_email}. For "
+"technical questions, please make sure you are using a current version of "
+"Firefox or Chrome, and include browser and version in your e-mail, as well "
+"as screenshots or other pertinent details. If you find a bug or other "
+"issues, you can reach us at the following: {bugs_email}."
 msgstr ""
-"如果您對於{platform_name}平臺整體上有什麼意見，或者遇到了常見的技術問題(如郵寄地址和密碼的問題)，您以通過<a "
-"href=\"mailto:{tech_email}\">{tech_email}</a>聯繫我們。如果您遇到了技術問題，請確保您運用Firefox或者Chrome瀏覽器的最新版本瀏覽我們的網頁，並在郵件中說明您所使用的瀏覽器版本，並附上螢幕截圖或相關的細節描述。如果您發現了我們的錯誤，可以通過<a"
-" href=\"mailto:{bugs_email}\">{bugs_email}</a>聯繫我們。"
 
 #: lms/templates/contact.html
 msgid "Media"
@@ -4147,7 +4165,7 @@ msgstr "發生錯誤。請稍後再試一次。"
 
 #: lms/templates/dashboard.html
 msgid "Please verify your new email"
-msgstr ""
+msgstr "請驗證您的新電子郵件信箱"
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -4323,18 +4341,6 @@ msgstr "被拒絕的學生："
 msgid "Debug: "
 msgstr "除錯："
 
-#: lms/templates/enroll_students.html
-msgid "foo"
-msgstr "甲"
-
-#: lms/templates/enroll_students.html
-msgid "bar"
-msgstr "乙"
-
-#: lms/templates/enroll_students.html
-msgid "biff"
-msgstr "一擊"
-
 #: lms/templates/extauth_failure.html lms/templates/extauth_failure.html
 msgid "External Authentication failed"
 msgstr "外部認證失敗"
@@ -4445,13 +4451,9 @@ msgstr "重置我的密碼"
 msgid "Email is incorrect."
 msgstr "電子郵件信箱不正確。"
 
-#: lms/templates/help_modal.html
+#: lms/templates/help_modal.html lms/templates/help_modal.html
 msgid "{platform_name} Help"
 msgstr "{platform_name} 幫助"
-
-#: lms/templates/help_modal.html
-msgid "{span_start}{platform_name}{span_end} Help"
-msgstr "{span_start}{platform_name}{span_end} 幫助"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -4498,7 +4500,8 @@ msgstr ""
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/provider_login.html
 #: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/register.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
 msgid "E-mail"
 msgstr "電子郵件"
 
@@ -4601,7 +4604,7 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Please try again later."
-msgstr ""
+msgstr "請稍後再試。"
 
 #: lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
@@ -4687,7 +4690,7 @@ msgstr "存取我的課程"
 
 #: lms/templates/login.html lms/templates/register.html
 msgid "Processing your account information…"
-msgstr ""
+msgstr "正在處理您的帳戶資訊..."
 
 #: lms/templates/login.html
 msgid "Please log in"
@@ -4733,7 +4736,7 @@ msgstr "記住我"
 
 #: lms/templates/lti.html
 msgid "External resource"
-msgstr ""
+msgstr "外部資源"
 
 #: lms/templates/lti.html
 msgid "View resource in a new window"
@@ -4744,25 +4747,29 @@ msgid ""
 "Please provide launch_url. Click \"Edit\", and fill in the required fields."
 msgstr ""
 
+#: lms/templates/lti_form.html
+msgid "Press to Launch"
+msgstr ""
+
 #: lms/templates/manage_user_standing.html
 msgid "Disable or Reenable student accounts"
 msgstr ""
 
 #: lms/templates/manage_user_standing.html
 msgid "Username:"
-msgstr ""
+msgstr "使用者名稱："
 
 #: lms/templates/manage_user_standing.html
 msgid "Disable Account"
-msgstr ""
+msgstr "停用帳號"
 
 #: lms/templates/manage_user_standing.html
 msgid "Reenable Account"
-msgstr ""
+msgstr "重新啟用帳號"
 
 #: lms/templates/manage_user_standing.html
 msgid "Students whose accounts have been disabled"
-msgstr ""
+msgstr "已被停用的學生帳號"
 
 #: lms/templates/manage_user_standing.html
 msgid "(reload your page to refresh)"
@@ -4789,18 +4796,16 @@ msgid ""
 msgstr "您的瀏覽器不支援 MathPlayer。要使用 MathPlayer ，請使用Internet Explorer 6 至 9。"
 
 #: lms/templates/module-error.html
-msgid "There has been an error on the <em>{platform_name}</em> servers"
-msgstr "<em>{platform_name}</em>伺服器出現了錯誤。"
+#: lms/templates/courseware/courseware-error.html
+msgid "There has been an error on the {platform_name} servers"
+msgstr ""
 
 #: lms/templates/module-error.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at <a "
-"href=\"mailto:{tech_support_email}\">{tech_support_email}</a> to report any "
-"problems or downtime."
+" fix it as soon as possible. Please email us at {tech_support_email} to "
+"report any problems or downtime."
 msgstr ""
-"我們很遺憾，這個模組暫時無法工作了。我們的工程師正在盡可能快的修復這一問題。請隨時聯繫我們 <a "
-"href=\"mailto:{tech_support_email}\">{tech_support_email}</a>來報告系統錯誤或者系統的停機。"
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
@@ -4911,8 +4916,9 @@ msgstr "登入"
 
 #: lms/templates/provider_login.html
 msgid ""
-"Please note that we will be sending your user name, email, and full name to "
-"this third party site."
+"Your username, email, and full name will be sent to {destination}, where the"
+" collection and use of this information will be governed by their terms of "
+"service and privacy policy."
 msgstr ""
 
 #: lms/templates/provider_login.html
@@ -4929,7 +4935,7 @@ msgstr "更新我的 {platform_name} 帳號"
 
 #: lms/templates/register-shib.html
 msgid "Processing your account information …"
-msgstr ""
+msgstr "正在處理您的帳戶資訊..."
 
 #: lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
@@ -4952,7 +4958,7 @@ msgstr "必需的欄位已經被<strong class=\"indicator\">粗體和星號(*)</
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 msgid "Enter a public username:"
-msgstr "輸入一個公開的用戶名稱："
+msgstr "輸入一個公開的使用者名稱："
 
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/register.html
@@ -4969,10 +4975,12 @@ msgid "Account Acknowledgements"
 msgstr "帳戶確認"
 
 #: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Terms of Service{link_end}"
 msgstr "我同意{link_start}服務條約{link_end}"
 
 #: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Honor Code{link_end}"
 msgstr "我同意{link_start}榮譽規範{link_end}"
 
@@ -5049,7 +5057,7 @@ msgstr "{platform_name}註冊"
 
 #: lms/templates/register.html
 msgid "Create My {platform_name} Account"
-msgstr ""
+msgstr "創建我的 {platform_name} 帳戶"
 
 #: lms/templates/register.html
 msgid "Welcome!"
@@ -5081,11 +5089,11 @@ msgstr "歡迎 {username}"
 
 #: lms/templates/register.html
 msgid "Enter a Public Display Name:"
-msgstr ""
+msgstr "輸入一個公開的顯示名稱："
 
 #: lms/templates/register.html
 msgid "Public Display Name"
-msgstr ""
+msgstr "公開顯示名稱："
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "Extra Personal Information"
@@ -5133,6 +5141,8 @@ msgid ""
 "You have re-enabled forum notification emails from {platform_name}. Click "
 "{dashboard_link_start}here{link_end} to return to your dashboard. "
 msgstr ""
+"您已在{platform_name}上重新啟用論壇的通知郵件功能。點擊{dashboard_link_start}這裡{link_end} "
+"回到您的主頁。"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -5149,32 +5159,16 @@ msgid "Next"
 msgstr "下一個"
 
 #: lms/templates/signup_modal.html
-msgid "Sign Up for {span_start}{platform_name}{span_end}"
-msgstr "註冊加入{span_start}{platform_name}{span_end}"
-
-#: lms/templates/signup_modal.html lms/templates/signup_modal.html
-msgid "E-mail *"
-msgstr "電子郵件 *"
+msgid "Sign Up for {platform_name}"
+msgstr ""
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. yourname@domain.com"
 msgstr "例如：yourname@domain.com"
 
-#: lms/templates/signup_modal.html
-msgid "Password *"
-msgstr "密碼 *"
-
-#: lms/templates/signup_modal.html lms/templates/signup_modal.html
-msgid "Public Username *"
-msgstr "公開帳戶名稱 *"
-
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. yourname (shown on forums)"
 msgstr "例如：您的名字(顯示於論壇上)"
-
-#: lms/templates/signup_modal.html lms/templates/signup_modal.html
-msgid "Full Name *"
-msgstr "全名 *"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. Your Name (for certificates)"
@@ -5183,6 +5177,10 @@ msgstr "例如：您的名字(用於證書)"
 #: lms/templates/signup_modal.html
 msgid "<i>Welcome</i> {name}"
 msgstr "<i>歡迎</i> {name}"
+
+#: lms/templates/signup_modal.html
+msgid "Full Name *"
+msgstr "全名 *"
 
 #: lms/templates/signup_modal.html
 msgid "Ed. Completed"
@@ -5199,14 +5197,6 @@ msgstr "郵寄地址"
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
 msgstr "註冊加入{platform_name}的目標"
-
-#: lms/templates/signup_modal.html
-msgid "I agree to the {link_start}Terms of Service{link_end}*"
-msgstr "我同意{link_start}服務條約{link_end}*"
-
-#: lms/templates/signup_modal.html
-msgid "I agree to the {link_start}Honor Code{link_end}*"
-msgstr "我同意{link_start}榮譽規範{link_end}*"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
@@ -5247,8 +5237,8 @@ msgid "Tag"
 msgstr "標籤"
 
 #: lms/templates/staff_problem_info.html
-msgid "Optional tag (eg \"done\" or \"broken\"):&nbsp; "
-msgstr "可選標籤(例如：“完成”或“破碎”)：&nbsp;"
+msgid "Optional tag (eg \"done\" or \"broken\"):"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "tag"
@@ -5292,90 +5282,58 @@ msgstr "{course_number} 課本"
 msgid "Textbook Navigation"
 msgstr "課本導航"
 
-#: lms/templates/static_pdfbook.html
-msgid "Page:"
-msgstr "頁數："
-
-#: lms/templates/static_pdfbook.html lms/templates/static_pdfbook.html
-msgid "Zoom Out"
-msgstr "縮小"
-
-#: lms/templates/static_pdfbook.html lms/templates/static_pdfbook.html
-msgid "Zoom In"
-msgstr "放大"
-
-#: lms/templates/static_pdfbook.html
-msgid "Zoom"
-msgstr "縮放"
-
-#: lms/templates/static_pdfbook.html
-msgid "Automatic Zoom"
-msgstr "自動縮放"
-
-#: lms/templates/static_pdfbook.html
-msgid "Actual Size"
-msgstr "實際大小"
-
-#: lms/templates/static_pdfbook.html
-msgid "Fit Page"
-msgstr "根據頁面調整"
-
-#: lms/templates/static_pdfbook.html
-msgid "Full Width"
-msgstr "全寬"
-
-#: lms/templates/static_pdfbook.html lms/templates/staticbook.html
+#: lms/templates/staticbook.html
 msgid "Previous page"
 msgstr "上一頁"
 
-#: lms/templates/static_pdfbook.html lms/templates/staticbook.html
+#: lms/templates/staticbook.html
 msgid "Next page"
 msgstr "下一頁"
 
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Sysadmin Dashboard"
-msgstr ""
+msgstr "系統管理員主頁"
 
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Users"
-msgstr ""
+msgstr "使用者"
 
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Staffing and Enrollment"
-msgstr ""
+msgstr "工作人員及註冊資訊"
 
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Logs"
-msgstr ""
+msgstr "Git日誌"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "User Management"
-msgstr ""
+msgstr "用戶管理"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Email or username"
-msgstr ""
+msgstr "電子郵件或使用者帳號"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete user"
-msgstr ""
+msgstr "刪除用戶"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Create user"
-msgstr ""
+msgstr "創建用戶"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Download list of all users (csv file)"
-msgstr ""
+msgstr "下載所有用戶列表(CSV 格式)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Check and repair external authentication map"
-msgstr ""
+msgstr "檢查並修復外部認證對應"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid ""
@@ -5393,7 +5351,7 @@ msgstr "下載工作人員與教師列表(CSV 格式檔案)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
-msgstr ""
+msgstr "管理課程"
 
 #. Translators: Repo is short for git repository or source of
 #. courseware
@@ -5409,24 +5367,24 @@ msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
-msgstr ""
+msgstr "從github載入新課程"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Course ID or dir"
-msgstr ""
+msgstr "課程編號或目錄"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
-msgstr ""
+msgstr "從網站中刪除課程"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Django PID"
-msgstr ""
+msgstr "Django的PID"
 
 #. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
 msgid "Platform Version"
-msgstr ""
+msgstr "平台版本"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -5441,15 +5399,15 @@ msgstr "課程編號"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
-msgstr ""
+msgstr "Git動作"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for"
-msgstr ""
+msgstr "近期的git載入活動"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "git action"
-msgstr ""
+msgstr "git動作"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -5486,6 +5444,7 @@ msgid ""
 "you did not mean to do this, click {undo_link_start}here{link_end} to re-"
 "subscribe."
 msgstr ""
+"您將不打算再從{platform_name}接收論壇通知郵件，請點選{dashboard_link_start}這裡{link_end}返回到主頁。如果您反悔了，請點選{undo_link_start}這裡{link_end}重新訂閱。"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -5519,11 +5478,11 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Loading video player"
-msgstr ""
+msgstr "正在載入影片撥放器"
 
 #: lms/templates/video.html
 msgid "Play video"
-msgstr ""
+msgstr "播放影片"
 
 #: lms/templates/video.html
 msgid "Video position"
@@ -5551,7 +5510,7 @@ msgstr "填寫瀏覽器"
 
 #: lms/templates/video.html
 msgid "HD off"
-msgstr ""
+msgstr "關閉 HD"
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Turn off captions"
@@ -5559,7 +5518,7 @@ msgstr "關閉字幕"
 
 #: lms/templates/video.html
 msgid "Skip to end of transcript."
-msgstr ""
+msgstr "跳到字幕結尾。"
 
 #: lms/templates/video.html
 msgid ""
@@ -5569,7 +5528,7 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Go back to start of transcript."
-msgstr ""
+msgstr "回到字幕的起始點。"
 
 #: lms/templates/video.html
 msgid "Download video"
@@ -5768,7 +5727,7 @@ msgstr "新增同伴"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Add users by username or email.  One per line or comma-separated."
-msgstr "通過用戶名或電子郵件添加使用者。每一個單獨一行或使用逗號分隔。"
+msgstr "通過使用者名稱或電子郵件新增使用者，每位單獨一行或使用逗號分隔。"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Add cohort members"
@@ -5890,18 +5849,10 @@ msgstr "瀏覽{university_name}的免費課程。"
 
 #: lms/templates/courseware/courseware-error.html
 msgid ""
-"There has been an error on the {span_start}{platform_name}{span_end} servers"
-msgstr "{span_start}{platform_name}{span_end}伺服器出現錯誤。"
-
-#: lms/templates/courseware/courseware-error.html
-msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at '<a "
-"href=\"mailto:{tech_support_email}\">{tech_support_email}</a>' to report any"
-" problems or downtime."
+" fix it as soon as possible. Please email us at {tech_support_email}' to "
+"report any problems or downtime."
 msgstr ""
-"很抱歉，這個模組目前暫時不能訪問。我們的員工正在儘快修復。請發送郵件到'<a "
-"href=\"mailto:{tech_support_email}\">{tech_support_email}</a>'報告遇到的問題以及時間。"
 
 #: lms/templates/courseware/courseware.html
 msgid "{course_number} Courseware"
@@ -5935,15 +5886,15 @@ msgstr "提示"
 
 #: lms/templates/courseware/courseware.html
 msgid "Integers"
-msgstr ""
+msgstr "整數"
 
 #: lms/templates/courseware/courseware.html
 msgid "Decimals"
-msgstr ""
+msgstr "小數"
 
 #: lms/templates/courseware/courseware.html
 msgid "Scientific notation"
-msgstr ""
+msgstr "科學記號"
 
 #: lms/templates/courseware/courseware.html
 msgid "Appending SI postfixes"
@@ -5971,7 +5922,7 @@ msgstr "常量"
 
 #: lms/templates/courseware/courseware.html
 msgid "Euler's number"
-msgstr ""
+msgstr "尤拉數"
 
 #: lms/templates/courseware/courseware.html
 msgid "ratio of a circle's circumference to it's diameter"
@@ -5983,7 +5934,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "speed of light"
-msgstr ""
+msgstr "光速"
 
 #: lms/templates/courseware/courseware.html
 msgid "freezing point of water in degrees Kelvin"
@@ -6102,13 +6053,13 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Export grades to remote gradebook"
-msgstr "將成績匯出到遠程成績單"
+msgstr "將成績匯出到遠端成績單"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "The assignments defined for this course should match the ones stored in the "
 "gradebook, for this to work properly!"
-msgstr "這門課程的作業必須與存儲在成績單上的保持一致，否則系統會出現錯誤。"
+msgstr "這門課程的作業必須與儲存在成績單上的評分型式一致，否則系統會出現錯誤。"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6168,7 +6119,7 @@ msgstr "特定學生分數檢查和調整"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
-msgstr "在這可以查看{platform_name}的郵寄地址以及學生的用戶名："
+msgstr "在這可以查看{platform_name}上學生的電子郵件地址或是使用者名稱："
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Click this, and a link to student's progress page will appear below:"
@@ -6266,7 +6217,7 @@ msgid ""
 "as configured via the <tt>days_early_for_beta</tt> option in the course "
 "policy."
 msgstr ""
-"輸入要成為測試用戶的學生的用戶名或郵寄地址，一行一個，或者以逗號分開。他們可以在課程設置裡指定的<tt>提前測試日期</tt>看到課程的材料。"
+"輸入要成為測試用戶的學生的使用者名稱或電子郵件，一行一個，或者以逗號分開。他們可以在課程設定中指定的<tt>提前測試天數</tt>前看到課程內容。"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -6306,21 +6257,21 @@ msgstr ""
 msgid ""
 "Please try not to email students more than once per week. Important things "
 "to consider before sending:"
-msgstr ""
+msgstr "請儘量不要於一周內發送給學生超過一封電子郵件。發送前需考慮的重要事項："
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
 "Have you read over the email to make sure it says everything you want to "
 "say?"
-msgstr "您是否通讀過郵件以確保郵件已經包含您想說的全部內容？"
+msgstr "您是否已重新讀過郵件，以確認已包含所有您想說的內容？"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
 "Have you sent the email to yourself first to make sure you're happy with how"
 " it's displayed, and that embedded links and images work properly?"
-msgstr ""
+msgstr "您是否已經先把郵件發送給自己以確保您對其展示方式感到滿意，並且所嵌入的連結和圖片都能正常顯示？"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -6400,15 +6351,9 @@ msgid "Count of Students that Opened a Subsection"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Loading..."
-msgstr ""
-
-#: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Grade Distribution per Problem"
-msgstr ""
+msgstr "每個問題的成績分布"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -6532,7 +6477,7 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Problem Scores: "
-msgstr ""
+msgstr "問題分數："
 
 #: lms/templates/courseware/progress.html
 msgid "Practice Scores: "
@@ -6564,7 +6509,7 @@ msgstr "您的最終得分："
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
-msgstr ""
+msgstr "所需的評分 {cert_name_short}:"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -6655,11 +6600,11 @@ msgstr "課程開始 - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Document your accomplishment!"
-msgstr ""
+msgstr "記錄您的成就！"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Challenge Yourself!"
-msgstr ""
+msgstr "挑戰自己！"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Take this course as an ID-verified student."
@@ -6768,11 +6713,11 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_status_verification.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID-Verification Status"
-msgstr ""
+msgstr "身分驗證狀態"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Reviewed and Verified"
-msgstr ""
+msgstr "檢查與驗證"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Your verification status is good for one year after submission."
@@ -6814,6 +6759,10 @@ msgstr "發表文章"
 
 #: lms/templates/discussion/_discussion_module.html
 msgid "Show Discussion"
+msgstr "顯示討論"
+
+#: lms/templates/discussion/_discussion_module_studio.html
+msgid "To view live discussions, click Preview or View Live in Unit Settings."
 msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
@@ -6822,7 +6771,7 @@ msgstr "過濾主題"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "filter topics"
-msgstr ""
+msgstr "過濾主題"
 
 #: lms/templates/discussion/_filter_dropdown.html
 #: lms/templates/discussion/_new_post.html
@@ -6877,6 +6826,11 @@ msgstr "我的同伴"
 msgid "new post title"
 msgstr "新文章標題"
 
+#: lms/templates/discussion/_inline_new_post.html
+#: lms/templates/discussion/_new_post.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_discussion.mustache
+#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 #: wiki/forms.py wiki/forms.py wiki/forms.py
 msgid "Title"
 msgstr "標題"
@@ -6886,7 +6840,7 @@ msgstr "標題"
 #: lms/templates/discussion/mustache/_inline_discussion.mustache
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 msgid "Enter your question or comment…"
-msgstr ""
+msgstr "請輸入您的問題或評論..."
 
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
@@ -6905,7 +6859,7 @@ msgstr "過濾列表"
 
 #: lms/templates/discussion/_new_post.html
 msgid "Filter discussion areas"
-msgstr ""
+msgstr "過濾討論部分"
 
 #: lms/templates/discussion/_recent_active_posts.html
 msgid "Following"
@@ -6933,7 +6887,7 @@ msgstr "討論主題； 目前選擇是："
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search all discussions"
-msgstr ""
+msgstr "搜尋所有討論"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Sort by:"
@@ -6999,7 +6953,7 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Follow this post"
-msgstr ""
+msgstr "追蹤這篇文章 "
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -7140,17 +7094,17 @@ msgstr ""
 
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
-msgstr ""
+msgstr "，"
 
 #: lms/templates/discussion/_user_profile.html
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] ""
+msgstr[0] "%s 已開始的討論"
 
 #: lms/templates/discussion/_user_profile.html
 msgid "%s comment"
 msgid_plural "%s comments"
-msgstr[0] ""
+msgstr[0] "%s 評論"
 
 #: lms/templates/discussion/index.html
 #: lms/templates/discussion/user_profile.html
@@ -7177,13 +7131,8 @@ msgstr "活動主題"
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Loading content"
-msgstr ""
-
-#: lms/templates/discussion/mustache/_inline_thread.mustache
-#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Expand discussion"
-msgstr ""
+msgstr "展開討論"
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
@@ -7207,7 +7156,7 @@ msgstr "檢視討論"
 msgid ""
 "Thank you for signing up for {platform_name}! To activate your account, "
 "please copy and paste this address into your web browser's address bar:"
-msgstr ""
+msgstr "感謝您註冊 {platform_name}！要啟用您的帳號，請將下面的位址複製並貼到您的瀏覽器地址欄："
 
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/email_change.txt
@@ -7234,7 +7183,7 @@ msgstr ""
 #: lms/templates/emails/remove_beta_tester_email_message.txt
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
 msgid "Dear {full_name}"
-msgstr ""
+msgstr "親愛的 {full_name}"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid ""
@@ -7247,11 +7196,15 @@ msgid "Visit {course_about_url} to join the course and begin the beta test."
 msgstr ""
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
+msgid "Visit {site_name} to enroll in the course and begin the beta test."
+msgstr ""
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 #: lms/templates/emails/remove_beta_tester_email_message.txt
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "This email was automatically sent from {site_name} to {email_address}"
-msgstr ""
+msgstr "此封電子郵件由{site_name}自動寄給{email_address}"
 
 #: lms/templates/emails/add_beta_tester_email_subject.txt
 msgid "You have been invited to a beta test for {course_name}"
@@ -7263,6 +7216,7 @@ msgid ""
 "{platform_name} from {old_email} to {new_email}. If you did not make this "
 "request, please contact us at"
 msgstr ""
+"這封郵件用來確認您於{platform_name}上將電子郵件信箱由{old_email}改成{new_email}。若您並未這樣做，請與我們聯絡"
 
 #: lms/templates/emails/confirm_email_change.txt
 msgid ""
@@ -7270,6 +7224,7 @@ msgid ""
 "{platform_name} from {old_email} to {new_email}. If you did not make this "
 "request, please contact us immediately. Contact information is listed at:"
 msgstr ""
+"這封郵件用來確認您於{platform_name}上將電子郵件信箱由{old_email}改成{new_email}。若您並未這樣做，請立即與我們聯絡。聯絡方式如下所列："
 
 #: lms/templates/emails/confirm_email_change.txt
 msgid ""
@@ -7283,6 +7238,7 @@ msgid ""
 "{platform_name} account from {old_email} to {new_email}. If this is correct,"
 " please confirm your new e-mail address by visiting:"
 msgstr ""
+"我們收到您於{platform_name}上請求將您帳號的電子郵件從{old_email}改成{new_email}。若這是正確的，請拜訪下列網站以確認您的電子郵件地址："
 
 #: lms/templates/emails/email_change_subject.txt
 msgid "Request to change {platform_name} account e-mail"
@@ -7326,6 +7282,10 @@ msgid ""
 "{course_about_url} to join the course."
 msgstr ""
 
+#: lms/templates/emails/enroll_email_allowedmessage.txt
+msgid "You can then enroll in {course_name}."
+msgstr ""
+
 #: lms/templates/emails/enroll_email_allowedsubject.txt
 msgid "You have been invited to register for {course_name}"
 msgstr ""
@@ -7343,7 +7303,7 @@ msgstr ""
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
 msgid "This email was automatically sent from {site_name} to {full_name}"
-msgstr ""
+msgstr "此由電子郵件{site_name}自動寄給{full_name}"
 
 #: lms/templates/emails/enroll_email_enrolledsubject.txt
 msgid "You have been enrolled in {course_name}"
@@ -7465,8 +7425,6 @@ msgid ""
 " grading, though with diminishing returns. You can see the current accuracy "
 "of AI grading in the problem view."
 msgstr ""
-"這是一個目前需要被分級以進行AI分級及創建校準散文給同儕評分的問題列表。每個問題需要被分開來處理，我們已經表示出需要被分級的學生意見書數量。您可以分級超過最小需求數量的提交"
-"--這將改善AI評級的準確定，雖然diminishing returns。您可以看到現在目前AI分級在problem view的準確度。"
 
 #: lms/templates/instructor/staff_grading.html
 msgid "Problem List"
@@ -7537,7 +7495,7 @@ msgstr "性別分佈"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
-msgstr ""
+msgstr "註冊資訊"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Total number of enrollees (instructors, staff members, and students)"
@@ -7549,29 +7507,29 @@ msgstr "基本課程資訊"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Name:"
-msgstr ""
+msgstr "課程名稱："
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Display Name:"
-msgstr ""
+msgstr "課程顯示名稱："
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
-msgstr ""
+msgstr "課程開始了嗎？"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Yes"
-msgstr ""
+msgstr "是的"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "No"
-msgstr ""
+msgstr "還沒"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course ended?"
-msgstr ""
+msgstr "課程結束了嗎？"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
@@ -7657,7 +7615,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"
-msgstr ""
+msgstr "報告已可供下載"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7710,7 +7668,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
-msgstr ""
+msgstr "修改學生的結束時間"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Viewing granted extensions"
@@ -7726,7 +7684,7 @@ msgstr ""
 msgid ""
 "Choose a graded unit and click the button to obtain a list of all students "
 "who have extensions for the given unit."
-msgstr ""
+msgstr "選擇一個評分單元，然後點擊按鈕來取得所有學生中在單元中有延期情況的列表。"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List all students with due date extensions"
@@ -7753,7 +7711,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
-msgstr ""
+msgstr "重置學生的結束時間"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Back to Standard Dashboard"
@@ -7766,7 +7724,7 @@ msgstr "章節_顯示_名稱"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Enter email addresses separated by new lines or commas."
-msgstr ""
+msgstr "請以換行或是逗號的方式分隔電子郵件地址"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -7777,7 +7735,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Email Addresses"
-msgstr ""
+msgstr "電子郵件信箱"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Auto Enroll"
@@ -7797,9 +7755,13 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Checking this box has no effect if 'Unenroll' is selected."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Notify users by email"
-msgstr ""
+msgstr "透過電子郵件通知使用者"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7963,27 +7925,27 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
-msgstr ""
+msgstr "發送電子郵件"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Message:"
-msgstr ""
+msgstr "訊息："
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
 "Please try not to email students more than once per week. Before sending "
 "your email, consider:"
-msgstr ""
+msgstr "請儘量不要於一周內發送給學生超過一封電子郵件，發送前請考慮："
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
 "Email actions run in the background. The status for any active tasks - "
 "including email tasks - appears in a table below."
-msgstr ""
+msgstr "電子郵件正於後台寄送中，任何工作的狀態，包含寄送郵件的任務，都列在下表中。"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Email Task History"
-msgstr ""
+msgstr "電子郵件任務歷史"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
@@ -7993,16 +7955,16 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Show Email Task History"
-msgstr ""
+msgstr "顯示郵件遞送任務歷史"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
-msgstr "學生特定等級檢驗"
+msgstr "學生特定評分檢驗"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Email or Username"
-msgstr "學生 Email 或 使用者名稱"
+msgstr "學生的電子郵件或使用者名稱"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Click this link to view the student's progress page:"
@@ -8267,7 +8229,7 @@ msgstr "繼續"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Ready to grade!"
-msgstr "準備好進行評價！"
+msgstr "準備好進行評分！"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid ""
@@ -8385,11 +8347,11 @@ msgstr ""
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "Start Date: "
-msgstr ""
+msgstr "開始日期："
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "End Date: "
-msgstr ""
+msgstr "結束日期："
 
 #: lms/templates/shoppingcart/download_report.html
 msgid ""
@@ -8672,36 +8634,32 @@ msgstr ""
 #: lms/templates/static_templates/honor.html
 #: lms/templates/static_templates/honor.html
 msgid "Honor Code"
-msgstr ""
+msgstr "榮譽準則"
 
 #: lms/templates/static_templates/media-kit.html
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
-msgstr ""
+msgstr "媒體工具箱"
 
 #: lms/templates/static_templates/press.html
 #: lms/templates/static_templates/press.html
 msgid "In the Press"
-msgstr ""
+msgstr "新聞"
 
 #: lms/templates/static_templates/server-down.html
-msgid "Currently the <em>{platform_name}</em> servers are down"
-msgstr "目前<em>{platform_name}</em>伺服器未在運行"
+msgid "Currently the {platform_name} servers are down"
+msgstr ""
 
 #: lms/templates/static_templates/server-down.html
 #: lms/templates/static_templates/server-overloaded.html
 msgid ""
 "Our staff is currently working to get the site back up as soon as possible. "
-"Please email us at <a "
-"href=\"mailto:{tech_support_email}\">{tech_support_email}</a> to report any "
-"problems or downtime."
+"Please email us at {tech_support_email} to report any problems or downtime."
 msgstr ""
-"我們的員工正在儘快使這個網站恢復。請發電子郵件至<a "
-"href=\"mailto:{tech_support_email}\">{tech_support_email}</a>向我們回報問題或錯誤發生時間。"
 
 #: lms/templates/static_templates/server-error.html
-msgid "There has been a 500 error on the <em>{platform_name}</em> servers"
-msgstr "<em>{platform_name}</em>伺服器上出現了一個500錯誤。"
+msgid "There has been a 500 error on the {platform_name} servers"
+msgstr ""
 
 #: lms/templates/static_templates/server-error.html
 msgid ""
@@ -8710,8 +8668,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/static_templates/server-overloaded.html
-msgid "Currently the <em>{platform_name}</em> servers are overloaded"
-msgstr "目前<em>{platform_name}</em>伺服器超載"
+msgid "Currently the {platform_name} servers are overloaded"
+msgstr ""
 
 #: lms/templates/university_profile/edge.html
 #: lms/templates/university_profile/edge.html
@@ -8800,7 +8758,7 @@ msgstr "您正在註冊為"
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Upgrading to:"
-msgstr ""
+msgstr "升級成："
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Re-verifying for:"
@@ -8882,7 +8840,7 @@ msgstr ""
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Oops! Something went wrong. Please confirm your details and try again."
-msgstr ""
+msgstr "哎呀！有錯誤了！請確認您的資訊然後再重新嘗試。"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -9083,6 +9041,8 @@ msgid "Complete your other re-verifications"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_reverification_confirmation.html
+#: lms/templates/verify_student/midcourse_reverify_dash.html
+#: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "Return to where you left off"
 msgstr ""
 
@@ -9123,13 +9083,7 @@ msgid "Failed"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid ""
-"Don't want to re-verify right now? {a_start}Return to where you left "
-"off{a_end}"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "{a_start}Return to where you left off{a_end}"
+msgid "Don't want to re-verify right now?"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_reverify_dash.html
@@ -9178,11 +9132,11 @@ msgstr ""
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Re-Verification"
-msgstr ""
+msgstr "重新驗證"
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid "Please Resubmit Your Verification Information"
-msgstr ""
+msgstr "請重新提交您的認證資訊"
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid ""
@@ -9485,7 +9439,7 @@ msgstr "在進行之前，您需要啟動您的edX帳號。"
 msgid ""
 "Please check your email for further instructions on activating your new "
 "account."
-msgstr "請檢查您的email的進一步指示，來啟動您的新帳號。"
+msgstr "請檢查您的電子郵件，您會收到進一步的指示以啟動您的新帳號。"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "What You Will Need to Upgrade"
@@ -9512,7 +9466,7 @@ msgstr "啟動您的帳號"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Check your email"
-msgstr "檢查您的email"
+msgstr "檢查您的電子郵件"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
@@ -9629,7 +9583,7 @@ msgstr "無法找到您所搜尋的頁面。"
 msgid ""
 "Go back to the {homepage} or let us know about any pages that may have been "
 "moved at {email}."
-msgstr "回到 {homepage} 或發電子郵件至 {email} 告訴我們被移動的頁面。"
+msgstr "回到 {homepage} 或發電子郵件至 {email} 告訴我們可能被移動的頁面。"
 
 #: cms/templates/500.html
 msgid "Studio Server Error"
@@ -9764,7 +9718,7 @@ msgstr ""
 msgid ""
 "You use the Embed URL value to link to the file or image from a component, a"
 " course update, or a course handout."
-msgstr "您可以使用嵌入網址來連結一個元件、一個課程更新或一個課程講義中的檔案或圖片。"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -9828,14 +9782,15 @@ msgid "Editor"
 msgstr "編輯器"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html
 msgid "Duplicate this component"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html
 msgid "Delete this component"
 msgstr ""
 
@@ -9849,23 +9804,40 @@ msgstr "拖動以重新排序"
 msgid "Container"
 msgstr ""
 
-#: cms/templates/container.html cms/templates/studio_vertical_wrapper.html
-msgid "No Actions"
+#: cms/templates/container.html
+msgid "This page has no content yet."
 msgstr ""
 
-#: cms/templates/container.html
+#: cms/templates/container.html cms/templates/container.html
 msgid "Publishing Status"
-msgstr ""
+msgstr "發佈狀態"
 
 #: cms/templates/container.html
-msgid "This content is published with unit {unit_name}."
+msgid "Published"
 msgstr ""
 
 #: cms/templates/container.html
 msgid ""
-"You can view course components that contain other components on this page. "
-"In the case of experiment blocks, this allows you to confirm that you have "
-"properly configured your experiment groups."
+"To make changes to the content of this page, you need to edit unit "
+"{unit_link} as a draft."
+msgstr ""
+
+#: cms/templates/container.html
+msgid "Draft"
+msgstr ""
+
+#: cms/templates/container.html
+msgid ""
+"You can edit the content of this page, and your changes will be published "
+"with unit {unit_link}."
+msgstr ""
+
+#: cms/templates/container.html
+msgid ""
+"You can view and edit course components that contain other components on "
+"this page. In the case of experiment blocks, this allows you to confirm that"
+" you have properly configured your experiment groups and make changes to "
+"existing content."
 msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
@@ -9917,7 +9889,7 @@ msgstr ""
 
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 msgid "This page cannot be reordered"
-msgstr ""
+msgstr "無法復原此頁面"
 
 #: cms/templates/edit-tabs.html
 msgid "You can add additional custom pages to your course."
@@ -9925,7 +9897,7 @@ msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "Add a New Page"
-msgstr ""
+msgstr "新增頁面"
 
 #: cms/templates/edit-tabs.html
 msgid "What are pages?"
@@ -9947,7 +9919,7 @@ msgid ""
 "You can create and edit custom pages to provide students with additional "
 "course content. For example, you can create pages for the grading policy, "
 "course slides, and a course calendar. "
-msgstr ""
+msgstr "您可以建立自訂頁面以提供學生額外的課程資訊，舉例來說，您可以建立關於課程評分策略、課程簡報以及行事曆等相關頁面。"
 
 #: cms/templates/edit-tabs.html
 msgid "How do pages look to students in my course?"
@@ -10455,13 +10427,13 @@ msgstr "請設置章節或小節的發佈時間，系統會按照設定時間發
 
 #: cms/templates/html_error.html
 msgid "We're having trouble rendering your component"
-msgstr "渲染元件時遇到問題"
+msgstr ""
 
 #: cms/templates/html_error.html
 msgid ""
 "Students will not be able to access this component. Re-edit your component "
 "to fix the error."
-msgstr "學生將不能夠存取這個元件。請重新編輯您的元件來修正這個錯誤。"
+msgstr ""
 
 #: cms/templates/import.html cms/templates/import.html
 msgid "Course Import"
@@ -10548,7 +10520,7 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "Updating Course"
-msgstr ""
+msgstr "更新課程中"
 
 #: cms/templates/import.html
 msgid ""
@@ -10558,11 +10530,11 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "Success"
-msgstr ""
+msgstr "成功"
 
 #: cms/templates/import.html
 msgid "Your imported content has now been integrated into this course"
-msgstr ""
+msgstr "您所匯入的內容現在已經整合到這個課程當中。"
 
 #: cms/templates/import.html
 msgid "View Updated Outline"
@@ -10570,7 +10542,7 @@ msgstr "檢視更新後的大鋼"
 
 #: cms/templates/import.html
 msgid "Why import a course?"
-msgstr ""
+msgstr "為何匯入課程?"
 
 #: cms/templates/import.html
 msgid ""
@@ -10581,7 +10553,7 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "What content is imported?"
-msgstr ""
+msgstr "什麼內容被匯入?"
 
 #: cms/templates/import.html
 msgid ""
@@ -10594,7 +10566,7 @@ msgstr ""
 
 #: cms/templates/import.html
 msgid "Warning: Importing while a course is running"
-msgstr ""
+msgstr "警告：匯入到一個進行中的課程"
 
 #: cms/templates/import.html
 msgid ""
@@ -10603,51 +10575,53 @@ msgid ""
 "associated with those Problem components may be lost. This data includes "
 "students' problem scores."
 msgstr ""
+"如果您在課程進行中時執行匯入，並更改任何問題組件的網址名稱(或 url_name "
+"節點)，和此問題組件相關的學生資料可能會遺失，這些資料包含學生於問題中獲得的分數。"
 
 #: cms/templates/import.html
 msgid "There was an error during the upload process."
-msgstr ""
+msgstr "在上傳的過程中發生錯誤"
 
 #: cms/templates/import.html
 msgid "There was an error while unpacking the file."
-msgstr ""
+msgstr "在解壓縮檔案的過程中發生錯誤。"
 
 #: cms/templates/import.html
 msgid "There was an error while verifying the file you submitted."
-msgstr ""
+msgstr "驗證您提交的檔案時發生錯誤。"
 
 #: cms/templates/import.html
 msgid "There was an error while importing the new course to our database."
-msgstr ""
+msgstr "匯入新課程到我們的資料庫時發生錯誤。"
 
 #: cms/templates/import.html
 msgid "Your import has failed."
-msgstr ""
+msgstr "您的匯入失敗。"
 
 #: cms/templates/import.html cms/templates/import.html
 msgid "Choose new file"
-msgstr ""
+msgstr "選擇新的檔案"
 
 #: cms/templates/import.html
 msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
+msgstr "您的匯入正在進行中，離開頁面將會中止匯入。"
 
 #: cms/templates/index.html cms/templates/index.html
 #: cms/templates/widgets/header.html
 msgid "My Courses"
-msgstr ""
+msgstr "我的課程"
 
 #: cms/templates/index.html
 msgid "New Course"
-msgstr ""
+msgstr "新建課程"
 
 #: cms/templates/index.html
 msgid "Email staff to create course"
-msgstr ""
+msgstr "請寄信給員工以取得開課權限"
 
 #: cms/templates/index.html
 msgid "Welcome, {0}!"
-msgstr ""
+msgstr "歡迎，{0}！"
 
 #: cms/templates/index.html
 msgid "Here are all of the courses you currently have access to in Studio:"
@@ -10655,15 +10629,15 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "You currently aren't associated with any Studio Courses."
-msgstr ""
+msgstr "您目前尚未與任何Studio中的課程建立關聯。"
 
 #: cms/templates/index.html
 msgid "Please correct the highlighted fields below."
-msgstr ""
+msgstr "請更正下面高亮顯示的欄位。"
 
 #: cms/templates/index.html
 msgid "Create a New Course"
-msgstr ""
+msgstr "創建一個新課程"
 
 #: cms/templates/index.html
 msgid "Required Information to Create a New Course"
@@ -10671,74 +10645,74 @@ msgstr "創建一個新課程的必要資訊"
 
 #: cms/templates/index.html
 msgid "e.g. Introduction to Computer Science"
-msgstr ""
+msgstr "例如：計算機科學的介紹"
 
 #: cms/templates/index.html
 msgid "The public display name for your course."
-msgstr ""
+msgstr "您的課程的公開顯示名稱"
 
 #: cms/templates/index.html cms/templates/settings.html
 msgid "Organization"
-msgstr ""
+msgstr "組織名稱"
 
 #: cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
-msgstr ""
+msgstr "例如：UniversityX 或 OrganizationX"
 
 #: cms/templates/index.html
 msgid "The name of the organization sponsoring the course."
-msgstr ""
+msgstr "建立此課程的組織名稱。"
 
 #: cms/templates/index.html
 msgid ""
 "Note: This is part of your course URL, so no spaces or special characters "
 "are allowed."
-msgstr ""
+msgstr "注意：這會您課程網址的一部分，所以請勿使用空格或特殊字元 (包含中文)。"
 
 #: cms/templates/index.html
 msgid ""
 "This cannot be changed, but you can set a different display name in Advanced"
 " Settings later."
-msgstr ""
+msgstr "這之後不能被更改，但是您可以稍後在進階設定中設定不同的顯示名稱。"
 
 #: cms/templates/index.html
 msgid "e.g. CS101"
-msgstr ""
+msgstr "例如：CS101"
 
 #: cms/templates/index.html
 msgid ""
 "The unique number that identifies your course within your organization."
-msgstr ""
+msgstr "用來於您的組織中識別課程的唯一值。"
 
 #: cms/templates/index.html cms/templates/index.html
 msgid ""
 "Note: This is part of your course URL, so no spaces or special characters "
 "are allowed and it cannot be changed."
-msgstr ""
+msgstr "注意：這會您課程網址的一部分，所以請勿使用空格或特殊字元 (包含中文)，而且事後不能修改。"
 
 #: cms/templates/index.html
 msgid "Course Run"
-msgstr ""
+msgstr "開課時程"
 
 #: cms/templates/index.html
 msgid "e.g. 2014_T1"
-msgstr ""
+msgstr "例如：2014_T1"
 
 #: cms/templates/index.html
 msgid "The term in which your course will run."
-msgstr ""
+msgstr "您的課程開始的學期。"
 
 #: cms/templates/index.html
 msgid "Create"
-msgstr ""
+msgstr "創建"
 
 #: cms/templates/index.html
 msgid "Course Run:"
-msgstr ""
+msgstr "開課時程："
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing Studio course?"
-msgstr ""
+msgstr "您是一門已存在於Studio中課程的管理員？"
 
 #: cms/templates/index.html
 msgid ""
@@ -10749,15 +10723,15 @@ msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html
 msgid "Create Your First Course"
-msgstr ""
+msgstr "創建您的第一個課程"
 
 #: cms/templates/index.html
 msgid "Your new course is just a click away!"
-msgstr ""
+msgstr "您只需點擊即可建立新課程！"
 
 #: cms/templates/index.html
 msgid "Becoming a Course Creator in Studio"
-msgstr ""
+msgstr "成為Studio中的課程創建者"
 
 #: cms/templates/index.html
 msgid ""
@@ -10770,15 +10744,15 @@ msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Your Course Creator Request Status:"
-msgstr ""
+msgstr "您的課程創建者請求狀態："
 
 #: cms/templates/index.html
 msgid "Request the Ability to Create Courses"
-msgstr ""
+msgstr "請求創建課程所需要的權限"
 
 #: cms/templates/index.html cms/templates/index.html
 msgid "Your Course Creator Request Status"
-msgstr ""
+msgstr "您的課程創建者請求狀態"
 
 #: cms/templates/index.html
 msgid ""
@@ -10790,16 +10764,16 @@ msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html
 msgid "Your Course Creator request is:"
-msgstr ""
+msgstr "您的課程創建者請求："
 
 #: cms/templates/index.html
 msgid "Denied"
-msgstr ""
+msgstr "被拒絕"
 
 #: cms/templates/index.html
 msgid ""
 "Your request did not meet the criteria/guidelines specified by edX Staff."
-msgstr ""
+msgstr "您的請求不符合edX員工規定的標準/指導方針。"
 
 #: cms/templates/index.html
 msgid ""
@@ -10827,7 +10801,7 @@ msgstr "如果您對Studio不瞭解，同時開始使用時遇到困難，那麼
 
 #: cms/templates/index.html
 msgid "Get started by reading Studio's Documentation"
-msgstr ""
+msgstr "從閱讀Studio的說明文件開始"
 
 #: cms/templates/index.html
 msgid "Request help with Studio"
@@ -10835,11 +10809,11 @@ msgstr "向Studio請求幫助"
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Can I create courses in Studio?"
-msgstr ""
+msgstr "我可以在Studio中創建課程嗎？"
 
 #: cms/templates/index.html
 msgid "In order to create courses in Studio, you must"
-msgstr ""
+msgstr "為了在Studio中創建課程，您必須"
 
 #: cms/templates/index.html
 msgid "contact edX staff to help you create a course"
@@ -10853,15 +10827,15 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Your request to author courses in studio has been denied. Please"
-msgstr ""
+msgstr "您在Studio中創作課程的請求已經被拒絕。請"
 
 #: cms/templates/index.html
 msgid "contact edX Staff with further questions"
-msgstr ""
+msgstr "進一步的問題請聯繫edX員工"
 
 #: cms/templates/index.html
 msgid "Thanks for signing up, %(name)s!"
-msgstr ""
+msgstr "感謝註冊，%(name)s！"
 
 #: cms/templates/index.html
 msgid "We need to verify your email address"
@@ -10872,243 +10846,243 @@ msgid ""
 "Almost there! In order to complete your sign up we need you to verify your "
 "email address (%(email)s). An activation message and next steps should be "
 "waiting for you there."
-msgstr ""
+msgstr "快完成了！為了完成您的註冊，我們需要確認您的郵箱位址(%(email)s)。一封啟動資訊以及接下來的步驟應該已經送達您的郵箱。"
 
 #: cms/templates/index.html
 msgid ""
 "Please check your Junk or Spam folders in case our email isn't in your "
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
-msgstr ""
+msgstr "請檢查您的垃圾郵件，以防我們的郵件不在您的收件箱中。依然找不到確認郵件？透過下面的連結請求協助。"
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"
-msgstr ""
+msgstr "登入"
 
 #: cms/templates/login.html cms/templates/login.html
 msgid "Sign In to edX Studio"
-msgstr ""
+msgstr "登入到 edX Studio"
 
 #: cms/templates/login.html
 msgid "Don't have a Studio Account? Sign up!"
-msgstr ""
+msgstr "尚未擁有Studio帳戶嗎？即刻註冊！"
 
 #: cms/templates/login.html
 msgid "Required Information to Sign In to edX Studio"
-msgstr ""
+msgstr "註冊edX Studio所需的資訊"
 
 #: cms/templates/login.html cms/templates/register.html
 msgid "Email Address"
-msgstr ""
+msgstr "電子郵件地址"
 
 #: cms/templates/login.html cms/templates/widgets/sock.html
 msgid "Studio Support"
-msgstr ""
+msgstr "Studio 支援"
 
 #: cms/templates/login.html
 msgid ""
 "Having trouble with your account? Use {link_start}our support "
 "center{link_end} to look over self help steps, find solutions others have "
 "found to the same problem, or let us know of your issue."
-msgstr ""
+msgstr "如果您在使用帳戶時遇到問題，請訪問‘{link_start}'技術支持中心'{link_end}'來查看問題解決方法。"
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
-msgstr ""
+msgstr "課程團隊設定"
 
 #: cms/templates/manage_users.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 #: cms/templates/widgets/header.html
 msgid "Course Team"
-msgstr ""
+msgstr "課程團隊"
 
 #: cms/templates/manage_users.html
 msgid "New Team Member"
-msgstr ""
+msgstr "新的團隊成員"
 
 #: cms/templates/manage_users.html
 msgid "Add a User to Your Course's Team"
-msgstr ""
+msgstr "新增一位使用者到您的課程團隊中"
 
 #: cms/templates/manage_users.html
 msgid "New Team Member Information"
-msgstr ""
+msgstr "新團隊成員資訊"
 
 #: cms/templates/manage_users.html
 msgid "User's Email Address"
-msgstr ""
+msgstr "用戶的電子郵件信箱地址"
 
 #: cms/templates/manage_users.html
 msgid "e.g. jane.doe@gmail.com"
-msgstr ""
+msgstr "例如：jane.doe@gmail.com"
 
 #: cms/templates/manage_users.html
 msgid ""
 "Please provide the email address of the course staff member you'd like to "
 "add"
-msgstr ""
+msgstr "請提供您想要新增的課程成員的電子郵件地址"
 
 #: cms/templates/manage_users.html
 msgid "Add User"
-msgstr ""
+msgstr "新增用戶"
 
 #: cms/templates/manage_users.html cms/templates/manage_users.html
 msgid "Current Role:"
-msgstr ""
+msgstr "當前角色："
 
 #: cms/templates/manage_users.html cms/templates/manage_users.html
 msgid "You!"
-msgstr ""
+msgstr "您！"
 
 #: cms/templates/manage_users.html
 msgid "Staff"
-msgstr ""
+msgstr "員工"
 
 #: cms/templates/manage_users.html
 msgid "send an email message to {email}"
-msgstr ""
+msgstr "發送一封電子郵件給{email}"
 
 #: cms/templates/manage_users.html
 msgid "Promote another member to Admin to remove your admin rights"
-msgstr ""
+msgstr "先提升另一名成員為管理員，才能取消您自己的管理權"
 
 #: cms/templates/manage_users.html
 msgid "Remove Admin Access"
-msgstr ""
+msgstr "取消管理權"
 
 #: cms/templates/manage_users.html
 msgid "Add Admin Access"
-msgstr ""
+msgstr "新增管理者權限"
 
 #: cms/templates/manage_users.html
 msgid "Delete the user, {username}"
-msgstr ""
+msgstr "刪除用戶，{username}"
 
 #: cms/templates/manage_users.html
 msgid "Add Team Members to This Course"
-msgstr ""
+msgstr "新增團隊成員到此課程"
 
 #: cms/templates/manage_users.html
 msgid ""
 "Adding team members makes course authoring collaborative. Users must be "
 "signed up for Studio and have an active account. "
-msgstr ""
+msgstr "新增團隊成員以協助編輯課程，使用者必須先註冊並且啟動在Studio上的帳號。"
 
 #: cms/templates/manage_users.html
 msgid "Add a New Team Member"
-msgstr ""
+msgstr "新增一個團隊成員"
 
 #: cms/templates/manage_users.html
 msgid "Course Team Roles"
-msgstr ""
+msgstr "課程團隊角色"
 
 #: cms/templates/manage_users.html
 msgid ""
 "Course team members, or staff, are course co-authors. They have full writing"
 " and editing privileges on all course content."
-msgstr ""
+msgstr "課程團隊成員或者工作人員都是課程的共同作者，他們擁有完全撰寫及修改所有課程內容的權限。"
 
 #: cms/templates/manage_users.html
 msgid ""
 "Admins are course team members who can add and remove other course team "
 "members."
-msgstr ""
+msgstr "管理員是課程團隊成員，可以新增及移除其他課程團隊成員。"
 
 #: cms/templates/manage_users.html
 msgid "Transferring Ownership"
-msgstr ""
+msgstr "轉讓擁有權"
 
 #: cms/templates/manage_users.html
 msgid ""
 "Every course must have an Admin. If you're the Admin and you want transfer "
 "ownership of the course, click Add admin access to make another user the "
 "Admin, then ask that user to remove you from the Course Team list."
-msgstr ""
+msgstr "每門課程必須有一名管理員。如果您是管理員並希望轉讓您的課程擁有者身分，您可以賦予其他用戶管理員許可權，並請求他們將您從課程團隊列表中移除。"
 
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "Course Outline"
-msgstr ""
+msgstr "課程大綱"
 
 #: cms/templates/overview.html cms/templates/overview.html
 #: cms/templates/overview.html
 msgid "Expand/collapse this section"
-msgstr ""
+msgstr "擴展/收起此章節"
 
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "New Section Name"
-msgstr ""
+msgstr "新章節的名稱"
 
 #: cms/templates/overview.html
 msgid "Add a new section name"
-msgstr ""
+msgstr "新增一個新的章節名稱"
 
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "Delete this section"
-msgstr ""
+msgstr "刪除此章節"
 
 #: cms/templates/overview.html
 msgid "Drag to re-order"
-msgstr ""
+msgstr "拖動以重新排序"
 
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "New Subsection"
-msgstr ""
+msgstr "建立新小節"
 
 #: cms/templates/overview.html cms/templates/widgets/units.html
 msgid "New Unit"
-msgstr ""
+msgstr "建立新單元"
 
 #: cms/templates/overview.html
 msgid "You haven't added any sections to your course outline yet."
-msgstr ""
+msgstr "您還未在課程大綱中新增任何章節。"
 
 #: cms/templates/overview.html
 msgid "Add your first section"
-msgstr ""
+msgstr "新增您的第一個章節"
 
 #: cms/templates/overview.html
 msgid "Collapse All Sections"
-msgstr ""
+msgstr "折疊所有章節"
 
 #: cms/templates/overview.html
 msgid "New Section"
-msgstr ""
+msgstr "建立新章節"
 
 #: cms/templates/overview.html
 msgid "This section is not scheduled for release"
-msgstr ""
+msgstr "尚未排程發布此章節"
 
 #: cms/templates/overview.html
 msgid "Schedule"
-msgstr ""
+msgstr "時程表"
 
 #: cms/templates/overview.html
 msgid "Release date:"
-msgstr ""
+msgstr "發佈日期："
 
 #: cms/templates/overview.html
 msgid "Edit section release date"
-msgstr ""
+msgstr "編輯章節發佈日期"
 
 #: cms/templates/overview.html
 msgid "Delete section"
-msgstr ""
+msgstr "刪除章節"
 
 #: cms/templates/overview.html
 msgid "Drag to reorder section"
-msgstr ""
+msgstr "拖動以重新排序章節"
 
 #: cms/templates/overview.html
 msgid "Expand/collapse this subsection"
-msgstr ""
+msgstr "擴展/收起此小節"
 
 #: cms/templates/overview.html
 msgid "Delete this subsection"
-msgstr ""
+msgstr "刪除此小節"
 
 #: cms/templates/overview.html
 msgid "Delete subsection"
-msgstr ""
+msgstr "刪除小節"
 
 #: cms/templates/overview.html
 msgid ""
@@ -11116,23 +11090,23 @@ msgid ""
 "sections, and create new units in existing subsections.  You can set the "
 "assignment type for subsections that are to be graded, and you can open a "
 "subsection for further editing."
-msgstr ""
+msgstr "您可以創建新章節或小節，設定章節發佈日期，並且為小節創建新單元。您可以為小節設定評分類型，並且您可以開啟一個新的小節以進一步編輯。"
 
 #: cms/templates/overview.html
 msgid ""
 "In addition, you can drag and drop sections, subsections, and units to "
 "reorganize your course."
-msgstr ""
+msgstr "另外，您可以拖動章節、小節和單元來重新組織您的課程。"
 
 #: cms/templates/overview.html
 msgid "Section Release Date"
-msgstr ""
+msgstr "章節發佈日期"
 
 #: cms/templates/overview.html
 msgid ""
 "On the date set below, this section - {name} - will be released to students."
 " Any units marked private will only be visible to admins."
-msgstr ""
+msgstr " - {name} - 章節將於上面設定的日期發佈給學生。任何標為私密的單元將僅對管理員可見。"
 
 #: cms/templates/overview.html
 msgid "Form Actions"
@@ -11140,47 +11114,47 @@ msgstr ""
 
 #: cms/templates/register.html
 msgid "Sign Up for edX Studio"
-msgstr ""
+msgstr "註冊edX Studio"
 
 #: cms/templates/register.html
 msgid "Already have a Studio Account? Sign in"
-msgstr ""
+msgstr "已經擁有Studio帳號？請直接登入！"
 
 #: cms/templates/register.html
 msgid ""
 "Ready to start creating online courses? Sign up below and start creating "
 "your first edX course today."
-msgstr ""
+msgstr "準備好開始創建線上課程了嗎？請從下面開始註冊並立刻創建您的第一門edX課程。"
 
 #: cms/templates/register.html
 msgid "Required Information to Sign Up for edX Studio"
-msgstr ""
+msgstr "註冊edX Studio所需的資訊"
 
 #: cms/templates/register.html
 msgid ""
 "This will be used in public discussions with your courses and in our edX101 "
 "support forums"
-msgstr ""
+msgstr "這會被用於您的課程的公開討論以及我們的edX101支援討論區。"
 
 #: cms/templates/register.html
 msgid "Your Location"
-msgstr ""
+msgstr "您的位置、國家、城市"
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr ""
+msgstr "我同意 {a_start} 服務條約 {a_end}"
 
 #: cms/templates/register.html
 msgid "Create My Account &amp; Start Authoring Courses"
-msgstr ""
+msgstr "創建我的帳戶 &AMP; 開始製作課程"
 
 #: cms/templates/register.html
 msgid "Common Studio Questions"
-msgstr ""
+msgstr "關於Studio的常見問題"
 
 #: cms/templates/register.html
 msgid "Who is Studio for?"
-msgstr ""
+msgstr "Studio是做什麼用的？"
 
 #: cms/templates/register.html
 msgid ""
@@ -11191,7 +11165,7 @@ msgstr ""
 
 #: cms/templates/register.html
 msgid "How technically savvy do I need to be to create courses in Studio?"
-msgstr ""
+msgstr "在Studio創建課程需要掌握哪些技術？"
 
 #: cms/templates/register.html
 msgid ""
@@ -11217,44 +11191,44 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Schedule &amp; Details Settings"
-msgstr ""
+msgstr "時程與細節設置"
 
 #: cms/templates/settings.html
 msgid "Schedule & Details"
-msgstr ""
+msgstr "時程表與細節"
 
 #: cms/templates/settings.html
 msgid "Basic Information"
-msgstr ""
+msgstr "基本資訊"
 
 #: cms/templates/settings.html
 msgid "The nuts and bolts of your course"
-msgstr ""
+msgstr "您的課程的具體細節"
 
 #: cms/templates/settings.html cms/templates/settings.html
 #: cms/templates/settings.html
 msgid "This field is disabled: this information cannot be changed."
-msgstr ""
+msgstr "該欄位為關閉，資訊不可修改。"
 
 #: cms/templates/settings.html
 msgid "Course Summary Page"
-msgstr ""
+msgstr "課程總結頁面"
 
 #: cms/templates/settings.html
 msgid "(for student enrollment and access)"
-msgstr ""
+msgstr "(用於學生註冊和訪問)"
 
 #: cms/templates/settings.html
 msgid "Send a note to students via email"
-msgstr ""
+msgstr "透過電子郵件發送筆記給學生"
 
 #: cms/templates/settings.html
 msgid "Invite your students"
-msgstr ""
+msgstr "邀請您的學生"
 
 #: cms/templates/settings.html
 msgid "Promoting Your Course with edX"
-msgstr ""
+msgstr "透過edX平台推廣您的課程"
 
 #: cms/templates/settings.html
 msgid ""
@@ -11267,7 +11241,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Schedule"
-msgstr ""
+msgstr "課程時程表"
 
 #: cms/templates/settings.html
 msgid "Dates that control when your course can be viewed"
@@ -11275,51 +11249,51 @@ msgstr "日期決定了您的課程何時可以被瀏覽。"
 
 #: cms/templates/settings.html
 msgid "First day the course begins"
-msgstr ""
+msgstr "課程開始的第一天"
 
 #: cms/templates/settings.html
 msgid "Course Start Time"
-msgstr ""
+msgstr "開課時間"
 
 #: cms/templates/settings.html
 msgid "Course End Date"
-msgstr ""
+msgstr "課程結束日期"
 
 #: cms/templates/settings.html
 msgid "Last day your course is active"
-msgstr ""
+msgstr "您課程可被訪問的最後一天"
 
 #: cms/templates/settings.html
 msgid "Course End Time"
-msgstr ""
+msgstr "課程結束時間"
 
 #: cms/templates/settings.html
 msgid "Enrollment Start Date"
-msgstr ""
+msgstr "註冊開始日期"
 
 #: cms/templates/settings.html
 msgid "First day students can enroll"
-msgstr ""
+msgstr "學生可以註冊的第一天"
 
 #: cms/templates/settings.html
 msgid "Enrollment Start Time"
-msgstr ""
+msgstr "註冊開始時間"
 
 #: cms/templates/settings.html
 msgid "Enrollment End Date"
-msgstr ""
+msgstr "註冊結束日期"
 
 #: cms/templates/settings.html
 msgid "Last day students can enroll"
-msgstr ""
+msgstr "學生可以註冊的最後一天"
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
-msgstr ""
+msgstr "註冊結束時間"
 
 #: cms/templates/settings.html
 msgid "These Dates Are Not Used When Promoting Your Course"
-msgstr ""
+msgstr "當推廣您的課程的時候這些日期將不會被使用"
 
 #: cms/templates/settings.html
 msgid ""
@@ -11330,14 +11304,18 @@ msgid ""
 " Manager\">PM</abbr> or Conrad Warre <a rel=\"email\" class=\"action action-"
 "email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
 msgstr ""
+"這些日期影響了<strong>何時您的課程可以被瀏覽</strong>，但是它們<strong>並不是在您的課程總結頁面顯示的日期</strong>。為了在課程總結頁面提供課程開始和註冊的日期，請遵循您的"
+" <abbr title=\"Program Manager\">專案經理</abbr> 或者Conrad Warre <a rel=\"email\""
+" class=\"action action-email\" "
+"href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>所提供的說明。"
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
-msgstr ""
+msgstr "介紹您的課程"
 
 #: cms/templates/settings.html
 msgid "Information for prospective students"
-msgstr ""
+msgstr "準學生的資訊"
 
 #: cms/templates/settings.html
 msgid "Course Short Description"
@@ -11355,77 +11333,77 @@ msgstr "課程概述"
 
 #: cms/templates/settings.html
 msgid "your course summary page"
-msgstr ""
+msgstr "您的課程總結頁面"
 
 #: cms/templates/settings.html
 msgid ""
 "Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
-msgstr ""
+msgstr "介紹說明、先修條件、常見問題解答被列在%s (HTML格式)"
 
 #: cms/templates/settings.html cms/templates/settings.html
 #: cms/templates/settings.html
 msgid "Course Image"
-msgstr ""
+msgstr "課程圖片"
 
 #: cms/templates/settings.html
 msgid ""
 "You can manage this image along with all of your other <a href='{}'>files "
 "&amp; uploads</a>"
-msgstr ""
+msgstr "您可以管理此照片以及其他<a href='{}'>已上傳的檔案</a>"
 
 #: cms/templates/settings.html
 msgid ""
 "Your course currently does not have an image. Please upload one (JPEG or PNG"
 " format, and minimum suggested dimensions are 375px wide by 200px tall)"
-msgstr ""
+msgstr "您的課程目前沒有設定課程圖片，請上傳一張圖片(JPEG或PNG格式，最小建議大小為寬375像素、高200像素)"
 
 #: cms/templates/settings.html
 msgid ""
 "Please provide a valid path and name to your course image (Note: only JPEG "
 "or PNG format supported)"
-msgstr ""
+msgstr "請為您的課程圖片提供一個有效的路徑和名字（注意：僅支援JPEG和PNG格式）"
 
 #: cms/templates/settings.html
 msgid "Upload Course Image"
-msgstr ""
+msgstr "上傳課程圖片"
 
 #: cms/templates/settings.html
 msgid "Course Introduction Video"
-msgstr ""
+msgstr "課程簡介影片"
 
 #: cms/templates/settings.html
 msgid "Delete Current Video"
-msgstr ""
+msgstr "刪除當前影片"
 
 #: cms/templates/settings.html
 msgid "Enter your YouTube video's ID (along with any restriction parameters)"
-msgstr ""
+msgstr "請輸入您的 YouTube 影片編號 (以及任何必要的限制參數)"
 
 #: cms/templates/settings.html
 msgid "Requirements"
-msgstr ""
+msgstr "要求"
 
 #: cms/templates/settings.html
 msgid "Expectations of the students taking this course"
-msgstr ""
+msgstr "對參加這門課程的學生之期望"
 
 #: cms/templates/settings.html
 msgid "Hours of Effort per Week"
-msgstr ""
+msgstr "每週投入的學習時間"
 
 #: cms/templates/settings.html
 msgid "Time spent on all course work"
-msgstr ""
+msgstr "投入在整個課程的時間"
 
 #: cms/templates/settings.html
 msgid "How are these settings used?"
-msgstr ""
+msgstr "如何使用這些設定？"
 
 #: cms/templates/settings.html
 msgid ""
 "Your course's schedule determines when students can enroll in and begin a "
 "course."
-msgstr ""
+msgstr "您的課程時間表決定何時學生可以註冊和開始本門課程。"
 
 #: cms/templates/settings.html
 msgid ""
@@ -11439,54 +11417,54 @@ msgstr ""
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html
 msgid "Other Course Settings"
-msgstr ""
+msgstr "其他課程設定"
 
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 msgid "Grading"
-msgstr ""
+msgstr "評分"
 
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 #: cms/templates/widgets/header.html
 msgid "Advanced Settings"
-msgstr ""
+msgstr "進階設置"
 
 #: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."
-msgstr ""
+msgstr "已儲存您的設置變更。"
 
 #: cms/templates/settings_advanced.html
 msgid "There was an error saving your information. Please see below."
-msgstr ""
+msgstr "儲存您的訊息時發生錯誤，詳情如下。"
 
 #: cms/templates/settings_advanced.html
 msgid "Manual Policy Definition"
-msgstr ""
+msgstr "手動定義課程策略"
 
 #: cms/templates/settings_advanced.html
 msgid ""
 "<strong>Warning</strong>: Do not modify these policies unless you are "
 "familiar with their purpose."
-msgstr ""
+msgstr "<strong>警告</strong>：不要輕易修改這些設置，除非您已經非常清楚這些設定的目的。"
 
 #: cms/templates/settings_advanced.html
 msgid "What do advanced settings do?"
-msgstr ""
+msgstr "進階設定用來做什麼用途？"
 
 #: cms/templates/settings_advanced.html
 msgid ""
 "Advanced settings control specific course functionality. On this page, you "
 "can edit manual policies, which are JSON-based key and value pairs that "
 "control specific course settings."
-msgstr ""
+msgstr "進階設定控制了特定的課程功能。在這個頁面，您可以手動編輯以JSON鍵值對表示的策略設定，控制特定的課程設定。"
 
 #: cms/templates/settings_advanced.html
 msgid ""
 "Any policies you modify here override all other information you've defined "
 "elsewhere in Studio. Do not edit policies unless you are familiar with both "
 "their purpose and syntax."
-msgstr ""
+msgstr "您在這裡的更改會覆蓋在Studio其他地方定義的資訊。請注意不要修改您不熟悉的規則(包括它們的目標和語法)"
 
 #: cms/templates/settings_advanced.html
 msgid ""
@@ -11494,18 +11472,19 @@ msgid ""
 " you use double quotation marks (&quot;) around the string. Do not use "
 "single quotation marks (&apos;)."
 msgstr ""
+"{em_start}注意：{em_end} 當您輸入字串當作策略值時，請確認在字串中使用雙引號 (&quot;)，不要使用單引號 (&apos;) 。"
 
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
-msgstr ""
+msgstr "細節與時程"
 
 #: cms/templates/settings_graders.html
 msgid "Grading Settings"
-msgstr ""
+msgstr "評分設置"
 
 #: cms/templates/settings_graders.html
 msgid "Overall Grade Range"
-msgstr ""
+msgstr "整體評分範圍"
 
 #: cms/templates/settings_graders.html
 msgid "Your overall grading scale for student final grades"
@@ -11513,7 +11492,7 @@ msgstr ""
 
 #: cms/templates/settings_graders.html
 msgid "Grading Rules &amp; Policies"
-msgstr ""
+msgstr "評分規則與策略"
 
 #: cms/templates/settings_graders.html
 msgid "Deadlines, requirements, and logistics around grading student work"
@@ -11521,36 +11500,36 @@ msgstr ""
 
 #: cms/templates/settings_graders.html
 msgid "Grace Period on Deadline:"
-msgstr ""
+msgstr "截止日期的寬限時間"
 
 #: cms/templates/settings_graders.html
 msgid "Leeway on due dates"
-msgstr ""
+msgstr "允許作業遲交的寬限時間"
 
 #: cms/templates/settings_graders.html
 msgid "Assignment Types"
-msgstr ""
+msgstr "作業類別"
 
 #: cms/templates/settings_graders.html
 msgid "Categories and labels for any exercises that are gradable"
-msgstr ""
+msgstr "所有可評分的練習種類和標籤"
 
 #: cms/templates/settings_graders.html
 msgid "New Assignment Type"
-msgstr ""
+msgstr "新增作業類別"
 
 #: cms/templates/settings_graders.html
 msgid ""
 "You can use the slider under Overall Grade Range to specify whether your "
 "course is pass/fail or graded by letter, and to establish the thresholds for"
 " each grade."
-msgstr ""
+msgstr "您可以使用整體評分範圍下面的滑動條來指定評分標準，或者使用簡易等級字母評分，並且設定每種評分的門檻值。"
 
 #: cms/templates/settings_graders.html
 msgid ""
 "You can specify whether your course offers students a grace period for late "
 "assignments."
-msgstr ""
+msgstr "您可以指定您的課程是否給提供學生遲交作業的寬限期。"
 
 #: cms/templates/settings_graders.html
 msgid ""
@@ -11564,17 +11543,21 @@ msgstr ""
 msgid "Expand or Collapse"
 msgstr ""
 
+#: cms/templates/studio_vertical_wrapper.html
+msgid "No Actions"
+msgstr ""
+
 #: cms/templates/textbooks.html
 msgid "You have unsaved changes. Do you really want to leave this page?"
-msgstr ""
+msgstr "您尚有未保存的修改，確定要離開此頁面嗎?"
 
 #: cms/templates/textbooks.html
 msgid "New Textbook"
-msgstr ""
+msgstr "新的教材"
 
 #: cms/templates/textbooks.html
 msgid "Why should I break my textbook into chapters?"
-msgstr ""
+msgstr "為什麼我需要將教材拆分成章節？"
 
 #: cms/templates/textbooks.html
 msgid ""
@@ -11586,26 +11569,26 @@ msgstr "將您的課程教材拆分成章節有助於降低學生的載入時間
 
 #: cms/templates/textbooks.html
 msgid "What if my book isn't divided into chapters?"
-msgstr ""
+msgstr "如果我的教材沒有拆分成章節會怎麼樣？"
 
 #: cms/templates/textbooks.html
 msgid ""
 "If your textbook doesn't have individual chapters, you can upload the entire"
 " text as a single chapter and enter a name of your choice in the Chapter "
 "Name field."
-msgstr ""
+msgstr "如果您的教材沒有獨立的章節，您可以上傳整個文件作為一個章節，並在章節名稱欄位中輸入您所選擇的名稱。"
 
 #: cms/templates/unit.html cms/templates/ux/reference/unit.html
 msgid "Individual Unit"
-msgstr ""
+msgstr "獨立單元"
 
 #: cms/templates/unit.html
 msgid "You are editing a draft."
-msgstr ""
+msgstr "您正在編輯草稿。"
 
 #: cms/templates/unit.html
 msgid "This unit was originally published on {date}."
-msgstr ""
+msgstr "本單元原來已發佈於 '{date}'。"
 
 #: cms/templates/unit.html
 msgid "View the Live Version"
@@ -11613,73 +11596,74 @@ msgstr "檢視線上版本"
 
 #: cms/templates/unit.html
 msgid "Add New Component"
-msgstr ""
+msgstr "新增組件"
 
 #: cms/templates/unit.html
 msgid "Common Problem Types"
-msgstr ""
+msgstr "常見問題類型"
 
 #: cms/templates/unit.html
 msgid "Advanced"
-msgstr ""
+msgstr "進階"
 
 #: cms/templates/unit.html
 msgid "Unit Settings"
-msgstr ""
+msgstr "單元設定"
 
 #: cms/templates/unit.html
 msgid "Visibility:"
-msgstr ""
+msgstr "能見度："
 
 #: cms/templates/unit.html
 msgid "Public"
-msgstr ""
+msgstr "公開"
 
 #: cms/templates/unit.html
 msgid "Private"
-msgstr ""
+msgstr "不公開"
 
 #: cms/templates/unit.html
 msgid ""
 "This unit has been published. To make changes, you must {link_start}edit a "
 "draft{link_end}."
-msgstr ""
+msgstr "此單元已經被發布。您必須'{link_start}'編輯草稿'{link_end}'進行修改。"
 
 #: cms/templates/unit.html
 msgid ""
 "This is a draft of the published unit. To update the live version, you must "
 "{link_start}replace it with this draft{link_end}."
-msgstr ""
+msgstr "這是一個已發表單元的草稿，您必須點擊{link_start}使用本草稿替換{link_end}更新線上版本。"
 
 #: cms/templates/unit.html
 msgid ""
 "This unit is scheduled to be released to <strong>students</strong> on "
 "<strong>{date}</strong> with the subsection {link_start}{name}{link_end}"
 msgstr ""
+"此單元位於小節{link_start}{name}{link_end}，已排程於<strong>{date}</strong>釋出給<strong>學生</strong>。"
 
 #: cms/templates/unit.html
 msgid ""
 "This unit is scheduled to be released to <strong>students</strong> with the "
 "subsection {link_start}{name}{link_end}"
-msgstr ""
+msgstr "此單元位於小節{link_start}{name}{link_end}，已排程釋出給<strong>學生</strong>"
 
 #: cms/templates/unit.html
 msgid "Delete Draft"
-msgstr ""
+msgstr "刪除草稿"
 
 #: cms/templates/unit.html
 msgid "Unit Location"
-msgstr ""
+msgstr "單元位置"
 
 #: cms/templates/unit.html
 msgid "Unit Identifier:"
-msgstr ""
+msgstr "單元識別字："
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
 "Thank you for signing up for edX Studio! To activate your account, please "
 "copy and paste this address into your web browser's address bar:"
-msgstr ""
+msgstr "謝謝您註冊edX Studio！為了啟動您的帳號，請將下面的位址複製並貼到您的瀏覽器地址欄："
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
@@ -11690,21 +11674,21 @@ msgstr "如果您並未發出請求，則您不需要做做任何事，也將不
 
 #: cms/templates/emails/activation_email_subject.txt
 msgid "Your account for edX Studio"
-msgstr ""
+msgstr "您的edX Studio帳號"
 
 #: cms/templates/emails/course_creator_admin_subject.txt
 msgid "{email} has requested Studio course creator privileges on edge"
-msgstr ""
+msgstr "{email} 請求在Studio開課的權限。"
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
 msgid ""
 "User '{user}' with e-mail {email} has requested Studio course creator "
 "privileges on edge."
-msgstr ""
+msgstr "使用者'{user}' - {email} 請求Studio中課程創建者的權限。"
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
 msgid "To grant or deny this request, use the course creator admin table."
-msgstr ""
+msgstr "要授予或拒絕此請求，請使用課程建立者管理表。"
 
 #: cms/templates/emails/course_creator_denied.txt
 msgid ""
@@ -11736,7 +11720,7 @@ msgstr ""
 msgid ""
 "An activation link has been sent to {email}, along with instructions for "
 "activating your account."
-msgstr ""
+msgstr "我們已發送一封電子郵件至 {email} ，裡面包含一個啟動帳號的連結，以及啟動帳號的操作說明。"
 
 #: cms/templates/widgets/footer.html
 msgid "All rights reserved."
@@ -11950,7 +11934,7 @@ msgid ""
 "This is just the initial contents of your article. After creating it, you "
 "can use more complex features like adding plugins, meta data, related "
 "articles etc..."
-msgstr "這只是您文章的初始內容。創建後，您可以使用更複雜的功能，例如新增外掛元件，後設資料，相關文章等.."
+msgstr ""
 
 #: wiki/forms.py wiki/forms.py
 msgid "Contents"
@@ -12050,7 +12034,7 @@ msgstr "擁有者"
 
 #: wiki/forms.py
 msgid "Enter the username of the owner."
-msgstr "輸入擁有者的用戶名。"
+msgstr "輸入擁有者的使用者名稱。"
 
 #: wiki/forms.py
 msgid "(none)"
@@ -12431,7 +12415,7 @@ msgstr ""
 
 #: wiki/plugins/notifications/forms.py
 msgid "Also receive emails about article edits"
-msgstr ""
+msgstr "也要收到關於文章編輯的電子郵件通知"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Your notification settings were updated."

@@ -41,8 +41,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-07 10:06-0400\n"
-"PO-Revision-Date: 2014-04-01 20:11+0000\n"
+"POT-Creation-Date: 2014-04-12 15:40-0400\n"
+"PO-Revision-Date: 2014-04-10 20:30+0000\n"
 "Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -61,6 +61,8 @@ msgstr "OK"
 #: cms/static/js/base.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
+#: cms/static/js/views/modals/base_modal.js
+#: cms/static/js/views/pages/container.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
@@ -374,6 +376,7 @@ msgstr "Afficher la discussion"
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
 msgstr "Désolé"
@@ -439,22 +442,16 @@ msgid "vote"
 msgstr "voter"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid ""
-"%(voteNum)s%(startSrSpan)s vote (click to remove your vote)%(endSrSpan)s"
-msgid_plural ""
-"%(voteNum)s%(startSrSpan)s votes (click to remove your vote)%(endSrSpan)s"
+msgid "vote (click to remove your vote)"
+msgid_plural "votes (click to remove your vote)"
 msgstr[0] ""
-"%(voteNum)s%(startSrSpan)s vote (cliquez pour supprimer votre "
-"vote)%(endSrSpan)s"
 msgstr[1] ""
-"%(voteNum)s%(startSrSpan)s votes (cliquez pour supprimer votre "
-"vote)%(endSrSpan)s"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "%(voteNum)s%(startSrSpan)s vote (click to vote)%(endSrSpan)s"
-msgid_plural "%(voteNum)s%(startSrSpan)s votes (click to vote)%(endSrSpan)s"
-msgstr[0] "%(voteNum)s%(startSrSpan)s vote (cliquez pour voter)%(endSrSpan)s"
-msgstr[1] "%(voteNum)s%(startSrSpan)s votes (cliquez pour voter)%(endSrSpan)s"
+msgid "vote (click to vote)"
+msgid_plural "votes (click to vote)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
@@ -517,6 +514,11 @@ msgstr "Épinglé"
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Pin Thread"
 msgstr "Épingler le fil"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid ""
+"The thread you selected has been deleted. Please select another thread."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
@@ -1344,21 +1346,17 @@ msgid "(Show)"
 msgstr "(Afficher)"
 
 #: lms/static/js/Markdown.Editor.js
-msgid ""
-"<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>"
+msgid "Insert Hyperlink"
 msgstr ""
-"<p><b>Insérez un lien hypertexte </b></p><p>http://example.com/ \"titre "
-"optionnel\"</p>"
+
+#. Translators: Please keep the quotation marks (") around this text
+#: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js.c
+msgid "\"optional title\""
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
-msgid ""
-"<p><b>Insert Image (upload file or type "
-"url)</b></p><p>http://example.com/images/diagram.jpg \"optional "
-"title\"<br><br></p>"
+msgid "Insert Image (upload file or type url)"
 msgstr ""
-"<p><b>Insérez une image (téléchargez un fichier ou entrez une "
-"url)</b></p><p>http://example.com/images/diagram.jpg \"titre "
-"optionnel\"<br><br></p>"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
@@ -1470,17 +1468,13 @@ msgstr ""
 msgid "Studio's having trouble saving your work"
 msgstr "Studio a des problèmes pour sauvegarder votre travail"
 
-#: cms/static/coffee/src/views/module_edit.js
-msgid "<em>Editing:</em> %s"
-msgstr "<em>Edition:</em> %s"
-
-#: cms/static/coffee/src/views/module_edit.js
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
 #: cms/static/coffee/src/views/unit.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
 #: cms/static/js/views/asset.js cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
+#: cms/static/js/views/xblock_editor.js
 msgid "Saving&hellip;"
 msgstr "Enregistrement&hellip;"
 
@@ -1498,6 +1492,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
 #: cms/static/js/base.js cms/static/js/views/course_info_update.js
+#: cms/static/js/views/pages/container.js
 msgid "Deleting&hellip;"
 msgstr "Suppression&hellip;"
 
@@ -1505,19 +1500,19 @@ msgstr "Suppression&hellip;"
 msgid "Adding&hellip;"
 msgstr ""
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
 msgstr ""
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Delete this component?"
 msgstr "Supprimer ce composant ?"
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Deleting this component is permanent and cannot be undone."
 msgstr "Supprimer ce composant est définitif et ne peut pas être annulé."
 
-#: cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/views/unit.js cms/static/js/views/pages/container.js
 msgid "Yes, delete this component"
 msgstr "Oui, supprimer ce composant"
 
@@ -1682,6 +1677,10 @@ msgstr "Cette action ne peut pas être annulée."
 msgid "Upload a new PDF to “<%= name %>”"
 msgstr "Uploader un nouveau PDF appelé \"<%= name %>”"
 
+#: cms/static/js/views/edit_chapter.js
+msgid "Please select a PDF file to upload."
+msgstr ""
+
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
@@ -1766,6 +1765,10 @@ msgid "Deleting"
 msgstr "Suppression en cours"
 
 #: cms/static/js/views/uploads.js
+msgid "Upload"
+msgstr ""
+
+#: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
 msgstr "Désolé, il y a eu une erreur"
 
@@ -1795,6 +1798,26 @@ msgstr "Enregistrer les modifications"
 #: cms/static/js/views/validation.js
 msgid "Your changes have been saved."
 msgstr "Vos modifications ont été enregistrées."
+
+#: cms/static/js/views/xblock_editor.js
+msgid "Editor"
+msgstr ""
+
+#: cms/static/js/views/xblock_editor.js
+msgid "Settings"
+msgstr ""
+
+#: cms/static/js/views/modals/base_modal.js
+msgid "Save"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Component"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Editing: %(title)s"
+msgstr ""
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -1831,5 +1854,5 @@ msgid ""
 msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
-msgid "Upload translation."
+msgid "Upload translation"
 msgstr ""
