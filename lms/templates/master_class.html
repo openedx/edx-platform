@@ -51,8 +51,8 @@ list-style: none !important;
     <p>
     <section id="result_class_section_${element_id}" class="result_class_section">
         <p><span class="message"></span></p>
-        <h3>${_('Passed registration:')} <span class="total_register"></span></h3>
-        <h3>${_('Total places:')} <span class="total_places"></span></h3>
+        <h4>${_('Passed registration:')} <span class="total_register"></span></h4>
+        <h4>${_('Total places:')} <span class="total_places"></span></h4>
         <div class="master_class"></div>
     </section>
     <p>
@@ -71,13 +71,15 @@ list-style: none !important;
     </section>
 
     <section>
-        <input class="email-send" type="button" value="Скачать CSV файл с регистрациями" />
+        <input class="csv-download" type="button" value="Скачать CSV файл с регистрациями" />
     </section>
 
+    <h3>Отправка писем прошедшим регистрацию</h3>
+    <section class="email-sender">
     <ul class="list-fields">
       <li class="field">
         <label for="id_subject">${_("Subject: ")}</label>
-          <input type="text" id="id_subject" name="subject" maxlength="128" size="75">
+          <input type="text" id="id_subject" name="subject" maxlength="128" size="50">
         <span class="tip">${_("(Max 128 characters)")}</span>
       </li>
 
@@ -104,24 +106,10 @@ list-style: none !important;
         <input type="hidden" name="message" value="">
       </li>
     </ul>
-    <script type="text/javascript">
-    var emailEditor;
-      $(document).ready(function(event){
-        emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
-      });
-      function checkemail() {
-          this.idashform.message.value = emailEditor.save()['data'];
-          if (!this.idashform.subject.value) {
-              alert("Тема сообщения не может быть пустой.");
-              return false;
-          } else if (!this.idashform.message.value) {
-              alert("Сообщение не может быть пустым.");
-              return false;
-          } else {
-              return true;
-          }
-        };
-    </script>
+    <div class="submit-email-action"> 
+        <input type="button" class="email-send" value="Отослать письмо">
+    </div>
+    </section>
     % endif
 
 </section>

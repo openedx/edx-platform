@@ -42,6 +42,8 @@ define('MasterClassMain', [], function (logme) {
         // Hide MasterClass container before Ajax request done
         this.masterClassEl.hide();
 
+        this.emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
+
         // Retriveing response from the server as an AJAX request. Attach a callback that will
         // be fired on server's response.
         $.postWithPrefix(
@@ -69,6 +71,9 @@ define('MasterClassMain', [], function (logme) {
 
         $(el).find('input.save').on('click', function () {
             _this.submitAnswer();
+        });
+        $(el).find('input.csv-download').on('click', function () {
+            _this.downloadCSV();
         });
         $(el).find('input.email-send').on('click', function () {
             _this.submitEmail();
@@ -111,6 +116,40 @@ define('MasterClassMain', [], function (logme) {
 
 
     MasterClassMain.prototype.submitEmail = function () {
+        var _this = this,
+            data = {'subject': '', 'body': ''};
+
+        // Populate the data to be sent to the server with user's words.
+        data.body = this.emailEditor.save()['data'];
+        data.subject = this.masterClassEl.find('#id_subject').val();
+
+      if (!data.subject) {
+          alert(gettext("Email subject can not be empty."));
+          return false;
+      } else if (!data.body) {
+          alert(gettext("Email body can not be empty."));
+          return false;
+      }
+
+        // Send the data to the server as an AJAX request. Attach a callback that will
+        // be fired on server's response.
+        $.postWithPrefix(
+            _this.ajax_url + '/' + 'email', $.param(data),
+            function (response) {
+                if (response.status !== 'success') {
+                    console.log('ERROR: ' + response.error);
+
+                    return;
+                }
+
+                _this.showMasterClass(response);
+            }
+        );
+
+    }; // End-of: MasterClassMain.prototype.submitAnswer = function () {
+
+
+    MasterClassMain.prototype.downloadCSV = function () {
         var _this = this,
             data = {'master_class': '0'};
 

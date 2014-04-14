@@ -236,7 +236,11 @@ class MasterClassModule(MasterClassFields, XModule):
                     'status': 'fail',
                     'error': 'Unknown Command!'
                 })
-
+        elif dispatch == 'email':
+            subject = data.get('subject')
+            body =  data.get('body')
+            mail = self.runtime.bulkmail.create(self.course_id, self.runtime.user, 'list', subject, body, location=self.id, to_list=self.passed_registrations)
+            mail.send()
         else:
             return json.dumps({
                 'status': 'fail',
