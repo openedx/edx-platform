@@ -1,14 +1,7 @@
-<%!
-from django.utils.translation import ugettext as _
-%>
 <div class="vert-mod">
-    <ol class="vertical-container">
-        % for idx, item in enumerate(items):
-        <li class="vertical-element is-draggable">
-            <div class="vert vert-${idx}" data-id="${item['id']}">
-                ${item['content']}
-            </div>
-        </li>
-        % endfor
-    </ol>
+% for idx, item in enumerate(items):
+  <div class="vert vert-${idx}" data-id="${item['id']}">
+    ${item['content']}
+  </div>
+% endfor
 </div>
