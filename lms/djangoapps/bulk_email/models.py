@@ -62,6 +62,7 @@ class CourseEmail(Email):
     TO_OPTION_CHOICES = (
         (SEND_TO_MYSELF, 'Myself'),
         (SEND_TO_STAFF, 'Staff and instructors'),
+        (SEND_TO_LIST, 'To list'),
         (SEND_TO_ALL, 'All')
     )
     course_id = models.CharField(max_length=255, db_index=True)
