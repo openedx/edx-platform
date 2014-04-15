@@ -107,6 +107,29 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     });
                     expect(edit_helpers.isShowingModal()).toBeTruthy();
                 });
+            });
+
+            describe("Editing an xmodule", function() {
+                var mockContainerXBlockHtml,
+                    mockXModuleEditor,
+                    newDisplayName = 'New Display Name';
+
+                beforeEach(function () {
+                    edit_helpers.installMockXModule({
+                        data: "<p>Some HTML</p>",
+                        metadata: {
+                            display_name: newDisplayName
+                        }
+                    });
+                });
+
+                afterEach(function() {
+                    edit_helpers.uninstallMockXModule();
+                    edit_helpers.cancelModalIfShowing();
+                });
+
+                mockContainerXBlockHtml = readFixtures('mock/mock-container-xblock.underscore');
+                mockXModuleEditor = readFixtures('mock/mock-xmodule-editor.underscore');
 
                 it('can save changes to settings', function() {
                     var editButtons, modal, mockUpdatedXBlockHtml;
@@ -117,7 +140,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     expect(editButtons.length).toBe(6);
                     editButtons.first().click();
                     create_sinon.respondWithJson(requests, {
-                        html: mockXBlockEditorHtml,
+                        html: mockXModuleEditor,
                         resources: []
                     });
 

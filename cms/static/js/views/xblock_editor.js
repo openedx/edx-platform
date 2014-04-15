@@ -49,6 +49,10 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 return this.$('.editor-with-tabs').length > 0;
             },
 
+            hasCustomButtons: function() {
+                return this.$('.editor-with-buttons').length > 0;
+            },
+
             createMetadataEditor: function() {
                 var metadataEditor,
                     metadataData,
@@ -88,27 +92,36 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 var xblockInfo = this.model,
                     data,
                     saving;
-                data = this.getXBlockData();
-                saving = new NotificationView.Mini({
-                    title: gettext('Saving&hellip;')
-                });
-                saving.show();
-                return xblockInfo.save(data).done(function() {
-                    var success = options.success;
-                    saving.hide();
-                    if (success) {
-                        success();
-                    }
-                });
+                data = this.getXModuleData();
+                if (data) {
+                    saving = new NotificationView.Mini({
+                        title: gettext('Saving&hellip;')
+                    });
+                    saving.show();
+                    return xblockInfo.save(data).done(function() {
+                        var success = options.success;
+                        saving.hide();
+                        if (success) {
+                            success();
+                        }
+                    });
+                }
             },
 
-            getXBlockData: function() {
+            /**
+             * Returns the data saved for the xmodule. Note that this *does not* work for XBlocks.
+             */
+            getXModuleData: function() {
                 var xblock = this.xblock,
                     metadataEditor = this.getMetadataEditor(),
-                    data;
-                data = xblock.save();
-                if (metadataEditor) {
-                    data.metadata = _.extend(data.metadata || {}, this.getChangedMetadata());
+                    data = null;
+                if (xblock.save) {
+                    data = xblock.save();
+                    if (metadataEditor) {
+                        data.metadata = _.extend(data.metadata || {}, this.getChangedMetadata());
+                    }
+                } else {
+                    console.error('Cannot save xblock as it has no save method');
                 }
                 return data;
             },

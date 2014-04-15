@@ -765,34 +765,3 @@ class TestComponentHandler(TestCase):
         self.descriptor.handle = create_response
 
         self.assertEquals(component_handler(self.request, self.usage_id, 'dummy_handler').status_code, status_code)
-
-
-@ddt.ddt
-class TestNativeXBlock(ItemTest):
-    """
-    Test a "native" XBlock (not an XModule shim).
-    """
-
-    @ddt.data(('problem', True), ('acid', False))
-    @ddt.unpack
-    def test_save_cancel_buttons(self, category, include_buttons):
-        """
-        Native XBlocks handle their own persistence, so Studio
-        should not render Save/Cancel buttons for them.
-        """
-        # Create the XBlock
-        resp = self.create_xblock(category=category)
-        self.assertEqual(resp.status_code, 200)
-        native_loc = json.loads(resp.content)['locator']
-
-        # Render the XBlock
-        view_url = '/xblock/{locator}/student_view'.format(locator=native_loc)
-        resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
-        self.assertEqual(resp.status_code, 200)
-
-        # Check that the save and cancel buttons are hidden for native XBlocks,
-        # but shown for XModule shim XBlocks
-        resp_html = json.loads(resp.content)['html']
-        assert_func = self.assertIn if include_buttons else self.assertNotIn
-        assert_func('save-button', resp_html)
-        assert_func('cancel-button', resp_html)

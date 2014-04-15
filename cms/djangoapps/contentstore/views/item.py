@@ -246,10 +246,6 @@ def xblock_view_handler(request, package_id, view_name, tag=None, branch=None, v
                 fragment.content = render_to_string('component.html', {
                     'preview': fragment.content,
                     'label': component.display_name or component.scope_ids.block_type,
-
-                    # Native XBlocks are responsible for persisting their own data,
-                    # so they are also responsible for providing save/cancel buttons.
-                    'show_save_cancel': isinstance(component, xmodule.x_module.XModuleDescriptor),
                 })
         else:
             raise Http404
