@@ -10,6 +10,8 @@ Change Log
 
    * - Date
      - Change  
+   * - 4/15/14
+     - Updated :ref:`Testing Your Course` to include a section on how to :ref:`View Your Live Course`.
    * - 4/11/14
      - Expanded the :ref:`Grades` section to include a topic on interpreting the Student Answer Distribution report. 
    * - 4/7/14
