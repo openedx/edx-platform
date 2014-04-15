@@ -14,11 +14,6 @@ Change Log
      - Updated :ref:`Testing Your Course` to include a section on how to :ref:`View Your Live Course`.
    * - 4/11/14
      - Expanded the :ref:`Grades` section to include a topic on interpreting the Student Answer Distribution report. 
-   * - 4/7/14
-     - Expanded the :ref:`Course Data`, :ref:`Enrollment`, and :ref:`Course_Staffing` sections.
-     - Change  
-   * - 4/7/14
-     - Expanded the :ref:`Course Data`, :ref:`Enrollment`, and :ref:`Course_Staffing` sections.
    * - 04/08/14
      - Updated the chapter :ref:`Working with HTML Components` to reflect the
        new HTML editor. 
@@ -26,8 +21,7 @@ Change Log
      - Expanded the :ref:`Course Data`, :ref:`Enrollment`, and
        :ref:`Course_Staffing` sections.
    * - 04/03/14
-     - Updated the :ref:`Adding Pages to a Course` chapter to reflect ability to
-       :ref:`Show or Hide the Course Wiki Page`.
+     - Updated the :ref:`Adding Pages to a Course` chapter to reflect ability to :ref:`Show or Hide the Course Wiki Page`.
    * - 04/02/14
      - Reorganized the sections :ref:`Building a Course Index` and
        :ref:`Creating Course Content Index` to better reflect the workflow of
@@ -45,12 +39,10 @@ Change Log
      - Updated the :ref:`Adding Pages to a Course` section to reflect feature
        changes.
    * - 3/27/14
-     - Updated the section on :ref:`Beta_Testing` to include the new "batch add"
-       feature.
+     - Updated the section on :ref:`Beta_Testing` to include the new "batch add" feature.
    * - 3/19/14
      - Updated the sections on :ref:`Beta_Testing`, :ref:`Discussions`,
-       :ref:`Grades`, and :ref:`Student Data` with changes to the new Instructor
-       Dashboard.
+       :ref:`Grades`, and :ref:`Student Data` with changes to the new Instructor Dashboard.
    * - 03/17/14
      - Reorganized this document into major sections: 
 
