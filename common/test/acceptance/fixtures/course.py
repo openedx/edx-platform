@@ -272,7 +272,7 @@ class CourseFixture(StudioApiFixture):
         # If the course already exists, this will respond
         # with a 200 and an error message, which we ignore.
         response = self.session.post(
-            STUDIO_BASE_URL + '/course',
+            STUDIO_BASE_URL + '/course/',
             data=self._encode_post_dict(self._course_dict),
             headers=self.headers
         )
