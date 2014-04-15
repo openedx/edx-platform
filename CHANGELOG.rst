@@ -69,6 +69,9 @@ Blades: Add view for field type Dict in Studio. BLD-658.
 
 Blades: Refactor stub implementation of LTI Provider. BLD-601.
 
+LMS: multiple choice features: shuffle, answer-pool, targeted-feedback,
+choice name masking, submission timer
+
 Studio: Added ability to edit course short descriptions that appear on the course catalog page.
 
 LMS: In left accordion and progress page, due dates are now displayed in time

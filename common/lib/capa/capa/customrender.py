@@ -11,6 +11,7 @@ from .registry import TagRegistry
 import logging
 import re
 
+from cgi import escape as cgi_escape
 from lxml import etree
 import xml.sax.saxutils as saxutils
 from .registry import TagRegistry
@@ -98,3 +99,42 @@ class SolutionRenderer(object):
         return etree.XML(html)
 
 registry.register(SolutionRenderer)
+
+#-----------------------------------------------------------------------------
+
+
+class TargetedFeedbackRenderer(object):
+    """
+    A targeted feedback is just a <span>...</span> that is used for displaying an
+    extended piece of feedback to students if they incorrectly answered a question.
+    """
+    tags = ['targetedfeedback']
+
+    def __init__(self, system, xml):
+        self.system = system
+        self.xml = xml
+
+    def get_html(self):
+        """
+        Return the contents of this tag, rendered to html, as an etree element.
+        """
+        html = '<section class="targeted-feedback-span"><span>{}</span></section>'.format(etree.tostring(self.xml))
+        try:
+            xhtml = etree.XML(html)
+        except Exception as err:  # pylint: disable=broad-except
+            if self.system.DEBUG:
+                msg = """
+                    <html>
+                      <div class="inline-error">
+                        <p>Error {err}</p>
+                        <p>Failed to construct targeted feedback from <pre>{html}</pre></p>
+                      </div>
+                    </html>
+                """.format(err=cgi_escape(err), html=cgi_escape(html))
+                log.error(msg)
+                return etree.XML(msg)
+            else:
+                raise
+        return xhtml
+
+registry.register(TargetedFeedbackRenderer)
