@@ -15,8 +15,10 @@ April, 2014
    * - 04/22/14
      - Updated the :ref:`Bulk Email` section with information about the dashboard option to opt out of course email. 
    * - 
-     - In :ref:`Discussions`, corrected the steps to "Create" Discussion
+     - In :ref:`Discussions`, corrected the steps to "Create Discussion
        Categories".
+   * - 
+     - Updated the :ref:`Enrollment` section to reflect feature changes.      
    * - 04/16/14
      - Updated "Transcripts in Additional Languages" in :ref:`Working with Video Components`.
    * -  
@@ -67,7 +69,12 @@ March, 2014
      - Updated the :ref:`Adding Pages to a Course` section to reflect feature
        changes.
    * - 03/27/14
+<<<<<<< HEAD
      - Updated the section on :ref:`Beta_Testing` to include the new "batch add" feature.
+=======
+     - Updated the section on :ref:`Beta_Testing` to include the new "batch add"
+       feature.
+>>>>>>> doc for LMS-2525: feature changes for student enrollment
    * - 03/19/14
      - Updated the sections on :ref:`Beta_Testing`, :ref:`Discussions`,
        :ref:`Grades`, and :ref:`Student Data` with changes to the new Instructor Dashboard.
