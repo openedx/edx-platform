@@ -474,6 +474,7 @@ def course_info(request, course_id):
     staff_access = has_access(request.user, 'staff', course)
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
     reverifications = fetch_reverify_banner_info(request, course_key)
+    studio_url = get_studio_url(course_key, 'course_info')
 
     context = {
         'request': request,
@@ -566,8 +567,8 @@ def course_about(request, course_id):
     course_key = SlashSeparatedCourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'see_exists', course_key)
     registered = registered_for_course(course, request.user)
-    staff_access = has_access(request.user, course, 'staff')
-    studio_url = get_studio_url(course_id, 'settings/details')
+    staff_access = has_access(request.user, 'staff', course)
+    studio_url = get_studio_url(course_key, 'settings/details')
 
     if has_access(request.user, 'load', course):
         course_target = reverse('info', args=[course.id.to_deprecated_string()])
@@ -755,7 +756,6 @@ def submission_history(request, course_id, student_username, location):
 
     try:
         student = User.objects.get(username=student_username)
-        from nose.tools import set_trace; set_trace()
         student_module = StudentModule.objects.get(
             course_id=course_key,
             module_id=usage_key,

@@ -173,15 +173,11 @@ def add_users_to_cohort(request, course_id, cohort_id):
             present.append(username_or_email)
         except User.DoesNotExist:
             unknown.append(username_or_email)
-        except cohorts.CohortConflict as err:
-            conflict.append({'username_or_email': username_or_email,
-                             'msg': str(err)})
 
     return json_http_response({'success': True,
                                'added': added,
                                'changed': changed,
                                'present': present,
-                               'conflict': conflict,
                                'unknown': unknown})
 
 

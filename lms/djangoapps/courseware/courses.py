@@ -14,6 +14,7 @@ from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from static_replace import replace_static_urls
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache
@@ -357,19 +358,19 @@ def get_cms_block_link(block, page):
     assuming that the block is actually cms-backed.
     """
     locator = loc_mapper().translate_location(
-        block.location.course_id, block.location, False, True
+        block.location, False, True
     )
     return "//" + settings.CMS_BASE + locator.url_reverse(page, '')
 
 
-def get_studio_url(course_id, page):
+def get_studio_url(course_key, page):
     """
     Get the Studio URL of the page that is passed in.
     """
     assert(isinstance(course_key, CourseKey))
     course = get_course_by_id(course_key)
     is_studio_course = course.course_edit_method == "Studio"
-    is_mongo_course = modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE
+    is_mongo_course = modulestore().get_modulestore_type(course_key) == MONGO_MODULESTORE_TYPE
     studio_link = None
     if is_studio_course and is_mongo_course:
         studio_link = get_cms_block_link(course, page)
