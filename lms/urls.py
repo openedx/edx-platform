@@ -4,8 +4,13 @@ from ratelimitbackend import admin
 from django.conf.urls.static import static
 
 import django.contrib.auth.views
-
 from microsite_configuration import microsite
+import analytics
+
+# Initialize Segment.io analytics module. Flushes first time a message is received and 
+# every 50 messages thereafter, or if 10 seconds have passed since last flush
+if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+    analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):

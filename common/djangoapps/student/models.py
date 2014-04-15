@@ -43,6 +43,7 @@ from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from opaque_keys.edx.keys import CourseKey
 from functools import total_ordering
 
+enrollment_change = Signal(providing_args=["action", "user_id", "org", "course", "run", "mode"])
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -705,6 +706,15 @@ class CourseEnrollment(models.Model):
 
             else:
                 unenroll_done.send(sender=None, course_enrollment=self)
+                enrollment_change.send(
+                    sender=CourseEnrollment,
+                    action='unenroll',
+                    user_id=self.user_id,
+                    org=course_id_dict['org'],
+                    course=course_id_dict['course'],
+                    run=course_id_dict['name'],
+                    mode=self.mode
+                )
 
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
 
@@ -755,9 +765,22 @@ class CourseEnrollment(models.Model):
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
+
+        Also emits relevant events for analytics purposes.
         """
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
+
+        course_traits = course_id.split('/')
+        enrollment_change.send(
+            sender=CourseEnrollment,
+            action='enroll',
+            user_id=user.id,
+            org=course_traits[0],
+            course=course_traits[1],
+            run=course_traits[2],
+            mode=mode
+        )
         return enrollment
 
     @classmethod

@@ -128,6 +128,9 @@ splinter==0.5.4
 testtools==0.9.34
 flaky==0.2.0
 
+# Used for Segment.io analytics
+analytics-python==0.4.4
+
 git+https://github.com/mfogel/django-settings-context-processor.git
 
 # django-cas version 2.0.3 with patch to be compatible with django 1.4
