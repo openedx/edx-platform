@@ -11,6 +11,7 @@ from webob import Response
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.core.urlresolvers import reverse
 
 from contentstore.views.component import component_handler
 
@@ -20,9 +21,9 @@ from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
+from xmodule.modulestore.keys import UsageKey
 
 
 class ItemTest(CourseTestCase):
@@ -30,21 +31,15 @@ class ItemTest(CourseTestCase):
     def setUp(self):
         super(ItemTest, self).setUp()
 
-        self.course_locator = loc_mapper().translate_location(self.course.location, False, True)
-        self.unicode_locator = unicode(self.course_locator)
-
-    def get_old_id(self, locator):
-        """
-        Converts new locator to old id format (forcing to non-draft).
-        """
-        return loc_mapper().translate_locator_to_location(BlockUsageLocator.from_string(locator)).replace(revision=None)
+        self.course_key = self.course.id
+        self.unicode_usage_key = unicode(self.course.location)
 
     def get_item_from_modulestore(self, locator, draft=False):
         """
         Get the item referenced by the locator from the modulestore
         """
         store = modulestore('draft') if draft else modulestore('direct')
-        return store.get_item(self.get_old_id(locator))
+        return store.get_item(UsageKey.from_string(locator))
 
     def response_locator(self, response):
         """
@@ -56,14 +51,14 @@ class ItemTest(CourseTestCase):
 
     def create_xblock(self, parent_locator=None, display_name=None, category=None, boilerplate=None):
         data = {
-            'parent_locator': self.unicode_locator if parent_locator is None else parent_locator,
+            'parent_locator': self.unicode_usage_key if parent_locator is None else parent_locator,
             'category': category
         }
         if display_name is not None:
             data['display_name'] = display_name
         if boilerplate is not None:
             data['boilerplate'] = boilerplate
-        return self.client.ajax_post('/xblock', json.dumps(data))
+        return self.client.ajax_post(reverse('contentstore.views.xblock_handler'), json.dumps(data))
 
 
 class GetItem(ItemTest):
@@ -81,7 +76,9 @@ class GetItem(ItemTest):
         """
         Returns the HTML and resources required for the xblock at the specified locator
         """
-        preview_url = '/xblock/{locator}/container_preview'.format(locator=locator)
+        preview_url = reverse("contentstore.views.xblock_view_handler",
+                              kwargs={'usage_key_string': unicode(locator), 'view_name': 'container_preview'}
+        )
         resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
         resp_content = json.loads(resp.content)
@@ -98,7 +95,8 @@ class GetItem(ItemTest):
 
         # Retrieve it
         resp_content = json.loads(resp.content)
-        resp = self.client.get('/xblock/' + resp_content['locator'])
+        resp = self.client.get(reverse('contentstore.views.xblock_handler',
+            kwargs={'usage_key_string': resp_content['locator']}))
         self.assertEqual(resp.status_code, 200)
 
     def test_get_empty_container_fragment(self):
@@ -182,7 +180,10 @@ class DeleteItem(ItemTest):
 
         # Now delete it. There was a bug that the delete was failing (static tabs do not exist in draft modulestore).
         resp_content = json.loads(resp.content)
-        resp = self.client.delete('/xblock/' + resp_content['locator'])
+        resp = self.client.delete(reverse('contentstore.views.xblock_handler',
+            kwargs={'usage_key_string': resp_content['locator']})
+        )
+
         self.assertEqual(resp.status_code, 204)
 
 
@@ -208,8 +209,8 @@ class TestCreateItem(ItemTest):
         self.assertEqual(new_obj.location.course, self.course.location.course)
 
         # get the course and ensure it now points to this one
-        course = self.get_item_from_modulestore(self.unicode_locator)
-        self.assertIn(self.get_old_id(chap_locator).url(), course.children)
+        course = self.get_item_from_modulestore(self.unicode_usage_key)
+        self.assertIn(UsageKey.from_string(chap_locator), course.children)
 
         # use default display name
         resp = self.create_xblock(parent_locator=chap_locator, category='vertical')
@@ -259,7 +260,7 @@ class TestDuplicateItem(ItemTest):
         """ Creates the test course structure and a few components to 'duplicate'. """
         super(TestDuplicateItem, self).setUp()
         # Create a parent chapter (for testing children of children).
-        resp = self.create_xblock(parent_locator=self.unicode_locator, category='chapter')
+        resp = self.create_xblock(parent_locator=self.unicode_usage_key, category='chapter')
         self.chapter_locator = self.response_locator(resp)
 
         # create a sequential containing a problem and an html component
@@ -318,7 +319,7 @@ class TestDuplicateItem(ItemTest):
         duplicate_and_verify(self.problem_locator, self.seq_locator)
         duplicate_and_verify(self.html_locator, self.seq_locator)
         duplicate_and_verify(self.seq_locator, self.chapter_locator)
-        duplicate_and_verify(self.chapter_locator, self.unicode_locator)
+        duplicate_and_verify(self.chapter_locator, self.unicode_usage_key)
 
     def test_ordering(self):
         """
@@ -356,7 +357,7 @@ class TestDuplicateItem(ItemTest):
 
         # Test duplicating something into a location that is not the parent of the original item.
         # Duplicated item should appear at the end.
-        verify_order(self.html_locator, self.unicode_locator)
+        verify_order(self.html_locator, self.unicode_usage_key)
 
     def test_display_name(self):
         """
@@ -417,7 +418,7 @@ class TestEditItem(ItemTest):
         self.problem_locator = self.response_locator(resp)
         self.problem_update_url = '/xblock/' + self.problem_locator
 
-        self.course_update_url = '/xblock/' + self.unicode_locator
+        self.course_update_url = '/xblock/' + self.unicode_usage_key
 
     def test_delete_field(self):
         """
@@ -479,7 +480,7 @@ class TestEditItem(ItemTest):
         chapter1_locator = self.response_locator(resp_1)
         chapter2_locator = self.response_locator(resp_2)
 
-        course = self.get_item_from_modulestore(self.unicode_locator)
+        course = self.get_item_from_modulestore(self.unicode_usage_key)
         self.assertIn(self.get_old_id(chapter1_locator).url(), course.children)
         self.assertIn(self.get_old_id(chapter2_locator).url(), course.children)
 
@@ -491,7 +492,7 @@ class TestEditItem(ItemTest):
         self.assertEqual(resp.status_code, 200)
 
         # Verify that the child is removed.
-        course = self.get_item_from_modulestore(self.unicode_locator)
+        course = self.get_item_from_modulestore(self.unicode_usage_key)
         self.assertNotIn(self.get_old_id(chapter1_locator).url(), course.children)
         self.assertIn(self.get_old_id(chapter2_locator).url(), course.children)
 
