@@ -39,9 +39,9 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
         if header_key is None:
             try:
                 header_key = request.META['headers'].get('X-Edx-Api-Key')
-                if header_key is None:
-                 return False
             except KeyError:
+                return False
+            if header_key is None:
                 return False
 
         # The api key values need to be the same
