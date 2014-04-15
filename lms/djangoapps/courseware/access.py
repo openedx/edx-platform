@@ -426,7 +426,7 @@ def _has_access_to_location(user, access_level, location, course_id):
 
     staff_access = (
         CourseStaffRole(course_id).has_user(user) or
-        OrgStaffRole(course_id).has_user(user)
+        OrgStaffRole(course_id.org).has_user(user)
     )
 
     if staff_access and access_level == 'staff':
@@ -435,7 +435,7 @@ def _has_access_to_location(user, access_level, location, course_id):
 
     instructor_access = (
         CourseInstructorRole(course_id).has_user(user) or
-        OrgInstructorRole(course_id).has_user(user)
+        OrgInstructorRole(course_id.org).has_user(user)
     )
 
     if instructor_access and access_level in ('staff', 'instructor'):

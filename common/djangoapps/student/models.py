@@ -975,16 +975,26 @@ class CourseAccessRole(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True, blank=True, null=True)
     role = models.CharField(max_length=64, db_index=True)
 
+    class Meta:
+        unique_together = (('user', 'org', 'course_id', 'role'),)
+
+    @property
+    def _key(self):
+        """
+        convenience function to make eq overrides easier and clearer
+        """
+        return (self.user, self.org, self.course_id, self.role)
+
     def __eq__(self, other):
-        return self.user == other.user and self.role == other.role and self.org == other.org and self.course_id == other.course_id
+        return self._key == other._key
 
 
     def __ne__(self, other):
-        return self.user != other.user or self.role != other.role or self.org != other.org or self.course_id != other.course_id
+        return self._key != other._key
 
 
     def __hash__(self):
-        return hash(self.user) + hash(self.role) + hash(self.org) + hash(self.course_id)
+        return hash(self._key)
 
 
 #### Helper methods for use from python manage.py shell and other classes.

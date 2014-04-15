@@ -84,7 +84,7 @@ class OrgStaffFactory(UserFactory):
     def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a course location for an org-staff user")
-        OrgStaffRole(extracted).add_users(self)
+        OrgStaffRole(extracted.org).add_users(self)
 
 
 class OrgInstructorFactory(UserFactory):
@@ -98,7 +98,7 @@ class OrgInstructorFactory(UserFactory):
     def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a course location for an org-instructor user")
-        OrgInstructorRole(extracted).add_users(self)
+        OrgInstructorRole(extracted.org).add_users(self)
 
 
 class GlobalStaffFactory(UserFactory):
