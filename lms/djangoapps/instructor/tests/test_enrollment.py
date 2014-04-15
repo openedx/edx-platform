@@ -9,6 +9,7 @@ from courseware.models import StudentModule
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.test.client import RequestFactory
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -407,17 +408,19 @@ class TestGetEmailParams(TestCase):
         site = settings.SITE_NAME
         self.course_url = u'https://{}/courses/{}/'.format(
             site,
-            self.course.id
+            self.course.id.to_deprecated_string()
         )
         self.course_about_url = self.course_url + 'about'
         self.registration_url = u'https://{}/register'.format(
             site,
         )
 
+        self.request = RequestFactory().request()
+
     def test_normal_params(self):
         # For a normal site, what do we expect to get for the URLs?
         # Also make sure `auto_enroll` is properly passed through.
-        result = get_email_params(self.course, False)
+        result = get_email_params(self.request, self.course, False)
 
         self.assertEqual(result['auto_enroll'], False)
         self.assertEqual(result['course_about_url'], self.course_about_url)
@@ -428,7 +431,7 @@ class TestGetEmailParams(TestCase):
         # For a site with a marketing front end, what do we expect to get for the URLs?
         # Also make sure `auto_enroll` is properly passed through.
         with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            result = get_email_params(self.course, True)
+            result = get_email_params(self.request, self.course, True)
 
         self.assertEqual(result['auto_enroll'], True)
         # We should *not* get a course about url (LMS doesn't know what the marketing site URLs are)

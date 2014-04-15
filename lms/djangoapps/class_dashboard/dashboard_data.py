@@ -11,6 +11,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from analytics.csvs import create_csv_response
 
+from xmodule.modulestore import Location
+
 # Used to limit the length of list displayed to the screen.
 MAX_SCREEN_LIST_LENGTH = 250
 
@@ -415,12 +417,12 @@ def get_students_opened_subsection(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames for CSV download.
     """
-    module_id = request.GET.get('module_id')
+    module_id = Location.from_deprecated_string(request.GET.get('module_id'))
     csv = request.GET.get('csv')
 
     # Query for "opened a subsection" students
     students = models.StudentModule.objects.select_related('student').filter(
-        module_state_key__exact=module_id,
+        module_id__exact=module_id,
         module_type__exact='sequential',
     ).values('student__username', 'student__profile__name').order_by('student__profile__name')
 
@@ -465,12 +467,12 @@ def get_students_problem_grades(request, csv=False):
     If 'csv' is True, returns a header array, and an array of arrays in the format:
     student names, usernames, grades, percents for CSV download.
     """
-    module_id = request.GET.get('module_id')
+    module_id = Location.from_deprecated_string(request.GET.get('module_id'))
     csv = request.GET.get('csv')
 
     # Query for "problem grades" students
     students = models.StudentModule.objects.select_related('student').filter(
-        module_state_key__exact=module_id,
+        module_id__exact=module_id,
         module_type__exact='problem',
         grade__isnull=False,
     ).values('student__username', 'student__profile__name', 'grade', 'max_grade').order_by('student__profile__name')
