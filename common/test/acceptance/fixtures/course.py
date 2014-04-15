@@ -221,7 +221,7 @@ class CourseFixture(StudioApiFixture):
         """
         Add the asset to the list of assets to be uploaded when the install method is called.
         """
-        self._assets.append(asset_name)
+        self._assets.extend(asset_name)
 
     def install(self):
         """
@@ -312,7 +312,7 @@ class CourseFixture(StudioApiFixture):
             details = response.json()
         except ValueError:
             raise CourseFixtureError(
-                "Could not decode course details as JSON: '{0}'".format(old_details)
+                "Could not decode course details as JSON: '{0}'".format(details)
             )
 
         # Update the old details with our overrides

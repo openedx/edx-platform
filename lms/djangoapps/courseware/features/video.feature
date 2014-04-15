@@ -89,56 +89,6 @@ Feature: LMS.Video component
     And I see "Hi, welcome to Edx." text in the captions
 
   # 8
-  Scenario: CC button works correctly w/o english transcript in HTML5 mode of Video component
-    Given I am registered for the course "test_course"
-    And I have a "chinese_transcripts.srt" transcript file in assets
-    And it has a video in "HTML5" mode:
-      | transcripts                       |
-      | {"zh": "chinese_transcripts.srt"} |
-    And I make sure captions are opened
-    Then I see "好 各位同学" text in the captions
-
-  # 9
-  Scenario: CC button works correctly only w/ english transcript in HTML5 mode of Video component
-    Given I am registered for the course "test_course"
-    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-    And it has a video in "HTML5" mode:
-      | sub         |
-      | OEoXaMPEzfM |
-    And I make sure captions are opened
-    Then I see "Hi, welcome to Edx." text in the captions
-
-  # 10
-  Scenario: Video is aligned correctly if transcript is visible in fullscreen mode
-    Given I am registered for the course "test_course"
-    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-    And it has a video in "HTML5" mode:
-      | sub         |
-      | OEoXaMPEzfM |
-    And I make sure captions are opened
-    And I click video button "fullscreen"
-    Then I see video aligned correctly with enabled transcript
-
-  # 11
-  Scenario: Video is aligned correctly if transcript is hidden in fullscreen mode
-    Given the course has a Video component in "Youtube" mode
-    And I click video button "fullscreen"
-    Then I see video aligned correctly without enabled transcript
-
-  # 12
-  Scenario: Video is aligned correctly on transcript toggle in fullscreen mode
-    Given I am registered for the course "test_course"
-    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-    And it has a video in "Youtube" mode:
-      | sub         |
-      | OEoXaMPEzfM |
-    And I make sure captions are opened
-    And I click video button "fullscreen"
-    Then I see video aligned correctly with enabled transcript
-    And I click video button "CC"
-    Then I see video aligned correctly without enabled transcript
-
-  # 13
   Scenario: Download Transcript button works correctly in Video component
     Given I am registered for the course "test_course"
     And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
@@ -160,7 +110,7 @@ Feature: LMS.Video component
     When I open video "C"
     Then menu "download_transcript" doesn't exist
 
-  # 14
+  # 9
   Scenario: Youtube video has correct transcript if fields for other speeds are filled.
     Given I am registered for the course "test_course"
     And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
@@ -178,55 +128,7 @@ Feature: LMS.Video component
     # "1:56" is the duration in the VCR timer before the video plays.
     And I see duration "1:56"
 
-  # 15
-   Scenario: Download button works correctly for non-english transcript in Youtube mode of Video component
-    Given I am registered for the course "test_course"
-    And I have a "chinese_transcripts.srt" transcript file in assets
-    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-    And it has a video in "Youtube" mode:
-      | transcripts                       | sub         | download_track |
-      | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
-    And I see "Hi, welcome to Edx." text in the captions
-    Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
-    And I select language with code "zh"
-    And I see "好 各位同学" text in the captions
-    Then I can download transcript in "srt" format that has text "好 各位同学"
-
-  # 16
-   Scenario: Download button works correctly for non-english transcript in HTML5 mode of Video component
-    Given I am registered for the course "test_course"
-    And I have a "chinese_transcripts.srt" transcript file in assets
-    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-    And it has a video in "HTML5" mode:
-      | transcripts                       | sub         | download_track |
-      | {"zh": "chinese_transcripts.srt"} | OEoXaMPEzfM | true           |
-    And I see "Hi, welcome to Edx." text in the captions
-    Then I can download transcript in "srt" format that has text "Hi, welcome to Edx."
-    And I select language with code "zh"
-    And I see "好 各位同学" text in the captions
-    Then I can download transcript in "srt" format that has text "好 各位同学"
-
-  # 17
-  Scenario: Download button works correctly w/o english transcript in HTML5 mode of Video component
-    Given I am registered for the course "test_course"
-    And I have a "chinese_transcripts.srt" transcript file in assets
-    And it has a video in "HTML5" mode:
-      | transcripts                       | download_track |
-      | {"zh": "chinese_transcripts.srt"} | true           |
-    And I see "好 各位同学" text in the captions
-    Then I can download transcript in "srt" format that has text "好 各位同学"
-
-  # 18
-  Scenario: Download button works correctly w/o english transcript in Youtube mode of Video component
-    Given I am registered for the course "test_course"
-    And I have a "chinese_transcripts.srt" transcript file in assets
-    And it has a video in "Youtube" mode:
-      | transcripts                       | download_track |
-      | {"zh": "chinese_transcripts.srt"} | true           |
-    And I see "好 各位同学" text in the captions
-    Then I can download transcript in "srt" format that has text "好 各位同学"
-
-  # 19
+  # 10
   Scenario: Verify that each video in each sub-section includes a transcript for non-Youtube countries.
     Given youtube server is up and response time is 2 seconds
     And I am registered for the course "test_course"
@@ -255,7 +157,7 @@ Feature: LMS.Video component
     Then the video has rendered in "HTML5" mode
     And the video does not show the captions
 
-  # 20
+  # 11
   Scenario: Start time works for Youtube video
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -264,7 +166,7 @@ Feature: LMS.Video component
     And I click video button "play"
     Then I see video slider at "0:10" position
 
-  # 21
+  # 12
   Scenario: End time works for Youtube video
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -274,7 +176,7 @@ Feature: LMS.Video component
     And I wait "5" seconds
     Then I see video slider at "0:02" position
 
-  # 22
+  # 13
   Scenario: Youtube video with end-time at 1:00 and the video starts playing at 0:58
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -286,7 +188,7 @@ Feature: LMS.Video component
     And I wait "5" seconds
     Then I see video slider at "1:00" position
 
-  # 23
+  # 14
   Scenario: Start time and end time work together for Youtube video
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -297,7 +199,7 @@ Feature: LMS.Video component
     And I wait "5" seconds
     Then I see video slider at "0:12" position
 
-  # 24
+  # 15
   Scenario: Youtube video after pausing at end time video plays to the end from end time
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -312,7 +214,7 @@ Feature: LMS.Video component
     # The default video length is 00:01:55.
     Then I see video slider at "1:55" position
 
-  # 25
+  # 16
   Scenario: Youtube video with end-time at 0:32 and start-time at 0:30, the video starts playing from 0:28
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -324,7 +226,7 @@ Feature: LMS.Video component
     And I wait "8" seconds
     Then I see video slider at "0:32" position
 
-  # 26
+  # 17
   Scenario: Youtube video with end-time at 1:00, the video starts playing from 1:52
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -337,7 +239,7 @@ Feature: LMS.Video component
     # Video stops at the end.
     Then I see video slider at "1:55" position
 
-  # 27
+  # 18
   @skip_firefox
   Scenario: Quality button appears on play
     Given the course has a Video component in "Youtube" mode
@@ -345,7 +247,7 @@ Feature: LMS.Video component
     And I click video button "play"
     Then I see video button "quality" is visible
 
-  # 28
+  # 19
   @skip_firefox
   Scenario: Quality button works correctly
     Given the course has a Video component in "Youtube" mode
