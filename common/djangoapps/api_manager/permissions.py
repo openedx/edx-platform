@@ -35,9 +35,14 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
             return False
 
         # The client needs to present the same api key
-        header_key = request.META['headers'].get('X-Edx-Api-Key')
+        header_key = request.META.get('HTTP_X_EDX_API_KEY')
         if header_key is None:
-            return False
+            try:
+                header_key = request.META['headers'].get('X-Edx-Api-Key')
+                if header_key is None:
+                 return False
+            except KeyError:
+                return False
 
         # The api key values need to be the same
         if header_key != api_key:
