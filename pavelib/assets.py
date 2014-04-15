@@ -10,6 +10,7 @@ import glob
 import traceback
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
+from .utils.thread import run_threaded
 
 COFFEE_DIRS = ['lms', 'cms', 'common']
 SASS_LOAD_PATHS = ['./common/static/sass']
@@ -146,8 +147,10 @@ def compile_templated_sass(systems, settings):
     `systems` is a list of systems (e.g. 'lms' or 'studio' or both)
     `settings` is the Django settings module to use.
     """
-    for sys in systems:
-        sh(django_cmd(sys, settings, 'preprocess_assets'))
+    run_threaded([
+        (sh, [django_cmd(sys, settings, 'preprocess_assets')])
+        for sys in systems
+    ])
 
 
 def process_xmodule_assets():
@@ -163,8 +166,10 @@ def collect_assets(systems, settings):
     `systems` is a list of systems (e.g. 'lms' or 'studio' or both)
     `settings` is the Django settings module to use.
     """
-    for sys in systems:
-        sh(django_cmd(sys, settings, "collectstatic --noinput > /dev/null"))
+    run_threaded([
+        (sh, [django_cmd(sys, settings, "collectstatic --noinput > /dev/null")])
+        for sys in systems
+    ])
 
 
 @task
@@ -221,11 +226,13 @@ def update_assets(args):
         help="Watch files for changes",
     )
     args = parser.parse_args(args)
-
+    # this needs to run before other files are processed
     compile_templated_sass(args.system, args.settings)
-    process_xmodule_assets()
-    compile_coffeescript()
-    compile_sass(args.debug)
+    run_threaded([
+        process_xmodule_assets,
+        compile_coffeescript,
+        (compile_sass, (args.debug,)),
+    ])
 
     if args.collect:
         collect_assets(args.system, args.settings)
