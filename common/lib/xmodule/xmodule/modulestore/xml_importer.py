@@ -489,7 +489,7 @@ def remap_namespace(module, target_course_id):
         for entry in module.pdf_textbooks:
             for chapter in entry.get('chapters', []):
                 if StaticContent.is_c4x_path(chapter.get('url', '')):
-                    asset_key = AssetKey.from_string(chapter['url'])
+                    asset_key = StaticContent.get_location_from_path(chapter['url'])
                     chapter['url'] = unicode(asset_key.map_into_course(target_course_id))
 
         # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
