@@ -299,8 +299,8 @@ class AssetLocation(LocationBase, AssetKey):
     DEPRECATED_TAG = 'c4x'
     __slots__ = LocationBase.KEY_FIELDS
 
-    def __init__(self, org, course, run, asset_type, path, revision=None):
-        super(AssetLocation, self).__init__(org, course, run, asset_type, path, revision)
+    def __init__(self, org, course, run, category, name, revision=None):
+        super(AssetLocation, self).__init__(org, course, run, category, name, revision)
 
     @property
     def path(self):
