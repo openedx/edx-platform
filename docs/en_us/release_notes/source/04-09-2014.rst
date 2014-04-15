@@ -1,9 +1,9 @@
 ###################################
-April 9, 2014
+April 15, 2014
 ###################################
 
 The following information reflects what is new in the edX Platform as of April
-9, 2014.  See previous pages in this document for a history of changes.
+15, 2014.  See previous pages in this document for a history of changes.
 
 **************************
 edX Documentation
@@ -25,14 +25,6 @@ The following documentation is available:
 
   * Updated `Working with HTML Components <http://edx.readthedocs.org/projects/ca/en/latest/creating_content/create_html_component.html>`_ to reflect the new HTML editor. 
 
-
-* `edX Data Documentation
-  <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
-
-  Recent changes include:
-
-  *  
-
 * `edX Platform Developer Documentation
   <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
 
@@ -41,8 +33,6 @@ The following documentation is available:
   *  Added the `Custom JavaScript Display and Grading <http://edx.readthedocs.or
      g/projects/userdocs/en/latest/extending_platform/javascript.html>`_
      chapter.
-
-
 
 *************
 edX Studio
@@ -61,17 +51,17 @@ edX Studio
 edX Learning Management System
 ***************************************
 
+* New **View {page} in Studio** buttons are available in the LMS **Staff View** to make navigating between a live course and Studio easier.
+
+.. image:: /images/Live_Course_Staff_View.png
+  :alt: Image of the Courseware page in a live course with Staff View indicated at top right and a View Unit in Studio button
+
+For more information, see :ref:`View Your Live Course`.
+
 * A problem that prevented course staff from deleting the student's state for an XBlock in the Beta Instructor Dashboard is now resolved. (LMS-2491)
 
-* (LMS-2474)
+* All error messages that can be produced when a problem is submitted for grading are now correctly written in Javascript. These messages can now be read by screen readers, and no longer cause exception errors. (LMS-2474)
 
 * Video transcripts are now displayed in their source language. (BLD-935)
 
-* (BLD-958)
-
-
-***************************************
-edX Discussions
-***************************************
-
-* (FOR-542)
+* Video transcripts are now available for all video speeds in Firefox. (BLD-958)
