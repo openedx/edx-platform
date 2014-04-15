@@ -84,15 +84,15 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         # Test that importing course with unicode 'id' and 'display name' doesn't give UnicodeEncodeError
         """
         module_store = modulestore('direct')
-        target_location = Location(['i4x', u'Юникода', 'unicode_course', 'course', u'échantillon'])
+        course_id = CourseKey.from_string(u'Юникода/unicode_course/échantillon')
         import_from_xml(
             module_store,
             'common/test/data/',
             ['2014_Uni'],
-            target_location_namespace=target_location
+            target_course_id=course_id
         )
 
-        course = module_store.get_item(target_location)
+        course = module_store.get_course(course_id)
         self.assertIsNotNone(course)
 
         # test that course 'display_name' same as imported course 'display_name'
@@ -194,7 +194,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             target_course_id=target_course_id
         )
         peergrading_module = module_store.get_item(
-            Location('testX', 'peergrading_copy', 'copy_run', 'peergrading', 'PeerGradingLinked')
+            target_course_id.make_usage_key('peergrading', 'PeerGradingLinked')
         )
         self.assertIsNotNone(peergrading_module)
         self.assertEqual(
@@ -204,7 +204,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_rewrite_reference_value_dict(self):
         module_store = modulestore('direct')
-        target_course_id = CourseKey.from_string('testX/peergrading_copy/copy_run')
+        target_course_id = CourseKey.from_string('testX/split_test_copy/copy_run')
         import_from_xml(
             module_store,
             'common/test/data/',
@@ -212,7 +212,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             target_course_id=target_course_id
         )
         split_test_module = module_store.get_item(
-            Location('testX', 'split_test_copy', 'copy_run', 'split_test', 'split1'])
+            target_course_id.make_usage_key('split_test', 'split1')
         )
         self.assertIsNotNone(split_test_module)
         self.assertEqual(

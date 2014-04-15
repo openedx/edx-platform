@@ -58,20 +58,13 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
         rest = match.group('rest')
         return quote + '/jump_to_id/' + rest + quote
 
-    def generic_courseware_link_substitution(match):
-        return u'{quote}/courses/{course_id}/{rest}{quote}'.format(
-            quote=match.group('quote'),
-            course_id=dest_course_id,
-            rest=match.group('rest')
-        )
-
     # NOTE: ultimately link updating is not a hard requirement, so if something blows up with
-    # the regex subsitution, log the error and continue
+    # the regex substitution, log the error and continue
     c4x_link_base = StaticContent.get_base_url_path_for_course_assets(source_course_id)
     try:
         text = re.sub(_prefix_only_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
     except Exception as e:
-        logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", c4x_link_base, text, str(e))
+        logging.warning("Error going regex substitution %r on text = %r.\n\nError msg = %s", c4x_link_base, text, str(e))
 
     jump_to_link_base = u'/courses/{course_key:s}/jump_to/i4x://{course_key.org}/{course_key.course}/'.format(
         course_key=source_course_id
@@ -79,7 +72,7 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     try:
         text = re.sub(_prefix_and_category_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
     except Exception as e:
-        logging.warning("Error on regex substituion %r for text = %r.\n\nError msg = %s", jump_to_link_base, text, str(e))
+        logging.warning("Error on regex substitution %r for text = %r.\n\nError msg = %s", jump_to_link_base, text, str(e))
 
     # Also, there commonly is a set of link URL's used in the format:
     # /courses/<org>/<course>/<name> which will be broken if migrated to a different course_id
@@ -89,10 +82,10 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     #
     if source_course_id != dest_course_id:
         try:
-            generic_courseware_link_base = u'/courses/{org}/{course}/{name}/'.format(**course_id_dict)
+            generic_courseware_link_base = u'/courses/{}/'.format(source_course_id.to_deprecated_string())
             text = re.sub(_prefix_only_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)
         except Exception as e:
-            logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", generic_courseware_link_base, text, str(e))
+            logging.warning("Error going regex substitution %r on text = %r.\n\nError msg = %s", source_course_id, text, str(e))
 
     return text
 

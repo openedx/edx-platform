@@ -8,7 +8,7 @@ from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleDescriptor
-from xmodule.modulestore.keys import UsageKey
+from xmodule.modulestore.keys import UsageKey, AssetKey
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
@@ -176,11 +176,11 @@ def import_from_xml(
                 if module.scope_ids.block_type == 'course':
                     course_data_path = path(data_dir) / module.data_dir
 
-                    log.debug('======> IMPORTING course {course_id}'.format(
-                        course_id=module.id.to_deprecated_string(),
+                    log.debug(u'======> IMPORTING course {course_id}'.format(
+                        course_id=course_id,
                     ))
 
-                    module = remap_namespace(module, target_course_id)
+                    module = remap_namespace(module, dest_course_id)
 
                     if not do_import_static:
                         # for old-style xblock where this was actually linked to kvs
@@ -476,12 +476,14 @@ def remap_namespace(module, target_course_id):
 
     original_location = module.location
 
-    # This looks a bit wonky as we need to also change the 'name' of the
-    # imported course to be what the caller passed in
     module.location = module.location.map_into_course(target_course_id)
     if module.location.definition_key.block_type == 'course':
         # There is more re-namespacing work we have to do when
         # importing course modules
+
+        # This looks a bit wonky as we need to also change the 'name' of the
+        # imported course to be what the caller passed in
+        module.location = module.location.replace(name=target_course_id.run)
 
         # remap pdf_textbook urls
         for entry in module.pdf_textbooks:
@@ -493,17 +495,17 @@ def remap_namespace(module, target_course_id):
         # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
         # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
         # values then remap it so that the wiki does not point to the old wiki.
-        if original_location.course_id != target_course_id:
+        if original_location.course_key != target_course_id:
             original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
                 original_location.org,
                 original_location.course,
-                original_location.name
+                original_location.run
             )
             if module.wiki_slug == original_unique_wiki_slug or module.wiki_slug == original_location.course:
                 module.wiki_slug = u'{0}.{1}.{2}'.format(
                     target_course_id.org,
                     target_course_id.course,
-                    target_course_id.name,
+                    target_course_id.run,
                 )
 
         module.save()
@@ -520,18 +522,15 @@ def remap_namespace(module, target_course_id):
 
         Otherwise, returns the input value.
         """
+        if isinstance(reference, basestring):
+            reference = Location.from_deprecated_string(reference)
         new_ref = reference
-        ref = Location(reference)
-        in_original_namespace = (original_location.tag == ref.tag and
-                                 original_location.org == ref.org and
-                                 original_location.course == ref.course)
+
+        in_original_namespace = (original_location.org == reference.org and
+                                 original_location.course == reference.course)
         if in_original_namespace:
-            new_ref = ref.replace(
-                tag=target_course_id.tag,
-                org=target_course_id.org,
-                course=target_course_id.course
-            ).url()
-        return new_ref
+            new_ref = reference.map_into_course(target_course_id)
+        return new_ref.to_deprecated_string()
 
     for field_name in all_fields:
         field_object = module.fields.get(field_name)
