@@ -717,7 +717,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             if announcement and (now - announcement).days < 30:
                 # The course has been announced for less that month
                 return True
-            elif (now - start).days < 1:
+            elif (now - start).days < 30:
                 # The course has not started yet
                 return True
             else:
