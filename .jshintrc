@@ -108,5 +108,30 @@
     //
     // The parameter "predef" should remain empty for this configuration file
     // to remain as general as possible.
-    "predef": []
+    "predef": [
+        // jQuery library.
+        "jQuery", "$",
+
+        // Underscore.js library.
+        "_",
+
+        // Jasmine library.
+        "jasmine",
+        "describe", "xdescribe",
+        "it", "xit",
+        "spyOn",
+        "beforeEach",
+        "afterEach",
+        "expect",
+        "waitsFor",
+        "runs",
+
+        // jQuery-Jasmine library.
+        "loadFixtures",
+        "appendLoadFixtures",
+        "readFixtures",
+        "setFixtures",
+        "appendSetFixtures",
+        "spyOnEvent"
+    ]
 }
