@@ -4,7 +4,7 @@ Test CRUD for authorization.
 import copy
 
 from django.test.utils import override_settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
@@ -52,10 +52,10 @@ class TestCourseAccess(ModuleStoreTestCase):
         )
         self.client.ajax_post(course_url,
             {
-                'org': 'myu',
-                'number': 'mydept.mycourse',
+                'org': self.course_key.org,
+                'number': self.course_key.course,
                 'display_name': 'My favorite course',
-                'run': 'myrun',
+                'run': self.course_key.run,
             }
         )
 
@@ -100,18 +100,14 @@ class TestCourseAccess(ModuleStoreTestCase):
         for role in [CourseInstructorRole, CourseStaffRole]:
             user_by_role[role] = []
             # pylint: disable=protected-access
-            groupnames = role(self.course_key)._group_names
-            self.assertEqual(len(groupnames), 1)
+            group = role(self.course_key)
             # NOTE: this loop breaks the roles.py abstraction by purposely assigning
             # users to one of each possible groupname in order to test that has_course_access
             # and remove_user work
-            for groupname in groupnames:
-                group, _ = Group.objects.get_or_create(name=groupname)
-                user = users.pop()
-                user_by_role[role].append(user)
-                user.groups.add(group)
-                user.save()
-                self.assertTrue(has_course_access(user, self.course_key), "{} does not have access".format(user))
+            user = users.pop()
+            group, _ = group.add_users(user)
+            user_by_role[role].append(user)
+            self.assertTrue(has_course_access(user, self.course_key), "{} does not have access".format(user))
 
         course_team_url = reverse(
              'contentstore.views.course_team_handler',
@@ -137,8 +133,8 @@ class TestCourseAccess(ModuleStoreTestCase):
                 # forcefully decache the groups: premise is that any real request will not have
                 # multiple objects repr the same user but this test somehow uses different instance
                 # in above add_users call
-                if hasattr(user, '_groups'):
-                    del user._groups
+                if hasattr(user, '_roles'):
+                    del user._roles
 
                 self.assertTrue(has_course_access(user, copy_course_key), "{} no copy access".format(user))
                 auth.remove_users(self.user, role(self.course_key), user)

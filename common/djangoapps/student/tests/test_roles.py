@@ -9,7 +9,7 @@ from student.tests.factories import AnonymousUserFactory
 
 from student.roles import GlobalStaff, CourseRole, CourseStaffRole
 from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class RolesTestCase(TestCase):
@@ -32,22 +32,23 @@ class RolesTestCase(TestCase):
         self.assertFalse(GlobalStaff().has_user(self.course_instructor))
         self.assertTrue(GlobalStaff().has_user(self.global_staff))
 
-    def test_group_name_case_insensitive(self):
+    def test_group_name_case_sensitive(self):
         uppercase_course_id = "ORG/COURSE/NAME"
         lowercase_course_id = uppercase_course_id.lower()
         uppercase_course_key = SlashSeparatedCourseKey.from_string(uppercase_course_id)
         lowercase_course_key = SlashSeparatedCourseKey.from_string(lowercase_course_id)
 
-        lowercase_group = "role_org/course/name"
-        uppercase_group = lowercase_group.upper()
+        role = "role"
 
-        lowercase_user = UserFactory(groups=lowercase_group)
-        uppercase_user = UserFactory(groups=uppercase_group)
+        lowercase_user = UserFactory()
+        CourseRole(role, lowercase_course_key).add_users(lowercase_user)
+        uppercase_user = UserFactory()
+        CourseRole(role, uppercase_course_key).add_users(uppercase_user)
 
-        self.assertTrue(CourseRole("role", lowercase_course_key).has_user(lowercase_user))
-        self.assertTrue(CourseRole("role", uppercase_course_key).has_user(lowercase_user))
-        self.assertTrue(CourseRole("role", lowercase_course_key).has_user(uppercase_user))
-        self.assertTrue(CourseRole("role", uppercase_course_key).has_user(uppercase_user))
+        self.assertTrue(CourseRole(role, lowercase_course_key).has_user(lowercase_user))
+        self.assertFalse(CourseRole(role, uppercase_course_key).has_user(lowercase_user))
+        self.assertFalse(CourseRole(role, lowercase_course_key).has_user(uppercase_user))
+        self.assertTrue(CourseRole(role, uppercase_course_key).has_user(uppercase_user))
 
     def test_course_role(self):
         """

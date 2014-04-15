@@ -6,6 +6,7 @@ adding users, removing users, and listing members
 from abc import ABCMeta, abstractmethod
 
 from django.contrib.auth.models import User, Group
+from student.models import CourseAccessRole
 
 
 class CourseIdRequired(Exception):
@@ -75,32 +76,31 @@ class GlobalStaff(AccessRole):
 
 class GroupBasedRole(AccessRole):
     """
-    A role based on membership to any of a set of groups.
+    A role based on having a role independent of org or course.
     """
-    def __init__(self, group_names):
+    def __init__(self, role_name, org=None, course_key=None):
         """
-        Create a GroupBasedRole from a list of group names
-
-        The first element of `group_names` will be the preferred group
-        to use when adding a user to this Role.
-
-        If a user is a member of any of the groups in the list, then
-        they will be consider a member of the Role
+        Create a GroupBasedRole from a group names
                 """
-        self._group_names = [name.lower() for name in group_names]
+        self.org = org
+        self.course_key = course_key
+        self._role_name = role_name
 
     def has_user(self, user):
         """
-        Return whether the supplied django user has access to this role.
+        Return whether the supplied django user has access to this role independent of org and course.
         """
         if not (user.is_authenticated() and user.is_active):
             return False
 
         # pylint: disable=protected-access
-        if not hasattr(user, '_groups'):
-            user._groups = set(name.lower() for name in user.groups.values_list('name', flat=True))
+        if not hasattr(user, '_roles'):
+            user._roles = list(
+                CourseAccessRole.objects.filter(user=user).all()
+            )
 
-        return len(user._groups.intersection(self._group_names)) > 0
+        role = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
+        return role in user._roles
 
     def add_users(self, *users):
         """
@@ -108,62 +108,57 @@ class GroupBasedRole(AccessRole):
         """
         # silently ignores anonymous and inactive users so that any that are
         # legit get updated.
-        users = [user for user in users if user.is_authenticated() and user.is_active]
-        group, _ = Group.objects.get_or_create(name=self._group_names[0])
-        group.user_set.add(*users)
-        # remove cache
         for user in users:
-            if hasattr(user, '_groups'):
-                del user._groups
+            if user.is_authenticated and user.is_active:
+                entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
+                entry.save()
+                if hasattr(user, '_roles'):
+                    del user._roles
 
     def remove_users(self, *users):
         """
         Remove the supplied django users from this role.
         """
-        groups = Group.objects.filter(name__in=self._group_names)
-        for group in groups:
-            group.user_set.remove(*users)
-        # remove cache
         for user in users:
-            if hasattr(user, '_groups'):
-                del user._groups
+            entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
+            entry.delete()
+            if hasattr(user, '_roles'):
+                del user._roles
 
     def users_with_role(self):
         """
         Return a django QuerySet for all of the users with this role
         """
-        return User.objects.filter(groups__name__in=self._group_names)
+        # How do I just do a select user u join course_access_role c on u.id=c.user where c.role=role
+        # that is, not load the CourseAccessRole objects just query through them?
+        entries = CourseAccessRole.objects.filter(
+            role=self._role_name, course_id=self.course_key, org=self.org
+        ).select_related('user').all()
+        return [entry.user for entry in entries]
 
 
 class CourseRole(GroupBasedRole):
     """
     A named role in a particular course
     """
-    def __init__(self, role, course_id):
+    def __init__(self, role, course_key):
         """
         Args:
-            course_id (CourseKey)
+            course_key (CourseKey)
         """
-        self.course_id = course_id
-        self.role = role
-        # direct copy from auth.authz.get_all_course_role_groupnames will refactor to one impl asap
-        groupnames = []
-
-        groupnames.append(u'{0}_{1}'.format(role, self.course_id.to_deprecated_string().lower()))
-        super(CourseRole, self).__init__(groupnames)
+        super(CourseRole, self).__init__(role, course_key.org, course_key)
 
     @classmethod
     def course_group_already_exists(self, course_key):
-        # Case insensitive search -- looking for a Group that ends with the course's id
-        return Group.objects.filter(name__iendswith=course_key)
+        return CourseAccessRole.objects.filter(org=course_key.org, course_id=course_key).exists()
 
 
 class OrgRole(GroupBasedRole):
     """
-    A named role in a particular org
+    A named role in a particular org independent of course
     """
-    def __init__(self, role, course_id):
-        super(OrgRole, self).__init__([u'{}_{}'.format(role, course_id.org)])
+    def __init__(self, role, org):
+        super(OrgRole, self).__init__(role, org)
 
 
 class CourseStaffRole(CourseRole):
@@ -210,4 +205,4 @@ class CourseCreatorRole(GroupBasedRole):
     ROLE = "course_creator_group"
 
     def __init__(self, *args, **kwargs):
-        super(CourseCreatorRole, self).__init__([self.ROLE], *args, **kwargs)
+        super(CourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)
