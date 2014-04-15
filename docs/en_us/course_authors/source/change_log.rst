@@ -14,6 +14,15 @@ Change Log
      - Expanded the :ref:`Grades` section to include a topic on interpreting the Student Answer Distribution report. 
    * - 4/7/14
      - Expanded the :ref:`Course Data`, :ref:`Enrollment`, and :ref:`Course_Staffing` sections.
+     - Change  
+   * - 4/7/14
+     - Expanded the :ref:`Course Data`, :ref:`Enrollment`, and :ref:`Course_Staffing` sections.
+   * - 04/08/14
+     - Updated the chapter :ref:`Working with HTML Components` to reflect the
+       new HTML editor. 
+   * - 04/07/14
+     - Expanded the :ref:`Course Data`, :ref:`Enrollment`, and
+       :ref:`Course_Staffing` sections.
    * - 04/03/14
      - Updated the :ref:`Adding Pages to a Course` chapter to reflect ability to
        :ref:`Show or Hide the Course Wiki Page`.
