@@ -1,4 +1,5 @@
 if $('.instructor-dashboard-wrapper').length == 1
-    analytics.track "Loaded a Legacy Instructor Dashboard Page", 
+    analytics.track "edx.bi.course.legacy_instructor_dashboard.loaded", 
+        category: "courseware"
         location: window.location.pathname
         dashboard_page: $('.navbar .selectedmode').text()
