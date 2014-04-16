@@ -314,7 +314,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
         return render_to_response('discussion/index.html', context)
 
-
+@require_GET
 @login_required
 def user_profile(request, course_id, user_id):
     nr_transaction = newrelic.agent.current_transaction()
