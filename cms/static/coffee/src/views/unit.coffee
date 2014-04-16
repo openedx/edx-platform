@@ -212,6 +212,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       )
 
     createDraft: (event) ->
+      $(event.target).addClass "is-disabled"
       @wait(true)
 
       $.postJSON(@model.url(), {
@@ -222,9 +223,11 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
           unit_id: unit_location_analytics
 
         @model.set('state', 'draft')
+        $(event.target).removeClass "is-disabled"
       )
 
     publishDraft: (event) ->
+      $(event.target).addClass "is-disabled"
       @wait(true)
       @saveDraft()
 
@@ -236,6 +239,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
           unit_id: unit_location_analytics
 
         @model.set('state', 'public')
+        $(event.target).removeClass "is-disabled"
       )
 
     setVisibility: (event) ->
