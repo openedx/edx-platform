@@ -106,7 +106,14 @@ def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
     if course.static_asset_path or modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
-        return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
+        # If we are a static course with the course_image attribute
+        # set different than the default, return that path so that
+        # courses can use custom course image paths, otherwise just
+        # return the default static path.
+        if hasattr(course, 'course_image') and course.course_image != course.fields['course_image'].default:
+            return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + '/' + course.course_image
+        else:
+            return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
     else:
         loc = StaticContent.compute_location(course.location.org, course.location.course, course.course_image)
         _path = StaticContent.get_url_path_from_location(loc)
