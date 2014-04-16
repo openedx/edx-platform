@@ -1451,17 +1451,34 @@ def _do_enroll_students(course, course_key, students, overload=False, auto_enrol
             'SITE_NAME',
             settings.SITE_NAME
         )
-        registration_url = 'https://' + stripped_site_name + reverse('student.views.register_user')
-        #Composition of email
-        d = {'site_name': stripped_site_name,
-             'registration_url': registration_url,
-             'course': course,
-             'auto_enroll': auto_enroll,
-             # FIXME why is this generating urls by hand v using reverse?
-             'course_url': 'https://' + stripped_site_name + '/courses/' + course_key.to_deprecated_string(),
-             'course_about_url': 'https://' + stripped_site_name + '/courses/' + course_key.to_deprecated_string() + '/about',
-             'is_shib_course': is_shib_course
-             }
+        # TODO: Use request.build_absolute_uri rather than 'https://{}{}'.format
+        # and check with the Services team that this works well with microsites
+        registration_url = 'https://{}{}'.format(
+            stripped_site_name,
+            reverse('student.views.register_user')
+        )
+        course_url = 'https://{}{}'.format(
+            stripped_site_name,
+            reverse('course_root', kwargs={'course_id': course_key.to_deprecated_string()})
+        )
+        # We can't get the url to the course's About page if the marketing site is enabled.
+        course_about_url = None
+        if not settings.FEATURES.get('ENABLE_MKTG_SITE', False):
+            course_about_url = u'https://{}{}'.format(
+                stripped_site_name,
+                reverse('about_course', kwargs={'course_id': course_key.to_deprecated_string()})
+            )
+
+        # Composition of email
+        d = {
+            'site_name': stripped_site_name,
+            'registration_url': registration_url,
+            'course': course,
+            'auto_enroll': auto_enroll,
+            'course_url': course_url,
+            'course_about_url': course_about_url,
+            'is_shib_course': is_shib_course
+        }
 
     for student in new_students:
         try:
