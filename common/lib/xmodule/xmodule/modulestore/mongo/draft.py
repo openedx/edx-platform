@@ -9,7 +9,6 @@ and otherwise returns i4x://org/course/cat/name).
 from datetime import datetime
 
 from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
 from xmodule.modulestore.mongo.base import location_to_query, location_to_son, MongoModuleStore
 import pymongo
@@ -153,6 +152,10 @@ class DraftModuleStore(MongoModuleStore):
         except ItemNotFoundError:
             if not allow_not_found:
                 raise
+        except InvalidVersionError:
+            # it had tried to convert something that can't be draft to draft
+            # so use the non-draft location instead
+            draft_loc = xblock.location
 
         xblock.location = draft_loc
         super(DraftModuleStore, self).update_item(xblock, user, allow_not_found)

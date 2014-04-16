@@ -337,7 +337,7 @@ class CourseGradingTest(CourseTestCase):
     def test_update_section_grader_type(self):
         # Get the descriptor and the section_grader_type and assert they are the default values
         descriptor = get_modulestore(self.course.location).get_item(self.course.location)
-        section_grader_type = CourseGradingModel.get_section_grader_type(self.course.id)
+        section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
         self.assertEqual(None, descriptor.format)
@@ -346,7 +346,7 @@ class CourseGradingTest(CourseTestCase):
         # Change the default grader type to Homework, which should also mark the section as graded
         CourseGradingModel.update_section_grader_type(self.course, 'Homework', self.user)
         descriptor = get_modulestore(self.course.location).get_item(self.course.location)
-        section_grader_type = CourseGradingModel.get_section_grader_type(self.course.id)
+        section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('Homework', section_grader_type['graderType'])
         self.assertEqual('Homework', descriptor.format)
@@ -355,7 +355,7 @@ class CourseGradingTest(CourseTestCase):
         # Change the grader type back to notgraded, which should also unmark the section as graded
         CourseGradingModel.update_section_grader_type(self.course, 'notgraded', self.user)
         descriptor = get_modulestore(self.course.location).get_item(self.course.location)
-        section_grader_type = CourseGradingModel.get_section_grader_type(self.course.id)
+        section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
         self.assertEqual(None, descriptor.format)
@@ -444,8 +444,8 @@ class CourseMetadataEditingTest(CourseTestCase):
     def setUp(self):
         CourseTestCase.setUp(self)
         self.fullcourse = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        self.course_setting_url = get_url(self.course.id)
-        self.fullcourse_setting_url = get_url(self.fullcourse.id)
+        self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
+        self.fullcourse_setting_url = get_url(self.fullcourse.id, 'advanced_settings_handler')
 
     def test_fetch_initial_fields(self):
         test_model = CourseMetadata.fetch(self.course)
@@ -471,7 +471,7 @@ class CourseMetadataEditingTest(CourseTestCase):
          )
         self.update_check(test_model)
         # try fresh fetch to ensure persistence
-        fresh = modulestore().get_item(self.course.id)
+        fresh = modulestore('direct').get_course(self.course.id)
         test_model = CourseMetadata.fetch(fresh)
         self.update_check(test_model)
         # now change some of the existing metadata
@@ -561,13 +561,13 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.client.ajax_post(self.course_setting_url, {
             ADVANCED_COMPONENT_POLICY_KEY: ["combinedopenended"]
         })
-        course = modulestore().get_item(self.course_location)
+        course = modulestore().get_course(self.course.id)
         self.assertIn(EXTRA_TAB_PANELS.get("open_ended"), course.tabs)
         self.assertNotIn(EXTRA_TAB_PANELS.get("notes"), course.tabs)
         self.client.ajax_post(self.course_setting_url, {
             ADVANCED_COMPONENT_POLICY_KEY: []
         })
-        course = modulestore().get_item(self.course_location)
+        course = modulestore().get_course(self.course.id)
         self.assertNotIn(EXTRA_TAB_PANELS.get("open_ended"), course.tabs)
 
 

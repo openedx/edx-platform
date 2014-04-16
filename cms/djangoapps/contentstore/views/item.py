@@ -113,7 +113,7 @@ def xblock_handler(request, usage_key_string):
                 fields = request.REQUEST.get('fields', '').split(',')
                 if 'graderType' in fields:
                     # right now can't combine output of this w/ output of _get_module_info, but worthy goal
-                    return JsonResponse(CourseGradingModel.get_section_grader_type(locator))
+                    return JsonResponse(CourseGradingModel.get_section_grader_type(usage_key))
                 # TODO: pass fields to _get_module_info and only return those
                 rsp = _get_module_info(usage_key)
                 return JsonResponse(rsp)

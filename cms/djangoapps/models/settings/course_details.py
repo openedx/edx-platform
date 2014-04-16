@@ -9,8 +9,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from contentstore.utils import get_modulestore, course_image_url
 from models.settings import course_grading
 from xmodule.fields import Date
-from xmodule.modulestore.django import loc_mapper
-
+from xmodule.modulestore.django import modulestore
 
 class CourseDetails(object):
     def __init__(self, org, course_id, run):
@@ -151,7 +150,7 @@ class CourseDetails(object):
             dirty = True
 
         if dirty:
-            get_modulestore(course_key).update_item(descriptor, user.id)
+            modulestore().update_item(descriptor, user.id)
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.

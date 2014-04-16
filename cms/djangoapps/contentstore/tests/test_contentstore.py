@@ -1593,7 +1593,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         course_key = _course_factory_create_course()
 
         section_data = {
-            'parent_locator': unicode(course_key),
+            'parent_locator': unicode(course.location),
             'category': 'chapter',
             'display_name': 'Section One',
         }
