@@ -1,8 +1,9 @@
 define ["jquery", "jquery.ui", "gettext", "backbone",
         "js/views/feedback_notification", "js/views/feedback_prompt",
-        "coffee/src/views/module_edit", "js/models/module_info"],
-($, ui, gettext, Backbone, NotificationView, PromptView, ModuleEditView, ModuleModel) ->
-  class UnitEditView extends Backbone.View
+        "coffee/src/views/module_edit", "js/models/module_info",
+        "js/views/baseview"],
+($, ui, gettext, Backbone, NotificationView, PromptView, ModuleEditView, ModuleModel, BaseView) ->
+  class UnitEditView extends BaseView
     events:
       'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates'
       'click .new-component .new-component-type a.single-template': 'saveNewComponent'
@@ -212,30 +213,35 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       )
 
     createDraft: (event) ->
-      @wait(true)
+      self = this
+      @disableElementWhileRunning($(event.target), ->
+        self.wait(true)
+        $.postJSON(self.model.url(), {
+          publish: 'create_draft'
+        }, =>
+          analytics.track "Created Draft",
+            course: course_location_analytics
+            unit_id: unit_location_analytics
 
-      $.postJSON(@model.url(), {
-        publish: 'create_draft'
-      }, =>
-        analytics.track "Created Draft",
-          course: course_location_analytics
-          unit_id: unit_location_analytics
-
-        @model.set('state', 'draft')
+          self.model.set('state', 'draft')
+        )
       )
 
     publishDraft: (event) ->
-      @wait(true)
-      @saveDraft()
+      self = this
+      @disableElementWhileRunning($(event.target), ->
+        self.wait(true)
+        self.saveDraft()
 
-      $.postJSON(@model.url(), {
-        publish: 'make_public'
-      }, =>
-        analytics.track "Published Draft",
-          course: course_location_analytics
-          unit_id: unit_location_analytics
+        $.postJSON(self.model.url(), {
+          publish: 'make_public'
+        }, =>
+          analytics.track "Published Draft",
+            course: course_location_analytics
+            unit_id: unit_location_analytics
 
-        @model.set('state', 'public')
+          self.model.set('state', 'public')
+        )
       )
 
     setVisibility: (event) ->
@@ -259,7 +265,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
         @model.set('state', @$('.visibility-select').val())
       )
 
-  class UnitEditView.NameEdit extends Backbone.View
+  class UnitEditView.NameEdit extends BaseView
     events:
       'change .unit-display-name-input': 'saveName'
 
@@ -293,14 +299,14 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
         display_name: metadata.display_name
 
 
-  class UnitEditView.LocationState extends Backbone.View
+  class UnitEditView.LocationState extends BaseView
     initialize: =>
       @model.on('change:state', @render)
 
     render: =>
       @$el.toggleClass("#{@model.previous('state')}-item #{@model.get('state')}-item")
 
-  class UnitEditView.Visibility extends Backbone.View
+  class UnitEditView.Visibility extends BaseView
     initialize: =>
       @model.on('change:state', @render)
       @render()
