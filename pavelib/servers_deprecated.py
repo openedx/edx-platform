@@ -7,7 +7,7 @@ import argparse
 from paver.easy import *
 from .utils.cmd import django_cmd
 from .utils.process import run_process, run_multi_processes
-
+from .utils.deprecated import deprecated
 
 DEFAULT_PORT = {"lms": 8000, "studio": 8001}
 DEFAULT_SETTINGS = 'dev'
@@ -42,12 +42,13 @@ def run_server(system, settings=None, port=None, skip_assets=False):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs_deprecated.install_prereqs')
 @cmdopts([
     ("settings=", "s", "Django settings"),
     ("port=", "p", "Port"),
     ("fast", "f", "Skip updating assets")
 ])
+@deprecated('invoke servers.lms')
 def lms(options):
     """
     Run the LMS server.
@@ -59,12 +60,13 @@ def lms(options):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs_deprecated.install_prereqs')
 @cmdopts([
     ("settings=", "s", "Django settings"),
     ("port=", "p", "Port"),
     ("fast", "f", "Skip updating assets")
 ])
+@deprecated('invoke servers.cms')
 def studio(options):
     """
     Run the Studio server.
@@ -76,8 +78,9 @@ def studio(options):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs_deprecated.install_prereqs')
 @consume_args
+@deprecated('invoke --help servers.devstack')
 def devstack(args):
     """
     Start the devstack lms or studio server
@@ -90,10 +93,11 @@ def devstack(args):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs_deprecated.install_prereqs')
 @cmdopts([
     ("settings=", "s", "Django settings"),
 ])
+@deprecated('invoke servers.celery')
 def celery(options):
     """
     Runs Celery workers.
@@ -103,7 +107,7 @@ def celery(options):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs_deprecated.install_prereqs')
 @cmdopts([
     ("settings=", "s", "Django settings for both LMS and Studio"),
     ("worker_settings=", "w", "Celery worker Django settings"),
@@ -111,6 +115,8 @@ def celery(options):
     ("settings_lms=", "l", "Set LMS only, overriding the value from --settings (if provided)"),
     ("settings_cms=", "c", "Set Studio only, overriding the value from --settings (if provided)"),
 ])
+# Can't deal with parsing arguments of deprecated functions
+@deprecated('invoke servers.run')
 def run_all_servers(options):
     """
     Runs Celery workers, Studio, and LMS.
@@ -137,10 +143,11 @@ def run_all_servers(options):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs_deprecated.install_prereqs')
 @cmdopts([
     ("settings=", "s", "Django settings"),
 ])
+@deprecated('invoke servers.update_db')
 def update_db():
     """
     Runs syncdb and then migrate.
@@ -151,8 +158,10 @@ def update_db():
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs_deprecated.install_prereqs')
 @consume_args
+# Can't deal with parsing arguments of deprecated functions
+@deprecated('invoke --help servers.check_settings')
 def check_settings(args):
     """
     Checks settings files.

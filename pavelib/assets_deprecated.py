@@ -10,6 +10,8 @@ import glob
 import traceback
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
+from .utils.deprecated import deprecated
+
 
 # setup baseline paths
 
@@ -190,8 +192,9 @@ def watch_assets(options):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs_deprecated.install_prereqs')
 @consume_args
+@deprecated('invoke assets.update')
 def update_assets(args):
     """
     Compile CoffeeScript and Sass, then collect static assets.

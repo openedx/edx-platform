@@ -5,16 +5,19 @@ Install Python, Ruby, and Node prerequisites.
 import os
 import hashlib
 from distutils import sysconfig
-from paver.easy import *
+from invoke import Collection
+from invoke import task
+from invoke import run as sh
+
 from .utils.envs import Env
+
+ns = Collection()
 
 
 PREREQS_MD5_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
 NPM_REGISTRY = "http://registry.npmjs.org/"
 PYTHON_REQ_FILES = [
     'requirements/edx/pre.txt',
-    'requirements/edx/github.txt',
-    'requirements/edx/local.txt',
     'requirements/edx/base.txt',
     'requirements/edx/post.txt',
 ]
@@ -85,35 +88,10 @@ def prereq_cache(cache_name, paths, install_func):
                 raise
 
         with open(cache_file_path, "w") as cache_file:
-            # Since the pip requirement files are modified during the install
-            # process, we need to store the hash generated AFTER the installation
-            post_install_hash = compute_fingerprint(paths)
-            cache_file.write(post_install_hash)
+            cache_file.write(new_hash)
+
     else:
         print('{cache} unchanged, skipping...'.format(cache=cache_name))
-
-
-def ruby_prereqs_installation():
-    """
-    Installs Ruby prereqs
-    """
-    sh('bundle install --quiet')
-
-
-def node_prereqs_installation():
-    """
-    Installs Node prerequisites
-    """
-    sh("npm config set registry {}".format(NPM_REGISTRY))
-    sh('npm install')
-
-
-def python_prereqs_installation():
-    """
-    Installs Python prerequisites
-    """
-    for req_file in PYTHON_REQ_FILES:
-        sh("pip install -q --exists-action w -r {req_file}".format(req_file=req_file))
 
 
 @task
@@ -121,7 +99,7 @@ def install_ruby_prereqs():
     """
     Installs Ruby prereqs
     """
-    prereq_cache("Ruby prereqs", ["Gemfile"], ruby_prereqs_installation)
+    sh('bundle install --quiet')
 
 
 @task
@@ -129,7 +107,8 @@ def install_node_prereqs():
     """
     Installs Node prerequisites
     """
-    prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
+    sh("npm config set registry {}".format(NPM_REGISTRY))
+    sh('npm install')
 
 
 @task
@@ -137,17 +116,27 @@ def install_python_prereqs():
     """
     Installs Python prerequisites
     """
-    prereq_cache("Python prereqs", PYTHON_REQ_FILES + [sysconfig.get_python_lib()], python_prereqs_installation)
+    for req_file in PYTHON_REQ_FILES:
+        print(req_file)
+        sh("pip install --exists-action w -r {req_file}".format(req_file=req_file), hide='stdout')
 
 
 @task
-def install_prereqs():
+def install(**kwargs):
     """
     Installs Ruby, Node and Python prerequisites
     """
     if os.environ.get("NO_PREREQ_INSTALL", False):
         return
 
-    install_ruby_prereqs()
-    install_node_prereqs()
-    install_python_prereqs()
+    prereq_cache("Ruby prereqs", ["Gemfile"], install_ruby_prereqs)
+    prereq_cache("Node prereqs", ["package.json"], install_node_prereqs)
+    prereq_cache("Python prereqs", PYTHON_REQ_FILES + [sysconfig.get_python_lib()], install_python_prereqs)
+
+
+install_ns = Collection('install')
+install_ns.add_task(install_ruby_prereqs, 'ruby')
+install_ns.add_task(install_node_prereqs, 'node')
+install_ns.add_task(install_python_prereqs, 'python')
+install_ns.add_task(install, 'all', default=True)
+ns.add_collection(install_ns)

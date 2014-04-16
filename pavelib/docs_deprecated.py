@@ -1,7 +1,7 @@
 from __future__ import print_function
 import sys
 from paver.easy import *
-
+from .utils.deprecated import deprecated
 
 DOC_PATHS = {
     "dev": "docs/en_us/developers",
@@ -54,11 +54,12 @@ def doc_path(options, allow_default=True):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs_deprecated.install_prereqs')
 @cmdopts([
     ("type=", "t", "Type of docs to compile"),
     ("verbose", "v", "Display verbose output"),
 ])
+@deprecated('invoke docs.build')
 def build_docs(options):
     """
     Invoke sphinx 'make build' to generate docs.
