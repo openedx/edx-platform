@@ -399,7 +399,7 @@ def _create_item(request):
 
     # TODO replace w/ nicer accessor
     if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
-        parent.children.append(dest_location.url())
+        parent.children.append(dest_location)
         get_modulestore(parent.location).update_item(parent, request.user.id)
 
     return JsonResponse({"locator": unicode(dest_location)})
@@ -475,10 +475,9 @@ def _delete_item_at_location(item_usage_key, delete_children=False, delete_all_v
     if delete_all_versions:
         parent_locs = modulestore('direct').get_parent_locations(item_usage_key)
 
-        item_url = item_usage_key.url()
         for parent_loc in parent_locs:
             parent = modulestore('direct').get_item(parent_loc)
-            parent.children.remove(item_url)
+            parent.children.remove(item_usage_key)
             modulestore('direct').update_item(parent, user.id if user else None)
 
     return JsonResponse()

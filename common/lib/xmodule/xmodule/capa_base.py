@@ -370,7 +370,7 @@ class CapaMixin(CapaFields):
         progress = self.get_progress()
         return self.runtime.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
-            'id': self.id,
+            'id': self.location.to_deprecated_string(),
             'ajax_url': self.runtime.ajax_url,
             'progress_status': Progress.to_js_status_str(progress),
             'progress_detail': Progress.to_js_detail_str(progress),

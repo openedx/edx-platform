@@ -511,7 +511,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         chapter = direct_store.get_item(chapter_key)
 
         # make sure the parent points to the child object which is to be deleted
-        self.assertTrue(sequential.location.url() in chapter.children)
+        self.assertTrue(sequential.location in chapter.children)
 
         self.client.delete(get_url('xblock_handler', sequential_key), {'recurse': True, 'all_versions': True})
 
@@ -527,7 +527,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         chapter = direct_store.get_item(chapter_key)
 
         # make sure the parent no longer points to the child object which was deleted
-        self.assertFalse(sequential.location.url() in chapter.children)
+        self.assertFalse(sequential.location in chapter.children)
 
     def test_about_overrides(self):
         '''
@@ -990,7 +990,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # add the new private to list of children
         sequential = module_store.get_item(course_id.make_usage_key('sequential', 'vertical_sequential'))
         private_location_no_draft = private_vertical.location.replace(revision=None)
-        sequential.children.append(private_location_no_draft.url())
+        sequential.children.append(private_location_no_draft)
         module_store.update_item(sequential, self.user.id)
 
         # read back the sequential, to make sure we have a pointer to
@@ -1793,7 +1793,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # crate a new module and add it as a child to a vertical
         module_store.create_and_save_xmodule(new_component_location)
         parent = verticals[0]
-        parent.children.append(new_component_location.url())
+        parent.children.append(new_component_location)
         module_store.update_item(parent, self.user.id)
 
         # flush the cache
