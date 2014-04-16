@@ -83,3 +83,11 @@ class RolesTestCase(TestCase):
             CourseStaffRole(self.course_id).has_user(self.student),
             "Student doesn't have access to {}".format(unicode(vertical_location.url()))
         )
+
+    def test_get_user_for_role(self):
+        """
+        test users_for_role
+        """
+        role = CourseStaffRole(self.course_id)
+        role.add_users(self.student)
+        self.assertGreater(len(role.users_with_role()), 0)
