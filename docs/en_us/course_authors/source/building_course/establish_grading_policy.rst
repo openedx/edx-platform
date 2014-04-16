@@ -245,7 +245,7 @@ You can also :ref:`Set the Grace Period` for your assignments to cover any
 misunderstandings about time. For example, some classes have set a grace period
 of 1 day, 6 hours, and 1 minute. The grace period applies to all assignments.
 
-Students see the due date in the course accordian under the subsection title.
+Students see the due date in the course accordion under the subsection title.
 For example:
 
 .. image::  ../Images/Subsection_due_date.png

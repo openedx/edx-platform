@@ -236,7 +236,7 @@ Set the Display Name for a Component
 
 Each component has a display name that shows in the component header when you
 can edit the component. The display name also shows to students when they hover
-the mouse pointer over the unit icon in the course accordian.
+the mouse pointer over the unit icon in the course accordion.
 
 To set the display name for a component:
 
