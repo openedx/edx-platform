@@ -94,6 +94,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       @cheatsheet = $($('#simple-editor-cheatsheet').html())
       $(@markdown_editor.getWrapperElement()).append(@cheatsheet)
 
+    $(".CodeMirror").css({"overflow": "visible"})
+    $(".modal-content").css({"overflow-y": "visible", "overflow-x": "visible"})
+
     setTimeout (=> @cheatsheet.toggleClass('shown')), 10
 
   ###
