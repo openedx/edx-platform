@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_string, render_to_response
 from xmodule.modulestore.django import modulestore
+from contentstore.utils import reverse_course_url, reverse_usage_url
 
 __all__ = ['edge', 'event', 'landing']
 
@@ -93,19 +94,10 @@ def xblock_studio_url(xblock):
     else:
         parent_category = None
     if category == 'course':
-        return reverse(
-            "contentstore.views.course_handler",
-            kwargs={'course_key_string': unicode(xblock.location)}
-        )
+        return reverse_course_url('course_handler', xblock.location.course_key)
     elif category == 'vertical' and parent_category == 'sequential':
         # only show the unit page for verticals directly beneath a subsection
-        return reverse(
-            "contentstore.views.unit_handler",
-            kwargs={'usage_key_string': unicode(xblock.location)}
-        )
+        return reverse_usage_url('unit_handler', xblock.location)
     else:
-        return reverse(
-            "contentstore.views.container_handler",
-            kwargs={'usage_key_string': unicode(xblock.location)}
-        )
+        return reverse_usage_url('container_handler', xblock.location)
 

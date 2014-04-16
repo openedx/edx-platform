@@ -12,10 +12,9 @@ class HelpersTestCase(CourseTestCase):
     Unit tests for helpers.py.
     """
     def test_xblock_studio_url(self):
-        course = self.course
 
         # Verify course URL
-        self.assertEqual(xblock_studio_url(course),
+        self.assertEqual(xblock_studio_url(self.course),
                          u'/course/slashes:MITx+999+Robot_Super_Course')
 
         # Verify chapter URL
@@ -32,13 +31,13 @@ class HelpersTestCase(CourseTestCase):
         vertical = ItemFactory.create(parent_location=sequential.location, category='vertical',
                                       display_name='Unit')
         self.assertEqual(xblock_studio_url(vertical),
-                         u'/unit/MITx.999.Robot_Super_Course/branch/draft/block/Unit')
+                         u'/unit/location:MITx+999+Robot_Super_Course+vertical+Unit')
 
         # Verify child vertical URL
         child_vertical = ItemFactory.create(parent_location=vertical.location, category='vertical',
                                             display_name='Child Vertical')
         self.assertEqual(xblock_studio_url(child_vertical),
-                         u'/container/MITx.999.Robot_Super_Course/branch/draft/block/Child_Vertical')
+                         u'/container/location:MITx+999+Robot_Super_Course+vertical+Child_Vertical')
 
         # Verify video URL
         video = ItemFactory.create(parent_location=child_vertical.location, category="video",
