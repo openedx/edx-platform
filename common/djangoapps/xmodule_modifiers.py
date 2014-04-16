@@ -18,8 +18,7 @@ from xmodule.vertical_module import VerticalModule
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule.modulestore import MONGO_MODULESTORE_TYPE
-from xmodule.modulestore.django import modulestore, loc_mapper
-from django.core.urlresolvers import reverse
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -147,7 +146,7 @@ def grade_histogram(module_id):
     WHERE courseware_studentmodule.module_id=%s
     GROUP BY courseware_studentmodule.grade"""
     # Passing module_id this way prevents sql-injection.
-    cursor.execute(q, [module_id])
+    cursor.execute(q, [module_id.to_deprecated_string()])
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])  # Add ORDER BY to sql query?
@@ -173,10 +172,10 @@ def add_staff_markup(user, block, view, frag, context):  # pylint: disable=unuse
         is_studio_course = block.course_edit_method == "Studio"
 
         if is_studio_course and is_mongo_course:
-            # build edit link to unit in CMS
-            edit_link = "//" + settings.CMS_BASE + reverse(
-                'contentstore.views.unit_handler', kwargs={'usage_key_string': unicode(block.location)}
-            )
+            # build edit link to unit in CMS. Can't use reverse here as lms doesn't load cms's urls.py
+            # reverse for contentstore.views.unit_handler
+            edit_link = "//" + settings.CMS_BASE + '/unit/' + unicode(block.location)
+
             # return edit link in rendered HTML for display
             return wrap_fragment(frag, render_to_string("edit_unit_link.html", {'frag_content': frag.content, 'edit_link': edit_link}))
         else:
@@ -185,7 +184,7 @@ def add_staff_markup(user, block, view, frag, context):  # pylint: disable=unuse
     if isinstance(block, SequenceModule):
         return frag
 
-    block_id = block.id
+    block_id = block.location
     if block.has_score and settings.FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         histogram = grade_histogram(block_id)
         render_histogram = len(histogram) > 0
