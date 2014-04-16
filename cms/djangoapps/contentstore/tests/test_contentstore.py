@@ -26,7 +26,7 @@ from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore import mongo
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.keys import CourseKey, UsageKey
 from xmodule.modulestore.store_utilities import clone_course
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.django import modulestore
@@ -660,8 +660,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # go through the website to do the delete, since the soft-delete logic is in the view
         course = course_items[0]
-        location = loc_mapper().translate_location(course.location, True, True)
-        url = location.url_reverse('assets/', '/c4x/edX/toy/asset/sample_static.txt')
+        url = get_url('assets_handler', course.id.make_usage_key('asset', '/c4x/edX/toy/asset/sample_static.txt'))
         resp = self.client.delete(url)
         self.assertEqual(resp.status_code, 204)
 
@@ -997,7 +996,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # read back the sequential, to make sure we have a pointer to
         sequential = module_store.get_item(course_id.make_usage_key('sequential', 'vertical_sequential'))
 
-        self.assertIn(private_location_no_draft.url(), sequential.children)
+        self.assertIn(private_location_no_draft, sequential.children)
 
         locked_asset_key = self._lock_an_asset(content_store, course_id)
         locked_asset_attrs = content_store.get_attrs(locked_asset_key)
@@ -1620,7 +1619,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.ajax_post(reverse('contentstore.views.xblock_handler'), problem_data)
         self.assertEqual(resp.status_code, 200)
         payload = parse_json(resp)
-        problem_loc = loc_mapper().translate_locator_to_location(BlockUsageLocator.from_string(payload['locator']))
+        problem_loc = UsageKey.from_string(payload['locator'])
         problem = get_modulestore(problem_loc).get_item(problem_loc)
         # should be a CapaDescriptor
         self.assertIsInstance(problem, CapaDescriptor, "New problem is not a CapaDescriptor")
@@ -1642,8 +1641,8 @@ class ContentStoreTest(ModuleStoreTestCase):
             self.assertEqual(resp.status_code, 200)
             _test_no_locations(self, resp)
 
-        import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
-        course_key = CourseKey.from_string('edx/simple/2012_Fall')
+        _, course_items = import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
+        course_key = course_items[0].id
 
         resp = self._show_course_overview(course_key)
         self.assertEqual(resp.status_code, 200)

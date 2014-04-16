@@ -14,7 +14,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from xmodule.contentstore.django import contentstore
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_exporter import export_to_xml
 

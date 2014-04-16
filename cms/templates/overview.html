@@ -3,7 +3,7 @@
   import logging
   from util.date_utils import get_default_time_display
   from django.utils.translation import ugettext as _
-  from django.core.urlresolvers import reverse
+  from contentstore.utils import reverse_usage_url
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -212,7 +212,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                       <div class="section-item">
                         <div class="details">
                         <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="action expand-collapse expand"><i class="icon-caret-down ui-toggle-expansion"></i><span class="sr">${_('Expand/collapse this subsection')}</span></a>
-                          <a href="${subsection_locator.url_reverse('subsection')}">
+                          <a href="${reverse_usage_url('subsection_handler', subsection_locator)}">
                             <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
                           </a>
                         </div>

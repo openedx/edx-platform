@@ -239,7 +239,7 @@ def course_listing(request):
             reverse('contentstore.views.course_handler', kwargs={
                 'course_key_string': unicode(course.id),
             }),
-            get_lms_link_for_item(course.location, course.id),
+            get_lms_link_for_item(course.location),
             course.display_org_with_default,
             course.display_number_with_default,
             course.location.name
@@ -263,7 +263,7 @@ def course_index(request, course_key):
     org, course, name: Attributes of the Location for the item to edit
     """
     course_module = _get_course_module(course_key, request.user, depth=3)
-    lms_link = get_lms_link_for_item(course_module.location, course_module.id)
+    lms_link = get_lms_link_for_item(course_module.location)
     sections = course_module.get_children()
 
 

@@ -8,11 +8,10 @@ import mock
 
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
 
 from models.settings.course_details import (CourseDetails, CourseSettingsEncoder)
 from models.settings.course_grading import CourseGradingModel
-from contentstore.utils import get_modulestore, EXTRA_TAB_PANELS
+from contentstore.utils import get_modulestore, EXTRA_TAB_PANELS, reverse_course_url
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
@@ -24,7 +23,7 @@ from contentstore.views.component import ADVANCED_COMPONENT_POLICY_KEY
 
 
 def get_url(course_id, handler_name='settings_handler'):
-    return reverse('contentstore.views.' + handler_name, kwargs={'course_key_string': course_id})
+    return reverse_course_url(handler_name, course_id)
 
 class CourseDetailsTestCase(CourseTestCase):
     """

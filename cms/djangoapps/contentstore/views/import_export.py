@@ -38,6 +38,8 @@ from extract_tar import safetar_extractall
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student import auth
 
+from contentstore.utils import reverse_course_url
+
 
 __all__ = ['import_handler', 'import_status_handler', 'export_handler']
 
@@ -53,7 +55,7 @@ CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
-def import_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
+def import_handler(request, course_key_string):
     """
     The restful handler for importing a course.
 
@@ -63,9 +65,8 @@ def import_handler(request, tag=None, org=None, offering=None, branch=None, vers
     POST or PUT
         json: import a course via the .tar.gz file specified in request.FILES
     """
-    course_id = CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid)
-    location = BlockUsageLocator(course_id, block)
-    if not has_course_access(request.user, location):
+    course_key = CourseKey.from_string(course_key_string)
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
 
@@ -74,7 +75,7 @@ def import_handler(request, tag=None, org=None, offering=None, branch=None, vers
             raise NotImplementedError('coming soon')
         else:
             data_root = path(settings.GITHUB_REPO_ROOT)
-            course_subdir = "{0}-{1}".format(course_id.org, course_id.offering)
+            course_subdir = "{0}-{1}".format(course_key.org, course_key.offering)
             course_dir = data_root / course_subdir
 
             filename = request.FILES['course-data'].name
@@ -142,7 +143,7 @@ def import_handler(request, tag=None, org=None, offering=None, branch=None, vers
                                   "size": size,
                                   "deleteUrl": "",
                                   "deleteType": "",
-                                  "url": location.url_reverse('import'),
+                                  "url": reverse_course_url('import_handler', course_key),
                                   "thumbnailUrl": ""
                               }]
                 })
@@ -151,7 +152,7 @@ def import_handler(request, tag=None, org=None, offering=None, branch=None, vers
 
                 # Use sessions to keep info about import progress
                 session_status = request.session.setdefault("import_status", {})
-                key = unicode(location) + filename
+                key = unicode(course_key) + filename
                 session_status[key] = 1
                 request.session.modified = True
 
@@ -253,10 +254,10 @@ def import_handler(request, tag=None, org=None, offering=None, branch=None, vers
 
                 return JsonResponse({'Status': 'OK'})
     elif request.method == 'GET':  # assume html
-        course_module = modulestore().get_course(course_id)
+        course_module = modulestore().get_course(course_key)
         return render_to_response('import.html', {
             'context_course': course_module,
-            'successful_import_redirect_url': location.url_reverse("course"),
+            'successful_import_redirect_url': reverse("course"),
             'import_status_url': location.url_reverse("import_status", "fillerName"),
         })
     else:
@@ -294,7 +295,7 @@ def import_status_handler(request, tag=None, org=None, offering=None, branch=Non
 @ensure_csrf_cookie
 @login_required
 @require_http_methods(("GET",))
-def export_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
+def export_handler(request, course_key_string):
     """
     The restful handler for exporting a course.
 
@@ -309,11 +310,11 @@ def export_handler(request, tag=None, org=None, offering=None, branch=None, vers
     If the tar.gz file has been requested but the export operation fails, an HTML page will be returned
     which describes the error.
     """
-    location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-    if not has_course_access(request.user, location):
+    course_key = CourseKey.from_string(course_key_string)
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
-    course_module = modulestore().get_course(location.course_key)
+    course_module = modulestore().get_course(course_key)
 
     # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
     requested_format = request.REQUEST.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
