@@ -192,6 +192,9 @@ class OpaqueKey(object):
     def __hash__(self):
         return hash(self._key)
 
+    def __str__(self):
+        return unicode(self).encode('utf-8')
+
     def __repr__(self):
         return '{}({})'.format(
             self.__class__.__name__,
