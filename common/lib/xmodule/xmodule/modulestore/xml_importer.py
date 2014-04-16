@@ -517,12 +517,13 @@ def remap_namespace(module, target_location_namespace):
         # There is more re-namespacing work we have to do when
         # importing course modules
 
-        # remap pdf_textbook urls
+        # remap pdf_textbook urls to portable static URLs
         for entry in module.pdf_textbooks:
             for chapter in entry.get('chapters', []):
                 if StaticContent.is_c4x_path(chapter.get('url', '')):
-                    chapter['url'] = StaticContent.renamespace_c4x_path(
-                        chapter['url'], target_location_namespace
+                    chapter_loc = StaticContent.get_location_from_path(chapter['url'])
+                    chapter['url'] = StaticContent.get_static_path_from_location(
+                        chapter_loc
                     )
 
         # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
