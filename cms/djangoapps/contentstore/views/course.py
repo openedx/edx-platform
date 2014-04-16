@@ -523,7 +523,7 @@ def settings_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user)
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
-        upload_asset_url = reverse('contentstore.views.assets_handler', kwargs={'course_key': unicode(course_key)})
+        upload_asset_url = reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)})
 
         # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
         # course about page should be editable in Studio
@@ -538,7 +538,7 @@ def settings_handler(request, course_key_string):
         return render_to_response('settings.html', {
             'context_course': course_module,
             'course_locator': course_key,
-            'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_module.location),
+            'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
             'course_image_url': utils.course_image_url(course_module),
             'details_url': reverse('contentstore.views.settings_handler', kwargs={'course_key_string': course_key_string}),
             'about_page_editable': about_page_editable,

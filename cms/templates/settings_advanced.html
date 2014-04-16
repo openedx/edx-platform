@@ -90,7 +90,7 @@ require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/setting
       % if context_course:
         <%
           details_url = reverse('settings_handler', kwargs={'course_key_string': unicode(context_course.id)})
-          details_url = reverse('grading_handler', kwargs={'course_key_string': unicode(context_course.id)})
+          grading_url = reverse('grading_handler', kwargs={'course_key_string': unicode(context_course.id)})
           course_team_url = reverse('course_team_handler', kwargs={'course_key_string': unicode(context_course.id)})
         %>
       <h3 class="title-3">${_("Other Course Settings")}</h3>

@@ -138,9 +138,9 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
       <div class="bit">
       % if context_course:
         <%
-          course_team_url = course_locator.url_reverse('course_team/')
-          advanced_settings_url = course_locator.url_reverse('settings/advanced/')
-          detailed_settings_url = course_locator.url_reverse('settings/details/')
+          detailed_settings_url = reverse('settings_handler', kwargs={'course_key_string': unicode(context_course.id)})
+          course_team_url = reverse('course_team_handler', kwargs={'course_key_string': unicode(context_course.id)})
+          advanced_settings_url = reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_locator)})
         %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
