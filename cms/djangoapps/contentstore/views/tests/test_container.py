@@ -58,6 +58,16 @@ class ContainerViewTestCase(CourseTestCase):
             category="html", display_name="Child HTML"
         )
         draft_xblock_with_child = modulestore('draft').convert_to_draft(published_xblock_with_child.location)
+        expected_breadcrumbs = (
+            r'<a href="/unit/{unit_location}"\s*'
+            r'class="navigation-link navigation-parent">Unit</a>\s*'
+            r'<a href="/container/{child_vertical_location}"\s*'
+            r'class="navigation-link navigation-parent">Child Vertical</a>\s*'
+            r'<a href="#" class="navigation-link navigation-current">Wrapper</a>'
+        ).format(
+            unit_location=unicode(self.vertical.location).replace("+", "\\+"),
+            child_vertical_location=unicode(self.child_vertical.location).replace("+", "\\+"),
+        )
         self._test_html_content(
             published_xblock_with_child,
             expected_section_tag=(
@@ -66,35 +76,17 @@ class ContainerViewTestCase(CourseTestCase):
                     child_location=unicode(published_xblock_with_child.location),
                 )
             ),
-            expected_breadcrumbs=(
-                r'<a href="/unit/{unit_location}"\s*'
-                r'class="navigation-link navigation-parent">Unit</a>\s*'
-                r'<a href="/container/{wrapper_location}"\s*'
-                r'class="navigation-link navigation-parent">Child Vertical</a>\s*'
-                r'<a href="#" class="navigation-link navigation-current">Wrapper</a>'
-            ).format(
-                unit_location=unicode(self.vertical.location).replace("+", "\\+"),
-                wrapper_location=unicode(published_xblock_with_child.location).replace("+", "\\+"),
-            )
+            expected_breadcrumbs=expected_breadcrumbs
         )
         self._test_html_content(
             draft_xblock_with_child,
             expected_section_tag=(
                 '<section class="wrapper-xblock level-page is-hidden" '
-                'data-locator="location:{child_location}">'.format(
+                'data-locator="{child_location}">'.format(
                     child_location=unicode(draft_xblock_with_child.location),
                 )
             ),
-            expected_breadcrumbs=(
-                r'<a href="/unit/{unit_location}"\s*'
-                r'class="navigation-link navigation-parent">Unit</a>\s*'
-                r'<a href="/container/{wrapper_location}"\s*'
-                r'class="navigation-link navigation-parent">Child Vertical</a>\s*'
-                r'<a href="#" class="location:navigation-link navigation-current">Wrapper</a>'
-            ).format(
-                unit_location=unicode(self.vertical.location).replace("+", "\\+"),
-                wrapper_location=unicode(draft_xblock_with_child.location).replace("+", "\\+"),
-            )
+            expected_breadcrumbs=expected_breadcrumbs
         )
 
     def _test_html_content(self, xblock, expected_section_tag, expected_breadcrumbs):
