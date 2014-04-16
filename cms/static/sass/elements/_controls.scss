@@ -1,6 +1,21 @@
 // studio - elements - UI controls
 // ====================
 
+// ====================
+
+// general actions
+%action {
+  @extend %ui-fake-link;
+
+  &.is-disabled {
+    @extend %ui-disabled;
+    -webkit-filter: grayscale(65%);
+    opacity: 0.65;
+  }
+}
+
+// ====================
+
 // gray primary button
 %btn-primary-gray {
   @extend %ui-btn-primary;

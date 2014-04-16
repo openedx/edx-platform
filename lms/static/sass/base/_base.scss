@@ -222,10 +222,6 @@ mark {
   }
 }
 
-.sr {
-  @extend %text-sr;
-}
-
 .help-tab {
   @include transform(rotate(-90deg));
   @include transform-origin(0 0);
@@ -286,7 +282,19 @@ mark {
   height: 150px;
 }
 
-// ui - skipnav
+// ====================
+
+// UI - disabled state
+.is-disabled {
+  @extend %ui-disabled;
+}
+
+// UI - semantically hide text
+.sr {
+  @extend %text-sr;
+}
+
+// UI - skipnav
 .nav-skip {
   display: block;
   position: absolute;
