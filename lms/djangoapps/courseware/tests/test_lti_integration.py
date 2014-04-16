@@ -27,18 +27,19 @@ class TestLTI(BaseTestXmodule):
         mocked_signature_after_sign = u'my_signature%3D'
         mocked_decoded_signature = u'my_signature='
 
-        lti_id = self.item_descriptor.lti_id
-        module_id = unicode(urllib.quote(self.item_descriptor.id))
+        context_id = self.item_descriptor.course_id
         user_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
+        hostname = self.item_descriptor.xmodule_runtime.hostname
+        resource_link_id = unicode(urllib.quote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
 
-        sourcedId = "{id}:{resource_link}:{user_id}".format(
-            id=urllib.quote(lti_id),
-            resource_link=urllib.quote(module_id),
-            user_id=urllib.quote(user_id)
+        sourcedId = "{context}:{resource_link}:{user_id}".format(
+            context=urllib.quote(context_id),
+            resource_link=resource_link_id,
+            user_id=user_id
         )
 
         lis_outcome_service_url = 'https://{host}{path}'.format(
-            host=self.item_descriptor.xmodule_runtime.hostname,
+            host=hostname,
             path=self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'grade_handler', thirdparty=True).rstrip('/?')
         )
         self.correct_headers = {
@@ -48,8 +49,9 @@ class TestLTI(BaseTestXmodule):
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
             u'roles': u'Student',
+            u'context_id': context_id,
 
-            u'resource_link_id': module_id,
+            u'resource_link_id': resource_link_id,
             u'lis_result_sourcedid': sourcedId,
 
             u'oauth_nonce': mocked_nonce,

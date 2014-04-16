@@ -11,11 +11,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList, VideoTranslation
 
         // Model is CMS.Models.MetadataCollection,
         initialize : function() {
-            var tpl = $("#metadata-editor-tpl").text();
-            if(!tpl) {
-                console.error("Couldn't load metadata editor template");
-            }
-            this.template = _.template(tpl);
+            this.template = this.loadTemplate('metadata-editor');
 
             this.$el.html(this.template({numEntries: this.collection.length}));
             var counter = 0;

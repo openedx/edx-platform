@@ -1654,17 +1654,18 @@ def confirm_email_change(request, key):
 
 
 @ensure_csrf_cookie
+@require_POST
 def change_name_request(request):
     """ Log a request for a new name. """
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated():
         raise Http404
 
     try:
-        pnc = PendingNameChange.objects.get(user=request.user)
+        pnc = PendingNameChange.objects.get(user=request.user.id)
     except PendingNameChange.DoesNotExist:
         pnc = PendingNameChange()
     pnc.user = request.user
-    pnc.new_name = request.POST['new_name']
+    pnc.new_name = request.POST['new_name'].strip()
     pnc.rationale = request.POST['rationale']
     if len(pnc.new_name) < 2:
         return JsonResponse({

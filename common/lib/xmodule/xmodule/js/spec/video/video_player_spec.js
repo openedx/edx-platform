@@ -52,8 +52,6 @@ function (VideoPlayer) {
                 it('create video speed control', function () {
                     expect(state.videoSpeedControl).toBeDefined();
                     expect(state.videoSpeedControl.el).toHaveClass('speeds');
-                    expect(state.videoSpeedControl.speeds)
-                        .toEqual([ '0.75', '1.0', '1.25', '1.50' ]);
                     expect(state.speed).toEqual('1.50');
                 });
 

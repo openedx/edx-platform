@@ -37,7 +37,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
 
 
         var closeModalNew = function () {
-            $('body').removeClass('dialog-is-shown');
+            $('body').removeClass('modal-window-is-shown');
             $('.edit-section-publish-settings').removeClass('is-shown');
         };
 
@@ -51,7 +51,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                 $modal.find('.save-button').hide();
             }
             $modal.find('.section-name').html('"' + $(this).closest('.courseware-section').find('.section-name-span').text() + '"');
-            $('body').addClass('dialog-is-shown');
+            $('body').addClass('modal-window-is-shown');
             $('.edit-section-publish-settings').addClass('is-shown');
         };
 

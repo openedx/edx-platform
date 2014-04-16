@@ -12,11 +12,12 @@ Introduction to Peer Assessments
 
 Peer assessments allow instructors to assign questions that may not have definite answers. Students submit a response to a question, and then compare their peers' responses to a rubric that you create. Peer assessment problems also include self assessments, in which students compare their own responses to the rubric.
 
-Accessing Student Responses
-***********************************
+For more information, see the following sections:
 
-Student responses, along with other data for peer assessment assignments, are available from your course's `data czar <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/data_czar.html>`_.
-
+* :ref:`PA Elements`
+* :ref:`PA Scoring`
+* :ref:`PA Create a PA Problem`
+* :ref:`PA Access Status`
 
 .. _PA Elements:
 
@@ -32,7 +33,7 @@ When you create a peer assessment problem, you'll specify several elements:
 * The question.
 * The rubric.
 
-For step-by-step instructions, see :ref:`Create a PA Problem`.
+For step-by-step instructions, see :ref:`PA Create a PA Problem`.
 
 
 Number of Responses and Assessments
@@ -140,6 +141,8 @@ Note that different criteria in the same assignment can have different numbers o
 
 For more information, see :ref:`PA Add Rubric`.
 
+.. _PA Scoring:
+
 ***********************
 Peer Assessment Scoring
 ***********************
@@ -182,7 +185,7 @@ To calculate the final score, add the median scores for each criterion:
 
 Note, again, that final scores are calculated by criteria, not by individual assessor. Thus the response's score is not the median of the scores that each individual peer assessor gave the response.
 
-.. _Create a PA Problem:
+.. _PA Create a PA Problem:
 
 ********************************
 Create a Peer Assessment Problem
@@ -400,3 +403,24 @@ Step 6. Test the Problem
 ********************************
 
 To test your assignment, set up the assignment in a test course, and ask a group of beta users to submit responses and grade each other. The beta testers can then let you know if they found the question and the rubric easy to understand or if they found any problems with the assignment.
+
+.. _PA Access Status:
+
+******************************
+Access Status of Problem Steps
+******************************
+
+After your problem has opened, you can check the current number of students who are in each step--that is, how many students have submitted responses, have completed peer and self assessments, are waiting to assess responses or receive grades, or have finished the problem entirely. 
+
+To find this information, open the problem in the LMS, scroll to the bottom of the problem, and then click the black **Course Staff Information** banner.
+
+.. image:: /Images/PA_CourseStaffInfo_Collapsed.png
+   :alt: The Course Staff Information banner at the bottom of the peer assessment
+
+**Course Staff Information** expands, and you can see the number of students who are actively in each step of the problem.
+
+.. image:: /Images/PA_CourseStaffInfo_Expanded.png
+   :alt: The Course Staff Information box expanded, showing problem status
+
+
+

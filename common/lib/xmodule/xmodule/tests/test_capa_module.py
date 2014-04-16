@@ -82,6 +82,7 @@ class CapaFactory(object):
                attempts=None,
                problem_state=None,
                correct=False,
+               xml=None,
                **kwargs
                ):
         """
@@ -102,7 +103,9 @@ class CapaFactory(object):
         """
         location = Location(["i4x", "edX", "capa_test", "problem",
                              "SampleProblem{0}".format(cls.next_num())])
-        field_data = {'data': cls.sample_problem_xml}
+        if xml is None:
+            xml = cls.sample_problem_xml
+        field_data = {'data': xml}
         field_data.update(kwargs)
         descriptor = Mock(weight="1")
         if problem_state is not None:
@@ -933,11 +936,19 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(attempts=0)
         self.assertEqual(module.check_button_name(), "Check")
 
+    def test_check_button_checking_name(self):
+        module = CapaFactory.create(attempts=1, max_attempts=10)
+        self.assertEqual(module.check_button_checking_name(), "Checking...")
+
+        module = CapaFactory.create(attempts=10, max_attempts=10)
+        self.assertEqual(module.check_button_checking_name(), "Checking...")
+
     def test_check_button_name_customization(self):
-        module = CapaFactory.create(attempts=1,
-                                    max_attempts=10,
-                                    text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
-                                    )
+        module = CapaFactory.create(
+            attempts=1,
+            max_attempts=10,
+            text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
+        )
         self.assertEqual(module.check_button_name(), "Submit")
 
         module = CapaFactory.create(attempts=9,
@@ -945,6 +956,29 @@ class CapaModuleTest(unittest.TestCase):
                                     text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
                                     )
         self.assertEqual(module.check_button_name(), "Final Submit")
+
+    def test_check_button_checking_name_customization(self):
+        module = CapaFactory.create(
+            attempts=1,
+            max_attempts=10,
+            text_customization={
+                "custom_check": "Submit",
+                "custom_final_check": "Final Submit",
+                "custom_checking": "Checking..."
+            }
+        )
+        self.assertEqual(module.check_button_checking_name(), "Checking...")
+
+        module = CapaFactory.create(
+            attempts=9,
+            max_attempts=10,
+            text_customization={
+                "custom_check": "Submit",
+                "custom_final_check": "Final Submit",
+                "custom_checking": "Checking..."
+            }
+        )
+        self.assertEqual(module.check_button_checking_name(), "Checking...")
 
     def test_should_show_check_button(self):
 
@@ -1392,6 +1426,105 @@ class CapaModuleTest(unittest.TestCase):
         """
         module = CapaFactory.create()
         self.assertEquals(module.get_problem("data"), {'html': module.get_problem_html(encapsulate=False)})
+
+    # Standard question with shuffle="true" used by a few tests
+    common_shuffle_xml = textwrap.dedent("""
+        <problem>
+        <multiplechoiceresponse>
+          <choicegroup type="MultipleChoice" shuffle="true">
+            <choice correct="false">Apple</choice>
+            <choice correct="false">Banana</choice>
+            <choice correct="false">Chocolate</choice>
+            <choice correct ="true">Donut</choice>
+          </choicegroup>
+        </multiplechoiceresponse>
+        </problem>
+    """)
+
+    def test_check_unmask(self):
+        """
+        Check that shuffle unmasking is plumbed through: when check_problem is called,
+        unmasked names should appear in the track_function event_info.
+        """
+        module = CapaFactory.create(xml=self.common_shuffle_xml)
+        with patch.object(module.runtime, 'track_function') as mock_track_function:
+            get_request_dict = {CapaFactory.input_key(): 'mask_1'}  # the correct choice
+            module.check_problem(get_request_dict)
+            mock_call = mock_track_function.mock_calls[0]
+            event_info = mock_call[1][1]
+            # 'answers' key modified to use unmasked name
+            self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_3')
+            # 'permutation' key added to record how problem was shown
+            self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
+                              ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0']))
+            self.assertEquals(event_info['success'], 'correct')
+
+    def test_save_unmask(self):
+        """On problem save, unmasked data should appear on track_function."""
+        module = CapaFactory.create(xml=self.common_shuffle_xml)
+        with patch.object(module.runtime, 'track_function') as mock_track_function:
+            get_request_dict = {CapaFactory.input_key(): 'mask_0'}
+            module.save_problem(get_request_dict)
+            mock_call = mock_track_function.mock_calls[0]
+            event_info = mock_call[1][1]
+            self.assertEquals(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
+
+    def test_reset_unmask(self):
+        """On problem reset, unmask names should appear track_function."""
+        module = CapaFactory.create(xml=self.common_shuffle_xml)
+        get_request_dict = {CapaFactory.input_key(): 'mask_0'}
+        module.check_problem(get_request_dict)
+        # On reset, 'old_state' should use unmasked names
+        with patch.object(module.runtime, 'track_function') as mock_track_function:
+            module.reset_problem(None)
+            mock_call = mock_track_function.mock_calls[0]
+            event_info = mock_call[1][1]
+            self.assertEquals(mock_call[1][0], 'reset_problem')
+            self.assertEquals(event_info['old_state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
+
+    def test_rescore_unmask(self):
+        """On problem rescore, unmasked names should appear on track_function."""
+        module = CapaFactory.create(xml=self.common_shuffle_xml)
+        get_request_dict = {CapaFactory.input_key(): 'mask_0'}
+        module.check_problem(get_request_dict)
+        # On rescore, state/student_answers should use unmasked names
+        with patch.object(module.runtime, 'track_function') as mock_track_function:
+            module.rescore_problem()
+            mock_call = mock_track_function.mock_calls[0]
+            event_info = mock_call[1][1]
+            self.assertEquals(mock_call[1][0], 'problem_rescore')
+            self.assertEquals(event_info['state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
+
+    def test_check_unmask_answerpool(self):
+        """Check answer-pool question track_function uses unmasked names"""
+        xml = textwrap.dedent("""
+            <problem>
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="4">
+                <choice correct="false">Apple</choice>
+                <choice correct="false">Banana</choice>
+                <choice correct="false">Chocolate</choice>
+                <choice correct ="true">Donut</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+            </problem>
+        """)
+        module = CapaFactory.create(xml=xml)
+        with patch.object(module.runtime, 'track_function') as mock_track_function:
+            get_request_dict = {CapaFactory.input_key(): 'mask_0'}
+            module.check_problem(get_request_dict)
+            mock_call = mock_track_function.mock_calls[0]
+            event_info = mock_call[1][1]
+            print event_info
+            # 'answers' key modified to use unmasked name
+            self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
+            # 'permutation' key added to record how problem was shown
+            self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
+                              ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0']))
+            self.assertEquals(event_info['success'], 'incorrect')
 
 
 class ComplexEncoderTest(unittest.TestCase):

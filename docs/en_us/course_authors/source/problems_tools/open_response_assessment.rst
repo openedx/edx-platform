@@ -10,6 +10,8 @@ Introduction to Open Response Assessments
           you test them thoroughly in a practice course and only add them to
           courses that are **not** already running.
 
+.. warning:: Problems can occur when you move your course from edge.edx.org to edx.org, or vice versa, if your course has the same URL in both places. To work around this problem, make sure that the URLs are different by specifying a different university or course number when you create each course. For example, if your university is edX and your course number is edX101, you can specify the course number as **edx_101** (note the underscore) on Edge and **edX101** on edX.
+
 Open response assessments allow instructors to assess student learning
 through questions that may not have definite answers. Tens of thousands
 of students can receive feedback on written responses of varying lengths
@@ -167,6 +169,8 @@ Creating an open response assessment is a multi-step process.
 * :ref:`ORA Step 9`
 
 Each of these steps is described in detail below.
+
+.. warning:: Problems can occur when you move your course from edge.edx.org to edx.org, or vice versa, if your course has the same URL in both places. To work around this problem, make sure that the URLs are different by specifying a different university or course number when you create each course. For example, if your university is edX and your course number is edX101, you can specify the course number as **edx_101** (note the underscore) on Edge and **edX101** on edX.
 
 .. _ORA Step 1:
 

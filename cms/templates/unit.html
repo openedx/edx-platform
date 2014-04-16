@@ -1,6 +1,7 @@
 <%inherit file="base.html" />
 <%!
 from django.core.urlresolvers import reverse
+from contentstore.views.helpers import EDITING_TEMPLATES
 from django.utils.translation import ugettext as _
 from xmodule.modulestore.django import loc_mapper
 %>
@@ -8,6 +9,14 @@ from xmodule.modulestore.django import loc_mapper
 <%namespace name="units" file="widgets/units.html" />
 <%block name="title">${_("Individual Unit")}</%block>
 <%block name="bodyclass">is-signedin course unit view-unit feature-upload</%block>
+
+<%block name="header_extras">
+% for template_name in EDITING_TEMPLATES:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
 
 <%block name="jsextra">
   <script type='text/javascript'>
@@ -34,15 +43,8 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
   });
 });
   </script>
-
-  <script type="text/template" id="image-modal-tpl">
-    <%static:include path="js/imageModal.underscore" />
-  </script>
-  <script type="text/template" id="upload-dialog-tpl">
-      <%static:include path="js/upload-dialog.underscore" />
-  </script>
-
 </%block>
+
 <%block name="content">
   <div class="main-wrapper edit-state-${unit_state}" data-locator="${unit_locator}">
     <div class="inner-wrapper">
@@ -223,7 +225,4 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       </div>
     </div>
   </div>
-
-
-
 </%block>

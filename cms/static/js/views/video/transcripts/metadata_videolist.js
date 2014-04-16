@@ -46,7 +46,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
                 _.debounce(_.bind(this.inputHandler, this), this.inputDelay)
             );
 
-            this.component_locator = this.$el.closest('.component').data('locator');
+            this.component_locator = this.$el.closest('[data-locator]').data('locator');
         },
 
         render: function () {
@@ -55,7 +55,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
                 .apply(this, arguments);
 
             var self = this,
-                component_locator =  this.$el.closest('.component').data('locator'),
+                component_locator =  this.$el.closest('[data-locator]').data('locator'),
                 videoList = this.getVideoObjectsList(),
 
                 showServerError = function (response) {

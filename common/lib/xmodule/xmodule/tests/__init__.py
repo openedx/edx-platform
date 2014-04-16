@@ -131,7 +131,7 @@ class LogicTest(unittest.TestCase):
             url_name = ''
             category = 'test'
 
-        self.system = get_test_system()
+        self.system = get_test_system(course_id='test/course/id')
         self.descriptor = EmptyClass()
 
         self.xmodule_class = self.descriptor_class.module_class

@@ -180,7 +180,7 @@
                         expect(state.lang).toBe('de');
                         expect(state.storage.setItem)
                             .toHaveBeenCalledWith('language', 'de');
-                        expect($('.langs-list li.active').length).toBe(1);
+                        expect($('.langs-list li.is-active').length).toBe(1);
                     });
 
                     it('when clicking on link with current language', function () {
@@ -198,15 +198,15 @@
                         expect(state.lang).toBe('en');
                         expect(state.storage.setItem)
                             .not.toHaveBeenCalledWith('language', 'en');
-                        expect($('.langs-list li.active').length).toBe(1);
+                        expect($('.langs-list li.is-active').length).toBe(1);
                     });
 
                     it('open the language toggle on hover', function () {
                         state = jasmine.initializePlayer();
                         $('.lang').mouseenter();
-                        expect($('.lang')).toHaveClass('open');
+                        expect($('.lang')).toHaveClass('is-opened');
                         $('.lang').mouseleave();
-                        expect($('.lang')).not.toHaveClass('open');
+                        expect($('.lang')).not.toHaveClass('is-opened');
                     });
                 });
 

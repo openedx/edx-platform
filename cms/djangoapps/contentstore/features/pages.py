@@ -44,14 +44,13 @@ def click_edit_or_delete(step, edit_or_delete):
 
 @step(u'I change the name to "([^"]*)"$')
 def change_name(step, new_name):
-    settings_css = '#settings-mode a'
+    settings_css = '.settings-button'
     world.css_click(settings_css)
     input_css = 'input.setting-input'
     world.css_fill(input_css, new_name)
     if world.is_firefox():
         world.trigger_event(input_css)
-    save_button = 'a.save-button'
-    world.css_click(save_button)
+    world.save_component()
 
 
 @step(u'I drag the first static page to the last$')
@@ -99,25 +98,25 @@ def _verify_page_names(first, second):
 
 @step(u'the built-in pages are in the default order$')
 def built_in_pages_in_default_order(step):
-    expected_pages = ['Courseware', 'Course Info', 'Discussion', 'Wiki', 'Progress']
+    expected_pages = ['Courseware', 'Course Info', 'Wiki', 'Progress']
     see_pages_in_expected_order(expected_pages)
 
 
 @step(u'the built-in pages are switched$')
 def built_in_pages_switched(step):
-    expected_pages = ['Courseware', 'Course Info', 'Wiki', 'Progress', 'Discussion']
+    expected_pages = ['Courseware', 'Course Info', 'Progress', 'Wiki']
     see_pages_in_expected_order(expected_pages)
 
 
 @step(u'the pages are in the default order$')
 def pages_in_default_order(step):
-    expected_pages = ['Courseware', 'Course Info', 'Discussion', 'Wiki', 'Progress', 'First', 'Empty']
+    expected_pages = ['Courseware', 'Course Info', 'Wiki', 'Progress', 'First', 'Empty']
     see_pages_in_expected_order(expected_pages)
 
 
 @step(u'the pages are switched$$')
 def pages_are_switched(step):
-    expected_pages = ['Courseware', 'Course Info', 'Wiki', 'Progress', 'First', 'Empty', 'Discussion']
+    expected_pages = ['Courseware', 'Course Info', 'Progress', 'First', 'Empty', 'Wiki']
     see_pages_in_expected_order(expected_pages)
 
 

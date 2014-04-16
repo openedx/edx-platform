@@ -22,6 +22,7 @@ if Backbone?
 
     render: ->
       @$el.html(@renderTemplate())
+      @initLocal()
       @delegateEvents()
 
       @renderShowView()
@@ -33,10 +34,7 @@ if Backbone?
       @responses.on("add", @renderResponse)
       # Without a delay, jQuery doesn't add the loading extension defined in
       # utils.coffee before safeAjax is invoked, which results in an error
-      setTimeout(
-        => @loadResponses(INITIAL_RESPONSE_PAGE_SIZE, @$el.find(".responses"), true),
-        100
-      )
+      setTimeout((=> @loadInitialResponses()), 100)
       @
 
     cleanup: ->
@@ -59,8 +57,13 @@ if Backbone?
           @responses.add(data['content']['children'])
           @renderResponseCountAndPagination(data['content']['resp_total'])
           @trigger "thread:responses:rendered"
-        error: =>
-          if firstLoad
+        error: (xhr) =>
+          if xhr.status == 404
+            DiscussionUtil.discussionAlert(
+              gettext("Sorry"),
+              gettext("The thread you selected has been deleted. Please select another thread.")
+            )
+          else if firstLoad
             DiscussionUtil.discussionAlert(
               gettext("Sorry"),
               gettext("We had some trouble loading responses. Please reload the page.")
@@ -70,6 +73,9 @@ if Backbone?
               gettext("Sorry"),
               gettext("We had some trouble loading more responses. Please try again.")
             )
+
+    loadInitialResponses: () ->
+      @loadResponses(INITIAL_RESPONSE_PAGE_SIZE, @$el.find(".responses"), true)
 
     renderResponseCountAndPagination: (responseTotal) =>
       @$el.find(".response-count").html(
@@ -226,6 +232,9 @@ if Backbone?
     renderEditView: () ->
       @renderSubView(@editView)
 
+    getShowViewClass: () ->
+      return DiscussionThreadShowView
+
     createShowView: () ->
 
       if @editView?
@@ -233,7 +242,8 @@ if Backbone?
         @editView.$el.empty()
         @editView = null
 
-      @showView = new DiscussionThreadShowView(model: @model)
+      showViewClass = @getShowViewClass()
+      @showView = new showViewClass(model: @model)
       @showView.bind "thread:_delete", @_delete
       @showView.bind "thread:edit", @edit
 

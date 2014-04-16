@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from xmodule import modulestore
 import courseware
 
+
 def user_is_article_course_staff(user, article):
     """
     The root of a course wiki is /<course_number>. This means in case there

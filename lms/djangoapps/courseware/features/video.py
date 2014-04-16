@@ -6,7 +6,7 @@ import json
 import os
 import time
 import requests
-from nose.tools import assert_less, assert_equal
+from nose.tools import assert_less, assert_equal, assert_true, assert_false
 from common import i_am_registered_for_the_course, visit_scenario_item
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -44,6 +44,7 @@ VIDEO_BUTTONS = {
     'pause': '.video_control.pause',
     'fullscreen': '.add-fullscreen',
     'download_transcript': '.video-tracks > a',
+    'quality': '.quality-control',
 }
 
 VIDEO_MENUS = {
@@ -218,14 +219,14 @@ def navigate_to_an_item_in_a_sequence(number):
 
 
 def change_video_speed(speed):
-    world.browser.execute_script("$('.speeds').addClass('open')")
+    world.browser.execute_script("$('.speeds').addClass('is-opened')")
     speed_css = 'li[data-speed="{0}"] a'.format(speed)
     world.wait_for_visible('.speeds')
     world.css_click(speed_css)
 
 
 def open_menu(menu):
-    world.browser.execute_script("$('{selector}').parent().addClass('open')".format(
+    world.browser.execute_script("$('{selector}').parent().addClass('is-opened')".format(
         selector=VIDEO_MENUS[menu]
     ))
 
@@ -379,7 +380,7 @@ def open_video(_step, player_id):
 
 @step('video "([^"]*)" should start playing at speed "([^"]*)"$')
 def check_video_speed(_step, player_id, speed):
-    speed_css = '.speeds p.active'
+    speed_css = '.speeds .value'
     assert world.css_has_text(speed_css, '{0}x'.format(speed))
 
 
@@ -397,7 +398,6 @@ def video_is_rendered(_step, mode):
     }
     html_tag = modes[mode.lower()]
     assert world.css_find('.video {0}'.format(html_tag)).first
-    assert world.is_css_present('.speed_link')
 
 
 @step('videos have rendered in "([^"]*)" mode$')
@@ -412,7 +412,6 @@ def videos_are_rendered(_step, mode):
     actual = len(world.css_find('.video {0}'.format(html_tag)))
     expected = len(world.css_find('.xmodule_VideoModule'))
     assert actual == expected
-    assert world.is_css_present('.speed_link')
 
 
 @step('all sources are correct$')
@@ -494,8 +493,8 @@ def select_language(_step, code):
     world.wait_for_present('.lang.open')
     world.css_click(selector)
 
-    assert world.css_has_class(selector, 'active')
-    assert len(world.css_find(VIDEO_MENUS["language"] + ' li.active')) == 1
+    assert world.css_has_class(selector, 'is-active')
+    assert len(world.css_find(VIDEO_MENUS["language"] + ' li.is-active')) == 1
 
     # Make sure that all ajax requests that affects the display of captions are finished.
     # For example, request to get new translation etc.
@@ -542,11 +541,6 @@ def seek_video_to_n_seconds(_step, seconds):
 @step('I have a "([^"]*)" transcript file in assets$')
 def upload_to_assets(_step, filename):
     upload_file(filename, world.scenario_dict['COURSE'].location)
-
-
-@step('button "([^"]*)" is hidden$')
-def is_hidden_button(_step, button):
-    assert not world.css_visible(VIDEO_BUTTONS[button])
 
 
 @step('menu "([^"]*)" doesn\'t exist$')
@@ -629,4 +623,30 @@ def click_on_the_caption(_step, index, expected_time):
     find_caption_line_by_data_index(int(index)).click()
     actual_time = elapsed_time()
     assert int(expected_time) == actual_time
+
+
+@step('button "([^"]*)" is (hidden|visible)$')
+def is_hidden_button(_step, button, state):
+    selector = VIDEO_BUTTONS[button]
+    if state == 'hidden':
+        world.wait_for_invisible(selector)
+        assert_false(
+            world.css_visible(selector),
+            'Button {0} is invisible, but should be visible'.format(button)
+        )
+    else:
+        world.wait_for_visible(selector)
+        assert_true(
+            world.css_visible(selector),
+            'Button {0} is visible, but should be invisible'.format(button)
+        )
+
+
+@step('button "([^"]*)" is (active|inactive)$')
+def i_see_active_button(_step, button, state):
+    selector = VIDEO_BUTTONS[button]
+    if state == 'active':
+       assert world.css_has_class(selector, 'active')
+    else:
+       assert not world.css_has_class(selector, 'active')
 

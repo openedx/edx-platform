@@ -42,7 +42,6 @@ import hashlib
 import base64
 import urllib
 import textwrap
-import json
 from lxml import etree
 from webob import Response
 import mock
@@ -191,19 +190,15 @@ class LTIModule(LTIFields, XModule):
         PARAMETERS = [
             "lti_message_type",
             "lti_version",
-            "resource_link_id",
             "resource_link_title",
             "resource_link_description",
-            "user_id",
             "user_image",
-            "roles",
             "lis_person_name_given",
             "lis_person_name_family",
             "lis_person_name_full",
             "lis_person_contact_email_primary",
             "lis_person_sourcedid",
             "role_scope_mentor",
-            "context_id",
             "context_type",
             "context_title",
             "context_label",
@@ -230,8 +225,11 @@ class LTIModule(LTIFields, XModule):
             try:
                 param_name, param_value = [p.strip() for p in custom_parameter.split('=', 1)]
             except ValueError:
-                raise LTIError('Could not parse custom parameter: {0!r}. \
-                    Should be "x=y" string.'.format(custom_parameter))
+                _ = self.runtime.service(self, "i18n").ugettext
+                msg = _('Could not parse custom parameter: {custom_parameter}. Should be "x=y" string.').format(
+                    custom_parameter="{0!r}".format(custom_parameter)
+                )
+                raise LTIError(msg)
 
             # LTI specs: 'custom_' should be prepended before each custom parameter, as pointed in link above.
             if param_name not in PARAMETERS:
@@ -309,8 +307,26 @@ class LTIModule(LTIFields, XModule):
         context and imported into another system or context.
 
         This parameter is required.
+
+        Example:  u'edx.org-i4x-2-3-lti-31de800015cf4afb973356dbe81496df'
+
+        Hostname, edx.org,
+        makes resource_link_id change on import to another system.
+
+        Last part of location, location.name - 31de800015cf4afb973356dbe81496df,
+        is random hash, updated by course_id,
+        this makes resource_link_id unique inside single course.
+
+        First part of location is tag-org-course-category, i4x-2-3-lti.
+
+        Location.name itself does not change on import to another course,
+        but org and course_id change.
+
+        So together with org and course_id in a form of
+        i4x-2-3-lti-31de800015cf4afb973356dbe81496df this part of resource_link_id:
+        makes resource_link_id to be unique among courses inside same system.
         """
-        return unicode(urllib.quote(self.id))
+        return unicode(urllib.quote("{}-{}".format(self.system.hostname, self.location.html_id())))
 
     def get_lis_result_sourcedid(self):
         """
@@ -320,15 +336,11 @@ class LTIModule(LTIFields, XModule):
         This value may change for a particular resource_link_id / user_id  from one launch to the next.
         The TP should only retain the most recent value for this field for a particular resource_link_id / user_id.
         This field is generally optional, but is required for grading.
-
-        context_id is - is an opaque identifier that uniquely identifies the context that contains
-        the link being launched.
-        lti_id should be context_id by meaning.
         """
-        return "{id}:{resource_link}:{user_id}".format(
-            id=urllib.quote(self.lti_id),
-            resource_link=urllib.quote(self.get_resource_link_id()),
-            user_id=urllib.quote(self.get_user_id())
+        return "{context}:{resource_link}:{user_id}".format(
+            context=urllib.quote(self.context_id),
+            resource_link=self.get_resource_link_id(),
+            user_id=self.get_user_id()
         )
 
     def get_course(self):
@@ -338,6 +350,16 @@ class LTIModule(LTIFields, XModule):
         course_location = CourseDescriptor.id_to_location(self.course_id)
         course = self.descriptor.runtime.modulestore.get_item(course_location)
         return course
+
+    @property
+    def context_id(self):
+        """
+        Return context_id.
+
+        context_id is an opaque identifier that uniquely identifies the context (e.g., a course)
+        that contains the link being launched.
+        """
+        return self.course_id
 
     @property
     def role(self):
@@ -379,6 +401,7 @@ class LTIModule(LTIFields, XModule):
             u'resource_link_id': self.get_resource_link_id(),
             u'lis_result_sourcedid': self.get_lis_result_sourcedid(),
 
+            u'context_id': self.context_id,
         }
 
         if self.has_score:
@@ -634,8 +657,12 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             try:
                 lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
             except ValueError:
-                raise LTIError('Could not parse LTI passport: {0!r}. \
-                    Should be "id:key:secret" string.'.format(lti_passport))
+                _ = self.runtime.service(self, "i18n").ugettext
+                msg = _('Could not parse LTI passport: {lti_passport}. Should be "id:key:secret" string.').format(
+                    lti_passport='{0!r}'.format(lti_passport)
+                )
+                raise LTIError(msg)
+
             if lti_id == self.lti_id.strip():
                 return key, secret
         return '', ''

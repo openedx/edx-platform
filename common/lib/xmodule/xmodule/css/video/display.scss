@@ -317,7 +317,10 @@ div.video {
       div.secondary-controls {
         float: right;
 
-        div.speeds>a, div.volume>a, a.add-fullscreen, a.quality_control,
+        a.speed-button,
+        div.volume > a,
+        a.add-fullscreen,
+        a.quality-control,
         a.hide-subtitles {
           // overflow is used to bypass Firefox CSS :focus outline bug
           // http://johndoesdesign.com/blog/2012/css/firefox-and-its-css-focus-outline-bug/
@@ -334,7 +337,7 @@ div.video {
           float: left;
           position: relative;
 
-          &.open {
+          &.is-opened {
             .menu {
               display: block;
               opacity: 1;
@@ -377,7 +380,7 @@ div.video {
                 }
               }
 
-              &.active{
+              &.is-active{
                 a {
                   font-weight: bold;
                 }
@@ -393,8 +396,8 @@ div.video {
         }
 
         div.speeds {
-          &.open {
-            & > a {
+          &.is-opened {
+            .speed-button {
               background-image: url('../images/open-arrow.png');
             }
           }
@@ -407,7 +410,7 @@ div.video {
             }
           }
 
-          & > a {
+          .speed-button {
             @extend %video-button;
             @include clearfix();
             background-image: url('../images/closed-arrow.png');
@@ -421,7 +424,7 @@ div.video {
               width: 60px;
             }
 
-            h3 {
+            .label {
               float: left;
               font-size: em(14);
               font-weight: normal;
@@ -436,7 +439,7 @@ div.video {
               }
             }
 
-            p.active {
+            .value {
               float: left;
               font-weight: bold;
               margin-bottom: 0;
@@ -533,11 +536,10 @@ div.video {
         }
 
 
-        a.quality_control {
+        a.quality-control {
           @extend %video-button;
           background: url(../images/hd.png) center no-repeat;
           border-left: none;
-          display: none;
           float: left;
           padding: 0 11px;
           width: 30px;
@@ -546,6 +548,10 @@ div.video {
             background-color: #F44;
             color: #0ff;
             text-decoration: none;
+          }
+
+          &.is-hidden {
+            display: none !important;
           }
         }
 

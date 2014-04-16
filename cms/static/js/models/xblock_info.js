@@ -9,6 +9,8 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
             "category": null,
             "is_draft": null,
             "is_container": null,
+            "data": null,
+            "metadata" : null,
             "children": []
         }
     });

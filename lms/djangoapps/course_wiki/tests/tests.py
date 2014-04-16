@@ -53,10 +53,8 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
 
         self.assertEqual(resp['Location'], 'http://testserver' + redirected_to)
 
-
         # Now we test that the student will be redirected away from that page if the course doesn't exist
         # We do this in the same test because we want to make sure the redirected_to is constructed correctly
-
         # This is a location like /courses/*/wiki/* , but with an invalid course ID
         bad_course_wiki_page = redirected_to.replace(self.toy.location.course, "bad_course")
 
@@ -119,6 +117,7 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
         self.create_course_page(self.toy)
 
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
+
         referer = reverse("courseware", kwargs={'course_id': self.toy.id})
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
@@ -167,6 +166,4 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
         # and end up at the login page
         resp = self.client.get(course_wiki_page, follow=True)
         target_url, __ = resp.redirect_chain[-1]
-        self.assertTrue(
-            target_url.endswith(reverse('accounts_login'))
-        )
+        self.assertTrue(reverse('accounts_login') in target_url)

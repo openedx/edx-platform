@@ -14,6 +14,14 @@ body.view-container {
     padding-bottom: 0;
   }
 
+  .wrapper-mast .mast.has-navigation .nav-actions {
+    bottom: -($baseline*.75);
+
+    .nav-item .button {
+
+    }
+  }
+
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
     float: left;
@@ -22,6 +30,25 @@ body.view-container {
   .content-primary {
     margin-right: flex-gutter();
     width: flex-grid(9,12);
+    box-shadow: none;
+    border: 0;
+
+    .no-container-content {
+      @extend %ui-well;
+      padding: ($baseline*2);
+      background-color: $gray-l4;
+      text-align: center;
+      color: $gray;
+
+      .new-button {
+        @include font-size(14);
+        margin-left: $baseline;
+
+        [class^="icon-"] {
+          margin-right: ($baseline/2);
+        }
+      }
+    }
   }
 
   .content-supplementary {
@@ -35,10 +62,35 @@ body.view-container {
       margin-bottom: $baseline;
       border-top: 5px solid $blue;
       background-color: $white;
-      padding: ($baseline*.75) ($baseline*.75) ($baseline) ($baseline*.75);
+
+      .pub-status {
+        @extend %t-title6;
+        display: block;
+        background-color: $blue-l2;
+        padding: ($baseline/2) ($baseline*.75);
+        font-weight: 600;
+      }
+
+      &.published {
+        border-top: 5px solid $blue;
+
+        .pub-status {
+          background-color: $blue-t0;
+        }
+
+      }
+
+      &.draft {
+        border-top: 5px solid $gray-l1;
+
+        .pub-status {
+          background-color: $gray-l4;
+        }
+      }
 
       .copy {
         @extend %t-copy-sub1;
+        padding: ($baseline*.75) ($baseline*.75) ($baseline) ($baseline*.75);
       }
     }
   }
@@ -61,13 +113,13 @@ body.view-container  .content-primary {
 
     // CASE: nesting level xblock rendering
     &.level-nesting {
+      @include transition(all $tmg-f2 linear 0s);
       border: none;
       padding-bottom: $baseline;
       box-shadow: none;
 
       &:hover {
-        @include transition(all $tmg-f2 linear 0s);
-        background-color: $gray-l7;
+        background-color: $gray-l6;
         box-shadow: 0 0 1px $shadow-d2 inset;
       }
 
@@ -79,7 +131,7 @@ body.view-container  .content-primary {
       }
 
       .xblock-render {
-        margin: 0 $baseline $baseline $baseline;
+        margin: ($baseline/2);
       }
 
       // STATE: nesting level xblock is collapsed
@@ -92,10 +144,10 @@ body.view-container  .content-primary {
 
     // CASE: element level xblock rendering
     &.level-element {
+      @include transition(all $tmg-f2 linear 0s);
       box-shadow: none;
 
       &:hover {
-        @include transition(all $tmg-f2 linear 0s);
         border-color: $blue;
       }
 
@@ -108,7 +160,8 @@ body.view-container  .content-primary {
       }
 
       .xblock-render {
-        margin: $baseline;
+        margin: ($baseline/2);
+        padding: ($baseline/2);
       }
 
       // STATE: xBlock containers styled as rows.
@@ -145,3 +198,4 @@ body.view-container  .content-primary {
     text-transform: uppercase;
   }
 }
+

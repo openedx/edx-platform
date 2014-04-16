@@ -2069,10 +2069,6 @@ body.discussion {
             font-size: 12px;
             line-height: 30px;
 
-            &.collapse-post {
-              display: none;
-            }
-
             .icon {
               color: $link-color;
               margin-right: ($baseline*0.25);

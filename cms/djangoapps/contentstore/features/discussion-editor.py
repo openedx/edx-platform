@@ -21,3 +21,8 @@ def i_see_only_the_settings_and_values(step):
             ['Display Name', "Discussion", False],
             ['Subcategory', "Topic-Level Student-Visible Label", False]
         ])
+
+
+@step('I edit the component$')
+def i_edit_and_select_settings(_step):
+    world.edit_component()

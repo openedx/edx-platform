@@ -145,12 +145,13 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
                 target = $(event.currentTarget),
                 lang = target.data('lang'),
                 model = new FileUpload({
-                    title: gettext('Upload translation.'),
+                    title: gettext('Upload translation'),
                     fileFormats: ['srt']
                 }),
                 view = new VideoUploadDialog({
                     model: model,
                     url: self.model.get('urlRoot') + '/' + lang,
+                    parentElement: target.closest('.xblock-editor'),
                     onSuccess: function (response) {
                         if (!response['filename']) { return; }
 
@@ -161,7 +162,7 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
                     }
                 });
 
-            $('.wrapper-view').after(view.show().el);
+            view.show();
         },
 
         enableAdd: function() {

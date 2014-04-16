@@ -8,6 +8,14 @@
 <%block name="title">${_("Pages")}</%block>
 <%block name="bodyclass">is-signedin course view-static-pages</%block>
 
+<%block name="header_extras">
+% for template_name in ["basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
 <%block name="jsextra">
 <script type='text/javascript'>
     require(["js/models/explicit_url", "coffee/src/views/tabs",

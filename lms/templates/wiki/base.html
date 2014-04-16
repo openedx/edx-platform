@@ -49,8 +49,10 @@
 {% block nav_skip %}#wiki-content{% endblock %}
 
 {% block body %}
-  {% if course %}
+  {% if request.course %}
+  {% with course=request.course %}
     {% include "courseware/course_navigation.html" with active_page_context="wiki" %}
+  {% endwith %}
   {% endif %}
 
   <section class="container wiki {{ selected_tab }}" id="wiki-content">

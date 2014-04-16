@@ -10,6 +10,10 @@ Change Log
 
    * - Date
      - Change  
+   * - 4/11/14
+     - Expanded the :ref:`Grades` section to include a topic on interpreting the Student Answer Distribution report. 
+   * - 4/7/14
+     - Expanded the :ref:`Course Data`, :ref:`Enrollment`, and :ref:`Course_Staffing` sections.
    * - 04/03/14
      - Updated the :ref:`Adding Pages to a Course` chapter to reflect ability to
        :ref:`Show or Hide the Course Wiki Page`.

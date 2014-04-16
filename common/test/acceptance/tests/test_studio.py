@@ -112,6 +112,45 @@ class CoursePagesTest(UniqueCourseTest):
             page.visit()
 
 
+class DiscussionPreviewTest(UniqueCourseTest):
+    """
+    Tests that Inline Discussions are rendered with a custom preview in Studio
+    """
+
+    def setUp(self):
+        super(DiscussionPreviewTest, self).setUp()
+        CourseFixture(**self.course_info).add_children(
+            XBlockFixtureDesc("chapter", "Test Section").add_children(
+                XBlockFixtureDesc("sequential", "Test Subsection").add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit").add_children(
+                        XBlockFixtureDesc(
+                            "discussion",
+                            "Test Discussion",
+                        )
+                    )
+                )
+            )
+        ).install()
+
+        AutoAuthPage(self.browser, staff=True).visit()
+        cop = CourseOutlinePage(
+                self.browser,
+                self.course_info['org'],
+                self.course_info['number'],
+                self.course_info['run']
+                )
+        cop.visit()
+        self.unit = cop.section('Test Section').subsection('Test Subsection').toggle_expand().unit('Test Unit')
+        self.unit.go_to()
+
+    def test_is_preview(self):
+        """
+        Ensure that the preview version of the discussion is rendered.
+        """
+        self.assertTrue(self.unit.q(css=".discussion-preview").present)
+        self.assertFalse(self.unit.q(css=".discussion-show").present)
+
+
 class XBlockAcidBase(WebAppTest):
     """
     Base class for tests that verify that XBlock integration is working correctly

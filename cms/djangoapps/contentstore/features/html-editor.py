@@ -123,7 +123,7 @@ def perform_action_in_plugin(action):
 
 @step('I save the page$')
 def i_click_on_save(step):
-    world.save_component(step)
+    world.save_component()
 
 
 @step('the page text contains:')

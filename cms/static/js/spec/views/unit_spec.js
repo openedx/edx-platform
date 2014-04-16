@@ -1,4 +1,4 @@
-define(["coffee/src/views/unit", "js/models/module_info", "js/spec/create_sinon", "js/views/feedback_notification",
+define(["coffee/src/views/unit", "js/models/module_info", "js/spec_helpers/create_sinon", "js/views/feedback_notification",
     "jasmine-stealth"],
     function (UnitEditView, ModuleModel, create_sinon, NotificationView) {
         var verifyJSON = function (requests, json) {

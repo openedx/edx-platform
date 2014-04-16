@@ -27,7 +27,11 @@
     </button>
 
     <header>
-      <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=platform_name)}</h2>
+      <h2>
+	${_('{platform_name} Help').format(
+	    platform_name=u'<span class="edx">{}</span>'.format(platform_name)
+	)}
+      </h2>
       <hr>
     </header>
 
