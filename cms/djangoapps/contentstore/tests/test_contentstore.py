@@ -357,7 +357,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_create_static_tab_and_rename(self):
         module_store = modulestore('direct')
         course = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        item = ItemFactory.create(parent_location=course.id, category='static_tab', display_name="My Tab")
+        item = ItemFactory.create(course_key=course.id, category='static_tab', display_name="My Tab")
 
         expected_tabs = []
         expected_tabs.append({u'type': u'courseware'})
@@ -451,11 +451,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         course = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
         ItemFactory.create(
-            parent_location=course.id,
+            course_key=course.id,
             category="static_tab",
             display_name="Static_1")
         ItemFactory.create(
-            parent_location=course.id,
+            course_key=course.id,
             category="static_tab",
             display_name="Static_2")
 
@@ -1590,7 +1590,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_item(self):
         """Test creating a new xblock instance."""
-        course_key = _course_factory_create_course()
+        course = _course_factory_create_course()
 
         section_data = {
             'parent_locator': unicode(course.location),
@@ -1610,10 +1610,10 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""
-        locator = _course_factory_create_course()
+        course = _course_factory_create_course()
 
         problem_data = {
-            'parent_locator': unicode(locator),
+            'parent_locator': unicode(course.location),
             'category': 'problem'
         }
 
@@ -1902,7 +1902,7 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
         </video>
         '''
         self.video_descriptor = ItemFactory.create(
-            parent_location=course.id, category='video',
+            parent_location=course.location, category='video',
             data={'data': video_sample_xml}
         )
 
@@ -1984,8 +1984,7 @@ def _course_factory_create_course():
     """
     Creates a course via the CourseFactory and returns the locator for it.
     """
-    course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
-    return course.id
+    return CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
 
 def _get_course_id(course_data):
