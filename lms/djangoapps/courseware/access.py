@@ -190,7 +190,7 @@ def _has_access_course_desc(user, course, action):
                     for course_id in course.duplicate_courses:
                         if (user.courseenrollment_set.filter(course_id = course_id, is_active = True)):
                             return False
-                if (not user.courseenrollment_set.filter(course_id = course_id, is_active = True)):
+                if (not user.courseenrollment_set.filter(course_id = course.id, is_active = True)):
                     for dupcourse in modulestore().get_courses():
                         if course.id in dupcourse.duplicate_courses:
                             return False
