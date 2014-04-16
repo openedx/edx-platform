@@ -191,7 +191,7 @@ def _has_access_course_desc(user, course, action):
                         if (user.courseenrollment_set.filter(course_id = course_id, is_active = True)):
                             return False
                 for dupcourse in modulestore().get_courses():
-                    if dupcourse.id in course.duplicate_courses:
+                    if course.id in dupcourse.duplicate_courses:
                         return False
                 return True
             return _has_staff_access_to_descriptor(user, course)
