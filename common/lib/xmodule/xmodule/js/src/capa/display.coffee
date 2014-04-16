@@ -342,7 +342,18 @@ class @Problem
             answer = @$("#answer_#{key}, #solution_#{key}")
             answer.html(value)
             Collapsible.setCollapsibles(answer)
-            solution = $(value).find('.detailed-solution')
+
+            # Sometimes, `value` is just a string containing a MathJax formula.
+            # If this is the case, jQuery will throw an error in some corner cases
+            # because of an incorrect selector. We setup a try..catch so that
+            # the script doesn't break in such cases.
+            #
+            # We will fallback to the second `if statement` below, if an
+            # error is thrown by jQuery.
+            try
+                solution = $(value).find('.detailed-solution')
+            catch e
+                solution = {}
             if solution.length
               answer_text.push(solution)
             else
