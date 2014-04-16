@@ -330,29 +330,20 @@ You can provide transcripts for your video in other languages. To do this,
 you'll work with a third-party service to obtain an .srt transcript file for
 each language, and then associate the .srt file with the video in Studio.
 
-#. After you've obtained the .srt files for additional languages, upload the
-   .srt transcript files for those languages to the **Files & Uploads** page.
-   Make a note of the URL for each .srt file.
-  
-   For more information about uploading files, see :ref:`Add Files to a Course`.
-
-#. In Studio, open the Video component for the video.
+#. After you've obtained the .srt files for additional languages, open the Video component for the video.
 
 #. On the **Advanced** tab, scroll down to **Transcript Translations**, and then
-   click **Add**. Two boxes appear above the **Add** button.
+   click **Add**. 
 
-#. In the box on the left, enter the ISO 639-1 language code for the language of
-   the transcript file. To find a language code, see the second column of the
-   `Codes for the Representation of Names chart
-   <http://www.loc.gov/standards/iso639-2/php/code_list.php>`_. For example, you
-   might enter **es** for Spanish, or **ru** for Russian.
+#. In the drop-down list that appears, select the language for the transcript that you want to add. 
 
-#. In the box on the right, enter the URL for the language transcript file you
-   uploaded to the **Files & Uploads** page. For example, you might enter
-   **/static/Video1_Spanish.srt** or **/static/Video1_Russian.srt**.
+   An **Upload** button appears below the language.
 
-   .. image:: ../Images/TranscriptTranslations.png
-     :alt: Image of Transcript Translations fields
+#. Click **Upload**, browse to the .srt file for the language that you want, and then click **Open**.
+
+#. In the **Upload translation** dialog box, click **Upload**.
+
+#. Repeat steps 2 - 5 for any additional languages. 
 
 .. note:: Make sure that all your transcript file names are unique to each video
  and language. If you use the same transcript name in more than one Video
@@ -360,11 +351,12 @@ each language, and then associate the .srt file with the video in Studio.
  problem, you could name your foreign language transcript files according to
  the video's file name and the transcript language.
 
-  For example, you may have two videos, named 12345abcde.mp4 and 54321edcba.mp4.
-  Each video has a Russian transcript and a Spanish transcript. You can name the
-  transcripts for the first video 12345abcde_ru.srt and 12345abcde_es.srt, and
-  name the transcripts for the second video 54321edcba_ru.srt and
-  54321edcba_es.srt.
+ For example, you may have two videos, named video1.mp4 and video2.mp4. Each video has a Russian transcript and a Spanish transcript. You can name the transcripts for the first video video1_RU.srt and video1_ES.srt, and name the transcripts for the second video video2_RU.srt and video2_ES.srt.
+
+When your students view the video, they can click the **CC** button at the bottom of the video player to select a language.
+
+.. image:: ../Images/Video_LanguageTranscripts_LMS.png
+   :alt: Video playing with language options visible
 
 .. _Steps for sjson files:
 

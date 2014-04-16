@@ -12,6 +12,8 @@ April, 2014
 
    * - Date
      - Change  
+   * - 4/16/14
+     - Updated "Transcripts in Additional Languages" in :ref:`Working with Video Components`.
    * - 04/16/14
      - In support of new features, added the following sections to :ref:`Multiple Choice` problems:
 
