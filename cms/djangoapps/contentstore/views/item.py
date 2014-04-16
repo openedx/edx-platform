@@ -3,7 +3,6 @@ from __future__ import absolute_import
 
 import hashlib
 import logging
-import copy
 from uuid import uuid4
 
 from collections import OrderedDict
@@ -293,8 +292,12 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
         data = existing_item.get_explicitly_set_fields_by_scope(Scope.content)
 
     if children is not None:
-        # TODO: we need to make sure there is a test covering this (test_item.py did not hit it).
-        existing_item.children = copy.deepcopy(children)
+        children_usage_keys = [
+            UsageKey.from_string(child)
+            for child
+            in children
+        ]
+        existing_item.children = children_usage_keys
 
     # also commit any metadata which might have been passed along
     if nullout is not None or metadata is not None:
@@ -436,18 +439,18 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
         dest_module.children = []
         for child in source_item.children:
             dupe = _duplicate_item(dest_location, child, user=user)
-            dest_module.children.append(dupe.url())
+            dest_module.children.append(dupe)
         get_modulestore(dest_location).update_item(dest_module, user.id if user else None)
 
     if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
         parent = get_modulestore(parent_location).get_item(parent_location)
         # If source was already a child of the parent, add duplicate immediately afterward.
         # Otherwise, add child to end.
-        if duplicate_source_location.url() in parent.children:
-            source_index = parent.children.index(duplicate_source_location.url())
-            parent.children.insert(source_index + 1, dest_location.url())
+        if duplicate_source_location in parent.children:
+            source_index = parent.children.index(duplicate_source_location)
+            parent.children.insert(source_index + 1, dest_location)
         else:
-            parent.children.append(dest_location.url())
+            parent.children.append(dest_location)
         get_modulestore(parent_location).update_item(parent, user.id if user else None)
 
     return dest_location

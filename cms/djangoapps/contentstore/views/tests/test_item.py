@@ -150,9 +150,9 @@ class GetItem(ItemTest):
         self.assertIn('wrapper-xblock', html)
         self.assertRegexpMatches(
             html,
-            # The instance of the wrapper class will have an auto-generated ID (wrapperxxx). Allow anything
-            # for the 3 characters after wrapper.
-            (r'"/container/MITx.999.Robot_Super_Course/branch/draft/block/wrapper.{3}" class="action-button">\s*'
+            # The instance of the wrapper class will have an auto-generated ID. Allow any
+            # characters after wrapper.
+            (r'"/container/location:MITx\+999\+Robot_Super_Course\+wrapper\+\w+" class="action-button">\s*'
              '<span class="action-button-text">View</span>')
         )
 
@@ -328,14 +328,14 @@ class TestDuplicateItem(ItemTest):
         end of the children of the parent.
         """
         def verify_order(source_locator, parent_locator, source_position=None):
-            locator = self._duplicate_item(parent_locator, source_locator)
+            locator = UsageKey.from_string(self._duplicate_item(parent_locator, source_locator))
             parent = self.get_item_from_modulestore(parent_locator)
             children = parent.children
             if source_position is None:
                 self.assertFalse(source_locator in children, 'source item not expected in children array')
                 self.assertEqual(
                     children[len(children) - 1],
-                    self.get_old_id(locator).url(),
+                    locator,
                     "duplicated item not at end"
                 )
             else:
@@ -346,7 +346,7 @@ class TestDuplicateItem(ItemTest):
                 )
                 self.assertEqual(
                     children[source_position + 1],
-                    UsageKey.from_string(locator),
+                    locator,
                     "duplicated item not ordered after source item"
                 )
 
@@ -481,8 +481,8 @@ class TestEditItem(ItemTest):
         chapter2_locator = self.response_locator(resp_2)
 
         course = self.get_item_from_modulestore(self.unicode_usage_key)
-        self.assertIn(self.get_old_id(chapter1_locator).url(), course.children)
-        self.assertIn(self.get_old_id(chapter2_locator).url(), course.children)
+        self.assertIn(UsageKey.from_string(chapter1_locator), course.children)
+        self.assertIn(UsageKey.from_string(chapter2_locator), course.children)
 
         # Remove one child from the course.
         resp = self.client.ajax_post(
@@ -493,8 +493,8 @@ class TestEditItem(ItemTest):
 
         # Verify that the child is removed.
         course = self.get_item_from_modulestore(self.unicode_usage_key)
-        self.assertNotIn(self.get_old_id(chapter1_locator).url(), course.children)
-        self.assertIn(self.get_old_id(chapter2_locator).url(), course.children)
+        self.assertNotIn(UsageKey.from_string(chapter1_locator), course.children)
+        self.assertIn(UsageKey.from_string(chapter2_locator), course.children)
 
     def test_reorder_children(self):
         """
@@ -511,8 +511,8 @@ class TestEditItem(ItemTest):
         # Children must be on the sequential to reproduce the original bug,
         # as it is important that the parent (sequential) NOT be in the draft store.
         children = self.get_item_from_modulestore(self.seq_locator).children
-        self.assertEqual(self.get_old_id(unit1_locator).url(), children[1])
-        self.assertEqual(self.get_old_id(unit2_locator).url(), children[2])
+        self.assertEqual(UsageKey.from_string(unit1_locator), children[1])
+        self.assertEqual(UsageKey.from_string(unit2_locator), children[2])
 
         resp = self.client.ajax_post(
             self.seq_update_url,
@@ -521,9 +521,9 @@ class TestEditItem(ItemTest):
         self.assertEqual(resp.status_code, 200)
 
         children = self.get_item_from_modulestore(self.seq_locator).children
-        self.assertEqual(self.get_old_id(self.problem_locator).url(), children[0])
-        self.assertEqual(self.get_old_id(unit1_locator).url(), children[2])
-        self.assertEqual(self.get_old_id(unit2_locator).url(), children[1])
+        self.assertEqual(UsageKey.from_string(self.problem_locator), children[0])
+        self.assertEqual(UsageKey.from_string(unit1_locator), children[2])
+        self.assertEqual(UsageKey.from_string(unit2_locator), children[1])
 
     def test_make_public(self):
         """ Test making a private problem public (publishing it). """
