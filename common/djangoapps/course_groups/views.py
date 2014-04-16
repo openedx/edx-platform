@@ -176,6 +176,7 @@ def add_users_to_cohort(request, course_id, cohort_id):
 
     return json_http_response({'success': True,
                                'added': added,
+                               'changed': changed,
                                'present': present,
                                'unknown': unknown})
 
