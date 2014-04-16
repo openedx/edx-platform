@@ -119,9 +119,9 @@ class GroupBasedRole(AccessRole):
         """
         Remove the supplied django users from this role.
         """
+        entries = CourseAccessRole.objects.filter(user__in=users, role=self._role_name, course_id=self.course_key, org=self.org)
+        entries.delete()
         for user in users:
-            entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
-            entry.delete()
             if hasattr(user, '_roles'):
                 del user._roles
 

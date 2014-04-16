@@ -2,10 +2,11 @@
 Tests for contentstore/views/user.py.
 """
 import json
+
 from contentstore.tests.utils import CourseTestCase
+from contentstore.utils import reverse_course_url
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
-from xmodule.modulestore.django import loc_mapper
 from student.roles import CourseStaffRole, CourseInstructorRole
 from student import auth
 
@@ -24,12 +25,16 @@ class UsersTestCase(CourseTestCase):
         self.inactive_user.is_staff = False
         self.inactive_user.save()
 
-        self.location = loc_mapper().translate_location(self.course.location, False, True)
+        self.index_url = self.course_team_url()
+        self.detail_url = self.course_team_url(email=self.ext_user.email)
+        self.inactive_detail_url = self.course_team_url(email=self.inactive_user.email)
+        self.invalid_detail_url = self.course_team_url(email='nonexistent@user.com')
 
-        self.index_url = self.location.url_reverse('course_team', '')
-        self.detail_url = self.location.url_reverse('course_team', self.ext_user.email)
-        self.inactive_detail_url = self.location.url_reverse('course_team', self.inactive_user.email)
-        self.invalid_detail_url = self.location.url_reverse('course_team', "nonexistent@user.com")
+    def course_team_url(self, email=None):
+        return reverse_course_url(
+            'course_team_handler', self.course.id,
+            kwargs={'email': email} if email else {}
+        )
 
     def test_index(self):
         resp = self.client.get(self.index_url, HTTP_ACCEPT='text/html')
@@ -206,7 +211,7 @@ class UsersTestCase(CourseTestCase):
         self.user.is_staff = False
         self.user.save()
 
-        self_url = self.location.url_reverse('course_team', self.user.email)
+        self_url = self.course_team_url(email=self.user.email)
 
         resp = self.client.post(
             self_url,
@@ -236,7 +241,7 @@ class UsersTestCase(CourseTestCase):
         self.user.is_staff = False
         self.user.save()
 
-        self_url = self.location.url_reverse('course_team', self.user.email)
+        self_url = self.course_team_url(email=self.user.email)
 
         resp = self.client.delete(self_url)
         self.assertEqual(resp.status_code, 204)
