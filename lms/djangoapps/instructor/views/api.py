@@ -51,6 +51,10 @@ import analytics.distributions
 import analytics.csvs
 import csv
 
+# Submissions is a Django app that is currently installed
+# from the edx-ora2 repo, although it will likely move in the future.
+from submissions import api as sub_api
+
 from bulk_email.models import CourseEmail
 
 from .tools import (
@@ -739,7 +743,11 @@ def reset_student_attempts(request, course_id):
         try:
             enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=delete_module)
         except StudentModule.DoesNotExist:
-            return HttpResponseBadRequest("Module does not exist.")
+            return HttpResponseBadRequest(_("Module does not exist."))
+        except sub_api.SubmissionError:
+            # Trust the submissions API to log the error
+            error_msg = _("An error occurred while deleting the score.")
+            return HttpResponse(error_msg, status=500)
         response_payload['student'] = student_identifier
     elif all_students:
         instructor_task.api.submit_reset_problem_attempts_for_all_students(request, course_id, module_state_key)
