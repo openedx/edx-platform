@@ -351,7 +351,7 @@ each language, and then associate the .srt file with the video in Studio.
  problem, you could name your foreign language transcript files according to
  the video's file name and the transcript language.
 
- For example, you may have two videos, named video1.mp4 and video2.mp4. Each video has a Russian transcript and a Spanish transcript. You can name the transcripts for the first video video1_RU.srt and video1_ES.srt, and name the transcripts for the second video video2_RU.srt and video2_ES.srt.
+ For example, you have two videos, named video1.mp4 and video2.mp4. Each video has a Russian transcript and a Spanish transcript. You can name the transcripts for the first video video1_RU.srt and video1_ES.srt, and name the transcripts for the second video video2_RU.srt and video2_ES.srt.
 
 When your students view the video, they can click the **CC** button at the bottom of the video player to select a language.
 
