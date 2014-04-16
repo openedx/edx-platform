@@ -1,10 +1,8 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <article class="discussion-article" data-id="{{id}}">
-    <div class="local"><a href="javascript:void(0)" class="dogear action-follow"></a></div>
     <div class="discussion-post local">
         <header>
-            <a href="#" class="vote-btn" role="button" aria-pressed="false"/>
             <h3>{{title}}</h3>
             <p class="posted-details">                
                 {{#user}}
@@ -22,10 +20,6 @@
         </header>
         <div class="post-body">{{abbreviatedBody}}</div>
     </div>
-    <ol class="responses post-extended-content">
-        <li class="loading"></li>
-    </ol>
-
     <div class="local post-tools">
         <a href="{{permalink}}">${_("View discussion")}</a>
     </div>
