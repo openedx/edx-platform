@@ -74,7 +74,7 @@ def import_handler(request, course_key_string):
             raise NotImplementedError('coming soon')
         else:
             data_root = path(settings.GITHUB_REPO_ROOT)
-            course_subdir = "{0}-{1}".format(course_key.org, course_key.offering)
+            course_subdir = "{0}-{1}-{2}".format(course_key.org, course_key.course, course_key.run)
             course_dir = data_root / course_subdir
 
             filename = request.FILES['course-data'].name
