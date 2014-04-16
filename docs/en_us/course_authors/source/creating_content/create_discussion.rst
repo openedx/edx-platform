@@ -14,7 +14,7 @@ Unit and give students a chance to respond and interact.
 See the following topics:
 
 * :ref:`Create a Discussion Component`
-* :ref:`A Student's View of the Discussion`
+* :ref:`A Students View of the Discussion`
 
 
 Before you add a Discussion component, it is generally a good idea to add an
@@ -33,51 +33,37 @@ Also see the following chapters:
 Create a Discussion Component 
 *****************************
 
-.. note:: Before you create a Discussion component, consider that Discussion
- categories are immediately visible in your forum (on the Discussion tab for
- your course) when you create them, even though the unit that contains the
- Discussion component is set to Private.
-
-
 To create a new Discussion component in an existing unit, ensure the unit is
 Private. For more information, see :ref:`Public and
 Private Units`.
 
-#. Under **Add New Component**, click the **discussion** icon.
+#. Under **Add New Component**, click **Discussion**.
 
+#. In the Discussion component that appears, click **Edit**.
+  
    .. image:: ../Images/NewComponent_Discussion.png
-    :alt: Image of the adding a new discussion component
-  
-   The Discussion component is added:
-  
-   .. image:: ../Images/EditDiscussionComponent.png
     :alt: Image of the discussion component with the Edit button circled
 
-
-#. In the Discussion component, click **Edit**.
-
-   The Discussion component editor opens.
+#. When the Discussion component editor opens, follow the guidelines in the editor to fill in the **Category**, **Display Name**, and **Subcategory** fields.
    
    .. image:: ../Images/DiscussionComponentEditor.png
     :alt: Image of the discussion component editor
-
-#. Follow the guidelines in the editor to fill in the **Category**, **Display
-   Name**, and **Subcategory**.
   
 #. Click **Save**.
 
-.. note:: For a Discussion component to be visible in the **Discussion** tab's
- topic drop-down list, the unit must be published and the section and
- subsection must have a release date in the past. See :ref:`Publishing Your
- Course` for more information.
+.. warning:: You should always use these steps to create a discussion component. If you create a discussion component by using the **Duplicate** button in Studio, both discussion components will contain the same conversations, even if users post in different discussions.
 
-.. _A Student's View of the Discussion:
+Discussion *categories* are immediately visible on the **Discussion** tab for your course when you create them, even if the unit that contains the Discussion component is set to Private. However, an individual Discussion component is not visible until the unit is published and release dates for the section and subsection have passed. See :ref:`Publishing Your Course` for more information.
+
+Additionally, you cannot see posts, responses, or comments in a Discussion component when you are working in Studio. To see the discussion, go to the unit that contains the Discussion component in Studio, and then click **Preview** or **View Live** under **Unit Settings**.
+
+.. _A Students View of the Discussion:
 
 **********************************
 A Student's View of the Discussion 
 **********************************
 
-For students, Discussion component names appear in the course ribbon at the top
+For students, the display name for the Discussion component appears in the course ribbon at the top
 of the page:
 
 .. image:: ../Images/DiscussionComponent_LMS_Ribbon.png
