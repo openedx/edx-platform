@@ -15,7 +15,7 @@ urlpatterns = patterns('',  # nopep8
     url(r'^transcripts/rename$', 'contentstore.views.rename_transcripts', name='rename_transcripts'),
     url(r'^transcripts/save$', 'contentstore.views.save_transcripts', name='save_transcripts'),
 
-    url(r'^preview/xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+    url(r'^preview/xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
         'contentstore.views.preview_handler', name='preview_handler'),
 
     url(r'^xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',

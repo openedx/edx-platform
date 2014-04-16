@@ -14,7 +14,6 @@ from edxmako.shortcuts import render_to_response
 
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.django import loc_mapper
 
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -226,10 +225,6 @@ def unit_handler(request, usage_key_string):
             )
 
         xblocks = item.get_children()
-        locators = [
-            loc_mapper().translate_location(xblock.location, False, True)
-            for xblock in xblocks
-        ]
 
         # TODO (cpennington): If we share units between courses,
         # this will need to change to check permissions correctly so as
@@ -267,7 +262,7 @@ def unit_handler(request, usage_key_string):
             'context_course': course,
             'unit': item,
             'unit_locator': usage_key,
-            'locators': locators,
+            'xblocks': xblocks,
             'component_templates': component_templates,
             'draft_preview_link': preview_lms_link,
             'published_preview_link': lms_link,

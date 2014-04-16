@@ -19,7 +19,7 @@ class GetPreviewHtmlTestCase(TestCase):
     get_preview_fragment via the xblock RESTful API.
     """
 
-    def test_preview_handler(self):
+    def test_preview_fragment(self):
         """
         Test for calling get_preview_html.
 
