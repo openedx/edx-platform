@@ -1,0 +1,83 @@
+###################################
+April 16, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of April
+16, 2014.  See previous pages in this document for a history of changes.
+
+**************************
+edX Documentation
+**************************
+
+You can now access the `edX Status <http://status.edx.org/>`_ page to get an up-
+to-date status for all services on edx.org and edX Edge. The page also includes
+the Twitter feed for @edXstatus, which the edX Operations team uses to post
+updates.
+
+You can access the public edX `roadmap <https://edx-
+wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap>`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course.
+  <http://edx.readthedocs.org/projects/ca/en/latest/>`_ You can also download
+  the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include: 
+
+  * In support of new features, added the following sections to `Multiple Choice <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#multiple-choice>`_ problems:
+    
+    * `Shuffle Answers in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#shuffle-answers-in-a-multiple-choice-problem>`_
+    * `Targeted Feedback in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#targeted-feedback-in-a-multiple-choice-problem>`_
+    * `Answer Pools in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#answer-pools-in-a-multiple-choice-problem>`_
+      
+  * Expanded the `Grade and Answer Data <http://edx.readthedocs.org/projects/ca/en/latest/running_course/course_grades.html#grades>`_ section to include a topic on interpreting the Student Answer Distribution report.
+
+* `edX Data Documentation
+  <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
+
+* `edX Platform Developer Documentation
+  <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
+
+
+*************
+edX Studio
+*************
+
+* **Multiple Choice Problem Enhancements**
+
+  Multiple choice problems now support shuffling answers, providing targeted
+  feedback, and answer pools. See the following documentation for more
+  information:
+
+  * `Shuffle Answers in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#shuffle-answers-in-a-multiple-choice-problem>`_
+  * `Targeted Feedback in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#targeted-feedback-in-a-multiple-choice-problem>`_
+  * `Answer Pools in a Multiple Choice Problem <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/common_problems.html#answer-pools-in-a-multiple-choice-problem>`_
+
+* When you import a large course, your browser may time out while the course is
+  being imported.  In this situation, the following message is now displayed on
+  the Import page: *Your browser has timed out but the server is still
+  processing your import. Please wait 5 min and verify that the new content has
+  appeared*. (STUD-1283)
+
+* In Studio, the Discussion component is updated with the following text: *To
+  view live discussions, click Preview or View Live in Unit Settings*. (FOR-429)
+
+***************************************
+edX Learning Management System
+***************************************
+
+* When you enrolled students in a course on edx.org and sent a notification
+  email message, the message included an invalid link to the course. This
+  problem is now resolved. (LMS-2217)
+
+* The video player now only shows the HD button when an HD video option is
+  available. (BLD-937)
+
+===========================
+Accessibility Improvements
+===========================
+
+* The PDF viewer used for textbooks was updated and is now accessible to screen
+  readers. (LMS-2276)
