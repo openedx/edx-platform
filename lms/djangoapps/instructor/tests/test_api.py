@@ -435,7 +435,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
     def test_enroll_email_not_registered_mktgsite(self):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # Try with marketing site enabled
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
@@ -633,7 +633,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_enroll_email_not_registered_shib_mktgsite(self, mock_uses_shib):
         mock_uses_shib.return_value = True
 
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # Try with marketing site enabled
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
@@ -777,7 +777,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         )
 
     def test_add_notenrolled_email_mktgsite(self):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # Try with marketing site enabled
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': True})

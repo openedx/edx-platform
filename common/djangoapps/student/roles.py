@@ -131,10 +131,9 @@ class GroupBasedRole(AccessRole):
         """
         # How do I just do a select user u join course_access_role c on u.id=c.user where c.role=role
         # that is, not load the CourseAccessRole objects just query through them?
-        entries = CourseAccessRole.objects.filter(
-            role=self._role_name, course_id=self.course_key, org=self.org
-        ).select_related('user').all()
-        return [entry.user for entry in entries]
+        return User.objects.filter(
+            courseaccessrole__role=self._role_name, courseaccessrole__course_id=self.course_key, courseaccessrole__org=self.org
+        )
 
 
 class CourseRole(GroupBasedRole):
