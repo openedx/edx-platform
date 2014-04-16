@@ -328,8 +328,14 @@
 
         .embed-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
+          @extend %t-copy-sub2;
           padding-left: ($baseline*0.75);
           color: $gray-l2;
+
+          .label {
+            display: inline-block;
+            width: ($baseline*2);
+          }
 
           .embeddable-xml-input {
             @include transition(all $tmg-f2 ease-in-out 0s);
@@ -337,13 +343,14 @@
             box-shadow: none;
             border: 1px solid transparent;
             background: none;
-            width: 100%;
+            padding: ($baseline/5);
             color: $gray-l2;
 
             &:focus {
               background-color: $white;
               box-shadow: 0 1px 5px $shadow-l1 inset;
               border: 1px solid $gray-l3;
+              color: $black;
             }
           }
         }
