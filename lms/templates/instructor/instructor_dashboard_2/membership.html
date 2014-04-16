@@ -30,9 +30,10 @@
 <div class="batch-enrollment">
   <h2> ${_("Batch Enrollment")} </h2>
   <p>
-    <label for="student-emails">${_("Enter email addresses separated by new lines or commas.")}
+    <label for="student-ids">
+      ${_("Enter email addresses and/or usernames separated by new lines or commas.")}
       ${_("You will not get notification for emails that bounce, so please double-check spelling.")} </label>
-    <textarea rows="6" name="student-emails" placeholder="${_("Email Addresses")}" spellcheck="false"></textarea>
+    <textarea rows="6" name="student-ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
   </p>
 
   <div class="enroll-option">
@@ -70,15 +71,28 @@
 
 %if section_data['access']['instructor']:
 <div class="batch-beta-testers">
-  <h2> ${_("Batch Beta Testers")} </h2>
+  <h2> ${_("Batch Beta Tester Addition")} </h2>
   <p>
-    <label for="student-emails-for-beta">
-      ${_("Enter email addresses separated by new lines or commas.")}<br/>
+    <label for="student-ids-for-beta">
+      ${_("Enter email addresses and/or usernames separated by new lines or commas.")}<br/>
       ${_("Note: Users must have an activated {platform_name} account before they can be enrolled as a beta tester.").format(platform_name=settings.PLATFORM_NAME)}
     </label>
 
-  <textarea rows="6" cols="50" name="student-emails-for-beta" placeholder="${_("Email Addresses")}" spellcheck="false"></textarea>
+  <textarea rows="6" cols="50" name="student-ids-for-beta" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
   </p>
+
+  <div class="enroll-option">
+    <input type="checkbox" name="auto-enroll" value="Auto-Enroll" checked="yes">
+    <label for="auto-enroll-beta">${_("Auto Enroll")}</label>
+    <div class="hint auto-enroll-beta-hint">
+      <span class="hint-caret"></span>
+      <p>
+	${_("If this option is <em>checked</em>, users who have not enrolled in your course will be automatically enrolled.")}
+	<br /><br />
+	${_("Checking this box has no effect if 'Remove beta testers' is selected.")}
+      </p>
+    </div>
+  </div>
 
   <div class="enroll-option">
     <input type="checkbox" name="email-students" value="Notify-students-by-email" checked="yes">
