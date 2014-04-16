@@ -45,20 +45,17 @@ class Basetranscripts(CourseTestCase):
     def setUp(self):
         """Create initial data."""
         super(Basetranscripts, self).setUp()
-        self.unicode_locator = unicode(
-            loc_mapper().translate_location(self.course.location, False, True)
-        )
 
         # Add video module
         data = {
-            'parent_locator': self.unicode_locator,
+            'parent_locator': unicode(self.course.location),
             'category': 'video',
             'type': 'video'
         }
         resp = self.client.ajax_post('/xblock', data)
-        self.item_locator, self.item_location = self._get_locator(resp)
         self.assertEqual(resp.status_code, 200)
 
+        self.item_locator, self.item_location = self._get_locator(resp)
         self.item = modulestore().get_item(self.item_location)
         # hI10vDNYz4M - valid Youtube ID with transcripts.
         # JMD_ifUUfsU, AKqURZnYqpk, DYpADpL7jAY - valid Youtube IDs without transcripts.
