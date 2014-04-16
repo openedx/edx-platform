@@ -41,7 +41,7 @@ Private Units`.
 
 #. In the Discussion component that appears, click **Edit**.
   
-   .. image:: ../Images/NewComponent_Discussion.png
+   .. image:: ../Images/Disc_Create_Edit.png
     :alt: Image of the discussion component with the Edit button circled
 
 #. When the Discussion component editor opens, follow the guidelines in the editor to fill in the **Category**, **Display Name**, and **Subcategory** fields.
