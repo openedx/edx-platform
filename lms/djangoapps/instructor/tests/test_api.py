@@ -12,6 +12,7 @@ from django.test import TestCase
 from nose.tools import raises
 from mock import Mock, patch
 from django.test.utils import override_settings
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
@@ -28,6 +29,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory
 from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory
 from student.roles import CourseBetaTesterRole
+from microsite_configuration import microsite
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
@@ -277,10 +279,25 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.notregistered_email = 'robot-not-an-email-yet@robot.org'
         self.assertEqual(User.objects.filter(email=self.notregistered_email).count(), 0)
 
+        # Email URL values
+        self.site_name = microsite.get_value(
+            'SITE_NAME',
+            settings.SITE_NAME
+        )
+        self.registration_url = 'https://{}/register'.format(self.site_name)
+        self.about_url = 'https://{}/courses/MITx/999/Robot_Super_Course/about'.format(self.site_name)
+        self.course_url = 'https://{}/courses/MITx/999/Robot_Super_Course/'.format(self.site_name)
+
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
         # (comment because pylint C0103)
         # self.maxDiff = None
+
+    def tearDown(self):
+        """
+        Undo all patches.
+        """
+        patch.stopall()
 
     def test_missing_params(self):
         """ Test missing all query parameters. """
@@ -363,7 +380,6 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # test that the user is now enrolled
         user = User.objects.get(email=self.notenrolled_student.email)
         self.assertTrue(CourseEnrollment.is_enrolled(user, self.course.id))
-        course_url = self.request.build_absolute_uri(reverse('course_root', kwargs={'course_id': self.course.id.to_deprecated_string()}))
 
         # test the response data
         expected = {
@@ -403,13 +419,13 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "at edx.org by a member of the course staff. "
             "The course should now appear on your edx.org dashboard.\n\n"
             "To start accessing course materials, please visit "
-            "{site_url}\n\n----\n"
-            "This email was automatically sent from edx.org to NotEnrolled Student").format(site_url=course_url)
+            "{course_url}\n\n----\n"
+            "This email was automatically sent from edx.org to NotEnrolled Student").format(
+                course_url=self.course_url
+            )
         )
 
     def test_enroll_with_email_not_registered(self):
-        registration_url = self.request.build_absolute_uri(reverse('student.views.register_user'))
-        about_url = self.request.build_absolute_uri(reverse('about_course', args=[self.course.id.to_deprecated_string()]))
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
         self.assertEqual(response.status_code, 200)
@@ -427,14 +443,16 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, "
             "visit {about_url} to join the course.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org").format(registration_url=registration_url, about_url=about_url)
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org").format(
+                registration_url=self.registration_url, about_url=self.about_url
+            )
         )
 
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_enroll_email_not_registered_mktgsite(self):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # Try with marketing site enabled
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -450,7 +468,6 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True})
         self.assertEqual(response.status_code, 200)
-        registration_url = self.request.build_absolute_uri(reverse('student.views.register_user'))
 
         # Check the outbox
         self.assertEqual(len(mail.outbox), 1)
@@ -464,7 +481,9 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "To finish your registration, please visit {registration_url} and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, you will see Robot Super Course listed on your dashboard.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org").format(registration_url=registration_url)
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org").format(
+                registration_url=self.registration_url
+            )
         )
 
     def test_unenroll_without_email(self):
@@ -617,18 +636,20 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To access the course visit " + self.request.build_absolute_uri(reverse('about_course', args=[self.course.id.to_deprecated_string()])) + " and register for the course.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+            "To access the course visit {about_url} and register for the course.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
+                about_url=self.about_url
+            )
         )
 
     @patch('instructor.enrollment.uses_shib')
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_enroll_email_not_registered_shib_mktgsite(self, mock_uses_shib):
+        # Try with marketing site enabled and shib on
         mock_uses_shib.return_value = True
 
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        # Try with marketing site enabled
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
+        response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -656,8 +677,10 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To access the course visit " + self.request.build_absolute_uri(reverse('course_root', kwargs={'course_id': self.course.id.to_deprecated_string()})) + " and login.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+            "To access the course visit {course_url} and login.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
+                course_url=self.course_url
+            )
         )
 
 
@@ -685,10 +708,23 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
         self.request = RequestFactory().request()
 
+        # Email URL values
+        self.site_name = microsite.get_value(
+            'SITE_NAME',
+            settings.SITE_NAME
+        )
+        self.about_url = 'https://{}/courses/MITx/999/Robot_Super_Course/about'.format(self.site_name)
+
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
         # (comment because pylint C0103)
         # self.maxDiff = None
+
+    def tearDown(self):
+        """
+        Undo all patches.
+        """
+        patch.stopall()
 
     def test_missing_params(self):
         """ Test missing all query parameters. """
@@ -729,7 +765,6 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
     def test_add_notenrolled_with_email(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        about_url = self.request.build_absolute_uri(reverse('about_course', args=[self.course.id.to_deprecated_string()]))
         response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
         self.assertEqual(response.status_code, 200)
 
@@ -763,16 +798,16 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
             "the course and begin the beta test.\n\n----\n"
             "This email was automatically sent from edx.org to {2}".format(
                 self.notenrolled_student.profile.name,
-                about_url,
+                self.about_url,
                 self.notenrolled_student.email
             )
         )
 
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_add_notenrolled_email_mktgsite(self):
-        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # Try with marketing site enabled
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
