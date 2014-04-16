@@ -19,10 +19,17 @@ ${_("You have been invited to be a beta tester for {course_name} at {site_name} 
 <br/>
 </%block>
 
+<%block name="call_to_action_href">
 % if course_about_url is not None:
-<%block name="call_to_action_href">${course_about_url}</%block>
-<%block name="call_to_action_label">${_("Join the course")}</%block>
+  ${course_about_url}
 % else:
-<%block name="call_to_action_href">${site_name}</%block>
-<%block name="call_to_action_label">${_("Enroll in the course")}</%block>
+  ${site_name}
 % endif
+</%block>
+<%block name="call_to_action_label">
+% if course_about_url is not None:
+  ${_("Join the course")}
+% else:
+  ${_("Enroll in the course")}
+% endif
+</%block>

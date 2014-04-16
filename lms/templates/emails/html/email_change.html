@@ -29,11 +29,13 @@ ${_("We received a request to change the e-mail associated with your "
 
 </%block>
 
+<%block name="call_to_action_href">
 % if is_secure:
-<%block name="call_to_action_href">https://${ site }/email_confirm/${ key }</%block>
+https://${ site }/email_confirm/${ key }
 % else:
-<%block name="call_to_action_href">http://${ site }/email_confirm/${ key }</%block>
+http://${ site }/email_confirm/${ key }
 % endif
+</%block>
 
 <%block name="call_to_action_label">${_("Confirm change")}</%block>
 
