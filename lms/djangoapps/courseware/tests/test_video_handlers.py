@@ -226,7 +226,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
     DATA = """
         <video show_captions="true"
         display_name="A Name"
-        sub='blahblah'
+        sub='OEoXaMPEzfM'
         >
             <source src="example.mp4"/>
             <source src="example.webm"/>
@@ -278,23 +278,6 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.body, 'Subs!')
         self.assertEqual(response.headers['Content-Type'], 'application/x-subrip; charset=utf-8')
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="塞.srt"')
-
-    def test_download_static_transcript(self):
-        """
-        Set course static_asset_path and ensure we get redirected to that path
-        if it isn't found in the contentstore
-        """
-        self.course.static_asset_path = 'dummy/static'
-        self.course.save()
-        store = editable_modulestore()
-        store.update_item(self.course, 'blahblah')
-        request = Request.blank('/download')
-        response = self.item.transcript(request=request, dispatch='download')
-        self.assertEqual(response.status, '307 Temporary Redirect')
-        self.assertIn(
-            ('Location', '/static/dummy/static/subs_blahblah.srt.sjson'),
-            response.headerlist
-        )
 
 
 class TestTranscriptTranslationGetDispatch(TestVideo):
@@ -429,7 +412,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         self.course.static_asset_path = 'dummy/static'
         self.course.save()
         store = editable_modulestore()
-        store.update_item(self.course, 'blahblah')
+        store.update_item(self.course, 'OEoXaMPEzfM')
 
         # Test youtube style en
         request = Request.blank('/translation/en?videoId=12345')
@@ -441,23 +424,20 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         )
 
         # Test HTML5 video style
-        self.item.sub = 'blahblah'
+        self.item.sub = 'OEoXaMPEzfM'
         request = Request.blank('/translation/en')
         response = self.item.transcript(request=request, dispatch='translation/en')
         self.assertEqual(response.status, '307 Temporary Redirect')
         self.assertIn(
-            ('Location', '/static/dummy/static/subs_blahblah.srt.sjson'),
+            ('Location', '/static/dummy/static/subs_OEoXaMPEzfM.srt.sjson'),
             response.headerlist
         )
 
-        # Test different language
+        # Test different language to ensure we are just ignoring it since we can't
+        # translate with static fallback
         request = Request.blank('/translation/uk')
         response = self.item.transcript(request=request, dispatch='translation/uk')
-        self.assertEqual(response.status, '307 Temporary Redirect')
-        self.assertIn(
-            ('Location', '/static/dummy/static/uk_subs_blahblah.srt.sjson'),
-            response.headerlist
-        )
+        self.assertEqual(response.status, '404 Not Found')
 
 
 class TestStudioTranscriptTranslationGetDispatch(TestVideo):

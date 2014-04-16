@@ -175,15 +175,21 @@ class VideoStudentViewHandlers(object):
 
     def get_static_transcript(self, request):
         """
-        Return URL for static transcript if it isn't available in the content store
+        Courses that are imported with the --nostatic flag do not show
+        transcripts/captions properly even if those captions are stored inside
+        their static folder. This adds a last resort method of redirecting to
+        the static asset path of the course if the transcript can't be found
+        inside the contentstore and the course has the static_asset_path field
+        set.
         """
-        # Try to return static redirect to the transcript as a last
-        # resort, but return 404 if we don't
         response = Response(status=404)
-        vid_id = request.GET.get('videoId', None)
+        # Only do redirect for English
+        if not self.transcript_language == 'en':
+            return response
 
-        if vid_id:
-            transcript_name = vid_id
+        video_id = request.GET.get('videoId', None)
+        if video_id:
+            transcript_name = video_id
         else:
             transcript_name = self.sub
 
@@ -238,16 +244,18 @@ class VideoStudentViewHandlers(object):
 
             try:
                 transcript = self.translation(request.GET.get('videoId', None))
+            except NotFoundError, ex:
+                log.info(ex.message)
+                # Try to return static URL redirection as last resort
+                # if no translation is required
+                return self.get_static_transcript(request)
             except (
                 TranscriptException,
-                NotFoundError,
                 UnicodeDecodeError,
-                TranscriptException,
                 TranscriptsGenerationException
             ) as ex:
                 log.info(ex.message)
-                # Try to return static URL redirection as last resort
-                return self.get_static_transcript(request)
+                response = Response(status=404)
             else:
                 response = Response(transcript, headerlist=[('Content-Language', language)])
                 response.content_type = Transcript.mime_types['sjson']
@@ -257,8 +265,7 @@ class VideoStudentViewHandlers(object):
                 transcript_content, transcript_filename, transcript_mime_type = self.get_transcript(self.transcript_download_format)
             except (NotFoundError, ValueError, KeyError, UnicodeDecodeError):
                 log.debug("Video@download exception")
-                # Return static URL or 404
-                return self.get_static_transcript(request)
+                return Response(status=404)
             else:
                 response = Response(
                     transcript_content,
