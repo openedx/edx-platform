@@ -39,7 +39,9 @@ class ItemTest(CourseTestCase):
         Get the item referenced by the locator from the modulestore
         """
         store = modulestore('draft') if draft else modulestore('direct')
-        return store.get_item(UsageKey.from_string(locator))
+        if isinstance(locator, basestring):
+            locator = UsageKey.from_string(locator)
+        return store.get_item(locator)
 
     def response_locator(self, response):
         """
@@ -308,9 +310,7 @@ class TestDuplicateItem(ItemTest):
                     "Duplicated item differs in number of children"
                 )
                 for i in xrange(len(original_item.children)):
-                    source_locator = loc_mapper().translate_location(Location(original_item.children[i]), False, True)
-                    duplicate_locator = loc_mapper().translate_location(Location(duplicated_item.children[i]), False, True)
-                    if not check_equality(source_locator, duplicate_locator):
+                     if not check_equality(original_item.children[i], duplicated_item.children[i]):
                         return False
                 duplicated_item.children = original_item.children
 
@@ -341,12 +341,12 @@ class TestDuplicateItem(ItemTest):
             else:
                 self.assertEqual(
                     children[source_position],
-                    self.get_old_id(source_locator).url(),
+                    UsageKey.from_string(source_locator),
                     "source item at wrong position"
                 )
                 self.assertEqual(
                     children[source_position + 1],
-                    self.get_old_id(locator).url(),
+                    UsageKey.from_string(locator),
                     "duplicated item not ordered after source item"
                 )
 
@@ -391,7 +391,7 @@ class TestDuplicateItem(ItemTest):
         if display_name is not None:
             data['display_name'] = display_name
 
-        resp = self.client.ajax_post('/xblock', json.dumps(data))
+        resp = self.client.ajax_post(reverse('contentstore.views.xblock_handler'), json.dumps(data))
         resp_content = json.loads(resp.content)
         self.assertEqual(resp.status_code, 200)
         return resp_content['locator']

@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import hashlib
 import logging
+import copy
 from uuid import uuid4
 
 from collections import OrderedDict
@@ -124,17 +125,10 @@ def xblock_handler(request, usage_key_string):
             delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
 
             return _delete_item_at_location(usage_key, delete_children, delete_all_versions, request.user)
-        else:  # Since we have an offering id, we are updating an existing xblock.
-            if block == 'handouts' and old_location is None:
-                # update handouts location in loc_mapper
-                course_location = loc_mapper().translate_locator_to_location(locator, get_course=True)
-                old_location = course_location.replace(category='course_info', name=block)
-                locator = loc_mapper().translate_location(old_location)
-
+        else:  # Since we have a usage_key, we are updating an existing xblock.
             return _save_item(
                 request,
-                locator,
-                old_location,
+                usage_key,
                 data=request.json.get('data'),
                 children=request.json.get('children'),
                 metadata=request.json.get('metadata'),
@@ -259,30 +253,28 @@ def xblock_view_handler(request, usage_key_string, view_name):
         return HttpResponse(status=406)
 
 
-def _save_item(request, usage_loc, item_location, data=None, children=None, metadata=None, nullout=None,
+def _save_item(request, usage_key, data=None, children=None, metadata=None, nullout=None,
                grader_type=None, publish=None):
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
     nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
     to default).
-
-    The item_location is still the old-style location whereas usage_loc is a BlockUsageLocator
     """
-    store = get_modulestore(item_location)
+    store = get_modulestore(usage_key)
 
     try:
-        existing_item = store.get_item(item_location)
+        existing_item = store.get_item(usage_key)
     except ItemNotFoundError:
-        if item_location.category in CREATE_IF_NOT_FOUND:
+        if usage_key.category in CREATE_IF_NOT_FOUND:
             # New module at this location, for pages that are not pre-created.
             # Used for course info handouts.
-            store.create_and_save_xmodule(item_location)
-            existing_item = store.get_item(item_location)
+            store.create_and_save_xmodule(usage_key)
+            existing_item = store.get_item(usage_key)
         else:
             raise
     except InvalidLocationError:
         log.error("Can't find item by location.")
-        return JsonResponse({"error": "Can't find item by location: " + str(item_location)}, 404)
+        return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
 
     old_metadata = own_metadata(existing_item)
 
@@ -301,12 +293,8 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
         data = existing_item.get_explicitly_set_fields_by_scope(Scope.content)
 
     if children is not None:
-        children_ids = [
-            loc_mapper().translate_locator_to_location(BlockUsageLocator.from_string(child_locator)).url()
-            for child_locator
-            in children
-        ]
-        existing_item.children = children_ids
+        # TODO: we need to make sure there is a test covering this (test_item.py did not hit it).
+        existing_item.children = copy.deepcopy(children)
 
     # also commit any metadata which might have been passed along
     if nullout is not None or metadata is not None:
@@ -340,7 +328,7 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
     store.update_item(existing_item, request.user.id)
 
     result = {
-        'id': unicode(usage_loc),
+        'id': unicode(usage_key),
         'data': data,
         'metadata': own_metadata(existing_item)
     }
