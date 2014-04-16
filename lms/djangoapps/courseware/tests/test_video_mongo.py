@@ -372,6 +372,80 @@ class TestGetHtmlMethod(BaseTestXmodule):
             )
 
 
+class TestGetHtmlSubstituteSource(BaseTestXmodule):
+    '''
+    Test that sources subtsituting works fine.
+    '''
+    CATEGORY = "video"
+    DATA = SOURCE_XML
+    METADATA = {}
+
+    url_to_substitute = u'http://after.com/'
+
+    def setUp(self):
+        self.setup_course(html5_video_url=self.url_to_substitute)
+
+    def test_substitute_sources(self):
+        SOURCE_XML = """
+            <video show_captions="true"
+            display_name="A Name"
+            sub="a_sub_file.srt.sjson" source="http:/before.com/example.mp4"
+            download_video="true"
+            start_time="01:00:03" end_time="01:00:10"
+            >
+                <source src="http:/before.com/example.mp4"/>
+                <source src="http:/before.com/example.webm"/>
+            </video>
+        """
+
+        expected_context = {
+            'data_dir': getattr(self, 'data_dir', None),
+            'show_captions': 'true',
+            'display_name': u'A Name',
+            'end': 3610.0,
+            'id': None,
+            'sources': None,
+            'speed': 'null',
+            'general_speed': 1.0,
+            'start': 3603.0,
+            'saved_video_position': 0.0,
+            'sub': u'a_sub_file.srt.sjson',
+            'track': None,
+            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
+            'yt_test_timeout': 1500,
+            'yt_api_url': 'www.youtube.com/iframe_api',
+            'yt_test_url': 'gdata.youtube.com/feeds/api/videos/',
+            'transcript_download_format': 'srt',
+            'transcript_download_formats_list': [{'display_name': 'SubRip (.srt) file', 'value': 'srt'}, {'display_name': 'Text (.txt) file', 'value': 'txt'}],
+            'transcript_language': u'en',
+            'transcript_languages': '{"en": "English"}',
+        }
+
+        self.initialize_module(data=SOURCE_XML)
+        context = self.item_descriptor.render('student_view').content
+
+        expected_context.update({
+            'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
+                self.item_descriptor, 'transcript', 'translation'
+            ).rstrip('/?'),
+            'transcript_available_translations_url': self.item_descriptor.xmodule_runtime.handler_url(
+                self.item_descriptor, 'transcript', 'available_translations'
+            ).rstrip('/?'),
+            'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+            'sources': {
+                'main': self.url_to_substitute + u'example.mp4',
+               u'mp4': self.url_to_substitute + u'example.mp4',
+               u'webm': self.url_to_substitute + u'example.webm'
+            },
+            'id': self.item_descriptor.location.html_id(),
+        })
+
+        self.assertEqual(
+            context,
+            self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+        )
+
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
     Make sure that module initialization works correctly.

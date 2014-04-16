@@ -1,14 +1,17 @@
 """
 Module containts utils specific for video_module but not for transcripts.
 """
+from xmodule.course_module import CourseDescriptor
 
-def get_course(self):
+
+def get_course(module):
     """
     Return course by course id.
     """
-    course_location = CourseDescriptor.id_to_location(self.course_id)
-    course = self.descriptor.runtime.modulestore.get_item(course_location)
+    course_location = CourseDescriptor.id_to_location(module.course_id)
+    course = module.descriptor.runtime.modulestore.get_item(course_location)
     return course
+
 
 def create_youtube_string(module):
     """

@@ -97,7 +97,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
         transcript_download_format = self.transcript_download_format
 
         substituted_html5_sources = self.html5_sources
-        new_url = getattr(get_course(self.course_id), 'html5_video_url', None)
+        new_url = get_course(self).html5_video_url
         if new_url:
             substituted_html5_sources = [new_url + x.rpartition('/')[-1] for x in self.html5_sources]
 
