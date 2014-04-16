@@ -5,7 +5,7 @@ adding users, removing users, and listing members
 
 from abc import ABCMeta, abstractmethod
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from student.models import CourseAccessRole
 
 
@@ -81,7 +81,7 @@ class GroupBasedRole(AccessRole):
     def __init__(self, role_name, org=None, course_key=None):
         """
         Create a GroupBasedRole from a group names
-                """
+        """
         self.org = org
         self.course_key = course_key
         self._role_name = role_name
@@ -129,8 +129,6 @@ class GroupBasedRole(AccessRole):
         """
         Return a django QuerySet for all of the users with this role
         """
-        # How do I just do a select user u join course_access_role c on u.id=c.user where c.role=role
-        # that is, not load the CourseAccessRole objects just query through them?
         return User.objects.filter(
             courseaccessrole__role=self._role_name, courseaccessrole__course_id=self.course_key, courseaccessrole__org=self.org
         )
@@ -205,3 +203,63 @@ class CourseCreatorRole(GroupBasedRole):
 
     def __init__(self, *args, **kwargs):
         super(CourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)
+
+class UserBasedRole(object):
+    """
+    Backward mapping: given a user, manipulate the courses and roles
+    """
+    def __init__(self, user, role):
+        """
+        Create a UserBasedRole accessor: for a given user and role (e.g., "instructor")
+        """
+        self.user = user
+        self.role = role
+
+    def has_course(self, course_key):
+        """
+        Return whether the role's user has the configured role access to the passed course
+        """
+        if not (self.user.is_authenticated() and self.user.is_active):
+            return False
+
+        # pylint: disable=protected-access
+        if not hasattr(self.user, '_roles'):
+            self.user._roles = list(
+                CourseAccessRole.objects.filter(user=self.user).all()
+            )
+
+        role = CourseAccessRole(user=self.user, role=self.role, course_id=course_key, org=course_key.org)
+        return role in self.user._roles
+
+    def add_course(self, *course_keys):
+        """
+        Grant this object's user the object's role for the supplied courses
+        """
+        if self.user.is_authenticated and self.user.is_active:
+            for course_key in course_keys:
+                entry = CourseAccessRole(user=self.user, role=self.role, course_id=course_key, org=course_key.org)
+                entry.save()
+            if hasattr(self.user, '_roles'):
+                del user._roles
+        else:
+            raise ValueError("user is not active. Cannot grant access to courses")
+
+    def remove_courses(self, *course_keys):
+        """
+        Remove the supplied courses from this user's configured role.
+        """
+        entries = CourseAccessRole.objects.filter(user=self.user, role=self.role, course_id__in=course_keys)
+        entries.delete()
+        if hasattr(self.user, '_roles'):
+            del self.user._roles
+
+    def courses_with_role(self):
+        """
+        Return a django QuerySet for all of the courses with this user x role. You can access
+        any of these properties on each result record:
+        * user (will be self.user--thus uninteresting)
+        * org
+        * course_id
+        * role (will be self.role--thus uninteresting)
+        """
+        return CourseAccessRole.objects.filter(role=self.role, user=self.user)

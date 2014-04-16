@@ -50,7 +50,7 @@ from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 
 from student.models import CourseEnrollment
-from student.roles import CourseRole
+from student.roles import CourseRole, UserBasedRole
 
 from xmodule.html_module import AboutDescriptor
 from xmodule.modulestore.keys import CourseKey, UsageKey
@@ -176,33 +176,18 @@ def _accessible_courses_list(request):
     return courses
 
 
-# pylint: disable=invalid-name
 def _accessible_courses_list_from_groups(request):
     """
     List all courses available to the logged in user by reversing access group names
     """
     courses_list = []
-    course_keys = set()
 
-    user_staff_group_names = request.user.groups.filter(
-        Q(name__startswith='instructor_') | Q(name__startswith='staff_')
-    ).values_list('name', flat=True)
+    instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
+    staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
+    all_courses = instructor_courses | staff_courses
 
-    # we can only get course_ids from role names with the new format (instructor_org/number/run or
-    # instructor_org.number.run but not instructor_number).
-    for user_staff_group_name in user_staff_group_names:
-        # to avoid duplication try to convert all course_id's to format with dots e.g. "edx.course.run"
-        if user_staff_group_name.startswith("instructor_"):
-            # strip starting text "instructor_"
-            course_id = user_staff_group_name[11:]
-        else:
-            # strip starting text "staff_"
-            course_id = user_staff_group_name[6:]
-
-        course_key = CourseKey.from_string(course_id)
-        course_keys.add(course_key)
-
-    for course_key in course_keys:
+    for course_access in all_courses:
+        course_key = course_access.course_id
         course = modulestore('direct').get_course(course_key)
         if course is None:
             raise ItemNotFoundError(course_key)
