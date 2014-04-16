@@ -14,8 +14,8 @@
 
 define(
 'video/01_initialize.js',
-['video/03_video_player.js', 'video/00_video_storage.js'],
-function (VideoPlayer, VideoStorage) {
+['video/03_video_player.js', 'video/00_video_storage.js', 'video/00_i18n.js'],
+function (VideoPlayer, VideoStorage, i18n) {
     /**
      * @function
      *
@@ -39,7 +39,7 @@ function (VideoPlayer, VideoStorage) {
                     return false;
                 }
 
-                _initializeModules(state)
+                _initializeModules(state, i18n)
                     .done(function () {
                         // On iPad ready state occurs just after start playing.
                         // We hide controls before video starts playing.
@@ -341,11 +341,11 @@ function (VideoPlayer, VideoStorage) {
         state.captionHideTimeout = null;
     }
 
-    function _initializeModules(state) {
+    function _initializeModules(state, i18n) {
         var dfd = $.Deferred(),
             modulesList = $.map(state.modules, function(module) {
                 if ($.isFunction(module)) {
-                    return module(state);
+                    return module(state, i18n);
                 } else if ($.isPlainObject(module)) {
                     return module;
                 }
@@ -494,7 +494,6 @@ function (VideoPlayer, VideoStorage) {
             __dfd__: __dfd__,
             el: el,
             container: container,
-            currentVolume: 100,
             id: id,
             isFullScreen: false,
             isTouch: isTouch,
