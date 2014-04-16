@@ -5,7 +5,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.utils.translation import ugettext as _
-  from django.core.urlresolvers import reverse
+  from contentstore import utils
 %>
 
 <%block name="header_extras">
@@ -305,9 +305,9 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
      <div class="bit">
      % if context_course:
           <%
-            course_team_url = reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(course_locator)})
-            grading_config_url = reverse('contentstore.views.grading_handler', kwargs={'course_key_string': unicode(course_locator)})
-            advanced_config_url = reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_locator)})
+            course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
+            grading_config_url = utils.reverse_course_url('grading_handler', context_course.id)
+            advanced_config_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
           %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">

@@ -101,6 +101,7 @@ def _course_team_user(request, course_key, email):
         }
         return JsonResponse(msg, 400)
 
+
     try:
         user = User.objects.get(email=email)
     except Exception:

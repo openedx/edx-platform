@@ -85,7 +85,7 @@ def subsection_handler(request, usage_key_string):
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        preview_link = get_lms_link_for_item(usage_key, course_id=course.id, preview=True)
+        preview_link = get_lms_link_for_item(usage_key, preview=True)
 
         # make sure that location references a 'sequential', otherwise return
         # BadRequest

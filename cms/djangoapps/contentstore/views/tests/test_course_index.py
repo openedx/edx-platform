@@ -5,8 +5,7 @@ import json
 import lxml
 
 from contentstore.tests.utils import CourseTestCase
-from django.core.urlresolvers import reverse
-from xmodule.modulestore.django import loc_mapper
+from contentstore.utils import reverse_course_url
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore import parsers
 
@@ -60,7 +59,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Test the error conditions for the access
         """
-        outline_url = reverse('contentstore.views.course_handler', kwargs={'course_key_string': unicode(self.course.id)})
+        outline_url = reverse_course_url('course_handler', self.course.id)
         # register a non-staff member and try to delete the course branch
         non_staff_client, _ = self.create_non_staff_authed_user_client()
         response = non_staff_client.delete(outline_url, {}, HTTP_ACCEPT='application/json')
@@ -72,13 +71,10 @@ class TestCourseIndex(CourseTestCase):
         """
         course_staff_client, course_staff = self.create_non_staff_authed_user_client()
         for course in [self.course, self.odd_course]:
-            permission_url = reverse('contentstore.views.course_team_handler', kwargs={
-                'course_key_string': unicode(course.id),
-                'email': course_staff.email
-            })
+            permission_url = reverse_course_url('course_team_handler', course.id, kwargs={'email': course_staff.email})
 
             self.client.post(
-            permission_url,
+                permission_url,
                 data=json.dumps({"role": "staff"}),
                 content_type="application/json",
                 HTTP_ACCEPT="application/json",
@@ -88,7 +84,7 @@ class TestCourseIndex(CourseTestCase):
         self.check_index_and_outline(course_staff_client)
 
     def test_json_responses(self):
-        outline_url = reverse('contentstore.views.course_handler', kwargs={'course_key_string': unicode(self.course.id)})
+        outline_url = reverse_course_url('course_handler', self.course.id)
         chapter = ItemFactory.create(parent_location=self.course.location, category='chapter', display_name="Week 1")
         lesson = ItemFactory.create(parent_location=chapter.location, category='sequential', display_name="Lesson 1")
         subsection = ItemFactory.create(parent_location=lesson.location, category='vertical', display_name='Subsection 1')

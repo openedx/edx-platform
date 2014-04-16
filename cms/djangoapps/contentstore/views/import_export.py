@@ -30,7 +30,6 @@ from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.keys import CourseKey
 from xmodule.exceptions import SerializationError
 
-from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from .access import has_course_access
 
 from util.json_request import JsonResponse
@@ -38,7 +37,7 @@ from extract_tar import safetar_extractall
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student import auth
 
-from contentstore.utils import reverse_course_url
+from contentstore.utils import reverse_course_url, reverse_usage_url
 
 
 __all__ = ['import_handler', 'import_status_handler', 'export_handler']
@@ -225,7 +224,7 @@ def import_handler(request, course_key_string):
                         [course_subdir],
                         load_error_modules=False,
                         static_content_store=contentstore(),
-                        target_course_id=course_id,
+                        target_course_id=course_key,
                         draft_store=modulestore()
                     )
 
@@ -257,8 +256,8 @@ def import_handler(request, course_key_string):
         course_module = modulestore().get_course(course_key)
         return render_to_response('import.html', {
             'context_course': course_module,
-            'successful_import_redirect_url': reverse("course"),
-            'import_status_url': location.url_reverse("import_status", "fillerName"),
+            'successful_import_redirect_url': reverse_course_url('course_handler', course_key),
+            'import_status_url': reverse_course_url("import_status_handler", course_key, kwargs={'filename': "fillerName"}),
         })
     else:
         return HttpResponseNotFound()
@@ -268,7 +267,7 @@ def import_handler(request, course_key_string):
 @require_GET
 @ensure_csrf_cookie
 @login_required
-def import_status_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None, filename=None):
+def import_status_handler(request, course_key_string, filename=None):
     """
     Returns an integer corresponding to the status of a file import. These are:
 
@@ -278,13 +277,13 @@ def import_status_handler(request, tag=None, org=None, offering=None, branch=Non
         3 : Importing to mongo
 
     """
-    location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-    if not has_course_access(request.user, location):
+    course_key = CourseKey.from_string(course_key_string)
+    if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
     try:
         session_status = request.session["import_status"]
-        status = session_status[unicode(location) + filename]
+        status = session_status[course_key_string + filename]
     except KeyError:
         status = 0
 
@@ -319,7 +318,7 @@ def export_handler(request, course_key_string):
     # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
     requested_format = request.REQUEST.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
-    export_url = location.url_reverse('export') + '?_accept=application/x-tgz'
+    export_url = reverse_course_url('export_handler', course_key) + '?_accept=application/x-tgz'
     if 'application/x-tgz' in requested_format:
         name = course_module.url_name
         export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
@@ -348,16 +347,14 @@ def export_handler(request, course_key_string):
                 # if we have a nested exception, then we'll show the more generic error message
                 pass
 
-            unit_locator = loc_mapper().translate_location(parent.location, False, True)
-
             return render_to_response('export.html', {
                 'context_course': course_module,
                 'in_err': True,
                 'raw_err_msg': str(e),
                 'failed_module': failed_item,
                 'unit': unit,
-                'edit_unit_url': unit_locator.url_reverse("unit") if parent else "",
-                'course_home_url': location.url_reverse("course"),
+                'edit_unit_url': reverse_usage_url("unit_handler", parent.location) if parent else "",
+                'course_home_url': reverse_course_url("course_handler", course_key),
                 'export_url': export_url
             })
         except Exception, e:
@@ -367,7 +364,7 @@ def export_handler(request, course_key_string):
                 'in_err': True,
                 'unit': None,
                 'raw_err_msg': str(e),
-                'course_home_url': location.url_reverse("course"),
+                'course_home_url': reverse_course_url("course_handler", course_key),
                 'export_url': export_url
             })
         finally:

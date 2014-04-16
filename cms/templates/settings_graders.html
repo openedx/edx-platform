@@ -6,7 +6,6 @@
 <%!
   from contentstore import utils
   from django.utils.translation import ugettext as _
-  from xmodule.modulestore.django import loc_mapper
 %>
 
 <%block name="header_extras">
@@ -138,9 +137,9 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
       <div class="bit">
       % if context_course:
         <%
-          detailed_settings_url = reverse('settings_handler', kwargs={'course_key_string': unicode(context_course.id)})
-          course_team_url = reverse('course_team_handler', kwargs={'course_key_string': unicode(context_course.id)})
-          advanced_settings_url = reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_locator)})
+          detailed_settings_url = utils.reverse_course_url('settings_handler', context_course.id)
+          course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
+          advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
         %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">

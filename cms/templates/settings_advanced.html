@@ -3,7 +3,6 @@
 <%!
   from django.utils.translation import ugettext as _
   from contentstore import utils
-  from xmodule.modulestore.django import loc_mapper
 %>
 <%block name="title">${_("Advanced Settings")}</%block>
 <%block name="bodyclass">is-signedin course advanced view-settings</%block>
@@ -89,9 +88,9 @@ require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/setting
       <div class="bit">
       % if context_course:
         <%
-          details_url = reverse('settings_handler', kwargs={'course_key_string': unicode(context_course.id)})
-          grading_url = reverse('grading_handler', kwargs={'course_key_string': unicode(context_course.id)})
-          course_team_url = reverse('course_team_handler', kwargs={'course_key_string': unicode(context_course.id)})
+          details_url = utils.reverse_course_url('settings_handler', context_course.id)
+          grading_url = utils.reverse_course_url('grading_handler', context_course.id)
+          course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
         %>
       <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">

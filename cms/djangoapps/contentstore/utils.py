@@ -201,24 +201,26 @@ def remove_extra_panel_tab(tab_type, course):
     return changed, course_tabs
 
 
-def reverse_url(handler_name, key_name=None, key_value=None):
+def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
     """
     Creates the URL for the given handler.
     The optional key_name and key_value are passed in as kwargs to the handler.
     """
-    kwargs = {key_name: unicode(key_value)} if key_name else None
-    return reverse('contentstore.views.' + handler_name, kwargs=kwargs)
+    kwargs_for_reverse = {key_name: unicode(key_value)} if key_name else None
+    if kwargs:
+        kwargs_for_reverse.update(kwargs)
+    return reverse('contentstore.views.' + handler_name, kwargs=kwargs_for_reverse)
 
 
-def reverse_course_url(handler_name, course_key):
+def reverse_course_url(handler_name, course_key, kwargs=None):
     """
     Creates the URL for handlers that use course_keys as URL parameters.
     """
-    return reverse_url(handler_name, 'course_key_string', course_key)
+    return reverse_url(handler_name, 'course_key_string', course_key, kwargs)
 
 
-def reverse_usage_url(handler_name, usage_key):
+def reverse_usage_url(handler_name, usage_key, kwargs=None):
     """
     Creates the URL for handlers that use usage_keys as URL parameters.
     """
-    return reverse_url(handler_name, 'usage_key_string', usage_key)
+    return reverse_url(handler_name, 'usage_key_string', usage_key, kwargs)
