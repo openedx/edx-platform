@@ -50,6 +50,7 @@ _FIELDS_STORED_IN_SESSION = ['auth_entry']
 _MIDDLEWARE_CLASSES = (
     'third_party_auth.middleware.ExceptionMiddleware',
 )
+_SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
 
 
 def _merge_auth_info(django_settings, auth_info):
@@ -92,7 +93,7 @@ def _set_global_settings(django_settings):
     django_settings.SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
 
     # Where to send the user once social authentication is successful.
-    django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
+    django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL = _SOCIAL_AUTH_LOGIN_REDIRECT_URL
 
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.

@@ -230,7 +230,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     def assert_redirect_to_dashboard_looks_correct(self, response):
         """Asserts a response would redirect to /dashboard."""
         self.assertEqual(302, response.status_code)
-        self.assertEqual('/dashboard', response.get('Location'))
+        # pylint: disable-msg=protected-access
+        self.assertEqual(auth_settings._SOCIAL_AUTH_LOGIN_REDIRECT_URL, response.get('Location'))
 
     def assert_redirect_to_login_looks_correct(self, response):
         """Asserts a response would redirect to /login."""
@@ -388,6 +389,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # redirects to /auth/complete. In the browser ajax handlers will
         # redirect the user to the dashboard; we invoke it manually here.
         self.assert_json_success_response_looks_correct(student_views.login_user(strategy.request))
+        self.assert_redirect_to_dashboard_looks_correct(
+            actions.do_complete(strategy, social_views._do_login, user=user))
         self.assert_dashboard_response_looks_correct(student_views.dashboard(request), user)
 
     def test_signin_fails_if_no_account_associated(self):

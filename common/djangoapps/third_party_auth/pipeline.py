@@ -241,7 +241,7 @@ def parse_query_params(strategy, response, *args, **kwargs):
 @partial.partial
 def redirect_to_supplementary_form(strategy, details, response, uid, is_login=None, is_register=None, user=None, *args, **kwargs):
     """Dispatches user to a create account form if they are new."""
-    if is_login:
+    if is_login and user is None:
         return redirect('/login', name='signin_user')
 
     if is_register and user is None:
