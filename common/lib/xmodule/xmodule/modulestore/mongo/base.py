@@ -156,8 +156,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         """
         Return an XModule instance for the specified location
         """
-        if isinstance(location, basestring):
-            location = Location.from_string(location)
+        assert isinstance(location, Location)
         json_data = self.module_data.get(location)
         if json_data is None:
             module = self.modulestore.get_item(location)
@@ -208,7 +207,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 return ErrorDescriptor.from_json(
                     json_data,
                     self,
-                    json_data['location'],
+                    location,
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
 
