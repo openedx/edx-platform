@@ -8,7 +8,6 @@ from courseware.tests.factories import UserFactory, StaffFactory, InstructorFact
 from student.tests.factories import AnonymousUserFactory
 
 from student.roles import GlobalStaff, CourseRole, CourseStaffRole
-from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
@@ -54,10 +53,9 @@ class RolesTestCase(TestCase):
         """
         Test that giving a user a course role enables access appropriately
         """
-        course_locator = loc_mapper().translate_location(self.course_loc, add_entry_if_missing=True)
         self.assertFalse(
             CourseStaffRole(self.course_id).has_user(self.student),
-            "Student has premature access to {}".format(unicode(course_locator))
+            "Student has premature access to {}".format(unicode(self.course_id))
         )
         self.assertFalse(
             CourseStaffRole(self.course_id).has_user(self.student),
@@ -66,14 +64,14 @@ class RolesTestCase(TestCase):
         CourseStaffRole(self.course_id).add_users(self.student)
         self.assertTrue(
             CourseStaffRole(self.course_id).has_user(self.student),
-            "Student doesn't have access to {}".format(unicode(course_locator))
+            "Student doesn't have access to {}".format(unicode(self.course_id))
         )
         self.assertTrue(
             CourseStaffRole(self.course_id).has_user(self.student),
             "Student doesn't have access to {}".format(unicode(self.course_id))
         )
         # now try accessing something internal to the course
-        vertical_locator = course_locator.course_key.make_usage_key('vertical', 'madeup')
+        vertical_locator = self.course_id.make_usage_key('vertical', 'madeup')
         vertical_location = self.course_id.make_usage_key(block_type='vertical', name='madeuptoo')
         self.assertTrue(
             CourseStaffRole(self.course_id).has_user(self.student),
