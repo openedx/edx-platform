@@ -13,6 +13,7 @@ from xmodule.modulestore import Location
 from xmodule.x_module import XModule
 
 from xblock.core import XBlock
+from xmodule.modulestore.django import modulestore
 
 from student.models import CourseEnrollmentAllowed
 from external_auth.models import ExternalAuthMap
@@ -187,8 +188,11 @@ def _has_access_course_desc(user, course, action):
                 debug("Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic")
                 if course.duplicate_courses:
                     for course_id in course.duplicate_courses:
-                        if (user.courseenrollment_set.filter(course_id = course_id)):
+                        if (user.courseenrollment_set.filter(course_id = course_id, is_active = True)):
                             return False
+                for dupcourse in modulestore().get_courses():
+                    if dupcourse.id in course.duplicate_courses:
+                        return False
                 return True
             return _has_staff_access_to_descriptor(user, course)
 
