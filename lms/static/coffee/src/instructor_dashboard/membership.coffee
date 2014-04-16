@@ -180,8 +180,8 @@ class BetaTesterBulkAddition
     # gather elements
     @$identifier_input       = @$container.find("textarea[name='student-ids-for-beta']")
     @$btn_beta_testers       = @$container.find("input[name='beta-testers']")
-    @$checkbox_emailstudents = @$container.find("input[name='email-students']")
     @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']")
+    @$checkbox_emailstudents = @$container.find("input[name='email-students-beta']")
     @$task_response          = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
 
@@ -278,7 +278,7 @@ class BatchEnrollment
 
     # attach click handler for enrollment buttons
     @$enrollment_button.click =>
-      emailStudents: @$checkbox_emailstudents.is(':checked')
+      emailStudents = @$checkbox_emailstudents.is(':checked')
       send_data =
         action: $(event.target).data('action') # 'enroll' or 'unenroll'
         identifiers: @$identifier_input.val()
