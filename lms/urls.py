@@ -11,10 +11,6 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 
 urlpatterns = ('',  # nopep8
 
-        # ...
-        url(r"^announcements/", include("announcements.urls")),
-        # ...
-
     # certificate view
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
@@ -75,6 +71,9 @@ urlpatterns = ('',  # nopep8
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     url(r'^embargo$', 'student.views.embargo', name="embargo"),
+
+url(r'^announcements/announcement_list$', 'student.views.announcement_list', name='announcement_list')
+
 )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):

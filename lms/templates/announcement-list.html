@@ -168,19 +168,6 @@
     accessible_modal("#pwd_reset_button", "#password_reset_complete .close-modal", "#password_reset_complete", "#dashboard-main");
 
 
-    $(".email-settings").each(function(index){
-      $(this).attr("id", "unenroll-" + index);
-      // a bit of a hack, but gets the unique selector for the modal trigger
-      var trigger = "#" + $(this).attr("id");
-      accessible_modal(trigger, "#email-settings-modal .close-modal", "#email-settings-modal", "#dashboard-main");
-    });
-
-    $(".unenroll").each(function(index){
-      $(this).attr("id", "email-settings-" + index);
-      // a bit of a hack, but gets the unique selector for the modal trigger
-      var trigger = "#" + $(this).attr("id");
-      accessible_modal(trigger, "#unenroll-modal .close-modal", "#unenroll-modal", "#dashboard-main");
-    });
     $('.announcement-list').accordion({
       collapsible: true
     })
@@ -241,8 +228,25 @@ section.announcements div > h3.title {
 font-size: small;
 padding-left: 5px;
 }
-</style>
 
+div.announcements-wrapper section.announcements > ol {
+list-style: none;
+margin-bottom: 1.41575em;
+padding-left: 0;
+}
+div.announcements-wrapper section.announcements > ol > li {
+margin-bottom: 1em;
+}
+div.announcements-wrapper section.announcements > ol > li h2 {
+font-size: normal;
+font-weight: bold !important;
+background: url("/static/images/calendar-icon.png") 0 center no-repeat;
+padding-left: 20px;
+margin-bottom: 0px;
+text-transform: capitalize;
+}
+
+</style>
   <section class="profile-sidebar">
     <header class="profile">
       <h1 class="user-name">${ user.username }</h1>
@@ -302,80 +306,23 @@ padding-left: 5px;
 
   <section class="my-courses" id="my-courses">
     <header>
-      <h2>${_("Current Courses")}</h2>
+      <h2>Все новости</h2>
     </header>
+          <div class="announcements-wrapper">
+           <section class="announcements">
+            <ol>
+                % for announcement in announcements:
+                <li class="announcement">
+                    <h2 class="date">${_date(announcement.creation_date.astimezone(_timezone(settings.TIME_ZONE)),"d E Y")} - ${announcement.title}</h2>
+                    ${announcement.content}
+                </li>
+                % endfor
+            </ol>
+           </section>
+        </div>
 
-    % if len(course_enrollment_pairs) > 0:
-      <ul class="listing-courses">
-        % for course, enrollment in course_enrollment_pairs:
-            <% show_courseware_link = (course.id in show_courseware_links_for) %>
-            <% cert_status = cert_statuses.get(course.id) %>
-            <% show_email_settings = (course.id in show_email_settings_for) %>
-            <% course_mode_info = all_course_modes.get(course.id) %>
-            <% show_refund_option = (course.id in show_refund_option_for) %>
-            <%include file='dashboard/_dashboard_course_listing.html' args="course=course, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, show_refund_option = show_refund_option" />
-      % endfor
-
-      </ul>
-    % else:
-      <section class="empty-dashboard-message">
-        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-          <p>${_("Looks like you haven't registered for any courses yet.")}</p>
-          <a href="${reverse('courses_list')}">
-            ${_("Find courses now!")}
-          </a>
-        % else:
-          <p>${_("Looks like you haven't been enrolled in any courses yet.")}</p>
-        %endif
-      </section>
-    % endif
-
-    % if staff_access and len(errored_courses) > 0:
-      <div id="course-errors">
-        <h2>${_("Course-loading errors")}</h2>
-
-      % for course_dir, errors in errored_courses.items():
-         <h3>${course_dir | h}</h3>
-             <ul>
-           % for (msg, err) in errors:
-               <li>${msg}
-                 <ul><li><pre>${err}</pre></li></ul>
-               </li>
-           % endfor
-             </ul>
-      % endfor
-    % endif
+    
   </section>
-</section>
-
-<section id="email-settings-modal" class="modal" aria-hidden="true">
-  <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
-    <button class="close-modal">&#10005;
-      <span class="sr">
-        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close Modal')}
-      </span>
-    </button>
-
-    <header>
-      <h2 id="email-settings-title">
-        ${_('Email Settings for {course_number}').format(course_number='<span id="email_settings_course_number"></span>')}
-        <span class="sr">,
-          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
-          ${_("modal open")}
-        </span>
-      </h2>
-      <hr/>
-    </header>
-
-    <form id="email_settings_form" method="post">
-      <input name="course_id" id="email_settings_course_id" type="hidden" />
-      <label>${_("Receive course emails")} <input type="checkbox" id="receive_emails" name="receive_emails" /></label>
-      <div class="submit">
-        <input type="submit" id="submit" value="${_('Save Settings')}" />
-      </div>
-    </form>
-  </div>
 </section>
 
 
@@ -494,32 +441,3 @@ padding-left: 5px;
   </div>
 </section>
 
-<section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
-  <div class="inner-wrapper" role="alertdialog" aria-labelledy="unenrollment-modal-title">
-    <button class="close-modal">&#10005;
-      <span class="sr">
-        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close Modal')}
-      </span>
-    </button>
-
-    <header>
-      <h2 id="unenrollment-modal-title">
-        ${_('<span id="track-info"></span> {course_number}?  <span id="refund-info"></span>').format(course_number='<span id="unenroll_course_number"></span>')}
-        <span class="sr">,
-          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
-          ${_("modal open")}
-        </span>
-      </h2>
-      <hr/>
-    </header>
-    <div id="unenroll_error" class="modal-form-error"></div>
-    <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
-      <input name="course_id" id="unenroll_course_id" type="hidden" />
-      <input name="enrollment_action" type="hidden" value="unenroll" />
-      <div class="submit">
-        <input name="submit" type="submit" value="${_('Unregister')}" />
-      </div>
-    </form>
-  </div>
-</section>
