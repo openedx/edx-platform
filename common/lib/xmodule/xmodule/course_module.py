@@ -168,6 +168,7 @@ class UserPartitionList(List):
 
 
 class CourseFields(object):
+    html5_video_url = String(help="Url to substitute for html5 videos", scrope=Scope.settings)
     lti_passports = List(help="LTI tools passports as id:client_key:client_secret", scope=Scope.settings)
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
                              default=[], scope=Scope.content)
