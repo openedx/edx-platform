@@ -4,7 +4,6 @@ by reversing group name formats.
 """
 import random
 from chrono import Timer
-from unittest import skip
 
 from django.contrib.auth.models import Group
 from django.test import RequestFactory
@@ -15,7 +14,6 @@ from contentstore.utils import delete_course_and_groups
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
 from student.roles import CourseInstructorRole, CourseStaffRole
-from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -50,13 +48,10 @@ class TestCourseListing(ModuleStoreTestCase):
             run=course_location.run
         )
 
-        for role in [CourseInstructorRole, CourseStaffRole]:
-            # pylint: disable=protected-access
-            groupname = role(course.id)._role_name
-            group, __ = Group.objects.get_or_create(name=groupname)
+        if user is not None:
+            for role in [CourseInstructorRole, CourseStaffRole]:
+                role(course.id).add_users(user)
 
-            if user is not None:
-                user.groups.add(group)
         return course
 
     def tearDown(self):

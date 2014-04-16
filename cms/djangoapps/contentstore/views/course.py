@@ -180,7 +180,7 @@ def _accessible_courses_list_from_groups(request):
     """
     List all courses available to the logged in user by reversing access group names
     """
-    courses_list = []
+    courses_list = {}
 
     instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
     staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
@@ -188,12 +188,13 @@ def _accessible_courses_list_from_groups(request):
 
     for course_access in all_courses:
         course_key = course_access.course_id
-        course = modulestore('direct').get_course(course_key)
-        if course is None:
-            raise ItemNotFoundError(course_key)
-        courses_list.append(course)
+        if course_key not in courses_list:
+            course = modulestore('direct').get_course(course_key)
+            if course is None:
+                raise ItemNotFoundError(course_key)
+            courses_list[course_key] = course
 
-    return courses_list
+    return courses_list.values()
 
 
 @login_required
