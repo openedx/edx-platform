@@ -203,7 +203,7 @@ def remove_extra_panel_tab(tab_type, course):
 
 def reverse_url(handler_name, key_name=None, key_value=None):
     kwargs = {key_name: unicode(key_value)} if key_name else None
-    return reverse('contentstore.views.' + handler_name, kwargs)
+    return reverse('contentstore.views.' + handler_name, kwargs=kwargs)
 
 def reverse_course_url(handler_name, course_key):
     return reverse_url(handler_name, 'course_key_string', course_key)

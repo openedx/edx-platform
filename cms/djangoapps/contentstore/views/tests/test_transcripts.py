@@ -52,7 +52,7 @@ class Basetranscripts(CourseTestCase):
             'category': 'video',
             'type': 'video'
         }
-        resp = self.client.ajax_post('/xblock', data)
+        resp = self.client.ajax_post('/xblock/', data)
         self.assertEqual(resp.status_code, 200)
 
         self.item_locator, self.item_location = self._get_locator(resp)
