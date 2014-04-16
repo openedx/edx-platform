@@ -1,6 +1,6 @@
 <%inherit file="base.html" />
 <%!
-from django.core.urlresolvers import reverse
+from contentstore import utils
 from contentstore.views.helpers import EDITING_TEMPLATES
 from django.utils.translation import ugettext as _
 from xmodule.modulestore.django import loc_mapper
@@ -148,8 +148,8 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       </div>
 
       <%
-        index_url = reverse('course_handler', kwargs={'course_key_string': unicode(context_course.id)})
-        subsection_url = reverse('subsection_handler', kwargs={'usage_key_string': unicode(subsection.location)})
+        index_url = utils.reverse_course_url('course_handler', context_course.id)
+        subsection_url = utils.reverse_usage_url('subsection_handler', subsection.location)
       %>
       <div class="sidebar">
         <div class="unit-settings window">

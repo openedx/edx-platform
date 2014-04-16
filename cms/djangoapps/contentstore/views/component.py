@@ -114,8 +114,6 @@ def subsection_handler(request, usage_key_string):
                 can_view_live = True
                 break
 
-        course_locator = loc_mapper().translate_location(course.location, False, True)
-
         return render_to_response(
             'edit_subsection.html',
             {
@@ -124,7 +122,7 @@ def subsection_handler(request, usage_key_string):
                 'new_unit_category': 'vertical',
                 'lms_link': lms_link,
                 'preview_link': preview_link,
-                'course_graders': json.dumps(CourseGradingModel.fetch(course_locator).graders),
+                'course_graders': json.dumps(CourseGradingModel.fetch(usage_key.course_key).graders),
                 'parent_item': parent,
                 'locator': usage_key,
                 'policy_metadata': policy_metadata,
