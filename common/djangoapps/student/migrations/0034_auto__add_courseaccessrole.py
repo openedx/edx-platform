@@ -12,7 +12,7 @@ class Migration(SchemaMigration):
         db.create_table('student_courseaccessrole', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('org', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=64, blank=True)),
+            ('org', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=64, blank=True, null=True)),
             ('course_id', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, null=True, blank=True)),
             ('role', self.gf('django.db.models.fields.CharField')(max_length=64, db_index=True)),
         ))
@@ -72,7 +72,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'CourseAccessRole'},
             'course_id': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'org': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '64', 'blank': 'True'}),
+            'org': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '64', 'blank': 'True', 'null': 'True'}),
             'role': ('django.db.models.fields.CharField', [], {'max_length': '64', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
