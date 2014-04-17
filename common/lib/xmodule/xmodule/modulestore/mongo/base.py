@@ -920,7 +920,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         :param xblock: the XBlock class
         :param jsonfields: a dict of the jsonified version of the fields
         """
-        for field_name, value in jsonfields:
+        assert isinstance(jsonfields, dict)
+        for field_name, value in jsonfields.iteritems():
             if value:
                 if issubclass(xblock.fields[field_name], Reference):
                     jsonfields[field_name] = value.to_deprecated_string()
