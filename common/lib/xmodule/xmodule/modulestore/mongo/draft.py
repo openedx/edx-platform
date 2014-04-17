@@ -111,10 +111,18 @@ class DraftModuleStore(MongoModuleStore):
                 Substring matching pass a regex object.
                 ``name`` is another commonly provided key (Location based stores)
         """
-        draft_items = super(DraftModuleStore, self).get_items(course_key, revision='draft', **kwargs)
-        non_draft_items = super(DraftModuleStore, self).get_items(course_key, revision=None, **kwargs)
-
-        return [wrap_draft(item) for item in draft_items + non_draft_items]
+        draft_items = [
+            wrap_draft(item) for item in
+            super(DraftModuleStore, self).get_items(course_key, revision='draft', **kwargs)
+        ]
+        draft_items_locations = {item.location for item in draft_items}
+        non_draft_items = [
+            item for item in
+            super(DraftModuleStore, self).get_items(course_key, revision=None, **kwargs)
+            # filter out items that are not already in draft
+            if item.location not in draft_items_locations
+        ]
+        return draft_items + non_draft_items
 
     def convert_to_draft(self, source_location):
         """

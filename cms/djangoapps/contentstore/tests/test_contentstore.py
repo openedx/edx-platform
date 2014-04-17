@@ -192,28 +192,29 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         Unfortunately, None = published for the revision field, so get_items() would return
         both draft and non-draft copies.
         '''
-        store = modulestore('direct')
+        direct_store = modulestore('direct')
         draft_store = modulestore('draft')
-        _, course_items = import_from_xml(store, 'common/test/data/', ['simple'])
-        html_usage_key = course_items[0].id.make_usage_key('html', 'test_html')
+        _, course_items = import_from_xml(direct_store, 'common/test/data/', ['simple'])
+        course_key = course_items[0].id
+        html_usage_key = course_key.make_usage_key('html', 'test_html')
 
-        html_module = draft_store.get_item(html_usage_key)
+        html_module_from_draft_store = draft_store.get_item(html_usage_key)
+        draft_store.convert_to_draft(html_module_from_draft_store.location)
 
-        draft_store.convert_to_draft(html_module.location)
+        # Query get_items() and find the html item. This should just return back a single item (not 2).
 
-        # now query get_items() to get this location with revision=None, this should just
-        # return back a single item (not 2)
+        direct_store_items = direct_store.get_items(course_key)
+        html_items_from_direct_store = [item for item in direct_store_items if (item.location == html_usage_key)]
+        self.assertEqual(len(html_items_from_direct_store), 1)
+        self.assertFalse(getattr(html_items_from_direct_store[0], 'is_draft', False))
 
-        # TODO - get_items takes in a course_key - not a usage_key.  So is this test even valid?
-        items = store.get_items(html_usage_key)
-        self.assertEqual(len(items), 1)
-        self.assertFalse(getattr(items[0], 'is_draft', False))
+        # Fetch from the draft store. Note that even though we pass
+        # None in the revision field, the draft store will replace that with 'draft'.
+        draft_store_items = draft_store.get_items(course_key)
+        html_items_from_draft_store = [item for item in draft_store_items if (item.location == html_usage_key)]
+        self.assertEqual(len(html_items_from_draft_store), 1)
+        self.assertTrue(getattr(html_items_from_draft_store[0], 'is_draft', False))
 
-        # now refetch from the draft store. Note that even though we pass
-        # None in the revision field, the draft store will replace that with 'draft'
-        items = draft_store.get_items(html_usage_key)
-        self.assertEqual(len(items), 1)
-        self.assertTrue(getattr(items[0], 'is_draft', False))
 
     def test_draft_metadata(self):
         '''
@@ -1334,7 +1335,8 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.client.ajax_post('/course/', self.course_data)
         cache_current = self.course_data['org']
         self.course_data['org'] = self.course_data['org'].lower()
-        # TODO - Are we no longer case sensitive in our comparison of orgs?
+        # NAA TODO - Are we no longer case sensitive in our comparison of orgs?
+        # TODO - Need information from product on whether higher layers (no longer Roles) should enforce this.
         self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
         self.course_data['org'] = cache_current
 
@@ -1390,7 +1392,8 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_create_course_with_course_creator(self):
         """Test new course creation -- use course creator group"""
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
-            # TODO - This throws a database IntegrityError: student_courseaccessrole.org may not be NULL
+            # NAA TODO - This throws a database IntegrityError: student_courseaccessrole.org may not be NULL
+            # NAA NEED TO remigrate the table
             auth.add_users(self.user, CourseCreatorRole(), self.user)
             self.assert_created_course()
 
@@ -1614,16 +1617,13 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEquals(course_module.wiki_slug, 'toy')
 
         # But change the wiki_slug if it is a different course.
-        target_course_id = target_course_id.replace(run='2013_Spring')
+        target_course_id = CourseKey.from_string('MITx/999/2013_Spring')
         course_data = {
             'org': target_course_id.org,
             'number': target_course_id.course,
             'display_name': 'Robot Super Course',
             'run': target_course_id.run
         }
-        # TODO: This returns an ErrMsg - why doesn't it allow creation of a new course with a different run?
-        # TODO: Also, why do we have 3 different error message strings returned in the JSON response from
-        # TODO:   course.py:create_new_course?
         _create_course(self, target_course_id, course_data)
 
         # Import a course with wiki_slug == location.course
@@ -1673,7 +1673,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # let's assert on the metadata_inheritance on an existing vertical
         for vertical in verticals:
             self.assertEqual(course.xqa_key, vertical.xqa_key)
-            # TODO - AssertionError: datetime(2015, 7, 17, 12, 0, tzinfo=<UTC>) != datetime(2030, 1, 1, 0, 0, tzinfo=<UTC>)
+            # NAA TODO - AssertionError: datetime(2015, 7, 17, 12, 0, tzinfo=<UTC>) != datetime(2030, 1, 1, 0, 0, tzinfo=<UTC>)
             self.assertEqual(course.start, vertical.start)
 
         self.assertGreater(len(verticals), 0)
@@ -1739,7 +1739,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         # Use conditional_and_poll, as it's got an image already
-        # TODO - getting InvalidDocument: Cannot encode object: Location('HarvardX', 'ER22x', '2013_Spring', 'poll_question', 'second_poll', None)
+        # NAA TODO - getting InvalidDocument: Cannot encode object: Location('HarvardX', 'ER22x', '2013_Spring', 'poll_question', 'second_poll', None)
         import_from_xml(
             module_store,
             'common/test/data/',
