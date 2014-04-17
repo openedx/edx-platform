@@ -186,7 +186,7 @@ class BetaTesterBulkAddition
     @$request_response_error = @$container.find(".request-response-error")
 
     # click handlers
-    @$btn_beta_testers.click =>
+    @$btn_beta_testers.click (event) =>
       emailStudents = @$checkbox_emailstudents.is(':checked')
       autoEnroll = @$checkbox_autoenroll.is(':checked')
       send_data = 
@@ -277,7 +277,7 @@ class BatchEnrollment
     @$request_response_error = @$container.find(".request-response-error")
 
     # attach click handler for enrollment buttons
-    @$enrollment_button.click =>
+    @$enrollment_button.click (event) =>
       emailStudents = @$checkbox_emailstudents.is(':checked')
       send_data =
         action: $(event.target).data('action') # 'enroll' or 'unenroll'
