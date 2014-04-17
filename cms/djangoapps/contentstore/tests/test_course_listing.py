@@ -83,8 +83,7 @@ class TestCourseListing(ModuleStoreTestCase):
 
     def test_get_course_list_with_invalid_course_location(self):
         """
-        Test getting courses with invalid course location (course deleted from modulestore but
-        location exists in loc_mapper).
+        Test getting courses with invalid course location (course deleted from modulestore).
         """
         request = self.factory.get('/course')
         request.user = self.user
@@ -105,9 +104,7 @@ class TestCourseListing(ModuleStoreTestCase):
         # now delete this course and re-add user to instructor group of this course
         delete_course_and_groups(course_key, commit=True)
 
-        instructor_group_name = CourseInstructorRole(course_key)._role_name  # pylint: disable=protected-access
-        group, __ = Group.objects.get_or_create(name=instructor_group_name)
-        self.user.groups.add(group)
+        CourseInstructorRole(course_key).add_users(self.user)
 
         # test that get courses through iterating all courses now returns no course
         courses_list = _accessible_courses_list(request)
