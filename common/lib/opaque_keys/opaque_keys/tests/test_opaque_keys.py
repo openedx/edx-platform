@@ -84,13 +84,11 @@ class KeyTests(TestCase):
             DummyKey.from_string('no_namespace:0x10')
 
     def test_no_namespace_from_string(self):
-        hex_key = DummyKey.from_string('0x10')
-        self.assertIsInstance(hex_key, HexKey)
-        self.assertEquals(hex_key.value, 16)
+        with self.assertRaises(InvalidKeyError):
+            DummyKey.from_string('0x10')
 
-        base_key = DummyKey.from_string('15')
-        self.assertIsInstance(base_key, Base10Key)
-        self.assertEquals(base_key.value, 15)
+        with self.assertRaises(InvalidKeyError):
+            DummyKey.from_string('15')
 
     def test_immutability(self):
         key = HexKey(10)
@@ -99,8 +97,8 @@ class KeyTests(TestCase):
             key.value = 11
 
     def test_equality(self):
-        self.assertEquals(DummyKey.from_string('0x10'), DummyKey.from_string('0x10'))
-        self.assertNotEquals(DummyKey.from_string('0x10'), DummyKey.from_string('16'))
+        self.assertEquals(DummyKey.from_string('hex:0x10'), DummyKey.from_string('hex:0x10'))
+        self.assertNotEquals(DummyKey.from_string('hex:0x10'), DummyKey.from_string('base10:16'))
 
     def test_constructor(self):
         with self.assertRaises(TypeError):
@@ -150,4 +148,4 @@ class KeyTests(TestCase):
             HexKey.from_string('base10:15')
 
         with self.assertRaises(InvalidKeyError):
-            Base10Key.from_string('0x10')
+            Base10Key.from_string('hex:0x10')

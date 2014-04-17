@@ -5,13 +5,6 @@ from collections import namedtuple
 from stevedore.enabled import EnabledExtensionManager
 
 
-class MissingNamespaceError(Exception):
-    """
-    Raised to indicated that a serialized key doesn't have a parseable namespace.
-    """
-    pass
-
-
 class InvalidKeyError(Exception):
     """
     Raised to indicated that a serialized key isn't valid (wasn't able to be parsed
@@ -111,7 +104,7 @@ class OpaqueKey(object):
 
         # No ':' found by partition, so it returns the input string
         if namespace == serialized:
-            raise MissingNamespaceError(serialized)
+            raise InvalidKeyError(cls, serialized)
 
         return (namespace, rest)
 
@@ -226,31 +219,8 @@ class OpaqueKey(object):
         if serialized is None:
             raise InvalidKeyError(cls, serialized)
 
-        try:
-            namespace, rest = cls._separate_namespace(serialized)
-        except MissingNamespaceError:
-            return cls._from_string_fallback(serialized)
-
+        namespace, rest = cls._separate_namespace(serialized)
         try:
             return cls._drivers()[namespace].plugin._from_string(rest)
         except KeyError:
-            return cls._from_string_fallback(serialized)
-
-    @classmethod
-    def _from_string_fallback(cls, serialized):
-        """
-        Return a :class:`OpaqueKey` object deserialized from
-        the `serialized` argument. This object will be an instance
-        of a subclass of the `cls` argument.
-
-        Args:
-            serialized: A malformed serialized :class:`OpaqueKey` that
-                doesn't have a valid namespace
-        """
-        for driver in cls._drivers():
-            try:
-                return driver.plugin._from_string(serialized)
-            except InvalidKeyError:
-                pass
-
-        raise InvalidKeyError(cls, serialized)
+            raise InvalidKeyError(cls, serialized)
