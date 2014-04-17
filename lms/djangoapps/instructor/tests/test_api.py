@@ -848,6 +848,10 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         response = self.client.get(url, {'emails': self.beta_tester.email, 'action': 'remove', 'email_students': False})
         self.assertEqual(response.status_code, 200)
 
+        # Works around a caching bug which supposedly can't happen in prod. The instance here is not ==
+        # the instance fetched from the email above which had its cache cleared
+        if hasattr(self.beta_tester, '_roles'):
+            del self.beta_tester._roles
         self.assertFalse(CourseBetaTesterRole(self.course.id).has_user(self.beta_tester))
 
         # test the response data
@@ -872,6 +876,10 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         response = self.client.get(url, {'emails': self.beta_tester.email, 'action': 'remove', 'email_students': True})
         self.assertEqual(response.status_code, 200)
 
+        # Works around a caching bug which supposedly can't happen in prod. The instance here is not ==
+        # the instance fetched from the email above which had its cache cleared
+        if hasattr(self.beta_tester, '_roles'):
+            del self.beta_tester._roles
         self.assertFalse(CourseBetaTesterRole(self.course.id).has_user(self.beta_tester))
 
         # test the response data
