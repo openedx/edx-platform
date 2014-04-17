@@ -81,7 +81,7 @@ def xblock_handler(request, usage_key_string):
         json: if xblock locator is specified, update the xblock instance. The json payload can contain
               these fields, all optional:
                 :data: the new value for the data.
-                :children: the locator ids of children for this xblock.
+                :children: the unicode representation of the UsageKeys of children for this xblock.
                 :metadata: new values for the metadata fields. Any whose values are None will be deleted not set
                        to None! Absent ones will be left alone.
                 :nullout: which metadata fields to set to None
@@ -89,7 +89,7 @@ def xblock_handler(request, usage_key_string):
                 :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'
               The JSON representation on the updated xblock (minus children) is returned.
 
-              if xblock locator is not specified, create a new xblock instance, either by duplicating
+              if usage_key_string is not specified, create a new xblock instance, either by duplicating
               an existing xblock, or creating an entirely new one. The json playload can contain
               these fields:
                 :parent_locator: parent for new xblock, required for both duplicate and create new instance
@@ -98,7 +98,7 @@ def xblock_handler(request, usage_key_string):
                 :display_name: name for new xblock, optional
                 :boilerplate: template name for populating fields, optional and only used
                      if duplicate_source_locator is not present
-              The locator (and old-style id) for the created xblock (minus children) is returned.
+              The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
     if usage_key_string:
         usage_key = UsageKey.from_string(usage_key_string)
@@ -140,14 +140,14 @@ def xblock_handler(request, usage_key_string):
             parent_usage_key = UsageKey.from_string(request.json['parent_locator'])
             duplicate_source_usage_key = UsageKey.from_string(request.json['duplicate_source_locator'])
 
-            dest_location = _duplicate_item(
+            dest_usage_key = _duplicate_item(
                 parent_usage_key,
                 duplicate_source_usage_key,
                 request.json.get('display_name'),
                 request.user,
             )
 
-            return JsonResponse({"locator": unicode(dest_location)})
+            return JsonResponse({"locator": unicode(dest_usage_key)})
         else:
             return _create_item(request)
     else:
@@ -373,7 +373,7 @@ def _create_item(request):
         raise PermissionDenied()
 
     parent = get_modulestore(category).get_item(usage_key)
-    dest_location = usage_key.replace(category=category, name=uuid4().hex)
+    dest_usage_key = usage_key.replace(category=category, name=uuid4().hex)
 
     # get the metadata, display_name, and definition from the request
     metadata = {}
@@ -391,7 +391,7 @@ def _create_item(request):
         metadata['display_name'] = display_name
 
     get_modulestore(category).create_and_save_xmodule(
-        dest_location,
+        dest_usage_key,
         definition_data=data,
         metadata=metadata,
         system=parent.runtime,
@@ -399,21 +399,21 @@ def _create_item(request):
 
     # TODO replace w/ nicer accessor
     if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
-        parent.children.append(dest_location)
+        parent.children.append(dest_usage_key)
         get_modulestore(parent.location).update_item(parent, request.user.id)
 
-    return JsonResponse({"locator": unicode(dest_location)})
+    return JsonResponse({"locator": unicode(dest_usage_key)})
 
 
-def _duplicate_item(parent_location, duplicate_source_location, display_name=None, user=None):
+def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=None, user=None):
     """
-    Duplicate an existing xblock as a child of the supplied parent_location.
+    Duplicate an existing xblock as a child of the supplied parent_usage_key.
     """
-    store = get_modulestore(duplicate_source_location)
-    source_item = store.get_item(duplicate_source_location)
+    store = get_modulestore(duplicate_source_usage_key)
+    source_item = store.get_item(duplicate_source_usage_key)
     # Change the blockID to be unique.
-    dest_location = duplicate_source_location.replace(name=uuid4().hex)
-    category = dest_location.category
+    dest_usage_key = duplicate_source_usage_key.replace(name=uuid4().hex)
+    category = dest_usage_key.category
 
     # Update the display name to indicate this is a duplicate (unless display name provided).
     duplicate_metadata = own_metadata(source_item)
@@ -426,34 +426,34 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
             duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
 
     get_modulestore(category).create_and_save_xmodule(
-        dest_location,
+        dest_usage_key,
         definition_data=source_item.data if hasattr(source_item, 'data') else None,
         metadata=duplicate_metadata,
         system=source_item.runtime,
     )
 
-    dest_module = get_modulestore(category).get_item(dest_location)
+    dest_module = get_modulestore(category).get_item(dest_usage_key)
     # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
     # Because DAGs are not fully supported, we need to actually duplicate each child as well.
     if source_item.has_children:
         dest_module.children = []
         for child in source_item.children:
-            dupe = _duplicate_item(dest_location, child, user=user)
+            dupe = _duplicate_item(dest_usage_key, child, user=user)
             dest_module.children.append(dupe)
-        get_modulestore(dest_location).update_item(dest_module, user.id if user else None)
+        get_modulestore(dest_usage_key).update_item(dest_module, user.id if user else None)
 
     if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
-        parent = get_modulestore(parent_location).get_item(parent_location)
+        parent = get_modulestore(parent_usage_key).get_item(parent_usage_key)
         # If source was already a child of the parent, add duplicate immediately afterward.
         # Otherwise, add child to end.
-        if duplicate_source_location in parent.children:
-            source_index = parent.children.index(duplicate_source_location)
-            parent.children.insert(source_index + 1, dest_location)
+        if duplicate_source_usage_key in parent.children:
+            source_index = parent.children.index(duplicate_source_usage_key)
+            parent.children.insert(source_index + 1, dest_usage_key)
         else:
-            parent.children.append(dest_location)
-        get_modulestore(parent_location).update_item(parent, user.id if user else None)
+            parent.children.append(dest_usage_key)
+        get_modulestore(parent_usage_key).update_item(parent, user.id if user else None)
 
-    return dest_location
+    return dest_usage_key
 
 
 def _delete_item_at_location(item_usage_key, delete_children=False, delete_all_versions=False, user=None):
@@ -515,7 +515,7 @@ def orphan_handler(request, course_key_string):
 def _get_module_info(usage_key, rewrite_static_links=True):
     """
     metadata, data, id representation of a leaf module fetcher.
-    :param usage_loc: A BlockUsageLocator
+    :param usage_key: A UsageKey
     """
     store = get_modulestore(usage_key)
     try:
