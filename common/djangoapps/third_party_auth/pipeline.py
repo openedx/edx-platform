@@ -71,9 +71,14 @@ from . import provider
 
 
 AUTH_ENTRY_KEY = 'auth_entry'
+AUTH_ENTRY_DASHBOARD = 'dashboard'
 AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_REGISTER = 'register'
-_AUTH_ENTRY_CHOICES = frozenset([AUTH_ENTRY_LOGIN, AUTH_ENTRY_REGISTER])
+_AUTH_ENTRY_CHOICES = frozenset([
+    AUTH_ENTRY_DASHBOARD,
+    AUTH_ENTRY_LOGIN,
+    AUTH_ENTRY_REGISTER
+])
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12
 _PASSWORD_CHARSET = string.letters + string.digits
 
@@ -91,6 +96,27 @@ class AuthEntryError(AuthException):
     invoked earlier than the login code, and it needs to know if the login flow
     was requested to dispatch correctly).
     """
+
+
+class ProviderUserState(object):
+    """Object representing the provider state (attached or not) for a user.
+
+    This is intended only for use when rendering templates. See for example
+    lms/templates/dashboard.html.
+    """
+
+    def __init__(self, enabled_provider, user, state):
+        # Boolean. Whether the user has an account associated with the provider
+        self.has_account = state
+        # provider.BaseProvider child. Callers must verify that the provider is
+        # enabled.
+        self.provider = enabled_provider
+        # django.contrib.auth.models.User.
+        self.user = user
+
+    def get_unlink_form_name(self):
+        """Gets the name used in HTML forms that unlink a provider account."""
+        return self.provider.NAME + '_unlink_form'
 
 
 def get(request):
@@ -121,10 +147,6 @@ def get_authenticated_user(username, backend_name):
         AssertionError: if the user is not authenticated.
     """
     user = models.DjangoStorage.user.user_model().objects.get(username=username)
-
-    if not user:
-        raise User.DoesNotExist
-
     match = models.DjangoStorage.user.get_social_auth_for_user(user, provider=backend_name)
 
     if not match:
@@ -132,6 +154,16 @@ def get_authenticated_user(username, backend_name):
 
     user.backend = provider.Registry.get_by_backend_name(backend_name).get_authentication_backend()
     return user
+
+
+def _get_enabled_provider_by_name(provider_name):
+    """Gets an enabled provider by its NAME member or throws."""
+    enabled_provider = provider.Registry.get(provider_name)
+
+    if not enabled_provider:
+        raise ValueError('Provider %s not enabled' % provider_name)
+
+    return enabled_provider
 
 
 def _get_url(view_name, backend_name, auth_entry=None):
@@ -166,6 +198,23 @@ def get_complete_url(backend_name):
     return _get_url('social:complete', backend_name)
 
 
+def get_disconnect_url(provider_name):
+    """Gets URL for the endpoint that starts the disconnect pipeline.
+
+    Args:
+        provider_name: string. Name of the provider.BaseProvider child you want
+            to disconnect from.
+
+    Returns:
+        String. URL that starts the disconnection pipeline.
+
+    Raises:
+        ValueError: if no provider is enabled with the given backend_name.
+    """
+    enabled_provider = _get_enabled_provider_by_name(provider_name)
+    return _get_url('social:disconnect', enabled_provider.BACKEND_CLASS.name)
+
+
 def get_login_url(provider_name, auth_entry):
     """Gets the login URL for the endpoint that kicks off auth with a provider.
 
@@ -183,12 +232,52 @@ def get_login_url(provider_name, auth_entry):
         ValueError: if no provider is enabled with the given provider_name.
     """
     assert auth_entry in _AUTH_ENTRY_CHOICES
-    enabled_provider = provider.Registry.get(provider_name)
-
-    if not enabled_provider:
-        raise ValueError('Provider %s not enabled' % provider_name)
-
+    enabled_provider = _get_enabled_provider_by_name(provider_name)
     return _get_url('social:begin', enabled_provider.BACKEND_CLASS.name, auth_entry=auth_entry)
+
+
+def get_duplicate_provider(messages):
+    """Gets provider from message about social account already in use.
+
+    python-social-auth's exception middleware uses the messages module to
+    record details about duplicate account associations. It records exactly one
+    message there is a request to associate a social account S with an edX
+    account E if S is already associated with an edX account E'.
+
+    Returns:
+        provider.BaseProvider child instance. The provider of the duplicate
+        account, or None if there is no duplicate (and hence no error).
+    """
+    social_auth_messages = [m for m in messages if m.extra_tags.startswith('social-auth')]
+
+    if not social_auth_messages:
+        return
+
+    assert len(social_auth_messages) == 1
+    return provider.Registry.get_by_backend_name(social_auth_messages[0].extra_tags.split()[1])
+
+
+def get_provider_user_states(user):
+    """Gets list of states of provider-user combinations.
+
+    Args:
+        django.contrib.auth.User. The user to get states for.
+
+    Returns:
+        List of ProviderUserState. The list of states of a user's account with
+            each enabled provider.
+    """
+    states = []
+    found_user_backends = [
+        social_auth.provider for social_auth in models.DjangoStorage.user.get_social_auth_for_user(user)
+    ]
+
+    for enabled_provider in provider.Registry.enabled():
+        states.append(
+            ProviderUserState(enabled_provider, user, enabled_provider.BACKEND_CLASS.name in found_user_backends)
+        )
+
+    return states
 
 
 def make_random_password(length=None, choice_fn=random.SystemRandom().choice):
@@ -231,6 +320,8 @@ def parse_query_params(strategy, response, *args, **kwargs):
         raise AuthEntryError(strategy.backend, 'auth_entry missing or invalid')
 
     return {
+        # Whether the auth pipeline entered from /dashboard.
+        'is_dashboard': auth_entry == AUTH_ENTRY_DASHBOARD,
         # Whether the auth pipeline entered from /login.
         'is_login': auth_entry == AUTH_ENTRY_LOGIN,
         # Whether the auth pipeline entered from /register.
@@ -239,8 +330,24 @@ def parse_query_params(strategy, response, *args, **kwargs):
 
 
 @partial.partial
-def redirect_to_supplementary_form(strategy, details, response, uid, is_login=None, is_register=None, user=None, *args, **kwargs):
-    """Dispatches user to a create account form if they are new."""
+def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboard=None, is_login=None, is_register=None, user=None, *args, **kwargs):
+    """Dispatches user to views outside the pipeline if necessary."""
+
+    # We're deliberately verbose here to make it clear what the intended
+    # dispatch behavior is for the three pipeline entry points, given the
+    # current state of the pipeline. Keep in mind the pipeline is re-entrant
+    # and values will change on repeated invocations (for example, the first
+    # time through the login flow the user will be None so we dispatch to the
+    # login form; the second time it will have a value so we continue to the
+    # next pipeline step directly).
+    #
+    # It is important that we always execute the entire pipeline. Even if
+    # behavior appears correct without executing a step, it means important
+    # invariants have been violated and future misbehavior is likely.
+
+    if is_dashboard:
+        return
+
     if is_login and user is None:
         return redirect('/login', name='signin_user')
 

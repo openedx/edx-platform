@@ -9,6 +9,7 @@ import mock
 from django import test
 from django.contrib import auth
 from django.contrib.auth import models as auth_models
+from django.contrib.messages.storage import fallback
 from django.contrib.sessions.backends import cache
 from django.test import utils as django_utils
 from django.conf import settings as django_settings
@@ -108,11 +109,37 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.client = test.Client()
         self.request_factory = test.RequestFactory()
 
-    def assert_dashboard_response_looks_correct(self, response, user):
-        """Asserts the user's dashboard 200s and contains their info."""
+    def assert_dashboard_response_looks_correct(self, response, user, duplicate=False, linked=None):
+        """Asserts the user's dashboard is in the expected state.
+
+        We check unconditionally that the dashboard 200s and contains the
+        user's info. If duplicate is True, we expect the duplicate account
+        association error to be present. If linked is passed, we conditionally
+        check the content and controls in the Account Links section of the
+        sidebar.
+        """
+        duplicate_account_error_needle = '<section class="dashboard-banner third-party-auth">'
+        assert_duplicate_presence_fn = self.assertIn if duplicate else self.assertNotIn
+
         self.assertEqual(200, response.status_code)
         self.assertIn(user.email, response.content)
         self.assertIn(user.username, response.content)
+        assert_duplicate_presence_fn(duplicate_account_error_needle, response.content)
+
+        if linked is not None:
+
+            if linked:
+                expected_control_text = pipeline.ProviderUserState(
+                    self.PROVIDER_CLASS, user, False).get_unlink_form_name()
+            else:
+                expected_control_text = pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_DASHBOARD)
+
+            icon_state = re.search(r'third-party-auth.+icon icon-(\w+)', response.content, re.DOTALL).groups()[0]
+            provider_name = re.search(r'<span class="provider">([^<]+)', response.content, re.DOTALL).groups()[0]
+
+            self.assertIn(expected_control_text, response.content)
+            self.assertEqual('link' if linked else 'unlink', icon_state)
+            self.assertEqual(self.PROVIDER_CLASS.NAME, provider_name)
 
     def assert_exception_redirect_looks_correct(self, auth_entry=None):
         """Tests middleware conditional redirection.
@@ -248,7 +275,13 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertEqual(200, response.status_code)
         self.assertIn('Sign in with ' + self.PROVIDER_CLASS.NAME, response.content)
 
-    def assert_social_auth_created_for_user(self, user, strategy):
+    def assert_social_auth_does_not_exist_for_user(self, user, strategy):
+        """Asserts a user does not have an auth with the expected provider."""
+        social_auths = strategy.storage.user.get_social_auth_for_user(
+            user, provider=self.PROVIDER_CLASS.BACKEND_CLASS.name)
+        self.assertEqual(0, len(social_auths))
+
+    def assert_social_auth_exists_for_user(self, user, strategy):
         """Asserts a user has a social auth with the expected provider."""
         social_auths = strategy.storage.user.get_social_auth_for_user(
             user, provider=self.PROVIDER_CLASS.BACKEND_CLASS.name)
@@ -357,14 +390,129 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     def test_canceling_authentication_redirects_to_root_when_auth_entry_not_set(self):
         self.assert_exception_redirect_looks_correct()
 
-    def test_full_pipeline_succeeds_for_existing_account_signin(self):
-        # First, create, the request and strategy that store pipeline state.
-        # Mock out wire traffic.
+    def test_full_pipeline_succeeds_for_linking_account(self):
+        # First, create, the request and strategy that store pipeline state,
+        # configure the backend, and mock out wire traffic.
+        request, strategy = self.get_request_and_strategy(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
+        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        request.user = self.create_user_models_for_existing_account(
+            strategy, 'user@example.com', 'password', self.get_username(), skip_social_auth=True)
+
+        # Instrument the pipeline to get to the dashboard with the full
+        # expected state.
+        self.client.get(
+            pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
+        actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
+        student_views.signin_user(strategy.request)
+        student_views.login_user(strategy.request)
+        actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
+
+        # First we expect that we're in the unlinked state, and that there
+        # really is no association in the backend.
+        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), request.user, linked=False)
+        self.assert_social_auth_does_not_exist_for_user(request.user, strategy)
+
+        # Fire off the auth pipeline to link.
+        self.assert_redirect_to_dashboard_looks_correct(actions.do_complete(
+            request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
+            redirect_field_name=auth.REDIRECT_FIELD_NAME))
+
+        # Now we expect to be in the linked state, with a backend entry.
+        self.assert_social_auth_exists_for_user(request.user, strategy)
+        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), request.user, linked=True)
+
+    def test_full_pipeline_succeeds_for_unlinking_account(self):
+        # First, create, the request and strategy that store pipeline state,
+        # configure the backend, and mock out wire traffic.
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
         strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username())
+        self.assert_social_auth_exists_for_user(user, strategy)
+
+        # Instrument the pipeline to get to the dashboard with the full
+        # expected state.
+        self.client.get(
+            pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
+        actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
+        student_views.signin_user(strategy.request)
+        student_views.login_user(strategy.request)
+        actions.do_complete(strategy, social_views._do_login, user=user)  # pylint: disable-msg=protected-access
+
+        # First we expect that we're in the linked state, with a backend entry.
+        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), user, linked=True)
+        self.assert_social_auth_exists_for_user(request.user, strategy)
+
+        # Fire off the disconnect pipeline to unlink.
+        self.assert_redirect_to_dashboard_looks_correct(actions.do_disconnect(
+            request.social_strategy, request.user, None, redirect_field_name=auth.REDIRECT_FIELD_NAME))
+
+        # Now we expect to be in the unlinked state, with no backend entry.
+        self.assert_dashboard_response_looks_correct(student_views.dashboard(request), user, linked=False)
+        self.assert_social_auth_does_not_exist_for_user(user, strategy)
+
+    def test_linking_already_associated_account_raises_auth_already_associated(self):
+        # This is of a piece with
+        # test_already_associated_exception_populates_dashboard_with_error. It
+        # verifies the exception gets raised when we expect; the latter test
+        # covers exception handling.
+        email = 'user@example.com'
+        password = 'password'
+        username = self.get_username()
+        _, strategy = self.get_request_and_strategy(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
+        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        linked_user = self.create_user_models_for_existing_account(strategy, email, password, username)
+        unlinked_user = social_utils.Storage.user.create_user(
+            email='other_' + email, password=password, username='other_' + username)
+
+        self.assert_social_auth_exists_for_user(linked_user, strategy)
+        self.assert_social_auth_does_not_exist_for_user(unlinked_user, strategy)
+
+        with self.assertRaises(exceptions.AuthAlreadyAssociated):
+            actions.do_complete(strategy, social_views._do_login, user=unlinked_user)  # pylint: disable-msg=protected-access
+
+    def test_already_associated_exception_populates_dashboard_with_error(self):
+        # Instrument the pipeline with an exception. We test that the
+        # exception is raised correctly separately, so it's ok that we're
+        # raising it artificially here. This makes the linked=True artificial
+        # in the final assert because in practice the account would be
+        # unlinked, but getting that behavior is cumbersome here and already
+        # covered in other tests. Using linked=True does, however, let us test
+        # that the duplicate error has no effect on the state of the controls.
+        request, strategy = self.get_request_and_strategy(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
+        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        user = self.create_user_models_for_existing_account(
+            strategy, 'user@example.com', 'password', self.get_username())
+        self.assert_social_auth_exists_for_user(user, strategy)
+
+        self.client.get('/login')
+        self.client.get(pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
+        actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
+        student_views.signin_user(strategy.request)
+        student_views.login_user(strategy.request)
+        actions.do_complete(strategy, social_views._do_login, user=user)  # pylint: disable-msg=protected-access
+
+        # Monkey-patch storage for messaging; pylint: disable-msg=protected-access
+        request._messages = fallback.FallbackStorage(request)
+        middleware.ExceptionMiddleware().process_exception(
+            request, exceptions.AuthAlreadyAssociated(self.PROVIDER_CLASS.BACKEND_CLASS.name, 'duplicate'))
+
+        self.assert_dashboard_response_looks_correct(
+            student_views.dashboard(request), user, duplicate=True, linked=True)
+
+    def test_full_pipeline_succeeds_for_signing_in_to_existing_account(self):
+        # First, create, the request and strategy that store pipeline state,
+        # configure the backend, and mock out wire traffic.
+        request, strategy = self.get_request_and_strategy(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
+        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        user = self.create_user_models_for_existing_account(
+            strategy, 'user@example.com', 'password', self.get_username())
+        self.assert_social_auth_exists_for_user(user, strategy)
 
         # Begin! Ensure that the login form contains expected controls before
         # the user starts the pipeline.
@@ -416,7 +564,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assert_first_party_auth_trumps_third_party_auth(
             email='user@example.com', password='password', success=True)
 
-    def test_full_pipeline_succeeds_for_new_account_registration(self):
+    def test_full_pipeline_succeeds_registering_new_account(self):
         # First, create, the request and strategy that store pipeline state.
         # Mock out wire traffic.
         request, strategy = self.get_request_and_strategy(
@@ -468,7 +616,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # backend and the correct user's data on display.
         self.assert_redirect_to_dashboard_looks_correct(
             actions.do_complete(strategy, social_views._do_login, user=created_user))
-        self.assert_social_auth_created_for_user(created_user, strategy)
+        self.assert_social_auth_exists_for_user(created_user, strategy)
         self.assert_dashboard_response_looks_correct(student_views.dashboard(request), created_user)
 
     def test_new_account_registration_assigns_distinct_username_on_collision(self):

@@ -70,6 +70,68 @@ class GetAuthenticatedUserTestCase(TestCase):
 
 @unittest.skipUnless(
     testutil.AUTH_FEATURES_KEY in settings.FEATURES, testutil.AUTH_FEATURES_KEY + ' not in settings.FEATURES')
+class GetProviderUserStatesTestCase(testutil.TestCase, test.TestCase):
+    """Tests generation of ProviderUserStates."""
+
+    def setUp(self):
+        super(GetProviderUserStatesTestCase, self).setUp()
+        self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
+
+    def test_returns_empty_list_if_no_enabled_providers(self):
+        provider.Registry.configure_once([])
+        self.assertEquals([], pipeline.get_provider_user_states(self.user))
+
+    def test_state_not_returned_for_disabled_provider(self):
+        disabled_provider = provider.GoogleOauth2
+        enabled_provider = provider.LinkedInOauth2
+        provider.Registry.configure_once([enabled_provider.NAME])
+        social_models.DjangoStorage.user.create_social_auth(self.user, 'uid', disabled_provider.BACKEND_CLASS.name)
+        states = pipeline.get_provider_user_states(self.user)
+
+        self.assertEqual(1, len(states))
+        self.assertNotIn(disabled_provider, (state.provider for state in states))
+
+    def test_states_for_enabled_providers_user_has_accounts_associated_with(self):
+        provider.Registry.configure_once([provider.GoogleOauth2.NAME, provider.LinkedInOauth2.NAME])
+        social_models.DjangoStorage.user.create_social_auth(self.user, 'uid', provider.GoogleOauth2.BACKEND_CLASS.name)
+        social_models.DjangoStorage.user.create_social_auth(
+            self.user, 'uid', provider.LinkedInOauth2.BACKEND_CLASS.name)
+        states = pipeline.get_provider_user_states(self.user)
+
+        self.assertEqual(2, len(states))
+
+        google_state = [state for state in states if state.provider == provider.GoogleOauth2][0]
+        linkedin_state = [state for state in states if state.provider == provider.LinkedInOauth2][0]
+
+        self.assertTrue(google_state.has_account)
+        self.assertEqual(provider.GoogleOauth2, google_state.provider)
+        self.assertEqual(self.user, google_state.user)
+
+        self.assertTrue(linkedin_state.has_account)
+        self.assertEqual(provider.LinkedInOauth2, linkedin_state.provider)
+        self.assertEqual(self.user, linkedin_state.user)
+
+    def test_states_for_enabled_providers_user_has_no_account_associated_with(self):
+        provider.Registry.configure_once([provider.GoogleOauth2.NAME, provider.LinkedInOauth2.NAME])
+        states = pipeline.get_provider_user_states(self.user)
+
+        self.assertEqual([], [x for x in social_models.DjangoStorage.user.objects.all()])
+        self.assertEqual(2, len(states))
+
+        google_state = [state for state in states if state.provider == provider.GoogleOauth2][0]
+        linkedin_state = [state for state in states if state.provider == provider.LinkedInOauth2][0]
+
+        self.assertFalse(google_state.has_account)
+        self.assertEqual(provider.GoogleOauth2, google_state.provider)
+        self.assertEqual(self.user, google_state.user)
+
+        self.assertFalse(linkedin_state.has_account)
+        self.assertEqual(provider.LinkedInOauth2, linkedin_state.provider)
+        self.assertEqual(self.user, linkedin_state.user)
+
+
+@unittest.skipUnless(
+    testutil.AUTH_FEATURES_KEY in settings.FEATURES, testutil.AUTH_FEATURES_KEY + ' not in settings.FEATURES')
 class UrlFormationTestCase(TestCase):
     """Tests formation of URLs for pipeline hook points."""
 
@@ -86,6 +148,20 @@ class UrlFormationTestCase(TestCase):
 
         self.assertTrue(complete_url.startswith('/auth/complete'))
         self.assertIn(self.enabled_provider.BACKEND_CLASS.name, complete_url)
+
+    def test_disconnect_url_raises_value_error_if_provider_not_enabled(self):
+        provider_name = 'not_enabled'
+
+        self.assertIsNone(provider.Registry.get(provider_name))
+
+        with self.assertRaises(ValueError):
+            pipeline.get_disconnect_url(provider_name)
+
+    def test_disconnect_url_returns_expected_format(self):
+        disconnect_url = pipeline.get_disconnect_url(self.enabled_provider.NAME)
+
+        self.assertTrue(disconnect_url.startswith('/auth/disconnect'))
+        self.assertIn(self.enabled_provider.BACKEND_CLASS.name, disconnect_url)
 
     def test_login_url_raises_value_error_if_provider_not_enabled(self):
         provider_name = 'not_enabled'

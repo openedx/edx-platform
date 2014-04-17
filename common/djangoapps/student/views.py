@@ -16,6 +16,7 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import password_reset_confirm
+from django.contrib import messages
 from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
@@ -557,7 +558,15 @@ def dashboard(request):
         'current_language': current_language,
         'current_language_code': cur_lang_code,
         'user': user,
+        'duplicate_provider': None,
+        'logout_url': reverse(logout_user),
+        'platform_name': settings.PLATFORM_NAME,
+        'provider_states': [],
     }
+
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+        context['duplicate_provider'] = pipeline.get_duplicate_provider(messages.get_messages(request))
+        context['provider_user_states'] = pipeline.get_provider_user_states(user)
 
     return render_to_response('dashboard.html', context)
 
@@ -1096,7 +1105,7 @@ def _do_create_account(post_vars):
 
 
 @ensure_csrf_cookie
-def create_account(request, post_override=None):
+def create_account(request, post_override=None):  # pylint: disable-msg=too-many-statements
     """
     JSON call to create new edX account.
     Used by form in signup_modal.html, which is included into navigation.html

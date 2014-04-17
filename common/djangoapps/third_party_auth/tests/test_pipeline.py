@@ -2,7 +2,7 @@
 
 import random
 
-from third_party_auth import pipeline
+from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
 
 
@@ -32,3 +32,11 @@ class MakeRandomPasswordTest(testutil.TestCase):
             for _ in xrange(pipeline._DEFAULT_RANDOM_PASSWORD_LENGTH))
         random_instance.seed(self.seed)
         self.assertEqual(expected, pipeline.make_random_password(choice_fn=random_instance.choice))
+
+
+class ProviderUserStateTestCase(testutil.TestCase):
+    """Tests ProviderUserState behavior."""
+
+    def test_get_unlink_form_name(self):
+        state = pipeline.ProviderUserState(provider.GoogleOauth2, object(), False)
+        self.assertEqual(provider.GoogleOauth2.NAME + '_unlink_form', state.get_unlink_form_name())

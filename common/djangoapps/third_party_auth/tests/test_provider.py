@@ -1,4 +1,4 @@
-"""Unit tests for configuration of providers."""
+"""Unit tests for provider.py."""
 
 from third_party_auth import provider
 from third_party_auth.tests import testutil
