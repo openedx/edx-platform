@@ -15,7 +15,7 @@ from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
@@ -136,7 +136,7 @@ class TestMongoModuleStore(object):
         assert_equals(len(courses), 5)
         course_ids = [course.id for course in courses]
         for course_key in [
-            CourseKey.from_string(key_string)
+            SlashSeparatedCourseKey.from_deprecated_string(key_string)
             for key_string in [
                 'edX/simple/2012_Fall', 'edX/simple_with_draft/2012_Fall',
                 'edX/test_import_course/2012_Fall', 'edX/test_unicode/2012_Fall', 'edX/toy/2012_Fall'

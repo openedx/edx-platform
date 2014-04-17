@@ -145,7 +145,7 @@ def student_problem_list(request, course_id):
     @return: Renders an HTML problem list table.
     """
     assert isinstance(course_id, basestring)
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     # Load the course.  Don't catch any errors here, as we want them to be loud.
     course = get_course_with_access(request.user, 'load', course_key)
 
@@ -186,7 +186,7 @@ def flagged_problem_list(request, course_id):
     '''
     Show a student problem list
     '''
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'staff', course_key)
     student_id = unique_id_for_user(request.user)
 
@@ -240,7 +240,7 @@ def combined_notifications(request, course_id):
     """
     Gets combined notifications from the grading controller and displays them
     """
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     user = request.user
     notifications = open_ended_notifications.combined_notifications(course, user)
@@ -303,7 +303,7 @@ def take_action_on_flags(request, course_id):
     Takes action on student flagged submissions.
     Currently, only support unflag and ban actions.
     """
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     if request.method != 'POST':
         raise Http404
 

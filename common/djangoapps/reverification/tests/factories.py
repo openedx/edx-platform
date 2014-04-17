@@ -14,7 +14,7 @@ class MidcourseReverificationWindowFactory(DjangoModelFactory):
     """ Creates a generic MidcourseReverificationWindow. """
     FACTORY_FOR = MidcourseReverificationWindow
 
-    course_id = SlashSeparatedCourseKey(u'MITx', u'999', u'Robot_Super_Course')
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(u'MITx/999/Robot_Super_Course')
     # By default this factory creates a window that is currently open
     start_date = datetime.now(pytz.UTC) - timedelta(days=100)
     end_date = datetime.now(pytz.UTC) + timedelta(days=100)

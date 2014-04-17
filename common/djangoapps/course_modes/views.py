@@ -36,7 +36,7 @@ class ChooseModeView(View):
     def get(self, request, course_id, error=None):
         """ Displays the course mode choice page """
 
-        course_id = SlashSeparatedCourseKey.from_string(course_id)
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
         enrollment_mode = CourseEnrollment.enrollment_mode_for_user(request.user, course_id)
         upgrade = request.GET.get('upgrade', False)
@@ -75,7 +75,7 @@ class ChooseModeView(View):
     @method_decorator(login_required)
     def post(self, request, course_id):
         """ Takes the form submission from the page and parses it """
-        course_id = SlashSeparatedCourseKey.from_string(course_id)
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         user = request.user
 
         # This is a bit redundant with logic in student.views.change_enrollement,

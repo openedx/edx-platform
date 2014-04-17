@@ -29,7 +29,7 @@ def hint_manager(request, course_id):
     """
     The URL landing function for all calls to the hint manager, both POST and GET.
     """
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
         get_course_with_access(request.user, 'staff', course_key, depth=None)
     except Http404:

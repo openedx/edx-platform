@@ -19,6 +19,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_exporter import export_to_xml
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
@@ -41,7 +42,7 @@ class Command(BaseCommand):
     def _parse_arguments(self, args):
         """Parse command line arguments"""
         try:
-            course_id = CourseKey.from_string(args[0])
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
             filename = args[1]
         except InvalidKeyError:
             raise CommandError("Unparsable course_id")

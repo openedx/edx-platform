@@ -34,7 +34,7 @@ def checklists_handler(request, course_key_string, checklist_index=None):
     POST or PUT
         json: updates the checked state for items within a particular checklist. checklist_index is required.
     """
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
     if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 

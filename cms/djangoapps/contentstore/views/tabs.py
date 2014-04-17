@@ -38,7 +38,7 @@ def tabs_handler(request, course_key_string):
     Creating a tab, deleting a tab, or changing its contents is not supported through this method.
     Instead use the general xblock URL (see item.xblock_handler).
     """
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
     if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 

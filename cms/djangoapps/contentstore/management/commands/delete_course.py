@@ -14,7 +14,7 @@ class Command(BaseCommand):
         if len(args) != 1 and len(args) != 2:
             raise CommandError("delete_course requires one or more arguments: <course_id> |commit|")
 
-        course_id = CourseKey.from_string(args[0])
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
 
         commit = False
         if len(args) == 2:

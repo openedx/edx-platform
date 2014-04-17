@@ -22,7 +22,7 @@ class Command(BaseCommand):
         if len(args) != 2:
             raise CommandError("export requires two arguments: <course id> <output path>")
 
-        course_id = CourseKey.from_string(args[0])
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
         output_path = args[1]
 
         print("Exporting course id = {0} to {1}".format(course_id, output_path))
