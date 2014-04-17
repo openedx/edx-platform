@@ -1,7 +1,7 @@
 describe("CSS3 workarounds", function() {
 	describe("pointer-events", function() {
 		beforeEach(function() {
-			var html = "<a href='#' class='ui-disabled'>What wondrous life in this I lead</a>";
+			var html = "<a href='#' class='is-disabled'>What wondrous life in this I lead</a>";
 			setFixtures(html);
 		});
 
@@ -14,10 +14,10 @@ describe("CSS3 workarounds", function() {
 				mockBodyStyle["pointerEvents"] = "";
 			};
 
-			pointerEventsNone(".ui-disabled", mockBodyStyle);
-			spyOnEvent(".ui-disabled", "click");
-			$(".ui-disabled").click();
-			expect("click").not.toHaveBeenPreventedOn(".ui-disabled");
+			pointerEventsNone(".is-disabled", mockBodyStyle);
+			spyOnEvent(".is-disabled", "click");
+			$(".is-disabled").click();
+			expect("click").not.toHaveBeenPreventedOn(".is-disabled");
 		});
 
 		it("should prevent default when pointerEvents is not Supported", function() {
@@ -31,10 +31,10 @@ describe("CSS3 workarounds", function() {
 				};
 			};
 
-			pointerEventsNone(".ui-disabled", mockBodyStyle);
-			spyOnEvent(".ui-disabled", "click");
-			$(".ui-disabled").click();
-			expect("click").toHaveBeenPreventedOn(".ui-disabled");
+			pointerEventsNone(".is-disabled", mockBodyStyle);
+			spyOnEvent(".is-disabled", "click");
+			$(".is-disabled").click();
+			expect("click").toHaveBeenPreventedOn(".is-disabled");
 		});
 	});
 });

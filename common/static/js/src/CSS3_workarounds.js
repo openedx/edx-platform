@@ -13,5 +13,5 @@ var pointerEventsNone = function (selector, supportedStyles) {
 };
 
 $(function () {
-	pointerEventsNone('.ui-disabled', document.body.styles);
+	pointerEventsNone('.is-disabled', document.body.styles);
 });
