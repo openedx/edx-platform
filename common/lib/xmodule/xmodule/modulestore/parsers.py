@@ -12,7 +12,6 @@ ALLOWED_ID_RE = re.compile(r'^' + ALLOWED_ID_CHARS + '+$', re.UNICODE)
 
 # NOTE: if we need to support period in place of +, make it aggressive (take the first period in the string)
 URL_RE_SOURCE = r"""
-    (?P<tag>edx:)?
     ((?P<org>{ALLOWED_ID_CHARS}+)[+.](?P<offering>{ALLOWED_ID_CHARS}+)/?)?
     ({BRANCH_PREFIX}(?P<branch>{ALLOWED_ID_CHARS}+)/?)?
     ({VERSION_PREFIX}(?P<version_guid>[A-F0-9]+)/?)?
@@ -25,9 +24,8 @@ URL_RE_SOURCE = r"""
 URL_RE = re.compile('^' + URL_RE_SOURCE + '$', re.IGNORECASE | re.VERBOSE | re.UNICODE)
 
 
-def parse_url(string, tag_optional=False):
+def parse_url(string):
     """
-    A url usually begins with 'edx:' (case-insensitive match),
     followed by either a version_guid or a org + offering pair. If tag_optional, then
     the url does not have to start with the tag and edx will be assumed.
 
@@ -50,8 +48,6 @@ def parse_url(string, tag_optional=False):
     if not match:
         return None
     matched_dict = match.groupdict()
-    if matched_dict['tag'] is None and not tag_optional:
-        return None
     return matched_dict
 
 

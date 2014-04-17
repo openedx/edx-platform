@@ -195,9 +195,8 @@ class TestLocationMapper(LocMapperSetupSansDjango):
         run = 'delta_run'
         test_delta_new_org = '{}.geek_dept'.format(org)
         test_delta_new_offering = '{}.{}'.format(course, run)
-        test_delta_old_id = '{}/{}/{}'.format(org, course, run)
         loc_mapper().create_map_entry(
-            SlashSeparatedCourseKey.from_string(test_delta_old_id),
+            SlashSeparatedCourseKey(org, course, run),
             test_delta_new_org, test_delta_new_offering,
             block_map=distractor_block_map
         )

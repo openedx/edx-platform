@@ -76,13 +76,13 @@ class LocatorTest(TestCase):
                 CourseLocator(org='test', offering=bad_id)
 
             with self.assertRaises(InvalidKeyError):
-                CourseLocator.from_string('edx:' + bad_id)
+                CourseLocator.from_string('course-locator:' + bad_id)
 
     def test_course_constructor_bad_url(self):
-        for bad_url in ('edx:',
-                        'edx:/mit.eecs',
+        for bad_url in ('course-locator:',
+                        'course-locator:/mit.eecs',
                         'http:mit.eecs',
-                        'edx//mit.eecs'):
+                        'course-locator//mit.eecs'):
             with self.assertRaises(InvalidKeyError):
                 CourseLocator.from_string(bad_url)
 
@@ -90,7 +90,7 @@ class LocatorTest(TestCase):
         # Test parsing a url when it starts with a version ID and there is also a block ID.
         # This hits the parsers parse_guid method.
         test_id_loc = '519665f6223ebd6980884f2b'
-        testobj = CourseLocator.from_string("edx:{}{}/{}hw3".format(VERSION_PREFIX, test_id_loc, BLOCK_PREFIX))
+        testobj = CourseLocator.from_string("course-locator:{}{}/{}hw3".format(VERSION_PREFIX, test_id_loc, BLOCK_PREFIX))
         self.check_course_locn_fields(
             testobj,
             version_guid=ObjectId(test_id_loc)
@@ -98,7 +98,7 @@ class LocatorTest(TestCase):
 
     def test_course_constructor_url_package_id_and_version_guid(self):
         test_id_loc = '519665f6223ebd6980884f2b'
-        testobj = CourseLocator.from_string('edx:mit.eecs+honors.6002x/' + VERSION_PREFIX + test_id_loc)
+        testobj = CourseLocator.from_string('course-locator:mit.eecs+honors.6002x/' + VERSION_PREFIX + test_id_loc)
         self.check_course_locn_fields(
             testobj,
             org='mit.eecs',
@@ -110,7 +110,7 @@ class LocatorTest(TestCase):
         test_id_loc = '519665f6223ebd6980884f2b'
         org = 'mit.eecs'
         offering = '~6002x'
-        testobj = CourseLocator.from_string('edx:{}+{}/{}draft-1/{}{}'.format(
+        testobj = CourseLocator.from_string('course-locator:{}+{}/{}draft-1/{}{}'.format(
             org, offering, BRANCH_PREFIX, VERSION_PREFIX, test_id_loc
         ))
         self.check_course_locn_fields(
@@ -152,7 +152,7 @@ class LocatorTest(TestCase):
         expected_offering = '6002x'
         expected_branch = 'published'
         expected_block_ref = 'HW3'
-        testurn = '{}+{}/{}{}/{}{}'.format(
+        testurn = 'edx:{}+{}/{}{}/{}{}'.format(
             expected_org, expected_offering, BRANCH_PREFIX, expected_branch, BLOCK_PREFIX, 'HW3'
         )
         testobj = BlockUsageLocator.from_string(testurn)
@@ -161,7 +161,7 @@ class LocatorTest(TestCase):
                                      offering=expected_offering,
                                      branch=expected_branch,
                                      block=expected_block_ref)
-        self.assertEqual(unicode(testobj), 'edx:' + testurn)
+        self.assertEqual(unicode(testobj), testurn)
         testobj = BlockUsageLocator(testobj.course_key.for_version(ObjectId()), testobj.block_id)
         agnostic = testobj.version_agnostic()
         self.assertIsNone(agnostic.version_guid)
@@ -246,9 +246,9 @@ class LocatorTest(TestCase):
         )
 
     def test_repr(self):
-        testurn = 'mit.eecs+6002x/' + BRANCH_PREFIX + 'published/' + BLOCK_PREFIX + 'HW3'
+        testurn = 'edx:mit.eecs+6002x/' + BRANCH_PREFIX + 'published/' + BLOCK_PREFIX + 'HW3'
         testobj = BlockUsageLocator.from_string(testurn)
-        self.assertEqual("BlockUsageLocator(CourseLocator('mit.eecs', '6002x', 'published', None), 'HW3')", repr(testobj))
+        self.assertEqual("BlockUsageLocator(CourseLocator(u'mit.eecs', u'6002x', u'published', None), u'HW3')", repr(testobj))
 
     def test_url_reverse(self):
         """
