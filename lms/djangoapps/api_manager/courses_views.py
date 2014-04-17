@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from lxml import etree
 from StringIO import StringIO
+from collections import OrderedDict
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -315,18 +316,38 @@ def _parse_about_html(html):
     for section in sections:
         section_class = section.get('class')
         if section_class:
-            section_data = {}
-            section_data['name'] = section_class
+            section_data = OrderedDict()
+            section_data['class'] = section_class
 
-            section_data['articles'] = []
             articles = section.findall('article')
             if articles:
+                section_data['articles'] = []
                 for article in articles:
                     article_class = article.get('class')
                     if article_class:
-                        article_data = {}
-                        article_data['name'] = article_class
-                        article_data['body'] = etree.tostring(article)
+                        article_data = OrderedDict()
+                        article_data['class'] = article_class
+
+                        if article_class == "teacher":
+
+                            name_element = article.find('h3')
+                            if name_element is not None:
+                                article_data['name'] = name_element.text
+
+                            image_element = article.find("./div[@class='teacher-image']/img")
+                            if image_element is not None:
+                                article_data['image_src'] = image_element.get('src')
+
+                            bios = article.findall('p')
+                            bio_html = ''
+                            for bio in bios:
+                                bio_html += etree.tostring(bio)
+
+                            if bio_html:
+                                article_data['bio'] = bio_html
+                        else:
+                            article_data['body'] = etree.tostring(article)
+
                         section_data['articles'].append(article_data)
             else:
                 section_data['body'] = etree.tostring(section)
@@ -344,7 +365,7 @@ def course_about(request, course_id):
     naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"about", "_id.name":"overview"}
     """
     store = modulestore()
-    response_data = {}
+    response_data = OrderedDict()
 
     try:
         course_module = store.get_course(course_id)
@@ -352,12 +373,11 @@ def course_about(request, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
         overview = get_course_about_section(course_module, 'overview')
-        short_description = get_course_about_section(course_module, 'short_description')
 
-        response_data['sections'] = _parse_about_html(overview)
-
-        response_data['overview_html'] = overview
-        response_data['short_description'] = short_description
+        if request.GET.get('parsed'):
+            response_data['sections'] = _parse_about_html(overview)
+        else:
+            response_data['overview_html'] = overview
 
     except InvalidLocationError:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
