@@ -170,6 +170,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 category = json_data['location']['category']
                 class_ = self.load_block_type(category)
 
+
                 definition = json_data.get('definition', {})
                 metadata = json_data.get('metadata', {})
                 for old_name, new_name in getattr(class_, 'metadata_translations', {}).items():
@@ -182,8 +183,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     for childloc in definition.get('children', [])
                 ]
                 data = definition.get('data', {})
-                data = self._convert_reference_fields(class_, location.course_key, data)
-                metadata = self._convert_reference_fields(class_, location.course_key, metadata)
+                mixed_class = self.mixologist.mix(class_)
+                data = self._convert_reference_fields(mixed_class, location.course_key, data)
+                metadata = self._convert_reference_fields(mixed_class, location.course_key, metadata)
                 kvs = MongoKeyValueStore(
                     data,
                     children,
@@ -221,7 +223,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         :param jsonfields: a dict of the jsonified version of the fields
         """
         for field_name, value in jsonfields.iteritems():
-            if value and (field_name in class_.fields):
+            if value:
+                if field_name not in class_.fields:
+                    pass
                 if isinstance(class_.fields[field_name], Reference):
                     jsonfields[field_name] = course_key.make_usage_key_from_deprecated_string(value)
                 elif isinstance(class_.fields[field_name], ReferenceList):
@@ -605,12 +609,15 @@ class MongoModuleStore(ModuleStoreWriteBase):
         except ItemNotFoundError:
             return None
 
-    def has_course(self, course_key):
+    def has_course(self, course_key, ignore_case=False):
         """
         Is the given course in this modulestore
         """
         assert(isinstance(course_key, SlashSeparatedCourseKey))
         course_query = self._course_key_to_son(course_key)
+        if ignore_case:
+            for key in course_query.iterkeys():
+                course_query[key] = r"(?i)^{}$".format(course_query[key])
         return self.collection.find_one(course_query, fields={'_id': True}) is not None
 
     def has_item(self, usage_key):

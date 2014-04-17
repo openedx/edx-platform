@@ -298,9 +298,9 @@ def create_new_course(request):
                 name=display_name, err=error.message)})
 
     # see if the course already exists
-    existing_course = None
+    existing_course_exists = False
     try:
-        existing_course = modulestore('direct').get_course(course_key)
+        existing_course_exists = modulestore('direct').has_course(course_key, ignore_case=True)
     except InsufficientSpecificationError:
         pass
     except InvalidKeyError as error:
@@ -308,7 +308,7 @@ def create_new_course(request):
             "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(
                 name=display_name, err=error.message)})
 
-    if existing_course is not None:
+    if existing_course_exists:
         return JsonResponse({
             'ErrMsg': _(
                 'There is already a course defined with the same '

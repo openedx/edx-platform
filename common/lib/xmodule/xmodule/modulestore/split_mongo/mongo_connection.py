@@ -65,11 +65,14 @@ class MongoConnection(object):
         """
         self.structures.update({'_id': structure['_id']}, structure)
 
-    def get_course_index(self, key):
+    def get_course_index(self, key, ignore_case=False):
         """
         Get the course_index from the persistence mechanism whose id is the given key
         """
-        return self.course_index.find_one(son.SON([('org', key.org), ('offering', key.offering)]))
+        case_regex = r"(?i)^{}$" if ignore_case else r"{}"
+        return self.course_index.find_one(
+            son.SON([('org', case_regex.format(key.org)), ('offering', case_regex.format(key.offering))])
+        )
 
     def find_matching_course_indexes(self, query):
         """

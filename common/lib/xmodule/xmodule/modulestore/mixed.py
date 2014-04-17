@@ -167,7 +167,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         except ItemNotFoundError:
             return None
 
-    def has_course(self, course_id):
+    def has_course(self, course_id, ignore_case=False):
         """
         returns whether the course exists
 
@@ -176,7 +176,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         assert(isinstance(course_id, CourseKey))
         store = self._get_modulestore_for_courseid(course_id)
-        return store.has_course(course_id)
+        return store.has_course(course_id, ignore_case)
 
     def delete_course(self, course_key, user_id=None):
         """

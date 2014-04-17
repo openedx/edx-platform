@@ -172,7 +172,7 @@ class ItemFactory(XModuleFactory):
         store.update_item(module)
 
         if 'detached' not in module._class_tags:
-            parent.children.append(location.url())
+            parent.children.append(location)
             store.update_item(parent, '**replace_user**')
 
         return store.get_item(location)
