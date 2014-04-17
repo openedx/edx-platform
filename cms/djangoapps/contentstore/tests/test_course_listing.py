@@ -89,8 +89,8 @@ class TestCourseListing(ModuleStoreTestCase):
         request = self.factory.get('/course')
         request.user = self.user
 
-        course_location = CourseKey.from_string('Org/Course/Run')
-        self._create_course_with_access_groups(course_location, self.user)
+        course_key = CourseKey.from_string('Org/Course/Run')
+        self._create_course_with_access_groups(course_key, self.user)
 
         # get courses through iterating all courses
         courses_list = _accessible_courses_list(request)
@@ -103,9 +103,9 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(courses_list, courses_list_by_groups)
 
         # now delete this course and re-add user to instructor group of this course
-        delete_course_and_groups(course_location.course_id, commit=True)
+        delete_course_and_groups(course_key, commit=True)
 
-        instructor_group_name = CourseInstructorRole(course_location)._role_name  # pylint: disable=protected-access
+        instructor_group_name = CourseInstructorRole(course_key)._role_name  # pylint: disable=protected-access
         group, __ = Group.objects.get_or_create(name=instructor_group_name)
         self.user.groups.add(group)
 
