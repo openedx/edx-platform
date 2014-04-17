@@ -1345,7 +1345,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             raise ItemNotFoundError(course_key)
         # this is the only real delete in the system. should it do something else?
         log.info(u"deleting course from split-mongo: %s", course_key)
-        self.db_connection.delete_course_index(index['_id'])
+        self.db_connection.delete_course_index(index)
 
     def get_errored_courses(self):
         """

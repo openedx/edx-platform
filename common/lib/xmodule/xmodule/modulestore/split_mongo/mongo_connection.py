@@ -93,11 +93,11 @@ class MongoConnection(object):
             course_index
         )
 
-    def delete_course_index(self, key):
+    def delete_course_index(self, course_index):
         """
-        Delete the course_index from the persistence mechanism whose id is the given key
+        Delete the course_index from the persistence mechanism whose id is the given course_index
         """
-        return self.course_index.remove(son.SON([('org', key.org), ('offering', key.offering)]))
+        return self.course_index.remove(son.SON([('org', course_index['org']), ('offering', course_index['offering'])]))
 
     def get_definition(self, key):
         """
