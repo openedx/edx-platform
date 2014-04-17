@@ -17,7 +17,7 @@ from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 TOTAL_COURSES_COUNT = 500
 USER_COURSES_COUNT = 50
@@ -68,7 +68,7 @@ class TestCourseListing(ModuleStoreTestCase):
         request = self.factory.get('/course/')
         request.user = self.user
 
-        course_location = CourseKey.from_string('Org1/Course1/Run1')
+        course_location = SlashSeparatedCourseKey('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_location, self.user)
 
         # get courses through iterating all courses
@@ -88,7 +88,7 @@ class TestCourseListing(ModuleStoreTestCase):
         request = self.factory.get('/course')
         request.user = self.user
 
-        course_key = CourseKey.from_string('Org/Course/Run')
+        course_key = SlashSeparatedCourseKey('Org', 'Course', 'Run')
         self._create_course_with_access_groups(course_key, self.user)
 
         # get courses through iterating all courses
@@ -134,7 +134,7 @@ class TestCourseListing(ModuleStoreTestCase):
             org = 'Org{0}'.format(number)
             course = 'Course{0}'.format(number)
             run = 'Run{0}'.format(number)
-            course_location = CourseKey.from_string(org + '/' + course + '/' + run)
+            course_location = SlashSeparatedCourseKey(org, course, run)
             if number in user_course_ids:
                 self._create_course_with_access_groups(course_location, self.user)
             else:
@@ -176,7 +176,7 @@ class TestCourseListing(ModuleStoreTestCase):
         request.user = self.user
         self.client.login(username=self.user.username, password='test')
 
-        course_location_caps = CourseKey.from_string('Org/COURSE/Run')
+        course_location_caps = SlashSeparatedCourseKey('Org', 'COURSE', 'Run')
         self._create_course_with_access_groups(course_location_caps, self.user)
 
         # get courses through iterating all courses
@@ -190,7 +190,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(courses_list, courses_list_by_groups)
 
         # now create another course with same course_id but different name case
-        course_location_camel = CourseKey.from_string('Org/Course/Run')
+        course_location_camel = SlashSeparatedCourseKey('Org', 'Course', 'Run')
         self._create_course_with_access_groups(course_location_camel, self.user)
 
         # test that get courses through iterating all courses returns both courses

@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from contentstore.tests.utils import AjaxEnabledTestClient
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from contentstore.utils import reverse_url, reverse_course_url
 from student.roles import CourseInstructorRole, CourseStaffRole
 from contentstore.views.access import has_course_access
@@ -46,7 +46,7 @@ class TestCourseAccess(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
         # create a course via the view handler which has a different strategy for permissions than the factory
-        self.course_key = CourseKey.from_string('myu/mydept.mycourse/myrun')
+        self.course_key = SlashSeparatedCourseKey('myu', 'mydept.mycourse', 'myrun')
         course_url = reverse_url('course_handler')
         self.client.ajax_post(course_url,
             {
@@ -114,7 +114,7 @@ class TestCourseAccess(ModuleStoreTestCase):
                 self.assertContains(response, user.email)
 
         # test copying course permissions
-        copy_course_key = CourseKey.from_string('copyu/copydept.mycourse/myrun')
+        copy_course_key = SlashSeparatedCourseKey('copyu', 'copydept.mycourse', 'myrun')
         for role in [CourseInstructorRole, CourseStaffRole]:
             auth.add_users(
                 self.user,

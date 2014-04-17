@@ -7,7 +7,7 @@ from contentstore.utils import delete_course_and_groups, reverse_url
 from courseware.tests.factories import UserFactory
 from xmodule.modulestore import Location
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from student.models import CourseEnrollment
 
@@ -27,7 +27,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password='test')
 
         # create a course via the view handler to create course
-        self.course_key = CourseKey.from_string('Org_1/Course_1/Run_1')
+        self.course_key = SlashSeparatedCourseKey('Org_1', 'Course_1', 'Run_1')
         self._create_course_with_given_location(self.course_key)
 
     def _create_course_with_given_location(self, course_key):
@@ -102,9 +102,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         delete_course_and_groups(self.course_key, commit=True)
 
         # now create same course with different name case ('uppercase')
-        new_course_key = CourseKey.from_string(
-            self.course_key.org + '/' + self.course_key.course.upper() + '/' + self.course_key.run
-        )
+        new_course_key = self.course_key.replace(course=self.course_key.course.upper())
         resp = self._create_course_with_given_location(new_course_key)
         self.assertEqual(resp.status_code, 200)
 

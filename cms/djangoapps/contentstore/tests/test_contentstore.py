@@ -25,7 +25,8 @@ from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore import mongo
-from xmodule.modulestore.keys import CourseKey, UsageKey, AssetKey
+from xmodule.modulestore.keys import UsageKey, AssetKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.store_utilities import clone_course
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.django import modulestore
@@ -226,7 +227,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store = modulestore('draft')
         import_from_xml(store, 'common/test/data/', ['simple'])
 
-        course_key = CourseKey.from_string('edX/simple/2012_Fall')
+        course_key = SlashSeparatedCourseKey('edX', 'simple', '2012_Fall')
         html_usage_key = course_key.make_usage_key('html', 'test_html')
         course = draft_store.get_course(course_key)
         html_module = draft_store.get_item(html_usage_key)
@@ -286,7 +287,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_get_depth_with_drafts(self):
         import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
 
-        course_key = CourseKey.from_string('edX/simple/2012_Fall')
+        course_key = SlashSeparatedCourseKey('edX', 'simple', '2012_Fall')
         course = modulestore('draft').get_course(course_key)
 
         # make sure no draft items have been returned
@@ -333,7 +334,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
-        course = module_store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
+        course = module_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
         self.assertGreater(len(course.textbooks), 0)
 
     def test_import_polls(self):
@@ -428,7 +429,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store, verbose=True)
 
-        course = module_store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
+        course = module_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
         self.assertIsNotNone(course)
 
@@ -551,7 +552,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, data_dir, ['course_info_updates'],
                         static_content_store=content_store, verbose=True)
 
-        course_id = CourseKey.from_string('edX/course_info_updates/2014_T1')
+        course_id = SlashSeparatedCourseKey('edX', 'course_info_updates', '2014_T1')
         course = module_store.get_course(course_id)
 
         self.assertIsNotNone(course)
@@ -603,7 +604,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         _, trash_store, _ = self._delete_asset_in_course()
 
         # make sure there's something in the trashcan
-        course_id = CourseKey.from_string('edX/toy/6.002_Spring_2012')
+        course_id = SlashSeparatedCourseKey('edX', 'toy', '6.002_Spring_2012')
         all_assets, __ = trash_store.get_all_content_for_course(course_id)
         self.assertGreater(len(all_assets), 0)
 
@@ -712,7 +713,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        source_course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        source_course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         dest_course_id = _get_course_id(course_data)
 
         # let's force a non-portable link in the clone source
@@ -769,7 +770,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         # first check a static asset link
-        course_key = CourseKey.from_string('edX/toy/run')
+        course_key = SlashSeparatedCourseKey('edX', 'toy', 'run')
         html_module_location = course_key.make_usage_key('html', 'nonportable')
         html_module = module_store.get_item(html_module_location)
         self.assertIn('/static/foo.jpg', html_module.data)
@@ -836,7 +837,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
-        course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         # get a vertical (and components in it) to copy into an orphan sub dag
         vertical = module_store.get_item(course_id.make_usage_key('vertical', 'vertical_test'), depth=1)
@@ -917,7 +918,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         )
         # import to different course id
         self.check_import(
-            module_store, root_dir, draft_store, content_store, CourseKey.from_string('anotherX/anotherToy/Someday'),
+            module_store, root_dir, draft_store, content_store, SlashSeparatedCourseKey('anotherX', 'anotherToy', 'Someday'),
             locked_asset_key, locked_asset_attrs
         )
 
@@ -992,7 +993,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         import_from_xml(module_store, 'common/test/data/', ['toy'])
-        course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         # create a new video module and add it as a child to a vertical
         # this re-creates a bug whereby since the video template doesn't have
@@ -1023,7 +1024,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         import_from_xml(module_store, 'common/test/data/', ['word_cloud'])
-        course_id = CourseKey.from_string('HarvardX/ER22x/2013_Spring')
+        course_id = SlashSeparatedCourseKey('HarvardX', 'ER22x', '2013_Spring')
 
         verticals = module_store.get_items(course_id.make_usage_key('vertical', None))
 
@@ -1052,7 +1053,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         import_from_xml(module_store, 'common/test/data/', ['toy'])
-        course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         verticals = module_store.get_items(course_id.make_usage_key('vertical', None))
 
@@ -1085,7 +1086,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         # Export the course
         root_dir = path(mkdtemp_clean())
@@ -1123,7 +1124,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_prefetch_children(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
-        course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         wrapper = MongoCollectionFindWrapper(module_store.collection.find)
         module_store.collection.find = wrapper.find
@@ -1597,7 +1598,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
 
         # If reimporting into the same course do not change the wiki_slug.
-        target_course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        target_course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         course_data = {
             'org': target_course_id.org,
             'number': target_course_id.course,
@@ -1639,7 +1640,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['simple'])
         did_load_item = False
         try:
-            course_key = CourseKey.from_string('edX/simple/problem')
+            course_key = SlashSeparatedCourseKey('edX', 'simple', 'problem')
             usage_key = course_key.make_usage_key('problem', 'ps01-simple')
             module_store.get_item(usage_key)
             did_load_item = True
@@ -1877,7 +1878,7 @@ def _course_factory_create_course():
 
 def _get_course_id(course_data):
     """Returns the course ID (org/number/run)."""
-    return CourseKey.from_string('slashes:' + course_data['org'] + '/' + course_data['number'] + '/' + course_data['run'])
+    return SlashSeparatedCourseKey(course_data['org'], course_data['number'], course_data['run'])
 
 
 def _test_no_locations(test, resp, status_code=200, html=True):
