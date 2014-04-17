@@ -16,6 +16,7 @@ from mock import Mock
 from path import path
 
 from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
@@ -130,12 +131,15 @@ class LogicTest(unittest.TestCase):
             url_name = ''
             category = 'test'
 
-        self.system = get_test_system(course_id='test/course/id')
+        self.system = get_test_system()
         self.descriptor = EmptyClass()
 
         self.xmodule_class = self.descriptor_class.module_class
+        usage_key = self.system.course_id.make_usage_key(self.descriptor.category, 'test_loc')
+        # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
+        scope_ids = ScopeIds(1, self.descriptor.category, usage_key, usage_key)
         self.xmodule = self.xmodule_class(
-            self.descriptor, self.system, DictFieldData(self.raw_field_data), Mock()
+            self.descriptor, self.system, DictFieldData(self.raw_field_data), scope_ids
         )
 
     def ajax_request(self, dispatch, data):
