@@ -331,7 +331,9 @@ class ModuleStoreReadBase(ModuleStoreRead):
     def has_course(self, course_id, ignore_case=False):
         """Default impl--linear search through course list"""
         assert(isinstance(course_id, CourseKey))
-        # NAATODO
+        if ignore_case:
+            # NAATODO
+            pass
         return any(c.id == course_id for c in self.get_courses())
 
     def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
