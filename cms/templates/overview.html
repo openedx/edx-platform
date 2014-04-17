@@ -55,7 +55,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
           <h3 class="section-name">
             <form class="section-name-form">
               <input type="text" value="${_('New Section Name')}" class="new-section-name" />
-              <input type="submit" class="new-section-name-save" data-parent="${context_course.id}"
+              <input type="submit" class="new-section-name-save" data-parent="${context_course.location}"
                      data-category="${new_section_category}" value="${_('Save')}" />
               <input type="button" class="new-section-name-cancel" value="${_('Cancel')}" />
             </form>
