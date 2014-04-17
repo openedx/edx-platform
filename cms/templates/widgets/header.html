@@ -105,7 +105,7 @@
                   </li>
                   % if settings.FEATURES.get('ENABLE_EXPORT_GIT') and context_course.giturl:
                   <li class="nav-item nav-course-tools-export-git">
-                    <a href="${reverse('export_git', kwargs=dict(org=course_key.org, course=course_key.course, name=course_key.name))}">${_("Export to Git")}</a>
+                    <a href="${reverse('export_git', kwargs=dict(course_key_string=unicode(course_key)))}">${_("Export to Git")}</a>
                   </li>
                   % endif
                 </ul>

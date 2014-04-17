@@ -105,7 +105,7 @@ urlpatterns += patterns('',
 
 
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
-    urlpatterns += (url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export_git/(?P<name>[^/]+)$',
+    urlpatterns += (url(r'^export_git/(?P<course_key_string>[^/]+)$',
                         'contentstore.views.export_git', name='export_git'),)
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
