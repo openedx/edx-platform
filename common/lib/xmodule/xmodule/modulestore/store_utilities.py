@@ -1,8 +1,5 @@
 import re
 from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.keys import CourseKey
 
 import logging
 
