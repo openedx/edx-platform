@@ -28,7 +28,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.html_module import AboutDescriptor
 from xblock.runtime import KvsFieldData
 from xblock.exceptions import InvalidScopeError
-from xblock.fields import Scope, ScopeIds
+from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
 
 from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
@@ -36,6 +36,7 @@ from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inhe
 from xmodule.tabs import StaticTab, CourseTabList
 from xblock.core import XBlock
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
+import collections
 
 log = logging.getLogger(__name__)
 
@@ -181,8 +182,11 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     location.course_key.make_usage_key_from_deprecated_string(childloc)
                     for childloc in definition.get('children', [])
                 ]
+                data = definition.get('data', {})
+                data = self._convert_reference_fields(class_, location.course_key, data)
+                metadata = self._convert_reference_fields(class_, location.course_key, metadata)
                 kvs = MongoKeyValueStore(
-                    definition.get('data', {}),
+                    data,
                     children,
                     metadata,
                 )
@@ -210,6 +214,25 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     location,
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
+
+    def _convert_reference_fields(self, class_, course_key, jsonfields):
+        """
+        Find all fields of type reference and convert the payload into UsageKeys
+        :param class_: the XBlock class
+        :param jsonfields: a dict of the jsonified version of the fields
+        """
+        for field_name, value in jsonfields:
+            if value:
+                if issubclass(class_.fields[field_name], Reference):
+                    jsonfields[field_name] = course_key.make_usage_key_from_deprecated_string(value)
+                elif issubclass(class_.fields[field_name], ReferenceList):
+                    jsonfields[field_name] = [
+                        course_key.make_usage_key_from_deprecated_string(ele) for ele in value
+                    ]
+                elif issubclass(class_.fields[field_name], ReferenceValueDict):
+                    for key, subvalue in value.iteritems():
+                        assert isinstance(subvalue, basestring)
+                        value[key] = course_key.make_usage_key_from_deprecated_string(subvalue)
 
 
 def location_to_son(location, prefix='', tag='i4x'):
@@ -865,18 +888,14 @@ class MongoModuleStore(ModuleStoreWriteBase):
         data: A nested dictionary of problem data
         """
         try:
-            definition_data = xblock.get_explicitly_set_fields_by_scope()
+            definition_data = self._convert_reference_fields(xblock, xblock.get_explicitly_set_fields_by_scope())
             payload = {
                 'definition.data': definition_data,
-                'metadata': own_metadata(xblock),
+                'metadata': self._convert_reference_fields(xblock, own_metadata(xblock)),
             }
             if xblock.has_children:
-                # convert all to urls
-                xblock.children = [
-                    child.to_deprecated_string() if isinstance(child, Location) else child
-                    for child in xblock.children
-                ]
-                payload.update({'definition.children': xblock.children})
+                children = self._convert_reference_fields(xblock, {'children': xblock.children})
+                payload.update({'definition.children': children['children']})
             self._update_single_item(xblock.location, payload)
             # for static tabs, their containing course also records their display name
             if xblock.category == 'static_tab':
@@ -894,6 +913,25 @@ class MongoModuleStore(ModuleStoreWriteBase):
         except ItemNotFoundError:
             if not allow_not_found:
                 raise
+
+    def _convert_reference_fields(self, xblock, jsonfields):
+        """
+        Find all fields of type reference and convert the payload from UsageKeys to deprecated strings
+        :param xblock: the XBlock class
+        :param jsonfields: a dict of the jsonified version of the fields
+        """
+        for field_name, value in jsonfields:
+            if value:
+                if issubclass(xblock.fields[field_name], Reference):
+                    jsonfields[field_name] = value.to_deprecated_string()
+                elif issubclass(xblock.fields[field_name], ReferenceList):
+                    jsonfields[field_name] = [
+                        ele.to_deprecated_string() for ele in value
+                    ]
+                elif issubclass(xblock.fields[field_name], ReferenceValueDict):
+                    for key, subvalue in value.iteritems():
+                        assert isinstance(subvalue, Location)
+                        value[key] = subvalue.to_deprecated_string()
 
     # pylint: disable=unused-argument
     def delete_item(self, location, **kwargs):
