@@ -14,6 +14,7 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
+from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.roles import CourseStaffRole
@@ -37,18 +38,10 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.graded_course = modulestore().get_course(CourseKey.from_string("edX/graded/2012_Fall"))
 
         # Create staff account
-        self.instructor = 'view2@test.com'
-        self.password = 'foo'
-        self.create_account('u2', self.instructor, self.password)
-        self.activate_user(self.instructor)
-
-        def make_instructor(course):
-            CourseStaffRole(course.id).add_users(User.objects.get(email=self.instructor))
-
-        make_instructor(self.graded_course)
+        self.staff = StaffFactory(course=self.graded_course.id)
 
         self.logout()
-        self.login(self.instructor, self.password)
+        self.login(self.staff, self.staff.password)
         self.enroll(self.graded_course)
 
     def get_cw_section(self):
@@ -65,7 +58,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
     def test_staff_debug_for_staff(self):
         resp = self.get_cw_section()
         sdebug = 'Staff Debug Info'
-
+        print resp.content
         self.assertTrue(sdebug in resp.content)
 
     def toggle_masquerade(self):
