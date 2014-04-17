@@ -231,7 +231,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         request = RequestFactory().post("dummy_url")
         response = views.single_thread(
             request,
-            self.course.id,
+            self.course.id.to_deprecated_string(),
             "dummy_discussion_id",
             "dummy_thread_id"
         )
@@ -246,7 +246,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
             Http404,
             views.single_thread,
             request,
-            self.course.id,
+            self.course.id.to_deprecated_string(),
             "test_discussion_id",
             "test_thread_id"
         )
