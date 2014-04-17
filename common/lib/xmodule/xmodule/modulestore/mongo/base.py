@@ -220,7 +220,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         :param class_: the XBlock class
         :param jsonfields: a dict of the jsonified version of the fields
         """
-        for field_name, value in jsonfields:
+        for field_name, value in jsonfields.iteritems():
             if value:
                 if isinstance(class_.fields[field_name], Reference):
                     jsonfields[field_name] = course_key.make_usage_key_from_deprecated_string(value)
