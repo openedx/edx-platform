@@ -36,7 +36,6 @@ from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inhe
 from xmodule.tabs import StaticTab, CourseTabList
 from xblock.core import XBlock
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
-import collections
 
 log = logging.getLogger(__name__)
 
@@ -223,16 +222,17 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         """
         for field_name, value in jsonfields:
             if value:
-                if issubclass(class_.fields[field_name], Reference):
+                if isinstance(class_.fields[field_name], Reference):
                     jsonfields[field_name] = course_key.make_usage_key_from_deprecated_string(value)
-                elif issubclass(class_.fields[field_name], ReferenceList):
+                elif isinstance(class_.fields[field_name], ReferenceList):
                     jsonfields[field_name] = [
                         course_key.make_usage_key_from_deprecated_string(ele) for ele in value
                     ]
-                elif issubclass(class_.fields[field_name], ReferenceValueDict):
+                elif isinstance(class_.fields[field_name], ReferenceValueDict):
                     for key, subvalue in value.iteritems():
                         assert isinstance(subvalue, basestring)
                         value[key] = course_key.make_usage_key_from_deprecated_string(subvalue)
+        return jsonfields
 
 
 def location_to_son(location, prefix='', tag='i4x'):
@@ -468,7 +468,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # first get non-draft in a round-trip
         query = {
             '_id': {'$in': [
-                location_to_son(course_key.make_usage_key_from_deprecated_string(item)) for item in items
+                location_to_son(item) for item in items
             ]}
         }
         return list(self.collection.find(query))
@@ -923,16 +923,17 @@ class MongoModuleStore(ModuleStoreWriteBase):
         assert isinstance(jsonfields, dict)
         for field_name, value in jsonfields.iteritems():
             if value:
-                if issubclass(xblock.fields[field_name], Reference):
+                if isinstance(xblock.fields[field_name], Reference):
                     jsonfields[field_name] = value.to_deprecated_string()
-                elif issubclass(xblock.fields[field_name], ReferenceList):
+                elif isinstance(xblock.fields[field_name], ReferenceList):
                     jsonfields[field_name] = [
                         ele.to_deprecated_string() for ele in value
                     ]
-                elif issubclass(xblock.fields[field_name], ReferenceValueDict):
+                elif isinstance(xblock.fields[field_name], ReferenceValueDict):
                     for key, subvalue in value.iteritems():
                         assert isinstance(subvalue, Location)
                         value[key] = subvalue.to_deprecated_string()
+        return jsonfields
 
     # pylint: disable=unused-argument
     def delete_item(self, location, **kwargs):

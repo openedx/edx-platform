@@ -1,14 +1,15 @@
 # pylint: disable=E0611
 from nose.tools import assert_equals, assert_raises, \
-    assert_not_equals, assert_false, assert_true, assert_greater
+    assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance
 # pylint: enable=E0611
 import pymongo
 import logging
 from uuid import uuid4
 
-from xblock.fields import Scope
+from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import InvalidScopeError
+from xblock.plugin import Plugin
 
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
@@ -21,9 +22,11 @@ from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore.tests.test_modulestore import check_path_to_location
 from nose.tools import assert_in
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.exceptions import InsufficientSpecificationError
 from git.test.lib.asserts import assert_not_none
 import bson.son
+from xmodule.modulestore.tests.factories import ItemFactory
+import xmodule.modulestore.mongo.base
+from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +38,15 @@ FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing loa
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
 RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
 
+
+class ReferenceTestXBlock(XBlock):
+    """
+    Test xblock type to test the reference field types
+    """
+    has_children = True
+    reference_link = Reference(default=None, scope=Scope.content)
+    reference_list = ReferenceList(scope=Scope.content)
+    reference_dict = ReferenceValueDict(scope=Scope.settings)
 
 class TestMongoModuleStore(object):
     '''Tests!'''
@@ -306,6 +318,68 @@ class TestMongoModuleStore(object):
         assert_equals(len(course_locations), 1)
         assert_in(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall'), course_locations)
 
+    @Plugin.register_temp_plugin(ReferenceTestXBlock, 'ref_test')
+    def test_reference_converters(self):
+        """
+        Test that xblocks w/ references
+        """
+        course_key = CourseKey.from_string('edX/toy/2012_Fall')
+        def setup_test():
+            course = self.store.get_course(course_key)
+            refele = ItemFactory.create(
+                category='ref_test', parent_location=course.location,
+            )
+            self.refloc = refele.location
+            p1ele = ItemFactory.create(
+                 category='problem', parent_location=self.refloc,
+            )
+            refele.reference_link = p1ele.location
+            p2ele = ItemFactory.create(
+                 category='html', parent_location=self.refloc,
+            )
+            refele.rference_list = [p1ele.location, p2ele.location]
+            refele.reference_dict = {'p1': p1ele.location, 'p2': p2ele.location}
+            self.store.update_item(refele)
+
+        def check_xblock_fields():
+            def check_children(xblock):
+                for child in xblock.children:
+                    assert_is_instance(child, Location)
+
+            course = self.store.get_course(course_key)
+            check_children(course)
+
+            refele = self.store.get_item(self.refloc)
+            check_children(refele)
+            assert_is_instance(refele.reference_link, Location)
+            assert_greater(len(refele.reference_list), 0)
+            for ref in refele.reference_list:
+                assert_is_instance(ref, Location)
+            assert_greater(len(refele.reference_dict), 0)
+            for ref in refele.reference_dict.itervalues():
+                assert_is_instance(ref, Location)
+
+        def check_mongo_fields():
+            def get_item(location):
+                return xmodule.modulestore.mongo.base.MongoModuleStore._find_one(location)
+
+            def check_children(payload):
+                for child in payload['definition.children']:
+                    assert_is_instance(child, basestring)
+
+            refele = get_item(self.refloc)
+            check_children(refele)
+            assert_is_instance(refele['definition.data']['reference_link'], basestring)
+            assert_greater(len(refele['definition.data']['reference_list']), 0)
+            for ref in refele['definition.data']['reference_list']:
+                assert_is_instance(ref, basestring)
+            assert_greater(len(refele['metadata']['reference_dict']), 0)
+            for ref in refele['metadata']['reference_dict'].itervalues():
+                assert_is_instance(ref, basestring)
+
+        setup_test()
+        check_xblock_fields()
+        check_mongo_fields()
 
 class TestMongoKeyValueStore(object):
     """
