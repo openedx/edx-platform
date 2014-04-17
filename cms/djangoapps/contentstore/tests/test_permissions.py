@@ -10,7 +10,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from contentstore.tests.utils import AjaxEnabledTestClient
 from xmodule.modulestore.keys import CourseKey
-from django.core.urlresolvers import reverse
+from contentstore.utils import reverse_url, reverse_course_url
 from student.roles import CourseInstructorRole, CourseStaffRole
 from contentstore.views.access import has_course_access
 from student import auth
@@ -47,9 +47,7 @@ class TestCourseAccess(ModuleStoreTestCase):
 
         # create a course via the view handler which has a different strategy for permissions than the factory
         self.course_key = CourseKey.from_string('myu/mydept.mycourse/myrun')
-        course_url = reverse(
-             'contentstore.views.course_handler'
-        )
+        course_url = reverse_url('course_handler')
         self.client.ajax_post(course_url,
             {
                 'org': self.course_key.org,
@@ -109,10 +107,7 @@ class TestCourseAccess(ModuleStoreTestCase):
             user_by_role[role].append(user)
             self.assertTrue(has_course_access(user, self.course_key), "{} does not have access".format(user))
 
-        course_team_url = reverse(
-             'contentstore.views.course_team_handler',
-             kwargs={'course_key_string': unicode(self.course_key)}
-        )
+        course_team_url = reverse_course_url('course_team_handler', self.course_key)
         response = self.client.get_html(course_team_url)
         for role in [CourseInstructorRole, CourseStaffRole]:
             for user in user_by_role[role]:
