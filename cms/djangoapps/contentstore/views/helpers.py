@@ -2,7 +2,6 @@ import logging
 
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_string, render_to_response
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import reverse_course_url, reverse_usage_url
