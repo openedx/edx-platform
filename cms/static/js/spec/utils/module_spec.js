@@ -7,7 +7,7 @@ define(['js/utils/module'],
         });
         describe('getUpdateUrl ', function () {
             it('can take no arguments', function () {
-                expect(ModuleUtils.getUpdateUrl()).toBe('/xblock');
+                expect(ModuleUtils.getUpdateUrl()).toBe('/xblock/');
             });
             it('appends a locator', function () {
                 expect(ModuleUtils.getUpdateUrl("locator")).toBe('/xblock/locator');
