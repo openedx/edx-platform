@@ -9,7 +9,6 @@ from mock import patch
 
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
-from xmodule.modulestore.keys import CourseKey
 
 from .test_modulestore import check_path_to_location
 from xmodule.tests import DATA_DIR
@@ -59,13 +58,13 @@ class TestXMLModuleStore(unittest.TestCase):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'], load_error_modules=False)
 
         # Look up the errors during load. There should be none.
-        errors = modulestore.get_course_errors(CourseKey.from_string("edX/toy/2012_Fall"))
+        errors = modulestore.get_course_errors(SlashSeparatedCourseKey("edX", "toy", "2012_Fall"))
         assert errors == []
 
     @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)
     def test_tilde_files_ignored(self, _fake_glob):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['tilde'], load_error_modules=False)
-        about_location = SlashSeparatedCourseKey.from_string('edX/tilde/2012_Fall').make_usage_key(
+        about_location = SlashSeparatedCourseKey('edX', 'tilde', '2012_Fall').make_usage_key(
             'about', 'index',
         )
         about_module = modulestore.get_item(about_location)
@@ -86,7 +85,7 @@ class TestXMLModuleStore(unittest.TestCase):
         self.assertEqual(len(course_locations), 0)
 
         # now set toy course to share the wiki with simple course
-        toy_course = store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
+        toy_course = store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
         toy_course.wiki_slug = 'simple'
 
         course_locations = store.get_courses_for_wiki('toy')

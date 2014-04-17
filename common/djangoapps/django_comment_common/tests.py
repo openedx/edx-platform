@@ -22,7 +22,7 @@ class RoleAssignmentTest(TestCase):
             "hacky",
             "hacky@fake.edx.org"
         )
-        self.course_key = SlashSeparatedCourseKey.from_string("edX/Fake101/2012")
+        self.course_key = SlashSeparatedCourseKey("edX", "Fake101", "2012")
         CourseEnrollment.enroll(self.staff_user, self.course_key)
         CourseEnrollment.enroll(self.student_user, self.course_key)
 

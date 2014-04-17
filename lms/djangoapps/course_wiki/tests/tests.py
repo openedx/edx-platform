@@ -4,7 +4,7 @@ from django.test.utils import override_settings
 from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from mock import patch
 
@@ -15,7 +15,7 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
     def setUp(self):
 
         # Load the toy course
-        self.toy = modulestore().get_course(CourseKey.from_string('edX/toy/2012_Fall'))
+        self.toy = modulestore().get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
         # Create two accounts
         self.student = 'view@test.com'

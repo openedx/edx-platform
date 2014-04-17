@@ -4,9 +4,8 @@ Tests for ErrorModule and NonStaffErrorModule
 import unittest
 from xmodule.tests import get_test_system
 from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
-from xmodule.modulestore import Location
 from xmodule.modulestore.xml import CourseLocationGenerator
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey, Location
 from xmodule.x_module import XModuleDescriptor, XModule
 from mock import MagicMock, Mock, patch
 from xblock.runtime import Runtime, IdReader
@@ -18,7 +17,7 @@ from xblock.test.tools import unabc
 class SetupTestErrorModules():
     def setUp(self):
         self.system = get_test_system()
-        self.course_id = CourseKey.from_string('org/course/run')
+        self.course_id = SlashSeparatedCourseKey('org', 'course', 'run')
         self.location = self.course_id.make_usage_key('foo', 'bar')
         self.valid_xml = u"<problem>ABC \N{SNOWMAN}</problem>"
         self.error_msg = "Error"

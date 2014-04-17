@@ -11,7 +11,7 @@ from textwrap import dedent
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -132,7 +132,7 @@ class TestXmlCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         # Load one of the XML based courses
         # Our test mapping rules allow the MixedModuleStore
         # to load this course from XML, not Mongo.
-        self.check_all_pages_load(CourseKey.from_string('edX/toy/2012_Fall'))
+        self.check_all_pages_load(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
 
 # Importing XML courses isn't possible with MixedModuleStore,
@@ -159,7 +159,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
             </table_of_contents>
         """).strip()
 
-        location = CourseKey.from_string('edX/toy/2012_Fall').make_usage_key('course', '2012_Fall')
+        location = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall').make_usage_key('course', '2012_Fall')
         course = self.store.get_item(location)
         self.assertGreater(len(course.textbooks), 0)
 

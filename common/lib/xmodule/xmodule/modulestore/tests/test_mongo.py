@@ -16,6 +16,7 @@ from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
@@ -214,7 +215,7 @@ class TestMongoModuleStore(object):
 
             Assumes the information is desired for courses[4] ('toy' course).
             """
-            course = self.store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
+            course = self.store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
             return course.tabs[index]['name']
 
         # There was a bug where model.save was not getting called after the static tab name
@@ -295,7 +296,7 @@ class TestMongoModuleStore(object):
         assert_equals(len(course_locations), 0)
 
         # set toy course to share the wiki with simple course
-        toy_course = self.store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
+        toy_course = self.store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
         toy_course.wiki_slug = 'simple'
         self.store.update_item(toy_course)
 
@@ -310,7 +311,7 @@ class TestMongoModuleStore(object):
             assert_in(Location('edX', course_number, '2012_Fall', 'course', '2012_Fall'), course_locations)
 
         # configure simple course to use unique wiki_slug.
-        simple_course = self.store.get_course(CourseKey.from_string('edX/simple/2012_Fall'))
+        simple_course = self.store.get_course(SlashSeparatedCourseKey('edX', 'simple', '2012_Fall'))
         simple_course.wiki_slug = 'edX.simple.2012_Fall'
         self.store.update_item(simple_course)
         # it should be retrievable with its new wiki_slug
@@ -323,7 +324,7 @@ class TestMongoModuleStore(object):
         """
         Test that xblocks w/ references
         """
-        course_key = CourseKey.from_string('edX/toy/2012_Fall')
+        course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         def setup_test():
             course = self.store.get_course(course_key)
             refele = ItemFactory.create(

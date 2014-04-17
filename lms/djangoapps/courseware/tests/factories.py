@@ -20,10 +20,10 @@ from student.roles import (
     OrgInstructorRole,
 )
 
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
-course_id = CourseKey.from_string(u'edX/test_course/test')
+course_id = SlashSeparatedCourseKey(u'edX', u'test_course', u'test')
 location = partial(course_id.make_usage_key, u'problem')
 
 
@@ -117,7 +117,7 @@ class StudentModuleFactory(DjangoModelFactory):
 
     module_type = "problem"
     student = factory.SubFactory(UserFactory)
-    course_id = CourseKey.from_string("MITx/999/Robot_Super_Course")
+    course_id = SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course")
     state = None
     grade = None
     max_grade = None

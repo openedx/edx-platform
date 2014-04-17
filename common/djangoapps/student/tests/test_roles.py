@@ -34,8 +34,8 @@ class RolesTestCase(TestCase):
     def test_group_name_case_sensitive(self):
         uppercase_course_id = "ORG/COURSE/NAME"
         lowercase_course_id = uppercase_course_id.lower()
-        uppercase_course_key = SlashSeparatedCourseKey.from_string(uppercase_course_id)
-        lowercase_course_key = SlashSeparatedCourseKey.from_string(lowercase_course_id)
+        uppercase_course_key = SlashSeparatedCourseKey.from_deprecated_string(uppercase_course_id)
+        lowercase_course_key = SlashSeparatedCourseKey.from_deprecated_string(lowercase_course_id)
 
         role = "role"
 

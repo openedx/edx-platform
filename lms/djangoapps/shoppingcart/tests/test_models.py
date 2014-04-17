@@ -56,7 +56,7 @@ class OrderTest(ModuleStoreTestCase):
     def test_cart_clear(self):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        CertificateItem.add_to_order(cart, SlashSeparatedCourseKey.from_string('org/test/Test_Course_1'), self.cost, 'honor')
+        CertificateItem.add_to_order(cart, SlashSeparatedCourseKey('org', 'test', 'Test_Course_1'), self.cost, 'honor')
         self.assertEquals(cart.orderitem_set.count(), 2)
         self.assertTrue(cart.has_items())
         cart.clear()
@@ -309,13 +309,13 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
     def test_purchased_callback_exception(self):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        reg1.course_id = SlashSeparatedCourseKey.from_string("changed/forsome/reason")
+        reg1.course_id = SlashSeparatedCourseKey("changed", "forsome", "reason")
         reg1.save()
         with self.assertRaises(PurchasedCallbackException):
             reg1.purchased_callback()
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
 
-        reg1.course_id = SlashSeparatedCourseKey.from_string("abc/efg/hij")
+        reg1.course_id = SlashSeparatedCourseKey("abc", "efg", "hij")
         reg1.save()
         with self.assertRaises(PurchasedCallbackException):
             reg1.purchased_callback()

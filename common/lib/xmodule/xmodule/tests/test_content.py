@@ -21,7 +21,7 @@ class ContentTest(unittest.TestCase):
         self.assertIsNone(content.thumbnail_location)
 
     def test_static_url_generation_from_courseid(self):
-        course_key = SlashSeparatedCourseKey.from_string('foo/bar/bz')
+        course_key = SlashSeparatedCourseKey('foo', 'bar', 'bz')
         url = StaticContent.convert_legacy_static_url_with_course_id('images_course_image.jpg', course_key)
         self.assertEqual(url, '/c4x/foo/bar/asset/images_course_image.jpg')
 

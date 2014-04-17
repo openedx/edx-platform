@@ -11,7 +11,7 @@ from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowe
 from xmodule.modulestore import Location
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 import pytz
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 # pylint: disable=protected-access
@@ -22,7 +22,7 @@ class AccessTestCase(TestCase):
     """
 
     def setUp(self):
-        course_key = CourseKey.from_string('edX/toy/2012_Fall')
+        course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.course = course_key.make_usage_key('course', course_key.run)
         self.anonymous_user = AnonymousUserFactory()
         self.student = UserFactory()
@@ -110,7 +110,7 @@ class AccessTestCase(TestCase):
 
         c = Mock(
             enrollment_start=tomorrow, enrollment_end=tomorrow,
-            id=CourseKey.from_string('edX/test/2012_Fall'), enrollment_domain=''
+            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'), enrollment_domain=''
         )
 
         CourseEnrollmentAllowedFactory(email=u.email, course_id=c.id)
@@ -123,7 +123,7 @@ class AccessTestCase(TestCase):
 
         c = Mock(
             enrollment_start=tomorrow, enrollment_end=tomorrow,
-            id=CourseKey.from_string('edX/test/Whenever'), enrollment_domain='',
+            id=SlashSeparatedCourseKey('edX', 'test', 'Whenever'), enrollment_domain='',
         )
         self.assertTrue(access._has_access_course_desc(u, 'enroll', c))
 
@@ -140,7 +140,7 @@ class UserRoleTestCase(TestCase):
     Tests for user roles.
     """
     def setUp(self):
-        self.course_key = CourseKey.from_string('edX/toy/2012_Fall')
+        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.anonymous_user = AnonymousUserFactory()
         self.student = UserFactory()
         self.global_staff = UserFactory(is_staff=True)

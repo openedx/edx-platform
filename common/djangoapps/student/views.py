@@ -53,7 +53,7 @@ from dark_lang.models import DarkLangConfig
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.keys import SlashSeparatedCourseKey
 from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
 
 from collections import namedtuple
@@ -579,7 +579,7 @@ def change_enrollment(request):
     if 'course_id' not in request.POST:
         return HttpResponseBadRequest(_("Course id not specified"))
 
-    course_id = CourseKey.from_string(request.POST.get("course_id"))
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
 
     if not user.is_authenticated():
         return HttpResponseForbidden()
@@ -646,7 +646,7 @@ def _parse_course_id_from_string(input_str):
     """
     m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
     if m_obj:
-        return CourseKey.from_string(m_obj.group('course_id'))
+        return SlashSeparatedCourseKey.from_deprecated_string(m_obj.group('course_id'))
     return None
 
 
@@ -1284,7 +1284,7 @@ def auto_auth(request):
     course_id = request.GET.get('course_id', None)
     course_key = None
     if course_id:
-        course_key = CourseKey.from_string(course_id)
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object
@@ -1772,7 +1772,7 @@ def change_email_settings(request):
     user = request.user
 
     course_id = request.POST.get("course_id")
-    course_key = CourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     receive_emails = request.POST.get("receive_emails")
     if receive_emails:
         optout_object = Optout.objects.filter(user=user, course_id=course_key)
@@ -1797,7 +1797,7 @@ def token(request):
     the token was issued. This will be stored with the user along with
     the id for identification purposes in the backend.
     '''
-    course_id = CourseKey.from_string(request.GET.get("course_id"))
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(request.GET.get("course_id"))
     course = course_from_id(course_id)
     dtnow = datetime.datetime.now()
     dtutcnow = datetime.datetime.utcnow()

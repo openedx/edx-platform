@@ -19,7 +19,7 @@ class CourseModeModelTest(TestCase):
     """
 
     def setUp(self):
-        self.course_id = SlashSeparatedCourseKey.from_string('Test/TestCourse/TestCourseRun')
+        self.course_id = SlashSeparatedCourseKey('Test', 'TestCourse', 'TestCourseRun')
         CourseMode.objects.all().delete()
 
     def create_mode(self, mode_slug, mode_name, min_price=0, suggested_prices='', currency='usd'):
@@ -111,5 +111,5 @@ class CourseModeModelTest(TestCase):
         modes = CourseMode.modes_for_course(self.course_id)
         self.assertEqual([expired_mode_value, mode1], modes)
 
-        modes = CourseMode.modes_for_course(SlashSeparatedCourseKey.from_string('TestCourse/Test/second_test_course'))
+        modes = CourseMode.modes_for_course(SlashSeparatedCourseKey('TestCourse', 'Test', 'second_test_course'))
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)

@@ -278,7 +278,7 @@ class UtilFnTest(TestCase):
         NON_COURSE_URL = u'/blahblah'                             # pylint: disable=C0103
         self.assertEqual(
             _parse_course_id_from_string(COURSE_URL),
-            SlashSeparatedCourseKey.from_string(COURSE_ID)
+            SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID)
         )
         self.assertIsNone(_parse_course_id_from_string(NON_COURSE_URL))
 

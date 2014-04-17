@@ -19,7 +19,6 @@ from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.x_module import XModuleDescriptor
@@ -44,7 +43,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     Tests of courseware.module_render
     """
     def setUp(self):
-        self.course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        self.course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.location = self.course_id.make_usage_key('chapter', 'Overview')
         self.toy_course = modulestore().get_course(self.course_id)
         self.mock_user = UserFactory()
@@ -167,7 +166,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
-        self.course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        self.course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.location = self.course_id.make_usage_key('chapter', 'Overview')
         self.toy_course = modulestore().get_course(self.course_id)
         self.mock_user = UserFactory()
@@ -318,7 +317,7 @@ class TestTOC(TestCase):
     def setUp(self):
 
         # Toy courses should be loaded
-        self.course_key = CourseKey.from_string('edX/toy/2012_Fall')
+        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.toy_course = modulestore().get_course(self.course_key)
         self.portal_user = UserFactory()
 
@@ -563,7 +562,7 @@ class ViewInStudioTest(ModuleStoreTestCase):
         Define the XML backed course to use.
         Toy courses are already loaded in XML and mixed modulestores.
         """
-        course_key = SlashSeparatedCourseKey.from_string('edX/toy/2012_Fall')
+        course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         location = course_key.make_usage_key('chapter', 'Overview')
         descriptor = modulestore().get_item(location)
 
@@ -810,14 +809,14 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             # This value is set by observation, so that later changes to the student
             # id computation don't break old data
             'e3b0b940318df9c14be59acb08e78af5',
-            self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), descriptor_class)
+            self._get_anonymous_id(SlashSeparatedCourseKey('MITx', '6.00x', '2012_Fall'), descriptor_class)
         )
 
         self.assertEquals(
             # This value is set by observation, so that later changes to the student
             # id computation don't break old data
             'f82b5416c9f54b5ce33989511bb5ef2e',
-            self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2013_Spring'), descriptor_class)
+            self._get_anonymous_id(SlashSeparatedCourseKey('MITx', '6.00x', '2013_Spring'), descriptor_class)
         )
 
 

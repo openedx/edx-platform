@@ -17,7 +17,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.roles import CourseStaffRole
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -43,7 +43,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
         clear_existing_modulestores()
         courses = modulestore().get_courses()
 
-        self.course_id = CourseKey.from_string("edX/toy/2012_Fall")
+        self.course_id = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.toy = modulestore().get_course(self.course_id)
 
         # Create two accounts

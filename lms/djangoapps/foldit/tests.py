@@ -24,8 +24,8 @@ class FolditTestCase(TestCase):
         self.factory = RequestFactory()
         self.url = reverse('foldit_ops')
 
-        self.course_id = SlashSeparatedCourseKey.from_string('course/id/1')
-        self.course_id2 = SlashSeparatedCourseKey.from_string('course/id/2')
+        self.course_id = SlashSeparatedCourseKey('course', 'id', '1')
+        self.course_id2 = SlashSeparatedCourseKey('course', 'id', '2')
 
         self.user = UserFactory.create()
         self.user2 = UserFactory.create()

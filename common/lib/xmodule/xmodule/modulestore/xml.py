@@ -356,7 +356,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
 
         if course_ids is not None:
-            course_ids = [CourseKey.from_string(course_id) for course_id in course_ids]
+            course_ids = [SlashSeparatedCourseKey.from_deprecated_string(course_id) for course_id in course_ids]
 
         self.load_error_modules = load_error_modules
 

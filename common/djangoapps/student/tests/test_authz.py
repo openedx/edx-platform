@@ -12,7 +12,7 @@ from django.core.exceptions import PermissionDenied
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
 from student.tests.factories import AdminFactory
 from student.auth import has_access, add_users, remove_users
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class CreatorGroupTest(TestCase):
@@ -139,7 +139,7 @@ class CourseGroupTest(TestCase):
         self.global_admin = AdminFactory()
         self.creator = User.objects.create_user('testcreator', 'testcreator+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
-        self.course_id = CourseKey.from_string('mitX/101/test')
+        self.course_id = SlashSeparatedCourseKey('mitX', '101', 'test')
 
     def test_add_user_to_course_group(self):
         """

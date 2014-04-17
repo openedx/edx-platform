@@ -32,7 +32,7 @@ class OpenEndedPostTest(ModuleStoreTestCase):
     """Test the openended_post management command."""
 
     def setUp(self):
-        self.course_id = SlashSeparatedCourseKey.from_string("edX/open_ended/2012_Fall")
+        self.course_id = SlashSeparatedCourseKey("edX", "open_ended", "2012_Fall")
         self.problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
         self.self_assessment_task_number = 0
         self.open_ended_task_number = 1
@@ -128,7 +128,7 @@ class OpenEndedStatsTest(ModuleStoreTestCase):
     """Test the openended_stats management command."""
 
     def setUp(self):
-        self.course_id = SlashSeparatedCourseKey.from_string("edX/open_ended/2012_Fall")
+        self.course_id = SlashSeparatedCourseKey("edX", "open_ended", "2012_Fall")
         self.problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
         self.task_number = 1
         self.invalid_task_number = 3

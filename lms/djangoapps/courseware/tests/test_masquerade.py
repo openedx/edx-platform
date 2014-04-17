@@ -21,7 +21,7 @@ from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from lms.lib.xblock.runtime import quote_slashes
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -35,7 +35,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         # Clear out the modulestores, causing them to reload
         clear_existing_modulestores()
 
-        self.graded_course = modulestore().get_course(CourseKey.from_string("edX/graded/2012_Fall"))
+        self.graded_course = modulestore().get_course(SlashSeparatedCourseKey("edX", "graded", "2012_Fall"))
 
         # Create staff account
         self.staff = StaffFactory(course=self.graded_course.id)

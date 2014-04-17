@@ -17,7 +17,7 @@ from django.db import DatabaseError
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 
 from bulk_email.models import CourseEmail, SEND_TO_ALL
@@ -172,7 +172,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the course in the email doesn't exist
         """
-        course_id = CourseKey.from_string("I/DONT/EXIST")
+        course_id = SlashSeparatedCourseKey("I", "DONT", "EXIST")
         email = CourseEmail(course_id=course_id)
         email.save()
         entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
@@ -195,7 +195,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the course_id in CourseEmail is not the same as one explicitly passed in.
         """
-        email = CourseEmail(course_id=CourseKey.from_string("bogus/course/id"), to_option=SEND_TO_ALL)
+        email = CourseEmail(course_id=SlashSeparatedCourseKey("bogus", "course", "id"), to_option=SEND_TO_ALL)
         email.save()
         entry = InstructorTask.create(self.course.id, "task_type", "task_key", "task_input", self.instructor)
         task_input = {"email_id": email.id}  # pylint: disable=E1101

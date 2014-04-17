@@ -10,7 +10,7 @@ class TabTestCase(unittest.TestCase):
     def setUp(self):
 
         self.course = MagicMock()
-        self.course.id = SlashSeparatedCourseKey.from_string('edX/toy/2012_Fall')
+        self.course.id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.fake_dict_tab = {'fake_key': 'fake_value'}
         self.settings = MagicMock()
         self.settings.FEATURES = {}

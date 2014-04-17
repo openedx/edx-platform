@@ -42,7 +42,7 @@ class TestHandlerUrl(TestCase):
 
     def setUp(self):
         self.block = Mock()
-        self.course_key = SlashSeparatedCourseKey.from_string("org/course/run")
+        self.course_key = SlashSeparatedCourseKey("org", "course", "run")
         self.runtime = LmsModuleSystem(
             static_url='/static',
             track_function=Mock(),
@@ -93,7 +93,7 @@ class TestUserServiceAPI(TestCase):
     """Test the user service interface"""
 
     def setUp(self):
-        self.course_id = SlashSeparatedCourseKey.from_string("org/course/run")
+        self.course_id = SlashSeparatedCourseKey("org", "course", "run")
 
         self.user = User(username='runtime_robot', email='runtime_robot@edx.org', password='test', first_name='Robot')
         self.user.save()

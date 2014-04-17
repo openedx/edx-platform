@@ -15,7 +15,6 @@ from xmodule.modulestore.tests.test_location_mapper import LocMapperSetupSansDja
 # before importing the module
 from django.conf import settings
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.keys import CourseKey
 import bson.son
 if not settings.configured:
     settings.configure()
@@ -158,7 +157,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
 
         # convert to CourseKeys
         self.course_locations = {
-            course_id: SlashSeparatedCourseKey.from_string(course_id)
+            course_id: SlashSeparatedCourseKey.from_deprecated_string(course_id)
             for course_id in [self.MONGO_COURSEID, self.XML_COURSEID1, self.XML_COURSEID2]
         }
         # and then to the root UsageKey
@@ -197,7 +196,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         )
         # try an unknown mapping, it should be the 'default' store
         self.assertEqual(self.store.get_modulestore_type(
-            CourseKey.from_string('foo/bar/2012_Fall')), mongo_ms_type
+            SlashSeparatedCourseKey('foo', 'bar', '2012_Fall')), mongo_ms_type
         )
 
     @ddt.data('direct', 'split')

@@ -18,7 +18,6 @@ from mock import patch
 from bulk_email.models import CourseAuthorization
 from bulk_email.forms import CourseAuthorizationAdminForm
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.keys import CourseKey
 from opaque_keys import InvalidKeyError
 
 
@@ -117,7 +116,7 @@ class CourseAuthorizationXMLFormTest(ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_xml_course_authorization(self):
-        course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         # Assert this is an XML course
         self.assertEqual(modulestore().get_modulestore_type(course_id), XML_MODULESTORE_TYPE)
 

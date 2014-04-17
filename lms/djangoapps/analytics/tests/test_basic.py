@@ -5,7 +5,7 @@ Tests for instructor.basic
 from django.test import TestCase
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from analytics.basic import enrolled_students_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 
@@ -15,7 +15,7 @@ class TestAnalyticsBasic(TestCase):
 
     def setUp(self):
         self.course_id = 'robot/course/id'
-        self.course_key = CourseKey.from_string('robot/course/id')
+        self.course_key = SlashSeparatedCourseKey('robot', 'course', 'id')
         self.users = tuple(UserFactory() for _ in xrange(30))
         self.ces = tuple(CourseEnrollment.enroll(user, self.course_key)
                          for user in self.users)

@@ -7,6 +7,7 @@ In this way, courses can be served up both - say - XMLModuleStore or MongoModule
 
 import logging
 from uuid import uuid4
+from opaque_keys import InvalidKeyError
 
 from . import ModuleStoreWriteBase
 from xmodule.modulestore.django import create_modulestore_instance, loc_mapper
@@ -33,7 +34,13 @@ class MixedModuleStore(ModuleStoreWriteBase):
         super(MixedModuleStore, self).__init__(**kwargs)
 
         self.modulestores = {}
-        self.mappings = {CourseKey.from_string(course_id): store_name for course_id, store_name in mappings.iteritems()}
+        self.mappings = {}
+
+        for course_id, store_name in mappings.iteritems():
+            try:
+                self.mappings[CourseKey.from_string(course_id)] = store_name
+            except InvalidKeyError:
+                self.mappings[SlashSeparatedCourseKey.from_deprecated_string(course_id)] = store_name
 
         if 'default' not in stores:
             raise Exception('Missing a default modulestore in the MixedModuleStore __init__ method.')

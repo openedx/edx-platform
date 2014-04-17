@@ -15,7 +15,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -28,7 +28,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             category="static_tab", parent_location=self.course.location,
             data="OOGIE BLOOGIE", display_name="new_tab"
         )
-        self.toy_course_id = CourseKey.from_string('edX/toy/2012_Fall')
+        self.toy_course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
     def test_logged_in(self):
         self.setup_user()
@@ -68,7 +68,7 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     # The following XML test course (which lives at common/test/data/2014)
     # is closed; we're testing that tabs still appear when
     # the course is already closed
-    xml_course_id = CourseKey.from_string('edX/detached_pages/2014')
+    xml_course_id = SlashSeparatedCourseKey('edX', 'detached_pages', '2014')
 
     # this text appears in the test course's tab
     # common/test/data/2014/tabs/8e4cce2b4aaf4ba28b1220804619e41f.html

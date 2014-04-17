@@ -56,7 +56,7 @@ class ApiTest(TestCase):
         self.student = User.objects.create_user('student', 'student@test.com', self.password)
         self.student2 = User.objects.create_user('student2', 'student2@test.com', self.password)
         self.instructor = User.objects.create_user('instructor', 'instructor@test.com', self.password)
-        self.course_key = SlashSeparatedCourseKey.from_string('HarvardX/CB22x/The_Ancient_Greek_Hero')
+        self.course_key = SlashSeparatedCourseKey('HarvardX', 'CB22x', 'The_Ancient_Greek_Hero')
         self.note = {
             'user': self.student,
             'course_id': self.course_key,
@@ -344,7 +344,7 @@ class NoteTest(TestCase):
     def setUp(self):
         self.password = 'abc'
         self.student = User.objects.create_user('student', 'student@test.com', self.password)
-        self.course_key = SlashSeparatedCourseKey.from_string('HarvardX/CB22x/The_Ancient_Greek_Hero')
+        self.course_key = SlashSeparatedCourseKey('HarvardX', 'CB22x', 'The_Ancient_Greek_Hero')
         self.note = {
             'user': self.student,
             'course_id': self.course_key,

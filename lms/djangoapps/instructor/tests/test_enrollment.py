@@ -29,7 +29,7 @@ from xmodule.modulestore.locations import SlashSeparatedCourseKey
 class TestSettableEnrollmentState(TestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey.from_string('robot/fake/course')
+        self.course_key = SlashSeparatedCourseKey('robot', 'fake', 'course')
 
     def test_mes_create(self):
         """
@@ -59,7 +59,7 @@ class TestEnrollmentChangeBase(TestCase):
     __metaclass__ = ABCMeta
 
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey.from_string('robot/fake/course')
+        self.course_key = SlashSeparatedCourseKey('robot', 'fake', 'course')
 
     def _run_state_change_test(self, before_ideal, after_ideal, action):
         """
@@ -286,7 +286,7 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
 class TestInstructorEnrollmentStudentModule(TestCase):
     """ Test student module manipulations. """
     def setUp(self):
-        self.course_key = SlashSeparatedCourseKey.from_string('fake/course/id')
+        self.course_key = SlashSeparatedCourseKey('fake', 'course', 'id')
 
     def test_reset_student_attempts(self):
         user = UserFactory()

@@ -44,7 +44,7 @@ class TestJumpTo(TestCase):
 
     def setUp(self):
         # Use toy course from XML
-        self.course_key = SlashSeparatedCourseKey.from_string('edX/toy/2012_Fall')
+        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
     def test_jumpto_invalid_location(self):
         location = self.course_key.make_usage_key(None, 'NoSuchPlace')
@@ -81,7 +81,7 @@ class ViewsTestCase(TestCase):
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
         self.date = datetime(2013, 1, 22, tzinfo=UTC)
-        self.course_id = SlashSeparatedCourseKey.from_string('edX/toy/2012_Fall')
+        self.course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_id)
         self.enrollment.created = self.date
         self.enrollment.save()
@@ -422,7 +422,7 @@ class StartDateTests(ModuleStoreTestCase):
         "SHORT_DATE_FORMAT": "%Y-%b-%d",
     }))
     def test_format_localized_in_xml_course(self):
-        text = self.get_about_text(SlashSeparatedCourseKey.from_string('edX/toy/TT_2012_Fall'))
+        text = self.get_about_text(SlashSeparatedCourseKey('edX', 'toy', 'TT_2012_Fall'))
         # The start date is set in common/test/data/two_toys/policies/TT_2012_Fall/policy.json
         self.assertIn("2015-JULY-17", text)
 
