@@ -26,7 +26,7 @@ class StudioApiFixture(object):
 
     @lazy
     def session(self):
-        """
+        """N
         Log in as a staff user, then return a `requests` `session` object for the logged in user.
         Raises a `StudioApiLoginError` if the login fails.
         """
@@ -235,14 +235,21 @@ class CourseFixture(StudioApiFixture):
         self._install_course_handouts()
         self._configure_course()
         self._upload_assets()
-        self._create_xblock_children(self._course_loc, self._children)
+        self._create_xblock_children(self._course_location, self._children)
 
     @property
-    def _course_loc(self):
+    def _course_key(self):
         """
         Return the locator string for the course.
         """
         return "slashes:{org}+{number}+{run}".format(**self._course_dict)
+
+    @property
+    def _course_location(self):
+        """
+        Return the locator string for the course.
+        """
+        return "location:{org}+{number}+{run}+course+{run}".format(**self._course_dict)
 
     @property
     def _updates_loc(self):
@@ -263,7 +270,7 @@ class CourseFixture(StudioApiFixture):
         """
         Return the locator string for the course handouts
         """
-        return "slashes:{org}+{number}+{run}/handouts".format(**self._course_dict)
+        return "location:{org}+{number}+{run}+course_info+handouts".format(**self._course_dict)
 
     def _create_course(self):
         """
@@ -298,7 +305,7 @@ class CourseFixture(StudioApiFixture):
         """
         Configure course settings (e.g. start and end date)
         """
-        url = STUDIO_BASE_URL + '/settings/details/' + self._course_loc
+        url = STUDIO_BASE_URL + '/settings/details/' + self._course_key
 
         # First, get the current values
         response = self.session.get(url, headers=self.headers)
@@ -425,7 +432,7 @@ class CourseFixture(StudioApiFixture):
 
         # Create the new XBlock
         response = self.session.post(
-            STUDIO_BASE_URL + '/xblock',
+            STUDIO_BASE_URL + '/xblock/',
             data=json.dumps(create_payload),
             headers=self.headers,
         )

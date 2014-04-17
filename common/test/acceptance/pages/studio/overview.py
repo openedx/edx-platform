@@ -6,7 +6,7 @@ from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
 from .unit import UnitPage
-
+from . import BASE_URL
 
 class CourseOutlineContainer(object):
     """
@@ -162,3 +162,11 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Return the :class:`.CourseOutlineSection` with the title `title`.
         """
         return self.child(title)
+
+    @property
+    def url(self):
+        """
+        Construct a URL to the outline page.
+        """
+        course_key = "slashes:{course_org}+{course_num}+{course_run}".format(**self.course_info)
+        return "/".join([BASE_URL, self.url_path, course_key])
