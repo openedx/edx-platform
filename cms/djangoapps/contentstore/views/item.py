@@ -37,7 +37,7 @@ from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
-from xmodule.modulestore.keys import UsageKey
+from xmodule.modulestore.keys import UsageKey, CourseKey
 
 __all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler']
 
@@ -486,7 +486,7 @@ def _delete_item_at_location(item_usage_key, delete_children=False, delete_all_v
 # pylint: disable=W0613
 @login_required
 @require_http_methods(("GET", "DELETE"))
-def orphan_handler(request, tag=None, org=None, offering=None, branch=None, version_guid=None, block=None):
+def orphan_handler(request, course_key_string):
     """
     View for handling orphan related requests. GET gets all of the current orphans.
     DELETE removes all orphans (requires is_staff access)
@@ -494,19 +494,19 @@ def orphan_handler(request, tag=None, org=None, offering=None, branch=None, vers
     An orphan is a block whose category is not in the DETACHED_CATEGORY list, is not the root, and is not reachable
     from the root via children
     """
-    location = BlockUsageLocator(CourseLocator(org=org, offering=offering, branch=branch, version_guid=version_guid), block)
-    # DHM: when split becomes back-end, move or conditionalize this conversion
-    old_location = loc_mapper().translate_locator_to_location(location)
+    course_usage_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
-        if has_course_access(request.user, old_location.course_key):
-            return JsonResponse(modulestore().get_orphans(old_location.course_key))
+        if has_course_access(request.user, course_usage_key):
+            return JsonResponse(modulestore().get_orphans(course_usage_key))
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
         if request.user.is_staff:
-            items = modulestore().get_orphans(old_location.course_key)
+            items = modulestore().get_orphans(course_usage_key)
             for itemloc in items:
-                modulestore('draft').delete_item(itemloc, delete_all_versions=True)
+                # get_orphans returns the deprecated string format
+                usage_key = course_usage_key.make_usage_key_from_deprecated_string(itemloc)
+                modulestore('draft').delete_item(usage_key, delete_all_versions=True)
             return JsonResponse({'deleted': items})
         else:
             raise PermissionDenied()

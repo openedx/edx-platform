@@ -944,7 +944,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
     def get_orphans(self, course_key):
         """
-        Return an array all of the locations for orphans in the course.
+        Return an array all of the locations (deprecated string format) for orphans in the course.
         """
         detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
         query = self._course_key_to_son(course_key)
@@ -954,6 +954,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         item_locs = set()
         for item in all_items:
             if item['_id']['category'] != 'course':
+                # It would be nice to change this method to return UsageKeys instead of the deprecated string.
                 item_locs.add(
                     self._location_from_id(item['_id'], course_key.run).replace(revision=None).to_deprecated_string()
                 )
