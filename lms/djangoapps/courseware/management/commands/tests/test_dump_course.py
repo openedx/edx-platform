@@ -22,7 +22,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 DATA_DIR = 'common/test/data/'
 
@@ -55,7 +55,7 @@ class CommandsTestBase(TestCase):
 
         courses = store.get_courses()
         # NOTE: if xml store owns these, it won't import them into mongo
-        if CourseKey.from_string(TEST_COURSE_ID) not in [c.id for c in courses]:
+        if SlashSeparatedCourseKey.from_deprecated_string(TEST_COURSE_ID) not in [c.id for c in courses]:
             import_from_xml(store, DATA_DIR, ['toy', 'simple'])
 
         return [course.id for course in store.get_courses()]
@@ -92,7 +92,7 @@ class CommandsTestBase(TestCase):
             self.assertNotIn('inherited_metadata', element)
 
         # Check a few elements in the course dump
-        test_course_key = CourseKey.from_string(TEST_COURSE_ID)
+        test_course_key = SlashSeparatedCourseKey.from_deprecated_string(TEST_COURSE_ID)
         parent_id = test_course_key.make_usage_key('chapter', 'Overview').to_deprecated_string()
         self.assertEqual(dump[parent_id]['category'], 'chapter')
         self.assertEqual(len(dump[parent_id]['children']), 3)

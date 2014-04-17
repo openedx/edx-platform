@@ -67,7 +67,7 @@ class Middleware(object):
 
         course_match = IN_COURSE_WIKI_COMPILED_REGEX.match(destination)
         if course_match:
-            course_id = CourseKey.from_string(course_match.group('course_id'))
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(course_match.group('course_id'))
 
             # Authorization Check
             # Let's see if user is enrolled or the course allows for public access
@@ -122,7 +122,7 @@ class Middleware(object):
             # We are going to the wiki. Check if we came from a course
             course_match = re.match(r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/.*', referer_path)
             if course_match:
-                course_id = CourseKey.from_string(course_match.group('course_id'))
+                course_id = SlashSeparatedCourseKey.from_deprecated_string(course_match.group('course_id'))
 
                 # See if we are able to view the course. If we are, redirect to it
                 try:
@@ -137,7 +137,7 @@ class Middleware(object):
             # don't have permission to see the course!
             course_match = re.match(IN_COURSE_WIKI_REGEX, destination)
             if course_match:
-                course_id = CourseKey.from_string(course_match.group('course_id'))
+                course_id = SlashSeparatedCourseKey.from_deprecated_string(course_match.group('course_id'))
                 # See if we are able to view the course. If we aren't, redirect to regular wiki
                 try:
                     course = get_course_with_access(user, 'load', course_id)
@@ -161,7 +161,7 @@ def context_processor(request):
 
     match = re.match(IN_COURSE_WIKI_REGEX, request.path)
     if match:
-        course_id = CourseKey.from_string(match.group('course_id'))
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(match.group('course_id'))
 
         try:
             course = get_course_with_access(request.user, 'load', course_id)

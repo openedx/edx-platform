@@ -27,6 +27,7 @@ from xmodule.modulestore.inheritance import own_metadata, compute_inherited_meta
 from xblock.fields import Scope
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 FILTER_LIST = ['xml_attributes', 'checklists']
 INHERITED_FILTER_LIST = ['children', 'xml_attributes', 'checklists']
@@ -69,7 +70,7 @@ class Command(BaseCommand):
         # Get the course data
 
         try:
-            course_id = CourseKey.from_string(args[0])
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
         except InvalidKeyError:
             raise CommandError("Invalid course_id")
 

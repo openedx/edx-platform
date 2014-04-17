@@ -38,7 +38,7 @@ from student.views import course_from_id, single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
@@ -244,7 +244,7 @@ def index(request, course_id, chapter=None, section=None,
 
      - HTTPresponse
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user  # keep just one instance of User
     course = get_course_with_access(user, 'load', course_key, depth=2)
@@ -410,7 +410,7 @@ def jump_to_id(request, course_id, module_id):
     This entry point allows for a shorter version of a jump to where just the id of the element is
     passed in. This assumes that id is unique within the course_id namespace
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     items = modulestore().get_items(course_key, name=module_id)
 
     if len(items) == 0:
@@ -438,7 +438,7 @@ def jump_to(request, course_id, location):
     has access, and what they should see.
     """
     try:
-        course_key = CourseKey.from_string(course_id)
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         usage_key = course_key.make_usage_key_from_deprecated_string(location)
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")
@@ -469,7 +469,7 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     staff_access = has_access(request.user, 'staff', course)
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
@@ -497,7 +497,7 @@ def static_tab(request, course_id, tab_slug):
 
     Assumes the course_id is in a valid format.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
 
     tab = CourseTabList.get_tab_by_slug(course.tabs, tab_slug)
@@ -528,7 +528,7 @@ def syllabus(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     staff_access = has_access(request.user, 'staff', course)
 
@@ -564,7 +564,7 @@ def course_about(request, course_id):
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     ):
         raise Http404
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'see_exists', course_key)
     registered = registered_for_course(course, request.user)
     staff_access = has_access(request.user, 'staff', course)
@@ -617,7 +617,7 @@ def mktg_course_about(request, course_id):
     This is the button that gets put into an iframe on the Drupal site
     """
 
-    course_key = CourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
         course = get_course_with_access(request.user, 'see_exists', course_key)
     except (ValueError, Http404) as e:
@@ -659,7 +659,7 @@ def progress(request, course_id, student_id=None):
     there are unanticipated errors.
     """
     with grades.manual_transaction():
-        return _progress(request, CourseKey.from_string(course_id), student_id)
+        return _progress(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), student_id)
 
 
 def _progress(request, course_key, student_id):
@@ -737,7 +737,7 @@ def submission_history(request, course_id, student_username, location):
     StudentModuleHistory records.
     """
     try:
-        course_key = CourseKey.from_string(course_id)
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     except (InvalidKeyError, AssertionError):
         return HttpResponse(escape(_(u'Invalid course id.')))
 

@@ -56,7 +56,7 @@ class VerifyView(View):
         """
         upgrade = request.GET.get('upgrade', False)
 
-        course_id = SlashSeparatedCourseKey.from_string(course_id)
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         # If the user has already been verified within the given time period,
         # redirect straight to the payment -- no need to verify again.
         if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
@@ -118,7 +118,7 @@ class VerifiedView(View):
         Handle the case where we have a get request
         """
         upgrade = request.GET.get('upgrade', False)
-        course_id = SlashSeparatedCourseKey.from_string(course_id)
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
@@ -163,7 +163,7 @@ def create_order(request):
         attempt.save()
 
     course_id = request.POST['course_id']
-    course_id = SlashSeparatedCourseKey.from_string(course_id)
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     donation_for_course = request.session.get('donation_for_course', {})
     current_donation = donation_for_course.get(course_id, decimal.Decimal(0))
     contribution = request.POST.get("contribution", donation_for_course.get(course_id, 0))
@@ -268,7 +268,7 @@ def results_callback(request):
     # If this is a reverification, log an event
     if attempt.window:
         course_id = attempt.window.course_id
-        course_id = SlashSeparatedCourseKey.from_string(course_id)
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         course = course_from_id(course_id)
         course_enrollment = CourseEnrollment.get_or_create_enrollment(attempt.user, course_id)
         course_enrollment.emit_event(EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE)
@@ -281,7 +281,7 @@ def show_requirements(request, course_id):
     """
     Show the requirements necessary for the verification flow.
     """
-    course_id = SlashSeparatedCourseKey.from_string(course_id)
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
         return redirect(reverse('dashboard'))
 
@@ -369,7 +369,7 @@ class MidCourseReverifyView(View):
         """
         display this view
         """
-        course_id = SlashSeparatedCourseKey.from_string(course_id)
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         course = course_from_id(course_id)
         course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
         course_enrollment.update_enrollment(mode="verified")
@@ -393,7 +393,7 @@ class MidCourseReverifyView(View):
         """
         try:
             now = datetime.datetime.now(UTC)
-            course_id = SlashSeparatedCourseKey.from_string(course_id)
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
             window = MidcourseReverificationWindow.get_window(course_id, now)
             if window is None:
                 raise WindowExpiredException

@@ -59,7 +59,7 @@ class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
     def clean_course_id(self):
         """Validate the course id"""
         try:
-            course_id = CourseKey.from_string(self.cleaned_data["course_id"])
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(self.cleaned_data["course_id"])
             # Just try to get the course descriptor.
             # If we can do that, it's a real course.
             get_course_by_id(course_id, depth=1)

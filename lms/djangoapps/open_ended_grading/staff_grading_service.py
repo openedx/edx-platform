@@ -265,7 +265,7 @@ def get_next(request, course_id):
     'error': if success is False, will have an error message with more info.
     """
     assert(isinstance(course_id, basestring))
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     _check_access(request.user, course_key)
 
     required = set(['location'])
@@ -307,7 +307,7 @@ def get_problem_list(request, course_id):
         'error': if success is False, will have an error message with more info.
     """
     assert(isinstance(course_id, basestring))
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     _check_access(request.user, course_key)
     try:
         response = staff_grading_service().get_problem_list(course_key, unique_id_for_user(request.user))
@@ -380,7 +380,7 @@ def save_grade(request, course_id):
     are possible if something goes wrong with saving the grade.
     """
 
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     _check_access(request.user, course_key)
 
     if request.method != 'POST':
