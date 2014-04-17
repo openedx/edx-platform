@@ -48,6 +48,7 @@ describe "DiscussionThreadInlineView", ->
         spyOn($, "ajax")
         # Avoid unnecessary boilerplate
         spyOn(@view.showView, "render")
+        spyOn(@view.showView, "convertMath")
         spyOn(@view, "makeWmdEditor")
         spyOn(DiscussionThreadView.prototype, "renderResponse")
 
@@ -98,5 +99,8 @@ describe "DiscussionThreadInlineView", ->
             @view.render()
             @view.expandPost()
             expect(@view.$el.find(".post-body").text()).toEqual(@thread.get("body"))
+            expect(@view.showView.convertMath).toHaveBeenCalled()
+            @view.showView.convertMath.reset()
             @view.collapsePost()
             expect(@view.$el.find(".post-body").text()).toEqual(@thread.get("abbreviatedBody"))
+            expect(@view.showView.convertMath).toHaveBeenCalled()
