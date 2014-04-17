@@ -336,7 +336,7 @@ def create_new_course(request):
     # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
     # existing xml courses this cannot be changed in CourseDescriptor.
     ## TODO get rid of defining wiki slug in this org/course/run specific way
-    wiki_slug = "{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.run)
+    wiki_slug = u"{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.run)
     definition_data = {'wiki_slug': wiki_slug}
 
     # Create the course then fetch it from the modulestore
