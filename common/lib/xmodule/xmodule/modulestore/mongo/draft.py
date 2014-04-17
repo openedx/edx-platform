@@ -228,8 +228,7 @@ class DraftModuleStore(MongoModuleStore):
         # now query all draft content in another round-trip
         query = {
             '_id': {'$in': [
-                location_to_son(as_draft(course_key.make_usage_key_from_deprecated_string(item)))
-                for item in items
+                location_to_son(as_draft(course_key.make_usage_key_from_deprecated_string(item))) for item in items
             ]}
         }
         to_process_drafts = list(self.collection.find(query))

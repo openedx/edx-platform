@@ -1392,8 +1392,6 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_create_course_with_course_creator(self):
         """Test new course creation -- use course creator group"""
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
-            # NAA TODO - This throws a database IntegrityError: student_courseaccessrole.org may not be NULL
-            # NAA NEED TO remigrate the table
             auth.add_users(self.user, CourseCreatorRole(), self.user)
             self.assert_created_course()
 

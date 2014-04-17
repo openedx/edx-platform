@@ -522,15 +522,16 @@ def remap_namespace(module, target_course_id):
 
         Otherwise, returns the input value.
         """
-        if isinstance(reference, basestring):
-            reference = Location.from_deprecated_string(reference)
+        assert isinstance(reference, UsageKey)
+        #if isinstance(reference, basestring):
+        #    reference = Location.from_deprecated_string(reference)
         new_ref = reference
 
         in_original_namespace = (original_location.org == reference.org and
                                  original_location.course == reference.course)
         if in_original_namespace:
             new_ref = reference.map_into_course(target_course_id)
-        return new_ref.to_deprecated_string()
+        return new_ref
 
     for field_name in all_fields:
         field_object = module.fields.get(field_name)

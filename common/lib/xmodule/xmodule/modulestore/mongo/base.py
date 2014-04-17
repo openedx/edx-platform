@@ -221,7 +221,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         :param jsonfields: a dict of the jsonified version of the fields
         """
         for field_name, value in jsonfields.iteritems():
-            if value:
+            if value and (field_name in class_.fields):
                 if isinstance(class_.fields[field_name], Reference):
                     jsonfields[field_name] = course_key.make_usage_key_from_deprecated_string(value)
                 elif isinstance(class_.fields[field_name], ReferenceList):
@@ -468,7 +468,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # first get non-draft in a round-trip
         query = {
             '_id': {'$in': [
-                location_to_son(item) for item in items
+                location_to_son(course_key.make_usage_key_from_deprecated_string(item)) for item in items
             ]}
         }
         return list(self.collection.find(query))
