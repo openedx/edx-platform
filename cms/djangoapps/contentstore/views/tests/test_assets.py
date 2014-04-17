@@ -182,7 +182,7 @@ class LockAssetTestCase(AssetsTestCase):
             asset_location = course.id.make_asset_key('asset', 'sample_static.txt')
             url = reverse(
                 'contentstore.views.assets_handler',
-                kwargs={'course_key_string': course.id, 'asset_id': unicode(asset_location)})
+                kwargs={'course_key_string': course.id, 'asset_key_string': unicode(asset_location)})
 
             resp = self.client.post(
                 url,

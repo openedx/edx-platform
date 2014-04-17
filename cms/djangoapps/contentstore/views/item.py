@@ -535,7 +535,7 @@ def _get_module_info(usage_key, rewrite_static_links=True):
         data = replace_static_urls(
             data,
             None,
-            course_id=module.location.org + '/' + module.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE'
+            course_id=usage_key.course_key
         )
 
     # Note that children aren't being returned until we have a use case.

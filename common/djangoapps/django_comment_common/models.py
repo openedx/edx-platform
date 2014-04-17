@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_noop
 from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule_django.models import CourseKeyField
 
 FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
@@ -73,6 +73,8 @@ class Role(models.Model):
 
     def has_permission(self, permission):
         course = modulestore().get_course(self.course_id)
+        if course is None:
+            raise ItemNotFoundError(self.course_id)
         if self.name == FORUM_ROLE_STUDENT and \
            (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
            (not course.forum_posts_allowed):

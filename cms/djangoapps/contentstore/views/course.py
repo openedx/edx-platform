@@ -5,7 +5,6 @@ import json
 import random
 import string  # pylint: disable=W0402
 
-from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
@@ -22,7 +21,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
 
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError
+from opaque_keys import InvalidKeyError
 from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
@@ -303,6 +303,10 @@ def create_new_course(request):
         existing_course = modulestore('direct').get_course(course_key)
     except InsufficientSpecificationError:
         pass
+    except InvalidKeyError as error:
+        return JsonResponse({
+            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(
+                name=display_name, err=error.message)})
 
     if existing_course is not None:
         return JsonResponse({

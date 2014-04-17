@@ -115,14 +115,14 @@ def _clone_modules(modulestore, modules, source_course_id, dest_course_id):
         modulestore.update_item(module, '**replace_user**')
 
 
-def clone_course(modulestore, contentstore, source_course_id, dest_course_id, delete_original=False):
+def clone_course(modulestore, contentstore, source_course_id, dest_course_id):
     # check to see if the dest_location exists as an empty course
     # we need an empty course because the app layers manage the permissions and users
     if not modulestore.has_course(dest_course_id):
         raise Exception("An empty course at {0} must have already been created. Aborting...".format(dest_course_id))
 
     # verify that the dest_location really is an empty course, which means only one with an optional 'overview'
-    dest_modules = modulestore.get_items(CourseKey.from_string(dest_course_id))
+    dest_modules = modulestore.get_items(dest_course_id)
 
     basically_empty = True
     for module in dest_modules:
@@ -142,10 +142,10 @@ def clone_course(modulestore, contentstore, source_course_id, dest_course_id, de
 
     # Get all modules under this namespace which is (tag, org, course) tuple
 
-    modules = modulestore.get_items(CourseKey.from_string(source_course_id), revision=None)
+    modules = modulestore.get_items(source_course_id, revision=None)
     _clone_modules(modulestore, modules, source_course_id, dest_course_id)
 
-    modules = modulestore.get_items(CourseKey.from_string(source_course_id), revision='draft')
+    modules = modulestore.get_items(source_course_id, revision='draft')
     _clone_modules(modulestore, modules, source_course_id, dest_course_id)
 
     # now iterate through all of the assets and clone them
@@ -195,8 +195,5 @@ def delete_course(modulestore, contentstore, course_key, commit=False):
     print "Deleting {0}...".format(course_key)
     if commit:
         modulestore.delete_course(course_key, '**replace-user**')
-
-        # remove location of this course from loc_mapper and cache
-        loc_mapper().delete_course_mapping(course_key)
 
     return True

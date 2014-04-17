@@ -35,7 +35,7 @@ __all__ = ['assets_handler']
 # pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
-def assets_handler(request, course_key_string=None, asset_id=None):
+def assets_handler(request, course_key_string=None, asset_key_string=None):
     """
     The restful handler for assets.
     It allows retrieval of all the assets (as an HTML page), as well as uploading new assets,
@@ -66,7 +66,7 @@ def assets_handler(request, course_key_string=None, asset_id=None):
         if request.method == 'GET':
             return _assets_json(request, course_key)
         else:
-            asset_key = AssetKey.from_string(asset_id) if asset_id else None
+            asset_key = AssetKey.from_string(asset_key_string) if asset_key_string else None
             return _update_asset(request, course_key, asset_key)
     elif request.method == 'GET':  # assume html
         return _asset_index(request, course_key)
