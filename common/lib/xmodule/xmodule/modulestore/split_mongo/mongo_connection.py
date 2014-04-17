@@ -1,6 +1,7 @@
 """
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
+import re
 import pymongo
 from bson import son
 
@@ -71,7 +72,10 @@ class MongoConnection(object):
         """
         case_regex = r"(?i)^{}$" if ignore_case else r"{}"
         return self.course_index.find_one(
-            son.SON([('org', case_regex.format(key.org)), ('offering', case_regex.format(key.offering))])
+            son.SON([
+                (key_attr, re.compile(case_regex.format(getattr(key, key_attr))))
+                for key_attr in ('org', 'offering')
+            ])
         )
 
     def find_matching_course_indexes(self, query):

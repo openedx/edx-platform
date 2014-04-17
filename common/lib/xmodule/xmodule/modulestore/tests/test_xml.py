@@ -13,6 +13,7 @@ from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
 from .test_modulestore import check_path_to_location
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 
 
 def glob_tildes_at_end(path):
@@ -95,3 +96,13 @@ class TestXMLModuleStore(unittest.TestCase):
         self.assertEqual(len(course_locations), 2)
         for course_number in ['toy', 'simple']:
             self.assertIn(Location('edX', course_number, '2012_Fall', 'course', '2012_Fall'), course_locations)
+
+    def test_has_course(self):
+        """
+        Test the has_course method
+        """
+        check_has_course_method(
+            XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple']),
+            SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'),
+            locator_key_fields=SlashSeparatedCourseKey.KEY_FIELDS
+        )

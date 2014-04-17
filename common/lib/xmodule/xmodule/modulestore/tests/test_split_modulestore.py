@@ -18,6 +18,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
+from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 
 
 class SplitModuleTest(unittest.TestCase):
@@ -555,6 +556,17 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(courses), 2)
         self.assertIsNotNone(self.findByIdInResult(courses, "head12345"))
         self.assertIsNotNone(self.findByIdInResult(courses, "head23456"))
+
+    def test_has_course(self):
+        '''
+        Test the various calling forms for has_course
+        '''
+
+        check_has_course_method(
+            modulestore(),
+            CourseLocator(org='testx', offering='wonderful', branch="draft"),
+            locator_key_fields=['org', 'offering']
+        )
 
     def test_get_course(self):
         '''
