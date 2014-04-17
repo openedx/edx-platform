@@ -83,7 +83,7 @@ class OrderTest(ModuleStoreTestCase):
                         ('org/test/Test_Course_3', 10),
                         ('org/test/Test_Course_4', 20)]
         for course, cost in course_costs:
-            CertificateItem.add_to_order(cart, SlashSeparatedCourseKey.from_string(course), cost, 'honor')
+            CertificateItem.add_to_order(cart, SlashSeparatedCourseKey.from_deprecated_string(course), cost, 'honor')
         self.assertEquals(cart.orderitem_set.count(), len(course_costs))
         self.assertEquals(cart.total_cost, sum(cost for _course, cost in course_costs))
 

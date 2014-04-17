@@ -51,7 +51,7 @@ def add_course_to_cart(request, course_id):
         log.info("Anon user trying to add course {} to cart".format(course_id))
         return HttpResponseForbidden(_('You must be logged-in to add to a shopping cart'))
     cart = Order.get_cart_for_user(request.user)
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     # All logging from here handled by the model
     try:
         PaidCourseRegistration.add_to_order(cart, course_key)

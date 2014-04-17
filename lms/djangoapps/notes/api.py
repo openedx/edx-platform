@@ -51,7 +51,7 @@ def api_request(request, course_id, **kwargs):
         disabled for the course.
     '''
     assert isinstance(course_id, basestring)
-    course_key = SlashSeparatedCourseKey.from_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     # Verify that the api should be accessible to this course
     if not api_enabled(request, course_key):

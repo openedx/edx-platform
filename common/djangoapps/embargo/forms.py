@@ -12,6 +12,7 @@ import socket
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
@@ -23,7 +24,7 @@ class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protoc
     def clean_course_id(self):
         """Validate the course id"""
         try:
-            course_id = CourseKey.from_string(self.cleaned_data["course_id"])
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(self.cleaned_data["course_id"])
 
         except InvalidKeyError:
             msg = 'COURSE NOT FOUND'

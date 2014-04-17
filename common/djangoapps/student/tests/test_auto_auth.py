@@ -7,6 +7,7 @@ from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment, UserProfile
 from util.testing import UrlResetMixin
 from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from mock import patch
 
 
@@ -25,7 +26,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         self.url = '/auto_auth'
         self.client = Client()
         self.course_id = 'edX/Test101/2014_Spring'
-        self.course_key = CourseKey.from_string(self.course_id)
+        self.course_key = SlashSeparatedCourseKey.from_deprecated_string(self.course_id)
 
     def test_create_user(self):
         """

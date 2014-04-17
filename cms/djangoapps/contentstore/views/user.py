@@ -50,7 +50,7 @@ def course_team_handler(request, course_key_string=None, email=None):
     DELETE:
         json: remove a particular course team member from the course team (email is required).
     """
-    course_key = CourseKey.from_string(course_key_string) if course_key_string else None
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string) if course_key_string else None
     if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 

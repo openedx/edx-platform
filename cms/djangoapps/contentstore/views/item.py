@@ -494,7 +494,7 @@ def orphan_handler(request, course_key_string):
     An orphan is a block whose category is not in the DETACHED_CATEGORY list, is not the root, and is not reachable
     from the root via children
     """
-    course_usage_key = CourseKey.from_string(course_key_string)
+    course_usage_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
     if request.method == 'GET':
         if has_course_access(request.user, course_usage_key):
             return JsonResponse(modulestore().get_orphans(course_usage_key))

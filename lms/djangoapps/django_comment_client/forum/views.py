@@ -168,7 +168,7 @@ def forum_form_discussion(request, course_id):
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
-    course_id = SlashSeparatedCourseKey.from_string(course_id)
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_id)
@@ -231,7 +231,7 @@ def forum_form_discussion(request, course_id):
 @require_GET
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
-    course_id = SlashSeparatedCourseKey.from_string(course_id)
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_id)
@@ -321,7 +321,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
 @login_required
 def user_profile(request, course_id, user_id):
-    course_id = SlashSeparatedCourseKey.from_string(course_id)
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     nr_transaction = newrelic.agent.current_transaction()
 
     #TODO: Allow sorting?
@@ -368,7 +368,7 @@ def user_profile(request, course_id, user_id):
 
 @login_required
 def followed_threads(request, course_id, user_id):
-    course_id = SlashSeparatedCourseKey.from_string(course_id)
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_id)

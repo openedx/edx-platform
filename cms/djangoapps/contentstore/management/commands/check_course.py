@@ -11,7 +11,7 @@ class Command(BaseCommand):
         if len(args) != 1:
             raise CommandError("check_course requires one argument: <course_id>")
 
-        course_key = CourseKey.from_string(args[0])
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
 
         store = modulestore()
 

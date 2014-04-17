@@ -57,7 +57,7 @@ def assets_handler(request, course_key_string=None, asset_key_string=None):
         json: delete an asset
     """
     # translate merely to do auth check
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
     if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 

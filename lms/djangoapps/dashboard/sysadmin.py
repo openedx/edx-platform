@@ -534,7 +534,7 @@ class Courses(SysadminDashboardView):
 
         elif action == 'del_course':
             course_id = request.POST.get('course_id', '').strip()
-            course_key = SlashSeparatedCourseKey.from_string(course_id)
+            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
             course_found = False
             if course_key in courses:
                 course_found = True
@@ -667,7 +667,7 @@ class GitLogs(TemplateView):
 
         course_id = kwargs.get('course_id')
         if course_id:
-            course_id = SlashSeparatedCourseKey.from_string(course_id)
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
         # Set mongodb defaults even if it isn't defined in settings
         mongo_db = {
