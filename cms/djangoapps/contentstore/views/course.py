@@ -103,7 +103,7 @@ def course_handler(request, course_key_string=None):
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string) if course_key_string else None
+    course_key = CourseKey.from_string(course_key_string) if course_key_string else None
     response_format = request.REQUEST.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
@@ -424,7 +424,7 @@ def course_info_handler(request, course_key_string):
     GET
         html: return html for editing the course info handouts and updates.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user)
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         update_locator = course_key.make_usage_key('course_info', 'updates')
@@ -510,7 +510,7 @@ def settings_handler(request, course_key_string):
     PUT
         json: update the Course and About xblocks through the CourseDetails model
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user)
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
         upload_asset_url = reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)})
@@ -564,7 +564,7 @@ def grading_handler(request, course_key_string, grader_index=None):
         json no grader_index: update the Course through the CourseGrading model
         json w/ grader_index: create or update the specific grader (create if index out of range)
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user)
 
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
@@ -668,7 +668,7 @@ def advanced_settings_handler(request, course_key_string):
             metadata dicts. The dict can include a "unsetKeys" entry which is a list
             of keys whose values to unset: i.e., revert to default
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user)
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
 
@@ -774,7 +774,7 @@ def textbooks_list_handler(request, course_key_string):
     PUT
         json: overwrite all textbooks in the course with the given list
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     course = _get_course_module(course_key, request.user)
     store = get_modulestore(course.location)
 
@@ -849,7 +849,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
     DELETE
         json: remove textbook
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user)
     store = get_modulestore(course_module.location)
     matching_id = [tb for tb in course_module.pdf_textbooks

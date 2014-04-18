@@ -64,7 +64,7 @@ def import_handler(request, course_key_string):
     POST or PUT
         json: import a course via the .tar.gz file specified in request.FILES
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
@@ -277,7 +277,7 @@ def import_status_handler(request, course_key_string, filename=None):
         3 : Importing to mongo
 
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
@@ -309,7 +309,7 @@ def export_handler(request, course_key_string):
     If the tar.gz file has been requested but the export operation fails, an HTML page will be returned
     which describes the error.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
