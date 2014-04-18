@@ -165,14 +165,14 @@ def fullstat(request = None):
     request = DummyRequest()
     
 
-    header = [u'ФИО', u'ФИО (измененное)', u'логин школы', u'email', u'email (измененное)', u'курс', u'зарег. в пакет рег.', u"дата рег. на курс", u'2/3', u'100%', u'Задачи/Задания(Модули)']
+    header = [u'ФИО', u'ФИО (измененное)', u'логин школы', u'email', u'email (измененное)', u'курс', u'курс опубл.', u'зарег. в пакет рег.', u"дата рег. на курс", u'2/3', u'100%', u'Задачи/Задания(Модули)']
     assignments = []
     datatablefull = {'header': header, 'assignments': assignments, 'students': []}
     datafull = []
 
     for course in modulestore().get_courses():
         
-        datarow = [u'-', u'-', u'-', u'-', u'-', course.id, u'-', u'-', u'-']
+        datarow = [u'-', u'-', u'-', u'-', u'-', course.id, u'-', u'-', u'-', u'-', u'-']
         
         assignments = []
         
@@ -291,8 +291,13 @@ def fullstat(request = None):
                 else:
                     datarow += [u'']
                 #Course
-                datarow += [course.display_name]
+                datarow += [course.display_number_with_default + " " + course.display_name_with_default]
 
+                if course.ispublic:
+                    datarow += [u'Да']
+                else:
+                    datarow += [u'Нет']
+                    
                 if off_reg:
                     datarow += [u'Да']
                 else:
@@ -330,6 +335,7 @@ def fullstat(request = None):
                 pass
     datatablefull['data'] = datafull
     return_csv('full_stat.csv',datatablefull, open("/var/www/edx/fullstat.csv", "wb"))
+    return_csv('full_stat.xls',datatablefull, open("/var/www/edx/fullstat.xls", "wb"), encoding="cp1251", dialect="excel-tab")
 
 
     for course in modulestore().get_courses():

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-26 10:56+0000\n"
+"POT-Creation-Date: 2014-04-14 16:30+0400\n"
 "PO-Revision-Date: 2014-03-26 15:03+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -38,7 +38,7 @@ msgstr "Курс"
 #. Translators: "Course Info" is the name of the course's information and
 #. updates page
 #: cms/djangoapps/contentstore/views/tabs.py:39
-#: common/lib/xmodule/xmodule/course_module.py:460
+#: common/lib/xmodule/xmodule/course_module.py:463
 #: lms/djangoapps/instructor/views/instructor_dashboard.py:113
 msgid "Course Info"
 msgstr "Информация о курсе"
@@ -48,7 +48,7 @@ msgstr "Информация о курсе"
 #. Translators: 'Discussion' refers to the tab in the courseware
 #. that leads to the discussion forums
 #: cms/djangoapps/contentstore/views/tabs.py:41
-#: common/lib/xmodule/xmodule/course_module.py:474
+#: common/lib/xmodule/xmodule/course_module.py:477
 #: common/lib/xmodule/xmodule/discussion_module.py:16
 #: lms/djangoapps/courseware/tabs.py:125
 msgid "Discussion"
@@ -63,7 +63,7 @@ msgstr "Wiki"
 #. Translators: "Progress" is the title of the student's grade information
 #. page
 #: cms/djangoapps/contentstore/views/tabs.py:45
-#: common/lib/xmodule/xmodule/course_module.py:482
+#: common/lib/xmodule/xmodule/course_module.py:485
 msgid "Progress"
 msgstr "Прогресс"
 
@@ -72,7 +72,7 @@ msgid "Honor Code Certificate"
 msgstr "Сертификат кода чести"
 
 #: common/djangoapps/course_modes/views.py:81
-#: common/djangoapps/student/views.py:598
+#: common/djangoapps/student/views.py:597
 msgid "Enrollment is closed"
 msgstr "Запись на курс закрыта"
 
@@ -388,47 +388,47 @@ msgstr "Первая"
 msgid "Second"
 msgstr "Вторая"
 
-#: common/djangoapps/student/views.py:582
+#: common/djangoapps/student/views.py:581
 msgid "Course id not specified"
 msgstr "Id курса не задан"
 
-#: common/djangoapps/student/views.py:595
+#: common/djangoapps/student/views.py:594
 msgid "Course id is invalid"
 msgstr "Id курса некорректен"
 
-#: common/djangoapps/student/views.py:604
+#: common/djangoapps/student/views.py:603
 #, fuzzy
 msgid "Course is full"
 msgstr "Id курса некорректен"
 
-#: common/djangoapps/student/views.py:643
+#: common/djangoapps/student/views.py:642
 msgid "You are not enrolled in this course"
 msgstr "Вы не записаны на этот курс"
 
-#: common/djangoapps/student/views.py:654
+#: common/djangoapps/student/views.py:653
 msgid "Enrollment action is invalid"
 msgstr "Недействительная запись на курс"
 
-#: common/djangoapps/student/views.py:715
+#: common/djangoapps/student/views.py:714
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 "Произошла ошибка сохранения вашей информации. Пожалуйста, смотрите ниже."
 
-#: common/djangoapps/student/views.py:750
+#: common/djangoapps/student/views.py:749
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py:763
+#: common/djangoapps/student/views.py:762
 msgid "Too many failed login attempts. Try again later."
 msgstr "Слишком много попыток неудачного входа. Попробуйте позднее."
 
-#: common/djangoapps/student/views.py:780
+#: common/djangoapps/student/views.py:779
 msgid "Email or password is incorrect."
 msgstr "E-mail или пароль введены неверно."
 
-#: common/djangoapps/student/views.py:837
+#: common/djangoapps/student/views.py:836
 msgid ""
 "This account has not been activated. We have sent another activation "
 "message. Please check your e-mail for the activation instructions."
@@ -437,226 +437,217 @@ msgstr ""
 "письмо. Пожалуйста, проверьте свою электронную почту для инструкций по "
 "активации."
 
-#: common/djangoapps/student/views.py:906
+#: common/djangoapps/student/views.py:905
 #, fuzzy
 msgid "Please enter a username"
 msgstr "Пожалуйста, укажите Ваше имя."
 
-#: common/djangoapps/student/views.py:911
+#: common/djangoapps/student/views.py:910
 msgid "Please choose an option"
 msgstr ""
 
-#: common/djangoapps/student/views.py:918
+#: common/djangoapps/student/views.py:917
 #, fuzzy
 msgid "User with username {} does not exist"
 msgstr "Пользователь не существует."
 
-#: common/djangoapps/student/views.py:926
+#: common/djangoapps/student/views.py:925
 msgid "Successfully disabled {}'s account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:930
+#: common/djangoapps/student/views.py:929
 msgid "Successfully reenabled {}'s account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:933
+#: common/djangoapps/student/views.py:932
 msgid "Unexpected account status"
 msgstr ""
 
 #: common/djangoapps/student/views.py:993
-#, fuzzy
-msgid "An account with the Public Username '{username}' already exists."
-msgstr "Учетная запись с адресом '{email}' уже существует."
-
-#: common/djangoapps/student/views.py:998
 msgid "An account with the Email '{email}' already exists."
 msgstr "Учетная запись с адресом '{email}' уже существует."
 
-#: common/djangoapps/student/views.py:1082
+#: common/djangoapps/student/views.py:1077
 msgid "Error (401 {field}). E-mail us."
 msgstr "Ошибка (401 {field}). Отправите сообщение об ошибке."
 
-#: common/djangoapps/student/views.py:1088
+#: common/djangoapps/student/views.py:1083
 msgid "To enroll, you must follow the honor code."
 msgstr "Для записи вы должны следовать Кодексу поведения."
 
-#: common/djangoapps/student/views.py:1104
+#: common/djangoapps/student/views.py:1099
 msgid "You must accept the terms of service."
 msgstr "Я согласен с условиями предоставления услуг"
 
-#: common/djangoapps/student/views.py:1133
+#: common/djangoapps/student/views.py:1129
 msgid "Username must be minimum of two characters long."
 msgstr "Имя пользователя должно быть длиннее двух символов."
 
-#: common/djangoapps/student/views.py:1134
+#: common/djangoapps/student/views.py:1130
 msgid "A properly formatted e-mail is required."
 msgstr "Требуется правильный электронный адрес."
 
-#: common/djangoapps/student/views.py:1135
+#: common/djangoapps/student/views.py:1131
 msgid "Your legal name must be a minimum of two characters long."
 msgstr "Ваше рельное имя должно быть длиннее двух символов."
 
-#: common/djangoapps/student/views.py:1136
+#: common/djangoapps/student/views.py:1132
 msgid "A valid password is required."
 msgstr "Требуется корректный пароль."
 
-#: common/djangoapps/student/views.py:1137
+#: common/djangoapps/student/views.py:1133
 msgid "Accepting Terms of Service is required."
 msgstr "Требуется принять правила использования сервиса."
 
-#: common/djangoapps/student/views.py:1138
+#: common/djangoapps/student/views.py:1134
 msgid "Agreeing to the Honor Code is required."
 msgstr "Требуется принять Кодекс Чести."
 
-#: common/djangoapps/student/views.py:1139
+#: common/djangoapps/student/views.py:1135
 msgid "Lastname must be a minimum of two characters long."
 msgstr "Фамилия должна быть длиннее двух символов."
 
-#: common/djangoapps/student/views.py:1140
+#: common/djangoapps/student/views.py:1136
 msgid "Firstname must be a minimum of two characters long."
 msgstr "Имя должно быть длиннее двух символов."
 
-#: common/djangoapps/student/views.py:1141
+#: common/djangoapps/student/views.py:1137
 msgid "Middlename must be a minimum of two characters long."
 msgstr "Отчество должно быть длиннее двух символов."
 
-#: common/djangoapps/student/views.py:1142
+#: common/djangoapps/student/views.py:1138
 msgid "Year of birth is required"
 msgstr "Требуется год рождения"
 
-#: common/djangoapps/student/views.py:1143
+#: common/djangoapps/student/views.py:1139
 msgid "Education level is required"
 msgstr "Требуется заполненое поле Образование"
 
-#: common/djangoapps/student/views.py:1144
+#: common/djangoapps/student/views.py:1140
 msgid "Education place is required"
 msgstr "Требуется заполненое поле Название учебного учреждения"
 
-#: common/djangoapps/student/views.py:1145
+#: common/djangoapps/student/views.py:1141
 msgid "Education year is required"
 msgstr "Требуется заполненое поле Год окончания учебного заведения"
 
-#: common/djangoapps/student/views.py:1146
+#: common/djangoapps/student/views.py:1142
 msgid "Work type is required"
 msgstr "Требуется заполненое поле Тип образовательного учреждения"
 
-#: common/djangoapps/student/views.py:1147
+#: common/djangoapps/student/views.py:1143
 msgid "Work number is required"
 msgstr "Требуется заполненое поле Номер образовательного учреждения"
 
-#: common/djangoapps/student/views.py:1148
+#: common/djangoapps/student/views.py:1144
 msgid "Work name is required"
 msgstr "Требуется заполненое поле Название образовательного учреждения"
 
-#: common/djangoapps/student/views.py:1149
+#: common/djangoapps/student/views.py:1145
 msgid "Work StatGrad login is required"
 msgstr ""
 "Требуется заполненое поле Логин образовательного учреждения в системе "
 "Статград"
 
-#: common/djangoapps/student/views.py:1150
+#: common/djangoapps/student/views.py:1146
 msgid "Work location is required"
 msgstr "Должно быть указано местоположение рабочего места"
 
-#: common/djangoapps/student/views.py:1151
+#: common/djangoapps/student/views.py:1147
 msgid "Work occupation is required"
 msgstr "Должен быть указан род занятий"
 
-#: common/djangoapps/student/views.py:1152
+#: common/djangoapps/student/views.py:1148
 msgid "Work teaching experience is required"
 msgstr "Должен быть указан опыт работы"
 
-#: common/djangoapps/student/views.py:1153
+#: common/djangoapps/student/views.py:1149
 msgid "Work qualification category is required"
 msgstr "Должна быть указана квалификация"
 
-#: common/djangoapps/student/views.py:1154
+#: common/djangoapps/student/views.py:1150
 msgid "Work qualification year is required"
 msgstr "Должен быть указан стаж"
 
-#: common/djangoapps/student/views.py:1155
+#: common/djangoapps/student/views.py:1151
 msgid "Contact phone is required"
 msgstr "Должен быть указан контактный телефон"
 
-#: common/djangoapps/student/views.py:1156
+#: common/djangoapps/student/views.py:1152
 #, fuzzy
 msgid "Your mailing address is required"
 msgstr "Введите действительный адрес эл. почты!"
 
-#: common/djangoapps/student/views.py:1157
+#: common/djangoapps/student/views.py:1153
 #, fuzzy
 msgid "A description of your goals is required"
 msgstr "Требуется заполненое поле Год окончания учебного заведения"
 
-#: common/djangoapps/student/views.py:1158
+#: common/djangoapps/student/views.py:1154
 #, fuzzy
 msgid "A city is required"
 msgstr "Требуется заполненое поле Тип образовательного учреждения"
 
-#: common/djangoapps/student/views.py:1159
+#: common/djangoapps/student/views.py:1155
 #, fuzzy
 msgid "A country is required"
 msgstr "Требуется заполненое поле Тип образовательного учреждения"
 
-#: common/djangoapps/student/views.py:1171
+#: common/djangoapps/student/views.py:1167
 #, fuzzy
 msgid "Username cannot be more than {0} characters long"
 msgstr "Имя пользователя должно быть длиннее двух символов."
 
-#: common/djangoapps/student/views.py:1172
+#: common/djangoapps/student/views.py:1168
 msgid "Email cannot be more than {0} characters long"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1181
+#: common/djangoapps/student/views.py:1177
 msgid "Valid e-mail is required."
 msgstr "Введите действительный адрес эл. почты!"
 
-#: common/djangoapps/student/views.py:1188
-msgid "Username should only consist of A-Z and 0-9, with no spaces."
-msgstr ""
-
-#: common/djangoapps/student/views.py:1201
+#: common/djangoapps/student/views.py:1190
 msgid "Password: "
 msgstr "Пароль:"
 
-#: common/djangoapps/student/views.py:1240
+#: common/djangoapps/student/views.py:1229
 msgid "Could not send activation e-mail."
 msgstr "Невозможно отправить письмо с информацией об активации."
 
-#: common/djangoapps/student/views.py:1421
+#: common/djangoapps/student/views.py:1410
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr "Кажется, что-то пошло не так. Напишите нам, как это получилось"
 
-#: common/djangoapps/student/views.py:1483
+#: common/djangoapps/student/views.py:1472
 msgid "No inactive user with this e-mail exists"
 msgstr "С таким адресом не существует неактивных пользователей"
 
-#: common/djangoapps/student/views.py:1501
+#: common/djangoapps/student/views.py:1490
 msgid "Unable to send reactivation email"
 msgstr "Невозможно отправить письмо с повторной активацией"
 
-#: common/djangoapps/student/views.py:1520
+#: common/djangoapps/student/views.py:1509
 msgid "Invalid password"
 msgstr "Неверный пароль"
 
-#: common/djangoapps/student/views.py:1529
+#: common/djangoapps/student/views.py:1518
 msgid "Valid e-mail address required."
 msgstr "Введите действительный адрес эл. почты!"
 
-#: common/djangoapps/student/views.py:1536
+#: common/djangoapps/student/views.py:1525
 msgid "An account with this e-mail already exists."
 msgstr "Учетная запись с таким адресом электронной почты уже существует."
 
-#: common/djangoapps/student/views.py:1554
+#: common/djangoapps/student/views.py:1543
 msgid "Old email is the same as the new email."
 msgstr "Старый адрес электронной почты совпадает с новым."
 
-#: common/djangoapps/student/views.py:1659
+#: common/djangoapps/student/views.py:1648
 msgid "Name required"
 msgstr "Требуется имя"
 
-#: common/djangoapps/student/views.py:1702
-#: common/djangoapps/student/views.py:1715
+#: common/djangoapps/student/views.py:1691
+#: common/djangoapps/student/views.py:1704
 msgid "Invalid ID"
 msgstr "Неверный ID"
 
@@ -1094,17 +1085,17 @@ msgid ""
 "by that feedback."
 msgstr ""
 
-#: common/lib/capa/capa/inputtypes.py:1087
-#: common/lib/capa/capa/inputtypes.py:1176
+#: common/lib/capa/capa/inputtypes.py:1088
+#: common/lib/capa/capa/inputtypes.py:1178
 msgid "No formula specified."
 msgstr ""
 
-#: common/lib/capa/capa/inputtypes.py:1098
-#: common/lib/capa/capa/inputtypes.py:1194
+#: common/lib/capa/capa/inputtypes.py:1099
+#: common/lib/capa/capa/inputtypes.py:1196
 msgid "Error while rendering preview"
 msgstr ""
 
-#: common/lib/capa/capa/inputtypes.py:1187
+#: common/lib/capa/capa/inputtypes.py:1189
 msgid "Sorry, couldn't parse formula"
 msgstr ""
 
@@ -2154,13 +2145,17 @@ msgstr "Вы не записаны на этот курс"
 msgid "Use new chapter based progress render"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py:451
+#: common/lib/xmodule/xmodule/course_module.py:409
+msgid "List of course_id of courses which this course duplicates"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:454
 msgid "General"
 msgstr "Основной раздел"
 
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
 #. does not yet have an announced start date.
-#: common/lib/xmodule/xmodule/course_module.py:883
+#: common/lib/xmodule/xmodule/course_module.py:886
 msgid "TBD"
 msgstr ""
 
@@ -3319,6 +3314,314 @@ msgstr "Эл. почта"
 msgid "Analytics"
 msgstr "Аналитика"
 
+#: lms/djangoapps/instructor/views/legacy.py:121
+#, fuzzy
+msgid "Course Statistics At A Glance"
+msgstr "Курс"
+
+#: lms/djangoapps/instructor/views/legacy.py:190
+msgid "Found a single student.  "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:194
+msgid "Couldn't find student with that email or username."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:233
+msgid "List of students enrolled in {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:239
+msgid "Summary Grades of students enrolled in {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:246
+msgid "Raw Grades of students enrolled in {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:275
+msgid "Failed to create a background task for rescoring \"{0}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:281
+msgid ""
+"Failed to create a background task for rescoring \"{0}\": problem not found."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:286
+msgid "Failed to create a background task for rescoring \"{url}\": {message}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:298
+msgid "Failed to create a background task for resetting \"{0}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:305
+msgid ""
+"Failed to create a background task for resetting \"{0}\": problem not found."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:310
+msgid "Failed to create a background task for resetting \"{url}\": {message}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:354
+msgid "Found module.  "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:356
+msgid "Couldn't find module with that urlname: {url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:366
+msgid "Deleted student module state for {state}!"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:380
+msgid "Failed to delete module state for {id}/{url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:404
+msgid "Module state successfully reset!"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:407
+msgid "Couldn't reset module state for {id}/{url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:418
+msgid ""
+"Failed to create a background task for rescoring \"{key}\" for student {id}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:426
+msgid "Failed to create a background task for rescoring \"{key}\": {id}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:444
+msgid "Progress page for username: {username} with email address: {email}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:461
+msgid "Assignment Name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:485
+#, fuzzy
+msgid "Please enter an assignment name"
+msgstr "Пожалуйста, укажите Ваше имя."
+
+#: lms/djangoapps/instructor/views/legacy.py:490
+msgid "Invalid assignment name '{name}'"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:494
+#: lms/djangoapps/instructor/views/legacy.py:1193
+msgid "External email"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:505
+msgid "Grades for assignment \"{name}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:524
+msgid "List of Staff"
+msgstr "Список Персонала"
+
+#: lms/djangoapps/instructor/views/legacy.py:529
+msgid "List of Instructors"
+msgstr "Список Администраторов"
+
+#: lms/djangoapps/instructor/views/legacy.py:569
+msgid "Student profile data for course {course_id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:585
+msgid "Found {num} records to dump."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:588
+msgid "Couldn't find module with that urlname."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:596
+msgid "Student state for problem {problem}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:613
+msgid "List of Beta Testers"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:739
+msgid "Email subject can not be empty."
+msgstr "Тема письма не может быть пустой."
+
+#: lms/djangoapps/instructor/views/legacy.py:741
+msgid "Email body can not be empty."
+msgstr "Тело письма не может быть пустым."
+
+#: lms/djangoapps/instructor/views/legacy.py:756
+msgid "Failed to send email! ({error_message})"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:764
+msgid ""
+"Your email was successfully queued for sending. Please note that for large "
+"classes, it may take up to an hour (or more, if other courses are "
+"simultaneously sending email) to send all emails."
+msgstr ""
+"Ваше электронное письмо успешно поставлено в очередь для отправки. Не "
+"забудьте, что для больших открытых курсов, отправка всех писем может "
+"занять около 1-2 часов (и даже больше при одновременной рассылке писем из "
+"нескольких курсов)"
+
+#: lms/djangoapps/instructor/views/legacy.py:770
+msgid "Your email was successfully queued for sending."
+msgstr "Ваше электронное письмо успешно поставлено в очередь для отправки."
+
+#: lms/djangoapps/instructor/views/legacy.py:847
+msgid "Grades from {course_id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:941
+msgid "No remote gradebook defined in course metadata"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:946
+msgid "No remote gradebook url defined in settings.FEATURES"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:951
+msgid "No gradebook name defined in course remote_gradebook metadata"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:963
+msgid "Failed to communicate with gradebook server at {url}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:964
+msgid "Error: {err}"
+msgstr "Ошибка: {err}"
+
+#: lms/djangoapps/instructor/views/legacy.py:975
+msgid "Remote gradebook response for {action}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:994
+#: lms/djangoapps/instructor/views/legacy.py:1068
+#: lms/djangoapps/instructor/views/legacy.py:1193
+#: lms/djangoapps/instructor/views/tools.py:173
+msgid "Username"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:994
+#: lms/djangoapps/instructor/views/legacy.py:1068
+#, fuzzy
+msgid "Full name"
+msgstr "Курс"
+
+#: lms/djangoapps/instructor/views/legacy.py:994
+msgid "Roles"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:995
+#, fuzzy
+msgid "List of Forum {name}s in course {id}"
+msgstr "Вы не записаны на этот курс"
+
+#: lms/djangoapps/instructor/views/legacy.py:1000
+#: lms/djangoapps/instructor/views/legacy.py:1028
+msgid "Error: unknown rolename \"{0}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1024
+msgid "Error: unknown username \"{0}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1036
+msgid "Error: user \"{0}\" does not have rolename \"{1}\", cannot remove"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1039
+msgid "Removed \"{0}\" from \"{1}\" forum role = \"{2}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1042
+msgid "Error: user \"{0}\" already has rolename \"{1}\", cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1045
+msgid ""
+"Error: user \"{0}\" should first be added as staff before adding as a forum "
+"administrator, cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1048
+msgid "Added \"{0}\" to \"{1}\" forum role = \"{2}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1070
+msgid "{0} in course {1}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1193
+msgid "ID"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1193
+#: lms/djangoapps/instructor/views/tools.py:173
+#, fuzzy
+msgid "Full Name"
+msgstr "Курс"
+
+#: lms/djangoapps/instructor/views/legacy.py:1193
+#, fuzzy
+msgid "edX email"
+msgstr "Эл. почта"
+
+#: lms/djangoapps/instructor/views/legacy.py:1454
+#, fuzzy
+msgid "Enrollment of students"
+msgstr "Запись на курс закрыта"
+
+#: lms/djangoapps/instructor/views/legacy.py:1530
+msgid "Un-enrollment of students"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1631
+msgid "url_name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1631
+#, fuzzy
+msgid "display name"
+msgstr "Отображаемое имя:"
+
+#: lms/djangoapps/instructor/views/legacy.py:1631
+msgid "answer id"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1631
+#, fuzzy
+msgid "answer"
+msgstr "Администратор студентов"
+
+#: lms/djangoapps/instructor/views/legacy.py:1631
+msgid "count"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1736
+msgid ""
+"Failed to find any background tasks for course \"{course}\", module "
+"\"{problem}\" and student \"{student}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1739
+msgid ""
+"Failed to find any background tasks for course \"{course}\" and module "
+"\"{problem}\"."
+msgstr ""
+
 #: lms/djangoapps/instructor/views/tools.py:78
 msgid "Unable to parse date: "
 msgstr ""
@@ -3326,15 +3629,6 @@ msgstr ""
 #: lms/djangoapps/instructor/views/tools.py:101
 msgid "Couldn't find module for url: {0}"
 msgstr ""
-
-#: lms/djangoapps/instructor/views/tools.py:173
-msgid "Username"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/tools.py:173
-#, fuzzy
-msgid "Full Name"
-msgstr "Курс"
 
 #: lms/djangoapps/instructor/views/tools.py:173
 #: lms/djangoapps/instructor/views/tools.py:203
@@ -4726,6 +5020,10 @@ msgstr "Предыдущий"
 #: lms/templates/wiki/plugins/attachments/index.html:130
 msgid "There are no attachments for this article."
 msgstr ""
+
+#, fuzzy
+#~ msgid "An account with the Public Username '{username}' already exists."
+#~ msgstr "Учетная запись с адресом '{email}' уже существует."
 
 #~ msgid "My Notes"
 #~ msgstr "Мои заметки"

@@ -182,7 +182,8 @@
       accessible_modal(trigger, "#unenroll-modal .close-modal", "#unenroll-modal", "#dashboard-main");
     });
     $('.announcement-list').accordion({
-      collapsible: true
+      collapsible: true,
+heightStyle: "content"
     })
 
   });
@@ -230,6 +231,7 @@ margin-bottom: 3px;
 margin-top: 5px;
 padding-top: 5px;
 text-transform: capitalize;
+overflow-x: hidden;
 }
 section.announcements div > h3.title.ui-accordion-header-active {
 background: url("/static/images/calendar-icon.png") 0px 10px no-repeat, url("/static/images/small-grey-arrows-right.png") 0px 28px no-repeat;

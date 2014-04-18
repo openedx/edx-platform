@@ -48,7 +48,7 @@ def merge(locale, target='django.po', sources=('django-partial.po',), fail_if_mi
         raise e
 
     for sourse in sources:
-        clean_cmd = 'msgattrib --translated -o clean-' + sourse + ' ' + sourse
+        clean_cmd = 'msgattrib --no-obsolete --force-po -o clean-' + sourse + ' ' + sourse
         execute(clean_cmd, working_directory=locale_directory)
 
     sources = ['clean-' + source for source in sources]

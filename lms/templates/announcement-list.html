@@ -19,7 +19,7 @@
 
 <%namespace name='static' file='static_content.html'/>
 
-<%block name="pagetitle">${_("Dashboard")}</%block>
+<%block name="pagetitle">Все новости</%block>
 <%block name="bodyclass">view-dashboard is-authenticated</%block>
 <%block name="nav_skip">#my-courses</%block>
 
@@ -169,7 +169,8 @@
 
 
     $('.announcement-list').accordion({
-      collapsible: true
+      collapsible: true,
+heightStyle: "content"
     })
 
   });
@@ -216,6 +217,7 @@ padding-left: 20px;
 margin-bottom: 3px;
 margin-top: 5px;
 padding-top: 5px;
+overflow-x: hidden;
 text-transform: capitalize;
 }
 section.announcements div > h3.title.ui-accordion-header-active {

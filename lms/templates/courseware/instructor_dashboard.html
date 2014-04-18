@@ -566,20 +566,22 @@ function goto( mode)
 	<b>${_("A queued email CANNOT be cancelled.")}</b></p>
       </div>
       <br />
-      <input type="submit" name="action" onclick="this.value='Send email'" value="${_("Send email")}">
+      <input type="submit" name="action" onclick="this.value='Send email'; return checkemail();" value="${_("Send email")}">
     </div>
     <script type="text/javascript">
     var emailEditor;
       $(document).ready(function(event){
         emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
       });
-      function checkemail() {
+      function checkemail(event) {
           this.idashform.message.value = emailEditor.save()['data'];
           if (!this.idashform.subject.value) {
               alert("${_("Email subject can not be empty.")}");
+              event.preventDefault();
               return false;
           } else if (!this.idashform.message.value) {
               alert("${_("Email body can not be empty.")}");
+              event.preventDefault();
               return false;
           } else {
               return true;

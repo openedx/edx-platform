@@ -44,10 +44,10 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
   <nav>
 
-  <h1 class="logo">
+  <h1 class="logo" style=" width: 84px; height: 40px; ">
     <a href="${marketing_link('ROOT')}">
       <%block name="navigation_logo">
-          <img src="${static.url(branding.get_logo_url())}" alt="
+          <img src="${static.url(branding.get_logo_url())}" style="position:absolute;" alt="
           % if course:
           ${course.display_org_with_default | h}: ${course.display_number_with_default | h} ${course.display_name_with_default | h} @
           % endif
@@ -125,6 +125,7 @@ site_status_msg = get_site_status_msg(course_id)
     % endif
   </nav>
 </header>
+<div style="height:10px; background: white;"></div>
 % if course:
 <!--[if IE]>
 <div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}Firefox{ff_link_end}.').format(chrome_link_start='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">', chrome_link_end='</a>', ff_link_start='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">', ff_link_end='</a>')}</div>
