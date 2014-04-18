@@ -238,6 +238,16 @@ def fullstat(request = None):
 
                 found = False
                 rows = []
+                oldemail = user.email
+                oldname = user.profile.name
+                try:
+                    oldemail = user.profile.get_meta().get('old_emails',[])[::-1][0][0]
+                except:
+                    pass
+                try:
+                    oldname = user.profile.get_meta().get('old_names',[])[::-1][0][0]
+                except:
+                    pass
                 try:
                     for elem in user.profile.get_meta().get('old_emails',[])[::-1]:
                         if usermap[elem[0]]:
@@ -270,26 +280,29 @@ def fullstat(request = None):
                 try:
                     name = rows[0]['second-name'] + ' ' + rows[0]['first-name'] + ' ' + rows[0]['patronymic']
                 except:
-                    pass
+                    name = oldname
                 datarow += [name]
                 if user.profile.name != name:
                     datarow += [user.profile.name]
                 else:
                     datarow += [u'']
+                
                 try:
                     datarow += [rows[0]['login']]
                 except:
-                    datarow += ['']
+                    datarow += []
+
                 email = ''
                 try:
-                    datarow += [rows[0]['email']]
                     email = rows[0]['email']
                 except:
-                    datarow += ['']
+                    email = oldemail
+                datarow += [email]
                 if user.email != email:
                     datarow += [user.email]
                 else:
                     datarow += [u'']
+
                 #Course
                 datarow += [course.display_name]
 
