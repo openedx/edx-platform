@@ -20,7 +20,7 @@ from opaque_keys import InvalidKeyError
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
-from xblock.fields import Field
+from xblock.fields import Field, Scope
 import datetime
 
 log = logging.getLogger('edx.modulestore')
@@ -368,6 +368,22 @@ class ModuleStoreReadBase(ModuleStoreRead):
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         raise NotImplementedError
+
+    # DHM: a copy of x_module's definition b/c we now have XBlocks which are not XModuleDescriptors
+    # but XBlocks doesn't provide a simple replacement for this afaik.
+    @classmethod
+    def get_xblock_explicitly_set_fields_by_scope(cls, xblock, scope=Scope.content):
+        """
+        Get a dictionary of the fields for the given scope which are set explicitly on this xblock. (Including
+        any set to None.)
+        """
+        result = {}
+        for field in xblock.fields.values():
+            if (field.scope == scope and field.is_set_on(xblock)):
+                result[field.name] = field.read_json(xblock)
+        return result
+
+
 
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     '''

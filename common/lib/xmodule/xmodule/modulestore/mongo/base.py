@@ -840,7 +840,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # differs from split mongo in that I believe most of this logic should be above the persistence
         # layer but added it here to enable quick conversion. I'll need to reconcile these.
         new_object = self.create_xmodule(location, definition_data, metadata, system, fields)
-        location = new_object.location
+        location = new_object.scope_ids.usage_id
         self.update_item(new_object, allow_not_found=True)
 
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
@@ -852,7 +852,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             course.tabs.append(
                 StaticTab(
                     name=new_object.display_name,
-                    url_slug=new_object.location.name,
+                    url_slug=new_object.scope_ids.usage_id.name,
                 )
             )
             self.update_item(course)
@@ -895,7 +895,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         data: A nested dictionary of problem data
         """
         try:
-            definition_data = self._convert_reference_fields(xblock, xblock.get_explicitly_set_fields_by_scope())
+            definition_data = self._convert_reference_fields(xblock, self.get_xblock_explicitly_set_fields_by_scope(xblock))
             payload = {
                 'definition.data': definition_data,
                 'metadata': self._convert_reference_fields(xblock, own_metadata(xblock)),
@@ -903,19 +903,19 @@ class MongoModuleStore(ModuleStoreWriteBase):
             if xblock.has_children:
                 children = self._convert_reference_fields(xblock, {'children': xblock.children})
                 payload.update({'definition.children': children['children']})
-            self._update_single_item(xblock.location, payload)
+            self._update_single_item(xblock.scope_ids.usage_id, payload)
             # for static tabs, their containing course also records their display name
-            if xblock.category == 'static_tab':
-                course = self._get_course_for_item(xblock.location)
+            if xblock.scope_ids.block_type == 'static_tab':
+                course = self._get_course_for_item(xblock.scope_ids.usage_id)
                 # find the course's reference to this tab and update the name.
-                static_tab = CourseTabList.get_tab_by_slug(course.tabs, xblock.location.name)
+                static_tab = CourseTabList.get_tab_by_slug(course.tabs, xblock.scope_ids.usage_id.name)
                 # only update if changed
                 if static_tab and static_tab['name'] != xblock.display_name:
                     static_tab['name'] = xblock.display_name
                     self.update_item(course, user)
 
             # recompute (and update) the metadata inheritance tree which is cached
-            self.refresh_cached_metadata_inheritance_tree(xblock.location.course_key, xblock.runtime)
+            self.refresh_cached_metadata_inheritance_tree(xblock.scope_ids.usage_id.course_key, xblock.runtime)
             # fire signal that we've written to DB
         except ItemNotFoundError:
             if not allow_not_found:
@@ -956,7 +956,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # we should remove this once we can break this reference from the course to static tabs
         if location.category == 'static_tab':
             item = self.get_item(location)
-            course = self._get_course_for_item(item.location)
+            course = self._get_course_for_item(item.scope_ids.usage_id)
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
             self.update_item(course, '**replace_user**')

@@ -25,9 +25,10 @@ from nose.tools import assert_in
 from xmodule.exceptions import NotFoundError
 from git.test.lib.asserts import assert_not_none
 import bson.son
-from xmodule.modulestore.tests.factories import ItemFactory
-import xmodule.modulestore.mongo.base
 from xblock.core import XBlock
+from xmodule.course_module import CourseDescriptor
+import unittest
+
 
 log = logging.getLogger(__name__)
 
@@ -49,7 +50,8 @@ class ReferenceTestXBlock(XBlock):
     reference_list = ReferenceList(scope=Scope.content)
     reference_dict = ReferenceValueDict(scope=Scope.settings)
 
-class TestMongoModuleStore(object):
+
+class TestMongoModuleStore(unittest.TestCase):
     '''Tests!'''
     # Explicitly list the courses to load (don't want the big one)
     courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
@@ -72,6 +74,7 @@ class TestMongoModuleStore(object):
 
     @classmethod
     def teardownClass(cls):
+#         cls.patcher.stop()
         if cls.connection:
             cls.connection.drop_database(DB)
             cls.connection.close()
@@ -138,8 +141,9 @@ class TestMongoModuleStore(object):
         for course_key in [
             SlashSeparatedCourseKey.from_deprecated_string(key_string)
             for key_string in [
-                'edX/simple/2012_Fall', 'edX/simple_with_draft/2012_Fall',
-                'edX/test_import_course/2012_Fall', 'edX/test_unicode/2012_Fall', 'edX/toy/2012_Fall'
+                'slashes:edX/simple/2012_Fall', 'slashes:edX/simple_with_draft/2012_Fall',
+                'slashes:edX/test_import_course/2012_Fall', 'slashes:edX/test_unicode/2012_Fall',
+                'slashes:edX/toy/2012_Fall'
             ]
         ]:
             assert_in(course_key, course_ids)
@@ -148,44 +152,44 @@ class TestMongoModuleStore(object):
 
     def test_loads(self):
         assert_not_none(
-            self.store.get_item(Location.from_string("edX/toy/2012_Fall/course/2012_Fall"))
+            self.store.get_item(Location.from_string("location:edX/toy/2012_Fall/course/2012_Fall"))
         )
 
         assert_not_none(
-            self.store.get_item(Location.from_string("edX/simple/2012_Fall/course/2012_Fall")),
+            self.store.get_item(Location.from_string("location:edX/simple/2012_Fall/course/2012_Fall")),
         )
 
         assert_not_none(
-            self.store.get_item(Location.from_string("edX/toy/2012_Fall/video/Welcome")),
+            self.store.get_item(Location.from_string("location:edX/toy/2012_Fall/video/Welcome")),
         )
 
     def test_unicode_loads(self):
         assert_not_none(
-            self.store.get_item(Location.from_string("edX/test_unicode/2012_Fall/course/2012_Fall")),
+            self.store.get_item(Location.from_string("location:edX/test_unicode/2012_Fall/course/2012_Fall")),
         )
         # All items with ascii-only filenames should load properly.
         assert_not_none(
-            self.store.get_item(Location.from_string("edX/test_unicode/2012_Fall/video/Welcome")),
+            self.store.get_item(Location.from_string("location:edX/test_unicode/2012_Fall/video/Welcome")),
         )
         assert_not_none(
-            self.store.get_item(Location.from_string("edX/test_unicode/2012_Fall/video/Welcome")),
+            self.store.get_item(Location.from_string("location:edX/test_unicode/2012_Fall/video/Welcome")),
         )
         assert_not_none(
-            self.store.get_item(Location.from_string("edX/test_unicode/2012_Fall/chapter/Overview")),
+            self.store.get_item(Location.from_string("location:edX/test_unicode/2012_Fall/chapter/Overview")),
         )
 
 
     def test_find_one(self):
         assert_not_none(
-            self.store._find_one(Location.from_string("edX/toy/2012_Fall/course/2012_Fall")),
+            self.store._find_one(Location.from_string("location:edX/toy/2012_Fall/course/2012_Fall")),
         )
 
         assert_not_none(
-            self.store._find_one(Location.from_string("edX/simple/2012_Fall/course/2012_Fall")),
+            self.store._find_one(Location.from_string("location:edX/simple/2012_Fall/course/2012_Fall")),
         )
 
         assert_not_none(
-            self.store._find_one(Location.from_string("edX/toy/2012_Fall/video/Welcome")),
+            self.store._find_one(Location.from_string("location:edX/toy/2012_Fall/video/Welcome")),
         )
 
     def test_path_to_location(self):
@@ -327,20 +331,18 @@ class TestMongoModuleStore(object):
         course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         def setup_test():
             course = self.store.get_course(course_key)
-            refele = ItemFactory.create(
-                category='ref_test', parent_location=course.location,
+            # can't use item factory as it depends on django settings
+            p1ele = self.store.create_and_save_xmodule(course.id.make_usage_key('problem', 'p1'))
+            p2ele = self.store.create_and_save_xmodule(course.id.make_usage_key('problem', 'p2'))
+            self.refloc = course.id.make_usage_key('ref_test', 'ref_test')
+            self.store.create_and_save_xmodule(
+                self.refloc, fields={
+                    'reference_link': p1ele.location,
+                    'reference_list': [p1ele.location, p2ele.location],
+                    'reference_dict': {'p1': p1ele.location, 'p2': p2ele.location},
+                    'children': [p1ele.location, p2ele.location],
+                }
             )
-            self.refloc = refele.location
-            p1ele = ItemFactory.create(
-                 category='problem', parent_location=self.refloc,
-            )
-            refele.reference_link = p1ele.location
-            p2ele = ItemFactory.create(
-                 category='html', parent_location=self.refloc,
-            )
-            refele.rference_list = [p1ele.location, p2ele.location]
-            refele.reference_dict = {'p1': p1ele.location, 'p2': p2ele.location}
-            self.store.update_item(refele)
 
         def check_xblock_fields():
             def check_children(xblock):
@@ -362,17 +364,17 @@ class TestMongoModuleStore(object):
 
         def check_mongo_fields():
             def get_item(location):
-                return xmodule.modulestore.mongo.base.MongoModuleStore._find_one(location)
+                return self.store._find_one(location)
 
             def check_children(payload):
-                for child in payload['definition.children']:
+                for child in payload['definition']['children']:
                     assert_is_instance(child, basestring)
 
             refele = get_item(self.refloc)
             check_children(refele)
-            assert_is_instance(refele['definition.data']['reference_link'], basestring)
-            assert_greater(len(refele['definition.data']['reference_list']), 0)
-            for ref in refele['definition.data']['reference_list']:
+            assert_is_instance(refele['definition']['data']['reference_link'], basestring)
+            assert_greater(len(refele['definition']['data']['reference_list']), 0)
+            for ref in refele['definition']['data']['reference_list']:
                 assert_is_instance(ref, basestring)
             assert_greater(len(refele['metadata']['reference_dict']), 0)
             for ref in refele['metadata']['reference_dict'].itervalues():

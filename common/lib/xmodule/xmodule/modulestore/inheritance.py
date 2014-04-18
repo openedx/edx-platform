@@ -9,6 +9,7 @@ from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict
 from xblock.runtime import KeyValueStore, KvsFieldData
 
 from xmodule.fields import Date, Timedelta
+from xmodule.modulestore import ModuleStoreReadBase
 
 
 class InheritanceMixin(XBlockMixin):
@@ -121,7 +122,7 @@ def own_metadata(module):
     Return a dictionary that contains only non-inherited field keys,
     mapped to their serialized values
     """
-    return module.get_explicitly_set_fields_by_scope(Scope.settings)
+    return ModuleStoreReadBase.get_xblock_explicitly_set_fields_by_scope(module, Scope.settings)
 
 
 class InheritingFieldData(KvsFieldData):
