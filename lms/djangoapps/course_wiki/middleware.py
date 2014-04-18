@@ -31,7 +31,7 @@ class WikiAccessMiddleware(object):
             # See if we are able to view the course. If we are, redirect to it
             try:
                 course = get_course_with_access(request.user, 'load', course_id)
-                return redirect("/courses/{course_id}/wiki/{path}".format(course_id=course_id, path=wiki_path))
+                return redirect("/courses/{course_id}/wiki/{path}".format(course_id=course_id.to_deprecated_string(), path=wiki_path))
             except Http404:
                 # Even though we came from the course, we can't see it. So don't worry about it.
                 pass
@@ -61,7 +61,7 @@ class WikiAccessMiddleware(object):
             # Authorization Check
             # Let's see if user is enrolled or the course allows for public access
             try:
-                course = get_course_with_access(request.user, course_id, 'load')
+                course = get_course_with_access(request.user, 'load', course_id)
             except Http404:
                 # course does not exist. redirect to root wiki.
                 # clearing the referrer will cause process_response not to redirect
@@ -71,11 +71,11 @@ class WikiAccessMiddleware(object):
 
             if not course.allow_public_wiki_access:
                 is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
-                is_staff = has_access(request.user, course, 'staff')
+                is_staff = has_access(request.user, 'staff', course)
                 if not (is_enrolled or is_staff):
                     # if a user is logged in, but not authorized to see a page,
                     # we'll redirect them to the course about page
-                    return redirect('about_course', course_id)
+                    return redirect('about_course', course_id.to_deprecated_string)
             # set the course onto here so that the wiki template can show the course navigation
             request.course = course
         else:

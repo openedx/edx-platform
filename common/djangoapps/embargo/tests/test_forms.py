@@ -23,8 +23,8 @@ class EmbargoCourseFormTest(ModuleStoreTestCase):
 
     def setUp(self):
         self.course = CourseFactory.create()
-        self.true_form_data = {'course_id': self.course.id, 'embargoed': True}
-        self.false_form_data = {'course_id': self.course.id, 'embargoed': False}
+        self.true_form_data = {'course_id': self.course.id.to_deprecated_string(), 'embargoed': True}
+        self.false_form_data = {'course_id': self.course.id.to_deprecated_string(), 'embargoed': False}
 
     def test_embargo_course(self):
         self.assertFalse(EmbargoedCourse.is_embargoed(self.course.id))

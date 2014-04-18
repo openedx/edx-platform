@@ -215,7 +215,7 @@ class ViewsTestCase(TestCase):
     def test_course_mktg_register(self):
         admin = AdminFactory()
         self.client.login(username=admin.username, password='test')
-        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id})
+        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id.to_deprecated_string()})
         response = self.client.get(url)
         self.assertIn('Register for', response.content)
         self.assertNotIn('and choose your student track', response.content)
@@ -229,7 +229,7 @@ class ViewsTestCase(TestCase):
                                          mode_display_name='Verified Certificate',
                                          course_id=self.course_id)
         self.client.login(username=admin.username, password='test')
-        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id})
+        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id.to_deprecated_string()})
         response = self.client.get(url)
         self.assertIn('Register for', response.content)
         self.assertIn('and choose your student track', response.content)
