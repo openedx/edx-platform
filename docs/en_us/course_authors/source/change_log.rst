@@ -12,6 +12,8 @@ April, 2014
 
    * - Date
      - Change  
+   * - 04/22/14
+     - Updated the :ref:`Bulk Email` section with information about the dashboard option to opt out of course email. 
    * - 4/16/14
      - Updated "Transcripts in Additional Languages" in :ref:`Working with Video Components`.
    * - 04/16/14
