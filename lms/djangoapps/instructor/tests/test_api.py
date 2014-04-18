@@ -845,6 +845,48 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
             )
         )
 
+    def test_add_notenrolled_with_email_autoenroll(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(
+            url,
+            {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True, 'auto_enroll': True}
+        )
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(self.notenrolled_student))
+        # test the response data
+        expected = {
+            "action": "add",
+            "results": [
+                {
+                    "identifier": self.notenrolled_student.email,
+                    "error": False,
+                    "userDoesNotExist": False
+                }
+            ]
+        }
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been invited to a beta test for Robot Super Course'
+        )
+
+        self.assertEqual(
+            mail.outbox[0].body,
+            u"Dear {0}\n\nYou have been invited to be a beta tester "
+            "for Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "To start accessing course materials, please visit "
+            "https://edx.org/courses/MITx/999/Robot_Super_Course/\n\n----\n"
+            "This email was automatically sent from edx.org to {1}".format(
+                self.notenrolled_student.profile.name,
+                self.notenrolled_student.email
+            )
+        )
+
     def test_add_notenrolled_email_mktgsite(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id})
         # Try with marketing site enabled
