@@ -143,7 +143,6 @@ class ConditionalModule(ConditionalFields, XModule):
 
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
-            'id': self.id,
             'ajax_url': self.system.ajax_url,
             'depends': ';'.join(self.required_html_ids)
         })

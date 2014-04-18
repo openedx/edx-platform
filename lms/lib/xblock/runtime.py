@@ -87,7 +87,7 @@ class LmsHandlerUrls(object):
 
         url = reverse(view_name, kwargs={
             'course_id': self.course_id.to_deprecated_string(),
-            'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
+            'usage_id': quote_slashes(block.scope_ids.usage_id.to_deprecated_string().encode('utf-8')),
             'handler': handler_name,
             'suffix': suffix,
         })

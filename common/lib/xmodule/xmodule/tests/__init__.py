@@ -46,10 +46,18 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     ModuleSystem for testing
     """
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):
-        return str(block.scope_ids.usage_id) + '/' + handler + '/' + suffix + '?' + query
+        return '{usage_id}/{handler}{suffix}?{query}'.format(
+            usage_id=block.scope_ids.usage_id.to_deprecated_string(),
+            handler=handler,
+            suffix=suffix,
+            query=query,
+        )
 
     def local_resource_url(self, block, uri):
-        return 'resource/' + str(block.scope_ids.block_type) + '/' + uri
+        return 'resource/{usage_id}/{uri}'.format(
+            usage_id=block.scope_ids.block_type.to_deprecated_string(),
+            uri=uri,
+        )
 
 
 def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
