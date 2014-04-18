@@ -55,7 +55,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def local_resource_url(self, block, uri):
         return 'resource/{usage_id}/{uri}'.format(
-            usage_id=block.scope_ids.block_type.to_deprecated_string(),
+            usage_id=block.scope_ids.usage_id.to_deprecated_string(),
             uri=uri,
         )
 
