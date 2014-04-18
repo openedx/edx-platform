@@ -128,12 +128,11 @@ def compile_sass(debug=False):
     """
     Compile Sass to CSS.
     """
-    theme_paths = THEME_SASS_PATHS
     sh(cmd(
         'sass', '' if debug else '--style compressed',
         "--cache-location {cache}".format(cache=SASS_CACHE_PATH),
-        "--load-path", " ".join(SASS_LOAD_PATHS + theme_paths),
-        "--update", "-E", "utf-8", " ".join(SASS_UPDATE_DIRS + theme_paths)
+        "--load-path", " ".join(SASS_LOAD_PATHS + THEME_SASS_PATHS),
+        "--update", "-E", "utf-8", " ".join(SASS_UPDATE_DIRS + THEME_SASS_PATHS)
     ))
 
 
