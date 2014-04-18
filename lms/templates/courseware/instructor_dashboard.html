@@ -757,7 +757,9 @@ function goto( mode)
         </div>
     %endfor
       <script>
-        ${all_section_metrics.body("metric_opened_","metric_grade_","metric_attempts_","metric_tooltip_",course.id)}
+        var allSubsectionTooltipArr = new Array();
+        var allProblemTooltipArr = new Array();
+        ${all_section_metrics.body("metric_opened_","metric_grade_","metric_attempts_","metric_tooltip_",course.id, allSubsectionTooltipArr, allProblemTooltipArr)}
       </script>
 
   %endif
