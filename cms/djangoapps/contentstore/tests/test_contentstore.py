@@ -1616,7 +1616,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEquals(course_module.wiki_slug, 'toy')
 
         # But change the wiki_slug if it is a different course.
-        target_course_id = SlashSeparatedCourseKey.from_deprecated_string('MITx/999/2013_Spring')
+        target_course_id = CourseKey.from_string('MITx/999/2013_Spring')
         course_data = {
             'org': target_course_id.org,
             'number': target_course_id.course,
