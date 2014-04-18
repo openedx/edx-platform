@@ -1,4 +1,4 @@
-define([ "jquery", "js/spec/create_sinon", "URI", "js/views/container", "js/models/xblock_info",
+define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/container", "js/models/xblock_info",
     "js/views/feedback_notification", "jquery.simulate",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
     function ($, create_sinon, URI, ContainerView, XBlockInfo, Notification) {
@@ -7,24 +7,26 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/container", "js/mode
 
             describe("Supports reordering components", function () {
 
-                var model, containerView, mockContainerHTML, respondWithMockXBlockFragment;
+                var model, containerView, mockContainerHTML, respondWithMockXBlockFragment,
+                    init, dragHandle, verifyRequest, verifyNumReorderCalls, respondToRequest,
 
-                // TODO: this will all need to be updated according to Andy's mock HTML,
-                // and locators should be draft.
-                var splitTestUrl = "/xblock/ccc.dd.ee/branch/draft/block/AB_Test";
+                    rootLocator = 'testCourse/branch/draft/split_test/splitFFF',
+                    containerTestUrl = '/xblock/' + rootLocator,
 
-                var groupAUrl = "/xblock/ccc.dd.ee/branch/published/block/group_a";
-                var groupA = "ccc.dd.ee/branch/published/block/group_a";
-                var groupAText = "ccc.dd.ee/branch/published/block/html_4658c0f4c400";
-                var groupAVideo = "ccc.dd.ee/branch/published/block/group_a_video";
+                    groupAUrl = "/xblock/locator-group-A",
+                    groupA = "locator-group-A",
+                    groupAComponent1 = "locator-component-A1",
+                    groupAComponent2 = "locator-component-A2",
+                    groupAComponent3 = "locator-component-A3",
 
-                var groupBUrl = "/xblock/ccc.dd.ee/branch/published/block/group_b";
-                var groupB = "ccc.dd.ee/branch/published/block/group_b";
-                var groupBText = "ccc.dd.ee/branch/published/block/html_b5c18016d991";
-                var groupBProblem = "ccc.dd.ee/branch/published/block/Checkboxes";
+                    groupBUrl = "/xblock/locator-group-B",
+                    groupB = "locator-group-B",
+                    groupBComponent1 = "locator-component-B1",
+                    groupBComponent2 = "locator-component-B2",
+                    groupBComponent3 = "locator-component-B3";
 
-                // TODO: switch to using Andy's mock container view files (which uses mock xblocks).
-                mockContainerHTML = readFixtures('mock/mock-container.underscore');
+                rootLocator = 'testCourse/branch/draft/split_test/splitFFF';
+                mockContainerHTML = readFixtures('mock/mock-container-xblock.underscore');
 
                 respondWithMockXBlockFragment = function (requests, response) {
                     var requestIndex = requests.length - 1;
@@ -32,15 +34,17 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/container", "js/mode
                 };
 
                 beforeEach(function () {
+                    setFixtures('<div class="wrapper-xblock level-page" data-locator="' + rootLocator + '"></div>');
                     model = new XBlockInfo({
-                        id: 'testCourse/branch/draft/split_test/splitFFF',
+                        id: rootLocator,
                         display_name: 'Test AB Test',
                         category: 'split_test'
                     });
 
                     containerView = new ContainerView({
                         model: model,
-                        view: 'container_preview'
+                        view: 'container_preview',
+                        el: $('.wrapper-xblock')
                     });
                 });
 
@@ -48,7 +52,7 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/container", "js/mode
                     containerView.remove();
                 });
 
-                var init = function (caller) {
+                init = function (caller) {
                     var requests = create_sinon.requests(caller);
                     containerView.render();
 
@@ -61,27 +65,29 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/container", "js/mode
                     return requests;
                 };
 
-                var dragHandle = function (index, dy) {
-                    containerView.$el.find(".drag-handle:eq(" + index + ")").simulate("drag", {dy: dy});
+                dragHandle = function (index, dy) {
+                    var handle = containerView.$(".drag-handle:eq(" + index + ")");
+                    handle.simulate("drag", {dy: dy});
                 };
 
-                var verifyRequest = function (requests, reorderCallIndex, expectedURL, expectedChildren) {
+                verifyRequest = function (requests, reorderCallIndex, expectedURL, expectedChildren) {
+                    var request, children, i;
                     // 0th call is the response to the initial render call to get HTML.
-                    var request = requests[reorderCallIndex + 1];
+                    request = requests[reorderCallIndex + 1];
                     expect(request.url).toEqual(expectedURL);
-                    var children = (JSON.parse(request.requestBody)).children;
+                    children = (JSON.parse(request.requestBody)).children;
                     expect(children.length).toEqual(expectedChildren.length);
-                    for (var i = 0; i < children.length; i++) {
+                    for (i = 0; i < children.length; i++) {
                         expect(children[i]).toEqual(expectedChildren[i]);
                     }
                 };
 
-                var verifyNumReorderCalls = function (requests, expectedCalls) {
+                verifyNumReorderCalls = function (requests, expectedCalls) {
                     // Number of calls will be 1 more than expected because of the initial render call to get HTML.
                     expect(requests.length).toEqual(expectedCalls + 1);
                 };
 
-                var respondToRequest = function (requests, reorderCallIndex, status) {
+                respondToRequest = function (requests, reorderCallIndex, status) {
                     // Number of calls will be 1 more than expected because of the initial render call to get HTML.
                     requests[reorderCallIndex + 1].respond(status);
                 };
@@ -89,68 +95,70 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/container", "js/mode
                 it('does nothing if item not moved far enough', function () {
                     var requests = init(this);
                     // Drag the first thing in Group A (text component) down very slightly, but not past second thing.
-                    dragHandle(1, 5);
+                    dragHandle(2, 5);
                     verifyNumReorderCalls(requests, 0);
                 });
 
                 it('can reorder within a group', function () {
                     var requests = init(this);
-                    // Drag the first thing in Group A (text component) after the second thing (video).
-                    dragHandle(1, 80);
+                    // Drag the first component in Group A to the end
+                    dragHandle(2, 80);
                     respondToRequest(requests, 0, 200);
                     verifyNumReorderCalls(requests, 1);
-                    verifyRequest(requests, 0, groupAUrl, [groupAVideo, groupAText]);
+                    verifyRequest(requests, 0, groupAUrl, [groupAComponent2, groupAComponent3, groupAComponent1]);
                 });
 
                 it('can drag from one group to another', function () {
                     var requests = init(this);
-                    // Drag the first thing in Group A (text component) into the second group.
-                    dragHandle(1, 200);
+                    // Drag the first component in Group A into the second group.
+                    dragHandle(2, 300);
                     respondToRequest(requests, 0, 200);
                     respondToRequest(requests, 1, 200);
                     // Will get an event to move into Group B and an event to remove from Group A.
                     verifyNumReorderCalls(requests, 2);
-                    verifyRequest(requests, 0, groupBUrl, [groupBText, groupAText, groupBProblem]);
-                    verifyRequest(requests, 1, groupAUrl, [groupAVideo]);
+                    verifyRequest(requests, 0, groupBUrl,
+                        [groupBComponent1, groupBComponent2, groupAComponent1, groupBComponent3]);
+                    verifyRequest(requests, 1, groupAUrl, [groupAComponent2, groupAComponent3]);
                 });
 
                 it('does not remove from old group if addition to new group fails', function () {
                     var requests = init(this);
-                    // Drag the first thing in Group A (text component) into the second group.
-                    dragHandle(1, 200);
+                    // Drag the first component in Group A into the second group.
+                    dragHandle(2, 300);
                     respondToRequest(requests, 0, 500);
                     // Send failure for addition to new group-- no removal event should be received.
                     verifyNumReorderCalls(requests, 1);
-                    verifyRequest(requests, 0, groupBUrl, [groupBText, groupAText, groupBProblem]);
+                    verifyRequest(requests, 0, groupBUrl,
+                        [groupBComponent1, groupBComponent2, groupAComponent1, groupBComponent3]);
                 });
 
                 it('can swap group A and group B', function () {
                     var requests = init(this);
                     // Drag Group B before group A.
-                    dragHandle(3, -200);
+                    dragHandle(5, -300);
                     respondToRequest(requests, 0, 200);
                     verifyNumReorderCalls(requests, 1);
-                    verifyRequest(requests, 0, splitTestUrl, [groupB, groupA]);
+                    verifyRequest(requests, 0, containerTestUrl, [groupB, groupA]);
                 });
 
 
                 it('can drag a component to the top level, and nest one group in another', function () {
                     var requests = init(this);
                     // Drag text item in Group A to the top level (in first position).
-                    dragHandle(1, -20);
+                    dragHandle(2, -40);
                     respondToRequest(requests, 0, 200);
                     respondToRequest(requests, 1, 200);
                     verifyNumReorderCalls(requests, 2);
-                    verifyRequest(requests, 0, splitTestUrl, [groupAText, groupA, groupB]);
-                    verifyRequest(requests, 1, groupAUrl, [groupAVideo]);
+                    verifyRequest(requests, 0, containerTestUrl, [groupAComponent1, groupA, groupB]);
+                    verifyRequest(requests, 1, groupAUrl, [groupAComponent2, groupAComponent3]);
 
-                    // Drag Group A (only contains video now) into Group B.
+                    // Drag Group A into Group B.
                     dragHandle(1, 150);
                     respondToRequest(requests, 2, 200);
                     respondToRequest(requests, 3, 200);
                     verifyNumReorderCalls(requests, 4);
-                    verifyRequest(requests, 2, groupBUrl, [groupBText, groupA, groupBProblem]);
-                    verifyRequest(requests, 3, splitTestUrl, [groupAText, groupB]);
+                    verifyRequest(requests, 2, groupBUrl, [groupBComponent1, groupA, groupBComponent2]);
+                    verifyRequest(requests, 3, containerTestUrl, [groupAComponent1, groupB]);
                 });
 
                 describe("Shows a saving message", function () {
@@ -163,13 +171,16 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/container", "js/mode
                     });
 
                     it('hides saving message upon success', function () {
-                        var requests = init(this);
-                        // Drag text item in Group A to the top level (in first position).
-                        dragHandle(1, -20);
+                        var requests, savingOptions;
+                        requests = init(this);
+
+                        // Drag the first component in Group A into the second group.
+                        dragHandle(2, 200);
+
                         expect(savingSpies.constructor).toHaveBeenCalled();
                         expect(savingSpies.show).toHaveBeenCalled();
                         expect(savingSpies.hide).not.toHaveBeenCalled();
-                        var savingOptions = savingSpies.constructor.mostRecentCall.args[0];
+                        savingOptions = savingSpies.constructor.mostRecentCall.args[0];
                         expect(savingOptions.title).toMatch(/Saving/);
 
                         respondToRequest(requests, 0, 200);
@@ -181,8 +192,10 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/container", "js/mode
 
                     it('does not hide saving message if failure', function () {
                         var requests = init(this);
-                        // Drag text item in Group A to the top level (in first position).
-                        dragHandle(1, -20);
+
+                        // Drag the first component in Group A into the second group.
+                        dragHandle(2, 200);
+
                         expect(savingSpies.constructor).toHaveBeenCalled();
                         expect(savingSpies.show).toHaveBeenCalled();
                         expect(savingSpies.hide).not.toHaveBeenCalled();
@@ -196,3 +209,4 @@ define([ "jquery", "js/spec/create_sinon", "URI", "js/views/container", "js/mode
             });
         });
     });
+147

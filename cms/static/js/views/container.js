@@ -4,8 +4,8 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
 
             xblockReady: function () {
                 XBlockView.prototype.xblockReady.call(this);
-                var verticalContainer = $(this.$el).find('.vertical-container'),
-                    alreadySortable = $(this.$el).find('.ui-sortable'),
+                var verticalContainer = this.$('.vertical-container'),
+                    alreadySortable = this.$('.ui-sortable'),
                     newParent,
                     oldParent,
                     self = this;
@@ -16,6 +16,8 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                     handle: '.drag-handle',
 
                     stop: function (event, ui) {
+                        var saving, hideSaving, removeFromParent;
+
                         console.log('stop');
 
                         if (oldParent === undefined) {
@@ -24,12 +26,12 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                             return;
                         }
 
-                        var saving = new NotificationView.Mini({
+                        saving = new NotificationView.Mini({
                             title: gettext('Saving&hellip;')
                         });
                         saving.show();
 
-                        var hideSaving = function () {
+                        hideSaving = function () {
                             saving.hide();
                         };
 
@@ -37,12 +39,11 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                         // add to new container before deleting from old to
                         // avoid creating an orphan if the addition fails.
                         if (newParent) {
-                            var removeFromParent = oldParent;
+                            removeFromParent = oldParent;
                             self.reorder(newParent, function () {
                                 self.reorder(removeFromParent, hideSaving);
                             });
-                        }
-                        else {
+                        } else {
                             // No new parent, only reordering within same container.
                             self.reorder(oldParent, hideSaving);
                         }
@@ -60,8 +61,7 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                         if (ui.sender) {
                             // Move to a new container (the addition part).
                             newParent = parent;
-                        }
-                        else {
+                        } else {
                             // Reorder inside a container, or deletion when moving to new container.
                             oldParent = parent;
                         }
@@ -79,16 +79,18 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
             },
 
             reorder: function (targetParent, successCallback) {
+                var children, childLocators;
+
                 console.log('calling reorder for ' + targetParent.data('locator'));
 
                 // Find descendants with class "wrapper-xblock" whose parent == targetParent.
                 // This is necessary to filter our grandchildren, great-grandchildren, etc.
-                var children = targetParent.find('.wrapper-xblock').filter(function () {
+                children = targetParent.find('.wrapper-xblock').filter(function () {
                     var parent = $(this).parent().closest('.wrapper-xblock');
                     return parent.data('locator') === targetParent.data('locator');
                 });
 
-                var childLocators = _.map(
+                childLocators = _.map(
                     children,
                     function (child) {
                         return $(child).data('locator');
