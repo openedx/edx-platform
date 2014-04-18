@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from student.models import CourseEnrollment
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.locations import SlashSeparatedCourseKey
 from xmodule.course_module import CourseDescriptor
 from courseware.courses import get_course_by_id
 from xmodule import seq_module, vertical_module
@@ -119,8 +120,11 @@ def go_into_course(step):
 
 
 def course_id(course_num):
-    return "%s/%s/%s" % (world.scenario_dict['COURSE'].org, course_num,
-                         world.scenario_dict['COURSE'].url_name)
+    return SlashSeparatedCourseKey(
+        world.scenario_dict['COURSE'].org,
+        course_num,
+        world.scenario_dict['COURSE'].url_name
+    )
 
 
 def course_location(course_num):
