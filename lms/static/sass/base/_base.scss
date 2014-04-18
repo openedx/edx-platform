@@ -35,14 +35,20 @@ h2 {
   -webkit-font-smoothing: antialiased;
 }
 
-p + h2, ul + h2, ol + h2 {
+p + h2, ul + h2, ol + h2, dl + h2 {
   margin-top: 40px;
 }
 
-p {
+p, ul, ol, dl {
   color: $base-font-color;
   font: normal 1em/1.6em $serif;
   margin: 0px;
+}
+
+dl {
+  dt {
+    font-weight: 700;
+  }
 }
 
 span {
@@ -55,11 +61,11 @@ span {
   font: inherit;
 }
 
-p + p, ul + p, ol + p {
+p + p, ul + p, ol + p, dl + p, dd + dt, p + dl {
   margin-top: 20px;
 }
 
-p {
+p, ul, ol, dl {
   a:link, a:visited {
     color: $link-color;
     font: normal 1em/1em $serif;
