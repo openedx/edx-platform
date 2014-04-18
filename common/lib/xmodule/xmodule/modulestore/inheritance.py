@@ -122,7 +122,7 @@ def own_metadata(module):
     Return a dictionary that contains only non-inherited field keys,
     mapped to their serialized values
     """
-    return ModuleStoreReadBase.get_xblock_explicitly_set_fields_by_scope(module, Scope.settings)
+    return module.get_explicitly_set_fields_by_scope(Scope.settings)
 
 
 class InheritingFieldData(KvsFieldData):
