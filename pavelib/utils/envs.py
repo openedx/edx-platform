@@ -24,12 +24,10 @@ class Env(object):
     # If service variant not configured in env, then pass the correct
     # environment for lms / cms
     if not SERVICE_VARIANT:  # this will intentionally catch "";
-         args = sys.argv[1:]
-         if 'lms' in args:
-             SERVICE_VARIANT = 'lms'
-         elif any(i in args for i in ('cms', 'studio')):
-             SERVICE_VARIANT = 'cms'
-
+        if any(i in sys.argv[1:] for i in ('cms', 'studio')):
+            SERVICE_VARIANT = 'cms'
+        else:
+            SERVICE_VARIANT = 'lms'
 
     @lazy
     def env_tokens(self):
