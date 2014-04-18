@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 """
-Automatically start and stop your vagrant instance.
+Automatically start and stop your vagrant instance on OS X (tested on 10.9).
 
-Copy vagrantmonitor.plist to ~/Library/LaunchAgents/ and edit it to point to
-the path to this script. Then reboot or "launchctl load ~/Library/LaunchAgents/vagrantmonitor.plist"
+
+Copy vagrantmonitor.plist to ~/Library/LaunchAgents/ and replace PATH_TO to
+the absolute path to the edx-platform parent directory.
+Then reboot or "launchctl load ~/Library/LaunchAgents/vagrantmonitor.plist"
 On logout, this script will suspend the vagrant instance.
 
 In order for vagrant to add shared folders without prompting for a password,
