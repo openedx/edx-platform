@@ -256,14 +256,14 @@ class CourseFixture(StudioApiFixture):
         """
         Return the locator string for the course updates
         """
-        return "slashes:{org}+{number}+{run}/updates".format(**self._course_dict)
+        return self._course_key + "/updates"
 
     @property
     def _assets_url(self):
         """
         Return the url string for the assets
         """
-        return "/assets/slashes:{org}+{number}+{run}".format(**self._course_dict)
+        return "/assets/" + self._course_key
 
     @property
     def _handouts_loc(self):
