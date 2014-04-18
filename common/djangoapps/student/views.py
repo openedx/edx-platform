@@ -871,7 +871,6 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
         if third_party_auth_successful:
             redirect_url = pipeline.get_complete_url(backend_name)
 
-        dog_stats_api.increment("common.student.successful_login")
         response = JsonResponse({
             "success": True,
             "redirect_url": redirect_url,
