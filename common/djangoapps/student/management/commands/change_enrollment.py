@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
         Change enrollment for all users in some/course/id from audit to honor
 
-          $ ... change_enrollment -u joe -c some/course/id --from audit --to honor
+          $ ... change_enrollment -c some/course/id --from audit --to honor
 
     """
 
