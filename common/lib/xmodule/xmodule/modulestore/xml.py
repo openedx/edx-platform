@@ -20,10 +20,8 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.tabs import CourseTabList
-from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
-from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore, IdGenerator
 
@@ -31,6 +29,8 @@ from . import ModuleStoreReadBase, Location, XML_MODULESTORE_TYPE
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata, inheriting_field_data
+
+from xblock.fields import ScopeIds, Reference, ReferenceList, ReferenceValueDict
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
@@ -275,6 +275,25 @@ def create_block_from_xml(xml_data, system, id_generator):
         XBlock: The fully instantiated :class:`~xblock.core.XBlock`.
 
     """
+    def _convert_reference_fields_to_keys(xblock):
+        """
+        Find all fields of type reference and convert the payload into UsageKeys
+        """
+        course_key = xblock.location.course_key
+
+        for field in xblock.fields.itervalues():
+            if field.is_set_on(xblock):
+                field_value = getattr(xblock, field.name)
+                if isinstance(field, Reference):
+                    setattr(xblock, field.name, course_key.make_usage_key_from_deprecated_string(field_value))
+                elif isinstance(field, ReferenceList):
+                    setattr(xblock, field.name, [course_key.make_usage_key_from_deprecated_string(ele) for ele in field_value])
+                elif isinstance(field, ReferenceValueDict):
+                    for key, subvalue in field_value.iteritems():
+                        assert isinstance(subvalue, basestring)
+                        field_value[key] = course_key.make_usage_key_from_deprecated_string(subvalue)
+                    setattr(xblock, field.name, field_value)
+
     node = etree.fromstring(xml_data)
     raw_class = system.load_block_type(node.tag)
     xblock_class = system.mixologist.mix(raw_class)
@@ -289,6 +308,9 @@ def create_block_from_xml(xml_data, system, id_generator):
 
     scope_ids = ScopeIds(None, block_type, def_id, usage_id)
     xblock = xblock_class.parse_xml(node, system, scope_ids, id_generator)
+
+    _convert_reference_fields_to_keys(xblock)
+
     return xblock
 
 
