@@ -159,7 +159,7 @@ def _accessible_courses_list(request):
     """
     courses = modulestore('direct').get_courses()
 
-    # filter out courses that we don't have access too
+    # filter out courses that we don't have access to
     def course_filter(course):
         """
         Get courses to which this user has access

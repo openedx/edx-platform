@@ -7,10 +7,9 @@ from chrono import Timer
 
 from django.contrib.auth.models import Group
 from django.test import RequestFactory
-from django.core.urlresolvers import reverse
 
 from contentstore.views.course import _accessible_courses_list, _accessible_courses_list_from_groups
-from contentstore.utils import delete_course_and_groups
+from contentstore.utils import delete_course_and_groups, reverse_course_url
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -19,8 +18,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
-TOTAL_COURSES_COUNT = 500
-USER_COURSES_COUNT = 50
+TOTAL_COURSES_COUNT = 5
+USER_COURSES_COUNT = 2
 
 
 class TestCourseListing(ModuleStoreTestCase):
@@ -197,13 +196,12 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list = _accessible_courses_list(request)
         self.assertEqual(len(courses_list), 2)
 
-        # test that get courses by reversing group name formats returns only one course
+        # test that get courses by reversing group name formats returns both courses
         courses_list_by_groups = _accessible_courses_list_from_groups(request)
-        self.assertEqual(len(courses_list_by_groups), 1)
+        self.assertEqual(len(courses_list_by_groups), 2)
 
-        outline_url = reverse('contentstore.views.course_handler')
         # now delete first course (course_location_caps) and check that it is no longer accessible
-        delete_course_and_groups(course_location_caps.course_id, commit=True)
+        delete_course_and_groups(course_location_caps, commit=True)
         # add user to this course instructor group since he was removed from that group on course delete
         instructor_group_name = CourseInstructorRole(course_location_caps)._role_name  # pylint: disable=protected-access
         group, __ = Group.objects.get_or_create(name=instructor_group_name)
@@ -226,11 +224,12 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list_by_groups = _accessible_courses_list_from_groups(request)
         self.assertEqual(len(courses_list_by_groups), 1)
 
-        # now check that deleted course in not accessible
+        # now check that deleted course is not accessible
+        outline_url = reverse_course_url('course_handler', course_location_caps)
         response = self.client.get(outline_url, HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 403)
 
-        # now check that other course in accessible
-        outline_url = reverse('contentstore.views.course_handler')
+        # now check that other course is accessible
+        outline_url = reverse_course_url('course_handler', course_location_camel)
         response = self.client.get(outline_url, HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 200)
