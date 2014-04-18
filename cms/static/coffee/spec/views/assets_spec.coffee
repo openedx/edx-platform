@@ -1,5 +1,5 @@
-define ["jasmine", "js/spec_helpers/create_sinon", "squire"],
-(jasmine, create_sinon, Squire) ->
+define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
+($, jasmine, create_sinon, Squire) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')
     assetLibraryTpl = readFixtures('asset-library.underscore')
@@ -235,6 +235,33 @@ define ["jasmine", "js/spec_helpers/create_sinon", "squire"],
                 @view.setPage(0)
                 create_sinon.respondWithJson(requests, @mockAssetsResponse)
                 return requests
+
+            $.fn.fileupload = ->
+                return ''
+
+            clickEvent = (html_selector) ->
+                $(html_selector).click()
+
+            it "should show upload modal on clicking upload asset button", ->
+                spyOn(@view, "showUploadModal")
+                setup.call(this)
+                expect(@view.showUploadModal).not.toHaveBeenCalled()
+                @view.showUploadModal(clickEvent(".upload-button"))
+                expect(@view.showUploadModal).toHaveBeenCalled()
+
+            it "should show file selection menu on choose file button", ->
+                spyOn(@view, "showFileSelectionMenu")
+                setup.call(this)
+                expect(@view.showFileSelectionMenu).not.toHaveBeenCalled()
+                @view.showFileSelectionMenu(clickEvent(".choose-file-button"))
+                expect(@view.showFileSelectionMenu).toHaveBeenCalled()
+
+            it "should hide upload modal on clicking close button", ->
+                spyOn(@view, "hideModal")
+                setup.call(this)
+                expect(@view.hideModal).not.toHaveBeenCalled()
+                @view.hideModal(clickEvent(".close-button"))
+                expect(@view.hideModal).toHaveBeenCalled()
 
             it "should show a status indicator while loading", ->
                 appendSetFixtures('<div class="ui-loading"/>')
