@@ -75,7 +75,7 @@ class WikiAccessMiddleware(object):
                 if not (is_enrolled or is_staff):
                     # if a user is logged in, but not authorized to see a page,
                     # we'll redirect them to the course about page
-                    return redirect('about_course', course_id.to_deprecated_string)
+                    return redirect('about_course', course_id.to_deprecated_string())
             # set the course onto here so that the wiki template can show the course navigation
             request.course = course
         else:
