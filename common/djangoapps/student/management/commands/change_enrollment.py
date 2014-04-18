@@ -41,7 +41,7 @@ class Command(BaseCommand):
                     metavar='COURSE_ID',
                     dest='course_id',
                     default=False,
-                    help="course id to for transfer"),
+                    help="course id to use for transfer"),
         make_option('-n', '--noop',
                     action='store_true',
                     dest='noop',
