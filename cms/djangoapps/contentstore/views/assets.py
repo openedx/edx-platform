@@ -125,7 +125,10 @@ def _assets_json(request, course_key):
         asset_id = asset['_id']
         asset_location = StaticContent.compute_location(course_key, asset_id['name'])
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
-        thumbnail_location = asset.get('thumbnail_location', None)
+        # Note also that we are ignoring the value of the thumbnail_location-- we only care whether
+        # or not a thumbnail has been stored, and we can now easily create the correct path.
+        thumbnail_location = course_key.make_asset_key('thumbnail', asset_id['name']) \
+            if asset.get('thumbnail_location', None) else None
 
         asset_locked = asset.get('locked', False)
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
@@ -239,15 +242,18 @@ def _update_asset(request, course_key, asset_key):
 
         # see if there is a thumbnail as well, if so move that as well
         if content.thumbnail_location is not None:
+            # We are ignoring the value of the thumbnail_location-- we only care whether
+            # or not a thumbnail has been stored, and we can now easily create the correct path.
+            thumbnail_location = course_key.make_asset_key('thumbnail', asset_key.name)
             try:
-                thumbnail_content = contentstore().find(content.thumbnail_location)
+                thumbnail_content = contentstore().find(thumbnail_location)
                 contentstore('trashcan').save(thumbnail_content)
                 # hard delete thumbnail from origin
                 contentstore().delete(thumbnail_content.get_id())
                 # remove from any caching
-                del_cached_content(thumbnail_content.location)
+                del_cached_content(thumbnail_location)
             except:
-                logging.warning('Could not delete thumbnail: %s', content.thumbnail_location)
+                logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
         # delete the original
         contentstore().delete(content.get_id())
@@ -285,5 +291,5 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
         'thumbnail': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None,
         'locked': locked,
         # Needed for Backbone delete/update.
-        'id': asset_url
+        'id': unicode(location)
     }

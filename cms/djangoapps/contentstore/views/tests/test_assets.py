@@ -154,7 +154,7 @@ class AssetToJsonTestCase(AssetsTestCase):
         self.assertEquals(output["external_url"], "lms_base_url/c4x/org/class/asset/my_file_name.jpg")
         self.assertEquals(output["portable_url"], "/static/my_file_name.jpg")
         self.assertEquals(output["thumbnail"], "/c4x/org/class/thumbnail/my_file_name_thumb.jpg")
-        self.assertEquals(output["id"], output["url"])
+        self.assertEquals(output["id"], unicode(location))
         self.assertEquals(output['locked'], True)
 
         output = assets._get_asset_json("name", upload_date, location, None, False)
