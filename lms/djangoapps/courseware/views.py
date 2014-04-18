@@ -690,7 +690,7 @@ def _progress(request, course_key, student_id):
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
     courseware_summary = grades.progress_summary(student, request, course)
-    studio_url = get_studio_url(course_id, 'settings/grading')
+    studio_url = get_studio_url(course_key, 'settings/grading')
     grade_summary = grades.grade(student, request, course)
 
     if courseware_summary is None:

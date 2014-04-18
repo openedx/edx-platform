@@ -369,7 +369,7 @@ class TestAccordionDueDate(BaseDueDateTests):
     def get_text(self, course):
         """ Returns the HTML for the accordion """
         return views.render_accordion(
-            self.request, course, course.get_children()[0].id, None, None
+            self.request, course, course.get_children()[0].scope_ids.usage_id.to_deprecated_string(), None, None
         )
 
 
