@@ -25,7 +25,7 @@ def export_git(request, course_key_string):
     """
     This method serves up the 'Export to Git' page
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 

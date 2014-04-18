@@ -23,8 +23,8 @@ class Command(BaseCommand):
         if len(args) != 2:
             raise CommandError("clone requires 2 arguments: <source-course_id> <dest-course_id>")
 
-        source_course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
-        dest_course_id = SlashSeparatedCourseKey.from_deprecated_string(args[1])
+        source_course_id = CourseKey.from_string(args[0])
+        dest_course_id = CourseKey.from_string(args[1])
 
         mstore = modulestore('direct')
         cstore = contentstore()

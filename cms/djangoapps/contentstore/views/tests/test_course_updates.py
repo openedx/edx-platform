@@ -237,7 +237,7 @@ class CourseUpdateTest(CourseTestCase):
         Test that a user can successfully post on course updates and handouts of a course
         whose location in not in loc_mapper
         """
-        course_key = SlashSeparatedCourseKey.from_deprecated_string('slashes:Org1/Course_1/Run_1')
+        course_key = CourseKey.from_string('slashes:Org1/Course_1/Run_1')
         course_update_url = self.create_update_url(course_key=course_key)
 
         # create a course via the view handler
