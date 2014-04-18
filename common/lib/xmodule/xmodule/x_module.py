@@ -187,6 +187,15 @@ class XModuleMixin(XBlockMixin):
             name = self.url_name.replace('_', ' ')
         return name
 
+    @property
+    def xblock_kvs(self):
+        """
+        Use w/ caution. Really intended for use by the persistence layer.
+        """
+        # if caller wants kvs, caller's assuming it's up to date; so, decache it
+        self.save()
+        return self._field_data._kvs  # pylint: disable=protected-access
+
     def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
         """
         Get a dictionary of the fields for the given scope which are set explicitly on this xblock. (Including
@@ -197,15 +206,6 @@ class XModuleMixin(XBlockMixin):
             if (field.scope == scope and field.is_set_on(self)):
                 result[field.name] = field.read_json(self)
         return result
-
-    @property
-    def xblock_kvs(self):
-        """
-        Use w/ caution. Really intended for use by the persistence layer.
-        """
-        # if caller wants kvs, caller's assuming it's up to date; so, decache it
-        self.save()
-        return self._field_data._kvs  # pylint: disable=protected-access
 
     def get_content_titles(self):
         """

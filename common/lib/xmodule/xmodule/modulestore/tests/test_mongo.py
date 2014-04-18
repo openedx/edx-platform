@@ -5,6 +5,9 @@ from nose.tools import assert_equals, assert_raises, \
 import pymongo
 import logging
 from uuid import uuid4
+import unittest
+import bson.son
+from xblock.core import XBlock
 
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xblock.runtime import KeyValueStore
@@ -16,7 +19,6 @@ from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
@@ -24,8 +26,8 @@ from xmodule.modulestore.tests.test_modulestore import check_path_to_location
 from nose.tools import assert_in
 from xmodule.exceptions import NotFoundError
 from git.test.lib.asserts import assert_not_none
-import bson.son
-from xblock.core import XBlock
+from xmodule.x_module import XModuleMixin
+
 from xmodule.course_module import CourseDescriptor
 import unittest
 
@@ -87,7 +89,10 @@ class TestMongoModuleStore(unittest.TestCase):
             'db': DB,
             'collection': COLLECTION,
         }
-        store = MongoModuleStore(doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        store = MongoModuleStore(
+            doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS,
+            xblock_mixins=(XModuleMixin,)
+        )
         # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
         # as well
         content_store = MongoContentStore(HOST, DB)
@@ -139,11 +144,12 @@ class TestMongoModuleStore(unittest.TestCase):
         assert_equals(len(courses), 5)
         course_ids = [course.id for course in courses]
         for course_key in [
-            SlashSeparatedCourseKey.from_deprecated_string(key_string)
-            for key_string in [
-                'slashes:edX/simple/2012_Fall', 'slashes:edX/simple_with_draft/2012_Fall',
-                'slashes:edX/test_import_course/2012_Fall', 'slashes:edX/test_unicode/2012_Fall',
-                'slashes:edX/toy/2012_Fall'
+
+            SlashSeparatedCourseKey(*fields)
+            for fields in [
+                ['edX', 'simple', '2012_Fall'], ['edX', 'simple_with_draft', '2012_Fall'],
+                ['edX', 'test_import_course', '2012_Fall'], ['edX', 'test_unicode', '2012_Fall'],
+                ['edX', 'toy', '2012_Fall']
             ]
         ]:
             assert_in(course_key, course_ids)
@@ -152,44 +158,44 @@ class TestMongoModuleStore(unittest.TestCase):
 
     def test_loads(self):
         assert_not_none(
-            self.store.get_item(Location.from_string("location:edX/toy/2012_Fall/course/2012_Fall"))
+            self.store.get_item(Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall'))
         )
 
         assert_not_none(
-            self.store.get_item(Location.from_string("location:edX/simple/2012_Fall/course/2012_Fall")),
+            self.store.get_item(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall')),
         )
 
         assert_not_none(
-            self.store.get_item(Location.from_string("location:edX/toy/2012_Fall/video/Welcome")),
+            self.store.get_item(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
         )
 
     def test_unicode_loads(self):
         assert_not_none(
-            self.store.get_item(Location.from_string("location:edX/test_unicode/2012_Fall/course/2012_Fall")),
+            self.store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'course', '2012_Fall')),
         )
         # All items with ascii-only filenames should load properly.
         assert_not_none(
-            self.store.get_item(Location.from_string("location:edX/test_unicode/2012_Fall/video/Welcome")),
+            self.store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'video', 'Welcome')),
         )
         assert_not_none(
-            self.store.get_item(Location.from_string("location:edX/test_unicode/2012_Fall/video/Welcome")),
+            self.store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'video', 'Welcome')),
         )
         assert_not_none(
-            self.store.get_item(Location.from_string("location:edX/test_unicode/2012_Fall/chapter/Overview")),
+            self.store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'chapter', 'Overview')),
         )
 
 
     def test_find_one(self):
         assert_not_none(
-            self.store._find_one(Location.from_string("location:edX/toy/2012_Fall/course/2012_Fall")),
+            self.store._find_one(Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall')),
         )
 
         assert_not_none(
-            self.store._find_one(Location.from_string("location:edX/simple/2012_Fall/course/2012_Fall")),
+            self.store._find_one(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall')),
         )
 
         assert_not_none(
-            self.store._find_one(Location.from_string("location:edX/toy/2012_Fall/video/Welcome")),
+            self.store._find_one(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
         )
 
     def test_path_to_location(self):
