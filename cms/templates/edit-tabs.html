@@ -22,7 +22,7 @@
         "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
             function (TabsModel, TabsEditView) {
                 var model = new TabsModel({
-                    id: "${context_course.id}",
+                    id: "${context_course.location}",
                     explicit_url: "${reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': context_course.id})}"
                 });
 

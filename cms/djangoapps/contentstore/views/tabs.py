@@ -12,11 +12,10 @@ from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.django import loc_mapper
 from xmodule.tabs import CourseTabList, StaticTab, CourseTab, InvalidTabsException
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.keys import CourseKey, UsageKey
 
-from ..utils import get_modulestore, get_lms_link_for_item
+from ..utils import get_lms_link_for_item
 
 __all__ = ['tabs_handler']
 
@@ -67,9 +66,7 @@ def tabs_handler(request, course_key_string):
             if isinstance(tab, StaticTab):
                 # static tab needs its locator information to render itself as an xmodule
                 static_tab_loc = course_key.make_usage_key('static_tab', tab.url_slug)
-                tab.locator = loc_mapper().translate_location(
-                    static_tab_loc, False, True
-                )
+                tab.locator = static_tab_loc
             tabs_to_render.append(tab)
 
         return render_to_response('edit-tabs.html', {
@@ -161,11 +158,11 @@ def get_tab_by_tab_id_locator(tab_list, tab_id_locator):
     return tab
 
 
-def get_tab_by_locator(tab_list, tab_locator):
+def get_tab_by_locator(tab_list, usage_key_string):
     """
     Look for a tab with the specified locator.  Returns the first matching tab.
     """
-    tab_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(tab_locator))
+    tab_location = UsageKey.from_string(usage_key_string)
     item = modulestore('direct').get_item(tab_location)
     static_tab = StaticTab(
         name=item.display_name,
