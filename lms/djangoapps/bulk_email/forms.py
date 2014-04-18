@@ -11,7 +11,7 @@ from bulk_email.models import CourseEmailTemplate, COURSE_EMAIL_MESSAGE_BODY_TAG
 from courseware.courses import get_course_by_id
 from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
