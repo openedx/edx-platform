@@ -895,7 +895,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         data: A nested dictionary of problem data
         """
         try:
-            definition_data = self._convert_reference_fields(xblock, self.get_xblock_explicitly_set_fields_by_scope(xblock))
+            definition_data = self._convert_reference_fields(xblock, xblock.get_explicitly_set_fields_by_scope())
             payload = {
                 'definition.data': definition_data,
                 'metadata': self._convert_reference_fields(xblock, own_metadata(xblock)),
