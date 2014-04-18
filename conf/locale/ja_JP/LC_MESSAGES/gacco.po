@@ -164,3 +164,19 @@ msgstr ""
 "\n"
 "退会手続きが完了しました。<br />\n"
 "何か不明な点がございましたら、<a href=\"mailto:%(support_email)s?subject=退会手続き\">%(support_email)s</a> へご連絡ください。"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Survey"
+msgstr "アンケート"
+
+#: lms/templates/instructor/instructor_dashboard_2/survey.html
+msgid "Survey Download"
+msgstr "アンケート結果ダウンロード"
+
+#: lms/templates/instructor/instructor_dashboard_2/survey.html
+msgid "The survey result can be downloaded as a CSV file."
+msgstr "アンケート結果がCSVファイルでダウンロードできます。"
+
+#: lms/templates/instructor/instructor_dashboard_2/survey.html
+msgid "Get Survey CSV"
+msgstr "アンケート結果をCSVとしてダウンロードする"

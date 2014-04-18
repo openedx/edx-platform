@@ -42,7 +42,7 @@ from django_comment_common.models import (
 from edxmako.shortcuts import render_to_response, render_to_string
 from courseware.models import StudentModule
 from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption, Invoice, CourseMode
-from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
+from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user, UserProfile, UserStanding
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import ReportStore
@@ -65,6 +65,7 @@ from instructor.views import INVOICE_KEY
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from bulk_email.models import CourseEmail
+from survey.models import SurveySubmission
 
 from .tools import (
     dump_student_extensions,
@@ -1721,3 +1722,60 @@ def spoc_gradebook(request, course_id):
         'staff_access': True,
         'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
     })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_survey(request, course_id):  # pylint: disable=W0613
+    """
+    Gets survey result as a CSV file.
+    """
+    def csv_response(filename, header, rows):
+        """Returns a CSV http response for the given header and rows (excel/cp932)."""
+        response = HttpResponse(mimetype='text/csv')
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+        writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
+        encoded = [unicode(s).encode('cp932') for s in header]
+        writer.writerow(encoded)
+        for row in rows:
+            # NOTE: this data is mostly Japanese, so encode cp932
+            encoded = [unicode(s).encode('cp932') for s in row]
+            writer.writerow(encoded)
+        return response
+
+    header = ['Unit ID', 'Survey Name', 'Created', 'User Name', 'Gender', 'Year of Birth',
+              'Level of Education', 'Disabled']
+    rows = []
+
+    submissions = list(SurveySubmission.objects.raw(
+        '''SELECT s.*, u.*, p.*, t.account_status
+           FROM survey_surveysubmission s
+           LEFT OUTER JOIN auth_user u
+           ON s.user_id = u.id
+           LEFT OUTER JOIN auth_userprofile p
+           ON s.user_id = p.user_id
+           LEFT OUTER JOIN student_userstanding t
+           ON s.user_id = t.user_id
+           WHERE course_id = %s
+           ORDER BY s.unit_id, s.created''',
+        [course_id]
+    ))
+
+    if len(submissions) > 0:
+        keys = sorted(submissions[0].get_survey_answer().keys())
+        header.extend(keys)
+        for s in submissions:
+            row = [s.unit_id, s.survey_name, s.created, s.username]
+            row.append(dict(UserProfile.GENDER_CHOICES).get(s.gender, s.gender) or '')
+            row.append(s.year_of_birth or '')
+            row.append(dict(UserProfile.LEVEL_OF_EDUCATION_CHOICES).get(s.level_of_education, s.level_of_education) or '')
+            row.append(s.account_status if s.account_status == UserStanding.ACCOUNT_DISABLED else '')
+            for key in keys:
+                value = s.get_survey_answer().get(key)
+                # NOTE: replace list into commified str
+                if isinstance(value, list):
+                    value = ','.join(value)
+                row.append(value)
+            rows.append(row)
+    return csv_response(course_id.replace('/', '-') + '-survey.csv', header, rows)
