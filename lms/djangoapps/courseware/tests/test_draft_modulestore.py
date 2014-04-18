@@ -3,7 +3,6 @@ from django.test.utils import override_settings
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore import Location
 
 from modulestore_config import TEST_DATA_DRAFT_MONGO_MODULESTORE
 

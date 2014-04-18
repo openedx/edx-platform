@@ -14,7 +14,7 @@ from xmodule.modulestore.django import create_modulestore_instance, loc_mapper
 from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
 from xmodule.modulestore.locator import CourseLocator, Locator, BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.keys import CourseKey, UsageKey
 from xmodule.modulestore.mongo.base import MongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
@@ -258,23 +258,16 @@ class MixedModuleStore(ModuleStoreWriteBase):
         # invoke its create_item
         if isinstance(store, MongoModuleStore):
             block_id = kwargs.pop('block_id', getattr(location, 'name', uuid4().hex))
-            # convert parent loc if it's legit
-            if isinstance(course_or_parent_loc, basestring):
-                parent_loc = None
-                if location is None:
-                    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-                    location = course_key.make_usage_key(category, block_id)
-            else:
-                parent_loc = course_or_parent_loc
-                # must have a legitimate location, compute if appropriate
-                if location is None:
-                    location = parent_loc.replace(category=category, name=block_id)
+            parent_loc = course_or_parent_loc if isinstance(course_or_parent_loc, UsageKey) else None
+            # must have a legitimate location, compute if appropriate
+            if location is None:
+                location = course_id.make_usage_key(category, block_id)
             # do the actual creation
             xblock = store.create_and_save_xmodule(location, **kwargs)
             # don't forget to attach to parent
             if parent_loc is not None and not 'detached' in xblock._class_tags:
                 parent = store.get_item(parent_loc)
-                parent.children.append(location.url())
+                parent.children.append(location)
                 store.update_item(parent)
         elif isinstance(store, SplitMongoModuleStore):
             if not isinstance(course_or_parent_loc, (CourseLocator, BlockUsageLocator)):

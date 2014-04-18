@@ -330,10 +330,7 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
     def test_get_orphans(self, default_ms):
         self.initdb(default_ms)
         # create an orphan
-        if default_ms == 'split':
-            course_id = self.course_locations[self.MONGO_COURSEID].course_key
-        else:
-            course_id = self.MONGO_COURSEID
+        course_id = self.course_locations[self.MONGO_COURSEID].course_key
         orphan = self.store.create_item(course_id, 'problem', block_id='orphan')
         found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
         if default_ms == 'split':
