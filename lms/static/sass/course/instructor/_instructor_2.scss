@@ -591,17 +591,16 @@ section.instructor-dashboard-content-2 {
 
 .instructor-dashboard-wrapper-2 section.idash-section#metrics {
 
-  .metrics-container {
+  .metrics-container, .metrics-header-container {
     position: relative;
     width: 100%;
     float: left;
     clear: both;
     margin-top: 25px;
-
-    .metrics-left {
+  
+    .metrics-left, .metrics-left-header {
       position: relative;
       width: 30%;
-      height: 640px;
       float: left;
       margin-right: 2.5%;
 
@@ -609,10 +608,13 @@ section.instructor-dashboard-content-2 {
         width: 100%;
       }
     }
-    .metrics-right {
+    .metrics-section.metrics-left {
+    	height: 640px;
+    }
+    
+    .metrics-right, .metrics-right-header {
       position: relative;
       width: 65%;
-      height: 295px;
       float: left;
       margin-left: 2.5%;
       margin-bottom: 25px;
@@ -622,6 +624,10 @@ section.instructor-dashboard-content-2 {
       }
     }
 
+    .metrics-section.metrics-right {
+    	height: 295px;
+    }
+          
     svg {
       .stacked-bar {
         cursor: pointer;
@@ -717,10 +723,6 @@ section.instructor-dashboard-content-2 {
       border: 1px solid #999;
       border-radius: 5px;
       margin-top: 25px;
-    }
-
-    input#graph_reload {
-      display: none;
     }
   }
 }
