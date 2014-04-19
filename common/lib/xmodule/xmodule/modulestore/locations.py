@@ -306,6 +306,9 @@ class AssetLocation(LocationBase, AssetKey):
     def path(self):
         return self.name
 
+    def map_into_course(self, course_key):
+        return AssetLocation(course_key.org, course_key.course, course_key.run, self.category, self.name, self.revision)
+
 
 class i4xEncoder(json.JSONEncoder):
     """

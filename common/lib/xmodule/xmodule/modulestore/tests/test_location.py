@@ -2,7 +2,7 @@ import ddt
 
 from unittest import TestCase
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
+from xmodule.modulestore.locations import Location, AssetLocation, SlashSeparatedCourseKey
 
 # Pairs for testing the clean* functions.
 # The first item in the tuple is the input string.
@@ -155,3 +155,19 @@ class TestLocations(TestCase):
         loc = Location('o', 'c', 'r', 'c', 'n', 'r')
         with self.assertRaises(AttributeError):
             setattr(loc, attr, attr)
+
+    def test_map_into_course_location(self):
+        loc = Location('org', 'course', 'run', 'cat', 'name:more_name', 'rev')
+        course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.assertEquals(
+            Location("edX", "toy", "2012_Fall", 'cat', 'name:more_name', 'rev'),
+            loc.map_into_course(course_key)
+        )
+
+    def test_map_into_course_asset_location(self):
+        loc = AssetLocation('org', 'course', 'run', 'asset', 'foo.bar')
+        course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.assertEquals(
+            AssetLocation("edX", "toy", "2012_Fall", 'asset', 'foo.bar'),
+            loc.map_into_course(course_key)
+        )
