@@ -11,10 +11,23 @@ import traceback
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
 
+# setup baseline paths
+
 COFFEE_DIRS = ['lms', 'cms', 'common']
 SASS_LOAD_PATHS = ['./common/static/sass']
 SASS_UPDATE_DIRS = ['*/static']
 SASS_CACHE_PATH = '/tmp/sass-cache'
+
+THEME_COFFEE_PATHS = []
+THEME_SASS_PATHS = []
+
+edxapp_env = Env()
+if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
+    theme_name = edxapp_env.env_tokens.get('THEME_NAME', '')
+    parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
+    theme_root = parent_dir / "themes" / theme_name
+    THEME_COFFEE_PATHS = [theme_root]
+    THEME_SASS_PATHS = [theme_root / "static" / "sass"]
 
 
 class CoffeeScriptWatcher(PatternMatchingEventHandler):
@@ -54,7 +67,7 @@ class SassWatcher(PatternMatchingEventHandler):
         """
         register files with observer
         """
-        for dirname in SASS_LOAD_PATHS + SASS_UPDATE_DIRS + theme_sass_paths():
+        for dirname in SASS_LOAD_PATHS + SASS_UPDATE_DIRS + THEME_SASS_PATHS:
             paths = []
             if '*' in dirname:
                 paths.extend(glob.glob(dirname))
@@ -92,27 +105,11 @@ class XModuleSassWatcher(SassWatcher):
             traceback.print_exc()
 
 
-def theme_sass_paths():
-    """
-    Return the a list of paths to the theme's sass assets,
-    or an empty list if no theme is configured.
-    """
-    edxapp_env = Env()
-
-    if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
-        theme_name = edxapp_env.env_tokens.get('THEME_NAME', '')
-        parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
-        theme_root = parent_dir / "themes" / theme_name
-        return [theme_root / "static" / "sass"]
-    else:
-        return []
-
-
 def coffeescript_files():
     """
     return find command for paths containing coffee files
     """
-    dirs = " ".join([Env.REPO_ROOT / coffee_dir for coffee_dir in COFFEE_DIRS])
+    dirs = " ".join(THEME_COFFEE_PATHS + [Env.REPO_ROOT / coffee_dir for coffee_dir in COFFEE_DIRS])
     return cmd('find', dirs, '-type f', '-name \"*.coffee\"')
 
 
@@ -131,12 +128,11 @@ def compile_sass(debug=False):
     """
     Compile Sass to CSS.
     """
-    theme_paths = theme_sass_paths()
     sh(cmd(
         'sass', '' if debug else '--style compressed',
         "--cache-location {cache}".format(cache=SASS_CACHE_PATH),
-        "--load-path", " ".join(SASS_LOAD_PATHS + theme_paths),
-        "--update", "-E", "utf-8", " ".join(SASS_UPDATE_DIRS + theme_paths)
+        "--load-path", " ".join(SASS_LOAD_PATHS + THEME_SASS_PATHS),
+        "--update", "-E", "utf-8", " ".join(SASS_UPDATE_DIRS + THEME_SASS_PATHS)
     ))
 
 
