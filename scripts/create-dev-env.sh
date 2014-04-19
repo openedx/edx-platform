@@ -481,7 +481,7 @@ pip install -r $BASE/edx-platform/requirements/edx/pre.txt
 
 output "Installing edX paver-requirements"
 pip install -r $BASE/edx-platform/requirements/edx/paver.txt
-pip install watchdog==0.7.1
+
 
 output "Installing edX requirements"
 # Install prereqs
