@@ -117,7 +117,6 @@ class SplitTestBase(ModuleStoreTestCase):
                     'chapter': self.chapter.url_name,
                     'section': self.sequential.url_name}
         ))
-
         content = resp.content
 
         # Assert we see the proper icon in the top display
@@ -184,7 +183,7 @@ class TestVertSplitTestVert(SplitTestBase):
             category="split_test",
             display_name="Split test",
             user_partition_id='0',
-            group_id_to_child={"0": c0_url.url(), "1": c1_url.url()},
+            group_id_to_child={"0": c0_url, "1": c1_url},
         )
 
         cond0vert = ItemFactory.create(
@@ -250,7 +249,7 @@ class TestSplitTestVert(SplitTestBase):
             category="split_test",
             display_name="Split test",
             user_partition_id='0',
-            group_id_to_child={"0": c0_url.url(), "1": c1_url.url()},
+            group_id_to_child={"0": c0_url, "1": c1_url},
         )
 
         cond0vert = ItemFactory.create(
