@@ -221,6 +221,7 @@ def courses_detail(request, course_id):
     return Response(response_data, status=status_code)
 
 
+<<<<<<< HEAD
 @api_view(['POST'])
 @permission_classes((ApiKeyHeaderPermission,))
 def courses_groups_list(request, course_id):
@@ -302,6 +303,19 @@ def courses_groups_detail(request, course_id, group_id):
 
 
 def _parse_about_html(html):
+=======
+def _inner_content(tag):
+    """
+    Helper method
+    """
+    inner_content = None
+    if tag is not None:
+        inner_content = u''.join(etree.tostring(e) for e in tag)
+
+    return inner_content
+
+def _parse_overview_html(html):
+>>>>>>> initial implementation
     """
     Helper method to break up the course about HTML into components
     """
@@ -346,11 +360,11 @@ def _parse_about_html(html):
                             if bio_html:
                                 article_data['bio'] = bio_html
                         else:
-                            article_data['body'] = etree.tostring(article)
+                            article_data['body'] = _inner_content(article)
 
                         section_data['articles'].append(article_data)
             else:
-                section_data['body'] = etree.tostring(section)
+                section_data['body'] = _inner_content(section)
 
             result.append(section_data)
 
@@ -359,7 +373,7 @@ def _parse_about_html(html):
 
 @api_view(['GET'])
 @permission_classes((ApiKeyHeaderPermission,))
-def course_about(request, course_id):
+def course_overview(request, course_id):
     """
     GET retrieves the course overview module, which - in MongoDB - is stored with the following
     naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"about", "_id.name":"overview"}
@@ -374,8 +388,11 @@ def course_about(request, course_id):
 
         overview = get_course_about_section(course_module, 'overview')
 
-        if request.GET.get('parsed'):
-            response_data['sections'] = _parse_about_html(overview)
+        if request.GET.get('parse') and request.GET.get('parse') in ['True', 'true']:
+            try:
+                response_data['sections'] = _parse_overview_html(overview)
+            except:
+                return Response({'err': 'could_not_parse'}, status=status.HTTP_409_CONFLICT)
         else:
             response_data['overview_html'] = overview
 
