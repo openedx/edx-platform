@@ -19,6 +19,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from .content import TEST_COURSE_OVERVIEW_CONTENT, TEST_COURSE_UPDATES_CONTENT
+from .content import TEST_STATIC_TAB1_CONTENT, TEST_STATIC_TAB2_CONTENT
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -81,7 +82,22 @@ class CoursesApiTests(TestCase):
             display_name="updates"
         )
 
+        self.static_tab1 = ItemFactory.create(
+            category="static_tab",
+            parent_location=self.course.location,
+            data=TEST_STATIC_TAB1_CONTENT,
+            display_name="syllabus"
+        )
+
+        self.static_tab2 = ItemFactory.create(
+            category="static_tab",
+            parent_location=self.course.location,
+            data=TEST_STATIC_TAB2_CONTENT,
+            display_name="readings"
+        )
+
         self.test_course_id = self.course.id
+        self.test_bogus_course_id = 'foo/bar/baz'
         self.test_course_name = self.course.display_name
         self.test_course_number = self.course.number
         self.test_course_org = self.course.org
@@ -390,3 +406,66 @@ class CoursesApiTests(TestCase):
         self.assertEqual(postings[2]['content'], 'Some text before paragraph tag<p>This is inside paragraph tag</p>Some text after tag<p>one more</p>')
         self.assertEqual(postings[3]['date'], 'April 15, 2014')
         self.assertEqual(postings[3]['content'], '<p>A perfectly</p><p>formatted piece</p><p>of HTML</p>')
+
+    def test_static_tab_list(self):
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+
+        tabs = response.data['tabs']
+        self.assertEqual(len(tabs), 2)
+        self.assertEqual(tabs[0]['name'], u'syllabus')
+        self.assertEqual(tabs[0]['id'], u'syllabus')
+        self.assertEqual(tabs[1]['name'], u'readings')
+        self.assertEqual(tabs[1]['id'], u'readings')
+
+        # now try when we get the details on the tabs
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs?detail=true'
+        response = self.do_get(test_uri)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+
+        tabs = response.data['tabs']
+        self.assertEqual(tabs[0]['name'], u'syllabus')
+        self.assertEqual(tabs[0]['id'], u'syllabus')
+        self.assertEqual(tabs[0]['content'], self.static_tab1.data)
+        self.assertEqual(tabs[1]['name'], u'readings')
+        self.assertEqual(tabs[1]['id'], u'readings')
+        self.assertEqual(tabs[1]['content'], self.static_tab2.data)
+
+        #try a bogus course_id to test failure case
+        test_uri = self.base_courses_uri + '/' + self.test_bogus_course_id + '/static_tabs'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_static_tab_detail(self):
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/syllabus'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        tab = response.data
+        self.assertEqual(tab['name'], u'syllabus')
+        self.assertEqual(tab['id'], u'syllabus')
+        self.assertEqual(tab['content'], self.static_tab1.data)
+
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/readings'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        tab = response.data
+        self.assertEqual(tab['name'], u'readings')
+        self.assertEqual(tab['id'], u'readings')
+        self.assertEqual(tab['content'], self.static_tab2.data)
+
+        # try a bogus courseId
+        test_uri = self.base_courses_uri + '/' + self.test_bogus_course_id + '/static_tabs/syllabus'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+        # try a not found item
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/bogus'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+

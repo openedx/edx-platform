@@ -27,6 +27,15 @@ TEST_COURSE_UPDATES_CONTENT = dedent("""
 """
 )
 
+TEST_STATIC_TAB1_CONTENT = dedent("""
+  <div>This is static tab1</div>
+"""
+)
+
+TEST_STATIC_TAB2_CONTENT = dedent("""
+  <div>This is static tab2</div>
+"""
+)
 
 TEST_COURSE_OVERVIEW_CONTENT = dedent("""
         <section class="about">
