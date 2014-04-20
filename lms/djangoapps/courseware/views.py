@@ -773,7 +773,7 @@ def notification_image_for_tab(course_tab, user, course):
     return None
 
 
-def get_static_tab_contents(request, course, tab):
+def get_static_tab_contents(request, course, tab, wrap_xmodule_display=True):
     """
     Returns the contents for the given static tab
     """
@@ -788,7 +788,7 @@ def get_static_tab_contents(request, course, tab):
         course.id, request.user, modulestore().get_instance(course.id, loc), depth=0
     )
     tab_module = get_module(
-        request.user, request, loc, field_data_cache, course.id, static_asset_path=course.static_asset_path
+        request.user, request, loc, field_data_cache, course.id, static_asset_path=course.static_asset_path, wrap_xmodule_display=wrap_xmodule_display
     )
 
     logging.debug('course_module = {0}'.format(tab_module))

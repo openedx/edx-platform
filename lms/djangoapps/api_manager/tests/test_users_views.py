@@ -51,9 +51,6 @@ class UsersApiTests(TestCase):
             'X-Edx-Api-Key': str(TEST_API_KEY),
         }
         json_data = json.dumps(data)
-        print "POST: " + uri
-        print json_data
-        print ""
 
         response = self.client.post(uri, headers=headers, content_type='application/json', data=json_data)
         return response
