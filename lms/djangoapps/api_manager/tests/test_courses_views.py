@@ -303,7 +303,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_course_groups_detail_delete_invalid_course(self):
-        test_uri = '{}/123987102/groups/123124'.format(self.base_courses_uri)
+        test_uri = '{}/{}/groups/123124'.format(self.base_courses_uri, self.test_bogus_course_id)
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
 
