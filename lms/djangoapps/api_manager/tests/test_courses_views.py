@@ -11,8 +11,6 @@ import unittest
 >>>>>>> initial implementation
 import uuid
 
-from textwrap import dedent
-
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
@@ -20,47 +18,9 @@ from django.test.utils import override_settings
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+from .content import TEST_COURSE_OVERVIEW_CONTENT, TEST_COURSE_UPDATES_CONTENT
 
 TEST_API_KEY = str(uuid.uuid4())
-
-TEST_COURSE_OVERVIEW_CONTENT = dedent("""
-        <section class="about">
-          <h2>About This Course</h2>
-          <p>Include your long course description here. The long course description should contain 150-400 words.</p>
-
-          <p>This is paragraph 2 of the long course description. Add more paragraphs as needed. Make sure to enclose them in paragraph tags.</p>
-        </section>
-
-        <section class="prerequisites">
-          <h2>Prerequisites</h2>
-          <p>Add information about course prerequisites here.</p>
-        </section>
-
-        <section class="course-staff">
-          <h2>Course Staff</h2>
-          <article class="teacher">
-            <div class="teacher-image">
-              <img src="/images/pl-faculty.png" align="left" style="margin:0 20 px 0" alt="Course Staff Image #1">
-            </div>
-
-            <h3>Staff Member #1</h3>
-            <p>Biography of instructor/staff member #1</p>
-          </article>
-
-          <article class="teacher">
-            <div class="teacher-image">
-              <img src="/images/pl-faculty.png" align="left" style="margin:0 20 px 0" alt="Course Staff Image #2">
-            </div>
-
-            <h3>Staff Member #2</h3>
-            <p>Biography of instructor/staff member #2</p>
-          </article>
-        </section>
-
-        <section class="faq">
-            <p>Some text here</p>
-        </section>
-       """)
 
 
 class SecureClient(Client):
@@ -112,6 +72,13 @@ class CoursesApiTests(TestCase):
             parent_location=self.course.location,
             data=TEST_COURSE_OVERVIEW_CONTENT,
             display_name="overview"
+        )
+
+        self.updates = ItemFactory.create(
+            category="course_info",
+            parent_location=self.course.location,
+            data=TEST_COURSE_UPDATES_CONTENT,
+            display_name="updates"
         )
 
         self.test_course_id = self.course.id
@@ -398,3 +365,28 @@ class CoursesApiTests(TestCase):
         self.assertGreater(len(prerequisites['body']), 0)
         faq = self._find_item_by_class(sections, 'faq')
         self.assertGreater(len(faq['body']), 0)
+
+    def test_get_course_updates(self):
+        # first try raw without any parsing
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/updates'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        self.assertEqual(response.data['content'], self.updates.data)
+
+        # then try parsed
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/updates?parse=True'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+
+        postings = response.data['postings']
+        self.assertEqual(len(postings), 4)
+        self.assertEqual(postings[0]['date'], 'April 18, 2014')
+        self.assertEqual(postings[0]['content'], 'This does not have a paragraph tag around it')
+        self.assertEqual(postings[1]['date'], 'April 17, 2014')
+        self.assertEqual(postings[1]['content'], 'Some text before paragraph tag<p>This is inside paragraph tag</p>Some text after tag')
+        self.assertEqual(postings[2]['date'], 'April 16, 2014')
+        self.assertEqual(postings[2]['content'], 'Some text before paragraph tag<p>This is inside paragraph tag</p>Some text after tag<p>one more</p>')
+        self.assertEqual(postings[3]['date'], 'April 15, 2014')
+        self.assertEqual(postings[3]['content'], '<p>A perfectly</p><p>formatted piece</p><p>of HTML</p>')

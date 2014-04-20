@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from lxml import etree
 from StringIO import StringIO
 from collections import OrderedDict
+import logging
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -15,7 +16,9 @@ from api_manager.models import CourseGroupRelationship
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
 
-from courseware.courses import get_course_about_section
+from courseware.courses import get_course_about_section, get_course_info_section
+
+log = logging.getLogger(__name__)
 
 def _generate_base_uri(request):
     """
@@ -310,7 +313,9 @@ def _inner_content(tag):
     """
     inner_content = None
     if tag is not None:
-        inner_content = u''.join(etree.tostring(e) for e in tag)
+        inner_content = tag.text if tag.text else u''
+        inner_content += u''.join(etree.tostring(e) for e in tag)
+        inner_content += tag.tail if tag.tail else u''
 
     return inner_content
 
@@ -386,15 +391,91 @@ def course_overview(request, course_id):
         if not course_module:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
-        overview = get_course_about_section(course_module, 'overview')
+        content = get_course_about_section(course_module, 'overview')
 
         if request.GET.get('parse') and request.GET.get('parse') in ['True', 'true']:
             try:
-                response_data['sections'] = _parse_overview_html(overview)
+                response_data['sections'] = _parse_overview_html(content)
             except:
+                log.exception(
+                    u"Error prasing course overview. Content = {0}".format(
+                        content
+                    ))
                 return Response({'err': 'could_not_parse'}, status=status.HTTP_409_CONFLICT)
         else:
-            response_data['overview_html'] = overview
+            response_data['overview_html'] = content
+
+    except InvalidLocationError:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response(response_data)
+
+
+def _parse_updates_html(html):
+    """
+    Helper method to break up the course updates HTML into components
+    """
+    result = {}
+
+    parser = etree.HTMLParser()
+    tree = etree.parse(StringIO(html), parser)
+
+    # get all of the individual postings
+    postings = tree.findall('/body/ol/li')
+
+    result = []
+    for posting in postings:
+        posting_data = {}
+        posting_date_element = posting.find('h2')
+        if posting_date_element is not None:
+            posting_data['date'] = posting_date_element.text
+
+        content = u''
+        for el in posting:
+            # note, we can't delete or skip over the date element in
+            # the HTML tree because there might be some tailing content
+            if el != posting_date_element:
+                content += etree.tostring(el)
+            else:
+                content += el.tail if el.tail else u''
+
+        posting_data['content'] = content.strip()
+        result.append(posting_data)
+
+    return result
+
+
+@api_view(['GET'])
+@permission_classes((ApiKeyHeaderPermission,))
+def course_updates(request, course_id):
+    """
+    GET retrieves the course overview module, which - in MongoDB - is stored with the following
+    naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"course_info", "_id.name":"updates"}
+    """
+    store = modulestore()
+    response_data = OrderedDict()
+
+    try:
+        course_module = store.get_course(course_id)
+        if not course_module:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        content = get_course_info_section(request, course_module, 'updates')
+
+        if not content:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.GET.get('parse') and request.GET.get('parse') in ['True', 'true']:
+            try:
+                response_data['postings'] = _parse_updates_html(content)
+            except:
+                log.exception(
+                    u"Error prasing course updates. Content = {0}".format(
+                        content
+                    ))
+                return Response({'err': 'could_not_parse'}, status=status.HTTP_409_CONFLICT)
+        else:
+            response_data['content'] = content
 
     except InvalidLocationError:
         return Response({}, status=status.HTTP_404_NOT_FOUND)

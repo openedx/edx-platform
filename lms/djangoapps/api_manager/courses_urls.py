@@ -13,5 +13,6 @@ urlpatterns = patterns(
     url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)/groups/(?P<group_id>[0-9]+)$', 'courses_groups_detail'),
     url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)/groups/*$', 'courses_groups_list'),
     url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)/overview$', 'course_overview'),
+    url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)/updates$', 'course_updates'),
     url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)$', 'courses_detail'),
 )
