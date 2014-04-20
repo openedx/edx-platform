@@ -14,6 +14,8 @@ from django.test import TestCase, Client
 from django.test.utils import override_settings
 
 from api_manager.models import GroupRelationship
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -26,6 +28,7 @@ class SecureClient(Client):
         super(SecureClient, self).__init__(*args, **kwargs)
 
 
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 class GroupsApiTests(TestCase):
     """ Test suite for Groups API views """
@@ -38,6 +41,9 @@ class GroupsApiTests(TestCase):
         self.test_group_name = str(uuid.uuid4())
         self.base_users_uri = '/api/users'
         self.base_groups_uri = '/api/groups'
+
+        self.course = CourseFactory.create()
+        self.test_course_id = self.course.id
 
         self.client = SecureClient()
         cache.clear()
@@ -510,4 +516,105 @@ class GroupsApiTests(TestCase):
     def test_group_groups_detail_delete_invalid(self):
         test_uri = self.base_groups_uri + '/1231234232/groups/1'
         response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_group_courses_list_post(self):
+        data = {'name': self.test_group_name}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        group_id = response.data['id']
+        test_uri = response.data['uri'] + '/courses'
+        data = {'course_id': self.test_course_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        confirm_uri = test_uri + '/' + self.course.id
+        self.assertEqual(response.data['uri'], confirm_uri)
+        self.assertEqual(response.data['group_id'], str(group_id))
+        self.assertEqual(response.data['course_id'], self.test_course_id)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_group_courses_list_post_duplicate(self):
+        data = {'name': self.test_group_name}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        group_id = response.data['id']
+        test_uri = response.data['uri'] + '/courses'
+        data = {'course_id': self.test_course_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 409)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_group_courses_list_post_invalid_resources(self):
+        test_uri = self.base_groups_uri + '/1239878976/courses'
+        data = {'course_id': "98723896"}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_group_courses_detail_get(self):
+        data = {'name': self.test_group_name}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        group_id = response.data['id']
+        test_uri = response.data['uri'] + '/courses'
+        data = {'course_id': self.test_course_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}/{}/courses/{}'.format(self.base_groups_uri, group_id, self.test_course_id)
+        print test_uri
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        confirm_uri = '{}{}/{}/courses/{}'.format(
+            self.test_server_prefix,
+            self.base_groups_uri,
+            group_id,
+            self.test_course_id
+        )
+        self.assertEqual(response.data['uri'], confirm_uri)
+        self.assertEqual(response.data['group_id'], group_id)
+        self.assertEqual(response.data['course_id'], self.test_course_id)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_group_courses_detail_delete(self):
+        data = {'name': self.test_group_name}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = response.data['uri'] + '/courses'
+        data = {'course_id': self.test_course_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = response.data['uri']
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 204)
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 204)  # Idempotent
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_group_courses_detail_delete_invalid_group(self):
+        test_uri = self.base_groups_uri + '/123987102/courses/123124'
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 204)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_group_courses_detail_delete_invalid_course(self):
+        data = {'name': self.test_group_name}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = response.data['uri'] + '/courses/123124'
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 204)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_group_courses_detail_get_undefined(self):
+        data = {'name': self.test_group_name}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        group_id = response.data['id']
+        test_uri = '{}/courses/{}'.format(response.data['uri'], self.course.id)
+        response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
