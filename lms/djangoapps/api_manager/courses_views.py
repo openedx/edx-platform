@@ -1,12 +1,31 @@
 """ API implementation for course-oriented interactions. """
 
+from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from api_manager.permissions import ApiKeyHeaderPermission
+from api_manager.models import CourseGroupRelationship
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
+
+
+def _generate_base_uri(request):
+    """
+    Constructs the protocol:host:path component of the resource uri
+    """
+    protocol = 'http'
+    if request.is_secure():
+        protocol = protocol + 's'
+    resource_uri = '{}://{}{}'.format(
+        protocol,
+        request.get_host(),
+        request.path
+    )
+    return resource_uri
 
 
 def _get_module_submodules(module, submodule_type=None):
@@ -196,3 +215,83 @@ def courses_detail(request, course_id):
     else:
         status_code = status.HTTP_404_NOT_FOUND
     return Response(response_data, status=status_code)
+
+
+@api_view(['POST'])
+@permission_classes((ApiKeyHeaderPermission,))
+def courses_groups_list(request, course_id):
+    """
+    POST creates a new course-group relationship in the system
+    """
+    response_data = {}
+    group_id = request.DATA['group_id']
+    base_uri = _generate_base_uri(request)
+    store = modulestore()
+    try:
+        existing_course = store.get_course(course_id)
+    except ValueError:
+        existing_course = None
+    try:
+        existing_group = Group.objects.get(id=group_id)
+    except ObjectDoesNotExist:
+        existing_group = None
+    if existing_course and existing_group:
+        try:
+            existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
+        except ObjectDoesNotExist:
+            existing_relationship = None
+        if existing_relationship is None:
+            CourseGroupRelationship.objects.create(course_id=course_id, group=existing_group)
+            response_data['course_id'] = str(existing_course.id)
+            response_data['group_id'] = str(existing_group.id)
+            response_data['uri'] = '{}/{}'.format(base_uri, existing_group.id)
+            response_status = status.HTTP_201_CREATED
+        else:
+            response_data['message'] = "Relationship already exists."
+            response_status = status.HTTP_409_CONFLICT
+    else:
+        response_status = status.HTTP_404_NOT_FOUND
+    return Response(response_data, status=response_status)
+
+
+@api_view(['GET', 'DELETE'])
+@permission_classes((ApiKeyHeaderPermission,))
+def courses_groups_detail(request, course_id, group_id):
+    """
+    GET retrieves an existing course-group relationship from the system
+    DELETE removes/inactivates/etc. an existing course-group relationship
+    """
+    if request.method == 'GET':
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = base_uri
+        response_data['course_id'] = course_id
+        response_data['group_id'] = group_id
+        store = modulestore()
+        try:
+            existing_course = store.get_course(course_id)
+        except ValueError:
+            existing_course = None
+        try:
+            existing_group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            existing_group = None
+        if existing_course and existing_group:
+            try:
+                existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
+            except ObjectDoesNotExist:
+                existing_relationship = None
+            if existing_relationship:
+                response_status = status.HTTP_200_OK
+            else:
+                response_status = status.HTTP_404_NOT_FOUND
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+    elif request.method == 'DELETE':
+        try:
+            existing_group = Group.objects.get(id=group_id)
+            existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group).delete()
+        except ObjectDoesNotExist:
+            pass
+        return Response({}, status=status.HTTP_204_NO_CONTENT)

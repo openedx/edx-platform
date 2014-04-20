@@ -82,3 +82,13 @@ class LinkedGroupRelationship(models.Model):
     record_active = models.BooleanField(default=True)
     record_date_created = models.DateTimeField(default=timezone.now())
     record_date_modified = models.DateTimeField(auto_now=True)
+
+
+class CourseGroupRelationship(models.Model):
+    """
+    The CourseGroupRelationship model contains information describing the
+    link between a course and a group.  A typical use case for this table
+    is to manage the courses for an XSeries or other sort of program.
+    """
+    course_id = models.CharField(max_length=255, db_index=True)
+    group = models.ForeignKey(Group, db_index=True)

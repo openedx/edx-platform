@@ -1,4 +1,4 @@
-""" API implementation for gourse-oriented interactions. """
+""" API implementation for group-oriented interactions. """
 import uuid
 
 from django.contrib.auth.models import Group, User
@@ -10,7 +10,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from api_manager.permissions import ApiKeyHeaderPermission
-from api_manager.models import GroupRelationship
+from api_manager.models import GroupRelationship, CourseGroupRelationship
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location, InvalidLocationError
 
 RELATIONSHIP_TYPES = {'hierarchical': 'h', 'graph': 'g'}
 
@@ -269,3 +271,81 @@ def group_groups_detail(request, group_id, related_group_id):
         else:
             response_status = status.HTTP_404_NOT_FOUND
         return Response({}, status=response_status)
+
+
+@api_view(['POST'])
+@permission_classes((ApiKeyHeaderPermission,))
+def group_courses_list(request, group_id):
+    """
+    POST creates a new group-course relationship in the system
+    """
+    response_data = {}
+    group_id = group_id
+    course_id = request.DATA['course_id']
+    base_uri = _generate_base_uri(request)
+    response_data['uri'] = '{}/{}'.format(base_uri, course_id)
+    store = modulestore()
+    print "GROUP COURSES LIST"
+    try:
+        existing_group = Group.objects.get(id=group_id)
+    except ObjectDoesNotExist:
+        existing_group = None
+    try:
+        existing_course = store.get_course(course_id)
+    except ValueError:
+        existing_course = None
+    print existing_group
+    print existing_course
+    if existing_group and existing_course:
+        try:
+            existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
+        except ObjectDoesNotExist:
+            existing_relationship = None
+        print existing_relationship
+        if existing_relationship is None:
+            new_relationship = CourseGroupRelationship.objects.create(course_id=course_id, group=existing_group)
+            print new_relationship.__dict__
+            response_data['group_id'] = str(new_relationship.group_id)
+            response_data['course_id'] = str(new_relationship.course_id)
+            response_status = status.HTTP_201_CREATED
+        else:
+            response_data['message'] = "Relationship already exists."
+            response_status = status.HTTP_409_CONFLICT
+    else:
+        print request.DATA
+        response_status = status.HTTP_404_NOT_FOUND
+    return Response(response_data, status=response_status)
+
+
+@api_view(['GET', 'DELETE'])
+@permission_classes((ApiKeyHeaderPermission,))
+def group_courses_detail(request, group_id, course_id):
+    """
+    GET retrieves an existing group-course relationship from the system
+    DELETE removes/inactivates/etc. an existing group-course relationship
+    """
+    if request.method == 'GET':
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = base_uri
+        try:
+            existing_group = Group.objects.get(id=group_id)
+            existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
+        except ObjectDoesNotExist:
+            existing_group = None
+            existing_relationship = None
+        if existing_group and existing_relationship:
+            response_data['group_id'] = existing_group.id
+            response_data['course_id'] = existing_relationship.course_id
+            response_status = status.HTTP_200_OK
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+    elif request.method == 'DELETE':
+        try:
+            existing_group = Group.objects.get(id=group_id)
+            existing_group.coursegrouprelationship_set.get(course_id=course_id).delete()
+            existing_group.save()
+        except ObjectDoesNotExist:
+            pass
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
