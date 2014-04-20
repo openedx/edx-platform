@@ -285,7 +285,6 @@ def group_courses_list(request, group_id):
     base_uri = _generate_base_uri(request)
     response_data['uri'] = '{}/{}'.format(base_uri, course_id)
     store = modulestore()
-    print "GROUP COURSES LIST"
     try:
         existing_group = Group.objects.get(id=group_id)
     except ObjectDoesNotExist:
@@ -294,17 +293,15 @@ def group_courses_list(request, group_id):
         existing_course = store.get_course(course_id)
     except ValueError:
         existing_course = None
-    print existing_group
-    print existing_course
+
     if existing_group and existing_course:
         try:
             existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
         except ObjectDoesNotExist:
             existing_relationship = None
-        print existing_relationship
+
         if existing_relationship is None:
             new_relationship = CourseGroupRelationship.objects.create(course_id=course_id, group=existing_group)
-            print new_relationship.__dict__
             response_data['group_id'] = str(new_relationship.group_id)
             response_data['course_id'] = str(new_relationship.course_id)
             response_status = status.HTTP_201_CREATED
@@ -312,7 +309,6 @@ def group_courses_list(request, group_id):
             response_data['message'] = "Relationship already exists."
             response_status = status.HTTP_409_CONFLICT
     else:
-        print request.DATA
         response_status = status.HTTP_404_NOT_FOUND
     return Response(response_data, status=response_status)
 

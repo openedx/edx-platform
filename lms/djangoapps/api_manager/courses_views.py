@@ -225,7 +225,6 @@ def courses_detail(request, course_id):
     return Response(response_data, status=status_code)
 
 
-<<<<<<< HEAD
 @api_view(['POST'])
 @permission_classes((ApiKeyHeaderPermission,))
 def courses_groups_list(request, course_id):
@@ -306,8 +305,6 @@ def courses_groups_detail(request, course_id, group_id):
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
-def _parse_about_html(html):
-=======
 def _inner_content(tag):
     """
     Helper method
@@ -320,8 +317,8 @@ def _inner_content(tag):
 
     return inner_content
 
+
 def _parse_overview_html(html):
->>>>>>> initial implementation
     """
     Helper method to break up the course about HTML into components
     """
