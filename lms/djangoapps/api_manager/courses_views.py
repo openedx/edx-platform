@@ -17,6 +17,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
 
 from courseware.courses import get_course_about_section, get_course_info_section
+from courseware.views import get_static_tab_contents
 
 log = logging.getLogger(__name__)
 
@@ -478,6 +479,76 @@ def course_updates(request, course_id):
             response_data['content'] = content
 
     except InvalidLocationError:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response(response_data)
+
+
+@api_view(['GET'])
+@permission_classes((ApiKeyHeaderPermission,))
+def static_tabs_list(request, course_id):
+    """
+    GET returns an array of Static Tabs inside of a course
+    """
+    store = modulestore()
+    response_data = OrderedDict()
+
+    try:
+        course_module = store.get_course(course_id)
+        if not course_module:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        tabs = []
+        for tab in course_module.tabs:
+            if tab.type == 'static_tab':
+                tab_data = OrderedDict()
+                tab_data['id'] = tab.url_slug
+                tab_data['name'] = tab.name
+                if request.GET.get('detail') and request.GET.get('detail') in ['True', 'true']:
+                    tab_data['content'] = get_static_tab_contents(request,
+                        course_module,
+                        tab,
+                        wrap_xmodule_display=False
+                    )
+
+                tabs.append(tab_data)
+
+        response_data['tabs'] = tabs
+
+    except InvalidLocationError:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response(response_data)
+
+
+@api_view(['GET'])
+@permission_classes((ApiKeyHeaderPermission,))
+def static_tab_detail(request, course_id, tab_id):
+    """
+    GET returns an array of Static Tabs inside of a course
+    """
+    store = modulestore()
+    response_data = OrderedDict()
+
+    try:
+        course_module = store.get_course(course_id)
+        if not course_module:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        for tab in course_module.tabs:
+            if tab.type == 'static_tab' and tab.url_slug == tab_id:
+                response_data['id'] = tab.url_slug
+                response_data['name'] = tab.name
+                response_data['content'] = get_static_tab_contents(request,
+                    course_module,
+                    tab,
+                    wrap_xmodule_display=False
+                )
+
+    except InvalidLocationError:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+    if not response_data:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
     return Response(response_data)
