@@ -7,6 +7,7 @@ Run these tests @ Devstack:
 import simplejson as json
 import unittest
 import uuid
+from random import randint
 
 from django.core.cache import cache
 from django.test import TestCase, Client
@@ -450,3 +451,73 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
+    def test_course_enrollments(self):
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+
+        # assert that there is no enrolled students
+        enrollments = response.data['enrollments']
+        self.assertEqual(len(enrollments), 0)
+        self.assertNotIn('pending_enrollments', response.data)
+
+        # enroll a non-existing student
+        # first, don't allow non-existing
+        post_data = {}
+        post_data['email'] = 'test+pending@tester.com'
+        post_data['allow_pending'] = False
+        response = self.do_post(test_uri, post_data)
+        self.assertEqual(response.status_code, 400)
+
+        post_data['allow_pending'] = True
+        response = self.do_post(test_uri, post_data)
+        self.assertEqual(response.status_code, 201)
+
+        # re-run query
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+
+        # assert that we just have a single pending enrollment
+        enrollments = response.data['enrollments']
+        self.assertEqual(len(enrollments), 0)
+        self.assertIn('pending_enrollments', response.data)
+        pending = response.data['pending_enrollments']
+        self.assertEqual(len(pending), 1)
+        self.assertEqual(pending[0], 'test+pending@tester.com')
+
+        # create a new user (note, this calls into the /users/ subsystem)
+        test_user_uri = '/api/users'
+        local_username = "some_test_user" + str(randint(11, 99))
+        local_email = "test+notpending@tester.com"
+        data = {
+            'email': local_email,
+            'username': local_username,
+            'password': 'fooabr',
+            'first_name': 'Joe',
+            'last_name': 'Brown'
+        }
+        response = self.do_post(test_user_uri, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertGreater(response.data['id'], 0)
+        created_user_id = response.data['id']
+
+        # now register this user
+        post_data = {}
+        post_data['user_id'] = created_user_id
+        response = self.do_post(test_uri, post_data)
+        self.assertEqual(response.status_code, 201)
+
+        # now re-query, we should see it listed now in the list of enrollments
+        # re-run query
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+
+        # assert that we just have a single pending enrollment
+        enrollments = response.data['enrollments']
+        self.assertEqual(len(enrollments), 1)
+        self.assertEqual(enrollments[0]['id'], created_user_id)
+        self.assertEqual(enrollments[0]['email'], local_email)
+        self.assertEqual(enrollments[0]['username'], local_username)
