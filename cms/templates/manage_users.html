@@ -59,12 +59,12 @@
       %endif
 
       <ol class="user-list">
-        <% course_team_url = reverse(
-             'contentstore.views.course_team_handler',
-             kwargs={'course_key_string': unicode(context_course.id)}
-        )
-        %>
         % for user in staff:
+          <% course_team_url = reverse(
+             'contentstore.views.course_team_handler',
+             kwargs={'course_key_string': unicode(context_course.id), 'email': user.email}
+          )
+          %>
 
         <li class="user-item" data-email="${user.email}" data-url="${course_team_url}">
 
