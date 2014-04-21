@@ -92,3 +92,19 @@ class CourseGroupRelationship(models.Model):
     """
     course_id = models.CharField(max_length=255, db_index=True)
     group = models.ForeignKey(Group, db_index=True)
+
+
+class GroupProfile(models.Model):
+    """
+    This table will provide additional tables regarding groups. This has a foreign key to
+    the auth_groups table
+    """
+
+    class Meta:
+        db_table = "auth_groupprofile"
+
+    group = models.ForeignKey(Group, db_index=True)
+    group_type = models.CharField(null=True, max_length=32, db_index=True)
+
+    data = models.TextField(blank=True)  # JSON dictionary for generic key/value pairs
+

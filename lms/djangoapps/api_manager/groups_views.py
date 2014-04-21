@@ -1,5 +1,6 @@
 """ API implementation for group-oriented interactions. """
 import uuid
+import json
 
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,7 +11,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from api_manager.permissions import ApiKeyHeaderPermission
-from api_manager.models import GroupRelationship, CourseGroupRelationship
+from api_manager.models import GroupRelationship, CourseGroupRelationship, GroupProfile
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
 
@@ -43,13 +44,23 @@ def group_list(request):
     # Group name must be unique, but we need to support dupes
     group = Group.objects.create(name=str(uuid.uuid4()))
     original_group_name = request.DATA['name']
+
     group.name = '{:04d}: {}'.format(group.id, original_group_name)
     group.record_active = True
     group.record_date_created = timezone.now()
     group.record_date_modified = timezone.now()
     group.save()
+
     # Relationship model also allows us to use duplicate names
     GroupRelationship.objects.create(name=original_group_name, group_id=group.id, parent_group=None)
+
+    # allow for optional meta information about groups, this will end up in the GroupProfile table
+    group_type = request.DATA.get('group_type')
+    data = request.DATA.get('data')
+
+    if group_type or data:
+        profile, _ = GroupProfile.objects.get_or_create(group_id=group.id, group_type=group_type, data=data)
+
     response_data = {'id': group.id, 'name': original_group_name}
     base_uri = _generate_base_uri(request)
     response_data['uri'] = '{}/{}'.format(base_uri, group.id)
@@ -80,6 +91,19 @@ def group_detail(request, group_id):
         response_data['resources'].append({'uri': resource_uri})
         resource_uri = '{}/groups'.format(base_uri)
         response_data['resources'].append({'uri': resource_uri})
+
+        # see if there is an (optional) GroupProfile
+        try:
+            existing_group_profile = GroupProfile.objects.get(group_id=group_id)
+            if existing_group_profile.group_type:
+                response_data['group_type'] = existing_group_profile.group_type
+            data = existing_group_profile.data
+            if data:
+                print '******* data = {0}'.format(data)
+                response_data['data'] = json.loads(data)
+        except ObjectDoesNotExist:
+            pass
+
         response_status = status.HTTP_200_OK
     else:
         response_status = status.HTTP_404_NOT_FOUND
