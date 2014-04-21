@@ -47,7 +47,6 @@ ANNOTATOR_COMMON_CSS = [
     resource_string(__name__, 'css/ova/edx-annotator.css'),
     resource_string(__name__, 'css/ova/annotator.css'),
     resource_string(__name__, 'css/ova/ova.css'),
-    resource_string(__name__, 'css/ova/skin.min.css'),
     resource_string(__name__, 'css/ova/rangeslider.css'),
     resource_string(__name__, 'css/ova/share-annotator.css'),
     resource_string(__name__, 'css/ova/richText-annotator.css'),
