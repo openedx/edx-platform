@@ -8,6 +8,7 @@ from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.importlib import import_module
+from django.utils.translation import ugettext as _
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -15,6 +16,7 @@ from rest_framework.response import Response
 
 from api_manager.permissions import ApiKeyHeaderPermission
 from api_manager.serializers import UserSerializer
+from student.models import LoginFailures
 
 
 def _generate_base_uri(request):
@@ -45,9 +47,23 @@ def session_list(request):
         existing_user = User.objects.get(username=request.DATA['username'])
     except ObjectDoesNotExist:
         existing_user = None
+
+    # see if account has been locked out due to excessive login failures
+    if existing_user and LoginFailures.is_feature_enabled():
+        if LoginFailures.is_user_locked_out(existing_user):
+            response_status = status.HTTP_403_FORBIDDEN
+            response_data['message'] = _('This account has been temporarily locked due to excessive login failures. '
+                                         'Try again later.')
+            return Response(response_data, status=response_status)
+
     if existing_user:
         user = authenticate(username=existing_user.username, password=request.DATA['password'])
         if user is not None:
+
+            # successful login, clear failed login attempts counters, if applicable
+            if LoginFailures.is_feature_enabled():
+                LoginFailures.clear_lockout_counter(user)
+
             if user.is_active:
                 login(request, user)
                 response_data['token'] = request.session.session_key
@@ -59,6 +75,10 @@ def session_list(request):
             else:
                 response_status = status.HTTP_403_FORBIDDEN
         else:
+            # tick the failed login counters if the user exists in the database
+            if LoginFailures.is_feature_enabled():
+                LoginFailures.increment_lockout_counter(existing_user)
+
             response_status = status.HTTP_401_UNAUTHORIZED
     else:
         response_status = status.HTTP_404_NOT_FOUND
