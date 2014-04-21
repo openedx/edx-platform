@@ -363,6 +363,7 @@ def fullstat(request = None):
         datarow += [u'Нет']
         datarow += [u"Нет"]
         datarow += [u"Нет"]
+        datafull.append(datarow)
 
 
 
