@@ -105,6 +105,9 @@ def user_list(request):
         user.last_name = last_name
         user.save()
 
+        # CDODGE:  @TODO: We will have to extend this to look in the CourseEnrollmentAllowed table and
+        # auto-enroll students when they create a new account. Also be sure to remove from
+        # the CourseEnrollmentAllow table after the auto-registration has taken place
     if user:
         status_code = status.HTTP_201_CREATED
         response_data = _serialize_user(response_data, user)

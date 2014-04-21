@@ -1,6 +1,6 @@
 """ API implementation for course-oriented interactions. """
 
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
 from lxml import etree
 from StringIO import StringIO
@@ -18,6 +18,7 @@ from xmodule.modulestore import Location, InvalidLocationError
 
 from courseware.courses import get_course_about_section, get_course_info_section
 from courseware.views import get_static_tab_contents
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 
 log = logging.getLogger(__name__)
 
@@ -549,3 +550,72 @@ def static_tab_detail(request, course_id, tab_id):
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
     return Response(response_data)
+
+@api_view(['GET', 'POST', 'DELETE'])
+@permission_classes((ApiKeyHeaderPermission,))
+def course_users_list(request, course_id):
+    """
+    GET returns a list of users enrolled in the course_id
+    POST enrolls a student in the course. Note, this can be a user_id or just an email, in case
+    the user does not exist in the system
+    """
+    store = modulestore()
+    response_data = OrderedDict()
+
+    try:
+        # find the course
+        course_module = store.get_course(course_id)
+        if not course_module:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+    except InvalidLocationError:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        # Get a list of all enrolled students
+        users = CourseEnrollment.users_enrolled_in(course_id)
+        response_data['enrollments'] = []
+        for user in users:
+            user_data = OrderedDict()
+            user_data['id'] = user.id
+            user_data['email'] = user.email
+            user_data['username'] = user.username
+            # @TODO: Should we create a URI resourse that points to user?!? But that's in a different URL subpath
+            response_data['enrollments'].append(user_data)
+
+        # Then list all enrollments which are pending. These are enrollments for students that have not yet
+        # created an account
+        pending_enrollments = CourseEnrollmentAllowed.objects.filter(course_id=course_id)
+        if pending_enrollments:
+            response_data['pending_enrollments'] = []
+            for cea in pending_enrollments:
+                response_data['pending_enrollments'].append(cea.email)
+        return Response(response_data)
+
+    elif request.method == 'POST':
+        if 'user_id' in request.DATA:
+            user_id = request.DATA['user_id']
+            try:
+                existing_user = User.objects.get(id=user_id)
+                CourseEnrollment.enroll(existing_user, course_id)
+            except ObjectDoesNotExist:
+                return Response({'err': 'user_does_not_exist'}, status=status.HTTP_400_BAD_REQUEST)
+        elif 'email' in request.DATA:
+            # If caller passed in an email, then let's look up user by email address
+            # if it doesn't exist then we need to assume that the student does not exist
+            # in our database and that the instructor is pre-enrolling ment
+            email = request.DATA['email']
+            try:
+                existing_user = User.objects.get(email=email)
+                CourseEnrollment.enroll(existing_user, course_id)
+            except ObjectDoesNotExist:
+                if not request.DATA.get('allow_pending', False):
+                    return Response({'err': 'user_does_not_exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+                # In this case we can pre-enroll a non-existing student. This is what the
+                # CourseEnrollmentAllowed table is for
+                # NOTE: This logic really should live in CourseEnrollment.....
+                cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=email)
+                cea.auto_enroll = True
+                cea.save()
+
+        return Response({}, status.HTTP_201_CREATED)
