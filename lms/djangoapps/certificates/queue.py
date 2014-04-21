@@ -179,6 +179,7 @@ class XQueueCertInterface(object):
             self.request.user = student
             self.request.session = {}
 
+            course_name = course.display_name or course_id
             is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
             grade = grades.grade(student, self.request, course)
             enrollment_mode = CourseEnrollment.enrollment_mode_for_user(student, course_id)
@@ -231,6 +232,7 @@ class XQueueCertInterface(object):
                         'action': 'create',
                         'username': student.username,
                         'course_id': course_id,
+                        'course_name': course_name,
                         'name': profile_name,
                         'grade': grade_text,
                         'template_pdf': template_pdf,
