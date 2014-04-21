@@ -6,7 +6,8 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
-
+from xmodule.annotator_token import retrieve_token
+from xmodule.annotator_mixin import get_instructions, ANNOTATOR_COMMON_JS, ANNOTATOR_COMMON_CSS
 import textwrap
 
 
@@ -30,7 +31,7 @@ class AnnotatableFields(object):
         scope=Scope.settings,
         default='Text Annotation',
     )
-    tags = String(
+    instructor_tags = String(
         display_name="Tags for Assignments",
         help="Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue",
         scope=Scope.settings,
@@ -43,13 +44,20 @@ class AnnotatableFields(object):
         default='None',
     )
     annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
+    annotation_token_secret = String(help="Secret string for annotation storage", scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name="Secret Token String for Annotation")
+    diacritics = String(
+        display_name="Diacritic Marks",
+        help= "Add diacritic marks to be added to a text using the comma-separated form, i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2",
+        scope=Scope.settings,
+        default='',
+    )
 
 
 class TextAnnotationModule(AnnotatableFields, XModule):
     ''' Text Annotation Module '''
     js = {'coffee': [],
-          'js': []}
-    css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
+          'js': ANNOTATOR_COMMON_JS}
+    css = {'scss': ANNOTATOR_COMMON_CSS + [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'textannotation'
 
     def __init__(self, *args, **kwargs):
@@ -59,36 +67,27 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
-        self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
-
-    def _render_content(self):
-        """ Renders annotatable content with annotation spans and returns HTML. """
-        xmltree = etree.fromstring(self.content)
-        if 'display_name' in xmltree.attrib:
-            del xmltree.attrib['display_name']
-
-        return etree.tostring(xmltree, encoding='unicode')
+        self.user = ""
+        if self.runtime.get_real_user is not None:
+            self.user = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
-        instructions = xmltree.find('instructions')
-        if instructions is not None:
-            instructions.tag = 'div'
-            xmltree.remove(instructions)
-            return etree.tostring(instructions, encoding='unicode')
-        return None
+        return get_instructions(xmltree)
 
     def get_html(self):
         """ Renders parameters to template. """
+        print self
         context = {
             'display_name': self.display_name_with_default,
-            'tag': self.tags,
+            'tag': self.instructor_tags,
             'source': self.source,
             'instructions_html': self.instructions,
-            'content_html': self._render_content(),
-            'annotation_storage': self.annotation_storage_url
+            'content_html': self.content,
+            'annotation_storage': self.annotation_storage_url,
+            'token': retrieve_token(self.user, self.annotation_token_secret),
+            'diacritic_marks': self.diacritics,
         }
-
         return self.system.render_template('textannotation.html', context)
 
 
@@ -101,6 +100,7 @@ class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(TextAnnotationDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([
-            TextAnnotationDescriptor.annotation_storage_url
+            TextAnnotationDescriptor.annotation_storage_url,
+            TextAnnotationDescriptor.annotation_token_secret
         ])
         return non_editable_fields

@@ -19,7 +19,7 @@ annotationList:
         '<div class="header">'+
             '<div class="annotationRow">'+
                 '<div class="expandableIcon field">'+
-                    '&nbsp  <!-- TODO: better way to ensure width upon hide -->'+
+                    '&nbsp;  <!-- TODO: better way to ensure width upon hide -->'+
                 '</div>'+
 
                 '<div class="annotatedBy field">'+
@@ -568,7 +568,6 @@ CatchAnnotation.prototype = {
         var moreBut = this.element.find('.annotationListButtons .moreButtonCatch');
         moreBut.html('More');
         
-        setTimeout();
     },
 
 //    
@@ -1095,11 +1094,10 @@ CatchAnnotation.prototype = {
                     annotation = item.data('annotation');
         var authorized = permissions.options.userAuthorize('delete', annotation,permissions.user);
         if(authorized){
-            //annotator.deleteAnnotation(annotation);
             if(confirm('Would you like to delete this reply?')){
               annotator.plugins['Store']._apiRequest('destroy', annotation, function(){});
               item.remove();
-          }
+            }
         }
     }
 }
