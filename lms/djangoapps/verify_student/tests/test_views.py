@@ -1,3 +1,4 @@
+# encoding: utf-8
 """
 
 
@@ -215,3 +216,26 @@ class TestMidCourseReverifyView(TestCase):
         response = self.client.get(url)
         # enrolled in a verified course, and the window is open
         self.assertEquals(response.status_code, 200)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestReverificationBanner(TestCase):
+    """ Tests for the midcourse reverification  failed toggle banner off """
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def setUp(self):
+        self.user = UserFactory.create(username="rusty", password="test")
+        self.client.login(username="rusty", password="test")
+        self.course_id = 'Robot/999/Test_Course'
+        CourseFactory.create(org='Robot', number='999', display_name=u'Test Course é')
+        self.window = MidcourseReverificationWindowFactory(course_id=self.course_id)
+        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': self.course_id})
+        self.client.post(url, {'face_image': ','})
+        photo_verification = SoftwareSecurePhotoVerification.objects.get(user=self.user, window=self.window)
+        photo_verification.status = 'denied'
+        photo_verification.save()
+
+    def test_banner_display_off(self):
+        self.client.post(reverse('verify_student_toggle_failed_banner_off'))
+        photo_verification = SoftwareSecurePhotoVerification.objects.get(user=self.user, window=self.window)
+        self.assertFalse(photo_verification.display)

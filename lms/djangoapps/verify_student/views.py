@@ -439,13 +439,17 @@ def midcourse_reverify_dash(request):
     return render_to_response("verify_student/midcourse_reverify_dash.html", context)
 
 
+@login_required
+@require_POST
 def toggle_failed_banner_off(request):
     """
     Finds all denied midcourse reverifications for a user and permanently toggles
     the "Reverification Failed" banner off for those verifications.
     """
-    user_id = request.POST.get('user_id')
+    user_id = request.user.id
     SoftwareSecurePhotoVerification.display_off(user_id)
+    return HttpResponse('Success')
+
 
 
 @login_required
