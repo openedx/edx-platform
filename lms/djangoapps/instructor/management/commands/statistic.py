@@ -165,7 +165,7 @@ def fullstat(request = None):
     request = DummyRequest()
     
 
-    header = [u'ФИО', u'ФИО (измененное)', u'логин школы', u'email', u'email (измененное)', u'курс', u'курс опубл.', u'зарег. в пакет рег.', u"дата рег. на курс", u'2/3', u'100%', u'Задачи/Задания(Модули)']
+    header = [u'Фамилия', u'Имя', u'Отчество', u'Фамилия (измененное)', u'Имя (измененное)', u'Отчество (измененное)', u'логин школы', u'email', u'email (измененное)', u'курс', u'курс опубл.', u'зарег. в пакет рег.', u"дата рег. на курс", u'2/3', u'100%', u'Задачи/Задания(Модули)']
     assignments = []
     datatablefull = {'header': header, 'assignments': assignments, 'students': []}
     datafull = []
@@ -225,7 +225,6 @@ def fullstat(request = None):
     for course in modulestore().get_courses():
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course.id,
-            courseenrollment__is_active=1,
         ).prefetch_related("groups").order_by('username')
         enrolled_students = [st for st in enrolled_students if not _has_staff_access_to_course_id(st, course.id)]
 
@@ -263,13 +262,8 @@ def fullstat(request = None):
                 off_reg = False
                 try:
                     for row in rows:
-                        found = False
-                        for course_id, course_name in coursemap.iteritems():
-                            if course_name in row['subject']:
-                                found = True
-                                off_reg = True
-                                break
-                        if found:
+                        if coursemap[course.id] in row['subject']:
+                            off_reg = True
                             break
                 except:
                     pass
@@ -281,11 +275,11 @@ def fullstat(request = None):
                     name = rows[0]['second-name'] + ' ' + rows[0]['first-name'] + ' ' + rows[0]['patronymic']
                 except:
                     name = oldname
-                datarow += [name]
+                datarow += [name.split(' ', 2)]
                 if user.profile.name != name:
-                    datarow += [user.profile.name]
+                    datarow += [user.profile.name.split(' ', 2)]
                 else:
-                    datarow += [u'']
+                    datarow += [u'', u'', u'']
                 
                 try:
                     datarow += [rows[0]['login']]
@@ -341,11 +335,37 @@ def fullstat(request = None):
                 if len(statsec) > 0 and len(statprob) > 0:
                     datarow += statprob
                     datarow += statsec
+
+                usermap.pop(email)
                 
                 datafull.append(datarow)
             except:
                 logging.exception("Something awful happened in fullstat!")
                 pass
+
+    for userrow in usermap:
+        datarow = []
+        #User
+        name = userrow['second-name'] + ' ' + userrow['first-name'] + ' ' + userrow['patronymic']
+        datarow += [name.split(' ', 2)]
+        datarow += [u'']
+        datarow += [userrow['login']]
+        email = userrow['email']
+        datarow += [email]
+        datarow += [u'']
+
+        #Course
+        datarow += [userrow['subject']]
+
+        datarow += [u'Нет']
+            
+        datarow += [u'Да']
+        datarow += [u'Нет']
+        datarow += [u"Нет"]
+        datarow += [u"Нет"]
+
+
+
     datatablefull['data'] = datafull
     return_csv('full_stat.csv',datatablefull, open("/var/www/edx/fullstat.csv", "wb"))
     return_csv('full_stat.xls',datatablefull, open("/var/www/edx/fullstat.xls", "wb"), encoding="cp1251", dialect="excel-tab")
