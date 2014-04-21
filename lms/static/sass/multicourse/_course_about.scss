@@ -154,7 +154,11 @@
             float: left;
             margin: 1px flex-gutter(8) 0 0;
             @include transition(none);
-            width: flex-grid(5, 8);
+            width: flex-grid(4, 8);
+          }
+          
+          span.sneakpeek {
+            margin-right: 0;
           }
 
           #register_error {
