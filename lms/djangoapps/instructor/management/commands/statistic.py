@@ -264,6 +264,7 @@ def fullstat(request = None):
                     for row in rows:
                         if coursemap[course.id] in row['subject']:
                             off_reg = True
+                            row['used'] = True
                             break
                 except:
                     pass
@@ -336,34 +337,34 @@ def fullstat(request = None):
                     datarow += statprob
                     datarow += statsec
 
-                usermap.pop(email)
-                
                 datafull.append(datarow)
             except:
                 logging.exception("Something awful happened in fullstat!")
                 pass
 
-    for userrow in usermap:
-        datarow = []
-        #User
-        name = userrow['second-name'] + ' ' + userrow['first-name'] + ' ' + userrow['patronymic']
-        datarow += [name.split(' ', 2)]
-        datarow += [u'']
-        datarow += [userrow['login']]
-        email = userrow['email']
-        datarow += [email]
-        datarow += [u'']
+    for userrows in usermap:
+        for userrow in userrows:
+            if userrow.get('used', False):
+                datarow = []
+                #User
+                name = userrow['second-name'] + ' ' + userrow['first-name'] + ' ' + userrow['patronymic']
+                datarow += [name.split(' ', 2)]
+                datarow += [u'']
+                datarow += [userrow['login']]
+                email = userrow['email']
+                datarow += [email]
+                datarow += [u'']
 
-        #Course
-        datarow += [userrow['subject']]
+                #Course
+                datarow += [userrow['subject']]
 
-        datarow += [u'Нет']
-            
-        datarow += [u'Да']
-        datarow += [u'Нет']
-        datarow += [u"Нет"]
-        datarow += [u"Нет"]
-        datafull.append(datarow)
+                datarow += [u'Нет']
+                    
+                datarow += [u'Да']
+                datarow += [u'Нет']
+                datarow += [u"Нет"]
+                datarow += [u"Нет"]
+                datafull.append(datarow)
 
 
 
