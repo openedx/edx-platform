@@ -756,8 +756,8 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                     username=username, backend_name=backend_name))
             return JsonResponse({
                 "success": False,
-                ## Translators: provider_name is the name of an external, third-party user authentication service (like
-                ## Google or LinkedIn).
+                # Translators: provider_name is the name of an external, third-party user authentication service (like
+                # Google or LinkedIn).
                 "value": _('There is no {platform_name} account associated with your {provider_name} account. Please use your {platform_name} credentials or pick another provider.').format(
                     platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME)
             })  # TODO: this should be a status code 401  # pylint: disable=fixme
