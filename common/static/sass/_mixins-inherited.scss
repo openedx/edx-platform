@@ -127,14 +127,14 @@
   padding: ($baseline/5) $baseline ($baseline/4);
 
   &.disabled, &.is-disabled {
-    border: 1px solid $gray-l1 !important;
-    border-radius: 3px !important;
-    background: $gray-l1 !important;
-    color: $gray-d1 !important;
+    border: 1px solid $gray-l1;
+    border-radius: 3px;
+    background: $gray-l1;
+    color: $gray-d1;
     pointer-events: none;
     cursor: none;
     &:hover, &:focus {
-      box-shadow: 0 0 0 0 !important;
+      box-shadow: 0 0 0 0;
     }
   }
 
@@ -158,9 +158,9 @@
   }
 
   &.disabled, &.is-disabled {
-    border: 1px solid $green-l3 !important;
-    background: $green-l3 !important;
-    color: $white !important;
+    border: 1px solid $green-l3;
+    background: $green-l3;
+    color: $white;
     box-shadow: none;
   }
 }
@@ -180,9 +180,9 @@
 
   &.disabled, &.is-disabled {
     box-shadow: none;
-    border: 1px solid $blue-l3 !important;
-    background: $blue-l3 !important;
-    color: $white !important;
+    border: 1px solid $blue-l3;
+    background: $blue-l3;
+    color: $white;
   }
 }
 
@@ -201,9 +201,9 @@
 
   &.disabled, &.is-disabled {
     box-shadow: none;
-    border: 1px solid $red-l3 !important;
-    background: $red-l3 !important;
-    color: $white !important;
+    border: 1px solid $red-l3;
+    background: $red-l3;
+    color: $white;
   }
 }
 
@@ -222,9 +222,9 @@
 
   &.disabled, &.is-disabled {
     box-shadow: none;
-    border: 1px solid $pink-l3 !important;
-    background: $pink-l3 !important;
-    color: $white !important;
+    border: 1px solid $pink-l3;
+    background: $pink-l3;
+    color: $white;
   }
 }
 
@@ -243,9 +243,9 @@
   }
 
   &.disabled, &.is-disabled {
-    border: 1px solid $orange-l3 !important;
-    background: $orange-l2 !important;
-    color: $gray-l1 !important;
+    border: 1px solid $orange-l3;
+    background: $orange-l2;
+    color: $gray-l1;
     box-shadow: none;
   }
 }
