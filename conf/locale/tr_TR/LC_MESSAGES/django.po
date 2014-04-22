@@ -73,7 +73,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-12 15:41-0400\n"
+"POT-Creation-Date: 2014-04-22 09:02-0400\n"
 "PO-Revision-Date: 2014-02-24 17:06+0000\n"
 "Last-Translator: Hakan Senel <hgsenel@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
@@ -880,6 +880,28 @@ msgstr "(Kaynak kodu satırı bilinmiyor)"
 msgid "See XML source line {sourcenum}."
 msgstr "XML kaynak satırına {sourcenum} bakınız."
 
+#. Translators: 'unmask_name' is a method name and should not be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "unmask_name called on response that is not masked"
+msgstr ""
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr ""
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "answer-pool value should be an integer"
+msgstr ""
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr ""
+
 #: common/lib/capa/capa/responsetypes.py common/lib/capa/capa/responsetypes.py
 msgid "There was a problem with the staff answer to this problem."
 msgstr "Bu probleme personelin verdiği yanıtta bir sorun vardı."
@@ -1019,10 +1041,28 @@ msgstr "Daha sonra yeniden kontrol edilmeden önce problem sıfırlanmalıdır."
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr "Yüklemeler arasında en az {wait} saniye beklemelisiniz."
 
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"You must wait at least {wait_secs} between submissions. {remaining_secs} "
+"remaining."
+msgstr ""
+
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Error: {msg}"
 msgstr "Hata: {msg}"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_hour} hour"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_minute} minute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_second} second"
+msgstr ""
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -1870,6 +1910,8 @@ msgid "Username"
 msgstr "Kullanıcı adı"
 
 #: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Name"
 msgstr "İsim"
@@ -1911,6 +1953,15 @@ msgstr "Posta Adresi"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Goals"
 msgstr "Hedefler"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Module does not exist."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "An error occurred while deleting the score."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/verify_student/midcourse_reverify_dash.html
@@ -2562,6 +2613,10 @@ msgstr "Ödeme Talimatı Onayı"
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Trying to add a different currency into the cart"
 msgstr "Sepete farklı bir para birimi eklemeye çalışılıyor"
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid "Registration for Course: {course_name}"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
@@ -3452,6 +3507,7 @@ msgstr "Önizleme"
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
 msgid "Close"
@@ -4039,37 +4095,6 @@ msgstr "Sayfa bulunamadı"
 msgid "close"
 msgstr "kapat"
 
-#: cms/templates/component.html cms/templates/manage_users.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "Settings"
-msgstr "Ayarlar"
-
-#: cms/templates/component.html cms/templates/overview.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html lms/templates/problem.html
-#: lms/templates/word_cloud.html
-#: lms/templates/combinedopenended/openended/open_ended.html
-#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
-#: lms/templates/verify_student/face_upload.html
-msgid "Save"
-msgstr "Kaydet"
-
-#: cms/templates/component.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/overview.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-#: lms/templates/verify_student/face_upload.html
-msgid "Cancel"
-msgstr "İptal"
-
 #: cms/templates/container.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -4091,6 +4116,19 @@ msgstr "Hata:"
 #: lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "Kurs Numarası"
+
+#: cms/templates/index.html cms/templates/manage_users.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: cms/templates/overview.html lms/templates/discussion/_inline_new_post.html
+#: lms/templates/discussion/_new_post.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_discussion.mustache
+#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
+#: lms/templates/verify_student/face_upload.html
+msgid "Cancel"
+msgstr "İptal"
 
 #: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -4121,10 +4159,26 @@ msgstr "Şifremi unuttum"
 msgid "Password"
 msgstr "Şifre"
 
+#: cms/templates/manage_users.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "Settings"
+msgstr "Ayarlar"
+
 #: cms/templates/manage_users.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Admin"
 msgstr "Yönetici"
+
+#: cms/templates/overview.html cms/templates/overview.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: lms/templates/problem.html lms/templates/word_cloud.html
+#: lms/templates/combinedopenended/openended/open_ended.html
+#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
+#: lms/templates/verify_student/face_upload.html
+msgid "Save"
+msgstr "Kaydet"
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
@@ -5199,6 +5253,10 @@ msgstr "Daha fazla opsiyon aşağıaçılır listesi"
 #: lms/templates/navigation.html
 msgid "Log Out"
 msgstr "Çıkış yap"
+
+#: lms/templates/navigation.html
+msgid "Shopping Cart"
+msgstr ""
 
 #: lms/templates/navigation.html
 msgid "How it Works"
@@ -7099,6 +7157,13 @@ msgstr ""
 "istediğinize emin misiniz"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"In order to request a refund for the amount you paid, you will need to send "
+"an email to {billing_email}.  Be sure to include your email and the course "
+"name."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr "E-posta Ayarları"
 
@@ -8226,7 +8291,8 @@ msgstr "bölüm_görüntü_ismi"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Enter email addresses separated by new lines or commas."
+msgid ""
+"Enter email addresses and/or usernames separated by new lines or commas."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -8237,9 +8303,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Email Addresses"
+msgid "Email Addresses/Usernames"
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Auto Enroll"
 msgstr "Otomatik Kayıt"
@@ -8282,13 +8349,23 @@ msgid "Unenroll"
 msgstr "Kaydı iptal et"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Batch Beta Testers"
+msgid "Batch Beta Tester Addition"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Note: Users must have an activated {platform_name} account before they can "
 "be enrolled as a beta tester."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"If this option is <em>checked</em>, users who have not enrolled in your "
+"course will be automatically enrolled."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Checking this box has no effect if 'Remove beta testers' is selected."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -8449,6 +8526,27 @@ msgstr "Grafikleri Yeniden Yükle"
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Count of Students Opened a Subsection"
 msgstr "Bir Altbölüm Açmış Öğrencilerin Sayısı"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Student Opened as a CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Student Grades as a CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "This is a partial list, to view all students download as a csv."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Percent"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -8976,6 +9074,16 @@ msgstr "Satın almak için hiç bir şey seçmediniz."
 #: lms/templates/shoppingcart/receipt.html
 msgid "Register for [Course Name] | Receipt (Order"
 msgstr "Kaydol [Ders Adı] | Fatura (Sipariş"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Thank you for your Purchase!"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid ""
+"Please print this receipt page for your records. You should also have "
+"received a receipt in your email."
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid " () Electronic Receipt"
@@ -10499,10 +10607,6 @@ msgstr ""
 "Bu kontrol listelerinde yaptığınız herhangi bir değişiklik otomatik olarak "
 "kaydedilmekte ve anında diğer ders takım üyeleri tarafından görülebilir hale"
 " getirilmektedir. "
-
-#: cms/templates/component.html
-msgid "Editor"
-msgstr "Editör"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html

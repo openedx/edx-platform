@@ -36,9 +36,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-12 15:40-0400\n"
-"PO-Revision-Date: 2014-04-10 20:30+0000\n"
-"Last-Translator: sarina <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-04-22 09:01-0400\n"
+"PO-Revision-Date: 2014-04-17 10:24+0000\n"
+"Last-Translator: may <may@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -48,6 +48,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
 msgstr ""
@@ -966,9 +967,10 @@ msgid ""
 "beta tester."
 msgstr ""
 
-#. Translators: A list of email addresses appears after this sentence;
+#. Translators: A list of identifiers (which are email addresses and/or
+#. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Could not find users associated with the following email addresses:"
+msgid "Could not find users associated with the following identifiers:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -976,7 +978,7 @@ msgid "Error enrolling/unenrolling users."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "The following email addresses are invalid:"
+msgid "The following email addresses and/or usernames are invalid:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js

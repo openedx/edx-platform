@@ -15,6 +15,7 @@
 # JRolland <julien.rolland33@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # JRolland <julien.rolland33@gmail.com>, 2013
+# laurentFUN <laurent.at.fun@gmail.com>, 2014
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # pchiu <philippe.chiu@gmail.com>, 2013
@@ -41,7 +42,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-12 15:40-0400\n"
+"POT-Creation-Date: 2014-04-22 09:01-0400\n"
 "PO-Revision-Date: 2014-04-10 20:30+0000\n"
 "Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -53,6 +54,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
 msgstr "OK"
@@ -126,17 +128,17 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Hide Answer"
-msgstr ""
+msgstr "Masquer la réponse"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Show Answer"
-msgstr ""
+msgstr "Afficher la réponse"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Reveal Answer"
-msgstr ""
+msgstr "Afficher la réponse"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer hidden"
@@ -954,9 +956,10 @@ msgid ""
 "beta tester."
 msgstr ""
 
-#. Translators: A list of email addresses appears after this sentence;
+#. Translators: A list of identifiers (which are email addresses and/or
+#. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Could not find users associated with the following email addresses:"
+msgid "Could not find users associated with the following identifiers:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -964,7 +967,7 @@ msgid "Error enrolling/unenrolling users."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "The following email addresses are invalid:"
+msgid "The following email addresses and/or usernames are invalid:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js

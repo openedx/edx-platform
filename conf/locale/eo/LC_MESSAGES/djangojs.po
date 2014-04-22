@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-14 10:33-0400\n"
-"PO-Revision-Date: 2014-04-14 14:34:33.758844\n"
+"POT-Creation-Date: 2014-04-22 10:02-0400\n"
+"PO-Revision-Date: 2014-04-22 14:03:27.561369\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -19,6 +19,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
 msgstr "ÖK Ⱡ'#"
@@ -945,20 +946,23 @@ msgstr ""
 "Ûsérs müst çréäté änd äçtïväté théïr äççöünt ßéföré théý çän ßé prömötéd tö "
 "ßétä téstér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#. Translators: A list of email addresses appears after this sentence;
+#. Translators: A list of identifiers (which are email addresses and/or
+#. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Could not find users associated with the following email addresses:"
+msgid "Could not find users associated with the following identifiers:"
 msgstr ""
-"Çöüld nöt fïnd üsérs ässöçïätéd wïth thé föllöwïng émäïl äddréssés: Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕ#"
+"Çöüld nöt fïnd üsérs ässöçïätéd wïth thé föllöwïng ïdéntïfïérs: Ⱡ'σяєм ιρѕυм"
+" ∂σłσя#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "Érrör énröllïng/ünénröllïng üsérs. Ⱡ'σяєм ιρ#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "The following email addresses are invalid:"
-msgstr "Thé föllöwïng émäïl äddréssés äré ïnvälïd: Ⱡ'σяєм ιρѕυ#"
+msgid "The following email addresses and/or usernames are invalid:"
+msgstr ""
+"Thé föllöwïng émäïl äddréssés änd/ör üsérnämés äré ïnvälïd: Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"

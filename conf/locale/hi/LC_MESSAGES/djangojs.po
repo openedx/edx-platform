@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-12 15:40-0400\n"
+"POT-Creation-Date: 2014-04-22 09:01-0400\n"
 "PO-Revision-Date: 2014-04-10 20:30+0000\n"
 "Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -36,6 +36,7 @@ msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
 msgstr "ठीक"
@@ -937,18 +938,19 @@ msgstr ""
 "बीटा परीक्षक के लिए पदोन्नत होने के लिए पहले उपयोगकर्ताओं के खाते को बनाना "
 "और सक्रिय करना ज़रूरी है।"
 
-#. Translators: A list of email addresses appears after this sentence;
+#. Translators: A list of identifiers (which are email addresses and/or
+#. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Could not find users associated with the following email addresses:"
-msgstr "इन ई-मेल पते के साथ जुड़े उपयोगकर्ताओं को खोजा नहीं जा सका:"
+msgid "Could not find users associated with the following identifiers:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "उपयोगकर्ताओं का नामांकन/अनामांकन करने में त्रुटि। "
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "The following email addresses are invalid:"
-msgstr "निम्नलिखित ई-मेल पते अमान्य हैं:"
+msgid "The following email addresses and/or usernames are invalid:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
