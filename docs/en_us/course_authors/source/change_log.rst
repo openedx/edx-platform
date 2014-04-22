@@ -69,12 +69,7 @@ March, 2014
      - Updated the :ref:`Adding Pages to a Course` section to reflect feature
        changes.
    * - 03/27/14
-<<<<<<< HEAD
      - Updated the section on :ref:`Beta_Testing` to include the new "batch add" feature.
-=======
-     - Updated the section on :ref:`Beta_Testing` to include the new "batch add"
-       feature.
->>>>>>> doc for LMS-2525: feature changes for student enrollment
    * - 03/19/14
      - Updated the sections on :ref:`Beta_Testing`, :ref:`Discussions`,
        :ref:`Grades`, and :ref:`Student Data` with changes to the new Instructor Dashboard.
