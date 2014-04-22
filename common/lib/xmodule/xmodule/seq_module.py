@@ -96,7 +96,7 @@ class SequenceModule(SequenceFields, XModule):
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
-                'id': child.scope_ids.usage_id.to_deprecated_string(),  # TODO someone check me on this
+                'id': child.scope_ids.usage_id.to_deprecated_string(),
             }
             if childinfo['title'] == '':
                 childinfo['title'] = child.display_name_with_default

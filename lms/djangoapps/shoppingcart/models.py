@@ -561,7 +561,7 @@ class CertificateItem(OrderItem):
     def single_item_receipt_context(self):
         course = course_from_id(self.course_id)
         return {
-            "course_id" : self.course_id,
+            "course_id": self.course_id,
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,

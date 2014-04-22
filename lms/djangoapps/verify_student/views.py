@@ -122,10 +122,13 @@ class VerifiedView(View):
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == 'verified':
             return redirect(reverse('dashboard'))
         verify_mode = CourseMode.mode_for_course(course_id, "verified")
-        if course_id in request.session.get("donation_for_course", {}):
-            chosen_price = request.session["donation_for_course"][course_id.to_deprecated_string()]
-        else:
-            chosen_price = verify_mode.min_price.format("{:g}")
+        chosen_price = request.session.get(
+            "donation_for_course",
+            {}
+        ).get(
+            course_id.to_deprecated_string(),
+            verify_mode.min_price.format("{:g}")
+        )
 
         course = course_from_id(course_id)
         context = {

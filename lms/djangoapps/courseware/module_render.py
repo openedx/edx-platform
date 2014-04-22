@@ -463,7 +463,7 @@ def find_target_student_module(request, user_id, course_id, mod_id):
     Retrieve target StudentModule
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    usage_key = UsageKey.from_string(mod_id)
+    usage_key = course_id.make_usage_key_from_deprecated_string(mod_id)
     user = User.objects.get(id=user_id)
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
