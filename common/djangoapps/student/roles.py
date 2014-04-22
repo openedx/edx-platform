@@ -109,7 +109,7 @@ class GroupBasedRole(AccessRole):
         # silently ignores anonymous and inactive users so that any that are
         # legit get updated.
         for user in users:
-            if user.is_authenticated and user.is_active:
+            if user.is_authenticated and user.is_active and not self.has_user(user):
                 entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
                 entry.save()
                 if hasattr(user, '_roles'):
