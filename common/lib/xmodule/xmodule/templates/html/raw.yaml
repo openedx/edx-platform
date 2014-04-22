@@ -1,0 +1,6 @@
+---
+metadata:
+    display_name: Raw HTML
+    editor: raw
+data: |
+      <p>For use with complex HTML, to allow complete control over the final product.</p>
