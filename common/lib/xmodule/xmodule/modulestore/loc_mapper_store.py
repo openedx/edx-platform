@@ -206,7 +206,11 @@ class LocMapperStore(object):
         :param locator: a BlockUsageLocator
         """
         if get_course:
-            cached_value = self._get_course_location_from_cache(locator.course_key, lower_only)
+            cached_value = self._get_course_location_from_cache(
+                # if locator is already a course_key it won't have course_key attr
+                getattr(locator, 'course_key', locator),
+                lower_only
+            )
         else:
             cached_value = self._get_location_from_cache(locator)
         if cached_value:
