@@ -5,18 +5,16 @@ Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/tests/test_group_views.py]
 """
 from random import randint
-import unittest
 import uuid
 import json
 
-from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
 from api_manager.models import GroupRelationship
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -119,6 +117,21 @@ class GroupsApiTests(TestCase):
         self.assertGreater(response.data['id'], 0)
         group_id = response.data['id']
 
+        # query for list of groups, but don't put the type filter (bad)
+        test_uri = self.base_groups_uri
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 400)
+
+        # try again with filter
+        test_uri = self.base_groups_uri + '?type=series'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['group_id'], group_id)
+        self.assertEqual(response.data[0]['group_type'], 'series')
+        self.assertEqual(response.data[0]['data']['display_name'], 'My first series')
+
+        # query the group detail
         test_uri = self.base_groups_uri + '/' + str(group_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -127,7 +140,35 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['name'], self.test_group_name)
         self.assertEqual(response.data['group_type'], 'series')
-        self.assertEqual(response.data['data']['display_name'],'My first series')
+        self.assertEqual(response.data['data']['display_name'], 'My first series')
+
+        # update the profile
+
+        # first with missing data
+        response = self.do_post(test_uri, {})
+        self.assertEqual(response.status_code, 400)
+
+        data = {
+            'name': self.test_group_name,
+            'group_type': 'seriesX',
+            'data': json.dumps({'display_name': 'My updated series'})
+        }
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+
+        # requery the filter
+        test_uri = self.base_groups_uri + '?type=series'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+        test_uri = self.base_groups_uri + '?type=seriesX'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['group_id'], group_id)
+        self.assertEqual(response.data[0]['group_type'], 'seriesX')
+        self.assertEqual(response.data[0]['data']['display_name'], 'My updated series')
 
     def test_group_detail_get_undefined(self):
         test_uri = self.base_groups_uri + '/123456789'
