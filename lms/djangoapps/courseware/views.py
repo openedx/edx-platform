@@ -253,21 +253,21 @@ def index(request, course_id, chapter=None, section=None,
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.url())
-        return redirect(reverse('about_course', args=[course.id.to_deprecated_string()]))
+        return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
 
     masq = setup_masquerade(request, staff_access)
 
     try:
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course.id, user, course, depth=2)
+            course_key, user, course, depth=2)
 
-        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
+        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course_key)
         if course_module is None:
             log.warning(u'If you see this, something went wrong: if we got this'
                         u' far, should have gotten a course module for this user')
-            return redirect(reverse('about_course', args=[course.id.to_deprecated_string()]))
+            return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
 
-        studio_url = get_studio_url(course_id, 'course')
+        studio_url = get_studio_url(course_key, 'course')
 
         if chapter is None:
             return redirect_to_course_position(course_module)
@@ -350,7 +350,7 @@ def index(request, course_id, chapter=None, section=None,
             context['section_title'] = section_descriptor.display_name_with_default
         else:
             # section is none, so display a message
-            studio_url = get_studio_url(course_id, 'course')
+            studio_url = get_studio_url(course_key, 'course')
             prev_section = get_current_child(chapter_module)
             if prev_section is None:
                 # Something went wrong -- perhaps this chapter has no sections visible to the user

@@ -367,6 +367,7 @@ def get_studio_url(course_key, page):
     """
     Get the Studio URL of the page that is passed in.
     """
+    assert(isinstance(course_key, CourseKey))
     course = get_course_by_id(course_key)
     is_studio_course = course.course_edit_method == "Studio"
     is_mongo_course = modulestore().get_modulestore_type(course_key) == MONGO_MODULESTORE_TYPE

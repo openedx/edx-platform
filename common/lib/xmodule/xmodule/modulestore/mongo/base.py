@@ -590,6 +590,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         specified, returns the latest.  If the item is not present, raise
         ItemNotFoundError.
         '''
+        assert isinstance(location, Location)
         item = self.collection.find_one(
             {'_id': location_to_son(location)},
             sort=[('revision', pymongo.ASCENDING)],
