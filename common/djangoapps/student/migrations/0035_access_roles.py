@@ -29,6 +29,7 @@ class Migration(DataMigration):
         # course only once. The below datastructures help ensure that.
         hold = {}
         done = set()
+        orgs = {}
         query = Q(name__startswith='course_creator_group')
         for role in ['staff', 'instructor', 'beta_testers', ]:
             query = query | Q(name__startswith=role)
@@ -39,7 +40,7 @@ class Migration(DataMigration):
             if parsed_entry.group('role_id') == 'course_creator_group':
                 for user in orm['auth.user'].objects.filter(groups=group).all():
                     entry = orm['student.courseaccessrole'](role=parsed_entry.group('role_id'), user=user)
-                entry.save()
+                    entry.save()
             else:
                 course_id_string = parsed_entry.group('course_id_string')
                 try:
@@ -56,6 +57,7 @@ class Migration(DataMigration):
                             entry.save()
                         done.add(course_key)
                         done.add(correct_course_key)
+                        orgs[course_key.org] = correct_course_key.org
                 except InvalidKeyError:
                     # not the slashed version
                     if course_id_string not in done:
@@ -64,18 +66,28 @@ class Migration(DataMigration):
         # see if any in hold ere missed above
         for not_ssck, group in hold.iteritems():
             if not_ssck not in done:
-                # should this just log or really make an effort to do the conversion?
-                log.warn("Didn't convert role %s", group.name)
+                if not_ssck in orgs:
+                    # they have org permission
+                    for user in orm['auth.user'].objects.filter(groups=group).all():
+                        entry = orm['student.courseaccessrole'](
+                            role=parsed_entry.group('role_id'), user=user,
+                            org=orgs[not_ssck],
+                        )
+                        entry.save()
+                else:
+                    # should this just log or really make an effort to do the conversion?
+                    log.warn("Didn't convert role %s", group.name)
 
     def backwards(self, orm):
         "Write your backwards methods here."
         # Since this migration is non-destructive (monotonically adds information), I'm not sure what
         # the semantic of backwards should be other than perhaps clearing the table.
-        orm['student.courseaccessrole'].delete()
+        orm['student.courseaccessrole'].objects.all().delete()
 
     def _map_downcased_ssck(self, downcased_ssck, loc_map_collection, done):
         """
-        Get the normal cased version of this downcased slash sep course key
+        Get the normal cased version of this downcased slash sep course key and add
+        the lowercased locator form to done map
         """
         # given the regex, the son may be an overkill
         course_son = bson.son.SON([
