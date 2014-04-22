@@ -198,7 +198,7 @@
   % if duplicate_provider:
     <section class="dashboard-banner third-party-auth">
       ## Translators: this message is displayed when a user tries to link their account with a third-party authentication provider (for example, Google or LinkedIn) with a given edX account, but their third-party account is already associated with another edX account. provider_name is the name of the third-party authentication provider, and platform_name is the name of the edX deployment.
-      ${_('The selected {provider_name} account is already linked to another {platform_name} account. Please <a href="{logout_url}">log out</a>, then log in with your {provider_name} account.').format(provider_name='<strong>%s</strong>' % duplicate_provider.NAME, platform_name=platform_name, logout_url=logout_url)}
+      ${_('The selected {provider_name} account is already linked to another {platform_name} account. Please {link_start}log out{link_end}, then log in with your {provider_name} account.').format(link_end='</a>', link_start='<a href="%s">' % logout_url, provider_name='<strong>%s</strong>' % duplicate_provider.NAME, platform_name=platform_name)}
     </section>
   % endif
 
