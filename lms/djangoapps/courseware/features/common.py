@@ -128,11 +128,11 @@ def course_id(course_num):
 
 
 def course_location(course_num):
-    return world.scenario_dict['COURSE'].location._replace(course=course_num)
+    return world.scenario_dict['COURSE'].location.replace(course=course_num)
 
 
 def section_location(course_num):
-    return world.scenario_dict['SECTION'].location._replace(course=course_num)
+    return world.scenario_dict['SECTION'].location.replace(course=course_num)
 
 
 def visit_scenario_item(item_key):
