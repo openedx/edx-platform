@@ -1,5 +1,6 @@
 import re
 from xmodule.contentstore.content import StaticContent
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 import logging
 
@@ -63,8 +64,8 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     except Exception as e:
         logging.warning("Error going regex substitution %r on text = %r.\n\nError msg = %s", c4x_link_base, text, str(e))
 
-    jump_to_link_base = u'/courses/{course_key:s}/jump_to/i4x://{course_key.org}/{course_key.course}/'.format(
-        course_key=source_course_id
+    jump_to_link_base = u'/courses/{course_key_string}/jump_to/i4x://{course_key.org}/{course_key.course}/'.format(
+        course_key_string=source_course_id.to_deprecated_string(), course_key=source_course_id
     )
     try:
         text = re.sub(_prefix_and_category_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
@@ -105,7 +106,7 @@ def _clone_modules(modulestore, modules, source_course_id, dest_course_id):
             for child_loc_url in module.children:
                 child_loc = original_loc.course_key.make_usage_key_from_deprecated_string(child_loc_url)
                 child_loc = child_loc.map_into_course(dest_course_id)
-                new_children.append(child_loc.url())
+                new_children.append(child_loc)
 
             module.children = new_children
 

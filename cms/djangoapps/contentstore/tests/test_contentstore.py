@@ -16,6 +16,7 @@ from json import loads
 from datetime import timedelta
 from django.test import TestCase
 
+
 from django.contrib.auth.models import User
 from contentstore.utils import get_modulestore
 from contentstore.tests.utils import parse_json, AjaxEnabledTestClient
@@ -163,7 +164,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         _, course_items = import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
 
         items = modulestore().get_items(course_items[0].id.make_usage_key('vertical', None))
-        self._check_verticals(items, course_items[0].id)
+        self._check_verticals(items)
 
     def _lock_an_asset(self, content_store, course_id):
         """
@@ -654,7 +655,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         for child in vertical.get_children():
             draft_store.convert_to_draft(child.location)
 
-        items = module_store.get_items(source_course_id, qualifiers={'version': 'draft'})
+        items = module_store.get_items(source_course_id, revision='draft')
         self.assertGreater(len(items), 0)
 
         _create_course(self, dest_course_id, course_data)
@@ -665,17 +666,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         clone_course(module_store, content_store, source_course_id, dest_course_id)
 
         # first assert that all draft content got cloned as well
-        items = module_store.get_items(source_course_id, qualifiers={'version': 'draft'})
+        items = module_store.get_items(source_course_id, revision='draft')
         self.assertGreater(len(items), 0)
-        clone_items = module_store.get_items(dest_course_id, qualifiers={'version': 'draft'})
+        clone_items = module_store.get_items(dest_course_id, revision='draft')
         self.assertGreater(len(clone_items), 0)
         self.assertEqual(len(items), len(clone_items))
 
         # now loop through all the units in the course and verify that the clone can render them, which
         # means the objects are at least present
-        items = module_store.get_items(source_course_id, qualifiers={'version': None})
+        items = module_store.get_items(source_course_id, revision=None)
         self.assertGreater(len(items), 0)
-        clone_items = module_store.get_items(dest_course_id, qualifiers={'version': None})
+        clone_items = module_store.get_items(dest_course_id, revision=None)
         self.assertGreater(len(clone_items), 0)
 
         for descriptor in items:
@@ -936,8 +937,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             target_course_id=course_id,
         )
 
-        items = module_store.get_items(course_id, qualifiers={'category': 'vertical'})
-        self._check_verticals(items, course_id)
+        items = module_store.get_items(course_id, kwargs={'category': 'vertical'})
+        self._check_verticals(items)
 
         # verify that we have the content in the draft store as well
         vertical = draft_store.get_item(
@@ -1173,11 +1174,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         items = module_store.get_items(
             course_id,
-            qualifiers={'category': 'sequential', 'name': 'vertical_sequential'}
+            category='sequential',
+            name='vertical_sequential'
         )
         self.assertEqual(len(items), 1)
 
-    def _check_verticals(self, items, course_id):
+    def _check_verticals(self, items):
         """ Test getting the editing HTML for each vertical. """
         # Assert is here to make sure that the course being tested actually has verticals (units) to check.
         self.assertGreater(len(items), 0)
