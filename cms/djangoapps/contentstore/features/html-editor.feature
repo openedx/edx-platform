@@ -5,7 +5,7 @@ Feature: CMS.HTML Editor
   Scenario: User can view metadata
     Given I have created a Blank HTML Page
     And I edit and select Settings
-    Then I see only the HTML display name setting
+    Then I see the HTML component settings
 
   # Safari doesn't save the name properly
   @skip_safari
