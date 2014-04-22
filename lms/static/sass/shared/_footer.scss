@@ -31,7 +31,7 @@
       @include transition(link-color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
       border-bottom: none;
       color: $link-color;
-      text-decoration: none !important;
+      text-decoration: none;
 
       &:hover, &:focus, &:active {
         border-bottom: 1px dotted $link-color;

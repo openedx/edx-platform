@@ -46,12 +46,12 @@
     }
 
     tr.always-gray{
-      background: #eee !important;
+      background: #eee;
       border-top: 2px solid $white;
     }
 
     tr.always-white {
-      background: $white !important;
+      background: $white;
 
       td {
         padding: ($baseline*1.5) 0 ($baseline/2);
@@ -187,7 +187,7 @@
         padding-bottom: ($baseline/2);
 
         span.old-price {
-          text-decoration: line-through !important;
+          text-decoration: line-through;
         }
       }
     }
