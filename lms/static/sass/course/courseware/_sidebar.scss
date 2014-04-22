@@ -69,7 +69,7 @@
     }
 
     .chapter {
-      width: 100% !important;
+      width: 100%;
       @include box-sizing(border-box);
       padding: 11px 14px;
       @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
