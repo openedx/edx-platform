@@ -328,28 +328,37 @@ def group_groups_detail(request, group_id, related_group_id):
         return Response({}, status=response_status)
 
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @permission_classes((ApiKeyHeaderPermission,))
 def group_courses_list(request, group_id):
     """
+    GET returns all courses that has a relationship to the group
     POST creates a new group-course relationship in the system
     """
     response_data = {}
-    group_id = group_id
-    course_id = request.DATA['course_id']
-    base_uri = _generate_base_uri(request)
-    response_data['uri'] = '{}/{}'.format(base_uri, course_id)
-    store = modulestore()
+
     try:
         existing_group = Group.objects.get(id=group_id)
     except ObjectDoesNotExist:
-        existing_group = None
-    try:
-        existing_course = store.get_course(course_id)
-    except ValueError:
-        existing_course = None
+        return Response({}, status.HTTP_404_NOT_FOUND)
 
-    if existing_group and existing_course:
+    if request.method == 'GET':
+        members = CourseGroupRelationship.objects.filter(group=existing_group)
+        response_data['courses'] = []
+        for member in members:
+            response_data['courses'].append(member.course_id)
+        response_status = status.HTTP_200_OK
+    else:
+        course_id = request.DATA['course_id']
+
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = '{}/{}'.format(base_uri, course_id)
+        store = modulestore()
+
+        existing_course = store.get_course(course_id)
+        if not existing_course:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+
         try:
             existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
         except ObjectDoesNotExist:
@@ -363,8 +372,7 @@ def group_courses_list(request, group_id):
         else:
             response_data['message'] = "Relationship already exists."
             response_status = status.HTTP_409_CONFLICT
-    else:
-        response_status = status.HTTP_404_NOT_FOUND
+
     return Response(response_data, status=response_status)
 
 
