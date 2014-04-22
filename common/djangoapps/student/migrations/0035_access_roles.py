@@ -100,8 +100,12 @@ class Migration(DataMigration):
             # cache that the dotted form is done too
             if 'lower_course_id' in entry:
                 done.add(entry['lower_course_id'])
-            else:
+            elif 'course_id' in entry:
+                done.add(entry['course_id'].lower())
+            elif 'lower_org' in entry:
                 done.add('{}.{}'.format(entry['lower_org'], entry['lower_offering']))
+            else:
+                done.add('{}.{}'.format(entry['org'].lower(), entry['offering'].lower()))
             return SlashSeparatedCourseKey(*entry['_id'].values())
         else:
             return None
