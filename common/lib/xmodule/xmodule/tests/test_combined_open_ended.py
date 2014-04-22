@@ -513,6 +513,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock(data=full_definition)
     test_system = get_test_system()
     test_system.open_ended_grading_interface = None
+    usage_key = test_system.course_id.make_usage_key('combinedopenended', 'test_loc')
+    # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
+    scope_ids = ScopeIds(1, 'combinedopenended', usage_key, usage_key)
     combinedoe_container = CombinedOpenEndedModule(
         descriptor=descriptor,
         runtime=test_system,
@@ -520,7 +523,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             'data': full_definition,
             'weight': '1',
         }),
-        scope_ids=ScopeIds(None, None, None, None),
+        scope_ids=scope_ids,
     )
 
     def setUp(self):
@@ -866,6 +869,9 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
     descriptor = Mock(data=full_definition)
     test_system = get_test_system()
     test_system.open_ended_grading_interface = None
+    usage_key = test_system.course_id.make_usage_key('combinedopenended', 'test_loc')
+    # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
+    scope_ids = ScopeIds(1, 'combinedopenended', usage_key, usage_key)
     combinedoe_container = CombinedOpenEndedModule(
         descriptor=descriptor,
         runtime=test_system,
@@ -873,7 +879,7 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
             'data': full_definition,
             'weight': '1',
         }),
-        scope_ids=ScopeIds(None, None, None, None),
+        scope_ids=scope_ids,
     )
 
     def setUp(self):
