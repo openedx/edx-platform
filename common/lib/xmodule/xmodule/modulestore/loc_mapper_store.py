@@ -533,7 +533,7 @@ class LocMapperStore(object):
         Remove: course_id, lower_course_id
         :param entry:
         """
-        if not hasattr(entry['_id'], 'name'):
+        if 'name' not in entry['_id']:
             entry_id = entry['_id']
             entry_id = bson.son.SON([
                 ('org', entry_id['org']),
@@ -546,11 +546,11 @@ class LocMapperStore(object):
         entry['schema'] = 0
         entry.pop('course_id', None)
         entry.pop('lower_course_id', None)
-        old_course_id = SlashSeparatedCourseKey.from_deprecated_string(entry['_id'])
+        old_course_id = SlashSeparatedCourseKey(entry['_id']['org'], entry['_id']['course'], entry['_id']['name'])
         entry['org'] = old_course_id.org
         entry['lower_org'] = old_course_id.org.lower()
-        entry['offering'] = old_course_id.offering
-        entry['lower_offering'] = old_course_id.offering.lower()
-        self._migrate_1(entry, True)
+        entry['offering'] = old_course_id.offering.replace('/', '+')
+        entry['lower_offering'] = entry['offering'].lower()
+        return self._migrate_1(entry, True)
 
     _migrate = [_migrate_0, _migrate_1]

@@ -7,7 +7,7 @@ BLOCK_PREFIX = r"block/"
 # Prefix for the version portion of a locator URL, when it is preceded by a course ID
 VERSION_PREFIX = r"version/"
 
-ALLOWED_ID_CHARS = r'[\w\-~.:]'
+ALLOWED_ID_CHARS = r'[\w\-~.:+]'
 ALLOWED_ID_RE = re.compile(r'^' + ALLOWED_ID_CHARS + '+$', re.UNICODE)
 
 # NOTE: if we need to support period in place of +, make it aggressive (take the first period in the string)
