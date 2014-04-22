@@ -148,6 +148,7 @@ def correct_video_settings(_step):
         ['Transcript Display', 'True', False],
         ['Transcript Download Allowed', 'False', False],
         ['Transcript Translations', '', False],
+        ['Upload Handout', '', False],
         ['Video Download Allowed', 'False', False],
         ['Video Sources', '', False],
         ['Youtube ID', 'OEoXaMPEzfM', False],

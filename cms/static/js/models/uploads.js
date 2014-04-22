@@ -47,7 +47,8 @@ var FileUpload = Backbone.Model.extend({
                 return  RegExp(('(?:.+)\\.(' + formats.join('|') + ')$'), 'i');
             };
 
-        return _.contains(attrs.mimeTypes, file.type) ||
+        return (attrs.mimeTypes.length === 0 && attrs.fileFormats.length === 0) ||
+                _.contains(attrs.mimeTypes, file.type) ||
                 getRegExp(attrs.fileFormats).test(file.name);
     },
     // Return strings for the valid file types and extensions this

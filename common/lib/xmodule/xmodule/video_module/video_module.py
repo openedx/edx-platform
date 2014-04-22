@@ -143,6 +143,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             'data_dir': getattr(self, 'data_dir', None),
             'display_name': self.display_name_with_default,
             'end': self.end_time.total_seconds(),
+            'handout': self.handout,
             'id': self.location.html_id(),
             'show_captions': json.dumps(self.show_captions),
             'sources': sources,
@@ -248,6 +249,8 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         editable_fields['transcripts']['languages'] = languages
         editable_fields['transcripts']['type'] = 'VideoTranslations'
         editable_fields['transcripts']['urlRoot'] = self.runtime.handler_url(self, 'studio_transcript', 'translation').rstrip('/?')
+        editable_fields['handout']['type'] = 'FileUploader'
+
         return editable_fields
 
     @classmethod
@@ -318,6 +321,11 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         if self.track:
             ele = etree.Element('track')
             ele.set('src', self.track)
+            xml.append(ele)
+
+        if self.handout:
+            ele = etree.Element('handout')
+            ele.set('src', self.handout)
             xml.append(ele)
 
         # sorting for easy testing of resulting xml
@@ -421,6 +429,10 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         track = xml.find('track')
         if track is not None:
             field_data['track'] = track.get('src')
+
+        handout = xml.find('handout')
+        if handout is not None:
+            field_data['handout'] = handout.get('src')
 
         transcripts = xml.findall('transcript')
         if transcripts:

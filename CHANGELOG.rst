@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Add an upload button for authors to provide students with an option to
+download a handout associated with a video (of arbitrary file format). BLD-1000.
+
 Blades: Show the HD button only if there is an HD version available. BLD-937.
 
 Studio: Add edit button to leaf xblocks on the container page. STUD-1306.
