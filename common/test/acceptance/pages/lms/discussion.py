@@ -231,3 +231,76 @@ class InlineDiscussionThreadPage(DiscussionThreadPage):
             "Thread expanded"
         ).fulfill()
 
+
+class DiscussionUserProfilePage(CoursePage):
+
+    TEXT_NEXT = u'Next >'
+    TEXT_PREV = u'< Previous'
+    PAGING_SELECTOR = "a.discussion-pagination[data-page-number]"
+
+    def __init__(self, browser, course_id, user_id, username, page=1):
+        super(DiscussionUserProfilePage, self).__init__(browser, course_id)
+        self.url_path = "discussion/forum/dummy/users/{}?page={}".format(user_id, page)
+        self.username = username
+
+    def is_browser_on_page(self):
+        return (
+            self.q(css='section.discussion-user-threads[data-course-id="{}"]'.format(self.course_id)).present
+            and
+            self.q(css='section.user-profile div.sidebar-username').present
+            and
+            self.q(css='section.user-profile div.sidebar-username').text[0] == self.username
+        )
+
+    def get_shown_thread_ids(self):
+        elems = self.q(css="article.discussion-thread")
+        return [elem.get_attribute("id")[7:] for elem in elems]
+
+    def get_current_page(self):
+        return int(self.q(css="nav.discussion-paginator li.current-page").text[0])
+
+    def _check_pager(self, text, page_number=None):
+        """
+        returns True if 'text' matches the text in any of the pagination elements.  If
+        page_number is provided, only return True if the element points to that result
+        page.
+        """
+        elems = self.q(css=self.PAGING_SELECTOR).filter(lambda elem: elem.text == text)
+        if page_number:
+            elems = elems.filter(lambda elem: int(elem.get_attribute('data-page-number')) == page_number)
+        return elems.present
+
+    def get_clickable_pages(self):
+        return sorted([
+            int(elem.get_attribute('data-page-number'))
+            for elem in self.q(css=self.PAGING_SELECTOR)
+            if str(elem.text).isdigit()
+        ])
+
+    def is_prev_button_shown(self, page_number=None):
+        return self._check_pager(self.TEXT_PREV, page_number)
+
+    def is_next_button_shown(self, page_number=None):
+        return self._check_pager(self.TEXT_NEXT, page_number)
+
+    def _click_pager_with_text(self, text, page_number):
+        """
+        click the first pagination element with whose text is `text` and ensure
+        the resulting page number matches `page_number`.
+        """
+        targets = [elem for elem in self.q(css=self.PAGING_SELECTOR) if elem.text == text]
+        targets[0].click()
+        EmptyPromise(
+            lambda: self.get_current_page() == page_number,
+            "navigated to desired page"
+        ).fulfill()
+
+    def click_prev_page(self):
+        self._click_pager_with_text(self.TEXT_PREV, self.get_current_page() - 1)
+
+    def click_next_page(self):
+        self._click_pager_with_text(self.TEXT_NEXT, self.get_current_page() + 1)
+
+    def click_on_page(self, page_number):
+        self._click_pager_with_text(unicode(page_number), page_number)
+
