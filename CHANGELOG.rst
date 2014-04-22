@@ -10,6 +10,9 @@ Blades: Set initial video quality to large instead of default to avoid automatic
 Blades: Add an upload button for authors to provide students with an option to
 download a handout associated with a video (of arbitrary file format). BLD-1000.
 
+Studio: Add "raw HTML" editor so that authors can write HTML that will not be
+changed in any way. STUD-1562
+
 Blades: Show the HD button only if there is an HD version available. BLD-937.
 
 Studio: Add edit button to leaf xblocks on the container page. STUD-1306.
