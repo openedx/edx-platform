@@ -17,5 +17,6 @@ urlpatterns = patterns(
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/static_tabs/(?P<tab_id>[a-zA-Z0-9/_:]+)$', 'static_tab_detail'),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/static_tabs$', 'static_tabs_list'),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/users$', 'course_users_list'),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/tree/(?P<depth>[0-9]+)$', 'course_tree'),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)$', 'courses_detail'),
 )

@@ -170,6 +170,36 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
+    def test_course_tree_get(self):
+        # query the course tree to quickly get naviation information
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/tree/2'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        self.assertEqual(response.data['category'], 'course')
+        self.assertEqual(response.data['name'], self.course.display_name)
+        self.assertEqual(len(response.data['modules']), 1)
+
+        chapter = response.data['modules'][0]
+        self.assertEqual(chapter['category'], 'chapter')
+        self.assertEqual(chapter['name'], 'Overview')
+        self.assertEqual(len(chapter['modules']), 1)
+
+        sequence = chapter['modules'][0]
+        self.assertEqual(sequence['category'], 'videosequence')
+        self.assertEqual(sequence['name'], 'Video_Sequence')
+        self.assertNotIn('modules', sequence)
+
+    def test_course_tree_get_root(self):
+        # query the course tree to quickly get naviation information
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/tree/0'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        self.assertEqual(response.data['category'], 'course')
+        self.assertEqual(response.data['name'], self.course.display_name)
+        self.assertNotIn('modules', response.data)
+
     def test_chapter_list_get(self):
         test_uri = self.base_chapters_uri
         response = self.do_get(test_uri)
