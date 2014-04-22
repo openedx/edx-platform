@@ -184,6 +184,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     for childloc in definition.get('children', [])
                 ]
                 data = definition.get('data', {})
+                if isinstance(data, basestring):
+                    data = {'data': data}
                 mixed_class = self.mixologist.mix(class_)
                 data = self._convert_reference_fields(mixed_class, location.course_key, data)
                 metadata = self._convert_reference_fields(mixed_class, location.course_key, metadata)
