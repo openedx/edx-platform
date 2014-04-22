@@ -801,7 +801,7 @@ main_vendor_js = [
     'js/vendor/ova/vjs.youtube.js',
     'js/vendor/ova/rangeslider.js',
     'js/vendor/ova/share-annotator.js',
-    'js/vendor/ova/tinymce.full.min.js',
+    'js/vendor/ova/tinymce.min.js',
     'js/vendor/ova/richText-annotator.js',
     'js/vendor/ova/reply-annotator.js',
     'js/vendor/ova/tags-annotator.js',
