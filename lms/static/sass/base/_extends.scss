@@ -89,15 +89,15 @@
 
 // needed utility extend for resetting poor basic <button> elem styling
 %ui-reset-button  {
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  text-shadow: none !important;
-  letter-spacing: 0 !important;
-  text-transform: none !important;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  text-shadow: none;
+  letter-spacing: 0;
+  text-transform: none;
 
   &:focus {
-    // outline: thin dotted !important;
+    // outline: thin dotted;
   }
 }
 
