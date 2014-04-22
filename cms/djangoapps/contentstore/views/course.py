@@ -292,55 +292,31 @@ def create_new_course(request):
 
     try:
         course_key = SlashSeparatedCourseKey(org, number, run)
-    except InvalidLocationError as error:
-        return JsonResponse({
-            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(
-                name=display_name, err=error.message)})
 
-    # see if the course already exists
-    existing_course_exists = False
-    try:
-        existing_course_exists = modulestore('direct').has_course(course_key, ignore_case=True)
-    except InsufficientSpecificationError:
-        pass
-    except InvalidKeyError as error:
-        return JsonResponse({
-            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(
-                name=display_name, err=error.message)})
+        # see if the course already exists
+        existing_course_exists = False
+        try:
+            existing_course_exists = modulestore('direct').has_course(course_key, ignore_case=True)
+        except InsufficientSpecificationError:
+            pass
 
-    if existing_course_exists:
-        return JsonResponse({
-            'ErrMsg': _(
-                'There is already a course defined with the same '
-                'organization, course number, and course run. Please '
-                'change either organization or course number to be '
-                'unique.'
-            ),
-            'OrgErrMsg': _(
-                'Please change either the organization or '
-                'course number so that it is unique.'
-            ),
-            'CourseErrMsg': _(
-                'Please change either the organization or '
-                'course number so that it is unique.'
-            ),
-        })
+        if existing_course_exists:
+            raise InvalidLocationError()
 
-    # instantiate the CourseDescriptor and then persist it
-    # note: no system to pass
-    if display_name is None:
-        metadata = {}
-    else:
-        metadata = {'display_name': display_name}
+        # instantiate the CourseDescriptor and then persist it
+        # note: no system to pass
+        if display_name is None:
+            metadata = {}
+        else:
+            metadata = {'display_name': display_name}
 
-    # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
-    # existing xml courses this cannot be changed in CourseDescriptor.
-    ## TODO get rid of defining wiki slug in this org/course/run specific way
-    wiki_slug = u"{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.run)
-    definition_data = {'wiki_slug': wiki_slug}
+        # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
+        # existing xml courses this cannot be changed in CourseDescriptor.
+        ## TODO get rid of defining wiki slug in this org/course/run specific way
+        wiki_slug = u"{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.run)
+        definition_data = {'wiki_slug': wiki_slug}
 
-    # Create the course then fetch it from the modulestore
-    try:
+        # Create the course then fetch it from the modulestore
         # Check if role permissions group for a course named like this already exists
         # Important because role groups are case insensitive
         if CourseRole.course_group_already_exists(course_key):
@@ -356,12 +332,48 @@ def create_new_course(request):
             course_key.offering,
             fields=fields,
         )
+
+        new_course = modulestore('direct').get_course(course_key)
+
+        # clone a default 'about' overview module as well
+        dest_about_location = new_course.location.replace(
+            category='about',
+            name='overview'
+        )
+        overview_template = AboutDescriptor.get_template('overview.yaml')
+        modulestore('direct').create_and_save_xmodule(
+            dest_about_location,
+            system=new_course.system,
+            definition_data=overview_template.get('data')
+        )
+
+        # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
+        # however, we can assume that b/c this user had authority to create the course, the user can add themselves
+        CourseInstructorRole(new_course.id).add_users(request.user)
+        auth.add_users(request.user, CourseStaffRole(new_course.id), request.user)
+
+        # seed the forums
+        seed_permissions_roles(new_course.id)
+
+        # auto-enroll the course creator in the course so that "View Live" will
+        # work.
+        CourseEnrollment.enroll(request.user, new_course.id)
+        _users_assign_default_role(new_course.id)
+
+        return JsonResponse({
+            'url': reverse(
+                'contentstore.views.course_handler',
+                kwargs={'course_key_string': unicode(new_course.id)}
+            )}
+        )
+
     except InvalidLocationError:
         return JsonResponse({
             'ErrMsg': _(
                 'There is already a course defined with the same '
-                'organization and course number. Please '
-                'change at least one field to be unique.'),
+                'organization, course number, and course run. Please '
+                'change either organization or course number to be unique.'
+            ),
             'OrgErrMsg': _(
                 'Please change either the organization or '
                 'course number so that it is unique.'),
@@ -369,41 +381,10 @@ def create_new_course(request):
                 'Please change either the organization or '
                 'course number so that it is unique.'),
         })
-
-    new_course = modulestore('direct').get_course(course_key)
-
-    # clone a default 'about' overview module as well
-    dest_about_location = new_course.location.replace(
-        category='about',
-        name='overview'
-    )
-    overview_template = AboutDescriptor.get_template('overview.yaml')
-    modulestore('direct').create_and_save_xmodule(
-        dest_about_location,
-        system=new_course.system,
-        definition_data=overview_template.get('data')
-    )
-
-
-    # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
-    # however, we can assume that b/c this user had authority to create the course, the user can add themselves
-    CourseInstructorRole(new_course.id).add_users(request.user)
-    auth.add_users(request.user, CourseStaffRole(new_course.id), request.user)
-
-    # seed the forums
-    seed_permissions_roles(new_course.id)
-
-    # auto-enroll the course creator in the course so that "View Live" will
-    # work.
-    CourseEnrollment.enroll(request.user, new_course.id)
-    _users_assign_default_role(new_course.id)
-
-    return JsonResponse({
-        'url': reverse(
-            'contentstore.views.course_handler',
-            kwargs={'course_key_string': unicode(new_course.id)}
-        )}
-    )
+    except InvalidKeyError as error:
+        return JsonResponse({
+            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=error.message)}
+        )
 
 
 def _users_assign_default_role(course_id):

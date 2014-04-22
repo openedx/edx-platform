@@ -16,6 +16,7 @@ import pymongo
 import sys
 import logging
 import copy
+import re
 
 from bson.son import SON
 from fs.osfs import OSFS
@@ -618,7 +619,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         course_query = self._course_key_to_son(course_key)
         if ignore_case:
             for key in course_query.iterkeys():
-                course_query[key] = r"(?i)^{}$".format(course_query[key])
+                course_query[key] = re.compile(r"(?i)^{}$".format(course_query[key]))
         return self.collection.find_one(course_query, fields={'_id': True}) is not None
 
     def has_item(self, usage_key):

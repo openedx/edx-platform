@@ -759,7 +759,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertRaises(InvalidVersionError, draft_store.unpublish, location)
 
     def test_bad_contentstore_request(self):
-        resp = self.client.get_html('http://localhost:8001/c4x/CDX/123123/asset/images_circuits_Lab7Solution2.png')
+        resp = self.client.get_html('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
         self.assertEqual(resp.status_code, 400)
         _test_no_locations(self, resp, 400)
 
@@ -890,7 +890,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # check for about content
         self.verify_content_existence(module_store, root_dir, course_id, 'about', 'about', '.html')
 
-        # check for graiding_policy.json
+        # check for grading_policy.json
         filesystem = OSFS(root_dir / 'test_export/policies/2012_Fall')
         self.assertTrue(filesystem.exists('grading_policy.json'))
 
@@ -1328,7 +1328,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.course_data['display_name'] = 'Robot Super Course Two'
         self.course_data['run'] = '2013_Summer'
 
-        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
 
     def test_create_course_case_change(self):
         """Test new course creation - error path due to case insensitive name equality"""
@@ -1336,15 +1336,13 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.client.ajax_post('/course/', self.course_data)
         cache_current = self.course_data['org']
         self.course_data['org'] = self.course_data['org'].lower()
-        # NAA TODO - Are we no longer case sensitive in our comparison of orgs?
-        # TODO - Need information from product on whether higher layers (no longer Roles) should enforce this.
-        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
         self.course_data['org'] = cache_current
 
         self.client.ajax_post('/course/', self.course_data)
         cache_current = self.course_data['number']
         self.course_data['number'] = self.course_data['number'].upper()
-        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
 
     def test_course_substring(self):
         """
@@ -1591,8 +1589,8 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertEquals(len(course_module.pdf_textbooks), 1)
         self.assertEquals(len(course_module.pdf_textbooks[0]["chapters"]), 2)
-        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], 'location:MITx+999+2013_Spring+asset+Chapter1.pdf')
-        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], 'location:MITx+999+2013_Spring+asset+Chapter2.pdf')
+        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], 'asset-location:MITx+999+2013_Spring+asset+Chapter1.pdf')
+        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], 'asset-location:MITx+999+2013_Spring+asset+Chapter2.pdf')
 
     def test_import_into_new_course_id_wiki_slug_renamespacing(self):
         module_store = modulestore('direct')
@@ -1616,7 +1614,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEquals(course_module.wiki_slug, 'toy')
 
         # But change the wiki_slug if it is a different course.
-        target_course_id = CourseKey.from_string('MITx/999/2013_Spring')
+        target_course_id = SlashSeparatedCourseKey('MITx', '999', '2013_Spring')
         course_data = {
             'org': target_course_id.org,
             'number': target_course_id.course,
