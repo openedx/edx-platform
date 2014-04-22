@@ -4,7 +4,7 @@
 
 // Override global a rules
 .forum-nav-browse {
-  color: $black !important;
+  color: $black;
 }
 
 // Override global label rules
@@ -14,13 +14,13 @@
 
 // Override global input rules
 .forum-nav-search-input {
-  box-shadow: none !important;
-  border: 1px solid $gray-l2 !important;
-  border-radius: 3px !important;
-  height: auto !important;
-  padding-left: ($baseline/4) !important;
-  padding-right: ($baseline/2 + 12px) !important; // Leave room for icon
-  font-size: 12px !important;
+  box-shadow: none;
+  border: 1px solid $gray-l2;
+  border-radius: 3px;
+  height: auto;
+  padding-left: ($baseline/4);
+  padding-right: ($baseline/2 + 12px); // Leave room for icon
+  font-size: 12px;
 }
 
 // Firefox does not compute the correct containing box for absolute positioning
@@ -35,7 +35,7 @@
 
 // Override global a rules
 .forum-nav-browse-title {
-  color: inherit !important;
+  color: inherit;
 }
 
 // Override global label rules
@@ -45,12 +45,12 @@
 
 // Override global input rules
 .forum-nav-browse-filter-input {
-  box-shadow: none !important;
-  border-radius: 3px !important;
-  height: auto !important;
-  padding-left: ($baseline/4) !important;
-  padding-right: ($baseline/2 + 12px) !important; // Leave room for icon
-  font-size: 12px !important;
+  box-shadow: none;
+  border-radius: 3px;
+  height: auto;
+  padding-left: ($baseline/4);
+  padding-right: ($baseline/2 + 12px); // Leave room for icon
+  font-size: 12px;
 }
 
 // Override global ul rules
@@ -92,6 +92,6 @@ li[class*=forum-nav-thread-label-] {
 
   // Override clearfix stuff in .sidebar ul li rules
   &:before, &:after {
-    display: none !important;
+    display: none;
   }
 }

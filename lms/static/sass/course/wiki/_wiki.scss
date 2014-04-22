@@ -83,7 +83,7 @@ section.wiki {
   .add-article-btn {
     @include button(simple, #eee);
     margin-left: 25px;
-    padding: 7px 15px !important;
+    padding: 7px 15px;
     font-size: 0.72em;
     font-weight: 600;
 
@@ -463,8 +463,8 @@ section.wiki {
     font-size: 0.8em;
     margin-right: 5px;
     line-height: 1.2em;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
+    text-transform: none;
+    letter-spacing: 0;
 
     &:hover, &:focus {
       color: $base-font-color;
@@ -488,7 +488,7 @@ section.wiki {
   }
 
   a.btn {
-    padding: 7px 18px 8px !important;
+    padding: 7px 18px 8px;
   }
 
   .modal {
@@ -582,7 +582,7 @@ section.wiki {
   }
 
   #previewWindow body {
-    background: #f00 !important;
+    background: #f00;
   }
 
   #cheatsheetLink {
@@ -1020,7 +1020,7 @@ section.wiki {
 }
 
 .modal-preview .main-article {
-  width: 100% !important;
+  width: 100%;
   margin-left: 0;
 }
 
@@ -1061,8 +1061,8 @@ section.wiki {
     font-size: 0.8em;
     margin-right: 5px;
     line-height: 1.2em;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
+    text-transform: none;
+    letter-spacing: 0;
 
     &:hover, &:focus {
       color: $base-font-color;

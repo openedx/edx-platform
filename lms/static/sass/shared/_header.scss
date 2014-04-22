@@ -244,7 +244,7 @@ header.global {
       font-size: em(14);
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0 !important;
+      letter-spacing: 0;
 
       &:last-child {
         margin-right: 0;
@@ -313,6 +313,6 @@ header.global {
 
   a {
     text-decoration: none;
-    color: $link-color !important;
+    color: $link-color;
   }
 }

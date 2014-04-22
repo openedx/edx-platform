@@ -21,7 +21,7 @@
       &:link, &:visited, &:hover, &:focus, &:active {
         border-bottom: none;
         color: $link-color;
-        text-decoration: none !important;
+        text-decoration: none;
         font-family: $sans-serif;
       }
 

@@ -36,7 +36,7 @@
     font-size: 14px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0 !important;
+    letter-spacing: 0;
     color: $m-gray-d2;
   }
 
@@ -72,11 +72,11 @@
     font-weight: 500;
     cursor: pointer;
     text-align: center;
-    border: none !important;
+    border: none;
     text-shadow: none;
     letter-spacing: 0;
     font-size: 16px;
-    box-shadow: none !important;
+    box-shadow: none;
   }
 
   %button-secondary {
@@ -89,11 +89,11 @@
     font-weight: 600;
     cursor: pointer;
     text-align: center;
-    border: none !important;
+    border: none;
     text-shadow: none;
     letter-spacing: 0;
     font-size: 16px;
-    box-shadow: 0 !important;
+    box-shadow: 0;
   }
 
   // layout
@@ -176,12 +176,12 @@
     &:link, &:visited, &:hover, &:active, &:focus {
       color: $link-color-d1;
       font-weight: 400;
-      text-decoration: none !important; // needed but nasty
+      text-decoration: none; // needed but nasty
       font-family: $sans-serif;
     }
 
     &:hover, &:active, &:focus {
-      text-decoration: none !important; // needed but nasty
+      text-decoration: none; // needed but nasty
       border-bottom: 1px dotted $link-color-d1;
     }
   }
@@ -207,7 +207,7 @@
     float: left;
 
     p, ol, ul {
-      font-size: 14px !important;
+      font-size: 14px;
     }
   }
 
@@ -405,7 +405,7 @@
           font-weight: 600;
 
           a {
-            font-weight: 600 !important;
+            font-weight: 600;
           }
         }
 
@@ -426,7 +426,7 @@
 
       &:disabled, &.is-disabled {
         opacity: 0.3;
-        cursor: default !important;
+        cursor: default;
       }
     }
 
@@ -481,7 +481,7 @@
 
     .message-copy {
       @extend %body-text;
-      margin: 0 !important;
+      margin: 0;
       padding: 0;
       list-style: none;
 
@@ -497,7 +497,7 @@
     background: tint($red,95%);
 
     .message-title {
-      color: shade($red, 10%) !important;
+      color: shade($red, 10%);
     }
 
     .message-copy {
@@ -590,7 +590,7 @@
   .inner-wrapper {
     border-radius: 2px;
     background: $body-bg;
-    padding-bottom: 0 !important;
+    padding-bottom: 0;
   }
 
   #password-reset {
@@ -642,11 +642,11 @@
       }
 
       .form-actions {
-        padding: 0 !important;
+        padding: 0;
 
         .action-primary {
           float: none;
-          display: block !important;
+          display: block;
           width: 100%;
         }
       }
@@ -657,7 +657,7 @@
     @extend %body-text;
     box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
     @include box-sizing(border-box);
-    margin: $baseline 0 ($baseline/2) 0 !important;
+    margin: $baseline 0 ($baseline/2) 0;
     padding: $baseline;
     border: none;
     border-bottom: 3px solid shade($red, 10%);

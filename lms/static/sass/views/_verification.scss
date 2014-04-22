@@ -161,15 +161,15 @@
   .action-primary {
     @extend %btn-primary-blue;
     // needed for override due to .register a:link styling
-    border: 0 !important;
-    color: $white !important;
+    border: 0;
+    color: $white;
   }
 
   .action-confirm {
     @extend %btn-verify-primary;
     // needed for override due to .register a:link styling
-    border: 0 !important;
-    color: $white !important;
+    border: 0;
+    color: $white;
   }
 
   // ====================
@@ -1250,7 +1250,7 @@
       // extra register options/info
       .title-expand {
         @extend %t-copy-sub1;
-        font-weight: 500 !important;
+        font-weight: 500;
         display: inline-block;
         margin: 0;
       }
@@ -2316,7 +2316,7 @@
   }
 
   .progress-sts-value {
-    width: 32% !important;
+    width: 32%;
   }
 }
 
@@ -2326,7 +2326,7 @@
 .register.is-upgrading {
 
   .form-register-choose {
-    margin-top: ($baseline*2) !important;
+    margin-top: ($baseline*2);
   }
 }
 
@@ -2365,7 +2365,7 @@
     }
 
     .progress-sts-value {
-      width: 0% !important;
+      width: 0%;
     }
   }
 
@@ -2404,7 +2404,7 @@
     }
 
     .progress-sts-value {
-      width: 40% !important;
+      width: 40%;
     }
   }
 
@@ -2443,7 +2443,7 @@
     }
 
     .progress-sts-value {
-      width: 70% !important;
+      width: 70%;
     }
   }
 

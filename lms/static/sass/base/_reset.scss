@@ -75,7 +75,7 @@ td { vertical-align: top; }
 
 .ir { display: block; border: 0; text-indent: -999em; overflow: hidden; background-color: transparent; background-repeat: no-repeat; text-align: left; direction: ltr; *line-height: 0; }
 .ir br { display: none; }
-.hidden { display: none !important; visibility: hidden; }
+.hidden { display: none; visibility: hidden; }
 .visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
 .visuallyhidden.focusable:active, .visuallyhidden.focusable:focus { clip: auto; height: auto; margin: 0; overflow: visible; position: static; width: auto; }
 .invisible { visibility: hidden; }
@@ -84,7 +84,7 @@ td { vertical-align: top; }
 .clearfix { *zoom: 1; }
 
 @media print {
-  * { background: transparent !important; color: black !important; box-shadow:none !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; }
+  * { background: transparent; color: black; box-shadow:none; text-shadow: none; filter:none; -ms-filter: none; }
   a, a:visited { text-decoration: underline; }
   a[href]:after { content: " (" attr(href) ")"; }
   abbr[title]:after { content: " (" attr(title) ")"; }
@@ -92,7 +92,7 @@ td { vertical-align: top; }
   pre, blockquote { border: 1px solid #999; page-break-inside: avoid; }
   thead { display: table-header-group; }
   tr, img { page-break-inside: avoid; }
-  img { max-width: 100% !important; }
+  img { max-width: 100%; }
   @page { margin: 0.5cm; }
   p, h2, h3 { orphans: 3; widows: 3; }
   h2, h3 { page-break-after: avoid; }

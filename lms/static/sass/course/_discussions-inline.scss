@@ -2,7 +2,7 @@
   @extend .discussion-body;
   margin: 20px 0;
   padding: 20px 20px 28px 20px;
-  background: #f6f6f6 !important;
+  background: #f6f6f6;
   border-radius: 3px;
 
   .responses {
@@ -308,7 +308,7 @@
   }
 
   .moderator-actions {
-    padding-left: 0 !important;
+    padding-left: 0;
   }
 
   section.pagination {
