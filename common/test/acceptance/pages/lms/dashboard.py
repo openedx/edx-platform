@@ -78,6 +78,10 @@ class DashboardPage(PageObject):
         self.q(css='select[name="language"] option[value="{}"]'.format(code)).first.click()
         self.q(css="#submit-lang").first.click()
 
+        # Clicking the submit-lang button does a jquery ajax post, so make sure that
+        # has completed before continuing on.
+        self.wait_for_ajax()
+
         self._changed_lang_promise(code).fulfill()
 
     def _changed_lang_promise(self, code):
