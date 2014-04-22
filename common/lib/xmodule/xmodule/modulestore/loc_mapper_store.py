@@ -537,7 +537,7 @@ class LocMapperStore(object):
         Remove: course_id, lower_course_id
         :param entry:
         """
-        if not hasattr(entry['_id', 'name']):
+        if not hasattr(entry['_id'], 'name'):
             entry_id = entry['_id']
             entry_id = bson.son.SON([
                 ('org', entry_id['org']),
