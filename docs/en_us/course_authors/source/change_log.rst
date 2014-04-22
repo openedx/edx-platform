@@ -14,18 +14,21 @@ April, 2014
      - Change  
    * - 04/22/14
      - Updated the :ref:`Bulk Email` section with information about the dashboard option to opt out of course email. 
-   * - 4/16/14
-     - Updated "Transcripts in Additional Languages" in :ref:`Working with Video Components`.
+   * - 
+     - In :ref:`Discussions`, corrected the steps to "Create" Discussion
+       Categories".
    * - 04/16/14
+     - Updated "Transcripts in Additional Languages" in :ref:`Working with Video Components`.
+   * -  
      - In support of new features, added the following sections to :ref:`Multiple Choice` problems:
 
        * :ref:`Shuffle Answers in a Multiple Choice Problem`
        * :ref:`Targeted Feedback in a Multiple Choice Problem`
        * :ref:`Answer Pools in a Multiple Choice Problem`
 
-   * - 4/15/14
+   * - 04/15/14
      - Updated :ref:`Testing Your Course` to include a section on how to :ref:`View Your Live Course`.
-   * - 4/11/14
+   * - 04/11/14
      - Expanded the :ref:`Grades` section to include a topic on interpreting the Student Answer Distribution report. 
    * - 04/08/14
      - Updated the chapter :ref:`Working with HTML Components` to reflect the
@@ -63,9 +66,9 @@ March, 2014
    * - 03/27/14
      - Updated the :ref:`Adding Pages to a Course` section to reflect feature
        changes.
-   * - 3/27/14
+   * - 03/27/14
      - Updated the section on :ref:`Beta_Testing` to include the new "batch add" feature.
-   * - 3/19/14
+   * - 03/19/14
      - Updated the sections on :ref:`Beta_Testing`, :ref:`Discussions`,
        :ref:`Grades`, and :ref:`Student Data` with changes to the new Instructor Dashboard.
    * - 03/17/14
