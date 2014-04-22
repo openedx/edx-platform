@@ -18,7 +18,7 @@
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@cfe5c37f98febd9a215d23cb206a25711056a142#egg=XBlock
--e git+https://github.com/edx/codejail.git@e3d98f9455#egg=codejail
+-e git+https://github.com/edx/codejail.git@71f5c5616e2a73ae8cecd1ff2362774a773d3665#egg=codejail
 -e git+https://github.com/edx/diff-cover.git@v0.2.9#egg=diff_cover
 -e git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool
 -e git+https://github.com/edx/django-waffle.git@823a102e48#egg=django-waffle
