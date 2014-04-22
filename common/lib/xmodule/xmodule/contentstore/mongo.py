@@ -64,6 +64,7 @@ class MongoContentStore(ContentStore):
     def delete(self, content_id):
         if self.fs.exists({"_id": content_id}):
             self.fs.delete(content_id)
+            assert not self.fs.exists({"_id": content_id})
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
         content_id = StaticContent.get_id_from_location(location)
@@ -257,4 +258,6 @@ class MongoContentStore(ContentStore):
         :param course_key:
         """
         course_query = MongoModuleStore._course_key_to_son(course_key, tag=XASSET_LOCATION_TAG)
-        self.fs.delete(course_query)
+        matching_assets = self.fs_files.find(course_query)
+        for asset in matching_assets:
+            self.fs.delete(asset['_id'])

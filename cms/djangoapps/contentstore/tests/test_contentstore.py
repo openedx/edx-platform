@@ -474,7 +474,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         '''
         This test will exercise the soft delete/restore functionality of the assets
         '''
-        content_store, trash_store, thumbnail_location = self._delete_asset_in_course()
+        content_store, trash_store, thumbnail_location, location = self._delete_asset_in_course()
         asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
 
         # now try to find it in store, but they should not be there any longer
@@ -540,7 +540,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.delete(url)
         self.assertEqual(resp.status_code, 204)
 
-        return content_store, trash_store, thumbnail_location
+        return content_store, trash_store, thumbnail_location, location
 
     def test_course_info_updates_import_export(self):
         """
@@ -601,7 +601,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         '''
         This test will exercise the emptying of the asset trashcan
         '''
-        _, trash_store, _ = self._delete_asset_in_course()
+        _, trash_store, _, location = self._delete_asset_in_course()
 
         # make sure there's something in the trashcan
         course_id = SlashSeparatedCourseKey('edX', 'toy', '6.002_Spring_2012')
