@@ -12,8 +12,9 @@ Student Instructions
 
 Peer assessment problems have several steps--you'll submit a response, then assess (grade) peer responses, and then assess your own response.  When you come to a peer assessment problem in the course, you'll see the question and a response field, followed by grayed-out steps that show you what you'll do next.
 
-.. image:: /Images/PA_S_QandRfield.png
-   :alt: Image of a peer assessment question and student response field
+.. image:: /Images/PA_AsmtWithResponse_Students.png
+   :alt: Peer assessment example with question, response field, and assessment types and status labeled
+   :width: 550
 
 Here, we'll walk you through the process of performing a peer assessment:
 
@@ -40,16 +41,17 @@ After you compose a response, type it into the response field under **Your Respo
 
 After you submit your response, if no other students have submitted responses yet, you'll see the following message:
 
-	Waiting for Peer Responses
+	**Waiting for Peer Responses**
 
-	All submitted peer responses have been assessed. Check back later to see if more students have submitted responses. You'll receive your grade after you complete the peer assessment and self assessment steps, and after your peers have assessed your response.
+	**All submitted peer responses have been assessed. Check back later to see if more students have submitted responses. You'll receive your grade after you complete the peer assessment and self assessment steps, and after your peers have assessed your response.**
 
 If other students have already submitted responses, the peer assessment step starts immediately after you submit your response. However, you don't have to start grading right away. If you want to stop working and come back later, just refresh or reopen your browser when you come back. New peer responses will be available for you to grade.
 
-Note that you can go back and review your response at any time after you submit it. To do this, click the **Your Response** heading to expand the response field.
+Note that you can view your response at any time after you submit it. To do this, click the **Your Response** heading to expand the response field.
 
 .. image:: /Images/PA_S_ReviewResponse.png
    :alt: Image of the Response field collapsed and then expanded
+   :width: 550
 
 
 Assess Peer Responses
@@ -57,12 +59,13 @@ Assess Peer Responses
 
 When peer assessment starts, you'll see the original question followed by another student's response and a rubric. Above the rubric you can also see how many responses you'll assess, how many you've already assessed, and the amount of time you can expect to spend on each assessment. Below the rubric is a field where you can provide comments about the student's response.
 
-.. image:: /Images/PA_LMS-PARubric.png
-   :alt: Image of the question, response, and rubric
-
 The rubric contains *criteria*, each of which has several *options*. Read the student's response and the rubric carefully, and then select the option that you think best reflects the student's response.
 
-When you've selected options in the rubric, provide additional comments about the response. When you're done, click **Submit your assessment and move to response #<number>**.
+.. image:: /Images/PA_LMS-PARubric.png
+   :alt: Image of the question, response, and rubric
+   :width: 550
+
+When you've selected options in the rubric, provide additional comments about the response in the field below the rubric. When you're done, click **Submit your assessment and move to response #<number>**.
 
 When you submit your assessment of the first student's response, another response opens for you. Assess this response in the same way that you assessed the first response, and then submit your assessment. You'll repeat these steps until you've assessed the required number of responses. The number in the upper-right corner of the rubric updates as you assess each response.
 
@@ -76,20 +79,21 @@ When you've completed enough peer assessments, your self assessment opens. You'l
 Receive Your Score and Provide Feedback
 ****************************************
 
-After you submit your self assessment, if other students are still assessing your response, you'll see the following message under **Your Grade**.
+After you submit your self assessment, if other students are still assessing your response, you'll see the following message under the **Assess Your Response** step.
 
-	Waiting for Peers to Assess Your Response
+	**Your Grade: Waiting for Peer Assessment**
 
-	Your response is still undergoing peer assessment. After your peers have assessed your response, you'll see their feedback and receive your final grade.
+	**Your response is still undergoing peer assessment. After your peers have assessed your response, you'll see their feedback and receive your final grade.**
 
 If you see this message, keep checking back periodically until peer assessment is complete.
 
 When peer assessment is complete, you can see the scores you received from all of your peers, as well as your self assessment. You can also see any additional comments that your peers have provided.
 
 .. image:: /Images/PA_AllScores.png
-   :alt: Image of a student's response with peer and self assessment scores
+   :alt: A student's response with peer and self assessment scores
+   :width: 550
 
-If you want to, you can provide feedback on the scores that you received under **Give Feedback on Peer Evaluations**.
+If you want to, you can provide feedback on the scores that you received under **Provide Feedback on Peer Assessments**.
 
 Assess Additional Peer Responses (optional)
 *******************************************
