@@ -40,7 +40,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-12 15:41-0400\n"
+"POT-Creation-Date: 2014-04-22 09:02-0400\n"
 "PO-Revision-Date: 2014-02-06 03:04+0000\n"
 "Last-Translator: nedbat <ned@edx.org>\n"
 "Language-Team: Slovenian (http://www.transifex.com/projects/p/edx-platform/language/sl/)\n"
@@ -825,6 +825,28 @@ msgstr ""
 msgid "See XML source line {sourcenum}."
 msgstr ""
 
+#. Translators: 'unmask_name' is a method name and should not be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "unmask_name called on response that is not masked"
+msgstr ""
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr ""
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "answer-pool value should be an integer"
+msgstr ""
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr ""
+
 #: common/lib/capa/capa/responsetypes.py common/lib/capa/capa/responsetypes.py
 msgid "There was a problem with the staff answer to this problem."
 msgstr ""
@@ -955,9 +977,27 @@ msgstr ""
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"You must wait at least {wait_secs} between submissions. {remaining_secs} "
+"remaining."
+msgstr ""
+
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Error: {msg}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_hour} hour"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_minute} minute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_second} second"
 msgstr ""
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
@@ -1740,10 +1780,14 @@ msgstr ""
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Name"
 msgstr ""
@@ -1784,6 +1828,15 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Goals"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Module does not exist."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "An error occurred while deleting the score."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -2397,6 +2450,10 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Trying to add a different currency into the cart"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid "Registration for Course: {course_name}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -3158,6 +3215,7 @@ msgstr ""
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
 msgid "Close"
@@ -3699,37 +3757,6 @@ msgstr ""
 msgid "close"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/manage_users.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "Settings"
-msgstr ""
-
-#: cms/templates/component.html cms/templates/overview.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html lms/templates/problem.html
-#: lms/templates/word_cloud.html
-#: lms/templates/combinedopenended/openended/open_ended.html
-#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
-#: lms/templates/verify_student/face_upload.html
-msgid "Save"
-msgstr ""
-
-#: cms/templates/component.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/overview.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-#: lms/templates/verify_student/face_upload.html
-msgid "Cancel"
-msgstr ""
-
 #: cms/templates/container.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -3750,6 +3777,19 @@ msgstr ""
 #: cms/templates/index.html cms/templates/settings.html
 #: lms/templates/courseware/course_about.html
 msgid "Course Number"
+msgstr ""
+
+#: cms/templates/index.html cms/templates/manage_users.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: cms/templates/overview.html lms/templates/discussion/_inline_new_post.html
+#: lms/templates/discussion/_new_post.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_discussion.mustache
+#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
+#: lms/templates/verify_student/face_upload.html
+msgid "Cancel"
 msgstr ""
 
 #: cms/templates/index.html
@@ -3781,9 +3821,25 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+#: cms/templates/manage_users.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "Settings"
+msgstr ""
+
 #: cms/templates/manage_users.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Admin"
+msgstr ""
+
+#: cms/templates/overview.html cms/templates/overview.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: lms/templates/problem.html lms/templates/word_cloud.html
+#: lms/templates/combinedopenended/openended/open_ended.html
+#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
+#: lms/templates/verify_student/face_upload.html
+msgid "Save"
 msgstr ""
 
 #: cms/templates/register.html cms/templates/widgets/header.html
@@ -4772,6 +4828,10 @@ msgstr ""
 
 #: lms/templates/navigation.html
 msgid "Log Out"
+msgstr ""
+
+#: lms/templates/navigation.html
+msgid "Shopping Cart"
 msgstr ""
 
 #: lms/templates/navigation.html
@@ -6546,6 +6606,13 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"In order to request a refund for the amount you paid, you will need to send "
+"an email to {billing_email}.  Be sure to include your email and the course "
+"name."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr ""
 
@@ -7628,7 +7695,8 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Enter email addresses separated by new lines or commas."
+msgid ""
+"Enter email addresses and/or usernames separated by new lines or commas."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7639,9 +7707,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Email Addresses"
+msgid "Email Addresses/Usernames"
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Auto Enroll"
 msgstr ""
@@ -7684,13 +7753,23 @@ msgid "Unenroll"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Batch Beta Testers"
+msgid "Batch Beta Tester Addition"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Note: Users must have an activated {platform_name} account before they can "
 "be enrolled as a beta tester."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"If this option is <em>checked</em>, users who have not enrolled in your "
+"course will be automatically enrolled."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Checking this box has no effect if 'Remove beta testers' is selected."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7822,6 +7901,27 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Count of Students Opened a Subsection"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Student Opened as a CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Student Grades as a CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "This is a partial list, to view all students download as a csv."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Percent"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -8295,6 +8395,16 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Register for [Course Name] | Receipt (Order"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Thank you for your Purchase!"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid ""
+"Please print this receipt page for your records. You should also have "
+"received a receipt in your email."
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
@@ -9657,10 +9767,6 @@ msgstr ""
 msgid ""
 "Any changes you make to these checklists are saved automatically and are "
 "immediately visible to other course team members."
-msgstr ""
-
-#: cms/templates/component.html
-msgid "Editor"
 msgstr ""
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html

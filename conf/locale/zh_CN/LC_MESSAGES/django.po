@@ -41,6 +41,7 @@
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # Jie <jie.li@anu.edu.au>, 2013
 # liuyang <liuyang2011@tsinghua.edu.cn>, 2013
+# pku9104038 <pku9104038@hotmail.com>, 2014
 # csc <am15501@163.com>, 2014
 # thinxer <me@thinxer.com>, 2013
 # vicapple22 <vicapple22@gmail.com>, 2013
@@ -74,6 +75,7 @@
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # kuangchong07 <kuangchong07@gmail.com>, 2013
 # daisybellamy <linmiaoqiqi@hotmail.com>, 2014
+# Junjie, 2014
 # liuyang <liuyang2011@tsinghua.edu.cn>, 2013
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014
@@ -116,6 +118,7 @@
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # kuangchong07 <kuangchong07@gmail.com>, 2013
 # liuyang <liuyang2011@tsinghua.edu.cn>, 2013
+# pku9104038 <pku9104038@hotmail.com>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014
 # thinxer <me@thinxer.com>, 2013
 # tucunchao <tucunchao@gmail.com>, 2013
@@ -154,8 +157,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-12 15:41-0400\n"
-"PO-Revision-Date: 2014-04-02 06:20+0000\n"
+"POT-Creation-Date: 2014-04-22 09:02-0400\n"
+"PO-Revision-Date: 2014-04-16 08:31+0000\n"
 "Last-Translator: jiangnan.hugo <jiangnan.hugo@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -175,23 +178,23 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
-msgstr ""
+msgstr "荣誉证书"
 
 #: common/djangoapps/course_modes/views.py common/djangoapps/student/views.py
 msgid "Enrollment is closed"
-msgstr ""
+msgstr "注册已终止"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment mode not supported"
-msgstr ""
+msgstr "注册模式不支持"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Invalid amount selected."
-msgstr ""
+msgstr "选择的数量无效。"
 
 #: common/djangoapps/course_modes/views.py
 msgid "No selected price or selected price is too low."
-msgstr ""
+msgstr "未选择价格或选择的价格过低。"
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Administrator"
@@ -268,11 +271,11 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
-msgstr ""
+msgstr "课程编号未指定"
 
 #: common/djangoapps/student/views.py
 msgid "Course id is invalid"
-msgstr ""
+msgstr "课程编号无效"
 
 #: common/djangoapps/student/views.py
 #: lms/templates/courseware/course_about.html
@@ -281,15 +284,15 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
-msgstr ""
+msgstr "您还没有注册本课程"
 
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
-msgstr ""
+msgstr "注册操作无效"
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
-msgstr ""
+msgstr "接受您的登录信息时出现错误，请发电子邮件给我们。"
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -306,17 +309,22 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
-msgstr ""
+msgstr "失败次数超过限制，请稍后再试！"
 
-#: lms/templates/provider_login.html
+#: common/djangoapps/student/views.py lms/templates/provider_login.html
+#, fuzzy
 msgid "Email or password is incorrect."
-msgstr "邮箱或密码错误"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"邮箱或密码错误。\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"邮箱或密码错误"
 
 #: common/djangoapps/student/views.py
 msgid ""
 "This account has not been activated. We have sent another activation "
 "message. Please check your e-mail for the activation instructions."
-msgstr ""
+msgstr "该账号尚未激活。我们已经重新发送账号激活操作信息，请注意查收您的电子邮件。"
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
@@ -344,23 +352,23 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Public Username '{username}' already exists."
-msgstr ""
+msgstr "用户名'{username}'对应的账户已存在。"
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
-msgstr ""
+msgstr "电子邮件'{email}'对应的账户已存在。"
 
 #: common/djangoapps/student/views.py
 msgid "Error (401 {field}). E-mail us."
-msgstr ""
+msgstr "错误(401 {field})，请给我们发送电子邮件。"
 
 #: common/djangoapps/student/views.py
 msgid "To enroll, you must follow the honor code."
-msgstr ""
+msgstr "您必须遵循荣誉准则才能注册。"
 
 #: common/djangoapps/student/views.py
 msgid "You must accept the terms of service."
-msgstr ""
+msgstr "您必须接受本服务条款。"
 
 #: common/djangoapps/student/views.py
 msgid "Username must be minimum of two characters long"
@@ -424,11 +432,11 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail is required."
-msgstr ""
+msgstr "需要有效的电子邮件地址。"
 
 #: common/djangoapps/student/views.py
 msgid "Username should only consist of A-Z and 0-9, with no spaces."
-msgstr ""
+msgstr "用户名只能包含英文字母A-Z大小写和阿拉伯数字0-9，不能包含空格。"
 
 #: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Password: "
@@ -436,11 +444,11 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Could not send activation e-mail."
-msgstr ""
+msgstr "无法发送激活邮件。"
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
-msgstr ""
+msgstr "未知错误。请给我们发电子邮件，告知错误是如何发生的。"
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -460,35 +468,35 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
-msgstr ""
+msgstr "本邮件地址不存在非激活用户。"
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send reactivation email"
-msgstr ""
+msgstr "无法发送重新激活的电子邮件"
 
 #: common/djangoapps/student/views.py
 msgid "Invalid password"
-msgstr ""
+msgstr "无效的密码"
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail address required."
-msgstr ""
+msgstr "需要有效的电子邮件地址"
 
 #: common/djangoapps/student/views.py
 msgid "An account with this e-mail already exists."
-msgstr ""
+msgstr "该邮箱地址已经存在一个对应账号。"
 
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
-msgstr ""
+msgstr "新邮件地址与旧邮件地址相同。"
 
 #: common/djangoapps/student/views.py
 msgid "Name required"
-msgstr ""
+msgstr "需要填写姓名"
 
 #: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Invalid ID"
-msgstr ""
+msgstr "无效的ID"
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -939,6 +947,28 @@ msgstr ""
 msgid "See XML source line {sourcenum}."
 msgstr ""
 
+#. Translators: 'unmask_name' is a method name and should not be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "unmask_name called on response that is not masked"
+msgstr ""
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr ""
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "answer-pool value should be an integer"
+msgstr ""
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr ""
+
 #: common/lib/capa/capa/responsetypes.py common/lib/capa/capa/responsetypes.py
 msgid "There was a problem with the staff answer to this problem."
 msgstr ""
@@ -1027,11 +1057,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Check"
-msgstr ""
+msgstr "检查"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Final Check"
-msgstr ""
+msgstr "最终检查"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Checking..."
@@ -1069,9 +1099,27 @@ msgstr ""
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"You must wait at least {wait_secs} between submissions. {remaining_secs} "
+"remaining."
+msgstr ""
+
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Error: {msg}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_hour} hour"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_minute} minute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_second} second"
 msgstr ""
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
@@ -1135,13 +1183,9 @@ msgid ""
 "string."
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: 'Courseware' refers to the tab in the courseware that leads to
-#. the content of a course
-#: common/lib/xmodule/xmodule/tabs.py
 #: lms/templates/courseware/courseware-error.html
 msgid "Courseware"
-msgstr ""
+msgstr "课程"
 
 #. Translators: "Course Info" is the name of the course's information and
 #. updates page
@@ -1170,10 +1214,10 @@ msgstr ""
 msgid "Discussion"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/tabs.py cms/templates/textbooks.html
-#: cms/templates/textbooks.html cms/templates/widgets/header.html
+#: cms/templates/textbooks.html cms/templates/textbooks.html
+#: cms/templates/widgets/header.html
 msgid "Textbooks"
-msgstr ""
+msgstr "教材"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: "Staff grading" appears on a tab that allows
@@ -1426,27 +1470,24 @@ msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
-msgstr ""
+msgstr "导航"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "About these documents"
-msgstr ""
+msgstr "关于文档"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Index"
-msgstr ""
+msgstr "索引"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: lms/templates/discussion/_thread_list_template.html
 msgid "Search"
-msgstr ""
+msgstr "搜索"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
-#: lms/templates/static_templates/copyright.html
-#: lms/templates/static_templates/copyright.html
 msgid "Copyright"
-msgstr ""
+msgstr "版权"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid ""
@@ -1504,7 +1545,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/features/video.py lms/templates/video.html
 msgid "ERROR: No playable video sources found!"
-msgstr ""
+msgstr "错误：没有找到可以播放的视频源！"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
@@ -1633,11 +1674,9 @@ msgstr ""
 msgid "Courses loaded in the modulestore"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py
 #: lms/templates/tracking_log.html
 msgid "username"
-msgstr ""
+msgstr "用户名"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
@@ -1700,10 +1739,9 @@ msgstr ""
 msgid "Loaded course {0} {1}<br/>Errors:"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: cms/templates/index.html cms/templates/settings.html
 msgid "Course Name"
-msgstr ""
+msgstr "课程名称"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Directory/ID"
@@ -1817,44 +1855,47 @@ msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "allowed file types are '%(file_types)s'"
-msgstr ""
+msgstr "允许的文件类型是'%(file_types)s'"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "maximum upload file size is %(file_size)sK"
-msgstr ""
+msgstr "最大上传文件%(file_size)s KB"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid ""
 "Error uploading file. Please contact the site administrator. Thank you."
-msgstr ""
+msgstr "上传文件出错，请联系网站管理员，谢谢。"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Good"
 msgstr ""
 
-#: lms/djangoapps/django_comment_client/forum/views.py
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
 msgid "All Groups"
-msgstr ""
+msgstr "所有分组"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
-msgstr ""
+msgstr "该用户不存在。"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
-msgstr ""
+msgstr "任务已在运行中。"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Name"
 msgstr ""
@@ -1881,10 +1922,9 @@ msgstr ""
 msgid "Gender"
 msgstr "性别"
 
-#: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Level of Education"
-msgstr ""
+msgstr "教育水平"
 
 #: lms/templates/register.html
 msgid "Mailing Address"
@@ -1892,6 +1932,15 @@ msgstr "邮寄地址"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Goals"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Module does not exist."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "An error occurred while deleting the score."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -1926,11 +1975,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
-msgstr ""
+msgstr "会员资格"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Student Admin"
-msgstr ""
+msgstr "学生管理"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Extensions"
@@ -1939,12 +1988,12 @@ msgstr ""
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Data Download"
-msgstr ""
+msgstr "数据下载"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
-msgstr ""
+msgstr "分析"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Course Statistics At A Glance"
@@ -2248,13 +2297,12 @@ msgstr ""
 msgid "reset"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
-#: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
+#: lms/templates/wiki/plugins/attachments/index.html
 msgid "deleted"
-msgstr ""
+msgstr "已删除"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -2423,23 +2471,23 @@ msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "AI Assessment"
-msgstr ""
+msgstr "智能评估"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Peer Assessment"
-msgstr ""
+msgstr "互评"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Not yet available"
-msgstr ""
+msgstr "还未有效"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Automatic Checker"
-msgstr ""
+msgstr "自动检查器"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Instructor Assessment"
-msgstr ""
+msgstr "主讲教师评分"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid ""
@@ -2501,10 +2549,14 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Order Payment Confirmation"
-msgstr ""
+msgstr "订单付款确认"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Trying to add a different currency into the cart"
+msgstr "尝试添加不同的货币到购物车"
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid "Registration for Course: {course_name}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -2566,11 +2618,10 @@ msgstr ""
 msgid "Order ID"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Status"
-msgstr ""
+msgstr "状态"
 
 #: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
 msgid "Quantity"
@@ -2617,9 +2668,9 @@ msgstr ""
 msgid "Course Announce Date"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
+#: cms/templates/settings.html
 msgid "Course Start Date"
-msgstr ""
+msgstr "课程开始日期"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Course Registration Close Date"
@@ -2683,26 +2734,26 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "You must be logged-in to add to a shopping cart"
-msgstr ""
+msgstr "您必须登录才能添加到购物车"
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "The course you requested does not exist."
-msgstr ""
+msgstr "您请求的课程不存在。"
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "The course {0} is already in your cart."
-msgstr ""
+msgstr "课程 {0} 已经在您的购物车中"
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "You are already registered in course {0}."
-msgstr ""
+msgstr "您已经在课程 {0} 中注册。"
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "Course added to cart."
-msgstr ""
+msgstr "课程添加到购物车。"
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
@@ -2710,23 +2761,23 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor did not return a required parameter: {0}"
-msgstr ""
+msgstr "付款处理器没有返回所需的参数：{0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
-msgstr ""
+msgstr "对于参数 {1} ，付款处理器返回一个错误类型值 {0} 。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "The payment processor accepted an order whose number is not in our system."
-msgstr ""
+msgstr "付款处理器接受了一个号码不在我们系统中的订单。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
-msgstr ""
+msgstr "付款处理器收取的总金额 {0} {1} 与订单总金额 {2} {3} 不一致。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2779,15 +2830,15 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "Successful transaction."
-msgstr ""
+msgstr "交易成功。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The request is missing one or more required fields."
-msgstr ""
+msgstr "请求缺少了一个或多个必须的字段"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "One or more fields in the request contains invalid data."
-msgstr ""
+msgstr "请求中的一个或多个字段包含了无效数据。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2802,7 +2853,7 @@ msgstr ""
 msgid ""
 "Error: General system failure. Possible fix: retry the payment after a few "
 "minutes."
-msgstr ""
+msgstr "错误：系统故障。可能的解决方法：几分钟后重试支付。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2825,7 +2876,7 @@ msgstr ""
 msgid ""
 "The issuing bank has questions about the request. Possible fix: retry with "
 "another form of payment"
-msgstr ""
+msgstr "发卡银行对请求有问题。可能的解决方法：重试另一种付款方式。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2848,17 +2899,17 @@ msgstr ""
 msgid ""
 "Insufficient funds in the account. Possible fix: retry with another form of "
 "payment"
-msgstr ""
+msgstr "账户中的资金不足。可能的解决方法：重试另一种付款方式"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "Unknown reason"
-msgstr ""
+msgstr "未知的原因"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Issuing bank unavailable. Possible fix: retry again after a few minutes"
-msgstr ""
+msgstr "发卡银行无响应。可能的解决方法：几分钟后重试"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2872,18 +2923,18 @@ msgstr ""
 msgid ""
 "The card has reached the credit limit. Possible fix: retry with another form"
 " of payment"
-msgstr ""
+msgstr "已超过该卡信用额度。可能的解决方法：重试另一种付款方式"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Invalid card verification number. Possible fix: retry with another form of "
 "payment"
-msgstr ""
+msgstr "无效的信用卡验证码。可能的解决方法：重试另一种付款方式"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Invalid account number. Possible fix: retry with another form of payment"
-msgstr ""
+msgstr "无效的帐户号码。可能的解决方法：重试另一种付款方式"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2897,7 +2948,7 @@ msgstr ""
 msgid ""
 "General decline by the processor.  Possible fix: retry with another form of "
 "payment"
-msgstr ""
+msgstr "付款被拒绝。可能的解决方法：重试另一种付款方式"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2908,20 +2959,20 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The requested amount exceeds the originally authorized amount."
-msgstr ""
+msgstr "所要求的数额超过的原始授权的金额。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "Processor Failure.  Possible fix: retry the payment"
-msgstr ""
+msgstr "处理器故障。可能的解决方法：重试支付。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The authorization has already been captured"
-msgstr ""
+msgstr "授权已经被获取"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "The requested transaction amount must match the previous transaction amount."
-msgstr ""
+msgstr "要求的交易金额必须与先前的交易金额一致。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2933,7 +2984,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The request ID is invalid."
-msgstr ""
+msgstr "请求ID无效。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2944,7 +2995,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The transaction has already been settled or reversed."
-msgstr ""
+msgstr "该交易已经得到处理或已被退回。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -3030,7 +3081,7 @@ msgstr ""
 #: lms/templates/registration/password_reset_complete.html
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
-msgstr ""
+msgstr "您的密码重置已完成"
 
 #: lms/templates/registration/password_reset_complete.html
 msgid ""
@@ -3038,6 +3089,8 @@ msgid ""
 "      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
 "      "
 msgstr ""
+"\n"
+"您的密码已经设置。您现在可以继续 %(link_start)s 登录 %(link_end)s。"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -3045,6 +3098,8 @@ msgid ""
 "      Reset Your %(platform_name)s Password\n"
 "  "
 msgstr ""
+"\n"
+"重置您的 %(platform_name)s 密码"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -3052,10 +3107,12 @@ msgid ""
 "          Reset Your %(platform_name)s Password\n"
 "          "
 msgstr ""
+"\n"
+"重置您的 %(platform_name)s 密码"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Form"
-msgstr ""
+msgstr "密码重置申请表"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -3063,6 +3120,8 @@ msgid ""
 "                We're sorry, %(platform_name)s enrollment is not available in your region\n"
 "            "
 msgstr ""
+"\n"
+"很抱歉，您所在的区域当前无法注册 %(platform_name)s"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The following errors occurred while processing your registration: "
@@ -3070,17 +3129,17 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "You must complete all fields."
-msgstr ""
+msgstr "您必须完成所有的字段。"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The two password fields didn't match."
-msgstr ""
+msgstr "两次输入的密码不匹配。"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
 "We're sorry, our systems seem to be having trouble processing your password "
 "reset"
-msgstr ""
+msgstr "很抱歉，系统在重置您的密码时似乎出现异常。"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -3088,6 +3147,8 @@ msgid ""
 "                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
 "            "
 msgstr ""
+"\n"
+"已将该问题知会相关人员。请稍后再试。如果您有任何顾虑请 %(start_link)s 联系我们 %(end_link)s "
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -3095,27 +3156,35 @@ msgid ""
 "correctly. <br /> Required fields are noted by <strong "
 "class=\"indicator\">bold text and an asterisk (*)</strong>."
 msgstr ""
+"请输入您的新密码两次以便校验密码的正确性。<br /> 必填字段由 <strong class=\"indicator\"> 加粗字体和星号 (*) "
+"标明 </strong>。"
 
+#: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 #: lms/templates/register-shib.html lms/templates/register.html
+#, fuzzy
 msgid "Required Information"
-msgstr "必要的信息"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"需要的信息\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"必填信息"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password"
-msgstr ""
+msgstr "您的新密码"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password Again"
-msgstr ""
+msgstr "再输一次您的新密码"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Change My Password"
-msgstr ""
+msgstr "修改我的密码"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your Password Reset Was Unsuccessful"
-msgstr ""
+msgstr "您的密码重置失败"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -3123,16 +3192,16 @@ msgid ""
 "            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
 "        "
 msgstr ""
+"\n"
+"密码重置链接无效，可能因为链接已经被使用。请回到 %(start_link)s 登录页面 %(end_link)s 重新开始密码重置过程。"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Help"
-msgstr ""
+msgstr "密码重置帮助"
 
 #: lms/templates/registration/password_reset_confirm.html
-#: cms/templates/login.html lms/templates/login-sidebar.html
-#: lms/templates/register-sidebar.html
 msgid "Need Help?"
-msgstr ""
+msgstr "需要帮助？"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -3140,16 +3209,18 @@ msgid ""
 "              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
 "          "
 msgstr ""
+"\n"
+"查看我们的 %(start_link)s 帮助区以寻找联系信息和常见问题解答 %(end_link)s"
 
 #: lms/templates/registration/password_reset_email.html
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
 " user account at edx.org."
-msgstr ""
+msgstr "您收到本邮件是由于您曾经要求重置您在edx.org的账号的密码。"
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "请到以下页面设置新的密码："
 
 #: lms/templates/registration/password_reset_email.html
 msgid ""
@@ -3159,104 +3230,89 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Thanks for using our site!"
-msgstr ""
+msgstr "谢谢您访问我们的网站！"
 
 #: lms/templates/registration/password_reset_email.html
 msgid "The edX Team"
-msgstr ""
+msgstr "EDX团队"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
-msgstr ""
+msgstr "最后修改："
 
 #: lms/templates/wiki/article.html
 msgid "See all children"
-msgstr ""
+msgstr "查看所有子文章"
 
 #: lms/templates/wiki/article.html
 msgid "This article was last modified:"
-msgstr ""
+msgstr "这篇文章最后修改："
 
 #: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
 msgid "Add new article"
-msgstr ""
+msgstr "增加新文章"
 
 #: lms/templates/wiki/create.html
 msgid "Create article"
-msgstr ""
+msgstr "创建文章"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
 #: lms/templates/wiki/delete.html.py
 msgid "Go back"
-msgstr ""
+msgstr "返回"
 
 #: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
 #: lms/templates/wiki/edit.html
 msgid "Delete article"
-msgstr ""
+msgstr "删除文章"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Delete"
-msgstr ""
+msgstr "删除"
 
 #: lms/templates/wiki/delete.html
 msgid "You cannot delete a root article."
-msgstr ""
+msgstr "根文章不可删除。"
 
 #: lms/templates/wiki/delete.html
 msgid ""
 "You cannot delete this article because you do not have permission to delete "
 "articles with children. Try to remove the children manually one-by-one."
-msgstr ""
+msgstr "当文章带有子文章时您无权删除，请尝试手动逐一删除子文章。"
 
 #: lms/templates/wiki/delete.html
 msgid ""
 "You are deleting an article. This means that its children will be deleted as"
 " well. If you choose to purge, children will also be purged!"
-msgstr ""
+msgstr "删除这篇文章将会导致相关子文章会同时被删除。如果您选择清除，子文章也将同时被清除。"
 
 #: lms/templates/wiki/delete.html
 msgid "Articles that will be deleted"
-msgstr ""
+msgstr "将要被删除的文章"
 
 #: lms/templates/wiki/delete.html
 msgid "...and more!"
-msgstr ""
+msgstr "...还有更多！"
 
 #: lms/templates/wiki/delete.html
 msgid "You are deleting an article. Please confirm."
-msgstr ""
+msgstr "您正试图删除文章。请确认！"
 
-#: lms/templates/wiki/edit.html cms/templates/component.html
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-#: lms/templates/wiki/includes/article_menu.html
+#: lms/templates/wiki/edit.html
 msgid "Edit"
-msgstr ""
+msgstr "编辑"
 
 #: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
 msgid "Save changes"
-msgstr ""
+msgstr "保存修改"
 
 #: lms/templates/wiki/edit.html cms/templates/unit.html
 msgid "Preview"
-msgstr ""
+msgstr "预览"
 
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a control to allow users to exit out of this modal
 #. interface (a menu or piece of UI that takes the full focus of the screen)
-#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard.html lms/templates/forgot_password_modal.html
@@ -3265,10 +3321,11 @@ msgstr ""
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"
@@ -3288,11 +3345,11 @@ msgstr ""
 
 #: lms/templates/wiki/edit.html
 msgid "Back to editor"
-msgstr ""
+msgstr "返回编辑器"
 
 #: lms/templates/wiki/history.html
 msgid "History"
-msgstr ""
+msgstr "历史记录"
 
 #: lms/templates/wiki/history.html
 msgid ""
@@ -3301,6 +3358,7 @@ msgid ""
 " can change to a particular revision or merge an old revision with the "
 "current one."
 msgstr ""
+"点击每一个版本，您将会看到被编辑行的列表。点击预览按钮，您可以看到这篇文章目前的状态。在页面的底部，您可以切换到一个指定版本，或者合并两个现存的版本生成新版本。"
 
 #: lms/templates/wiki/history.html
 msgid "(no log message)"
@@ -3308,23 +3366,23 @@ msgstr ""
 
 #: lms/templates/wiki/history.html
 msgid "Preview this revision"
-msgstr ""
+msgstr "预览本次修改"
 
 #: lms/templates/wiki/history.html
 msgid "Auto log:"
-msgstr ""
+msgstr "自动日志"
 
 #: lms/templates/wiki/history.html
 msgid "Change"
-msgstr ""
+msgstr "修改"
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Merge selected with current..."
-msgstr ""
+msgstr "合并选择项和当前项..."
 
 #: lms/templates/wiki/history.html
 msgid "Switch to selected version"
-msgstr ""
+msgstr "转到选择的版本"
 
 #: lms/templates/wiki/history.html
 msgid "Wiki Revision Preview"
@@ -3332,11 +3390,11 @@ msgstr ""
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Back to history view"
-msgstr ""
+msgstr "返回历史视图"
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Switch to this version"
-msgstr ""
+msgstr "切换到这个版本"
 
 #: lms/templates/wiki/history.html
 msgid "Merge Revision"
@@ -3344,21 +3402,21 @@ msgstr ""
 
 #: lms/templates/wiki/history.html
 msgid "Merge with current"
-msgstr ""
+msgstr "和当前版本合并"
 
 #: lms/templates/wiki/history.html
 msgid ""
 "When you merge a revision with the current, all data will be retained from "
 "both versions and merged at its approximate location from each revision."
-msgstr ""
+msgstr "当您合并修订版本与当前版本，两个版本的数据都会保留在各自版本对应的大概位置。"
 
 #: lms/templates/wiki/history.html
 msgid "After this, it's important to do a manual review."
-msgstr ""
+msgstr "注意：请在操作完成后做一次人工检查。"
 
 #: lms/templates/wiki/history.html lms/templates/wiki/history.html
 msgid "Create new merged version"
-msgstr ""
+msgstr "创建新的合并版本"
 
 #: lms/templates/wiki/preview_inline.html
 msgid "Previewing revision:"
@@ -3370,11 +3428,11 @@ msgstr ""
 
 #: lms/templates/wiki/preview_inline.html
 msgid "This revision has been deleted."
-msgstr ""
+msgstr "该修订已被删除。"
 
 #: lms/templates/wiki/preview_inline.html
 msgid "Restoring to this revision will mark the article as deleted."
-msgstr ""
+msgstr "恢复该修订将标记本文章为已删除状态。"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid ""
@@ -3382,10 +3440,12 @@ msgid ""
 "  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
 "  "
 msgstr ""
+"\n"
+"您必须<a href=\"%(login_url)s\">登录</a>或<a href=\"%(signup_url)s\">注册</a>才能使用这项功能。"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in or sign up to use this function."
-msgstr ""
+msgstr "您需要注册或者登录才能使用这个功能。"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Wiki Cheatsheet"
@@ -3393,40 +3453,40 @@ msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Wiki Syntax Help"
-msgstr ""
+msgstr "百科编写的语法帮助"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid ""
 "This wiki uses <strong>Markdown</strong> for styling. There are several "
 "useful guides online. See any of the links below for in-depth details:"
-msgstr ""
+msgstr "这个百科使用了 <strong>Markdown</strong> 语法来排版，网上有许多相关的指导。点击以下链接可了解更过细节："
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Markdown: Basics"
-msgstr ""
+msgstr "Markdown：基础知识"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Quick Markdown Syntax Guide"
-msgstr ""
+msgstr "Markdown 语法快速指南"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Miniature Markdown Guide"
-msgstr ""
+msgstr "简明 Markdown 语法指南"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid ""
 "To create a new wiki article, create a link to it. Clicking the link gives "
 "you the creation page."
-msgstr ""
+msgstr "要创建一篇新的百科条目，先创建一个条目链接。点击该链接转向自动创建页面。"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "[Article Name](wiki:ArticleName)"
-msgstr ""
+msgstr "[文章名称](wiki:ArticleName)"
 
 #. Translators: Do not translate "edX"
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "edX Additions:"
-msgstr ""
+msgstr "edX 附加："
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Math Expression"
@@ -3434,7 +3494,7 @@ msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Useful examples:"
-msgstr ""
+msgstr "实用的例子："
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Wikipedia"
@@ -3446,45 +3506,45 @@ msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Huge Header"
-msgstr ""
+msgstr "超大标题"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Smaller Header"
-msgstr ""
+msgstr "较小的标题"
 
 #. Translators: Leave the punctuation, but translate "emphasis"
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "*emphasis* or _emphasis_"
-msgstr ""
+msgstr "*重点* or _重点_"
 
 #. Translators: Leave the punctuation, but translate "strong"
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "**strong** or __strong__"
-msgstr ""
+msgstr "**强调** or __强调__"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Unordered List"
-msgstr ""
+msgstr "无序列表"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Sub Item 1"
-msgstr ""
+msgstr "子项目1"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Sub Item 2"
-msgstr ""
+msgstr "子项目2"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Ordered"
-msgstr ""
+msgstr "排序"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "List"
-msgstr ""
+msgstr "列表"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Quotes"
-msgstr ""
+msgstr "引言"
 
 #: lms/templates/wiki/includes/editor_widget.html
 msgid ""
@@ -3494,152 +3554,153 @@ msgid ""
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: wiki/plugins/attachments/wiki_plugin.py
 msgid "Attachments"
-msgstr ""
+msgstr "附件"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload new file"
-msgstr ""
+msgstr "上传新文件"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Search and add file"
-msgstr ""
+msgstr "搜索并添加文件"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload File"
-msgstr ""
+msgstr "上传文件"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload file"
-msgstr ""
+msgstr "上传文件"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Search files and articles"
-msgstr ""
+msgstr "搜索文件和文章"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid ""
 "You can reuse files from other articles. These files are subject to updates "
 "on other articles which may or may not be a good thing."
-msgstr ""
+msgstr "您可以从其他文章中重用一些文件。但是该文件的更新依赖于原始文章，请判断该引用关系是否恰当。"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
-msgstr ""
+msgstr "下列文件对这篇文章可用，请复制markdown标记到文本中，直接指向对应文件。"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Markdown tag"
-msgstr ""
+msgstr "Markdown标记"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Uploaded by"
-msgstr ""
+msgstr "上传者是"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Size"
-msgstr ""
+msgstr "大小"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "File History"
-msgstr ""
+msgstr "文件历史记录"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Detach"
-msgstr ""
+msgstr "分离"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Replace"
-msgstr ""
+msgstr "替换"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Restore"
-msgstr ""
+msgstr "恢复"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "anonymous (IP logged)"
-msgstr ""
+msgstr "匿名(IP已记录)"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "File history"
-msgstr ""
+msgstr "文件历史"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "revisions"
-msgstr ""
+msgstr "修订版"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "There are no attachments for this article."
-msgstr ""
+msgstr "这篇文章没有附件"
 
 #: cms/djangoapps/contentstore/course_info_model.py
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
-msgstr ""
+msgstr "课程ID更新无效。"
 
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Course update not found."
-msgstr ""
+msgstr "课程更新没有找到。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
 "configure a different path with GIT_REPO_EXPORT_DIR"
 msgstr ""
+"GIT_REPO_EXPORT_DIR 未被设置或者路径 {0} 不存在，请创建它，或者为 GIT_REPO_EXPORT_DIR 设置一个不同的路径。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Non writable git url provided. Expecting something like: "
 "git@github.com:mitocw/edx4edx_lite.git"
-msgstr ""
+msgstr "没有可写的Git地址。期待类似这样的地址：git@github.com:mitocw/edx4edx_lite.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "If using http urls, you must provide the username and password in the url. "
 "Similar to https://user:pass@github.com/user/course."
 msgstr ""
+"如果使用HTTP地址，您必须在地址里提供用户名和密码，类似于 https://user:pass@github.com/user/course 。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to determine branch, repo in detached HEAD mode"
-msgstr ""
+msgstr "无法找到分支，源正处于分离HEAD模式。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to update or clone git repository."
-msgstr ""
+msgstr "无法更新或者复制Git源。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to export course to xml."
-msgstr ""
+msgstr "无法将课程导出成XML文件。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to configure git username and password"
-msgstr ""
+msgstr "无法配置Git的用户名和密码"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to commit changes. This is usually because there are no changes to be"
 " committed"
-msgstr ""
+msgstr "无法提交变更，这通常是因为没有变更之处，不需要提交。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to push changes.  This is usually because the remote repository "
 "cannot be contacted"
-msgstr ""
+msgstr "无法推送变更，这通常是因为无法连接远程源。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Bad course location provided"
-msgstr ""
+msgstr "提供了错误的课程地址"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Missing branch on fresh clone"
-msgstr ""
+msgstr "在最近的复制中，丢失一些分支"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Command was: {0!r}. Working directory was: {1!r}"
-msgstr ""
+msgstr "命令是：{0!r}。工作目录是：{1!r}"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Command output was: {0!r}"
@@ -3648,9 +3709,9 @@ msgstr ""
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Directory already exists, doing a git reset and pull instead of git clone."
-msgstr ""
+msgstr "目录已经存在，请使用指令git reset和git pull而非git clone。"
 
-#: lms/templates/notes.html
+#: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "我的笔记"
 
@@ -3659,16 +3720,18 @@ msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
 ". Course directory must already be a git repository. Usage:  git_export <course_loc> <git_url>"
 msgstr ""
+"取得指定的课程然后尝试将其导出到一个Git源。\n"
+"课程目录必须已经是一个Git源。用法： git_export <course_loc> <git_url>"
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
-msgstr ""
+msgstr "上传完成"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
 "run."
-msgstr ""
+msgstr "在组织，课程编号和开课时间中，不允许使用特殊字符。"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -3676,13 +3739,16 @@ msgid ""
 "\n"
 "{err}"
 msgstr ""
+"无法创建课程'{name}'。\n"
+"\n"
+"{err}"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "There is already a course defined with the same organization, course number,"
 " and course run. Please change either organization or course number to be "
 "unique."
-msgstr ""
+msgstr "已经存在一个具有相同的组织、课程号和开课时间的课程。请更改组织或者课程号以确保唯一性。"
 
 #: cms/djangoapps/contentstore/views/course.py
 #: cms/djangoapps/contentstore/views/course.py
@@ -3690,107 +3756,107 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Please change either the organization or course number so that it is unique."
-msgstr ""
+msgstr "请更改组织或者课程号以确保唯一性。"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change at least one field to be unique."
-msgstr ""
+msgstr "已经有一个具有相同的组织、课程号的课程。请更改至少一项以确保唯一性。"
 
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
-msgstr ""
+msgstr "课程成功被导出到Git源"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
-msgstr ""
+msgstr "我们仅支持上传.tar.gz格式文件。"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
-msgstr ""
+msgstr "文件上传失败，请重试。"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Could not find the course.xml file in the package."
-msgstr ""
+msgstr "在包中未找到course.xml文件。"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of {0}"
-msgstr ""
+msgstr "'{0}'副本"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of '{0}'"
-msgstr ""
+msgstr "'{0}'副本"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
-msgstr ""
+msgstr "来源视频数据为空。"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Can't find item by locator."
-msgstr ""
+msgstr "定位器无法找到它们。"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" modules."
-msgstr ""
+msgstr "字幕只支持视频模块。"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
-msgstr ""
+msgstr "没有足够的权限"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Could not find user by email address '{email}'."
-msgstr ""
+msgstr "无法通过邮件地址'{email}'找到用户。"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "User {email} has registered but has not yet activated his/her account."
-msgstr ""
+msgstr "用户{email}已注册但尚未激活其账户。"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "`role` is required"
-msgstr ""
+msgstr "‘角色’是必须的"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Only instructors may create other instructors"
-msgstr ""
+msgstr "只有主讲教师可以创建其他主讲教师"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "You may not remove the last instructor from a course"
-msgstr ""
+msgstr "您不可以删除课程的最后一个主讲教师"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
-msgstr ""
+msgstr "未请求的"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "pending"
-msgstr ""
+msgstr "处理中"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "granted"
-msgstr ""
+msgstr "已授权"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "denied"
-msgstr ""
+msgstr "已拒绝"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Studio user"
-msgstr ""
+msgstr "Studio用户"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "The date when state was last updated"
-msgstr ""
+msgstr "状态最后更新日期"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Current course creator state"
-msgstr ""
+msgstr "课程创建者当前状态"
 
 #: cms/djangoapps/course_creators/models.py
 msgid ""
 "Optional notes about this user (for example, why course creation access was "
 "denied)"
-msgstr ""
+msgstr "关于本用户的可选备注（例如，课程创建被拒绝的原因）"
 
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
@@ -3804,37 +3870,6 @@ msgstr ""
 #: cms/templates/asset_index.html lms/templates/courseware/courseware.html
 #: lms/templates/verify_student/_modal_editname.html
 msgid "close"
-msgstr ""
-
-#: cms/templates/component.html cms/templates/manage_users.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "Settings"
-msgstr ""
-
-#: cms/templates/component.html cms/templates/overview.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html lms/templates/problem.html
-#: lms/templates/word_cloud.html
-#: lms/templates/combinedopenended/openended/open_ended.html
-#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
-#: lms/templates/verify_student/face_upload.html
-msgid "Save"
-msgstr ""
-
-#: cms/templates/component.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/overview.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-#: lms/templates/verify_student/face_upload.html
-msgid "Cancel"
 msgstr ""
 
 #: cms/templates/container.html
@@ -3857,6 +3892,19 @@ msgstr ""
 #: cms/templates/index.html cms/templates/settings.html
 #: lms/templates/courseware/course_about.html
 msgid "Course Number"
+msgstr ""
+
+#: cms/templates/index.html cms/templates/manage_users.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: cms/templates/overview.html lms/templates/discussion/_inline_new_post.html
+#: lms/templates/discussion/_new_post.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_discussion.mustache
+#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
+#: lms/templates/verify_student/face_upload.html
+msgid "Cancel"
 msgstr ""
 
 #: cms/templates/index.html
@@ -3888,9 +3936,25 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+#: cms/templates/manage_users.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "Settings"
+msgstr ""
+
 #: cms/templates/manage_users.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Admin"
+msgstr ""
+
+#: cms/templates/overview.html cms/templates/overview.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: lms/templates/problem.html lms/templates/word_cloud.html
+#: lms/templates/combinedopenended/openended/open_ended.html
+#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
+#: lms/templates/verify_student/face_upload.html
+msgid "Save"
 msgstr ""
 
 #: cms/templates/register.html cms/templates/widgets/header.html
@@ -3951,7 +4015,7 @@ msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to register you"
-msgstr ""
+msgstr "对不起，当尝试注册时发生错误"
 
 #: common/templates/course_modes/choose.html
 msgid "Select your track:"
@@ -3984,7 +4048,7 @@ msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay?"
-msgstr ""
+msgstr "为什么我要付费？"
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -4007,7 +4071,7 @@ msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "What if I can't afford it or don't have the necessary equipment?"
-msgstr ""
+msgstr "如果我支付不起或者没有必要设备怎么办？"
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -4018,20 +4082,21 @@ msgid ""
 " below, and then click the 'Select Certificate' button to complete your "
 "registration."
 msgstr ""
+"如果你无法支付最低费用或者没有满足最低要求，你可以旁听或者选择诚信条例证书而无需付费。如果你希望获得诚信条例证书，请点击“诚信条例证书”，并在下方告诉我们你不能获得身份认证证书的原因，然后点击‘选择证书’按钮来完成你的注册。"
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
-msgstr ""
+msgstr "选择诚信条例证书"
 
 #: common/templates/course_modes/choose.html
 msgid "Explain your situation: "
-msgstr ""
+msgstr "解释你的情况："
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "Please write a few sentences about why you'd like to opt out of the paid "
 "verified certificate to pursue the honor code certificate:"
-msgstr ""
+msgstr "请简短描述你选择诚信条例证书而不选择付费课程认证证书的原因；"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
@@ -4043,7 +4108,7 @@ msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Verified Registration Requirements"
-msgstr ""
+msgstr "认证注册要求"
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -4074,7 +4139,7 @@ msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
-msgstr ""
+msgstr "旁听这门课程"
 
 #: common/templates/course_modes/choose.html
 msgid "Sign up to audit this course for free and track your own progress."
@@ -4141,7 +4206,7 @@ msgid ""
 " issues specific to a particular class, please post on the discussion forums"
 " of that&nbsp;class."
 msgstr ""
-"我们一直在寻找可以提升我们课程质量的反馈。如果您是一位已注册学生，有任何提问、反馈、建议或者其他任何关于某一课程的问题，请在相应的课堂论坛下发贴&nbsp;。"
+"我们一直在寻找可以提升我们课程质量的反馈。如果您是一位已注册学生，有任何疑问、反馈、建议或者其他任何关于某一课程的问题，请在相应的课堂论坛下发贴&nbsp;。"
 
 #: lms/templates/contact.html
 msgid "General Inquiries and Feedback"
@@ -4204,7 +4269,7 @@ msgstr "控制面板"
 #: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
-msgstr ""
+msgstr "出现错误，请稍后再试。"
 
 #: lms/templates/dashboard.html
 msgid "Please verify your new email"
@@ -4233,7 +4298,7 @@ msgstr "现在就查找课程！"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't been enrolled in any courses yet."
-msgstr ""
+msgstr "看来你还没有参加任何课程。"
 
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
@@ -4241,15 +4306,15 @@ msgstr "课程加载错误"
 
 #: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
-msgstr ""
+msgstr "{course_number}的电子邮件设置"
 
 #: lms/templates/dashboard.html
 msgid "Receive course emails"
-msgstr ""
+msgstr "接收课程邮件"
 
 #: lms/templates/dashboard.html
 msgid "Save Settings"
-msgstr ""
+msgstr "保存设置"
 
 #: lms/templates/dashboard.html
 msgid "Password Reset Email Sent"
@@ -4277,7 +4342,7 @@ msgstr "请确认您的密码："
 msgid ""
 "We will send a confirmation to both {email} and your new email as part of "
 "the process."
-msgstr "按照程序，我们将同时发送确认邮件到{email}和你的新邮箱。"
+msgstr "按照流程，我们将同时发送确认邮件到{email}和你的新邮箱。"
 
 #: lms/templates/dashboard.html
 msgid "Change your name"
@@ -4321,7 +4386,7 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Unregister"
-msgstr "未注册"
+msgstr "退出课程"
 
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
@@ -4333,7 +4398,7 @@ msgstr "邮件变更失败"
 
 #: lms/templates/email_change_failed.html
 msgid "We were unable to send a confirmation email to {email}"
-msgstr "我们将无法向 {email}发送确认邮件"
+msgstr "我们无法向 {email}发送确认邮件"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 #: lms/templates/invalid_email_key.html
@@ -4348,7 +4413,7 @@ msgstr "邮箱更改成功！"
 #: lms/templates/email_change_successful.html
 #: lms/templates/emails_change_successful.html
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
-msgstr "您可以在{link_start}主页{link_end}看到您的新邮箱地址"
+msgstr "您可以在{link_start}控制面板{link_end}看到您的新邮箱地址"
 
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
@@ -4368,7 +4433,7 @@ msgstr "添加新学生"
 
 #: lms/templates/enroll_students.html
 msgid "Existing students:"
-msgstr "已有学生："
+msgstr "现有学生："
 
 #: lms/templates/enroll_students.html
 msgid "New students added: "
@@ -4396,11 +4461,11 @@ msgstr "状态："
 
 #: lms/templates/folditbasic.html
 msgid "You have successfully gotten to level {goal_level}."
-msgstr "您已经成功达到{goal_level}水平。"
+msgstr "您已经成功达到{goal_level}级别。"
 
 #: lms/templates/folditbasic.html
 msgid "You have not yet gotten to level {goal_level}."
-msgstr "您还没有成功达到 {goal_level}水平。"
+msgstr "您还没有成功达到 {goal_level}级别。"
 
 #: lms/templates/folditbasic.html
 msgid "Completed puzzles"
@@ -4434,7 +4499,7 @@ msgstr "关于我们"
 #: lms/templates/footer.html lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
-msgstr "任务"
+msgstr "招才纳贤"
 
 #: lms/templates/footer.html lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
@@ -4454,8 +4519,8 @@ msgid ""
 "computer science, public health, and artificial intelligence."
 msgstr ""
 "{platform_name} 是由合作创建方 {Harvard} 和 {MIT} "
-"共同创立的非盈利组织，它的使命是将最好的高等教育带给世界各地的各个年龄段的学生，只要他们拥有网络连接。{platform_name}的免费在线 MOOC"
-" 是交互式的，主题包括计算机科学，公共医疗和人工智能等。"
+"共同创立的非盈利组织，它的使命是将最好的高等教育带给世界各地不同年龄段拥有上网机会的学生。{platform_name}的免费在线 MOOC "
+"提供交互式的学习体验，课程包括计算机科学，公共健康和人工智能等。"
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved."
@@ -4494,7 +4559,7 @@ msgstr "邮箱不正确。"
 
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 msgid "{platform_name} Help"
-msgstr ""
+msgstr "{platform_name} 帮助"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -4510,13 +4575,13 @@ msgid ""
 "{link_start}FAQ{link_end}."
 msgstr ""
 "对于 <strong> {platform_name} 有常见的疑问 </strong>？你可以在{platform_name} "
-"的{link_start}FAQ{link_end}上找到一些帮助。"
+"的{link_start}FAQ{link_end}上获得一些有用的信息。"
 
 #: lms/templates/help_modal.html
 msgid ""
 "Have a <strong>question about something specific</strong>? You can contact "
 "the {platform_name} general support team directly:"
-msgstr ""
+msgstr "有关<strong>平台技术方面的问题</strong>？ 请直接联络 {platform_name} 支持团队："
 
 #: lms/templates/help_modal.html
 msgid "Report a problem"
@@ -4569,7 +4634,7 @@ msgstr "附上错误消息以及导致错误的步骤等"
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Submit"
-msgstr ""
+msgstr "提交"
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -4734,11 +4799,11 @@ msgstr ""
 
 #: lms/templates/login.html
 msgid "Please log in"
-msgstr ""
+msgstr "请登录"
 
 #: lms/templates/login.html
 msgid "to access your account and courses"
-msgstr ""
+msgstr "来访问你的账户和课程"
 
 #: lms/templates/login.html
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
@@ -4831,7 +4896,7 @@ msgstr ""
 msgid ""
 "Your browser does not support the MathPlayer plugin. To use MathPlayer, "
 "please use Internet Explorer 6 through 9."
-msgstr ""
+msgstr "你的浏览器不支持MathPlayer插件。请使用IE6至9浏览器来使用MathPlayer。"
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
@@ -4895,6 +4960,10 @@ msgid "Log Out"
 msgstr "注销"
 
 #: lms/templates/navigation.html
+msgid "Shopping Cart"
+msgstr ""
+
+#: lms/templates/navigation.html
 msgid "How it Works"
 msgstr "运行机制"
 
@@ -4922,7 +4991,7 @@ msgid ""
 "recommend using {chrome_link_start}Chrome{chrome_link_end} or "
 "{ff_link_start}Firefox{ff_link_end}."
 msgstr ""
-"<strong>警告：</strong> 你的浏览器不支持全部功能.。我们强烈建议您使用 "
+"<strong>警告：</strong> 你的浏览器不支持全部功能。我们强烈建议您使用 "
 "{chrome_link_start}谷歌浏览器{chrome_link_end}或者 "
 "{ff_link_start}火狐浏览器{ff_link_end}。"
 
@@ -4965,11 +5034,11 @@ msgstr "返回%s"
 
 #: lms/templates/register-shib.html
 msgid "Preferences for {platform_name}"
-msgstr ""
+msgstr "{platform_name}偏好设置"
 
 #: lms/templates/register-shib.html
 msgid "Update my {platform_name} Account"
-msgstr ""
+msgstr "更新{platform_name}账户"
 
 #: lms/templates/register-shib.html
 msgid "Processing your account information …"
@@ -4977,7 +5046,7 @@ msgstr ""
 
 #: lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
-msgstr ""
+msgstr "欢迎 {username}! 接下来请设置你的偏好设置"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid ""
@@ -4996,7 +5065,7 @@ msgstr "必需的字段已经被<strong class=\"indicator\">粗体和星号(*)</
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 msgid "Enter a public username:"
-msgstr ""
+msgstr "输入用户昵称"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/register.html
@@ -5015,7 +5084,7 @@ msgstr ""
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr "我同意{link_start}服务条约{link_end}"
+msgstr "我同意{link_start}服务条款{link_end}"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/signup_modal.html
@@ -5024,7 +5093,7 @@ msgstr "我同意{link_start}诚信条例{link_end}"
 
 #: lms/templates/register-shib.html
 msgid "Update My Account"
-msgstr ""
+msgstr "更新我的账户"
 
 #: lms/templates/register-sidebar.html
 msgid "Registration Help"
@@ -5048,10 +5117,12 @@ msgid ""
 "future free courses. Not ready to take a course just yet? Registering puts "
 "you on our mailing list - we will update you as courses are added."
 msgstr ""
+"在 {platform_name} 注册之后, "
+"您可以访问我们现有和将来所有的免费课程。如果您现在还不想加入课程？注册将会使您加入我们的邮件列表，您将通过邮件收到新课程的通知。"
 
 #: lms/templates/register-sidebar.html
 msgid "Next Steps"
-msgstr ""
+msgstr "下面的步骤"
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -5060,6 +5131,7 @@ msgid ""
 "mark emails from class.stanford.edu as 'not spam', since you'll want to be "
 "able to receive email from your courses."
 msgstr ""
+"您会收到一封激活邮件。您必须点击激活链接才能完成注册。如果没有看见邮件，请检查垃圾邮件。若您希望收到来自课程的邮件，请把来自class.stanford.edu的邮件标记为“非垃圾邮件”。"
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -5068,20 +5140,23 @@ msgid ""
 "the email?  Check your spam folder and mark {platform_name} emails as 'not "
 "spam'.  At {platform_name}, we communicate mostly through email."
 msgstr ""
+"加入 {platform_name} "
+"的过程中，您将会收到一封激活邮件。您必须点击激活链接才能完成注册过程。如果没有看见邮件，请检查垃圾邮件夹并把来自{platform_name}的邮件标记为”非垃圾邮件“。在"
+" {platform_name}，我们主要通过电子邮件联系。"
 
 #: lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
-msgstr ""
+msgstr "在注册{platform_name}时需要帮助？"
 
 #: lms/templates/register-sidebar.html
 msgid "View our FAQs for answers to commonly asked questions."
-msgstr ""
+msgstr "查看我们的FAQ来获得常见问题的解答。"
 
 #: lms/templates/register-sidebar.html
 msgid ""
 "Once registered, most questions can be answered in the course specific "
 "discussion forums or through the FAQs."
-msgstr ""
+msgstr "注册成功后，大部分问题均可在具体课程讨论论坛或FAQ中得到解决。"
 
 #: lms/templates/register.html
 msgid "Register for {platform_name}"
@@ -5093,11 +5168,11 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Welcome!"
-msgstr ""
+msgstr "欢迎！"
 
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
-msgstr ""
+msgstr "注册以创建你在 {platform_name}的账户"
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
@@ -5154,7 +5229,7 @@ msgstr "出生年份"
 
 #: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
-msgstr "请与我们分享您注册 {platform_name}的原因"
+msgstr "请告诉我们您注册 {platform_name}的原因"
 
 #: lms/templates/register.html lms/templates/university_profile/edge.html
 msgid "Register"
@@ -5177,16 +5252,16 @@ msgstr ""
 #: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Previous"
-msgstr ""
+msgstr "上一个"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
 msgid "Section Navigation"
-msgstr ""
+msgstr "章节导航"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Next"
-msgstr ""
+msgstr "下一个"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -5194,47 +5269,47 @@ msgstr ""
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. yourname@domain.com"
-msgstr ""
+msgstr "例如 yourname@domain.com"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. yourname (shown on forums)"
-msgstr ""
+msgstr "例如：昵称(在论坛上显示的名称)"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. Your Name (for certificates)"
-msgstr ""
+msgstr "例如：姓名(用于证书)"
 
 #: lms/templates/signup_modal.html
 msgid "<i>Welcome</i> {name}"
-msgstr ""
+msgstr "<i>欢迎</i> {name}"
 
 #: lms/templates/signup_modal.html
 msgid "Full Name *"
-msgstr ""
+msgstr "全名 *"
 
 #: lms/templates/signup_modal.html
 msgid "Ed. Completed"
-msgstr ""
+msgstr "已完成"
 
 #: lms/templates/signup_modal.html
 msgid "Year of birth"
-msgstr ""
+msgstr "出生年份"
 
 #: lms/templates/signup_modal.html
 msgid "Mailing address"
-msgstr ""
+msgstr "邮寄地址"
 
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
-msgstr ""
+msgstr "注册加入{platform_name}的目标"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
-msgstr ""
+msgstr "已经有了账号？"
 
 #: lms/templates/signup_modal.html
 msgid "Login."
-msgstr ""
+msgstr "登录"
 
 #. Translators: The 'Group' here refers to the group of users that has been
 #. sorted into group_id
@@ -5244,27 +5319,27 @@ msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
-msgstr ""
+msgstr "工作人员调试信息"
 
 #: lms/templates/staff_problem_info.html
 msgid "Submission history"
-msgstr ""
+msgstr "提交历史"
 
 #: lms/templates/staff_problem_info.html
 msgid "{platform_name} Content Quality Assessment"
-msgstr ""
+msgstr "{platform_name} 内容质量评估"
 
 #: lms/templates/staff_problem_info.html
 msgid "Comment"
-msgstr ""
+msgstr "注释"
 
 #: lms/templates/staff_problem_info.html
 msgid "comment"
-msgstr ""
+msgstr "注释"
 
 #: lms/templates/staff_problem_info.html
 msgid "Tag"
-msgstr ""
+msgstr "标签"
 
 #: lms/templates/staff_problem_info.html
 msgid "Optional tag (eg \"done\" or \"broken\"):"
@@ -5272,45 +5347,45 @@ msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "tag"
-msgstr ""
+msgstr "标签"
 
 #: lms/templates/staff_problem_info.html
 msgid "Add comment"
-msgstr ""
+msgstr "添加评论"
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug"
-msgstr ""
+msgstr "工作人员调试"
 
 #: lms/templates/staff_problem_info.html lms/templates/staff_problem_info.html
 msgid "Module Fields"
-msgstr ""
+msgstr "模块域"
 
 #: lms/templates/staff_problem_info.html
 msgid "XML attributes"
-msgstr ""
+msgstr "XML 属性"
 
 #: lms/templates/staff_problem_info.html
 msgid "Submission History Viewer"
-msgstr ""
+msgstr "提交历史查看器"
 
 #: lms/templates/staff_problem_info.html
 msgid "User:"
-msgstr ""
+msgstr "用户："
 
 #: lms/templates/staff_problem_info.html
 msgid "View History"
-msgstr ""
+msgstr "查看历史记录"
 
 #: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
 #: lms/templates/staticbook.html
 msgid "{course_number} Textbook"
-msgstr ""
+msgstr "{course_number} 教材"
 
 #: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
 #: lms/templates/staticbook.html
 msgid "Textbook Navigation"
-msgstr ""
+msgstr "课本导航"
 
 #: lms/templates/staticbook.html
 msgid "Previous page"
@@ -5425,7 +5500,7 @@ msgstr ""
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Course ID"
-msgstr ""
+msgstr "课程编号"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
@@ -5445,23 +5520,23 @@ msgstr ""
 
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
-msgstr ""
+msgstr "追踪记录"
 
 #: lms/templates/tracking_log.html
 msgid "datetime"
-msgstr ""
+msgstr "日期时间"
 
 #: lms/templates/tracking_log.html
 msgid "ipaddr"
-msgstr ""
+msgstr "IP地址"
 
 #: lms/templates/tracking_log.html
 msgid "source"
-msgstr ""
+msgstr "源"
 
 #: lms/templates/tracking_log.html
 msgid "type"
-msgstr ""
+msgstr "类型"
 
 #: lms/templates/unsubscribe.html
 msgid "Unsubscribe Successful!"
@@ -5477,20 +5552,20 @@ msgstr ""
 
 #: lms/templates/using.html
 msgid "Using the system"
-msgstr ""
+msgstr "使用系统"
 
 #: lms/templates/using.html
 msgid ""
 "During video playback, use the subtitles and the scroll bar to navigate. "
 "Clicking the subtitles is a fast way to skip forwards and backwards by small"
 " amounts."
-msgstr ""
+msgstr "在视频回放期间，您可以使用字幕或者滚动条来操纵视频播放。点击字幕可以便捷地实现向前或向后跳跃一小段。"
 
 #: lms/templates/using.html
 msgid ""
 "If you are on a low-resolution display, the left navigation bar can be "
 "hidden by clicking on the set of three left arrows next to it."
-msgstr ""
+msgstr "如果您使用的是低分辨率的显示器，可以通过点击旁边的三个左箭头来隐藏左边的滚动条。"
 
 #: lms/templates/using.html
 msgid ""
@@ -5498,6 +5573,8 @@ msgid ""
 "them up or down. Under Google Chrome, this is done by pressing ctrl-plus, or"
 " ctrl-minus at the same time."
 msgstr ""
+"如果您需要改变字体大小，请使用浏览器设置实现缩放。以Google Chrome浏览器为例，可以通过按键\"Ctrl\" 和 \"+\"，\"Ctrl\""
+" 和 \"-\" 来使用放大和缩小功能。"
 
 #: lms/templates/video.html
 msgid "Skip to a navigable version of this video's transcript."
@@ -5517,19 +5594,19 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Play"
-msgstr ""
+msgstr "播放"
 
 #: lms/templates/video.html
 msgid "Speeds"
-msgstr ""
+msgstr "速度"
 
 #: lms/templates/video.html
 msgid "Speed"
-msgstr ""
+msgstr "速度"
 
 #: lms/templates/video.html
 msgid "Volume"
-msgstr ""
+msgstr "音量"
 
 #: lms/templates/video.html
 msgid "Fill browser"
@@ -5541,7 +5618,7 @@ msgstr ""
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Turn off captions"
-msgstr ""
+msgstr "关闭字幕"
 
 #: lms/templates/video.html
 msgid "Skip to end of transcript."
@@ -5559,7 +5636,7 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Download video"
-msgstr ""
+msgstr "下载视频"
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Download transcript"
@@ -5571,11 +5648,11 @@ msgstr ""
 
 #: lms/templates/word_cloud.html
 msgid "Your words:"
-msgstr ""
+msgstr "您的话："
 
 #: lms/templates/word_cloud.html
 msgid "Total number of words:"
-msgstr ""
+msgstr "总字数："
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Open Response"
@@ -5588,7 +5665,7 @@ msgstr ""
 #: lms/templates/combinedopenended/combined_open_ended.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Hide Question"
-msgstr ""
+msgstr "隐藏问题"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "New Submission"
@@ -5596,7 +5673,7 @@ msgstr ""
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Next Step"
-msgstr ""
+msgstr "下一步"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid ""
@@ -5609,7 +5686,7 @@ msgstr ""
 
 #: lms/templates/combinedopenended/combined_open_ended_legend.html
 msgid "Legend"
-msgstr ""
+msgstr " 图例"
 
 #: lms/templates/combinedopenended/combined_open_ended_results.html
 msgid "Submitted Rubric"
@@ -5637,7 +5714,7 @@ msgstr ""
 #. graded openended problem
 #: lms/templates/combinedopenended/open_ended_result_table.html
 msgid "See full feedback"
-msgstr ""
+msgstr "查看所有反馈"
 
 #. Translators: this text forms a link that, when
 #. clicked, allows a user to respond to the feedback
@@ -5648,47 +5725,47 @@ msgstr ""
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Respond to Feedback"
-msgstr ""
+msgstr "回复反馈"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "How accurate do you find this feedback?"
-msgstr ""
+msgstr "您认为这个反馈是否准确？"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Correct"
-msgstr ""
+msgstr "正确"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Partially Correct"
-msgstr ""
+msgstr "部分正确"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "No Opinion"
-msgstr ""
+msgstr "没有建议"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Partially Incorrect"
-msgstr ""
+msgstr "部分不正确"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Incorrect"
-msgstr ""
+msgstr "不正确"
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Additional comments:"
-msgstr ""
+msgstr "附加说明："
 
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Submit Feedback"
-msgstr ""
+msgstr "提交反馈"
 
 #. Translators: "Response" labels an area that contains the user's
 #. Response to an openended problem. It is a noun.
@@ -5698,15 +5775,15 @@ msgstr ""
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Response"
-msgstr ""
+msgstr "回复"
 
 #: lms/templates/combinedopenended/openended/open_ended.html
 msgid "Unanswered"
-msgstr ""
+msgstr "未答复"
 
 #: lms/templates/combinedopenended/openended/open_ended.html
 msgid "Skip Post-Assessment"
-msgstr ""
+msgstr "跳过后继评阅"
 
 #: lms/templates/combinedopenended/openended/open_ended_combined_rubric.html
 msgid "{num} point: {explanatory_text}"
@@ -5715,11 +5792,11 @@ msgstr[0] ""
 
 #: lms/templates/combinedopenended/openended/open_ended_error.html
 msgid "There was an error with your submission.  Please contact course staff."
-msgstr ""
+msgstr "您的提交出现错误，请联系课程教员。"
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html
 msgid "Rubric"
-msgstr ""
+msgstr "评分标准"
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html
 msgid ""
@@ -5734,35 +5811,35 @@ msgstr[0] ""
 
 #: lms/templates/combinedopenended/selfassessment/self_assessment_hint.html
 msgid "Please enter a hint below:"
-msgstr ""
+msgstr "请在下面输入一个提示："
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Cohort groups"
-msgstr ""
+msgstr "同伴小组"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Show cohorts"
-msgstr ""
+msgstr "显示同伴"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Cohorts in the course"
-msgstr ""
+msgstr "课程中的同伴"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Add cohort"
-msgstr ""
+msgstr "添加同伴"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Add users by username or email.  One per line or comma-separated."
-msgstr ""
+msgstr "通过用户名或电子邮件添加用户。每行一个用户或使用逗号分隔。"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Add cohort members"
-msgstr ""
+msgstr "添加同伴"
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
-msgstr ""
+msgstr "{chapter}, 当前章节"
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
@@ -5779,7 +5856,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "About {course.display_number_with_default}"
-msgstr ""
+msgstr "关于{course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html
 msgid "You are registered for this course"
@@ -5787,7 +5864,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
-msgstr ""
+msgstr "进入课程"
 
 #: lms/templates/courseware/course_about.html
 msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
@@ -5800,7 +5877,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course.display_number_with_default}"
-msgstr ""
+msgstr "注册{course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -5808,11 +5885,11 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Overview"
-msgstr ""
+msgstr "课程概况"
 
 #: lms/templates/courseware/course_about.html
 msgid "Share with friends and family!"
-msgstr ""
+msgstr "与亲朋好友分享！"
 
 #. Translators: This text will be automatically posted to the student's
 #. Twitter account. {url} should appear at the end of the text.
@@ -5830,11 +5907,11 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
-msgstr ""
+msgstr "课程开始"
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes End"
-msgstr ""
+msgstr "课程结束"
 
 #: lms/templates/courseware/course_about.html
 msgid "Estimated Effort"
@@ -5842,11 +5919,11 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Prerequisites"
-msgstr ""
+msgstr "预备知识"
 
 #: lms/templates/courseware/course_about.html
 msgid "Additional Resources"
-msgstr ""
+msgstr "额外资源"
 
 #. Translators: 'needs attention' is an alternative string for the
 #. notification image that indicates the tab "needs attention".
@@ -5857,19 +5934,19 @@ msgstr ""
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/course_navigation.html
 msgid "Staff view"
-msgstr ""
+msgstr "教员视图"
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Student view"
-msgstr ""
+msgstr "学生视图"
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from leading universities."
-msgstr ""
+msgstr "浏览顶尖大学的免费课程。"
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from {university_name}."
-msgstr ""
+msgstr "浏览{university_name}的免费课程。"
 
 #: lms/templates/courseware/courseware-error.html
 msgid ""
@@ -5880,19 +5957,19 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "{course_number} Courseware"
-msgstr ""
+msgstr "{course_number} 课件"
 
 #: lms/templates/courseware/courseware.html
 msgid "Return to Exam"
-msgstr ""
+msgstr "返回考试"
 
 #: lms/templates/courseware/courseware.html
 msgid "Course Navigation"
-msgstr ""
+msgstr "课程导航"
 
 #: lms/templates/courseware/courseware.html
 msgid "Open Calculator"
-msgstr ""
+msgstr "开启计算器"
 
 #: lms/templates/courseware/courseware.html
 msgid "Calculator Input Field"
@@ -5906,7 +5983,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Hints"
-msgstr ""
+msgstr "提示"
 
 #: lms/templates/courseware/courseware.html
 msgid "Integers"
@@ -5942,7 +6019,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Constants"
-msgstr ""
+msgstr "常量"
 
 #: lms/templates/courseware/courseware.html
 msgid "Euler's number"
@@ -5986,16 +6063,16 @@ msgstr ""
 #: lms/templates/courseware/grade_summary.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade summary"
-msgstr ""
+msgstr "评分汇总"
 
 #: lms/templates/courseware/grade_summary.html
 msgid "Not implemented yet"
-msgstr ""
+msgstr "尚未实现"
 
 #: lms/templates/courseware/gradebook.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Gradebook"
-msgstr ""
+msgstr "成绩簿"
 
 #: lms/templates/courseware/gradebook.html
 msgid "Search students"
@@ -6011,22 +6088,22 @@ msgstr ""
 
 #: lms/templates/courseware/info.html lms/templates/courseware/info.html
 msgid "Course Updates &amp; News"
-msgstr ""
+msgstr "课程动态 &amp; 新闻"
 
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
-msgstr ""
+msgstr "讲义导航"
 
 #: lms/templates/courseware/info.html
 msgid "Course Handouts"
-msgstr ""
+msgstr "课程讲义"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
-msgstr ""
+msgstr "授课教师面板"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -6039,23 +6116,23 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
-msgstr ""
+msgstr "心理测验学"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Forum Admin"
-msgstr ""
+msgstr "论坛管理员"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Enrollment"
-msgstr ""
+msgstr "注册"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "DataDump"
-msgstr ""
+msgstr "数据转储 "
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Manage Groups"
-msgstr ""
+msgstr "管理小组"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Metrics"
@@ -6076,22 +6153,22 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Export grades to remote gradebook"
-msgstr ""
+msgstr "将成绩导出到远程成绩单"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "The assignments defined for this course should match the ones stored in the "
 "gradebook, for this to work properly!"
-msgstr ""
+msgstr "这门课程的作业必须与存储在成绩单上的保持一致，否则系统会出现错误。"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Gradebook name:"
-msgstr ""
+msgstr "成绩单姓名："
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Assignment name:"
-msgstr ""
+msgstr "作业名称："
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -6115,22 +6192,24 @@ msgid ""
 "<tt>i4x://university/course/notaproblem/someothername</tt>, then provide "
 "<tt>notaproblem/someothername</tt>.)"
 msgstr ""
+"你可以使用 \"urlname\"如果这是一个问题，否则使用\"modulename/urlname\"。(如当前地址是 "
+"<tt>i4x://university/course/problem/problemname</tt>，你可以仅提供<tt>problemname</tt>。如果当前地址是<tt>i4x://university/course/notaproblem/someothername</tt>，那么请提供<tt>notaproblem/someothername</tt>。)"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Then select an action:"
-msgstr ""
+msgstr "然后选择一个操作："
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "These actions run in the background, and status for active tasks will appear"
 " in a table below. To see status for all tasks submitted for this problem, "
 "click on this button:"
-msgstr ""
+msgstr "这些项目在后台运行，而活跃任务状态会出现在如下表格中。如果你想查看这个问题的所有提交的状态，请点击这个按钮："
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Student-specific grade inspection and adjustment"
-msgstr ""
+msgstr "特定学生分数检查和调整"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -6140,23 +6219,23 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
-msgstr ""
+msgstr "在这可以查看{platform_name}的邮件地址以及学生的用户名："
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Click this, and a link to student's progress page will appear below:"
-msgstr ""
+msgstr "点击这里，学生学习进度页面的链接将会显示在下方。"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "You may also delete the entire state of a student for the specified module:"
-msgstr ""
+msgstr "您也可以删除一个特定模块的学生的全部状态"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in"
 " a table below. To see status for all tasks submitted for this problem and "
 "student, click on this button:"
-msgstr ""
+msgstr "后台正在重新评分，活跃任务状态会出现在如下表格中。如果你要查看关于这个问题所有提交的状态，点击这个按钮。"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Select a problem and an action:"
@@ -6194,7 +6273,7 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Enrollment Data"
-msgstr ""
+msgstr "课程注册数据"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Pull enrollment from remote gradebook"
@@ -6209,7 +6288,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Enrollment"
-msgstr ""
+msgstr "大批次注册"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
@@ -6241,12 +6320,12 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send to:"
-msgstr ""
+msgstr "发至："
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Myself"
-msgstr ""
+msgstr "我自己"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6265,7 +6344,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
-msgstr ""
+msgstr "主题："
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -6329,11 +6408,11 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Day"
-msgstr ""
+msgstr "日"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students"
-msgstr ""
+msgstr "学生"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Score distribution for problems"
@@ -6381,11 +6460,11 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students answering correctly"
-msgstr ""
+msgstr "回答正确的学生"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Number of students"
-msgstr ""
+msgstr "学生数目"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
@@ -6403,36 +6482,36 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task Type"
-msgstr ""
+msgstr "任务类型"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task inputs"
-msgstr ""
+msgstr "任务输入"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task Id"
-msgstr ""
+msgstr "任务编号"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Requester"
-msgstr ""
+msgstr "请求者"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task State"
-msgstr ""
+msgstr "任务状态"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Duration (sec)"
-msgstr ""
+msgstr "持续时间(秒)"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task Progress"
-msgstr ""
+msgstr "任务进度"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "unknown"
-msgstr ""
+msgstr "未知"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Course errors"
@@ -6440,31 +6519,31 @@ msgstr ""
 
 #: lms/templates/courseware/mktg_coming_soon.html
 msgid "About {course_id}"
-msgstr ""
+msgstr "关于{course_id}"
 
 #: lms/templates/courseware/mktg_coming_soon.html
 msgid "Coming Soon"
-msgstr ""
+msgstr "即将上线"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "About {course_number}"
-msgstr ""
+msgstr "关于{course_number}"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Access Courseware"
-msgstr ""
+msgstr "进入课程"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "You Are Registered"
-msgstr ""
+msgstr "您已经注册。"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Register for"
-msgstr ""
+msgstr "注册"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Registration Is Closed"
-msgstr ""
+msgstr "注册已经截止。"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -6472,7 +6551,7 @@ msgstr ""
 
 #: lms/templates/courseware/news.html
 msgid "Updates to Discussion Posts You Follow"
-msgstr ""
+msgstr "您关注的讨论帖的更新情况"
 
 #: lms/templates/courseware/progress.html
 msgid "{course_number} Progress"
@@ -6508,19 +6587,19 @@ msgstr ""
 
 #: lms/templates/courseware/syllabus.html
 msgid "{course.display_number_with_default} Course Info"
-msgstr ""
+msgstr "{course.display_number_with_default}课程信息"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
 "another section on the left."
-msgstr ""
+msgstr "您最近在{section_link}。如果您已经完成此章节，请选择左侧的另一个章节。"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
-msgstr "目前期末成绩尚未揭晓，但是您很快就能知晓最终名次。"
+msgstr "课程数据正在处理中，你将很快能看到最终的成绩。"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -6556,7 +6635,7 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "This link will open/download a PDF document"
-msgstr "这个链接会打开或下载一个PDF文件"
+msgstr "点击此链接打开或下载PDF文件"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -6582,7 +6661,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
-msgstr "完成课程反馈调研"
+msgstr "填写课程反馈问卷"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -6591,7 +6670,7 @@ msgstr "{course_number} {course_name} 封面图片"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
-msgstr ""
+msgstr "登记为："
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
@@ -6599,7 +6678,7 @@ msgstr ""
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "ID Verified"
-msgstr ""
+msgstr "ID验证"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
@@ -6663,8 +6742,15 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Email Settings"
+msgid ""
+"In order to request a refund for the amount you paid, you will need to send "
+"an email to {billing_email}.  Be sure to include your email and the course "
+"name."
 msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Email Settings"
+msgstr "电子邮件设置"
 
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
@@ -6774,7 +6860,7 @@ msgstr ""
 #: lms/templates/discussion/_discussion_course_navigation.html
 #: lms/templates/discussion/_discussion_module.html
 msgid "New Post"
-msgstr ""
+msgstr "新讨论帖"
 
 #: lms/templates/discussion/_discussion_module.html
 msgid "Show Discussion"
@@ -6786,7 +6872,7 @@ msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Filter Topics"
-msgstr ""
+msgstr "过滤主题"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "filter topics"
@@ -6796,29 +6882,29 @@ msgstr ""
 #: lms/templates/discussion/_new_post.html
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Show All Discussions"
-msgstr ""
+msgstr "显示所有讨论帖"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Show Flagged Discussions"
-msgstr ""
+msgstr "显示被举报的讨论帖"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
-msgstr ""
+msgstr "我关注的讨论帖"
 
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
 #: lms/templates/discussion/mustache/_inline_discussion.mustache
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 msgid "follow this post"
-msgstr ""
+msgstr "关注这个帖子"
 
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
 #: lms/templates/discussion/mustache/_inline_discussion.mustache
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 msgid "post anonymously"
-msgstr ""
+msgstr "匿名发帖"
 
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
@@ -6834,11 +6920,11 @@ msgstr ""
 #: lms/templates/discussion/_new_post.html
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 msgid "Make visible to:"
-msgstr ""
+msgstr "对其可见："
 
 #: lms/templates/discussion/_inline_new_post.html
 msgid "My Cohort"
-msgstr ""
+msgstr "我的同伴"
 
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
@@ -6866,7 +6952,7 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_discussion.mustache
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 msgid "Add post"
-msgstr ""
+msgstr "发新讨论帖"
 
 #: lms/templates/discussion/_new_post.html
 msgid "Create new post about:"
@@ -6874,7 +6960,7 @@ msgstr ""
 
 #: lms/templates/discussion/_new_post.html
 msgid "Filter List"
-msgstr ""
+msgstr "过滤列表"
 
 #: lms/templates/discussion/_new_post.html
 msgid "Filter discussion areas"
@@ -6882,15 +6968,15 @@ msgstr ""
 
 #: lms/templates/discussion/_recent_active_posts.html
 msgid "Following"
-msgstr ""
+msgstr "关注"
 
 #: lms/templates/discussion/_search_bar.html
 msgid "Search posts"
-msgstr ""
+msgstr "搜索讨论帖"
 
 #: lms/templates/discussion/_similar_posts.html
 msgid "Hide"
-msgstr ""
+msgstr "隐藏"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion Home"
@@ -6898,11 +6984,11 @@ msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion Topics"
-msgstr ""
+msgstr "讨论主题"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion topics; current selection is: "
-msgstr ""
+msgstr "讨论主题；当前选中的是:"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search all discussions"
@@ -6910,27 +6996,27 @@ msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Sort by:"
-msgstr ""
+msgstr "排序："
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "date"
-msgstr ""
+msgstr "日期"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "votes"
-msgstr ""
+msgstr "票数"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "comments"
-msgstr ""
+msgstr "评论数"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Show:"
-msgstr ""
+msgstr "显示："
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "View All"
-msgstr ""
+msgstr "查看所有"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "View as {name}"
@@ -6946,13 +7032,13 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/discussion/mustache/_profile_thread.mustache
 msgid "This thread is closed."
-msgstr ""
+msgstr "这个帖子已经关闭。"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Post a response:"
-msgstr ""
+msgstr "回复："
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -6964,7 +7050,7 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "&bull; This thread is closed."
-msgstr ""
+msgstr "&bull; 这个帖子已经关闭。"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "follow"
@@ -6983,7 +7069,7 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Pin Thread"
-msgstr ""
+msgstr "置顶讨论帖"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
@@ -7004,11 +7090,11 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Update post"
-msgstr ""
+msgstr "更新讨论帖"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Add a comment"
-msgstr ""
+msgstr "添加评论"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Add a comment..."
@@ -7020,11 +7106,11 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing response"
-msgstr ""
+msgstr "编辑回复"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Update response"
-msgstr ""
+msgstr "更新回复"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -7128,21 +7214,21 @@ msgstr[0] ""
 #: lms/templates/discussion/index.html
 #: lms/templates/discussion/user_profile.html
 msgid "Discussion - {course_number}"
-msgstr ""
+msgstr "讨论 - {course_number}"
 
 #: lms/templates/discussion/maintenance.html
 msgid "We're sorry"
-msgstr ""
+msgstr "很抱歉"
 
 #: lms/templates/discussion/maintenance.html
 msgid ""
 "The forums are currently undergoing maintenance. We'll have them back up "
 "shortly!"
-msgstr ""
+msgstr "论坛现在正在维护，将尽快恢复正常。"
 
 #: lms/templates/discussion/user_profile.html
 msgid "User Profile"
-msgstr ""
+msgstr "用户资料"
 
 #: lms/templates/discussion/user_profile.html
 msgid "Active Threads"
@@ -7444,7 +7530,7 @@ msgstr ""
 
 #: lms/templates/instructor/staff_grading.html
 msgid "Problem List"
-msgstr ""
+msgstr "问题列表"
 
 #: lms/templates/instructor/staff_grading.html
 msgid ""
@@ -7457,16 +7543,16 @@ msgstr ""
 
 #: lms/templates/instructor/staff_grading.html
 msgid "Prompt"
-msgstr ""
+msgstr "提示"
 
 #: lms/templates/instructor/staff_grading.html
 msgid "(Hide)"
-msgstr ""
+msgstr "(隐藏)"
 
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Student Response"
-msgstr ""
+msgstr "学生回复"
 
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -7483,7 +7569,7 @@ msgstr ""
 
 #: lms/templates/instructor/staff_grading.html
 msgid "Skip"
-msgstr ""
+msgstr "跳过"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Score Distribution"
@@ -7503,11 +7589,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Loading problem list..."
-msgstr ""
+msgstr "加载问题列表……"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Gender Distribution"
-msgstr ""
+msgstr "性别分布"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
@@ -7559,7 +7645,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Warnings"
-msgstr ""
+msgstr "课程警告"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7599,7 +7685,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Get Student Anonymized IDs CSV"
-msgstr ""
+msgstr "获取学生匿名ID CSV文件"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports"
@@ -7731,7 +7817,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Back to Standard Dashboard"
-msgstr ""
+msgstr "返回标准控制面板"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "section_display_name"
@@ -7739,7 +7825,8 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Enter email addresses separated by new lines or commas."
+msgid ""
+"Enter email addresses and/or usernames separated by new lines or commas."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7750,12 +7837,13 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Email Addresses"
+msgid "Email Addresses/Usernames"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Auto Enroll"
-msgstr ""
+msgstr "自动注册"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -7788,20 +7876,30 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Enroll"
-msgstr ""
+msgstr "注册"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Unenroll"
-msgstr ""
+msgstr "未注册"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Batch Beta Testers"
+msgid "Batch Beta Tester Addition"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Note: Users must have an activated {platform_name} account before they can "
 "be enrolled as a beta tester."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"If this option is <em>checked</em>, users who have not enrolled in your "
+"course will be automatically enrolled."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Checking this box has no effect if 'Remove beta testers' is selected."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -7827,7 +7925,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Getting available lists..."
-msgstr ""
+msgstr "获取可用列表..."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -7868,13 +7966,13 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Beta Testers"
-msgstr ""
+msgstr "Beta测试者"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Beta testers can see course content before the rest of the students. They "
 "can make sure that the content works, but have no additional privileges."
-msgstr ""
+msgstr "Beta测试者可以在其余学生之前看到课程内容。他们可以确保内容有效，但没有额外特权。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Beta Tester"
@@ -7909,7 +8007,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Moderator"
-msgstr ""
+msgstr "添加版主"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Community TAs"
@@ -7933,6 +8031,27 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Count of Students Opened a Subsection"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Student Opened as a CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Student Grades as a CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "This is a partial list, to view all students download as a csv."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Percent"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -7972,28 +8091,28 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
-msgstr ""
+msgstr "特定学生分数检查和调整"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Email or Username"
-msgstr ""
+msgstr "学生e-mail或者用户名"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Click this link to view the student's progress page:"
-msgstr ""
+msgstr "点击以观看学生进度页面"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Progress Page"
-msgstr ""
+msgstr "学生进度页面"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade adjustment"
-msgstr ""
+msgstr "特定学生分数调整"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem urlname"
-msgstr ""
+msgstr "问题网址"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -8013,7 +8132,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Student Submission"
-msgstr ""
+msgstr "对学生的提交记录重新评分"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -8037,15 +8156,15 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Then select an action"
-msgstr ""
+msgstr "选择一个操作"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Reset ALL students' attempts"
-msgstr ""
+msgstr "重置所有学生的尝试"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore ALL students' problem submissions"
-msgstr ""
+msgstr "重新对学生的问题提交评分"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -8088,7 +8207,7 @@ msgstr ""
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
-msgstr ""
+msgstr "{course_number} 所有通知"
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "Open Ended Console"
@@ -8096,11 +8215,11 @@ msgstr ""
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "Here are items that could potentially need your attention."
-msgstr ""
+msgstr "下面是一些可能需要您注意的事项。"
 
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "No items require attention at the moment."
-msgstr ""
+msgstr "当前没有需要注意的事项"
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "{course_number} Flagged Open Ended Problems"
@@ -8151,7 +8270,7 @@ msgstr ""
 
 #: lms/templates/open_ended_problems/open_ended_problems.html
 msgid "Grader Type"
-msgstr ""
+msgstr "评分者类型"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
@@ -8170,20 +8289,20 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading_closed.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Peer Grading"
-msgstr ""
+msgstr "同伴互评"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
 "Here are a list of problems that need to be peer graded for this course."
-msgstr ""
+msgstr "以下是这门课程中需要进行同伴互评的问题列表。"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Due date"
-msgstr ""
+msgstr "截止日期"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Graded"
-msgstr ""
+msgstr "已评分"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Available"
@@ -8195,25 +8314,25 @@ msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "No due date"
-msgstr ""
+msgstr "没有截止日期"
 
 #: lms/templates/peer_grading/peer_grading_closed.html
 msgid ""
 "The due date has passed, and peer grading for this problem is closed at this"
 " time."
-msgstr ""
+msgstr "截止日期已过，这个问题的同伴互评现已关闭。"
 
 #: lms/templates/peer_grading/peer_grading_closed.html
 msgid "The due date has passed, and peer grading is closed at this time."
-msgstr ""
+msgstr "截止日期已过，同伴互评现已关闭。"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Learning to Grade"
-msgstr ""
+msgstr "学习如何评分"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Please include some written feedback as well."
-msgstr ""
+msgstr "请给出一些书面反馈。"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid ""
@@ -8223,33 +8342,33 @@ msgstr ""
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "How did I do?"
-msgstr ""
+msgstr "我应该怎么做？"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Continue"
-msgstr ""
+msgstr "继续"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Ready to grade!"
-msgstr ""
+msgstr "已经准备好进行评分！"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid ""
 "You have finished learning to grade, which means that you are now ready to "
 "start grading."
-msgstr ""
+msgstr "您已完成了评分学习，这意味着现在你可以开始评分了。"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Start Grading!"
-msgstr ""
+msgstr "开始评分！"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Learning to grade"
-msgstr ""
+msgstr "学习如何进行评分"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "You have not yet finished learning to grade this problem."
-msgstr ""
+msgstr "您尚未完成学习如何对此问题进行评分。"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid ""
@@ -8265,7 +8384,7 @@ msgstr ""
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Start learning to grade"
-msgstr ""
+msgstr "开始学习如何进行评分"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Are you sure that you want to flag this submission?"
@@ -8281,25 +8400,25 @@ msgstr ""
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Remove Flag"
-msgstr ""
+msgstr "取消举报"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Keep Flag"
-msgstr ""
+msgstr "维持举报"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Go Back"
-msgstr ""
+msgstr "返回"
 
 #: lms/templates/registration/activate_account_notice.html
 msgid "Thanks For Registering!"
-msgstr ""
+msgstr "感谢您的注册！"
 
 #: lms/templates/registration/activate_account_notice.html
 msgid ""
 "Your account is not active yet. An activation link has been sent to {email},"
 " along with instructions for activating your account."
-msgstr ""
+msgstr "您的账号尚未激活。我们已发送一封电子邮件至{email}，里面包含一个激活账号的链接，以及激活账号的操作说明。"
 
 #: lms/templates/registration/activation_complete.html
 msgid "Activation Complete!"
@@ -8311,7 +8430,7 @@ msgstr "账号已经被激活！"
 
 #: lms/templates/registration/activation_complete.html
 msgid "You can now {link_start}log in{link_end}."
-msgstr ""
+msgstr "您现在可以{link_start}登录{link_end}。"
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Activation Invalid"
@@ -8331,13 +8450,13 @@ msgstr "或者您可以返回至{link_start}主页{link_end}。"
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
-msgstr ""
+msgstr "密码重设成功"
 
 #: lms/templates/registration/password_reset_done.html
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr ""
+msgstr "我们已经给您的邮箱发送邮件，您应该能够很快收到，请按照邮件里的指示设置密码。"
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Data"
@@ -8372,19 +8491,19 @@ msgstr ""
 
 #: lms/templates/shoppingcart/error.html
 msgid "Payment Error"
-msgstr ""
+msgstr "支付错误"
 
 #: lms/templates/shoppingcart/error.html
 msgid "There was an error processing your order!"
-msgstr ""
+msgstr "处理您的订单时出现了一个错误！"
 
 #: lms/templates/shoppingcart/list.html
 msgid "Your Shopping Cart"
-msgstr ""
+msgstr "您的购物车"
 
 #: lms/templates/shoppingcart/list.html
 msgid "Your selected items:"
-msgstr ""
+msgstr "您选择的项目："
 
 #: lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
@@ -8403,23 +8522,33 @@ msgstr ""
 
 #: lms/templates/shoppingcart/list.html
 msgid "You have selected no items for purchase."
-msgstr ""
+msgstr "您没有选择任何要购买的项目。"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Register for [Course Name] | Receipt (Order"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid " () Electronic Receipt"
+msgid "Thank you for your Purchase!"
 msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid ""
+"Please print this receipt page for your records. You should also have "
+"received a receipt in your email."
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid " () Electronic Receipt"
+msgstr "() 电子收据"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Order #"
-msgstr ""
+msgstr "订单号"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Date:"
-msgstr ""
+msgstr "日期："
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Items ordered:"
@@ -8432,16 +8561,16 @@ msgstr ""
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Note: items with strikethough like "
-msgstr ""
+msgstr "注意：划了删除线的项目"
 
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid " have been refunded."
-msgstr ""
+msgstr "已退款。"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Billed To:"
-msgstr ""
+msgstr "付款方："
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Receipt (Order"
@@ -8679,15 +8808,15 @@ msgstr ""
 
 #: lms/templates/university_profile/edge.html
 msgid "Log in to your courses"
-msgstr ""
+msgstr "登录到您的课程"
 
 #: lms/templates/university_profile/edge.html
 msgid "Register for classes"
-msgstr ""
+msgstr "注册课程"
 
 #: lms/templates/university_profile/edge.html
 msgid "Take free online courses from today's leading universities."
-msgstr ""
+msgstr "加入领先大学的免费在线课程。"
 
 #: lms/templates/verify_student/_modal_editname.html
 msgid "Edit Your Name"
@@ -9572,130 +9701,130 @@ msgstr ""
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
-msgstr ""
+msgstr "您查找的页面无法找到。"
 
 #: cms/templates/404.html
 msgid ""
 "Go back to the {homepage} or let us know about any pages that may have been "
 "moved at {email}."
-msgstr ""
+msgstr "返回到{homepage}或发电子邮件至{email}告诉我们被移动的页面。"
 
 #: cms/templates/500.html
 msgid "Studio Server Error"
-msgstr ""
+msgstr "Studio服务器错误"
 
 #: cms/templates/500.html
 msgid "The <em>Studio</em> servers encountered an error"
-msgstr ""
+msgstr "<em>Studio</em>服务器出现问题"
 
 #: cms/templates/500.html
 msgid ""
 "An error occurred in Studio and the page could not be loaded. Please try "
 "again in a few moments."
-msgstr ""
+msgstr "Studio出现错误，页面无法加载，请稍后再试。"
 
 #: cms/templates/500.html
 msgid ""
 "We've logged the error and our staff is currently working to resolve this "
 "error as soon as possible."
-msgstr ""
+msgstr "我们已经记录下这个错误，我们的员工正在试图尽快解决这个问题。"
 
 #: cms/templates/500.html
 msgid "If the problem persists, please email us at {email_link}."
-msgstr ""
+msgstr "如果问题仍然存在，请发送电子邮件至{email_link}."
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
 msgid "Studio Account Activation"
-msgstr ""
+msgstr "Studio账户激活"
 
 #: cms/templates/activation_active.html
 msgid "Your account is already active"
-msgstr ""
+msgstr "您的账户已经激活"
 
 #: cms/templates/activation_active.html
 msgid ""
 "This account, set up using {0}, has already been activated. Please sign in "
 "to start working within edX Studio."
-msgstr ""
+msgstr "这个基于{0}建立的账号已经被激活。请登录，开始使用edX Studio工作。"
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 msgid "Sign into Studio"
-msgstr ""
+msgstr "登录到Studio"
 
 #: cms/templates/activation_complete.html
 msgid "Your account activation is complete!"
-msgstr ""
+msgstr "您的账户激活已经完成！"
 
 #: cms/templates/activation_complete.html
 msgid ""
 "Thank you for activating your account. You may now sign in and start using "
 "edX Studio to author courses."
-msgstr ""
+msgstr "感谢您激活您的账户。现在您可以登录并且开始使用edX Studio来创作课程。"
 
 #: cms/templates/activation_invalid.html
 msgid "Your account activation is invalid"
-msgstr ""
+msgstr "您的账户激活是无效的"
 
 #: cms/templates/activation_invalid.html
 msgid ""
 "We're sorry. Something went wrong with your activation. Check to make sure "
 "the URL you went to was correct &mdash; e-mail programs will sometimes split"
 " it into two lines."
-msgstr ""
+msgstr "很抱歉，您的激活出现了一些错误。请核对确保您进入的网址是正确的 &mdash；邮箱程序有时候会将链接分割成两行。"
 
 #: cms/templates/activation_invalid.html
 msgid ""
 "If you still have issues, contact edX Support. In the meatime, you can also "
 "return to"
-msgstr ""
+msgstr "如果您还有问题，请联系edX技术支持。同时，您也可以返回至"
 
 #: cms/templates/activation_invalid.html
 msgid "Contact edX Support"
-msgstr ""
+msgstr "联系edX技术支持"
 
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 #: cms/templates/widgets/header.html
 msgid "Files &amp; Uploads"
-msgstr ""
+msgstr "文件&amp;上传"
 
 #: cms/templates/asset_index.html
 msgid "Uploading…"
-msgstr ""
+msgstr "上传中……"
 
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 msgid "Choose File"
-msgstr ""
+msgstr "选择文件"
 
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 #: cms/templates/asset_index.html
 msgid "Upload New File"
-msgstr ""
+msgstr "上传新文件"
 
 #: cms/templates/asset_index.html
 msgid "Load Another File"
-msgstr ""
+msgstr "加载其他文件"
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/edit-tabs.html cms/templates/overview.html
 #: cms/templates/textbooks.html cms/templates/widgets/header.html
 msgid "Content"
-msgstr ""
+msgstr "内容"
 
 #: cms/templates/asset_index.html cms/templates/container.html
 #: cms/templates/course_info.html cms/templates/edit-tabs.html
 #: cms/templates/index.html cms/templates/manage_users.html
 #: cms/templates/overview.html cms/templates/textbooks.html
 msgid "Page Actions"
-msgstr ""
+msgstr "页面操作"
 
 #: cms/templates/asset_index.html
 msgid "Loading&hellip;"
-msgstr ""
+msgstr "加载中&hellip;"
 
 #: cms/templates/asset_index.html
 msgid "What files are listed here?"
-msgstr ""
+msgstr "这里列出的是什么文件？"
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -9703,16 +9832,17 @@ msgid ""
 "the course appear in this list. These files include your course image, "
 "textbook chapters, and files that appear on your Course Handouts sidebar."
 msgstr ""
+"除了你在本页面上传的文件，你给该课程添加的任何文件都将会在这个列表中显示。这些文件包括了你的课程图片、课本章节、以及那些在课程讲义边栏中出现的文件。"
 
 #: cms/templates/asset_index.html
 msgid "File URLs"
-msgstr ""
+msgstr "文件 URLs"
 
 #: cms/templates/asset_index.html
 msgid ""
 "You use the Embed URL value to link to the file or image from a component, a"
 " course update, or a course handout."
-msgstr ""
+msgstr "您可以通过指定内嵌URL值的方式在一个组件，课程更新或者课程讲义里链接文件或者图片。"
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -9724,107 +9854,103 @@ msgstr ""
 #: cms/templates/asset_index.html cms/templates/container.html
 #: cms/templates/overview.html cms/templates/settings_graders.html
 msgid "What can I do on this page?"
-msgstr ""
+msgstr "我在这个页面能做什么？"
 
 #: cms/templates/asset_index.html
 msgid ""
 "You can upload new files or view, download, or delete existing files. You "
 "can lock a file so that people who are not enrolled in your course cannot "
 "access that file."
-msgstr ""
+msgstr "您可以上载新的文件，或者查看，下载，删除现有文件。你也可以锁住一个文件，这样其它未注册您的课程的人则不可以访问这个文件。"
 
 #: cms/templates/asset_index.html
 msgid "Your file has been deleted."
-msgstr ""
+msgstr "您的文件已经被删除"
 
 #: cms/templates/asset_index.html
 msgid "close alert"
-msgstr ""
+msgstr "关闭警告"
 
 #: cms/templates/checklists.html cms/templates/export.html
 #: cms/templates/export_git.html cms/templates/import.html
 #: cms/templates/widgets/header.html
 msgid "Tools"
-msgstr ""
+msgstr "工具"
 
 #: cms/templates/checklists.html
 msgid "Course Checklists"
-msgstr ""
+msgstr "课程核对表"
 
 #: cms/templates/checklists.html
 msgid "Current Checklists"
-msgstr ""
+msgstr "当前的核对表"
 
 #: cms/templates/checklists.html
 msgid "What are course checklists?"
-msgstr ""
+msgstr "什么是课程核对表？"
 
 #: cms/templates/checklists.html
 msgid ""
 "Course checklists are tools to help you understand and keep track of all the"
 " steps necessary to get your course ready for students."
-msgstr ""
+msgstr "课程核对表是一个工具，它可以帮助你理解并跟踪所有必要的步骤，完成您的课程准备。"
 
 #: cms/templates/checklists.html
 msgid ""
 "Any changes you make to these checklists are saved automatically and are "
 "immediately visible to other course team members."
-msgstr ""
-
-#: cms/templates/component.html
-msgid "Editor"
-msgstr ""
+msgstr "您所做的课程检查表的修改将会自动保存，其它成员也会即时看到您的修改。"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
-msgstr ""
+msgstr "复制"
 
 #: cms/templates/component.html
 msgid "Duplicate this component"
-msgstr ""
+msgstr "复制该组件"
 
 #: cms/templates/component.html
 msgid "Delete this component"
-msgstr ""
+msgstr "删除此组件"
 
 #: cms/templates/component.html cms/templates/container_xblock_component.html
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "Drag to reorder"
-msgstr ""
+msgstr "拖动以重排序"
 
 #: cms/templates/container.html
 msgid "Container"
-msgstr ""
+msgstr "容器"
 
 #: cms/templates/container.html
 msgid "This page has no content yet."
-msgstr ""
+msgstr "该页面尚无内容。"
 
 #: cms/templates/container.html cms/templates/container.html
 msgid "Publishing Status"
-msgstr ""
+msgstr "发布状态"
 
 #: cms/templates/container.html
 msgid "Published"
-msgstr ""
+msgstr "已经发布"
 
 #: cms/templates/container.html
 msgid ""
 "To make changes to the content of this page, you need to edit unit "
 "{unit_link} as a draft."
-msgstr ""
+msgstr "为了修改本页面的内容，您需要以草稿形式来编辑{unit_link}单元。"
 
 #: cms/templates/container.html
 msgid "Draft"
-msgstr ""
+msgstr "草稿"
 
 #: cms/templates/container.html
 msgid ""
 "You can edit the content of this page, and your changes will be published "
 "with unit {unit_link}."
-msgstr ""
+msgstr "您可以编辑该页面的内容，变更的内容将在{unit_link}单元发布。"
 
 #: cms/templates/container.html
 msgid ""
@@ -9832,160 +9958,160 @@ msgid ""
 "this page. In the case of experiment blocks, this allows you to confirm that"
 " you have properly configured your experiment groups and make changes to "
 "existing content."
-msgstr ""
+msgstr "您可以在这个页面上浏览、编辑包含其它组件的课程组件。针对实验板块，这有助于您确认实验组配置的正确性，也便于您修改已经存在的页面内容。"
 
 #: cms/templates/course_info.html cms/templates/course_info.html
 msgid "Course Updates"
-msgstr ""
+msgstr "课程更新"
 
 #: cms/templates/course_info.html
 msgid "New Update"
-msgstr ""
+msgstr "新的更新"
 
 #: cms/templates/course_info.html
 msgid ""
 "Use course updates to notify students of important dates or exams, highlight"
 " particular discussions in the forums, announce schedule changes, and "
 "respond to student questions. You add or edit updates in HTML."
-msgstr ""
+msgstr "使用课程更新来通知学生重要的日期或者考试，高亮显示论坛中的特别讨论，发布进度变更，以及回复学生问题。你可以用HTML来编辑更新。"
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
 #. each course.
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 #: cms/templates/export.html cms/templates/widgets/header.html
 msgid "Pages"
-msgstr ""
+msgstr "页面"
 
 #: cms/templates/edit-tabs.html
 msgid "New Page"
-msgstr ""
+msgstr "新的页面"
 
 #: cms/templates/edit-tabs.html cms/templates/edit_subsection.html
 #: cms/templates/index.html cms/templates/overview.html
 #: cms/templates/unit.html
 msgid "View Live"
-msgstr ""
+msgstr "在线查看"
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "Note: Pages are publicly visible. If users know the URL of a page, they can "
 "view the page even if they are not registered for or logged in to your "
 "course."
-msgstr ""
+msgstr "注意：页面是公开可见的，知道该页面链接的用户可以直接查看，即使他们尚未注册或者登录到您的课程。"
 
 #: cms/templates/edit-tabs.html
 msgid "Show this page"
-msgstr ""
+msgstr "显示该页面"
 
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 msgid "Show/hide page"
-msgstr ""
+msgstr "显示/隐藏页面"
 
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
 msgid "This page cannot be reordered"
-msgstr ""
+msgstr "该页面无法重新排序"
 
 #: cms/templates/edit-tabs.html
 msgid "You can add additional custom pages to your course."
-msgstr ""
+msgstr "您可以在课程中添加额外的自定义页面"
 
 #: cms/templates/edit-tabs.html
 msgid "Add a New Page"
-msgstr ""
+msgstr "添加新的页面"
 
 #: cms/templates/edit-tabs.html
 msgid "What are pages?"
-msgstr ""
+msgstr "什么是页面？"
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages are listed horizontally at the top of your course. Default pages "
 "(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
 "textbooks and custom pages that you create."
-msgstr ""
+msgstr "课程页面链接水平列于课程主页的上方。默认页面 (课件，课程信息，讨论，维基和进度)，之后是教材和自定义页面。"
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
-msgstr ""
+msgstr "自定义页面"
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "You can create and edit custom pages to provide students with additional "
 "course content. For example, you can create pages for the grading policy, "
 "course slides, and a course calendar. "
-msgstr ""
+msgstr "您可以通过创建个性化页面来为学生提供额外的课程内容。例如，您可以为评分策略、课程幻灯片、课程日历等创建自定义页面。"
 
 #: cms/templates/edit-tabs.html
 msgid "How do pages look to students in my course?"
-msgstr ""
+msgstr "学生看到的课程页面会是什么样子？"
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "Students see the default and custom pages at the top of your course and use "
 "these links to navigate."
-msgstr ""
+msgstr "学生将会看到水平列于您课程主页上方的缺省页面及自定义页面的链接，并通过这些链接来漫游整个课程。"
 
 #: cms/templates/edit-tabs.html
 msgid "See an example"
-msgstr ""
+msgstr "查看例子"
 
 #: cms/templates/edit-tabs.html
 msgid "Pages in Your Course"
-msgstr ""
+msgstr "课程中的页面"
 
 #: cms/templates/edit-tabs.html
 msgid "Preview of Pages in your course"
-msgstr ""
+msgstr "课程页面预览"
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages appear in your course's top navigation bar. The default pages "
 "(Courseware, Course Info, Discussion, Wiki, and Progress) are followed by "
 "textbooks and custom pages."
-msgstr ""
+msgstr "课程页面链接位于课程主页上方的导航条。首先是缺省页面链接(课件、课程信息、论坛、维基和进度)，之后是参考教材及自定义页面。"
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 msgid "close modal"
-msgstr ""
+msgstr "相似的模型"
 
 #: cms/templates/edit_subsection.html
 msgid "CMS Subsection"
-msgstr ""
+msgstr "CMS小节"
 
 #: cms/templates/edit_subsection.html cms/templates/unit.html
 msgid "Display Name:"
-msgstr ""
+msgstr "显示名称："
 
 #: cms/templates/edit_subsection.html
 msgid "Units:"
-msgstr ""
+msgstr "单元："
 
 #: cms/templates/edit_subsection.html
 msgid "Subsection Settings"
-msgstr ""
+msgstr "小节设置"
 
 #: cms/templates/edit_subsection.html cms/templates/overview.html
 msgid "Release Day"
-msgstr ""
+msgstr "发布日期"
 
 #: cms/templates/edit_subsection.html cms/templates/overview.html
 msgid "Release Time"
-msgstr ""
+msgstr "发布时间"
 
 #: cms/templates/edit_subsection.html cms/templates/edit_subsection.html
 #: cms/templates/overview.html
 msgid "Coordinated Universal Time"
-msgstr ""
+msgstr "世界标准时间"
 
 #: cms/templates/edit_subsection.html
 msgid "UTC"
-msgstr ""
+msgstr "国际标准时间"
 
 #: cms/templates/edit_subsection.html
 msgid ""
 "The date above differs from the release date of {name}, which is unset."
-msgstr ""
+msgstr "上述日期与尚未设定的{name}的发布日期不同。"
 
 #: cms/templates/edit_subsection.html
 msgid "The date above differs from the release date of {name} - {start_time}"
@@ -9993,39 +10119,39 @@ msgstr ""
 
 #: cms/templates/edit_subsection.html
 msgid "Sync to {name}."
-msgstr ""
+msgstr "同步至{name}。"
 
 #: cms/templates/edit_subsection.html
 msgid "Graded as:"
-msgstr ""
+msgstr "当前评分方式："
 
 #: cms/templates/edit_subsection.html
 msgid "Set a due date"
-msgstr ""
+msgstr "设置一个截止日期"
 
 #: cms/templates/edit_subsection.html
 msgid "Due Day"
-msgstr ""
+msgstr "截止日期"
 
 #: cms/templates/edit_subsection.html
 msgid "Due Time"
-msgstr ""
+msgstr "截止时间"
 
 #: cms/templates/edit_subsection.html
 msgid "Remove due date"
-msgstr ""
+msgstr "移除截止日期"
 
 #: cms/templates/edit_subsection.html
 msgid "Preview Drafts"
-msgstr ""
+msgstr "预览草稿"
 
 #: cms/templates/error.html
 msgid "Internal Server Error"
-msgstr ""
+msgstr "内部服务器错误"
 
 #: cms/templates/error.html
 msgid "The Page You Requested Page Cannot be Found"
-msgstr ""
+msgstr "您请求的页面无法找到"
 
 #: cms/templates/error.html
 msgid ""
@@ -10034,16 +10160,17 @@ msgid ""
 "having problems accessing things, please feel free to {link_start}contact "
 "Studio support{link_end} for further help."
 msgstr ""
+"很抱歉，我们无法找到您查找的Studio页面。您可能需要返回至Studio控制面板重新尝试。如果您仍遇到问题，请与{link_start}Studio技术支持{link_end}联系。"
 
 #: cms/templates/error.html cms/templates/error.html
 #: cms/templates/widgets/footer.html cms/templates/widgets/header.html
 #: cms/templates/widgets/sock.html
 msgid "Use our feedback tool, Tender, to share your feedback"
-msgstr ""
+msgstr "请使用工具Tender来分享您的反馈"
 
 #: cms/templates/error.html
 msgid "The Server Encountered an Error"
-msgstr ""
+msgstr "服务器发生错误"
 
 #: cms/templates/error.html
 msgid ""
@@ -10053,18 +10180,19 @@ msgid ""
 "please feel free to {link_start}contact Studio support{link_end} for further"
 " help."
 msgstr ""
+"很抱歉，服务器在处理您的上一个请求时出现错误。您可能需要返回至Studio控制面板或重新提交请求。如果您仍遇到问题，请与{link_start}Studio技术支持{link_end}联系以寻求帮助。"
 
 #: cms/templates/error.html
 msgid "Back to dashboard"
-msgstr ""
+msgstr "回到主页"
 
 #: cms/templates/export.html cms/templates/export.html
 msgid "Course Export"
-msgstr ""
+msgstr "导出课程"
 
 #: cms/templates/export.html
 msgid "About Exporting Courses"
-msgstr ""
+msgstr "关于导出课程"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -10074,62 +10202,64 @@ msgid ""
 " the course structure and content. You can also re-import courses that "
 "you've exported."
 msgstr ""
+"您可以导出课程并在Studio之外编辑它们。导出的文件是.tar.gz类型的文件 (使用GNU "
+"Zip压缩格式的.tar文件)，包含课程结构和内容。您也可以再次导入这些导出的课程。"
 
 #: cms/templates/export.html
 msgid "Export My Course Content"
-msgstr ""
+msgstr "导出我的课程内容"
 
 #: cms/templates/export.html
 msgid "Export Course Content"
-msgstr ""
+msgstr "导出课程内容"
 
 #: cms/templates/export.html
 msgid "Data {em_start}exported with{em_end} your course:"
-msgstr ""
+msgstr "随课程{em_start} 导出 {em_end} 数据："
 
 #: cms/templates/export.html
 msgid "Course Content (all Sections, Sub-sections, and Units)"
-msgstr ""
+msgstr "课程内容 (所有章节，小节和单元)"
 
 #: cms/templates/export.html
 msgid "Course Structure"
-msgstr ""
+msgstr "课程结构"
 
 #: cms/templates/export.html
 msgid "Individual Problems"
-msgstr ""
+msgstr "个别问题"
 
 #: cms/templates/export.html
 msgid "Course Assets"
-msgstr ""
+msgstr "课程资源"
 
 #: cms/templates/export.html
 msgid "Course Settings"
-msgstr ""
+msgstr "课程设置"
 
 #: cms/templates/export.html
 msgid "Data {em_start}not exported{em_end} with your course:"
-msgstr ""
+msgstr "不随课程{em_start} 导出 {em_end} 的数据："
 
 #: cms/templates/export.html
 msgid "User Data"
-msgstr ""
+msgstr "用户数据"
 
 #: cms/templates/export.html
 msgid "Course Team Data"
-msgstr ""
+msgstr "课程团队数据"
 
 #: cms/templates/export.html
 msgid "Forum/discussion Data"
-msgstr ""
+msgstr "论坛/讨论数据"
 
 #: cms/templates/export.html
 msgid "Certificates"
-msgstr ""
+msgstr "证书"
 
 #: cms/templates/export.html
 msgid "Why export a course?"
-msgstr ""
+msgstr "为什么导出课程？"
 
 #: cms/templates/export.html
 msgid ""
@@ -10137,11 +10267,11 @@ msgid ""
 " may want to create a backup copy of your course. Or, you may want to create"
 " a copy of your course that you can later import into another course "
 "instance and customize."
-msgstr ""
+msgstr "您或许想在Studio之外直接编辑课程的XML，或想为您的课程建立备份，或想复制一份课程供日后导入进另一个课程实例和修改。"
 
 #: cms/templates/export.html
 msgid "What content is exported?"
-msgstr ""
+msgstr "哪些内容被导出了？"
 
 #: cms/templates/export.html
 msgid ""
@@ -10149,11 +10279,11 @@ msgid ""
 "units) are exported. Other data, including student data, grading "
 "information, discussion forum data, course settings, and course team "
 "information, is not exported."
-msgstr ""
+msgstr "只有课程内容和结构(包括章，节，单元)被导出了。其它数据，包括学生数据，分数信息，讨论数据，课程设置的课程团队信息将不会被导出。"
 
 #: cms/templates/export.html
 msgid "Opening the downloaded file"
-msgstr ""
+msgstr "打开下载的文件"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -10161,81 +10291,81 @@ msgid ""
 "Use an archive program to extract the data from the .tar.gz file. Extracted "
 "data includes the course.xml file, as well as subfolders that contain course"
 " content."
-msgstr ""
+msgstr "使用档案工具解压.tar.gz中的文件。解压后的数据包含coursex.xml，还有一些子目录，存放了课程内容。"
 
 #: cms/templates/export_git.html
 msgid "Export Course to Git"
-msgstr ""
+msgstr "导出课程到Git"
 
 #: cms/templates/export_git.html cms/templates/export_git.html
 #: cms/templates/widgets/header.html
 msgid "Export to Git"
-msgstr ""
+msgstr "导出到Git"
 
 #: cms/templates/export_git.html
 msgid "About Export to Git"
-msgstr ""
+msgstr "关于导出课程到Git"
 
 #: cms/templates/export_git.html
 msgid "Use this to export your course to its git repository."
-msgstr ""
+msgstr "使用这个来导出您的课程到Git源。"
 
 #: cms/templates/export_git.html
 msgid ""
 "This will then trigger an automatic update of the main LMS site and update "
 "the contents of your course visible there to students if automatic git "
 "imports are configured."
-msgstr ""
+msgstr "这将触发主LMS站点的自动更新，若自动Git导入已配置好，学生可见的课程内容也会被自动更新。"
 
 #: cms/templates/export_git.html
 msgid "Export Course to Git:"
-msgstr ""
+msgstr "导出课程到Git："
 
 #: cms/templates/export_git.html
 msgid ""
 "giturl must be defined in your course settings before you can export to git."
-msgstr ""
+msgstr "在您导出到Git之前必须在课程设置里定义Git地址。"
 
 #: cms/templates/export_git.html
 msgid "Export Failed"
-msgstr ""
+msgstr "导出失败"
 
 #: cms/templates/export_git.html
 msgid "Export Succeeded"
-msgstr ""
+msgstr "导出成功"
 
 #: cms/templates/export_git.html
 msgid "Your course:"
-msgstr ""
+msgstr "您的课程："
 
 #: cms/templates/export_git.html
 msgid "Course git url:"
-msgstr ""
+msgstr "课程Git地址："
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
-msgstr ""
+msgstr "欢迎"
 
 #: cms/templates/howitworks.html
 msgid "Welcome to"
-msgstr ""
+msgstr "欢迎来到"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Studio helps manage your courses online, so you can focus on teaching them"
-msgstr ""
+msgstr "Studio 帮您管理在线课程，让您可以专注于课程的教学。"
 
 #: cms/templates/howitworks.html
 msgid "Studio's Many Features"
-msgstr ""
+msgstr "Studio特性"
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 msgid "Studio Helps You Keep Your Courses Organized"
-msgstr ""
+msgstr "Studio帮助您保持课程有序组织"
 
 #: cms/templates/howitworks.html
 msgid "Keeping Your Course Organized"
-msgstr ""
+msgstr "保持您的课程有序组织"
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -10243,41 +10373,42 @@ msgid ""
 "<strong>Outline</strong> editor, providing a simple hierarchy and easy drag "
 "and drop to help you and your students stay organized."
 msgstr ""
+"课程的首要因素是其组织形式。Studio为您提供了<strong>大纲</strong>编辑器，通过简单的层次组织和拖放操作来帮助您和学生在课程过程中始终保持组织有序。"
 
 #: cms/templates/howitworks.html
 msgid "Simple Organization For Content"
-msgstr ""
+msgstr "内容的简单组织"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Studio uses a simple hierarchy of <strong>sections</strong> and "
 "<strong>subsections</strong> to organize your content."
-msgstr ""
+msgstr "Studio使用一个简单的层次结构，包括<strong>章节</strong> 和<strong>小节</strong>来组织您的内容。"
 
 #: cms/templates/howitworks.html
 msgid "Change Your Mind Anytime"
-msgstr ""
+msgstr "随时改变您的思路"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Draft your outline and build content anywhere. Simple drag and drop tools "
 "let your reorganize quickly."
-msgstr ""
+msgstr "在任何地方起草您的大纲和创建内容。简单的拖放工具可以帮助您快速重新组织课程结构。"
 
 #: cms/templates/howitworks.html
 msgid "Go A Week Or A Semester At A Time"
-msgstr ""
+msgstr "按星期或学期发布内容"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Build and release <strong>sections</strong> to your students incrementally. "
 "You don't have to have it all done at once."
-msgstr ""
+msgstr "您可以根据教学计划逐步创建和发布 <strong>章节</strong>，而无需一次性完成所有章节的建设与发布。"
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 #: cms/templates/howitworks.html
 msgid "Learning is More than Just Lectures"
-msgstr ""
+msgstr "学习不仅仅是听课"
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -10286,45 +10417,47 @@ msgid ""
 "Insert videos and author a wide variety of exercise types with just a few "
 "clicks."
 msgstr ""
+"Studio "
+"以一种能提升教学效果的方式帮您组织内容&mdash;短视频教程、随堂练习等各种资源交织在一起。通过几次简单的点击就可以插入视频和各种类型的练习题。"
 
 #: cms/templates/howitworks.html
 msgid "Create Learning Pathways"
-msgstr ""
+msgstr "创建学习路径"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Help your students understand a small interactive piece at a time with "
 "multimedia, HTML, and exercises."
-msgstr ""
+msgstr "通过多媒体、HTML和练习等形式帮助您的学生理解互动教学点。"
 
 #: cms/templates/howitworks.html
 msgid "Work Visually, Organize Quickly"
-msgstr ""
+msgstr "可视化地工作，快速地组织"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Work visually and see exactly what your students will see. Reorganize all "
 "your content with drag and drop."
-msgstr ""
+msgstr "可视化地工作并且随时预览您的学生将要看的内容。通过拖放操作重新组织您的课程内容。"
 
 #: cms/templates/howitworks.html
 msgid "A Broad Library of Problem Types"
-msgstr ""
+msgstr "丰富的平台库可以支持各种问题类型"
 
 #: cms/templates/howitworks.html
 msgid ""
 "It's more than just multiple choice. Studio has nearly a dozen types of "
 "problems to challenge your learners."
-msgstr ""
+msgstr "这不仅仅是多重选择。Studio有多种问题类型来挑战学习者。"
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 msgid ""
 "Studio Gives You Simple, Fast, and Incremental Publishing. With Friends."
-msgstr ""
+msgstr "Studio给您和您的朋友提供简单、快速和递增式的内容发布。"
 
 #: cms/templates/howitworks.html
 msgid "Simple, Fast, and Incremental Publishing. With Friends."
-msgstr ""
+msgstr "与其他人一起合作，体验简单、快速、增量式的内容发布过程"
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -10333,92 +10466,93 @@ msgid ""
 "incremental release when it makes sense. And with co-authors, you can have a"
 " whole team building a course, together."
 msgstr ""
+"Studio的运行机制与您熟悉的网络应用类似，但还是需要了解一下如何创建课程。您可以根据需要在网上即时发布信息或者递增式发布信息。您还可以和合作者一起，作为一个整体团队来创建课程。"
 
 #: cms/templates/howitworks.html
 msgid "Instant Changes"
-msgstr ""
+msgstr "即时修改"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Caught a bug? No problem. When you want, your changes to live when you hit "
 "Save."
-msgstr ""
+msgstr "发现一个错误？没有问题。在您需要的时候，点击保存按钮即可使您的更改生效。"
 
 #: cms/templates/howitworks.html
 msgid "Release-On Date Publishing"
-msgstr ""
+msgstr "定期发布课程"
 
 #: cms/templates/howitworks.html
 msgid ""
 "When you've finished a <strong>section</strong>, pick when you want it to go"
 " live and Studio takes care of the rest. Build your course incrementally."
-msgstr ""
+msgstr "当您完成了一个<strong>章节</strong>，请选定发布时间，Studio会自动完成后续动作。这样便可以实现递增式地创建您的课程。"
 
 #: cms/templates/howitworks.html
 msgid "Work in Teams"
-msgstr ""
+msgstr "参与团队协作"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Co-authors have full access to all the same authoring tools. Make your "
 "course better through a team effort."
-msgstr ""
+msgstr "合作者有权访问相同的创作工具。团队协作将提高您的课程质量。"
 
 #: cms/templates/howitworks.html
 msgid "Sign Up for Studio Today!"
-msgstr ""
+msgstr "马上注册加入Studio！"
 
 #: cms/templates/howitworks.html
 msgid "Sign Up &amp; Start Making an edX Course"
-msgstr ""
+msgstr "注册 &amp;开始创建一个 edX 在线课程"
 
 #: cms/templates/howitworks.html
 msgid "Already have a Studio Account? Sign In"
-msgstr ""
+msgstr "如果您已经有了一个Studio账户，请直接登录"
 
 #: cms/templates/howitworks.html
 msgid "Outlining Your Course"
-msgstr ""
+msgstr "列出您的课程大纲"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Simple two-level outline to organize your couse. Drag and drop, and see your"
 " course at a glance."
-msgstr ""
+msgstr "使用简单的二级大纲来组织您的课程。通过拖放操作大致浏览您的课程。"
 
 #: cms/templates/howitworks.html
 msgid "More than Just Lectures"
-msgstr ""
+msgstr "不仅仅是课程讲座"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Quickly create videos, text snippets, inline discussions, and a variety of "
 "problem types."
-msgstr ""
+msgstr "快速创建视频、文本片段、内部讨论和各种问题类型。"
 
 #: cms/templates/howitworks.html
 msgid "Publishing on Date"
-msgstr ""
+msgstr "发布时间"
 
 #: cms/templates/howitworks.html
 msgid ""
 "Simply set the date of a section or subsection, and Studio will publish it "
 "to your students for you."
-msgstr ""
+msgstr "请设置章节或小节的发布时间，系统会按照设定时间发布这些内容。"
 
 #: cms/templates/html_error.html
 msgid "We're having trouble rendering your component"
-msgstr ""
+msgstr "渲染组件时遇到问题"
 
 #: cms/templates/html_error.html
 msgid ""
 "Students will not be able to access this component. Re-edit your component "
 "to fix the error."
-msgstr ""
+msgstr "学生无法访问这个组件。请重新编辑您的组件以修复错误。"
 
 #: cms/templates/import.html cms/templates/import.html
 msgid "Course Import"
-msgstr ""
+msgstr "课程导入"
 
 #: cms/templates/import.html
 msgid ""
@@ -10427,6 +10561,8 @@ msgid ""
 "cannot undo a course import{em_end}. We recommend that you first export the "
 "current course, so you have a backup copy of it."
 msgstr ""
+"在继续前请确保你想要导入一门课程。当前课程的所有内容会被导入的内容所取代。{em_start} 课程导入无法撤销 "
+"{em_end}。我们建议先将当前课程导出，这样你可以有个备份。"
 
 #. Translators: ".tar.gz" is a file extension, and files with that extension
 #. are called "gzipped tar files": these terms should not be translated
@@ -10436,6 +10572,8 @@ msgid ""
 "compressed with GNU Zip). This .tar.gz file must contain a course.xml file. "
 "It may also contain other files."
 msgstr ""
+"你将要导入的课程必须为.tar.gz格式的文件( 即一个采用GNU "
+"zip压缩后的.tar文件)。这个.tar.gz文件必须包含一个course.xml文件。另外也可能包含其他文件。"
 
 #: cms/templates/import.html
 msgid ""
@@ -10444,92 +10582,93 @@ msgid ""
 "completed. We recommend, however, that you don't make important changes to "
 "your course until the import operation has completed."
 msgstr ""
+"导入过程有五步。在前两步中，你必须停留在当前页面。而在解压步骤结束后你可以离开当前页面。不过，我们建议在导入操作结束前你都不要对课程做任何更改调整。"
 
 #. Translators: ".tar.gz" is a file extension, and files with that extension
 #. are called "gzipped tar files": these terms should not be translated
 #: cms/templates/import.html
 msgid "Select a .tar.gz File to Replace Your Course Content"
-msgstr ""
+msgstr "选择一个.tar.gz 文件以覆盖当前课程内容"
 
 #: cms/templates/import.html
 msgid "Choose a File to Import"
-msgstr ""
+msgstr "选择要导入的文件"
 
 #: cms/templates/import.html
 msgid "File Chosen:"
-msgstr ""
+msgstr "选中的文件："
 
 #: cms/templates/import.html
 msgid "Replace my course with the one above"
-msgstr ""
+msgstr "用上面的课程替换我的课程"
 
 #: cms/templates/import.html
 msgid "Course Import Status"
-msgstr ""
+msgstr "课程导入状态"
 
 #: cms/templates/import.html
 msgid "Uploading"
-msgstr ""
+msgstr "上传中"
 
 #: cms/templates/import.html
 msgid "Transferring your file to our servers"
-msgstr ""
+msgstr "正在传输你的文件至服务器"
 
 #: cms/templates/import.html
 msgid "Unpacking"
-msgstr ""
+msgstr "解压中"
 
 #: cms/templates/import.html
 msgid ""
 "Expanding and preparing folder/file structure (You can now leave this page "
 "safely, but avoid making drastic changes to content until this import is "
 "complete)"
-msgstr ""
+msgstr "展开预定义的目录/文件结构(您现在可以安全地离开这个页面了，但在内容导入完成之前请尽量避免不必要的修改)"
 
 #: cms/templates/import.html
 msgid "Verifying"
-msgstr ""
+msgstr "检验中"
 
 #: cms/templates/import.html
 msgid "Reviewing semantics, syntax, and required data"
-msgstr ""
+msgstr "复查语义、语法和必要数据"
 
 #: cms/templates/import.html
 msgid "Updating Course"
-msgstr ""
+msgstr "课程更新中"
 
 #: cms/templates/import.html
 msgid ""
 "Integrating your imported content into this course. This may take a while "
 "with larger courses."
-msgstr ""
+msgstr "整合你导入的内容到课程，对大的课程这可能花费较多时间。"
 
 #: cms/templates/import.html
 msgid "Success"
-msgstr ""
+msgstr "成功"
 
 #: cms/templates/import.html
 msgid "Your imported content has now been integrated into this course"
-msgstr ""
+msgstr "你导入的内容已经被整合进课程"
 
 #: cms/templates/import.html
 msgid "View Updated Outline"
-msgstr ""
+msgstr "显示更新后的课程大纲"
 
 #: cms/templates/import.html
 msgid "Why import a course?"
-msgstr ""
+msgstr "为什么导入课程？"
 
 #: cms/templates/import.html
 msgid ""
 "You may want to run a new version of an existing course, or replace an "
 "existing course altogether. Or, you may have developed a course outside "
 "Studio."
-msgstr ""
+msgstr "您或者想为现有课程创建新版本，或完全替换一个现有课程，或您已在Studio之外创建了课程。"
 
 #: cms/templates/import.html
 msgid "What content is imported?"
-msgstr ""
+msgstr "哪些内容被导入了？"
 
 #: cms/templates/import.html
 msgid ""
@@ -10537,11 +10676,11 @@ msgid ""
 "units) are imported. Other data, including student data, grading "
 "information, discussion forum data, course settings, and course team "
 "information, remains the same as it was in the existing course."
-msgstr ""
+msgstr "只有课程内容和结构(包括章，节，单元)被导入了。其它数据，包括学生数据，分数信息，讨论数据，课程设置的课程团队信息，将沿用当前课程。"
 
 #: cms/templates/import.html
 msgid "Warning: Importing while a course is running"
-msgstr ""
+msgstr "注意：导入发生于课程进行中"
 
 #: cms/templates/import.html
 msgid ""
@@ -10550,161 +10689,162 @@ msgid ""
 "associated with those Problem components may be lost. This data includes "
 "students' problem scores."
 msgstr ""
+"如果您在课程进行中执行了导入，并更改了任意问题组件的URL名字(或url名字节点) ，与此问题组件相关的学生数据将可能丢失。这些数据包括学生问题得分。"
 
 #: cms/templates/import.html
 msgid "There was an error during the upload process."
-msgstr ""
+msgstr "在文件上传发生错误"
 
 #: cms/templates/import.html
 msgid "There was an error while unpacking the file."
-msgstr ""
+msgstr "在文件解压发生错误"
 
 #: cms/templates/import.html
 msgid "There was an error while verifying the file you submitted."
-msgstr ""
+msgstr "在验证您提交的文件时发现错误"
 
 #: cms/templates/import.html
 msgid "There was an error while importing the new course to our database."
-msgstr ""
+msgstr "在导入新课程到数据库时发生错误"
 
 #: cms/templates/import.html
 msgid "Your import has failed."
-msgstr ""
+msgstr "导入失败。"
 
 #: cms/templates/import.html cms/templates/import.html
 msgid "Choose new file"
-msgstr ""
+msgstr "选择新文件"
 
 #: cms/templates/import.html
 msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
+msgstr "导入进行中，离开当前页面将会中断导入过程。"
 
 #: cms/templates/index.html cms/templates/index.html
 #: cms/templates/widgets/header.html
 msgid "My Courses"
-msgstr ""
+msgstr "我的课程"
 
 #: cms/templates/index.html
 msgid "New Course"
-msgstr ""
+msgstr "新建课程"
 
 #: cms/templates/index.html
 msgid "Email staff to create course"
-msgstr ""
+msgstr "发邮件给教员来创建课程"
 
 #: cms/templates/index.html
 msgid "Welcome, {0}!"
-msgstr ""
+msgstr "欢迎，{0}！"
 
 #: cms/templates/index.html
 msgid "Here are all of the courses you currently have access to in Studio:"
-msgstr ""
+msgstr "这里当前您在Studio中可以访问的所有课程："
 
 #: cms/templates/index.html
 msgid "You currently aren't associated with any Studio Courses."
-msgstr ""
+msgstr "您当前与Studio中的任何课程均无关联。"
 
 #: cms/templates/index.html
 msgid "Please correct the highlighted fields below."
-msgstr ""
+msgstr "请改正下面高亮的字段。"
 
 #: cms/templates/index.html
 msgid "Create a New Course"
-msgstr ""
+msgstr "创建一个新课程"
 
 #: cms/templates/index.html
 msgid "Required Information to Create a New Course"
-msgstr ""
+msgstr "创建一个新课程的必要信息"
 
 #: cms/templates/index.html
 msgid "e.g. Introduction to Computer Science"
-msgstr ""
+msgstr "例如，计算机科学导论"
 
 #: cms/templates/index.html
 msgid "The public display name for your course."
-msgstr ""
+msgstr "您的课程的公开显示名称"
 
 #: cms/templates/index.html cms/templates/settings.html
 msgid "Organization"
-msgstr ""
+msgstr "组织"
 
 #: cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
-msgstr ""
+msgstr "例如：UniversityX 或 OrganizationX"
 
 #: cms/templates/index.html
 msgid "The name of the organization sponsoring the course."
-msgstr ""
+msgstr "资助本课程的机构名称。"
 
 #: cms/templates/index.html
 msgid ""
 "Note: This is part of your course URL, so no spaces or special characters "
 "are allowed."
-msgstr ""
+msgstr "注意：这是你课程URL的一部分，请勿使用空格或特殊字符。"
 
 #: cms/templates/index.html
 msgid ""
 "This cannot be changed, but you can set a different display name in Advanced"
 " Settings later."
-msgstr ""
+msgstr "这将不能被更改，但是您可以稍后在高级设置中设置不同的显示名称。"
 
 #: cms/templates/index.html
 msgid "e.g. CS101"
-msgstr ""
+msgstr "例如： CS101"
 
 #: cms/templates/index.html
 msgid ""
 "The unique number that identifies your course within your organization."
-msgstr ""
+msgstr "这个编号用来标记该课程在组织内的唯一性。"
 
 #: cms/templates/index.html cms/templates/index.html
 msgid ""
 "Note: This is part of your course URL, so no spaces or special characters "
 "are allowed and it cannot be changed."
-msgstr ""
+msgstr "注意：这是课程URL的一部分，请勿使用空格或特殊字符，一旦设定不可更改。"
 
 #: cms/templates/index.html
 msgid "Course Run"
-msgstr ""
+msgstr "开课时间"
 
 #: cms/templates/index.html
 msgid "e.g. 2014_T1"
-msgstr ""
+msgstr "例如：2014_T1"
 
 #: cms/templates/index.html
 msgid "The term in which your course will run."
-msgstr ""
+msgstr " 您课程开设的学期。"
 
 #: cms/templates/index.html
 msgid "Create"
-msgstr ""
+msgstr "创建"
 
 #: cms/templates/index.html
 msgid "Course Run:"
-msgstr ""
+msgstr "开课时间"
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing Studio course?"
-msgstr ""
+msgstr "您是Studio现有课程中的一名教员吗？"
 
 #: cms/templates/index.html
 msgid ""
 "You will need to be added to the course in Studio by the course creator. "
 "Please get in touch with the course creator or administrator for the "
 "specific course you are helping to author."
-msgstr ""
+msgstr "您需要被课程创建者添加到 Studio 的课程之中。请与您希望协助创作的特定课程的创建者或者管理员取得联系。"
 
 #: cms/templates/index.html cms/templates/index.html
 msgid "Create Your First Course"
-msgstr ""
+msgstr "创建您的第一个课程"
 
 #: cms/templates/index.html
 msgid "Your new course is just a click away!"
-msgstr ""
+msgstr "您的新课程只需点击即可！"
 
 #: cms/templates/index.html
 msgid "Becoming a Course Creator in Studio"
-msgstr ""
+msgstr "成为Studio中的课程创建者"
 
 #: cms/templates/index.html
 msgid ""
@@ -10714,18 +10854,20 @@ msgid ""
 "evaluate your request and provide you feedback within 24 hours during the "
 "work week."
 msgstr ""
+"edX Studio是一个为我们X-"
+"联盟的合作者以及特定顾客提供的托管解决方案。您作为团队成员的课程已在上面列出供您编辑，而创建新课程的权限则需要由edX授予。我们的团队会评估您的请求，并会在工作日的24小时之内给予您反馈。"
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Your Course Creator Request Status:"
-msgstr ""
+msgstr "你的课程创建者资格请求状态："
 
 #: cms/templates/index.html
 msgid "Request the Ability to Create Courses"
-msgstr ""
+msgstr "请求创建课程的权限"
 
 #: cms/templates/index.html cms/templates/index.html
 msgid "Your Course Creator Request Status"
-msgstr ""
+msgstr "你的课程创建者资格请求状态"
 
 #: cms/templates/index.html
 msgid ""
@@ -10734,19 +10876,21 @@ msgid ""
 "edit, while course creator privileges are granted by edX. Our team is has "
 "completed evaluating your request."
 msgstr ""
+"edX Studio是一个为我们X-"
+"联盟的合作者以及特定顾客提供的托管解决方案。您作为团队成员的课程已在上面列出供您编辑，而创建新课程的权限则需要由edX授予。我们的团队已经完成了对您的请求的评估。"
 
 #: cms/templates/index.html cms/templates/index.html
 msgid "Your Course Creator request is:"
-msgstr ""
+msgstr "您的课程创建者资格的请求是："
 
 #: cms/templates/index.html
 msgid "Denied"
-msgstr ""
+msgstr "拒绝"
 
 #: cms/templates/index.html
 msgid ""
 "Your request did not meet the criteria/guidelines specified by edX Staff."
-msgstr ""
+msgstr "您的请求不符合edX成员规定。"
 
 #: cms/templates/index.html
 msgid ""
@@ -10755,102 +10899,104 @@ msgid ""
 "edit, while course creator privileges are granted by edX. Our team is "
 "currently  evaluating your request."
 msgstr ""
+"edX Studio是一个为我们X-"
+"联盟的合作者以及特定顾客提供的托管解决方案。您作为团队成员的课程已在上面列出供您编辑，而创建新课程的权限则需要由edX授予。我们的团队目前正在评估您的请求。"
 
 #: cms/templates/index.html
 msgid ""
 "Your request is currently being reviewed by edX staff and should be updated "
 "shortly."
-msgstr ""
+msgstr "edX员工正在审核您的请求，并将尽快给您反馈。"
 
 #: cms/templates/index.html cms/templates/index.html
 msgid "Need help?"
-msgstr ""
+msgstr "需要帮助？"
 
 #: cms/templates/index.html
 msgid ""
 "If you are new to Studio and having trouble getting started, there are a few"
 " things that may be of help:"
-msgstr ""
+msgstr "如果您是Studio新手，开始使用时遇到困难，那么这些东西可能对您有所帮助。"
 
 #: cms/templates/index.html
 msgid "Get started by reading Studio's Documentation"
-msgstr ""
+msgstr "从阅读Studio文档入手"
 
 #: cms/templates/index.html
 msgid "Request help with Studio"
-msgstr ""
+msgstr "向Studio请求帮助"
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Can I create courses in Studio?"
-msgstr ""
+msgstr "我可以在Studio中创建课程吗？"
 
 #: cms/templates/index.html
 msgid "In order to create courses in Studio, you must"
-msgstr ""
+msgstr "为了在Studio中创建课程，您必须"
 
 #: cms/templates/index.html
 msgid "contact edX staff to help you create a course"
-msgstr ""
+msgstr "联系edX员工来帮助您创建一个课程"
 
 #: cms/templates/index.html
 msgid ""
 "In order to create courses in Studio, you must have course creator "
 "privileges to create your own course."
-msgstr ""
+msgstr "为了在Studio中创建课程，您必须获得edX的课程创建者资格。"
 
 #: cms/templates/index.html
 msgid "Your request to author courses in studio has been denied. Please"
-msgstr ""
+msgstr "您在Studio中创作课程的请求已经被拒绝。请"
 
 #: cms/templates/index.html
 msgid "contact edX Staff with further questions"
-msgstr ""
+msgstr "联系edX员工以了解相关问题"
 
 #: cms/templates/index.html
 msgid "Thanks for signing up, %(name)s!"
-msgstr ""
+msgstr "感谢注册，%(name)s！"
 
 #: cms/templates/index.html
 msgid "We need to verify your email address"
-msgstr ""
+msgstr "我们需要验证您的电子邮箱地址"
 
 #: cms/templates/index.html
 msgid ""
 "Almost there! In order to complete your sign up we need you to verify your "
 "email address (%(email)s). An activation message and next steps should be "
 "waiting for you there."
-msgstr ""
+msgstr "快完成了！为了完成您的注册，我们需要验证您的邮箱地址(%(email)s)。一封激活信息以及接下来的步骤应该已经送达您的邮箱。"
 
 #: cms/templates/index.html
 msgid ""
 "Please check your Junk or Spam folders in case our email isn't in your "
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
-msgstr ""
+msgstr "请检查您的垃圾邮件，以防我们的邮件不在您的收件箱中。仍然不能找到确认邮件？通过下面的链接获得帮助。"
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"
-msgstr ""
+msgstr "登录"
 
 #: cms/templates/login.html cms/templates/login.html
 msgid "Sign In to edX Studio"
-msgstr ""
+msgstr "登录edX Studio"
 
 #: cms/templates/login.html
 msgid "Don't have a Studio Account? Sign up!"
-msgstr ""
+msgstr "如果您没有Studio账号，请现在注册。"
 
 #: cms/templates/login.html
 msgid "Required Information to Sign In to edX Studio"
-msgstr ""
+msgstr "登录edX Studio所需的信息"
 
 #: cms/templates/login.html cms/templates/register.html
 msgid "Email Address"
-msgstr ""
+msgstr "电子邮件地址"
 
 #: cms/templates/login.html cms/templates/widgets/sock.html
 msgid "Studio Support"
-msgstr ""
+msgstr "Studio支持"
 
 #: cms/templates/login.html
 msgid ""
@@ -10858,204 +11004,205 @@ msgid ""
 "center{link_end} to look over self help steps, find solutions others have "
 "found to the same problem, or let us know of your issue."
 msgstr ""
+"如果您在使用账户时遇到问题，请访问{link_start}技术支持中心{link_end}寻找自助的步骤，或者其他类似问题的解决方案，或者让我们了解您的问题。"
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
-msgstr ""
+msgstr "课程团队设置"
 
 #: cms/templates/manage_users.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 #: cms/templates/widgets/header.html
 msgid "Course Team"
-msgstr ""
+msgstr "课程团队"
 
 #: cms/templates/manage_users.html
 msgid "New Team Member"
-msgstr ""
+msgstr "新的团队成员"
 
 #: cms/templates/manage_users.html
 msgid "Add a User to Your Course's Team"
-msgstr ""
+msgstr "向您的课程团队中添加一个用户"
 
 #: cms/templates/manage_users.html
 msgid "New Team Member Information"
-msgstr ""
+msgstr "新团队成员信息"
 
 #: cms/templates/manage_users.html
 msgid "User's Email Address"
-msgstr ""
+msgstr "用户邮箱地址"
 
 #: cms/templates/manage_users.html
 msgid "e.g. jane.doe@gmail.com"
-msgstr ""
+msgstr "例如：jane.doe@gmail.com"
 
 #: cms/templates/manage_users.html
 msgid ""
 "Please provide the email address of the course staff member you'd like to "
 "add"
-msgstr ""
+msgstr "请提供您想要添加的课程教员的邮箱地址"
 
 #: cms/templates/manage_users.html
 msgid "Add User"
-msgstr ""
+msgstr "添加用户"
 
 #: cms/templates/manage_users.html cms/templates/manage_users.html
 msgid "Current Role:"
-msgstr ""
+msgstr "当前角色："
 
 #: cms/templates/manage_users.html cms/templates/manage_users.html
 msgid "You!"
-msgstr ""
+msgstr "您！"
 
 #: cms/templates/manage_users.html
 msgid "Staff"
-msgstr ""
+msgstr "教员"
 
 #: cms/templates/manage_users.html
 msgid "send an email message to {email}"
-msgstr ""
+msgstr "向{email}发送一封邮件信息"
 
 #: cms/templates/manage_users.html
 msgid "Promote another member to Admin to remove your admin rights"
-msgstr ""
+msgstr "提升另一名成员为管理员，解除您自己的管理权限"
 
 #: cms/templates/manage_users.html
 msgid "Remove Admin Access"
-msgstr ""
+msgstr "解除管理权限"
 
 #: cms/templates/manage_users.html
 msgid "Add Admin Access"
-msgstr ""
+msgstr "添加管理权限"
 
 #: cms/templates/manage_users.html
 msgid "Delete the user, {username}"
-msgstr ""
+msgstr "删除用户，{username}"
 
 #: cms/templates/manage_users.html
 msgid "Add Team Members to This Course"
-msgstr ""
+msgstr "向该课程添加团队成员"
 
 #: cms/templates/manage_users.html
 msgid ""
 "Adding team members makes course authoring collaborative. Users must be "
 "signed up for Studio and have an active account. "
-msgstr ""
+msgstr "添加团队成员以共同完成课程创作。用户必须注册了Studio并且拥有一个已激活账户。"
 
 #: cms/templates/manage_users.html
 msgid "Add a New Team Member"
-msgstr ""
+msgstr "添加一个团队成员"
 
 #: cms/templates/manage_users.html
 msgid "Course Team Roles"
-msgstr ""
+msgstr "课程团队角色"
 
 #: cms/templates/manage_users.html
 msgid ""
 "Course team members, or staff, are course co-authors. They have full writing"
 " and editing privileges on all course content."
-msgstr ""
+msgstr "课程团队成员或教员都是课程共同作者。他们有权编写及修改所有课程内容。"
 
 #: cms/templates/manage_users.html
 msgid ""
 "Admins are course team members who can add and remove other course team "
 "members."
-msgstr ""
+msgstr "管理员是课程团队成员中可以添加和移除其它课程团队成员的用户。"
 
 #: cms/templates/manage_users.html
 msgid "Transferring Ownership"
-msgstr ""
+msgstr "移交所有权"
 
 #: cms/templates/manage_users.html
 msgid ""
 "Every course must have an Admin. If you're the Admin and you want transfer "
 "ownership of the course, click Add admin access to make another user the "
 "Admin, then ask that user to remove you from the Course Team list."
-msgstr ""
+msgstr "每门课程必须有一名管理员。如果您当前是管理员，且期望移交管理员身份，您可以赋予其他用户管理员权限，并请求他们将你从课程团队列表中删除。"
 
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "Course Outline"
-msgstr ""
+msgstr "课程大纲"
 
 #: cms/templates/overview.html cms/templates/overview.html
 #: cms/templates/overview.html
 msgid "Expand/collapse this section"
-msgstr ""
+msgstr "展开/折叠本章节"
 
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "New Section Name"
-msgstr ""
+msgstr "新章节的名字"
 
 #: cms/templates/overview.html
 msgid "Add a new section name"
-msgstr ""
+msgstr "增加新章节的名字"
 
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "Delete this section"
-msgstr ""
+msgstr "删除该章节 "
 
 #: cms/templates/overview.html
 msgid "Drag to re-order"
-msgstr ""
+msgstr "拖动以重排序"
 
 #: cms/templates/overview.html cms/templates/overview.html
 msgid "New Subsection"
-msgstr ""
+msgstr "添加新的小节"
 
 #: cms/templates/overview.html cms/templates/widgets/units.html
 msgid "New Unit"
-msgstr ""
+msgstr "新的单元"
 
 #: cms/templates/overview.html
 msgid "You haven't added any sections to your course outline yet."
-msgstr ""
+msgstr "您还未在课程大纲中添加任何章节"
 
 #: cms/templates/overview.html
 msgid "Add your first section"
-msgstr ""
+msgstr "添加您的第一个章节"
 
 #: cms/templates/overview.html
 msgid "Collapse All Sections"
-msgstr ""
+msgstr "折叠所有章节"
 
 #: cms/templates/overview.html
 msgid "New Section"
-msgstr ""
+msgstr "添加新章节"
 
 #: cms/templates/overview.html
 msgid "This section is not scheduled for release"
-msgstr ""
+msgstr "该章节尚未制定发布计划"
 
 #: cms/templates/overview.html
 msgid "Schedule"
-msgstr ""
+msgstr "时间表"
 
 #: cms/templates/overview.html
 msgid "Release date:"
-msgstr ""
+msgstr "发布日期："
 
 #: cms/templates/overview.html
 msgid "Edit section release date"
-msgstr ""
+msgstr "编辑章节发布日期"
 
 #: cms/templates/overview.html
 msgid "Delete section"
-msgstr ""
+msgstr "删除章节"
 
 #: cms/templates/overview.html
 msgid "Drag to reorder section"
-msgstr ""
+msgstr "拖动以重排序章节"
 
 #: cms/templates/overview.html
 msgid "Expand/collapse this subsection"
-msgstr ""
+msgstr "展开/折叠本小节"
 
 #: cms/templates/overview.html
 msgid "Delete this subsection"
-msgstr ""
+msgstr "删除该小节"
 
 #: cms/templates/overview.html
 msgid "Delete subsection"
-msgstr ""
+msgstr "删除小节"
 
 #: cms/templates/overview.html
 msgid ""
@@ -11063,82 +11210,82 @@ msgid ""
 "sections, and create new units in existing subsections.  You can set the "
 "assignment type for subsections that are to be graded, and you can open a "
 "subsection for further editing."
-msgstr ""
+msgstr "您可以创建新章节和小节，设置章节发布日期，在小节中创建新单元。您可以设置小节中的作业类型以供计分，也可以打开小节作进一步编辑。"
 
 #: cms/templates/overview.html
 msgid ""
 "In addition, you can drag and drop sections, subsections, and units to "
 "reorganize your course."
-msgstr ""
+msgstr "此外，您可以拖动章节，小节和单元来重新组织您的课程。"
 
 #: cms/templates/overview.html
 msgid "Section Release Date"
-msgstr ""
+msgstr "章节发布日期"
 
 #: cms/templates/overview.html
 msgid ""
 "On the date set below, this section - {name} - will be released to students."
 " Any units marked private will only be visible to admins."
-msgstr ""
+msgstr "章节-{name}-将于以下设定日期向学生发布。任何标为私密的单元将仅对管理员可见。"
 
 #: cms/templates/overview.html
 msgid "Form Actions"
-msgstr ""
+msgstr "表格操作"
 
 #: cms/templates/register.html
 msgid "Sign Up for edX Studio"
-msgstr ""
+msgstr "注册edX Studio"
 
 #: cms/templates/register.html
 msgid "Already have a Studio Account? Sign in"
-msgstr ""
+msgstr "如果您已经有Studio账号，请直接登录"
 
 #: cms/templates/register.html
 msgid ""
 "Ready to start creating online courses? Sign up below and start creating "
 "your first edX course today."
-msgstr ""
+msgstr "如果您已准备好创建在线课程，请在下面注册并创建您的第一个edX课程。"
 
 #: cms/templates/register.html
 msgid "Required Information to Sign Up for edX Studio"
-msgstr ""
+msgstr "注册edX Studio所需的信息"
 
 #: cms/templates/register.html
 msgid ""
 "This will be used in public discussions with your courses and in our edX101 "
 "support forums"
-msgstr ""
+msgstr "这将会被用于您课程的公开讨论中以及我们edX101课程的支持论坛"
 
 #: cms/templates/register.html
 msgid "Your Location"
-msgstr ""
+msgstr "您的位置"
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr ""
+msgstr "我同意{a_start}服务条约{a_end}"
 
 #: cms/templates/register.html
 msgid "Create My Account &amp; Start Authoring Courses"
-msgstr ""
+msgstr "创建我的账号 &amp;开始创建课程"
 
 #: cms/templates/register.html
 msgid "Common Studio Questions"
-msgstr ""
+msgstr "关于Studio的常见问题"
 
 #: cms/templates/register.html
 msgid "Who is Studio for?"
-msgstr ""
+msgstr "Studio是为谁服务的？"
 
 #: cms/templates/register.html
 msgid ""
 "Studio is for anyone that wants to create online courses that leverage the "
 "global edX platform. Our users are often faculty members, teaching "
 "assistants and course staff, and members of instructional technology groups."
-msgstr ""
+msgstr "Studio面向任何希望使用全球化edX平台创建在线课程的用户，这些用户通常是院系教师、助教及教学技术小组。"
 
 #: cms/templates/register.html
 msgid "How technically savvy do I need to be to create courses in Studio?"
-msgstr ""
+msgstr "在Studio创建课程需要掌握哪些技术？"
 
 #: cms/templates/register.html
 msgid ""
@@ -11148,10 +11295,11 @@ msgid ""
 "technical background would be helpful. As always, we are here to help, so "
 "don't hesitate to dive right in."
 msgstr ""
+"对几乎所有熟悉网上编辑环境(例如WordPress，Moodle)的人而言，Studio都是很容易使用的。它无需任何编程知识，不过拥有技术背景会对使用一些高级特性有所帮助。我们会一如既往地为您提供帮助，不要犹豫赶快加入吧。"
 
 #: cms/templates/register.html
 msgid "I've never authored a course online before. Is there help?"
-msgstr ""
+msgstr "我以前从来没创建过在线课程，可以帮帮我吗？"
 
 #: cms/templates/register.html
 msgid ""
@@ -11160,47 +11308,48 @@ msgid ""
 "running an online course. Additionally, we're always here to help, just drop"
 " us a note."
 msgstr ""
+"当然。我们创建了一个在线课程：edX101，它介绍了一些创建在线课程的最佳实践：从拍摄视频，创建练习到开展在线教学的基础。另外，我们会尽力提供所需帮助，需要时请随时给我们留言。"
 
 #: cms/templates/settings.html
 msgid "Schedule &amp; Details Settings"
-msgstr ""
+msgstr "日程 &amp; 细节设置"
 
 #: cms/templates/settings.html
 msgid "Schedule & Details"
-msgstr ""
+msgstr "日程 & 细节"
 
 #: cms/templates/settings.html
 msgid "Basic Information"
-msgstr ""
+msgstr "基本信息"
 
 #: cms/templates/settings.html
 msgid "The nuts and bolts of your course"
-msgstr ""
+msgstr "您课程的具体细节"
 
 #: cms/templates/settings.html cms/templates/settings.html
 #: cms/templates/settings.html
 msgid "This field is disabled: this information cannot be changed."
-msgstr ""
+msgstr "该字段已禁用：信息不可修改。"
 
 #: cms/templates/settings.html
 msgid "Course Summary Page"
-msgstr ""
+msgstr "课程总结页面"
 
 #: cms/templates/settings.html
 msgid "(for student enrollment and access)"
-msgstr ""
+msgstr "(用于学生注册和访问)"
 
 #: cms/templates/settings.html
 msgid "Send a note to students via email"
-msgstr ""
+msgstr "通过电子邮件给学生发送笔记"
 
 #: cms/templates/settings.html
 msgid "Invite your students"
-msgstr ""
+msgstr "邀请您的学生"
 
 #: cms/templates/settings.html
 msgid "Promoting Your Course with edX"
-msgstr ""
+msgstr "通过edX平台推广您的课程"
 
 #: cms/templates/settings.html
 msgid ""
@@ -11208,62 +11357,64 @@ msgid ""
 "announced. To provide content for the page and preview it, follow the "
 "instructions provided by your <abbr title=\"Program Manager\">PM</abbr>."
 msgstr ""
+"您的课程总结页面直到您的课程发布之后才会可见。为了向该页面提供信息和预览页面，请遵循您的<abbr title=\"Program "
+"Manager\">项目经理</abbr>提供的说明。"
 
 #: cms/templates/settings.html
 msgid "Course Schedule"
-msgstr ""
+msgstr "课程时间表"
 
 #: cms/templates/settings.html
 msgid "Dates that control when your course can be viewed"
-msgstr ""
+msgstr "调整您的课程可以浏览的日期"
 
 #: cms/templates/settings.html
 msgid "First day the course begins"
-msgstr ""
+msgstr "课程开始的第一天"
 
 #: cms/templates/settings.html
 msgid "Course Start Time"
-msgstr ""
+msgstr "课程开始时间"
 
 #: cms/templates/settings.html
 msgid "Course End Date"
-msgstr ""
+msgstr "课程结束日期"
 
 #: cms/templates/settings.html
 msgid "Last day your course is active"
-msgstr ""
+msgstr "您课程结束的最后一天"
 
 #: cms/templates/settings.html
 msgid "Course End Time"
-msgstr ""
+msgstr "课程结束时间"
 
 #: cms/templates/settings.html
 msgid "Enrollment Start Date"
-msgstr ""
+msgstr "注册开始日期"
 
 #: cms/templates/settings.html
 msgid "First day students can enroll"
-msgstr ""
+msgstr "学生可以注册的第一天"
 
 #: cms/templates/settings.html
 msgid "Enrollment Start Time"
-msgstr ""
+msgstr "注册开始时间"
 
 #: cms/templates/settings.html
 msgid "Enrollment End Date"
-msgstr ""
+msgstr "注册结束日期"
 
 #: cms/templates/settings.html
 msgid "Last day students can enroll"
-msgstr ""
+msgstr "学生可以注册的最后一天"
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
-msgstr ""
+msgstr "注册结束时间"
 
 #: cms/templates/settings.html
 msgid "These Dates Are Not Used When Promoting Your Course"
-msgstr ""
+msgstr "当推广您的课程的时候这些日期将不会被使用"
 
 #: cms/templates/settings.html
 msgid ""
@@ -11274,102 +11425,106 @@ msgid ""
 " Manager\">PM</abbr> or Conrad Warre <a rel=\"email\" class=\"action action-"
 "email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
 msgstr ""
+"这些日期影响<strong>您的课程何时可以被浏览</strong>，但是它们<strong>并不是在您的课程总结页面显示的日期</strong>。为了在课程总结页面提供课程开始和注册的日期，请遵循您的"
+" <abbr title=\"Program Manager\">项目经理</abbr> 或者康拉德 沃伦 <a rel=\"email\" "
+"class=\"action action-email\" "
+"href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>提供的说明。"
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
-msgstr ""
+msgstr "介绍您的课程"
 
 #: cms/templates/settings.html
 msgid "Information for prospective students"
-msgstr ""
+msgstr "提供给预期学生的信息"
 
 #: cms/templates/settings.html
 msgid "Course Short Description"
-msgstr ""
+msgstr "课程简介"
 
 #: cms/templates/settings.html
 msgid ""
 "Appears on the course catalog page when students roll over the course name. "
 "Limit to ~150 characters"
-msgstr ""
+msgstr "将在学生浏览课程目录时出现。限制150个字符。"
 
 #: cms/templates/settings.html
 msgid "Course Overview"
-msgstr ""
+msgstr "课程概览"
 
 #: cms/templates/settings.html
 msgid "your course summary page"
-msgstr ""
+msgstr "您的课程总结页面"
 
 #: cms/templates/settings.html
 msgid ""
 "Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
-msgstr ""
+msgstr "介绍说明、先修条件、常见问题解答在%s (HTML格式)"
 
 #: cms/templates/settings.html cms/templates/settings.html
 #: cms/templates/settings.html
 msgid "Course Image"
-msgstr ""
+msgstr "课程图片"
 
 #: cms/templates/settings.html
 msgid ""
 "You can manage this image along with all of your other <a href='{}'>files "
 "&amp; uploads</a>"
-msgstr ""
+msgstr "该图片可以随您的其他<a href='{}'>文件 &amp; 上传</a>共同管理"
 
 #: cms/templates/settings.html
 msgid ""
 "Your course currently does not have an image. Please upload one (JPEG or PNG"
 " format, and minimum suggested dimensions are 375px wide by 200px tall)"
-msgstr ""
+msgstr "您的课程目前没有图片。请上传一张（JPEG或PNG格式，最小建议大小为375像素宽、200像素高）"
 
 #: cms/templates/settings.html
 msgid ""
 "Please provide a valid path and name to your course image (Note: only JPEG "
 "or PNG format supported)"
-msgstr ""
+msgstr "请为您的课程图片提供一个有效的路径和名字（注意：仅支持JPEG和PNG格式）"
 
 #: cms/templates/settings.html
 msgid "Upload Course Image"
-msgstr ""
+msgstr "上传课程图片"
 
 #: cms/templates/settings.html
 msgid "Course Introduction Video"
-msgstr ""
+msgstr "课程介绍视频"
 
 #: cms/templates/settings.html
 msgid "Delete Current Video"
-msgstr ""
+msgstr "删除当前视频"
 
 #: cms/templates/settings.html
 msgid "Enter your YouTube video's ID (along with any restriction parameters)"
-msgstr ""
+msgstr "请输入您的YouTube视频编号(以及任何必要的限制参数)"
 
 #: cms/templates/settings.html
 msgid "Requirements"
-msgstr ""
+msgstr "要求"
 
 #: cms/templates/settings.html
 msgid "Expectations of the students taking this course"
-msgstr ""
+msgstr "对参加本门课程的学生的期望"
 
 #: cms/templates/settings.html
 msgid "Hours of Effort per Week"
-msgstr ""
+msgstr "每周投入课程学习的小时数"
 
 #: cms/templates/settings.html
 msgid "Time spent on all course work"
-msgstr ""
+msgstr "在整个课程上投入的时间"
 
 #: cms/templates/settings.html
 msgid "How are these settings used?"
-msgstr ""
+msgstr "如何使用这些设置？"
 
 #: cms/templates/settings.html
 msgid ""
 "Your course's schedule determines when students can enroll in and begin a "
 "course."
-msgstr ""
+msgstr "您的课程时间表决定何时学生可以注册和开始本门课程。"
 
 #: cms/templates/settings.html
 msgid ""
@@ -11378,150 +11533,151 @@ msgid ""
 "video, and estimated time requirements. Students use About pages to choose "
 "new courses to take."
 msgstr ""
+"本页面的其他信息将会出现在你课程的关于页面上。这些信息包括课程概要，课程图片，介绍视频，以及预估的时间要求。学生们使用关于页面来选择要上的课程。"
 
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html
 msgid "Other Course Settings"
-msgstr ""
+msgstr "课程其他设置"
 
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 msgid "Grading"
-msgstr ""
+msgstr "评分"
 
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 #: cms/templates/widgets/header.html
 msgid "Advanced Settings"
-msgstr ""
+msgstr "高级设置"
 
 #: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."
-msgstr ""
+msgstr "您的策略调整已保存。"
 
 #: cms/templates/settings_advanced.html
 msgid "There was an error saving your information. Please see below."
-msgstr ""
+msgstr "保存您的信息时出现错误，详情见下。"
 
 #: cms/templates/settings_advanced.html
 msgid "Manual Policy Definition"
-msgstr ""
+msgstr "手工策略定义"
 
 #: cms/templates/settings_advanced.html
 msgid ""
 "<strong>Warning</strong>: Do not modify these policies unless you are "
 "familiar with their purpose."
-msgstr ""
+msgstr "<strong>警告</strong>：不要轻易修改这些策略，除非您已经熟悉了这些策略的目的。"
 
 #: cms/templates/settings_advanced.html
 msgid "What do advanced settings do?"
-msgstr ""
+msgstr "高级设置有何作用？"
 
 #: cms/templates/settings_advanced.html
 msgid ""
 "Advanced settings control specific course functionality. On this page, you "
 "can edit manual policies, which are JSON-based key and value pairs that "
 "control specific course settings."
-msgstr ""
+msgstr "高级设置控制特定的课程功能。在本页面，你可以手工编辑基于JSON键值对的策略，控制特定的课程设置。"
 
 #: cms/templates/settings_advanced.html
 msgid ""
 "Any policies you modify here override all other information you've defined "
 "elsewhere in Studio. Do not edit policies unless you are familiar with both "
 "their purpose and syntax."
-msgstr ""
+msgstr "您在这里所做的任何策略更改均会覆盖您此前在Studio其他所作的定义。注意，如果您对策略的目的和语法不熟悉，请不要修改。"
 
 #: cms/templates/settings_advanced.html
 msgid ""
 "{em_start}Note:{em_end} When you enter strings as policy values, ensure that"
 " you use double quotation marks (&quot;) around the string. Do not use "
 "single quotation marks (&apos;)."
-msgstr ""
+msgstr "{em_start}注意：{em_end}当您输入字符串策略值的时候请用双引号(&quot;)引起来。请不要使用单引号(&apos;)。"
 
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
-msgstr ""
+msgstr "细节 &amp; 日程"
 
 #: cms/templates/settings_graders.html
 msgid "Grading Settings"
-msgstr ""
+msgstr "评分设置"
 
 #: cms/templates/settings_graders.html
 msgid "Overall Grade Range"
-msgstr ""
+msgstr "整体评分范围"
 
 #: cms/templates/settings_graders.html
 msgid "Your overall grading scale for student final grades"
-msgstr ""
+msgstr "您对学生最终得分的整体评分范围"
 
 #: cms/templates/settings_graders.html
 msgid "Grading Rules &amp; Policies"
-msgstr ""
+msgstr "评分规则 &amp; 策略"
 
 #: cms/templates/settings_graders.html
 msgid "Deadlines, requirements, and logistics around grading student work"
-msgstr ""
+msgstr "对学生作业进行评分的截止日期，要求和流程"
 
 #: cms/templates/settings_graders.html
 msgid "Grace Period on Deadline:"
-msgstr ""
+msgstr "截止日期的宽限期："
 
 #: cms/templates/settings_graders.html
 msgid "Leeway on due dates"
-msgstr ""
+msgstr "截止日期余量"
 
 #: cms/templates/settings_graders.html
 msgid "Assignment Types"
-msgstr ""
+msgstr "作业类型"
 
 #: cms/templates/settings_graders.html
 msgid "Categories and labels for any exercises that are gradable"
-msgstr ""
+msgstr "所有可打分的练习的种类和标签"
 
 #: cms/templates/settings_graders.html
 msgid "New Assignment Type"
-msgstr ""
+msgstr "添加新的作业类型"
 
 #: cms/templates/settings_graders.html
 msgid ""
 "You can use the slider under Overall Grade Range to specify whether your "
 "course is pass/fail or graded by letter, and to establish the thresholds for"
 " each grade."
-msgstr ""
+msgstr "你可以使用全局评价范围下面的滑动条来指定您的课程评分是合格／不合格或者字母评价等级，并且建立每个评价等级的阈值。"
 
 #: cms/templates/settings_graders.html
 msgid ""
 "You can specify whether your course offers students a grace period for late "
 "assignments."
-msgstr ""
+msgstr "你可以指定你的课程是否给学生提供迟交作业的宽限期。"
 
 #: cms/templates/settings_graders.html
 msgid ""
 "You can also create assignment types, such as homework, labs, quizzes, and "
 "exams, and specify how much of a student's grade each assignment type is "
 "worth."
-msgstr ""
+msgstr "你也可以创建作业类型，比如家庭作业、实验、测验、以及考试，并且指定每个作业是否计入最终的成绩及其评价分值。"
 
 #: cms/templates/studio_vertical_wrapper.html
 #: cms/templates/studio_vertical_wrapper.html
 msgid "Expand or Collapse"
-msgstr ""
+msgstr "展开或折叠"
 
 #: cms/templates/studio_vertical_wrapper.html
 msgid "No Actions"
-msgstr ""
+msgstr "无操作"
 
 #: cms/templates/textbooks.html
 msgid "You have unsaved changes. Do you really want to leave this page?"
-msgstr ""
+msgstr "您尚有未保存的修改，确定要离此页面吗？"
 
 #: cms/templates/textbooks.html
 msgid "New Textbook"
-msgstr ""
+msgstr "新教材"
 
 #: cms/templates/textbooks.html
 msgid "Why should I break my textbook into chapters?"
-msgstr ""
+msgstr "我什么我应该将教材拆分为章节？"
 
 #: cms/templates/textbooks.html
 msgid ""
@@ -11529,298 +11685,300 @@ msgid ""
 "students, especially those with slow Internet connections. Breaking up "
 "textbooks into chapters can also help students more easily find topic-based "
 "information."
-msgstr ""
+msgstr "将您的教材拆分为多个章节将有助于学生降低内容加载时间，特别是对于网速较慢的学生很有帮助。同时有助于学生按主题找到他们所需的信息。"
 
 #: cms/templates/textbooks.html
 msgid "What if my book isn't divided into chapters?"
-msgstr ""
+msgstr "如果我的教材没有拆分成章节会怎么样？"
 
 #: cms/templates/textbooks.html
 msgid ""
 "If your textbook doesn't have individual chapters, you can upload the entire"
 " text as a single chapter and enter a name of your choice in the Chapter "
 "Name field."
-msgstr ""
+msgstr "如果您的教材没有独立的章节，您可以上传整个文本作为一个章节，并在章节名称字段中输入您所选择的名称。"
 
 #: cms/templates/unit.html cms/templates/ux/reference/unit.html
 msgid "Individual Unit"
-msgstr ""
+msgstr "独立单元"
 
 #: cms/templates/unit.html
 msgid "You are editing a draft."
-msgstr ""
+msgstr "您正在编辑草稿。"
 
 #: cms/templates/unit.html
 msgid "This unit was originally published on {date}."
-msgstr ""
+msgstr "本单元原定发布时间{date}。"
 
 #: cms/templates/unit.html
 msgid "View the Live Version"
-msgstr ""
+msgstr "观看在线版本"
 
 #: cms/templates/unit.html
 msgid "Add New Component"
-msgstr ""
+msgstr "添加新组件"
 
 #: cms/templates/unit.html
 msgid "Common Problem Types"
-msgstr ""
+msgstr "常见问题类型"
 
 #: cms/templates/unit.html
 msgid "Advanced"
-msgstr ""
+msgstr "高级"
 
 #: cms/templates/unit.html
 msgid "Unit Settings"
-msgstr ""
+msgstr "单元设置"
 
 #: cms/templates/unit.html
 msgid "Visibility:"
-msgstr ""
+msgstr "可见性："
 
 #: cms/templates/unit.html
 msgid "Public"
-msgstr ""
+msgstr "公开"
 
 #: cms/templates/unit.html
 msgid "Private"
-msgstr ""
+msgstr "私密"
 
 #: cms/templates/unit.html
 msgid ""
 "This unit has been published. To make changes, you must {link_start}edit a "
 "draft{link_end}."
-msgstr ""
+msgstr "本单元已经发布。如需修改，请点击{link_start}编辑草稿{link_end}进行修改。"
 
 #: cms/templates/unit.html
 msgid ""
 "This is a draft of the published unit. To update the live version, you must "
 "{link_start}replace it with this draft{link_end}."
-msgstr ""
+msgstr "这是已发布单元的编辑稿。您必须点击{link_start}使用本草稿进行替换{link_end}来更新在线版本。"
 
 #: cms/templates/unit.html
 msgid ""
 "This unit is scheduled to be released to <strong>students</strong> on "
 "<strong>{date}</strong> with the subsection {link_start}{name}{link_end}"
 msgstr ""
+"本单元将 连同小节{link_start}{name}{link_end}一起，在 <strong>{date}</strong>发布给 "
+"<strong>学生</strong>"
 
 #: cms/templates/unit.html
 msgid ""
 "This unit is scheduled to be released to <strong>students</strong> with the "
 "subsection {link_start}{name}{link_end}"
-msgstr ""
+msgstr "本单元将 连同小节{link_start}{name}{link_end}一起，发布给 <strong>学生</strong>"
 
 #: cms/templates/unit.html
 msgid "Delete Draft"
-msgstr ""
+msgstr "删除草稿"
 
 #: cms/templates/unit.html
 msgid "Unit Location"
-msgstr ""
+msgstr "单元位置"
 
 #: cms/templates/unit.html
 msgid "Unit Identifier:"
-msgstr ""
+msgstr "单元标识符："
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
 "Thank you for signing up for edX Studio! To activate your account, please "
 "copy and paste this address into your web browser's address bar:"
-msgstr ""
+msgstr "感谢您注册edX Studio！为了激活您的账号，请将下面的地址复制并粘贴到您的浏览器地址栏："
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
 "If you didn't request this, you don't need to do anything; you won't receive"
 " any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the help section of the edX web site."
-msgstr ""
+msgstr "如果您未发起请求，您无需做任何事，将来不会再收到我们的邮件。请不要直接回复此邮件。如果您需要帮助，请点击edX网站的帮助页面。"
 
 #: cms/templates/emails/activation_email_subject.txt
 msgid "Your account for edX Studio"
-msgstr ""
+msgstr "您的edX Studio账号"
 
 #: cms/templates/emails/course_creator_admin_subject.txt
 msgid "{email} has requested Studio course creator privileges on edge"
-msgstr ""
+msgstr "{email}请求Studio课程创建者资格"
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
 msgid ""
 "User '{user}' with e-mail {email} has requested Studio course creator "
 "privileges on edge."
-msgstr ""
+msgstr "使用电子邮件{email}的用户'{user}'申请Studio课程创建者资格。"
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
 msgid "To grant or deny this request, use the course creator admin table."
-msgstr ""
+msgstr "要授予或拒绝这一请求，请使用课程创建者管理表。"
 
 #: cms/templates/emails/course_creator_denied.txt
 msgid ""
 "Your request for course creation rights to edX Studio have been denied. If "
 "you believe this was in error, please contact: "
-msgstr ""
+msgstr "您关于课程创建权限的申请已被拒绝。如果有问题，请联系："
 
 #: cms/templates/emails/course_creator_granted.txt
 msgid ""
 "Your request for course creation rights to edX Studio have been granted. To "
 "create your first course, visit:"
-msgstr ""
+msgstr "你关于课程创建权限的申请已被接受。创建您的第一门课程，请访问："
 
 #: cms/templates/emails/course_creator_revoked.txt
 msgid ""
 "Your course creation rights to edX Studio have been revoked. If you believe "
 "this was in error, please contact: "
-msgstr ""
+msgstr "您关于课程创建权限的申请已经撤销。如果有问题，请联系："
 
 #: cms/templates/emails/course_creator_subject.txt
 msgid "Your course creator status for edX Studio"
-msgstr ""
+msgstr "您在edX Studio的课程创建者状态"
 
 #: cms/templates/registration/activation_complete.html
 msgid "You can now {link_start}login{link_end}."
-msgstr ""
+msgstr "您现在可以{link_start}登录{link_end}。"
 
 #: cms/templates/registration/reg_complete.html
 msgid ""
 "An activation link has been sent to {email}, along with instructions for "
 "activating your account."
-msgstr ""
+msgstr "我们已发送一封电子邮件至{email}，里面包含一个激活账号的链接，以及激活账号的操作说明。"
 
 #: cms/templates/widgets/footer.html
 msgid "All rights reserved."
-msgstr ""
+msgstr "保留所有权利。"
 
 #: cms/templates/widgets/footer.html cms/templates/widgets/header.html
 #: cms/templates/widgets/sock.html
 msgid "Contact Us"
-msgstr ""
+msgstr "联系我们"
 
 #: cms/templates/widgets/header.html
 msgid "Current Course:"
-msgstr ""
+msgstr "当前课程"
 
 #: cms/templates/widgets/header.html
 msgid "{course_name}'s Navigation:"
-msgstr ""
+msgstr "{course_name}导航："
 
 #: cms/templates/widgets/header.html
 msgid "Outline"
-msgstr ""
+msgstr "大纲"
 
 #: cms/templates/widgets/header.html
 msgid "Updates"
-msgstr ""
+msgstr "更新"
 
 #: cms/templates/widgets/header.html
 msgid "Schedule &amp; Details"
-msgstr ""
+msgstr "日程 &amp; 细节"
 
 #: cms/templates/widgets/header.html
 msgid "Checklists"
-msgstr ""
+msgstr "核对表"
 
 #: cms/templates/widgets/header.html
 msgid "Import"
-msgstr ""
+msgstr "导入"
 
 #: cms/templates/widgets/header.html
 msgid "Export"
-msgstr ""
+msgstr "导出"
 
 #: cms/templates/widgets/header.html
 msgid "Help &amp; Account Navigation"
-msgstr ""
+msgstr "帮助 &amp; 账户导航"
 
 #: cms/templates/widgets/header.html cms/templates/widgets/sock.html
 msgid "This is a PDF Document"
-msgstr ""
+msgstr "这是一个PDF文档"
 
 #: cms/templates/widgets/header.html
 msgid "Studio Documentation"
-msgstr ""
+msgstr "Studio文档"
 
 #: cms/templates/widgets/header.html cms/templates/widgets/sock.html
 #: cms/templates/widgets/sock.html
 msgid "Studio Help Center"
-msgstr ""
+msgstr "Studio帮助中心"
 
 #: cms/templates/widgets/header.html
 msgid "Currently signed in as:"
-msgstr ""
+msgstr "当前登录用户："
 
 #: cms/templates/widgets/header.html
 msgid "Sign Out"
-msgstr ""
+msgstr "退出"
 
 #: cms/templates/widgets/header.html
 msgid "You're not currently signed in"
-msgstr ""
+msgstr "您当前没有登录"
 
 #: cms/templates/widgets/header.html
 msgid "How Studio Works"
-msgstr ""
+msgstr "Studio指南"
 
 #: cms/templates/widgets/header.html
 msgid "Studio Help"
-msgstr ""
+msgstr "Studio帮助"
 
 #: cms/templates/widgets/metadata-edit.html
 msgid "Launch Latex Source Compiler"
-msgstr ""
+msgstr "启动 Latex 源编译器"
 
 #: cms/templates/widgets/problem-edit.html
 #: cms/templates/widgets/problem-edit.html
 msgid "Heading 1"
-msgstr ""
+msgstr "标题一"
 
 #: cms/templates/widgets/problem-edit.html
 #: cms/templates/widgets/problem-edit.html
 msgid "Multiple Choice"
-msgstr ""
+msgstr "多项选择"
 
 #: cms/templates/widgets/problem-edit.html
 #: cms/templates/widgets/problem-edit.html
 msgid "Checkboxes"
-msgstr ""
+msgstr "复选框"
 
 #: cms/templates/widgets/problem-edit.html
 #: cms/templates/widgets/problem-edit.html
 msgid "Text Input"
-msgstr ""
+msgstr "文本输入"
 
 #: cms/templates/widgets/problem-edit.html
 #: cms/templates/widgets/problem-edit.html
 msgid "Numerical Input"
-msgstr ""
+msgstr "数值输入"
 
 #: cms/templates/widgets/problem-edit.html
 #: cms/templates/widgets/problem-edit.html
 msgid "Dropdown"
-msgstr ""
+msgstr "下拉列表"
 
 #: cms/templates/widgets/problem-edit.html
 #: cms/templates/widgets/problem-edit.html
 msgid "Explanation"
-msgstr ""
+msgstr "解释"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Advanced Editor"
-msgstr ""
+msgstr "高级编辑器"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Toggle Cheatsheet"
-msgstr ""
+msgstr "切换速记"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Label"
-msgstr ""
+msgstr "标签"
 
 #: cms/templates/widgets/sock.html
 msgid "Looking for Help with Studio?"
-msgstr ""
+msgstr "寻求关于Studio用法的帮助？"
 
 #: cms/templates/widgets/sock.html
 msgid "edX Studio Help"
-msgstr ""
+msgstr "edX Studio帮助"
 
 #: cms/templates/widgets/sock.html
 msgid ""
@@ -11828,48 +11986,49 @@ msgid ""
 "Take advantage of our documentation, help center, as well as our edX101 "
 "introduction course for course authors."
 msgstr ""
+"需要关于Studio的帮助吗？由于创建课程比较复杂，因此我们在此提供帮助。请仔细阅读我们的文档，帮助中心以及面向课程作者的入门课程edX101。"
 
 #: cms/templates/widgets/sock.html
 msgid "Download Studio Documentation"
-msgstr ""
+msgstr "下载Studio文档"
 
 #: cms/templates/widgets/sock.html cms/templates/widgets/sock.html
 msgid "How to use Studio to build your course"
-msgstr ""
+msgstr "如何使用Studio创建您的课程"
 
 #: cms/templates/widgets/sock.html
 msgid "Enroll in edX101"
-msgstr ""
+msgstr "注册edX101"
 
 #: cms/templates/widgets/sock.html
 msgid "Contact us about Studio"
-msgstr ""
+msgstr "联系我们"
 
 #: cms/templates/widgets/sock.html
 msgid ""
 "Have problems, questions, or suggestions about Studio? We're also here to "
 "listen to any feedback you want to share."
-msgstr ""
+msgstr "如果您遇到困难，希望对Studio提出问题或建议，请与我们分享您的反馈。"
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
-msgstr ""
+msgstr "名称"
 
 #: cms/templates/widgets/units.html
 msgid "Delete this unit"
-msgstr ""
+msgstr "删除本单元"
 
 #: cms/templates/widgets/units.html
 msgid "Delete unit"
-msgstr ""
+msgstr "删除单元"
 
 #: cms/templates/widgets/units.html
 msgid "Drag to sort"
-msgstr ""
+msgstr "拖动以排序"
 
 #: cms/templates/widgets/units.html
 msgid "Drag to reorder unit"
-msgstr ""
+msgstr "拖动以重排序单元"
 
 # empty
 msgid "This is a key string."

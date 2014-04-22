@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-12 15:41-0400\n"
+"POT-Creation-Date: 2014-04-22 09:02-0400\n"
 "PO-Revision-Date: 2014-03-28 05:40+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -872,6 +872,28 @@ msgstr "(Source code line unavailable)"
 msgid "See XML source line {sourcenum}."
 msgstr "एक्स एम एल स्रोत लाइन {sourcenum} देखें।"
 
+#. Translators: 'unmask_name' is a method name and should not be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "unmask_name called on response that is not masked"
+msgstr ""
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr ""
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "answer-pool value should be an integer"
+msgstr ""
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: common/lib/capa/capa/responsetypes.py
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr ""
+
 #: common/lib/capa/capa/responsetypes.py common/lib/capa/capa/responsetypes.py
 msgid "There was a problem with the staff answer to this problem."
 msgstr "इस समस्या के लिए स्टाफ़ के जवाब में कुछ गड़बड़ थी।"
@@ -1017,10 +1039,28 @@ msgstr ""
 "आपको हर प्रस्तुति करने के बीच में कम से कम {wait} सेकंड की प्रतीक्षा करनी "
 "चाहिए।"
 
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"You must wait at least {wait_secs} between submissions. {remaining_secs} "
+"remaining."
+msgstr ""
+
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Error: {msg}"
 msgstr "त्रुटि: {msg}"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_hour} hour"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_minute} minute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "{num_second} second"
+msgstr ""
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -1860,6 +1900,8 @@ msgid "Username"
 msgstr "उपयोगकर्ता नाम"
 
 #: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Name"
 msgstr "नाम"
@@ -1900,6 +1942,15 @@ msgstr "डाक - पता"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Goals"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Module does not exist."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+msgid "An error occurred while deleting the score."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -2560,6 +2611,10 @@ msgstr "ऑर्डर भुगतान की पुष्टि"
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Trying to add a different currency into the cart"
 msgstr "कार्ट में अलग मुद्रा डालने की कोशिश कर रहे हैं"
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid "Registration for Course: {course_name}"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
@@ -3462,6 +3517,7 @@ msgstr "पूर्वावलोकन"
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
 #, fuzzy
@@ -4036,37 +4092,6 @@ msgstr "यह पेज मौजूद नहीं है"
 msgid "close"
 msgstr "बंद करें"
 
-#: cms/templates/component.html cms/templates/manage_users.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "Settings"
-msgstr "सेटिंग्स"
-
-#: cms/templates/component.html cms/templates/overview.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html lms/templates/problem.html
-#: lms/templates/word_cloud.html
-#: lms/templates/combinedopenended/openended/open_ended.html
-#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
-#: lms/templates/verify_student/face_upload.html
-msgid "Save"
-msgstr "सेव करें"
-
-#: cms/templates/component.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/overview.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-#: lms/templates/verify_student/face_upload.html
-msgid "Cancel"
-msgstr "रद्द करें"
-
 #: cms/templates/container.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -4088,6 +4113,19 @@ msgstr "त्रुटि:"
 #: lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "पाठ्यक्रम संख्या"
+
+#: cms/templates/index.html cms/templates/manage_users.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: cms/templates/overview.html lms/templates/discussion/_inline_new_post.html
+#: lms/templates/discussion/_new_post.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_discussion.mustache
+#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
+#: lms/templates/verify_student/face_upload.html
+msgid "Cancel"
+msgstr "रद्द करें"
 
 #: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -4118,10 +4156,26 @@ msgstr "पासवर्ड भूल गए?"
 msgid "Password"
 msgstr "पासवर्ड"
 
+#: cms/templates/manage_users.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "Settings"
+msgstr "सेटिंग्स"
+
 #: cms/templates/manage_users.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Admin"
 msgstr "व्यवस्थापक"
+
+#: cms/templates/overview.html cms/templates/overview.html
+#: cms/templates/overview.html cms/templates/overview.html
+#: lms/templates/problem.html lms/templates/word_cloud.html
+#: lms/templates/combinedopenended/openended/open_ended.html
+#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
+#: lms/templates/verify_student/face_upload.html
+msgid "Save"
+msgstr "सेव करें"
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
@@ -5206,6 +5260,10 @@ msgstr "और विकल्पों के लिए ड्रॉपडा�
 #: lms/templates/navigation.html
 msgid "Log Out"
 msgstr "लॉग आउट"
+
+#: lms/templates/navigation.html
+msgid "Shopping Cart"
+msgstr ""
 
 #: lms/templates/navigation.html
 msgid "How it Works"
@@ -7112,6 +7170,13 @@ msgstr ""
 "रजिस्ट्रेशन रद्द करना चाहते हैं"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"In order to request a refund for the amount you paid, you will need to send "
+"an email to {billing_email}.  Be sure to include your email and the course "
+"name."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr "ई-मेल सेटिंग्स"
 
@@ -8247,8 +8312,9 @@ msgstr "भाग_डिस्प्ले_नाम"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Enter email addresses separated by new lines or commas."
-msgstr "ई-मेल पते नई पंक्तियों में या अल्पविराम से अलग करके दर्ज करें।"
+msgid ""
+"Enter email addresses and/or usernames separated by new lines or commas."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -8260,9 +8326,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Email Addresses"
-msgstr "ई-मेल पते"
+msgid "Email Addresses/Usernames"
+msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Auto Enroll"
 msgstr "खुद-ब-खुद दाखिला "
@@ -8312,8 +8379,8 @@ msgid "Unenroll"
 msgstr "दाखिला रद्द करें"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Batch Beta Testers"
-msgstr "बीटा परीक्षणकर्ताओं का बैच"
+msgid "Batch Beta Tester Addition"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -8322,6 +8389,16 @@ msgid ""
 msgstr ""
 "नोट: बीटा परीक्षक के रूप में दाखिला लेने से पहले उपयोगकर्ताओं का एक सक्रिय "
 "{platform_name} खाता होना ज़रूरी है।"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"If this option is <em>checked</em>, users who have not enrolled in your "
+"course will be automatically enrolled."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Checking this box has no effect if 'Remove beta testers' is selected."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add beta testers"
@@ -8483,6 +8560,27 @@ msgstr "ग्राफ़्स फिर से लोड करें"
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Count of Students Opened a Subsection"
 msgstr "उन छात्रों की संख्या जिन्होंने एक अनुभाग खोला"
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Student Opened as a CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Download Student Grades as a CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "This is a partial list, to view all students download as a csv."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Grade"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Percent"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -9017,6 +9115,16 @@ msgstr "आपने खरीदने के लिए कोई भी आइ
 #: lms/templates/shoppingcart/receipt.html
 msgid "Register for [Course Name] | Receipt (Order"
 msgstr "[Course Name] के लिए रजिस्टर करें | रसीद (Order"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Thank you for your Purchase!"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid ""
+"Please print this receipt page for your records. You should also have "
+"received a receipt in your email."
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid " () Electronic Receipt"
@@ -10531,10 +10639,6 @@ msgid ""
 "Any changes you make to these checklists are saved automatically and are "
 "immediately visible to other course team members."
 msgstr ""
-
-#: cms/templates/component.html
-msgid "Editor"
-msgstr "संपादक"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html

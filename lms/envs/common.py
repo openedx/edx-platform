@@ -547,7 +547,7 @@ LANGUAGES = (
     ('es-419', u'Español (Latinoamérica)'),  # Spanish (Latin America)
 #    ('es-ar', u'Español (Argentina)'),  # Spanish (Argentina)
 #    ('es-ec', u'Español (Ecuador)'),  # Spanish (Ecuador)
-#    ('es-es', u'Español (España)'),  # Spanish (Spain)
+    ('es-es', u'Español (España)'),  # Spanish (Spain)
 #    ('es-mx', u'Español (México)'),  # Spanish (Mexico)
 #    ('es-pe', u'Español (Perú)'),  # Spanish (Peru)
 #    ('es-us', u'Español (Estados Unidos)'),  # Spanish (United States)
@@ -565,6 +565,7 @@ LANGUAGES = (
     ('id', u'Bahasa Indonesia'),  # Indonesian
     ('it-it', u'Italiano (Italia)'),  # Italian (Italy)
     ('ja-jp', u'日本語(日本)'),  # Japanese (Japan)
+#    ('kk-kz', u'қазақ тілі (Қазақстан)'),  # Kazakh (Kazakhstan)
 #    ('km-kh', u'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
     ('ko-kr', u'한국어(대한민국)'),  # Korean (Korea)
     ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)

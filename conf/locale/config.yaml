@@ -22,7 +22,7 @@ locales:
     - es_419  # Spanish (Latin America)
 #    - es_AR  # Spanish (Argentina)
 #    - es_EC  # Spanish (Ecuador)
-#    - es_ES  # Spanish (Spain)
+    - es_ES  # Spanish (Spain)
 #    - es_MX  # Spanish (Mexico)
 #    - es_PE  # Spanish (Peru)
 #    - es_US  # Spanish (United States)
@@ -40,6 +40,7 @@ locales:
     - id  # Indonesian
     - it_IT  # Italian (Italy)
     - ja_JP  # Japanese (Japan)
+#    - kk_KZ  # Kazakh (Kazakhstan)
 #    - km_KH  # Khmer (Cambodia)
     - ko_KR  # Korean (Korea)
     - lt_LT  # Lithuanian (Lithuania)
