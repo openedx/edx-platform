@@ -82,7 +82,10 @@ var StaffDebug = (function(){
         data: pdata,
         success: function(data){
             var msg = $("#idash_msg", data);
-            $( "#result_"+locname ).html( msg );
+            $("#result_" + locname).html( msg );
+        },
+        error: function(request, status, error) {
+            $("#result_" + locname).html('<p id="idash_msg"><font color="red">${_('Something has gone wrong with this request.  The server replied with a status of: ')}' + error + '</font></p>')
         },
         dataType: 'html'
     });
@@ -96,25 +99,24 @@ var StaffDebug = (function(){
     do_idash_action(locname, "Delete student state for module");
   }
 
-  reload = function(locname){
-    var url = geturl('jump_to_id/' + locname);
-    window.location.replace(url);
-  }
-
   return {reset: reset,
-          reload: reload,
           sdelete: sdelete,
           do_idash_action: do_idash_action
           }
 })();
 </script>
-
-    [ <a href='javascript:StaffDebug.reset("${location.name}")'>${_('Reset Attempts')}</a> |
-      <a href='javascript:StaffDebug.reload("${location.name}")'>${_('Reload Page')}</a> |
-      <a href='javascript:StaffDebug.sdelete("${location.name}")'>${_('Delete State')}</a>
+<hr />
+<h3>Actions</h3>
+  <div>
+    <label for="sd_fu_${location.name}">For User:</label>
+    <input type="text" id="sd_fu_${location.name}" placeholder="${user.username}"/>
+  </div>
+  <div>
+    [ <a href='javascript:StaffDebug.reset("${location.name}")'>${_('Reset Student Attempts')}</a> |
+      <a href='javascript:StaffDebug.sdelete("${location.name}")'>${_('Delete Student State')}</a>
     ]
-    <span style="float:right">For user:<input type="text" id="sd_fu_${location.name}" /></span>
-    <div id="result_${location.name}"/>
+</div>
+<div id="result_${location.name}"/>
 
     <div class="staff_info" style="display:block">
 is_released = ${is_released}

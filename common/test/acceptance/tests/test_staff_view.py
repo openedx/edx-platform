@@ -15,6 +15,7 @@ class StaffDebugTest(UniqueCourseTest):
     """
     Tests that verify the staff debug info.
     """
+    USERNAME = "STAFF_TESTER"
 
     def setUp(self):
         super(StaffDebugTest, self).setUp()
@@ -48,14 +49,62 @@ class StaffDebugTest(UniqueCourseTest):
 
         # Auto-auth register for the course.
         # Do this as global staff so that you will see the Staff View
-        AutoAuthPage(self.browser, course_id=self.course_id, staff=True).visit()
+        AutoAuthPage(self.browser, username=self.USERNAME,
+                     course_id=self.course_id, staff=True).visit()
 
-    def test_staff_debug(self):
+    def _goto_staff_page(self):
+        """
+        Open staff page with assertion
+        """
         self.courseware_page.visit()
         staff_page = StaffPage(self.browser)
         self.assertEqual(staff_page.staff_status, 'Staff view')
+        return staff_page
+
+    def test_reset_attempts_empty(self):
+        """
+        Test that we fail properly when there is no student state
+        """
+
+        staff_debug_page = self._goto_staff_page().open_staff_debug_info()
+        staff_debug_page.reset_attempts()
+        msg = staff_debug_page.idash_msg[0]
+        self.assertIn((u"Found a single student. Found module. Couldn't "
+                       "reset module state for {0}/").format(self.USERNAME),
+                      msg)
+
+    def test_delete_state_empty(self):
+        """
+        Test that we delete properly even when there isn't state to delete.
+        """
+        staff_debug_page = self._goto_staff_page().open_staff_debug_info()
+        staff_debug_page.delete_state()
+        msg = staff_debug_page.idash_msg[0]
+        self.assertIn((u"Found a single student. Found module. "
+                       "Deleted student module state for"), msg)
+
+    def test_reset_attempts_state(self):
+        """
+        Successfully reset the student attempts
+        """
+        staff_page = self._goto_staff_page()
+        staff_page.answer_problem()
+
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.reset_attempts()
+        msg = staff_debug_page.idash_msg[0]
+        self.assertIn((u"Found a single student. Found module. Module "
+                       "state successfully reset!"), msg)
 
-        msg = staff_debug_page.idash_msg
-        self.assertEqual('foo', msg) # Not sure what is supposed to happen
+    def test_student_state_state(self):
+        """
+        Successfully delete the student state with an answer
+        """
+        staff_page = self._goto_staff_page()
+        staff_page.answer_problem()
+
+        staff_debug_page = staff_page.open_staff_debug_info()
+        staff_debug_page.delete_state()
+        msg = staff_debug_page.idash_msg[0]
+        self.assertIn((u"Found a single student. Found module. "
+                       "Deleted student module state for"), msg)

@@ -31,6 +31,13 @@ class StaffPage(PageObject):
         staff_debug_page.wait_for_page()
         return staff_debug_page
 
+    def answer_problem(self):
+        """
+        Answers the problem to give state that we can clean
+        """
+        self.q(css='input.check').first.click()
+        self.wait_for_ajax()
+
 
 class StaffDebugPage(PageObject):
     """
@@ -43,6 +50,9 @@ class StaffDebugPage(PageObject):
         return self.q(css='section.staff-modal').present
 
     def _click_link(self, link_text):
+        """
+        Clicks on an action link based on text
+        """
         for link in self.q(css='section.staff-modal a').execute():
             if link.text == link_text:
                 return link.click()
@@ -50,8 +60,22 @@ class StaffDebugPage(PageObject):
         raise Exception('Could not find the {} link to click on.'.format(
             link_text))
 
-    def reset_attempts(self):
-        self._click_link('Reset Attempts')
+    def reset_attempts(self, user=None):
+        """
+        This clicks on the reset attempts link with an optionally
+        specified user.
+        """
+        if user:
+            self.q(css='input[id^=sd_fu_]').first.fill(user)
+        self._click_link('Reset Student Attempts')
+
+    def delete_state(self, user=None):
+        """
+        This delete's a student's state for the problem
+        """
+        if user:
+            self.q(css='input[id^=sd_fu_]').fill(user)
+        self._click_link('Delete Student State')
 
     @property
     def idash_msg(self):
