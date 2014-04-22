@@ -1,5 +1,7 @@
-""" API implementation for gourse-oriented interactions. """
+""" API implementation for group-oriented interactions. """
 import uuid
+import json
+from collections import OrderedDict
 
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,7 +12,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from api_manager.permissions import ApiKeyHeaderPermission
-from api_manager.models import GroupRelationship
+from api_manager.models import GroupRelationship, CourseGroupRelationship, GroupProfile
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location, InvalidLocationError
 
 RELATIONSHIP_TYPES = {'hierarchical': 'h', 'graph': 'g'}
 
@@ -30,46 +34,73 @@ def _generate_base_uri(request):
     return resource_uri
 
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @permission_classes((ApiKeyHeaderPermission,))
 def group_list(request):
     """
+    GET retrieves a list of groups in the system filtered by type
     POST creates a new group in the system
     """
-    response_data = {}
-    base_uri = _generate_base_uri(request)
-    # Group name must be unique, but we need to support dupes
-    group = Group.objects.create(name=str(uuid.uuid4()))
-    original_group_name = request.DATA['name']
-    group.name = '{:04d}: {}'.format(group.id, original_group_name)
-    group.record_active = True
-    group.record_date_created = timezone.now()
-    group.record_date_modified = timezone.now()
-    group.save()
-    # Relationship model also allows us to use duplicate names
-    GroupRelationship.objects.create(name=original_group_name, group_id=group.id, parent_group=None)
-    response_data = {'id': group.id, 'name': original_group_name}
-    base_uri = _generate_base_uri(request)
-    response_data['uri'] = '{}/{}'.format(base_uri, group.id)
-    response_status = status.HTTP_201_CREATED
-    return Response(response_data, status=response_status)
+    if request.method == 'GET':
+        if not 'type' in request.GET:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        response_data = []
+        profiles = GroupProfile.objects.filter(group_type=request.GET['type'])
+        for profile in profiles:
+            item_data = OrderedDict()
+            item_data['group_id'] = profile.group_id
+            item_data['group_type'] = profile.group_type
+            item_data['data'] = json.loads(profile.data)
+            response_data.append(item_data)
+
+        return Response(response_data)
+    elif request.method == 'POST':
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        # Group name must be unique, but we need to support dupes
+        group = Group.objects.create(name=str(uuid.uuid4()))
+        original_group_name = request.DATA['name']
+
+        group.name = '{:04d}: {}'.format(group.id, original_group_name)
+        group.record_active = True
+        group.record_date_created = timezone.now()
+        group.record_date_modified = timezone.now()
+        group.save()
+
+        # Relationship model also allows us to use duplicate names
+        GroupRelationship.objects.create(name=original_group_name, group_id=group.id, parent_group=None)
+
+        # allow for optional meta information about groups, this will end up in the GroupProfile table
+        group_type = request.DATA.get('group_type')
+        data = request.DATA.get('data')
+
+        if group_type or data:
+            profile, _ = GroupProfile.objects.get_or_create(group_id=group.id, group_type=group_type, data=data)
+
+        response_data = {'id': group.id, 'name': original_group_name}
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = '{}/{}'.format(base_uri, group.id)
+        response_status = status.HTTP_201_CREATED
+        return Response(response_data, status=response_status)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 @permission_classes((ApiKeyHeaderPermission,))
 def group_detail(request, group_id):
     """
     GET retrieves an existing group from the system
     """
+
     response_data = {}
     base_uri = _generate_base_uri(request)
     try:
         existing_group = Group.objects.get(id=group_id)
         existing_group_relationship = GroupRelationship.objects.get(group_id=group_id)
     except ObjectDoesNotExist:
-        existing_group = None
-        existing_group_relationship = None
-    if existing_group and existing_group_relationship:
+        return Response({}, status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
         response_data['name'] = existing_group_relationship.name
         response_data['id'] = existing_group.id
         response_data['uri'] = base_uri
@@ -78,10 +109,36 @@ def group_detail(request, group_id):
         response_data['resources'].append({'uri': resource_uri})
         resource_uri = '{}/groups'.format(base_uri)
         response_data['resources'].append({'uri': resource_uri})
+
+        # see if there is an (optional) GroupProfile
+        try:
+            existing_group_profile = GroupProfile.objects.get(group_id=group_id)
+            if existing_group_profile.group_type:
+                response_data['group_type'] = existing_group_profile.group_type
+            data = existing_group_profile.data
+            if data:
+                response_data['data'] = json.loads(data)
+        except ObjectDoesNotExist:
+            pass
+
         response_status = status.HTTP_200_OK
-    else:
-        response_status = status.HTTP_404_NOT_FOUND
-    return Response(response_data, status=response_status)
+
+        return Response(response_data, status=response_status)
+    elif request.method == 'POST':
+        # update GroupProfile data
+
+        group_type = request.DATA.get('group_type')
+        data = request.DATA.get('data')
+
+        if not group_type and not data:
+            return Response({}, status.HTTP_400_BAD_REQUEST)
+
+        profile, _ = GroupProfile.objects.get_or_create(group_id=group_id)
+        profile.group_type = group_type
+        profile.data = data
+        profile.save()
+
+        return Response({})
 
 
 @api_view(['POST'])
@@ -269,3 +326,77 @@ def group_groups_detail(request, group_id, related_group_id):
         else:
             response_status = status.HTTP_404_NOT_FOUND
         return Response({}, status=response_status)
+
+
+@api_view(['POST'])
+@permission_classes((ApiKeyHeaderPermission,))
+def group_courses_list(request, group_id):
+    """
+    POST creates a new group-course relationship in the system
+    """
+    response_data = {}
+    group_id = group_id
+    course_id = request.DATA['course_id']
+    base_uri = _generate_base_uri(request)
+    response_data['uri'] = '{}/{}'.format(base_uri, course_id)
+    store = modulestore()
+    try:
+        existing_group = Group.objects.get(id=group_id)
+    except ObjectDoesNotExist:
+        existing_group = None
+    try:
+        existing_course = store.get_course(course_id)
+    except ValueError:
+        existing_course = None
+
+    if existing_group and existing_course:
+        try:
+            existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
+        except ObjectDoesNotExist:
+            existing_relationship = None
+
+        if existing_relationship is None:
+            new_relationship = CourseGroupRelationship.objects.create(course_id=course_id, group=existing_group)
+            response_data['group_id'] = str(new_relationship.group_id)
+            response_data['course_id'] = str(new_relationship.course_id)
+            response_status = status.HTTP_201_CREATED
+        else:
+            response_data['message'] = "Relationship already exists."
+            response_status = status.HTTP_409_CONFLICT
+    else:
+        response_status = status.HTTP_404_NOT_FOUND
+    return Response(response_data, status=response_status)
+
+
+@api_view(['GET', 'DELETE'])
+@permission_classes((ApiKeyHeaderPermission,))
+def group_courses_detail(request, group_id, course_id):
+    """
+    GET retrieves an existing group-course relationship from the system
+    DELETE removes/inactivates/etc. an existing group-course relationship
+    """
+    if request.method == 'GET':
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = base_uri
+        try:
+            existing_group = Group.objects.get(id=group_id)
+            existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
+        except ObjectDoesNotExist:
+            existing_group = None
+            existing_relationship = None
+        if existing_group and existing_relationship:
+            response_data['group_id'] = existing_group.id
+            response_data['course_id'] = existing_relationship.course_id
+            response_status = status.HTTP_200_OK
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+    elif request.method == 'DELETE':
+        try:
+            existing_group = Group.objects.get(id=group_id)
+            existing_group.coursegrouprelationship_set.get(course_id=course_id).delete()
+            existing_group.save()
+        except ObjectDoesNotExist:
+            pass
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
