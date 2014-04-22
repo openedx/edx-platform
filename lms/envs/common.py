@@ -565,7 +565,7 @@ LANGUAGES = (
 #    ('he', u'עברית'),  # Hebrew
     ('hi', u'हिन्दी'),  # Hindi
 #    ('hu', u'magyar'),  # Hungarian
-    ('hy-am', u'Հայերէն (Հայաստանի Հանրապետութիւն)'),  # Armenian (Armenia)
+    ('hy-am', u'Հայերեն (Հայաստան)'),  # Armenian (Armenia)
     ('id', u'Bahasa Indonesia'),  # Indonesian
     ('it-it', u'Italiano (Italia)'),  # Italian (Italy)
     ('ja-jp', u'日本語(日本)'),  # Japanese (Japan)
