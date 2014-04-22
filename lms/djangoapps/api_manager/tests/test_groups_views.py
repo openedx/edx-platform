@@ -574,7 +574,8 @@ class GroupsApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['courses']), 1)
-        self.assertEqual(response.data['courses'][0], self.test_course_id)
+        self.assertEqual(response.data['courses'][0]['course_id'], self.test_course_id)
+        self.assertEqual(response.data['courses'][0]['display_name'], self.course.display_name)
 
     def test_group_courses_list_post_duplicate(self):
         data = {'name': self.test_group_name}

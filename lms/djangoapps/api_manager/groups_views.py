@@ -342,18 +342,24 @@ def group_courses_list(request, group_id):
     except ObjectDoesNotExist:
         return Response({}, status.HTTP_404_NOT_FOUND)
 
+    store = modulestore()
+
     if request.method == 'GET':
         members = CourseGroupRelationship.objects.filter(group=existing_group)
         response_data['courses'] = []
         for member in members:
-            response_data['courses'].append(member.course_id)
+            course = store.get_course(member.course_id)
+            course_data = {
+                'course_id': member.course_id,
+                'display_name': course.display_name
+            }
+            response_data['courses'].append(course_data)
         response_status = status.HTTP_200_OK
     else:
         course_id = request.DATA['course_id']
 
         base_uri = _generate_base_uri(request)
         response_data['uri'] = '{}/{}'.format(base_uri, course_id)
-        store = modulestore()
 
         existing_course = store.get_course(course_id)
         if not existing_course:
