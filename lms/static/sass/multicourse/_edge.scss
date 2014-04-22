@@ -17,14 +17,14 @@ $paleYellow: #fffcf1;
   @include transition(background-color .15s linear 0s, box-shadow .15s linear 0s);
 
   &.disabled {
-    border: 1px solid $lightGrey !important;
-    border-radius: 3px !important;
-    background: $lightGrey !important;
-    color: $darkGrey !important;
+    border: 1px solid $lightGrey;
+    border-radius: 3px;
+    background: $lightGrey;
+    color: $darkGrey;
     pointer-events: none;
     cursor: none;
     &:hover, &:focus {
-      box-shadow: 0 0 0 0 !important;
+      box-shadow: 0 0 0 0;
     }
   }
 

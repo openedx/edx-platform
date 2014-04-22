@@ -41,7 +41,7 @@
 
   // because ie doesn't like :last
   .last {
-    margin-right: 0  !important;
+    margin-right: 0 ;
   }
 
   // make partners not animate
@@ -156,11 +156,11 @@
   }
 
   div.course-wrapper {
-    display: block !important;
+    display: block;
 
     section.course-content,
     div.course-index {
-      display: block !important;
+      display: block;
       float: left;
     }
 
@@ -170,15 +170,15 @@
   }
 
   .sidebar {
-    float: left !important;
-    display: block !important;
+    float: left;
+    display: block;
   }
 
   .sequence-nav ol {
-    display: block !important;
+    display: block;
 
     li {
-      float: left !important;
+      float: left;
       width: 50px;
     }
   }
@@ -194,6 +194,6 @@
 .lte9 {
 
   .ie-banner {
-    display: block !important;
+    display: block;
   }
 }

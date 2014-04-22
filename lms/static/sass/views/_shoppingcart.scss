@@ -38,11 +38,11 @@
         border-bottom: 1px solid #f3f3f3;
       }
     tr.always-gray{
-      background: #eee !important;
+      background: #eee;
       border-top: 2px solid #FFFFFF;
     }
     tr.always-white{
-      background: #fff !important;
+      background: #fff;
       td{
         padding: 30px 0px 10px;
       }
@@ -165,7 +165,7 @@
       td {
         padding-bottom: 10px;
         span.old-price{
-          text-decoration: line-through !important;
+          text-decoration: line-through;
         }
       }
     }

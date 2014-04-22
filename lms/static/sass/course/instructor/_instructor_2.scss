@@ -594,7 +594,7 @@ section.instructor-dashboard-content-2 {
       }
       // Disable horizontal scroll bar when grid only has 1 column. Remove this CSS class when more columns added.
       .slick-viewport {
-        overflow-x: hidden !important;
+        overflow-x: hidden;
       }
     }
   }
@@ -850,7 +850,7 @@ input[name="subject"] {
     display: none;
     }
   .content{
-    padding: 0 !important;
+    padding: 0;
   }
   input[name="download_company_name"],
   input[name="active_company_name"], input[name="spent_company_name"] {
@@ -866,11 +866,11 @@ input[name="subject"] {
         border-bottom: 1px solid #f3f3f3;
       }
     tr.always-gray{
-      background: #eee !important;
+      background: #eee;
       border-top: 2px solid #FFFFFF;
     }
     tr.always-white{
-      background: #fff !important;
+      background: #fff;
       td{
         padding: 30px 0px 10px;
       }
@@ -915,7 +915,7 @@ input[name="subject"] {
 
     // in_active coupon rows style
     .inactive_coupon{
-      background:  #FFF0F0 !important;
+      background:  #FFF0F0;
       text-decoration: line-through;
       color: rgba(51,51,51,0.2);
       border-bottom: 1px solid #fff;
@@ -975,7 +975,7 @@ input[name="subject"] {
       margin-top: 5px;
       color: #646464
     }
-    top:-95px !important;
+    top:-95px;
     width: 650px;
     margin-left: -325px;
     border-radius: 2px;
@@ -1000,7 +1000,7 @@ input[name="subject"] {
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
-      margin: 20px 0 10px 0 !important;
+      margin: 20px 0 10px 0;
       padding: 20px;
       border: none;
       border-bottom: 3px solid #a0050e;
@@ -1016,20 +1016,20 @@ input[name="subject"] {
         }
       }
       li:nth-child(even){
-        margin-left: 30px !important;
+        margin-left: 30px;
       }
       li:nth-child(3), li:nth-child(4){
-        margin-left: 0px !important;
+        margin-left: 0px;
         width: 100%;
       }
       li:nth-child(3) {
-        margin-bottom: 0px !important;
+        margin-bottom: 0px;
         textarea {
           min-height: 100px;
         }
       }
       li:last-child{
-        margin-bottom: 0px !important;
+        margin-bottom: 0px;
       }
     }
     form#generate_codes ol.list-input{
@@ -1095,7 +1095,7 @@ input[name="subject"] {
       }
     }
     li#set-course-mode-modal-field-currency{
-      margin-left: 0px !important;
+      margin-left: 0px;
       select {
         width: 100%;
       }
@@ -1138,7 +1138,7 @@ input[name="subject"] {
           list-style: none;
         }
         .readonly {
-          background-color: #eee !important;
+          background-color: #eee;
           color: #aaa;
         }
         .field {

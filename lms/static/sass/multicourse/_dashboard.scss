@@ -814,7 +814,7 @@
             text-align: center;
 
             &.disabled {
-              cursor: default !important;
+              cursor: default;
 
               &:hover, &:focus {
                 background: #eee;
@@ -1072,9 +1072,9 @@
   .status--verification {
 
     .data {
-      white-space: normal !important;
-      text-overflow: no !important;
-      overflow: visible !important;
+      white-space: normal;
+      text-overflow: no;
+      overflow: visible;
     }
 
     .list--nav {
@@ -1085,7 +1085,7 @@
     &.is-denied {
 
       .data {
-        color: $error-color !important;
+        color: $error-color;
       }
     }
   }
