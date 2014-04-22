@@ -48,7 +48,7 @@ FEATURES = {
     'AUTH_USE_CERTIFICATES': False,
 
     # email address for studio staff (eg to request course creation)
-    'STUDIO_REQUEST_EMAIL': '',
+    'STUDIO_REQUEST_EMAIL': 'edu.olimpiada@yandex.ru',
 
     'STUDIO_NPS_SURVEY': True,
 

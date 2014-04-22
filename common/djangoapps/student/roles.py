@@ -196,6 +196,14 @@ class OrgRole(GroupBasedRole):
         super(OrgRole, self).__init__([u'{}_{}'.format(role, location.org)])
 
 
+class CourseTeacherRole(CourseRole):
+    """A Staff member of a course"""
+    ROLE = 'teacher'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseTeacherRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
 class CourseStaffRole(CourseRole):
     """A Staff member of a course"""
     ROLE = 'staff'

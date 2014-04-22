@@ -21,7 +21,7 @@ from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
 from student.models import CourseEnrollment
 from student.roles import (
-    GlobalStaff, CourseStaffRole, CourseInstructorRole,
+    GlobalStaff, CourseTeacherRole, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
 DEBUG_ACCESS = False
@@ -427,10 +427,18 @@ def _has_access_to_location(user, location, access_level, course_context):
         debug("Allow: user.is_staff")
         return True
 
-    if access_level not in ('staff', 'instructor'):
+    if access_level not in ('teacher', 'staff', 'instructor'):
         log.debug("Error in access._has_access_to_location access_level=%s unknown", access_level)
         debug("Deny: unknown access level")
         return False
+
+    teacher_access = (
+        CourseTeacherRole(location, course_context).has_user(user)
+    )
+
+    if teacher_access and access_level == 'staff':
+        debug("Allow: user has course teacher access")
+        return True
 
     staff_access = (
         CourseStaffRole(location, course_context).has_user(user) or

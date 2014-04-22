@@ -36,7 +36,7 @@ from courseware import grades
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_cms_course_link
 from student.roles import (
-    CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole, GlobalStaff
+    CourseTeacherRole, CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole, GlobalStaff
 )
 from courseware.models import StudentModule
 from django_comment_common.models import (
@@ -519,6 +519,11 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # Admin
 
+    elif 'List course teachers' in action:
+        role = CourseTeacherRole(course.location)
+        datatable = _role_members_table(role, _("List of Teachers"), course_id)
+        track.views.server_track(request, "list-teacher", {}, page="idashboard")
+
     elif 'List course staff' in action:
         role = CourseStaffRole(course.location)
         datatable = _role_members_table(role, _("List of Staff"), course_id)
@@ -529,6 +534,11 @@ def instructor_dashboard(request, course_id):
         datatable = _role_members_table(role, _("List of Instructors"), course_id)
         track.views.server_track(request, "list-instructors", {}, page="idashboard")
 
+    elif action == 'Add teacher' and request.user.is_staff:
+        uname = request.POST['teacher']
+        role = CourseTeacherRole(course.location)
+        msg += add_user_to_role(request, uname, role, 'teacher', 'teacher')
+
     elif action == 'Add course staff':
         uname = request.POST['staffuser']
         role = CourseStaffRole(course.location)
@@ -538,6 +548,11 @@ def instructor_dashboard(request, course_id):
         uname = request.POST['instructor']
         role = CourseInstructorRole(course.location)
         msg += add_user_to_role(request, uname, role, 'instructor', 'instructor')
+
+    elif action == 'Remove teacher' and request.user.is_staff:
+        uname = request.POST['teacher']
+        role = CourseTeacherRole(course.location)
+        msg += remove_user_from_role(request, uname, role, 'teacher', 'teacher')
 
     elif action == 'Remove course staff':
         uname = request.POST['staffuser']

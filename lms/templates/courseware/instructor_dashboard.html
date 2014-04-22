@@ -133,7 +133,9 @@ function goto( mode)
           %if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">${_("Psychometrics")}</a> |
           %endif
+          %if instructor_access:
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">${_("Admin")}</a> |
+          %endif
           <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">${_("Forum Admin")}</a> |
           <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">${_("Enrollment")}</a> |
           <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">${_("DataDump")}</a> |
@@ -345,6 +347,16 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
+
+  %if admin_access:
+    <hr width="40%" style="align:left">
+    <p>
+    <input type="submit" name="action" onclick="this.value='List course teachers'" value="${_("List course teachers")}">
+    <p>
+    <input type="text" name="teacher"> <input type="submit" name="action" onclick="this.value='Remove teacher'" value="${_("Remove teacher")}">
+    <input type="submit" name="action" onclick="this.value='Add teacher'" value="${_("Add teacher")}">
+    <hr width="40%" style="align:left">
+  %endif
 
   %if instructor_access:
     <hr width="40%" style="align:left">
