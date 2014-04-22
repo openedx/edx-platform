@@ -342,7 +342,7 @@ def bulk_beta_modify_access(request, course_id):
 
     email_params = {}
     if email_students:
-        email_params = get_email_params(course, auto_enroll=False)
+        email_params = get_email_params(course, auto_enroll=auto_enroll)
 
     for identifier in identifiers:
         try:
