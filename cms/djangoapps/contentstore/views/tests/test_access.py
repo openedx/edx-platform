@@ -3,7 +3,6 @@ Tests access.py
 """
 from django.test import TestCase
 from django.contrib.auth.models import User
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory
