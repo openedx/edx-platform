@@ -16,7 +16,7 @@ from api_manager.models import CourseGroupRelationship
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
 
-from courseware.courses import get_course_about_section, get_course_info_section
+from courseware.courses import get_course_about_section, get_course_info_section, get_course_by_id
 from courseware.views import get_static_tab_contents
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 
@@ -224,6 +224,40 @@ def courses_detail(request, course_id):
     else:
         status_code = status.HTTP_404_NOT_FOUND
     return Response(response_data, status=status_code)
+
+
+@api_view(['GET'])
+@permission_classes((ApiKeyHeaderPermission,))
+def course_tree(request, course_id, depth):
+    """
+    GET retrieves an existing course from the system and returns summary information about the submodules
+    to the specified depth
+    """
+    response_data = {}
+
+    depth_int = int(depth)
+
+    # note, passing in depth=N optimizes the number of round trips to the database
+    course_descriptor = get_course_by_id(course_id, depth=depth_int)
+    if not course_descriptor:
+        return Response({}, status.HTTP_404_NOT_FOUND)
+
+    def _serialize_node_with_children(descriptor, depth):
+        data = _serialize_module(
+            request,
+            course_descriptor.id,
+            descriptor
+        )
+
+        if depth > 0:
+            data['modules'] = []
+            for child in descriptor.get_children():
+                data['modules'].append(_serialize_node_with_children(child, depth-1))
+
+        return data
+
+    response_data = _serialize_node_with_children(course_descriptor, depth_int)
+    return Response(response_data)
 
 
 @api_view(['POST'])
