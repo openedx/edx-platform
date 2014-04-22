@@ -25,19 +25,19 @@ div.syllabus {
 
     tr.first {
       td {
-        padding-top: 15px !important;
+        padding-top: 15px;
       }
     } 
 
     td {
-      border: none !important;
-      padding: 5px 10px !important;
+      border: none;
+      padding: 5px 10px;
       vertical-align: middle;
-      font-size: 1em !important;
+      font-size: 1em;
       line-height: auto;
 
       &.day, &.due, &.slides, &.assignment {
-        white-space: nowrap !important;
+        white-space: nowrap;
       }
 
       &.no_class {
@@ -49,7 +49,7 @@ div.syllabus {
       }
 
       &.week_separator {
-        padding: 0px !important;
+        padding: 0px;
         
         hr {
           margin: 10px;
