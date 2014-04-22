@@ -141,6 +141,8 @@ class ItemFactory(XModuleFactory):
         display_name = kwargs.pop('display_name', None)
         metadata = kwargs.pop('metadata', {})
         location = kwargs.pop('location')
+
+        assert isinstance(location, Location)
         assert location != parent_location
 
         store = kwargs.pop('modulestore')

@@ -104,7 +104,7 @@ class SequenceModule(SequenceFields, XModule):
 
         params = {'items': contents,
                   'element_id': self.location.html_id(),
-                  'item_id': self.id,
+                  'item_id': self.location.to_deprecated_string(),
                   'position': self.position,
                   'tag': self.location.category,
                   'ajax_url': self.system.ajax_url,

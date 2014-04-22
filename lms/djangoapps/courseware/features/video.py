@@ -197,7 +197,7 @@ def add_vertical_to_course(course_num):
 
 
 def last_vertical_location(course_num):
-    return world.scenario_dict['LAST_VERTICAL'].location._replace(course=course_num)
+    return world.scenario_dict['LAST_VERTICAL'].location.replace(course=course_num)
 
 
 def upload_file(filename, location):
