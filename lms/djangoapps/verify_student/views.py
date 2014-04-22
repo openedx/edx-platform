@@ -89,6 +89,7 @@ class VerifyView(View):
             "progress_state": progress_state,
             "user_full_name": request.user.profile.name,
             "course_id": course_id.to_deprecated_string(),
+            "course_modes_choose_url": reverse('course_modes_choose', kwargs={'course_id': course_id.to_deprecated_string()}),
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
@@ -129,12 +130,14 @@ class VerifiedView(View):
         course = course_from_id(course_id)
         context = {
             "course_id": course_id.to_deprecated_string(),
+            "course_modes_choose_url": reverse('course_modes_choose', kwargs={'course_id': course_id.to_deprecated_string()}),
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
             "purchase_endpoint": get_purchase_endpoint(),
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
+            "create_order_url": reverse("verify_student_create_order"),
             "upgrade": upgrade,
         }
         return render_to_response('verify_student/verified.html', context)
@@ -283,6 +286,8 @@ def show_requirements(request, course_id):
     course = course_from_id(course_id)
     context = {
         "course_id": course_id.to_deprecated_string(),
+        "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_id.to_deprecated_string()}),
+        "verify_student_url": reverse('verify_student_verify', kwargs={'course_id': course_id.to_deprecated_string()}),
         "course_name": course.display_name_with_default,
         "course_org": course.display_org_with_default,
         "course_num": course.display_number_with_default,

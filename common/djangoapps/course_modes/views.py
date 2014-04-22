@@ -56,7 +56,7 @@ class ChooseModeView(View):
 
         course = course_from_id(course_id)
         context = {
-            "course_id": course_id,
+            "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_id.to_deprecated_string()}),
             "modes": modes,
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
