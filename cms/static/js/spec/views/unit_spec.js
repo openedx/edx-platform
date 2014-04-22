@@ -165,6 +165,8 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec_helpers/creat
         describe("Disabled edit/publish links during ajax call", function() {
             var unit,
                 link,
+                selectors,
+                selectors = [".publish-draft", ".create-draft"],
                 editLinkFixture =
                 '<div class="main-wrapper edit-state-draft" data-locator="unit_locator"> \
                   <div class="unit-settings window"> \
@@ -190,7 +192,6 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec_helpers/creat
                         state: 'draft'
                     }),
                 });
-                link = $(".publish-draft");
                 setStyleFixtures('.is-disabled {pointer-events: none}');
                 // needed to stub out the ajax
                 window.analytics = jasmine.createSpyObj('analytics', ['track']);
@@ -198,34 +199,41 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec_helpers/creat
                 window.unit_location_analytics = jasmine.createSpy('unit_location_analytics');
             });
 
-            it("disables the publish-draft link once it is clicked", function() {
-                // don't return anything from ajax, so "removeClass"
-                // is never called
-                spyOn($, "ajax");
-                spyOn($.fn, "removeClass");
-                link.click();
-                expect(link).toHaveClass("is-disabled");
-                expect($.fn.removeClass).not.toHaveBeenCalledWith("is-disabled");
-            });
-
-            it("reenables the publish-draft link once the ajax call returns", function() {
-                spyOn($, "ajax").andCallFake(function(params) {
-                    params.success({});
+            function test_link_disabled_during_ajax_call(selector) {
+                it("disables the " + selector + " link once it is clicked", function() {
+                    // don't return anything from ajax, so "removeClass"
+                    // is never called
+                    spyOn($, "ajax");
+                    spyOn($.fn, "removeClass");
+                    link = $(selector);
+                    link.click();
+                    expect(link).toHaveClass("is-disabled");
+                    expect($.fn.removeClass).not.toHaveBeenCalledWith("is-disabled");
                 });
-                spyOn($.fn, 'addClass');
-                spyOn($.fn, 'removeClass');
-                link.click();
 
-                // check that the `is-disabled` class was added and removed
-                expect($.fn.addClass).toHaveBeenCalledWith("is-disabled");
-                expect($.fn.removeClass).toHaveBeenCalledWith("is-disabled");
+                it("reenables the " + selector + " link once the ajax call returns", function() {
+                    spyOn($, "ajax").andCallFake(function(params) {
+                        params.success({});
+                    });
+                    spyOn($.fn, 'addClass');
+                    spyOn($.fn, 'removeClass');
+                    link = $(selector);
+                    link.click();
 
-                // make sure the link finishes without the `is-disabled` class
-                expect(link).not.toHaveClass("is-disabled");
+                    // check that the `is-disabled` class was added and removed
+                    expect($.fn.addClass).toHaveBeenCalledWith("is-disabled");
+                    expect($.fn.removeClass).toHaveBeenCalledWith("is-disabled");
 
-                // affirm that ajax was called
-                expect($.ajax).toHaveBeenCalled();
-            });
+                    // make sure the link finishes without the `is-disabled` class
+                    expect(link).not.toHaveClass("is-disabled");
+
+                    // affirm that ajax was called
+                    expect($.ajax).toHaveBeenCalled();
+                });
+            };
+            for (var i = 0; i < selectors.length; i++) {
+                test_link_disabled_during_ajax_call(selectors[i]);
+            };
         });
     }
 );
