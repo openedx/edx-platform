@@ -47,6 +47,26 @@ Feature: CMS.HTML Editor
       --></style>
       """
 
+  Scenario: TinyMCE and CodeMirror preserve span tags
+    Given I have created a Blank HTML Page
+    When I edit the page
+    And type "<span>Test</span>" in the code editor and press OK
+    And I save the page
+    Then the page text contains:
+      """
+      <span>Test</span>
+      """
+
+  Scenario: TinyMCE and CodeMirror preserve math tags
+    Given I have created a Blank HTML Page
+    When I edit the page
+    And type "<math><msup><mi>x</mi><mn>2</mn></msup></math>" in the code editor and press OK
+    And I save the page
+    Then the page text contains:
+      """
+      <math><msup><mi>x</mi><mn>2</mn></msup></math>
+      """
+
   Scenario: TinyMCE toolbar buttons are as expected
     Given I have created a Blank HTML Page
     When I edit the page
@@ -57,7 +77,7 @@ Feature: CMS.HTML Editor
     When I edit the page
     And type "<img src="/static/image.jpg">" in the code editor and press OK
     Then the src link is rewritten to "c4x/MITx/999/asset/image.jpg"
-    And the code editor displays "<p><img src="/static/image.jpg" alt="" /></p>"
+    And the code editor displays "<p><img src="/static/image.jpg" /></p>"
 
   Scenario: Code format toolbar button wraps text with code tags
     Given I have created a Blank HTML Page
