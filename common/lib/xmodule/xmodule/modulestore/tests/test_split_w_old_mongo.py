@@ -98,7 +98,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
             else:
                 mongo = self.draft_mongo
             parent = mongo.get_item(parent_location)
-            parent.children.append(location.url())
+            parent.children.append(location)
             mongo.update_item(parent, self.userid)
             # create pointer for split
             course_or_parent_locator = BlockUsageLocator(
