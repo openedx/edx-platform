@@ -203,13 +203,9 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
     @staticmethod
     def parse_sources(xml_element):
         """ Parse xml_element 'sources' attr and return a list of location strings. """
-        result = []
         sources = xml_element.get('sources')
         if sources:
-            locations = [location.strip() for location in sources.split(';')]
-            for location in locations:
-                result.append(location)
-        return result
+            return [location.strip() for location in sources.split(';')]
 
     def get_required_module_descriptors(self):
         """Returns a list of XModuleDescriptor instances upon

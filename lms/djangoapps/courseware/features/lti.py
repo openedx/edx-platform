@@ -201,12 +201,11 @@ def i_am_registered_for_the_course(coursenum, metadata, user='Instructor'):
         metadata.update({'days_early_for_beta': 5, 'start': tomorrow})
         create_course_for_lti(coursenum, metadata)
         course_descriptor = world.scenario_dict['COURSE']
-        course_location = world.scenario_dict['COURSE'].location
 
         # create beta tester
-        user = BetaTesterFactory(course=course_location)
+        user = BetaTesterFactory(course=course_descriptor.id)
         normal_student = UserFactory()
-        instructor = InstructorFactory(course=course_id(coursenum))
+        instructor = InstructorFactory(course=course_descriptor.id)
 
         assert not has_access(normal_student, 'load', course_descriptor)
         assert has_access(user, 'load', course_descriptor)
@@ -215,11 +214,11 @@ def i_am_registered_for_the_course(coursenum, metadata, user='Instructor'):
         metadata.update({'start': datetime.datetime(1970, 1, 1, tzinfo=UTC)})
         create_course_for_lti(coursenum, metadata)
         course_descriptor = world.scenario_dict['COURSE']
-        user = InstructorFactory(course=course_id(coursenum))
+        user = InstructorFactory(course=course_descriptor.id)
 
     # Enroll the user in the course and log them in
     if has_access(user, 'load', course_descriptor):
-        world.enroll_user(user, course_id(coursenum))
+        world.enroll_user(user, course_descriptor.id)
 
     world.log_in(username=user.username, password='test')
 
