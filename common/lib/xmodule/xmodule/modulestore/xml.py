@@ -279,7 +279,7 @@ def create_block_from_xml(xml_data, system, id_generator):
         """
         Find all fields of type reference and convert the payload into UsageKeys
         """
-        course_key = xblock.location.course_key
+        course_key = xblock.scope_ids.usage_id.course_key
 
         for field in xblock.fields.itervalues():
             if field.is_set_on(xblock):
