@@ -156,7 +156,7 @@ var JSInput = (function ($, undefined) {
             // only application that has ever used JSInput, jsVGL. Something 
             // more sturdy should be put in place.
             function whileloop(n) {
-                if (n < 5){
+                if (n > 0){
                     try {
                         if (sop) {
                             _deepKey(cWindow, stateSetter)(stateValue);
@@ -169,14 +169,14 @@ var JSInput = (function ($, undefined) {
                             });
                         }
                     } catch (err) {
-                        setTimeout(whileloop(n+1), 200);
+                        setTimeout(function() { whileloop(n - 1); }, 200);
                     }
                 }
                 else {
                     console.debug("Error: could not set state");
                 }
             }
-            whileloop(0);
+            whileloop(5);
         }
     }
 
