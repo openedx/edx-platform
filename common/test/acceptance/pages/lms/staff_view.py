@@ -79,5 +79,8 @@ class StaffDebugPage(PageObject):
 
     @property
     def idash_msg(self):
+        """
+        Returns the value of #idash_msg
+        """
         self.wait_for_ajax()
         return self.q(css='#idash_msg').text
