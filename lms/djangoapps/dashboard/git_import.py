@@ -17,7 +17,7 @@ from django.utils.translation import ugettext as _
 import mongoengine
 
 from dashboard.models import CourseImportLog
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
@@ -230,7 +230,7 @@ def add_repo(repo, rdir_in, branch=None):
     match = re.search(r'(?ms)===> IMPORTING course (\S+)', ret_import)
     if match:
         course_id = match.group(1)
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         cdir = '{0}/{1}'.format(GIT_REPO_DIR, course_key.course)
         log.debug('Studio course dir = {0}'.format(cdir))
 

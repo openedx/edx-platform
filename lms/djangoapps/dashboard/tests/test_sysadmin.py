@@ -505,7 +505,8 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self.assertEqual(response.status_code, 404)
         # Or specific logs
         response = self.client.get(reverse('gitlogs_detail', kwargs={
-            'course_id': 'MITx/edx4edx/edx4edx'}))
+            'course_id': 'MITx/edx4edx/edx4edx'
+        }))
         self.assertEqual(response.status_code, 404)
 
         # Add user as staff in course team
@@ -520,7 +521,8 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
-                'course_id': 'MITx/edx4edx/edx4edx'}))
+                'course_id': 'MITx/edx4edx/edx4edx'
+            }))
         self.assertIn('======&gt; IMPORTING course',
                       response.content)
 
