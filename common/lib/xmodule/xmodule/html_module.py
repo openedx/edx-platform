@@ -37,7 +37,7 @@ class HtmlFields(object):
         scope=Scope.settings
     )
     editor = String(
-        help="Supports switching between the Visual Editor and the Raw HTML Editor. The change does not take effect until Save is pressed.",
+        help="Select Visual to enter content and have the editor automatically create the HTML. Select Raw to edit HTML directly. If you change this setting, you must save the component, then re-open it for editing.",
         display_name="Editor",
         default="visual",
         values=[
