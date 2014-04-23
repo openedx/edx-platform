@@ -68,6 +68,15 @@ class MongoContentStore(ContentStore):
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
         content_id = StaticContent.get_id_from_location(location)
+        # Use slow attr based lookup
+        content_id = {u'_id.{}'.format(key): value for key, value in content_id.iteritems()}
+        fs_pointer = self.fs_files.find_one(content_id, fields={'_id': 1})
+        if fs_pointer is None and throw_on_not_found:
+            raise NotFoundError()
+        elif fs_pointer is None:
+            return None
+        content_id = fs_pointer['_id']
+
         try:
             if as_stream:
                 fp = self.fs.get(content_id)
@@ -99,6 +108,8 @@ class MongoContentStore(ContentStore):
 
     def get_stream(self, location):
         content_id = StaticContent.get_id_from_location(location)
+        # use slow attr based lookup
+        content_id = {u'_id.{}'.format(key): value for key, value in content_id.iteritems()}
         try:
             handle = self.fs.get(content_id)
         except NoFile:
