@@ -73,10 +73,11 @@ class SessionApiSecurityTest(TestCase):
 
     @override_settings(ENABLE_MAX_FAILED_LOGIN_ATTEMPTS=True, MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=10,
                        MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS=1800)
-    def test_login_blockout_reset_time_period(self):
+    def test_blockout_reset_time_period(self):
         """
-        Try logging in 10 times to block user and then login with right credentials(after 30 minutes)
-        to verify blocked out time expired and user can login successfully.
+        Try logging in 10 times to block user and then login with right
+        credentials(after 30 minutes) to verify blocked out time expired and
+        user can login successfully.
         """
         for i in xrange(10):
             password = u'test_password{0}'.format(i)
@@ -118,7 +119,8 @@ class SessionApiSecurityTest(TestCase):
                        PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
     def test_password_without_uppercase(self):
         """
-        Try (and fail) user creation since password should have atleast 2 upper characters
+        Try (and fail) user creation since password should have atleast
+        2 upper characters
         """
         response = self._do_post_request(self.user_url, 'test', 'test.pa64!', email='test@edx.org',
                                          first_name='John', last_name='Doe', secure=True)
@@ -129,7 +131,8 @@ class SessionApiSecurityTest(TestCase):
                        PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
     def test_password_without_lowercase(self):
         """
-        Try (and fail) user creation without any numeric characters in password
+        Try (and fail) user creation without any numeric characters
+        in password
         """
         response = self._do_post_request(self.user_url, 'test', 'TEST.PA64!', email='test@edx.org',
                                          first_name='John', last_name='Doe', secure=True)
