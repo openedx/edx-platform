@@ -51,14 +51,13 @@
   @include transition(width .3s linear 0s);
 
   &.shown {
-    width: 300px;
+    width: 20%;
     height: 100%;
     overflow-y: scroll;
   }
 
   .cheatsheet-wrapper {
-    width: 240px;
-    padding: 20px 30px;
+    padding: 10%;
   }
 
   h6 {
