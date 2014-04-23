@@ -163,7 +163,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def check_edit_unit(self, test_course_name):
         _, course_items = import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
 
-        items = modulestore().get_items(course_items[0].id.make_usage_key('vertical', None))
+        items = modulestore().get_items(course_items[0].id, category='vertical')
         self._check_verticals(items)
 
     def _lock_an_asset(self, content_store, course_id):
@@ -343,7 +343,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         _, course_items = import_from_xml(module_store, 'common/test/data/', ['toy'])
         course_key = course_items[0].id
 
-        items = module_store.get_items(course_key.make_usage_key('poll_question', None))
+        items = module_store.get_items(course_key, category='poll_question')
         found = len(items) > 0
 
         self.assertTrue(found)
@@ -748,16 +748,19 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         location = course.id.make_usage_key('chapter', 'neuvo')
         # Ensure draft mongo store does not allow us to create chapters either directly or via convert to draft
-        self.assertRaises(InvalidVersionError, draft_store.create_and_save_xmodule, location)
+        with self.assertRaises(InvalidVersionError):
+            draft_store.create_and_save_xmodule(location)
         direct_store.create_and_save_xmodule(location)
-        self.assertRaises(InvalidVersionError, draft_store.convert_to_draft, location)
+        with self.assertRaises(InvalidVersionError):
+            draft_store.convert_to_draft(location)
         chapter = draft_store.get_item(location)
         chapter.data = 'chapter data'
 
         with self.assertRaises(InvalidVersionError):
             draft_store.update_item(chapter, self.user.id)
 
-        self.assertRaises(InvalidVersionError, draft_store.unpublish, location)
+        with self.assertRaises(InvalidVersionError):
+            draft_store.unpublish(location)
 
     def test_bad_contentstore_request(self):
         resp = self.client.get_html('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
@@ -819,7 +822,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         filesystem = OSFS(root_dir / 'test_export')
         self.assertTrue(filesystem.exists(dirname))
 
-        items = store.get_items(course_id, qualifiers={'category': category_name})
+        items = store.get_items(course_id, category=category_name)
 
         for item in items:
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
@@ -937,7 +940,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             target_course_id=course_id,
         )
 
-        items = module_store.get_items(course_id, kwargs={'category': 'vertical'})
+        items = module_store.get_items(course_id, category='vertical')
         self._check_verticals(items)
 
         # verify that we have the content in the draft store as well
@@ -999,7 +1002,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # create a new video module and add it as a child to a vertical
         # this re-creates a bug whereby since the video template doesn't have
         # anything in 'data' field, the export was blowing up
-        verticals = module_store.get_items(course_id.make_usage_key('vertical', None))
+        verticals = module_store.get_items(course_id, category='vertical')
 
         self.assertGreater(len(verticals), 0)
 
@@ -1027,7 +1030,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['word_cloud'])
         course_id = SlashSeparatedCourseKey('HarvardX', 'ER22x', '2013_Spring')
 
-        verticals = module_store.get_items(course_id.make_usage_key('vertical', None))
+        verticals = module_store.get_items(course_id, category='vertical')
 
         self.assertGreater(len(verticals), 0)
 
@@ -1056,7 +1059,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['toy'])
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
-        verticals = module_store.get_items(course_id.make_usage_key('vertical', None))
+        verticals = module_store.get_items(course_id, category='vertical')
 
         self.assertGreater(len(verticals), 0)
 
@@ -1667,7 +1670,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         _, course_items = import_from_xml(module_store, 'common/test/data/', ['toy'])
 
         course = course_items[0]
-        verticals = module_store.get_items(course.id.make_usage_key('vertical', None))
+        verticals = module_store.get_items(course.id, category='vertical')
 
         # let's assert on the metadata_inheritance on an existing vertical
         for vertical in verticals:
