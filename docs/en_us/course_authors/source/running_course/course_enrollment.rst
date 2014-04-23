@@ -167,7 +167,7 @@ To unenroll students, you supply the email addresses of enrolled students.
 
 .. note:: The **Auto Enroll** option has no effect when you click **Unenroll**.
 
-#. Click **Unenroll**. The course is no longer listed on the students'
+5. Click **Unenroll**. The course is no longer listed on the students'
    dashboards, and the students can no longer contribute to discussions or the
    wiki or access the courseware.
 

@@ -16,6 +16,8 @@ April, 2014
      - Expanded the :ref:`Grades` chapter to include topics on interpreting the grade reports and student progress page.
    * - 04/23/14
      - Reorganized info about problems into :ref:`Exercises and Tools Index` section  
+   * - 04/23/14
+     - Added more information about collecting language and location data from students to :ref:`Student Data`.  
    * - 04/22/14
      - Updated the :ref:`Bulk Email` section with information about the dashboard option to opt out of course email.
    * - 
