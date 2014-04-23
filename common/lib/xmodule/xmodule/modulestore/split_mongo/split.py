@@ -122,7 +122,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         self.thread_cache = threading.local()
 
         if default_class is not None:
-            module_path, _, class_name = default_class.rpartition('.')
+            module_path, __, class_name = default_class.rpartition('.')
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
         else:

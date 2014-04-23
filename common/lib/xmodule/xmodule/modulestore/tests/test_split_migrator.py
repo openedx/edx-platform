@@ -94,11 +94,11 @@ class TestMigration(SplitWMongoCourseBoostrapper):
         self._create_item(
             conditional_loc.category, conditional_loc.name, 
             {
-                'show_tag_list': [indirect1_loc.url(), indirect2_loc.url()]
+                'show_tag_list': [indirect1_loc, indirect2_loc]
             }, 
             {
                 'xml_attributes': {
-                    'sources': [live_vert_loc.url(), ],
+                    'sources': [live_vert_loc, ],
                     'completed': True,
                 },
             }, 
