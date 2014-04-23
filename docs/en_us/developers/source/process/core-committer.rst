@@ -12,7 +12,7 @@ there are a few ways that the process is different:
 * The contributor cannot see when conflicts occur in the branch.
   These conflicts prevent the pull request from being merged,
   so you should ask the contributor to rebase their pull request,
-  and point them to the documentation for doing so.
+  and point them to `the documentation for doing so`_.
 
 * Jenkins may not run on the contributor’s pull request automatically.
   Be sure to start new Jenkins jobs for the PR as necessary -- do not approve
@@ -29,6 +29,8 @@ there are a few ways that the process is different:
   Do not close the pull request merely because the contributor hasn’t responded
   -- if you think the pull request should be closed, inform the
   community managers, and they will handle it.
+
+.. _the documentation for doing so: https://github.com/edx/edx-platform/wiki/How-to-Rebase-a-Pull-Request
 
 Each Scrum team should decide for themselves how to estimate stories related to
 reviewing external pull requests, and how to claim points for those stories,
