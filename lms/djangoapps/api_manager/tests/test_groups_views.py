@@ -182,7 +182,13 @@ class GroupsApiTests(TestCase):
 
     def test_group_users_list_post(self):
         local_username = self.test_username + str(randint(11, 99))
-        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password}
+        data = {
+            'email': self.test_email,
+            'username': local_username,
+            'password': self.test_password,
+            'first_name': 'Joe',
+            'last_name': 'Smith'
+        }
         response = self.do_post(self.base_users_uri, data)
         user_id = response.data['id']
         data = {'name': 'Alpha Group'}
@@ -198,6 +204,17 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['group_id'], str(group_id))
         self.assertEqual(response.data['user_id'], str(user_id))
+
+        # check to see if the user is listed after we associate it with the group
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        users = response.data['users']
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0]['id'], user_id)
+        self.assertEqual(users[0]['username'], local_username)
+        self.assertEqual(users[0]['email'], self.test_email)
+        self.assertEqual(users[0]['first_name'], 'Joe')
+        self.assertEqual(users[0]['last_name'], 'Smith')
 
     def test_group_users_list_post_duplicate(self):
         local_username = self.test_username + str(randint(11, 99))
