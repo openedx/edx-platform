@@ -104,6 +104,12 @@ function () {
         if (this.config.availableHDQualities.length > 0) {
             this.trigger('videoQualityControl.showQualityControl');
         }
+        // On initialization, force the video quality to be 'large' instead of
+        // 'default'. Otherwise, the player will sometimes switch to HD
+        // automatically, for example when the iframe resizes itself.
+        this.trigger('videoPlayer.handlePlaybackQualityChange',
+            this.videoQualityControl.quality
+        );
     }
 
     function onQualityChange(value) {
