@@ -37,6 +37,10 @@ Roles
 Overview
 --------
 
+.. image:: pr-process.png
+   :align: center
+   :alt: A visualization of the pull request process
+
 If you are a :doc:`contributor <contributor>` submitting a pull request, expect that it will
 take a few weeks before it can be merged. The earlier you can start talking
 with the rest of the Open edX community about the changes you want to make,
