@@ -82,7 +82,7 @@ class MongoContentStore(ContentStore):
                 fp = self.fs.get(content_id)
                 thumbnail_location = getattr(fp, 'thumbnail_location', None)
                 if thumbnail_location:
-                    thumbnail_location = location.course_key.make_usage_key_from_deprecated_string(thumbnail_location)
+                    thumbnail_location = location.course_key.make_asset_key('thumbnail', thumbnail_location[4])
                 return StaticContentStream(
                     location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
                     thumbnail_location=thumbnail_location,
@@ -93,7 +93,7 @@ class MongoContentStore(ContentStore):
                 with self.fs.get(content_id) as fp:
                     thumbnail_location = getattr(fp, 'thumbnail_location', None)
                     if thumbnail_location:
-                        thumbnail_location = location.course_key.make_usage_key_from_deprecated_string(thumbnail_location)
+                        thumbnail_location = location.course_key.make_asset_key('thumbnail', thumbnail_location[4])
                     return StaticContent(
                         location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
                         thumbnail_location=thumbnail_location,

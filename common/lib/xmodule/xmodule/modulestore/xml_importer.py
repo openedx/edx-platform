@@ -515,7 +515,7 @@ def remap_namespace(module, target_course_id):
     if hasattr(module, 'children'):
         all_fields['children'] = module.children
 
-    def convert_ref(reference):
+    def _convert_reference_fields_to_new_namespace(reference):
         """
         Convert a reference to the new namespace, but only
         if the original namespace matched the original course.
@@ -536,18 +536,18 @@ def remap_namespace(module, target_course_id):
     for field_name in all_fields:
         field_object = module.fields.get(field_name)
         if isinstance(field_object, Reference):
-            new_ref = convert_ref(getattr(module, field_name))
+            new_ref = _convert_reference_fields_to_new_namespace(getattr(module, field_name))
             setattr(module, field_name, new_ref)
             module.save()
         elif isinstance(field_object, ReferenceList):
             references = getattr(module, field_name)
-            new_references = [convert_ref(reference) for reference in references]
+            new_references = [_convert_reference_fields_to_new_namespace(reference) for reference in references]
             setattr(module, field_name, new_references)
             module.save()
         elif isinstance(field_object, ReferenceValueDict):
             reference_dict = getattr(module, field_name)
             new_reference_dict = {
-                key: convert_ref(reference)
+                key: _convert_reference_fields_to_new_namespace(reference)
                 for key, reference
                 in reference_dict.items()
             }

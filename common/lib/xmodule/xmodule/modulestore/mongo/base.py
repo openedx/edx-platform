@@ -187,8 +187,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 if isinstance(data, basestring):
                     data = {'data': data}
                 mixed_class = self.mixologist.mix(class_)
-                data = self._convert_reference_fields(mixed_class, location.course_key, data)
-                metadata = self._convert_reference_fields(mixed_class, location.course_key, metadata)
+                data = self._convert_reference_fields_to_keys(mixed_class, location.course_key, data)
+                metadata = self._convert_reference_fields_to_keys(mixed_class, location.course_key, metadata)
                 kvs = MongoKeyValueStore(
                     data,
                     children,
@@ -219,7 +219,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
 
-    def _convert_reference_fields(self, class_, course_key, jsonfields):
+    def _convert_reference_fields_to_keys(self, class_, course_key, jsonfields):
         """
         Find all fields of type reference and convert the payload into UsageKeys
         :param class_: the XBlock class
@@ -899,13 +899,13 @@ class MongoModuleStore(ModuleStoreWriteBase):
         data: A nested dictionary of problem data
         """
         try:
-            definition_data = self._convert_reference_fields(xblock, xblock.get_explicitly_set_fields_by_scope())
+            definition_data = self._convert_reference_fields_to_strings(xblock, xblock.get_explicitly_set_fields_by_scope())
             payload = {
                 'definition.data': definition_data,
-                'metadata': self._convert_reference_fields(xblock, own_metadata(xblock)),
+                'metadata': self._convert_reference_fields_to_strings(xblock, own_metadata(xblock)),
             }
             if xblock.has_children:
-                children = self._convert_reference_fields(xblock, {'children': xblock.children})
+                children = self._convert_reference_fields_to_strings(xblock, {'children': xblock.children})
                 payload.update({'definition.children': children['children']})
             self._update_single_item(xblock.scope_ids.usage_id, payload)
             # for static tabs, their containing course also records their display name
@@ -925,7 +925,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             if not allow_not_found:
                 raise
 
-    def _convert_reference_fields(self, xblock, jsonfields):
+    def _convert_reference_fields_to_strings(self, xblock, jsonfields):
         """
         Find all fields of type reference and convert the payload from UsageKeys to deprecated strings
         :param xblock: the XBlock class

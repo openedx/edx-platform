@@ -1741,7 +1741,6 @@ class ContentStoreTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         # Use conditional_and_poll, as it's got an image already
-        # NAA TODO - getting InvalidDocument: Cannot encode object: Location('HarvardX', 'ER22x', '2013_Spring', 'poll_question', 'second_poll', None)
         import_from_xml(
             module_store,
             'common/test/data/',

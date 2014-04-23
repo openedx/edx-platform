@@ -70,7 +70,7 @@ class StaticContent(object):
         Thumbnail locations stored as lists [c4x, org, course, thumbnail, path, None]
         :param location:
         """
-        return ['c4x', location.org, location.course, 'thumbnail', location.name, None]
+        return ['c4x', location.org, location.course, 'thumbnail', location.name, None] if location is not None else None
 
     @property
     def data(self):
