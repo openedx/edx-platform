@@ -65,6 +65,13 @@ class StaticContent(object):
     def get_url_path(self):
         return StaticContent.get_url_path_from_location(self.location)
 
+    def get_deprecated_loc_list(self, location):
+        """
+        Thumbnail locations stored as lists [c4x, org, course, thumbnail, path, None]
+        :param location:
+        """
+        return ['c4x', location.org, location.course, 'thumbnail', location.name, None]
+
     @property
     def data(self):
         return self._data
