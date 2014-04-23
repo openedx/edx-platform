@@ -1,5 +1,5 @@
 # disable missing docstring
-#pylint: disable=C0111
+# pylint: disable=C0111
 
 from lettuce import world, step
 from component_settings_editor_helpers import enter_xml_in_advanced_problem

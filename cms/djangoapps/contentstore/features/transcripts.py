@@ -195,35 +195,35 @@ def i_enter_a_source(_step, link, index):
 def upload_file(_step, file_name):
     path = os.path.join(TEST_ROOT, 'uploads/', file_name.strip())
     world.browser.execute_script("$('form.file-chooser').show()")
-    world.browser.attach_file('file', os.path.abspath(path))
+    world.browser.attach_file('transcript-file', os.path.abspath(path))
     world.wait_for_ajax_complete()
 
 
 @step('I see "([^"]*)" text in the captions')
 def check_text_in_the_captions(_step, text):
-    assert world.browser.is_text_present(text.strip(), 5)
+    world.wait_for_present('.video.is-captions-rendered')
+    world.wait_for(lambda _: world.css_text('.subtitles'), timeout=30)
+    actual_text = world.css_text('.subtitles')
+    assert (text in actual_text)
 
 
 @step('I see value "([^"]*)" in the field "([^"]*)"$')
 def check_transcripts_field(_step, values, field_name):
-    world.click_link_by_text('Advanced')
+    world.select_editor_tab('Advanced')
     field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
     values_list = [i.strip() == world.css_value(field_id) for i in values.split('|')]
     assert any(values_list)
-    world.click_link_by_text('Basic')
+    world.select_editor_tab('Basic')
 
 
 @step('I save changes$')
 def save_changes(_step):
-    save_css = 'a.save-button'
-    world.css_click(save_css)
-    world.wait_for_ajax_complete()
+    world.save_component()
 
 
 @step('I open tab "([^"]*)"$')
 def open_tab(_step, tab_name):
-    world.click_link_by_text(tab_name.strip())
-    world.wait_for_ajax_complete()
+    world.select_editor_tab(tab_name)
 
 
 @step('I set value "([^"]*)" to the field "([^"]*)"$')

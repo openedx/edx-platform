@@ -63,7 +63,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
     def test_staff_debug_for_staff(self):
         resp = self.get_cw_section()
-        sdebug = '<div aria-hidden="true"><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Staff Debug Info</a></div>'
+        sdebug = 'Staff Debug Info'
 
         self.assertTrue(sdebug in resp.content)
 
@@ -82,7 +82,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertEqual(togresp.content, '{"status": "student"}', '')
 
         resp = self.get_cw_section()
-        sdebug = '<div><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Staff Debug Info</a></div>'
+        sdebug = 'Staff Debug Info'
 
         self.assertFalse(sdebug in resp.content)
 
@@ -105,7 +105,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
         print html
-        sabut = '<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
+        sabut = '<button class="show"><span class="show-label" aria-hidden="true">Show Answer</span> <span class="sr">Reveal Answer</span></button>'
         self.assertTrue(sabut in html)
 
     def test_no_showanswer_for_student(self):
@@ -115,5 +115,5 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
-        sabut = '<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
+        sabut = '<button class="show"><span class="show-label" aria-hidden="true">Show Answer</span> <span class="sr">Reveal answer above</span></button>'
         self.assertFalse(sabut in html)

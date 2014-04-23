@@ -1,35 +1,45 @@
-<section id="textbox_${id}" class="textbox">
-  <textarea rows="${rows}" cols="${cols}" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}"
-       % if hidden:
-      	    style="display:none;"
-       % endif
+<section id="textbox_${id}" class="capa_inputtype cminput">
+<div class="script_placeholder" data-src="${matlab_editor_js}"></div>
+<textarea 
+  rows="${rows}" 
+  cols="${cols}" 
+  name="input_${id}" 
+  aria-describedby="answer_${id}" 
+  id="input_${id}"
+  data-tabsize="${tabsize}"
+  data-mode="octave"
+  % if linenumbers:
+  data-linenums="true"
+  % endif
+ % if hidden:
+  style="display:none;"
+ % endif
   >${value|h}</textarea>
 
-  <div class="grader-status">
-    % if status == 'unsubmitted':
-      <span class="unanswered" style="display:inline-block;" id="status_${id}"><span class="sr">Status: </span>Unanswered</span>
-    % elif status == 'correct':
-      <span class="correct" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: </span>Correct</span>
-    % elif status == 'incorrect':
-      <span class="incorrect" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: </span>Incorrect</span>
-    % elif status == 'queued':
-      <span class="processing" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: </span>Queued</span>
-      <span style="display:none;" class="xqueue" id="${id}" >${queue_len}</span>
+  <div class="grader-status" tabindex="-1">
+      <span id="status_${id}"
+            class="${status_class}"
+            aria-describedby="input_${id}"
+      >
+          <span class="status sr">${status_display}</span>
+      </span>
+    % if status == 'queued':
+      <span style="display:none;" class="xqueue" id="${id}">${queue_len}</span>
     % endif
 
     % if hidden:
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
 
-    <p class="debug">${status}</p>
+    <p class="debug">${status_display}</p>
   </div>
 
   <span id="answer_${id}"></span>
 
-  <div class="external-grader-message">
+  <div class="external-grader-message" aria-live="polite">
     ${msg|n}
   </div>
-  <div class="external-grader-message">
+  <div class="external-grader-message" aria-live="polite">
     ${queue_msg|n}
   </div>
 
@@ -40,28 +50,7 @@
   %endif
 
   <script>
-    // Note: We need to make the area follow the CodeMirror for this to work.
     $(function(){
-      var cm = CodeMirror.fromTextArea(document.getElementById("input_${id}"), {
-        % if linenumbers == 'true':
-        lineNumbers: true,
-        % endif
-        mode: "matlab",
-        matchBrackets: true,
-        lineWrapping: true,
-        indentUnit: "${tabsize}",
-        tabSize: "${tabsize}",
-        indentWithTabs: false,
-        extraKeys: {
-            "Tab": function(cm) {
-                cm.replaceSelection("${' '*tabsize}", "end");
-            }
-        },
-        smartIndent: false
-      });
-
-      $("#textbox_${id}").find('.CodeMirror-scroll').height(${int(13.5*eval(rows))});
-
       var gentle_alert = function (parent_elt, msg) {
           if($(parent_elt).find('.capa_alert').length) {
               $(parent_elt).find('.capa_alert').remove();
@@ -80,8 +69,13 @@
           input_id = "${id}";
 
           // save the codemirror text to the textarea
-          cm.save();
+          // since there could be multiple codemirror instances on the page,
+          // save all of them.
+          $('.CodeMirror').each(function(i, el){
+            el.CodeMirror.save();
+          });
           var input = $("#input_${id}");
+
           // pull out the coded text
           submission = input.val();
 

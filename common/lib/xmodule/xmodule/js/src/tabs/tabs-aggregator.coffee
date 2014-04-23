@@ -8,9 +8,6 @@ class @TabsEditingDescriptor
     (Like many CodeMirrors).
     ###
 
-    # hide editor/settings bar
-    @element.closest('.component-editor').find('.component-edit-header').hide()
-
     @$tabs = $(".tab", @element)
     @$content = $(".component-tab", @element)
 
@@ -25,7 +22,7 @@ class @TabsEditingDescriptor
     currentTab.trigger("click", [true, @html_id])
 
   onSwitchEditor: (e, firstTime, html_id) =>
-    e.preventDefault();
+    e.preventDefault()
 
     isInactiveClass = TabsEditingDescriptor.isInactiveClass
     $currentTarget = $(e.currentTarget)

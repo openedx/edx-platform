@@ -16,6 +16,8 @@ class User(models.Model):
     updatable_fields = ['username', 'external_id', 'email', 'default_sort_key']
     initializable_fields = updatable_fields
 
+    metric_tag_fields = ['course_id']
+
     base_url = "{prefix}/users".format(prefix=settings.PREFIX)
     default_retrieve_params = {'complete': True}
     type = 'user'
@@ -29,11 +31,23 @@ class User(models.Model):
 
     def follow(self, source):
         params = {'source_type': source.type, 'source_id': source.id}
-        response = perform_request('post', _url_for_subscription(self.id), params)
+        response = perform_request(
+            'post',
+            _url_for_subscription(self.id),
+            params,
+            metric_action='user.follow',
+            metric_tags=self._metric_tags + ['target.type:{}'.format(source.type)],
+        )
 
     def unfollow(self, source):
         params = {'source_type': source.type, 'source_id': source.id}
-        response = perform_request('delete', _url_for_subscription(self.id), params)
+        response = perform_request(
+            'delete',
+            _url_for_subscription(self.id),
+            params,
+            metric_action='user.unfollow',
+            metric_tags=self._metric_tags + ['target.type:{}'.format(source.type)],
+        )
 
     def vote(self, voteable, value):
         if voteable.type == 'thread':
@@ -43,7 +57,13 @@ class User(models.Model):
         else:
             raise CommentClientRequestError("Can only vote / unvote for threads or comments")
         params = {'user_id': self.id, 'value': value}
-        request = perform_request('put', url, params)
+        request = perform_request(
+            'put',
+            url,
+            params,
+            metric_action='user.vote',
+            metric_tags=self._metric_tags + ['target.type:{}'.format(voteable.type)],
+        )
         voteable.update_attributes(request)
 
     def unvote(self, voteable):
@@ -54,7 +74,13 @@ class User(models.Model):
         else:
             raise CommentClientRequestError("Can only vote / unvote for threads or comments")
         params = {'user_id': self.id}
-        request = perform_request('delete', url, params)
+        request = perform_request(
+            'delete',
+            url,
+            params,
+            metric_action='user.unvote',
+            metric_tags=self._metric_tags + ['target.type:{}'.format(voteable.type)],
+        )
         voteable.update_attributes(request)
 
     def active_threads(self, query_params={}):
@@ -63,7 +89,14 @@ class User(models.Model):
         url = _url_for_user_active_threads(self.id)
         params = {'course_id': self.course_id}
         params = merge_dict(params, query_params)
-        response = perform_request('get', url, params)
+        response = perform_request(
+            'get',
+            url,
+            params,
+            metric_action='user.active_threads',
+            metric_tags=self._metric_tags,
+            paged_results=True,
+        )
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
     def subscribed_threads(self, query_params={}):
@@ -72,7 +105,14 @@ class User(models.Model):
         url = _url_for_user_subscribed_threads(self.id)
         params = {'course_id': self.course_id}
         params = merge_dict(params, query_params)
-        response = perform_request('get', url, params)
+        response = perform_request(
+            'get',
+            url,
+            params,
+            metric_action='user.subscribed_threads',
+            metric_tags=self._metric_tags,
+            paged_results=True
+        )
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
     def _retrieve(self, *args, **kwargs):
@@ -80,7 +120,28 @@ class User(models.Model):
         retrieve_params = self.default_retrieve_params
         if self.attributes.get('course_id'):
             retrieve_params['course_id'] = self.course_id
-        response = perform_request('get', url, retrieve_params)
+        try:
+            response = perform_request(
+                'get',
+                url,
+                retrieve_params,
+                metric_action='model.retrieve',
+                metric_tags=self._metric_tags,
+            )
+        except CommentClientRequestError as e:
+            if e.status_code == 404:
+                # attempt to gracefully recover from a previous failure
+                # to sync this user to the comments service.
+                self.save()
+                response = perform_request(
+                    'get',
+                    url,
+                    retrieve_params,
+                    metric_action='model.retrieve',
+                    metric_tags=self._metric_tags,
+                )
+            else:
+                raise
         self.update_attributes(**response)
 
 

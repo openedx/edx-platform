@@ -1,5 +1,8 @@
 # Configuration for i18n workflow.
 
+# All project are listed here, but ones that do not yet have any reviewed translations
+# we don't pull so are commented out.
+
 locales:
     - en  # English - Source Language
     - ru  # Russian

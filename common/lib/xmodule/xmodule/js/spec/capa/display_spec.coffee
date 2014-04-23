@@ -7,6 +7,8 @@ describe 'Problem', ->
     @stubbedJax = root: jasmine.createSpyObj('jax.root', ['toMathML'])
     MathJax.Hub.getAllJax.andReturn [@stubbedJax]
     window.update_schematics = ->
+    spyOn SR, 'readElts'
+    spyOn SR, 'readText'
 
     # Load this function from spec/helper.coffee
     # Note that if your test fails with a message like:
@@ -140,6 +142,10 @@ describe 'Problem', ->
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_check event', ->
+      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
+        promise =
+          always: (callable) -> callable()
+          done: (callable) -> callable()
       @problem.check()
       expect(Logger.log).toHaveBeenCalledWith 'problem_check', 'foo=1&bar=2'
 
@@ -149,11 +155,17 @@ describe 'Problem', ->
           success: 'correct'
           contents: 'mock grader response'
         callback(response)
+        promise =
+          always: (callable) -> callable()
+          done: (callable) -> callable()
       @problem.check()
       expect(Logger.log).toHaveBeenCalledWith 'problem_graded', ['foo=1&bar=2', 'mock grader response'], @problem.id
 
     it 'submit the answer for check', ->
-      spyOn $, 'postWithPrefix'
+      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
+        promise =
+          always: (callable) -> callable()
+          done: (callable) -> callable()
       @problem.check()
       expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_check',
           'foo=1&bar=2', jasmine.any(Function)
@@ -162,15 +174,23 @@ describe 'Problem', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
           callback(success: 'correct', contents: 'Correct!')
+          promise =
+            always: (callable) -> callable()
+            done: (callable) -> callable()
         @problem.check()
         expect(@problem.el.html()).toEqual 'Correct!'
+        expect(window.SR.readElts).toHaveBeenCalled()
 
     describe 'when the response is incorrect', ->
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
           callback(success: 'incorrect', contents: 'Incorrect!')
+          promise =
+            always: (callable) -> callable()
+            done: (callable) -> callable()
         @problem.check()
         expect(@problem.el.html()).toEqual 'Incorrect!'
+        expect(window.SR.readElts).toHaveBeenCalled()
 
     # TODO: figure out why failing
     xdescribe 'when the response is undetermined', ->
@@ -232,12 +252,39 @@ describe 'Problem', ->
       it 'toggle the show answer button', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
-        expect($('.show .show-label')).toHaveText 'Hide Answer(s)'
+        expect($('.show .show-label')).toHaveText 'Hide Answer'
+        expect(window.SR.readElts).toHaveBeenCalled()
+
+      it 'toggle the show answer button, answers are strings', ->
+        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: '1_1': 'One', '1_2': 'Two')
+        @problem.show()
+        expect($('.show .show-label')).toHaveText 'Hide Answer'
+        expect(window.SR.readElts).toHaveBeenCalledWith ['<p>Answer: One</p>', '<p>Answer: Two</p>']
+
+      it 'toggle the show answer button, answers are elements', ->
+        answer1 = '<div><span class="detailed-solution">one</span></div>'
+        answer2 = '<div><span class="detailed-solution">two</span></div>'
+        spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: '1_1': answer1, '1_2': answer2)
+        @problem.show()
+        expect($('.show .show-label')).toHaveText 'Hide Answer'
+        expect(window.SR.readElts).toHaveBeenCalledWith [jasmine.any(jQuery), jasmine.any(jQuery)]
 
       it 'add the showed class to element', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
         expect(@problem.el).toHaveClass 'showed'
+
+      it 'reads the answers', ->
+        runs ->
+          spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: 'answers')
+          @problem.show()
+
+        waitsFor (->
+          return jQuery.active == 0
+        ), "jQuery requests finished", 1000
+
+        runs ->
+          expect(window.SR.readElts).toHaveBeenCalled()
 
       describe 'multiple choice question', ->
         beforeEach ->
@@ -310,41 +357,29 @@ describe 'Problem', ->
           expect($('input#1_2_1').attr('disabled')).not.toEqual('disabled')
 
       describe 'imageinput', ->
-        imageinput_html = readFixtures('imageinput.html')
-        states = [
-          {
-            desc: 'rectangle is drawn correctly',
-            data: {
-              'rectangle': '(10,10)-(30,30)',
-              'regions': null
-            }
-          },
-          {
-            desc: 'region is drawn correctly',
-            data: {
-              'rectangle': null,
-              'regions': '[[10,10],[30,30],[70,30],[20,30]]'
-            }
-          },
-          {
-            desc: 'mixed shapes are drawn correctly',
-            data: {
-              'rectangle': '(10,10)-(30,30);(5,5)-(20,20)',
-              'regions': '''[
-                [[50,50],[40,40],[70,30],[50,70]],
-                [[90,95],[95,95],[90,70],[70,70]]
-              ]'''
-            }
-          },
-        ]
+        imageinput_html = readFixtures('imageinput.underscore')
+
+        DEFAULTS =
+          id: '12345'
+          width: '300'
+          height: '400'
 
         beforeEach ->
           @problem = new Problem($('.xblock-student_view'))
-          @problem.el.prepend imageinput_html
+          @problem.el.prepend _.template(imageinput_html)(DEFAULTS)
+
+        assertAnswer = (problem, data) =>
+          stubRequest(data)
+          problem.show()
+
+          $.each data['answers'], (id, answer) =>
+            img = getImage(answer)
+            el = $('#inputtype_' + id)
+            expect(img).toImageDiffEqual(el.find('canvas')[0])
 
         stubRequest = (data) =>
           spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
-              callback answers: "12345": data
+            callback data
 
         getImage = (coords, c_width, c_height) =>
           types =
@@ -403,13 +438,56 @@ describe 'Problem', ->
 
           return canvas
 
-        $.each states, (index, state) =>
-          it state.desc, ->
-            stubRequest(state.data)
-            @problem.show()
-            img = getImage(state.data)
+        it 'rectangle is drawn correctly', ->
+          assertAnswer(@problem, {
+            'answers':
+              '12345':
+                'rectangle': '(10,10)-(30,30)',
+                'regions': null
+          })
 
-            expect(img).toImageDiffEqual($('canvas')[0])
+        it 'region is drawn correctly', ->
+          assertAnswer(@problem, {
+            'answers':
+              '12345':
+                'rectangle': null,
+                'regions': '[[10,10],[30,30],[70,30],[20,30]]'
+          })
+
+        it 'mixed shapes are drawn correctly', ->
+          assertAnswer(@problem, {
+            'answers':'12345':
+              'rectangle': '(10,10)-(30,30);(5,5)-(20,20)',
+              'regions': '''[
+                [[50,50],[40,40],[70,30],[50,70]],
+                [[90,95],[95,95],[90,70],[70,70]]
+              ]'''
+          })
+
+        it 'multiple image inputs draw answers on separate canvases', ->
+          data =
+            id: '67890'
+            width: '400'
+            height: '300'
+
+          @problem.el.prepend _.template(imageinput_html)(data)
+          assertAnswer(@problem, {
+            'answers':
+              '12345':
+                'rectangle': null,
+                'regions': '[[10,10],[30,30],[70,30],[20,30]]'
+              '67890':
+                'rectangle': '(10,10)-(30,30)',
+                'regions': null
+          })
+
+        it 'dictionary with answers doesn\'t contain answer for current id', ->
+          spyOn console, 'log'
+          stubRequest({'answers':{}})
+          @problem.show()
+          el = $('#inputtype_12345')
+          expect(el.find('canvas')).not.toExist()
+          expect(console.log).toHaveBeenCalledWith('Answer is absent for image input with id=12345')
 
     describe 'when the answers are already shown', ->
       beforeEach ->
@@ -431,7 +509,7 @@ describe 'Problem', ->
 
       it 'toggle the show answer button', ->
         @problem.show()
-        expect($('.show .show-label')).toHaveText 'Show Answer(s)'
+        expect($('.show .show-label')).toHaveText 'Show Answer'
 
       it 'remove the showed class from element', ->
         @problem.show()
@@ -451,6 +529,17 @@ describe 'Problem', ->
       @problem.save()
       expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_save',
           'foo=1&bar=2', jasmine.any(Function)
+
+    it 'reads the save message', ->
+      runs ->
+        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback(success: 'OK')
+        @problem.save()
+      waitsFor (->
+        return jQuery.active == 0
+      ), "jQuery requests finished", 1000
+
+      runs ->
+        expect(window.SR.readElts).toHaveBeenCalled()
 
     # TODO: figure out why failing
     xit 'alert to the user', ->

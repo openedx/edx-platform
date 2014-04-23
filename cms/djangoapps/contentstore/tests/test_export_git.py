@@ -76,6 +76,16 @@ class TestExportGit(CourseTestCase):
         response = self.client.get('{}?action=push'.format(self.test_url))
         self.assertIn('Export Failed:', response.content)
 
+    def test_exception_translation(self):
+        """
+        Regression test for making sure errors are properly stringified
+        """
+        self.course_module.giturl = 'foobar'
+        get_modulestore(self.course_module.location).update_item(self.course_module)
+
+        response = self.client.get('{}?action=push'.format(self.test_url))
+        self.assertNotIn('django.utils.functional.__proxy__', response.content)
+
     def test_course_export_success(self):
         """
         Test successful course export response.
@@ -92,7 +102,7 @@ class TestExportGit(CourseTestCase):
 
         subprocess.check_output(['git', '--bare', 'init', ], cwd=bare_repo_dir)
 
-        self.populateCourse()
+        self.populate_course()
         self.course_module.giturl = 'file://{}'.format(bare_repo_dir)
         get_modulestore(self.course_module.location).update_item(self.course_module)
 

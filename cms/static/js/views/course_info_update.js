@@ -1,6 +1,6 @@
-define(["js/views/baseview", "underscore", "codemirror", "js/models/course_update",
+define(["js/views/baseview", "codemirror", "js/models/course_update",
     "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal"],
-    function(BaseView, _, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
+    function(BaseView, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
 
     var CourseInfoUpdateView = BaseView.extend({
         // collection is CourseUpdateCollection
@@ -13,7 +13,7 @@ define(["js/views/baseview", "underscore", "codemirror", "js/models/course_updat
         },
 
         initialize: function() {
-            this.template = _.template($("#course_info_update-tpl").text());
+            this.template = this.loadTemplate('course_info_update');
             this.render();
             // when the client refetches the updates as a whole, re-render them
             this.listenTo(this.collection, 'reset', this.render);
@@ -64,7 +64,7 @@ define(["js/views/baseview", "underscore", "codemirror", "js/models/course_updat
 
             // Variable stored for unit test.
             this.$modalCover = ModalUtils.showModalCover(false, function() {
-                self.closeEditor(true)
+                // Binding empty function to prevent default hideModal.
             });
 
             $('.date').datepicker('destroy');

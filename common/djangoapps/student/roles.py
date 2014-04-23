@@ -64,7 +64,7 @@ class GlobalStaff(AccessRole):
 
     def add_users(self, *users):
         for user in users:
-            if (user.is_authenticated and user.is_active):
+            if (user.is_authenticated() and user.is_active):
                 user.is_staff = True
                 user.save()
 
@@ -98,7 +98,7 @@ class GroupBasedRole(AccessRole):
         """
         Return whether the supplied django user has access to this role.
         """
-        if not (user.is_authenticated and user.is_active):
+        if not (user.is_authenticated() and user.is_active):
             return False
 
         # pylint: disable=protected-access
@@ -113,7 +113,7 @@ class GroupBasedRole(AccessRole):
         """
         # silently ignores anonymous and inactive users so that any that are
         # legit get updated.
-        users = [user for user in users if user.is_authenticated and user.is_active]
+        users = [user for user in users if user.is_authenticated() and user.is_active]
         group, _ = Group.objects.get_or_create(name=self._group_names[0])
         group.user_set.add(*users)
         # remove cache

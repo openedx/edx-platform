@@ -11,3 +11,5 @@
 
 # Converted to JS from CoffeeScript.
 !time.js
+!collapsible.js
+!xmodule.js

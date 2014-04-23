@@ -47,6 +47,7 @@ import shlex  # for splitting quoted strings
 import sys
 import pyparsing
 import html5lib
+import bleach
 
 from .registry import TagRegistry
 from chem import chemcalc
@@ -259,6 +260,8 @@ class InputTypeBase(object):
             'id': self.input_id,
             'value': self.value,
             'status': self.status,
+            'status_class': self.status_class,
+            'status_display': self.status_display,
             'msg': self.msg,
             'STATIC_URL': self.capa_system.STATIC_URL,
         }
@@ -267,6 +270,34 @@ class InputTypeBase(object):
         )
         context.update(self._extra_context())
         return context
+
+    @property
+    def status_class(self):
+        """
+        Return the CSS class for the associated status.
+        """
+        statuses = {
+            'unsubmitted': 'unanswered',
+            'incomplete': 'incorrect',
+            'queued': 'processing',
+        }
+        return statuses.get(self.status, self.status)
+
+    @property
+    def status_display(self):
+        """
+        Return the human-readable and translated word for the associated status.
+        """
+        _ = self.capa_system.i18n.ugettext
+        statuses = {
+            'correct': _('correct'),
+            'incorrect': _('incorrect'),
+            'incomplete': _('incomplete'),
+            'unanswered': _('unanswered'),
+            'unsubmitted': _('unanswered'),
+            'queued': _('queued'),
+        }
+        return statuses.get(self.status, self.status)
 
     def _extra_context(self):
         """
@@ -716,7 +747,7 @@ class CodeInput(InputTypeBase):
         if self.status == 'incomplete':
             self.status = 'queued'
             self.queue_len = self.msg
-            self.msg = self.submitted_msg
+            self.msg = bleach.clean(self.submitted_msg)
 
     def setup(self):
         """ setup this input type """
@@ -772,7 +803,20 @@ class MatlabInput(CodeInput):
         # this is only set if we don't have a graded response
         # the graded response takes precedence
         if 'queue_msg' in self.input_state and self.status in ['queued', 'incomplete', 'unsubmitted']:
-            self.queue_msg = self.input_state['queue_msg']
+            attributes = bleach.ALLOWED_ATTRIBUTES.copy()
+            # Yuck! but bleach does not offer the option of passing in allowed_protocols,
+            # and matlab uses data urls for images
+            if u'data' not in bleach.BleachSanitizer.allowed_protocols:
+                bleach.BleachSanitizer.allowed_protocols.append(u'data')
+            attributes.update({'*': ['class', 'style', 'id'],
+                    'audio': ['controls', 'autobuffer', 'autoplay', 'src'],
+                    'img': ['src', 'width', 'height', 'class']})
+            self.queue_msg = bleach.clean(self.input_state['queue_msg'],
+                    tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre', 'img'],
+                    styles=['white-space'],
+                    attributes=attributes
+                    )
+
         if 'queuestate' in self.input_state and self.input_state['queuestate'] == 'queued':
             self.status = 'queued'
             self.queue_len = 1
@@ -832,6 +876,8 @@ class MatlabInput(CodeInput):
             'queue_len': str(self.queue_len),
             'queue_msg': self.queue_msg,
             'button_enabled': self.button_enabled(),
+            'matlab_editor_js': '{static_url}js/vendor/CodeMirror/octave.js'.format(
+                static_url=self.capa_system.STATIC_URL),
         }
         return extra_context
 
@@ -929,6 +975,15 @@ class Schematic(InputTypeBase):
             Attribute('label', ''),
         ]
 
+    def _extra_context(self):
+        """
+        """
+        context = {
+            'setup_script': '{static_url}js/capa/schematicinput.js'.format(
+                static_url=self.capa_system.STATIC_URL),
+        }
+
+        return context
 
 #-----------------------------------------------------------------------------
 
@@ -1134,16 +1189,10 @@ class FormulaEquationInput(InputTypeBase):
         TODO (vshnayder): Get rid of 'previewer' once we have a standard way of requiring js to be loaded.
         """
         # `reported_status` is basically `status`, except we say 'unanswered'
-        reported_status = ''
-        if self.status == 'unsubmitted':
-            reported_status = 'unanswered'
-        elif self.status in ('correct', 'incorrect', 'incomplete'):
-            reported_status = self.status
 
         return {
             'previewer': '{static_url}js/capa/src/formula_equation_preview.js'.format(
                 static_url=self.capa_system.STATIC_URL),
-            'reported_status': reported_status,
         }
 
     def handle_ajax(self, dispatch, get):

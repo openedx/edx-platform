@@ -1,11 +1,13 @@
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from django.db import models
 
 
 class UserPreference(models.Model):
     """A user's preference, stored as generic text to be processed by client"""
-    user = models.ForeignKey(User, db_index=True, related_name="+")
-    key = models.CharField(max_length=255, db_index=True)
+    KEY_REGEX = r"[-_a-zA-Z0-9]+"
+    user = models.ForeignKey(User, db_index=True, related_name="preferences")
+    key = models.CharField(max_length=255, db_index=True, validators=[RegexValidator(KEY_REGEX)])
     value = models.TextField()
 
     class Meta:  # pylint: disable=missing-docstring

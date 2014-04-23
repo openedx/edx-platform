@@ -143,7 +143,7 @@ class TestUploadtranscripts(Basetranscripts):
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         resp = self.client.post(link, {
             'locator': self.item_locator,
-            'file': self.good_srt_file,
+            'transcript-file': self.good_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
                 'video': filename,
@@ -162,7 +162,7 @@ class TestUploadtranscripts(Basetranscripts):
 
     def test_fail_data_without_id(self):
         link = reverse('upload_transcripts')
-        resp = self.client.post(link, {'file': self.good_srt_file})
+        resp = self.client.post(link, {'transcript-file': self.good_srt_file})
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(json.loads(resp.content).get('status'), 'POST data without "locator" form data.')
 
@@ -178,7 +178,7 @@ class TestUploadtranscripts(Basetranscripts):
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         resp = self.client.post(link, {
             'locator': 'BAD_LOCATOR',
-            'file': self.good_srt_file,
+            'transcript-file': self.good_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
                 'video': filename,
@@ -193,7 +193,7 @@ class TestUploadtranscripts(Basetranscripts):
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         resp = self.client.post(link, {
             'locator': '{0}_{1}'.format(self.item_locator, 'BAD_LOCATOR'),
-            'file': self.good_srt_file,
+            'transcript-file': self.good_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
                 'video': filename,
@@ -222,7 +222,7 @@ class TestUploadtranscripts(Basetranscripts):
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         resp = self.client.post(link, {
             'locator': item_locator,
-            'file': self.good_srt_file,
+            'transcript-file': self.good_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
                 'video': filename,
@@ -240,7 +240,7 @@ class TestUploadtranscripts(Basetranscripts):
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         resp = self.client.post(link, {
             'locator': self.item_locator,
-            'file': self.good_srt_file,
+            'transcript-file': self.good_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
                 'video': filename,
@@ -257,7 +257,7 @@ class TestUploadtranscripts(Basetranscripts):
         filename = os.path.splitext(os.path.basename(self.bad_data_srt_file.name))[0]
         resp = self.client.post(link, {
             'locator': self.item_locator,
-            'file': self.bad_data_srt_file,
+            'transcript-file': self.bad_data_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
                 'video': filename,
@@ -272,7 +272,7 @@ class TestUploadtranscripts(Basetranscripts):
         filename = os.path.splitext(os.path.basename(self.bad_name_srt_file.name))[0]
         resp = self.client.post(link, {
             'locator': self.item_locator,
-            'file': self.bad_name_srt_file,
+            'transcript-file': self.bad_name_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
                 'video': filename,
@@ -299,7 +299,7 @@ class TestUploadtranscripts(Basetranscripts):
         filename = os.path.splitext(os.path.basename(srt_file.name))[0]
         resp = self.client.post(link, {
             'locator': self.item_locator,
-            'file': srt_file,
+            'transcript-file': srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
                 'video': filename,

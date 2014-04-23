@@ -4,6 +4,7 @@ from django.test.utils import override_settings
 from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from mock import patch
 
@@ -52,10 +53,8 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
 
         self.assertEqual(resp['Location'], 'http://testserver' + redirected_to)
 
-
         # Now we test that the student will be redirected away from that page if the course doesn't exist
         # We do this in the same test because we want to make sure the redirected_to is constructed correctly
-
         # This is a location like /courses/*/wiki/* , but with an invalid course ID
         bad_course_wiki_page = redirected_to.replace(self.toy.location.course, "bad_course")
 
@@ -118,6 +117,7 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
         self.create_course_page(self.toy)
 
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
+
         referer = reverse("courseware", kwargs={'course_id': self.toy.id})
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
@@ -126,8 +126,9 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
     def test_wiki_not_accessible_when_not_enrolled(self):
-        """"
-        Test that going from a course page to a wiki page contains the course navigator.
+        """
+        Test that going from a course page to a wiki page when not enrolled
+        redirects a user to the course about page
         """
 
         self.login(self.instructor, self.password)
@@ -138,6 +139,31 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
         referer = reverse("courseware", kwargs={'course_id': self.toy.id})
 
-        resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
+        # When not enrolled, we should get a 302
+        resp = self.client.get(course_wiki_page, follow=False, HTTP_REFERER=referer)
+        self.assertEqual(resp.status_code, 302)
 
-        self.assertEquals(resp.status_code, 403)
+        # and end up at the course about page
+        resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
+        target_url, __ = resp.redirect_chain[-1]
+        self.assertTrue(
+            target_url.endswith(reverse('about_course', args=[self.toy.id]))
+        )
+
+    @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
+    def test_redirect_when_not_logged_in(self):
+        """
+        Test that attempting to reach a course wiki page when not logged in
+        redirects the user to the login page
+        """
+        self.logout()
+        course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
+
+        # When not logged in, we should get a 302
+        resp = self.client.get(course_wiki_page, follow=False)
+        self.assertEqual(resp.status_code, 302)
+
+        # and end up at the login page
+        resp = self.client.get(course_wiki_page, follow=True)
+        target_url, __ = resp.redirect_chain[-1]
+        self.assertTrue(reverse('accounts_login') in target_url)

@@ -1,7 +1,7 @@
 """
 Acceptance tests for Studio.
 """
-from unittest import expectedFailure
+from unittest import skip
 
 from bok_choy.web_app_test import WebAppTest
 
@@ -10,7 +10,7 @@ from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.studio.checklists import ChecklistsPage
 from ..pages.studio.course_import import ImportPage
 from ..pages.studio.course_info import CourseUpdatesPage
-from ..pages.studio.edit_tabs import StaticPagesPage
+from ..pages.studio.edit_tabs import PagesPage
 from ..pages.studio.export import ExportPage
 from ..pages.studio.howitworks import HowitworksPage
 from ..pages.studio.index import DashboardPage
@@ -93,7 +93,7 @@ class CoursePagesTest(UniqueCourseTest):
             clz(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
             for clz in [
                 AssetIndexPage, ChecklistsPage, ImportPage, CourseUpdatesPage,
-                StaticPagesPage, ExportPage, CourseTeamPage, CourseOutlinePage, SettingsPage,
+                PagesPage, ExportPage, CourseTeamPage, CourseOutlinePage, SettingsPage,
                 AdvancedSettingsPage, GradingPage, TextbooksPage
             ]
         ]
@@ -110,6 +110,45 @@ class CoursePagesTest(UniqueCourseTest):
         # Verify that each page is available
         for page in self.pages:
             page.visit()
+
+
+class DiscussionPreviewTest(UniqueCourseTest):
+    """
+    Tests that Inline Discussions are rendered with a custom preview in Studio
+    """
+
+    def setUp(self):
+        super(DiscussionPreviewTest, self).setUp()
+        CourseFixture(**self.course_info).add_children(
+            XBlockFixtureDesc("chapter", "Test Section").add_children(
+                XBlockFixtureDesc("sequential", "Test Subsection").add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit").add_children(
+                        XBlockFixtureDesc(
+                            "discussion",
+                            "Test Discussion",
+                        )
+                    )
+                )
+            )
+        ).install()
+
+        AutoAuthPage(self.browser, staff=True).visit()
+        cop = CourseOutlinePage(
+                self.browser,
+                self.course_info['org'],
+                self.course_info['number'],
+                self.course_info['run']
+                )
+        cop.visit()
+        self.unit = cop.section('Test Section').subsection('Test Subsection').toggle_expand().unit('Test Unit')
+        self.unit.go_to()
+
+    def test_is_preview(self):
+        """
+        Ensure that the preview version of the discussion is rendered.
+        """
+        self.assertTrue(self.unit.q(css=".discussion-preview").present)
+        self.assertFalse(self.unit.q(css=".discussion-show").present)
 
 
 class XBlockAcidBase(WebAppTest):
@@ -237,8 +276,7 @@ class XBlockAcidParentBase(XBlockAcidBase):
         acid_block = AcidView(self.browser, container.xblocks[0].preview_selector)
         self.validate_acid_block_preview(acid_block)
 
-    # This will fail until the container page supports editing
-    @expectedFailure
+    @skip('This will fail until the container page supports editing')
     def test_acid_block_editor(self):
         super(XBlockAcidParentBase, self).test_acid_block_editor()
 
@@ -299,12 +337,10 @@ class XBlockAcidChildTest(XBlockAcidParentBase):
             )
         ).install()
 
-    # This will fail until we fix support of children in pure XBlocks
-    @expectedFailure
+    @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block_preview(self):
         super(XBlockAcidChildTest, self).test_acid_block_preview()
 
-    # This will fail until we fix support of children in pure XBlocks
-    @expectedFailure
+    @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block_editor(self):
         super(XBlockAcidChildTest, self).test_acid_block_editor()

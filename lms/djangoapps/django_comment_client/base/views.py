@@ -431,6 +431,9 @@ def pin_thread(request, course_id, thread_id):
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
 
+@require_POST
+@login_required
+@permitted
 def un_pin_thread(request, course_id, thread_id):
     """
     given a course id and thread id, remove pin from this thread
@@ -516,27 +519,6 @@ def unfollow_user(request, course_id, followed_user_id):
     followed_user = cc.User.find(followed_user_id)
     user.unfollow(followed_user)
     return JsonResponse({})
-
-
-@require_GET
-def search_similar_threads(request, course_id, commentable_id):
-    """
-    given a course id and commentable id, run query given in text get param
-    of request
-    """
-    text = request.GET.get('text', None)
-    if text:
-        query_params = {
-            'text': text,
-            'commentable_id': commentable_id,
-        }
-        threads = cc.search_similar_threads(course_id, recursive=False, query_params=query_params)
-    else:
-        theads = []
-    context = {'threads': map(utils.extend_content, threads)}
-    return JsonResponse({
-        'html': render_to_string('discussion/_similar_posts.html', context)
-    })
 
 
 @require_POST

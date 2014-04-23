@@ -14,31 +14,44 @@ define ["js/models/uploads"], (FileUpload) ->
             expect(@model.isValid()).toBeTruthy()
 
         it "is invalid for text files by default", ->
-            file = {"type": "text/plain"}
+            file = {"type": "text/plain", "name": "filename.txt"}
             @model.set("selectedFile", file);
             expect(@model.isValid()).toBeFalsy()
 
         it "is invalid for PNG files by default", ->
-            file = {"type": "image/png"}
+            file = {"type": "image/png", "name": "filename.png"}
             @model.set("selectedFile", file);
             expect(@model.isValid()).toBeFalsy()
 
         it "can accept a file type when explicitly set", ->
-            file = {"type": "image/png"}
+            file = {"type": "image/png", "name": "filename.png"}
             @model.set("mimeTypes": ["image/png"])
             @model.set("selectedFile", file)
             expect(@model.isValid()).toBeTruthy()
 
+        it "can accept a file format when explicitly set", ->
+            file = {"type": "", "name": "filename.png"}
+            @model.set("fileFormats": ["png"])
+            @model.set("selectedFile", file)
+            expect(@model.isValid()).toBeTruthy()
+
         it "can accept multiple file types", ->
-            file = {"type": "image/gif"}
+            file = {"type": "image/gif", "name": "filename.gif"}
             @model.set("mimeTypes": ["image/png", "image/jpeg", "image/gif"])
+            @model.set("selectedFile", file)
+            expect(@model.isValid()).toBeTruthy()
+
+        it "can accept multiple file formats", ->
+            file = {"type": "image/gif", "name": "filename.gif"}
+            @model.set("fileFormats": ["png", "jpeg", "gif"])
             @model.set("selectedFile", file)
             expect(@model.isValid()).toBeTruthy()
 
         describe "fileTypes", ->
           it "returns a list of the uploader's file types", ->
             @model.set('mimeTypes', ['image/png', 'application/json'])
-            expect(@model.fileTypes()).toEqual(['PNG', 'JSON'])
+            @model.set('fileFormats', ['gif', 'srt'])
+            expect(@model.fileTypes()).toEqual(['PNG', 'JSON', 'GIF', 'SRT'])
 
         describe "formatValidTypes", ->
           it "returns a map of formatted file types and extensions", ->

@@ -3,8 +3,7 @@ Unit page in Studio
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.query import SubQuery
-from bok_choy.promise import EmptyPromise, fulfill
+from bok_choy.promise import EmptyPromise, Promise
 
 from . import BASE_URL
 from .container import ContainerPage
@@ -21,16 +20,23 @@ class UnitPage(PageObject):
 
     @property
     def url(self):
-        """URL to the static pages UI in a course."""
+        """URL to the pages UI in a course."""
         return "{}/unit/{}".format(BASE_URL, self.unit_locator)
 
     def is_browser_on_page(self):
-        # Wait until all components have been loaded
-        number_of_leaf_xblocks = len(self.q(css='{} .xblock-student_view'.format(Component.BODY_SELECTOR)))
-        number_of_container_xblocks = len(self.q(css='{} .wrapper-xblock'.format(Component.BODY_SELECTOR)))
+
+        def _is_finished_loading():
+            # Wait until all components have been loaded
+            number_of_leaf_xblocks = len(self.q(css='{} .xblock-student_view'.format(Component.BODY_SELECTOR)).results)
+            number_of_container_xblocks = len(self.q(css='{} .wrapper-xblock'.format(Component.BODY_SELECTOR)).results)
+            is_done = len(self.q(css=Component.BODY_SELECTOR).results) == number_of_leaf_xblocks + number_of_container_xblocks
+            return (is_done, is_done)
+
+        # First make sure that an element with the view-unit class is present on the page,
+        # and then wait to make sure that the xblocks are all there
         return (
-            self.is_css_present('body.view-unit') and
-            len(self.q(css=Component.BODY_SELECTOR)) == number_of_leaf_xblocks + number_of_container_xblocks
+            self.q(css='body.view-unit').present and
+            Promise(_is_finished_loading, 'Finished rendering the xblocks in the unit.').fulfill()
         )
 
     @property
@@ -38,21 +44,24 @@ class UnitPage(PageObject):
         """
         Return a list of components loaded on the unit page.
         """
-        return self.q(css=Component.BODY_SELECTOR).map(lambda el: Component(self.browser, el['data-locator'])).results
+        return self.q(css=Component.BODY_SELECTOR).map(
+            lambda el: Component(self.browser, el.get_attribute('data-locator'))).results
 
     def edit_draft(self):
         """
         Started editing a draft of this unit.
         """
-        fulfill(EmptyPromise(
+        EmptyPromise(
             lambda: self.q(css='.create-draft').present,
             'Wait for edit draft link to be present'
-        ))
-        self.q(css='.create-draft').click()
-        fulfill(EmptyPromise(
+        ).fulfill()
+
+        self.q(css='.create-draft').first.click()
+
+        EmptyPromise(
             lambda: self.q(css='.editing-draft-alert').present,
             'Wait for draft mode to be activated'
-        ))
+        ).fulfill()
 
 
 class Component(PageObject):
@@ -69,7 +78,7 @@ class Component(PageObject):
         self.locator = locator
 
     def is_browser_on_page(self):
-        return self.is_css_present('{}[data-locator="{}"]'.format(self.BODY_SELECTOR, self.locator))
+        return self.q(css='{}[data-locator="{}"]'.format(self.BODY_SELECTOR, self.locator)).present
 
     def _bounded_selector(self, selector):
         """
@@ -83,7 +92,7 @@ class Component(PageObject):
 
     @property
     def name(self):
-        titles = self.css_text(self._bounded_selector(self.NAME_SELECTOR))
+        titles = self.q(css=self._bounded_selector(self.NAME_SELECTOR)).text
         if titles:
             return titles[0]
         else:
@@ -94,20 +103,17 @@ class Component(PageObject):
         return self._bounded_selector('.xblock-student_view')
 
     def edit(self):
-        self.css_click(self._bounded_selector('.edit-button'))
-        fulfill(EmptyPromise(
-            lambda: all(
-                self.q(css=self._bounded_selector('.component-editor'))
-                    .map(lambda el: el.visible)
-                    .results
-                ),
-            "Verify that the editor for component {} has been expanded".format(self.locator)
-        ))
+        self.q(css=self._bounded_selector('.edit-button')).first.click()
+        EmptyPromise(
+            lambda: self.q(css='.xblock-studio_view').present,
+            'Wait for the Studio editor to be present'
+        ).fulfill()
+
         return self
 
     @property
     def editor_selector(self):
-        return self._bounded_selector('.xblock-studio_view')
+        return '.xblock-studio_view'
 
     def go_to_container(self):
         """

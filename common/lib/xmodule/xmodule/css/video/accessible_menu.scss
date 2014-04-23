@@ -48,7 +48,7 @@ $blue-s1: saturate($blue,15%);
         font-size: 14px;
         line-height: 23px;
 
-        &:hover {
+        &:hover, &:focus {
           color: $gray-d1;
         }
       }

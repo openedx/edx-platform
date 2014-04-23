@@ -2,7 +2,7 @@ define(["js/views/baseview", "underscore", "gettext", "js/views/feedback_prompt"
     function(BaseView, _, gettext, PromptView, NotificationView) {
 var AssetView = BaseView.extend({
   initialize: function() {
-    this.template = _.template($("#asset-tpl").text());
+    this.template = this.loadTemplate("asset");
     this.listenTo(this.model, "change:locked", this.updateLockState);
   },
   tagName: "tr",

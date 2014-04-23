@@ -4,7 +4,7 @@ Course navigation page object
 
 import re
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, fulfill_after
+from bok_choy.promise import EmptyPromise
 
 
 class CourseNavPage(PageObject):
@@ -15,7 +15,7 @@ class CourseNavPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.is_css_present('div.course-index')
+        return self.q(css='div.course-index').present
 
     @property
     def sections(self):
@@ -38,9 +38,7 @@ class CourseNavPage(PageObject):
         section_titles = self._section_titles()
 
         # Get the section titles for each chapter
-        for sec_index in range(len(section_titles)):
-
-            sec_title = section_titles[sec_index]
+        for sec_index, sec_title in enumerate(section_titles):
 
             if len(section_titles) < 1:
                 self.warning("Could not find subsections for '{0}'".format(sec_title))
@@ -60,7 +58,7 @@ class CourseNavPage(PageObject):
             ['Chemical Bonds Video', 'Practice Problems', 'Homework']
         """
         seq_css = 'ol#sequence-list>li>a>p'
-        return self.css_map(seq_css, self._clean_seq_titles)
+        return self.q(css=seq_css).map(self._clean_seq_titles).results
 
     def go_to_section(self, section_title, subsection_title):
         """
@@ -73,7 +71,7 @@ class CourseNavPage(PageObject):
         """
 
         # For test stability, disable JQuery animations (opening / closing menus)
-        self.disable_jquery_animations()
+        self.browser.execute_script("jQuery.fx.off = true;")
 
         # Get the section by index
         try:
@@ -85,7 +83,7 @@ class CourseNavPage(PageObject):
         # Click the section to ensure it's open (no harm in clicking twice if it's already open)
         # Add one to convert from list index to CSS index
         section_css = 'nav>div.chapter:nth-of-type({0})>h3>a'.format(sec_index + 1)
-        self.css_click(section_css)
+        self.q(css=section_css).first.click()
 
         # Get the subsection by index
         try:
@@ -101,8 +99,9 @@ class CourseNavPage(PageObject):
         )
 
         # Click the subsection and ensure that the page finishes reloading
-        with fulfill_after(self._on_section_promise(section_title, subsection_title)):
-            self.css_click(subsection_css)
+        self.q(css=subsection_css).first.click()
+        self._on_section_promise(section_title, subsection_title).fulfill()
+
 
     def go_to_sequential(self, sequential_title):
         """
@@ -126,14 +125,14 @@ class CourseNavPage(PageObject):
             # Click on the sequence item at the correct index
             # Convert the list index (starts at 0) to a CSS index (starts at 1)
             seq_css = "ol#sequence-list>li:nth-of-type({0})>a".format(seq_index + 1)
-            self.css_click(seq_css)
+            self.q(css=seq_css).first.click()
 
     def _section_titles(self):
         """
         Return a list of all section titles on the page.
         """
-        chapter_css = 'nav>div.chapter>h3>a'
-        return self.css_map(chapter_css, lambda el: el.text.strip())
+        chapter_css = 'nav > div.chapter > h3 > a'
+        return self.q(css=chapter_css).map(lambda el: el.text.strip()).results
 
     def _subsection_titles(self, section_index):
         """
@@ -148,10 +147,10 @@ class CourseNavPage(PageObject):
         # Otherwise, we need to get the HTML
         # It *would* make sense to always get the HTML, but unfortunately
         # the open tab has some child <span> tags that we don't want.
-        return self.css_map(
-            subsection_css,
-            lambda el: el.text.strip().split('\n')[0] if el.visible else el.html.strip()
-        )
+        return self.q(
+            css=subsection_css).map(
+            lambda el: el.text.strip().split('\n')[0] if el.is_displayed() else el.get_attribute('innerHTML').strip()
+        ).results
 
     def _on_section_promise(self, section_title, subsection_title):
         """
@@ -172,8 +171,8 @@ class CourseNavPage(PageObject):
         That's true right after we click the section/subsection, but not true in general
         (the user could go to a section, then expand another tab).
         """
-        current_section_list = self.css_text('nav>div.chapter.is-open>h3>a')
-        current_subsection_list = self.css_text('nav>div.chapter.is-open li.active>a>p')
+        current_section_list = self.q(css='nav>div.chapter.is-open>h3>a').text
+        current_subsection_list = self.q(css='nav>div.chapter.is-open li.active>a>p').text
 
         if len(current_section_list) == 0:
             self.warning("Could not find the current section")
@@ -196,4 +195,4 @@ class CourseNavPage(PageObject):
         """
         Clean HTML of sequence titles, stripping out span tags and returning the first line.
         """
-        return self.REMOVE_SPAN_TAG_RE.sub('', element.html).strip().split('\n')[0]
+        return self.REMOVE_SPAN_TAG_RE.sub('', element.get_attribute('innerHTML')).strip().split('\n')[0]

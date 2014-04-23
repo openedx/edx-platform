@@ -157,6 +157,26 @@
             });
         });
 
+        describe('YouTube API is not loaded', function () {
+            beforeEach(function () {
+                window.YT = undefined;
+
+                state = jasmine.initializePlayerYouTube('video.html');
+            });
+
+            it('callback, to be called after YouTube API loads, exists and is called', function () {
+                waitsFor(function () {
+                    return state.youtubeApiAvailable === true;
+                }, 'YouTube API is loaded', 3000);
+
+                runs(function () {
+                    // If YouTube API is not loaded, then the code will should create
+                    // a global callback that will be called by API once it is loaded.
+                    expect(window.onYouTubeIframeAPIReady).not.toBeUndefined();
+                });
+            });
+        });
+
         describe('YouTube video in FireFox will cue first', function () {
             var oldUserAgent;
 

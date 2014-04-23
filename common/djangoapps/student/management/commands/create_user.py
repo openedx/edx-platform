@@ -1,9 +1,12 @@
 from optparse import make_option
-from django.core.management.base import BaseCommand
-from student.models import CourseEnrollment, Registration
-from student.views import _do_create_account
-from django.contrib.auth.models import User
 
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
+from django.utils import translation
+
+from student.models import CourseEnrollment, Registration, create_comments_service_user
+from student.views import _do_create_account, AccountValidationError
 from track.management.tracked_command import TrackedCommand
 
 
@@ -36,7 +39,7 @@ class Command(TrackedCommand):
                     default=None,
                     help='Name, defaults to "user" in the email'),
         make_option('-p', '--password',
-                    metavar='NAME',
+                    metavar='PASSWORD',
                     dest='password',
                     default=None,
                     help='Password for user'),
@@ -51,7 +54,6 @@ class Command(TrackedCommand):
                     default=None,
                     help='course to enroll the user in (optional)'),
         make_option('-s', '--staff',
-                    metavar='COURSE_ID',
                     dest='staff',
                     default=False,
                     action='store_true',
@@ -74,17 +76,22 @@ class Command(TrackedCommand):
             'honor_code': u'true',
             'terms_of_service': u'true',
         }
-        create_account = _do_create_account(post_data)
-        if isinstance(create_account, tuple):
-            user = create_account[0]
+        # django.utils.translation.get_language() will be used to set the new
+        # user's preferred language.  This line ensures that the result will
+        # match this installation's default locale.  Otherwise, inside a
+        # management command, it will always return "en-us".
+        translation.activate(settings.LANGUAGE_CODE)
+        try:
+            user, profile, reg = _do_create_account(post_data)
             if options['staff']:
                 user.is_staff = True
                 user.save()
-            reg = Registration.objects.get(user=user)
             reg.activate()
             reg.save()
-        else:
-            print create_account
+            create_comments_service_user(user)
+        except AccountValidationError as e:
+            print e.message
             user = User.objects.get(email=options['email'])
         if options['course']:
             CourseEnrollment.enroll(user, options['course'], mode=options['mode'])
+        translation.deactivate()

@@ -3,7 +3,7 @@
 
 // extends - UI archetypes - xblock rendering
 %wrap-xblock {
-  margin: $baseline;
+  margin: ($baseline/2);
   border: 1px solid $gray-l4;
   border-radius: ($baseline/5);
   background: $white;
@@ -23,12 +23,12 @@
     border-radius: ($baseline/5) ($baseline/5) 0 0;
     min-height: ($baseline*2.5);
     background-color: $gray-l6;
+    padding: ($baseline/2) ($baseline/2) ($baseline/2) ($baseline);
 
     .header-details {
       @extend %cont-truncated;
       @extend %ui-justify-left-flex;
       @include ui-flexbox();
-      padding-left: flex-gutter();
       width: flex-grid(6,12);
       vertical-align: top;
     }
@@ -39,11 +39,6 @@
       width: flex-grid(6,12);
       vertical-align: top;
     }
-  }
-
-  // UI: xblock render
-  .xblock-render {
-    @extend %anim-fadeIn;
   }
 }
 
@@ -64,13 +59,19 @@
   .expand-collapse {
     @extend %expand-collapse;
     margin: 0 ($baseline/4);
-  }
+    height: ($baseline*1.25);
+    width: $baseline;
 
-  &.collapsed .xblock-render {
-    display: none;
+    &:focus {
+      outline: 0;
+    }
   }
 
   .action-view {
+
+    .action-button {
+      transition: none;
+    }
 
     .action-button-text {
       padding-right: ($baseline/5);

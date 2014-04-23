@@ -19,10 +19,6 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             category="about", parent_location=self.course.location,
             data="OOGIE BLOOGIE", display_name="overview"
         )
-        # The following XML course is closed; we're testing that
-        # an about page still appears when the course is already closed
-        self.xml_course_id = 'edX/detached_pages/2014'
-        self.xml_data = "about page 463139"
 
     def test_logged_in(self):
         self.setup_user()
@@ -36,6 +32,18 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    # The following XML test course (which lives at common/test/data/2014)
+    # is closed; we're testing that an about page still appears when
+    # the course is already closed
+    xml_course_id = 'edX/detached_pages/2014'
+
+    # this text appears in that course's about page
+    # common/test/data/2014/about/overview.html
+    xml_data = "about page 463139"
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
@@ -68,10 +76,6 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, ModuleStoreTes
             category="about", parent_location=self.course.location,
             data="OOGIE BLOOGIE", display_name="overview"
         )
-        # The following XML course is closed; we're testing that
-        # an about page still appears when the course is already closed
-        self.xml_course_id = 'edX/detached_pages/2014'
-        self.xml_data = "about page 463139"
 
     def test_enrollment_cap(self):
         """

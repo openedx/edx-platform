@@ -160,17 +160,12 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
                         {'template': template}, name=value),)
 
 
-if settings.PERFSTATS:
-    urlpatterns += (url(r'^reprofile$', 'lms.lib.perfstats.views.end_profile'),)
-
 # Multicourse wiki (Note: wiki urls must be above the courseware ones because of
 # the custom tab catch-all)
 if settings.WIKI_ENABLED:
     from wiki.urls import get_pattern as wiki_pattern
     from django_notify.urls import get_pattern as notify_pattern
 
-    # Note that some of these urls are repeated in course_wiki.course_nav. Make sure to update
-    # them together.
     urlpatterns += (
         # First we include views from course_wiki that we use to override the default views.
         # They come first in the urlpatterns so they get resolved first
@@ -399,6 +394,14 @@ if settings.FEATURES.get('CLASS_DASHBOARD'):
         # Json request data for metrics for particular section
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/problem_grade_distribution/(?P<section>\d+)$',
             'class_dashboard.views.section_problem_grade_distrib', name="section_problem_grade_distrib"),
+
+        # For listing students that opened a sub-section
+        url(r'^get_students_opened_subsection$',
+            'class_dashboard.dashboard_data.get_students_opened_subsection', name="get_students_opened_subsection"),
+
+        # For listing of students' grade per problem
+        url(r'^get_students_problem_grades$',
+            'class_dashboard.dashboard_data.get_students_problem_grades', name="get_students_problem_grades"),
     )
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -515,3 +518,9 @@ if settings.DEBUG:
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
+
+# display error page templates, for testing purposes
+urlpatterns += (
+    url(r'404', handler404),
+    url(r'500', handler500),
+)

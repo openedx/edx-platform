@@ -80,25 +80,48 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
         raise Http404("Invalid book index value: {0}".format(book_index))
     textbook = course.pdf_textbooks[book_index]
 
+    viewer_params = '&file='
+    current_url = ''
+
     if 'url' in textbook:
         textbook['url'] = remap_static_url(textbook['url'], course)
+        viewer_params += textbook['url']
+        current_url = textbook['url']
+
     # then remap all the chapter URLs as well, if they are provided.
+    current_chapter = None
     if 'chapters' in textbook:
         for entry in textbook['chapters']:
             entry['url'] = remap_static_url(entry['url'], course)
+        if chapter is not None:
+            current_chapter = textbook['chapters'][int(chapter) - 1]
+        else:
+            current_chapter = textbook['chapters'][0]
+        viewer_params += current_chapter['url']
+        current_url = current_chapter['url']
+
+    if page is not None:
+        viewer_params += '&amp;page={}'.format(page)
+
+    if request.GET.get('viewer','') == 'true':
+        template = 'pdf_viewer.html'
+    else:
+        template = 'static_pdfbook.html'
 
     return render_to_response(
-        'static_pdfbook.html',
+        template,
         {
             'book_index': book_index,
             'course': course,
             'textbook': textbook,
             'chapter': chapter,
             'page': page,
+            'viewer_params': viewer_params,
+            'current_chapter': current_chapter,
             'staff_access': staff_access,
+            'current_url': current_url,
         },
     )
-
 
 @login_required
 def html_index(request, course_id, book_index, chapter=None):

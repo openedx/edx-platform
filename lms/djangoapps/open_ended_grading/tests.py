@@ -45,7 +45,7 @@ class EmptyStaffGradingService(object):
         """
         Return a staff grading response that is missing a problem list key.
         """
-        return json.dumps({'success': True, 'error': 'No problems found.'})
+        return {'success': True, 'error': 'No problems found.'}
 
 
 def make_instructor(course, user_email):
@@ -62,10 +62,9 @@ class StudentProblemListMockQuery(object):
     def get_grading_status_list(self, *args, **kwargs):
         """
         Get a mock grading status list with locations from the open_ended test course.
-        @returns: json formatted grading status message.
+        @returns: grading status message dictionary.
         """
-        grading_status_list = json.dumps(
-            {
+        return {
                 "version": 1,
                 "problem_list": [
                     {
@@ -95,8 +94,6 @@ class StudentProblemListMockQuery(object):
                 ],
                 "success": True
             }
-        )
-        return grading_status_list
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

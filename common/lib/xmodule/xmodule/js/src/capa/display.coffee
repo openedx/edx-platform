@@ -5,6 +5,13 @@ class @Problem
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @url = @el.data('url')
+
+    # has_timed_out and has_response are used to ensure that are used to
+    # ensure that we wait a minimum of ~ 1s before transitioning the check
+    # button from disabled to enabled
+    @has_timed_out = false
+    @has_response = false
+
     @render()
 
   $: (selector) ->
@@ -20,7 +27,10 @@ class @Problem
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^=input_#{problem_prefix}_]")
     @$('div.action input:button').click @refreshAnswers
-    @$('div.action input.check').click @check_fd
+    @checkButton = @$('div.action input.check')
+    @checkButtonCheckText = @checkButton.val()
+    @checkButtonCheckingText = @checkButton.data('checking')
+    @checkButton.click @check_fd
     @$('div.action input.reset').click @reset
     @$('div.action button.show').click @show
     @$('div.action input.save').click @save
@@ -129,11 +139,13 @@ class @Problem
 
   render: (content) ->
     if content
+      @el.attr({'aria-busy': 'true', 'aria-live': 'off', 'aria-atomic': 'false'})
       @el.html(content)
       JavascriptLoader.executeModuleScripts @el, () =>
         @setupInputTypes()
         @bind()
         @queueing()
+      @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
@@ -199,9 +211,14 @@ class @Problem
       @check()
       return
 
+    @enableCheckButton false
+
     if not window.FormData
       alert "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads."
+      @enableCheckButton true
       return
+
+    timeout_id = @enableCheckButtonAfterTimeout()
 
     fd = new FormData()
 
@@ -226,7 +243,8 @@ class @Problem
             required_files.splice(required_files.indexOf(file.name), 1)
           if file.size > max_filesize
             file_too_large = true
-            errors.push 'Your file "' + file.name '" is too large (max size: ' + max_filesize/(1000*1000) + ' MB)'
+            max_size = max_filesize / (1000*1000)
+            errors.push "Your file #{file.name} is too large (max size: {max_size}MB)"
           fd.append(element.id, file)
         if element.files.length == 0
           file_not_selected = true
@@ -248,12 +266,17 @@ class @Problem
     @gentle_alert error_html
 
     abort_submission = file_too_large or file_not_selected or unallowed_file_submitted or required_files_not_submitted
+    if abort_submission
+      window.clearTimeout(timeout_id)
+      @enableCheckButton true
+      return
 
     settings =
       type: "POST"
       data: fd
       processData: false
       contentType: false
+      complete: @enableCheckButtonAfterResponse
       success: (response) =>
         switch response.success
           when 'incorrect', 'correct'
@@ -263,14 +286,17 @@ class @Problem
             @gentle_alert response.success
         Logger.log 'problem_graded', [@answers, response.contents], @id
 
-    if not abort_submission
-      $.ajaxWithPrefix("#{@url}/problem_check", settings)
+    $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
     if not @check_save_waitfor(@check_internal)
       @check_internal()
 
   check_internal: =>
+    @enableCheckButton false
+
+    timeout_id = @enableCheckButtonAfterTimeout()
+
     Logger.log 'problem_check', @answers
 
     # Segment.io
@@ -278,16 +304,19 @@ class @Problem
       problem_id: @id
       answers: @answers
 
-    $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
+    $.postWithPrefix("#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
+          window.SR.readElts($(response.contents).find('.status'))
           @render(response.contents)
           @updateProgress response
           if @el.hasClass 'showed'
             @el.removeClass 'showed'
+          @$('div.action input.check').focus()
         else
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
+    ).always(@enableCheckButtonAfterResponse)
 
   reset: =>
     Logger.log 'problem_reset', @answers
@@ -301,16 +330,34 @@ class @Problem
   show: =>
     if !@el.hasClass 'showed'
       Logger.log 'problem_show', problem: @id
+      answer_text = []
       $.postWithPrefix "#{@url}/problem_show", (response) =>
         answers = response.answers
         $.each answers, (key, value) =>
           if $.isArray(value)
             for choice in value
               @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
+              answer_text.push('<p>' + gettext('Answer:') + ' ' + value + '</p>')
           else
             answer = @$("#answer_#{key}, #solution_#{key}")
             answer.html(value)
             Collapsible.setCollapsibles(answer)
+
+            # Sometimes, `value` is just a string containing a MathJax formula.
+            # If this is the case, jQuery will throw an error in some corner cases
+            # because of an incorrect selector. We setup a try..catch so that
+            # the script doesn't break in such cases.
+            #
+            # We will fallback to the second `if statement` below, if an
+            # error is thrown by jQuery.
+            try
+                solution = $(value).find('.detailed-solution')
+            catch e
+                solution = {}
+            if solution.length
+              answer_text.push(solution)
+            else
+              answer_text.push('<p>' + gettext('Answer:') + ' ' + value + '</p>')
 
         # TODO remove the above once everything is extracted into its own
         # inputtype functions.
@@ -327,15 +374,19 @@ class @Problem
             MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
         `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
-        @$('.show-label').text gettext('Hide Answer(s)')
+        @$('.show-label').text gettext('Hide Answer')
+        @$('.show-label .sr').text gettext('Hide Answer')
         @el.addClass 'showed'
         @updateProgress response
+        window.SR.readElts(answer_text)
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
       @el.removeClass 'showed'
       `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
-      @$('.show-label').text gettext('Show Answer(s)')
+      @$('.show-label').text gettext('Show Answer')
+      @$('.show-label .sr').text gettext('Reveal Answer')
+      window.SR.readText(gettext('Answer hidden'))
 
       @el.find(".capa_inputtype").each (index, inputtype) =>
         display = @inputtypeDisplays[$(inputtype).attr('id')]
@@ -350,6 +401,7 @@ class @Problem
     alert_elem = "<div class='capa_alert'>" + msg + "</div>"
     @el.find('.action').after(alert_elem)
     @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
+    window.SR.readElts @el.find('.capa_alert')
 
   save: =>
     if not @check_save_waitfor(@save_internal)
@@ -484,6 +536,31 @@ class @Problem
 
       return display
 
+    cminput: (container) =>
+      element = $(container).find("textarea")
+      tabsize = element.data("tabsize")
+      mode = element.data("mode")
+      linenumbers = element.data("linenums")
+      spaces = Array(parseInt(tabsize) + 1).join(" ")
+      CodeMirror.fromTextArea element[0], {
+          lineNumbers: linenumbers
+          indentUnit: tabsize
+          tabSize: tabsize
+          mode: mode
+          matchBrackets: true
+          lineWrapping: true
+          indentWithTabs: false
+          smartIndent: false
+          extraKeys: {
+            "Esc": (cm) ->
+              $(".grader-status").focus()
+              return false
+            "Tab": (cm) ->
+              cm.replaceSelection(spaces, "end")
+              return false
+          }
+        }
+
   inputtypeShowAnswerMethods:
     choicegroup: (element, display, answers) =>
       element = $(element)
@@ -515,7 +592,7 @@ class @Problem
       #   'regions': '[[10,10], [30,30], [10, 30], [30, 10]]'
       # } }
       types =
-        rectangle: (coords) =>
+        rectangle: (ctx, coords) =>
           reg = /^\(([0-9]+),([0-9]+)\)-\(([0-9]+),([0-9]+)\)$/
           rects = coords.replace(/\s*/g, '').split(/;/)
 
@@ -531,7 +608,7 @@ class @Problem
           ctx.stroke()
           ctx.fill()
 
-        regions: (coords) =>
+        regions: (ctx, coords) =>
           parseCoords = (coords) =>
             reg = JSON.parse(coords)
 
@@ -576,11 +653,12 @@ class @Problem
       ctx.strokeStyle = "#FF0000";
       ctx.lineWidth = "2";
 
-      $.each answers, (key, answer) =>
-        $.each answer, (key, value) =>
-          types[key](value) if types[key]? and value
-
-      container.html(canvas)
+      if answers[id]
+        $.each answers[id], (key, value) =>
+          types[key](ctx, value) if types[key]? and value
+        container.html(canvas)
+      else
+        console.log "Answer is absent for image input with id=#{id}"
 
   inputtypeHideAnswerMethods:
     choicegroup: (element, display) =>
@@ -593,3 +671,29 @@ class @Problem
     choicetextgroup: (element, display) =>
       element = $(element)
       element.find("section[id^='forinput']").removeClass('choicetextgroup_show_correct')
+
+  enableCheckButton: (enable) =>
+    # Used to disable check button to reduce chance of accidental double-submissions.
+    if enable
+      @checkButton.removeClass 'is-disabled'
+      @checkButton.val(@checkButtonCheckText)
+    else
+      @checkButton.addClass 'is-disabled'
+      @checkButton.val(@checkButtonCheckingText)
+
+  enableCheckButtonAfterResponse: =>
+    @has_response = true
+    if not @has_timed_out
+      # Server has returned response before our timeout
+      @enableCheckButton false
+    else
+      @enableCheckButton true
+
+  enableCheckButtonAfterTimeout: =>
+    @has_timed_out = false
+    @has_response = false
+    enableCheckButton = () =>
+      @has_timed_out = true
+      if @has_response
+        @enableCheckButton true
+    window.setTimeout(enableCheckButton, 750)

@@ -105,7 +105,6 @@ section.wiki {
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) inset;
       font-family: $sans-serif;
       font-size: 12px;
-      outline: none;
       @include transition(border-color .1s linear 0s);
 
       &:-webkit-input-placholder {
@@ -324,6 +323,10 @@ section.wiki {
         height: 25px;
         margin-right: 3px;
         background: url(../images/wiki-icons.png) no-repeat;
+      }
+
+      [class^="icon-"] {
+        padding-right: ($baseline/4);
       }
 
       .icon-view,

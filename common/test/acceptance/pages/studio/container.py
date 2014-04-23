@@ -3,7 +3,7 @@ Container page in Studio
 """
 
 from bok_choy.page_object import PageObject
-
+from bok_choy.promise import Promise
 from . import BASE_URL
 
 
@@ -22,10 +22,18 @@ class ContainerPage(PageObject):
         return "{}/container/{}".format(BASE_URL, self.unit_locator)
 
     def is_browser_on_page(self):
-        # Wait until all components have been loaded
+
+        def _is_finished_loading():
+            # Wait until all components have been loaded
+            is_done = len(self.q(css=XBlockWrapper.BODY_SELECTOR).results) == len(
+                self.q(css='{} .xblock'.format(XBlockWrapper.BODY_SELECTOR)).results)
+            return (is_done, is_done)
+
+        # First make sure that an element with the view-container class is present on the page,
+        # and then wait to make sure that the xblocks are all there.
         return (
-            self.is_css_present('body.view-container') and
-            len(self.q(css=XBlockWrapper.BODY_SELECTOR)) == len(self.q(css='{} .xblock'.format(XBlockWrapper.BODY_SELECTOR)))
+            self.q(css='body.view-container').present and
+            Promise(_is_finished_loading, 'Finished rendering the xblock wrappers.').fulfill()
         )
 
     @property
@@ -33,7 +41,8 @@ class ContainerPage(PageObject):
         """
         Return a list of xblocks loaded on the container page.
         """
-        return self.q(css=XBlockWrapper.BODY_SELECTOR).map(lambda el: XBlockWrapper(self.browser, el['data-locator'])).results
+        return self.q(css=XBlockWrapper.BODY_SELECTOR).map(
+            lambda el: XBlockWrapper(self.browser, el.get_attribute('data-locator'))).results
 
 
 class XBlockWrapper(PageObject):
@@ -49,7 +58,7 @@ class XBlockWrapper(PageObject):
         self.locator = locator
 
     def is_browser_on_page(self):
-        return self.is_css_present('{}[data-locator="{}"]'.format(self.BODY_SELECTOR, self.locator))
+        return self.q(css='{}[data-locator="{}"]'.format(self.BODY_SELECTOR, self.locator)).present
 
     def _bounded_selector(self, selector):
         """
@@ -63,7 +72,7 @@ class XBlockWrapper(PageObject):
 
     @property
     def name(self):
-        titles = self.css_text(self._bounded_selector(self.NAME_SELECTOR))
+        titles = self.q(css=self._bounded_selector(self.NAME_SELECTOR)).text
         if titles:
             return titles[0]
         else:

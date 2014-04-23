@@ -60,8 +60,7 @@ def instructor_dashboard_2(request, course_id):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
-       is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
+    if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
         sections.append(_section_send_email(course_id, access, course))
 
     # Gate access to Metrics tab by featue flag and staff authorization
@@ -146,6 +145,7 @@ def _section_membership(course_id, access):
         'access': access,
         'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
         'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
+        'modify_beta_testers_button_url': reverse('bulk_beta_modify_access', kwargs={'course_id': course_id}),
         'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': course_id}),
         'modify_access_url': reverse('modify_access', kwargs={'course_id': course_id}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': course_id}),
@@ -194,7 +194,7 @@ def _section_data_download(course_id, access):
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_id}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_id}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
-        'list_grade_downloads_url': reverse('list_grade_downloads', kwargs={'course_id': course_id}),
+        'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': course_id}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_id}),
     }
     return section_data
@@ -241,6 +241,8 @@ def _section_metrics(course_id, access):
         'section_display_name': ('Metrics'),
         'access': access,
         'sub_section_display_name': get_section_display_name(course_id),
-        'section_has_problem': get_array_section_has_problem(course_id)
+        'section_has_problem': get_array_section_has_problem(course_id),
+        'get_students_opened_subsection_url': reverse('get_students_opened_subsection'),
+        'get_students_problem_grades_url': reverse('get_students_problem_grades'),
     }
     return section_data

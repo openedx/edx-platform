@@ -4,14 +4,13 @@
 ## These files assume that several libraries are available and bound to
 ## variables in the global context, so we load those libraries with requirejs
 ## and attach them to the global context manually.
-define(["jquery", "underscore", "youtube", "mathjax", "codemirror", "tinymce",
+define(["jquery", "underscore", "mathjax", "codemirror", "tinymce",
         "jquery.tinymce", "jquery.qtip", "jquery.scrollTo", "jquery.flot",
         "jquery.cookie",
         "utility"],
-       function($, _, YT, MathJax, CodeMirror, tinymce) {
+       function($, _, MathJax, CodeMirror, tinymce) {
     window.$ = $;
     window._ = _;
-    window.YT = YT;
     window.MathJax = MathJax;
     window.CodeMirror = CodeMirror;
     window.RequireJS = {

@@ -124,6 +124,8 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         self.context = {'id': '1',
                         'choices': choices,
                         'status': 'correct',
+                        'status_class': 'correct',
+                        'status_display': u'correct',
                         'label': 'test',
                         'input_type': 'checkbox',
                         'name_array_suffix': '1',
@@ -136,13 +138,13 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         (not a particular option) is marked correct.
         """
 
-        self.context['status'] = 'correct'
+        self.context['status'] = self.context['status_class'] = self.context['status_display'] = 'correct'
         self.context['input_type'] = 'checkbox'
         self.context['value'] = ['1', '2']
 
         # Should mark the entire problem correct
         xml = self.render_to_xml(self.context)
-        xpath = "//div[@class='indicator_container']/span[@class='correct']"
+        xpath = "//div[@class='indicator_container']/span[@class='status correct']"
         self.assert_has_xpath(xml, xpath, self.context)
 
         # Should NOT mark individual options
@@ -158,19 +160,19 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         (not a particular option) is marked incorrect.
         """
         conditions = [
-            {'status': 'incorrect', 'input_type': 'radio', 'value': ''},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': []},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': ['2']},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': ['2', '3']},
-            {'status': 'incomplete', 'input_type': 'radio', 'value': ''},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': []},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': ['2']},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': ['2', '3']}]
+            {'status': 'incorrect', 'input_type': 'radio', 'value': '', 'status_class': 'incorrect'},
+            {'status': 'incorrect', 'input_type': 'checkbox', 'value': [], 'status_class': 'incorrect'},
+            {'status': 'incorrect', 'input_type': 'checkbox', 'value': ['2'], 'status_class': 'incorrect'},
+            {'status': 'incorrect', 'input_type': 'checkbox', 'value': ['2', '3'], 'status_class': 'incorrect'},
+            {'status': 'incomplete', 'input_type': 'radio', 'value': '', 'status_class': 'incorrect'},
+            {'status': 'incomplete', 'input_type': 'checkbox', 'value': [], 'status_class': 'incorrect'},
+            {'status': 'incomplete', 'input_type': 'checkbox', 'value': ['2'], 'status_class': 'incorrect'},
+            {'status': 'incomplete', 'input_type': 'checkbox', 'value': ['2', '3'], 'status_class': 'incorrect'}]
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
             xml = self.render_to_xml(self.context)
-            xpath = "//div[@class='indicator_container']/span[@class='incorrect']"
+            xpath = "//div[@class='indicator_container']/span[@class='status incorrect']"
             self.assert_has_xpath(xml, xpath, self.context)
 
             # Should NOT mark individual options
@@ -188,21 +190,21 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         (not a particular option) is marked unanswered.
         """
         conditions = [
-            {'status': 'unsubmitted', 'input_type': 'radio', 'value': ''},
-            {'status': 'unsubmitted', 'input_type': 'radio', 'value': []},
-            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': []},
+            {'status': 'unsubmitted', 'input_type': 'radio', 'value': '', 'status_class': 'unanswered'},
+            {'status': 'unsubmitted', 'input_type': 'radio', 'value': [], 'status_class': 'unanswered'},
+            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': [], 'status_class': 'unanswered'},
             {'input_type': 'radio', 'value': ''},
             {'input_type': 'radio', 'value': []},
             {'input_type': 'checkbox', 'value': []},
             {'input_type': 'checkbox', 'value': ['1']},
             {'input_type': 'checkbox', 'value': ['1', '2']}]
 
-        self.context['status'] = 'unanswered'
+        self.context['status'] = self.context['status_class'] = 'unanswered'
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
             xml = self.render_to_xml(self.context)
-            xpath = "//div[@class='indicator_container']/span[@class='unanswered']"
+            xpath = "//div[@class='indicator_container']/span[@class='status unanswered']"
             self.assert_has_xpath(xml, xpath, self.context)
 
             # Should NOT mark individual options
@@ -244,7 +246,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             {'input_type': 'radio', 'value': '2'},
             {'input_type': 'radio', 'value': ['2']}]
 
-        self.context['status'] = 'incorrect'
+        self.context['status'] = self.context['status_class'] = 'incorrect'
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
@@ -268,16 +270,16 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         """
 
         conditions = [
-            {'input_type': 'radio', 'status': 'correct', 'value': ''},
-            {'input_type': 'radio', 'status': 'correct', 'value': '2'},
-            {'input_type': 'radio', 'status': 'correct', 'value': ['2']},
-            {'input_type': 'radio', 'status': 'incorrect', 'value': '2'},
-            {'input_type': 'radio', 'status': 'incorrect', 'value': []},
-            {'input_type': 'radio', 'status': 'incorrect', 'value': ['2']},
-            {'input_type': 'checkbox', 'status': 'correct', 'value': []},
-            {'input_type': 'checkbox', 'status': 'correct', 'value': ['2']},
-            {'input_type': 'checkbox', 'status': 'incorrect', 'value': []},
-            {'input_type': 'checkbox', 'status': 'incorrect', 'value': ['2']}]
+            {'input_type': 'radio', 'status': 'correct', 'value': '', 'status_class': 'correct'},
+            {'input_type': 'radio', 'status': 'correct', 'value': '2', 'status_class': 'correct'},
+            {'input_type': 'radio', 'status': 'correct', 'value': ['2'], 'status_class': 'correct'},
+            {'input_type': 'radio', 'status': 'incorrect', 'value': '2', 'status_class': 'incorrect'},
+            {'input_type': 'radio', 'status': 'incorrect', 'value': [], 'status_class': 'incorrect'},
+            {'input_type': 'radio', 'status': 'incorrect', 'value': ['2'], 'status_class': 'incorrect'},
+            {'input_type': 'checkbox', 'status': 'correct', 'value': [], 'status_class': 'correct'},
+            {'input_type': 'checkbox', 'status': 'correct', 'value': ['2'], 'status_class': 'correct'},
+            {'input_type': 'checkbox', 'status': 'incorrect', 'value': [], 'status_class': 'incorrect'},
+            {'input_type': 'checkbox', 'status': 'incorrect', 'value': ['2'], 'status_class': 'incorrect'}]
 
         self.context['show_correctness'] = 'never'
         self.context['submitted_message'] = 'Test message'
@@ -287,10 +289,10 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             xml = self.render_to_xml(self.context)
 
             # Should NOT mark the entire problem correct/incorrect
-            xpath = "//div[@class='indicator_container']/span[@class='correct']"
+            xpath = "//div[@class='indicator_container']/span[@class='status correct']"
             self.assert_no_xpath(xml, xpath, self.context)
 
-            xpath = "//div[@class='indicator_container']/span[@class='incorrect']"
+            xpath = "//div[@class='indicator_container']/span[@class='status incorrect']"
             self.assert_no_xpath(xml, xpath, self.context)
 
             # Should NOT mark individual options
@@ -353,6 +355,8 @@ class TextlineTemplateTest(TemplateTestCase):
     def setUp(self):
         self.context = {'id': '1',
                         'status': 'correct',
+                        'status_class': 'correct',
+                        'status_display': u'correct',
                         'label': 'test',
                         'value': '3',
                         'preprocessor': None,
@@ -369,7 +373,7 @@ class TextlineTemplateTest(TemplateTestCase):
             base_context = self.context.copy()
             base_context.update(context)
             xml = self.render_to_xml(base_context)
-            xpath = "//section[@class='%s']" % css_class
+            xpath = "//div[@class='%s']" % css_class
             self.assert_has_xpath(xml, xpath, self.context)
 
     def test_status(self):
@@ -380,6 +384,8 @@ class TextlineTemplateTest(TemplateTestCase):
 
         for (context_status, div_class, status_mark) in cases:
             self.context['status'] = context_status
+            self.context['status_class'] = div_class
+            self.context['status_display'] = status_mark
             xml = self.render_to_xml(self.context)
 
             # Expect that we get a <div> with correct class
@@ -456,6 +462,7 @@ class TextlineTemplateTest(TemplateTestCase):
 
         for (context_status, div_class) in cases:
             self.context['status'] = context_status
+            self.context['status_class'] = div_class
             xml = self.render_to_xml(self.context)
 
             # Expect that we get a <div> with correct class
@@ -481,6 +488,8 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
             'id': 2,
             'value': 'PREFILLED_VALUE',
             'status': 'unsubmitted',
+            'status_class': 'unanswered',
+            'status_display': u'unsubmitted',
             'label': 'test',
             'previewer': 'file.js',
             'reported_status': 'REPORTED_STATUS',
@@ -517,6 +526,8 @@ class AnnotationInputTemplateTest(TemplateTestCase):
                         'has_options_value': False,
                         'debug': False,
                         'status': 'unsubmitted',
+                        'status_class': 'unanswered',
+                        'status_display': u'unsubmitted',
                         'return_to_annotation': False,
                         'msg': '<p>This is a test message</p>', }
         super(AnnotationInputTemplateTest, self).setUp()
@@ -673,7 +684,15 @@ class OptionInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'optioninput.html'
 
     def setUp(self):
-        self.context = {'id': 2, 'options': [], 'status': 'unsubmitted', 'label': 'test', 'value': 0}
+        self.context = {
+            'id': 2,
+            'options': [],
+            'status': 'unsubmitted',
+            'status_class': 'unanswered',
+            'status_display': u'unanswered',
+            'label': 'test',
+            'value': 0
+        }
         super(OptionInputTemplateTest, self).setUp()
 
     def test_select_options(self):
@@ -704,13 +723,14 @@ class OptionInputTemplateTest(TemplateTestCase):
 
         # Test cases, where each tuple represents
         # `(input_status, expected_css_class)`
-        test_cases = [('unsubmitted', 'unanswered'),
-                      ('correct', 'correct'),
-                      ('incorrect', 'incorrect'),
-                      ('incomplete', 'incorrect')]
+        test_cases = [('unsubmitted', 'status unanswered'),
+                      ('correct', 'status correct'),
+                      ('incorrect', 'status incorrect'),
+                      ('incomplete', 'status incorrect')]
 
         for (input_status, expected_css_class) in test_cases:
             self.context['status'] = input_status
+            self.context['status_class'] = expected_css_class.split(' ')[1]
             xml = self.render_to_xml(self.context)
 
             xpath = "//span[@class='{0}']".format(expected_css_class)
@@ -795,6 +815,8 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         self.context = {'id': '1',
                         'choices': choices,
                         'status': 'correct',
+                        'status_class': 'correct',
+                        'status_display': u'correct',
                         'input_type': 'radio',
                         'label': 'choicetext label',
                         'value': self.VALUE_DICT}
@@ -826,7 +848,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
 
         # Should mark the entire problem correct
         xml = self.render_to_xml(self.context)
-        xpath = "//div[@class='indicator_container']/span[@class='correct']"
+        xpath = "//div[@class='indicator_container']/span[@class='status correct']"
         self.assert_has_xpath(xml, xpath, self.context)
 
         # Should NOT mark individual options
@@ -841,19 +863,19 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         (not a particular option) is marked incorrect"""
         grouping_tags = {'radio': 'label', 'checkbox': 'section'}
         conditions = [
-            {'status': 'incorrect', 'input_type': 'radio', 'value': {}},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': self.VALUE_DICT},
-            {'status': 'incomplete', 'input_type': 'radio', 'value': {}},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': self.VALUE_DICT}]
+            {'status': 'incorrect', 'status_class': 'incorrect', 'input_type': 'radio', 'value': {}},
+            {'status': 'incorrect', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
+            {'status': 'incorrect', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
+            {'status': 'incorrect', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.VALUE_DICT},
+            {'status': 'incomplete', 'status_class': 'incorrect', 'input_type': 'radio', 'value': {}},
+            {'status': 'incomplete', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
+            {'status': 'incomplete', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
+            {'status': 'incomplete', 'status_class': 'incorrect', 'input_type': 'checkbox', 'value': self.VALUE_DICT}]
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
             xml = self.render_to_xml(self.context)
-            xpath = "//div[@class='indicator_container']/span[@class='incorrect']"
+            xpath = "//div[@class='indicator_container']/span[@class='status incorrect']"
             self.assert_has_xpath(xml, xpath, self.context)
 
             # Should NOT mark individual options
@@ -880,11 +902,12 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX}]
 
         self.context['status'] = 'unanswered'
+        self.context['status_class'] = 'unanswered'
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
             xml = self.render_to_xml(self.context)
-            xpath = "//div[@class='indicator_container']/span[@class='unanswered']"
+            xpath = "//div[@class='indicator_container']/span[@class='status unanswered']"
             self.assert_has_xpath(xml, xpath, self.context)
 
             # Should NOT mark individual options

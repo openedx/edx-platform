@@ -5,7 +5,7 @@ Settings for bok choy tests
 import os
 from path import path
 
-CONFIG_ROOT = path(__file__).abspath().dirname()  #pylint: disable=E1120
+CONFIG_ROOT = path(__file__).abspath().dirname()  # pylint: disable=E1120
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
 ########################## Prod-like settings ###################################
@@ -22,7 +22,7 @@ from .aws import *  # pylint: disable=W0401, W0614
 
 ######################### Testing overrides ####################################
 
-# Needed for the `reset_db` management command
+# Needed for the reset database management command
 INSTALLED_APPS += ('django_extensions',)
 
 # Redirect to the test_root folder within the repo

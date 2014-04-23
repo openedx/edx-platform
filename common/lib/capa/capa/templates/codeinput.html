@@ -1,64 +1,41 @@
 <%! from django.utils.translation import ugettext as _ %>
-<section id="textbox_${id}" class="textbox">
+<section id="textbox_${id}" class="capa_inputtype textbox cminput">
   <textarea rows="${rows}" cols="${cols}" name="input_${id}" 
             aria-label="${_("{programming_language} editor").format(programming_language=mode)}" 
             aria-describedby="answer_${id}" 
             id="input_${id}" 
             tabindex="0"
-       % if hidden:
+            data-mode="${mode}"
+            data-tabsize="${tabsize}"
+            % if linenumbers:
+            data-linenums="true"
+            % endif
+            % if hidden:
       	    style="display:none;"
-       % endif
+            % endif
   >${value|h}</textarea>
 
-  <div class="grader-status" tabindex="1">
-    % if status == 'unsubmitted':
-      <span class="unanswered" style="display:inline-block;" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: </span>Unanswered</span>
-    % elif status == 'correct':
-      <span class="correct" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: </span>Correct</span>
-    % elif status == 'incorrect':
-      <span class="incorrect" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: </span>Incorrect</span>
-    % elif status == 'queued':
-      <span class="processing" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: </span>Queued</span>
-      <span style="display:none;" class="xqueue" id="${id}" >${queue_len}</span>
+  <div class="grader-status" tabindex="-1">
+      <span id="status_${id}"
+            class="${status_class}"
+            aria-describedby="input_${id}"
+      >
+          <span class="status sr">${status_display}</span>
+      </span>
+    % if status == 'queued':
+      <span style="display:none;" class="xqueue" id="${id}">${queue_len}</span>
     % endif
 
     % if hidden:
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
 
-    <p class="debug">${status}</p>
+    <p class="debug">${status_display}</p>
   </div>
 
   <span id="answer_${id}"></span>
 
-  <div class="external-grader-message">
+  <div class="external-grader-message" aria-live="polite">
     ${msg|n}
   </div>
-
-  <script>
-    // Note: We need to make the area follow the CodeMirror for this to work.
-    $(function(){
-      var cm = CodeMirror.fromTextArea(document.getElementById("input_${id}"), {
-        % if linenumbers == 'true':
-        lineNumbers: true,
-        % endif
-        mode: "${mode}",
-        matchBrackets: true,
-        lineWrapping: true,
-        indentUnit: "${tabsize}",
-        tabSize: "${tabsize}",
-        indentWithTabs: false,
-        extraKeys: {
-            "Esc": function(cm) {
-                $('.grader-status').focus();
-                return false;
-            },
-            "Tab": function(cm) {
-                cm.replaceSelection("${' '*tabsize}", "end");
-            }
-        },
-        smartIndent: false
-      });
-    });
-  </script>
 </section>

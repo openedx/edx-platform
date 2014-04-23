@@ -34,6 +34,7 @@ from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTOR
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xmodule.modulestore.xml import LocationReader
+from xmodule.tabs import StaticTab, CourseTabList
 from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
@@ -484,8 +485,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         data_dir = getattr(item, 'data_dir', location.course)
         root = self.fs_root / data_dir
 
-        if not root.isdir():
-            root.mkdir()
+        root.makedirs_p()  # create directory if it doesn't exist
 
         resource_fs = OSFS(root)
 
@@ -709,13 +709,12 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # TODO move this special casing to app tier (similar to attaching new element to parent)
         if location.category == 'static_tab':
             course = self._get_course_for_item(location)
-            existing_tabs = course.tabs or []
-            existing_tabs.append({
-                'type': 'static_tab',
-                'name': new_object.display_name,
-                'url_slug': new_object.location.name
-            })
-            course.tabs = existing_tabs
+            course.tabs.append(
+                StaticTab(
+                    name=new_object.display_name,
+                    url_slug=new_object.location.name,
+                )
+            )
             self.update_item(course)
 
         return new_object
@@ -798,13 +797,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
             if xblock.category == 'static_tab':
                 course = self._get_course_for_item(xblock.location)
                 # find the course's reference to this tab and update the name.
-                for tab in course.tabs:
-                    if tab.get('url_slug') == xblock.location.name:
-                        # only update if changed
-                        if tab['name'] != xblock.display_name:
-                            tab['name'] = xblock.display_name
-                            self.update_item(course, user)
-                            break
+                static_tab = CourseTabList.get_tab_by_slug(course.tabs, xblock.location.name)
+                # only update if changed
+                if static_tab and static_tab['name'] != xblock.display_name:
+                    static_tab['name'] = xblock.display_name
+                    self.update_item(course, user)
 
             # recompute (and update) the metadata inheritance tree which is cached
             # was conditional on children or metadata having changed before dhm made one update to rule them all

@@ -1,4 +1,5 @@
-#pylint: disable=E1101
+# -*- coding: utf-8 -*-
+# pylint: disable=E1101
 
 import json
 import mock
@@ -142,7 +143,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.check_components_on_page(
             ADVANCED_COMPONENT_TYPES,
             ['Word cloud', 'Annotation', 'Text Annotation', 'Video Annotation',
-             'Open Response Assessment', 'Peer Grading Interface'],
+             'Open Response Assessment', 'Peer Grading Interface', 'openassessment'],
         )
 
     def test_advanced_components_require_two_clicks(self):
@@ -399,23 +400,34 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         course = module_store.get_item(course_location)
 
-        # reverse the ordering
-        reverse_tabs = []
+        # reverse the ordering of the static tabs
+        reverse_static_tabs = []
+        built_in_tabs = []
         for tab in course.tabs:
             if tab['type'] == 'static_tab':
-                reverse_tabs.insert(0, unicode(self._get_tab_locator(course, tab)))
+                reverse_static_tabs.insert(0, tab)
+            else:
+                built_in_tabs.append(tab)
 
-        self.client.ajax_post(new_location.url_reverse('tabs'), {'tabs': reverse_tabs})
+        # create the requested tab_id_locators list
+        tab_id_locators = [
+            {
+                'tab_id': tab.tab_id
+            } for tab in built_in_tabs
+        ]
+        tab_id_locators.extend([
+            {
+                'tab_locator': unicode(self._get_tab_locator(course, tab))
+            } for tab in reverse_static_tabs
+        ])
+
+        self.client.ajax_post(new_location.url_reverse('tabs'), {'tabs': tab_id_locators})
 
         course = module_store.get_item(course_location)
 
         # compare to make sure that the tabs information is in the expected order after the server call
-        course_tabs = []
-        for tab in course.tabs:
-            if tab['type'] == 'static_tab':
-                course_tabs.append(unicode(self._get_tab_locator(course, tab)))
-
-        self.assertEqual(reverse_tabs, course_tabs)
+        new_static_tabs = [tab for tab in course.tabs if (tab['type'] == 'static_tab')]
+        self.assertEqual(reverse_static_tabs, new_static_tabs)
 
     def test_static_tab_deletion(self):
         module_store, course_location, _ = self._create_static_tabs()
@@ -1423,6 +1435,15 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, _get_course_id(test_course_data)))
         return test_course_data
 
+    def assert_create_course_failed(self, error_message):
+        """
+        Checks that the course not created.
+        """
+        resp = self.client.ajax_post('/course', self.course_data)
+        self.assertEqual(resp.status_code, 400)
+        data = parse_json(resp)
+        self.assertEqual(data['error'], error_message)
+
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
@@ -1561,6 +1582,21 @@ class ContentStoreTest(ModuleStoreTestCase):
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             auth.add_users(self.user, CourseCreatorRole(), self.user)
             self.assert_created_course()
+
+    def test_create_course_with_unicode_in_id_disabled(self):
+        """
+        Test new course creation with feature setting: ALLOW_UNICODE_COURSE_ID disabled.
+        """
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ALLOW_UNICODE_COURSE_ID': False}):
+            error_message = "Special characters not allowed in organization, course number, and course run."
+            self.course_data['org'] = u'Юникода'
+            self.assert_create_course_failed(error_message)
+
+            self.course_data['number'] = u'échantillon'
+            self.assert_create_course_failed(error_message)
+
+            self.course_data['run'] = u'όνομα'
+            self.assert_create_course_failed(error_message)
 
     def assert_course_permission_denied(self):
         """
@@ -2073,7 +2109,7 @@ def _course_factory_create_course():
 
 def _get_course_id(test_course_data):
     """Returns the course ID (org/number/run)."""
-    return "{org}/{number}/{run}".format(**test_course_data)
+    return u"{org}/{number}/{run}".format(**test_course_data)
 
 
 def _test_no_locations(test, resp, status_code=200, html=True):

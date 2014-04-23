@@ -2,11 +2,11 @@
 Course Outline page in Studio.
 """
 from bok_choy.page_object import PageObject
-from bok_choy.query import SubQuery
-from bok_choy.promise import EmptyPromise, fulfill
+from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
 from .unit import UnitPage
+
 
 class CourseOutlineContainer(object):
     """
@@ -18,13 +18,19 @@ class CourseOutlineContainer(object):
     CHILD_CLASS = None
 
     def child(self, title, child_class=None):
+        """
+
+        :type self: object
+        """
         if not child_class:
             child_class = self.CHILD_CLASS
+
         return child_class(
             self.browser,
             self.q(css=child_class.BODY_SELECTOR).filter(
-                SubQuery(css=child_class.NAME_SELECTOR).filter(text=title)
-            )[0]['data-locator']
+                lambda el: title in [inner.text for inner in
+                                     el.find_elements_by_css_selector(child_class.NAME_SELECTOR)]
+            ).attrs('data-locator')[0]
         )
 
 
@@ -104,22 +110,24 @@ class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
         """
         Toggle the expansion of this subsection.
         """
-        self.disable_jquery_animations()
+        self.browser.execute_script("jQuery.fx.off = true;")
 
         def subsection_expanded():
             return all(
                 self.q(css=self._bounded_selector('.new-unit-item'))
-                    .map(lambda el: el.visible)
-                    .results
+                .map(lambda el: el.is_displayed())
+                .results
             )
 
         currently_expanded = subsection_expanded()
 
-        self.css_click(self._bounded_selector('.expand-collapse'))
-        fulfill(EmptyPromise(
+        self.q(css=self._bounded_selector('.expand-collapse')).first.click()
+
+        EmptyPromise(
             lambda: subsection_expanded() != currently_expanded,
-            "Check that the subsection {} has been toggled".format(self.locator),
-        ))
+            "Check that the subsection {} has been toggled".format(self.locator)
+        ).fulfill()
+
         return self
 
 
@@ -147,7 +155,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
     CHILD_CLASS = CourseOutlineSection
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-outline')
+        return self.q(css='body.view-outline').present
 
     def section(self, title):
         """

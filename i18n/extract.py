@@ -21,49 +21,68 @@ import os
 import os.path
 import logging
 import sys
+import argparse
 
 from path import path
 from polib import pofile
 
 from i18n.config import BASE_DIR, LOCALE_DIR, CONFIGURATION
-from i18n.execute import execute, create_dir_if_necessary, remove_file
+from i18n.execute import execute, remove_file
 from i18n.segment import segment_pofiles
 
 
 EDX_MARKER = "edX translation file"
-
 LOG = logging.getLogger(__name__)
+DEVNULL = open(os.devnull, 'wb')
+
 
 def base(path1, *paths):
     """Return a relative path from BASE_DIR to path1 / paths[0] / ... """
     return BASE_DIR.relpathto(path1.joinpath(*paths))
 
-def main():
+
+def main(verbosity=1):
+    """
+    Main entry point of script
+    """
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    create_dir_if_necessary(LOCALE_DIR)
+    LOCALE_DIR.parent.makedirs_p()
     source_msgs_dir = CONFIGURATION.source_messages_dir
     remove_file(source_msgs_dir.joinpath('django.po'))
 
     # Extract strings from mako templates.
-    babel_mako_cmd = 'pybabel extract -k ugettext_lazy -k _u -F {config} -c "Translators:" . -o {output}'
+    verbosity_map = {
+        0: "-q",
+        1: "",
+        2: "-v",
+    }
+    babel_verbosity = verbosity_map.get(verbosity, "")
+
+    babel_mako_cmd = 'pybabel {verbosity} -k ugettext_lazy -k _u extract -F {config} -c "Translators:" . -o {output}'
     babel_mako_cmd = babel_mako_cmd.format(
+        verbosity=babel_verbosity,
         config=base(LOCALE_DIR, 'babel_mako.cfg'),
         output=base(CONFIGURATION.source_messages_dir, 'mako.po'),
     )
-    execute(babel_mako_cmd, working_directory=BASE_DIR)
+    if verbosity:
+        stderr = None
+    else:
+        stderr = DEVNULL
 
-    makemessages = "django-admin.py makemessages -l en"
+    execute(babel_mako_cmd, working_directory=BASE_DIR, stderr=stderr)
+
+    makemessages = "django-admin.py makemessages -l en -v{}".format(verbosity)
     ignores = " ".join('--ignore="{}/*"'.format(d) for d in CONFIGURATION.ignore_dirs)
     if ignores:
         makemessages += " " + ignores
 
     # Extract strings from django source files, including .py files.
     make_django_cmd = makemessages + ' --extension html'
-    execute(make_django_cmd, working_directory=BASE_DIR)
+    execute(make_django_cmd, working_directory=BASE_DIR, stderr=stderr)
 
     # Extract strings from Javascript source files.
     make_djangojs_cmd = makemessages + ' -d djangojs --extension js'
-    execute(make_djangojs_cmd, working_directory=BASE_DIR)
+    execute(make_djangojs_cmd, working_directory=BASE_DIR, stderr=stderr)
 
     # makemessages creates 'django.po'. This filename is hardcoded.
     # Rename it to django-partial.po to enable merging into django.po later.
@@ -90,13 +109,14 @@ def main():
         output_file = source_msgs_dir / (app_name + ".po")
         files_to_clean.add(output_file)
 
-        babel_cmd = 'pybabel extract -F {config} -c "Translators:" {app} -o {output}'
+        babel_cmd = 'pybabel {verbosity} extract -F {config} -c "Translators:" {app} -o {output}'
         babel_cmd = babel_cmd.format(
+            verbosity=babel_verbosity,
             config=LOCALE_DIR / 'babel_third_party.cfg',
             app=app_name,
             output=output_file,
         )
-        execute(babel_cmd, working_directory=app_dir)
+        execute(babel_cmd, working_directory=app_dir, stderr=stderr)
 
     # Segment the generated files.
     segmented_files = segment_pofiles("en")
@@ -132,19 +152,23 @@ def fix_header(po):
     fixes = (
         ('SOME DESCRIPTIVE TITLE', EDX_MARKER),
         ('Translations template for PROJECT.', EDX_MARKER),
-        ('YEAR', '%s' % datetime.utcnow().year),
+        ('YEAR', str(datetime.utcnow().year)),
         ('ORGANIZATION', 'edX'),
         ("THE PACKAGE'S COPYRIGHT HOLDER", "EdX"),
-        ('This file is distributed under the same license as the PROJECT project.',
-         'This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.'),
-        ('This file is distributed under the same license as the PACKAGE package.',
-         'This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.'),
-        ('FIRST AUTHOR <EMAIL@ADDRESS>',
-         'EdX Team <info@edx.org>')
-        )
+        (
+            'This file is distributed under the same license as the PROJECT project.',
+            'This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.'
+        ),
+        (
+            'This file is distributed under the same license as the PACKAGE package.',
+            'This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.'
+        ),
+        ('FIRST AUTHOR <EMAIL@ADDRESS>', 'EdX Team <info@edx.org>'),
+    )
     for src, dest in fixes:
         header = header.replace(src, dest)
     po.header = header
+
 
 def fix_metadata(po):
     """
@@ -168,11 +192,12 @@ def fix_metadata(po):
         'PO-Revision-Date': datetime.utcnow(),
         'Report-Msgid-Bugs-To': 'openedx-translation@googlegroups.com',
         'Project-Id-Version': '0.1a',
-        'Language' : 'en',
-        'Last-Translator' : '',
+        'Language': 'en',
+        'Last-Translator': '',
         'Language-Team': 'openedx-translation <openedx-translation@googlegroups.com>',
     }
     po.metadata.update(fixes)
+
 
 def strip_key_strings(po):
     """
@@ -183,6 +208,7 @@ def strip_key_strings(po):
     del po[:]
     po += newlist
 
+
 def is_key_string(string):
     """
     returns True if string is a key string.
@@ -190,5 +216,10 @@ def is_key_string(string):
     """
     return len(string) > 1 and string[0] == '_'
 
+
 if __name__ == '__main__':
-    main()
+    # pylint: disable=invalid-name
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--verbose', '-v', action='count', default=0)
+    args = parser.parse_args()
+    main(verbosity=args.verbose)

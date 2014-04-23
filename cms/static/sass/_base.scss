@@ -754,10 +754,10 @@ hr.divide {
 .tooltip {
   @include font-size(12);
   @include transition(opacity $tmg-f3 ease-out 0s);
+  @extend %ui-depth5;
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 10000;
   padding: 0 10px;
   border-radius: 3px;
   background: rgba(0, 0, 0, 0.85);

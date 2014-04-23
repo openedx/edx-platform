@@ -39,7 +39,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
-from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_debug_info, wrap_xblock
+from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_markup, wrap_xblock
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
 
@@ -294,15 +294,8 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
                                                   position, wrap_xmodule_display, grade_bucket_type,
                                                   static_asset_path)
 
-    def publish(block, event, custom_user=None):
-        """A function that allows XModules to publish events. This only supports grade changes right now."""
-        if event.get('event_name') != 'grade':
-            return
-
-        if custom_user:
-            user_id = custom_user.id
-        else:
-            user_id = user.id
+    def handle_grade_event(block, event_type, event):
+        user_id = event.get('user_id', user.id)
 
         # Construct the key for the module
         key = KeyValueStore.Key(
@@ -334,6 +327,13 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             tags.append('type:%s' % grade_bucket_type)
 
         dog_stats_api.increment("lms.courseware.question_answered", tags=tags)
+
+    def publish(block, event_type, event):
+        """A function that allows XModules to publish events."""
+        if event_type == 'grade':
+            handle_grade_event(block, event_type, event)
+        else:
+            track_function(event_type, event)
 
     # Build a list of wrapping functions that will be applied in order
     # to the Fragment content coming out of the xblocks that are about to be rendered.
@@ -373,7 +373,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if has_access(user, descriptor, 'staff', course_id):
-            block_wrappers.append(partial(add_staff_debug_info, user))
+            block_wrappers.append(partial(add_staff_markup, user))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with

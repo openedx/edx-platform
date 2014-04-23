@@ -14,7 +14,8 @@ class CourseAboutPage(CoursePage):
     url_path = "about"
 
     def is_browser_on_page(self):
-        return self.is_css_present('section.course-info')
+        return self.q(css='section.course-info').present
+
 
     def register(self):
         """
@@ -22,7 +23,7 @@ class CourseAboutPage(CoursePage):
         Waits for the registration page to load, then
         returns the registration page object.
         """
-        self.css_click('a.register')
+        self.q(css='a.register').first.click()
 
         registration_page = RegisterPage(self.browser, self.course_id)
         registration_page.wait_for_page()

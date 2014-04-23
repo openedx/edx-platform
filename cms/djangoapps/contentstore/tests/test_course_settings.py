@@ -410,7 +410,7 @@ class CourseGradingTest(CourseTestCase):
         """
         Populate the course, grab a section, get the url for the assignment type access
         """
-        self.populateCourse()
+        self.populate_course()
         sections = get_modulestore(self.course_location).get_items(
             self.course_location.replace(category="sequential", name=None)
         )

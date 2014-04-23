@@ -8,18 +8,29 @@
 
 <%block name="bodyclass">courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
-    % if section_title: 
+    % if section_title:
 ${page_title_breadcrumbs(section_title, course_name())}
     % else:
 ${page_title_breadcrumbs(course_name())}
-    %endif 
+    %endif
 </title></%block>
+
+<%block name="header_extras">
+% for template_name in ["image-modal"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
+<%static:css group='style-vendor-tinymce-content'/>
+<%static:css group='style-vendor-tinymce-skin'/>
 
-<%block name="nav_skip">#course-content</%block>
+<%block name="nav_skip">${"#seq_content" if section_title else "#course-content"}</%block>
 
 <%include file="../discussion/_js_head_dependencies.html" />
 
@@ -37,10 +48,8 @@ ${page_title_breadcrumbs(course_name())}
   <script type="text/javascript" src="${static.url('js/vendor/jquery.scrollTo-1.4.2-min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery.ui.datepicker-ru.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/tiny_mce.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/jquery.tinymce.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/htmlmixed.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
   <script type="text/javascript">
     (function() {window.baseUrl = "${settings.STATIC_URL}";})(this);
   </script>
@@ -57,12 +66,6 @@ ${page_title_breadcrumbs(course_name())}
   % if staff_access:
   	<%include file="xqa_interface.html"/>
   % endif
-
-  <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
-  <script type="text/javascript">
-    document.write('\x3Cscript type="text/javascript" src="' +
-        document.location.protocol + '//www.youtube.com/iframe_api">\x3C/script>');
-  </script>
 
   <script type="text/javascript">
     var $$course_id = "${course.id}";
@@ -171,10 +174,6 @@ ${page_title_breadcrumbs(course_name())}
   </script>
 % endif
 
-<script type="text/template" id="image-modal-tpl">
-  <%static:include path="js/imageModal.underscore" />
-</script>
-
 ${fragment.foot_html()}
 
 </%block>
@@ -192,14 +191,14 @@ ${fragment.foot_html()}
 
 % if accordion:
   <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
- <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
+  <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 % endif
 
 <div class="container">
   <div class="course-wrapper">
 
 % if accordion:
-    <div class="course-index">
+    <div class="course-index" role="navigation">
       <header id="open_close_accordion">
         <a href="#">${_("close")}</a>
       </header>

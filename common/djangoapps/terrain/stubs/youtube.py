@@ -1,10 +1,26 @@
 """
 Stub implementation of YouTube for acceptance tests.
+
+
+To start this stub server on its own from Vagrant:
+
+1.) Locally, modify your Vagrantfile so that it contains:
+
+    config.vm.network :forwarded_port, guest: 8031, host: 8031
+
+2.) From within Vagrant dev environment do:
+
+    cd common/djangoapps/terrain
+    python -m stubs.start youtube 8031
+
+3.) Locally, try accessing http://localhost:8031/ and see that
+    you get "Unused url" message inside the browser.
 """
 
 from .http import StubHttpRequestHandler, StubHttpService
 import json
 import time
+import requests
 from urlparse import urlparse
 from collections import OrderedDict
 
@@ -60,6 +76,13 @@ class StubYouTubeHandler(StubHttpRequestHandler):
 
             self._send_video_response(youtube_id, "I'm youtube.")
 
+        elif 'get_youtube_api' in self.path:
+            if self.server.config.get('youtube_api_blocked'):
+                self.send_response(404, content='', headers={'Content-type': 'text/plain'})
+            else:
+                response = self.server.config['youtube_api_response']
+                self.send_response(200, content=response.text, headers={'Content-type': 'text/html'})
+
         else:
             self.send_response(
                 404, content="Unused url", headers={'Content-type': 'text/plain'}
@@ -75,11 +98,16 @@ class StubYouTubeHandler(StubHttpRequestHandler):
 
         # Construct the response content
         callback = self.get_params['callback']
+        youtube_metadata = json.loads(
+            requests.get(
+                "http://gdata.youtube.com/feeds/api/videos/{id}?v=2&alt=jsonc".format(id=youtube_id)
+            ).text
+        )
         data = OrderedDict({
             'data': OrderedDict({
                 'id': youtube_id,
                 'message': message,
-                'duration': 60 if youtube_id == 'OEoXaMPEzfM' else 77,
+                'duration': youtube_metadata['data']['duration'],
             })
         })
         response = "{cb}({data})".format(cb=callback, data=json.dumps(data))

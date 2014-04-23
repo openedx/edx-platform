@@ -26,7 +26,7 @@ from xblock.runtime import Mixologist
 
 from lms.lib.xblock.runtime import unquote_slashes
 
-from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_modulestore
+from contentstore.utils import get_lms_link_for_item, compute_publish_state, PublishState, get_modulestore
 from contentstore.views.helpers import get_parent_xblock
 
 from models.settings.course_grading import CourseGradingModel
@@ -65,6 +65,8 @@ else:
         'master_class',
         'graphical_slider_tool',
         'lti',
+        'concept',
+        'openassessment',  # edx-ora2
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
@@ -112,8 +114,8 @@ def subsection_handler(request, tag=None, package_id=None, branch=None, version_
         can_view_live = False
         subsection_units = item.get_children()
         for unit in subsection_units:
-            state = compute_unit_state(unit)
-            if state == UnitState.public or state == UnitState.draft:
+            state = compute_publish_state(unit)
+            if state in (PublishState.public, PublishState.draft):
                 can_view_live = True
                 break
 
@@ -287,7 +289,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
             ),
             'section': containing_section,
             'new_unit_category': 'vertical',
-            'unit_state': compute_unit_state(item),
+            'unit_state': compute_publish_state(item),
             'published_date': (
                 get_default_time_display(item.published_date)
                 if item.published_date is not None else None
@@ -320,13 +322,17 @@ def container_handler(request, tag=None, package_id=None, branch=None, version_g
         while parent and parent.category != 'sequential':
             ancestor_xblocks.append(parent)
             parent = get_parent_xblock(parent)
-
         ancestor_xblocks.reverse()
+
+        unit = ancestor_xblocks[0] if ancestor_xblocks else None
+        unit_publish_state = compute_publish_state(unit) if unit else None
 
         return render_to_response('container.html', {
             'context_course': course,
             'xblock': xblock,
             'xblock_locator': locator,
+            'unit': unit,
+            'unit_publish_state': unit_publish_state,
             'ancestor_xblocks': ancestor_xblocks,
         })
     else:

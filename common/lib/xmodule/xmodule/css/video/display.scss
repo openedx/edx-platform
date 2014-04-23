@@ -15,7 +15,6 @@ div.video {
   border-radius: 5px;
 
   &:focus, &:active, &:hover {
-    outline: 0;
     border: 0;
   }
 
@@ -59,7 +58,7 @@ div.video {
         padding: ($baseline*.75);
         color: $lighter-base-font-color;
 
-        &:hover {
+        &:hover, &:focus {
           background-color: $action-primary-active-bg;
           color: $very-light-text;
         }
@@ -167,7 +166,7 @@ div.video {
       color: #ccc;
       position: relative;
 
-      &:hover {
+      &:hover, &:focus {
         ul, div {
           opacity: 1;
         }
@@ -189,11 +188,10 @@ div.video {
         border-style: solid;
         border-color: #000;
 
-        &:hover {
+        &:hover, &:focus {
           background-color: #444;
           color: #fff;
           text-decoration: none;
-          outline: 0;
         }
 
         &:active,
@@ -254,7 +252,6 @@ div.video {
 
           &:focus, &:hover {
             background-color: lighten($pink, 10%);
-            outline: 0;
           }
         }
       }
@@ -320,7 +317,10 @@ div.video {
       div.secondary-controls {
         float: right;
 
-        div.speeds>a, div.volume>a, a.add-fullscreen, a.quality_control,
+        a.speed-button,
+        div.volume > a,
+        a.add-fullscreen,
+        a.quality-control,
         a.hide-subtitles {
           // overflow is used to bypass Firefox CSS :focus outline bug
           // http://johndoesdesign.com/blog/2012/css/firefox-and-its-css-focus-outline-bug/
@@ -337,7 +337,7 @@ div.video {
           float: left;
           position: relative;
 
-          &.open {
+          &.is-opened {
             .menu {
               display: block;
               opacity: 1;
@@ -373,14 +373,14 @@ div.video {
                 text-overflow: ellipsis;
                 white-space: nowrap;
 
-                &:hover {
+                &:hover, &:focus {
                   background-color: #666;
                   color: #aaa;
                   outline-offset: -4px;
                 }
               }
 
-              &.active{
+              &.is-active{
                 a {
                   font-weight: bold;
                 }
@@ -396,8 +396,8 @@ div.video {
         }
 
         div.speeds {
-          &.open {
-            & > a {
+          &.is-opened {
+            .speed-button {
               background-image: url('../images/open-arrow.png');
             }
           }
@@ -410,7 +410,7 @@ div.video {
             }
           }
 
-          & > a {
+          .speed-button {
             @extend %video-button;
             @include clearfix();
             background-image: url('../images/closed-arrow.png');
@@ -424,7 +424,7 @@ div.video {
               width: 60px;
             }
 
-            h3 {
+            .label {
               float: left;
               font-size: em(14);
               font-weight: normal;
@@ -439,7 +439,7 @@ div.video {
               }
             }
 
-            p.active {
+            .value {
               float: left;
               font-weight: bold;
               margin-bottom: 0;
@@ -536,11 +536,10 @@ div.video {
         }
 
 
-        a.quality_control {
+        a.quality-control {
           @extend %video-button;
           background: url(../images/hd.png) center no-repeat;
           border-left: none;
-          display: none;
           float: left;
           padding: 0 11px;
           width: 30px;
@@ -549,7 +548,10 @@ div.video {
             background-color: #F44;
             color: #0ff;
             text-decoration: none;
-            outline: 0;
+          }
+
+          &.is-hidden {
+            display: none !important;
           }
         }
 
@@ -610,7 +612,6 @@ div.video {
       margin-bottom: 8px;
       padding: 0;
       line-height: lh();
-      outline: 0;
 
       &.current {
         color: #333;
@@ -622,7 +623,7 @@ div.video {
         outline-offset: -1px;
       }
 
-      &:hover {
+      &:hover, &:focus {
         text-decoration: underline;
       }
 

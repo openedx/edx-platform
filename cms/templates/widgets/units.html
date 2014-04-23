@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<%! from contentstore.utils import compute_unit_state %>
+<%! from contentstore.utils import compute_publish_state %>
 <%! from xmodule.modulestore.django import loc_mapper %>
 <%! from django.utils.translation import ugettext as _ %>
 
@@ -26,7 +26,7 @@ This def will enumerate through a passed in subsection and list all of the units
     <%include file="_ui-dnd-indicator-before.html" />
 
     <%
-      unit_state = compute_unit_state(unit)
+      unit_state = compute_publish_state(unit)
       if unit.location == selected:
         selected_class = 'editing'
       else:

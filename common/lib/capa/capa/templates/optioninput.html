@@ -12,25 +12,12 @@
       % endfor
     </select>
 
-  <span id="answer_${id}"></span>
-
-  % if status == 'unsubmitted':
-  <span class="unanswered" style="display:inline-block;" id="status_${id}" aria-describedby="input_${id}">
-    <span class="sr">Status: unsubmitted</span>
+  <span id="answer_${id}"></span>  
+  <span class="status ${status_class}"
+      id="status_${id}"
+      aria-describedby="input_${id}">
+    <span class="sr">${value|h} - ${status_display}</span>
   </span>
-  % elif status == 'correct':
-  <span class="correct" id="status_${id}" aria-describedby="input_${id}">
-    <span class="sr">Status: correct</span>
-  </span>
-  % elif status == 'incorrect':
-  <span class="incorrect" id="status_${id}" aria-describedby="input_${id}">
-    <span class="sr">Status: incorrect</span>
-  </span>
-  % elif status == 'incomplete':
-  <span class="incorrect" id="status_${id}" aria-describedby="input_${id}">
-    <span class="sr">Status: incomplete</span>
-  </span>
-  % endif
 
   % if msg:
       <span class="message">${msg|n}</span>

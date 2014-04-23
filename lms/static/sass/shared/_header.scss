@@ -102,7 +102,7 @@ header.global {
           margin-right: 0px;
         }
 
-        &:hover, &:focus, &.active {
+        &:hover, &:focus, &:active {
           background: $button-bg-hover-color;
         }
       }

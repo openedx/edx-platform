@@ -1,80 +1,192 @@
 <%! from django.utils.translation import ugettext as _ %>
+
 <%page args="section_data"/>
 
 <script>
-	${d3_stacked_bar_graph.body()}
+  ${d3_stacked_bar_graph.body()}
 </script>
 
-  %if not any (section_data.values()):
-    <p>${_("There is no data available to display at this time.")}</p>
-  %else:
-    <%namespace name="d3_stacked_bar_graph" file="/class_dashboard/d3_stacked_bar_graph.js"/>
-    <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
+%if not any (section_data.values()):
+  <p>${_("There is no data available to display at this time.")}</p>
+%else:
+  <%namespace name="d3_stacked_bar_graph" file="/class_dashboard/d3_stacked_bar_graph.js"/>
+  <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
     
-    <h3 class="attention" id="graph_load">${_("Loading the latest graphs for you; depending on your class size, this may take a few minutes.")}</h3>
-    <input type="button" id="graph_reload" value="${_("Reload Graphs")}" />
+  <h3 class="attention" id="graph_load">${_("Loading the latest graphs for you; depending on your class size, this may take a few minutes.")}</h3>
+  <input type="button" id="graph_reload" value="${_("Reload Graphs")}" />
 
-    %for i in range(0,len(section_data['sub_section_display_name'])):
-        <div class="metrics-container" id="metrics_section_${i}">
-          <h2>${_("Section:")} ${section_data['sub_section_display_name'][i]}</h2>
-          <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
-          <div class="metrics-left" id="metric_opened_${i}">
-            <h3>${_("Count of Students Opened a Subsection")}</h3>
+  <!-- For each section with data, create the divs for displaying the graphs
+       and the popup window for listing the students
+  -->
+  %for i in range(0, len(section_data['sub_section_display_name'])):
+    <div class="metrics-container" id="metrics_section_${i}">
+      <h2>${_("Section:")} ${section_data['sub_section_display_name'][i]}</h2>
+      <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
+      <div class="metrics-section metrics-left" id="metric_opened_${i}">
+        <h3>${_("Count of Students Opened a Subsection")}</h3>
+      </div>
+      <div class="metrics-section metrics-right" id="metric_grade_${i}" data-section-has-problem=${section_data['section_has_problem'][i]}>
+        <h3>${_("Grade Distribution per Problem")}</h3>
+      </div>
+      <div class="metrics-overlay">
+        <div class="metrics-overlay-content-wrapper">
+          <div class="metrics-overlay-content">
+            <table>
+              <thead></thead>
+              <tbody></tbody>
+            </table>
           </div>
-          <div class="metrics-right" id="metric_grade_${i}" data-section-has-problem=${section_data['section_has_problem'][i]}>
-            <h3>${_("Grade Distribution per Problem")}</h3>
-          </div>
-        </div>
-    %endfor
-      <script>
-      	$(function () {
-      		var firstLoad = true;
+          <input class="download-csv metrics-student-opened" type="button" name="dump_student_opened" value="${_("Download Student Opened as a CSV")}" data-endpoint="${section_data['get_students_opened_subsection_url']}" data-csv="true">
+          <input class="download-csv metrics-student-grades" type="button" name="dump_student_grades" value="${_("Download Student Grades as a CSV")}" data-endpoint="${section_data['get_students_problem_grades_url']}" data-csv="true">
+          <a class="close-button" href="#"><i class="icon-remove"></i><span class="sr">${_("Close")}</span></a>
+      </div>
+      </div>
+    </div>
+  %endfor
+  <script>
+    $(function () {
+      var firstLoad = true;
 
-            loadGraphs = function() {
-              $('#graph_load').show();
-              $('#graph_reload').hide();
-              $('.loading').remove();
+      loadGraphs = function() {
+        $('#graph_load').show();
+        $('#graph_reload').hide();
+        $('.loading').remove();
 
-              var nothingText = "${_('There are no problems in this section.')}";
-              var loadingText = "${_('Loading...')}";
-      		  var nothingP = '<p class="nothing">' + nothingText  + '</p>';
-              var loading = '<p class="loading"><i class="icon-spinner icon-spin icon-large"></i>' + loadingText + '</p>';
+        var nothingText = "${_('There are no problems in this section.')}";
+        var loadingText = "${_('Loading...')}";
+        var nothingP = '<p class="nothing">' + nothingText  + '</p>';
+        var loading = '<p class="loading"><i class="icon-spinner icon-spin icon-large"></i>' + loadingText + '</p>';
 
-              $('.metrics-left').each(function() {
-                $(this).append(loading);
-              });
-              $('.metrics-right p.nothing').remove();
-              $('.metrics-right').each(function() {
-                if ($(this).data('section-has-problem') === "False") {
-                  $(this).append(nothingP);
-                } else {
-                  $(this).append(loading);
+        // Display spinners or "There are no problems in this section" message
+        $('.metrics-left').each(function() {
+          $(this).append(loading);
+        });
+        $('.metrics-right p.nothing').remove();
+        $('.metrics-right').each(function() {
+          if ($(this).data('section-has-problem') === "False") {
+            $(this).append(nothingP);
+          } else {
+            $(this).append(loading);
+          }
+        });
+        $('.metrics-left svg, .metrics-right svg').remove();
+
+        ${all_section_metrics.body("metric_opened_", "metric_grade_", "metric_attempts_", "metric_tooltip_", course.id)}
+	
+        setTimeout(function() {
+          $('#graph_load, #graph_reload').toggle();
+          $('.metrics-left .stacked-bar').on("click", function () {
+            var module_id = $('rect', this).attr('id');
+            var metrics_overlay = $(this).closest('.metrics-left').siblings('.metrics-overlay');
+			
+            // Set module_id attribute on metrics_overlay
+            metrics_overlay.data("module-id", module_id);
+			
+            var header = $(this).closest('.metrics-left').siblings('.metrics-tooltip').text();
+            var overlay_content = '<h3 class="metrics-overlay-title">' + header + '</h3>';
+            $('.metrics-overlay-content', metrics_overlay).before(overlay_content);
+
+            $.ajax({
+              url: "${section_data['get_students_opened_subsection_url']}",
+              type: "GET",
+              data: {module_id: module_id},
+              dataType: "json",
+
+              success: function(response) {
+                overlay_content = '<tr class="header"><th>${_("Name")}</th><th>${_("Username")}</th></tr>';
+                $('.metrics-overlay-content thead', metrics_overlay).append(overlay_content);
+					  
+                $.each(response.results, function(index, value ){
+                  overlay_content = '<tr><td>' + value['name'] + "</td><td>" + value['username'] + '</td></tr>';
+                  $('.metrics-overlay-content tbody', metrics_overlay).append(overlay_content);
+                });
+                // If student list too long, append message to screen.
+                if (response.max_exceeded) {
+                  overlay_content = '<p class="overflow-message">${_("This is a partial list, to view all students download as a csv.")}</p>';
+                  $('.metrics-overlay-content', metrics_overlay).after(overlay_content);
                 }
-              });
-              $('.metrics-left svg, .metrics-right svg').remove();
+              }
+            })
+            metrics_overlay.find('.metrics-student-opened').show();
+            metrics_overlay.show();
+          });
+		
+          $('.metrics-right .stacked-bar').on("click",function () {
+            var module_id = $('rect', this).attr('id');
+            var metrics_overlay = $(this).closest('.metrics-right').siblings('.metrics-overlay');
+			
+            //Set module_id attribute on metrics_overlay
+            metrics_overlay.data("module-id", module_id);
+			
+            var header = $(this).closest('.metrics-right').siblings('.metrics-tooltip').text();
+            var far_index = header.indexOf(' students (');
+            var near_index = header.substr(0, far_index).lastIndexOf(' ') + 1;
+            var title = header.substring(0, near_index -3);
+			
+            var overlay_content = '<h3 class="metrics-overlay-title">' + title + '</h3>';
+            $('.metrics-overlay-content', metrics_overlay).before(overlay_content);
 
-              ${all_section_metrics.body("metric_opened_","metric_grade_","metric_attempts_","metric_tooltip_",course.id)}
+            $.ajax({
+              url: "${section_data['get_students_problem_grades_url']}",
+              type: "GET",
+              data: {module_id: module_id},
+              dataType: "json",
 
-              setTimeout(function() {
-                $('#graph_load, #graph_reload').toggle();
-              }, 5000);
-            }
+              success: function(response) {
+                overlay_content = '<tr class="header"><th>${_("Name")}</th><th>${_("Username")}</th><th>${_("Grade")}</th><th>${_("Percent")}</th></tr>';
+                $('.metrics-overlay-content thead', metrics_overlay).append(overlay_content);
 
-         	$('.instructor-nav a').click(function () {
-				if ($(this).data('section') === "metrics" && firstLoad) {
-	      			loadGraphs();
-	      			firstLoad = false;
-	      		}
-	   		});
+                $.each(response.results, function(index, value ){
+                  overlay_content = '<tr><td>' + value['name'] + "</td><td>" + value['username'] + "</td><td>" + value['grade'] + "</td><td>" + value['percent'] + '</td></tr>';
+                  $('.metrics-overlay-content tbody', metrics_overlay).append(overlay_content);
+                });
+                // If student list too long, append message to screen.
+                if (response.max_exceeded) {
+                  overlay_content = '<p class="overflow-message">${_("This is a partial list, to view all students download as a csv.")}</p>';
+                  $('.metrics-overlay-content', metrics_overlay).after(overlay_content);
+                }
+              },
+            })
+            metrics_overlay.find('.metrics-student-grades').show();
+            metrics_overlay.show();
+          });
 
-            $('#graph_reload').click(function () {
-                loadGraphs();
-	   		});
+        }, 5000);
+      }
 
-	   		if (window.location.hash === "#view-metrics") {
-	   			$('.instructor-nav a[data-section="metrics"]').click();
-	   		}
-	   	});
-      </script>
+      $('.instructor-nav a').click(function () {
+        if ($(this).data('section') === "metrics" && firstLoad) {
+          loadGraphs();
+          firstLoad = false;
+        }
+      });
 
-  %endif
+      $('#graph_reload').click(function () {
+        loadGraphs();
+      });
+
+      if (window.location.hash === "#view-metrics") {
+        $('.instructor-nav a[data-section="metrics"]').click();
+      }
+    });
+    $('.metrics-overlay .close-button').click(function(event) {
+      event.preventDefault();
+      $('.metrics-overlay-content table thead, .metrics-overlay-content table tbody').empty();
+      $('.metrics-overlay-content-wrapper h3').remove();
+      $('.metrics-overlay-content-wrapper p').remove();
+      $(this).closest(".metrics-overlay").hide();
+      $('.metrics-overlay .download-csv').hide();
+    });
+  $('.metrics-overlay .download-csv').click(function(event) {
+
+    var module_id = $(this).closest('.metrics-overlay').data("module-id");       
+    var tooltip = $(this).closest('.metrics-container').children('.metrics-tooltip').text();
+    var attributes = '?module_id=' + module_id + '&tooltip=' + tooltip + '&csv=true';
+    var url = $(this).data("endpoint");
+    url += attributes;
+
+    return location.href = url;
+  });
+
+  </script>
+%endif

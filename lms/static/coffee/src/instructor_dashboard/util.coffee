@@ -42,47 +42,74 @@ create_task_list_table = ($table_tasks, tasks_data) ->
   columns = [
     id: 'task_type'
     field: 'task_type'
-    name: 'Task Type'
+    ###
+    Translators: a "Task" is a background process such as grading students or sending email
+    ###
+    name: gettext('Task Type')
     minWidth: 102
   ,
     id: 'task_input'
     field: 'task_input'
-    name: 'Task inputs'
+    ###
+    Translators: a "Task" is a background process such as grading students or sending email
+    ###
+    name: gettext('Task inputs')
     minWidth: 150
   ,
     id: 'task_id'
     field: 'task_id'
-    name: 'Task ID'
+    ###
+    Translators: a "Task" is a background process such as grading students or sending email
+    ###
+    name: gettext('Task ID')
     minWidth: 150
   ,
     id: 'requester'
     field: 'requester'
-    name: 'Requester'
+    ###
+    Translators: a "Requester" is a username that requested a task such as sending email
+    ###
+    name: gettext('Requester')
     minWidth: 80
   ,
     id: 'created'
     field: 'created'
-    name: 'Submitted'
+    ###
+    Translators: A timestamp of when a task (eg, sending email) was submitted appears after this
+    ###
+    name: gettext('Submitted')
     minWidth: 120
   ,
     id: 'duration_sec'
     field: 'duration_sec'
-    name: 'Duration (sec)'
+    ###
+    Translators: The length of a task (eg, sending email) in seconds appears this
+    ###
+    name: gettext('Duration (sec)')
     minWidth: 80
   ,
     id: 'task_state'
     field: 'task_state'
-    name: 'State'
+    ###
+    Translators: The state (eg, "In progress") of a task (eg, sending email) appears after this.
+    ###
+    name: gettext('State')
     minWidth: 80
   ,
     id: 'status'
     field: 'status'
-    name: 'Task Status'
+    ###
+    Translators: a "Task" is a background process such as grading students or sending email
+    ###
+    name: gettext('Task Status')
     minWidth: 80
   ,
     id: 'task_message'
     field: 'task_message'
-    name: 'Task Progress'
+    ###
+    Translators: a "Task" is a background process such as grading students or sending email
+    ###
+    name: gettext('Task Progress')
     minWidth: 120
   ]
 

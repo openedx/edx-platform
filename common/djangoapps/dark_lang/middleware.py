@@ -16,6 +16,42 @@ from django.utils.translation.trans_real import parse_accept_lang_header
 from dark_lang.models import DarkLangConfig
 
 
+def dark_parse_accept_lang_header(accept):
+    '''
+    The use of 'zh-cn' for 'Simplified Chinese' and 'zh-tw' for 'Traditional Chinese'
+    are now deprecated, as discussed here: https://code.djangoproject.com/ticket/18419.
+    The new language codes 'zh-hans' and 'zh-hant' are now used since django 1.7.
+    Although majority of browsers still use the old language codes, some new browsers
+    such as IE11 in Windows 8.1 start to use the new ones, which makes the current
+    chinese translations of edX don't work properly under these browsers.
+    This function can keep compatibility between the old and new language codes. If one
+    day edX uses django 1.7 or higher, this function can be modified to support the old
+    language codes until there are no browsers use them.
+    '''
+    browser_langs = parse_accept_lang_header(accept)
+    django_langs = []
+    for lang, priority in browser_langs:
+        lang = CHINESE_LANGUAGE_CODE_MAP.get(lang.lower(), lang)
+        django_langs.append((lang, priority))
+    return django_langs
+
+# If django 1.7 or higher is used, the right-side can be updated with new-style codes.
+CHINESE_LANGUAGE_CODE_MAP = {
+    # The following are the new-style language codes for chinese language
+    'zh-hans': 'zh-CN',     # Chinese (Simplified),
+    'zh-hans-cn': 'zh-CN',  # Chinese (Simplified, China)
+    'zh-hans-sg': 'zh-CN',  # Chinese (Simplified, Singapore)
+    'zh-hant': 'zh-TW',     # Chinese (Traditional)
+    'zh-hant-hk': 'zh-TW',  # Chinese (Traditional, Hongkong)
+    'zh-hant-mo': 'zh-TW',  # Chinese (Traditional, Macau)
+    'zh-hant-tw': 'zh-TW',  # Chinese (Traditional, Taiwan)
+    # The following are the old-style language codes that django does not recognize
+    'zh-hk': 'zh-TW',       # Chinese (Traditional, Hongkong)
+    'zh-mo': 'zh-TW',       # Chinese (Traditional, Macau)
+    'zh-sg': 'zh-CN',       # Chinese (Simplified, Singapore)
+}
+
+
 class DarkLangMiddleware(object):
     """
     Middleware for dark-launching languages.
@@ -65,7 +101,7 @@ class DarkLangMiddleware(object):
         new_accept = ", ".join(
             self._format_accept_value(lang, priority)
             for lang, priority
-            in parse_accept_lang_header(accept)
+            in dark_parse_accept_lang_header(accept)
             if self._is_released(lang)
         )
 
@@ -74,7 +110,7 @@ class DarkLangMiddleware(object):
     def _activate_preview_language(self, request):
         """
         If the request has the get parameter ``preview-lang``,
-        and that language appears doesn't appear in ``self.released_langs``,
+        and that language doesn't appear in ``self.released_langs``,
         then set the session ``django_language`` to that language.
         """
         if 'clear-lang' in request.GET:

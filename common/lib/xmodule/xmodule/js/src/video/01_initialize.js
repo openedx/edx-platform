@@ -63,17 +63,24 @@ function (VideoPlayer, VideoStorage) {
         fetchMetadata: fetchMetadata,
         getCurrentLanguage: getCurrentLanguage,
         getDuration: getDuration,
+        getPlayerMode: getPlayerMode,
         getVideoMetadata: getVideoMetadata,
         initialize: initialize,
+        isHtml5Mode: isHtml5Mode,
         isFlashMode: isFlashMode,
         parseSpeed: parseSpeed,
         parseVideoSources: parseVideoSources,
         parseYoutubeStreams: parseYoutubeStreams,
         saveState: saveState,
+        setPlayerMode: setPlayerMode,
         setSpeed: setSpeed,
+        speedToString: speedToString,
         trigger: trigger,
         youtubeId: youtubeId
-    };
+    },
+
+        _youtubeApiDeferred = null,
+        _oldOnYouTubeIframeAPIReady;
 
     Initialize.prototype = methodsDict;
 
@@ -112,21 +119,111 @@ function (VideoPlayer, VideoStorage) {
         // Require JS. At the time when we reach this code, the stand alone
         // HTML5 player is already loaded, so no further testing in that case
         // is required.
-        var video;
+        var video, onYTApiReady, setupOnYouTubeIframeAPIReady;
 
-        if(state.videoType === 'youtube') {
-            YT.ready(function() {
+        if (state.videoType === 'youtube') {
+            state.youtubeApiAvailable = false;
+
+            onYTApiReady = function () {
+                console.log('[Video info]: YouTube API is available and is loaded.');
+
                 video = VideoPlayer(state);
 
                 state.modules.push(video);
                 state.__dfd__.resolve();
-            });
+
+                state.youtubeApiAvailable = true;
+            };
+
+            if (window.YT) {
+                // If we have a Deferred object responsible for calling OnYouTubeIframeAPIReady
+                // callbacks, make sure that they have all been called by trying to resolve the
+                // Deferred object. Upon resolving, all the OnYouTubeIframeAPIReady will be
+                // called. If the object has been already resolved, the callbacks will not
+                // be called a second time.
+                if (_youtubeApiDeferred) {
+                    _youtubeApiDeferred.resolve();
+                }
+
+                window.YT.ready(function () {
+                    onYTApiReady();
+                });
+            } else {
+                // There is only one global variable window.onYouTubeIframeAPIReady which
+                // is supposed to be a function that will be called by the YouTube API
+                // when it finished initializing. This function will update this global function
+                // so that it resolves our Deferred object, which will call all of the
+                // OnYouTubeIframeAPIReady callbacks.
+                //
+                // If this global function is already defined, we store it first, and make
+                // sure that it gets executed when our Deferred object is resolved.
+                setupOnYouTubeIframeAPIReady = function () {
+                    _oldOnYouTubeIframeAPIReady = window.onYouTubeIframeAPIReady || undefined;
+
+                    window.onYouTubeIframeAPIReady = function () {
+                        window.onYouTubeIframeAPIReady.resolve();
+                    };
+
+                    window.onYouTubeIframeAPIReady.resolve = _youtubeApiDeferred.resolve;
+                    window.onYouTubeIframeAPIReady.done = _youtubeApiDeferred.done;
+
+                    if (_oldOnYouTubeIframeAPIReady) {
+                        window.onYouTubeIframeAPIReady.done(_oldOnYouTubeIframeAPIReady);
+                    }
+                };
+
+                // If a Deferred object hasn't been created yet, create one now. It will
+                // be responsible for calling OnYouTubeIframeAPIReady callbacks once the
+                // YouTube API loads. After creating the Deferred object, load the YouTube
+                // API.
+                if (!_youtubeApiDeferred) {
+                    _youtubeApiDeferred = $.Deferred();
+                    setupOnYouTubeIframeAPIReady();
+                    _loadYoutubeApi(state);
+                } else if (!window.onYouTubeIframeAPIReady || !window.onYouTubeIframeAPIReady.done) {
+                    // The Deferred object could have been already defined in a previous
+                    // initialization of the video module. However, since then the global variable
+                    // window.onYouTubeIframeAPIReady could have been overwritten. If so,
+                    // we should set it up again.
+                    setupOnYouTubeIframeAPIReady();
+                }
+
+                // Attach a callback to our Deferred object to be called once the
+                // YouTube API loads.
+                window.onYouTubeIframeAPIReady.done(function () {
+                    window.YT.ready(function () {
+                        onYTApiReady();
+                    });
+                });
+            }
         } else {
             video = VideoPlayer(state);
 
             state.modules.push(video);
             state.__dfd__.resolve();
         }
+    }
+
+    function _loadYoutubeApi(state) {
+        console.log('[Video info]: YouTube API is not loaded. Will try to load...');
+
+        window.setTimeout(function () {
+            // If YouTube API will load OK, it will run `onYouTubeIframeAPIReady`
+            // callback, which will set `state.youtubeApiAvailable` to `true`.
+            // If something goes wrong at this stage, `state.youtubeApiAvailable` is
+            // `false`.
+            _reportToServer(state, state.youtubeApiAvailable);
+        }, state.config.ytTestTimeout);
+
+        $.getScript(document.location.protocol + '//' + state.config.ytApiUrl);
+    }
+
+    function _reportToServer(state, youtubeIsAvailable) {
+        if (!youtubeIsAvailable) {
+            console.log('[Video info]: YouTube API is not available.');
+        }
+
+        state.saveState(true, { youtube_is_available: youtubeIsAvailable });
     }
 
     // function _configureCaptions(state)
@@ -155,18 +252,6 @@ function (VideoPlayer, VideoStorage) {
 
             state.el.addClass('closed');
         }
-    }
-
-    // function _setPlayerMode(state)
-    //     By default we will be forcing HTML5 player mode. Only in the case
-    //     when, after initializtion, we will get one available playback rate,
-    //     we will change to Flash player mode. There is a need to store this
-    //     setting in cookies because otherwise we will have to change from
-    //     HTML5 to Flash on every page load in a browser that doesn't fully
-    //     support HTML5. When we have this setting in cookies, we can select
-    //     the proper mode from the start (not having to change mode later on).
-    function _setPlayerMode(state) {
-        state.currentPlayerMode = 'html5';
     }
 
     // function _parseYouTubeIDs(state)
@@ -246,8 +331,7 @@ function (VideoPlayer, VideoStorage) {
 
     function _setConfigurations(state) {
         _configureCaptions(state);
-        _setPlayerMode(state);
-
+        state.setPlayerMode(state.config.mode);
         // Possible value are: 'visible', 'hiding', and 'invisible'.
         state.controlState = 'visible';
         state.controlHideTimeout = null;
@@ -427,7 +511,10 @@ function (VideoPlayer, VideoStorage) {
             element: element,
             fadeOutTimeout:     1400,
             captionsFreezeTime: 10000,
-            availableQualities: ['hd720', 'hd1080', 'highres']
+            mode: $.cookie('edX_video_player_mode'),
+            // Available HD qualities will only be accessible once the video has
+            // been played once, via player.getAvailableQualityLevels.
+            availableHDQualities: []
         });
 
         if (this.config.endTime < this.config.startTime) {
@@ -435,9 +522,9 @@ function (VideoPlayer, VideoStorage) {
         }
 
         this.lang = this.config.transcriptLanguage;
-        this.speed = Number(
+        this.speed = this.speedToString(
             this.config.speed || this.config.generalSpeed
-        ).toFixed(2).replace(/\.00$/, '.0');
+        );
 
         if (!(_parseYouTubeIDs(this))) {
 
@@ -546,7 +633,7 @@ function (VideoPlayer, VideoStorage) {
             var speed;
 
             video = video.split(/:/);
-            speed = parseFloat(video[0]).toFixed(2).replace(/\.00$/, '.0');
+            speed = _this.speedToString(video[0]);
 
             _this.videos[speed] = video[1];
         });
@@ -666,7 +753,7 @@ function (VideoPlayer, VideoStorage) {
         }
         successHandler = ($.isFunction(callback)) ? callback : null;
         xhr = $.ajax({
-            url: this.config.ytTestUrl + url + '?v=2&alt=jsonc',
+            url: document.location.protocol + '//'  + this.config.ytTestUrl + url + '?v=2&alt=jsonc',
             dataType: 'jsonp',
             timeout: this.config.ytTestTimeout,
             success: successHandler
@@ -718,8 +805,50 @@ function (VideoPlayer, VideoStorage) {
         }
     }
 
+    /**
+     * Sets player mode.
+     *
+     * @param {string} mode Mode to set for the video player if it is supported.
+     *                      Otherwise, `html5` is used by default.
+     */
+    function setPlayerMode(mode) {
+        var supportedModes = ['html5', 'flash'];
+
+        mode = _.contains(supportedModes, mode) ? mode : 'html5';
+        this.currentPlayerMode = mode;
+    }
+
+    /**
+     * Returns current player mode.
+     *
+     * @return {string} Returns string that describes player mode
+     */
+    function getPlayerMode() {
+        return this.currentPlayerMode;
+    }
+
+    /**
+     * Checks if current player mode is Flash.
+     *
+     * @return {boolean} Returns `true` if current mode is `flash`, otherwise
+     *                   it returns `false`
+     */
     function isFlashMode() {
-        return this.currentPlayerMode === 'flash';
+        return this.getPlayerMode() === 'flash';
+    }
+
+    /**
+     * Checks if current player mode is Html5.
+     *
+     * @return {boolean} Returns `true` if current mode is `html5`, otherwise
+     *                   it returns `false`
+     */
+    function isHtml5Mode() {
+        return this.getPlayerMode() === 'html5';
+    }
+
+    function speedToString(speed) {
+        return parseFloat(speed).toFixed(2).replace(/\.00$/, '.0');
     }
 
     function getCurrentLanguage() {

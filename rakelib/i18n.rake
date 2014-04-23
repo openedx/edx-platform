@@ -10,7 +10,11 @@ namespace :i18n do
 
   desc "Extract localizable strings from sources"
   task :extract => ["i18n:validate:gettext", "assets:coffee"] do
-    sh(File.join(REPO_ROOT, "i18n", "extract.py"))
+    command = File.join(REPO_ROOT, "i18n", "extract.py")
+    if verbose == true
+      command += " -vv"
+    end
+    sh(command)
   end
 
   desc "Compile localizable strings from sources, extracting strings first."

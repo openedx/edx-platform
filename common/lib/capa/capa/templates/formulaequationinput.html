@@ -1,6 +1,6 @@
 <% doinline = 'style="display:inline-block;vertical-align:top"' if inline else "" %>
 <section id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline}>
-  <div class="${reported_status}" id="status_${id}">
+  <div class="${status_class}" id="status_${id}">
     <input type="text" name="input_${id}" id="input_${id}"
         data-input-id="${id}" value="${value|h}"
         aria-label="${label}"
@@ -9,7 +9,19 @@
         % endif
         />
 
-      <p class="status">${reported_status}</p>
+      <p class="status" 
+         %if status != 'unsubmitted':
+         aria-hidden="true"
+         %endif
+         >
+          <span class="sr equation">
+              %if value:
+              ${value|h}
+              % else:
+              ${label}
+              %endif
+          </span> - ${status_display}
+      </p>
 
       <div id="input_${id}_preview" class="equation">
         \[\]

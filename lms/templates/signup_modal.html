@@ -26,16 +26,21 @@ $(document).ready(function(){
 
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
-    <button class="close-modal">&#10005;
+    <button class="close-modal">
+      <i class="icon-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close Modal')}
+        ${_('Close')}
       </span>
     </button>
 
     <div id="register" class="register">
       <header>
-        <h2>${_('Sign Up for {span_start}{platform_name}{span_end}').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
+        <h2>
+	  ${_('Sign Up for {platform_name}').format(
+	      platform_name=u'<span class="edx">{}</span>'.format(settings.PLATFORM_NAME)
+	  )}
+	</h2>
         <hr>
       </header>
 

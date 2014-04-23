@@ -37,7 +37,7 @@ master_doc = 'index'
 
 
 # General information about the project.
-project = u'Building a Course with edX Studio'
+project = u'Building and Running an edX Course'
 copyright = u'2014, edX'
 
 # The short X.Y version.

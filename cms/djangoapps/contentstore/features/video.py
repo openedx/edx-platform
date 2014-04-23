@@ -1,6 +1,7 @@
-#pylint: disable=C0111
+# pylint: disable=C0111
 
 from lettuce import world, step
+from nose.tools import assert_less
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 from selenium.webdriver.common.keys import Keys
@@ -21,11 +22,25 @@ SELECTORS = {
 DELAY = 0.5
 
 
+@step('youtube stub server (.*) YouTube API')
+def configure_youtube_api(_step, action):
+    action=action.strip()
+    if action == 'proxies':
+        world.youtube.config['youtube_api_blocked'] = False
+    elif action == 'blocks':
+        world.youtube.config['youtube_api_blocked'] = True
+    else:
+        raise ValueError('Parameter `action` should be one of "proxies" or "blocks".')
+
+
 @step('I have created a Video component$')
-def i_created_a_video_component(step):
+def i_created_a_video_component(_step):
+
+    assert_less(world.youtube.config['youtube_api_response'].status_code, 400,  "Real Youtube server is unavailable")
+
     world.create_course_with_unit()
     world.create_component_instance(
-        step=step,
+        step=_step,
         category='video',
     )
 
@@ -35,7 +50,8 @@ def i_created_a_video_component(step):
     world.wait_for_present('.is-initialized')
     world.wait(DELAY)
     world.wait_for_invisible(SELECTORS['spinner'])
-
+    if not world.youtube.config.get('youtube_api_blocked'):
+        world.wait_for_visible(SELECTORS['controls'])
 
 @step('I have created a Video component with subtitles$')
 def i_created_a_video_with_subs(_step):
@@ -77,7 +93,11 @@ def i_have_uploaded_subtitles(_step, sub_id):
 
 @step('when I view the (.*) it does not have autoplay enabled$')
 def does_not_autoplay(_step, video_type):
-    assert world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False'
+    world.wait(DELAY)
+    world.wait_for_ajax_complete()
+    actual = world.css_find('.%s' % video_type)[0]['data-autoplay']
+    expected = [u'False', u'false', False]
+    assert actual in expected
     assert world.css_has_class('.video_control', 'play')
 
 
@@ -177,11 +197,15 @@ def find_caption_line_by_data_index(index):
 
 @step('I focus on caption line with data-index "([^"]*)"$')
 def focus_on_caption_line(_step, index):
+    world.wait_for_present('.video.is-captions-rendered')
+    world.wait_for(lambda _: world.css_text('.subtitles'), timeout=30)
     find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.TAB)
 
 
 @step('I press "enter" button on caption line with data-index "([^"]*)"$')
 def click_on_the_caption(_step, index):
+    world.wait_for_present('.video.is-captions-rendered')
+    world.wait_for(lambda _: world.css_text('.subtitles'), timeout=30)
     find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.ENTER)
 
 
@@ -194,8 +218,21 @@ def caption_line_has_class(_step, index, className):
 @step('I see a range on slider$')
 def see_a_range_slider_with_proper_range(_step):
     world.wait_for_visible(VIDEO_BUTTONS['pause'])
-
     assert world.css_visible(".slider-range")
+
+
+@step('I (.*) see video button "([^"]*)"$')
+def do_not_see_or_not_button_video(_step, action, button_type):
+    world.wait(DELAY)
+    world.wait_for_ajax_complete()
+    action=action.strip()
+    button = button_type.strip()
+    if action == 'do not':
+        assert not world.is_css_present(VIDEO_BUTTONS[button])
+    elif action == 'can':
+        assert world.css_visible(VIDEO_BUTTONS[button])
+    else:
+        raise ValueError('Parameter `action` should be one of "do not" or "can".')
 
 
 @step('I click video button "([^"]*)"$')

@@ -1,4 +1,4 @@
-#pylint: disable=C0111,W0613
+# pylint: disable=C0111,W0613
 
 from django.http import (HttpResponse, HttpResponseServerError,
                          HttpResponseNotFound)

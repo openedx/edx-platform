@@ -143,7 +143,7 @@ DATADOG_FEEDBACK_METRIC = "lms_feedback_submissions"
 
 
 def _record_feedback_in_datadog(tags):
-    datadog_tags = ["{k}:{v}".format(k=k, v=v) for k, v in tags.items()]
+    datadog_tags = [u"{k}:{v}".format(k=k, v=v) for k, v in tags.items()]
     dog_stats_api.increment(DATADOG_FEEDBACK_METRIC, tags=datadog_tags)
 
 

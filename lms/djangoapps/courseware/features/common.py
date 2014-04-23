@@ -3,6 +3,8 @@
 
 from __future__ import absolute_import
 
+import time
+
 from lettuce import world, step
 from lettuce.django import django_url
 from django.contrib.auth.models import User
@@ -16,6 +18,42 @@ from xmodule import seq_module, vertical_module
 
 from logging import getLogger
 logger = getLogger(__name__)
+
+
+@step('I (.*) capturing of screenshots before and after each step$')
+def configure_screenshots_for_all_steps(_step, action):
+    """
+    A step to be used in *.feature files. Enables/disables
+    automatic saving of screenshots before and after each step in a
+    scenario.
+    """
+    action=action.strip()
+    if action == 'enable':
+        world.auto_capture_screenshots = True
+    elif action == 'disable':
+        world.auto_capture_screenshots = False
+    else:
+        raise ValueError('Parameter `action` should be one of "enable" or "disable".')
+
+
+def capture_screenshot_before_after(func):
+    """
+    A decorator that will take a screenshot before and after the applied
+    function is run. Use this if you do not want to capture screenshots
+    for each step in a scenario, but rather want to debug a single function.
+    """
+    def inner(*args, **kwargs):
+        prefix=round(time.time() * 1000)
+
+        world.capture_screenshot("{}_{}_{}".format(
+            prefix, func.func_name, 'before'
+        ))
+        ret_val=func(*args, **kwargs)
+        world.capture_screenshot("{}_{}_{}".format(
+            prefix, func.func_name, 'after'
+        ))
+        return ret_val
+    return inner
 
 
 @step(u'The course "([^"]*)" exists$')
