@@ -1,3 +1,4 @@
+// Build StaffDebug object
 var StaffDebug = (function(){
 
   get_current_url = function() {
@@ -6,7 +7,6 @@ var StaffDebug = (function(){
 
   get_url = function(action){
     var pathname = this.get_current_url();
-    console.log(pathname)
     var url = pathname.substr(0,pathname.indexOf('/courseware')) + '/' + action;
     return url;
   }
@@ -20,10 +20,12 @@ var StaffDebug = (function(){
   }
 
   do_idash_action = function(locname, idaction){
-    var pdata = {'action': idaction,
-                 'problem_for_student': locname,
-                 'unique_student_identifier': get_user(locname)
-                 }
+    var pdata = {
+        'action': idaction,
+        'problem_for_student': locname,
+        'unique_student_identifier': get_user(locname)
+    }
+
     $.ajax({
         type: "POST",
         url: get_url('instructor'),
@@ -33,7 +35,18 @@ var StaffDebug = (function(){
             $("#result_" + locname).html( msg );
         },
         error: function(request, status, error) {
-            $("#result_" + locname).html('<p id="idash_msg"><font color="red">' + gettext('Something has gone wrong with this request.  The server replied with a status of: ') + error + '</font></p>');
+            var text = _.template(
+                gettext('Something has gone wrong with this request.  \
+                     The server replied with a status of: {error}'),
+                {error: error},
+                {interpolate: /\{(.+?)\}/g}
+            )
+            var html = _.template(
+                '<p id="idash_msg"><font color="red">{text}</font></p>',
+                {text: text},
+                {interpolate: /\{(.+?)\}/g}
+            )
+            $("#result_"+locname).html(html);
         },
         dataType: 'html'
     });
@@ -47,11 +60,24 @@ var StaffDebug = (function(){
     do_idash_action(locname, "Delete student state for module");
   }
 
-  return {reset: reset,
-          sdelete: sdelete,
-          do_idash_action: do_idash_action,
-          get_current_url: get_current_url,
-          get_url: get_url,
-          get_user: get_user
-          }
+  return {
+      reset: reset,
+      sdelete: sdelete,
+      do_idash_action: do_idash_action,
+      get_current_url: get_current_url,
+      get_url: get_url,
+      get_user: get_user
+  }
 })();
+
+// Register click handlers
+$(document).ready(function() {
+    $('#staff-debug-reset').click(function() {
+        StaffDebug.reset($(this).data('location'));
+        return false;
+    });
+    $('#staff-debug-sdelete').click(function() {
+        StaffDebug.sdelete($(this).data('location'));
+        return false;
+    });
+});

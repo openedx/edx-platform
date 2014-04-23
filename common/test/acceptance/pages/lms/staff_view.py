@@ -49,17 +49,6 @@ class StaffDebugPage(PageObject):
     def is_browser_on_page(self):
         return self.q(css='section.staff-modal').present
 
-    def _click_link(self, link_text):
-        """
-        Clicks on an action link based on text
-        """
-        for link in self.q(css='section.staff-modal a').execute():
-            if link.text == link_text:
-                return link.click()
-
-        raise Exception('Could not find the {} link to click on.'.format(
-            link_text))
-
     def reset_attempts(self, user=None):
         """
         This clicks on the reset attempts link with an optionally
@@ -67,7 +56,7 @@ class StaffDebugPage(PageObject):
         """
         if user:
             self.q(css='input[id^=sd_fu_]').first.fill(user)
-        self._click_link('Reset Student Attempts')
+        self.q(css='section.staff-modal a#staff-debug-reset').click()
 
     def delete_state(self, user=None):
         """
@@ -75,7 +64,7 @@ class StaffDebugPage(PageObject):
         """
         if user:
             self.q(css='input[id^=sd_fu_]').fill(user)
-        self._click_link('Delete Student State')
+        self.q(css='section.staff-modal a#staff-debug-sdelete').click()
 
     @property
     def idash_msg(self):

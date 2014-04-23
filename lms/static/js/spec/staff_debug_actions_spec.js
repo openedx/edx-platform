@@ -1,7 +1,7 @@
 describe('StaffDebugActions', function() {
     var loc = 'test_loc';
     var fixture_id = 'sd_fu_' + loc;
-    var fixture = $('<input id="' + fixture_id + '" placeholder="userman" />');
+    var fixture = $('<input>', { id: fixture_id, placeholder: "userman" });
 
     describe('get_url ', function() {
         it('defines url to courseware ajax entry point', function() {
