@@ -127,8 +127,9 @@ def _assets_json(request, course_key):
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
         # Note also that we are ignoring the value of the thumbnail_location-- we only care whether
         # or not a thumbnail has been stored, and we can now easily create the correct path.
-        thumbnail_location = course_key.make_asset_key('thumbnail', asset_id['name']) \
-            if asset.get('thumbnail_location', None) else None
+        thumbnail_location = asset.get('thumbnail_location', None)
+        if thumbnail_location:
+            thumbnail_location = course_key.make_asset_key('thumbnail', thumbnail_location[4])
 
         asset_locked = asset.get('locked', False)
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
