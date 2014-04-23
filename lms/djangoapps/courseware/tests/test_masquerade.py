@@ -12,12 +12,10 @@ import json
 
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
 
 from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from lms.lib.xblock.runtime import quote_slashes
@@ -41,7 +39,8 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.staff = StaffFactory(course=self.graded_course.id)
 
         self.logout()
-        self.login(self.staff, self.staff.password)
+        # self.staff.password is the sha hash but login takes the plain text
+        self.login(self.staff.email, 'test')
         self.enroll(self.graded_course)
 
     def get_cw_section(self):
