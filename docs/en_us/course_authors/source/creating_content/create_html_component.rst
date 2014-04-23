@@ -9,11 +9,11 @@ Working with HTML Components
 HTML Component Overview
 ***********************
 
-HTML components are the most basic building blocks of your course. You use HTML components to add and format text, links, images, and more. 
+HTML components are the basic building blocks of your course content. You use HTML components to add and format text, links, images, and more. 
 
 For more information, see the following topics:
 
-* :ref:`The User Interface`
+* :ref:`The HTML Editor`
 * :ref:`Create an HTML Component`
 * :ref:`Add a Link in an HTML Component`
 * :ref:`Add an Image to an HTML Component`
@@ -23,48 +23,60 @@ For more information, see the following topics:
 
 To add an instant hangout to an HTML component, see :ref:`Using an Instant Hangout in Your Course`.
 
-.. _The User Interface:
+.. _The HTML Editor:
 
 *****************************************
-The HTML Component User Interface
+The HTML Component Editor
 *****************************************
 
-When you create a new HTML component, you work with the HTML component editor. The editor has two views: **Visual view** and **HTML view.** To switch between Visual view and HTML view, click the tab in the upper-right corner of the component editor.
+When you create a new HTML component, you work with the HTML editor:
 
-.. image:: ../Images/HTMLEditorTabs.png
- :alt: Image of the HTML component editor, with the Visual and HTML tabs circled
+.. image:: ../Images/HTMLEditor.png
+ :alt: Image of the HTML component editor
 
-- **Visual view** provides a “what you see is what you get” (WYSIWYG) editor that allows you to format text by clicking the formatting buttons at the top of the editor. By default, every HTML component opens in Visual view.
+The editor provides a “what you see is what you get” (WYSIWYG) interface that allows you to format text by clicking the formatting buttons at the top of the editor. 
 
-  Visual view includes the following formatting buttons.
+.. note:: The editor attempts to ensure the underlying HTML code is valid; for example, if you do not close a div tag, it inserts one at the end of the paragraph. You can see this by opening the HTML code editor, as described below.
 
-  .. image:: ../Images/HTML_VisualView_Toolbar.png
-    :alt: Image of the HTML visual editor, with callouts for formatting buttons
+The following image shows call-outs for the editing options and is followed by descriptions.
 
-  #. Select a formatting style, such as heading 1, heading 2, or paragraph.
-  #. Format text in bold.
-  #. Format text in italics.
-  #. Underline text.
-  #. Create a bulleted list.
-  #. Create a numbered list.
-  #. Decrease the indent.
-  #. Indent text.
-  #. Format text as a blockquote.
-  #. Format text as code (i.e., in Courier font).
-  #. Create a link.
-  #. Delete the current link.
+.. image:: ../Images/HTML_VisualView_Toolbar.png
+  :alt: Image of the HTML editor, with call-outs for formatting buttons
 
-  Visual view shows your content the way it will appear in the LMS. The following is the LMS rendition of the HTML component above.
+#. Choose a formatting style for the selected paragraph, such as heading 1, heading 2, or paragraph.
+#. Choose a font family for selected text, such as Arial, Courier New, or Times New Roman.
+#. Format selected text in bold.
+#. Format selected text in italics.
+#. Underline selected text.
+#. Apply a color to the selected text.
+#. Format selected text as code.
+#. Create a bulleted list.
+#. Create a numbered list.
+#. Decrease and increased the indentation of the selected paragraph.
+#. Format the selected paragraph as a blockquote.
+#. Create a link from the selected text. See :ref:`Add a Link in an HTML Component`.
+#. Delete the current link.
+#. Insert an image at the cursor. See :ref:`Add an Image to an HTML Component`.
+#. Work with HTML source code, described below.
 
-  .. image:: ../Images/HTMLComponent_VisualView_LMS.png
-   :alt: Image of the visual view of the HTML component
 
-- **HTML view** allows you to edit HTML code directly.
+.. _Work with HTML code:
 
-  .. image:: ../Images/HTML_HTMLView.png
-   :alt: Image of the HTML code view of the HTML component
+============================
+Work with HTML code
+============================
 
-  .. note:: If you're in HTML view, you can always switch to Visual view to make sure your content looks the way you expect. For example, we recommend that you do this if you add an image or a link to an HTML component.
+To work with HTML source code for the component, click **HTML**  in the editor toolbar. The HTML source code editor opens:
+
+.. image:: ../Images/HTML_source_code.png
+ :alt: Image of the HTML source code editor
+
+Edit the HTML code as needed.  
+
+Click **OK** to apply your changes to the HTML editor and close the source code.
+
+.. warning:: Clicking **OK** in the source code editor does not save your changes to the HTML component.  You return to the component editor, where your changes are applied.  You must click **Save** to save your changes and close the component. If you click **Cancel**, the changes you made in the HTML source code are lost.
+
 
 .. _Create an HTML Component:
 
@@ -88,14 +100,14 @@ To create an HTML component:
   .. image:: ../Images/HTMLComponent_Edit.png
    :alt: Image of an empty HTML component
 
-3. In the empty component, click **Edit**.
+3. In the component, click **Edit**.
 
-   The HTML component editor opens in Visual view.
+   The HTML component editor opens.
 
-  .. image:: ../Images/HTMLEditor.png
-   :alt: Image of the HTML component Visual view
+  .. image:: ../Images/HTMLEditor_empty.png
+   :alt: Image of the HTML component editor
 
-4. Enter the text and formatting that you want, either by using the formatting buttons in Visual view or by manually adding HTML tags in HTML view.
+4. Enter and format your content. You can :ref:`Work with HTML code` if needed.
 
 5. Enter a display name (the name that you want students to see). To do this, click **Settings** in the upper-right corner of the component editor, and then enter text in the **Display Name** field.
 
@@ -103,7 +115,7 @@ To create an HTML component:
 
 6. Click **Save** to save the HTML component.
 
-You can also add links and images to HTML components. Or, you can import LaTeX code. For more information, see:
+You can also:
 
 * :ref:`Add a Link in an HTML Component`
 * :ref:`Add an Image to an HTML Component`
@@ -115,12 +127,12 @@ You can also add links and images to HTML components. Or, you can import LaTeX c
 Add a Link in an HTML Component
 ***********************************
 
-To add a link to a website, course unit, or file in an HTML component, you'll work with the **Insert/Edit Link** dialog box.
+To add a link to a website, course unit, or file in an HTML component, you'll work with the **Insert link** dialog box.
 
 .. image:: ../Images/HTML_Insert-EditLink_DBox.png
- :alt: Image of the Insert/Edit Link dialog box
+ :alt: Image of the Insert link dialog box
 
-For more information, see:
+You can:
 
 * :ref:`Add a Link to a Website`
 * :ref:`Add a Link to a Course Unit`
@@ -138,14 +150,14 @@ To add a link to a website:
 
 #. Click the link icon in the toolbar.
 
-#. In the **Insert/Edit Link** dialog box, enter the URL of the website that you want in the **Link URL** field.
+#. In the **Insert link** dialog box, enter the URL of the website that you want in the **URL** field.
 
    .. image:: ../Images/HTML_Insert-EditLink_Website.png
-    :alt: Image of the Insert/Edit Link dialog box
+    :alt: Image of the Insert link dialog box
 
-#. If you want the link to open in a new window, click the drop-down arrow next to the **Target** field, and then select **Open Link in a New Window**. If not, you can leave the default value.
+#. If you want the link to open in a new window, click the drop-down arrow next to the **Target** field, and then select **New Window**. If not, you can leave the default value.
 
-#. Click **Insert**.
+#. Click **OK**.
 
 #. Save the HTML component and test the link.
 
@@ -169,7 +181,7 @@ You can add a link to a course unit in an HTML component.
 
 #. Click the link icon in the toolbar.
 
-#. In the **Insert/Edit Link** dialog box, enter the following in the **Link URL** field.
+#. In the **Insert link** dialog box, enter the following in the **URL** field.
 
    ``/jump_to_id/<unit identifier>``
 
@@ -177,10 +189,10 @@ You can add a link to a course unit in an HTML component.
    identifier that you copied in step 2, and make sure to include both forward slashes (/).
 
    .. image:: ../Images/HTML_Insert-EditLink_CourseUnit.png
-    :alt: Image of the Inser/Edit Link dialog box with a link to a unit identifier
+    :alt: Image of the Insert link dialog box with a link to a unit identifier
 
 #. If you want the link to open in a new window, click the drop-down arrow next to
-   the **Target** field, and then select **Open Link in a New Window**. If not, you can leave the default value.
+   the **Target** field, and then select **New Window**. If not, you can leave the default value.
 
 #. Click **Insert**.
 
@@ -202,30 +214,25 @@ You can add a link in an HTML component to any file you've uploaded for the cour
   
   .. note:: You must use the **Embed URL** to link to the file, not the **External URL**.
 
-
-
 2. Select the text that you want to make into the link.
 
 #. Click the link icon in the toolbar.
 
-#. In the **Insert/Edit Link** dialog box, enter the following in the **Link URL** field.
+#. In the **Insert link** dialog box, enter the following in the **URL** field.
 
    ``/static/FileName.type``
 
    Make sure to include both forward slashes (/).
 
    .. image:: ../Images/HTML_Insert-EditLink_File.png
-    :alt: Image of the Inser/Edit Link dialog box with a link to a file
+    :alt: Image of the Insert link dialog box with a link to a file
 
 #. If you want the link to open in a new window, click the drop-down arrow next to
-   the **Target** field, and then select **Open Link in a New Window**. If not, you can leave the default value.
+   the **Target** field, and then select **New Window**. If not, you can leave the default value.
 
 #. Click **Insert**.
 
 #. Save the HTML component and test the link.
-
-.. note::  When you add the file link in the format ``/static/FileName.type``, then later reopen the **Insert/Edit Link** dialog box, you see that the link changes to ``/c4x/edX/Course-name/asset/FileName.type``. This URL is OK and you do not need to change it. In the HTML view, the link appears as ``/static/FileName.type``.
-
 
 .. _Add an Image to an HTML Component:
 
@@ -235,7 +242,7 @@ Add an Image to an HTML Component
 
 You can add any image that you have uploaded for the course to an HTML component. For more information about uploading images, see :ref:`Add Files to a Course`.
 
-.. note:: Review :ref:`Best Practices for Describing Images` when you add images to HTML components.
+.. note:: Review :ref:`Best Practices for Describing Images` before you add images to HTML components.
 
 To add an image, you'll need the URL of the image that you uploaded to the course. You'll then create a link to the image in the HTML component.
 
@@ -248,27 +255,29 @@ To add an image, you'll need the URL of the image that you uploaded to the cours
 
 2. Click the image icon in the toolbar.
 
-#. In the **Insert/Edit Image** dialog box, enter the following in the **Image URL** field.
+#. In the **Insert image** dialog box, enter the following in the **Source** field.
 
    ``/static/FileName.type``
 
    Make sure to include both forward slashes (/).
 
    .. image:: ../Images/HTML_Insert-Edit_Image.png
-    :alt: Image of the Insert/Edit Image dialog box with a link to a file
+    :alt: Image of the Insert image dialog box with a reference to a file
 
-4. Enter alternative text in the Image Description field. See :ref:`Best Practices for Describing Images` for more information.
+4. Enter alternative text in the **Image description** field. This text becomes the value of the ``alt`` attribute in HTML and is required for your course to be fully accessible. See :ref:`Best Practices for Describing Images` for more information.
 
-#. As needed, in the **Insert/Edit Image** dialog box, customize the image alignment, dimensions, border, and vertical and horizontal space.
+#. As needed, customize the image dimensions. Keep **Constrain proportions** checked to ensure the image keeps the same width and height proportions.
 
-#. Click **Insert**.
+#. To change the spacing and border of the image, click the **Advanced** tab. 
+
+   .. image:: ../Images/HTML_Insert-Edit_Image_Advanced.png
+    :alt: Image of the Insert image dialog box Advanced tab
+
+#. Enter the **Vertical space**, **Horizontal space**, and **Border** as needed. The values you enter are automatically added to the **Style** field.
+
+#. Click **OK** to insert the image in the HTML component.
 
 #. Save the HTML component and test the image.
-
-.. note::  When you add the image URL in the format ``/static/FileName.type``, then later reopen the **Insert/Edit Image** dialog box, you see that the URL changes to ``/c4x/edX/Course-name/asset/FileName.type``. This URL is OK and you do not need to change it. In the HTML view, the URL appears as ``/static/FileName.type``.
-
-   ``<p><img src="/static/GreatLakes.png" alt="Map of the Great Lakes" /></p>``
-
 
 
 .. _Import LaTeX Code:
@@ -302,7 +311,7 @@ To create an HTML component that contains LaTeX code:
   .. image:: ../Images/latex_component.png
    :alt: Image of the HTML component editor with the Latex compiler.
 
-4. In the componenent editor, click **Launch Latex Source Compiler**. The Latex editor opens.
+4. In the component editor, click **Launch Latex Source Compiler**. The Latex editor opens.
 
    .. image:: ../Images/HTML_LaTeXEditor.png
     :alt: Image of the HTML component editor with the Latex compiler.
@@ -311,7 +320,7 @@ To create an HTML component that contains LaTeX code:
 
 #. When you have written or uploaded the Latex code you need, click **Save & Compile to edX XML** in the lower-left corner.
 
-   The component editor closes, and the unit page opens. You can see the way your LaTeX content looks.
+   The component editor closes. You can see the way your LaTeX content looks.
 
    .. image:: ../Images/HTML_LaTeX_CompEditor.png
     :alt: Image of the LaTeX component

@@ -14,6 +14,11 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 
+# Submissions is a Django app that is currently installed
+# from the edx-ora2 repo, although it will likely move in the future.
+from submissions import api as sub_api
+from student.models import anonymous_id_for_user
+
 from microsite_configuration import microsite
 
 # For determining if a shibboleth course
@@ -175,11 +180,28 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
     `problem_to_reset` is the name of a problem e.g. 'L2Node1'.
     To build the module_state_key 'problem/' and course information will be appended to `problem_to_reset`.
 
-    Throws ValueError if `problem_state` is invalid JSON.
+    Raises:
+        ValueError: `problem_state` is invalid JSON.
+        StudentModule.DoesNotExist: could not load the student module.
+        submissions.SubmissionError: unexpected error occurred while resetting the score in the submissions API.
+
     """
-    module_to_reset = StudentModule.objects.get(student_id=student.id,
-                                                course_id=course_id,
-                                                module_state_key=module_state_key)
+    # Reset the student's score in the submissions API
+    # Currently this is used only by open assessment (ORA 2)
+    # We need to do this *before* retrieving the `StudentModule` model,
+    # because it's possible for a score to exist even if no student module exists.
+    if delete_module:
+        sub_api.reset_score(
+            anonymous_id_for_user(student, course_id),
+            course_id,
+            module_state_key,
+        )
+
+    module_to_reset = StudentModule.objects.get(
+        student_id=student.id,
+        course_id=course_id,
+        module_state_key=module_state_key
+    )
 
     if delete_module:
         module_to_reset.delete()

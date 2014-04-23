@@ -9,6 +9,7 @@ from .xqueue import StubXQueueService
 from .youtube import StubYouTubeService
 from .ora import StubOraService
 from .lti import StubLtiService
+from .video_source import VideoSourceHttpService
 
 
 USAGE = "USAGE: python -m stubs.start SERVICE_NAME PORT_NUM [CONFIG_KEY=CONFIG_VAL, ...]"
@@ -19,6 +20,7 @@ SERVICES = {
     'ora': StubOraService,
     'comments': StubCommentsService,
     'lti': StubLtiService,
+    'video': VideoSourceHttpService,
 }
 
 # Log to stdout, including debug messages

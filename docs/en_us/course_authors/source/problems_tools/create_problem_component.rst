@@ -139,6 +139,9 @@ Editor and the Advanced Editor.
           of the Simple Editor interface. However, it is not possible to switch from
           the Advanced Editor to the Simple Editor.
 
+
+.. _Simple Editor:
+
 The Simple Editor
 ~~~~~~~~~~~~~~~~~
 The Common Problem templates, including multiple choice, open in the Simple Editor. The

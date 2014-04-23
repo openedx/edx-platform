@@ -1,22 +1,43 @@
-
-
-**********
+############
 Change Log
-**********
+############
+
+************
+April, 2014
+************
 
 .. list-table::
-   :widths: 10 80
+   :widths: 10 70
    :header-rows: 1
 
    * - Date
      - Change  
-   * - 4/11/14
+   * - 04/22/14
+     - Updated the :ref:`Bulk Email` section with information about the dashboard option to opt out of course email. 
+   * - 
+     - In :ref:`Discussions`, corrected the steps to "Create" Discussion
+       Categories".
+   * - 04/16/14
+     - Updated "Transcripts in Additional Languages" in :ref:`Working with Video Components`.
+   * -  
+     - In support of new features, added the following sections to :ref:`Multiple Choice` problems:
+
+       * :ref:`Shuffle Answers in a Multiple Choice Problem`
+       * :ref:`Targeted Feedback in a Multiple Choice Problem`
+       * :ref:`Answer Pools in a Multiple Choice Problem`
+
+   * - 04/15/14
+     - Updated :ref:`Testing Your Course` to include a section on how to :ref:`View Your Live Course`.
+   * - 04/11/14
      - Expanded the :ref:`Grades` section to include a topic on interpreting the Student Answer Distribution report. 
-   * - 4/7/14
-     - Expanded the :ref:`Course Data`, :ref:`Enrollment`, and :ref:`Course_Staffing` sections.
+   * - 04/08/14
+     - Updated the chapter :ref:`Working with HTML Components` to reflect the
+       new HTML editor. 
+   * - 04/07/14
+     - Expanded the :ref:`Course Data`, :ref:`Enrollment`, and
+       :ref:`Course_Staffing` sections.
    * - 04/03/14
-     - Updated the :ref:`Adding Pages to a Course` chapter to reflect ability to
-       :ref:`Show or Hide the Course Wiki Page`.
+     - Updated the :ref:`Adding Pages to a Course` chapter to reflect ability to :ref:`Show or Hide the Course Wiki Page`.
    * - 04/02/14
      - Reorganized the sections :ref:`Building a Course Index` and
        :ref:`Creating Course Content Index` to better reflect the workflow of
@@ -27,19 +48,29 @@ Change Log
    * - 
      - Updated the :ref:`Releasing Your Course Index` section to include
        :ref:`Launch`.
+   
+
+************
+March, 2014
+************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change  
    * - 03/31/14 
      - Expanded the :ref:`Grades` chapter to include the new
        :ref:`Review_Answers` section.
    * - 03/27/14
      - Updated the :ref:`Adding Pages to a Course` section to reflect feature
        changes.
-   * - 3/27/14
-     - Updated the section on :ref:`Beta_Testing` to include the new "batch add"
-       feature.
-   * - 3/19/14
+   * - 03/27/14
+     - Updated the section on :ref:`Beta_Testing` to include the new "batch add" feature.
+   * - 03/19/14
      - Updated the sections on :ref:`Beta_Testing`, :ref:`Discussions`,
-       :ref:`Grades`, and :ref:`Student Data` with changes to the new Instructor
-       Dashboard.
+       :ref:`Grades`, and :ref:`Student Data` with changes to the new Instructor Dashboard.
    * - 03/17/14
      - Reorganized this document into major sections: 
 
@@ -70,6 +101,18 @@ Change Log
 
        * :ref:`Describe Your Course`
 
+   
+
+****************
+February, 2014
+****************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change  
    * - 02/25/14
      - Updated :ref:`Add Files to a Course` section to include new External URL
        feature.
@@ -109,6 +152,18 @@ Change Log
    * - 
      - Added :ref:`Additional Tools` topic with :ref:`Multiple Choice and
        Numerical Input` and :ref:`Protein Builder`.
+   
+
+**************
+January, 2014
+**************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change  
    * - 01/29/2014
      - Added the chapter :ref:`Using an Instant Hangout in Your Course`.
    * - 01/24/2014
@@ -143,9 +198,17 @@ Change Log
      - Updated the chapters :ref:`Organizing Your Course Content` and
        :ref:`Testing Your Course` to reflect changes in the Course Outline
        design.
-   * - 
-     - Updated the topic :ref:`Add Files to a Course` to reflect addition of
-       pagination to the Files & Uploads page.
+
+***************
+December, 2013
+***************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change  
    * - 12/20/2013
      - Made :ref:`ORA for Students` into template that instructors can
        customize.

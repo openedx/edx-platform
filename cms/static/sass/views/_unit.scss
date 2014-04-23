@@ -1038,6 +1038,7 @@ body.unit {
     padding: $baseline/2 $baseline;
   }
 
+
   .unit-actions {
     border-bottom: none;
     padding-bottom: 0;
@@ -1055,8 +1056,16 @@ body.unit {
     div {
       margin-top: 15px;
     }
-  }
 
+    // actions - publish/edit
+    .publish-draft {
+      @extend %action;
+    }
+
+    .create-draft {
+      @extend %action;
+    }
+  }
 
 
   input[type="radio"] {

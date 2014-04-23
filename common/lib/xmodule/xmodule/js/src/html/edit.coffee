@@ -48,8 +48,15 @@ class @HTMLEditingDescriptor
       height: '400px',
       menubar: false,
       statusbar: false,
+
       # Necessary to avoid stripping of style tags.
       valid_children : "+body[style]",
+
+      # Allow any elements to be used, e.g. link, script, math
+      valid_elements: "*[*]",
+      extended_valid_elements: "*[*]",
+      invalid_elements: "",
+
       setup: @setupTinyMCE,
       # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
       # The tinyMCE callback passes in the editor as a parameter.

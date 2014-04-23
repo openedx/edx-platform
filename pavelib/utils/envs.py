@@ -21,6 +21,14 @@ class Env(object):
     # We use this to determine which envs.json file to load.
     SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
 
+    # If service variant not configured in env, then pass the correct
+    # environment for lms / cms
+    if not SERVICE_VARIANT:  # this will intentionally catch "";
+        if any(i in sys.argv[1:] for i in ('cms', 'studio')):
+            SERVICE_VARIANT = 'cms'
+        else:
+            SERVICE_VARIANT = 'lms'
+
     @lazy
     def env_tokens(self):
         """

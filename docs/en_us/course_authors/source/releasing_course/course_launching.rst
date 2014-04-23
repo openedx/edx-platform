@@ -104,8 +104,10 @@ recipients by selecting one of these predefined groups:
 * **Myself**, to test out a message before sending it to a larger group.
 * **Staff and Instructors**, to contact other members of the administrative
   team.
-* **All (students, staff and instructors)**, to communicate with all currently
-  enrolled students and the administrative team.
+* **All (students, staff and instructors)**, to communicate with currently
+  enrolled students and the administrative team. 
+
+.. note:: Students can opt not to receive email messages through the **Email Settings** link for each course on their dashboards. Email messages are not sent to these students.
 
 When you use the bulk email feature, consider that messages **cannot be
 cancelled** after they are sent. Before you send a message to all course
@@ -144,12 +146,12 @@ To send an email message to course participants:
    Instructor Tasks** section of the page.
 
 ======================================================
-Message Queueing and Delivery
+Message Queueing
 ======================================================
 
 When you send a message, it is queued for processing as a bulk email task.
 Multiple courses use the same queue to complete these tasks, so it can take
-some time for your message to be delivered to its recipients. If your course
+some time for your message to be sent to all of its recipients. If your course
 is a MOOC, consider limiting the number of messages that you send to all
 course participants to no more than one per week.
 
@@ -200,3 +202,14 @@ To produce the Email Task History report:
 .. image:: ../Images/Bulk_email_history.png
        :width: 800
        :alt: A tabular report with a row for each message sent and columns for requester, date and time submitted, duration, state, task status, and task progress.
+
+For messages with a State of "Success", the Task Progress can show an informational message such as "Message successfully emailed for 13457 recipients (skipping 29) (out of 13486)". To interpret this message, note that:
+
+* The first number indicates the number of messages sent to the selected
+  recipients.
+* The second "skipping" number indicates the number of enrolled users who have
+  opted out of receiving course email messages on their dashboards.
+* The final "out of" number indicates the number of users in the set of selected
+  recipients who were enrolled in the course when you sent the email message.
+  For email messages addressed to a large number of users, the number of
+  enrolled students can change while the message is queued for processing.

@@ -23,6 +23,8 @@ BOK_CHOY_XUNIT_REPORT = File.join(BOK_CHOY_REPORT_DIR, "xunit.xml")
 BOK_CHOY_COVERAGE_RC = File.join(BOK_CHOY_DIR, ".coveragerc")
 directory BOK_CHOY_REPORT_DIR
 
+# Directory that videos are served from
+VIDEO_SOURCE_DIR = File.join(REPO_ROOT, "test_root", "data", "video")
 
 BOK_CHOY_SERVERS = {
     :lms => { :port =>  8003, :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_lms.log") },
@@ -46,6 +48,12 @@ BOK_CHOY_STUBS = {
     :comments => {
         :port => 4567,
         :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_comments.log")
+    },
+
+    :video => {
+        :port => 8777,
+        :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_video_sources.log"),
+        :config => "root_dir=#{VIDEO_SOURCE_DIR}"
     }
 }
 

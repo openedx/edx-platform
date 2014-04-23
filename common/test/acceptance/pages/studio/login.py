@@ -28,6 +28,6 @@ class LoginPage(PageObject):
 
         # Ensure that we make it to another page
         EmptyPromise(
-            lambda: "login" not in self.browser.url,
+            lambda: "login" not in self.browser.current_url,
             "redirected from the login page"
         ).fulfill()

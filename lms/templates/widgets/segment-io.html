@@ -8,24 +8,7 @@
 <script type="text/javascript">
   // Asynchronously load Segment.io's analytics.js library
   window.analytics||(window.analytics=[]),window.analytics.methods=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group","on","once","off"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var method=window.analytics.methods[i];window.analytics[method]=window.analytics.factory(method)}window.analytics.load=function(t){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)},window.analytics.SNIPPET_VERSION="2.0.8",
-  window.analytics.load("${ settings.SEGMENT_IO_LMS_KEY }");
-
-  // Get current page URL and pull out the path
-  path = window.location.href.split("/")[3]
-  // Match on the current path and fire the appropriate pageview event
-  if (path == "register") {
-    // Registration page viewed
-    window.analytics.page("Registration");
-  } else if (path == "login") {
-    // Login page viewed
-    window.analytics.page("Login");
-  } else if (path == "dashboard") {
-    // Dashboard viewed
-    window.analytics.page("Dashboard");
-  } else {
-    // This event serves as a catch-all, firing when any other page is viewed
-    window.analytics.page("Other");
-  }
+  analytics.load("${ settings.SEGMENT_IO_LMS_KEY }");
 
   % if user.is_authenticated():
 
@@ -39,6 +22,23 @@
     });
 
   % endif
+
+  // Get current page URL and pull out the path
+  path = window.location.href.split("/")[3]
+  // Match on the current path and fire the appropriate pageview event
+  if (path == "register") {
+    // Registration page viewed
+    analytics.page("Registration");
+  } else if (path == "login") {
+    // Login page viewed
+    analytics.page("Login");
+  } else if (path == "dashboard") {
+    // Dashboard viewed
+    analytics.page("Dashboard");
+  } else {
+    // This event serves as a catch-all, firing when any other page is viewed
+    analytics.page("Other");
+  }
 </script>
 <!-- end Segment.io -->
 % else:

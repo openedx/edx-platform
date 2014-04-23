@@ -358,6 +358,11 @@ section.instructor-dashboard-content-2 {
     display: block;
   }
 
+  label[for="auto-enroll-beta"]:hover + .auto-enroll-beta-hint {
+    width: 30%;
+    display: block;
+  }
+
 
   label[for="email-students"]:hover + .email-students-hint {
     display: block;
