@@ -1290,6 +1290,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
     file_name = "Student file 1"
     answer_link = "http://www.edx.org"
     autolink_tag = '<a target="_blank" href='
+    autolink_tag_swapped = '<a href='
 
     def get_module_system(self, descriptor):
         test_system = get_test_system()
@@ -1339,7 +1340,8 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         response = json.loads(response)
         self.assertTrue(response['success'])
         self.assertIn(self.file_name, response['student_response'])
-        self.assertIn(self.autolink_tag, response['student_response'])
+        self.assertTrue(self.autolink_tag in response['student_response'] or
+                        self.autolink_tag_swapped in response['student_response'])
 
     def test_link_submission_success(self):
         """
@@ -1356,7 +1358,8 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
 
         self.assertTrue(response['success'])
         self.assertIn(self.answer_link, response['student_response'])
-        self.assertIn(self.autolink_tag, response['student_response'])
+        self.assertTrue(self.autolink_tag in response['student_response'] or
+                        self.autolink_tag_swapped in response['student_response'])
 
 
 class OpenEndedModuleUtilTest(unittest.TestCase):
@@ -1379,7 +1382,7 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
     text_brs = u"St\xfcdent submission:<br/>I like lamp."
 
     link_text = u'I love going to www.lolcatz.com'
-    link_atag = u'I love going to <a target="_blank" href="http://www.lolcatz.com">www.lolcatz.com</a>'
+    link_atag = u'I love going to <a href="http://www.lolcatz.com" target="_blank">www.lolcatz.com</a>'
 
     def test_script(self):
         """
