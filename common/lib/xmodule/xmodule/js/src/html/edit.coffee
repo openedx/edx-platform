@@ -53,7 +53,6 @@ class @HTMLEditingDescriptor
       valid_children : "+body[style]",
 
       # Allow any elements to be used, e.g. link, script, math
-      verify_html: false,
       valid_elements: "*[*]",
       extended_valid_elements: "*[*]",
       invalid_elements: "",
