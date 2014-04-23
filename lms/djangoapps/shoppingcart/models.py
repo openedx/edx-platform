@@ -567,6 +567,8 @@ class CertificateItem(OrderItem):
             "course_num": course.display_number_with_default,
             "course_start_date_text": course.start_date_text,
             "course_has_started": course.start > datetime.today().replace(tzinfo=pytz.utc),
+            "course_root_url": reverse('course_root', kwargs={'course_id': self.course_id.to_deprecated_string()}),
+            "dashboard_url": reverse('dashboard'),
         }
 
     @property
