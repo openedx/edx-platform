@@ -48,6 +48,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   ###
   onShowXMLButton: (e) =>
     e.preventDefault();
+    @addRemoveCheatsheetCSS()
     if @confirmConversionToXml()
       @createXMLEditor(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
       # Need to refresh to get line numbers to display properly (and put cursor position to 0)
@@ -94,10 +95,21 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       @cheatsheet = $($('#simple-editor-cheatsheet').html())
       $(@markdown_editor.getWrapperElement()).append(@cheatsheet)
 
-    $(".CodeMirror").css({"overflow": "visible"})
-    $(".modal-content").css({"overflow-y": "visible", "overflow-x": "visible"})
+    @addRemoveCheatsheetCSS()
 
     setTimeout (=> @cheatsheet.toggleClass('shown')), 10
+
+
+  ###
+  Function to add/remove CSS for cheatsheet.
+  ###
+  addRemoveCheatsheetCSS: () =>
+    if !@cheatsheet.hasClass("shown")
+      $(".CodeMirror").css({"overflow": "visible"})
+      $(".modal-content").css({"overflow-y": "visible", "overflow-x": "visible"})
+    else
+      $(".CodeMirror").removeAttr("style")
+      $(".modal-content").removeAttr("style")
 
   ###
   Stores the current editor and hides the one that is not displayed.
