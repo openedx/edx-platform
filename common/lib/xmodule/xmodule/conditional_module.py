@@ -262,5 +262,6 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
 
         # Overwrite the original sources attribute with the value from sources_list, as
         # Locations may have been changed to Locators.
-        self.xml_attributes['sources'] = ';'.join(self.sources_list)
+        stringified_sources_list = map(lambda loc: loc.to_deprecated_string(), self.sources_list)
+        self.xml_attributes['sources'] = ';'.join(stringified_sources_list)
         return xml_object
