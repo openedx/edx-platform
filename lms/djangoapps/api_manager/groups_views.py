@@ -131,7 +131,7 @@ def group_detail(request, group_id):
         # update GroupProfile data
 
         group_type = request.DATA.get('group_type')
-        data = request.DATA.get('data')
+        data = json.dumps(request.DATA.get('data')) if request.DATA.get('data') else None
 
         if not group_type and not data:
             return Response({}, status.HTTP_400_BAD_REQUEST)

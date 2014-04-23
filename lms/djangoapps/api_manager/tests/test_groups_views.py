@@ -53,7 +53,7 @@ class GroupsApiTests(TestCase):
             'Content-Type': 'application/json',
             'X-Edx-Api-Key': str(TEST_API_KEY),
         }
-        response = self.client.post(uri, headers=headers, data=data)
+        response = self.client.post(uri, headers=headers, data=json.dumps(data), content_type='application/json')
         return response
 
     def do_get(self, uri):
@@ -108,10 +108,6 @@ class GroupsApiTests(TestCase):
         self.assertEqual(response.data['name'], self.test_group_name)
 
     def test_group_list_get_with_profile(self):
-        # skip test. Seems like the Django test client is not serializing the nested JSON
-        # post arguments. Need to investigate
-        return
-
         data = {
             'name': self.test_group_name,
             'group_type': 'series',
