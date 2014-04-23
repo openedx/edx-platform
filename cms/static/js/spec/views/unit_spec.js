@@ -165,7 +165,6 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec_helpers/creat
         describe("Disabled edit/publish links during ajax call", function() {
             var unit,
                 link,
-                selectors,
                 selectors = [".publish-draft", ".create-draft"],
                 editLinkFixture =
                 '<div class="main-wrapper edit-state-draft" data-locator="unit_locator"> \
