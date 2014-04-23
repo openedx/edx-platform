@@ -4,11 +4,10 @@ metadata:
     editor: raw
 data: |
       <p>This template is similar to the Text template. The only difference is 
-      that this template opens in a raw HTML editor rather than in the Visual 
-      editor. Raw HTML is most useful when you need to use script and span tags 
-      to format your content.</p>
+      that this template opens in the Raw HTML editor rather than in the Visual
+      editor.</p>
 
-      <p>The raw HTML editor saves your HTML exactly as you enter it. 
+      <p>The Raw HTML editor saves your HTML exactly as you enter it.
       You can switch to the Visual editor by clicking the Settings tab and 
       changing the Editor setting to Visual. Note, however, that some of your 
       HTML may be modified when you save the component if you switch to the 
