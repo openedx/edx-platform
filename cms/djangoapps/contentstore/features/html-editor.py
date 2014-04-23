@@ -2,7 +2,7 @@
 # pylint: disable=C0111
 
 from lettuce import world, step
-from nose.tools import assert_in, assert_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_in, assert_false, assert_true, assert_equal  # pylint: disable=no-name-in-module
 from common import type_in_codemirror, get_codemirror_value
 
 CODEMIRROR_SELECTOR_PREFIX = "$('iframe').contents().find"
@@ -15,6 +15,16 @@ def i_created_blank_html_page(step):
         step=step,
         category='html',
         component_type='Text'
+    )
+
+
+@step('I have created a raw HTML component')
+def i_created_raw_html(step):
+    world.create_course_with_unit()
+    world.create_component_instance(
+        step=step,
+        category='html',
+        component_type='Raw HTML'
     )
 
 
@@ -86,6 +96,10 @@ def check_link_in_link_plugin(step, path):
 
 @step('type "(.*)" in the code editor and press OK$')
 def type_in_codemirror_plugin(step, text):
+    # Verify that raw code editor is not visible.
+    assert_true(world.css_has_class('.CodeMirror', 'is-inactive'))
+    # Verify that TinyMCE editor is present
+    assert_true(world.is_css_present('.tiny-mce'))
     use_code_editor(
         lambda: type_in_codemirror(0, text, CODEMIRROR_SELECTOR_PREFIX)
     )
@@ -134,6 +148,11 @@ def i_click_on_save(step):
 @step('the page text contains:')
 def check_page_text(step):
     assert_in(step.multiline, world.css_find('.xmodule_HtmlModule').html)
+
+
+@step('the Raw Editor contains exactly:')
+def check_raw_editor_text(step):
+    assert_equal(step.multiline, get_codemirror_value(0))
 
 
 @step('the src link is rewritten to "(.*)"$')
@@ -204,3 +223,18 @@ def set_text_and_select(step, text):
 def select_code_button(step):
     # This is our custom "code style" button. It uses an image instead of a class.
     world.css_click(".mce-i-none")
+
+
+@step('type "(.*)" into the Raw Editor$')
+def type_in_raw_editor(step, text):
+    # Verify that CodeMirror editor is not hidden
+    assert_false(world.css_has_class('.CodeMirror', 'is-inactive'))
+    # Verify that TinyMCE Editor is not present
+    assert_true(world.is_css_not_present('.tiny-mce'))
+    type_in_codemirror(0, text)
+
+
+@step('I edit the component and select the (Raw|Visual) Editor$')
+def select_editor(step, editor):
+    world.edit_component_and_select_settings()
+    world.browser.select('Editor', editor)

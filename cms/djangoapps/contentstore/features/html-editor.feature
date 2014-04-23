@@ -89,3 +89,42 @@ Feature: CMS.HTML Editor
       """
       <p><code>display as code</code></p>
       """
+
+  Scenario: Raw HTML component does not change text
+    Given I have created a raw HTML component
+    When I edit the page
+    And type "<li>zzzz<ol>" into the Raw Editor
+    And I save the page
+    Then the page text contains:
+      """
+      <li>zzzz<ol>
+      """
+    And I edit the page
+    Then the Raw Editor contains exactly:
+      """
+      <li>zzzz<ol>
+      """
+
+  Scenario: Can switch from Visual Editor to Raw
+    Given I have created a Blank HTML Page
+    When I edit the component and select the Raw Editor
+    And I save the page
+    When I edit the page
+    And type "fancy html" into the Raw Editor
+    And I save the page
+    Then the page text contains:
+      """
+      fancy html
+      """
+
+  Scenario: Can switch from Raw Editor to Visual
+    Given I have created a raw HTML component
+    And I edit the component and select the Visual Editor
+    And I save the page
+    When I edit the page
+    And type "less fancy html" in the code editor and press OK
+    And I save the page
+    Then the page text contains:
+      """
+      less fancy html
+      """

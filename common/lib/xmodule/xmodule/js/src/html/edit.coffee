@@ -144,9 +144,9 @@ class @HTMLEditingDescriptor
     text = undefined
     if @editor_choice == 'visual'
       visualEditor = @getVisualEditor()
-      content = visualEditor.getContent({format:"raw", no_events: 1})
-      if @starting_content != content
-        text = rewriteStaticLinks(content, @base_asset_url, '/static/')
+      raw_content = visualEditor.getContent({format:"raw", no_events: 1})
+      if @starting_content != raw_content
+        text = rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
 
     if text == undefined
       text = @advanced_editor.getValue()
