@@ -63,6 +63,8 @@ def see_a_multi_step_component(step, category):
                     '<h2>ZOOMING DIAGRAMS</h2>',
                 'E-text Written in LaTeX':
                     '<h2>Example: E-text page</h2>',
+                'Raw HTML':
+                    '<p>This template is similar to the Text template. The only difference is',
             }
             actual_html = world.css_html(selector, index=idx)
             assert_in(html_matcher[step_hash['Component']], actual_html)
