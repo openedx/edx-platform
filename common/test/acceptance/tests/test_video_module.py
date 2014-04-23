@@ -194,9 +194,9 @@ class YouTubeVideoTest(VideoBaseTest):
         # Verify that video has rendered in "Youtube" mode
         self.assertTrue(self.video.is_video_rendered('youtube'))
 
-    def test_cc_button_wo_english_transcript_youtube(self):
+    def test_cc_button_wo_english_transcript(self):
         """
-        Scenario: CC button works correctly w/o english transcript in Youtube mode of Video component
+        Scenario: CC button works correctly w/o english transcript in Youtube mode
         Given the course has a Video component in "Youtube" mode
         And I have defined a non-english transcript for the video
         And I have uploaded a non-english transcript file to assets
@@ -215,7 +215,7 @@ class YouTubeVideoTest(VideoBaseTest):
     def test_cc_button_transcripts_and_sub_fields_empty(self):
         """
         Scenario: CC button works correctly if transcripts and sub fields are empty,
-        but transcript file exists in assets (Youtube mode of Video component)
+            but transcript file exists in assets (Youtube mode of Video component)
         Given the course has a Video component in "Youtube" mode
         And I have uploaded a .srt.sjson file to assets
         Then I see the correct english text in the captions
@@ -238,8 +238,10 @@ class YouTubeVideoTest(VideoBaseTest):
 
     def test_fullscreen_video_alignment_with_transcript_hidden(self):
         """
-        Scenario: Video is aligned correctly if transcript is hidden in fullscreen mode
+        Scenario: Video is aligned with transcript hidden in fullscreen mode
         Given the course has a Video component in "Youtube" mode
+        When I view the video at fullscreen
+        Then the video with the transcript hidden is aligned correctly
         """
         self.navigate_to_video()
 
@@ -251,10 +253,11 @@ class YouTubeVideoTest(VideoBaseTest):
 
     def test_download_button_wo_english_transcript(self):
         """
-        Scenario: Download button works correctly w/o english transcript in Youtube mode of Video component
-        Given
-            I have a "chinese_transcripts.srt" transcript file in assets
-            And it has a video in "Youtube" mode
+        Scenario: Download button works correctly w/o english transcript in YouTube mode
+        Given the course has a Video component in "Youtube" mode
+        And I have defined a downloadable non-english transcript for the video
+        And I have uploaded a non-english transcript file to assets
+        Then I can download the transcript in "srt" format
         """
         data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}}
         self.metadata = self.metadata_for_mode('youtube', additional_data=data)
@@ -267,13 +270,16 @@ class YouTubeVideoTest(VideoBaseTest):
         unicode_text = "好 各位同学".decode('utf-8')
         self.video.downloaded_transcript_contains_text('srt', unicode_text)
 
-    def test_download_button_two_transcript_languages_youtube(self):
+    def test_download_button_two_transcript_languages(self):
         """
-        Scenario: Download button works correctly for non-english transcript in Youtube mode of Video component
-        Given
-            I have a "chinese_transcripts.srt" transcript file in assets
-            And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-            And it has a video in "Youtube" mode
+        Scenario: Download button works correctly for multiple transcript languages
+        Given the course has a Video component in "Youtube" mode
+        And I have defined a downloadable non-english transcript for the video
+        And I have defined english subtitles for the video
+        Then I see the correct english text in the captions
+        And the english transcript downloads correctly
+        And I see the correct non-english text in the captions
+        And the non-english transcript downloads correctly
         """
         self.assets.extend(['chinese_transcripts.srt', 'subs_OEoXaMPEzfM.srt.sjson'])
         data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}, 'sub': 'OEoXaMPEzfM'}
@@ -301,8 +307,13 @@ class YouTubeVideoTest(VideoBaseTest):
 
     def test_fullscreen_video_alignment_on_transcript_toggle(self):
         """
-        Tests that Video is aligned correctly on transcript toggle in fullscreen mode Given I have a
-        "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets And it has a video in "Youtube" mode.
+        Scenario: Video is aligned correctly on transcript toggle in fullscreen mode
+        Given the course has a Video component in "Youtube" mode
+        And I have uploaded a .srt.sjson file to assets
+        And I have defined subtitles for the video
+        When I view the video at fullscreen
+        Then the video with the transcript enabled is aligned correctly
+        And the video with the transcript hidden is aligned correctly
         """
         self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
         data = {'sub': 'OEoXaMPEzfM'}
@@ -336,7 +347,7 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
     def test_youtube_video_rendering_with_unsupported_sources(self):
         """
         Scenario: Video component is rendered in the LMS in Youtube mode
-                  with HTML5 sources that doesn't supported by browser
+            with HTML5 sources that doesn't supported by browser
         Given the course has a Video component in "Youtube_HTML5_Unsupported_Video" mode
         Then the video has rendered in "Youtube" mode
         """
@@ -355,8 +366,9 @@ class Html5VideoTest(VideoBaseTest):
 
     def test_autoplay_disabled_for_video_component(self):
         """
-        Scenario: Autoplay is disabled in LMS for a Video component
+        Scenario: Autoplay is disabled by default for a Video component
         Given the course has a Video component in "HTML5" mode
+        When I view the Video component
         Then it does not have autoplay enabled
         """
         self.metadata = self.metadata_for_mode('html5')
@@ -367,10 +379,11 @@ class Html5VideoTest(VideoBaseTest):
 
     def test_html5_video_rendering_with_unsupported_sources(self):
         """
-        Scenario: Video component is rendered in LMS in HTML5 mode with HTML5 sources that doesn't supported by browser
+        Scenario: LMS displays an error message for HTML5 sources that are not supported by browser
         Given the course has a Video component in "HTML5_Unsupported_Video" mode
-        Then error message is shown
-        And error message has correct text
+        When I view the Video component
+        Then and error message is shown
+        And the error message has the correct text
         """
         self.metadata = self.metadata_for_mode('html5_unsupported_video')
         self.navigate_to_video_no_render()
@@ -384,10 +397,12 @@ class Html5VideoTest(VideoBaseTest):
 
     def test_download_button_wo_english_transcript(self):
         """
-        Scenario: Download button works correctly w/o english transcript in HTML5 mode of Video component
-        Given
-            I have a "chinese_transcripts.srt" transcript file in assets
-            And it has a video in "HTML5" mode
+        Scenario: Download button works correctly w/o english transcript in HTML5 mode
+        Given the course has a Video component in "HTML5" mode
+        And I have defined a downloadable non-english transcript for the video
+        And I have uploaded a non-english transcript file to assets
+        Then I see the correct non-english text in the captions
+        And the non-english transcript downloads correctly
         """
         data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}}
         self.metadata = self.metadata_for_mode('html5', additional_data=data)
@@ -404,13 +419,16 @@ class Html5VideoTest(VideoBaseTest):
         unicode_text = "好 各位同学".decode('utf-8')
         self.video.downloaded_transcript_contains_text('srt', unicode_text)
 
-    def test_download_button_two_transcript_languages_html5(self):
+    def test_download_button_two_transcript_languages(self):
         """
-        Scenario: Download button works correctly for non-english transcript in HTML5 mode of Video component
-        Given
-            I have a "chinese_transcripts.srt" transcript file in assets
-            And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-            And it has a video in "HTML5" mode
+        Scenario: Download button works correctly for multiple transcript languages in HTML5 mode
+        Given the course has a Video component in "HTML5" mode
+        And I have defined a downloadable non-english transcript for the video
+        And I have defined english subtitles for the video
+        Then I see the correct english text in the captions
+        And the english transcript downloads correctly
+        And I see the correct non-english text in the captions
+        And the non-english transcript downloads correctly
         """
         self.assets.extend(['chinese_transcripts.srt', 'subs_OEoXaMPEzfM.srt.sjson'])
         data = {'download_track': True, 'transcripts': {'zh': 'chinese_transcripts.srt'}, 'sub': 'OEoXaMPEzfM'}
@@ -439,10 +457,13 @@ class Html5VideoTest(VideoBaseTest):
 
     def test_full_screen_video_alignment_with_transcript_visible(self):
         """
-        Scenario: Video is aligned correctly if transcript is visible in fullscreen mode
-        Given
-            I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-            And it has a video in "HTML5" mode
+        Scenario: Video is aligned correctly with transcript enabled in fullscreen mode
+        Given the course has a Video component in "HTML5" mode
+        And I have uploaded a .srt.sjson file to assets
+        And I have defined subtitles for the video
+        When I show the captions
+        And I view the video at fullscreen
+        Then the video with the transcript enabled is aligned correctly
         """
         self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
         data = {'sub': 'OEoXaMPEzfM'}
@@ -462,10 +483,11 @@ class Html5VideoTest(VideoBaseTest):
 
     def test_cc_button_with_english_transcript(self):
         """
-        Scenario: CC button works correctly only w/ english transcript in HTML5 mode of Video component
-        Given
-            I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-            And it has a video in "HTML5" mode
+        Scenario: CC button works correctly with only english transcript in HTML5 mode
+        Given the course has a Video component in "HTML5" mode
+        And I have defined english subtitles for the video
+        And I have uploaded an english transcript file to assets
+        Then I see the correct text in the captions
         """
         self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
         data = {'sub': 'OEoXaMPEzfM'}
@@ -480,12 +502,13 @@ class Html5VideoTest(VideoBaseTest):
         # check if we see "Hi, welcome to Edx." text in the captions
         self.assertIn("Hi, welcome to Edx.", self.video.captions_text)
 
-    def test_cc_button_wo_english_transcript_html5(self):
+    def test_cc_button_wo_english_transcript(self):
         """
-        Scenario: CC button works correctly w/o english transcript in HTML5 mode of Video component
-        Given
-            I have a "chinese_transcripts.srt" transcript file in assets
-            And it has a video in "HTML5" mode
+        Scenario: CC button works correctly w/o english transcript in HTML5 mode
+        Given the course has a Video component in "HTML5" mode
+        And I have defined a non-english transcript for the video
+        And I have uploaded a non-english transcript file to assets
+        Then I see the correct text in the captions
         """
         self.assets.append('chinese_transcripts.srt')
         data = {'transcripts': {'zh': 'chinese_transcripts.srt'}}
