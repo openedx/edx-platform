@@ -127,7 +127,7 @@ class VerifiedView(View):
             {}
         ).get(
             course_id.to_deprecated_string(),
-            verify_mode.min_price.format("{:g}")
+            verify_mode.min_price
         )
 
         course = course_from_id(course_id)
