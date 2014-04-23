@@ -4,6 +4,7 @@ Tests for session api with advance security features
 import json
 import uuid
 import unittest
+from mock import patch
 from datetime import datetime, timedelta
 from freezegun import freeze_time
 from pytz import UTC
@@ -20,6 +21,8 @@ TEST_API_KEY = str(uuid.uuid4())
 
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
+@patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
+@patch.dict("django.conf.settings.FEATURES", {'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class SessionApiSecurityTest(TestCase):
     """
