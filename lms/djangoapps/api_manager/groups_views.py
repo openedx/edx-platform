@@ -76,7 +76,7 @@ def group_list(request):
 
         # allow for optional meta information about groups, this will end up in the GroupProfile table
         group_type = request.DATA.get('group_type')
-        data = json.dumps(request.DATA.get('data'))
+        data = json.dumps(request.DATA.get('data')) if request.DATA.get('data') else None
 
         if group_type or data:
             profile, _ = GroupProfile.objects.get_or_create(group_id=group.id, group_type=group_type, data=data)
