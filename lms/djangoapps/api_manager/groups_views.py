@@ -144,23 +144,41 @@ def group_detail(request, group_id):
         return Response({})
 
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @permission_classes((ApiKeyHeaderPermission,))
 def group_users_list(request, group_id):
     """
     POST creates a new group-user relationship in the system
     """
     response_data = {}
-    group_id = group_id
-    user_id = request.DATA['user_id']
-    base_uri = _generate_base_uri(request)
+
     try:
         existing_group = Group.objects.get(id=group_id)
-        existing_user = User.objects.get(id=user_id)
     except ObjectDoesNotExist:
-        existing_group = None
-        existing_user = None
-    if existing_group and existing_user:
+        return Response({}, status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        users = existing_group.user_set.all()
+        response_data['users'] = []
+        for user in users:
+            user_data = {}
+            user_data['id'] = user.id
+            user_data['email'] = user.email
+            user_data['username'] = user.username
+            user_data['first_name'] = user.first_name
+            user_data['last_name'] = user.last_name
+            response_data['users'].append(user_data)
+
+        response_status = status.HTTP_200_OK
+
+    elif request.method == "POST":
+        user_id = request.DATA['user_id']
+        base_uri = _generate_base_uri(request)
+        try:
+            existing_user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+
         try:
             existing_relationship = Group.objects.get(user=existing_user)
         except ObjectDoesNotExist:
@@ -175,8 +193,7 @@ def group_users_list(request, group_id):
             response_data['uri'] = '{}/{}'.format(base_uri, existing_user.id)
             response_data['message'] = "Relationship already exists."
             response_status = status.HTTP_409_CONFLICT
-    else:
-        response_status = status.HTTP_404_NOT_FOUND
+
     return Response(response_data, status=response_status)
 
 
