@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 gem 'rake', '~> 10.0.3'
-gem 'sass', '3.2.12'
+gem 'sass', '3.3.5'
 gem 'bourbon', '~> 3.1.8'
 gem 'neat', '~> 1.4.0'
 gem 'colorize', '~> 0.5.8'
