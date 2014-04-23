@@ -23,7 +23,6 @@ TEST_API_KEY = str(uuid.uuid4())
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
 @patch.dict("django.conf.settings.FEATURES", {'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True})
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class SessionApiSecurityTest(TestCase):
     """
     Test api_manager.session.session_list view
@@ -43,7 +42,7 @@ class SessionApiSecurityTest(TestCase):
         self.session_url = '/api/sessions'
         self.user_url = '/api/users'
 
-    @override_settings(ENABLE_MAX_FAILED_LOGIN_ATTEMPTS=True, MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=10)
+    @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=10)
     def test_login_ratelimited_success(self):
         """
         Try (and fail) logging in with fewer attempts than the limit of 10
@@ -58,7 +57,7 @@ class SessionApiSecurityTest(TestCase):
         response = self._do_post_request(self.session_url, 'test', 'test_password', secure=True)
         self._assert_response(response, status=201)
 
-    @override_settings(ENABLE_MAX_FAILED_LOGIN_ATTEMPTS=True, MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=10)
+    @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=10)
     def test_login_blockout(self):
         """
         Try (and fail) logging in with 10 attempts
@@ -74,7 +73,7 @@ class SessionApiSecurityTest(TestCase):
         message = _('This account has been temporarily locked due to excessive login failures. Try again later.')
         self._assert_response(response, status=403, message=message)
 
-    @override_settings(ENABLE_MAX_FAILED_LOGIN_ATTEMPTS=True, MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=10,
+    @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=10,
                        MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS=1800)
     def test_blockout_reset_time_period(self):
         """
@@ -98,7 +97,7 @@ class SessionApiSecurityTest(TestCase):
             response = self._do_post_request(self.session_url, 'test', 'test_password', secure=True)
             self._assert_response(response, status=201)
 
-    @override_settings(ENFORCE_PASSWORD_POLICY=True, PASSWORD_MIN_LENGTH=4)
+    @override_settings(PASSWORD_MIN_LENGTH=4)
     def test_with_short_password(self):
         """
         Try (and fail) user creation with shorter password
@@ -108,7 +107,7 @@ class SessionApiSecurityTest(TestCase):
         message = _('Password: Invalid Length (must be 4 characters or more)')
         self._assert_response(response, status=400, message=message)
 
-    @override_settings(ENFORCE_PASSWORD_POLICY=True, PASSWORD_MAX_LENGTH=12)
+    @override_settings(PASSWORD_MAX_LENGTH=12)
     def test_with_long_password(self):
         """
         Try (and fail) user creation with longer password
@@ -118,8 +117,7 @@ class SessionApiSecurityTest(TestCase):
         message = _('Password: Invalid Length (must be 12 characters or less)')
         self._assert_response(response, status=400, message=message)
 
-    @override_settings(ENFORCE_PASSWORD_POLICY=True,
-                       PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
+    @override_settings(PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
     def test_password_without_uppercase(self):
         """
         Try (and fail) user creation since password should have atleast
@@ -130,8 +128,7 @@ class SessionApiSecurityTest(TestCase):
         message = _('Password: Must be more complex (must contain 2 or more uppercase characters)')
         self._assert_response(response, status=400, message=message)
 
-    @override_settings(ENFORCE_PASSWORD_POLICY=True,
-                       PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
+    @override_settings(PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
     def test_password_without_lowercase(self):
         """
         Try (and fail) user creation without any numeric characters
@@ -142,8 +139,7 @@ class SessionApiSecurityTest(TestCase):
         message = _('Password: Must be more complex (must contain 2 or more lowercase characters)')
         self._assert_response(response, status=400, message=message)
 
-    @override_settings(ENFORCE_PASSWORD_POLICY=True,
-                       PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
+    @override_settings(PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
     def test_password_without_punctuation(self):
         """
         Try (and fail) user creation without any punctuation in password
@@ -154,8 +150,7 @@ class SessionApiSecurityTest(TestCase):
                     ' must contain 2 or more punctuation characters)')
         self._assert_response(response, status=400, message=message)
 
-    @override_settings(ENFORCE_PASSWORD_POLICY=True,
-                       PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
+    @override_settings(PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
     def test_password_without_numeric(self):
         """
         Try (and fail) user creation without any numeric characters in password
@@ -166,8 +161,7 @@ class SessionApiSecurityTest(TestCase):
                     ' must contain 2 or more digits)')
         self._assert_response(response, status=400, message=message)
 
-    @override_settings(ENFORCE_PASSWORD_POLICY=True,
-                       PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
+    @override_settings(PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
     def test_password_with_complexity(self):
         """
         This should pass since it has everything needed for a complex password
