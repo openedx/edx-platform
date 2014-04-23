@@ -152,25 +152,9 @@ class LocMapperStore(object):
         if cached_value:
             return cached_value
 
-        maps = self.location_map.find(location_id)
-        maps = list(maps)
-        if len(maps) == 0:
-            if add_entry_if_missing:
-                # create a new map
-                course_location = location.replace(category='course', name=location_id['_id']['name'])
-                self.create_map_entry(course_location)
-                entry = self.location_map.find_one(location_id)
-            else:
-                raise ItemNotFoundError(location)
-        elif len(maps) == 1:
-            entry = maps[0]
-        else:
-            # find entry w/o name, if any; otherwise, pick arbitrary
-            entry = maps[0]
-            for item in maps:
-                if 'name' not in item['_id']:
-                    entry = item
-                    break
+        entry = self._get_map_entry_form_location(location_id, location, add_entry_if_missing)
+        if entry is None:
+            raise ItemNotFoundError(location)
 
         block_id = entry['block_map'].get(self.encode_key_for_mongo(location.name))
         if block_id is None:
@@ -208,6 +192,34 @@ class LocMapperStore(object):
 
         self._cache_location_map_entry(old_style_course_id, location, published_usage, draft_usage)
         return result
+
+    def _get_map_entry_form_location(self, location_id, location=None, add_entry_if_missing=False):
+        """
+        Returns loc_mapper entry related to provided location_id
+
+        :param location:  a Location pointing to a module
+        :param location_id: location id in form of SON dict for querying the mapping table if location is provided
+        :param add_entry_if_missing: a boolean as to whether to return none or to create an entry
+        """
+        maps = self.location_map.find(location_id)
+        maps = list(maps)
+        entry = None
+        if len(maps) == 0:
+            if location is not None and add_entry_if_missing:
+                # create a new map
+                course_location = location.replace(category='course', name=location_id['_id']['name'])
+                self.create_map_entry(course_location)
+                entry = self.location_map.find_one(location_id)
+        elif len(maps) == 1:
+            entry = maps[0]
+        else:
+            # find entry w/o name, if any; otherwise, pick arbitrary
+            entry = maps[0]
+            for item in maps:
+                if 'name' not in item['_id']:
+                    entry = item
+                    break
+        return entry
 
     def translate_locator_to_location(self, locator, get_course=False, lower_only=False):
         """
@@ -299,19 +311,10 @@ class LocMapperStore(object):
 
         location_id = self._interpret_location_course_id(old_style_course_id, location, lower_only)
 
-        maps = self.location_map.find(location_id)
-        maps = list(maps)
-        if len(maps) == 0:
+        entry = self._get_map_entry_form_location(location_id)
+        if entry is None:
             raise ItemNotFoundError(location)
-        elif len(maps) == 1:
-            entry = maps[0]
-        else:
-            # find entry w/o name, if any; otherwise, pick arbitrary
-            entry = maps[0]
-            for item in maps:
-                if 'name' not in item['_id']:
-                    entry = item
-                    break
+
         published_course_locator = CourseLocator(package_id=entry['course_id'], branch=entry['prod_branch'])
         draft_course_locator = CourseLocator(package_id=entry['course_id'], branch=entry['draft_branch'])
         self._cache_course_locator(old_style_course_id, published_course_locator, draft_course_locator)
@@ -337,6 +340,20 @@ class LocMapperStore(object):
         block_map.setdefault(encoded_location_name, {})[location.category] = block_id
         self.location_map.update(location_id, {'$set': {'block_map': block_map}})
         return block_id
+
+    def _remove_from_block_map(self, location, location_id, block_map):
+        """
+        Remove the given location from the block_map and persist it
+        """
+        encoded_location_name = self.encode_key_for_mongo(location.name)
+        if encoded_location_name in block_map.keys():
+            map_entry = block_map[encoded_location_name]
+            if location.category in map_entry:
+                if len(map_entry) == 1:
+                    del block_map[encoded_location_name]
+                else:
+                    del map_entry[location.category]
+                self.location_map.update(location_id, {'$set': {'block_map': block_map}})
 
     def _interpret_location_course_id(self, course_id, location, lower_only=False):
         """
@@ -531,3 +548,17 @@ class LocMapperStore(object):
         delete_keys.append(u'{}+{}'.format(old_course_id, location.url()))
         delete_keys.append(old_course_id)
         self.cache.delete_many(delete_keys)
+
+    def delete_item_mapping(self, locator, location):
+        """
+        Delete item from loc_mapper and cache
+
+        :param locator: a BlockUsageLocator
+        :param location: a Location pointing to a module
+        """
+        course_location = self.translate_locator_to_location(locator, get_course=True)
+        location_id = self._interpret_location_course_id(course_location.course_id, location)
+
+        entry = self._get_map_entry_form_location(location_id)
+        if entry is not None:
+            self._remove_from_block_map(location, location_id, entry['block_map'])
