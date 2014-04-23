@@ -48,10 +48,13 @@ def group_list(request):
         response_data = []
         profiles = GroupProfile.objects.filter(group_type=request.GET['type'])
         for profile in profiles:
-            item_data = OrderedDict()
+            item_data = {}
             item_data['group_id'] = profile.group_id
-            item_data['group_type'] = profile.group_type
-            item_data['data'] = json.loads(profile.data)
+            if profile.group_type:
+                item_data['group_type'] = profile.group_type
+
+            if profile.data:
+                item_data['data'] = json.loads(profile.data)
             response_data.append(item_data)
 
         return Response(response_data)
@@ -73,7 +76,7 @@ def group_list(request):
 
         # allow for optional meta information about groups, this will end up in the GroupProfile table
         group_type = request.DATA.get('group_type')
-        data = request.DATA.get('data')
+        data = json.dumps(request.DATA.get('data'))
 
         if group_type or data:
             profile, _ = GroupProfile.objects.get_or_create(group_id=group.id, group_type=group_type, data=data)
