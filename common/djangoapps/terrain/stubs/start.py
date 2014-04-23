@@ -3,6 +3,7 @@ Command-line utility to start a stub service.
 """
 import sys
 import time
+import requests
 import logging
 from .comments import StubCommentsService
 from .xqueue import StubXQueueService
@@ -87,6 +88,9 @@ def main():
     print "Starting stub service '{0}' on port {1}...".format(service_name, port_num)
 
     server = SERVICES[service_name](port_num=port_num)
+    if service_name == 'youtube':
+        config_dict['youtube_api_response'] = requests.get('http://www.youtube.com/iframe_api')
+
     server.config.update(config_dict)
 
     try:
