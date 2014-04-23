@@ -2,18 +2,6 @@
 Feature: LMS.Video component
   As a student, I want to view course videos in LMS
 
-  # 1 Disabled 4/8/14 after intermittent failures in master
-  #Scenario: Video component stores position correctly when page is reloaded
-  #  Given the course has a Video component in "Youtube" mode
-  #  When the video has rendered in "Youtube" mode
-  #  And I click video button "play"
-  #  And I click video button "pause"
-  #  Then I seek video to "10" seconds
-  #  And I click video button "play"
-  #  And I click video button "pause"
-  #  And I reload the page with video
-  #  Then I see video slider at "10" seconds
-
   # 1
   Scenario: Video component is fully rendered in the LMS in HTML5 mode
     Given the course has a Video component in "HTML5" mode
@@ -267,36 +255,87 @@ Feature: LMS.Video component
     Then the video has rendered in "HTML5" mode
     And the video does not show the captions
 
-  # 20 Disabled 4/8/14 after intermittent failures in master
-  #Scenario: Transcripts are available on different speeds of Flash mode
-  #  Given I am registered for the course "test_course"
-  #  And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-  #  And it has a video in "Flash" mode
-  #  Then the video has rendered in "Flash" mode
-  #  And I make sure captions are opened
-  #  And I see "Hi, welcome to Edx." text in the captions
-  #  Then I select the "1.50" speed
-  #  And I see "Hi, welcome to Edx." text in the captions
-  #  Then I select the "0.75" speed
-  #  And I see "Hi, welcome to Edx." text in the captions
-  #  Then I select the "1.25" speed
-  #  And I see "Hi, welcome to Edx." text in the captions
+  # 20
+  Scenario: Start time works for Youtube video
+    Given I am registered for the course "test_course"
+    And it has a video in "Youtube" mode:
+      | start_time |
+      | 00:00:10   |
+    And I click video button "play"
+    Then I see video slider at "0:10" position
 
-  # 21 Disabled 4/8/14 after intermittent failures in master
-  #Scenario: Elapsed time calculates correctly on different speeds of Flash mode
-  #  Given I am registered for the course "test_course"
-  #  And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-  #  And it has a video in "Flash" mode
-  #  And I make sure captions are opened
-  #  Then I select the "1.50" speed
-  #  And I click video button "pause"
-  #  And I click on caption line "4", video module shows elapsed time "7"
-  #  Then I select the "0.75" speed
-  #  And I click video button "pause"
-  #  And I click on caption line "3", video module shows elapsed time "9"
-  #  Then I select the "1.25" speed
-  #  And I click video button "pause"
-  #  And I click on caption line "2", video module shows elapsed time "4"
+  # 21
+  Scenario: End time works for Youtube video
+    Given I am registered for the course "test_course"
+    And it has a video in "Youtube" mode:
+      | end_time |
+      | 00:00:02 |
+    And I click video button "play"
+    And I wait "5" seconds
+    Then I see video slider at "0:02" position
+
+  # 22
+  Scenario: Youtube video with end-time at 1:00 and the video starts playing at 0:58
+    Given I am registered for the course "test_course"
+    And it has a video in "Youtube" mode:
+      | end_time |
+      | 00:01:00 |
+    And I wait for video controls appear
+    And I seek video to "0:58" position
+    And I click video button "play"
+    And I wait "5" seconds
+    Then I see video slider at "1:00" position
+
+  # 23
+  Scenario: Start time and end time work together for Youtube video
+    Given I am registered for the course "test_course"
+    And it has a video in "Youtube" mode:
+      | start_time | end_time |
+      | 00:00:10   | 00:00:12 |
+    And I click video button "play"
+    Then I see video slider at "0:10" position
+    And I wait "5" seconds
+    Then I see video slider at "0:12" position
+
+  # 24
+  Scenario: Youtube video after pausing at end time video plays to the end from end time
+    Given I am registered for the course "test_course"
+    And it has a video in "Youtube" mode:
+      | start_time | end_time |
+      | 00:01:51   | 00:01:52 |
+    And I click video button "play"
+    And I wait "5" seconds
+    # The end time is 00:01:52.
+    Then I see video slider at "1:52" position
+    And I click video button "play"
+    And I wait "8" seconds
+    # The default video length is 00:01:55.
+    Then I see video slider at "1:55" position
+
+  # 25
+  Scenario: Youtube video with end-time at 0:32 and start-time at 0:30, the video starts playing from 0:28
+    Given I am registered for the course "test_course"
+    And it has a video in "Youtube" mode:
+      | start_time | end_time |
+      | 00:00:30   | 00:00:32 |
+    And I wait for video controls appear
+    And I seek video to "0:28" position
+    And I click video button "play"
+    And I wait "8" seconds
+    Then I see video slider at "0:32" position
+
+  # 26
+  Scenario: Youtube video with end-time at 1:00, the video starts playing from 1:52
+    Given I am registered for the course "test_course"
+    And it has a video in "Youtube" mode:
+      | end_time |
+      | 00:01:00 |
+    And I wait for video controls appear
+    And I seek video to "1:52" position
+    And I click video button "play"
+    And I wait "5" seconds
+    # Video stops at the end.
+    Then I see video slider at "1:55" position
 
   # 27
   @skip_firefox
@@ -314,3 +353,46 @@ Feature: LMS.Video component
     And I see video button "quality" is inactive
     And I click video button "quality"
     Then I see video button "quality" is active
+
+  # 29 Disabled 4/8/14 after intermittent failures in master
+  #Scenario: Transcripts are available on different speeds of Flash mode
+  #  Given I am registered for the course "test_course"
+  #  And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+  #  And it has a video in "Flash" mode
+  #  Then the video has rendered in "Flash" mode
+  #  And I make sure captions are opened
+  #  And I see "Hi, welcome to Edx." text in the captions
+  #  Then I select the "1.50" speed
+  #  And I see "Hi, welcome to Edx." text in the captions
+  #  Then I select the "0.75" speed
+  #  And I see "Hi, welcome to Edx." text in the captions
+  #  Then I select the "1.25" speed
+  #  And I see "Hi, welcome to Edx." text in the captions
+
+  # 30 Disabled 4/8/14 after intermittent failures in master
+  #Scenario: Elapsed time calculates correctly on different speeds of Flash mode
+  #  Given I am registered for the course "test_course"
+  #  And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+  #  And it has a video in "Flash" mode
+  #  And I make sure captions are opened
+  #  Then I select the "1.50" speed
+  #  And I click video button "pause"
+  #  And I click on caption line "4", video module shows elapsed time "7"
+  #  Then I select the "0.75" speed
+  #  And I click video button "pause"
+  #  And I click on caption line "3", video module shows elapsed time "9"
+  #  Then I select the "1.25" speed
+  #  And I click video button "pause"
+  #  And I click on caption line "2", video module shows elapsed time "4"
+
+  # 31 Disabled 4/8/14 after intermittent failures in master
+  #Scenario: Video component stores position correctly when page is reloaded
+  #  Given the course has a Video component in "Youtube" mode
+  #  When the video has rendered in "Youtube" mode
+  #  And I click video button "play"
+  #  And I click video button "pause"
+  #  Then I seek video to "0:10" position
+  #  And I click video button "play"
+  #  And I click video button "pause"
+  #  And I reload the page with video
+  #  Then I see video slider at "0:10" position

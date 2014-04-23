@@ -117,7 +117,7 @@
 
                         runs(function () {
                             expect(state.videoPlayer.player.getPlayerState())
-                                .toBe(STATUS.PLAYING);
+                                .toBe(STATUS.BUFFERING);
                         });
                     });
 
