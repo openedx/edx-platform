@@ -60,3 +60,17 @@ class StubYouTubeServiceTest(unittest.TestCase):
     def test_transcript_not_found(self):
         response = requests.get(self.url + 'test_transcripts_youtube/some_id')
         self.assertEqual(404, response.status_code)
+
+    def test_reset_configuration(self):
+
+        reset_config_url = self.url + 'del_config'
+
+        # add some configuration data
+        self.server.config['test_reset'] = 'This is a reset config test'
+
+        # reset server configuration
+        response = requests.delete(reset_config_url)
+        self.assertEqual(response.status_code, 200)
+
+        # ensure that server config dict is empty after successful reset
+        self.assertEqual(self.server.config, {})

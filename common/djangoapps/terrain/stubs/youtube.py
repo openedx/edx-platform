@@ -17,12 +17,24 @@ To start this stub server on its own from Vagrant:
     you get "Unused url" message inside the browser.
 """
 
+import textwrap
 from .http import StubHttpRequestHandler, StubHttpService
 import json
 import time
 import requests
 from urlparse import urlparse
 from collections import OrderedDict
+
+
+IFRAME_API_RESPONSE = textwrap.dedent(
+    "if (!window['YT']) {var YT = {loading: 0,loaded: 0};}if (!window['YTConfig']) {var YTConfig"
+    " = {};}if (!YT.loading) {YT.loading = 1;(function(){var l = [];YT.ready = function(f) {if ("
+    "YT.loaded) {f();} else {l.push(f);}};window.onYTReady = function() {YT.loaded = 1;for (var "
+    "i = 0; i < l.length; i++) {try {l[i]();} catch (e) {}}};YT.setConfig = function(c) {for (var"
+    " k in c) {if (c.hasOwnProperty(k)) {YTConfig[k] = c[k];}}};var a = document.createElement"
+    "('script');a.id = 'www-widgetapi-script';a.src = 'http:' + '"
+    "//s.ytimg.com/yts/jsbin/www-widgetapi-vflxHr_AR.js';a.async = true;var b = "
+    "document.getElementsByTagName('script')[0];b.parentNode.insertBefore(a, b);})();}")
 
 
 class StubYouTubeHandler(StubHttpRequestHandler):
@@ -32,6 +44,17 @@ class StubYouTubeHandler(StubHttpRequestHandler):
 
     # Default number of seconds to delay the response to simulate network latency.
     DEFAULT_DELAY_SEC = 0.5
+
+    def do_DELETE(self):  # pylint: disable=C0103
+        """
+        Allow callers to delete all the server configurations using the /del_config URL.
+        """
+        if self.path == "/del_config" or self.path == "/del_config/":
+            self.server.config = dict()
+            self.log_message("Reset Server Configuration.")
+            self.send_response(200)
+        else:
+            self.send_response(404)
 
     def do_GET(self):
         """
@@ -80,8 +103,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             if self.server.config.get('youtube_api_blocked'):
                 self.send_response(404, content='', headers={'Content-type': 'text/plain'})
             else:
-                response = self.server.config['youtube_api_response']
-                self.send_response(200, content=response.text, headers={'Content-type': 'text/html'})
+                self.send_response(200, content=IFRAME_API_RESPONSE, headers={'Content-type': 'text/html'})
 
         else:
             self.send_response(

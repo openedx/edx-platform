@@ -47,7 +47,6 @@ VIDEO_MENUS = {
 }
 
 
-
 @js_defined('window.Video', 'window.RequireJS.require', 'window.jQuery')
 class VideoPage(PageObject):
     """
