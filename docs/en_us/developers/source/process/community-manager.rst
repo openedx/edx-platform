@@ -121,6 +121,9 @@ but in addition, there are a few guidelines:
 * If any XModules are modified,
   include the blades team.
 
+* If any logging events are modified,
+  include the analytics team.
+
 * Include the doc team on every contributor pull request.
 
 Once the code review process has started, the community managers are also
