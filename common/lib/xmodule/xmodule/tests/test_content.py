@@ -43,6 +43,6 @@ class ContentTest(unittest.TestCase):
     def test_get_location_from_path(self):
         asset_location = StaticContent.get_location_from_path(u'/c4x/foo/bar/asset/images_course_image.jpg')
         self.assertEqual(
-            AssetLocation(u'foo', u'bar', u'ignore_run', u'asset', u'images_course_image.jpg', None),
+            AssetLocation(u'foo', u'bar', None, u'asset', u'images_course_image.jpg', None),
             asset_location
         )
