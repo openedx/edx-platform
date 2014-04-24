@@ -19,7 +19,7 @@ General Exercises and Tools
 ****************************
 
 .. list-table::
-   :widths: 30 25 80
+   :widths: 25 25 50
 
    * - .. image:: /Images/AnnotationExample.png
           :width: 100
