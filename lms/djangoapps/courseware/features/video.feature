@@ -111,7 +111,7 @@ Feature: LMS.Video component
     Then menu "download_transcript" doesn't exist
 
   # 9
-  Scenario: Youtube video has correct transcript if fields for other speeds are filled.
+  Scenario: Youtube video has correct transcript if fields for other speeds are filled
     Given I am registered for the course "test_course"
     And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
     And I have a "subs_b7xgknqkQk8.srt.sjson" transcript file in assets
@@ -129,7 +129,7 @@ Feature: LMS.Video component
     And I see duration "1:56"
 
   # 10
-  Scenario: Verify that each video in each sub-section includes a transcript for non-Youtube countries.
+  Scenario: Verify that each video in each sub-section includes a transcript for non-Youtube countries
     Given youtube server is up and response time is 2 seconds
     And I am registered for the course "test_course"
     And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
