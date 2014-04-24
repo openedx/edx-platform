@@ -8,7 +8,7 @@ from .helpers import UniqueCourseTest
 from ..pages.lms.video import VideoPage
 from ..pages.lms.tab_nav import TabNavPage
 from ..pages.lms.course_nav import CourseNavPage
-from ..pages.studio.auto_auth import AutoAuthPage
+from ..pages.lms.auto_auth import AutoAuthPage
 from ..pages.lms.course_info import CourseInfoPage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
