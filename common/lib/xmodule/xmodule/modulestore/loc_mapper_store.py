@@ -516,14 +516,13 @@ class LocMapperStore(object):
             ('name', entry_id['name'])
         ])
 
-    def _migrate_1(self, entry, updated=False):
+    def _migrate_top(self, entry, updated=False):
         """
         Current version, so a no data change until next update. But since it's the top
         it's responsible for persisting the record if it changed.
         """
         if updated:
             entry['schema'] = self.SCHEMA_VERSION
-            # TODO check if '_id' is already a SON and thus doesn't need this coercion
             entry_id = self._entry_id_to_son(entry['_id'])
             self.location_map.update({'_id': entry_id}, entry)
 
@@ -557,4 +556,6 @@ class LocMapperStore(object):
         entry['lower_offering'] = entry['offering'].lower()
         return self._migrate_1(entry, True)
 
-    _migrate = [_migrate_0, _migrate_1]
+    # insert new migrations just before _migrate_top. _migrate_top sets the schema version and
+    # saves the record
+    _migrate = [_migrate_0, _migrate_top]
