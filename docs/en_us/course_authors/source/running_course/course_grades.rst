@@ -392,7 +392,7 @@ For checkboxes and multiple choice problems, the answer choices actually selecte
 
 **Why don't I see a Question for some of my problems?**
 
-The value in the **Question** column is the accessibility label for the problem. For more information about how to set up labels for problems, see :ref:`Common Problems`.
+The value in the **Question** column is the accessibility label for the problem. For more information about how to set up labels for problems, see :ref:`Create Exercises`.
 
 Also, for problems that use the **Randomization** setting in Studio, if a particular answer has not been selected since early March 2014, the **Question** is blank for that answer.
 
