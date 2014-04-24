@@ -67,6 +67,12 @@ The rubric contains *criteria*, each of which has several *options*. Read the st
 
 When you've selected options in the rubric, provide additional comments about the response in the field below the rubric. When you're done, click **Submit your assessment and move to response #<number>**.
 
+.. note:: Some assessments may have an additional **Comments** field for one or more of the assessment's individual criteria. You can enter up to 300 characters in these fields. In the following image, the first of the criteria has a separate **Comments** field, but the second does not.
+
+    .. image:: /Images/PA_Students_CommentBoxes.png
+       :alt: Rubric with call-outs for comment boxes
+       :width: 500
+
 When you submit your assessment of the first student's response, another response opens for you. Assess this response in the same way that you assessed the first response, and then submit your assessment. You'll repeat these steps until you've assessed the required number of responses. The number in the upper-right corner of the rubric updates as you assess each response.
 
 
