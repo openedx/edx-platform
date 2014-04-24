@@ -191,7 +191,6 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec_helpers/creat
                         state: 'draft'
                     }),
                 });
-                setStyleFixtures('.is-disabled {pointer-events: none}');
                 // needed to stub out the ajax
                 window.analytics = jasmine.createSpyObj('analytics', ['track']);
                 window.course_location_analytics = jasmine.createSpy('course_location_analytics');

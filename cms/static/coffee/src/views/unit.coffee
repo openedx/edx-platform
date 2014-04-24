@@ -1,8 +1,9 @@
 define ["jquery", "jquery.ui", "gettext", "backbone",
         "js/views/feedback_notification", "js/views/feedback_prompt",
-        "coffee/src/views/module_edit", "js/models/module_info"],
-($, ui, gettext, Backbone, NotificationView, PromptView, ModuleEditView, ModuleModel) ->
-  class UnitEditView extends Backbone.View
+        "coffee/src/views/module_edit", "js/models/module_info",
+        "js/views/baseview", "underscore"],
+($, ui, gettext, Backbone, NotificationView, PromptView, ModuleEditView, ModuleModel, BaseView, _) ->
+  class UnitEditView extends BaseView
     events:
       'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates'
       'click .new-component .new-component-type a.single-template': 'saveNewComponent'
@@ -212,7 +213,16 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       )
 
     createDraft: (event) ->
-      $(event.target).addClass "is-disabled"
+      self = this
+      action = -> self.createDraftOperation event
+      @disableElementWhileRunning($(event.target), action)
+
+    publishDraft: (event) ->
+      self = this
+      action = -> self.publishDraftOperation event
+      @disableElementWhileRunning($(event.target), action)
+
+    createDraftOperation: (event) ->
       @wait(true)
 
       $.postJSON(@model.url(), {
@@ -223,11 +233,9 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
           unit_id: unit_location_analytics
 
         @model.set('state', 'draft')
-        $(event.target).removeClass "is-disabled"
       )
 
-    publishDraft: (event) ->
-      $(event.target).addClass "is-disabled"
+    publishDraftOperation: (event) ->
       @wait(true)
       @saveDraft()
 
@@ -239,7 +247,6 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
           unit_id: unit_location_analytics
 
         @model.set('state', 'public')
-        $(event.target).removeClass "is-disabled"
       )
 
     setVisibility: (event) ->
@@ -263,7 +270,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
         @model.set('state', @$('.visibility-select').val())
       )
 
-  class UnitEditView.NameEdit extends Backbone.View
+  class UnitEditView.NameEdit extends BaseView
     events:
       'change .unit-display-name-input': 'saveName'
 
@@ -297,14 +304,14 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
         display_name: metadata.display_name
 
 
-  class UnitEditView.LocationState extends Backbone.View
+  class UnitEditView.LocationState extends BaseView
     initialize: =>
       @model.on('change:state', @render)
 
     render: =>
       @$el.toggleClass("#{@model.previous('state')}-item #{@model.get('state')}-item")
 
-  class UnitEditView.Visibility extends Backbone.View
+  class UnitEditView.Visibility extends BaseView
     initialize: =>
       @model.on('change:state', @render)
       @render()

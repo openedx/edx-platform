@@ -60,6 +60,16 @@ define(["jquery", "underscore", "backbone", "js/utils/handle_iframe_binding"],
                 $('.ui-loading').hide();
             },
 
+            disableElementWhileRunning: function(element, action) {
+                // element is a jquery object
+                // action is the function during whose duration the element
+                // should be disabled
+                element.addClass("is-disabled");
+                action.always(function(){
+                    element.removeClass("is-disabled");
+                });
+            },
+
             /**
              * Loads the named template from the page, or logs an error if it fails.
              * @param name The name of the template.
