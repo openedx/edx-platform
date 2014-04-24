@@ -21,7 +21,7 @@ For more information, see the following topics:
 
 .. note:: Review :ref:`Organizing Your Course Content` and :ref:`Best Practices for HTML Markup` before you start working with HTML components.
 
-To add an instant hangout to an HTML component, see :ref:`Using an Instant Hangout in Your Course`.
+To add an instant hangout to an HTML component, see :ref:`Google Instant Hangout`.
 
 .. _The HTML Editor:
 
