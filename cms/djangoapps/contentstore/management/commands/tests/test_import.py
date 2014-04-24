@@ -22,7 +22,7 @@ class TestImport(ModuleStoreTestCase):
     Unit tests for importing a course from command line
     """
 
-    COURSE_USAGE_KEY = SlashSeparatedCourseKey('edX', 'test_import_course', '2013_Spring')
+    COURSE_USAGE_KEY = SlashSeparatedCourseKey(u'edX', u'test_import_course', u'2013_Spring')
 
     def setUp(self):
         """
@@ -36,7 +36,7 @@ class TestImport(ModuleStoreTestCase):
         self.good_dir = tempfile.mkdtemp(dir=self.content_dir)
         os.makedirs(os.path.join(self.good_dir, "course"))
         with open(os.path.join(self.good_dir, "course.xml"), "w+") as f:
-            f.write('<course url_name="2013_Spring" org="edx" course="test_import_course"/>')
+            f.write('<course url_name="2013_Spring" org="edX" course="test_import_course"/>')
 
         with open(os.path.join(self.good_dir, "course", "2013_Spring.xml"), "w+") as f:
             f.write('<course></course>')
