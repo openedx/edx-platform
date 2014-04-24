@@ -491,6 +491,30 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'data': ''
         })
 
+    def test_from_xml_graded_video(self):
+        """
+        Test graded video import.
+        """
+        module_system = DummySystem(load_error_modules=True)
+        xml_data = '''
+            <video display_name="Test Video"
+                    youtube="1.0:p2Q6BrNhdh8"
+                    has_score="true"
+                    scored_on_end="true"
+                    weight="10.0"
+                    scored_on_percent="5">
+            </video>
+        '''
+        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        expected_attrs = {
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'has_score': True,
+            'scored_on_end': True,
+            'weight': 10.0,
+            'scored_on_percent': 5,
+        }
+        self.assert_attributes_equal(output, expected_attrs)
+
 
 class VideoExportTestCase(unittest.TestCase):
     """
@@ -575,3 +599,23 @@ class VideoExportTestCase(unittest.TestCase):
         expected = '<video url_name="SampleProblem1"/>\n'
 
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
+
+    def test_graded_video_export_to_xml(self):
+        """Test for graded video export."""
+        module_system = DummySystem(load_error_modules=True)
+        location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
+        desc = VideoDescriptor(module_system, DictFieldData({}), ScopeIds(None, None, location, location))
+
+        desc.youtube_id_1_0 = 'p2Q6BrNhdh8'
+        desc.grade_videos = True
+        desc.has_score = True
+        desc.scored_on_end = True
+        desc.weight = 10.0
+        desc.scored_on_percent = 5
+
+        xml = desc.definition_to_xml(None)  # We don't use the `resource_fs` parameter
+        expected = etree.fromstring('''\
+         <video url_name="SampleProblem1" has_score="true" scored_on_end="true" weight="10.0" scored_on_percent="5" grade_videos="true" youtube="1.00:p2Q6BrNhdh8" />
+        ''')
+
+        self.assertXmlEqual(expected, xml)

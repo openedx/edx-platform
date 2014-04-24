@@ -132,6 +132,11 @@
         "readFixtures",
         "setFixtures",
         "appendSetFixtures",
-        "spyOnEvent"
+        "spyOnEvent",
+
+        // i18n
+        "gettext",
+        "ngettext",
+        "interpolate",
     ]
 }

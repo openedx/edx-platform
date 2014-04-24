@@ -38,20 +38,25 @@ class VideoStudentViewHandlers(object):
     """
     Handlers for video module instance.
     """
-
     def handle_ajax(self, dispatch, data):
         """
         Update values of xfields, that were changed by student.
         """
         accepted_keys = [
             'speed', 'saved_video_position', 'transcript_language',
-            'transcript_download_format', 'youtube_is_available'
+            'transcript_download_format', 'youtube_is_available',
+            'cumulative_score',
         ]
 
         conversions = {
+            'cumulative_score': json.loads,
             'speed': json.loads,
             'saved_video_position': RelativeTime.isotime_to_timedelta,
             'youtube_is_available': json.loads,
+        }
+
+        save_actions = {
+            'cumulative_score': self.cumulative_score_save_action,
         }
 
         if dispatch == 'save_user_state':
@@ -62,7 +67,10 @@ class VideoStudentViewHandlers(object):
                     else:
                         value = data[key]
 
-                    setattr(self, key, value)
+                    if key in save_actions:
+                        setattr(self, key, save_actions[key](value))
+                    else:
+                        setattr(self, key, value)
 
                     if key == 'speed':
                         self.global_speed = self.speed
@@ -251,7 +259,7 @@ class VideoStudentViewHandlers(object):
 
             try:
                 transcript = self.translation(request.GET.get('videoId', None))
-            except NotFoundError, ex:
+            except NotFoundError as ex:
                 log.info(ex.message)
                 # Try to return static URL redirection as last resort
                 # if no translation is required
@@ -309,11 +317,42 @@ class VideoStudentViewHandlers(object):
 
         return response
 
+    @XBlock.handler
+    def grade_handler(self, request, dispatch):
+        """
+        Accumulate score from graders and save if all graders succeed.
+        """
+        grader_name = request.POST.get('graderName', None)
+
+        if not grader_name or grader_name not in self.active_graders:
+            return Response(status=400)
+
+        if not all(
+            [values['isScored'] for name, values in self.cumulative_score.items() if name != grader_name]
+        ):
+            self.cumulative_score[grader_name]['isScored'] = True
+            return Response(json.dumps(self.module_score), status=200)
+
+        if not(self.module_score and self.module_score == self.max_score()):
+            try:
+                self.update_score(self.max_score())
+                self.cumulative_score[grader_name]['isScored'] = True
+            except NotImplementedError:
+                if getattr(self.system, 'is_author_mode', False):
+                    return Response(json.dumps(self.module_score), status=200)
+                else:
+                    return Response(status=501)
+            except AssertionError:
+                return Response(status=500)
+
+        return Response(json.dumps(self.module_score), status=200)
+
 
 class VideoStudioViewHandlers(object):
     """
     Handlers for Studio view.
     """
+
     @XBlock.handler
     def studio_transcript(self, request, dispatch):
         """
@@ -342,8 +381,6 @@ class VideoStudioViewHandlers(object):
                     no SRT extension or not parse-able by PySRT
                 UnicodeDecodeError: non-UTF8 uploaded file content encoding.
         """
-        _ = self.runtime.service(self, "i18n").ugettext
-
         if dispatch.startswith('translation'):
             language = dispatch.replace('translation', '').strip('/')
 

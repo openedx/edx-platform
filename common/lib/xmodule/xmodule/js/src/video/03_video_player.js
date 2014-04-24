@@ -15,6 +15,7 @@ function (HTML5Video, Resizer) {
             return dfd.promise();
         },
         methodsDict = {
+            destroy: destroy,
             duration: duration,
             handlePlaybackQualityChange: handlePlaybackQualityChange,
 
@@ -330,6 +331,7 @@ function (HTML5Video, Resizer) {
         this.videoPlayer.currentTime = time || this.videoPlayer.player.getCurrentTime();
 
         if (isFinite(this.videoPlayer.currentTime)) {
+            this.el.trigger('progress', [this.videoPlayer.currentTime]);
             this.videoPlayer.updatePlayTime(this.videoPlayer.currentTime);
 
             // We need to pause the video if current time is smaller (or equal)
@@ -341,9 +343,11 @@ function (HTML5Video, Resizer) {
                 this.videoPlayer.endTime <= this.videoPlayer.currentTime
             ) {
                 this.videoPlayer.stopAtEndTime = false;
-
                 this.videoPlayer.pause();
-
+                this.el.trigger('endTime', [
+                    this.videoPlayer.currentTime,
+                    this.videoPlayer.endTime
+                ]);
                 this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
                     end: true
                 });
@@ -452,7 +456,7 @@ function (HTML5Video, Resizer) {
         );
     }
 
-    function seekTo(time) {
+    function seekTo(time, silent) {
         var duration = this.videoPlayer.duration();
 
         if ((typeof time !== 'number') || (time > duration) || (time < 0)) {
@@ -486,7 +490,9 @@ function (HTML5Video, Resizer) {
         }
 
         this.videoPlayer.updatePlayTime(time, true);
-        this.el.trigger('seek', arguments);
+        if (!silent) {
+            this.el.trigger('seek', arguments);
+        }
     }
 
     function runTimer() {
@@ -675,7 +681,7 @@ function (HTML5Video, Resizer) {
             time = this.videoPlayer.figureOutStartingTime(duration);
 
         if (time > 0 && this.videoPlayer.goToStartTime) {
-            this.videoPlayer.seekTo(time);
+            this.videoPlayer.seekTo(time, true);
         }
 
         this.el.trigger('ready', arguments);
@@ -922,6 +928,13 @@ function (HTML5Video, Resizer) {
 
     function onVolumeChange(volume) {
         this.videoPlayer.player.setVolume(volume);
+    }
+
+    function destroy() {
+        this.videoPlayer.stopTimer();
+        if (this.isYoutubeType()){
+            this.videoPlayer.player.destroy();
+        }
     }
 });
 

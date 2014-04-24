@@ -1,6 +1,7 @@
 <div class="course-content">
   <div id="video_example">
     <div id="example">
+      <div class="problem-progress">1.0 points possible</div>
       <div
         id="video_id"
         class="video closed"
@@ -25,7 +26,6 @@
         data-autohide-html5="True"
       >
         <div class="focus_grabber first"></div>
-
         <div class="tc-wrapper">
           <article class="video-wrapper">
             <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
@@ -35,11 +35,20 @@
             </section>
             <section class="video-controls is-hidden"></section>
           </article>
-
           <ol class="subtitles"><li></li></ol>
         </div>
-
         <div class="focus_grabber last"></div>
+        <ul class="wrapper-downloads">
+          <li class="video-sources video-download-button">
+              <a href="#">Download video</a>
+          </li>
+          <li class="video-tracks video-download-button">
+            <a href="#" class="external-track">Download transcript</a>
+          </li>
+          <li class="video-handout video-download-button">
+            <a href="#" target="_blank">Download Handout</a>
+          </li>
+        </ul>
       </div>
     </div>
   </div>

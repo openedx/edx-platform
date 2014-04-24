@@ -3,7 +3,6 @@
 """
 Acceptance tests for Video.
 """
-
 import json
 import requests
 from ..helpers import UniqueCourseTest
@@ -133,7 +132,6 @@ class VideoBaseTest(UniqueCourseTest):
     def _navigate_to_courseware_video(self):
         """ Register for the course and navigate to the video unit """
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
-
         self.course_info_page.visit()
         self.tab_nav.go_to_tab('Courseware')
 

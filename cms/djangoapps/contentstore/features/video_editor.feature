@@ -5,6 +5,7 @@ Feature: CMS Video Component Editor
   # 1
   Scenario: User can view Video metadata
     Given I have created a Video component
+    And I have enabled video grading
     And I edit the component
     Then I see the correct video settings and default values
 

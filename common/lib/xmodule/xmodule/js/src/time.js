@@ -12,6 +12,10 @@
     function format(time, formatFull) {
         var hours, minutes, seconds;
 
+        if (!isFinite(time)) {
+            time = 0;
+        }
+
         seconds = Math.floor(time);
         minutes = Math.floor(seconds / 60);
         hours = Math.floor(minutes / 60);

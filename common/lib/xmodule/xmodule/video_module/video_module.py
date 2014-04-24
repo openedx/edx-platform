@@ -31,9 +31,11 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 
-from .video_utils import create_youtube_string
+
+from .video_utils import create_youtube_string, get_course_for_item
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
+from .video_scoring import VideoScoringMixin
 
 from urlparse import urlparse
 
@@ -48,7 +50,7 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
-class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
+class VideoModule(VideoFields, VideoScoringMixin, VideoStudentViewHandlers, XModule):
     """
     XML source example:
 
@@ -73,6 +75,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             resource_string(module, 'js/src/video/00_resizer.js'),
             resource_string(module, 'js/src/video/00_async_process.js'),
             resource_string(module, 'js/src/video/00_i18n.js'),
+            resource_string(module, 'js/src/video/00_abstract_grader.js'),
             resource_string(module, 'js/src/video/00_sjson.js'),
             resource_string(module, 'js/src/video/00_iterator.js'),
             resource_string(module, 'js/src/video/01_initialize.js'),
@@ -86,7 +89,9 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             resource_string(module, 'js/src/video/07_video_volume_control.js'),
             resource_string(module, 'js/src/video/08_video_speed_control.js'),
             resource_string(module, 'js/src/video/09_video_caption.js'),
-            resource_string(module, 'js/src/video/10_main.js')
+            resource_string(module, 'js/src/video/10_grader_collection.js'),
+            resource_string(module, 'js/src/video/11_grader.js'),
+            resource_string(module, 'js/src/video/12_main.js'),
         ]
     }
     css = {'scss': [
@@ -137,7 +142,6 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
 
         # OrderedDict for easy testing of rendered context in tests
         sorted_languages = OrderedDict(sorted(languages.items(), key=itemgetter(1)))
-
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
@@ -168,6 +172,11 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             'transcript_languages': json.dumps(sorted_languages),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript', 'translation').rstrip('/?'),
             'transcript_available_translations_url': self.runtime.handler_url(self, 'transcript', 'available_translations').rstrip('/?'),
+            'grade_url': self.runtime.handler_url(self, 'grade_handler').rstrip('/?'),
+            'has_score': json.dumps(self.really_has_score),
+            'max_score': json.dumps(self.max_score()),
+            'module_score': json.dumps(self.module_score),
+            'graders': json.dumps(self.graders()),
         })
 
 
@@ -177,6 +186,8 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
     """
     module_class = VideoModule
     transcript = module_attr('transcript')
+    grade_handler = module_attr('grade_handler')
+    graders = module_attr('graders')
 
     tabs = [
         {
@@ -254,6 +265,15 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         editable_fields['transcripts']['urlRoot'] = self.runtime.handler_url(self, 'studio_transcript', 'translation').rstrip('/?')
         editable_fields['handout']['type'] = 'FileUploader'
 
+        editable_fields.pop('grade_videos')
+
+        # Inheritance does not work for video player descriptor
+        # that's why we obtain grade_videos value from course itself.
+        # Should be fixed when used outside of Studio.
+        if not get_course_for_item(self).grade_videos:
+            for field_name in ['has_score', 'scored_on_end', 'scored_on_percent', 'weight']:
+                editable_fields.pop(field_name)
+
         return editable_fields
 
     @classmethod
@@ -308,6 +328,11 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
             'sub': self.sub,
             'download_track': json.dumps(self.download_track),
             'download_video': json.dumps(self.download_video),
+            'grade_videos': json.dumps(self.grade_videos),
+            'has_score': json.dumps(self.has_score),
+            'scored_on_end': json.dumps(self.scored_on_end),
+            'weight': self.weight,
+            'scored_on_percent': self.scored_on_percent,
         }
         for key, value in attrs.items():
             # Mild workaround to ensure that tests pass -- if a field

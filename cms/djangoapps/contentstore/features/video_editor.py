@@ -8,6 +8,7 @@ from nose.tools import assert_true, assert_equal, assert_in, assert_not_equal # 
 from terrain.steps import reload_the_page
 from django.conf import settings
 from common import upload_file, attach_file
+from advanced_settings import change_value
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
@@ -150,8 +151,12 @@ def correct_video_settings(_step):
         ['Upload Handout', '', False],
         ['Video Download Allowed', 'False', False],
         ['Video File URLs', '', False],
+        ['Video Is Scored', 'False', False],
+        ['Video Is Scored When Viewed', 'False', False],
+        ['Video Percent to View', '', False],
         ['Video Start Time', '00:00:00', False],
         ['Video Stop Time', '00:00:00', False],
+        ['Weight', '1', False],
         ['YouTube ID', 'OEoXaMPEzfM', False],
         ['YouTube ID for .75x speed', '', False],
         ['YouTube ID for 1.25x speed', '', False],
@@ -306,3 +311,12 @@ def i_see_correct_langs(_step, langs):
     for lang_code, label in translations.items():
         assert_true(any([i.text == label for i in items]))
         assert_true(any([i['data-lang-code'] == lang_code for i in items]))
+
+
+@step('I have enabled video grading')
+def enable_video_grading(step):
+    url = world.browser.url
+    step.given("I select the Advanced Settings")
+    change_value(step, 'grade_videos', 'true')
+    world.visit(url)
+    world.wait_for_xmodule()
