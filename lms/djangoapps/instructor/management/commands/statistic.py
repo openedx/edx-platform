@@ -276,16 +276,25 @@ def fullstat(request = None):
                     name = rows[0]['second-name'] + ' ' + rows[0]['first-name'] + ' ' + rows[0]['patronymic']
                 except:
                     name = oldname
-                datarow += [name.split(' ', 2)]
+                fio = name.split(None, 2)
+                if len(fio) < 3:
+                    fio += [u'']
+                datarow += fio
+
                 if user.profile.name != name:
-                    datarow += [user.profile.name.split(' ', 2)]
+                    fio = user.profile.name.split(None, 2)
+                    if len(fio) < 3:
+                        fio += [u'']
+                    if len(fio) < 3:
+                        fio += [u'']
+                    datarow += fio
                 else:
                     datarow += [u'', u'', u'']
                 
                 try:
                     datarow += [rows[0]['login']]
                 except:
-                    datarow += []
+                    datarow += [u'']
 
                 email = ''
                 try:
@@ -342,14 +351,17 @@ def fullstat(request = None):
                 logging.exception("Something awful happened in fullstat!")
                 pass
 
-    for userrows in usermap:
+    for useremail, userrows in usermap.iteritems():
         for userrow in userrows:
             if userrow.get('used', False):
                 datarow = []
                 #User
                 name = userrow['second-name'] + ' ' + userrow['first-name'] + ' ' + userrow['patronymic']
-                datarow += [name.split(' ', 2)]
-                datarow += [u'']
+                fio = name.split(None, 2)
+                if len(fio) < 3:
+                    fio += [u'']
+                datarow += fio
+                datarow += [u'',u'',u'']
                 datarow += [userrow['login']]
                 email = userrow['email']
                 datarow += [email]

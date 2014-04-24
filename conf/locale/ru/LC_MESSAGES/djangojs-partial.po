@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-14 16:31+0400\n"
+"POT-Creation-Date: 2014-04-22 18:53+0400\n"
 "PO-Revision-Date: 2014-03-28 16:16+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -213,15 +213,15 @@ msgstr "Показать задание"
 msgid "Hide Question"
 msgstr "Скрыть задание"
 
-#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:127
+#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:129
 msgid "Email subject can not be empty."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:130
+#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:132
 msgid "Email body can not be empty."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:278
+#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:283
 msgid ""
 "You have been registered for this master class. We will provide addition "
 "information soon."
@@ -229,7 +229,7 @@ msgstr ""
 "Вы зарегистрированы на мастер-класс. Мы сообщим дополнительную информацию в "
 "скором времени."
 
-#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:279
+#: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:284
 msgid ""
 "You are pending for registration for this master class. Please visit this "
 "page later for result."

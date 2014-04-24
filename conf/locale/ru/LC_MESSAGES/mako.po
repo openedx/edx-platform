@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-14 16:30+0400\n"
+"POT-Creation-Date: 2014-04-22 18:52+0400\n"
 "PO-Revision-Date: 2014-04-11 17:00+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -115,14 +115,14 @@ msgstr "Номер курса:"
 msgid "Pending"
 msgstr "Ожидание"
 
-#: cms/templates/login.html:31 lms/templates/login.html:197
+#: cms/templates/login.html:31 lms/templates/login.html:196
 #: lms/templates/login_modal.html:40
 #: lms/templates/university_profile/edge.html:27
 msgid "Forgot password?"
 msgstr "Забыли пароль?"
 
 #: cms/templates/login.html:32 cms/templates/register.html:35
-#: lms/templates/login.html:192 lms/templates/login_modal.html:24
+#: lms/templates/login.html:191 lms/templates/login_modal.html:24
 #: lms/templates/provider_login.html:47 lms/templates/provider_login.html:48
 #: lms/templates/register.html:129 lms/templates/signup_modal.html:53
 #: lms/templates/sysadmin_dashboard.html:79
@@ -136,7 +136,7 @@ msgid "Need Help?"
 msgstr "Нужна помощь?"
 
 #: cms/templates/manage_users.html:74
-#: lms/templates/courseware/instructor_dashboard.html:136
+#: lms/templates/courseware/instructor_dashboard.html:137
 msgid "Admin"
 msgstr "Администратор"
 
@@ -513,6 +513,146 @@ msgstr "Управляемая дискуссия"
 msgid "Hide Annotations"
 msgstr "Скрыть аннотации"
 
+#: lms/templates/announcement-list.html:83 lms/templates/dashboard.html:83
+#: lms/templates/courseware/course_about.html:54
+#: lms/templates/courseware/course_about.html:91
+#: lms/templates/courseware/mktg_course_about.html:40
+msgid "An error occurred. Please try again later."
+msgstr "Возникла ошибка. Пожалуйста, попробуйте повторить операцию позже."
+
+#: lms/templates/announcement-list.html:116 lms/templates/dashboard.html:116
+msgid "Please verify your new email"
+msgstr "Проверьте Ваш новый адрес email"
+
+#: lms/templates/announcement-list.html:117 lms/templates/dashboard.html:117
+msgid ""
+"You'll receive a confirmation in your in-box. Please click the link in the "
+"email to confirm the email change."
+msgstr ""
+"Вы получите подтверждение в вашем входящем ящике. Пожалуйста пройдите по "
+"ссылке указанной в письме для смены почтового адреса."
+
+#: lms/templates/announcement-list.html:259 lms/templates/dashboard.html:255
+#: lms/templates/register-shib.html:141 lms/templates/register.html:161
+#: lms/templates/sysadmin_dashboard.html:75
+#: lms/templates/verify_student/_modal_editname.html:19
+#: lms/templates/verify_student/face_upload.html:309
+msgid "Full Name"
+msgstr "Полное имя"
+
+#: lms/templates/announcement-list.html:259
+#: lms/templates/announcement-list.html:264 lms/templates/dashboard.html:255
+#: lms/templates/dashboard.html:260
+#: lms/templates/dashboard/_dashboard_info_language.html:9
+msgid "edit"
+msgstr "изменить"
+
+#: lms/templates/announcement-list.html:262 lms/templates/dashboard.html:258
+#: lms/templates/login.html:187
+#: lms/templates/courseware/instructor_dashboard.html:144
+#: lms/templates/university_profile/edge.html:18
+msgid "Email"
+msgstr "Эл. почта"
+
+#: lms/templates/announcement-list.html:275
+#: lms/templates/announcement-list.html:278 lms/templates/dashboard.html:271
+#: lms/templates/dashboard.html:274
+msgid "Reset Password"
+msgstr "Восстановить/изменить пароль"
+
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
+#: lms/templates/announcement-list.html:337
+#: lms/templates/announcement-list.html:366
+#: lms/templates/announcement-list.html:409 lms/templates/dashboard.html:358
+#: lms/templates/dashboard.html:390 lms/templates/dashboard.html:419
+#: lms/templates/dashboard.html:462 lms/templates/dashboard.html:504
+#: lms/templates/forgot_password_modal.html:10
+#: lms/templates/help_modal.html:24 lms/templates/help_modal.html:72
+#: lms/templates/help_modal.html:106 lms/templates/login_modal.html:11
+#: lms/templates/signup_modal.html:32
+#: lms/templates/modal/_modal-settings-language.html:13
+#: lms/templates/modal/accessible_confirm.html:7
+msgid "Close Modal"
+msgstr "Закрыть"
+
+#: lms/templates/announcement-list.html:343 lms/templates/dashboard.html:396
+msgid "Password Reset Email Sent"
+msgstr "Письмо с инструкциями по восстановлению пароля выслано"
+
+#. Translators: this text gives status on if the modal interface (a menu or
+#. piece of UI that takes the full focus of the screen) is open or not
+#: lms/templates/announcement-list.html:346
+#: lms/templates/announcement-list.html:375
+#: lms/templates/announcement-list.html:418 lms/templates/dashboard.html:367
+#: lms/templates/dashboard.html:399 lms/templates/dashboard.html:428
+#: lms/templates/dashboard.html:471 lms/templates/dashboard.html:513
+#: lms/templates/modal/_modal-settings-language.html:22
+#: lms/templates/modal/accessible_confirm.html:16
+msgid "modal open"
+msgstr ""
+
+#: lms/templates/announcement-list.html:354 lms/templates/dashboard.html:407
+msgid ""
+"An email has been sent to {email}. Follow the link in the email to change "
+"your password."
+msgstr ""
+"Письмо было выслано по адресу {email}. Перейдите по ссылке в письме для "
+"изменения пароля."
+
+#: lms/templates/announcement-list.html:372
+#: lms/templates/announcement-list.html:394 lms/templates/dashboard.html:425
+#: lms/templates/dashboard.html:447
+msgid "Change Email"
+msgstr "Изменить Email"
+
+#: lms/templates/announcement-list.html:385 lms/templates/dashboard.html:438
+msgid "Please enter your new email address:"
+msgstr "Введите новый адрес электронной почты:"
+
+#: lms/templates/announcement-list.html:387 lms/templates/dashboard.html:440
+msgid "Please confirm your password:"
+msgstr "Подтвердите ваш пароль:"
+
+#: lms/templates/announcement-list.html:391 lms/templates/dashboard.html:444
+msgid ""
+"We will send a confirmation to both {email} and your new email as part of "
+"the process."
+msgstr "Мы вышлем подтверждения и на адрес {email}, и на новый адрес."
+
+#: lms/templates/announcement-list.html:415 lms/templates/dashboard.html:468
+msgid "Change your name"
+msgstr "Изменение отображаемого имени"
+
+#. Translators: note that {platform} {cert_name_short} will look something
+#. like: "edX certificate". Please do not change the order of these
+#. placeholders.
+#: lms/templates/announcement-list.html:427 lms/templates/dashboard.html:480
+msgid ""
+"To uphold the credibility of your {platform} {cert_name_short}, all name "
+"changes will be logged and recorded."
+msgstr ""
+"Для сохранения доверия к сертификатам ЦПМ все изменения имени сохраняются в "
+"истории."
+
+#. Translators: note that {platform} {cert_name_short} will look something
+#. like: "edX certificate". Please do not change the order of these
+#. placeholders.
+#: lms/templates/announcement-list.html:432 lms/templates/dashboard.html:485
+msgid ""
+"Enter your desired full name, as it will appear on your {platform} "
+"{cert_name_short}:"
+msgstr "Введите Ваше полное имя, как оно будет напечатано на сертификате ЦПМ:"
+
+#: lms/templates/announcement-list.html:434 lms/templates/dashboard.html:487
+#: lms/templates/verify_student/_modal_editname.html:21
+msgid "Reason for name change:"
+msgstr "Причина изменения имени:"
+
+#: lms/templates/announcement-list.html:438 lms/templates/dashboard.html:491
+msgid "Change My Name"
+msgstr "Изменить имя"
+
 #: lms/templates/contact.html:9 lms/templates/static_templates/about.html:4
 #: lms/templates/static_templates/about.html:7
 msgid "Vision"
@@ -648,177 +788,49 @@ msgstr "Прошедшие"
 msgid "Search"
 msgstr "Поиск"
 
-#: lms/templates/dashboard.html:21
+#: lms/templates/dashboard.html:22
 msgid "Dashboard"
 msgstr "Личный кабинет"
 
-#: lms/templates/dashboard.html:82
-#: lms/templates/courseware/course_about.html:54
-#: lms/templates/courseware/course_about.html:91
-#: lms/templates/courseware/mktg_course_about.html:40
-msgid "An error occurred. Please try again later."
-msgstr "Возникла ошибка. Пожалуйста, попробуйте повторить операцию позже."
-
-#: lms/templates/dashboard.html:115
-msgid "Please verify your new email"
-msgstr "Проверьте Ваш новый адрес email"
-
-#: lms/templates/dashboard.html:116
-msgid ""
-"You'll receive a confirmation in your in-box. Please click the link in the "
-"email to confirm the email change."
-msgstr ""
-"Вы получите подтверждение в вашем входящем ящике. Пожалуйста пройдите по "
-"ссылке указанной в письме для смены почтового адреса."
-
-#: lms/templates/dashboard.html:244 lms/templates/register-shib.html:141
-#: lms/templates/register.html:161 lms/templates/sysadmin_dashboard.html:75
-#: lms/templates/verify_student/_modal_editname.html:19
-#: lms/templates/verify_student/face_upload.html:309
-msgid "Full Name"
-msgstr "Полное имя"
-
-#: lms/templates/dashboard.html:244 lms/templates/dashboard.html:249
-#: lms/templates/dashboard/_dashboard_info_language.html:9
-msgid "edit"
-msgstr "изменить"
-
-#: lms/templates/dashboard.html:247 lms/templates/login.html:188
-#: lms/templates/courseware/instructor_dashboard.html:142
-#: lms/templates/university_profile/edge.html:18
-msgid "Email"
-msgstr "Эл. почта"
-
-#: lms/templates/dashboard.html:260 lms/templates/dashboard.html:263
-msgid "Reset Password"
-msgstr "Восстановить/изменить пароль"
-
-#: lms/templates/dashboard.html:279
+#: lms/templates/dashboard.html:307
 msgid "Current Courses"
 msgstr "Текущие курсы"
 
-#: lms/templates/dashboard.html:297
+#: lms/templates/dashboard.html:325
 msgid "Looks like you haven't registered for any courses yet."
 msgstr "Вы не зарегистрированы ни на один курс"
 
-#: lms/templates/dashboard.html:299
+#: lms/templates/dashboard.html:327
 msgid "Find courses now!"
 msgstr "Найти курсы!"
 
-#: lms/templates/dashboard.html:302
+#: lms/templates/dashboard.html:330
 msgid "Looks like you haven't been enrolled in any courses yet."
 msgstr "Вы не зарегистрированы ни на один курс"
 
-#: lms/templates/dashboard.html:309
+#: lms/templates/dashboard.html:337
 msgid "Course-loading errors"
 msgstr "Ошибка при загрузке курсов"
 
-#. Translators: this is a control to allow users to exit out of this modal
-#. interface (a menu or piece of UI that takes the full focus of the screen)
-#: lms/templates/dashboard.html:330 lms/templates/dashboard.html:362
-#: lms/templates/dashboard.html:391 lms/templates/dashboard.html:434
-#: lms/templates/dashboard.html:476
-#: lms/templates/forgot_password_modal.html:10
-#: lms/templates/help_modal.html:24 lms/templates/help_modal.html:72
-#: lms/templates/help_modal.html:106 lms/templates/login_modal.html:11
-#: lms/templates/signup_modal.html:32
-#: lms/templates/modal/_modal-settings-language.html:13
-#: lms/templates/modal/accessible_confirm.html:7
-msgid "Close Modal"
-msgstr "Закрыть"
-
-#: lms/templates/dashboard.html:336
+#: lms/templates/dashboard.html:364
 msgid "Email Settings for {course_number}"
 msgstr "Настройки email для {course_number}"
 
-#. Translators: this text gives status on if the modal interface (a menu or
-#. piece of UI that takes the full focus of the screen) is open or not
-#: lms/templates/dashboard.html:339 lms/templates/dashboard.html:371
-#: lms/templates/dashboard.html:400 lms/templates/dashboard.html:443
-#: lms/templates/dashboard.html:485
-#: lms/templates/modal/_modal-settings-language.html:22
-#: lms/templates/modal/accessible_confirm.html:16
-msgid "modal open"
-msgstr ""
-
-#: lms/templates/dashboard.html:347
+#: lms/templates/dashboard.html:375
 msgid "Receive course emails"
 msgstr "Получать рассылку курса"
 
-#: lms/templates/dashboard.html:349
+#: lms/templates/dashboard.html:377
 msgid "Save Settings"
 msgstr "Сохранить настройки"
 
-#: lms/templates/dashboard.html:368
-msgid "Password Reset Email Sent"
-msgstr "Письмо с инструкциями по восстановлению пароля выслано"
-
-#: lms/templates/dashboard.html:379
-msgid ""
-"An email has been sent to {email}. Follow the link in the email to change "
-"your password."
-msgstr ""
-"Письмо было выслано по адресу {email}. Перейдите по ссылке в письме для "
-"изменения пароля."
-
-#: lms/templates/dashboard.html:397 lms/templates/dashboard.html:419
-msgid "Change Email"
-msgstr "Изменить Email"
-
-#: lms/templates/dashboard.html:410
-msgid "Please enter your new email address:"
-msgstr "Введите новый адрес электронной почты:"
-
-#: lms/templates/dashboard.html:412
-msgid "Please confirm your password:"
-msgstr "Подтвердите ваш пароль:"
-
-#: lms/templates/dashboard.html:416
-msgid ""
-"We will send a confirmation to both {email} and your new email as part of "
-"the process."
-msgstr "Мы вышлем подтверждения и на адрес {email}, и на новый адрес."
-
-#: lms/templates/dashboard.html:440
-msgid "Change your name"
-msgstr "Изменение отображаемого имени"
-
-#. Translators: note that {platform} {cert_name_short} will look something
-#. like: "edX certificate". Please do not change the order of these
-#. placeholders.
-#: lms/templates/dashboard.html:452
-msgid ""
-"To uphold the credibility of your {platform} {cert_name_short}, all name "
-"changes will be logged and recorded."
-msgstr ""
-"Для сохранения доверия к сертификатам ЦПМ все изменения имени сохраняются в "
-"истории."
-
-#. Translators: note that {platform} {cert_name_short} will look something
-#. like: "edX certificate". Please do not change the order of these
-#. placeholders.
-#: lms/templates/dashboard.html:457
-msgid ""
-"Enter your desired full name, as it will appear on your {platform} "
-"{cert_name_short}:"
-msgstr "Введите Ваше полное имя, как оно будет напечатано на сертификате ЦПМ:"
-
-#: lms/templates/dashboard.html:459
-#: lms/templates/verify_student/_modal_editname.html:21
-msgid "Reason for name change:"
-msgstr "Причина изменения имени:"
-
-#: lms/templates/dashboard.html:463
-msgid "Change My Name"
-msgstr "Изменить имя"
-
-#: lms/templates/dashboard.html:482
+#: lms/templates/dashboard.html:510
 msgid ""
 "<span id=\"track-info\"></span> {course_number}?  <span id=\"refund-info\"></"
 "span>"
 msgstr ""
 
-#: lms/templates/dashboard.html:495
+#: lms/templates/dashboard.html:523
 #: lms/templates/dashboard/_dashboard_course_listing.html:119
 #: lms/templates/dashboard/_dashboard_course_listing.html:125
 #: lms/templates/dashboard/_dashboard_course_listing.html:131
@@ -923,7 +935,7 @@ msgid "Level"
 msgstr "Уровень"
 
 #: lms/templates/folditbasic.html:23
-#: lms/templates/courseware/instructor_dashboard.html:856
+#: lms/templates/courseware/instructor_dashboard.html:868
 msgid "Submitted"
 msgstr "Отправлено"
 
@@ -1125,17 +1137,17 @@ msgstr "Ищете помощи для входа или с вашей учет�
 msgid "View our help section for answers to commonly asked questions."
 msgstr "Посмотрите наш раздел помощи для ответов на часто задаваемые вопросы"
 
-#: lms/templates/login.html:185 lms/templates/university_profile/edge.html:15
+#: lms/templates/login.html:184 lms/templates/university_profile/edge.html:15
 msgid "Log in to your courses"
 msgstr "Войти в ваши курсы"
 
-#: lms/templates/login.html:196 lms/templates/login_modal.html:16
+#: lms/templates/login.html:195 lms/templates/login_modal.html:16
 #: lms/templates/provider_login.html:37
 #: lms/templates/university_profile/edge.html:26
 msgid "Log In"
 msgstr "Войти"
 
-#: lms/templates/login.html:202 lms/templates/university_profile/edge.html:32
+#: lms/templates/login.html:201 lms/templates/university_profile/edge.html:32
 msgid "Register for classes"
 msgstr "Регистрация на курсы"
 
@@ -1201,45 +1213,45 @@ msgstr ""
 msgid "working..."
 msgstr ""
 
-#: lms/templates/master_class.html:38 lms/templates/register.html:201
+#: lms/templates/master_class.html:51 lms/templates/register.html:201
 #: lms/templates/university_profile/edge.html:34
 msgid "Register"
 msgstr "Регистрация"
 
-#: lms/templates/master_class.html:44
+#: lms/templates/master_class.html:57
 msgid "Passed registration:"
 msgstr "Прошедшие регистрацию:"
 
-#: lms/templates/master_class.html:45
+#: lms/templates/master_class.html:58
 msgid "Total places:"
 msgstr "Всего мест:"
 
-#: lms/templates/master_class.html:51
+#: lms/templates/master_class.html:64
 msgid "Staff Inforamtion"
 msgstr "Информация для преподавателей"
 
-#: lms/templates/master_class.html:52
+#: lms/templates/master_class.html:65
 msgid "Students pending registration"
 msgstr "Студенты, ожидающие регистрацию"
 
-#: lms/templates/master_class.html:56
+#: lms/templates/master_class.html:69
 msgid "Students passed registration"
 msgstr "Студенты, прошедшие регистрацию"
 
-#: lms/templates/master_class.html:71
-#: lms/templates/courseware/instructor_dashboard.html:539
+#: lms/templates/master_class.html:84
+#: lms/templates/courseware/instructor_dashboard.html:551
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:26
 msgid "Subject: "
 msgstr "Тема:"
 
-#: lms/templates/master_class.html:73
-#: lms/templates/courseware/instructor_dashboard.html:545
+#: lms/templates/master_class.html:86
+#: lms/templates/courseware/instructor_dashboard.html:557
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:32
 msgid "(Max 128 characters)"
 msgstr "(Максимум 128 символов)"
 
-#: lms/templates/master_class.html:77
-#: lms/templates/courseware/instructor_dashboard.html:549
+#: lms/templates/master_class.html:90
+#: lms/templates/courseware/instructor_dashboard.html:561
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:35
 msgid "Message:"
 msgstr "Сообщение:"
@@ -1339,7 +1351,7 @@ msgstr "Школы"
 msgid "Log in"
 msgstr "Вход в систему"
 
-#: lms/templates/navigation.html:130
+#: lms/templates/navigation.html:131
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}"
@@ -2454,12 +2466,12 @@ msgstr "Поиск студента"
 
 #: lms/templates/courseware/grade_summary.html:83
 #: lms/templates/courseware/grade_summary2.html:212
-#: lms/templates/courseware/instructor_dashboard.html:193
+#: lms/templates/courseware/instructor_dashboard.html:195
 msgid "Grade summary"
 msgstr "Итог по оценкам"
 
 #: lms/templates/courseware/gradebook.html:41
-#: lms/templates/courseware/instructor_dashboard.html:189
+#: lms/templates/courseware/instructor_dashboard.html:191
 msgid "Gradebook"
 msgstr "Журнал оценок"
 
@@ -2508,36 +2520,36 @@ msgstr "Оценки"
 msgid "Psychometrics"
 msgstr "Психометрика"
 
-#: lms/templates/courseware/instructor_dashboard.html:137
+#: lms/templates/courseware/instructor_dashboard.html:139
 msgid "Forum Admin"
 msgstr "Администратор форума"
 
-#: lms/templates/courseware/instructor_dashboard.html:138
+#: lms/templates/courseware/instructor_dashboard.html:140
 msgid "Enrollment"
 msgstr "Регистрация на курс"
 
-#: lms/templates/courseware/instructor_dashboard.html:139
+#: lms/templates/courseware/instructor_dashboard.html:141
 msgid "DataDump"
 msgstr "Вывод данных"
 
-#: lms/templates/courseware/instructor_dashboard.html:140
+#: lms/templates/courseware/instructor_dashboard.html:142
 msgid "Manage Groups"
 msgstr "Управление группами"
 
-#: lms/templates/courseware/instructor_dashboard.html:145
+#: lms/templates/courseware/instructor_dashboard.html:147
 msgid "Analytics"
 msgstr "Аналитика"
 
-#: lms/templates/courseware/instructor_dashboard.html:148
+#: lms/templates/courseware/instructor_dashboard.html:150
 msgid "Metrics"
 msgstr "Метрики"
 
-#: lms/templates/courseware/instructor_dashboard.html:170
+#: lms/templates/courseware/instructor_dashboard.html:172
 msgid "Grade Downloads"
 msgstr "Загрузка оценок"
 
-#: lms/templates/courseware/instructor_dashboard.html:177
-#: lms/templates/courseware/instructor_dashboard.html:423
+#: lms/templates/courseware/instructor_dashboard.html:179
+#: lms/templates/courseware/instructor_dashboard.html:435
 msgid ""
 "Note: some of these buttons are known to time out for larger courses. We "
 "have temporarily disabled those features for courses with more than "
@@ -2549,39 +2561,39 @@ msgstr ""
 "курсов с количеством участников больше {max_enrollment} человек. Вы можете "
 "отредактировать это значение в расширенных настройках курса."
 
-#: lms/templates/courseware/instructor_dashboard.html:198
+#: lms/templates/courseware/instructor_dashboard.html:200
 msgid "Dump list of enrolled students"
 msgstr "Список зачисленных студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:202
+#: lms/templates/courseware/instructor_dashboard.html:204
 msgid "Dump Grades for all students in this course"
 msgstr "Оценки всех студентов этого курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:203
+#: lms/templates/courseware/instructor_dashboard.html:205
 msgid "Download CSV of all student grades for this course"
 msgstr "CSV оценок всех студентов этого курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:207
+#: lms/templates/courseware/instructor_dashboard.html:209
 msgid "Dump all RAW grades for all students in this course"
 msgstr "Необработанные оценки всех студентов этого курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:208
+#: lms/templates/courseware/instructor_dashboard.html:210
 msgid "Download CSV of all RAW grades"
 msgstr "CSV всех необработанных оценок"
 
-#: lms/templates/courseware/instructor_dashboard.html:212
+#: lms/templates/courseware/instructor_dashboard.html:214
 msgid "Download CSV of answer distributions"
 msgstr "CSV распределения ответов"
 
-#: lms/templates/courseware/instructor_dashboard.html:213
+#: lms/templates/courseware/instructor_dashboard.html:215
 msgid "Dump description of graded assignments configuration"
 msgstr "Описания конфигураций оцениваемых заданий"
 
-#: lms/templates/courseware/instructor_dashboard.html:224
+#: lms/templates/courseware/instructor_dashboard.html:226
 msgid "Export grades to remote gradebook"
 msgstr "Экспортировать оценки в удаленный журнал"
 
-#: lms/templates/courseware/instructor_dashboard.html:225
+#: lms/templates/courseware/instructor_dashboard.html:227
 msgid ""
 "The assignments defined for this course should match the ones stored in the "
 "gradebook, for this to work properly!"
@@ -2589,53 +2601,53 @@ msgstr ""
 "Задания, определенные для данного курса, должны соответствовать сохраненным "
 "в журнале оценок, чтобы данная функция работала корректно!"
 
-#: lms/templates/courseware/instructor_dashboard.html:228
-#: lms/templates/courseware/instructor_dashboard.html:447
+#: lms/templates/courseware/instructor_dashboard.html:230
+#: lms/templates/courseware/instructor_dashboard.html:459
 msgid "Gradebook name:"
 msgstr "Название журнала оценок:"
 
-#: lms/templates/courseware/instructor_dashboard.html:231
+#: lms/templates/courseware/instructor_dashboard.html:233
 msgid "List assignments available in remote gradebook"
 msgstr "Задания, доступные в удаленном журнале оценок"
 
-#: lms/templates/courseware/instructor_dashboard.html:232
+#: lms/templates/courseware/instructor_dashboard.html:234
 msgid "List enrolled students matching remote gradebook"
 msgstr "Вывести зачисленных студентов из удаленного журнала оценок"
 
-#: lms/templates/courseware/instructor_dashboard.html:236
+#: lms/templates/courseware/instructor_dashboard.html:238
 msgid "List assignments available for this course"
 msgstr "Вывести задания, доступные для этого курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:240
+#: lms/templates/courseware/instructor_dashboard.html:242
 msgid "Assignment name:"
 msgstr "Название задания:"
 
-#: lms/templates/courseware/instructor_dashboard.html:243
+#: lms/templates/courseware/instructor_dashboard.html:245
 msgid "Display grades for assignment"
 msgstr "Вывести оценки для задания"
 
-#: lms/templates/courseware/instructor_dashboard.html:244
+#: lms/templates/courseware/instructor_dashboard.html:246
 msgid "Export grades for assignment to remote gradebook"
 msgstr "Экспортировать оценки для задания в удаленный журнал"
 
-#: lms/templates/courseware/instructor_dashboard.html:245
+#: lms/templates/courseware/instructor_dashboard.html:247
 msgid "Export CSV file of grades for assignment"
 msgstr "Экспортировать CSV с оценками для заданий"
 
-#: lms/templates/courseware/instructor_dashboard.html:252
+#: lms/templates/courseware/instructor_dashboard.html:254
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:80
 msgid "Course-specific grade adjustment"
 msgstr "Исправления оценок для всех студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:255
-#: lms/templates/courseware/instructor_dashboard.html:290
+#: lms/templates/courseware/instructor_dashboard.html:257
+#: lms/templates/courseware/instructor_dashboard.html:292
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:33
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:84
 msgid "Specify a particular problem in the course here by its url:"
 msgstr "Укажите URL задачи из курса:"
 
-#: lms/templates/courseware/instructor_dashboard.html:259
-#: lms/templates/courseware/instructor_dashboard.html:294
+#: lms/templates/courseware/instructor_dashboard.html:261
+#: lms/templates/courseware/instructor_dashboard.html:296
 msgid ""
 "You may use just the \"urlname\" if a problem, or \"modulename/urlname\" if "
 "not. (For example, if the location is <tt>i4x://university/course/problem/"
@@ -2649,22 +2661,22 @@ msgstr ""
 "задачи <tt>i4x://university/course/notaproblem/someothername</tt>, укажите "
 "<tt>notaproblem/someothername</tt>."
 
-#: lms/templates/courseware/instructor_dashboard.html:266
-#: lms/templates/courseware/instructor_dashboard.html:301
+#: lms/templates/courseware/instructor_dashboard.html:268
+#: lms/templates/courseware/instructor_dashboard.html:303
 msgid "Then select an action:"
 msgstr "Потом выберите действие:"
 
-#: lms/templates/courseware/instructor_dashboard.html:267
+#: lms/templates/courseware/instructor_dashboard.html:269
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:97
 msgid "Reset ALL students' attempts"
 msgstr "Очистить все попытки студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:268
+#: lms/templates/courseware/instructor_dashboard.html:270
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:98
 msgid "Rescore ALL students' problem submissions"
 msgstr "Перепроверить все попытки студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:271
+#: lms/templates/courseware/instructor_dashboard.html:273
 msgid ""
 "These actions run in the background, and status for active tasks will appear "
 "in a table below. To see status for all tasks submitted for this problem, "
@@ -2674,15 +2686,15 @@ msgstr ""
 "будет отображаться в таблице ниже. Чтобы увидеть статус всех заданий нажмите "
 "на кнопку:"
 
-#: lms/templates/courseware/instructor_dashboard.html:274
+#: lms/templates/courseware/instructor_dashboard.html:276
 msgid "Show Background Task History"
 msgstr "Показать историю фоновых заданий"
 
-#: lms/templates/courseware/instructor_dashboard.html:280
+#: lms/templates/courseware/instructor_dashboard.html:282
 msgid "Student-specific grade inspection and adjustment"
 msgstr "Специальная инспекция и исправление оценок студента"
 
-#: lms/templates/courseware/instructor_dashboard.html:282
+#: lms/templates/courseware/instructor_dashboard.html:284
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html:13
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html:67
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html:90
@@ -2693,32 +2705,32 @@ msgid ""
 msgstr ""
 "Укажите адрес email или имя пользователя студента {platform_name} здесь:"
 
-#: lms/templates/courseware/instructor_dashboard.html:286
+#: lms/templates/courseware/instructor_dashboard.html:288
 msgid "Click this, and a link to student's progress page will appear below:"
 msgstr "Нажмите, и ниже появится ссылка на страницу с прогрессом ученика:"
 
-#: lms/templates/courseware/instructor_dashboard.html:287
+#: lms/templates/courseware/instructor_dashboard.html:289
 msgid "Get link to student's progress page"
 msgstr "Получить ссылку на страницу прогресса ученика"
 
-#: lms/templates/courseware/instructor_dashboard.html:302
+#: lms/templates/courseware/instructor_dashboard.html:304
 msgid "Reset student's attempts"
 msgstr "Очистить все попытки студента"
 
-#: lms/templates/courseware/instructor_dashboard.html:304
+#: lms/templates/courseware/instructor_dashboard.html:306
 msgid "Rescore student's problem submission"
 msgstr "Перепроверить все попытки студента"
 
-#: lms/templates/courseware/instructor_dashboard.html:310
+#: lms/templates/courseware/instructor_dashboard.html:312
 msgid ""
 "You may also delete the entire state of a student for the specified module:"
 msgstr "Вы также можете удалить все состояние студента в указанном объекте:"
 
-#: lms/templates/courseware/instructor_dashboard.html:311
+#: lms/templates/courseware/instructor_dashboard.html:313
 msgid "Delete student state for module"
 msgstr "Удалить состояние студента для данного объекта"
 
-#: lms/templates/courseware/instructor_dashboard.html:315
+#: lms/templates/courseware/instructor_dashboard.html:317
 msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in "
 "a table below. To see status for all tasks submitted for this problem and "
@@ -2728,88 +2740,100 @@ msgstr ""
 "перепроверки будет отображаться в таблице ниже. Чтобы увидеть статус всех "
 "заданий, нажмите на эту кнопку:"
 
-#: lms/templates/courseware/instructor_dashboard.html:319
+#: lms/templates/courseware/instructor_dashboard.html:321
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:72
 msgid "Show Background Task History for Student"
 msgstr "Показать историю фоновых заданий перепроверки для студента"
 
-#: lms/templates/courseware/instructor_dashboard.html:328
+#: lms/templates/courseware/instructor_dashboard.html:330
 msgid "Select a problem and an action:"
 msgstr "Выберите задачу и действие:"
 
-#: lms/templates/courseware/instructor_dashboard.html:339
+#: lms/templates/courseware/instructor_dashboard.html:341
 msgid "Generate Histogram and IRT Plot"
 msgstr "Сгенерировать гистограмму и график"
 
-#: lms/templates/courseware/instructor_dashboard.html:352
+#: lms/templates/courseware/instructor_dashboard.html:354
+msgid "List course teachers"
+msgstr "Список преподавателей курса"
+
+#: lms/templates/courseware/instructor_dashboard.html:356
+msgid "Remove teacher"
+msgstr "Удалить преподавателя"
+
+#: lms/templates/courseware/instructor_dashboard.html:357
+msgid "Add teacher"
+msgstr "Добавить преподавателя"
+
+#: lms/templates/courseware/instructor_dashboard.html:364
 msgid "List course staff members"
 msgstr "Список персонала курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:355
+#: lms/templates/courseware/instructor_dashboard.html:367
 msgid "Remove course staff"
 msgstr "Удалить члена персонала курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:356
+#: lms/templates/courseware/instructor_dashboard.html:368
 msgid "Add course staff"
 msgstr "Добавить члена персонала курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:363
+#: lms/templates/courseware/instructor_dashboard.html:375
 msgid "List course instructors"
 msgstr "Список администраторов курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:365
+#: lms/templates/courseware/instructor_dashboard.html:377
 msgid "Remove instructor"
 msgstr "Удалить администратора"
 
-#: lms/templates/courseware/instructor_dashboard.html:366
+#: lms/templates/courseware/instructor_dashboard.html:378
 msgid "Add instructor"
 msgstr "Добавить администратора"
 
-#: lms/templates/courseware/instructor_dashboard.html:372
+#: lms/templates/courseware/instructor_dashboard.html:384
 msgid "Reload course from XML files"
 msgstr "Перезагрузить курс из XML файла"
 
-#: lms/templates/courseware/instructor_dashboard.html:373
+#: lms/templates/courseware/instructor_dashboard.html:385
 msgid "GIT pull and Reload course"
 msgstr "Вытянуть из GIT и перезагрузить курс"
 
-#: lms/templates/courseware/instructor_dashboard.html:382
+#: lms/templates/courseware/instructor_dashboard.html:394
 msgid "List course forum admins"
 msgstr "Список админов форума курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:384
+#: lms/templates/courseware/instructor_dashboard.html:396
 msgid "Remove forum admin"
 msgstr "Удалить админа форума"
 
-#: lms/templates/courseware/instructor_dashboard.html:385
+#: lms/templates/courseware/instructor_dashboard.html:397
 msgid "Add forum admin"
 msgstr "Добавить админа форума"
 
-#: lms/templates/courseware/instructor_dashboard.html:391
+#: lms/templates/courseware/instructor_dashboard.html:403
 msgid "List course forum moderators"
 msgstr "Список модераторов форума курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:392
+#: lms/templates/courseware/instructor_dashboard.html:404
 msgid "List course forum community TAs"
 msgstr "Список АП форумного сообщества"
 
-#: lms/templates/courseware/instructor_dashboard.html:395
+#: lms/templates/courseware/instructor_dashboard.html:407
 msgid "Remove forum moderator"
 msgstr "Удалить модератора форума"
 
-#: lms/templates/courseware/instructor_dashboard.html:396
+#: lms/templates/courseware/instructor_dashboard.html:408
 msgid "Add forum moderator"
 msgstr "Добавить модератора форума"
 
-#: lms/templates/courseware/instructor_dashboard.html:397
+#: lms/templates/courseware/instructor_dashboard.html:409
 msgid "Remove forum community TA"
 msgstr "Удалить АП форумного общества"
 
-#: lms/templates/courseware/instructor_dashboard.html:398
+#: lms/templates/courseware/instructor_dashboard.html:410
 msgid "Add forum community TA"
 msgstr "Добавить АП форумного общества"
 
-#: lms/templates/courseware/instructor_dashboard.html:401
+#: lms/templates/courseware/instructor_dashboard.html:413
 msgid ""
 "User requires forum administrator privileges to perform administration "
 "tasks.  See instructor."
@@ -2817,77 +2841,77 @@ msgstr ""
 "У пользователя должны быть административные привилегии для выполнения "
 "административных задач. Обратитесь к администратору."
 
-#: lms/templates/courseware/instructor_dashboard.html:405
+#: lms/templates/courseware/instructor_dashboard.html:417
 #, fuzzy
 msgid "Explanation of Roles:"
 msgstr "Объяснение"
 
-#: lms/templates/courseware/instructor_dashboard.html:406
+#: lms/templates/courseware/instructor_dashboard.html:418
 msgid ""
 "Forum Moderators: can edit or delete any post, remove misuse flags, close "
 "and re-open threads, endorse responses, and see posts from all cohorts (if "
 "the course is cohorted). Moderators' posts are marked as 'staff'."
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:408
+#: lms/templates/courseware/instructor_dashboard.html:420
 msgid ""
 "Forum Admins: have moderator privileges, as well as the ability to edit the "
 "list of forum moderators (e.g. to appoint a new moderator). Admins' posts "
 "are marked as 'staff'."
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:410
+#: lms/templates/courseware/instructor_dashboard.html:422
 msgid ""
 "Community TAs: have forum moderator privileges, and their posts are labelled "
 "'Community TA'."
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:417
+#: lms/templates/courseware/instructor_dashboard.html:429
 msgid "Enrollment Data"
 msgstr "Информация о регистрациях"
 
-#: lms/templates/courseware/instructor_dashboard.html:435
+#: lms/templates/courseware/instructor_dashboard.html:447
 msgid "List enrolled students"
 msgstr "Список зачисленных студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:436
+#: lms/templates/courseware/instructor_dashboard.html:448
 msgid "List students who may enroll but may not have yet signed up"
 msgstr ""
 "Список студентов, которые могут быть зачислены, но которые еще не "
 "зарегистрировались"
 
-#: lms/templates/courseware/instructor_dashboard.html:445
+#: lms/templates/courseware/instructor_dashboard.html:457
 msgid "Pull enrollment from remote gradebook"
 msgstr "Загрузить регистрации на курс из удаленного журнала оценок"
 
-#: lms/templates/courseware/instructor_dashboard.html:448
-#: lms/templates/courseware/instructor_dashboard.html:703
+#: lms/templates/courseware/instructor_dashboard.html:460
+#: lms/templates/courseware/instructor_dashboard.html:715
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html:19
 msgid "Section:"
 msgstr "Раздел:"
 
-#: lms/templates/courseware/instructor_dashboard.html:450
+#: lms/templates/courseware/instructor_dashboard.html:462
 msgid "List sections available in remote gradebook"
 msgstr "Список разделов из удаленного журнала оценок"
 
-#: lms/templates/courseware/instructor_dashboard.html:451
+#: lms/templates/courseware/instructor_dashboard.html:463
 msgid "List students in section in remote gradebook"
 msgstr "Список студентов в удаленном журнале оценок"
 
-#: lms/templates/courseware/instructor_dashboard.html:452
+#: lms/templates/courseware/instructor_dashboard.html:464
 msgid "Overload enrollment list using remote gradebook"
 msgstr "Перезагрузить список зачисленных из удаленного журнала оценок"
 
-#: lms/templates/courseware/instructor_dashboard.html:453
+#: lms/templates/courseware/instructor_dashboard.html:465
 msgid "Merge enrollment list with remote gradebook"
 msgstr "Слить список зачисленных из удаленного журнала оценок"
 
-#: lms/templates/courseware/instructor_dashboard.html:457
+#: lms/templates/courseware/instructor_dashboard.html:469
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:30
 msgid "Batch Enrollment"
 msgstr "Групповая запись"
 
-#: lms/templates/courseware/instructor_dashboard.html:458
+#: lms/templates/courseware/instructor_dashboard.html:470
 msgid ""
 "Enroll or un-enroll one or many students: enter emails, separated by new "
 "lines or commas;"
@@ -2895,41 +2919,41 @@ msgstr ""
 "Зарегистрировать или отрегистрировать одного или нескольких студентов: "
 "введите адреса e-mail на отдельных строках или разделенные запятой"
 
-#: lms/templates/courseware/instructor_dashboard.html:461
+#: lms/templates/courseware/instructor_dashboard.html:473
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:45
 msgid "Notify students by email"
 msgstr "Оповестить студентов по электронной почте"
 
-#: lms/templates/courseware/instructor_dashboard.html:463
+#: lms/templates/courseware/instructor_dashboard.html:475
 msgid "Auto-enroll students when they activate"
 msgstr "Авто-регистрировать студентов при их активации"
 
-#: lms/templates/courseware/instructor_dashboard.html:464
+#: lms/templates/courseware/instructor_dashboard.html:476
 msgid "Enroll multiple students"
 msgstr "Зачислить несколько студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:466
+#: lms/templates/courseware/instructor_dashboard.html:478
 msgid "Unenroll multiple students"
 msgstr "Отчислить несколько студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:475
+#: lms/templates/courseware/instructor_dashboard.html:487
 msgid "Download CSV of all student profile data"
 msgstr "CSV всех профилей студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:477
+#: lms/templates/courseware/instructor_dashboard.html:489
 msgid "Problem urlname:"
 msgstr "Имя URL задачи:"
 
-#: lms/templates/courseware/instructor_dashboard.html:479
+#: lms/templates/courseware/instructor_dashboard.html:491
 msgid "Download CSV of all responses to problem"
 msgstr "CSV всех ответов на задачу"
 
-#: lms/templates/courseware/instructor_dashboard.html:493
+#: lms/templates/courseware/instructor_dashboard.html:505
 msgid "List beta testers"
 msgstr "Список бета-тестеров"
 
 #. Translators: days_early_for_beta should not be translated
-#: lms/templates/courseware/instructor_dashboard.html:496
+#: lms/templates/courseware/instructor_dashboard.html:508
 msgid ""
 "Enter usernames or emails for students who should be beta-testers, one per "
 "line, or separated by commas.  They will get to see course materials early, "
@@ -2941,39 +2965,39 @@ msgstr ""
 "увидеть материалы раньше других, как определяется параметром "
 "<tt>days_early_for_beta</tt> политик курса."
 
-#: lms/templates/courseware/instructor_dashboard.html:501
+#: lms/templates/courseware/instructor_dashboard.html:513
 msgid "Remove beta testers"
 msgstr "Удалить бета-тестера"
 
-#: lms/templates/courseware/instructor_dashboard.html:502
+#: lms/templates/courseware/instructor_dashboard.html:514
 msgid "Add beta testers"
 msgstr "Добавить бета-тестера"
 
-#: lms/templates/courseware/instructor_dashboard.html:522
+#: lms/templates/courseware/instructor_dashboard.html:534
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:9
 msgid "Send to:"
 msgstr "Отправить:"
 
-#: lms/templates/courseware/instructor_dashboard.html:524
+#: lms/templates/courseware/instructor_dashboard.html:536
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:11
 msgid "Myself"
 msgstr "Себе"
 
-#: lms/templates/courseware/instructor_dashboard.html:526
-#: lms/templates/courseware/instructor_dashboard.html:528
+#: lms/templates/courseware/instructor_dashboard.html:538
+#: lms/templates/courseware/instructor_dashboard.html:540
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:13
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:15
 msgid "Staff and instructors"
 msgstr "Персонал и Администраторы"
 
-#: lms/templates/courseware/instructor_dashboard.html:531
-#: lms/templates/courseware/instructor_dashboard.html:533
+#: lms/templates/courseware/instructor_dashboard.html:543
+#: lms/templates/courseware/instructor_dashboard.html:545
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:18
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:20
 msgid "All (students, staff and instructors)"
 msgstr "Все (студенты, персонал и администраторы)"
 
-#: lms/templates/courseware/instructor_dashboard.html:558
+#: lms/templates/courseware/instructor_dashboard.html:570
 msgid ""
 "Please try not to email students more than once per week. Important things "
 "to consider before sending:"
@@ -2981,14 +3005,14 @@ msgstr ""
 "Пожалуйста, не пишите студентам чаще одного раза в день. Перед посылкой "
 "обратите внимание на следующее:"
 
-#: lms/templates/courseware/instructor_dashboard.html:560
+#: lms/templates/courseware/instructor_dashboard.html:572
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:45
 msgid ""
 "Have you read over the email to make sure it says everything you want to say?"
 msgstr ""
 "Вы перечитали письмо, чтобы убедиться, что сказали все, что хотели сказать?"
 
-#: lms/templates/courseware/instructor_dashboard.html:561
+#: lms/templates/courseware/instructor_dashboard.html:573
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:46
 msgid ""
 "Have you sent the email to yourself first to make sure you're happy with how "
@@ -2997,12 +3021,12 @@ msgstr ""
 "Вы отправили письмо себе, чтобы убедиться, что удовлетворены тем, как оно "
 "отображается, и все ссылки и картинки работают правильно?"
 
-#: lms/templates/courseware/instructor_dashboard.html:564
+#: lms/templates/courseware/instructor_dashboard.html:576
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:50
 msgid "CAUTION!"
 msgstr "ВНИМАНИЕ!"
 
-#: lms/templates/courseware/instructor_dashboard.html:565
+#: lms/templates/courseware/instructor_dashboard.html:577
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:51
 msgid ""
 "Once the 'Send Email' button is clicked, your email will be queued for "
@@ -3011,24 +3035,24 @@ msgstr ""
 "Как только нажата кнопка 'Отослать письмо', ваше письмо будет поставлено в "
 "очередь на отправку."
 
-#: lms/templates/courseware/instructor_dashboard.html:566
+#: lms/templates/courseware/instructor_dashboard.html:578
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:52
 msgid "A queued email CANNOT be cancelled."
 msgstr "Письма, находящиеся в очереди, НЕЛЬЗЯ отменить."
 
-#: lms/templates/courseware/instructor_dashboard.html:569
+#: lms/templates/courseware/instructor_dashboard.html:581
 msgid "Send email"
 msgstr "Отослать письмо"
 
-#: lms/templates/courseware/instructor_dashboard.html:579
+#: lms/templates/courseware/instructor_dashboard.html:591
 msgid "Email subject can not be empty."
 msgstr "Тема сообщения не может быть пустой."
 
-#: lms/templates/courseware/instructor_dashboard.html:583
+#: lms/templates/courseware/instructor_dashboard.html:595
 msgid "Email body can not be empty."
 msgstr "Сообщение не может быть пустым."
 
-#: lms/templates/courseware/instructor_dashboard.html:593
+#: lms/templates/courseware/instructor_dashboard.html:605
 msgid ""
 "These email actions run in the background, and status for active email tasks "
 "will appear in a table below. To see status for all bulk email tasks "
@@ -3038,98 +3062,98 @@ msgstr ""
 "писем будет отображаться в таблице ниже. Чтобы увидеть статус всех заданий "
 "нажмите на кнопку:"
 
-#: lms/templates/courseware/instructor_dashboard.html:596
+#: lms/templates/courseware/instructor_dashboard.html:608
 msgid "Show Background Email Task History"
 msgstr "Показать историю фоновых заданий"
 
-#: lms/templates/courseware/instructor_dashboard.html:612
+#: lms/templates/courseware/instructor_dashboard.html:624
 msgid "No Analytics are available at this time."
 msgstr "Аналитика не доступна на данный момент."
 
-#: lms/templates/courseware/instructor_dashboard.html:617
+#: lms/templates/courseware/instructor_dashboard.html:629
 msgid ""
 "Students enrolled (historical count, includes those who have since "
 "unenrolled):"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:625
+#: lms/templates/courseware/instructor_dashboard.html:637
 msgid "Students active in the last week:"
 msgstr "Студенты, активные на прошлой неделе"
 
-#: lms/templates/courseware/instructor_dashboard.html:633
+#: lms/templates/courseware/instructor_dashboard.html:645
 msgid "Student activity day by day"
 msgstr "Активность студентов день за днем"
 
-#: lms/templates/courseware/instructor_dashboard.html:639
+#: lms/templates/courseware/instructor_dashboard.html:651
 msgid "Day"
 msgstr "День"
 
-#: lms/templates/courseware/instructor_dashboard.html:640
+#: lms/templates/courseware/instructor_dashboard.html:652
 msgid "Students"
 msgstr "Студенты"
 
-#: lms/templates/courseware/instructor_dashboard.html:655
+#: lms/templates/courseware/instructor_dashboard.html:667
 msgid "Answer distribution for problems"
 msgstr "Распределение ответов по задачам"
 
-#: lms/templates/courseware/instructor_dashboard.html:661
-#: lms/templates/courseware/instructor_dashboard.html:738
+#: lms/templates/courseware/instructor_dashboard.html:673
+#: lms/templates/courseware/instructor_dashboard.html:750
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:25
 msgid "Problem"
 msgstr "Задача"
 
-#: lms/templates/courseware/instructor_dashboard.html:662
+#: lms/templates/courseware/instructor_dashboard.html:674
 msgid "Max"
 msgstr "Максимальный"
 
-#: lms/templates/courseware/instructor_dashboard.html:663
+#: lms/templates/courseware/instructor_dashboard.html:675
 msgid "Points Earned (Num Students)"
 msgstr "Получено баллов (число студентов)"
 
-#: lms/templates/courseware/instructor_dashboard.html:688
+#: lms/templates/courseware/instructor_dashboard.html:700
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html:9
 #, fuzzy
 msgid "There is no data available to display at this time."
 msgstr "Аналитика не доступна на данный момент."
 
-#: lms/templates/courseware/instructor_dashboard.html:699
+#: lms/templates/courseware/instructor_dashboard.html:711
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html:14
 msgid ""
 "Loading the latest graphs for you; depending on your class size, this may "
 "take a few minutes."
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:706
+#: lms/templates/courseware/instructor_dashboard.html:718
 msgid "Count of Students that Opened a Subsection"
 msgstr ""
 
-#: lms/templates/courseware/instructor_dashboard.html:707
-#: lms/templates/courseware/instructor_dashboard.html:714
+#: lms/templates/courseware/instructor_dashboard.html:719
+#: lms/templates/courseware/instructor_dashboard.html:726
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html:39
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: lms/templates/courseware/instructor_dashboard.html:710
+#: lms/templates/courseware/instructor_dashboard.html:722
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html:25
 #, fuzzy
 msgid "Grade Distribution per Problem"
 msgstr "Распределение оценки"
 
-#: lms/templates/courseware/instructor_dashboard.html:712
+#: lms/templates/courseware/instructor_dashboard.html:724
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html:38
 #, fuzzy
 msgid "There are no problems in this section."
 msgstr "Нет оцениваемых заданий в этой секции"
 
-#: lms/templates/courseware/instructor_dashboard.html:732
+#: lms/templates/courseware/instructor_dashboard.html:744
 msgid "Students answering correctly"
 msgstr "Студенты, ответившие корректно"
 
-#: lms/templates/courseware/instructor_dashboard.html:739
+#: lms/templates/courseware/instructor_dashboard.html:751
 msgid "Number of students"
 msgstr "Число студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:752
+#: lms/templates/courseware/instructor_dashboard.html:764
 msgid ""
 "Student distribution per country, all courses, Sep-12 to Oct-17, 1 server "
 "(shown here as an example):"
@@ -3137,7 +3161,7 @@ msgstr ""
 "Распределение студентов по странам, все курсы, сен-2012, окт-2017, 1 сервер "
 "(показано для примера):"
 
-#: lms/templates/courseware/instructor_dashboard.html:848
+#: lms/templates/courseware/instructor_dashboard.html:860
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:64
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html:57
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:61
@@ -3145,49 +3169,49 @@ msgstr ""
 msgid "Pending Instructor Tasks"
 msgstr "Ожидающие в очереди задания"
 
-#: lms/templates/courseware/instructor_dashboard.html:852
+#: lms/templates/courseware/instructor_dashboard.html:864
 msgid "Task Type"
 msgstr "Тип задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:853
+#: lms/templates/courseware/instructor_dashboard.html:865
 msgid "Task inputs"
 msgstr "Входные данные задач"
 
-#: lms/templates/courseware/instructor_dashboard.html:854
+#: lms/templates/courseware/instructor_dashboard.html:866
 msgid "Task Id"
 msgstr "ID задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:855
+#: lms/templates/courseware/instructor_dashboard.html:867
 msgid "Requester"
 msgstr "Запрашивающий"
 
-#: lms/templates/courseware/instructor_dashboard.html:857
+#: lms/templates/courseware/instructor_dashboard.html:869
 msgid "Task State"
 msgstr "Состояние задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:858
+#: lms/templates/courseware/instructor_dashboard.html:870
 msgid "Duration (sec)"
 msgstr "Длительность (в секундах)"
 
-#: lms/templates/courseware/instructor_dashboard.html:859
+#: lms/templates/courseware/instructor_dashboard.html:871
 msgid "Task Progress"
 msgstr "Ход выполнения задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:871
-#: lms/templates/courseware/instructor_dashboard.html:872
+#: lms/templates/courseware/instructor_dashboard.html:883
+#: lms/templates/courseware/instructor_dashboard.html:884
 msgid "unknown"
 msgstr "неизвестный"
 
-#: lms/templates/courseware/instructor_dashboard.html:892
+#: lms/templates/courseware/instructor_dashboard.html:904
 msgid "Hide course statistics"
 msgstr "Скрыть статистику курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:895
-#: lms/templates/courseware/instructor_dashboard.html:901
+#: lms/templates/courseware/instructor_dashboard.html:907
+#: lms/templates/courseware/instructor_dashboard.html:913
 msgid "Show course statistics"
 msgstr "Показать статистику курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:954
+#: lms/templates/courseware/instructor_dashboard.html:966
 msgid "Course errors"
 msgstr "Ошибки курса"
 
@@ -6929,9 +6953,6 @@ msgstr ""
 #~ msgid "Due Time"
 #~ msgstr "Время"
 
-#~ msgid "Remove due date"
-#~ msgstr "Удалить срок"
-
 #~ msgid "Preview Drafts"
 #~ msgstr "Предварительный просмотр проекта"
 
@@ -8479,9 +8500,6 @@ msgstr ""
 
 #~ msgid "Territorial units with special status"
 #~ msgstr "Городского подчинения"
-
-#~ msgid "Teacher"
-#~ msgstr "Учитель"
 
 #~ msgid "Teacher and organizer"
 #~ msgstr "Педагог-организатор"
