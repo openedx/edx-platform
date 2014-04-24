@@ -189,7 +189,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(courses_list, courses_list_by_groups)
 
         # now create another course with same course_id but different name case
-        course_location_camel = SlashSeparatedCourseKey('Org', 'Course2', 'Run')
+        course_location_camel = SlashSeparatedCourseKey('Org', 'Course', 'Run')
         self._create_course_with_access_groups(course_location_camel, self.user)
 
         # test that get courses through iterating all courses returns both courses

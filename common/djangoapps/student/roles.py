@@ -128,7 +128,7 @@ class GroupBasedRole(AccessRole):
                 del user._roles
 
     def users_with_role(self):
-        """[e.course_id for e in entries]
+        """
         Return a django QuerySet for all of the users with this role
         """
         entries = User.objects.filter(
