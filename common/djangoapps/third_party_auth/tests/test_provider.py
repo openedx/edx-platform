@@ -1,6 +1,4 @@
-"""
-Test configuration of providers.
-"""
+"""Unit tests for provider.py."""
 
 from third_party_auth import provider
 from third_party_auth.tests import testutil
@@ -10,8 +8,7 @@ class RegistryTest(testutil.TestCase):
     """Tests registry discovery and operation."""
 
     # Allow access to protected methods (or module-protected methods) under
-    # test.
-    # pylint: disable-msg=protected-access
+    # test. pylint: disable-msg=protected-access
 
     def test_calling_configure_once_twice_raises_value_error(self):
         provider.Registry.configure_once([provider.GoogleOauth2.NAME])
@@ -68,4 +65,18 @@ class RegistryTest(testutil.TestCase):
 
     def test_get_returns_none_if_provider_not_enabled(self):
         provider.Registry.configure_once([])
-        self.assertIsNone(provider.Registry.get(provider.MozillaPersona.NAME))
+        self.assertIsNone(provider.Registry.get(provider.LinkedInOauth2.NAME))
+
+    def test_get_by_backend_name_raises_runtime_error_if_not_configured(self):
+        with self.assertRaisesRegexp(RuntimeError, '^.*not configured$'):
+            provider.Registry.get_by_backend_name('')
+
+    def test_get_by_backend_name_returns_enabled_provider(self):
+        provider.Registry.configure_once([provider.GoogleOauth2.NAME])
+        self.assertIs(
+            provider.GoogleOauth2,
+            provider.Registry.get_by_backend_name(provider.GoogleOauth2.BACKEND_CLASS.name))
+
+    def test_get_by_backend_name_returns_none_if_provider_not_enabled(self):
+        provider.Registry.configure_once([])
+        self.assertIsNone(provider.Registry.get_by_backend_name(provider.GoogleOauth2.BACKEND_CLASS.name))
