@@ -31,7 +31,7 @@ Roles
     submits pull requests for eventual committing to an Open edX repository.
 
 .. note::
-  At the moment, developers who work for edX are core contributors, and other
+  At the moment, developers who work for edX are core committers, and other
   developers are contributors. This may change in the future.
 
 Overview
