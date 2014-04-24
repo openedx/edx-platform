@@ -210,6 +210,13 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertIn(argument_string, ['true', 'false'])
         self.assertEqual(boolean, True if argument_string == 'true' else False)
 
+    def assert_json_failure_response_is_inactive_account(self, response):
+        """Asserts failure on /login for inactive account looks right."""
+        self.assertEqual(200, response.status_code)  # Yes, it's a 200 even though it's a failure.
+        payload = json.loads(response.content)
+        self.assertFalse(payload.get('success'))
+        self.assertIn('This account has not been activated', payload.get('value'))
+
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
         self.assertEqual(200, response.status_code)  # Yes, it's a 200 even though it's a failure.
@@ -508,12 +515,13 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # Monkey-patch storage for messaging; pylint: disable-msg=protected-access
         request._messages = fallback.FallbackStorage(request)
         middleware.ExceptionMiddleware().process_exception(
-            request, exceptions.AuthAlreadyAssociated(self.PROVIDER_CLASS.BACKEND_CLASS.name, 'duplicate'))
+            request,
+            exceptions.AuthAlreadyAssociated(self.PROVIDER_CLASS.BACKEND_CLASS.name, 'account is already in use.'))
 
         self.assert_dashboard_response_looks_correct(
             student_views.dashboard(request), user, duplicate=True, linked=True)
 
-    def test_full_pipeline_succeeds_for_signing_in_to_existing_account(self):
+    def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self):
         # First, create, the request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.
         request, strategy = self.get_request_and_strategy(
@@ -522,6 +530,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username())
         self.assert_social_auth_exists_for_user(user, strategy)
+        self.assertTrue(user.is_active)
 
         # Begin! Ensure that the login form contains expected controls before
         # the user starts the pipeline.
@@ -549,6 +558,17 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assert_redirect_to_dashboard_looks_correct(
             actions.do_complete(strategy, social_views._do_login, user=user))
         self.assert_dashboard_response_looks_correct(student_views.dashboard(request), user)
+
+    def test_signin_fails_if_account_not_active(self):
+        _, strategy = self.get_request_and_strategy(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
+        strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        user = self.create_user_models_for_existing_account(strategy, 'user@example.com', 'password', self.get_username())
+
+        user.is_active = False
+        user.save()
+
+        self.assert_json_failure_response_is_inactive_account(student_views.login_user(strategy.request))
 
     def test_signin_fails_if_no_account_associated(self):
         _, strategy = self.get_request_and_strategy(
@@ -619,6 +639,14 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # value won't work:
         created_user = self.get_user_by_email(strategy, email)
         self.assert_password_overridden_by_pipeline(overridden_password, created_user.username)
+
+        # The user's account isn't created yet, so an attempt to complete the
+        # pipeline will error out on /login:
+        self.assert_redirect_to_login_looks_correct(
+            actions.do_complete(strategy, social_views._do_login, user=created_user))
+        # So we activate the account in order to verify the redirect to /dashboard:
+        created_user.is_active = True
+        created_user.save()
 
         # Last step in the pipeline: we re-invoke the pipeline and expect to
         # end up on /dashboard, with the correct social auth object now in the

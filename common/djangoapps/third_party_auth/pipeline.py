@@ -244,11 +244,14 @@ def get_duplicate_provider(messages):
     message there is a request to associate a social account S with an edX
     account E if S is already associated with an edX account E'.
 
+    This messaging approach is stringly-typed and the particular string is
+    unfortunately not in a reusable constant.
+
     Returns:
         provider.BaseProvider child instance. The provider of the duplicate
         account, or None if there is no duplicate (and hence no error).
     """
-    social_auth_messages = [m for m in messages if m.extra_tags.startswith('social-auth')]
+    social_auth_messages = [m for m in messages if m.message.endswith('is already in use.')]
 
     if not social_auth_messages:
         return
@@ -348,7 +351,7 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
     if is_dashboard:
         return
 
-    if is_login and user is None:
+    if is_login and user is None or user and not user.is_active:
         return redirect('/login', name='signin_user')
 
     if is_register and user is None:
