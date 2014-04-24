@@ -131,6 +131,12 @@ class LocationBase(object):
         hashlist = [self.org, self.course, self.category, self.name, self.revision]
         return hash('~'.join(item for item in hashlist if item))
 
+    def __lt__(self, other):
+        return hash(self) < hash(other)
+
+    def __gt__(self, other):
+        return hash(self) > hash(other)
+
     @classmethod
     def _check_location_part(cls, val, regexp):
         """
