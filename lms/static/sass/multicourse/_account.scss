@@ -450,6 +450,20 @@
     }
   }
 
+  // forms - third-party auth
+  .form-third-party-auth {
+    margin-bottom: $baseline;
+
+    button {
+      margin-right: $baseline;
+
+      .icon {
+        color: inherit;
+        margin-right: $baseline/2;
+      }
+    }
+  }
+
   // forms - messages/status
   .status {
     @include box-sizing(border-box);
