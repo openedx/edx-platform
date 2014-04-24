@@ -4,7 +4,7 @@
 Write-Your-Own-Grader Problem
 ##############################
 
-In custom Python-evaluated input (also called "write-your-own-grader problems" problems), the grader uses a Python script that you create and embed in the problem to evaluates a student's response or provide hints. These problems can be any type. Numerical input and text input problems are the most popular write-your-own-grader problems.
+In custom Python-evaluated input (also called "write-your-own-grader" problems), the grader uses a Python script that you create and embed in the problem to evaluates a student's response or provide hints. These problems can be any type. Numerical input and text input problems are the most popular write-your-own-grader problems.
 
 .. image:: /Images/CustomPythonExample.png
  :alt: Image of a write your own grader problem

@@ -14,7 +14,6 @@ Creating Exercises and Tools
    circuit_schematic_builder
    conditional_module
    custom_javascript
-   custom_python
    drag_and_drop
    dropdown
    external_graders
@@ -36,5 +35,6 @@ Creating Exercises and Tools
    protein_builder
    text_input
    word_cloud
+   custom_python
    zooming_image
    mathjax

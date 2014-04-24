@@ -26,9 +26,8 @@ For more information, see the following topics.
 * :ref:`Problem Settings`
 * :ref:`Modifying a Released Problem`
 * :ref:`Additional Work with Problems`
-
-  * :ref:`Multiple Problems in One Component`
-  * :ref:`Problem Randomization`
+* :ref:`Multiple Problems in One Component`
+* :ref:`Problem Randomization`
   
 
 .. _Problem Student View:
@@ -134,8 +133,10 @@ You can switch at any time from the Simple Editor to the Advanced Editor by clic
 
 .. _Simple Editor:
 
+=================
 The Simple Editor
 =================
+
 Several problem templates, including multiple choice and text input problem templates, open in the Simple Editor. The following image shows a multiple choice problem in the Simple Editor.
 
 .. image:: ../Images//MultipleChoice_SimpleEditor.png
