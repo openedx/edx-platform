@@ -142,40 +142,96 @@ Example
 
 Beta tester access to courseware for a course with ``days_early_for_beta`` = 20 and 2 sections:
 
-+------------------------------------------------+--------------------------------------------------+
-| Course Enrollment Date = 31 August             | 31 August; earlier if enrolled by course staff   |
-+------------------------------------------------+--------------------------------------------------+
-| Course Start Date = 15 September               | 26 August                                        |
-+------------------------------------------------+--------------------------------------------------+
-| section 1 Release Day = 15 September           | 26 August                                        | 
-+------------------------------------------------+--------------------------------------------------+
-| section 2 Release Day = 22 September           | 2 September                                      |
-+------------------------------------------------+--------------------------------------------------+
-| subsection 1 Release Day = 22 September        | 2 September                                      |
-+------------------------------------------------+--------------------------------------------------+
-| subsection 2 Release Day = 24 September        | 4 September                                      |
-+------------------------------------------------+--------------------------------------------------+
-| subsection 2, unit 1 Visibility = Public       | 4 September                                      |
-+------------------------------------------------+--------------------------------------------------+
-| subsection 2, unit 2 Visibility = Public;      | 4 September for Public version;                  |
-| draft in progress                              | No access to draft                               |
-+------------------------------------------------+--------------------------------------------------+
-| subsection 2, unit 3 Visibility = Private      | No access                                        |
-+------------------------------------------------+--------------------------------------------------+
++-------------------------------------------+------------------------------------------------+
+| Course Enrollment Date = 31 August        | 31 August; earlier if enrolled by course staff |
++===========================================+================================================+
+| Course Start Date = 15 September          | 26 August                                      |
++-------------------------------------------+------------------------------------------------+
+| section 1 Release Day = 15 September      | 26 August                                      |
++-------------------------------------------+------------------------------------------------+
+| section 2 Release Day = 22 September      | 2 September                                    |
++-------------------------------------------+------------------------------------------------+
+| subsection 1 Release Day = 22 September   | 2 September                                    |
++-------------------------------------------+------------------------------------------------+
+| subsection 2 Release Day = 24 September   | 4 September                                    |
++-------------------------------------------+------------------------------------------------+
+| subsection 2, unit 1 Visibility = Public  | 4 September                                    |
++-------------------------------------------+------------------------------------------------+
+| subsection 2, unit 2 Visibility = Public; | 4 September for Public version;                |
+| draft in progress                         | No access to draft                             |
++-------------------------------------------+------------------------------------------------+
+| subsection 2, unit 3 Visibility = Private | No access                                      |
++-------------------------------------------+------------------------------------------------+
 
 In this example, the beta testers cannot access all of the courseware when the beta test starts on 26 August: they can access section 1 but not section 2. You may want to provide a schedule of section availability to your testers so that they can plan their time appropriately. Future release dates do not display to the beta testers in the courseware.
 
 .. _Add_Testers:
 
 *********************************
-Add Individual Beta Testers 
+Add Beta Testers 
 *********************************
 
 Before you can add beta testers:
 
 * You need the email address or username of each beta tester. 
 
-* Each beta tester must register and activate a user account for that email address and username. 
+* Each beta tester must register and activate a user account for that email
+  address/username.
+
+When you add beta testers, note the following. 
+
+* If the beta test starts before the course **Enrollment Start Date**, testers
+  cannot enroll themselves in your course. However, you can enroll the beta
+  testers prior to the **Enrollment Start Date**.
+
+* If you add the beta testers after the defined start of the beta test, and 
+  they are enrolled in the course, they see your course on their dashboards when they log in.
+
+* If you add beta testers before the test starts, or if they are not enrolled,
+  they do not see your course on their dashboards. You can enroll the beta
+  testers in the course yourself, and you may want to send an email message to
+  remind them when the test begins.
+
+.. _Add_Testers_Bulk:
+
+--------------------------
+Add Multiple Beta Testers
+--------------------------
+
+If you have a number of beta testers that you want to add, you can use the "batch
+add" option to add them all at once, rather than individually. With this
+feature, you have options to enroll the beta testers in the course (before
+or after the **Enrollment Start Date**) and send an email message to notify the
+beta testers that they have been added.
+
+To add multiple beta testers:
+
+#. View the live version of your course.
+
+#. Click **Instructor**, and then click **Try New Beta Dashboard**.
+
+#. Click **Membership**. 
+
+#. In the **Batch Beta Tester Addition** section of the page, enter one or more addresses or usernames separated by commas or line feeds (the Enter key). You can also copy data from a CSV file of email addresses and paste it here. 
+ 
+#. To enroll the beta testers in your course, leave **Auto Enroll** selected. If the beta test starts before the course **Enrollment Start Date**, testers cannot enroll themselves in your course. 
+
+#. To send an email message to the beta testers, leave **Notify users by email** selected. An example of the message that is sent to a beta tester who is not enrolled (or auto enrolled) in the course follows.
+
+.. image:: ../Images/Beta_tester_email.png
+  :alt: "You have been invited to be a beta tester for <course name> at <URL>. Visit <link> to join the course and begin the beta test."
+
+6. Click **Add beta testers**.
+
+To remove the Beta Tester role from one or more users, enter their email
+addresses in the **Batch Add Beta Testers** field and then click **Remove beta
+testers**. 
+
+.. note:: The **Auto Enroll** option has no effect when you click **Remove beta testers**. The user's role as a beta tester is removed; course enrollment is not affected.
+
+-----------------------------
+Add Beta Testers Individually
+-----------------------------
 
 To add a single beta tester:
 
@@ -187,54 +243,15 @@ To add a single beta tester:
 
 #. In the **Administration List Management** section, use the drop-down list to select **Beta Testers**.
 
-#. Under the list of users who currently have that role, enter an email address or username and click **Add Beta Tester**.
+#. Under the list of users who currently have that role, enter an email address
+   or username and click **Add Beta Tester**. 
 
-  *  If the beta test starts before the course **Enrollment Start Date**, testers cannot enroll themselves in your course. You can enroll the beta testers prior to the **Enrollment Start Date**. See :ref:`Enrollment`.
+   If the beta test starts before the **Enrollment Start Date** of your course,
+   you can also enroll the beta tester. See :ref:`Enrollment`.
 
-  * If you add the beta testers after the defined start of the beta test, and they are enrolled in the course, they see your course on their dashboards when they log in. 
-
-  * If you add beta testers before the test starts, or if they are not enrolled, they do not see your course on their dashboards. You may need to enroll them or send an email message to remind them when the test begins. 
-
-To remove the Beta Tester role from users individually, find the user in the list of beta testers, and then click **Revoke access** to the right of that user's email address. 
-
-.. _Add_Testers_Bulk:
-
-*********************************
-Add Multiple Beta Testers
-*********************************
-
-If you have a number of beta testers that you want to add, you can use a "batch add" option to add them all at once, rather than individually. With this feature, you can also send an email message to notify the beta testers that they have been added. 
-
-To use this feature:
-
-* You need the email address of each beta tester. 
-
-* Each beta tester must register and activate a user account for that email address. 
-
-To add multiple beta testers:
-
-#. View the live version of your course.
-
-#. Click **Instructor**, and then click **Try New Beta Dashboard**.
-
-#. Click **Membership**. 
-
-#. In the **Batch Beta Testers** section of the page, enter one or more addresses separated by commas or line feeds (the Enter key). You can also copy data from a CSV file of email addresses and paste it here. 
-
-#. Optionally, check the **Notify users by email** checkbox to send an email message to the beta testers. The text of the message is:
-
-.. image:: ../Images/Beta_tester_email.png
-  :alt: "You have been invited to be a beta tester for <course name> at <URL>. Visit <link> to join the course and begin the beta test."
-
-6. Click **Add beta testers**.
-
-  *  If the beta test starts before the course **Enrollment Start Date**, testers cannot enroll themselves in your course. You can enroll the beta testers prior to the **Enrollment Start Date**. See :ref:`Enrollment`.
-
-  * If you add the beta testers after the defined start of the beta test, and they are enrolled in the course, they see your course on their dashboards when they log in. 
-
-  * If you add beta testers before the test starts, or if they are not enrolled, they do not see your course on their dashboards. You may need to enroll them or send an email message to remind them when the test begins. 
-
-To remove the Beta Tester role from one or more users, enter their email addresses in the **Batch Add Beta Testers** field and then click **Remove beta testers**. 
+To remove the Beta Tester role from users individually, find the user in the
+list of beta testers, and then click **Revoke access** to the right of that
+user's email address.
 
 .. _Issue_Reporting_During_Course:
 
@@ -246,7 +263,7 @@ Despite the efforts of the course team and the beta testers, additional problems
 
 * Often, students report issues by asking questions in a discussion. Your discussion administration team can watch for posts that indicate problems.
 
-* To let students know the best way to report problems, you can post information on the Course Info page or post it in a discussion. 
+* To let students know the best way to report problems, you can post information on the **Course Info** page or post it in a discussion. 
 
 .. per Mark 19 Feb 14: eventually we want to provide more guidance for students:  course issues > use discussions, platform issues > submit issue to edx.
 
