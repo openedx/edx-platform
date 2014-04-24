@@ -38,7 +38,7 @@ class TestOrphan(CourseTestCase):
             # add child to parent in mongo
             parent_location = self.course.location.replace(category=parent_category, name=parent_name)
             parent = store.get_item(parent_location)
-            parent.children.append(location.url())
+            parent.children.append(location)
             store.update_item(parent, self.user.id)
 
     def test_mongo_orphan(self):
