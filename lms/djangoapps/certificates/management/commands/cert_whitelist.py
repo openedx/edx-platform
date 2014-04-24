@@ -1,5 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
+from opaque_keys import InvalidKeyError
+from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from certificates.models import CertificateWhitelist
 from django.contrib.auth.models import User
 
@@ -48,6 +51,13 @@ class Command(BaseCommand):
         course_id = options['course_id']
         if not course_id:
             raise CommandError("You must specify a course-id")
+
+        # try to parse the serialized course key into a CourseKey
+        try:
+            course = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            course = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
         if options['add'] and options['del']:
             raise CommandError("Either remove or add a user, not both")
 
@@ -60,14 +70,14 @@ class Command(BaseCommand):
 
             cert_whitelist, created = \
                 CertificateWhitelist.objects.get_or_create(
-                    user=user, course_id=course_id)
+                    user=user, course_id=course)
             if options['add']:
                 cert_whitelist.whitelist = True
             elif options['del']:
                 cert_whitelist.whitelist = False
             cert_whitelist.save()
 
-        whitelist = CertificateWhitelist.objects.filter(course_id=course_id)
+        whitelist = CertificateWhitelist.objects.filter(course_id=course)
         print "User whitelist for course {0}:\n{1}".format(course_id,
               '\n'.join(["{0} {1} {2}".format(
                   u.user.username, u.user.email, u.whitelist)
