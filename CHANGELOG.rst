@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Add "raw HTML" editor so that authors can write HTML that will not be
+changed in any way. STUD-1562
+
 Blades: Show the HD button only if there is an HD version available. BLD-937.
 
 Studio: Add edit button to leaf xblocks on the container page. STUD-1306.
