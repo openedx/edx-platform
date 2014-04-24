@@ -22,7 +22,7 @@ from edxmako.middleware import MakoMiddleware
 from external_auth.models import ExternalAuthMap
 import external_auth.views
 from student.tests.factories import UserFactory
-from xmodule.modulestore.exceptions import InsufficientSpecificationError
+from opaque_keys import InvalidKeyError
 
 FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
@@ -193,11 +193,11 @@ class SSLClientTest(TestCase):
         This tests to make sure when immediate signup is on that
         the user doesn't get presented with the registration page.
         """
-        # Expect a NotImplementError from course page as we don't have anything else built
+        # Expect an InvalidKeyError from course page as we don't have anything else built
         with self.assertRaisesRegexp(
-                InsufficientSpecificationError,
-                'Must provide one of url, version_guid, org+offering'
-        ):
+                InvalidKeyError,
+                "<class 'xmodule.modulestore.keys.CourseKey'>: None"
+            ):
             self.client.get(
                 reverse('signup'), follow=True,
                 SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
@@ -207,9 +207,9 @@ class SSLClientTest(TestCase):
 
         # Now that we are logged in, make sure we don't see the registration page
         with self.assertRaisesRegexp(
-                InsufficientSpecificationError,
-                'Must provide one of url, version_guid, org+offering'
-        ):
+                InvalidKeyError,
+                "<class 'xmodule.modulestore.keys.CourseKey'>: None"
+            ):
             self.client.get(reverse('signup'), follow=True)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

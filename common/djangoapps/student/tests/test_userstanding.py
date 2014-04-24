@@ -53,7 +53,7 @@ class UserStandingTest(TestCase):
         try:
             self.some_url = reverse('dashboard')
         except NoReverseMatch:
-            self.some_url = '/course'
+            self.some_url = '/course/'
 
         # since it's only possible to disable accounts from lms, we're going
         # to skip tests for cms

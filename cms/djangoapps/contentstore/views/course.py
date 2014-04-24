@@ -103,14 +103,13 @@ def course_handler(request, course_key_string=None):
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
-    course_key = CourseKey.from_string(course_key_string) if course_key_string else None
     response_format = request.REQUEST.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
-            return JsonResponse(_course_json(request, course_key))
+            return JsonResponse(_course_json(request, CourseKey.from_string(course_key_string)))
         elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
             return create_new_course(request)
-        elif not has_course_access(request.user, course_key):
+        elif not has_course_access(request.user, CourseKey.from_string(course_key_string)):
             raise PermissionDenied()
         elif request.method == 'PUT':
             raise NotImplementedError()
@@ -119,10 +118,10 @@ def course_handler(request, course_key_string=None):
         else:
             return HttpResponseBadRequest()
     elif request.method == 'GET':  # assume html
-        if course_key is None:
+        if course_key_string is None:
             return course_listing(request)
         else:
-            return course_index(request, course_key)
+            return course_index(request, CourseKey.from_string(course_key_string))
     else:
         return HttpResponseNotFound()
 
