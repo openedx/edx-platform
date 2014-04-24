@@ -11,6 +11,7 @@ from django.utils.html import escape
 from django.http import Http404
 from django.conf import settings
 
+from lms.lib.xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore import XML_MODULESTORE_TYPE
@@ -207,7 +208,8 @@ def _section_send_email(course_key, access, course):
     fragment = course.system.render(html_module, 'studio_view')
     fragment = wrap_xblock(
         'LmsRuntime', html_module, 'studio_view', fragment, None,
-        extra_data={"course-id": course_key.to_deprecated_string()}
+        extra_data={"course-id": course_key.to_deprecated_string()},
+        usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string())
     )
     email_editor = fragment.content
     section_data = {

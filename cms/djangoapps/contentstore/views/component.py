@@ -22,8 +22,6 @@ from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from lms.lib.xblock.runtime import unquote_slashes
-
 from contentstore.utils import get_lms_link_for_item, compute_publish_state, PublishState, get_modulestore
 from contentstore.views.helpers import get_parent_xblock
 
@@ -348,7 +346,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
     Dispatch an AJAX action to an xblock
 
     Args:
-        usage_id: The usage-id of the block to dispatch to, passed through `quote_slashes`
+        usage_id: The usage-id of the block to dispatch to
         handler (str): The handler to execute
         suffix (str): The remainder of the url to be passed to the handler
 

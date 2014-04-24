@@ -21,7 +21,6 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
 
 from lms.lib.xblock.field_data import LmsFieldData
-from lms.lib.xblock.runtime import quote_slashes, unquote_slashes
 from cms.lib.xblock.runtime import local_resource_url
 
 from util.sandboxing import can_execute_unsafe_code
@@ -108,7 +107,7 @@ def _preview_module_system(request, descriptor):
 
     wrappers = [
         # This wrapper wraps the module in the template specified above
-        partial(wrap_xblock, 'PreviewRuntime', display_name_only=display_name_only),
+        partial(wrap_xblock, 'PreviewRuntime', display_name_only=display_name_only, usage_id_serializer=unicode),
 
         # This wrapper replaces urls in the output that start with /static
         # with the correct course-specific url for the static content

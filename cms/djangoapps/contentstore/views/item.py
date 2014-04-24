@@ -181,7 +181,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
-        component.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime'))
+        component.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime', usage_id_serializer=unicode))
 
         if view_name == 'studio_view':
             try:

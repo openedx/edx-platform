@@ -939,6 +939,7 @@ def instructor_dashboard(request, course_id):
         fragment = wrap_xblock(
             'LmsRuntime', html_module, 'studio_view', fragment, None,
             extra_data={"course-id": course_key.to_deprecated_string()}
+            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string())
         )
         email_editor = fragment.content
 

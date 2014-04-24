@@ -22,7 +22,7 @@ from courseware.access import has_access, get_user_role
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.lib.xblock.field_data import LmsFieldData
-from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes
+from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -341,7 +341,8 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     if wrap_xmodule_display is True:
         block_wrappers.append(partial(
             wrap_xblock, 'LmsRuntime',
-            extra_data={'course-id': course_id.to_deprecated_string()})
+            extra_data={'course-id': course_id.to_deprecated_string()}),
+            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string())
         )
 
     # TODO (cpennington): When modules are shared between courses, the static

@@ -33,7 +33,7 @@ def wrap_fragment(fragment, new_content):
     return wrapper_frag
 
 
-def wrap_xblock(runtime_class, block, view, frag, context, display_name_only=False, extra_data=None):  # pylint: disable=unused-argument
+def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, display_name_only=False, extra_data=None):  # pylint: disable=unused-argument
     """
     Wraps the results of rendering an XBlock view in a standard <section> with identifying
     data so that the appropriate javascript module can be loaded onto it.
@@ -43,6 +43,8 @@ def wrap_xblock(runtime_class, block, view, frag, context, display_name_only=Fal
     :param view: The name of the view that rendered the fragment being wrapped
     :param frag: The :class:`Fragment` to be wrapped
     :param context: The context passed to the view being rendered
+    :param usage_id_serializer: A function to serialize the block's usage_id for use by the
+        front-end Javascript Runtime.
     :param display_name_only: If true, don't render the fragment content at all.
         Instead, just render the `display_name` of `block`
     :param extra_data: A dictionary with extra data values to be set on the wrapper
@@ -74,7 +76,7 @@ def wrap_xblock(runtime_class, block, view, frag, context, display_name_only=Fal
         data['runtime-class'] = runtime_class
         data['runtime-version'] = frag.js_init_version
         data['block-type'] = block.scope_ids.block_type
-        data['usage-id'] = quote_slashes(unicode(block.scope_ids.usage_id.to_deprecated_string())).decode('utf-8')
+        data['usage-id'] = usage_id_serializer(block.scope_ids.usage_id)
 
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
