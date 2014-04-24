@@ -227,15 +227,16 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         """
         for field_name, value in jsonfields.iteritems():
             if value:
-                if field_name not in class_.fields:
-                    pass
-                if isinstance(class_.fields[field_name], Reference):
+                field = class_.fields.get(field_name)
+                if field is None:
+                    continue
+                elif isinstance(field, Reference):
                     jsonfields[field_name] = course_key.make_usage_key_from_deprecated_string(value)
-                elif isinstance(class_.fields[field_name], ReferenceList):
+                elif isinstance(field, ReferenceList):
                     jsonfields[field_name] = [
                         course_key.make_usage_key_from_deprecated_string(ele) for ele in value
                     ]
-                elif isinstance(class_.fields[field_name], ReferenceValueDict):
+                elif isinstance(field, ReferenceValueDict):
                     for key, subvalue in value.iteritems():
                         assert isinstance(subvalue, basestring)
                         value[key] = course_key.make_usage_key_from_deprecated_string(subvalue)

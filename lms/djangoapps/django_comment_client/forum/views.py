@@ -215,7 +215,7 @@ def forum_form_discussion(request, course_id):
             'user_info': saxutils.escape(json.dumps(user_info), escapedict),
             'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, 'staff', course),
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
-            'course_id': course.id,
+            'course_id': course.id.to_deprecated_string(),
             'category_map': category_map,
             'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
@@ -302,7 +302,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course': course,
             #'recent_active_threads': recent_active_threads,
-            'course_id': course.id,   # TODO: Why pass both course and course.id to template?
+            'course_id': course.id.to_deprecated_string(),   # TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'category_map': category_map,
