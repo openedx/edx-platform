@@ -103,7 +103,7 @@ class TestCourseAccess(ModuleStoreTestCase):
             # users to one of each possible groupname in order to test that has_course_access
             # and remove_user work
             user = users.pop()
-            group, _ = group.add_users(user)
+            group.add_users(user)
             user_by_role[role].append(user)
             self.assertTrue(has_course_access(user, self.course_key), "{} does not have access".format(user))
 
