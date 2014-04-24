@@ -1,23 +1,44 @@
 if Backbone?
   class @DiscussionUserProfileView extends Backbone.View
-#    events:
-#      "":""
-    initialize: (options) ->
-      @renderThreads @$el, @collection
-    renderThreads: ($elem, threads) =>
-      #Content.loadContentInfos(response.annotated_content_info)
-      @discussion = new Discussion()
-      @discussion.reset(threads, {silent: false})
-      $discussion = $(Mustache.render $("script#_user_profile").html(), {'threads':threads})
-      $elem.append($discussion)
-      @threadviews = @discussion.map (thread) ->
-        new DiscussionThreadProfileView el: @$("article#thread_#{thread.id}"), model: thread
-      _.each @threadviews, (dtv) -> dtv.render()
+    events:
+      "click .discussion-paginator a": "changePage"
 
-    addThread: (thread, collection, options) =>
-      # TODO: When doing pagination, this will need to repaginate. Perhaps just reload page 1?
-      article = $("<article class='discussion-thread' id='thread_#{thread.id}'></article>")
-      @$('section.discussion > .threads').prepend(article)
-      threadView = new DiscussionThreadInlineView el: article, model: thread
-      threadView.render()
-      @threadviews.unshift threadView
+    initialize: (options) ->
+      super()
+      @page = options.page
+      @numPages = options.numPages
+      @discussion = new Discussion()
+      @discussion.on("reset", @render)
+      @discussion.reset(@collection, {silent: false})
+
+    render: () =>
+      profileTemplate = $("script#_user_profile").html()
+      @$el.html(Mustache.render(profileTemplate, {threads: @discussion.models}))
+      @discussion.map (thread) ->
+        new DiscussionThreadProfileView(el: @$("article#thread_#{thread.id}"), model: thread).render()
+      baseUri = URI(window.location).removeSearch("page")
+      pageUrlFunc = (page) -> baseUri.clone().addSearch("page", page)
+      paginationParams = DiscussionUtil.getPaginationParams(@page, @numPages, pageUrlFunc)
+      paginationTemplate = $("script#_pagination").html()
+      @$el.find(".pagination").html(Mustache.render(paginationTemplate, paginationParams))
+
+    changePage: (event) ->
+      event.preventDefault()
+      url = $(event.target).attr("href")
+      DiscussionUtil.safeAjax
+        $elem: @$el
+        $loading: $(event.target)
+        takeFocus: true
+        url: url
+        type: "GET"
+        dataType: "json"
+        success: (response, textStatus, xhr) =>
+          @page = response.page
+          @numPages = response.num_pages
+          @discussion.reset(response.discussion_data, {silent: false})
+          history.pushState({}, "", url)
+        error: =>
+          DiscussionUtil.discussionAlert(
+            gettext("Sorry"),
+            gettext("We had some trouble loading the page you requested. Please try again.")
+          )

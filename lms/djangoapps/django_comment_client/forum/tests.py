@@ -299,8 +299,8 @@ class UserProfileTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
         html = response.content
-        self.assertRegexpMatches(html, r'var \$\$course_id = \"{}\"'.format(self.course.id))
-        self.assertRegexpMatches(html, r'var \$\$profiled_user_id = \"{}\"'.format(self.profiled_user.id))
+        self.assertRegexpMatches(html, r'data-page="1"')
+        self.assertRegexpMatches(html, r'data-num-pages="1"')
         self.assertRegexpMatches(html, r'<span>1</span> discussion started')
         self.assertRegexpMatches(html, r'<span>2</span> comments')
         self.assertRegexpMatches(html, r'&quot;id&quot;: &quot;{}&quot;'.format(self.TEST_THREAD_ID))

@@ -2226,18 +2226,18 @@ body.discussion {
           a {
             @include white-button;
           }
-        }
-
-        li.current-page{
-          height: 35px;
-          padding: 0 15px;
-          border: 1px solid #ccc;
-          border-radius: 3px;
-          font-size: 13px;
-          font-weight: 700;
-          line-height: 32px;
-          color: #333;
-          text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+          &.current-page span {
+            display: inline-block;
+            height: 35px;
+            padding: 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 32px;
+            color: #333;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+          }
         }
       }
     }

@@ -32,14 +32,8 @@
       </nav>
     </section>
 
-    <section class="course-content container discussion-user-threads" data-user-id="${django_user.id | h}" data-course-id="${course.id | h}" data-threads="${threads}" data-user-info="${user_info}">
-        <h2>${_("Active Threads")}</h2>
-    </section>
+    <section class="course-content container discussion-user-threads" data-course-id="${course.id | h}" data-threads="${threads}" data-user-info="${user_info}" data-page="${page}" data-num-pages="${num_pages}"/>
   </div>
 </section>
 
-<script type="text/javascript">
-  var $$profiled_user_id = "${django_user.id | escapejs}";
-  var $$course_id = "${course.id | escapejs}";
-</script>
 <%include file="_underscore_templates.html" />
