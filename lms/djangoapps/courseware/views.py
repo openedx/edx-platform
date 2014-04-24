@@ -356,9 +356,9 @@ def index(request, course_id, chapter=None, section=None,
                 # Something went wrong -- perhaps this chapter has no sections visible to the user
                 raise Http404
             prev_section_url = reverse('courseware_section', kwargs={
-                 'course_id': course_key.to_deprecated_string(),
-                 'chapter': chapter_descriptor.url_name,
-                 'section': prev_section.url_name
+                'course_id': course_key.to_deprecated_string(),
+                'chapter': chapter_descriptor.url_name,
+                'section': prev_section.url_name
             })
             context['fragment'] = Fragment(content=render_to_string(
                 'courseware/welcome-back.html',
@@ -763,7 +763,7 @@ def submission_history(request, course_id, student_username, location):
         )
     except User.DoesNotExist:
         return HttpResponse(escape(_(u'User {username} does not exist.').format(username=student_username)))
-    except (StudentModule.DoesNotExist):  #TODO ugh is this too broad
+    except (StudentModule.DoesNotExist):  # TODO ugh is this too broad
         return HttpResponse(escape(_(u'User {username} has never accessed problem {location}').format(
             username=student_username,
             location=location

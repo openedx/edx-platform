@@ -406,6 +406,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         course = self._lookup_course(course_locator)
         items = []
+
         def _block_matches_all(block_json):
             """
             Check that the block matches all the criteria

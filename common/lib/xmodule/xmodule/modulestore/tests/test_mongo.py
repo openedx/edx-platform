@@ -335,6 +335,7 @@ class TestMongoModuleStore(unittest.TestCase):
         Test that xblocks w/ references
         """
         course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+
         def setup_test():
             course = self.store.get_course(course_key)
             # can't use item factory as it depends on django settings

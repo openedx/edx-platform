@@ -275,8 +275,12 @@ def instructor_dashboard(request, course_id):
                     )
                 )
             else:
-                track.views.server_track(request, "rescore-all-submissions", {
-                        "problem": problem_url, "course": course_key.to_deprecated_string()
+                track.views.server_track(
+                    request,
+                    "rescore-all-submissions",
+                    {
+                        "problem": problem_url,
+                        "course": course_key.to_deprecated_string()
                     },
                     page="idashboard"
                 )
@@ -304,7 +308,10 @@ def instructor_dashboard(request, course_id):
                     text=_('Failed to create a background task for resetting "{problem_url}".').format(problem_url=problem_url)
                 )
             else:
-                track.views.server_track(request, "reset-all-attempts", {
+                track.views.server_track(
+                    request,
+                    "reset-all-attempts",
+                    {
                         "problem": problem_url,
                         "course": course_key.to_deprecated_string()
                     },
@@ -433,7 +440,10 @@ def instructor_dashboard(request, course_id):
                             )
                         )
                     else:
-                        track.views.server_track(request, "rescore-student-submission", {
+                        track.views.server_track(
+                            request,
+                            "rescore-student-submission",
+                            {
                                 "problem": module_state_key,
                                 "student": unique_student_identifier,
                                 "course": course_key.to_deprecated_string()
@@ -461,7 +471,10 @@ def instructor_dashboard(request, course_id):
                 'course_id': course_key.to_deprecated_string(),
                 'student_id': student.id
             })
-            track.views.server_track(request, "get-student-progress-page", {
+            track.views.server_track(
+                request,
+                "get-student-progress-page",
+                {
                     "student": unicode(student),
                     "instructor": unicode(request.user),
                     "course": course_key.to_deprecated_string()
@@ -598,9 +611,8 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = _('Student profile data for course {course_id}').format(
             course_id=course_key.to_deprecated_string()
         )
-        return return_csv('profiledata_{course_id}.csv'.format(
-                course_id=course_key.to_deprecated_string()
-            ),
+        return return_csv(
+            'profiledata_{course_id}.csv'.format(course_id=course_key.to_deprecated_string()),
             datatable
         )
 

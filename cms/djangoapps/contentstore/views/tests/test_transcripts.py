@@ -523,7 +523,7 @@ class TestChecktranscripts(Basetranscripts):
         self.save_subs_to_store(subs, subs_id)
 
         data = {
-            'locator':  unicode(self.video_usage_key),
+            'locator': unicode(self.video_usage_key),
             'videos': [{
                 'type': 'html5',
                 'video': subs_id,
@@ -623,7 +623,7 @@ class TestChecktranscripts(Basetranscripts):
 
         # Test for raising `ItemNotFoundError` exception.
         data = {
-            'locator':  '{0}_{1}'.format(self.video_usage_key, 'BAD_LOCATOR'),
+            'locator': '{0}_{1}'.format(self.video_usage_key, 'BAD_LOCATOR'),
             'videos': [{
                 'type': '',
                 'video': '',
@@ -666,7 +666,7 @@ class TestChecktranscripts(Basetranscripts):
         self.save_subs_to_store(subs, subs_id)
 
         data = {
-            'locator':  unicode(usage_key),
+            'locator': unicode(usage_key),
             'videos': [{
                 'type': '',
                 'video': '',

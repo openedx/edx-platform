@@ -307,11 +307,11 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
     the PsychometricData instance for the given StudentModule instance.
     """
     sm, status = StudentModule.objects.get_or_create(
-                       course_id=course_id.to_deprecated_string(),
-                       student=user,
-                       module_state_key=module_state_key,
-                       defaults={'state': '{}', 'module_type': 'problem'},
-                 )
+        course_id=course_id.to_deprecated_string(),
+        student=user,
+        module_state_key=module_state_key,
+        defaults={'state': '{}', 'module_type': 'problem'},
+    )
 
     try:
         pmd = PsychometricData.objects.using(db).get(studentmodule=sm)

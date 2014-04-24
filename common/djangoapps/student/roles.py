@@ -220,6 +220,7 @@ class CourseCreatorRole(GroupBasedRole):
     def __init__(self, *args, **kwargs):
         super(CourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)
 
+
 class UserBasedRole(object):
     """
     Backward mapping: given a user, manipulate the courses and roles

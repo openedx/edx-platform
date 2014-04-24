@@ -270,7 +270,6 @@ class LTIModuleTest(LogicTest):
         real_lis_result_sourcedid = self.xmodule.get_lis_result_sourcedid()
         self.assertEqual(real_lis_result_sourcedid, expected_sourcedId)
 
-
     def test_client_key_secret(self):
         """
         LTI module gets client key and secret provided.

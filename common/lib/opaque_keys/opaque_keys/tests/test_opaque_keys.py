@@ -55,6 +55,7 @@ class Base10Key(DummyKey):
         except (ValueError, TypeError):
             raise InvalidKeyError(cls, serialized)
 
+
 class DictKey(DummyKey):
     KEY_FIELDS = ('value',)
     __slots__ = KEY_FIELDS
@@ -68,6 +69,7 @@ class DictKey(DummyKey):
             return cls(json.loads(serialized))
         except (ValueError, TypeError):
             raise InvalidKeyError(cls, serialized)
+
 
 class KeyTests(TestCase):
     def test_namespace_from_string(self):
@@ -161,7 +163,6 @@ class KeyTests(TestCase):
         self.assertGreater(eleven, ten)
         self.assertGreaterEqual(eleven, eleven)
         self.assertGreaterEqual(eleven, ten)
-
 
     def test_non_ordering(self):
         # Verify that different key types aren't comparable

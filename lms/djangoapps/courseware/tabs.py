@@ -107,8 +107,10 @@ def _discussion(tab, user, course, active_page, request):
     This tab format only supports the new Berkeley discussion forums.
     """
     if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
-        link = reverse('django_comment_client.forum.views.forum_form_discussion',
-                              args=[course.id])
+        link = reverse(
+            'django_comment_client.forum.views.forum_form_discussion',
+            args=[course.id]
+        )
         return [CourseTab(tab['name'], link, active_page == 'discussion')]
     return []
 
@@ -177,7 +179,7 @@ def _staff_grading(tab, user, course, active_page, request):
         # staff to view openended problems that require staff grading
         tab_name = _("Staff grading")
 
-        notifications  = open_ended_notifications.staff_grading_notifications(course, user)
+        notifications = open_ended_notifications.staff_grading_notifications(course, user)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
@@ -218,7 +220,7 @@ def _combined_open_ended_grading(tab, user, course, active_page, request):
         # that a user has submitted or needs to grade
         tab_name = _("Open Ended Panel")
 
-        notifications  = open_ended_notifications.combined_notifications(course, user)
+        notifications = open_ended_notifications.combined_notifications(course, user)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
@@ -233,12 +235,14 @@ def _notes_tab(tab, user, course, active_page, request):
         return [CourseTab(tab['name'], link, active_page == 'notes')]
     return []
 
+
 def _instructor(course, active_page):
     link = reverse('instructor_dashboard', args=[course.id])
     # Translators: 'Instructor' appears on the tab that leads to
     # the instructor dashboard, which is a portal where an instructor
     # can get data and perform various actions on their course
     return CourseTab(_('Instructor'), link, active_page == 'instructor')
+
 
 #### Validators
 def key_checker(expected_keys):

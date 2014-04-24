@@ -698,6 +698,7 @@ class MatlabTest(unittest.TestCase):
         received = fromstring(context['queue_msg'])
         html_tree_equal(received, expected)
 
+
 def html_tree_equal(received, expected):
     """
 
@@ -713,6 +714,7 @@ def html_tree_equal(received, expected):
     if any(not html_tree_equal(rec, exp) for rec, exp in zip(received, expected)):
         return False
     return True
+
 
 class SchematicTest(unittest.TestCase):
     '''

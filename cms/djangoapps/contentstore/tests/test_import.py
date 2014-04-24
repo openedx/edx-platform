@@ -144,10 +144,10 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
 
-        handouts = module_store.get_item(Location('edX', 'toy', '2012_Fall','course_info', 'handouts'))
+        handouts = module_store.get_item(Location('edX', 'toy', '2012_Fall', 'course_info', 'handouts'))
         self.assertIn('/static/', handouts.data)
 
-        handouts = module_store.get_item(Location('edX', 'toy', '2012_Fall','html', 'toyhtml'))
+        handouts = module_store.get_item(Location('edX', 'toy', '2012_Fall', 'html', 'toyhtml'))
         self.assertIn('/static/', handouts.data)
 
     def test_tab_name_imports_correctly(self):

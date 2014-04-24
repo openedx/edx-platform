@@ -12,6 +12,7 @@ from xmodule.modulestore.tests import test_location_mapper
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
 from nose.tools import nottest
 
+
 @nottest
 class TestMigration(SplitWMongoCourseBoostrapper):
     """
@@ -50,14 +51,14 @@ class TestMigration(SplitWMongoCourseBoostrapper):
         # vertical in live only
         live_vert_name = uuid.uuid4().hex
         self._create_item(
-            'vertical', live_vert_name, {}, {'display_name': 'Live vertical'}, 'chapter', chapter1_name, 
+            'vertical', live_vert_name, {}, {'display_name': 'Live vertical'}, 'chapter', chapter1_name,
             draft=False, split=False
         )
         self.create_random_units(False, self.old_course_key.make_usage_key('vertical', live_vert_name))
         # vertical in both live and draft
         both_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)
         self._create_item(
-            both_vert_loc.category, both_vert_loc.name, {}, {'display_name': 'Both vertical'}, 'chapter', chapter1_name, 
+            both_vert_loc.category, both_vert_loc.name, {}, {'display_name': 'Both vertical'}, 'chapter', chapter1_name,
             draft=False, split=False
         )
         self.create_random_units(False, both_vert_loc)
@@ -82,7 +83,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
         # and finally one in live only (so published has to skip 2)
         live_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)
         self._create_item(
-            live_vert_loc.category, live_vert_loc.name, {}, {'display_name': 'Live vertical end'}, 'chapter', chapter1_name, 
+            live_vert_loc.category, live_vert_loc.name, {}, {'display_name': 'Live vertical end'}, 'chapter', chapter1_name,
             draft=False, split=False
         )
         self.create_random_units(True, draft_vert_loc)
@@ -93,17 +94,17 @@ class TestMigration(SplitWMongoCourseBoostrapper):
         indirect2_loc = self.old_course_key.make_usage_key('html', uuid.uuid4().hex)
         conditional_loc = self.old_course_key.make_usage_key('conditional', uuid.uuid4().hex)
         self._create_item(
-            conditional_loc.category, conditional_loc.name, 
+            conditional_loc.category, conditional_loc.name,
             {
                 'show_tag_list': [indirect1_loc, indirect2_loc],
                 'sources_list': [live_vert_loc, ],
-            }, 
+            },
             {
                 'xml_attributes': {
                     'completed': True,
                 },
-            }, 
-            chap2_loc.category, chap2_loc.name, 
+            },
+            chap2_loc.category, chap2_loc.name,
             draft=False, split=False
         )
         # create the children

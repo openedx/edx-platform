@@ -12,8 +12,9 @@ class TextbookIndexTestCase(CourseTestCase):
     def setUp(self):
         "Set the URL for tests"
         super(TextbookIndexTestCase, self).setUp()
-        self.url = reverse("contentstore.views.textbooks_list_handler",
-                           kwargs={'course_key_string': unicode(self.course.id)}
+        self.url = reverse(
+            "contentstore.views.textbooks_list_handler",
+            kwargs={'course_key_string': unicode(self.course.id)}
         )
 
     def test_view_index(self):
@@ -112,9 +113,11 @@ class TextbookCreateTestCase(CourseTestCase):
     def setUp(self):
         "Set up a url and some textbook content for tests"
         super(TextbookCreateTestCase, self).setUp()
-        self.url = reverse("contentstore.views.textbooks_list_handler",
-                           kwargs={'course_key_string': unicode(self.course.id)}
+        self.url = reverse(
+            "contentstore.views.textbooks_list_handler",
+            kwargs={'course_key_string': unicode(self.course.id)}
         )
+
         self.textbook = {
             "tab_title": "Economics",
             "chapters": {

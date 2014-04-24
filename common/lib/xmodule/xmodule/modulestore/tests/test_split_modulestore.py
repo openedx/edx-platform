@@ -765,11 +765,11 @@ class SplitModuleItemTests(SplitModuleTest):
         # try to look up other branches
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(
-                  BlockUsageLocator(
-                        hero_locator.for_branch("published"),
-                                    block_id=locator.block_id,
-                  )
-             )
+                BlockUsageLocator(
+                    hero_locator.for_branch("published"),
+                    block_id=locator.block_id,
+                )
+            )
         self.assertIsInstance(
             modulestore().get_item(locator),
             CourseDescriptor
@@ -849,7 +849,7 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(len(matches), 0)
         matches = modulestore().get_items(
             locator,
-            category ='chapter',
+            category='chapter',
             settings={'display_name': re.compile(r'Hera')},
         )
         self.assertEqual(len(matches), 2)
@@ -863,8 +863,8 @@ class SplitModuleItemTests(SplitModuleTest):
         get_parent_locations(locator): [BlockUsageLocator]
         '''
         locator = BlockUsageLocator(
-                CourseLocator(org='testx', offering='GreekHero', branch='draft'),
-                block_id='chapter1'
+            CourseLocator(org='testx', offering='GreekHero', branch='draft'),
+            block_id='chapter1'
         )
         parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 1)
@@ -991,8 +991,8 @@ class TestItemCrud(SplitModuleTest):
         Actually, this tries to test all create_item features not tested above.
         """
         locator = BlockUsageLocator(
-                CourseLocator(org='testx', offering='GreekHero', branch='draft'),
-                block_id='problem1'
+            CourseLocator(org='testx', offering='GreekHero', branch='draft'),
+            block_id='problem1'
         )
         original = modulestore().get_item(locator)
 

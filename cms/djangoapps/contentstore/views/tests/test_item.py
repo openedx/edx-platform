@@ -296,7 +296,7 @@ class TestDuplicateItem(ItemTest):
                     "Duplicated item differs in number of children"
                 )
                 for i in xrange(len(original_item.children)):
-                     if not check_equality(original_item.children[i], duplicated_item.children[i]):
+                    if not check_equality(original_item.children[i], duplicated_item.children[i]):
                         return False
                 duplicated_item.children = original_item.children
 
@@ -663,7 +663,7 @@ class TestEditItem(ItemTest):
         html_usage_key = self.response_usage_key(resp)
 
         # The unit and its children should be private initially
-        unit_update_url = reverse_usage_url('xblock_handler',  unit_usage_key)
+        unit_update_url = reverse_usage_url('xblock_handler', unit_usage_key)
         unit = self.get_item_from_modulestore(unit_usage_key, True)
         html = self.get_item_from_modulestore(html_usage_key, True)
         self.assertEqual(compute_publish_state(unit), PublishState.private)

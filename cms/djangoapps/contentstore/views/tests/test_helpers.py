@@ -43,4 +43,3 @@ class HelpersTestCase(CourseTestCase):
         video = ItemFactory.create(parent_location=child_vertical.location, category="video",
                                    display_name="My Video")
         self.assertIsNone(xblock_studio_url(video))
-

@@ -19,6 +19,7 @@ IN_COURSE_WIKI_REGEX = r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/(?P<wiki
 IN_COURSE_WIKI_COMPILED_REGEX = re.compile(IN_COURSE_WIKI_REGEX)
 WIKI_ROOT_ACCESS_COMPILED_REGEX = re.compile(r'^/wiki/(?P<wiki_path>.*|)$')
 
+
 class Middleware(object):
     """
     This middleware is to keep the course nav bar above the wiki while
@@ -89,7 +90,6 @@ class Middleware(object):
 
         return None
 
-
     def process_response(self, request, response):
         """
         If this is a redirect response going to /wiki/*, then we might need
@@ -107,7 +107,6 @@ class Middleware(object):
                 response['LOCATION'] = new_url
 
         return response
-
 
     def get_redirected_url(self, user, referer, destination):
         """

@@ -30,8 +30,9 @@ class TestPublish(SplitWMongoCourseBoostrapper):
                 "display_name": "Lecture 1 Discussion",
                 "discussion_id": "a08bfd89b2aa40fa81f2c650a9332846"
             },
-            'vertical', 'Vert1'
-        , split=False)
+            'vertical', 'Vert1',
+            split=False
+        )
         self._create_item('html', 'Html2', "<p>Hellow</p>", {'display_name': 'Hollow Html'}, 'vertical', 'Vert1', split=False)
         self._create_item(
             'discussion', 'Discussion2',
@@ -42,8 +43,9 @@ class TestPublish(SplitWMongoCourseBoostrapper):
                 "display_name": "Lecture 2 Discussion",
                 "discussion_id": "b08bfd89b2aa40fa81f2c650a9332846"
             },
-            'vertical', 'Vert2'
-        , split=False)
+            'vertical', 'Vert2',
+            split=False
+        )
         self._create_item('static_tab', 'staticuno', "<p>tab</p>", {'display_name': 'Tab uno'}, None, None, split=False)
         self._create_item('about', 'overview', "<p>overview</p>", {}, None, None, split=False)
         self._create_item('course_info', 'updates', "<ol><li><h2>Sep 22</h2><p>test</p></li></ol>", {}, None, None, split=False)

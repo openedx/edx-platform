@@ -733,6 +733,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         category = kwargs.pop('category', None)
         name = kwargs.pop('name', None)
+
         def _block_matches_all(mod_loc, module):
             if category and mod_loc.category != category:
                 return False

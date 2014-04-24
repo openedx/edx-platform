@@ -59,10 +59,10 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.login_username(username)
         # make ajax call:
         modx_url = reverse('xblock_handler', kwargs={
-           'course_id': self.course.id.to_deprecated_string(),
-           'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string()),
-           'handler': 'xmodule_handler',
-           'suffix': 'problem_check',
+            'course_id': self.course.id.to_deprecated_string(),
+            'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string()),
+            'handler': 'xmodule_handler',
+            'suffix': 'problem_check',
         })
 
         # we assume we have two responses, so assign them the correct identifiers.

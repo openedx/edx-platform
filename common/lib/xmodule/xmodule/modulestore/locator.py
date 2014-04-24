@@ -194,8 +194,10 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         are specified.
         This should always return True, since this should be validated in the constructor.
         """
-        return (self.version_guid is not None or
-            (self.org is not None and self.offering is not None and self.branch is not None))
+        return (
+            self.version_guid is not None or
+            (self.org is not None and self.offering is not None and self.branch is not None)
+        )
 
     def html_id(self):
         """
@@ -469,6 +471,7 @@ class DefinitionLocator(Locator):
     KEY_FIELDS = ('definition_id',)
 
     URL_RE = re.compile(r'^defx:' + VERSION_PREFIX + '([^/]+)$', re.IGNORECASE)
+
     def __init__(self, definition_id):
         if isinstance(definition_id, LocalId):
             super(DefinitionLocator, self).__init__(definition_id)

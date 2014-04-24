@@ -143,6 +143,6 @@ class LoginEnrollmentTestCase(TestCase):
         `course` is an instance of CourseDescriptor.
         """
         check_for_post_code(self, 200, reverse('change_enrollment'), {
-              'enrollment_action': 'unenroll',
-              'course_id': course.id.to_deprecated_string()
+            'enrollment_action': 'unenroll',
+            'course_id': course.id.to_deprecated_string()
         })

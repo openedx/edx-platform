@@ -573,7 +573,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         '''
         return sum(
             [
-                 self._load_items(
+                self._load_items(
                     SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name']),
                     [course]
                 )
@@ -581,7 +581,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 # I tried to add '$and': [{'_id.org': {'$ne': 'edx'}}, {'_id.course': {'$ne': 'templates'}}]
                 # but it didn't do the right thing (it filtered all edx and all templates out)
                 in self.collection.find({'_id.category': 'course'})
-                if not (# TODO kill this
+                if not (  # TODO kill this
                     course['_id']['org'] == 'edx' and
                     course['_id']['course'] == 'templates'
                 )
@@ -664,7 +664,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
             ('_id.org', course_id.org),
             ('_id.course', course_id.course),
         ])
-
 
     def get_items(self, course_id, settings=None, content=None, revision=None, **kwargs):
         """

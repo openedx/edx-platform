@@ -56,6 +56,7 @@ class TestRollbackSplitCourseNoOldMongo(ModuleStoreTestCase):
         with self.assertRaisesRegexp(CommandError, errstring):
             Command().handle(str(locator))
 
+
 @unittest.skip("Not fixing split mongo until we land opaque-keys 0.9")
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestRollbackSplitCourseNoSplitMongo(ModuleStoreTestCase):

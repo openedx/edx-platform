@@ -197,10 +197,11 @@ class SSLClientTest(TestCase):
         with self.assertRaisesRegexp(
                 InsufficientSpecificationError,
                 'Must provide one of url, version_guid, org+offering'
-            ):
+        ):
             self.client.get(
                 reverse('signup'), follow=True,
-                SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
+                SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
+            )
         # assert that we are logged in
         self.assertIn(SESSION_KEY, self.client.session)
 
@@ -208,7 +209,7 @@ class SSLClientTest(TestCase):
         with self.assertRaisesRegexp(
                 InsufficientSpecificationError,
                 'Must provide one of url, version_guid, org+offering'
-            ):
+        ):
             self.client.get(reverse('signup'), follow=True)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

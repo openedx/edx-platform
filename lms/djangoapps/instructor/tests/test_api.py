@@ -415,12 +415,12 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         self.assertEqual(
             mail.outbox[0].body,
-            ("Dear NotEnrolled Student\n\nYou have been enrolled in Robot Super Course "
+            "Dear NotEnrolled Student\n\nYou have been enrolled in Robot Super Course "
             "at edx.org by a member of the course staff. "
             "The course should now appear on your edx.org dashboard.\n\n"
             "To start accessing course materials, please visit "
             "{course_url}\n\n----\n"
-            "This email was automatically sent from edx.org to NotEnrolled Student").format(
+            "This email was automatically sent from edx.org to NotEnrolled Student".format(
                 course_url=self.course_url
             )
         )
@@ -438,12 +438,12 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         self.assertEqual(
             mail.outbox[0].body,
-            ("Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
             "To finish your registration, please visit {registration_url} and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, "
             "visit {about_url} to join the course.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org").format(
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
                 registration_url=self.registration_url, about_url=self.about_url
             )
         )
@@ -477,11 +477,11 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         self.assertEqual(
             mail.outbox[0].body,
-            ("Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
             "To finish your registration, please visit {registration_url} and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, you will see Robot Super Course listed on your dashboard.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org").format(
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
                 registration_url=self.registration_url
             )
         )

@@ -99,4 +99,3 @@ def xblock_studio_url(xblock):
         return reverse_usage_url('unit_handler', xblock.location)
     else:
         return reverse_usage_url('container_handler', xblock.location)
-

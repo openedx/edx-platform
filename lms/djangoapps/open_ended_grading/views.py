@@ -28,6 +28,7 @@ from open_ended_grading.utils import (STAFF_ERROR_MESSAGE, STUDENT_ERROR_MESSAGE
 
 log = logging.getLogger(__name__)
 
+
 def _reverse_with_slash(url_name, course_key):
     """
     Reverses the URL given the name and the course id, and then adds a trailing slash if

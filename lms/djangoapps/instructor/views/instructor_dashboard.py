@@ -216,8 +216,9 @@ def _section_send_email(course_key, access, course):
         'access': access,
         'send_email': reverse('send_email', kwargs={'course_id': course_key.to_deprecated_string()}),
         'editor': email_editor,
-        'list_instructor_tasks_url':
-            reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'list_instructor_tasks_url': reverse(
+            'list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}
+        ),
         'email_background_tasks_url': reverse(
             'list_background_email_tasks', kwargs={'course_id': course_key.to_deprecated_string()}
         ),

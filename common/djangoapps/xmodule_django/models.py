@@ -36,6 +36,7 @@ class CourseKeyField(models.CharField):
         if isinstance(value, SlashSeparatedCourseKey):
             assert len(value.to_deprecated_string()) <= self.max_length
 
+
 class LocationKeyField(models.CharField):
     description = "A Location object, saved to the DB in the form of a string"
 
@@ -56,7 +57,6 @@ class LocationKeyField(models.CharField):
     def get_prep_value(self, value):
         assert isinstance(value, Location)
         return value.to_deprecated_string() if value else ''
-
 
     def validate(self, value, model_instance):
         # The default django CharField validator tries to call len() on Locations,

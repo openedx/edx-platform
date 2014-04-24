@@ -82,9 +82,13 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
             course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))
 
         # Delete git loaded course
-        response = self.client.post(reverse('sysadmin_courses'),
-                                {'course_id': course.id.to_deprecated_string(),
-                                 'action': 'del_course', })
+        response = self.client.post(
+            reverse('sysadmin_courses'),
+            {
+                'course_id': course.id.to_deprecated_string(),
+                'action': 'del_course',
+            }
+        )
         self.addCleanup(self._rm_glob, '{0}_deleted_*'.format(course_path))
 
         return response
