@@ -12,17 +12,17 @@ April, 2014
 
    * - Date
      - Change  
-    * - 04/24/14
+   * - 04/24/14
      - Expanded the :ref:`Grades` chapter to include topics on interpreting the grade reports and student progress page.
    * - 04/23/14
      - Reorganized info about problems into :ref:`Exercises and Tools Index` section  
    * - 04/22/14
-     - Updated the :ref:`Bulk Email` section with information about the dashboard option to opt out of course email. 
+     - Updated the :ref:`Bulk Email` section with information about the dashboard option to opt out of course email.
    * - 
      - In :ref:`Discussions`, corrected the steps to "Create Discussion
        Categories".
    * - 
-     - Updated the :ref:`Enrollment` section to reflect feature changes.      
+     - Updated the :ref:`Enrollment` section to reflect feature changes.
    * - 04/16/14
      - Updated "Transcripts in Additional Languages" in :ref:`Working with Video Components`.
    * -  
