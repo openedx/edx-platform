@@ -50,7 +50,7 @@ list of requirements to be sure that your pull request is ready to be reviewed:
    and point out any failing tests.)
 
 #. The author of the pull request should provide a test plan for verifying
-   the change in this pull request. The test plan should should include details
+   the change in this pull request. The test plan should include details
    of what should be checked, how to check it, and what the correct behavior
    should be.
 
