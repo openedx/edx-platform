@@ -5,6 +5,9 @@ import logging
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from django.core.validators import validate_email, validate_slug, ValidationError
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -14,8 +17,12 @@ from api_manager.permissions import ApiKeyHeaderPermission
 from courseware import module_render
 from courseware.model_data import FieldDataCache
 from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, PasswordHistory
 from xmodule.modulestore.django import modulestore
+from util.password_policy_validators import (
+    validate_password_length, validate_password_complexity,
+    validate_password_dictionary
+)
 
 log = logging.getLogger(__name__)
 
@@ -95,6 +102,32 @@ def user_list(request):
     password = request.DATA['password']
     first_name = request.DATA.get('first_name', '')
     last_name = request.DATA.get('last_name', '')
+
+    # enforce password complexity as an optional feature
+    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+        try:
+            validate_password_length(password)
+            validate_password_complexity(password)
+            validate_password_dictionary(password)
+        except ValidationError, err:
+            status_code = status.HTTP_400_BAD_REQUEST
+            response_data['message'] = _('Password: ') + '; '.join(err.messages)
+            return Response(response_data, status=status_code)
+    try:
+        validate_email(email)
+    except ValidationError:
+        status_code = status.HTTP_400_BAD_REQUEST
+        response_data['message'] = _('Valid e-mail is required.')
+        return Response(response_data, status=status_code)
+
+    try:
+        validate_slug(username)
+    except ValidationError:
+        status_code = status.HTTP_400_BAD_REQUEST
+        response_data['message'] = _('Username should only consist of A-Z and 0-9, with no spaces.')
+        return Response(response_data, status=status_code)
+
+
     try:
         user = User.objects.create(email=email, username=username)
     except IntegrityError:
@@ -104,6 +137,11 @@ def user_list(request):
         user.first_name = first_name
         user.last_name = last_name
         user.save()
+
+        # add this account creation to password history
+        # NOTE, this will be a NOP unless the feature has been turned on in configuration
+        password_history_entry = PasswordHistory()
+        password_history_entry.create(user)
 
         # CDODGE:  @TODO: We will have to extend this to look in the CourseEnrollmentAllowed table and
         # auto-enroll students when they create a new account. Also be sure to remove from
