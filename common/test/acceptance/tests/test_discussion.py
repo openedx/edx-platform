@@ -10,10 +10,11 @@ from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.discussion import (
     DiscussionTabSingleThreadPage,
     InlineDiscussionPage,
-    InlineDiscussionThreadPage
+    InlineDiscussionThreadPage,
+    DiscussionUserProfilePage
 )
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..fixtures.discussion import SingleThreadViewFixture, Thread, Response, Comment
+from ..fixtures.discussion import SingleThreadViewFixture, UserProfileViewFixture, Thread, Response, Comment
 
 
 class DiscussionResponsePaginationTestMixin(object):
@@ -301,3 +302,106 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
     def test_expand_discussion_empty(self):
         self.discussion_page.expand_discussion()
         self.assertEqual(self.discussion_page.get_num_displayed_threads(), 0)
+
+
+class DiscussionUserProfileTest(UniqueCourseTest):
+    """
+    Tests for user profile page in discussion tab.
+    """
+
+    PAGE_SIZE = 20  # django_comment_client.forum.views.THREADS_PER_PAGE
+    PROFILED_USERNAME = "profiled-user"
+
+    def setUp(self):
+        super(DiscussionUserProfileTest, self).setUp()
+        CourseFixture(**self.course_info).install()
+        # The following line creates a user enrolled in our course, whose
+        # threads will be viewed, but not the one who will view the page.
+        # It isn't necessary to log them in, but using the AutoAuthPage 
+        # saves a lot of code.   
+        self.profiled_user_id = AutoAuthPage(
+            self.browser,
+            username=self.PROFILED_USERNAME,
+            course_id=self.course_id
+        ).visit().get_user_id()
+        # now create a second user who will view the profile.
+        self.user_id = AutoAuthPage(
+            self.browser,
+            course_id=self.course_id
+        ).visit().get_user_id()
+
+    def check_pages(self, num_threads):
+        # set up the stub server to return the desired amount of thread results
+        threads = [Thread(id=uuid4().hex) for _ in range(num_threads)]
+        UserProfileViewFixture(threads).push()
+        # navigate to default view (page 1)
+        page = DiscussionUserProfilePage(
+            self.browser,
+            self.course_id,
+            self.profiled_user_id,
+            self.PROFILED_USERNAME
+        )
+        page.visit()
+
+        current_page = 1
+        total_pages = max(num_threads - 1, 1) / self.PAGE_SIZE + 1
+        all_pages = range(1, total_pages + 1)
+
+        def _check_page():
+            # ensure the page being displayed as "current" is the expected one 
+            self.assertEqual(page.get_current_page(), current_page)
+            # ensure the expected threads are being shown in the right order
+            threads_expected = threads[(current_page - 1) * self.PAGE_SIZE:current_page * self.PAGE_SIZE]
+            self.assertEqual(page.get_shown_thread_ids(), [t["id"] for t in threads_expected])
+            # ensure the clickable page numbers are the expected ones
+            self.assertEqual(page.get_clickable_pages(), [
+                p for p in all_pages
+                if p != current_page
+                and p - 2 <= current_page <= p + 2
+                or (current_page > 2 and p == 1)
+                or (current_page < total_pages and p == total_pages)
+            ])
+            # ensure the previous button is shown, but only if it should be.
+            # when it is shown, make sure it works.
+            if current_page > 1:
+                self.assertTrue(page.is_prev_button_shown(current_page - 1))
+                page.click_prev_page()
+                self.assertEqual(page.get_current_page(), current_page - 1)
+                page.click_next_page()
+                self.assertEqual(page.get_current_page(), current_page)
+            else:
+                self.assertFalse(page.is_prev_button_shown())
+            # ensure the next button is shown, but only if it should be.
+            if current_page < total_pages:
+                self.assertTrue(page.is_next_button_shown(current_page + 1))
+            else:
+                self.assertFalse(page.is_next_button_shown())
+
+        # click all the way up through each page
+        for i in range(current_page, total_pages):
+            _check_page()
+            if current_page < total_pages:
+                page.click_on_page(current_page + 1)
+                current_page += 1
+
+        # click all the way back down
+        for i in range(current_page, 0, -1):
+            _check_page()
+            if current_page > 1:
+                page.click_on_page(current_page - 1)
+                current_page -= 1
+
+    def test_0_threads(self):
+        self.check_pages(0)
+
+    def test_1_thread(self):
+        self.check_pages(1)
+
+    def test_20_threads(self):
+        self.check_pages(20)
+
+    def test_21_threads(self):
+        self.check_pages(21)
+
+    def test_151_threads(self):
+        self.check_pages(151)
