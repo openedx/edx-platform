@@ -259,8 +259,8 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     a student's dashboard.
     """
     for enrollment in CourseEnrollment.enrollments_for_user(user):
-        try:
-            course = course_from_id(enrollment.course_id)
+        course = course_from_id(enrollment.course_id)
+        if course:
 
             # if we are in a Microsite, then filter out anything that is not
             # attributed (by ORG) to that Microsite
@@ -272,7 +272,7 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
                 continue
 
             yield (course, enrollment)
-        except ItemNotFoundError:
+        else:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
 
