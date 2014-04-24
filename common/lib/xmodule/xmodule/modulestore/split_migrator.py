@@ -6,7 +6,10 @@ Exists at the top level of modulestore b/c it needs to know about and access eac
 In general, it's strategy is to treat the other modulestores as read-only and to never directly
 manipulate storage but use existing api's.
 '''
-from xmodule.modulestore.keys import UsageKey
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict
+from xmodule.modulestore.locations import Location
+
+
 class SplitMigrator(object):
     """
     Copies courses from old mongo to split mongo and sets up location mapping so any references to the old
@@ -42,7 +45,7 @@ class SplitMigrator(object):
         new_course_root_locator = self.loc_mapper.translate_location(original_course.location)
         new_course = self.split_modulestore.create_course(
             new_course_root_locator.org, new_course_root_locator.offering, user.id,
-            fields=self._get_json_fields_translate_children(original_course, course_key, True),
+            fields=self._get_json_fields_translate_references(original_course, course_key, True),
             root_block_id=new_course_root_locator.block_id,
             master_branch=new_course_root_locator.branch
         )
@@ -74,7 +77,7 @@ class SplitMigrator(object):
                 _new_module = self.split_modulestore.create_item(
                     course_version_locator, module.category, user.id,
                     block_id=new_locator.block_id,
-                    fields=self._get_json_fields_translate_children(module, course_key, True),
+                    fields=self._get_json_fields_translate_references(module, course_key, True),
                     continue_version=True
                 )
         # after done w/ published items, add version for 'draft' pointing to the published structure
@@ -121,7 +124,7 @@ class SplitMigrator(object):
                     _new_module = self.split_modulestore.create_item(
                         new_draft_course_loc, module.category, user.id,
                         block_id=new_locator.block_id,
-                        fields=self._get_json_fields_translate_children(module, course_key, True)
+                        fields=self._get_json_fields_translate_references(module, course_key, True)
                     )
                     awaiting_adoption[module.location] = new_locator.block_id
         for draft_location, new_block_id in awaiting_adoption.iteritems():
@@ -147,23 +150,32 @@ class SplitMigrator(object):
                 new_parent.children.insert(new_parent_cursor, new_block_id)
                 new_parent = self.split_modulestore.update_item(new_parent, user.id)
 
-    def _get_json_fields_translate_children(self, xblock, old_course_id, published):
+    def _get_json_fields_translate_references(self, xblock, old_course_id, published):
         """
-        Return the json repr for explicitly set fields but convert all children to their block_id's
+        Return the json repr for explicitly set fields but convert all references to their block_id's
         """
-        fields = self.get_json_fields_explicitly_set(xblock)
-        # this will too generously copy the children even for ones that don't exist in the published b/c the old mongo
-        # had no way of not having parents point to draft only children :-(
-        if 'children' in fields:
-            fields['children'] = [
-                self.loc_mapper.translate_location(child, published, add_entry_if_missing=True).block_id
-                for child in fields['children']
-            ]
-        return fields
+        # FIXME change split to take field values as pythonic values not json values
+        result = {}
+        for field_name, field in xblock.fields.iteritems():
+            if field.is_set_on(xblock):
+                if isinstance(field, Reference):
+                    result[field_name] = unicode(self.loc_mapper.translate_location(
+                        getattr(xblock, field_name), published, add_entry_if_missing=True
+                    ))
+                elif isinstance(field, ReferenceList):
+                    result[field_name] = [
+                        unicode(self.loc_mapper.translate_location(
+                            ele, published, add_entry_if_missing=True
+                        )) for ele in getattr(xblock, field_name)
+                    ]
+                elif isinstance(field, ReferenceValueDict):
+                    result[field_name] = {
+                        key: unicode(self.loc_mapper.translate_location(
+                            subvalue, published, add_entry_if_missing=True
+                        ))
+                        for key, subvalue in getattr(xblock, field_name).iteritems()
+                    }
+                else:
+                    result[field_name] = field.read_json(xblock)
 
-    def get_json_fields_explicitly_set(self, xblock):
-        """
-        Get the json repr for fields set on this specific xblock
-        :param xblock:
-        """
-        return {field.name: field.read_json(xblock) for field in xblock.fields.itervalues() if field.is_set_on(xblock)}
+        return result

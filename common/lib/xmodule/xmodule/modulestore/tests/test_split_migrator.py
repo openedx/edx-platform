@@ -10,8 +10,9 @@ from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore.mongo import draft
 from xmodule.modulestore.tests import test_location_mapper
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
+from nose.tools import nottest
 
-
+@nottest
 class TestMigration(SplitWMongoCourseBoostrapper):
     """
     Test the split migrator
@@ -94,11 +95,11 @@ class TestMigration(SplitWMongoCourseBoostrapper):
         self._create_item(
             conditional_loc.category, conditional_loc.name, 
             {
-                'show_tag_list': [indirect1_loc, indirect2_loc]
+                'show_tag_list': [indirect1_loc, indirect2_loc],
+                'sources_list': [live_vert_loc, ],
             }, 
             {
                 'xml_attributes': {
-                    'sources': [live_vert_loc, ],
                     'completed': True,
                 },
             }, 
