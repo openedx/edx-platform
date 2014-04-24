@@ -119,23 +119,23 @@ class GroupBasedRole(AccessRole):
         """
         Remove the supplied django users from this role.
         """
-        entries = CourseAccessRole.objects.filter(user__in=users, role=self._role_name, org=self.org)
-        if self.course_key is not None:
-            entries.filter(course_id=self.course_key)
+        entries = CourseAccessRole.objects.filter(
+            user__in=users, role=self._role_name, org=self.org, course_id=self.course_key
+        )
         entries.delete()
         for user in users:
             if hasattr(user, '_roles'):
                 del user._roles
 
     def users_with_role(self):
-        """
+        """[e.course_id for e in entries]
         Return a django QuerySet for all of the users with this role
         """
         entries = User.objects.filter(
-            courseaccessrole__role=self._role_name, courseaccessrole__org=self.org
+            courseaccessrole__role=self._role_name,
+            courseaccessrole__org=self.org,
+            courseaccessrole__course_id=self.course_key
         )
-        if self.course_key is not None:
-            entries.filter(courseaccessrole__course_id=self.course_key)
         return entries
 
 

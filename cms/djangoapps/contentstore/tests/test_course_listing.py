@@ -189,7 +189,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(courses_list, courses_list_by_groups)
 
         # now create another course with same course_id but different name case
-        course_location_camel = SlashSeparatedCourseKey('Org', 'Course', 'Run')
+        course_location_camel = SlashSeparatedCourseKey('Org', 'Course2', 'Run')
         self._create_course_with_access_groups(course_location_camel, self.user)
 
         # test that get courses through iterating all courses returns both courses
@@ -202,19 +202,6 @@ class TestCourseListing(ModuleStoreTestCase):
 
         # now delete first course (course_location_caps) and check that it is no longer accessible
         delete_course_and_groups(course_location_caps, commit=True)
-        # add user to this course instructor group since he was removed from that group on course delete
-        instructor_group_name = CourseInstructorRole(course_location_caps)._role_name  # pylint: disable=protected-access
-        group, __ = Group.objects.get_or_create(name=instructor_group_name)
-        self.user.groups.add(group)
-
-        # test viewing the index page which creates missing courses loc_map entries
-        resp = self.client.get_html('/course/')
-        self.assertContains(
-            resp,
-            '<h1 class="page-header">My Courses</h1>',
-            status_code=200,
-            html=True
-        )
 
         # test that get courses through iterating all courses now returns one course
         courses_list = _accessible_courses_list(request)
