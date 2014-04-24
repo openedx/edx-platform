@@ -9,6 +9,8 @@ In multiple choice problems, students select one option from a list of answer op
 .. image:: /Images/MultipleChoiceExample.png
  :alt: Image of a multiple choice problem
 
+Multiple choice problems also have several advanced options, such as presenting a random set of choices to each student. For more information about these options, see :ref:`Multiple Choice Advanced Options`.
+
 ****************************************
 Create a Multiple Choice Problem
 ****************************************
@@ -99,6 +101,254 @@ To create this problem in the Advanced Editor, click the **Advanced** tab in the
     </div>
   </solution>
   </problem>
+
+.. _Multiple Choice Advanced Options:
+
+*********************************************
+Advanced Options for Multiple Choice Problems
+*********************************************
+
+Multiple choice problems have several advanced options. You can change the order of answers in the problem, include explanations that appear when a student selects a specific incorrect answer, or present a random set of choices to each student. For more information, see the following:
+
+
+* :ref:`Shuffle Answers in a Multiple Choice Problem`
+* :ref:`Targeted Feedback in a Multiple Choice Problem`
+* :ref:`Answer Pools in a Multiple Choice Problem`
+
+.. _Shuffle Answers in a Multiple Choice Problem:
+
+=============================================
+Shuffle Answers in a Multiple Choice Problem
+============================================= 
+
+Optionally, you can configure a multiple choice problem so that it shuffles the order of possible answers.
+
+For example, one view of the problem could be:
+
+.. image:: ../Images/multiple-choice-shuffle-1.png
+ :alt: Image of a multiple choice problem
+
+And another view of the same problem, for another student or for the same student of a subsequent view of the unit, could be:
+
+.. image:: ../Images/multiple-choice-shuffle-2.png
+ :alt: Image of a multiple choice problem with shuffled answers
+
+You can also have some answers shuffled, but not others. For example, you may want to have the answer "All of the Above" fixed at the end of the list, but shuffle other answers.
+
+You can configure the problem to shuffle answers through :ref:`Simple Editor` or :ref:`Advanced Editor`.
+
+
+Use the Simple Editor to Shuffle Answers
+*********************************************
+
+You can configure the problem to shuffle answers in :ref:`Simple Editor`.
+
+For example, the following text defines a multiple choice problem, before shuffling is enabled. The ``(x)`` indicates the correct answer::
+
+ >>What Apple device competed with the portable CD player?<<
+     ( ) The iPad
+     ( ) Napster
+     (x) The iPod
+     ( ) The vegetable peeler
+
+To add shuffling to this problem, add ``!`` in the parenthesis of the first answer::
+
+ >>What Apple device competed with the portable CD player?<<
+     (!) The iPad
+     ( ) Napster
+     (x) The iPod
+     ( ) The vegetable peeler
+
+To fix an answer's location in the list, add ``@`` in the parenthesis of that answer::
+
+ >>What Apple device competed with the portable CD player?<<
+     (!) The iPad
+     ( ) Napster
+     (x) The iPod
+     ( ) The vegetable peeler
+     (@) All of the above
+
+You can combine symbols within parenthesis as necessary. For example, to show the correct answer in a fixed location, you could use::
+ 
+  (x@) The iPod
+
+Use the Advanced Editor to Shuffle Answers
+*********************************************
+
+You can configure the problem to shuffle answers through XML in :ref:`Advanced Editor`.
+
+For example, the following XML defines a multiple choice problem, before shuffling is enabled:
+
+.. code-block:: xml
+
+ <p>What Apple device competed with the portable CD player?</p>
+ <multiplechoiceresponse>
+  <choicegroup type="MultipleChoice">
+    <choice correct="false">The iPad</choice>
+    <choice correct="false">Napster</choice>
+    <choice correct="true">The iPod</choice>
+    <choice correct="false">The vegetable peeler</choice>
+  </choicegroup>
+ </multiplechoiceresponse>
+
+
+To add shuffling to this problem, add ``shuffle="true"`` to the ``<choicegroup>`` element:
+
+.. code-block:: xml
+
+ <p>What Apple device competed with the portable CD player?</p>
+ <multiplechoiceresponse>
+  <choicegroup type="MultipleChoice" shuffle="true">
+    <choice correct="false">The iPad</choice>
+    <choice correct="false">Napster</choice>
+    <choice correct="true">The iPod</choice>
+    <choice correct="false">The vegetable peeler</choice>
+  </choicegroup>
+ </multiplechoiceresponse>
+
+To fix an answer's location in the list, add ``fixed="true"`` to the ``choice`` element for the answer:
+
+.. code-block:: xml
+
+ <p>What Apple device competed with the portable CD player?</p>
+ <multiplechoiceresponse>
+  <choicegroup type="MultipleChoice" shuffle="true">
+    <choice correct="false">The iPad</choice>
+    <choice correct="false">Napster</choice>
+    <choice correct="true">The iPod</choice>
+    <choice correct="false">The vegetable peeler</choice>
+    <choice correct="false" fixed="true">All of the above</choice>
+  </choicegroup>
+ </multiplechoiceresponse>
+
+
+.. _Targeted Feedback in a Multiple Choice Problem:
+
+===============================================
+Targeted Feedback in a Multiple Choice Problem
+===============================================
+
+You can configure a multiple choice problem so that explanations for incorrect answers are automatically shown to students. You can use these explanations to guide students towards the right answer. Therefore, targeted feedback is most useful for multiple choice problems for which students are allowed multiple attempts.
+
+
+Use the Advanced Editor to Configure Targeted Feedback
+********************************************************
+
+You configure the problem to provide targeted feedback through XML in :ref:`Advanced Editor`.
+
+Follow these XML guidelines:
+
+* Add a ``targeted-feedback`` attribute to the ``<multiplechoiceresponse>`` element, with no value: ``<multiplechoiceresponse targeted-feedback="">``
+* Add a ``<targetedfeedbackset>`` element before the ``<solution>`` element.
+* Within ``<targetedfeedbackset>``, add one or more ``<targetedfeedback>`` elements.
+* Within each ``<targetedfeedback>`` element, enter your explanation for the incorrect answer in HTML as markup described below.
+* Connect the ``<targetedfeedback>`` element with a specific incorrect answer by using the same ``explanation-id`` attribute value for each.
+* Use the ``<solution>`` element for the correct answer, with the same ``explanation-id`` attribute value as the correct ``<choice>`` element.
+
+For example, the XML for the multiple choice problem is:
+
+.. code-block:: xml
+
+   <p>What Apple device competed with the portable CD player?</p>
+   <multiplechoiceresponse targeted-feedback="">
+    <choicegroup type="MultipleChoice">
+      <choice correct="false" explanation-id="feedback1">The iPad</choice>
+      <choice correct="false" explanation-id="feedback2">Napster</choice>
+      <choice correct="true" explanation-id="correct">The iPod</choice>
+      <choice correct="false" explanation-id="feedback3">The vegetable peeler</choice>
+    </choicegroup>
+   </multiplechoiceresponse>
+ 
+This is followed by XML that defines the targeted feedback:
+
+.. code-block:: xml
+
+   <targetedfeedbackset>
+     <targetedfeedback explanation-id="feedback1">
+       <div class="detailed-targeted-feedback">
+         <p>Targeted Feedback</p>
+         <p>The iPad came out later and did not directly compete with portable CD players.</p>
+       </div>
+     </targetedfeedback>
+     <targetedfeedback explanation-id="feedback2">
+       <div class="detailed-targeted-feedback">
+         <p>Targeted Feedback</p>
+         <p>Napster was not an Apple product.</p>
+       </div>
+     </targetedfeedback>
+     <targetedfeedback explanation-id="feedback3">
+       <div class="detailed-targeted-feedback">
+         <p>Targeted Feedback</p>
+         <p>Vegetable peelers don't play music.</p>
+       </div>
+     </targetedfeedback>
+    </targetedfeedbackset>
+
+    <solution explanation-id="correct">
+     <div class="detailed-solution">
+      <p>The iPod directly competed with portable CD players.</p>
+     </div>
+    </solution>
+
+
+.. _Answer Pools in a Multiple Choice Problem:
+
+=============================================
+Answer Pools in a Multiple Choice Problem
+=============================================
+
+You can configure a multiple choice problem so that a random subset of choices are shown to each student. For example, you can add 10 possible choices to the problem, and each student views a set of five choices.
+
+The answer pool must have at least one correct answer, and can have more than one. In each set of choices shown to a student, one correct answer is included. For example, you may configure two correct answers in the set of 10. One of the two correct answers is included in each set a student views.
+
+Use the Advanced Editor to Configure Answer Pools
+**************************************************
+
+You configure the problem to provide answer pools through XML in :ref:`Advanced Editor`.
+
+Follow these XML guidelines:
+
+* In the ``<choicegroup>`` element, add the ``answer-pool`` attribute, with the numerical value indicating the number of possible answers in the set. For example, ``<choicegroup answer-pool="4">``.
+
+* For each correct answer, to the ``<choice>`` element, add an ``explanation-id`` attribute and value that maps to a solution. For example, ``<choice correct="true" explanation-id="iPod">The iPod</choice>``.
+
+* For each ``<solution>`` element, add an ``explanation-id`` attribute and value that maps back to a correct answer. For example, ``<solution explanation-id="iPod">``.
+
+.. note:: If the choices include only one correct answer, you do not have to use the ``explanation-id`` in either the ``choice`` or ``<solution>`` element. You do still use the ``<solutionset>`` element to wrap the ``<solution>`` element.
+
+For example, for the following multiple choice problem, a student will see four choices, and in each set one of the choices will be one of the two correct ones. The explanation shown for the correct answer is the one with the same explanation ID.
+
+.. code-block:: xml
+
+ <problem>
+   <p>What Apple devices let you carry your digital music library in your pocket?</p>
+   <multiplechoiceresponse>
+    <choicegroup type="MultipleChoice" answer-pool="4">
+      <choice correct="false">The iPad</choice>
+      <choice correct="false">Napster</choice>
+      <choice correct="true" explanation-id="iPod">The iPod</choice>
+      <choice correct="false">The vegetable peeler</choice>
+      <choice correct="false">The iMac</choice>
+      <choice correct="true" explanation-id="iPhone">The iPhone</choice>
+    </choicegroup>
+   </multiplechoiceresponse>
+
+    <solutionset>
+        <solution explanation-id="iPod">
+        <div class="detailed-solution">
+            <p>Explanation</p>
+            <p>Yes, the iPod is Apple's portable digital music player.</p>
+        </div>
+        </solution>
+        <solution explanation-id="iPhone">
+        <div class="detailed-solution">
+            <p>Explanation</p>
+            <p>In addition to being a cell phone, the iPhone can store and play your digital music.</p>
+        </div>
+        </solution>
+    </solutionset>
+ </problem>
+
 
 .. _Multiple Choice Problem XML:
 
