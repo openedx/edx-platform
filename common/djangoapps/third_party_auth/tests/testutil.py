@@ -9,11 +9,14 @@ import unittest
 from third_party_auth import provider
 
 
+AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
+
+
 class FakeDjangoSettings(object):
     """A fake for Django settings."""
 
     def __init__(self, mappings):
-        """Initializes the fake from `mappings`, a dict."""
+        """Initializes the fake from mappings dict."""
         for key, value in mappings.iteritems():
             setattr(self, key, value)
 

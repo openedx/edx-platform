@@ -1,18 +1,17 @@
-"""
-Unit tests for settings code.
-"""
+"""Unit tests for settings.py."""
 
-from third_party_auth import provider
-from third_party_auth import settings
+from third_party_auth import provider, settings
 from third_party_auth.tests import testutil
 
 
 _ORIGINAL_AUTHENTICATION_BACKENDS = ('first_authentication_backend',)
 _ORIGINAL_INSTALLED_APPS = ('first_installed_app',)
+_ORIGINAL_MIDDLEWARE_CLASSES = ('first_middleware_class',)
 _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS = ('first_template_context_preprocessor',)
 _SETTINGS_MAP = {
     'AUTHENTICATION_BACKENDS': _ORIGINAL_AUTHENTICATION_BACKENDS,
     'INSTALLED_APPS': _ORIGINAL_INSTALLED_APPS,
+    'MIDDLEWARE_CLASSES': _ORIGINAL_MIDDLEWARE_CLASSES,
     'TEMPLATE_CONTEXT_PROCESSORS': _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS,
 }
 
@@ -20,12 +19,23 @@ _SETTINGS_MAP = {
 class SettingsUnitTest(testutil.TestCase):
     """Unit tests for settings management code."""
 
+    # Allow access to protected methods (or module-protected methods) under
+    # test. pylint: disable-msg=protected-access
     # Suppress sprurious no-member warning on fakes.
     # pylint: disable-msg=no-member
 
     def setUp(self):
         super(SettingsUnitTest, self).setUp()
         self.settings = testutil.FakeDjangoSettings(_SETTINGS_MAP)
+
+    def test_apply_settings_adds_exception_middleware(self):
+        settings.apply_settings({}, self.settings)
+        for middleware_name in settings._MIDDLEWARE_CLASSES:
+            self.assertIn(middleware_name, self.settings.MIDDLEWARE_CLASSES)
+
+    def test_apply_settings_adds_fields_stored_in_session(self):
+        settings.apply_settings({}, self.settings)
+        self.assertEqual(settings._FIELDS_STORED_IN_SESSION, self.settings.FIELDS_STORED_IN_SESSION)
 
     def test_apply_settings_adds_third_party_auth_to_installed_apps(self):
         settings.apply_settings({}, self.settings)
@@ -50,9 +60,9 @@ class SettingsUnitTest(testutil.TestCase):
 
     def test_apply_settings_prepends_auth_backends(self):
         self.assertEqual(_ORIGINAL_AUTHENTICATION_BACKENDS, self.settings.AUTHENTICATION_BACKENDS)
-        settings.apply_settings({provider.GoogleOauth2.NAME: {}, provider.MozillaPersona.NAME: {}}, self.settings)
+        settings.apply_settings({provider.GoogleOauth2.NAME: {}, provider.LinkedInOauth2.NAME: {}}, self.settings)
         self.assertEqual((
-            provider.GoogleOauth2.AUTHENTICATION_BACKEND, provider.MozillaPersona.AUTHENTICATION_BACKEND) +
+            provider.GoogleOauth2.get_authentication_backend(), provider.LinkedInOauth2.get_authentication_backend()) +
             _ORIGINAL_AUTHENTICATION_BACKENDS,
             self.settings.AUTHENTICATION_BACKENDS)
 
@@ -66,3 +76,9 @@ class SettingsUnitTest(testutil.TestCase):
         }
         with self.assertRaisesRegexp(ValueError, '^.*not initialized$'):
             settings.apply_settings(auth_info, self.settings)
+
+    def test_apply_settings_turns_off_raising_social_exceptions(self):
+        # Guard against submitting a conf change that's convenient in dev but
+        # bad in prod.
+        settings.apply_settings({}, self.settings)
+        self.assertFalse(self.settings.SOCIAL_AUTH_RAISE_EXCEPTIONS)
