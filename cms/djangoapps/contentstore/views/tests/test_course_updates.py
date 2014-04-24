@@ -253,7 +253,6 @@ class CourseUpdateTest(CourseTestCase):
         payload = json.loads(resp.content)
         self.assertHTMLEqual(payload['content'], content)
 
-        # now test that calling translate_location returns a locator whose block_id is 'updates'
         updates_location = self.course.id.make_usage_key('course_info', 'updates')
         self.assertTrue(isinstance(updates_location, Location))
         self.assertEqual(updates_location.name, block)

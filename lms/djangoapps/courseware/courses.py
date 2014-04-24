@@ -341,15 +341,12 @@ def sort_by_announcement(courses):
     return courses
 
 
-def get_cms_course_link(course):
+def get_cms_course_link(course, page='course'):
     """
     Returns a link to course_index for editing the course in cms,
     assuming that the course is actually cms-backed.
     """
-    locator = loc_mapper().translate_location(
-        course.location, False, True
-    )
-    return "//" + settings.CMS_BASE + locator.url_reverse('course/', '')
+    return u"//{}/{}/{}".format(settings.CMS_BASE, page, unicode(course.id))
 
 
 def get_cms_block_link(block, page):
@@ -357,10 +354,7 @@ def get_cms_block_link(block, page):
     Returns a link to block_index for editing the course in cms,
     assuming that the block is actually cms-backed.
     """
-    locator = loc_mapper().translate_location(
-        block.location, False, True
-    )
-    return "//" + settings.CMS_BASE + locator.url_reverse(page, '')
+    return u"//{}/{}/{}".format(settings.CMS_BASE, page, block.location)
 
 
 def get_studio_url(course_key, page):
@@ -373,5 +367,5 @@ def get_studio_url(course_key, page):
     is_mongo_course = modulestore().get_modulestore_type(course_key) == MONGO_MODULESTORE_TYPE
     studio_link = None
     if is_studio_course and is_mongo_course:
-        studio_link = get_cms_block_link(course, page)
+        studio_link = get_cms_course_link(course, page)
     return studio_link

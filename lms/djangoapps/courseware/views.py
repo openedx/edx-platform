@@ -38,17 +38,14 @@ from student.views import course_from_id, single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore import Location
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 import shoppingcart
 from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger("edx.courseware")
 
