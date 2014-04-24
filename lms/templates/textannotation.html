@@ -46,14 +46,11 @@
 	
 	//Grab uri of the course
     var parts = window.location.href.split("/"), 
-    	uri = '',
-	courseid;
+    	uri = '';
 	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
-	courseid = parts[4] + "/" + parts[5] + "/" + parts[6];
 	//Change uri in cms
 	var lms_location = $('.sidebar .preview-button').attr('href');
 	if (typeof lms_location!='undefined'){
-		courseid = parts[4].split(".").join("/");
 		uri = window.location.protocol;
 		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
 	}
@@ -115,7 +112,7 @@
                   },
             },
             auth: {
-                tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
+                token: "${token}"
             },
             store: {
                 // The endpoint of the store on your server.
@@ -145,6 +142,9 @@
             },
             highlightTags:{
                 tag: "${tag}",
+            },
+            diacriticMarks:{
+                diacritics: "${diacritic_marks}"
             }
         },
         optionsVideoJS: {techOrder: ["html5","flash","youtube"]},
@@ -161,7 +161,6 @@
             }
         },
     };
-	
 
 	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
 	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
@@ -174,7 +173,6 @@
     //Load the plugin Video/Text Annotation
     var ova = new OpenVideoAnnotation.Annotator($('#textHolder'),options);
     
-    
     //Catch
     var annotator = ova.annotator,
         catchOptions = {
@@ -183,7 +181,7 @@
             imageUrlRoot:imgURLRoot,
             showMediaSelector: false,
             showPublicPrivate: true,
-	    userId:'${user.email}',
+	        userId:'${user.email}',
             pagination:pagination,//Number of Annotations per load in the pagination,
             flags:is_staff
         },
