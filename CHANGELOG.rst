@@ -5,6 +5,40 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Show the HD button only if there is an HD version available. BLD-937.
+
+Studio: Add edit button to leaf xblocks on the container page. STUD-1306.
+
+Blades: Add LTI context_id parameter. BLD-584.
+
+Blades: Update LTI resource_link_id parameter. BLD-768.
+
+Blades: Transcript translations should be displayed in their source language (BLD-935).
+
+Blades: Create an upload modal for video transcript translations (BLD-751).
+
+Studio and LMS: Upgrade version of TinyMCE to 4.0.20. Switch from tabbed Visual/HTML
+Editor for HTML modules to showing the code editor as a plugin within TinyMCE (triggered
+from toolbar). STUD-1422
+
+Studio: Add ability to reorder Pages and hide the Wiki page. STUD-1375
+
+Blades: Added template for iFrames. BLD-611.
+
+Studio: Support for viewing built-in tabs on the Pages page. STUD-1193
+
+Blades: Fixed bug when image mapped input's Show Answer multiplies rectangles on
+ many inputtypes. BLD-810.
+
+LMS: Enabled screen reader feedback of problem responses.
+  LMS-2158
+
+Blades: Removed tooltip from captions. BLD-629.
+
+Blades: Fix problem with loading YouTube API is it is not available. BLD-531.
+
+Blades: Fix download subs for non youtube videos and non-en language. BLD-897.
+
 Blades: Fix issues related to videos that have separate YouTube IDs for the
 different video speeds. BLD-915, BLD-901.
 
@@ -34,6 +68,9 @@ Blades: Fix for the list metadata editor that gets into a bad state where "Add"
 Blades: Add view for field type Dict in Studio. BLD-658.
 
 Blades: Refactor stub implementation of LTI Provider. BLD-601.
+
+LMS: multiple choice features: shuffle, answer-pool, targeted-feedback,
+choice name masking, submission timer
 
 Studio: Added ability to edit course short descriptions that appear on the course catalog page.
 

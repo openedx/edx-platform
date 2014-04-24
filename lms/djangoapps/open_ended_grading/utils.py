@@ -125,12 +125,10 @@ class StudentProblemList(object):
         self.success = False
         try:
             #Get list of all open ended problems that the grading server knows about
-            problem_list_json = self.controller_qs.get_grading_status_list(self.course_id, self.user_id)
+            problem_list_dict = self.controller_qs.get_grading_status_list(self.course_id, self.user_id)
         except GradingServiceError:
             log.error("Problem contacting open ended grading service " + self.course_error_ending)
             return self.success
-        try:
-            problem_list_dict = json.loads(problem_list_json)
         except ValueError:
             log.error("Problem with results from external grading service for open ended" + self.course_error_ending)
             return self.success

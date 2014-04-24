@@ -209,20 +209,24 @@ class ModuleStoreTestCase(TestCase):
         return updated_course
 
     @staticmethod
-    def drop_mongo_collections():
+    def drop_mongo_collections(store_name='default'):
         """
         If using a Mongo-backed modulestore & contentstore, drop the collections.
         """
 
         # This will return the mongo-backed modulestore
         # even if we're using a mixed modulestore
-        store = editable_modulestore()
+        store = editable_modulestore(store_name)
         if hasattr(store, 'collection'):
             connection = store.collection.database.connection
             store.collection.drop()
             connection.close()
         elif hasattr(store, 'close_all_connections'):
             store.close_all_connections()
+        elif hasattr(store, 'db'):
+            connection = store.db.connection
+            connection.drop_database(store.db.name)
+            connection.close()
 
         if contentstore().fs_files:
             db = contentstore().fs_files.database

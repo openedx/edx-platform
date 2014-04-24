@@ -15,14 +15,24 @@ class DynamicTemplateLookup(TemplateLookup):
     A specialization of the standard mako `TemplateLookup` class which allows
     for adding directories progressively.
     """
-    def add_directory(self, directory):
+    def add_directory(self, directory, prepend=False):
         """
         Add a new directory to the template lookup path.
         """
-        self.directories.append(os.path.normpath(directory))
+        if prepend:
+            self.directories.insert(0, os.path.normpath(directory))
+        else:
+            self.directories.append(os.path.normpath(directory))
 
 
-def add_lookup(namespace, directory, package=None):
+def clear_lookups(namespace):
+    """
+    Remove mako template lookups for the given namespace.
+    """
+    if namespace in LOOKUP:
+        del LOOKUP[namespace]
+
+def add_lookup(namespace, directory, package=None, prepend=False):
     """
     Adds a new mako template lookup directory to the given namespace.
 
@@ -41,7 +51,7 @@ def add_lookup(namespace, directory, package=None):
         )
     if package:
         directory = pkg_resources.resource_filename(package, directory)
-    templates.add_directory(directory)
+    templates.add_directory(directory, prepend=prepend)
 
 
 def lookup_template(namespace, name):

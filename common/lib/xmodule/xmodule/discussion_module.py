@@ -51,7 +51,11 @@ class DiscussionModule(DiscussionFields, XModule):
         context = {
             'discussion_id': self.discussion_id,
         }
-        return self.system.render_template('discussion/_discussion_module.html', context)
+        if getattr(self.system, 'is_author_mode', False):
+            template = 'discussion/_discussion_module_studio.html'
+        else:
+            template = 'discussion/_discussion_module.html'
+        return self.system.render_template(template, context)
 
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):

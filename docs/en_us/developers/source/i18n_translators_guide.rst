@@ -24,6 +24,8 @@ Getting Started with Transifex
 Contributors wishing to help translate edx-platform and
 associated projects can find edX translation projects on 
 `Transifex <https://www.transifex.com/organization/open-edx/dashboard>`_.
+Note: All strings must be both translated **and reviewed** before
+we will publish them on the edx.org website.
 
 You should become a translator only if you feel very confident
 in both your language in English. Open edX is written in English, so all
@@ -71,8 +73,12 @@ Joining A Review Team
 =====================
 
 Optionally, you can request to become a `reviewer <http://support.transifex.com/customer/portal/articles/1167280>`_
-for a language. You should do this only if you feel very confident in both your language and in English. To do this, request permission
-from the project coordinator(s).
+for a language. Review teams are incredibly important, because
+all strings must be both translated **and reviewed** before
+we will publish them on the edx.org website.
+
+You should join a review team only if you feel very confident in both your language
+and in English. To join a review team, request permission from the project coordinator(s).
 
 1. Click on the "Members" tab of your language:
 
@@ -89,6 +95,8 @@ If the coordinator don't respond, try messaging another coordinator, or message 
 You can find the project maintainers at the top of the main project page:
 
 .. image:: images/project-maintainers.png
+
+If you are willing to become a coordinator for your language, let us know in your message.
 
 How To Translate With Transifex
 ===============================
@@ -131,9 +139,14 @@ Before requesting a new language, please first make sure your language is not li
 mind that variants of your language may exist ("Chinese" versus "Chinese-China") and these
 variants may meet your needs.
 
-An edX translation team member will respond to your request within a few days. Once your
+An edX translation team member will respond to your request within a few days. If your
 language is approved, you will be the coordinator of the project. You can add additional
 coordinators, reviewers, and translators as you wish.
+
+If you request a new language, we ask that you commit to the success of your language's
+translation project. Particularly, we expect you to be an active translator and work to
+recruit other translators and reviewers so your language project advances to completion,
+with all strings translated and reviewed, so that we can publish your work on the edx.org website.
 
 
 Guidelines for Translators

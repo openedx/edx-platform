@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 18:07+0400\n"
+"POT-Creation-Date: 2014-04-24 12:24+0000\n"
 "PO-Revision-Date: 2014-02-12 15:32+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -131,7 +131,16 @@ msgstr "задачи"
 msgid "video"
 msgstr "видео"
 
-#: cms/djangoapps/contentstore/views/course.py:320
+#: cms/djangoapps/contentstore/views/course.py:329
+#, fuzzy
+msgid ""
+"Special characters not allowed in organization, course number, and course "
+"run."
+msgstr ""
+"Пожалуйста, измените либо организацию, либо номер курса, чтобы они были "
+"уникальны"
+
+#: cms/djangoapps/contentstore/views/course.py:337
 msgid ""
 "Unable to create course '{name}'.\n"
 "\n"
@@ -141,7 +150,7 @@ msgstr ""
 "\n"
 "{err}"
 
-#: cms/djangoapps/contentstore/views/course.py:332
+#: cms/djangoapps/contentstore/views/course.py:349
 msgid ""
 "There is already a course defined with the same organization, course number, "
 "and course run. Please change either organization or course number to be "
@@ -150,17 +159,17 @@ msgstr ""
 "Уже существует курс, созданный той же самой организацией, с тем же номером и "
 "годом проведения. Измените что-нибудь, чтобы достичь уникальности."
 
-#: cms/djangoapps/contentstore/views/course.py:338
-#: cms/djangoapps/contentstore/views/course.py:342
-#: cms/djangoapps/contentstore/views/course.py:366
-#: cms/djangoapps/contentstore/views/course.py:369
+#: cms/djangoapps/contentstore/views/course.py:355
+#: cms/djangoapps/contentstore/views/course.py:359
+#: cms/djangoapps/contentstore/views/course.py:383
+#: cms/djangoapps/contentstore/views/course.py:386
 msgid ""
 "Please change either the organization or course number so that it is unique."
 msgstr ""
 "Пожалуйста, измените либо организацию, либо номер курса, чтобы они были "
 "уникальны"
 
-#: cms/djangoapps/contentstore/views/course.py:362
+#: cms/djangoapps/contentstore/views/course.py:379
 msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change at least one field to be unique."
@@ -184,23 +193,23 @@ msgstr "Загруженный файл поврежден. Пожалуйста
 msgid "Could not find the course.xml file in the package."
 msgstr "Невозможно найти course.xml  в этом пакете."
 
-#: cms/djangoapps/contentstore/views/item.py:442
+#: cms/djangoapps/contentstore/views/item.py:440
 msgid "Duplicate of {0}"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py:444
+#: cms/djangoapps/contentstore/views/item.py:442
 msgid "Duplicate of '{0}'"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py:446
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py:437
 msgid "Incoming video data is empty."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py:451
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py:442
 msgid "Can't find item by locator."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py:454
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py:445
 msgid "Transcripts are supported only for \"video\" modules."
 msgstr ""
 

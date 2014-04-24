@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-03-24 18:07+0400\n"
+"POT-Creation-Date: 2014-04-24 12:24+0000\n"
 "PO-Revision-Date: 2014-04-10 16:53+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -127,12 +127,12 @@ msgstr "Файлы &amp; Загрузки"
 msgid "Uploading…"
 msgstr "Загружаю"
 
-#: cms/templates/asset_index.html:94 cms/templates/asset_index.html:191
+#: cms/templates/asset_index.html:94 cms/templates/asset_index.html:196
 msgid "Choose File"
 msgstr "Выберите файл"
 
 #: cms/templates/asset_index.html:108 cms/templates/asset_index.html:142
-#: cms/templates/asset_index.html:180
+#: cms/templates/asset_index.html:185
 msgid "Upload New File"
 msgstr "Загрузить новый файл"
 
@@ -141,24 +141,29 @@ msgid "Load Another File"
 msgstr "Загрузить другой файл"
 
 #: cms/templates/asset_index.html:134 cms/templates/course_info.html:50
-#: cms/templates/edit-tabs.html:33 cms/templates/overview.html:124
+#: cms/templates/edit-tabs.html:42 cms/templates/overview.html:124
 #: cms/templates/textbooks.html:49 cms/templates/widgets/header.html:44
 msgid "Content"
 msgstr "Содержание"
 
-#: cms/templates/asset_index.html:139 cms/templates/container.html:64
-#: cms/templates/course_info.html:55 cms/templates/edit-tabs.html:38
+#: cms/templates/asset_index.html:139 cms/templates/container.html:71
+#: cms/templates/course_info.html:55 cms/templates/edit-tabs.html:48
 #: cms/templates/index.html:42 cms/templates/manage_users.html:20
 #: cms/templates/overview.html:129 cms/templates/textbooks.html:54
 msgid "Page Actions"
 msgstr "Actions-страница"
 
-#: cms/templates/asset_index.html:155
+#: cms/templates/asset_index.html:154
+#, fuzzy
+msgid "Loading&hellip;"
+msgstr "Сохранение&hellip;"
+
+#: cms/templates/asset_index.html:160
 #, fuzzy
 msgid "What files are listed here?"
 msgstr "Какие файлы включены?"
 
-#: cms/templates/asset_index.html:156
+#: cms/templates/asset_index.html:161
 #, fuzzy
 msgid ""
 "In addition to the files you upload on this page, any files that you add to "
@@ -168,40 +173,40 @@ msgstr ""
 "Все файлы, которые Вы загружаете на сервер в курс будут показаны здесь,\n"
 "включая изображения, главы учебников и прочие файлы. "
 
-#: cms/templates/asset_index.html:159
+#: cms/templates/asset_index.html:164
 msgid "File URLs"
 msgstr ""
 
-#: cms/templates/asset_index.html:161
+#: cms/templates/asset_index.html:166
 msgid ""
 "You use the Embed URL value to link to the file or image from a component, a "
 "course update, or a course handout."
 msgstr ""
 
-#: cms/templates/asset_index.html:162
+#: cms/templates/asset_index.html:167
 msgid ""
 "You use the External URL value to reference the file or image from outside "
 "of your course. Do not use the External URL as a link value within your "
 "course."
 msgstr ""
 
-#: cms/templates/asset_index.html:167 cms/templates/container.html:83
+#: cms/templates/asset_index.html:172 cms/templates/container.html:124
 #: cms/templates/overview.html:269 cms/templates/settings_graders.html:130
 msgid "What can I do on this page?"
 msgstr "Что я могу делать на этой странице?"
 
-#: cms/templates/asset_index.html:169
+#: cms/templates/asset_index.html:174
 msgid ""
 "You can upload new files or view, download, or delete existing files. You "
 "can lock a file so that people who are not enrolled in your course cannot "
 "access that file."
 msgstr ""
 
-#: cms/templates/asset_index.html:207
+#: cms/templates/asset_index.html:212
 msgid "Your file has been deleted."
 msgstr "Файл был удален."
 
-#: cms/templates/asset_index.html:212
+#: cms/templates/asset_index.html:217
 msgid "close alert"
 msgstr "закрыть уведомление"
 
@@ -242,46 +247,69 @@ msgstr ""
 "Любые измения в контрольных списках сохраняются автоматически и немодленно "
 "отображаются остальному персоналу курса."
 
-#: cms/templates/component.html:10
-msgid "Editor"
-msgstr "Редактор"
-
-#: cms/templates/component.html:42 cms/templates/studio_xblock_wrapper.html:23
+#: cms/templates/component.html:16 cms/templates/studio_xblock_wrapper.html:25
+#: cms/templates/studio_xblock_wrapper.html:27
 msgid "Duplicate"
 msgstr ""
 
-#: cms/templates/component.html:44 cms/templates/studio_xblock_wrapper.html:25
+#: cms/templates/component.html:18
 #, fuzzy
 msgid "Duplicate this component"
 msgstr "Удалить этот компонент?"
 
-#: cms/templates/component.html:50 cms/templates/studio_xblock_wrapper.html:31
+#: cms/templates/component.html:24
 #, fuzzy
 msgid "Delete this component"
 msgstr "Удалить этот компонент?"
 
-#: cms/templates/component.html:55
+#: cms/templates/component.html:29
 #: cms/templates/container_xblock_component.html:26
+#: cms/templates/edit-tabs.html:127 cms/templates/edit-tabs.html:128
 #: cms/templates/overview.html:200 cms/templates/overview.html:237
 msgid "Drag to reorder"
 msgstr "Для изменения порядка - перетащите"
 
-#: cms/templates/container.html:8 cms/templates/ux/reference/container.html:6
+#: cms/templates/container.html:9
 #, fuzzy
 msgid "Container"
 msgstr "Продолжить"
 
-#: cms/templates/container.html:67
-#: cms/templates/studio_vertical_wrapper.html:15
-#, fuzzy
-msgid "No Actions"
-msgstr "Действия"
+#: cms/templates/container.html:86
+msgid "This page has no content yet."
+msgstr ""
 
-#: cms/templates/container.html:85
+#: cms/templates/container.html:96 cms/templates/container.html:110
+#, fuzzy
+msgid "Publishing Status"
+msgstr "Дата публикации"
+
+#: cms/templates/container.html:96
+#, fuzzy
+msgid "Published"
+msgstr "Публичный"
+
+#: cms/templates/container.html:104
 msgid ""
-"You can view course components that contain other components on this page. "
-"In the case of experiment blocks, this allows you to confirm that you have "
-"properly configured your experiment groups."
+"To make changes to the content of this page, you need to edit unit "
+"{unit_link} as a draft."
+msgstr ""
+
+#: cms/templates/container.html:110
+msgid "Draft"
+msgstr ""
+
+#: cms/templates/container.html:118
+msgid ""
+"You can edit the content of this page, and your changes will be published "
+"with unit {unit_link}."
+msgstr ""
+
+#: cms/templates/container.html:126
+msgid ""
+"You can view and edit course components that contain other components on "
+"this page. In the case of experiment blocks, this allows you to confirm that "
+"you have properly configured your experiment groups and make changes to "
+"existing content."
 msgstr ""
 
 #: cms/templates/course_info.html:8 cms/templates/course_info.html:51
@@ -299,51 +327,113 @@ msgid ""
 "to student questions. You add or edit updates in HTML."
 msgstr ""
 
-#: cms/templates/edit-tabs.html:34 cms/templates/export.html:121
-#: cms/templates/widgets/header.html:56
-msgid "Static Pages"
-msgstr "Дополнительная страница"
+#. Translators: Pages refer to the tabs that appear in the top navigation of
+#. each course.
+#: cms/templates/edit-tabs.html:8 cms/templates/edit-tabs.html:44
+#: cms/templates/export.html:121 cms/templates/widgets/header.html:56
+#, fuzzy
+msgid "Pages"
+msgstr "Страница:"
 
-#: cms/templates/edit-tabs.html:41
+#: cms/templates/edit-tabs.html:51
 msgid "New Page"
 msgstr "Новая страница"
 
-#: cms/templates/edit-tabs.html:51
+#: cms/templates/edit-tabs.html:54 cms/templates/edit_subsection.html:89
+#: cms/templates/index.html:158 cms/templates/overview.html:138
+#: cms/templates/unit.html:193
+msgid "View Live"
+msgstr "Текущий просмотр"
+
+#: cms/templates/edit-tabs.html:66
 msgid ""
-"Use Static Pages to share a syllabus, a calendar, handouts, or other "
-"supplements to your courseware."
+"Note: Pages are publicly visible. If users know the URL of a page, they can "
+"view the page even if they are not registered for or logged in to your "
+"course."
 msgstr ""
 
-#: cms/templates/edit-tabs.html:52
-msgid ""
-"NOTE: all content on Static Pages will be visible to anyone who knows the "
-"URL, regardless of whether they are registered in the course or not."
-msgstr ""
-
-#: cms/templates/edit-tabs.html:56
+#: cms/templates/edit-tabs.html:113
 #, fuzzy
-msgid "What do static pages look like in my course?"
+msgid "Show this page"
+msgstr "следить за сообщением"
+
+#: cms/templates/edit-tabs.html:115 cms/templates/edit-tabs.html:117
+msgid "Show/hide page"
+msgstr ""
+
+#: cms/templates/edit-tabs.html:131 cms/templates/edit-tabs.html:132
+#, fuzzy
+msgid "This page cannot be reordered"
+msgstr "Это действие не может быть отменено."
+
+#: cms/templates/edit-tabs.html:145
+msgid "You can add additional custom pages to your course."
+msgstr ""
+
+#: cms/templates/edit-tabs.html:145
+#, fuzzy
+msgid "Add a New Page"
+msgstr "Новая страница"
+
+#: cms/templates/edit-tabs.html:153
+msgid "What are pages?"
+msgstr ""
+
+#: cms/templates/edit-tabs.html:154
+msgid ""
+"Pages are listed horizontally at the top of your course. Default pages "
+"(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
+"textbooks and custom pages that you create."
+msgstr ""
+
+#: cms/templates/edit-tabs.html:157
+msgid "Custom pages"
+msgstr ""
+
+#: cms/templates/edit-tabs.html:158
+msgid ""
+"You can create and edit custom pages to provide students with additional "
+"course content. For example, you can create pages for the grading policy, "
+"course slides, and a course calendar. "
+msgstr ""
+
+#: cms/templates/edit-tabs.html:161
+#, fuzzy
+msgid "How do pages look to students in my course?"
 msgstr "Как дополнительные страницы отображаются у студентов?"
 
-#: cms/templates/edit-tabs.html:84
+#: cms/templates/edit-tabs.html:162
+msgid ""
+"Students see the default and custom pages at the top of your course and use "
+"these links to navigate."
+msgstr ""
+
+#: cms/templates/edit-tabs.html:162
 #, fuzzy
-msgid "Static Pages in Your Course"
+msgid "See an example"
+msgstr "Расписание и детали"
+
+#: cms/templates/edit-tabs.html:170
+#, fuzzy
+msgid "Pages in Your Course"
 msgstr "Какие дополнительные страницы используются в вашем курсе"
 
-#: cms/templates/edit-tabs.html:86
+#: cms/templates/edit-tabs.html:172
 #, fuzzy
-msgid "Preview of Static Pages in your course"
+msgid "Preview of Pages in your course"
 msgstr "Просмотр дополнительных страниц, которые используются в вашем курсе"
 
-#: cms/templates/edit-tabs.html:87
+#: cms/templates/edit-tabs.html:173
+#, fuzzy
 msgid ""
-"The names of your Static Pages appear in your course's main navigation bar, "
-"along with Courseware, Course Info, Discussion, Wiki, and Progress."
+"Pages appear in your course's top navigation bar. The default pages "
+"(Courseware, Course Info, Discussion, Wiki, and Progress) are followed by "
+"textbooks and custom pages."
 msgstr ""
 "Эти страницы будут расположены в главной навигации вашего курса, наряду с "
 "информацией о курсе, форуме, wiki-странице курса и т.д."
 
-#: cms/templates/edit-tabs.html:92 cms/templates/howitworks.html:161
+#: cms/templates/edit-tabs.html:178 cms/templates/howitworks.html:161
 #: cms/templates/howitworks.html:174 cms/templates/howitworks.html:187
 msgid "close modal"
 msgstr "закрыть форму"
@@ -352,7 +442,7 @@ msgstr "закрыть форму"
 msgid "CMS Subsection"
 msgstr "CMS"
 
-#: cms/templates/edit_subsection.html:21 cms/templates/unit.html:56
+#: cms/templates/edit_subsection.html:21 cms/templates/unit.html:61
 msgid "Display Name:"
 msgstr "Отображаемое имя:"
 
@@ -417,11 +507,6 @@ msgstr "Удалить срок"
 #: cms/templates/edit_subsection.html:87
 msgid "Preview Drafts"
 msgstr "Предварительный просмотр проекта"
-
-#: cms/templates/edit_subsection.html:89 cms/templates/index.html:157
-#: cms/templates/overview.html:138 cms/templates/unit.html:182
-msgid "View Live"
-msgstr "Текущий просмотр"
 
 #: cms/templates/error.html:9
 msgid "Internal Server Error"
@@ -1101,7 +1186,7 @@ msgstr "например Введение в Математический Ана
 msgid "The public display name for your course."
 msgstr "Публично отображаемое имя для вашего курса."
 
-#: cms/templates/index.html:101 cms/templates/settings.html:69
+#: cms/templates/index.html:101 cms/templates/settings.html:73
 msgid "Organization"
 msgstr "Организация"
 
@@ -1147,7 +1232,7 @@ msgstr ""
 "Заметка: Пробелы и специальные символы запрещены. Данное поле не может быть "
 "изменено."
 
-#: cms/templates/index.html:115 cms/templates/settings.html:81
+#: cms/templates/index.html:115 cms/templates/settings.html:85
 msgid "Course Run"
 msgstr "Учебный год"
 
@@ -1161,19 +1246,19 @@ msgstr "к примеру 2013_Весна"
 msgid "The term in which your course will run."
 msgstr "Правила по которым читается курс"
 
-#: cms/templates/index.html:126
+#: cms/templates/index.html:127
 msgid "Create"
 msgstr "Создать"
 
-#: cms/templates/index.html:150
+#: cms/templates/index.html:151
 msgid "Course Run:"
 msgstr "Учебный год:"
 
-#: cms/templates/index.html:172
+#: cms/templates/index.html:173
 msgid "Are you staff on an existing Studio course?"
 msgstr "Вы являетесь персоналом существующего курса Студии?"
 
-#: cms/templates/index.html:174
+#: cms/templates/index.html:175
 msgid ""
 "You will need to be added to the course in Studio by the course creator. "
 "Please get in touch with the course creator or administrator for the "
@@ -1182,19 +1267,19 @@ msgstr ""
 "Вы должны быть добавлены к курсу в Студии создателем курса. Пожалуйста, "
 "свяжитесь с создателем курса или администратором."
 
-#: cms/templates/index.html:182 cms/templates/index.html:190
+#: cms/templates/index.html:183 cms/templates/index.html:191
 msgid "Create Your First Course"
 msgstr "Создать Ваш первый курс"
 
-#: cms/templates/index.html:184
+#: cms/templates/index.html:185
 msgid "Your new course is just a click away!"
 msgstr "Ваш первый курс в клике от вас!"
 
-#: cms/templates/index.html:203
+#: cms/templates/index.html:204
 msgid "Becoming a Course Creator in Studio"
 msgstr "Стать создателем курса в Студии"
 
-#: cms/templates/index.html:208
+#: cms/templates/index.html:209
 msgid ""
 "edX Studio is a hosted solution for our xConsortium partners and selected "
 "guests. Courses for which you are a team member appear above for you to "
@@ -1203,20 +1288,20 @@ msgid ""
 "work week."
 msgstr ""
 
-#: cms/templates/index.html:212 cms/templates/index.html:235
-#: cms/templates/index.html:261
+#: cms/templates/index.html:213 cms/templates/index.html:236
+#: cms/templates/index.html:262
 msgid "Your Course Creator Request Status:"
 msgstr "Ваш статус запроса на создание курса:"
 
-#: cms/templates/index.html:216
+#: cms/templates/index.html:217
 msgid "Request the Ability to Create Courses"
 msgstr "Запросить права на создание курсов"
 
-#: cms/templates/index.html:226 cms/templates/index.html:252
+#: cms/templates/index.html:227 cms/templates/index.html:253
 msgid "Your Course Creator Request Status"
 msgstr "Статус вашего запроса на права создания курса"
 
-#: cms/templates/index.html:231
+#: cms/templates/index.html:232
 msgid ""
 "edX Studio is a hosted solution for our xConsortium partners and selected "
 "guests. Courses for which you are a team member appear above for you to "
@@ -1224,22 +1309,22 @@ msgid ""
 "completed evaluating your request."
 msgstr ""
 
-#: cms/templates/index.html:238 cms/templates/index.html:264
+#: cms/templates/index.html:239 cms/templates/index.html:265
 msgid "Your Course Creator request is:"
 msgstr "Ваш запрос на создание курсов:"
 
-#: cms/templates/index.html:241
+#: cms/templates/index.html:242
 msgid "Denied"
 msgstr "Отказ в доступе"
 
-#: cms/templates/index.html:242
+#: cms/templates/index.html:243
 msgid ""
 "Your request did not meet the criteria/guidelines specified by edX Staff."
 msgstr ""
 "Ваш запрос не соответствует критериям/руководствам, определенным персоналом "
 "edX."
 
-#: cms/templates/index.html:257
+#: cms/templates/index.html:258
 msgid ""
 "edX Studio is a hosted solution for our xConsortium partners and selected "
 "guests. Courses for which you are a team member appear above for you to "
@@ -1247,7 +1332,7 @@ msgid ""
 "currently  evaluating your request."
 msgstr ""
 
-#: cms/templates/index.html:268
+#: cms/templates/index.html:269
 msgid ""
 "Your request is currently being reviewed by edX staff and should be updated "
 "shortly."
@@ -1255,11 +1340,11 @@ msgstr ""
 "Ваш запрос в настоящее время обрабатывается персоналом edX, статус запроса "
 "будет скоро обновлен."
 
-#: cms/templates/index.html:280 cms/templates/index.html:336
+#: cms/templates/index.html:281 cms/templates/index.html:337
 msgid "Need help?"
 msgstr "Нужна помощь?"
 
-#: cms/templates/index.html:281
+#: cms/templates/index.html:282
 msgid ""
 "If you are new to Studio and having trouble getting started, there are a few "
 "things that may be of help:"
@@ -1267,51 +1352,51 @@ msgstr ""
 "Если Вы новичок в Студии и не знаете, как начать работать, вам может помочь "
 "следующее:"
 
-#: cms/templates/index.html:285
+#: cms/templates/index.html:286
 msgid "Get started by reading Studio's Documentation"
 msgstr "Начните с чтения документации по Студии"
 
-#: cms/templates/index.html:288
+#: cms/templates/index.html:289
 msgid "Request help with Studio"
 msgstr "Нужна помощь со студией?"
 
-#: cms/templates/index.html:295 cms/templates/index.html:302
-#: cms/templates/index.html:308
+#: cms/templates/index.html:296 cms/templates/index.html:303
+#: cms/templates/index.html:309
 msgid "Can I create courses in Studio?"
 msgstr "Я могу создавать курсы в Студии?"
 
-#: cms/templates/index.html:296
+#: cms/templates/index.html:297
 msgid "In order to create courses in Studio, you must"
 msgstr "Для создания курса Вы должны"
 
-#: cms/templates/index.html:296
+#: cms/templates/index.html:297
 msgid "contact edX staff to help you create a course"
 msgstr "свяжитесь с персоналом edX для получения помощи в создании курса"
 
-#: cms/templates/index.html:303
+#: cms/templates/index.html:304
 msgid ""
 "In order to create courses in Studio, you must have course creator "
 "privileges to create your own course."
 msgstr "Для создания курсов в Студии вам нужны соответствующие привилегии"
 
-#: cms/templates/index.html:309
+#: cms/templates/index.html:310
 msgid "Your request to author courses in studio has been denied. Please"
 msgstr "Ваш запрос на право создания курсов в Студии был отклонен. Пожалуйста"
 
-#: cms/templates/index.html:309
+#: cms/templates/index.html:310
 msgid "contact edX Staff with further questions"
 msgstr "свяжитесь с персоналом edX для дальнейших вопросов"
 
-#: cms/templates/index.html:321
+#: cms/templates/index.html:322
 #, python-format
 msgid "Thanks for signing up, %(name)s!"
 msgstr "Спасибо за регистрацию, %(name)s!"
 
-#: cms/templates/index.html:326
+#: cms/templates/index.html:327
 msgid "We need to verify your email address"
 msgstr "Необходимо проверить Ваш адрес электронной почты"
 
-#: cms/templates/index.html:328
+#: cms/templates/index.html:329
 #, python-format
 msgid ""
 "Almost there! In order to complete your sign up we need you to verify your "
@@ -1322,7 +1407,7 @@ msgstr ""
 "адрес e-mail (%(email)s). На данный адрес выслано активационное письмо с "
 "дальнейшими инструкциями. "
 
-#: cms/templates/index.html:337
+#: cms/templates/index.html:338
 msgid ""
 "Please check your Junk or Spam folders in case our email isn't in your "
 "INBOX. Still can't find the verification email? Request help via the link "
@@ -1369,7 +1454,7 @@ msgstr ""
 msgid "Course Team Settings"
 msgstr "Настройки команды курса"
 
-#: cms/templates/manage_users.html:16 cms/templates/settings.html:312
+#: cms/templates/manage_users.html:16 cms/templates/settings.html:316
 #: cms/templates/settings_advanced.html:103
 #: cms/templates/settings_graders.html:149
 #: cms/templates/widgets/header.html:82
@@ -1772,44 +1857,44 @@ msgstr ""
 msgid "Schedule &amp; Details Settings"
 msgstr "Расписание &amp; Подробности настройки"
 
-#: cms/templates/settings.html:52
+#: cms/templates/settings.html:56
 msgid "Schedule & Details"
 msgstr "Расписание & Детали"
 
-#: cms/templates/settings.html:63
+#: cms/templates/settings.html:67
 msgid "Basic Information"
 msgstr "Основная информация"
 
-#: cms/templates/settings.html:64
+#: cms/templates/settings.html:68
 msgid "The nuts and bolts of your course"
 msgstr "Гайки и болты вашего курса"
 
-#: cms/templates/settings.html:70 cms/templates/settings.html:76
-#: cms/templates/settings.html:82
+#: cms/templates/settings.html:74 cms/templates/settings.html:80
+#: cms/templates/settings.html:86
 msgid "This field is disabled: this information cannot be changed."
 msgstr "Это поле недоступно: эта информация не может быть изменена."
 
-#: cms/templates/settings.html:89
+#: cms/templates/settings.html:93
 msgid "Course Summary Page"
 msgstr "Сводка страницы курса"
 
-#: cms/templates/settings.html:89
+#: cms/templates/settings.html:93
 msgid "(for student enrollment and access)"
 msgstr "(для доступа зарегистрированных студентов)"
 
-#: cms/templates/settings.html:96
+#: cms/templates/settings.html:100
 msgid "Send a note to students via email"
 msgstr "Отправить записку студентом по электронной почте"
 
-#: cms/templates/settings.html:98
+#: cms/templates/settings.html:102
 msgid "Invite your students"
 msgstr "Пригласите ваших студентов"
 
-#: cms/templates/settings.html:106
+#: cms/templates/settings.html:110
 msgid "Promoting Your Course with edX"
 msgstr "Продвигайте свой курс с edX"
 
-#: cms/templates/settings.html:108
+#: cms/templates/settings.html:112
 #, fuzzy
 msgid ""
 "Your course summary page will not be viewable until your course has been "
@@ -1822,68 +1907,68 @@ msgstr ""
 "<a rel=\"email\" class=\"action action-email\" href=\"mailto:conrad@edx.org"
 "\">(conrad@edx.org)</a>."
 
-#: cms/templates/settings.html:121
+#: cms/templates/settings.html:125
 msgid "Course Schedule"
 msgstr "Расписание курса"
 
-#: cms/templates/settings.html:122
+#: cms/templates/settings.html:126
 #, fuzzy
 msgid "Dates that control when your course can be viewed"
 msgstr "Даты контроля вашего курса можно посмотреть."
 
-#: cms/templates/settings.html:128
+#: cms/templates/settings.html:132
 msgid "Course Start Date"
 msgstr "Дата начала курса"
 
-#: cms/templates/settings.html:130
+#: cms/templates/settings.html:134
 msgid "First day the course begins"
 msgstr "Первый день курса"
 
-#: cms/templates/settings.html:134
+#: cms/templates/settings.html:138
 msgid "Course Start Time"
 msgstr "Время начала курса"
 
-#: cms/templates/settings.html:142
+#: cms/templates/settings.html:146
 msgid "Course End Date"
 msgstr "Дата окончания курса"
 
-#: cms/templates/settings.html:144
+#: cms/templates/settings.html:148
 msgid "Last day your course is active"
 msgstr "Последний день вашего курса активен"
 
-#: cms/templates/settings.html:148
+#: cms/templates/settings.html:152
 msgid "Course End Time"
 msgstr "Время окончания курса"
 
-#: cms/templates/settings.html:158
+#: cms/templates/settings.html:162
 msgid "Enrollment Start Date"
 msgstr "Дата начала регистрации"
 
-#: cms/templates/settings.html:160
+#: cms/templates/settings.html:164
 msgid "First day students can enroll"
 msgstr "Первый день регистрации студентов"
 
-#: cms/templates/settings.html:164
+#: cms/templates/settings.html:168
 msgid "Enrollment Start Time"
 msgstr "Время начала регистрации"
 
-#: cms/templates/settings.html:172
+#: cms/templates/settings.html:176
 msgid "Enrollment End Date"
 msgstr "Дата окончания регистрации"
 
-#: cms/templates/settings.html:174
+#: cms/templates/settings.html:178
 msgid "Last day students can enroll"
 msgstr "Последний день регистрации студентов"
 
-#: cms/templates/settings.html:178
+#: cms/templates/settings.html:182
 msgid "Enrollment End Time"
 msgstr "Время окончания регистрации "
 
-#: cms/templates/settings.html:187
+#: cms/templates/settings.html:191
 msgid "These Dates Are Not Used When Promoting Your Course"
 msgstr "Эти даты не могут быть использованы для продвижения вашего курса"
 
-#: cms/templates/settings.html:189
+#: cms/templates/settings.html:193
 msgid ""
 "These dates impact <strong>when your courseware can be viewed</strong>, but "
 "they are <strong>not the dates shown on your course summary page</strong>.  "
@@ -1899,34 +1984,34 @@ msgstr ""
 "Manager\">PM</abbr> или Conrad Warre <a rel=\"email\" class=\"action action-"
 "email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
 
-#: cms/templates/settings.html:197
+#: cms/templates/settings.html:201
 msgid "Introducing Your Course"
 msgstr "Представление вашего курса"
 
-#: cms/templates/settings.html:198
+#: cms/templates/settings.html:202
 msgid "Information for prospective students"
 msgstr "Информация для абитуриентов"
 
-#: cms/templates/settings.html:203
+#: cms/templates/settings.html:207
 #, fuzzy
 msgid "Course Short Description"
 msgstr "Дата начала курса"
 
-#: cms/templates/settings.html:205
+#: cms/templates/settings.html:209
 msgid ""
 "Appears on the course catalog page when students roll over the course name. "
 "Limit to ~150 characters"
 msgstr ""
 
-#: cms/templates/settings.html:211
+#: cms/templates/settings.html:215
 msgid "Course Overview"
 msgstr "Обзор курса"
 
-#: cms/templates/settings.html:215
+#: cms/templates/settings.html:219
 msgid "your course summary page"
 msgstr "итоговая страница вашего курса"
 
-#: cms/templates/settings.html:217
+#: cms/templates/settings.html:221
 #, python-format
 msgid ""
 "Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
@@ -1934,19 +2019,19 @@ msgstr ""
 "Введения, предпосылки, часто задаваемые вопросы, которые используются на %s "
 "(formatted in HTML)"
 
-#: cms/templates/settings.html:224 cms/templates/settings.html:228
-#: cms/templates/settings.html:237
+#: cms/templates/settings.html:228 cms/templates/settings.html:232
+#: cms/templates/settings.html:241
 msgid "Course Image"
 msgstr "Образ курса"
 
-#: cms/templates/settings.html:232
+#: cms/templates/settings.html:236
 #, fuzzy
 msgid ""
 "You can manage this image along with all of your other <a href='{}'>files "
 "&amp; uploads</a>"
 msgstr "Вы можете управлять этим образом наряду со всеми другими"
 
-#: cms/templates/settings.html:239
+#: cms/templates/settings.html:243
 msgid ""
 "Your course currently does not have an image. Please upload one (JPEG or PNG "
 "format, and minimum suggested dimensions are 375px wide by 200px tall)"
@@ -1954,7 +2039,7 @@ msgstr ""
 "Ваш курс пока не имеет изображения. Пожалуйста, загрузите его (формат JPEG "
 "или PNG, минимальный размер 375x200 пикселей)"
 
-#: cms/templates/settings.html:246
+#: cms/templates/settings.html:250
 msgid ""
 "Please provide a valid path and name to your course image (Note: only JPEG "
 "or PNG format supported)"
@@ -1962,45 +2047,45 @@ msgstr ""
 "Пожалуйста, укажите корректный путь к изображению Вашего курса "
 "(поддерживаются только форматы JPEG или PNG)"
 
-#: cms/templates/settings.html:248
+#: cms/templates/settings.html:252
 msgid "Upload Course Image"
 msgstr "Загрузить изображение курса"
 
-#: cms/templates/settings.html:254
+#: cms/templates/settings.html:258
 msgid "Course Introduction Video"
 msgstr "Введение в курс"
 
-#: cms/templates/settings.html:260
+#: cms/templates/settings.html:264
 msgid "Delete Current Video"
 msgstr "Удалить текущее видео"
 
-#: cms/templates/settings.html:266
+#: cms/templates/settings.html:270
 msgid "Enter your YouTube video's ID (along with any restriction parameters)"
 msgstr ""
 "Введите  ID вашего видео на YouTube (а также любые ограничения параметров)"
 
-#: cms/templates/settings.html:278
+#: cms/templates/settings.html:282
 msgid "Requirements"
 msgstr "Требования"
 
-#: cms/templates/settings.html:279
+#: cms/templates/settings.html:283
 msgid "Expectations of the students taking this course"
 msgstr "Ожидания студентов этого курса"
 
-#: cms/templates/settings.html:284
+#: cms/templates/settings.html:288
 msgid "Hours of Effort per Week"
 msgstr "Часы усилия в неделю"
 
-#: cms/templates/settings.html:286
+#: cms/templates/settings.html:290
 msgid "Time spent on all course work"
 msgstr "Время, затраченное на все работы курса"
 
-#: cms/templates/settings.html:295
+#: cms/templates/settings.html:299
 #, fuzzy
 msgid "How are these settings used?"
 msgstr "Как эти параметры будут использоваться?"
 
-#: cms/templates/settings.html:296
+#: cms/templates/settings.html:300
 #, fuzzy
 msgid ""
 "Your course's schedule determines when students can enroll in and begin a "
@@ -2009,7 +2094,7 @@ msgstr ""
 "Настройки расписания вашего курса определяют, когда студенты смогут "
 "зарегистрироваться и начать прохождение курса."
 
-#: cms/templates/settings.html:298
+#: cms/templates/settings.html:302
 msgid ""
 "Other information from this page appears on the About page for your course. "
 "This information includes the course overview, course image, introduction "
@@ -2021,17 +2106,17 @@ msgstr ""
 "оцениваемое время выполнения. Студенты используют страницу \"О Курсе\" для "
 "выбора нового курса."
 
-#: cms/templates/settings.html:308 cms/templates/settings_advanced.html:98
+#: cms/templates/settings.html:312 cms/templates/settings_advanced.html:98
 #: cms/templates/settings_graders.html:145
 msgid "Other Course Settings"
 msgstr "Другие настройки курса "
 
-#: cms/templates/settings.html:311 cms/templates/settings_advanced.html:102
+#: cms/templates/settings.html:315 cms/templates/settings_advanced.html:102
 #: cms/templates/settings_graders.html:47 cms/templates/widgets/header.html:79
 msgid "Grading"
 msgstr "Оценивание"
 
-#: cms/templates/settings.html:313 cms/templates/settings_advanced.html:8
+#: cms/templates/settings.html:317 cms/templates/settings_advanced.html:8
 #: cms/templates/settings_advanced.html:46
 #: cms/templates/settings_graders.html:150
 #: cms/templates/widgets/header.html:85
@@ -2160,6 +2245,11 @@ msgstr ""
 msgid "Expand or Collapse"
 msgstr ""
 
+#: cms/templates/studio_vertical_wrapper.html:15
+#, fuzzy
+msgid "No Actions"
+msgstr "Действия"
+
 #: cms/templates/textbooks.html:6 cms/templates/textbooks.html:50
 #: cms/templates/widgets/header.html:62
 msgid "Textbooks"
@@ -2205,51 +2295,51 @@ msgstr ""
 "Если Вы не разбили Ваш текст на главы, можно загрузить текст как одну главу "
 "и указать выбранное имя в поле Имя главы"
 
-#: cms/templates/unit.html:9 cms/templates/ux/reference/unit.html:7
+#: cms/templates/unit.html:10 cms/templates/ux/reference/unit.html:7
 msgid "Individual Unit"
 msgstr "Отдельные подразделы"
 
-#: cms/templates/unit.html:47
+#: cms/templates/unit.html:52
 msgid "You are editing a draft."
 msgstr "Вы редактируете проект."
 
-#: cms/templates/unit.html:49
+#: cms/templates/unit.html:54
 msgid "This unit was originally published on {date}."
 msgstr "Этот подраздел был первоначально опубликован {date}."
 
-#: cms/templates/unit.html:52
+#: cms/templates/unit.html:57
 msgid "View the Live Version"
 msgstr "Просмотр текущей версии"
 
-#: cms/templates/unit.html:63
+#: cms/templates/unit.html:68
 msgid "Add New Component"
 msgstr "Добавить новый компонент"
 
-#: cms/templates/unit.html:88
+#: cms/templates/unit.html:93
 msgid "Common Problem Types"
 msgstr "Обычные"
 
-#: cms/templates/unit.html:91
+#: cms/templates/unit.html:96
 msgid "Advanced"
 msgstr "Расширенные"
 
-#: cms/templates/unit.html:154
+#: cms/templates/unit.html:159
 msgid "Unit Settings"
 msgstr "Настройки подраздела"
 
-#: cms/templates/unit.html:157
+#: cms/templates/unit.html:162
 msgid "Visibility:"
 msgstr "Видимость:"
 
-#: cms/templates/unit.html:159
+#: cms/templates/unit.html:164
 msgid "Public"
 msgstr "Публичный"
 
-#: cms/templates/unit.html:160
+#: cms/templates/unit.html:165
 msgid "Private"
 msgstr "Приватный"
 
-#: cms/templates/unit.html:164
+#: cms/templates/unit.html:169
 msgid ""
 "This unit has been published. To make changes, you must {link_start}edit a "
 "draft{link_end}."
@@ -2257,7 +2347,7 @@ msgstr ""
 "Этот подраздел уже был опубликован. Чтобы сделать необходимые изменения, вы "
 "должны {link_start} отредактировать проект {link_end}."
 
-#: cms/templates/unit.html:165
+#: cms/templates/unit.html:170
 msgid ""
 "This is a draft of the published unit. To update the live version, you must "
 "{link_start}replace it with this draft{link_end}."
@@ -2265,32 +2355,35 @@ msgstr ""
 "Этот проект опубликованного подраздела. Чтобы обновить текущую версию, вы "
 "должны {link_start} заменить это в проекте {link_end}."
 
-#: cms/templates/unit.html:168
-msgid "This unit is scheduled to be released to <strong>students</strong>"
+#: cms/templates/unit.html:175
+#, fuzzy
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> on "
+"<strong>{date}</strong> with the subsection {link_start}{name}{link_end}"
 msgstr ""
 "Заполнение этого раздела планируется с помощью <strong>студентов</strong>"
 
-#: cms/templates/unit.html:170
-msgid "on {date}"
-msgstr "в {date}"
+#: cms/templates/unit.html:182
+#, fuzzy
+msgid ""
+"This unit is scheduled to be released to <strong>students</strong> with the "
+"subsection {link_start}{name}{link_end}"
+msgstr ""
+"Заполнение этого раздела планируется с помощью <strong>студентов</strong>"
 
-#: cms/templates/unit.html:172
-msgid "with the subsection {link_start}{name}{link_end}"
-msgstr "с подразделом {link_start}{name}{link_end}"
-
-#: cms/templates/unit.html:180
+#: cms/templates/unit.html:191
 msgid "Delete Draft"
 msgstr "Удалить проект"
 
-#: cms/templates/unit.html:181
+#: cms/templates/unit.html:192
 msgid "Preview"
 msgstr "Предварительный просмотр"
 
-#: cms/templates/unit.html:187
+#: cms/templates/unit.html:198
 msgid "Unit Location"
 msgstr "Местонахождение подраздела "
 
-#: cms/templates/unit.html:191
+#: cms/templates/unit.html:202
 msgid "Unit Identifier:"
 msgstr "Идентификатор подраздела:"
 
@@ -2453,54 +2546,54 @@ msgstr "Как работает Студия"
 msgid "Studio Help"
 msgstr "Помощь Студии"
 
-#: cms/templates/widgets/metadata-edit.html:32
+#: cms/templates/widgets/metadata-edit.html:31
 msgid "Launch Latex Source Compiler"
 msgstr "Запуск компилятора Latex"
 
-#: cms/templates/widgets/problem-edit.html:10
-#: cms/templates/widgets/problem-edit.html:40
+#: cms/templates/widgets/problem-edit.html:16
+#: cms/templates/widgets/problem-edit.html:46
 msgid "Heading 1"
 msgstr "Заголовок 1"
 
-#: cms/templates/widgets/problem-edit.html:12
-#: cms/templates/widgets/problem-edit.html:51
+#: cms/templates/widgets/problem-edit.html:18
+#: cms/templates/widgets/problem-edit.html:57
 msgid "Multiple Choice"
 msgstr "Переключатели"
 
-#: cms/templates/widgets/problem-edit.html:14
-#: cms/templates/widgets/problem-edit.html:62
+#: cms/templates/widgets/problem-edit.html:20
+#: cms/templates/widgets/problem-edit.html:68
 msgid "Checkboxes"
 msgstr "Флажки"
 
-#: cms/templates/widgets/problem-edit.html:16
-#: cms/templates/widgets/problem-edit.html:73
+#: cms/templates/widgets/problem-edit.html:22
+#: cms/templates/widgets/problem-edit.html:79
 msgid "Text Input"
 msgstr "Текстовое поле"
 
-#: cms/templates/widgets/problem-edit.html:18
-#: cms/templates/widgets/problem-edit.html:84
+#: cms/templates/widgets/problem-edit.html:24
+#: cms/templates/widgets/problem-edit.html:90
 msgid "Numerical Input"
 msgstr "Числовое поле"
 
-#: cms/templates/widgets/problem-edit.html:20
-#: cms/templates/widgets/problem-edit.html:94
+#: cms/templates/widgets/problem-edit.html:26
+#: cms/templates/widgets/problem-edit.html:100
 msgid "Dropdown"
 msgstr "Выпадающий список"
 
-#: cms/templates/widgets/problem-edit.html:22
-#: cms/templates/widgets/problem-edit.html:109
+#: cms/templates/widgets/problem-edit.html:28
+#: cms/templates/widgets/problem-edit.html:115
 msgid "Explanation"
 msgstr "Объяснение"
 
-#: cms/templates/widgets/problem-edit.html:26
+#: cms/templates/widgets/problem-edit.html:32
 msgid "Advanced Editor"
 msgstr "Расширенный редактор"
 
-#: cms/templates/widgets/problem-edit.html:27
+#: cms/templates/widgets/problem-edit.html:33
 msgid "Toggle Cheatsheet"
 msgstr "Переключить шпаргалку"
 
-#: cms/templates/widgets/problem-edit.html:103
+#: cms/templates/widgets/problem-edit.html:109
 msgid "Label"
 msgstr ""
 
@@ -2565,6 +2658,18 @@ msgstr "Перетащите для сортировки"
 #: cms/templates/widgets/units.html:46
 msgid "Drag to reorder unit"
 msgstr "Перетащите для изменения порядка блоков"
+
+#~ msgid "Editor"
+#~ msgstr "Редактор"
+
+#~ msgid "Static Pages"
+#~ msgstr "Дополнительная страница"
+
+#~ msgid "on {date}"
+#~ msgstr "в {date}"
+
+#~ msgid "with the subsection {link_start}{name}{link_end}"
+#~ msgstr "с подразделом {link_start}{name}{link_end}"
 
 #~ msgid "Open Ended Panel"
 #~ msgstr "Панель задач"
@@ -2707,9 +2812,6 @@ msgstr "Перетащите для изменения порядка блоко
 
 #~ msgid "<em>Editing:</em> %s"
 #~ msgstr "<em>Редактирование:</em> %s"
-
-#~ msgid "Saving&hellip;"
-#~ msgstr "Сохранение&hellip;"
 
 #~ msgid "Delete Component Confirmation"
 #~ msgstr "Подтверждение удаления компонента"
@@ -2856,9 +2958,6 @@ msgstr "Перетащите для изменения порядка блоко
 
 #~ msgid "Are you sure you want to delete this update?"
 #~ msgstr "Вы действительно хотите удалить это обновление?"
-
-#~ msgid "This action cannot be undone."
-#~ msgstr "Это действие не может быть отменено."
 
 #~ msgid "Upload a new PDF to “<%= name %>”"
 #~ msgstr "Загрузить новый PDF в \"<%= name %>\""
@@ -5773,9 +5872,6 @@ msgstr "Перетащите для изменения порядка блоко
 #~ msgid "Textbook Navigation"
 #~ msgstr "Навигация по учебнику"
 
-#~ msgid "Page:"
-#~ msgstr "Страница:"
-
 #~ msgid "Zoom Out"
 #~ msgstr "Уменьшить"
 
@@ -6806,9 +6902,6 @@ msgstr "Перетащите для изменения порядка блоко
 
 #~ msgid "Posts I'm Following"
 #~ msgstr "Сообщения за которыми я слежу"
-
-#~ msgid "follow this post"
-#~ msgstr "следить за сообщением"
 
 #~ msgid "post anonymously"
 #~ msgstr "отправить анонимно"
@@ -8262,10 +8355,6 @@ msgstr "Перетащите для изменения порядка блоко
 #, fuzzy
 #~ msgid "Register for a Pearson VUE Proctored Exam"
 #~ msgstr "Зарегистрироваться на личный экзамен"
-
-#, fuzzy
-#~ msgid "Schedule Pearson exam"
-#~ msgstr "Расписание и детали"
 
 #, fuzzy
 #~ msgid "Your registration for the Pearson exam is pending"

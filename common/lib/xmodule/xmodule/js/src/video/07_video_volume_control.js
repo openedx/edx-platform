@@ -62,8 +62,6 @@ function () {
             previousVolume = 100,
             slider, buttonStr, volumeSliderHandleEl;
 
-        state.videoControl.secondaryControlsEl.prepend(element);
-
         if (!isFinite(currentVolume)) {
             currentVolume = 100;
         }

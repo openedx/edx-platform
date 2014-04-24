@@ -6,14 +6,24 @@ import mock
 
 from django.http import Http404
 from django.test.utils import override_settings
+from student.tests.factories import UserFactory
 from xmodule.modulestore.django import get_default_store_name_for_current_request
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 
-from courseware.courses import get_course_by_id, get_course, get_cms_course_link, course_image_url
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.courses import (
+    get_course_by_id,
+    get_course,
+    get_cms_course_link,
+    get_cms_block_link,
+    course_image_url,
+    get_course_info_section,
+    get_course_about_section
+)
+from courseware.tests.helpers import get_request_for_user
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
 
 
 CMS_BASE_TEST = 'testcms'
@@ -47,21 +57,18 @@ class CoursesTest(ModuleStoreTestCase):
     @override_settings(
         MODULESTORE=TEST_DATA_MONGO_MODULESTORE, CMS_BASE=CMS_BASE_TEST
     )
-    def test_get_cms_course_link(self):
+    def test_get_cms_course_block_link(self):
         """
-        Tests that get_cms_course_link_by_id returns the right thing
+        Tests that get_cms_course_link_by_id and get_cms_block_link_by_id return the right thing
         """
 
+        cms_url = u"//{}/course/org.num.name/branch/draft/block/name".format(CMS_BASE_TEST)
         self.course = CourseFactory.create(
             org='org', number='num', display_name='name'
         )
 
-        self.assertEqual(
-            u"//{}/course/org.num.name/branch/draft/block/name".format(
-                CMS_BASE_TEST
-            ),
-            get_cms_course_link(self.course)
-        )
+        self.assertEqual(cms_url, get_cms_course_link(self.course))
+        self.assertEqual(cms_url, get_cms_block_link(self.course, 'course'))
 
     @mock.patch(
         'xmodule.modulestore.django.get_current_request_hostname',
@@ -135,3 +142,43 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
         # XML Course images are always stored at /images/course_image.jpg
         course = self.process_xml(xml.CourseFactory.build(course_image=u'before after.jpg'))
         self.assertEquals(course_image_url(course), '/static/xml_test_course/images/course_image.jpg')
+
+
+class CoursesRenderTest(ModuleStoreTestCase):
+    """Test methods related to rendering courses content."""
+
+    @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+    def test_get_course_info_section_render(self):
+        course = get_course_by_id('edX/toy/2012_Fall')
+        request = get_request_for_user(UserFactory.create())
+
+        # Test render works okay
+        course_info = get_course_info_section(request, course, 'handouts')
+        self.assertEqual(course_info, "<a href='/static/toy/handouts/sample_handout.txt'>Sample</a>")
+
+        # Test when render raises an exception
+        with mock.patch('courseware.courses.get_module') as mock_module_render:
+            mock_module_render.return_value = mock.MagicMock(
+                render=mock.Mock(side_effect=Exception('Render failed!'))
+            )
+            course_info = get_course_info_section(request, course, 'handouts')
+            self.assertIn("this module is temporarily unavailable", course_info)
+
+    @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+    @mock.patch('courseware.courses.get_request_for_thread')
+    def test_get_course_about_section_render(self, mock_get_request):
+        course = get_course_by_id('edX/toy/2012_Fall')
+        request = get_request_for_user(UserFactory.create())
+        mock_get_request.return_value = request
+
+        # Test render works okay
+        course_about = get_course_about_section(course, 'short_description')
+        self.assertEqual(course_about, "A course about toys.")
+
+        # Test when render raises an exception
+        with mock.patch('courseware.courses.get_module') as mock_module_render:
+            mock_module_render.return_value = mock.MagicMock(
+                render=mock.Mock(side_effect=Exception('Render failed!'))
+            )
+            course_about = get_course_about_section(course, 'short_description')
+            self.assertIn("this module is temporarily unavailable", course_about)

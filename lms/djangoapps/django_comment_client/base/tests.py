@@ -10,6 +10,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from util.testing import UrlResetMixin
+from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles
 from django_comment_client.base import views
 from django_comment_client.tests.unicode import UnicodeTestMixin
@@ -22,9 +23,16 @@ log = logging.getLogger(__name__)
 
 CS_PREFIX = "http://localhost:4567/api/v1"
 
+
+class MockRequestSetupMixin(object):
+    def _set_mock_request_data(self, mock_request, data):
+        mock_request.return_value.text = json.dumps(data)
+        mock_request.return_value.json.return_value = data
+
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @patch('lms.lib.comment_client.utils.requests.request')
-class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
+class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -62,26 +70,35 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     def test_create_thread(self, mock_request):
         mock_request.return_value.status_code = 200
-        mock_request.return_value.text = u'{"title":"Hello",\
-                                            "body":"this is a post",\
-                                            "course_id":"MITx/999/Robot_Super_Course",\
-                                            "anonymous":false,\
-                                            "anonymous_to_peers":false,\
-                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
-                                            "created_at":"2013-05-10T18:53:43Z",\
-                                            "updated_at":"2013-05-10T18:53:43Z",\
-                                            "at_position_list":[],\
-                                            "closed":false,\
-                                            "id":"518d4237b023791dca00000d",\
-                                            "user_id":"1","username":"robot",\
-                                            "votes":{"count":0,"up_count":0,\
-                                            "down_count":0,"point":0},\
-                                            "abuse_flaggers":[],\
-                                            "type":"thread","group_id":null,\
-                                            "pinned":false,\
-                                            "endorsed":false,\
-                                            "unread_comments_count":0,\
-                                            "read":false,"comments_count":0}'
+        self._set_mock_request_data(mock_request, {
+            "title": "Hello",
+            "body": "this is a post",
+            "course_id": "MITx/999/Robot_Super_Course",
+            "anonymous": False,
+            "anonymous_to_peers": False,
+            "commentable_id": "i4x-MITx-999-course-Robot_Super_Course",
+            "created_at": "2013-05-10T18:53:43Z",
+            "updated_at": "2013-05-10T18:53:43Z",
+            "at_position_list": [],
+            "closed": False,
+            "id": "518d4237b023791dca00000d",
+            "user_id": "1",
+            "username": "robot",
+            "votes": {
+                "count": 0,
+                "up_count": 0,
+                "down_count": 0,
+                "point": 0
+            },
+            "abuse_flaggers": [],
+            "type": "thread",
+            "group_id": None,
+            "pinned": False,
+            "endorsed": False,
+            "unread_comments_count": 0,
+            "read": False,
+            "comments_count": 0,
+        })
         thread = {"body": ["this is a post"],
                   "anonymous_to_peers": ["false"],
                   "auto_subscribe": ["false"],
@@ -109,7 +126,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         assert_equal(response.status_code, 200)
 
     def test_delete_comment(self, mock_request):
-        mock_request.return_value.text = json.dumps({
+        self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
         })
@@ -137,7 +154,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         }
         if include_depth:
             data["depth"] = 0
-        mock_request.return_value.text = json.dumps(data)
+        self._set_mock_request_data(mock_request, data)
 
     def _test_request_error(self, view_name, view_kwargs, data, mock_request):
         """
@@ -289,26 +306,34 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     def test_flag_thread(self, mock_request):
         mock_request.return_value.status_code = 200
-        mock_request.return_value.text = u'{"title":"Hello",\
-                                            "body":"this is a post",\
-                                            "course_id":"MITx/999/Robot_Super_Course",\
-                                            "anonymous":false,\
-                                            "anonymous_to_peers":false,\
-                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
-                                            "created_at":"2013-05-10T18:53:43Z",\
-                                            "updated_at":"2013-05-10T18:53:43Z",\
-                                            "at_position_list":[],\
-                                            "closed":false,\
-                                            "id":"518d4237b023791dca00000d",\
-                                            "user_id":"1","username":"robot",\
-                                            "votes":{"count":0,"up_count":0,\
-                                            "down_count":0,"point":0},\
-                                            "abuse_flaggers":[1],\
-                                            "type":"thread","group_id":null,\
-                                            "pinned":false,\
-                                            "endorsed":false,\
-                                            "unread_comments_count":0,\
-                                            "read":false,"comments_count":0}'
+        self._set_mock_request_data(mock_request, {
+            "title": "Hello",
+            "body": "this is a post",
+            "course_id": "MITx/999/Robot_Super_Course",
+            "anonymous": False,
+            "anonymous_to_peers": False,
+            "commentable_id": "i4x-MITx-999-course-Robot_Super_Course",
+            "created_at": "2013-05-10T18:53:43Z",
+            "updated_at": "2013-05-10T18:53:43Z",
+            "at_position_list": [],
+            "closed": False,
+            "id": "518d4237b023791dca00000d",
+            "user_id": "1","username": "robot",
+            "votes": {
+                "count": 0,
+                "up_count": 0,
+                "down_count": 0,
+                "point": 0
+            },
+            "abuse_flaggers": [1],
+            "type": "thread",
+            "group_id": None,
+            "pinned": False,
+            "endorsed": False,
+            "unread_comments_count": 0,
+            "read": False,
+            "comments_count": 0,
+        })
         url = reverse('flag_abuse_for_thread', kwargs={'thread_id': '518d4237b023791dca00000d', 'course_id': self.course_id})
         response = self.client.post(url)
         assert_true(mock_request.called)
@@ -349,26 +374,35 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     def test_un_flag_thread(self, mock_request):
         mock_request.return_value.status_code = 200
-        mock_request.return_value.text = u'{"title":"Hello",\
-                                            "body":"this is a post",\
-                                            "course_id":"MITx/999/Robot_Super_Course",\
-                                            "anonymous":false,\
-                                            "anonymous_to_peers":false,\
-                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
-                                            "created_at":"2013-05-10T18:53:43Z",\
-                                            "updated_at":"2013-05-10T18:53:43Z",\
-                                            "at_position_list":[],\
-                                            "closed":false,\
-                                            "id":"518d4237b023791dca00000d",\
-                                            "user_id":"1","username":"robot",\
-                                            "votes":{"count":0,"up_count":0,\
-                                            "down_count":0,"point":0},\
-                                            "abuse_flaggers":[],\
-                                            "type":"thread","group_id":null,\
-                                            "pinned":false,\
-                                            "endorsed":false,\
-                                            "unread_comments_count":0,\
-                                            "read":false,"comments_count":0}'
+        self._set_mock_request_data(mock_request, {
+            "title": "Hello",
+            "body": "this is a post",
+            "course_id": "MITx/999/Robot_Super_Course",
+            "anonymous": False,
+            "anonymous_to_peers": False,
+            "commentable_id": "i4x-MITx-999-course-Robot_Super_Course",
+            "created_at": "2013-05-10T18:53:43Z",
+            "updated_at": "2013-05-10T18:53:43Z",
+            "at_position_list": [],
+            "closed": False,
+            "id": "518d4237b023791dca00000d",
+            "user_id": "1",
+            "username": "robot",
+            "votes": {
+                "count": 0,
+                "up_count": 0,
+                "down_count": 0,
+                "point": 0
+            },
+            "abuse_flaggers": [],
+            "type": "thread",
+            "group_id": None,
+            "pinned": False,
+            "endorsed": False,
+            "unread_comments_count": 0,
+            "read": False,
+            "comments_count": 0
+        })
         url = reverse('un_flag_abuse_for_thread', kwargs={'thread_id': '518d4237b023791dca00000d', 'course_id': self.course_id})
         response = self.client.post(url)
         assert_true(mock_request.called)
@@ -409,22 +443,29 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     def test_flag_comment(self, mock_request):
         mock_request.return_value.status_code = 200
-        mock_request.return_value.text = u'{"body":"this is a comment",\
-                                            "course_id":"MITx/999/Robot_Super_Course",\
-                                            "anonymous":false,\
-                                            "anonymous_to_peers":false,\
-                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
-                                            "created_at":"2013-05-10T18:53:43Z",\
-                                            "updated_at":"2013-05-10T18:53:43Z",\
-                                            "at_position_list":[],\
-                                            "closed":false,\
-                                            "id":"518d4237b023791dca00000d",\
-                                            "user_id":"1","username":"robot",\
-                                            "votes":{"count":0,"up_count":0,\
-                                            "down_count":0,"point":0},\
-                                            "abuse_flaggers":[1],\
-                                            "type":"comment",\
-                                            "endorsed":false}'
+        self._set_mock_request_data(mock_request, {
+            "body": "this is a comment",
+            "course_id": "MITx/999/Robot_Super_Course",
+            "anonymous": False,
+            "anonymous_to_peers": False,
+            "commentable_id": "i4x-MITx-999-course-Robot_Super_Course",
+            "created_at": "2013-05-10T18:53:43Z",
+            "updated_at": "2013-05-10T18:53:43Z",
+            "at_position_list": [],
+            "closed": False,
+            "id": "518d4237b023791dca00000d",
+            "user_id": "1",
+            "username": "robot",
+            "votes": {
+                "count": 0,
+                "up_count": 0,
+                "down_count": 0,
+                "point": 0
+            },
+            "abuse_flaggers": [1],
+            "type": "comment",
+            "endorsed": False
+        })
         url = reverse('flag_abuse_for_comment', kwargs={'comment_id': '518d4237b023791dca00000d', 'course_id': self.course_id})
         response = self.client.post(url)
         assert_true(mock_request.called)
@@ -465,22 +506,29 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     def test_un_flag_comment(self, mock_request):
         mock_request.return_value.status_code = 200
-        mock_request.return_value.text = u'{"body":"this is a comment",\
-                                            "course_id":"MITx/999/Robot_Super_Course",\
-                                            "anonymous":false,\
-                                            "anonymous_to_peers":false,\
-                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
-                                            "created_at":"2013-05-10T18:53:43Z",\
-                                            "updated_at":"2013-05-10T18:53:43Z",\
-                                            "at_position_list":[],\
-                                            "closed":false,\
-                                            "id":"518d4237b023791dca00000d",\
-                                            "user_id":"1","username":"robot",\
-                                            "votes":{"count":0,"up_count":0,\
-                                            "down_count":0,"point":0},\
-                                            "abuse_flaggers":[],\
-                                            "type":"comment",\
-                                            "endorsed":false}'
+        self._set_mock_request_data(mock_request, {
+            "body": "this is a comment",
+            "course_id": "MITx/999/Robot_Super_Course",
+            "anonymous": False,
+            "anonymous_to_peers": False,
+            "commentable_id": "i4x-MITx-999-course-Robot_Super_Course",
+            "created_at": "2013-05-10T18:53:43Z",
+            "updated_at": "2013-05-10T18:53:43Z",
+            "at_position_list": [],
+            "closed": False,
+            "id": "518d4237b023791dca00000d",
+            "user_id": "1",
+            "username": "robot",
+            "votes": {
+                "count": 0,
+                "up_count": 0,
+                "down_count": 0,
+                "point": 0
+            },
+            "abuse_flaggers": [],
+            "type": "comment",
+            "endorsed": False
+        })
         url = reverse('un_flag_abuse_for_comment', kwargs={'comment_id': '518d4237b023791dca00000d', 'course_id': self.course_id})
         response = self.client.post(url)
         assert_true(mock_request.called)
@@ -519,9 +567,56 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         assert_equal(response.status_code, 200)
 
+@patch("lms.lib.comment_client.utils.requests.request")
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(ViewPermissionsTestCase, self).setUp()
+        self.password = "test password"
+        self.course = CourseFactory.create()
+        seed_permissions_roles(self.course.id)
+        self.student = UserFactory.create(password=self.password)
+        self.moderator = UserFactory.create(password=self.password)
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+        CourseEnrollmentFactory(user=self.moderator, course_id=self.course.id)
+        self.moderator.roles.add(Role.objects.get(name="Moderator", course_id=self.course.id))
+
+    def test_pin_thread_as_student(self, mock_request):
+        self._set_mock_request_data(mock_request, {})
+        self.client.login(username=self.student.username, password=self.password)
+        response = self.client.post(
+            reverse("pin_thread", kwargs={"course_id": self.course.id, "thread_id": "dummy"})
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_pin_thread_as_moderator(self, mock_request):
+        self._set_mock_request_data(mock_request, {})
+        self.client.login(username=self.moderator.username, password=self.password)
+        response = self.client.post(
+            reverse("pin_thread", kwargs={"course_id": self.course.id, "thread_id": "dummy"})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_un_pin_thread_as_student(self, mock_request):
+        self._set_mock_request_data(mock_request, {})
+        self.client.login(username=self.student.username, password=self.password)
+        response = self.client.post(
+            reverse("un_pin_thread", kwargs={"course_id": self.course.id, "thread_id": "dummy"})
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_un_pin_thread_as_moderator(self, mock_request):
+        self._set_mock_request_data(mock_request, {})
+        self.client.login(username=self.moderator.username, password=self.password)
+        response = self.client.post(
+            reverse("un_pin_thread", kwargs={"course_id": self.course.id, "thread_id": "dummy"})
+        )
+        self.assertEqual(response.status_code, 200)
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
@@ -530,7 +625,7 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
-        mock_request.return_value.text = "{}"
+        self._set_mock_request_data(mock_request, {})
         request = RequestFactory().post("dummy_url", {"body": text, "title": text})
         request.user = self.student
         request.view_name = "create_thread"
@@ -543,7 +638,7 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
@@ -552,7 +647,7 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
-        mock_request.return_value.text = json.dumps({
+        self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
         })
@@ -568,7 +663,7 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
@@ -577,7 +672,7 @@ class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
-        mock_request.return_value.text = json.dumps({
+        self._set_mock_request_data(mock_request, {
             "closed": False,
         })
         request = RequestFactory().post("dummy_url", {"body": text})
@@ -591,7 +686,7 @@ class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
@@ -600,7 +695,7 @@ class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
-        mock_request.return_value.text = json.dumps({
+        self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
         })
@@ -615,7 +710,7 @@ class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
@@ -624,7 +719,7 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
-        mock_request.return_value.text = json.dumps({
+        self._set_mock_request_data(mock_request, {
             "closed": False,
             "depth": 1,
         })

@@ -21,8 +21,13 @@ These are properties and methods available on ``self.runtime`` when a view or ha
   that the block is being executed in. The same student in two different courses
   will have two different ids.
 
-* publish(event): Emit events to the surrounding system. Events are dictionaries with
-  at least the key 'event_type', which identifies the other fields.
+* publish(block, event_type, event): Emit events to the surrounding system. Events are dictionaries that can contain arbitrary data.
+  XBlocks can publish events by calling ``self.runtime.publish(self, event_type, event)``. The ``event_type`` parameter
+  enables downstream processing of the event since it uniquely identifies the schema. This call will cause the runtime
+  to save the event data in the application event stream. XBlocks should publish events whenever a significant state
+  change occurs. Post-hoc analysis of the event stream can yield insight about how the XBlock is used in the context of
+  the application. Ideally interesting state of the XBlock could be reconstructed at any point in history through
+  careful analysis of the event stream.
 
   TODO: Link to the authoritive list of event types.
 
@@ -51,12 +56,14 @@ should ``publish`` a ``grade`` event whenever the grade changes. The ``grade`` e
 dictionary of the following form::
 
     {
-        'event_type': 'grade',
         'value': <number>,
         'max_value': <number>,
+        'user_id': <number>,
     }
 
-The grade event represents a grade of ``value/max_value`` for the current user.
+The grade event represents a grade of ``value/max_value`` for the current user. The
+``user_id`` field is optional, the currently logged in user's ID will be used if it is
+omitted.
 
 Restrictions
 ~~~~~~~~~~~~
@@ -127,7 +134,7 @@ To enable an XBlock for testing in your devstack (https://github.com/edx/configu
     #. Advanced -> your-block
 
 Note the name ``your-block`` used in Studio must exactly match the key you used to add your
-block to your ``setup.py`` ``entry_points`` list.
+block to your ``setup.py`` ``entry_points`` list (if you are still discovering Xblocks and simply used the ``startnew.py`` script as described at https://github.com/edx/XBlock/blob/master/doc/getting_started.rst , look in the ``setup.py`` file that was created)
 
 
 Deploying your XBlock

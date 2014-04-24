@@ -1,13 +1,14 @@
 #!/usr/bin/env python
-
+from __future__ import print_function
 import sys
 from polib import pofile
+import argparse
 
 from i18n.config import CONFIGURATION
 from i18n.execute import execute
 from i18n.extract import EDX_MARKER
 
-TRANSIFEX_HEADER = 'edX community translations have been downloaded from %s'
+TRANSIFEX_HEADER = u'edX community translations have been downloaded from {}'
 TRANSIFEX_URL = 'https://www.transifex.com/projects/p/edx-platform/'
 
 
@@ -16,7 +17,7 @@ def push():
 
 
 def pull():
-    print "Pulling languages from transifex..."
+    print("Pulling languages from transifex...")
     execute('tx pull --mode=reviewed --all')
     clean_translated_locales()
 
@@ -46,7 +47,13 @@ def clean_file(filename):
     Strips out the warning from a translated po file about being an English source file.
     Replaces warning with a note about coming from Transifex.
     """
-    po = pofile(filename)
+    try:
+        po = pofile(filename)
+    except Exception as exc:
+        # An exception can occur when a language is deleted from Transifex.
+        # Don't totally fail here.
+        print("Encountered error %s with filename %s - does language project still exist on Transifex?", exc, filename)
+        return
     if po.header.find(EDX_MARKER) != -1:
         new_header = get_new_header(po)
         new = po.header.replace(EDX_MARKER, new_header)
@@ -57,18 +64,22 @@ def clean_file(filename):
 def get_new_header(po):
     team = po.metadata.get('Language-Team', None)
     if not team:
-        return TRANSIFEX_HEADER % TRANSIFEX_URL
+        return TRANSIFEX_HEADER.format(TRANSIFEX_URL)
     else:
-        return TRANSIFEX_HEADER % team
+        return TRANSIFEX_HEADER.format(team)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        raise Exception("missing argument: push or pull")
-    arg = sys.argv[1]
-    if arg == 'push':
+    # pylint: disable=invalid-name
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", help="push or pull")
+    parser.add_argument("--verbose", "-v")
+    args = parser.parse_args()
+    # pylint: enable=invalid-name
+
+    if args.command == "push":
         push()
-    elif arg == 'pull':
+    elif args.command == "pull":
         pull()
     else:
-        raise Exception("unknown argument: (%s)" % arg)
+        raise Exception("unknown command ({cmd})".format(cmd=args.command))

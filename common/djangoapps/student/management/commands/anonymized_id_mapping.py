@@ -19,6 +19,7 @@ from student.models import anonymous_id_for_user
 class Command(BaseCommand):
     """Add our handler to the space where django-admin looks up commands."""
 
+    # TODO: revisit now that rake has been deprecated
     # It appears that with the way Rake invokes these commands, we can't
     # have more than one arg passed through...annoying.
     args = ("course_id", )

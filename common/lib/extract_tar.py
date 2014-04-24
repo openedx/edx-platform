@@ -9,7 +9,7 @@ from os.path import abspath, realpath, dirname, join as joinpath
 from django.core.exceptions import SuspiciousOperation
 import logging
 
-log = logging.getLogger(__name__) #pylint: disable=C0103
+log = logging.getLogger(__name__) # pylint: disable=C0103
 
 def resolved(rpath):
     """

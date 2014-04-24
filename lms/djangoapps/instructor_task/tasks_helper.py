@@ -23,7 +23,7 @@ from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
-from instructor_task.models import GradesStore, InstructorTask, PROGRESS
+from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from student.models import CourseEnrollment
 
 # define different loggers for use within tasks and on client side
@@ -473,11 +473,11 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
 def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a grades CSV file for all students that
-    are enrolled, and store using a `GradesStore`. Once created, the files can
-    be accessed by instantiating another `GradesStore` (via
-    `GradesStore.from_config()`) and calling `link_for()` on it. Writes are
+    are enrolled, and store using a `ReportStore`. Once created, the files can
+    be accessed by instantiating another `ReportStore` (via
+    `ReportStore.from_config()`) and calling `link_for()` on it. Writes are
     buffered, so we'll never write part of a CSV file to S3 -- i.e. any files
-    that are visible in GradesStore will be complete ones.
+    that are visible in ReportStore will be complete ones.
 
     As we start to add more CSV downloads, it will probably be worthwhile to
     make a more general CSVDoc class instead of building out the rows like we
@@ -555,8 +555,8 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
     course_id_prefix = urllib.quote(course_id.replace("/", "_"))
 
     # Perform the actual upload
-    grades_store = GradesStore.from_config()
-    grades_store.store_rows(
+    report_store = ReportStore.from_config()
+    report_store.store_rows(
         course_id,
         u"{}_grade_report_{}.csv".format(course_id_prefix, timestamp_str),
         rows
@@ -564,7 +564,7 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
     # If there are any error rows (don't count the header), write them out as well
     if len(err_rows) > 1:
-        grades_store.store_rows(
+        report_store.store_rows(
             course_id,
             u"{}_grade_report_{}_err.csv".format(course_id_prefix, timestamp_str),
             err_rows

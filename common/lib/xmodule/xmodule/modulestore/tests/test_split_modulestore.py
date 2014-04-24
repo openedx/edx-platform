@@ -1,25 +1,24 @@
-'''
-Created on Mar 25, 2013
-
-@author: dmitchell
-'''
+"""
+    Test split modulestore w/o using any django stuff.
+"""
 import datetime
-import subprocess
 import unittest
 import uuid
 from importlib import import_module
-
-from xblock.fields import Scope
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError, VersionConflictError, \
-    DuplicateItemError
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DefinitionLocator
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin
-from pytz import UTC
 from path import path
 import re
 import random
+
+from xblock.fields import Scope
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.exceptions import (InsufficientSpecificationError, ItemNotFoundError, VersionConflictError,
+            DuplicateItemError, DuplicateCourseError)
+from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, LocalId
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
+from xmodule.fields import Date, Timedelta
+from bson.objectid import ObjectId
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 
 
 class SplitModuleTest(unittest.TestCase):
@@ -52,52 +51,442 @@ class SplitModuleTest(unittest.TestCase):
 
     modulestore = None
 
-    # These version_guids correspond to values hard-coded in fixture files
-    # used for these tests. The files live in mitx/fixtures/splitmongo_json/*
-
-    GUID_D0 = "1d00000000000000dddd0000"  # v12345d
-    GUID_D1 = "1d00000000000000dddd1111"  # v12345d1
-    GUID_D2 = "1d00000000000000dddd2222"  # v23456d
-    GUID_D3 = "1d00000000000000dddd3333"  # v12345d0
-    GUID_D4 = "1d00000000000000dddd4444"  # v23456d0
-    GUID_D5 = "1d00000000000000dddd5555"  # v345679d
-    GUID_P = "1d00000000000000eeee0000"  # v23456p
-
+    _date_field = Date()
+    _time_delta_field = Timedelta()
+    COURSE_CONTENT = {
+        "testx.GreekHero": {
+            "org": "testx",
+            "root_block_id": "head12345",
+            "user_id": "test@edx.org",
+            "fields": {
+                "tabs": [
+                        {
+                            "type": "courseware"
+                        },
+                        {
+                            "type": "course_info",
+                            "name": "Course Info"
+                        },
+                        {
+                            "type": "discussion",
+                            "name": "Discussion"
+                        },
+                        {
+                            "type": "wiki",
+                            "name": "Wiki"
+                        }
+                    ],
+                "start": _date_field.from_json("2013-02-14T05:00"),
+                "display_name": "The Ancient Greek Hero",
+                "grading_policy": {
+                    "GRADER": [
+                    {
+                        "min_count": 5,
+                        "weight": 0.15,
+                        "type": "Homework",
+                        "drop_count": 1,
+                        "short_label": "HWa"
+                    },
+                    {
+                        "short_label": "",
+                        "min_count": 2,
+                        "type": "Lab",
+                        "drop_count": 0,
+                        "weight": 0.15
+                    },
+                    {
+                        "short_label": "Midterm",
+                        "min_count": 1,
+                        "type": "Midterm Exam",
+                        "drop_count": 0,
+                        "weight": 0.3
+                    },
+                    {
+                        "short_label": "Final",
+                        "min_count": 1,
+                        "type": "Final Exam",
+                        "drop_count": 0,
+                        "weight": 0.4
+                    }
+                    ],
+                    "GRADE_CUTOFFS": {
+                        "Pass": 0.75
+                    },
+                },
+            },
+            "revisions": [{
+                "user_id": "testassist@edx.org",
+                "update": {
+                    "head12345": {
+                        "end": _date_field.from_json("2013-04-13T04:30"),
+                        "tabs": [
+                        {
+                            "type": "courseware"
+                        },
+                        {
+                            "type": "course_info",
+                            "name": "Course Info"
+                        },
+                        {
+                            "type": "discussion",
+                            "name": "Discussion"
+                        },
+                        {
+                            "type": "wiki",
+                            "name": "Wiki"
+                        },
+                        {
+                            "type": "static_tab",
+                            "name": "Syllabus",
+                            "url_slug": "01356a17b5924b17a04b7fc2426a3798"
+                        },
+                        {
+                            "type": "static_tab",
+                            "name": "Advice for Students",
+                            "url_slug": "57e9991c0d794ff58f7defae3e042e39"
+                        }
+                        ],
+                        "graceperiod": _time_delta_field.from_json("2 hours 0 minutes 0 seconds"),
+                        "grading_policy": {
+                            "GRADER": [
+                                {
+                                    "min_count": 5,
+                                    "weight": 0.15,
+                                    "type": "Homework",
+                                    "drop_count": 1,
+                                    "short_label": "HWa"
+                                },
+                                {
+                                    "short_label": "",
+                                    "min_count": 12,
+                                    "type": "Lab",
+                                    "drop_count": 2,
+                                    "weight": 0.15
+                                },
+                                {
+                                    "short_label": "Midterm",
+                                    "min_count": 1,
+                                    "type": "Midterm Exam",
+                                    "drop_count": 0,
+                                    "weight": 0.3
+                                },
+                                {
+                                    "short_label": "Final",
+                                    "min_count": 1,
+                                    "type": "Final Exam",
+                                    "drop_count": 0,
+                                    "weight": 0.4
+                                }
+                            ],
+                            "GRADE_CUTOFFS": {
+                                "Pass": 0.55
+                            }
+                        },
+                    }}
+                },
+                {"user_id": "testassist@edx.org",
+                 "update": 
+                    {"head12345": {
+                        "end": _date_field.from_json("2013-06-13T04:30"),
+                        "grading_policy": {
+                            "GRADER": [
+                                {
+                                    "min_count": 4,
+                                    "weight": 0.15,
+                                    "type": "Homework",
+                                    "drop_count": 2,
+                                    "short_label": "HWa"
+                                },
+                                {
+                                    "short_label": "",
+                                    "min_count": 12,
+                                    "type": "Lab",
+                                    "drop_count": 2,
+                                    "weight": 0.15
+                                },
+                                {
+                                    "short_label": "Midterm",
+                                    "min_count": 1,
+                                    "type": "Midterm Exam",
+                                    "drop_count": 0,
+                                    "weight": 0.3
+                                },
+                                {
+                                    "short_label": "Final",
+                                    "min_count": 1,
+                                    "type": "Final Exam",
+                                    "drop_count": 0,
+                                    "weight": 0.4
+                                }
+                            ],
+                            "GRADE_CUTOFFS": {
+                                "Pass": 0.45
+                            }
+                        },
+                        "enrollment_start": _date_field.from_json("2013-01-01T05:00"),
+                        "enrollment_end": _date_field.from_json("2013-03-02T05:00"),
+                        "advertised_start": "Fall 2013",
+                    }},
+                "create": [
+                    {
+                        "id": "chapter1",
+                        "parent": "head12345",
+                        "category": "chapter",
+                        "fields": {
+                            "display_name": "Hercules"
+                        },
+                    },
+                    {
+                        "id": "chapter2",
+                        "parent": "head12345",
+                        "category": "chapter",
+                        "fields": {
+                            "display_name": "Hera heckles Hercules"
+                        },
+                    },
+                    {
+                        "id": "chapter3",
+                        "parent": "head12345",
+                        "category": "chapter",
+                        "fields": {
+                            "display_name": "Hera cuckolds Zeus"
+                        },
+                    },
+                    {
+                        "id": "problem1",
+                        "parent": "chapter3",
+                        "category": "problem",
+                        "fields": {
+                            "display_name": "Problem 3.1",
+                            "graceperiod": "4 hours 0 minutes 0 seconds"
+                        },
+                    },
+                    {
+                        "id": "problem3_2",
+                        "parent": "chapter3",
+                        "category": "problem",
+                        "fields": {
+                            "display_name": "Problem 3.2"
+                        },
+                    }
+                ]
+                },
+            ]
+        }, 
+        "testx.wonderful": {
+            "org": "testx",
+            "root_block_id": "head23456",
+            "user_id": "test@edx.org",
+            "fields": {
+                "tabs": [
+                    {
+                        "type": "courseware"
+                    },
+                    {
+                        "type": "course_info",
+                        "name": "Course Info"
+                    },
+                    {
+                        "type": "discussion",
+                        "name": "Discussion"
+                    },
+                    {
+                        "type": "wiki",
+                        "name": "Wiki"
+                    }
+                ],
+                "start": _date_field.from_json("2013-02-14T05:00"),
+                "display_name": "A wonderful course",
+                "grading_policy": {
+                    "GRADER": [
+                        {
+                            "min_count": 14,
+                            "weight": 0.25,
+                            "type": "Homework",
+                            "drop_count": 1,
+                            "short_label": "HWa"
+                        },
+                        {
+                            "short_label": "",
+                            "min_count": 12,
+                            "type": "Lab",
+                            "drop_count": 2,
+                            "weight": 0.25
+                        },
+                        {
+                            "short_label": "Midterm",
+                            "min_count": 1,
+                            "type": "Midterm Exam",
+                            "drop_count": 0,
+                            "weight": 0.2
+                        },
+                        {
+                            "short_label": "Final",
+                            "min_count": 1,
+                            "type": "Final Exam",
+                            "drop_count": 0,
+                            "weight": 0.3
+                        }
+                    ],
+                    "GRADE_CUTOFFS": {
+                        "Pass": 0.95
+                    }
+                },
+            },
+            "revisions": [{
+                "user_id": "test@edx.org",
+                "update": {
+                    "head23456": {
+                        "display_name": "The most wonderful course",
+                        "grading_policy": {
+                            "GRADER": [
+                                {
+                                    "min_count": 14,
+                                    "weight": 0.25,
+                                    "type": "Homework",
+                                    "drop_count": 1,
+                                    "short_label": "HWa"
+                                },
+                                {
+                                    "short_label": "",
+                                    "min_count": 12,
+                                    "type": "Lab",
+                                    "drop_count": 2,
+                                    "weight": 0.25
+                                },
+                                {
+                                    "short_label": "Midterm",
+                                    "min_count": 1,
+                                    "type": "Midterm Exam",
+                                    "drop_count": 0,
+                                    "weight": 0.2
+                                },
+                                {
+                                    "short_label": "Final",
+                                    "min_count": 1,
+                                    "type": "Final Exam",
+                                    "drop_count": 0,
+                                    "weight": 0.3
+                                }
+                            ],
+                            "GRADE_CUTOFFS": {
+                                "Pass": 0.45
+                            }
+                        },
+                    }
+                }
+            }
+            ]
+        }, 
+        "guestx.contender": {
+            "org": "guestx",
+            "root_block_id": "head345679",
+            "user_id": "test@guestx.edu",
+            "fields": {
+                "tabs": [
+                    {
+                        "type": "courseware"
+                    },
+                    {
+                        "type": "course_info",
+                        "name": "Course Info"
+                    },
+                    {
+                        "type": "discussion",
+                        "name": "Discussion"
+                    },
+                    {
+                        "type": "wiki",
+                        "name": "Wiki"
+                    }
+                ],
+                "start": _date_field.from_json("2013-03-14T05:00"),
+                "display_name": "Yet another contender",
+                "grading_policy": {
+                    "GRADER": [
+                        {
+                            "min_count": 4,
+                            "weight": 0.25,
+                            "type": "Homework",
+                            "drop_count": 0,
+                            "short_label": "HW"
+                        },
+                        {
+                            "short_label": "Midterm",
+                            "min_count": 1,
+                            "type": "Midterm Exam",
+                            "drop_count": 0,
+                            "weight": 0.4
+                        },
+                        {
+                            "short_label": "Final",
+                            "min_count": 1,
+                            "type": "Final Exam",
+                            "drop_count": 0,
+                            "weight": 0.35
+                        }
+                    ],
+                    "GRADE_CUTOFFS": {
+                        "Pass": 0.25
+                    }
+                },
+            }
+        },
+    }
     @staticmethod
     def bootstrapDB():
         '''
-        Loads the initial data into the db ensuring the collection name is
-        unique.
+        Sets up the initial data into the db
         '''
-        collection_prefix = SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG']['collection'] + '.'
-        dbname = SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG']['db']
-        processes = [
-            subprocess.Popen([
-                'mongoimport', '-d', dbname, '-c',
-                collection_prefix + collection, '--jsonArray',
-                '--file',
-                SplitModuleTest.COMMON_ROOT + '/test/data/splitmongo_json/' + collection + '.json'
-                ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+        split_store = modulestore()
+        for course_id, course_spec in SplitModuleTest.COURSE_CONTENT.iteritems():
+            course = split_store.create_course(
+                course_id, course_spec['org'], course_spec['user_id'],
+                fields=course_spec['fields'],
+                root_block_id=course_spec['root_block_id']
             )
-            for collection in ('active_versions', 'structures', 'definitions')]
-        for p in processes:
-            stdout, stderr = p.communicate()
-            if p.returncode != 0:
-                print "Couldn't run mongoimport:"
-                print stdout
-                print stderr
-                raise Exception("DB did not init correctly")
+            for revision in course_spec.get('revisions', []):
+                for block_id, fields in revision.get('update', {}).iteritems():
+                    # cheat since course is most frequent
+                    if course.location.block_id == block_id:
+                        block = course
+                    else:
+                        block_usage = BlockUsageLocator.make_relative(course.location, block_id)
+                        block = split_store.get_instance(course.location.package_id, block_usage)
+                    for key, value in fields.iteritems():
+                        setattr(block, key, value)
+                # create new blocks into dag: parent must already exist; thus, order is important
+                new_ele_dict = {}
+                for spec in revision.get('create', []):
+                    if spec['parent'] in new_ele_dict:
+                        parent = new_ele_dict.get(spec['parent'])
+                    elif spec['parent'] == course.location.block_id:
+                        parent = course
+                    else:
+                        block_usage = BlockUsageLocator.make_relative(course.location, spec['parent'])
+                        parent = split_store.get_instance(course.location.package_id, block_usage)
+                    block_id = LocalId(spec['id'])
+                    child = split_store.create_xblock(
+                        course.runtime, spec['category'], spec['fields'], block_id, parent_xblock=parent
+                    )
+                    new_ele_dict[spec['id']] = child
+                course = split_store.persist_xblock_dag(course, revision['user_id'])
+        # publish "testx.wonderful"
+        to_publish = BlockUsageLocator(package_id="testx.wonderful", branch="draft", block_id="head23456")
+        destination = CourseLocator(package_id="testx.wonderful", branch="published")
+        split_store.xblock_publish("test@edx.org", to_publish, destination, [to_publish.block_id], None)
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
+        """
+        Clear persistence between each test.
+        """
         collection_prefix = SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG']['collection'] + '.'
         if SplitModuleTest.modulestore:
             for collection in ('active_versions', 'structures', 'definitions'):
                 modulestore().db.drop_collection(collection_prefix + collection)
             # drop the modulestore to force re init
             SplitModuleTest.modulestore = None
+        super(SplitModuleTest, self).tearDown()
 
     def findByIdInResult(self, collection, _id):
         """
@@ -120,11 +509,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(courses), 3, "Wrong number of courses")
         # check metadata -- NOTE no promised order
         course = self.findByIdInResult(courses, "head12345")
-        self.assertEqual(course.location.package_id, "GreekHero")
-        self.assertEqual(
-            str(course.location.version_guid), self.GUID_D0,
-            "course version mismatch"
-        )
+        self.assertEqual(course.location.package_id, "testx.GreekHero")
         self.assertEqual(course.category, 'course', 'wrong category')
         self.assertEqual(len(course.tabs), 6, "wrong number of tabs")
         self.assertEqual(
@@ -135,13 +520,9 @@ class SplitModuleCourseTests(SplitModuleTest):
             course.advertised_start, "Fall 2013",
             "advertised_start"
         )
-        self.assertEqual(
-            len(course.children), 3,
-            "children")
-        self.assertEqual(str(course.definition_locator.definition_id), "ad00000000000000dddd0000")
+        self.assertEqual(len(course.children), 3, "children")
         # check dates and graders--forces loading of descriptor
         self.assertEqual(course.edited_by, "testassist@edx.org")
-        self.assertEqual(str(course.previous_version), self.GUID_D1)
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
     def test_branch_requests(self):
@@ -151,9 +532,7 @@ class SplitModuleCourseTests(SplitModuleTest):
             self.assertEqual(len(courses_published), 1, len(courses_published))
             course = self.findByIdInResult(courses_published, "head23456")
             self.assertIsNotNone(course, "published courses")
-            self.assertEqual(course.location.package_id, "wonderful")
-            self.assertEqual(str(course.location.version_guid), self.GUID_P,
-                             course.location.version_guid)
+            self.assertEqual(course.location.package_id, "testx.wonderful")
             self.assertEqual(course.category, 'course', 'wrong category')
             self.assertEqual(len(course.tabs), 4, "wrong number of tabs")
             self.assertEqual(course.display_name, "The most wonderful course",
@@ -171,40 +550,31 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertIsNotNone(self.findByIdInResult(courses, "head12345"))
         self.assertIsNotNone(self.findByIdInResult(courses, "head23456"))
 
-        courses = modulestore().get_courses(
-            branch='draft',
-            qualifiers={'edited_on': {"$lt": datetime.datetime(2013, 3, 28, 15)}})
-        self.assertEqual(len(courses), 2)
-
-        courses = modulestore().get_courses(
-            branch='draft',
-            qualifiers={'org': 'testx', "prettyid": "test_course"})
-        self.assertEqual(len(courses), 1)
-        self.assertIsNotNone(self.findByIdInResult(courses, "head12345"))
-
     def test_get_course(self):
         '''
         Test the various calling forms for get_course
         '''
-        locator = CourseLocator(version_guid=self.GUID_D1)
+        locator = CourseLocator(package_id="testx.GreekHero", branch="draft")
+        head_course = modulestore().get_course(locator)
+        self.assertNotEqual(head_course.location.version_guid, head_course.previous_version)
+        locator = CourseLocator(version_guid=head_course.previous_version)
         course = modulestore().get_course(locator)
         self.assertIsNone(course.location.package_id)
-        self.assertEqual(str(course.location.version_guid), self.GUID_D1)
+        self.assertEqual(course.location.version_guid, head_course.previous_version)
         self.assertEqual(course.category, 'course')
         self.assertEqual(len(course.tabs), 6)
         self.assertEqual(course.display_name, "The Ancient Greek Hero")
         self.assertEqual(course.graceperiod, datetime.timedelta(hours=2))
         self.assertIsNone(course.advertised_start)
         self.assertEqual(len(course.children), 0)
-        self.assertEqual(str(course.definition_locator.definition_id), "ad00000000000000dddd0001")
+        self.assertNotEqual(course.definition_locator.definition_id, head_course.definition_locator.definition_id)
         # check dates and graders--forces loading of descriptor
         self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.55})
 
-        locator = CourseLocator(package_id='GreekHero', branch='draft')
+        locator = CourseLocator(package_id='testx.GreekHero', branch='draft')
         course = modulestore().get_course(locator)
-        self.assertEqual(course.location.package_id, "GreekHero")
-        self.assertEqual(str(course.location.version_guid), self.GUID_D0)
+        self.assertEqual(course.location.package_id, "testx.GreekHero")
         self.assertEqual(course.category, 'course')
         self.assertEqual(len(course.tabs), 6)
         self.assertEqual(course.display_name, "The Ancient Greek Hero")
@@ -214,14 +584,13 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
-        locator = CourseLocator(package_id='wonderful', branch='published')
+        locator = CourseLocator(package_id='testx.wonderful', branch='published')
         course = modulestore().get_course(locator)
-        self.assertEqual(course.location.package_id, "wonderful")
-        self.assertEqual(str(course.location.version_guid), self.GUID_P)
+        published_version = course.location.version_guid
 
-        locator = CourseLocator(package_id='wonderful', branch='draft')
+        locator = CourseLocator(package_id='testx.wonderful', branch='draft')
         course = modulestore().get_course(locator)
-        self.assertEqual(str(course.location.version_guid), self.GUID_D2)
+        self.assertNotEqual(course.location.version_guid, published_version)
 
     def test_get_course_negative(self):
         # Now negative testing
@@ -231,13 +600,13 @@ class SplitModuleCourseTests(SplitModuleTest):
                           modulestore().get_course, CourseLocator(package_id='nosuchthing', branch='draft'))
         self.assertRaises(ItemNotFoundError,
                           modulestore().get_course,
-                          CourseLocator(package_id='GreekHero', branch='published'))
+                          CourseLocator(package_id='testx.GreekHero', branch='published'))
 
     def test_cache(self):
         """
         Test that the mechanics of caching work.
         """
-        locator = CourseLocator(version_guid=self.GUID_D0)
+        locator = CourseLocator(package_id='testx.GreekHero', branch='draft')
         course = modulestore().get_course(locator)
         block_map = modulestore().cache_items(course.system, course.children, depth=3)
         self.assertIn('chapter1', block_map)
@@ -247,22 +616,32 @@ class SplitModuleCourseTests(SplitModuleTest):
         """
         get_course_successors(course_locator, version_history_depth=1)
         """
-        locator = CourseLocator(version_guid=self.GUID_D3)
+        locator = CourseLocator(package_id='testx.GreekHero', branch='draft')
+        course = modulestore().get_course(locator)
+        versions = [course.location.version_guid, course.previous_version]
+        locator = CourseLocator(version_guid=course.previous_version)
+        course = modulestore().get_course(locator)
+        versions.append(course.previous_version)
+
+        locator = CourseLocator(version_guid=course.previous_version)
         result = modulestore().get_course_successors(locator)
         self.assertIsInstance(result, VersionTree)
         self.assertIsNone(result.locator.package_id)
-        self.assertEqual(str(result.locator.version_guid), self.GUID_D3)
+        self.assertEqual(result.locator.version_guid, versions[-1])
         self.assertEqual(len(result.children), 1)
-        self.assertEqual(str(result.children[0].locator.version_guid), self.GUID_D1)
+        self.assertEqual(result.children[0].locator.version_guid, versions[-2])
         self.assertEqual(len(result.children[0].children), 0, "descended more than one level")
+
         result = modulestore().get_course_successors(locator, version_history_depth=2)
         self.assertEqual(len(result.children), 1)
-        self.assertEqual(str(result.children[0].locator.version_guid), self.GUID_D1)
+        self.assertEqual(result.children[0].locator.version_guid, versions[-2])
         self.assertEqual(len(result.children[0].children), 1)
+
         result = modulestore().get_course_successors(locator, version_history_depth=99)
         self.assertEqual(len(result.children), 1)
-        self.assertEqual(str(result.children[0].locator.version_guid), self.GUID_D1)
+        self.assertEqual(result.children[0].locator.version_guid, versions[-2])
         self.assertEqual(len(result.children[0].children), 1)
+        self.assertEqual(result.children[0].children[0].locator.version_guid, versions[0])
 
 class SplitModuleItemTests(SplitModuleTest):
     '''
@@ -273,97 +652,98 @@ class SplitModuleItemTests(SplitModuleTest):
         '''
         has_item(BlockUsageLocator)
         '''
-        package_id = 'GreekHero'
+        package_id = 'testx.GreekHero'
+        locator = CourseLocator(package_id=package_id, branch='draft')
+        course = modulestore().get_course(locator)
+        previous_version = course.previous_version
         # positive tests of various forms
-        locator = BlockUsageLocator(version_guid=self.GUID_D1, block_id='head12345')
-        self.assertTrue(modulestore().has_item(package_id, locator),
-                        "couldn't find in %s" % self.GUID_D1)
+        locator = BlockUsageLocator(version_guid=previous_version, block_id='head12345')
+        self.assertTrue(
+            modulestore().has_item(package_id, locator), "couldn't find in %s" % previous_version
+        )
 
-        locator = BlockUsageLocator(package_id='GreekHero', block_id='head12345', branch='draft')
+        locator = BlockUsageLocator(package_id='testx.GreekHero', block_id='head12345', branch='draft')
         self.assertTrue(
             modulestore().has_item(locator.package_id, locator),
-            "couldn't find in 12345"
-        )
-        self.assertTrue(
-            modulestore().has_item(locator.package_id, BlockUsageLocator(
-                package_id=locator.package_id,
-                branch='draft',
-                block_id=locator.block_id
-            )),
-            "couldn't find in draft 12345"
         )
         self.assertFalse(
             modulestore().has_item(locator.package_id, BlockUsageLocator(
                 package_id=locator.package_id,
                 branch='published',
                 block_id=locator.block_id)),
-            "found in published 12345"
-        )
-        locator.branch = 'draft'
-        self.assertTrue(
-            modulestore().has_item(locator.package_id, locator),
-            "not found in draft 12345"
+            "found in published head"
         )
 
         # not a course obj
-        locator = BlockUsageLocator(package_id='GreekHero', block_id='chapter1', branch='draft')
+        locator = BlockUsageLocator(package_id='testx.GreekHero', block_id='chapter1', branch='draft')
         self.assertTrue(
             modulestore().has_item(locator.package_id, locator),
             "couldn't find chapter1"
         )
 
         # in published course
-        locator = BlockUsageLocator(package_id="wonderful", block_id="head23456", branch='draft')
+        locator = BlockUsageLocator(package_id="testx.wonderful", block_id="head23456", branch='draft')
         self.assertTrue(
             modulestore().has_item(
                 locator.package_id,
                 BlockUsageLocator(package_id=locator.package_id, block_id=locator.block_id, branch='published')
-            ), "couldn't find in 23456"
+            )
         )
         locator.branch = 'published'
-        self.assertTrue(modulestore().has_item(package_id, locator), "couldn't find in 23456")
+        self.assertTrue(modulestore().has_item(package_id, locator), "couldn't find in published")
 
     def test_negative_has_item(self):
         # negative tests--not found
         # no such course or block
-        package_id = 'GreekHero'
+        package_id = 'testx.GreekHero'
         locator = BlockUsageLocator(package_id="doesnotexist", block_id="head23456", branch='draft')
         self.assertFalse(modulestore().has_item(package_id, locator))
-        locator = BlockUsageLocator(package_id="wonderful", block_id="doesnotexist", branch='draft')
+        locator = BlockUsageLocator(package_id="testx.wonderful", block_id="doesnotexist", branch='draft')
         self.assertFalse(modulestore().has_item(package_id, locator))
 
         # negative tests--insufficient specification
         self.assertRaises(InsufficientSpecificationError, BlockUsageLocator)
-        self.assertRaises(InsufficientSpecificationError,
-                          modulestore().has_item, None, BlockUsageLocator(version_guid=self.GUID_D1))
-        self.assertRaises(InsufficientSpecificationError,
-                          modulestore().has_item, None, BlockUsageLocator(package_id='GreekHero'))
+
+        locator = CourseLocator(package_id=package_id, branch='draft')
+        course = modulestore().get_course(locator)
+        previous_version = course.previous_version
+
+        with self.assertRaises(InsufficientSpecificationError):
+            modulestore().has_item(None, BlockUsageLocator(version_guid=previous_version))
+        with self.assertRaises(InsufficientSpecificationError):
+            modulestore().has_item(None, BlockUsageLocator(package_id='testx.GreekHero'))
 
     def test_get_item(self):
         '''
         get_item(blocklocator)
         '''
+        locator = CourseLocator(package_id="testx.GreekHero", branch='draft')
+        course = modulestore().get_course(locator)
+        previous_version = course.previous_version
+
         # positive tests of various forms
-        locator = BlockUsageLocator(version_guid=self.GUID_D1, block_id='head12345')
+        locator = BlockUsageLocator(version_guid=previous_version, block_id='head12345')
         block = modulestore().get_item(locator)
         self.assertIsInstance(block, CourseDescriptor)
         # get_instance just redirects to get_item, ignores package_id
         self.assertIsInstance(modulestore().get_instance("package_id", locator), CourseDescriptor)
 
         def verify_greek_hero(block):
-            self.assertEqual(block.location.package_id, "GreekHero")
+            """
+            Check contents of block
+            """
+            self.assertEqual(block.location.package_id, "testx.GreekHero")
             self.assertEqual(len(block.tabs), 6, "wrong number of tabs")
             self.assertEqual(block.display_name, "The Ancient Greek Hero")
             self.assertEqual(block.advertised_start, "Fall 2013")
             self.assertEqual(len(block.children), 3)
-            self.assertEqual(str(block.definition_locator.definition_id), "ad00000000000000dddd0000")
             # check dates and graders--forces loading of descriptor
             self.assertEqual(block.edited_by, "testassist@edx.org")
             self.assertDictEqual(
                 block.grade_cutoffs, {"Pass": 0.45},
             )
 
-        locator = BlockUsageLocator(package_id='GreekHero', block_id='head12345', branch='draft')
+        locator = BlockUsageLocator(package_id='testx.GreekHero', block_id='head12345', branch='draft')
         verify_greek_hero(modulestore().get_item(locator))
         # get_instance just redirects to get_item, ignores package_id
         verify_greek_hero(modulestore().get_instance("package_id", locator))
@@ -382,16 +762,15 @@ class SplitModuleItemTests(SplitModuleTest):
 
     def test_get_non_root(self):
         # not a course obj
-        locator = BlockUsageLocator(package_id='GreekHero', block_id='chapter1', branch='draft')
+        locator = BlockUsageLocator(package_id='testx.GreekHero', block_id='chapter1', branch='draft')
         block = modulestore().get_item(locator)
-        self.assertEqual(block.location.package_id, "GreekHero")
+        self.assertEqual(block.location.package_id, "testx.GreekHero")
         self.assertEqual(block.category, 'chapter')
-        self.assertEqual(str(block.definition_locator.definition_id), "cd00000000000000dddd0020")
         self.assertEqual(block.display_name, "Hercules")
         self.assertEqual(block.edited_by, "testassist@edx.org")
 
         # in published course
-        locator = BlockUsageLocator(package_id="wonderful", block_id="head23456", branch='published')
+        locator = BlockUsageLocator(package_id="testx.wonderful", block_id="head23456", branch='published')
         self.assertIsInstance(
             modulestore().get_item(locator),
             CourseDescriptor
@@ -402,15 +781,15 @@ class SplitModuleItemTests(SplitModuleTest):
         locator = BlockUsageLocator(package_id="doesnotexist", block_id="head23456", branch='draft')
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(locator)
-        locator = BlockUsageLocator(package_id="wonderful", block_id="doesnotexist", branch='draft')
+        locator = BlockUsageLocator(package_id="testx.wonderful", block_id="doesnotexist", branch='draft')
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(locator)
 
         # negative tests--insufficient specification
         with self.assertRaises(InsufficientSpecificationError):
-            modulestore().get_item(BlockUsageLocator(version_guid=self.GUID_D1))
+            modulestore().get_item(BlockUsageLocator(version_guid=ObjectId()))
         with self.assertRaises(InsufficientSpecificationError):
-            modulestore().get_item(BlockUsageLocator(package_id='GreekHero', branch='draft'))
+            modulestore().get_item(BlockUsageLocator(package_id='testx.GreekHero', branch='draft'))
 
     # pylint: disable=W0212
     def test_matching(self):
@@ -443,7 +822,7 @@ class SplitModuleItemTests(SplitModuleTest):
         '''
         get_items(locator, qualifiers, [branch])
         '''
-        locator = CourseLocator(version_guid=self.GUID_D0)
+        locator = CourseLocator(package_id="testx.GreekHero", branch='draft')
         # get all modules
         matches = modulestore().get_items(locator)
         self.assertEqual(len(matches), 6)
@@ -471,11 +850,11 @@ class SplitModuleItemTests(SplitModuleTest):
         '''
         get_parent_locations(locator, [block_id], [branch]): [BlockUsageLocator]
         '''
-        locator = BlockUsageLocator(package_id="GreekHero", branch='draft', block_id='chapter1')
+        locator = BlockUsageLocator(package_id="testx.GreekHero", branch='draft', block_id='chapter1')
         parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 1)
         self.assertEqual(parents[0].block_id, 'head12345')
-        self.assertEqual(parents[0].package_id, "GreekHero")
+        self.assertEqual(parents[0].package_id, "testx.GreekHero")
         locator.block_id = 'chapter2'
         parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 1)
@@ -488,7 +867,7 @@ class SplitModuleItemTests(SplitModuleTest):
         """
         Test the existing get_children method on xdescriptors
         """
-        locator = BlockUsageLocator(package_id="GreekHero", block_id="head12345", branch='draft')
+        locator = BlockUsageLocator(package_id="testx.GreekHero", block_id="head12345", branch='draft')
         block = modulestore().get_item(locator)
         children = block.get_children()
         expected_ids = [
@@ -530,9 +909,9 @@ class TestItemCrud(SplitModuleTest):
         create_item(course_or_parent_locator, category, user, definition_locator=None, fields): new_desciptor
         """
         # grab link to course to ensure new versioning works
-        locator = CourseLocator(package_id="GreekHero", branch='draft')
+        locator = CourseLocator(package_id="testx.GreekHero", branch='draft')
         premod_course = modulestore().get_course(locator)
-        premod_time = datetime.datetime.now(UTC) - datetime.timedelta(seconds=1)
+        premod_history = modulestore().get_course_history_info(premod_course.location)
         # add minimal one w/o a parent
         category = 'sequential'
         new_module = modulestore().create_item(
@@ -540,7 +919,7 @@ class TestItemCrud(SplitModuleTest):
             fields={'display_name': 'new sequential'}
         )
         # check that course version changed and course's previous is the other one
-        self.assertEqual(new_module.location.package_id, "GreekHero")
+        self.assertEqual(new_module.location.package_id, "testx.GreekHero")
         self.assertNotEqual(new_module.location.version_guid, premod_course.location.version_guid)
         self.assertIsNone(locator.version_guid, "Version inadvertently filled in")
         current_course = modulestore().get_course(locator)
@@ -548,10 +927,8 @@ class TestItemCrud(SplitModuleTest):
 
         history_info = modulestore().get_course_history_info(current_course.location)
         self.assertEqual(history_info['previous_version'], premod_course.location.version_guid)
-        self.assertEqual(str(history_info['original_version']), self.GUID_D3)
+        self.assertEqual(history_info['original_version'], premod_history['original_version'])
         self.assertEqual(history_info['edited_by'], "user123")
-        self.assertGreaterEqual(history_info['edited_on'], premod_time)
-        self.assertLessEqual(history_info['edited_on'], datetime.datetime.now(UTC))
         # check block's info: category, definition_locator, and display_name
         self.assertEqual(new_module.category, 'sequential')
         self.assertIsNotNone(new_module.definition_locator)
@@ -567,19 +944,22 @@ class TestItemCrud(SplitModuleTest):
         """
         Test create_item w/ specifying the parent of the new item
         """
-        locator = BlockUsageLocator(package_id="wonderful", block_id="head23456", branch='draft')
+        locator = BlockUsageLocator(package_id="testx.GreekHero", branch='draft', block_id='chapter2')
+        original = modulestore().get_item(locator)
+
+        locator = BlockUsageLocator(package_id="testx.wonderful", block_id="head23456", branch='draft')
         premod_course = modulestore().get_course(locator)
         category = 'chapter'
         new_module = modulestore().create_item(
             locator, category, 'user123',
             fields={'display_name': 'new chapter'},
-            definition_locator=DefinitionLocator("cd00000000000000dddd0022")
+            definition_locator=original.definition_locator
         )
         # check that course version changed and course's previous is the other one
         self.assertNotEqual(new_module.location.version_guid, premod_course.location.version_guid)
         parent = modulestore().get_item(locator)
         self.assertIn(new_module.location.block_id, parent.children)
-        self.assertEqual(str(new_module.definition_locator.definition_id), "cd00000000000000dddd0022")
+        self.assertEqual(new_module.definition_locator.definition_id, original.definition_locator.definition_id)
 
     def test_unique_naming(self):
         """
@@ -587,9 +967,11 @@ class TestItemCrud(SplitModuleTest):
         a definition id and new def data that it branches the definition in the db.
         Actually, this tries to test all create_item features not tested above.
         """
-        locator = BlockUsageLocator(package_id="contender", block_id="head345679", branch='draft')
+        locator = BlockUsageLocator(package_id="testx.GreekHero", branch='draft', block_id='problem1')
+        original = modulestore().get_item(locator)
+
+        locator = BlockUsageLocator(package_id="guestx.contender", block_id="head345679", branch='draft')
         category = 'problem'
-        premod_time = datetime.datetime.now(UTC) - datetime.timedelta(seconds=1)
         new_payload = "<problem>empty</problem>"
         new_module = modulestore().create_item(
             locator, category, 'anotheruser',
@@ -599,7 +981,7 @@ class TestItemCrud(SplitModuleTest):
         another_module = modulestore().create_item(
             locator, category, 'anotheruser',
             fields={'display_name': 'problem 2', 'data': another_payload},
-            definition_locator=DefinitionLocator("0d00000040000000dddd0031"),
+            definition_locator=original.definition_locator,
         )
         # check that course version changed and course's previous is the other one
         parent = modulestore().get_item(locator)
@@ -613,17 +995,15 @@ class TestItemCrud(SplitModuleTest):
         self.assertIsNone(new_history['previous_version'])
         self.assertEqual(new_history['original_version'], new_module.definition_locator.definition_id)
         self.assertEqual(new_history['edited_by'], "anotheruser")
-        self.assertLessEqual(new_history['edited_on'], datetime.datetime.now(UTC))
-        self.assertGreaterEqual(new_history['edited_on'], premod_time)
         another_history = modulestore().get_definition_history_info(another_module.definition_locator)
-        self.assertEqual(str(another_history['previous_version']), '0d00000040000000dddd0031')
+        self.assertEqual(another_history['previous_version'], original.definition_locator.definition_id)
 
     def test_encoded_naming(self):
         """
         Check that using odd characters in block id don't break ability to add and retrieve block.
         """
-        parent_locator = BlockUsageLocator(package_id="contender", block_id="head345679", branch='draft')
-        chapter_locator = BlockUsageLocator(package_id="contender", block_id="foo.bar_-~:0", branch='draft')
+        parent_locator = BlockUsageLocator(package_id="guestx.contender", block_id="head345679", branch='draft')
+        chapter_locator = BlockUsageLocator(package_id="guestx.contender", block_id="foo.bar_-~:0", branch='draft')
         modulestore().create_item(
             parent_locator, 'chapter', 'anotheruser',
             block_id=chapter_locator.block_id,
@@ -634,7 +1014,7 @@ class TestItemCrud(SplitModuleTest):
         self.assertEqual(new_module.location.block_id, "foo.bar_-~:0")  # hardcode to ensure BUL init didn't change
         # now try making that a parent of something
         new_payload = "<problem>empty</problem>"
-        problem_locator = BlockUsageLocator(package_id="contender", block_id="prob.bar_-~:99a", branch='draft')
+        problem_locator = BlockUsageLocator(package_id="guestx.contender", block_id="prob.bar_-~:99a", branch='draft')
         modulestore().create_item(
             chapter_locator, 'problem', 'anotheruser',
             block_id=problem_locator.block_id,
@@ -652,7 +1032,7 @@ class TestItemCrud(SplitModuleTest):
         """
         # start transaction w/ simple creation
         user = random.getrandbits(32)
-        new_course = modulestore().create_course('test_org', 'test_transaction', user)
+        new_course = modulestore().create_course('test_org.test_transaction', 'test_org', user)
         new_course_locator = new_course.location.as_course_locator()
         index_history_info = modulestore().get_course_history_info(new_course.location)
         course_block_prev_version = new_course.previous_version
@@ -735,13 +1115,12 @@ class TestItemCrud(SplitModuleTest):
         """
         test updating an items metadata ensuring the definition doesn't version but the course does if it should
         """
-        locator = BlockUsageLocator(package_id="GreekHero", block_id="problem3_2", branch='draft')
+        locator = BlockUsageLocator(package_id="testx.GreekHero", block_id="problem3_2", branch='draft')
         problem = modulestore().get_item(locator)
         pre_def_id = problem.definition_locator.definition_id
         pre_version_guid = problem.location.version_guid
         self.assertIsNotNone(pre_def_id)
         self.assertIsNotNone(pre_version_guid)
-        premod_time = datetime.datetime.now(UTC) - datetime.timedelta(seconds=1)
         self.assertNotEqual(problem.max_attempts, 4, "Invalidates rest of test")
 
         problem.max_attempts = 4
@@ -764,16 +1143,13 @@ class TestItemCrud(SplitModuleTest):
 
         history_info = modulestore().get_course_history_info(current_course.location)
         self.assertEqual(history_info['previous_version'], pre_version_guid)
-        self.assertEqual(str(history_info['original_version']), self.GUID_D3)
         self.assertEqual(history_info['edited_by'], "**replace_user**")
-        self.assertGreaterEqual(history_info['edited_on'], premod_time)
-        self.assertLessEqual(history_info['edited_on'], datetime.datetime.now(UTC))
 
     def test_update_children(self):
         """
         test updating an item's children ensuring the definition doesn't version but the course does if it should
         """
-        locator = BlockUsageLocator(package_id="GreekHero", block_id="chapter3", branch='draft')
+        locator = BlockUsageLocator(package_id="testx.GreekHero", block_id="chapter3", branch='draft')
         block = modulestore().get_item(locator)
         pre_def_id = block.definition_locator.definition_id
         pre_version_guid = block.location.version_guid
@@ -799,7 +1175,7 @@ class TestItemCrud(SplitModuleTest):
         """
         test updating an item's definition: ensure it gets versioned as well as the course getting versioned
         """
-        locator = BlockUsageLocator(package_id="GreekHero", block_id="head12345", branch='draft')
+        locator = BlockUsageLocator(package_id="testx.GreekHero", block_id="head12345", branch='draft')
         block = modulestore().get_item(locator)
         pre_def_id = block.definition_locator.definition_id
         pre_version_guid = block.location.version_guid
@@ -816,8 +1192,10 @@ class TestItemCrud(SplitModuleTest):
         """
         Test updating metadata, children, and definition in a single call ensuring all the versioning occurs
         """
+        locator = BlockUsageLocator(package_id="testx.GreekHero", branch='draft', block_id='problem1')
+        original = modulestore().get_item(locator)
         # first add 2 children to the course for the update to manipulate
-        locator = BlockUsageLocator(package_id="contender", block_id="head345679", branch='draft')
+        locator = BlockUsageLocator(package_id="guestx.contender", block_id="head345679", branch='draft')
         category = 'problem'
         new_payload = "<problem>empty</problem>"
         modulestore().create_item(
@@ -828,7 +1206,7 @@ class TestItemCrud(SplitModuleTest):
         modulestore().create_item(
             locator, category, 'test_update_manifold',
             fields={'display_name': 'problem 2', 'data': another_payload},
-            definition_locator=DefinitionLocator("0d00000040000000dddd0031"),
+            definition_locator=original.definition_locator,
         )
         # pylint: disable=W0212
         modulestore()._clear_cache()
@@ -884,6 +1262,9 @@ class TestItemCrud(SplitModuleTest):
         # check subtree
 
         def check_subtree(node):
+            """
+            Check contents of subtree recursively
+            """
             if node:
                 node_loc = node.location
                 self.assertFalse(modulestore().has_item(reusable_location.package_id,
@@ -901,7 +1282,10 @@ class TestItemCrud(SplitModuleTest):
         check_subtree(nodes[0])
 
     def create_course_for_deletion(self):
-        course = modulestore().create_course('nihilx', 'deletion', 'deleting_user')
+        """
+        Create a course we can delete
+        """
+        course = modulestore().create_course('nihilx.deletion', 'nihilx', 'deleting_user')
         root = BlockUsageLocator(
             package_id=course.location.package_id,
             block_id=course.location.block_id,
@@ -911,6 +1295,9 @@ class TestItemCrud(SplitModuleTest):
         return modulestore().get_item(root)
 
     def create_subtree_for_deletion(self, parent, category_queue):
+        """
+        Create a subtree in the tb deleted course
+        """
         if not category_queue:
             return
         node = modulestore().create_item(parent, category_queue[0], 'deleting_user')
@@ -921,29 +1308,23 @@ class TestItemCrud(SplitModuleTest):
 
 class TestCourseCreation(SplitModuleTest):
     """
-    Test create_course, duh :-)
+    Test create_course
     """
     def test_simple_creation(self):
         """
         The simplest case but probing all expected results from it.
         """
         # Oddly getting differences of 200nsec
-        pre_time = datetime.datetime.now(UTC) - datetime.timedelta(milliseconds=1)
-        new_course = modulestore().create_course('test_org', 'test_course', 'create_user')
+        new_course = modulestore().create_course('test_org.test_course', 'test_org', 'create_user')
         new_locator = new_course.location
         # check index entry
         index_info = modulestore().get_course_index_info(new_locator)
         self.assertEqual(index_info['org'], 'test_org')
-        self.assertEqual(index_info['prettyid'], 'test_course')
-        self.assertGreaterEqual(index_info["edited_on"], pre_time)
-        self.assertLessEqual(index_info["edited_on"], datetime.datetime.now(UTC))
         self.assertEqual(index_info['edited_by'], 'create_user')
         # check structure info
         structure_info = modulestore().get_course_history_info(new_locator)
         self.assertEqual(structure_info['original_version'], index_info['versions']['draft'])
         self.assertIsNone(structure_info['previous_version'])
-        self.assertGreaterEqual(structure_info["edited_on"], pre_time)
-        self.assertLessEqual(structure_info["edited_on"], datetime.datetime.now(UTC))
         self.assertEqual(structure_info['edited_by'], 'create_user')
         # check the returned course object
         self.assertIsInstance(new_course, CourseDescriptor)
@@ -959,28 +1340,23 @@ class TestCourseCreation(SplitModuleTest):
         """
         Test making a course which points to an existing draft and published but not making any changes to either.
         """
-        pre_time = datetime.datetime.now(UTC)
-        original_locator = CourseLocator(package_id="wonderful", branch='draft')
+        original_locator = CourseLocator(package_id="testx.wonderful", branch='draft')
         original_index = modulestore().get_course_index_info(original_locator)
         new_draft = modulestore().create_course(
-            'leech', 'best_course', 'leech_master', id_root='best',
+            'best', 'leech', 'leech_master',
             versions_dict=original_index['versions'])
         new_draft_locator = new_draft.location
-        self.assertRegexpMatches(new_draft_locator.package_id, r'best.*')
+        self.assertRegexpMatches(new_draft_locator.package_id, 'best')
         # the edited_by and other meta fields on the new course will be the original author not this one
         self.assertEqual(new_draft.edited_by, 'test@edx.org')
-        self.assertLess(new_draft.edited_on, pre_time)
-        self.assertEqual(new_draft.location.version_guid, original_index['versions']['draft'])
+        self.assertEqual(new_draft_locator.version_guid, original_index['versions']['draft'])
         # however the edited_by and other meta fields on course_index will be this one
         new_index = modulestore().get_course_index_info(new_draft_locator)
-        self.assertGreaterEqual(new_index["edited_on"], pre_time)
-        self.assertLessEqual(new_index["edited_on"], datetime.datetime.now(UTC))
         self.assertEqual(new_index['edited_by'], 'leech_master')
 
         new_published_locator = CourseLocator(package_id=new_draft_locator.package_id, branch='published')
         new_published = modulestore().get_course(new_published_locator)
         self.assertEqual(new_published.edited_by, 'test@edx.org')
-        self.assertLess(new_published.edited_on, pre_time)
         self.assertEqual(new_published.location.version_guid, original_index['versions']['published'])
 
         # changing this course will not change the original course
@@ -994,12 +1370,9 @@ class TestCourseCreation(SplitModuleTest):
         self.assertNotEqual(new_index['versions']['draft'], original_index['versions']['draft'])
         new_draft = modulestore().get_course(new_draft_locator)
         self.assertEqual(new_item.edited_by, 'leech_master')
-        self.assertGreaterEqual(new_item.edited_on, pre_time)
         self.assertNotEqual(new_item.location.version_guid, original_index['versions']['draft'])
         self.assertNotEqual(new_draft.location.version_guid, original_index['versions']['draft'])
         structure_info = modulestore().get_course_history_info(new_draft_locator)
-        self.assertGreaterEqual(structure_info["edited_on"], pre_time)
-        self.assertLessEqual(structure_info["edited_on"], datetime.datetime.now(UTC))
         self.assertEqual(structure_info['edited_by'], 'leech_master')
 
         original_course = modulestore().get_course(original_locator)
@@ -1015,33 +1388,34 @@ class TestCourseCreation(SplitModuleTest):
         """
         Create a new course which overrides metadata and course_data
         """
-        pre_time = datetime.datetime.now(UTC)
-        original_locator = CourseLocator(package_id="contender", branch='draft')
+        original_locator = CourseLocator(package_id="guestx.contender", branch='draft')
         original = modulestore().get_course(original_locator)
         original_index = modulestore().get_course_index_info(original_locator)
         fields = {}
         for field in original.fields.values():
+            value = getattr(original, field.name)
+            if not isinstance(value, datetime.datetime):
+                json_value = field.to_json(value)
+            else:
+                json_value = value
             if field.scope == Scope.content and field.name != 'location':
-                fields[field.name] = getattr(original, field.name)
+                fields[field.name] = json_value
             elif field.scope == Scope.settings:
-                fields[field.name] = getattr(original, field.name)
+                fields[field.name] = json_value
         fields['grading_policy']['GRADE_CUTOFFS'] = {'A': .9, 'B': .8, 'C': .65}
         fields['display_name'] = 'Derivative'
         new_draft = modulestore().create_course(
-            'leech', 'derivative', 'leech_master', id_root='counter',
+            'counter', 'leech', 'leech_master',
             versions_dict={'draft': original_index['versions']['draft']},
             fields=fields
         )
         new_draft_locator = new_draft.location
-        self.assertRegexpMatches(new_draft_locator.package_id, r'counter.*')
+        self.assertRegexpMatches(new_draft_locator.package_id, 'counter')
         # the edited_by and other meta fields on the new course will be the original author not this one
         self.assertEqual(new_draft.edited_by, 'leech_master')
-        self.assertGreaterEqual(new_draft.edited_on, pre_time)
-        self.assertNotEqual(new_draft.location.version_guid, original_index['versions']['draft'])
+        self.assertNotEqual(new_draft_locator.version_guid, original_index['versions']['draft'])
         # however the edited_by and other meta fields on course_index will be this one
         new_index = modulestore().get_course_index_info(new_draft_locator)
-        self.assertGreaterEqual(new_index["edited_on"], pre_time)
-        self.assertLessEqual(new_index["edited_on"], datetime.datetime.now(UTC))
         self.assertEqual(new_index['edited_by'], 'leech_master')
         self.assertEqual(new_draft.display_name, fields['display_name'])
         self.assertDictEqual(
@@ -1053,7 +1427,7 @@ class TestCourseCreation(SplitModuleTest):
         """
         Test changing the org, pretty id, etc of a course. Test that it doesn't allow changing the id, etc.
         """
-        locator = CourseLocator(package_id="GreekHero", branch='draft')
+        locator = CourseLocator(package_id="testx.GreekHero", branch='draft')
         course_info = modulestore().get_course_index_info(locator)
         course_info['org'] = 'funkyU'
         modulestore().update_course_index(course_info)
@@ -1061,24 +1435,23 @@ class TestCourseCreation(SplitModuleTest):
         self.assertEqual(course_info['org'], 'funkyU')
 
         course_info['org'] = 'moreFunky'
-        course_info['prettyid'] = 'Ancient Greek Demagods'
         modulestore().update_course_index(course_info)
         course_info = modulestore().get_course_index_info(locator)
         self.assertEqual(course_info['org'], 'moreFunky')
-        self.assertEqual(course_info['prettyid'], 'Ancient Greek Demagods')
 
         # an allowed but not necessarily recommended way to revert the draft version
+        head_course = modulestore().get_course(locator)
         versions = course_info['versions']
-        versions['draft'] = self.GUID_D1
+        versions['draft'] = head_course.previous_version
         modulestore().update_course_index(course_info)
         course = modulestore().get_course(locator)
-        self.assertEqual(str(course.location.version_guid), self.GUID_D1)
+        self.assertEqual(course.location.version_guid, versions['draft'])
 
         # an allowed but not recommended way to publish a course
-        versions['published'] = self.GUID_D1
+        versions['published'] = versions['draft']
         modulestore().update_course_index(course_info)
         course = modulestore().get_course(CourseLocator(package_id=locator.package_id, branch="published"))
-        self.assertEqual(str(course.location.version_guid), self.GUID_D1)
+        self.assertEqual(course.location.version_guid, versions['draft'])
 
     def test_create_with_root(self):
         """
@@ -1086,7 +1459,7 @@ class TestCourseCreation(SplitModuleTest):
         """
         user = random.getrandbits(32)
         new_course = modulestore().create_course(
-            'test_org', 'test_transaction', user,
+            'test_org.test_transaction', 'test_org', user,
             root_block_id='top', root_category='chapter'
         )
         self.assertEqual(new_course.location.block_id, 'top')
@@ -1100,6 +1473,14 @@ class TestCourseCreation(SplitModuleTest):
         self.assertIn('top', db_structure['blocks'])
         self.assertEqual(db_structure['blocks']['top']['category'], 'chapter')
 
+    def test_create_id_dupe(self):
+        """
+        Test create_course rejects duplicate id
+        """
+        user = random.getrandbits(32)
+        courses = modulestore().get_courses()
+        with self.assertRaises(DuplicateCourseError):
+            modulestore().create_course(courses[0].location.package_id, 'org', 'pretty', user)
 
 
 class TestInheritance(SplitModuleTest):
@@ -1112,11 +1493,11 @@ class TestInheritance(SplitModuleTest):
         """
         # Note, not testing value where defined (course) b/c there's no
         # defined accessor for it on CourseDescriptor.
-        locator = BlockUsageLocator(package_id="GreekHero", block_id="problem3_2", branch='draft')
+        locator = BlockUsageLocator(package_id="testx.GreekHero", block_id="problem3_2", branch='draft')
         node = modulestore().get_item(locator)
         # inherited
         self.assertEqual(node.graceperiod, datetime.timedelta(hours=2))
-        locator = BlockUsageLocator(package_id="GreekHero", block_id="problem1", branch='draft')
+        locator = BlockUsageLocator(package_id="testx.GreekHero", block_id="problem1", branch='draft')
         node = modulestore().get_item(locator)
         # overridden
         self.assertEqual(node.graceperiod, datetime.timedelta(hours=4))
@@ -1131,14 +1512,14 @@ class TestPublish(SplitModuleTest):
         self.user = random.getrandbits(32)
 
     def tearDown(self):
-        SplitModuleTest.tearDownClass()
+        SplitModuleTest.tearDown(self)
 
     def test_publish_safe(self):
         """
         Test the standard patterns: publish to new branch, revise and publish
         """
-        source_course = CourseLocator(package_id="GreekHero", branch='draft')
-        dest_course = CourseLocator(package_id="GreekHero", branch="published")
+        source_course = CourseLocator(package_id="testx.GreekHero", branch='draft')
+        dest_course = CourseLocator(package_id="testx.GreekHero", branch="published")
         modulestore().xblock_publish(self.user, source_course, dest_course, ["head12345"], ["chapter2", "chapter3"])
         expected = ["head12345", "chapter1"]
         self._check_course(
@@ -1146,19 +1527,19 @@ class TestPublish(SplitModuleTest):
         )
         # add a child under chapter1
         new_module = modulestore().create_item(
-            self._usage(source_course, "chapter1"), "sequential", self.user,
+            BlockUsageLocator.make_relative(source_course, "chapter1"), "sequential", self.user,
             fields={'display_name': 'new sequential'},
         )
         # remove chapter1 from expected b/c its pub'd version != the source anymore since source changed
         expected.remove("chapter1")
         # check that it's not in published course
         with self.assertRaises(ItemNotFoundError):
-            modulestore().get_item(self._usage(dest_course, new_module.location.block_id))
+            modulestore().get_item(BlockUsageLocator.make_relative(dest_course, new_module.location.block_id))
         # publish it
         modulestore().xblock_publish(self.user, source_course, dest_course, [new_module.location.block_id], None)
         expected.append(new_module.location.block_id)
         # check that it is in the published course and that its parent is the chapter
-        pub_module = modulestore().get_item(self._usage(dest_course, new_module.location.block_id))
+        pub_module = modulestore().get_item(BlockUsageLocator.make_relative(dest_course, new_module.location.block_id))
         self.assertEqual(
             modulestore().get_parent_locations(pub_module.location)[0].block_id, "chapter1"
         )
@@ -1170,7 +1551,7 @@ class TestPublish(SplitModuleTest):
         modulestore().xblock_publish(self.user, source_course, dest_course, [new_module.location.block_id], None)
         expected.append(new_module.location.block_id)
         # check that it is in the published course (no error means it worked)
-        pub_module = modulestore().get_item(self._usage(dest_course, new_module.location.block_id))
+        pub_module = modulestore().get_item(BlockUsageLocator.make_relative(dest_course, new_module.location.block_id))
         self._check_course(
             source_course, dest_course, expected, ["chapter2", "chapter3", "problem1", "problem3_2"]
         )
@@ -1179,13 +1560,13 @@ class TestPublish(SplitModuleTest):
         """
         Test the exceptions which preclude successful publication
         """
-        source_course = CourseLocator(package_id="GreekHero", branch='draft')
+        source_course = CourseLocator(package_id="testx.GreekHero", branch='draft')
         # destination does not exist
         destination_course = CourseLocator(package_id="Unknown", branch="published")
         with self.assertRaises(ItemNotFoundError):
             modulestore().xblock_publish(self.user, source_course, destination_course, ["chapter3"], None)
         # publishing into a new branch w/o publishing the root
-        destination_course = CourseLocator(package_id="GreekHero", branch="published")
+        destination_course = CourseLocator(package_id="testx.GreekHero", branch="published")
         with self.assertRaises(ItemNotFoundError):
             modulestore().xblock_publish(self.user, source_course, destination_course, ["chapter3"], None)
         # publishing a subdag w/o the parent already in course
@@ -1197,17 +1578,17 @@ class TestPublish(SplitModuleTest):
         """
         Test publishing moves and deletes.
         """
-        source_course = CourseLocator(package_id="GreekHero", branch='draft')
-        dest_course = CourseLocator(package_id="GreekHero", branch="published")
+        source_course = CourseLocator(package_id="testx.GreekHero", branch='draft')
+        dest_course = CourseLocator(package_id="testx.GreekHero", branch="published")
         modulestore().xblock_publish(self.user, source_course, dest_course, ["head12345"], ["chapter2"])
         expected = ["head12345", "chapter1", "chapter3", "problem1", "problem3_2"]
         self._check_course(source_course, dest_course, expected, ["chapter2"])
         # now move problem1 and delete problem3_2
-        chapter1 = modulestore().get_item(self._usage(source_course, "chapter1"))
-        chapter3 = modulestore().get_item(self._usage(source_course, "chapter3"))
+        chapter1 = modulestore().get_item(BlockUsageLocator.make_relative(source_course, "chapter1"))
+        chapter3 = modulestore().get_item(BlockUsageLocator.make_relative(source_course, "chapter3"))
         chapter1.children.append("problem1")
         chapter3.children.remove("problem1")
-        modulestore().delete_item(self._usage(source_course, "problem3_2"), self.user)
+        modulestore().delete_item(BlockUsageLocator.make_relative(source_course, "problem3_2"), self.user)
         modulestore().xblock_publish(self.user, source_course, dest_course, ["head12345"], ["chapter2"])
         expected = ["head12345", "chapter1", "chapter3", "problem1"]
         self._check_course(source_course, dest_course, expected, ["chapter2", "problem3_2"])
@@ -1216,13 +1597,18 @@ class TestPublish(SplitModuleTest):
         """
         Check that the course has the expected blocks and does not have the unexpected blocks
         """
+        history_info = modulestore().get_course_history_info(dest_course_loc)
+        self.assertEqual(history_info['edited_by'], self.user)
         for expected in expected_blocks:
-            source = modulestore().get_item(self._usage(source_course_loc, expected))
-            pub_copy = modulestore().get_item(self._usage(dest_course_loc, expected))
+            source = modulestore().get_item(BlockUsageLocator.make_relative(source_course_loc, expected))
+            pub_copy = modulestore().get_item(BlockUsageLocator.make_relative(dest_course_loc, expected))
             # everything except previous_version & children should be the same
             self.assertEqual(source.category, pub_copy.category)
             self.assertEqual(source.update_version, pub_copy.update_version)
-            self.assertEqual(self.user, pub_copy.edited_by)
+            self.assertEqual(
+                self.user, pub_copy.edited_by,
+                "{} edited_by {} not {}".format(pub_copy.location, pub_copy.edited_by, self.user)
+            )
             for field in source.fields.values():
                 if field.name == 'children':
                     self._compare_children(field.read_from(source), field.read_from(pub_copy), unexpected_blocks)
@@ -1230,13 +1616,7 @@ class TestPublish(SplitModuleTest):
                     self.assertEqual(field.read_from(source), field.read_from(pub_copy))
         for unexp in unexpected_blocks:
             with self.assertRaises(ItemNotFoundError):
-                modulestore().get_item(self._usage(dest_course_loc, unexp))
-
-    def _usage(self, course_loc, block_id):
-        """
-        Generate a BlockUsageLocator for the combo of the course location and block id
-        """
-        return BlockUsageLocator(package_id=course_loc.package_id, branch=course_loc.branch, block_id=block_id)
+                modulestore().get_item(BlockUsageLocator.make_relative(dest_course_loc, unexp))
 
     def _compare_children(self, source_children, dest_children, unexpected):
         """
@@ -1251,17 +1631,40 @@ class TestPublish(SplitModuleTest):
                 dest_cursor += 1
         self.assertEqual(dest_cursor, len(dest_children))
 
+class TestSchema(SplitModuleTest):
+    """
+    Test the db schema (and possibly eventually migrations?)
+    """
+    def test_schema(self):
+        """
+        Test that the schema is set in each document
+        """
+        db_connection = modulestore().db_connection
+        for collection in [db_connection.course_index, db_connection.structures, db_connection.definitions]:
+            self.assertEqual(
+                collection.find({'schema_version': {'$exists': False}}).count(),
+                0,
+                "{0.name} has records without schema_version".format(collection)
+            )
+            self.assertEqual(
+                collection.find({'schema_version': {'$ne': SplitMongoModuleStore.SCHEMA_VERSION}}).count(),
+                0,
+                "{0.name} has records with wrong schema_version".format(collection)
+            )
 
 #===========================================
-# This mocks the django.modulestore() function and is intended purely to disentangle
-# the tests from django
 def modulestore():
+    """
+    Mock the django dependent global modulestore function to disentangle tests from django
+    """
     def load_function(engine_path):
+        """
+        Load the given engine
+        """
         module_path, _, name = engine_path.rpartition('.')
         return getattr(import_module(module_path), name)
 
     if SplitModuleTest.modulestore is None:
-        SplitModuleTest.bootstrapDB()
         class_ = load_function(SplitModuleTest.MODULESTORE['ENGINE'])
 
         options = {}
@@ -1274,6 +1677,8 @@ def modulestore():
             SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG'],
             **options
         )
+
+        SplitModuleTest.bootstrapDB()
 
     return SplitModuleTest.modulestore
 

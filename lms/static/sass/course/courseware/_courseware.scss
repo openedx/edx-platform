@@ -11,7 +11,36 @@ html.video-fullscreen{
   }
 }
 
+.wrap-instructor-info {
+  margin: ($baseline/2) ($baseline/4) 0 0;
+  overflow: hidden;
+  
+  &.studio-view {
+    position: relative;
+    top: -($baseline/2);
+    margin: 0;
+  }
+
+  .instructor-info-action {
+    @extend %t-copy-sub2;
+    float: right;
+    margin-left: ($baseline/2);
+    padding: ($baseline/4) ($baseline/2);
+    border-radius: ($baseline/4);
+    background-color: $shadow-l2;
+    text-align: right;
+    text-transform: uppercase;
+    color: $lighter-base-font-color;
+
+    &:hover {
+      background-color: $link-hover;
+      color: $white;
+    }
+  }
+}
+
 div.course-wrapper {
+  position: relative;
 
   section.course-content {
     @extend .content;
@@ -230,12 +259,6 @@ div.course-wrapper {
   margin-bottom: 30px;
 
 
-}
-
-.xblock {
-  &:focus {
-    outline: 0;
-  }
 }
 
 textarea.short-form-response {

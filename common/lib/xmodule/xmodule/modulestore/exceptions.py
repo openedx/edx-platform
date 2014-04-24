@@ -46,3 +46,16 @@ class VersionConflictError(Exception):
         super(VersionConflictError, self).__init__()
         self.requestedLocation = requestedLocation
         self.currentHeadVersionGuid = currentHeadVersionGuid
+
+
+class DuplicateCourseError(Exception):
+    """
+    An attempt to create a course whose id duplicates an existing course's
+    """
+    def __init__(self, course_id, existing_entry):
+        """
+        existing_entry will have the who, when, and other properties of the existing entry
+        """
+        super(DuplicateCourseError, self).__init__()
+        self.course_id = course_id
+        self.existing_entry = existing_entry

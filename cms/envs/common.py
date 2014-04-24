@@ -28,7 +28,7 @@ import imp
 import sys
 import lms.envs.common
 from lms.envs.common import (
-    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES
+    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED
 )
 from path import path
 
@@ -43,7 +43,11 @@ FEATURES = {
 
     'GITHUB_PUSH': False,
 
-    'ENABLE_DISCUSSION_SERVICE': False,
+    # for consistency in user-experience, keep the value of the following 3 settings
+    # in sync with the ones in lms/envs/common.py
+    'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_TEXTBOOK': True,
+    'ENABLE_STUDENT_NOTES': True,
 
     'AUTH_USE_CERTIFICATES': False,
 
@@ -86,6 +90,21 @@ FEATURES = {
 
     # Turn on/off Microsites feature
     'USE_MICROSITES': False,
+
+    # Allow creating courses with non-ascii characters in the course id
+    'ALLOW_UNICODE_COURSE_ID': False,
+
+    # Prevent concurrent logins per user
+    'PREVENT_CONCURRENT_LOGINS': False,
+
+    # Turn off Advanced Security by default
+    'ADVANCED_SECURITY': False,
+
+    # Temporary feature flag for duplicating xblock leaves
+    'ENABLE_DUPLICATE_XBLOCK_LEAF_COMPONENT': False,
+
+    # Temporary feature flag for deleting xblock leaves
+    'ENABLE_DELETE_XBLOCK_LEAF_COMPONENT': False,
 }
 ENABLE_JASMINE = False
 
@@ -231,10 +250,6 @@ XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin, XModuleMixin)
 # xblocks can be added via advanced settings
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
-############################ SIGNAL HANDLERS ################################
-# This is imported to register the exception signal handling that logs exceptions
-import monitoring.exceptions  # noqa
-
 ############################ DJANGO_BUILTINS ################################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
 DEBUG = False
@@ -304,9 +319,23 @@ PIPELINE_CSS = {
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
             'js/vendor/markitup/skins/simple/style.css',
-            'js/vendor/markitup/sets/wiki/style.css',
+            'js/vendor/markitup/sets/wiki/style.css'
         ],
         'output_filename': 'css/cms-style-vendor.css',
+    },
+    'style-vendor-tinymce-content': {
+        'source_filenames': [
+            'css/tinymce-studio-content-fonts.css',
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
+            'css/tinymce-studio-content.css'
+        ],
+        'output_filename': 'css/cms-style-vendor-tinymce-content.css',
+    },
+    'style-vendor-tinymce-skin': {
+        'source_filenames': [
+            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
+        ],
+        'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
     'style-app': {
         'source_filenames': [
@@ -420,9 +449,23 @@ CELERY_QUEUES = {
 
 ############################## Video ##########################################
 
-# URL to test YouTube availability
-YOUTUBE_TEST_URL = 'https://gdata.youtube.com/feeds/api/videos/'
+YOUTUBE = {
+    # YouTube JavaScript API
+    'API': 'www.youtube.com/iframe_api',
 
+    # URL to test YouTube availability
+    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+
+    # Current youtube api for requesting transcripts.
+    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
+    'TEXT_API': {
+        'url': 'video.google.com/timedtext',
+        'params': {
+            'lang': 'en',
+            'v': 'set_youtube_id_of_11_symbols_here',
+        },
+    },
+}
 
 ############################ APPS #####################################
 
@@ -485,6 +528,9 @@ INSTALLED_APPS = (
     'django_openid_auth',
 
     'embargo',
+
+    # Monitoring signals
+    'monitoring',
 )
 
 
@@ -524,14 +570,6 @@ PASSWORD_DICTIONARY = []
 TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
 TRACKING_ENABLED = True
 
-# Current youtube api for requesting transcripts.
-# for example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
-YOUTUBE_API = {
-    'url': "http://video.google.com/timedtext",
-    'params': {'lang': 'en', 'v': 'set_youtube_id_of_11_symbols_here'}
-}
-
-
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
@@ -542,7 +580,15 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 OPTIONAL_APPS = (
     'edx_jsdraw',
     'mentoring',
+
+    # edx-ora2
+    'submissions',
+    'openassessment',
+    'openassessment.assessment',
+    'openassessment.workflow',
+    'openassessment.xblock'
 )
+
 
 for app_name in OPTIONAL_APPS:
     # First attempt to only find the module rather than actually importing it,
@@ -556,3 +602,7 @@ for app_name in OPTIONAL_APPS:
         except ImportError:
             continue
     INSTALLED_APPS += (app_name,)
+
+### ADVANCED_SECURITY_CONFIG
+# Empty by default
+ADVANCED_SECURITY_CONFIG = {}

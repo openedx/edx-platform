@@ -24,6 +24,7 @@ from i18n.config import BASE_DIR, CONFIGURATION
 from i18n.execute import execute
 
 LOG = logging.getLogger(__name__)
+DEVNULL = open(os.devnull, "wb")
 
 
 def merge(locale, target='django.po', sources=('django-partial.po',), fail_if_missing=True):
@@ -45,7 +46,7 @@ def merge(locale, target='django.po', sources=('django-partial.po',), fail_if_mi
     except Exception, e:
         if not fail_if_missing:
             return
-        raise e
+        raise
 
     for sourse in sources:
         clean_cmd = 'msgattrib --no-obsolete --force-po -o clean-' + sourse + ' ' + sourse
@@ -116,23 +117,31 @@ def validate_files(dir, files_to_merge):
             raise Exception("I18N: Cannot generate because file not found: {0}".format(pathname))
 
 
-def main(argv=None):
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-
-    parser = argparse.ArgumentParser(description="Generate merged and compiled message files.")
-    parser.add_argument("--strict", action='store_true', help="Complain about missing files.")
-
-    args = parser.parse_args(argv or [])
-
+def main(strict=True, verbosity=1):
+    """
+    Main entry point for script
+    """
     for locale in CONFIGURATION.translated_locales:
-        merge_files(locale, fail_if_missing=args.strict)
+        merge_files(locale, fail_if_missing=strict)
     # Dummy text is not required. Don't raise exception if files are missing.
     for locale in CONFIGURATION.dummy_locales:
         merge_files(locale, fail_if_missing=False)
 
-    compile_cmd = 'django-admin.py compilemessages'
-    execute(compile_cmd, working_directory=BASE_DIR)
+    compile_cmd = 'django-admin.py compilemessages -v{}'.format(verbosity)
+    if verbosity:
+        stderr = None
+    else:
+        stderr = DEVNULL
+    execute(compile_cmd, working_directory=BASE_DIR, stderr=stderr)
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
+    # pylint: disable=invalid-name
+    parser = argparse.ArgumentParser(description="Generate merged and compiled message files.")
+    parser.add_argument("--strict", action='store_true', help="Complain about missing files.")
+    parser.add_argument("--verbose", "-v", action="count", default=0)
+    args = parser.parse_args()
+
+    main(strict=args.strict, verbosity=args.verbose)

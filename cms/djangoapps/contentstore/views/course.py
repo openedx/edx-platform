@@ -22,6 +22,7 @@ from edxmako.shortcuts import render_to_response
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
+from xmodule.tabs import PDFTextbookTabs
 
 from xmodule.modulestore.exceptions import (
     ItemNotFoundError, InvalidLocationError)
@@ -36,9 +37,9 @@ from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
+from util.string_utils import _has_non_ascii_characters
 
 from .access import has_course_access
-from .tabs import initialize_course_tabs
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES, NOTE_COMPONENT_TYPES,
     ADVANCED_COMPONENT_POLICY_KEY)
@@ -72,7 +73,11 @@ def _get_locator_and_course(package_id, branch, version_guid, block_id, user, de
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block_id)
     if not has_course_access(user, locator):
         raise PermissionDenied()
+
     course_location = loc_mapper().translate_locator_to_location(locator)
+    if course_location is None:
+        raise PermissionDenied()
+
     course_module = modulestore().get_item(course_location, depth=depth)
     return locator, course_module
 
@@ -97,7 +102,7 @@ def course_handler(request, tag=None, package_id=None, branch=None, version_guid
         index entry.
     PUT
         json: update this course (index entry not xblock) such as repointing head, changing display name, org,
-        package_id, prettyid. Return same json as above.
+        package_id. Return same json as above.
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
@@ -215,6 +220,9 @@ def _accessible_courses_list_from_groups(request):
             raise ItemNotFoundError(course_id)
 
         course = modulestore('direct').get_course(course_location.course_id)
+        if course is None:
+            raise ItemNotFoundError(course_id)
+
         courses_list.append(course)
 
     return courses_list
@@ -266,6 +274,7 @@ def course_listing(request):
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
     })
 
 
@@ -312,6 +321,14 @@ def create_new_course(request):
     number = request.json.get('number')
     display_name = request.json.get('display_name')
     run = request.json.get('run')
+
+    # allow/disable unicode characters in course_id according to settings
+    if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
+        if _has_non_ascii_characters(org) or _has_non_ascii_characters(number) or _has_non_ascii_characters(run):
+            return JsonResponse(
+                {'error': _('Special characters not allowed in organization, course number, and course run.')},
+                status=400
+            )
 
     try:
         dest_location = Location(u'i4x', org, number, u'course', run)
@@ -379,7 +396,7 @@ def create_new_course(request):
 
     # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for existing xml courses this
     # cannot be changed in CourseDescriptor.
-    wiki_slug = "{0}.{1}.{2}".format(dest_location.org, dest_location.course, dest_location.name)
+    wiki_slug = u"{0}.{1}.{2}".format(dest_location.org, dest_location.course, dest_location.name)
     definition_data = {'wiki_slug': wiki_slug}
 
     modulestore('direct').create_and_save_xmodule(
@@ -400,8 +417,6 @@ def create_new_course(request):
         system=new_course.system,
         definition_data=overview_template.get('data')
     )
-
-    initialize_course_tabs(new_course, request.user)
 
     new_location = loc_mapper().translate_location(new_course.location.course_id, new_course.location, False, True)
     # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
@@ -647,8 +662,7 @@ def _config_course_advanced_components(request, course_module):
             'open_ended': OPEN_ENDED_COMPONENT_TYPES,
             'notes': NOTE_COMPONENT_TYPES,
         }
-        # Check to see if the user instantiated any notes or open ended
-        # components
+        # Check to see if the user instantiated any notes or open ended components
         for tab_type in tab_component_map.keys():
             component_types = tab_component_map.get(tab_type)
             found_ac_type = False
@@ -831,8 +845,8 @@ def textbooks_list_handler(request, tag=None, package_id=None, branch=None, vers
                 textbook["id"] = tid
                 tids.add(tid)
 
-        if not any(tab['type'] == 'pdf_textbooks' for tab in course.tabs):
-            course.tabs.append({"type": "pdf_textbooks"})
+        if not any(tab['type'] == PDFTextbookTabs.type for tab in course.tabs):
+            course.tabs.append(PDFTextbookTabs())
         course.pdf_textbooks = textbooks
         store.update_item(course, request.user.id)
         return JsonResponse(course.pdf_textbooks)
@@ -848,10 +862,8 @@ def textbooks_list_handler(request, tag=None, package_id=None, branch=None, vers
         existing = course.pdf_textbooks
         existing.append(textbook)
         course.pdf_textbooks = existing
-        if not any(tab['type'] == 'pdf_textbooks' for tab in course.tabs):
-            tabs = course.tabs
-            tabs.append({"type": "pdf_textbooks"})
-            course.tabs = tabs
+        if not any(tab['type'] == PDFTextbookTabs.type for tab in course.tabs):
+            course.tabs.append(PDFTextbookTabs())
         store.update_item(course, request.user.id)
         resp = JsonResponse(textbook, status=201)
         resp["Location"] = locator.url_reverse('textbooks', textbook["id"])
@@ -909,9 +921,9 @@ def textbooks_detail_handler(request, tid, tag=None, package_id=None, branch=Non
         if not textbook:
             return JsonResponse(status=404)
         i = course.pdf_textbooks.index(textbook)
-        new_textbooks = course.pdf_textbooks[0:i]
-        new_textbooks.extend(course.pdf_textbooks[i + 1:])
-        course.pdf_textbooks = new_textbooks
+        remaining_textbooks = course.pdf_textbooks[0:i]
+        remaining_textbooks.extend(course.pdf_textbooks[i + 1:])
+        course.pdf_textbooks = remaining_textbooks
         store.update_item(course, request.user.id)
         return JsonResponse()
 

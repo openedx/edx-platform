@@ -8,9 +8,8 @@
 
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
-git+https://github.com/smartdec/pytils.git
-bleach==1.2.2
-html5lib==0.95
+bleach==1.4
+html5lib==0.999
 boto==2.13.3
 celery==3.0.19
 dealer==0.2.3
@@ -57,7 +56,7 @@ pycrypto>=2.6
 pygments==1.6
 pygraphviz==1.1
 pymongo==2.4.1
-pyparsing==1.5.6
+pyparsing==2.0.1
 python-memcached==1.48
 python-openid==2.2.5
 python-dateutil==2.1
@@ -77,15 +76,12 @@ xmltodict==0.4.1
 django-ratelimit-backend==0.6
 unicodecsv==0.9.4
 
-# Used for debugging
-ipython==0.13.1
-
 # Used for development operation
-watchdog==0.6.0
+watchdog==0.7.1
 
 # Metrics gathering and monitoring
 dogapi==1.2.1
-newrelic==2.4.0.4
+newrelic==2.18.1.15
 
 # Used for documentation gathering
 sphinx==1.1.3
@@ -110,7 +106,7 @@ chrono==1.0.2
 coverage==3.7
 ddt==0.7.1
 django-crum==0.5
-django_nose==1.1
+django_nose==1.2
 factory_boy==2.2.1
 freezegun==0.1.11
 mock==1.0.1
@@ -121,12 +117,13 @@ pep8==1.4.5
 pylint==0.28
 python-subunit==0.0.16
 rednose==0.3
-selenium==2.34.0
+selenium==2.39.0
 splinter==0.5.4
 testtools==0.9.34
 
 git+https://github.com/mfogel/django-settings-context-processor.git
 git+https://github.com/brosner/django-announcements.git
+git+https://github.com/smartdec/pytils.git
 
 # django-cas version 2.0.3 with patch to be compatible with django 1.4
 git+https://github.com/mitocw/django-cas.git

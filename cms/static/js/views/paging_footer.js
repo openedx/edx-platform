@@ -1,6 +1,6 @@
-define(["backbone", "underscore"], function(Backbone, _) {
+define(["underscore", "js/views/baseview"], function(_, BaseView) {
 
-    var PagingFooter = Backbone.View.extend({
+    var PagingFooter = BaseView.extend({
         events : {
             "click .next-page-link": "nextPage",
             "click .previous-page-link": "previousPage",
@@ -11,7 +11,7 @@ define(["backbone", "underscore"], function(Backbone, _) {
             var view = options.view,
                 collection = view.collection;
             this.view = view;
-            this.template = _.template($("#paging-footer-tpl").text());
+            this.template = this.loadTemplate('paging-footer');
             collection.bind('add', _.bind(this.render, this));
             collection.bind('remove', _.bind(this.render, this));
             collection.bind('reset', _.bind(this.render, this));

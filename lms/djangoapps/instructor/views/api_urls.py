@@ -11,6 +11,8 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.list_course_role_members', name="list_course_role_members"),
     url(r'^modify_access$',
         'instructor.views.api.modify_access', name="modify_access"),
+    url(r'^bulk_beta_modify_access$',
+        'instructor.views.api.bulk_beta_modify_access', name="bulk_beta_modify_access"),
     url(r'^get_grading_config$',
         'instructor.views.api.get_grading_config', name="get_grading_config"),
     url(r'^get_students_features(?P<csv>/csv)?$',
@@ -47,8 +49,8 @@ urlpatterns = patterns('',  # nopep8
         name='show_student_extensions'),
 
     # Grade downloads...
-    url(r'^list_grade_downloads$',
-        'instructor.views.api.list_grade_downloads', name="list_grade_downloads"),
+    url(r'^list_report_downloads$',
+        'instructor.views.api.list_report_downloads', name="list_report_downloads"),
     url(r'calculate_grades_csv$',
         'instructor.views.api.calculate_grades_csv', name="calculate_grades_csv"),
 )

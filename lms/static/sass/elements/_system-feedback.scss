@@ -90,7 +90,7 @@
         text-shadow: none;
         color: inherit;
 
-        &:hover {
+        &:hover, &:focus {
           color: $action-primary-bg;
         }
       }

@@ -8,12 +8,16 @@
   from xmodule.modulestore.django import loc_mapper
 %>
 
+<%block name="header_extras">
+% for template_name in ["basic-modal", "modal-button", "upload-dialog"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-
-  <script type="text/template" id="upload-dialog-tpl">
-    <%static:include path="js/upload-dialog.underscore" />
-  </script>
 
   <script type="text/javascript">
 window.CMS = window.CMS || {};

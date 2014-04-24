@@ -1,6 +1,5 @@
 (function ($, undefined) {
-    // Stub YouTube API.
-    window.YT = {
+    var stubbedYT = {
         Player: function () {
             var Player = jasmine.createSpyObj(
                 'YT.Player',
@@ -9,12 +8,16 @@
                     'getPlayerState', 'getVolume', 'setVolume',
                     'loadVideoById', 'getAvailablePlaybackRates', 'playVideo',
                     'pauseVideo', 'seekTo', 'getDuration', 'setPlaybackRate',
-                    'getPlaybackQuality', 'destroy'
+                    'getAvailableQualityLevels', 'getPlaybackQuality',
+                    'setPlaybackQuality', 'destroy'
                 ]
             );
 
             Player.getDuration.andReturn(60);
             Player.getAvailablePlaybackRates.andReturn([0.50, 1.0, 1.50, 2.0]);
+            Player.getAvailableQualityLevels.andReturn(
+                ['highres', 'hd1080', 'hd720', 'large', 'medium', 'small']
+            );
 
             return Player;
         },
@@ -31,6 +34,9 @@
             return f();
         }
     };
+
+    // Stub YouTube API.
+    window.YT = stubbedYT;
 
     window.STATUS = window.YT.PlayerState;
 
@@ -142,7 +148,7 @@
                         }
                     };
                 }
-            } else if (settings.url == '/transcript/translation') {
+            } else if (settings.url.match(/transcript\/translation\/.+$/)) {
                 return settings.success(jasmine.stubbedCaption);
             } else if (settings.url == '/transcript/available_translations') {
                 return settings.success(['uk', 'de']);
@@ -158,6 +164,14 @@
             ) {
                 // Do nothing.
             } else if (settings.url == '/save_user_state') {
+                return {success: true};
+            } else if (settings.url === 'http://www.youtube.com/iframe_api') {
+                // Stub YouTube API.
+                window.YT = stubbedYT;
+
+                // Call the callback that must be called when YouTube API is loaded. By specification.
+                window.onYouTubeIframeAPIReady();
+
                 return {success: true};
             } else {
                 throw 'External request attempted for ' +

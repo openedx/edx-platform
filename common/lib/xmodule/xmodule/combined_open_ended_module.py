@@ -220,7 +220,7 @@ class CombinedOpenEndedFields(object):
     )
     graded = Boolean(
         display_name=_("Graded"),
-        help=_("Defines whether the student gets credit for grading this problem."),
+        help=_("Defines whether the student gets credit for this problem. Credit is based on peer grades of this problem."),
         default=False,
         scope=Scope.settings
     )
@@ -397,12 +397,13 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     icon_class = 'problem'
 
     js = {
-            'coffee':
-            [
-                resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
-                resource_string(__name__, 'js/src/collapsible.coffee'),
-                resource_string(__name__, 'js/src/javascript_loader.coffee'),
-            ]
+        'coffee': [
+            resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
+            resource_string(__name__, 'js/src/javascript_loader.coffee'),
+        ],
+        'js': [
+            resource_string(__name__, 'js/src/collapsible.js'),
+        ]
     }
     js_module_name = "CombinedOpenEnded"
 

@@ -1,15 +1,19 @@
 <span>
-  <input type="hidden" class="schematic" height="${height}" width="${width}" parts="${parts}" analyses="${analyses}" name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}" value="" initial_value=""/>
-
-  <div id="value_${id}" style="display:none">${value}</div>
-  <div id="initial_value_${id}" style="display:none">${initial_value}</div>
-  <div id="submit_value_${id}" style="display:none">${submit_analyses}</div>
-
-  <script>
-    $("#input_${id}").attr("value",$("#value_${id}").text());
-    $("#input_${id}").attr("initial_value",$("#initial_value_${id}").text());
-    $("#input_${id}").attr("submit_analyses",$("#submit_value_${id}").text());
-  </script>
+  <div class="script_placeholder" data-src="${setup_script}"/>
+  <input type="hidden"
+    class="schematic"
+    height="${height}"
+    width="${width}"
+    parts="${parts}"
+    analyses="${analyses}"
+    name="input_${id}"
+    id="input_${id}"
+    aria-label="${label}"
+    aria-describedby="answer_${id}"
+    value="${value|h}"
+    initial_value="${initial_value|h}"
+    submit_analyses="${submit_analyses|h}"
+    />
 
   <span id="answer_${id}"></span>
   % if status == 'unsubmitted':
@@ -29,5 +33,6 @@
     <span class="sr">Status: incomplete</span>
   </span>
   % endif
+
 </span>
 

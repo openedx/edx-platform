@@ -8,14 +8,14 @@ ${_("You have been invited to join {course_name} at {site_name} by a "
 		site_name=site_name
 	)}
 % if is_shib_course:
-
 % if auto_enroll:
+
 ${_("To access the course visit {course_url} and login.").format(course_url=course_url)}
-% else:
+% elif course_about_url is not None:
+
 ${_("To access the course visit {course_about_url} and register for the course.").format(
 		course_about_url=course_about_url)}
 % endif
-
 % else:
 
 ${_("To finish your registration, please visit {registration_url} and fill "
@@ -28,12 +28,14 @@ ${_("Once you have registered and activated your account, you will see "
 	"{course_name} listed on your dashboard.").format(
 		course_name=course.display_name_with_default
 	)}
-% else:
+% elif course_about_url is not None:
 ${_("Once you have registered and activated your account, visit {course_about_url} "
 	"to join the course.").format(course_about_url=course_about_url)}
+% else:
+${_("You can then enroll in {course_name}.").format(course_name=course.display_name_with_default)}
+% endif
 % endif
 
-% endif
 ----
 Внимание!
 Это письмо было сформировано и отправлено автоматической системой информирования.

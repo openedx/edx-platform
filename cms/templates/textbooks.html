@@ -4,10 +4,10 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%block name="title">${_("Textbooks")}</%block>
-<%block name="bodyclass">is-signedin course view-textbooks feature-upload</%block>
+<%block name="bodyclass">is-signedin course view-textbooks</%block>
 
 <%block name="header_extras">
-% for template_name in ["edit-textbook", "show-textbook", "edit-chapter", "no-textbooks", "upload-dialog"]:
+% for template_name in ["edit-textbook", "show-textbook", "edit-chapter", "no-textbooks", "basic-modal", "modal-button", "upload-dialog"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>

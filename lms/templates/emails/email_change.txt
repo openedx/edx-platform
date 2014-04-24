@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 Вы получили запрос о смене почтового адреса для учетной записи на курсах повышения квалификации учителей с ${old_email} на ${new_email}.
 Если это верно, то подтвердите свой запрос, пройдя по указанной ниже ссылке:

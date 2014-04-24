@@ -69,8 +69,8 @@ class AuthListWidget extends MemberListWidget
     super $container,
       title: $container.data 'display-name'
       info: $container.data 'info-text'
-      labels: ["username", "email", "revoke access"]
-      add_placeholder: "Enter email"
+      labels: [gettext("Username"), gettext("Email"), gettext("Revoke access")]
+      add_placeholder: gettext("Enter username or email")
       add_btn_label: $container.data 'add-button-label'
       add_handler: (input) => @add_handler input
 
@@ -98,7 +98,7 @@ class AuthListWidget extends MemberListWidget
         @clear_input()
         @reload_list()
     else
-      @show_errors "Enter an email."
+      @show_errors gettext "Please enter a username or email."
 
   # reload the list of members
   reload_list: ->
@@ -116,9 +116,10 @@ class AuthListWidget extends MemberListWidget
         # if there are members, show the list
 
         # create revoke button and insert it into the row
-        $revoke_btn = $ '<div/>',
+        label_trans = gettext("Revoke access")
+        $revoke_btn = $ _.template('<div class="revoke"><i class="icon-remove-sign"></i> <%= label %></div>', {label: label_trans}),
           class: 'revoke'
-          click: =>
+        $revoke_btn.click =>
             @modify_member_access member.email, 'revoke', (error) =>
               # abort on error
               return @show_errors error unless error is null
@@ -140,23 +141,117 @@ class AuthListWidget extends MemberListWidget
       url: @list_endpoint
       data: rolename: @rolename
       success: (data) => cb? null, data[@rolename]
-      error: std_ajax_err => cb? "Error fetching list for role '#{@rolename}'"
+      error: std_ajax_err => 
+        `// Translators: A rolename appears this sentence.`
+        cb? gettext("Error fetching list for role") + " '#{@rolename}'"
 
   # send ajax request to modify access
   # (add or remove them from the list)
   # `action` can be 'allow' or 'revoke'
   # `cb` is called with cb(error, data)
-  modify_member_access: (email, action, cb) ->
+  modify_member_access: (unique_student_identifier, action, cb) ->
     $.ajax
       dataType: 'json'
       url: @modify_endpoint
       data:
-        email: email
+        unique_student_identifier: unique_student_identifier
         rolename: @rolename
         action: action
-      success: (data) => cb? null, data
-      error: std_ajax_err => cb? "Error changing user's permissions."
+      success: (data) => @member_response data
+      error: std_ajax_err => cb? gettext "Error changing user's permissions."
 
+  member_response: (data) ->
+    @clear_errors()
+    @clear_input()
+    if data.userDoesNotExist
+      msg = gettext("Could not find a user with username or email address '<%= identifier %>'.")
+      @show_errors _.template(msg, {identifier: data.unique_student_identifier})
+    else if data.inactiveUser
+      msg = gettext("Error: User '<%= username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role.")
+      @show_errors _.template(msg, {username: data.unique_student_identifier})
+    else if data.removingSelfAsInstructor
+      @show_errors gettext "Error: You cannot remove yourself from the Instructor group!"
+    else
+      @reload_list()
+
+
+class BetaTesterBulkAddition
+  constructor: (@$container) ->
+    # gather elements
+    @$emails_input           = @$container.find("textarea[name='student-emails-for-beta']")
+    @$btn_beta_testers       = @$container.find("input[name='beta-testers']")
+    @$checkbox_emailstudents = @$container.find("input[name='email-students-beta']")
+    @$task_response          = @$container.find(".request-response")
+    @$request_response_error = @$container.find(".request-response-error")
+
+    # click handlers
+    @$btn_beta_testers.click =>
+      emailStudents = @$checkbox_emailstudents.is(':checked')
+      send_data = 
+        action: $(event.target).data('action')  # 'add' or 'remove'
+        emails: @$emails_input.val()
+        email_students: emailStudents
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_beta_testers.data 'endpoint'
+        data: send_data
+        success: (data) => @display_response data
+        error: std_ajax_err => @fail_with_error gettext "Error adding/removing users as beta testers."
+
+  fail_with_error: (msg) ->
+    console.warn msg
+    @$task_response.empty()
+    @$request_response_error.empty()
+    @$request_response_error.text msg
+
+  display_response: (data_from_server) ->
+    @$task_response.empty()
+    @$request_response_error.empty()
+    errors = []
+    successes = []
+    no_users = []
+    for student_results in data_from_server.results
+      if student_results.userDoesNotExist
+        no_users.push student_results
+      else if student_results.error
+        errors.push student_results
+      else
+        successes.push student_results
+
+    console.log(sr.email for sr in successes)
+
+    render_list = (label, emails) =>
+      task_res_section = $ '<div/>', class: 'request-res-section'
+      task_res_section.append $ '<h3/>', text: label
+      email_list = $ '<ul/>'
+      task_res_section.append email_list
+
+      for email in emails
+        email_list.append $ '<li/>', text: email
+
+      @$task_response.append task_res_section
+
+    if successes.length and data_from_server.action is 'add'
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("These users were successfully added as beta testers:"), (sr.email for sr in successes)
+
+    if successes.length and data_from_server.action is 'remove'
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("These users were successfully removed as beta testers:"), (sr.email for sr in successes)
+
+    if errors.length and data_from_server.action is 'add'
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("These users were not added as beta testers:"), (sr.email for sr in errors)
+
+    if errors.length and data_from_server.action is 'remove'
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("These users were not removed as beta testers:"), (sr.email for sr in errors)
+
+    if no_users.length
+      no_users.push gettext("Users must create and activate their account before they can be promoted to beta tester.")
+      `// Translators: A list of email addresses appears after this sentence`
+      render_list gettext("Could not find users associated with the following email addresses:"), (sr.email for sr in no_users)
 
 # Wrapper for the batch enrollment subsection.
 # This object handles buttons, success and failure reporting,
@@ -164,47 +259,28 @@ class AuthListWidget extends MemberListWidget
 class BatchEnrollment
   constructor: (@$container) ->
     # gather elements
-    @$emails_input           = @$container.find("textarea[name='student-emails']'")
-    @$btn_enroll             = @$container.find("input[name='enroll']'")
-    @$btn_unenroll           = @$container.find("input[name='unenroll']'")
-    @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']'")
-    @$checkbox_emailstudents = @$container.find("input[name='email-students']'")
+    @$emails_input           = @$container.find("textarea[name='student-emails']")
+    @$enrollment_button      = @$container.find(".enrollment-button")
+    @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']")
+    @$checkbox_emailstudents = @$container.find("input[name='email-students']")
     @$task_response          = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
 
-    # attach click handlers
-
-    @$btn_enroll.click =>
+    # attach click handler for enrollment buttons
+    @$enrollment_button.click =>
       emailStudents = @$checkbox_emailstudents.is(':checked')
-
       send_data =
-        action: 'enroll'
+        action: $(event.target).data('action') # 'enroll' or 'unenroll'
         emails: @$emails_input.val()
         auto_enroll: @$checkbox_autoenroll.is(':checked')
         email_students: emailStudents
 
       $.ajax
         dataType: 'json'
-        url: @$btn_enroll.data 'endpoint'
+        url: $(event.target).data 'endpoint'
         data: send_data
         success: (data) => @display_response data
-        error: std_ajax_err => @fail_with_error "Error enrolling/unenrolling students."
-
-    @$btn_unenroll.click =>
-      emailStudents = @$checkbox_emailstudents.is(':checked')
-
-      send_data =
-        action: 'unenroll'
-        emails: @$emails_input.val()
-        auto_enroll: @$checkbox_autoenroll.is(':checked')
-        email_students: emailStudents
-
-      $.ajax
-        dataType: 'json'
-        url: @$btn_unenroll.data 'endpoint'
-        data: send_data
-        success: (data) => @display_response data
-        error: std_ajax_err => @fail_with_error "Error enrolling/unenrolling students."
+        error: std_ajax_err => @fail_with_error gettext "Error enrolling/unenrolling users."
 
 
   fail_with_error: (msg) ->
@@ -220,6 +296,8 @@ class BatchEnrollment
     # these results arrays contain student_results
     # only populated arrays will be rendered
     #
+    # invalid email addresses
+    invalid_email = []
     # students for which there was an error during the action
     errors = []
     # students who are now enrolled in the course
@@ -256,9 +334,13 @@ class BatchEnrollment
       # student_results is of the form {
       #   'email': email,
       #   'error': True,
+      #   'invalidEmail': True,  # if email doesn't match "[^@]+@[^@]+\.[^@]+"
       # }
 
-      if student_results.error
+      if student_results.invalidEmail
+        invalid_email.push student_results
+
+      else if student_results.error
         errors.push student_results
 
       else if student_results.after.enrollment
@@ -271,7 +353,7 @@ class BatchEnrollment
           allowed.push student_results
 
       # The instructor is trying to unenroll someone who is not enrolled or allowed to enroll; non-sensical action.
-      else if data_from_server.action is 'unenroll' and not (student_results.before.enrollment) and not (student_results.before.allowed) 
+      else if data_from_server.action is 'unenroll' and not (student_results.before.enrollment) and not (student_results.before.allowed)
         notunenrolled.push student_results
 
       else if not student_results.after.enrollment
@@ -293,6 +375,9 @@ class BatchEnrollment
 
       @$task_response.append task_res_section
 
+    if invalid_email.length
+      render_list gettext("The following email addresses are invalid:"), (sr.email for sr in invalid_email)
+
     if errors.length
       errors_label = do ->
         if data_from_server.action is 'enroll'
@@ -307,41 +392,49 @@ class BatchEnrollment
         render_list errors_label, (sr.email for sr in errors)
 
     if enrolled.length and emailStudents
-      render_list gettext("Successfully enrolled and sent email to the following students:"), (sr.email for sr in enrolled)
+      render_list gettext("Successfully enrolled and sent email to the following users:"), (sr.email for sr in enrolled)
 
     if enrolled.length and not emailStudents
-      render_list gettext("Successfully enrolled the following students:"), (sr.email for sr in enrolled)
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("Successfully enrolled the following users:"), (sr.email for sr in enrolled)
 
     # Student hasn't registered so we allow them to enroll
     if allowed.length and emailStudents
-      render_list gettext("Successfully sent enrollment emails to the following students. They will be allowed to enroll once they register:"),
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:"),
         (sr.email for sr in allowed)
 
     # Student hasn't registered so we allow them to enroll
     if allowed.length and not emailStudents
-      render_list gettext("These students will be allowed to enroll once they register:"),
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("These users will be allowed to enroll once they register:"),
         (sr.email for sr in allowed)
 
     # Student hasn't registered so we allow them to enroll with autoenroll
     if autoenrolled.length and emailStudents
-      render_list gettext("Successfully sent enrollment emails to the following students. They will be enrolled once they register:"),
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("Successfully sent enrollment emails to the following users. They will be enrolled once they register:"),
         (sr.email for sr in autoenrolled)
 
     # Student hasn't registered so we allow them to enroll with autoenroll
     if autoenrolled.length and not emailStudents
-      render_list gettext("These students will be enrolled once they register:"),
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("These users will be enrolled once they register:"),
         (sr.email for sr in autoenrolled)
 
     if notenrolled.length and emailStudents
-      render_list gettext("Emails successfully sent. The following students are no longer enrolled in the course:"),
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("Emails successfully sent. The following users are no longer enrolled in the course:"),
         (sr.email for sr in notenrolled)
 
     if notenrolled.length and not emailStudents
-      render_list gettext("The following students are no longer enrolled in the course:"),
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("The following users are no longer enrolled in the course:"),
         (sr.email for sr in notenrolled)
 
     if notunenrolled.length
-      render_list gettext("These students were not affliliated with the course so could not be unenrolled:"),
+      `// Translators: A list of users appears after this sentence`
+      render_list gettext("These users were not affiliated with the course so could not be unenrolled:"),
         (sr.email for sr in notunenrolled)
 
 # Wrapper for auth list subsection.
@@ -451,7 +544,7 @@ class AuthList
         rolename: @rolename
         action: action
       success: (data) -> cb?(data)
-      error: std_ajax_err => @$request_response_error.text "Error changing user's permissions."
+      error: std_ajax_err => @$request_response_error.text gettext "Error changing user's permissions."
 
 
 # Membership Section
@@ -465,6 +558,9 @@ class Membership
 
     # isolate # initialize BatchEnrollment subsection
     plantTimeout 0, => new BatchEnrollment @$section.find '.batch-enrollment'
+    
+    # initialize BetaTesterBulkAddition subsection
+    plantTimeout 0, => new BetaTesterBulkAddition @$section.find '.batch-beta-testers'
 
     # gather elements
     @$list_selector = @$section.find 'select#member-lists-selector'

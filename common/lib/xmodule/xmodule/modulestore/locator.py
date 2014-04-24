@@ -22,12 +22,14 @@ log = logging.getLogger(__name__)
 
 class LocalId(object):
     """
-    Class for local ids for non-persisted xblocks
-
-    Should be hashable and distinguishable, but nothing else
+    Class for local ids for non-persisted xblocks (which can have hardcoded block_ids if necessary)
     """
+    def __init__(self, block_id=None):
+        self.block_id = block_id
+        super(LocalId, self).__init__()
+
     def __str__(self):
-        return "localid_{}".format(id(self))
+        return "localid_{}".format(self.block_id or id(self))
 
 
 class Locator(object):
@@ -358,8 +360,7 @@ class CourseLocator(Locator):
         Generate a discussion group id based on course
 
         To make compatible with old Location object functionality. I don't believe this behavior fits at this
-        place, but I have no way to override. If this is really needed, it should probably use the pretty_id to seed
-        the name although that's mutable. We should also clearly define the purpose and restrictions of this
+        place, but I have no way to override. We should clearly define the purpose and restrictions of this
         (e.g., I'm assuming periods are fine).
         """
         return self.package_id

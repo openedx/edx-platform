@@ -154,6 +154,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
         expected_textline_context = {
             'STATIC_URL': '/dummy-static/',
             'status': 'unsubmitted',
+            'status_class': 'unanswered',
+            'status_display': u'unanswered',
             'label': '',
             'value': '',
             'preprocessor': None,

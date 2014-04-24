@@ -1,4 +1,4 @@
-define ["jasmine", "js/spec/create_sinon", "squire"],
+define ["jasmine", "js/spec_helpers/create_sinon", "squire"],
 (jasmine, create_sinon, Squire) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')
@@ -235,6 +235,20 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                 @view.setPage(0)
                 create_sinon.respondWithJson(requests, @mockAssetsResponse)
                 return requests
+
+            it "should show a status indicator while loading", ->
+                appendSetFixtures('<div class="ui-loading"/>')
+                expect($('.ui-loading').is(':visible')).toBe(true)
+                setup.call(this)
+                expect($('.ui-loading').is(':visible')).toBe(false)
+
+            it "should hide the status indicator if an error occurs while loading", ->
+                requests = create_sinon.requests(this)
+                appendSetFixtures('<div class="ui-loading"/>')
+                expect($('.ui-loading').is(':visible')).toBe(true)
+                @view.setPage(0)
+                create_sinon.respondWithError(requests)
+                expect($('.ui-loading').is(':visible')).toBe(false)
 
             it "should render both assets", ->
                 requests = setup.call(this)

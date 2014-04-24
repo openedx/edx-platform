@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from lettuce.django import django_url
@@ -186,7 +186,7 @@ def confirm_details_match(step):
 
 @step(u'I am at the payment page')
 def at_the_payment_page(step):
-    world.wait_for_present('input[name=transactionSignature]') 
+    world.wait_for_present('input[name=transactionSignature]')
 
 
 @step(u'I submit valid payment information$')

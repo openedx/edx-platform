@@ -3,6 +3,7 @@ Module for running content split tests
 """
 
 import logging
+import json
 from webob import Response
 
 from xmodule.progress import Progress
@@ -41,7 +42,7 @@ class SplitTestFields(object):
 
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
-@XBlock.needs('partitions')
+@XBlock.wants('partitions')
 class SplitTestModule(SplitTestFields, XModule):
     """
     Show the user the appropriate child.  Uses the ExperimentState
@@ -61,7 +62,10 @@ class SplitTestModule(SplitTestFields, XModule):
 
         super(SplitTestModule, self).__init__(*args, **kwargs)
 
-        self.child_descriptor = self.get_child_descriptors()[0]
+        self.child_descriptor = None
+        child_descriptors = self.get_child_descriptors()
+        if len(child_descriptors) >= 1:
+            self.child_descriptor = child_descriptors[0]
         if self.child_descriptor is not None:
             self.child = self.system.get_module(self.child_descriptor)
         else:
@@ -106,7 +110,9 @@ class SplitTestModule(SplitTestFields, XModule):
         """
         For grading--return just the chosen child.
         """
-        group_id = self.runtime.service(self, 'partitions').get_user_group_for_partition(self.user_partition_id)
+        group_id = self.get_group_id()
+        if group_id is None:
+            return []
 
         # group_id_to_child comes from json, so it has to have string keys
         str_group_id = str(group_id)
@@ -125,6 +131,15 @@ class SplitTestModule(SplitTestFields, XModule):
             return []
 
         return [child_descriptor]
+
+    def get_group_id(self):
+        """
+        Returns the group ID, or None if none is available.
+        """
+        partitions_service = self.runtime.service(self, 'partitions')
+        if not partitions_service:
+            return None
+        return partitions_service.get_user_group_for_partition(self.user_partition_id)
 
     def _staff_view(self, context):
         """
@@ -155,11 +170,37 @@ class SplitTestModule(SplitTestFields, XModule):
         fragment.initialize_js('ABTestSelector')
         return fragment
 
+    def studio_preview_view(self, context):
+        """
+        Renders the Studio preview by rendering each child so that they can all be seen and edited.
+        """
+        fragment = Fragment()
+        contents = []
+
+        for child in self.descriptor.get_children():
+            rendered_child = self.runtime.get_module(child).render('student_view', context)
+            fragment.add_frag_resources(rendered_child)
+
+            contents.append({
+                'id': child.id,
+                'content': rendered_child.content
+            })
+
+        fragment.add_content(self.system.render_template('vert_module.html', {
+            'items': contents
+        }))
+
+        return fragment
+
     def student_view(self, context):
         """
         Render the contents of the chosen condition for students, and all the
         conditions for staff.
         """
+        # When rendering a Studio preview, render all of the block's children
+        if context and context['runtime_type'] == 'studio':
+            return self.studio_preview_view(context)
+
         if self.child is None:
             # raise error instead?  In fact, could complain on descriptor load...
             return Fragment(content=u"<div>Nothing here.  Move along.</div>")
@@ -197,7 +238,7 @@ class SplitTestModule(SplitTestFields, XModule):
 
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
-@XBlock.needs('partitions')
+@XBlock.wants('partitions')
 class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
@@ -211,11 +252,37 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor):
     def definition_to_xml(self, resource_fs):
 
         xml_object = etree.Element('split_test')
-        # TODO: also save the experiment id and the condition map
+        xml_object.set('group_id_to_child', json.dumps(self.group_id_to_child))
+        xml_object.set('user_partition_id', str(self.user_partition_id))
         for child in self.get_children():
-            xml_object.append(
-                etree.fromstring(child.export_to_xml(resource_fs)))
+            self.runtime.add_block_as_child_node(child, xml_object)
         return xml_object
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        children = []
+        raw_group_id_to_child = xml_object.attrib.get('group_id_to_child', None)
+        user_partition_id = xml_object.attrib.get('user_partition_id', None)
+        try:
+            group_id_to_child = json.loads(raw_group_id_to_child)
+        except ValueError:
+            msg = "group_id_to_child is not valid json"
+            log.exception(msg)
+            system.error_tracker(msg)
+
+        for child in xml_object:
+            try:
+                descriptor = system.process_xml(etree.tostring(child))
+                children.append(descriptor.scope_ids.usage_id)
+            except Exception:
+                msg = "Unable to load child when parsing split_test module."
+                log.exception(msg)
+                system.error_tracker(msg)
+
+        return ({
+            'group_id_to_child': group_id_to_child,
+            'user_partition_id': user_partition_id
+        }, children)
 
     def has_dynamic_children(self):
         """

@@ -65,7 +65,7 @@ div.calc-main {
         -webkit-appearance: none;
         width: flex-grid(.5) + flex-gutter();
 
-        &:hover {
+        &:hover, &:focus {
           color: #333;
         }
       }
@@ -102,7 +102,6 @@ div.calc-main {
           width: 100%;
 
           &:focus {
-            outline: none;
             border: none;
           }
         }

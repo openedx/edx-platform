@@ -1,5 +1,5 @@
 # disable missing docstring
-#pylint: disable=C0111
+# pylint: disable=C0111
 
 import json
 from lettuce import world, step
@@ -13,7 +13,7 @@ MAXIMUM_ATTEMPTS = "Maximum Attempts"
 PROBLEM_WEIGHT = "Problem Weight"
 RANDOMIZATION = 'Randomization'
 SHOW_ANSWER = "Show Answer"
-
+TIMER_BETWEEN_ATTEMPTS = "Timer Between Attempts"
 
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
@@ -44,6 +44,7 @@ def i_see_advanced_settings_with_values(step):
             [PROBLEM_WEIGHT, "", False],
             [RANDOMIZATION, "Never", False],
             [SHOW_ANSWER, "Finished", False],
+            [TIMER_BETWEEN_ATTEMPTS, "0", False]
         ])
 
 
@@ -142,7 +143,7 @@ def set_the_weight_to_abc(step, bad_weight):
 
 @step('if I set the max attempts to "(.*)", it will persist as a valid integer$')
 def set_the_max_attempts(step, max_attempts_set):
-    # on firefox with selenium, the behaviour is different.
+    # on firefox with selenium, the behavior is different.
     # eg 2.34 displays as 2.34 and is persisted as 2
     index = world.get_setting_entry_index(MAXIMUM_ATTEMPTS)
     world.set_field_value(index, max_attempts_set)
@@ -286,5 +287,5 @@ def set_weight(weight):
 
 
 def open_high_level_source():
-    world.css_click('a.edit-button')
+    world.edit_component()
     world.css_click('.launch-latex-compiler > a')

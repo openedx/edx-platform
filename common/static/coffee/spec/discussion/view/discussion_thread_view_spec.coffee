@@ -27,16 +27,8 @@ describe "DiscussionThreadView", ->
         spyOn(DiscussionThreadView.prototype, "renderResponse")
 
     describe "response count and pagination", ->
-
-        setNextResponseContent = (content) ->
-            $.ajax.andCallFake(
-                (params) =>
-                    params.success({"content": content})
-                    {always: ->}
-            )
-
         renderWithContent = (view, content) ->
-            setNextResponseContent(content)
+            DiscussionViewSpecHelper.setNextResponseContent(content)
             view.render()
             jasmine.Clock.tick(100)
 
@@ -73,16 +65,16 @@ describe "DiscussionThreadView", ->
                 assertRenderedCorrectly(@view, "5 responses", "Showing first response", "Load all responses")
                 
             it "correctly re-render when all threads have loaded", ->
-                setNextResponseContent({resp_total: 5, children: [{}, {}, {}, {}]})
+                DiscussionViewSpecHelper.setNextResponseContent({resp_total: 5, children: [{}, {}, {}, {}]})
                 @view.$el.find(".load-response-button").click()
                 assertRenderedCorrectly(@view, "5 responses", "Showing all responses", null)
 
             it "correctly re-render when one page remains", ->
-                setNextResponseContent({resp_total: 42, children: [{}, {}]})
+                DiscussionViewSpecHelper.setNextResponseContent({resp_total: 42, children: [{}, {}]})
                 @view.$el.find(".load-response-button").click()
                 assertRenderedCorrectly(@view, "42 responses", "Showing first 3 responses", "Load all responses")
 
             it "correctly re-render when multiple pages remain", ->
-                setNextResponseContent({resp_total: 111, children: [{}, {}]})
+                DiscussionViewSpecHelper.setNextResponseContent({resp_total: 111, children: [{}, {}]})
                 @view.$el.find(".load-response-button").click()
                 assertRenderedCorrectly(@view, "111 responses", "Showing first 3 responses", "Load next 100 responses")

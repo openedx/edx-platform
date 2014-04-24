@@ -43,12 +43,12 @@ class HtmlModule(HtmlFields, XModule):
     js = {
         'coffee': [
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
-            resource_string(__name__, 'js/src/collapsible.coffee'),
-            resource_string(__name__, 'js/src/html/display.coffee')
+            resource_string(__name__, 'js/src/html/display.coffee'),
         ],
         'js': [
+            resource_string(__name__, 'js/src/collapsible.js'),
             resource_string(__name__, 'js/src/html/imageModal.js'),
-            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.pkgd.js')
+            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.pkgd.js'),
         ]
     }
     js_module_name = "HTMLModule"
@@ -265,7 +265,7 @@ class StaticTabFields(object):
     )
     data = String(
         default=textwrap.dedent(u"""\
-            <p>This is where you can add additional pages to your courseware. Click the 'edit' button to begin editing.</p>
+            <p>Add the content you want students to see on this page.</p>
         """),
         scope=Scope.content,
         help=_("HTML for the additional pages")

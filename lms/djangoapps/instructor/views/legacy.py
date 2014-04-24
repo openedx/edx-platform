@@ -2,6 +2,7 @@
 """
 Instructor Views
 """
+from contextlib import contextmanager
 import csv
 import json
 import logging
@@ -190,7 +191,7 @@ def instructor_dashboard(request, course_id):
             msg += _("Found a single student.  ")
         except User.DoesNotExist:
             student = None
-            msg += u"<font color='red'>{text}</font>".format(
+            msg += "<font color='red'>{text}</font>".format(
                 text=_("Couldn't find student with that email or username.")
             )
         return msg, student
@@ -230,20 +231,20 @@ def instructor_dashboard(request, course_id):
     if action == 'Dump list of enrolled students' or action == 'List enrolled students':
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
-        datatable['title'] = _('List of students enrolled in {0}').format(course_id)
+        datatable['title'] = _('List of students enrolled in {course_id}').format(course_id=course_id)
         track.views.server_track(request, "list-students", {}, page="idashboard")
 
     elif 'Dump Grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
-        datatable['title'] = _('Summary Grades of students enrolled in {0}').format(course_id)
+        datatable['title'] = _('Summary Grades of students enrolled in {course_id}').format(course_id=course_id)
         track.views.server_track(request, "dump-grades", {}, page="idashboard")
 
     elif 'Dump all RAW grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
                                                    get_raw_scores=True, use_offline=use_offline)
-        datatable['title'] = _('Raw Grades of students enrolled in {0}').format(course_id)
+        datatable['title'] = _('Raw Grades of students enrolled in {course_id}').format(course_id=course_id)
         track.views.server_track(request, "dump-grades-raw", {}, page="idashboard")
 
     elif 'Download CSV of all student grades' in action:
@@ -272,13 +273,17 @@ def instructor_dashboard(request, course_id):
             instructor_task = submit_rescore_problem_for_all_students(request, course_id, problem_url)
             if instructor_task is None:
                 msg += u'<font color="red">{text}</font>'.format(
-                    text=_('Failed to create a background task for rescoring "{0}".').format(problem_url)
+                    text=_('Failed to create a background task for rescoring "{problem_url}".').format(
+                        problem_url=problem_url
+                    )
                 )
             else:
                 track.views.server_track(request, "rescore-all-submissions", {"problem": problem_url, "course": course_id}, page="idashboard")
         except ItemNotFoundError as err:
             msg += u'<font color="red">{text}</font>'.format(
-                text=_('Failed to create a background task for rescoring "{0}": problem not found.').format(problem_url)
+                text=_('Failed to create a background task for rescoring "{problem_url}": problem not found.').format(
+                    problem_url=problem_url
+                )
             )
         except Exception as err:
             log.error("Encountered exception from rescore: {0}".format(err))
@@ -295,14 +300,16 @@ def instructor_dashboard(request, course_id):
             instructor_task = submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
             if instructor_task is None:
                 msg += u'<font color="red">{text}</font>'.format(
-                    text=_('Failed to create a background task for resetting "{0}".').format(problem_url)
+                    text=_('Failed to create a background task for resetting "{problem_url}".').format(problem_url=problem_url)
                 )
             else:
                 track.views.server_track(request, "reset-all-attempts", {"problem": problem_url, "course": course_id}, page="idashboard")
         except ItemNotFoundError as err:
             log.error('Failure to reset: unknown problem "{0}"'.format(err))
             msg += u'<font color="red">{text}</font>'.format(
-                text=_('Failed to create a background task for resetting "{0}": problem not found.').format(problem_url)
+                text=_('Failed to create a background task for resetting "{problem_url}": problem not found.').format(
+                    problem_url=problem_url
+                )
             )
         except Exception as err:
             log.error("Encountered exception from reset: {0}".format(err))
@@ -513,7 +520,7 @@ def instructor_dashboard(request, course_id):
                     return_csv('', datatable, file_pointer=file_pointer)
                     file_pointer.seek(0)
                     files = {'datafile': file_pointer}
-                    msg2, trash = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
+                    msg2, __ = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
                     msg += msg2
 
     #----------------------------------------
@@ -872,7 +879,6 @@ def instructor_dashboard(request, course_id):
 
     # determine if this is a studio-backed course so we can provide a link to edit this course in studio
     is_studio_course = modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE
-
     studio_url = None
     if is_studio_course:
         studio_url = get_cms_course_link(course)
@@ -1012,7 +1018,7 @@ def _list_course_forum_members(course_id, rolename, datatable):
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)
     except Role.DoesNotExist:
-        return '<font color="red">' + _('Error: unknown rolename "{0}"').format(rolename) + '</font>'
+        return '<font color="red">' + _('Error: unknown rolename "{rolename}"').format(rolename=rolename) + '</font>'
     uset = role.users.all().order_by('username')
     msg = 'Role = {0}'.format(rolename)
     log.debug('role={0}'.format(rolename))
@@ -1036,11 +1042,11 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     try:
         user = User.objects.get(username=uname)
     except User.DoesNotExist:
-        return '<font color="red">' + _('Error: unknown username "{0}"').format(uname) + '</font>'
+        return '<font color="red">' + _('Error: unknown username "{username}"').format(username=uname) + '</font>'
     try:
         role = Role.objects.get(name=rolename, course_id=course.id)
     except Role.DoesNotExist:
-        return '<font color="red">' + _('Error: unknown rolename "{0}"').format(rolename) + '</font>'
+        return '<font color="red">' + _('Error: unknown rolename "{rolename}"').format(rolename=rolename) + '</font>'
 
     # check whether role already has the specified user:
     alreadyexists = role.users.filter(username=uname).exists()
@@ -1048,19 +1054,19 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     log.debug('rolename={0}'.format(rolename))
     if add_or_remove == FORUM_ROLE_REMOVE:
         if not alreadyexists:
-            msg = '<font color="red">' + _('Error: user "{0}" does not have rolename "{1}", cannot remove').format(uname, rolename) + '</font>'
+            msg = '<font color="red">' + _('Error: user "{username}" does not have rolename "{rolename}", cannot remove').format(username=uname, rolename=rolename) + '</font>'
         else:
             user.roles.remove(role)
-            msg = '<font color="green">' + _('Removed "{0}" from "{1}" forum role = "{2}"').format(user, course.id, rolename) + '</font>'
+            msg = '<font color="green">' + _('Removed "{username}" from "{course_id}" forum role = "{rolename}"').format(username=user, course_id=course.id, rolename=rolename) + '</font>'
     else:
         if alreadyexists:
-            msg = '<font color="red">' + _('Error: user "{0}" already has rolename "{1}", cannot add').format(uname, rolename) + '</font>'
+            msg = '<font color="red">' + _('Error: user "{username}" already has rolename "{rolename}", cannot add').format(username=uname, rolename=rolename) + '</font>'
         else:
             if (rolename == FORUM_ROLE_ADMINISTRATOR and not has_access(user, course, 'staff')):
-                msg = '<font color="red">' + _('Error: user "{0}" should first be added as staff before adding as a forum administrator, cannot add').format(uname) + '</font>'
+                msg = '<font color="red">' + _('Error: user "{username}" should first be added as staff before adding as a forum administrator, cannot add').format(username=uname) + '</font>'
             else:
                 user.roles.add(role)
-                msg = '<font color="green">' + _('Added "{0}" to "{1}" forum role = "{2}"').format(user, course.id, rolename) + '</font>'
+                msg = '<font color="green">' + _('Added "{username}" to "{course_id}" forum role = "{rolename}"').format(username=user, course_id=course.id, rolename=rolename) + '</font>'
 
     return msg
 
@@ -1082,7 +1088,7 @@ def _role_members_table(role, title, course_id):
     uset = role.users_with_role()
     datatable = {'header': [_('Username'), _('Full name')]}
     datatable['data'] = [[x.username, x.profile.name] for x in uset]
-    datatable['title'] = _('{0} in course {1}').format(title, course_id)
+    datatable['title'] = _('{title} in course {course_id}').format(title=title, course_id=course_id)
     return datatable
 
 
@@ -1182,6 +1188,74 @@ def remove_user_from_role(request, username_or_email, role, group_title, event_n
     return '<font color="green">Removed {0} from {1}</font>'.format(user, group_title)
 
 
+class GradeTable(object):
+    """
+    Keep track of grades, by student, for all graded assignment
+    components.  Each student's grades are stored in a list.  The
+    index of this list specifies the assignment component.  Not
+    all lists have the same length, because at the start of going
+    through the set of grades, it is unknown what assignment
+    compoments exist.  This is because some students may not do
+    all the assignment components.
+
+    The student grades are then stored in a dict, with the student
+    id as the key.
+    """
+    def __init__(self):
+        self.components = OrderedDict()
+        self.grades = {}
+        self._current_row = {}
+
+    def _add_grade_to_row(self, component, score):
+        """Creates component if needed, and assigns score
+
+        Args:
+            component (str): Course component being graded
+            score (float): Score of student on component
+
+        Returns:
+           None
+        """
+        component_index = self.components.setdefault(component, len(self.components))
+        self._current_row[component_index] = score
+
+    @contextmanager
+    def add_row(self, student_id):
+        """Context management for a row of grades
+
+        Uses a new dictionary to get all grades of a specified student
+        and closes by adding that dict to the internal table.
+
+        Args:
+            student_id (str): Student id that is having grades set
+
+        """
+        self._current_row = {}
+        yield self._add_grade_to_row
+        self.grades[student_id] = self._current_row
+
+    def get_grade(self, student_id):
+        """Retrieves padded list of grades for specified student
+
+        Args:
+            student_id (str): Student ID for desired grades
+
+        Returns:
+            list: Ordered list of grades for student
+
+        """
+        row = self.grades.get(student_id, [])
+        ncomp = len(self.components)
+        return [row.get(comp, None) for comp in range(ncomp)]
+
+    def get_graded_components(self):
+        """
+        Return a list of components that have been
+        discovered so far.
+        """
+        return self.components.keys()
+
+
 def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False, use_offline=False):
     '''
     Return data arrays with student identity and grades for specified course.
@@ -1206,34 +1280,11 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     ).prefetch_related("groups").order_by('username')
 
     header = [_('ID'), _('Username'), _('Full Name'), _('edX email'), _('External email')]
-    assignments = []
 
-    category_weights = {}
-    
-
-    if get_grades and enrolled_students.count() > 0:
-        # just to construct the header
-        gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
-        courseware_summary = grades.progress_summary(enrolled_students[0], request, course);
-
-        # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
-        if get_raw_scores:
-            assignments += [score.section for score in gradeset['raw_scores']]
-        elif course.new_progress:
-            for section in gradeset['grade_breakdown']:
-                category_weights[section['category']] = section['weight']
-            for chapter in courseware_summary:
-                for section in chapter['sections']:
-                    if not section['graded'] or len(section['format']) < 1:
-                        continue
-                    assignments += [section['format']]
-                assignments += [chapter['display_name']]
-        else:
-            assignments += [x['label'] for x in gradeset['section_breakdown']]
-    header += assignments
-
-    datatable = {'header': header, 'assignments': assignments, 'students': enrolled_students}
+    datatable = {'header': header, 'students': enrolled_students}
     data = []
+
+    gtab = GradeTable()
 
     for student in enrolled_students:
         datarow = [student.id, student.username, student.profile.name, student.email]
@@ -1243,29 +1294,33 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
             datarow.append('')
 
         if get_grades:
+            gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
             log.debug('student={0}, gradeset={1}'.format(student, gradeset))
-            if get_raw_scores:
-                gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
-                # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
-                sgrades = [(getattr(score, 'earned', '') or score[0]) for score in gradeset['raw_scores']]
-            elif course.new_progress:
-                sgrades = []
-                courseware_summary = grades.progress_summary(student, request, course);
-                for chapter in courseware_summary:
-                    total = 0
-                    for section in chapter['sections']:
-                        if not section['graded'] or len(section['format']) < 1:
-                            continue
-                        sgrades += [((section['section_total'].earned / section['section_total'].possible) if section['section_total'].possible else 0)]
-                        total += ((section['section_total'].earned / section['section_total'].possible) if section['section_total'].possible else 0) * category_weights.get(section['format'], 0.0)
-                    sgrades += [total]
-            else:
-                gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
-                sgrades = [x['percent'] for x in gradeset['section_breakdown']]
-            datarow += sgrades
-            student.grades = sgrades  	# store in student object
+            with gtab.add_row(student.id) as add_grade:
+                if get_raw_scores:
+                    # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
+                    for score in gradeset['raw_scores']:
+                        add_grade(score.section, getattr(score, 'earned', score[0]))
+                else:
+                    for grade_item in gradeset['section_breakdown']:
+                        add_grade(grade_item['label'], grade_item['percent'])
+            student.grades = gtab.get_grade(student.id)
 
         data.append(datarow)
+
+    # if getting grades, need to do a second pass, and add grades to each datarow;
+    # on the first pass we don't know all the graded components
+    if get_grades:
+        for datarow in data:
+            # get grades for student
+            sgrades = gtab.get_grade(datarow[0])
+            datarow += sgrades
+
+        # get graded components and add to table header
+        assignments = gtab.get_graded_components()
+        header += assignments
+        datatable['assignments'] = assignments
+
     datatable['data'] = data
     return datatable
 
@@ -1312,7 +1367,7 @@ def grade_summary(request, course_id):
     """Display the grade summary for a course."""
     course = get_course_with_access(request.user, course_id, 'staff')
 
-    # For now, just a static page
+    # For now, just a page
     context = {'course': course,
                'staff_access': True, }
     return render_to_response('courseware/grade_summary.html', context)
@@ -1400,16 +1455,32 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
             'SITE_NAME',
             settings.SITE_NAME
         )
-        registration_url = 'https://' + stripped_site_name + reverse('student.views.register_user')
-        #Composition of email
-        d = {'site_name': stripped_site_name,
-             'registration_url': registration_url,
-             'course': course,
-             'auto_enroll': auto_enroll,
-             'course_url': 'https://' + stripped_site_name + '/courses/' + course_id,
-             'course_about_url': 'https://' + stripped_site_name + '/courses/' + course_id + '/about',
-             'is_shib_course': is_shib_course
-             }
+        registration_url = 'https://{}{}'.format(
+            stripped_site_name,
+            reverse('student.views.register_user')
+        )
+        course_url = 'https://{}{}'.format(
+            stripped_site_name,
+            reverse('course_root', kwargs={'course_id': course_id})
+        )
+        # We can't get the url to the course's About page if the marketing site is enabled.
+        course_about_url = None
+        if not settings.FEATURES.get('ENABLE_MKTG_SITE', False):
+            course_about_url = u'https://{}{}'.format(
+                stripped_site_name,
+                reverse('about_course', kwargs={'course_id': course.id})
+            )
+
+        # Composition of email
+        d = {
+            'site_name': stripped_site_name,
+            'registration_url': registration_url,
+            'course': course,
+            'auto_enroll': auto_enroll,
+            'course_url': course_url,
+            'course_about_url': course_about_url,
+            'is_shib_course': is_shib_course
+        }
 
     for student in new_students:
         try:
@@ -1487,7 +1558,7 @@ def _do_unenroll_students(course_id, students, email_students=False):
     `email_students` is user input preference (a `boolean`)
     """
 
-    old_students, trash = get_and_clean_student_list(students)
+    old_students, __ = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in old_students)
 
     stripped_site_name = microsite.get_value(
@@ -1620,7 +1691,7 @@ def get_and_clean_student_list(students):
     """
 
     students = split_by_comma_and_whitespace(students)
-    students = [str(s.strip()) for s in students]
+    students = [unicode(s.strip()) for s in students]
     students = [s for s in students if s != '']
     students_lc = [x.lower() for x in students]
 

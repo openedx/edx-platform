@@ -199,8 +199,7 @@ def flagged_problem_list(request, course_id):
     # Make a service that can query edX ORA.
     controller_qs = create_controller_query_service()
     try:
-        problem_list_json = controller_qs.get_flagged_problem_list(course_id)
-        problem_list_dict = json.loads(problem_list_json)
+        problem_list_dict = controller_qs.get_flagged_problem_list(course_id)
         success = problem_list_dict['success']
         if 'error' in problem_list_dict:
             error_text = problem_list_dict['error']
@@ -332,7 +331,7 @@ def take_action_on_flags(request, course_id):
     controller_qs = create_controller_query_service()
     try:
         response = controller_qs.take_action_on_flags(course_id, student_id, submission_id, action_type)
-        return HttpResponse(response, mimetype="application/json")
+        return HttpResponse(json.dumps(response), mimetype="application/json")
     except GradingServiceError:
         log.exception(
             u"Error taking action on flagged peer grading submissions, "

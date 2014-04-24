@@ -36,13 +36,8 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
-
-% if course:
-  <header class="global slim" aria-label="${_('Global Navigation')}">
-% else:
-  <header class="global" aria-label="${_('Global Navigation')}">
-% endif
-  <nav>
+  <header class="global ${"slim" if course else ""}" aria-label="${_('Global Navigation')}">
+    <nav>
 
   <h1 class="logo" style=" width: 84px; height: 40px; ">
     <a href="${marketing_link('ROOT')}">
@@ -66,7 +61,6 @@ site_status_msg = get_site_status_msg(course_id)
     % endif
 
     % if user.is_authenticated():
-
     <div style="float:right">
     <ol class="left nav-global authenticated">
       <%block name="navigation_global_links_authenticated">

@@ -13,4 +13,4 @@ class ExportPage(CoursePage):
     url_path = "export"
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-export')
+        return self.q(css='body.view-export').present

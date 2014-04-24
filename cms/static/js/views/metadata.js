@@ -1,20 +1,17 @@
 define(
     [
         "js/views/baseview", "underscore", "js/models/metadata", "js/views/abstract_editor",
-        "js/views/transcripts/metadata_videolist"
+        "js/views/video/transcripts/metadata_videolist",
+        "js/views/video/translations_editor"
     ],
-function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
+function(BaseView, _, MetadataModel, AbstractEditor, VideoList, VideoTranslations) {
     var Metadata = {};
 
     Metadata.Editor = BaseView.extend({
 
         // Model is CMS.Models.MetadataCollection,
         initialize : function() {
-            var tpl = $("#metadata-editor-tpl").text();
-            if(!tpl) {
-                console.error("Couldn't load metadata editor template");
-            }
-            this.template = _.template(tpl);
+            this.template = this.loadTemplate('metadata-editor');
 
             this.$el.html(this.template({numEntries: this.collection.length}));
             var counter = 0;
@@ -82,6 +79,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
     });
 
     Metadata.VideoList = VideoList;
+    Metadata.VideoTranslations = VideoTranslations;
 
     Metadata.String = AbstractEditor.extend({
 
@@ -320,12 +318,14 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
 
     Metadata.RelativeTime = AbstractEditor.extend({
 
-        defaultValue : '00:00:00',
+        defaultValue: '00:00:00',
         // By default max value of RelativeTime field on Backend is 23:59:59,
         // that is 86399 seconds.
-        maxTimeInSeconds : 86399,
+        maxTimeInSeconds: 86399,
 
-        events : {
+        events: {
+            "focus input" : "addSelection",
+            "mouseup input" : "mouseUpHandler",
             "change input" : "updateModel",
             "keypress .setting-input" : "showClearButton"  ,
             "click .setting-clear" : "clear"
@@ -333,7 +333,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
 
         templateName: "metadata-string-entry",
 
-        getValueFromEditor : function () {
+        getValueFromEditor: function () {
             var $input = this.$el.find('#' + this.uniqueId);
 
             return $input.val();
@@ -384,18 +384,28 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
             ].join(':');
         },
 
-        setValueInEditor : function (value) {
+        setValueInEditor: function (value) {
             if (!value) {
                 value = this.defaultValue;
             }
 
             this.$el.find('input').val(value);
+        },
+
+        addSelection: function (event) {
+            $(event.currentTarget).select();
+        },
+
+        mouseUpHandler: function (event) {
+            // Prevents default behavior to make works selection in WebKit
+            // browsers
+            event.preventDefault();
         }
     });
 
     Metadata.Dict = AbstractEditor.extend({
 
-        events : {
+        events: {
             "click .setting-clear" : "clear",
             "keypress .setting-input" : "showClearButton",
             "change input" : "updateModel",

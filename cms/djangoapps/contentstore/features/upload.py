@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from lettuce.django import django_url
@@ -26,8 +26,7 @@ def go_to_uploads(_step):
 
 @step(u'I upload the( test)? file "([^"]*)"$')
 def upload_file(_step, is_test_file, file_name):
-    upload_css = 'a.upload-button'
-    world.css_click(upload_css)
+    world.click_link('Upload New File')
 
     if not is_test_file:
         _write_test_file(file_name, "test file")

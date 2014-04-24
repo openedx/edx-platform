@@ -7,14 +7,14 @@
 
 <div class="problem-progress"></div>
 
-<div class="problem">
+<div class="problem" role="application">
   ${ problem['html'] }
 
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
 
     % if check_button:
-    <input class="check ${ check_button }" type="button" value="${ check_button }" />
+    <input class="check ${ check_button }" type="button" data-checking="${ check_button_checking }" value="${ check_button }" />
     % endif
     % if reset_button:
     <input class="reset" type="button" value="${_('Reset')}" />
@@ -23,7 +23,7 @@
     <input class="save" type="button" value="${_('Save')}" />
     % endif
     % if answer_available:
-    <button class="show"><span class="show-label">${_('Show Answer(s)')}</span> <span class="sr">${_("(for question(s) above - adjacent to each field)")}</span></button>
+    <button class="show"><span class="show-label" aria-hidden="true">${_('Show Answer')}</span> <span class="sr">${_("Reveal Answer")}</span></button>
     % endif
     % if attempts_allowed :
     <div class="submission_feedback">

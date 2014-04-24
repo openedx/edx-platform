@@ -20,7 +20,7 @@
 
 html {
   height: 100%;
-  /* Font size is needed to make the activity bar the corect size. */
+  /* Font size is needed to make the activity bar the correct size. */
   font-size: 10px;
 }
 
@@ -35,6 +35,7 @@ input,
 button,
 select {
   font: message-box;
+  outline: none;
 }
 
 .hidden {
@@ -47,8 +48,7 @@ select {
 #viewerContainer:-webkit-full-screen {
   top: 0px;
   border-top: 2px solid transparent;
-  background-color: #404040;
-  background-image: url(images/texture.png);
+  background-color: #000;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -58,8 +58,7 @@ select {
 #viewerContainer:-moz-full-screen {
   top: 0px;
   border-top: 2px solid transparent;
-  background-color: #404040;
-  background-image: url(images/texture.png);
+  background-color: #000;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -76,15 +75,13 @@ select {
 }
 
 #viewerContainer:-ms-fullscreen::-ms-backdrop {
-  background-color: #404040;
-  background-image: url(images/texture.png);
+  background-color: #000;
 }
 
 #viewerContainer:fullscreen {
   top: 0px;
   border-top: 2px solid transparent;
-  background-color: #404040;
-  background-image: url(images/texture.png);
+  background-color: #000;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -235,26 +232,31 @@ html[dir='rtl'] #outerContainer.sidebarOpen > #mainContainer {
   overflow: auto;
   position: absolute;
   width: 200px;
-
   background-color: hsla(0,0%,0%,.1);
-  box-shadow: inset -1px 0 0 hsla(0,0%,0%,.25);
 }
 html[dir='ltr'] #sidebarContent {
   left: 0;
+  box-shadow: inset -1px 0 0 hsla(0,0%,0%,.25);
 }
 html[dir='rtl'] #sidebarContent {
   right: 0;
+  box-shadow: inset 1px 0 0 hsla(0,0%,0%,.25);
 }
 
 #viewerContainer {
   overflow: auto;
-  box-shadow: inset 1px 0 0 hsla(0,0%,100%,.05);
   position: absolute;
   top: 32px;
   right: 0;
   bottom: 0;
   left: 0;
   outline: none;
+}
+html[dir='ltr'] #viewerContainer {
+  box-shadow: inset 1px 0 0 hsla(0,0%,100%,.05);
+}
+html[dir='rtl'] #viewerContainer {
+  box-shadow: inset -1px 0 0 hsla(0,0%,100%,.05);
 }
 
 .toolbar {
@@ -275,9 +277,16 @@ html[dir='rtl'] #sidebarContent {
   background-color: #424242; /* fallback */
   background-image: url(images/texture.png),
                     linear-gradient(hsla(0,0%,30%,.99), hsla(0,0%,25%,.95));
+}
+html[dir='ltr'] #toolbarSidebar {
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.25),
-
               inset 0 -1px 0 hsla(0,0%,100%,.05),
+              0 1px 0 hsla(0,0%,0%,.15),
+              0 0 1px hsla(0,0%,0%,.1);
+}
+html[dir='rtl'] #toolbarSidebar {
+  box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.25),
+              inset 0 1px 0 hsla(0,0%,100%,.05),
               0 1px 0 hsla(0,0%,0%,.15),
               0 0 1px hsla(0,0%,0%,.1);
 }
@@ -288,7 +297,16 @@ html[dir='rtl'] #sidebarContent {
   background-color: #474747; /* fallback */
   background-image: url(images/texture.png),
                     linear-gradient(hsla(0,0%,32%,.99), hsla(0,0%,27%,.95));
+}
+html[dir='ltr'] #toolbarContainer, .findbar, .secondaryToolbar {
   box-shadow: inset 1px 0 0 hsla(0,0%,100%,.08),
+              inset 0 1px 1px hsla(0,0%,0%,.15),
+              inset 0 -1px 0 hsla(0,0%,100%,.05),
+              0 1px 0 hsla(0,0%,0%,.15),
+              0 1px 1px hsla(0,0%,0%,.1);
+}
+html[dir='rtl'] #toolbarContainer, .findbar, .secondaryToolbar {
+  box-shadow: inset -1px 0 0 hsla(0,0%,100%,.08),
               inset 0 1px 1px hsla(0,0%,0%,.15),
               inset 0 -1px 0 hsla(0,0%,100%,.05),
               0 1px 0 hsla(0,0%,0%,.15),
@@ -568,7 +586,7 @@ html[dir='rtl'] .splitToolbarButton > .toolbarButton {
 .splitToolbarButton > .toolbarButton:hover,
 .splitToolbarButton > .toolbarButton:focus,
 .dropdownToolbarButton:hover,
-.promptButton:hover,
+.overlayButton:hover,
 .toolbarButton.textButton:hover,
 .toolbarButton.textButton:focus {
   background-color: hsla(0,0%,0%,.2);
@@ -625,7 +643,7 @@ html[dir='rtl'] .splitToolbarButtonSeparator {
 
 .toolbarButton,
 .dropdownToolbarButton,
-.promptButton,
+.overlayButton,
 .secondaryToolbarButton {
   min-width: 16px;
   padding: 2px 6px 0;
@@ -648,12 +666,12 @@ html[dir='rtl'] .splitToolbarButtonSeparator {
 }
 
 html[dir='ltr'] .toolbarButton,
-html[dir='ltr'] .promptButton,
+html[dir='ltr'] .overlayButton,
 html[dir='ltr'] .dropdownToolbarButton {
   margin: 3px 2px 4px 0;
 }
 html[dir='rtl'] .toolbarButton,
-html[dir='rtl'] .promptButton,
+html[dir='rtl'] .overlayButton,
 html[dir='rtl'] .dropdownToolbarButton {
   margin: 3px 0 4px 2px;
 }
@@ -661,7 +679,7 @@ html[dir='rtl'] .dropdownToolbarButton {
 .toolbarButton:hover,
 .toolbarButton:focus,
 .dropdownToolbarButton,
-.promptButton,
+.overlayButton,
 .secondaryToolbarButton:hover,
 .secondaryToolbarButton:focus {
   background-color: hsla(0,0%,0%,.12);
@@ -675,7 +693,7 @@ html[dir='rtl'] .dropdownToolbarButton {
 }
 
 .toolbarButton:hover:active,
-.promptButton:hover:active,
+.overlayButton:hover:active,
 .dropdownToolbarButton:hover:active,
 .secondaryToolbarButton:hover:active {
   background-color: hsla(0,0%,0%,.2);
@@ -749,7 +767,7 @@ html[dir='rtl'] .dropdownToolbarButton {
   background: hsl(0,0%,24%);
 }
 
-.promptButton {
+.overlayButton {
   margin: 3px 2px 4px 5px !important;
   line-height: 16px;
   padding: 2px 6px 3px 6px;
@@ -805,7 +823,6 @@ html[dir='rtl'] #findNext {
 .toolbarButton::before,
 .secondaryToolbarButton::before {
   /* All matching images have a size of 16x16
-   * (except for the print button: 18x16)
    * All relevant containers have a size of 32x25 */
   position: absolute;
   display: inline-block;
@@ -878,14 +895,6 @@ html[dir='rtl'] .toolbarButton.pageDown::before {
 .toolbarButton.print::before,
 .secondaryToolbarButton.print::before {
   content: url(images/toolbarButton-print.png);
-  left: 6px;
-}
-
-html[dir="ltr"] .secondaryToolbarButton.print::before {
-  left: 3px;
-}
-html[dir="rtl"] .secondaryToolbarButton.print::before {
-  right: 3px;
 }
 
 .toolbarButton.openFile::before,
@@ -903,6 +912,7 @@ html[dir="rtl"] .secondaryToolbarButton.print::before {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+  outline: none;
   padding-top: 4px;
   text-decoration: none;
 }
@@ -983,6 +993,14 @@ html[dir="rtl"] .secondaryToolbarButton > span {
   content: url(images/secondaryToolbarButton-rotateCw.png);
 }
 
+.secondaryToolbarButton.handTool::before {
+  content: url(images/secondaryToolbarButton-handTool.png);
+}
+
+.secondaryToolbarButton.documentProperties::before {
+  content: url(images/secondaryToolbarButton-documentProperties.png);
+}
+
 .verticalToolbarSeparator {
   display: block;
   padding: 8px 0;
@@ -1034,6 +1052,7 @@ html[dir='rtl'] .verticalToolbarSeparator {
 }
 
 .toolbarField.pageNumber {
+  -moz-appearance: textfield; /* hides the spinner in moz */
   min-width: 16px;
   text-align: right;
   width: 40px;
@@ -1206,22 +1225,6 @@ html[dir='rtl'] .outlineItem > a {
   cursor: default;
 }
 
-#findScrollView {
-  position: absolute;
-  top: 10px;
-  bottom: 10px;
-  left: 10px;
-  width: 280px;
-}
-
-#sidebarControls {
-  position:absolute;
-  width: 180px;
-  height: 32px;
-  left: 15px;
-  bottom: 35px;
-}
-
 .canvasWrapper {
   overflow: hidden;
 }
@@ -1244,14 +1247,7 @@ canvas {
   background-color: white;
 }
 
-.page > a,
-.annotationLayer > a {
-  display: block;
-  position: absolute;
-}
-
-.page > a:hover,
-.annotationLayer > a:hover {
+.annotLink > a:hover {
   opacity: 0.2;
   background: #ff0;
   box-shadow: 0px 2px 10px #ff0;
@@ -1316,29 +1312,49 @@ canvas {
 ::selection { background:rgba(0,0,255,0.3); }
 ::-moz-selection { background:rgba(0,0,255,0.3); }
 
-.annotText > div {
-  z-index: 200;
+.annotationHighlight {
   position: absolute;
-  padding: 0.6em;
-  max-width: 20em;
-  background-color: #FFFF99;
-  box-shadow: 0px 2px 10px #333;
-  border-radius: 7px;
+  border: 2px #FFFF99 solid;
 }
 
 .annotText > img {
   position: absolute;
-  opacity: 0.6;
+  cursor: pointer;
 }
 
-.annotText > img:hover {
-  opacity: 1;
+.annotTextContentWrapper {
+  position: absolute;
+  width: 20em;
 }
 
-.annotText > div > h1 {
-  font-size: 1.2em;
+.annotTextContent {
+  z-index: 200;
+  float: left;
+  max-width: 20em;
+  background-color: #FFFF99;
+  box-shadow: 0px 2px 5px #333;
+  border-radius: 2px;
+  padding: 0.6em;
+  cursor: pointer;
+}
+
+.annotTextContent > h1 {
+  font-size: 1em;
   border-bottom: 1px solid #000000;
-  margin: 0px;
+  padding-bottom: 0.2em;
+}
+
+.annotTextContent > p {
+  padding-top: 0.2em;
+}
+
+.annotLink > a {
+  position: absolute;
+  font-size: 1em;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 #errorWrapper {
@@ -1425,6 +1441,73 @@ canvas {
   border-color: hsla(0,0%,0%,.32) hsla(0,0%,0%,.38) hsla(0,0%,0%,.42);
 }
 
+#documentPropertiesContainer {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#documentPropertiesContainer > * {
+  display: inline-block;
+  padding: 15px;
+  border-spacing: 4px;
+  max-width: 350px;
+  max-height: 350px;
+  color: hsl(0,0%,85%);
+  font-size: 12px;
+  line-height: 14px;
+  text-align: left;
+  cursor: default;
+  background-color: #474747; /* fallback */
+  background-image: url(images/texture.png),
+                    linear-gradient(hsla(0,0%,32%,.99), hsla(0,0%,27%,.95));
+  box-shadow: inset 1px 0 0 hsla(0,0%,100%,.08),
+              inset 0 1px 1px hsla(0,0%,0%,.15),
+              inset 0 -1px 0 hsla(0,0%,100%,.05),
+              0 1px 0 hsla(0,0%,0%,.15),
+              0 1px 1px hsla(0,0%,0%,.1);
+}
+
+#documentPropertiesContainer .separator {
+  display: block; 
+  margin: 4px 0 4px 0;
+  height: 1px;
+  width: 100%;
+  background-color: hsla(0,0%,0%,.5);
+  box-shadow: 0 0 0 1px hsla(0,0%,100%,.08);
+}
+
+#documentPropertiesContainer .row {
+  display: table-row;
+}
+
+html[dir='ltr'] #documentPropertiesContainer .row > * {
+  display: table-cell;
+  min-width: 100px;
+}
+
+html[dir='rtl'] #documentPropertiesContainer .row > * {
+  display: table-cell;
+  min-width: 100px;
+  text-align: right;
+}
+
+#documentPropertiesContainer .row span {
+  width: 125px;
+  word-wrap: break-word;
+}
+
+#documentPropertiesContainer .row p {
+  max-width: 225px;
+  word-wrap: break-word;
+}
+
+#documentPropertiesContainer .buttonRow {
+  margin-top: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+
 .clearBoth {
   clear: both;
 }
@@ -1433,6 +1516,10 @@ canvas {
   background: white;
   color: black;
   margin-top: 5px;
+  visibility: hidden;
+  position: fixed;
+  right: 0;
+  top: 0;
 }
 
 #PDFBug {
@@ -1494,12 +1581,185 @@ canvas {
   color: black;
 }
 
+.grab-to-pan-grab {
+  cursor: url("images/grab.cur"), move !important;
+  cursor: -webkit-grab !important;
+  cursor: -moz-grab !important;
+  cursor: grab !important;
+}
+.grab-to-pan-grab *:not(input):not(textarea):not(button):not(select):not(:link) {
+  cursor: inherit !important;
+}
+.grab-to-pan-grab:active,
+.grab-to-pan-grabbing {
+  cursor: url("images/grabbing.cur"), move !important;
+  cursor: -webkit-grabbing !important;
+  cursor: -moz-grabbing !important;
+  cursor: grabbing !important;
+
+  position: fixed;
+  background: transparent;
+  display: block;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: 50000; /* should be higher than anything else in PDF.js! */
+}
+
 @page {
   margin: 0;
 }
 
 #printContainer {
   display: none;
+}
+
+@media screen and (min-resolution: 2dppx) {
+  /* Rules for Retina screens */
+  .toolbarButton::before {
+    -webkit-transform: scale(0.5);
+    transform: scale(0.5);
+    top: -5px;
+  }
+
+  .secondaryToolbarButton::before {
+    -webkit-transform: scale(0.5);
+    transform: scale(0.5);
+    top: -4px;
+  }
+
+  html[dir='ltr'] .toolbarButton::before,
+  html[dir='rtl'] .toolbarButton::before {
+    left: -1px;
+  }
+
+  html[dir='ltr'] .secondaryToolbarButton::before {
+    left: -2px;
+  }
+  html[dir='rtl'] .secondaryToolbarButton::before {
+    left: 186px;
+  }
+
+  .dropdownToolbarButton {
+    background: url(images/toolbarButton-menuArrows@2x.png) no-repeat;
+    background-size: 7px 16px;
+  }
+  
+  html[dir='ltr'] .toolbarButton#sidebarToggle::before {
+    content: url(images/toolbarButton-sidebarToggle@2x.png);
+  }
+  html[dir='rtl'] .toolbarButton#sidebarToggle::before {
+    content: url(images/toolbarButton-sidebarToggle-rtl@2x.png);
+  }
+
+  html[dir='ltr'] .toolbarButton#secondaryToolbarToggle::before {
+    content: url(images/toolbarButton-secondaryToolbarToggle@2x.png);
+  }
+  html[dir='rtl'] .toolbarButton#secondaryToolbarToggle::before {
+    content: url(images/toolbarButton-secondaryToolbarToggle-rtl@2x.png);
+  }
+
+  html[dir='ltr'] .toolbarButton.findPrevious::before {
+    content: url(images/findbarButton-previous@2x.png);
+  }
+  html[dir='rtl'] .toolbarButton.findPrevious::before {
+    content: url(images/findbarButton-previous-rtl@2x.png);
+  }
+
+  html[dir='ltr'] .toolbarButton.findNext::before {
+    content: url(images/findbarButton-next@2x.png);
+  }
+  html[dir='rtl'] .toolbarButton.findNext::before {
+    content: url(images/findbarButton-next-rtl@2x.png);
+  }
+
+  html[dir='ltr'] .toolbarButton.pageUp::before {
+    content: url(images/toolbarButton-pageUp@2x.png);
+  }
+  html[dir='rtl'] .toolbarButton.pageUp::before {
+    content: url(images/toolbarButton-pageUp-rtl@2x.png);
+  }
+
+  html[dir='ltr'] .toolbarButton.pageDown::before {
+    content: url(images/toolbarButton-pageDown@2x.png);
+  }
+  html[dir='rtl'] .toolbarButton.pageDown::before {
+    content: url(images/toolbarButton-pageDown-rtl@2x.png);
+  }
+
+  .toolbarButton.zoomIn::before {
+    content: url(images/toolbarButton-zoomIn@2x.png);
+  }
+
+  .toolbarButton.zoomOut::before {
+    content: url(images/toolbarButton-zoomOut@2x.png);
+  }
+
+  .toolbarButton.presentationMode::before,
+  .secondaryToolbarButton.presentationMode::before {
+    content: url(images/toolbarButton-presentationMode@2x.png);
+  }
+
+  .toolbarButton.print::before,
+  .secondaryToolbarButton.print::before {
+    content: url(images/toolbarButton-print@2x.png);
+  }
+
+  .toolbarButton.openFile::before,
+  .secondaryToolbarButton.openFile::before {
+    content: url(images/toolbarButton-openFile@2x.png);
+  }
+
+  .toolbarButton.download::before,
+  .secondaryToolbarButton.download::before {
+    content: url(images/toolbarButton-download@2x.png);
+  }
+
+  .toolbarButton.bookmark::before,
+  .secondaryToolbarButton.bookmark::before {
+    content: url(images/toolbarButton-bookmark@2x.png);
+  }
+
+  #viewThumbnail.toolbarButton::before {
+    content: url(images/toolbarButton-viewThumbnail@2x.png);
+  }
+
+  html[dir="ltr"] #viewOutline.toolbarButton::before {
+    content: url(images/toolbarButton-viewOutline@2x.png);
+  }
+  html[dir="rtl"] #viewOutline.toolbarButton::before {
+    content: url(images/toolbarButton-viewOutline-rtl@2x.png);
+  }
+
+  #viewFind.toolbarButton::before {
+    content: url(images/toolbarButton-search@2x.png);
+  }
+
+  .secondaryToolbarButton.firstPage::before {
+    content: url(images/secondaryToolbarButton-firstPage@2x.png);
+  }
+
+  .secondaryToolbarButton.lastPage::before {
+    content: url(images/secondaryToolbarButton-lastPage@2x.png);
+  }
+
+  .secondaryToolbarButton.rotateCcw::before {
+    content: url(images/secondaryToolbarButton-rotateCcw@2x.png);
+  }
+
+  .secondaryToolbarButton.rotateCw::before {
+    content: url(images/secondaryToolbarButton-rotateCw@2x.png);
+  }
+
+  .secondaryToolbarButton.handTool::before {
+    content: url(images/secondaryToolbarButton-handTool@2x.png);
+  }
+
+  .secondaryToolbarButton.documentProperties::before {
+    content: url(images/secondaryToolbarButton-documentProperties@2x.png);
+  }
 }
 
 @media print {

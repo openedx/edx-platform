@@ -11,6 +11,7 @@ from xmodule.vertical_module import VerticalModule, VerticalDescriptor
 from xblock.field_data import DictFieldData
 from xblock.fragment import Fragment
 from xblock.core import XBlock
+from xblock.fields import ScopeIds
 
 from . import get_test_system
 
@@ -216,6 +217,7 @@ class FakeChild(XBlock):
         self.student_view = Mock(return_value=Fragment(self.get_html()))
         self.save = Mock()
         self.id = 'i4x://this/is/a/fake/id'
+        self.scope_ids = ScopeIds('fake_user_id', 'fake_block_type', 'fake_definition_id', 'fake_usage_id')
 
     def get_html(self):
         """

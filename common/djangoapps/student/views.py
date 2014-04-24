@@ -35,6 +35,8 @@ from django.utils.encoding import force_unicode
 from django.utils.simplejson import JSONEncoder
 from django.views.decorators.http import require_POST, require_GET
 
+from django.template.response import TemplateResponse
+
 from ratelimitbackend.exceptions import RateLimitException
 
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -45,7 +47,8 @@ from course_modes.models import CourseMode
 from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
-    CourseEnrollmentAllowed, UserStanding, LoginFailures
+    CourseEnrollmentAllowed, UserStanding, LoginFailures,
+    create_comments_service_user, PasswordHistory
 )
 from student.forms import PasswordResetFormNoActive
 from student.firebase_token_generator import create_token
@@ -609,6 +612,8 @@ def dashboard(request):
     # add in the default language if it's not in the list of released languages
     if settings.LANGUAGE_CODE not in language_options:
         language_options.append(settings.LANGUAGE_CODE)
+        # Re-alphabetize language options
+        language_options.sort()
 
     # try to get the prefered language for the user
     cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
@@ -725,15 +730,6 @@ def change_enrollment(request):
             )
 
         current_mode = available_modes[0]
-
-        course_id_dict = Location.parse_course_id(course_id)
-        dog_stats_api.increment(
-            "common.student.enrollment",
-            tags=[u"org:{org}".format(**course_id_dict),
-                  u"course:{course}".format(**course_id_dict),
-                  u"run:{name}".format(**course_id_dict)]
-        )
-
         CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
 
         return HttpResponse()
@@ -755,13 +751,6 @@ def change_enrollment(request):
         if not CourseEnrollment.is_enrolled(user, course_id):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
         CourseEnrollment.unenroll(user, course_id)
-        course_id_dict = Location.parse_course_id(course_id)
-        dog_stats_api.increment(
-            "common.student.unenrollment",
-            tags=[u"org:{org}".format(**course_id_dict),
-                  u"course:{course}".format(**course_id_dict),
-                  u"run:{name}".format(**course_id_dict)]
-        )
         return HttpResponse()
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
@@ -862,6 +851,15 @@ def login_user(request, error=""):
                 "success": False,
                 "value": _('This account has been temporarily locked due to excessive login failures. Try again later.'),
             })  # TODO: this should be status code 429  # pylint: disable=fixme
+
+    # see if the user must reset his/her password due to any policy settings
+    if PasswordHistory.should_user_reset_password_now(user_found_by_email_lookup):
+        return JsonResponse({
+            "success": False,
+            "value": _('Your password has expired due to password policy on this account. You must '
+                       'reset your password before you can log in again. Please click the '
+                       'Forgot Password" link on this page to reset your password before logging in again.'),
+        })  # TODO: this should be status code 403  # pylint: disable=fixme
 
     # if the user doesn't exist, we want to set the username to an invalid
     # username so that authentication is guaranteed to fail and we can take
@@ -1068,6 +1066,12 @@ def change_setting(request):
     })
 
 
+class AccountValidationError(Exception):
+    def __init__(self, message, field):
+        super(AccountValidationError, self).__init__(message)
+        self.field = field
+
+
 def _validate_statgradlogin(login):
     """
     Raises ValidationError
@@ -1095,20 +1099,30 @@ def _do_create_account(post_vars):
                 is_active=False)
     user.set_password(post_vars['password'])
     registration = Registration()
+
     # TODO: Rearrange so that if part of the process fails, the whole process fails.
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
     try:
         user.save()
     except IntegrityError:
-        js = {'success': False}
         # Figure out the cause of the integrity error
-        
-        if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = _("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
-            js['field'] = 'email'
-            return JsonResponse(js, status=400)
+        if len(User.objects.filter(username=post_vars['email'])) > 0:
+            raise AccountValidationError(
+                _("An account with the Public Username '{username}' already exists.").format(username=post_vars['username']),
+                field="username"
+                )
+        elif len(User.objects.filter(email=post_vars['email'])) > 0:
+            raise AccountValidationError(
+                _("An account with the Email '{email}' already exists.").format(email=post_vars['email']),
+                field="email"
+                )
+        else:
+            raise
 
-        raise
+    # add this account creation to password history
+    # NOTE, this will be a NOP unless the feature has been turned on in configuration
+    password_history_entry = PasswordHistory()
+    password_history_entry.create(user)
 
     registration.register(user)
 
@@ -1146,6 +1160,7 @@ def _do_create_account(post_vars):
         profile.save()
     except Exception:
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
+        raise
 
     UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
 
@@ -1306,10 +1321,16 @@ def create_account(request, post_override=None):
             return JsonResponse(js, status=400)
 
     # Ok, looks like everything is legit.  Create the account.
-    ret = _do_create_account(post_vars)
-    if isinstance(ret, HttpResponse):  # if there was an error then return that
-        return ret
+    try:
+        with transaction.commit_on_success():
+            ret = _do_create_account(post_vars)
+    except AccountValidationError as e:
+        return JsonResponse({'success': False, 'value': e.message, 'field': e.field}, status=400)
+
     (user, profile, registration) = ret
+
+    dog_stats_api.increment("common.student.account_created")
+    create_comments_service_user(user)
 
     context = {
         'name': post_vars['lastname'],
@@ -1370,8 +1391,6 @@ def create_account(request, post_override=None):
             login_user.is_active = True
             login_user.save()
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(login_user.username, login_user.email))
-
-    dog_stats_api.increment("common.student.account_created")
 
     response = JsonResponse({
         'success': True,
@@ -1441,20 +1460,16 @@ def auto_auth(request):
 
     # Attempt to create the account.
     # If successful, this will return a tuple containing
-    # the new user object; otherwise it will return an error
-    # message.
-    result = _do_create_account(post_data)
-
-    if isinstance(result, tuple):
-        user = result[0]
-
-    # If we did not create a new account, the user might already
-    # exist.  Attempt to retrieve it.
-    else:
+    # the new user object.
+    try:
+        user, profile, reg = _do_create_account(post_data)
+    except AccountValidationError:
+        # Attempt to retrieve the existing user.
         user = User.objects.get(username=username)
         user.email = email
         user.set_password(password)
         user.save()
+        reg = Registration.objects.get(user=user)
 
     # Set the user's global staff bit
     if is_staff is not None:
@@ -1462,7 +1477,6 @@ def auto_auth(request):
         user.save()
 
     # Activate the user
-    reg = Registration.objects.get(user=user)
     reg.activate()
     reg.save()
 
@@ -1478,6 +1492,8 @@ def auto_auth(request):
     # Log in as the user
     user = authenticate(username=username, password=password)
     login(request, user)
+
+    create_comments_service_user(user)
 
     # Provide the user with a valid CSRF token
     # then return a 200 response
@@ -1569,12 +1585,71 @@ def password_reset_confirm_wrapper(
         user.save()
     except (ValueError, User.DoesNotExist):
         pass
-    # we also want to pass settings.PLATFORM_NAME in as extra_context
 
-    extra_context = {"platform_name": settings.PLATFORM_NAME}
-    return password_reset_confirm(
-        request, uidb36=uidb36, token=token, extra_context=extra_context
-    )
+    # tie in password strength enforcement as an optional level of
+    # security protection
+    err_msg = None
+
+    if request.method == 'POST':
+        password = request.POST['new_password1']
+        if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+            try:
+                validate_password_length(password)
+                validate_password_complexity(password)
+                validate_password_dictionary(password)
+            except ValidationError, err:
+                err_msg = _('Password: ') + '; '.join(err.messages)
+
+        # also, check the password reuse policy
+        if not PasswordHistory.is_allowable_password_reuse(user, password):
+            if user.is_staff:
+                num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
+            else:
+                num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
+            err_msg = _("You are re-using a password that you have used recently. You must "
+                        "have {0} distinct password(s) before reusing a previous password.").format(num_distinct)
+
+        # also, check to see if passwords are getting reset too frequent
+        if PasswordHistory.is_password_reset_too_soon(user):
+            num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
+            err_msg = _("You are resetting passwords too frequently. Due to security policies, "
+                        "{0} day(s) must elapse between password resets").format(num_days)
+
+    if err_msg:
+        # We have an password reset attempt which violates some security policy, use the
+        # existing Django template to communicate this back to the user
+        context = {
+            'validlink': True,
+            'form': None,
+            'title': _('Password reset unsuccessful'),
+            'err_msg': err_msg,
+        }
+        return TemplateResponse(request, 'registration/password_reset_confirm.html', context)
+    else:
+        # we also want to pass settings.PLATFORM_NAME in as extra_context
+        extra_context = {"platform_name": settings.PLATFORM_NAME}
+
+        if request.method == 'POST':
+            # remember what the old password hash is before we call down
+            old_password_hash = user.password
+
+            result = password_reset_confirm(
+                request, uidb36=uidb36, token=token, extra_context=extra_context
+            )
+
+            # get the updated user
+            updated_user = User.objects.get(id=uid_int)
+
+            # did the password hash change, if so record it in the PasswordHistory
+            if updated_user.password != old_password_hash:
+                entry = PasswordHistory()
+                entry.create(updated_user)
+
+            return result
+        else:
+            return password_reset_confirm(
+                request, uidb36=uidb36, token=token, extra_context=extra_context
+            )
 
 
 def reactivation_email_for_user(user):
@@ -1612,7 +1687,7 @@ def change_email_request(request):
     """ AJAX call from the profile page. User wants a new e-mail.
     """
     ## Make sure it checks for existing e-mail conflicts
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated():
         raise Http404
 
     user = request.user
@@ -1744,17 +1819,18 @@ def confirm_email_change(request, key):
 
 
 @ensure_csrf_cookie
+@require_POST
 def change_name_request(request):
     """ Log a request for a new name. """
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated():
         raise Http404
 
     try:
-        pnc = PendingNameChange.objects.get(user=request.user)
+        pnc = PendingNameChange.objects.get(user=request.user.id)
     except PendingNameChange.DoesNotExist:
         pnc = PendingNameChange()
     pnc.user = request.user
-    pnc.new_name = request.POST['new_name']
+    pnc.new_name = request.POST['new_name'].strip()
     pnc.rationale = request.POST['rationale']
     if len(pnc.new_name) < 2:
         return JsonResponse({

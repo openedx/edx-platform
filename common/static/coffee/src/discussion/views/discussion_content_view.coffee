@@ -170,16 +170,17 @@ if Backbone?
       buttonTextFmt =
         if voted
           ngettext(
-            "%(voteNum)s%(startSrSpan)s vote (click to remove your vote)%(endSrSpan)s",
-            "%(voteNum)s%(startSrSpan)s votes (click to remove your vote)%(endSrSpan)s",
+            "vote (click to remove your vote)",
+            "votes (click to remove your vote)",
             voteNum
           )
         else
           ngettext(
-            "%(voteNum)s%(startSrSpan)s vote (click to vote)%(endSrSpan)s",
-            "%(voteNum)s%(startSrSpan)s votes (click to vote)%(endSrSpan)s",
+            "vote (click to vote)",
+            "votes (click to vote)",
             voteNum
           )
+      buttonTextFmt = "%(voteNum)s%(startSrSpan)s " + buttonTextFmt + "%(endSrSpan)s"
       buttonText = interpolate(
         buttonTextFmt,
         {voteNum: voteNum, startSrSpan: "<span class='sr'>", endSrSpan: "</span>"},

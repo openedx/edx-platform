@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 #EVERY PROBLEM TYPE MUST HAVE THE FOLLOWING:
 # -Section in Dictionary containing:

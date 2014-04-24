@@ -2,7 +2,7 @@ define(["js/views/baseview", "underscore", "jquery", "js/views/edit_chapter", "j
         function(BaseView, _, $, EditChapterView, NotificationView) {
     var EditTextbook = BaseView.extend({
         initialize: function() {
-            this.template = _.template($("#edit-textbook-tpl").text());
+            this.template = this.loadTemplate('edit-textbook');
             this.listenTo(this.model, "invalid", this.render);
             var chapters = this.model.get('chapters');
             this.listenTo(chapters, "add", this.addOne);

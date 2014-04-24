@@ -101,8 +101,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
         'coffee': [
             resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
             resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
-            resource_string(__name__, 'js/src/collapsible.coffee'),
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
+        ],
+        'js': [
+            resource_string(__name__, 'js/src/collapsible.js'),
         ]
     }
     js_module_name = "PeerGrading"
@@ -538,8 +540,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         error_text = ""
         problem_list = []
         try:
-            problem_list_json = self.peer_gs.get_problem_list(self.course_id, self.system.anonymous_student_id)
-            problem_list_dict = problem_list_json
+            problem_list_dict = self.peer_gs.get_problem_list(self.course_id, self.system.anonymous_student_id)
             success = problem_list_dict['success']
             if 'error' in problem_list_dict:
                 error_text = problem_list_dict['error']
@@ -719,4 +720,3 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     show_calibration_essay = module_attr('show_calibration_essay')
     use_for_single_location_local = module_attr('use_for_single_location_local')
     _find_corresponding_module_for_location = module_attr('_find_corresponding_module_for_location')
-

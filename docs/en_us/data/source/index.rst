@@ -5,7 +5,15 @@
 
 edX Data Documentation
 ======================
-The following documents are targeted at those who are working with various data formats consumed and produced by the edX platform -- primarily course authors and those who are conducting research on data in our system. Developer oriented discussion of architecture and strictly internal APIs should be documented elsewhere.
+The following documents are targeted at those who are working with various data formats consumed and produced by the edX platform -- primarily course authors and those who are conducting research on data in our system. 
+
+* If you are a course author working with course XML, see :ref:`Course Data Formats`.
+
+* If you are a researcher working with data, see :ref:`Internal Data Formats`.
+
+Developer-oriented discussion of architecture and strictly internal APIs will be documented elsewhere.
+
+.. _Course Data Formats:
 
 Course Data Formats
 -------------------
@@ -30,9 +38,9 @@ Specific Problem Types
    course_data_formats/word_cloud/word_cloud.rst
    course_data_formats/custom_response.rst
    course_data_formats/symbolic_response.rst
-   course_data_formats/jsinput.rst
    course_data_formats/formula_equation_input.rst
 
+.. _Internal Data Formats:
 
 Internal Data Formats
 ---------------------
@@ -42,6 +50,7 @@ These documents describe how we store course structure, student state/progress, 
    :maxdepth: 2
 
    internal_data_formats/change_log.rst
+   internal_data_formats/data_czar.rst
    internal_data_formats/sql_schema.rst
    internal_data_formats/discussion_data.rst
    internal_data_formats/wiki_data.rst

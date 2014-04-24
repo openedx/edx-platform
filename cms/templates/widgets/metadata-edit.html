@@ -5,14 +5,13 @@
   import hashlib
   import copy
   import json
-  hlskey = hashlib.md5(module.location.url()).hexdigest()
+  hlskey = hashlib.md5(module.location.url().encode('utf-8')).hexdigest()
 %>
 
 ## js templates
 <script id="metadata-editor-tpl" type="text/template">
     <%static:include path="js/metadata-editor.underscore" />
 </script>
-
 % for template_name in ["metadata-number-entry", "metadata-string-entry", "metadata-option-entry", "metadata-list-entry", "metadata-dict-entry"]:
     <script id="${template_name}" type="text/template">
         <%static:include path="js/${template_name}.underscore" />

@@ -26,11 +26,12 @@ from django.conf import settings
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
 <script>
-${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade)}
+  ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade)}
 </script>
 </%block>
 
 <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
+
 <%include file="/courseware/course_navigation.html" args="active_page='progress'" />
 
 <%
@@ -43,8 +44,14 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
   <div class="profile-wrapper">
 
     <div class="course-info" id="course-info-progress" aria-label="${_('Course Progress')}">
+      % if staff_access and studio_url is not None:
+        <div class="wrap-instructor-info">
+          <a class="instructor-info-action studio-view" href="${studio_url}">${_("View Grading in studio")}</a>
+        </div>
+      % endif
+      
       <header>
-      <h1>${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
+        <h1>${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
       </header>
 
       %if not course.disable_progress_graph:

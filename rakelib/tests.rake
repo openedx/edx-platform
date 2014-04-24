@@ -33,6 +33,10 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
         default_test_id += " #{system}/lib/*"
     end
 
+    if system == :lms
+        default_test_id += " #{system}/tests.py"
+    end
+
     if test_id.nil?
         test_id = default_test_id
 
@@ -47,9 +51,10 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
 end
 
 task :clean_test_files do
-    desc "Clean fixture files used by tests and .pyc files"
+    desc "Clean fixture files used by tests, .pyc files, and automatic screenshots"
     sh("git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads")
     sh("find . -type f -name \"*.pyc\" -delete")
+    sh("rm -rf test_root/log/auto_screenshots/*")
 end
 
 task :clean_reports_dir => REPORT_DIR do

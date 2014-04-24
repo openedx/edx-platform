@@ -75,7 +75,7 @@ class TestOrphan(CourseTestCase):
         """
         Test that auth restricts get and delete appropriately
         """
-        test_user_client, test_user = self.createNonStaffAuthedUserClient()
+        test_user_client, test_user = self.create_non_staff_authed_user_client()
         CourseEnrollment.enroll(test_user, self.course.location.course_id)
         locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
         orphan_url = locator.url_reverse('orphan/', '')

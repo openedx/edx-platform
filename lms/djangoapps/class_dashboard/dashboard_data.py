@@ -1,6 +1,7 @@
 """
 Computes the data to display on the Instructor Dashboard
 """
+from util.json_request import JsonResponse
 
 from courseware import models
 from django.db.models import Count
@@ -9,7 +10,10 @@ from django.utils.translation import ugettext as _
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
+from analytics.csvs import create_csv_response
 
+# Used to limit the length of list displayed to the screen.
+MAX_SCREEN_LIST_LENGTH = 250
 
 def get_problem_grade_distribution(course_id):
     """
@@ -193,6 +197,7 @@ def get_d3_problem_grade_distrib(course_id):
                                     'color': percent,
                                     'value': count_grade,
                                     'tooltip': tooltip,
+                                    'module_url': child.location.url(),
                                 })
 
                         problem = {
@@ -251,6 +256,7 @@ def get_d3_sequential_open_distrib(course_id):
                 'color': 0,
                 'value': num_students,
                 'tooltip': tooltip,
+                'module_url': subsection.location.url(),
             })
             subsection = {
                 'xValue': "SS {0}".format(c_subsection),
@@ -399,3 +405,125 @@ def get_array_section_has_problem(course_id):
         i += 1
 
     return b_section_has_problem
+
+
+def get_students_opened_subsection(request, csv=False):
+    """
+    Get a list of students that opened a particular subsection.
+    If 'csv' is False, returns a dict of student's name: username.
+
+    If 'csv' is True, returns a header array, and an array of arrays in the format:
+    student names, usernames for CSV download.
+    """
+    module_id = request.GET.get('module_id')
+    csv = request.GET.get('csv')
+
+    # Query for "opened a subsection" students
+    students = models.StudentModule.objects.select_related('student').filter(
+        module_state_key__exact=module_id,
+        module_type__exact='sequential',
+    ).values('student__username', 'student__profile__name').order_by('student__profile__name')
+
+    results = []
+    if not csv:
+        # Restrict screen list length
+        # Adding 1 so can tell if list is larger than MAX_SCREEN_LIST_LENGTH
+        # without doing another select.
+        for student in students[0:MAX_SCREEN_LIST_LENGTH + 1]:
+            results.append({
+                'name': student['student__profile__name'],
+                'username': student['student__username'],
+            })
+
+        max_exceeded = False
+        if len(results) > MAX_SCREEN_LIST_LENGTH:
+            # Remove the last item so list length is exactly MAX_SCREEN_LIST_LENGTH
+            del results[-1]
+            max_exceeded = True
+        response_payload = {
+            'results': results,
+            'max_exceeded': max_exceeded,
+        }
+        return JsonResponse(response_payload)
+    else:
+        tooltip = request.GET.get('tooltip')
+        filename = sanitize_filename(tooltip[tooltip.index('S'):])
+
+        header = ['Name', 'Username']
+        for student in students:
+            results.append([student['student__profile__name'], student['student__username']])
+
+        response = create_csv_response(filename, header, results)
+        return response
+
+
+def get_students_problem_grades(request, csv=False):
+    """
+    Get a list of students and grades for a particular problem.
+    If 'csv' is False, returns a dict of student's name: username: grade: percent.
+
+    If 'csv' is True, returns a header array, and an array of arrays in the format:
+    student names, usernames, grades, percents for CSV download.
+    """
+    module_id = request.GET.get('module_id')
+    csv = request.GET.get('csv')
+
+    # Query for "problem grades" students
+    students = models.StudentModule.objects.select_related('student').filter(
+        module_state_key__exact=module_id,
+        module_type__exact='problem',
+        grade__isnull=False,
+    ).values('student__username', 'student__profile__name', 'grade', 'max_grade').order_by('student__profile__name')
+
+    results = []
+    if not csv:
+        # Restrict screen list length
+        # Adding 1 so can tell if list is larger than MAX_SCREEN_LIST_LENGTH
+        # without doing another select.
+        for student in students[0:MAX_SCREEN_LIST_LENGTH + 1]:
+            student_dict = {
+                'name': student['student__profile__name'],
+                'username': student['student__username'],
+                'grade': student['grade'],
+            }
+
+            student_dict['percent'] = 0
+            if student['max_grade'] > 0:
+                student_dict['percent'] = round(student['grade'] * 100 / student['max_grade'])
+            results.append(student_dict)
+
+        max_exceeded = False
+        if len(results) > MAX_SCREEN_LIST_LENGTH:
+            # Remove the last item so list length is exactly MAX_SCREEN_LIST_LENGTH
+            del results[-1]
+            max_exceeded = True
+
+        response_payload = {
+            'results': results,
+            'max_exceeded': max_exceeded,
+        }
+        return JsonResponse(response_payload)
+    else:
+        tooltip = request.GET.get('tooltip')
+        filename = sanitize_filename(tooltip[:tooltip.rfind(' - ')])
+
+        header = ['Name', 'Username', 'Grade', 'Percent']
+        for student in students:
+
+            percent = 0
+            if student['max_grade'] > 0:
+                percent = round(student['grade'] * 100 / student['max_grade'])
+            results.append([student['student__profile__name'], student['student__username'], student['grade'], percent])
+
+        response = create_csv_response(filename, header, results)
+        return response
+
+
+def sanitize_filename(filename):
+    """
+    Utility function
+    """
+    filename = filename.replace(" ", "_")
+    filename = filename.encode('ascii')
+    filename = filename[0:25] + '.csv'
+    return filename

@@ -23,13 +23,17 @@ class CapaModule(CapaMixin, XModule):
     """
     icon_class = 'problem'
 
-    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     ],
-          'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
-                 resource_string(__name__, 'js/src/capa/schematic.js')
-                 ]}
+    js = {
+        'coffee': [
+            resource_string(__name__, 'js/src/capa/display.coffee'),
+            resource_string(__name__, 'js/src/javascript_loader.coffee'),
+        ],
+        'js': [
+            resource_string(__name__, 'js/src/collapsible.js'),
+            resource_string(__name__, 'js/src/capa/imageinput.js'),
+            resource_string(__name__, 'js/src/capa/schematic.js'),
+        ]
+    }
 
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
@@ -176,6 +180,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')
     check_button_name = module_attr('check_button_name')
+    check_button_checking_name = module_attr('check_button_checking_name')
     check_problem = module_attr('check_problem')
     choose_new_seed = module_attr('choose_new_seed')
     closed = module_attr('closed')
