@@ -1255,10 +1255,13 @@ if FEATURES.get('AUTH_USE_CAS'):
 ############# CORS headers for cross-domain requests #################
 
 if FEATURES.get('ENABLE_CORS_HEADERS'):
-    INSTALLED_APPS += ('corsheaders',)
-    MIDDLEWARE_CLASSES += ('corsheaders.middleware.CorsMiddleware',)
+    INSTALLED_APPS += ('corsheaders', 'cors_csrf')
+    MIDDLEWARE_CLASSES = (
+        'corsheaders.middleware.CorsMiddleware',
+        'cors_csrf.middleware.CorsCSRFMiddleware',
+    ) + MIDDLEWARE_CLASSES
     CORS_ALLOW_CREDENTIALS = True
-    CORS_ORIGIN_WHITELIST = ('')
+    CORS_ORIGIN_WHITELIST = ()
 
 ###################### Registration ##################################
 
