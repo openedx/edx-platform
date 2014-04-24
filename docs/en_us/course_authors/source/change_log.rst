@@ -11,7 +11,6 @@ April, 2014
    :header-rows: 1
 
    * - Date
-<<<<<<< HEAD
      - Change  
    * - 04/24/14
      - Expanded the :ref:`Grades` chapter to include topics on interpreting the grade reports and student progress page.
