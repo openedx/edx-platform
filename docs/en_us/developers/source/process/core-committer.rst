@@ -38,9 +38,13 @@ keeping in mind that an unresponsive contributor may block the story in ways
 that the team can’t control. When deciding how many contributor pull request
 reviews to commit to in the upcoming iteration, teams should plan to spend about
 two hours per week per developer on the team -- larger teams can plan to spend
-more time than smaller teams. This is just a guideline, however: the teams can
-decide for themselves how many contributor pull request reviews they want to
-commit to.
+more time than smaller teams. For example, a team with two developers should plan
+to spend about four hours per week on pull request review, while a team with
+four developers should plan to spend about eight hours per week on pull request
+review -- these hours can be spread out among multiple developers, or one
+developer can do all the review for the whole team in that iteration.
+However, this is just a guideline: the teams can decide for themselves how
+many contributor pull request reviews they want to commit to.
 
 Once a pull request from a contributor passes all required code reviews, a core
 committer will need to merge the pull request into the project. The core
