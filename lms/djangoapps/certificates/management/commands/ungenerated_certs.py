@@ -82,7 +82,7 @@ class Command(BaseCommand):
             # prefetch all chapters/sequentials by saying depth=2
             course = modulestore().get_course(course_key, depth=2)
 
-            print "Fetching enrolled students for {0}".format(course_key)
+            print "Fetching enrolled students for {0}".format(course_key.to_deprecated_string())
             enrolled_students = User.objects.filter(
                 courseenrollment__course_id=course_key)
 
