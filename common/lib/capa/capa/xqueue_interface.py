@@ -13,6 +13,9 @@ dateformat = '%Y%m%d%H%M%S'
 
 XQUEUE_METRIC_NAME = 'edxapp.xqueue'
 
+# Wait time for response from Xqueue.
+XQUEUE_TIMEOUT = 35 # seconds
+
 
 def make_hashkey(seed):
     """
