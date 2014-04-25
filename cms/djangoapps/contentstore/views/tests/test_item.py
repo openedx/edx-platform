@@ -23,6 +23,7 @@ from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.keys import UsageKey
+from xmodule.modulestore.locations import Location
 
 
 class ItemTest(CourseTestCase):
@@ -707,7 +708,9 @@ class TestComponentHandler(TestCase):
 
         self.descriptor = self.get_modulestore.return_value.get_item.return_value
 
-        self.usage_id = 'dummy_usage_id'
+        self.usage_key_string = unicode(
+            Location('dummy_org', 'dummy_course', 'dummy_run', 'dummy_category', 'dummy_name')
+        )
 
         self.user = UserFactory()
 
@@ -718,7 +721,7 @@ class TestComponentHandler(TestCase):
         self.descriptor.handle.side_effect = Http404
 
         with self.assertRaises(Http404):
-            component_handler(self.request, self.usage_id, 'invalid_handler')
+            component_handler(self.request, self.usage_key_string, 'invalid_handler')
 
     @ddt.data('GET', 'POST', 'PUT', 'DELETE')
     def test_request_method(self, method):
@@ -734,7 +737,7 @@ class TestComponentHandler(TestCase):
         request = req_factory_method('/dummy-url')
         request.user = self.user
 
-        component_handler(request, self.usage_id, 'dummy_handler')
+        component_handler(request, self.usage_key_string, 'dummy_handler')
 
     @ddt.data(200, 404, 500)
     def test_response_code(self, status_code):
@@ -743,7 +746,7 @@ class TestComponentHandler(TestCase):
 
         self.descriptor.handle = create_response
 
-        self.assertEquals(component_handler(self.request, self.usage_id, 'dummy_handler').status_code, status_code)
+        self.assertEquals(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code, status_code)
 
 
 @ddt.ddt
