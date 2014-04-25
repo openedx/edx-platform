@@ -67,7 +67,14 @@ urlpatterns = ('',  # nopep8
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     url(r'^embargo$', 'student.views.embargo', name="embargo"),
+
 )
+
+# OPEN EDX API
+if settings.FEATURES["API"]:
+    urlpatterns += (
+        url(r'^api/*', include('api_manager.urls')),
+    )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (
