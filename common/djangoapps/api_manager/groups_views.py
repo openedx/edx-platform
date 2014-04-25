@@ -1,0 +1,258 @@
+""" API specification for Group-oriented interactions """
+import uuid
+
+from django.contrib.auth.models import Group, User
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
+
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+
+from api_manager.permissions import ApiKeyHeaderPermission
+from api_manager.models import GroupRelationship
+
+RELATIONSHIP_TYPES = {'hierarchical': 'h', 'graph': 'g'}
+
+
+def _serialize_group(group):
+    """
+    Loads the object data into the response dict
+    This should probably evolve to use DRF serializers
+    """
+    return {'name': group.name, 'id': group.id}
+
+
+@api_view(['POST'])
+@permission_classes((ApiKeyHeaderPermission,))
+def group_list(request):
+    """
+    POST creates a new group in the system
+    """
+    if request.method == 'POST':
+        # Group name must be unique, but we need to support dupes
+        group = Group.objects.create(name=str(uuid.uuid4()))
+        original_group_name = request.DATA['name']
+        group.name = '{:04d}: {}'.format(group.id, original_group_name)
+        group.record_active = True
+        group.record_date_created = timezone.now()
+        group.record_date_modified = timezone.now()
+        group.save()
+        # Relationship model also allows us to use duplicate names
+        GroupRelationship.objects.create(name=original_group_name, group_id=group.id, parent_group=None)
+        response_data = _serialize_group(group)
+        response_data['uri'] = '{}/{}'.format(request.path, group.id)
+        response_status = status.HTTP_201_CREATED
+        return Response(response_data, status=response_status)
+
+
+@api_view(['GET'])
+@permission_classes((ApiKeyHeaderPermission,))
+def group_detail(request, group_id):
+    """
+    GET retrieves an existing group from the system
+    """
+    if request.method == 'GET':
+        response_data = {}
+        try:
+            existing_group = Group.objects.get(id=group_id)
+            existing_group_relationship = GroupRelationship.objects.get(group_id=group_id)
+        except ObjectDoesNotExist:
+            existing_group = None
+            existing_group_relationship = None
+        if existing_group and existing_group_relationship:
+            response_data['name'] = existing_group_relationship.name
+            response_data['id'] = existing_group.id
+            response_data['uri'] = request.path
+            response_data['resources'] = []
+            resource_uri = '{}/users'.format(request.path)
+            response_data['resources'].append({'uri': resource_uri})
+            resource_uri = '{}/groups'.format(request.path)
+            response_data['resources'].append({'uri': resource_uri})
+            response_status = status.HTTP_200_OK
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+
+
+@api_view(['POST'])
+@permission_classes((ApiKeyHeaderPermission,))
+def group_users_list(request, group_id):
+    """
+    POST creates a new group-user relationship in the system
+    """
+    if request.method == 'POST':
+        response_data = {}
+        group_id = group_id
+        user_id = request.DATA['user_id']
+        try:
+            existing_group = Group.objects.get(id=group_id)
+            existing_user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            existing_group = None
+            existing_user = None
+        if existing_group and existing_user:
+            try:
+                existing_relationship = Group.objects.get(user=existing_user)
+            except ObjectDoesNotExist:
+                existing_relationship = None
+            if existing_relationship is None:
+                existing_group.user_set.add(existing_user.id)
+                response_data['uri'] = '{}/{}'.format(request.path, existing_user.id)
+                response_data['group_id'] = str(existing_group.id)
+                response_data['user_id'] = str(existing_user.id)
+                response_status = status.HTTP_201_CREATED
+            else:
+                response_data['uri'] = '{}/{}'.format(request.path, existing_user.id)
+                response_data['message'] = "Relationship already exists."
+                response_status = status.HTTP_409_CONFLICT
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+
+
+@api_view(['GET', 'DELETE'])
+@permission_classes((ApiKeyHeaderPermission,))
+def group_users_detail(request, group_id, user_id):
+    """
+    GET retrieves an existing group-user relationship from the system
+    DELETE removes/inactivates/etc. an existing group-user relationship
+    """
+    if request.method == 'GET':
+        response_data = {}
+        try:
+            existing_group = Group.objects.get(id=group_id)
+            existing_relationship = existing_group.user_set.get(id=user_id)
+        except ObjectDoesNotExist:
+            existing_group = None
+            existing_relationship = None
+        if existing_group and existing_relationship:
+            response_data['group_id'] = existing_group.id
+            response_data['user_id'] = existing_relationship.id
+            response_data['uri'] = request.path
+            response_status = status.HTTP_200_OK
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+    elif request.method == 'DELETE':
+        try:
+            existing_group = Group.objects.get(id=group_id)
+            existing_group.user_set.remove(user_id)
+            existing_group.save()
+        except ObjectDoesNotExist:
+            pass
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['POST', 'GET'])
+@permission_classes((ApiKeyHeaderPermission,))
+def group_groups_list(request, group_id):
+    """
+    POST creates a new group-group relationship in the system
+    GET retrieves the existing group-group relationships for the specified group
+    """
+    if request.method == 'POST':
+        to_group_id = request.DATA['group_id']
+        relationship_type = request.DATA['relationship_type']
+        response_data = {}
+        response_data['uri'] = '{}/{}'.format(request.path, to_group_id)
+        response_data['group_id'] = str(to_group_id)
+        response_data['relationship_type'] = relationship_type
+        try:
+            from_group_relationship = GroupRelationship.objects.get(group__id=group_id)
+            to_group_relationship = GroupRelationship.objects.get(group__id=to_group_id)
+        except ObjectDoesNotExist:
+            from_group_relationship = None
+            to_group_relationship = None
+        if from_group_relationship and to_group_relationship:
+            response_status = status.HTTP_201_CREATED
+            if relationship_type == RELATIONSHIP_TYPES['hierarchical']:
+                to_group_relationship.parent_group = from_group_relationship
+                to_group_relationship.save()
+            elif relationship_type == RELATIONSHIP_TYPES['graph']:
+                from_group_relationship.add_linked_group_relationship(to_group_relationship)
+            else:
+                response_data['message'] = "Relationship type '%s' not currently supported" % relationship_type
+                response_data['field_conflict'] = 'relationship_type'
+                response_status = status.HTTP_406_NOT_ACCEPTABLE
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+    elif request.method == 'GET':
+        try:
+            from_group_relationship = GroupRelationship.objects.get(group__id=group_id)
+        except ObjectDoesNotExist:
+            from_group_relationship = None
+        response_data = []
+        if from_group_relationship:
+            child_groups = GroupRelationship.objects.filter(parent_group_id=group_id)
+            if child_groups:
+                for group in child_groups:
+                    response_data.append({
+                                         "id": group.group_id,
+                                         "relationship_type": RELATIONSHIP_TYPES['hierarchical'],
+                                         "uri": '{}/{}'.format(request.path, group.group.id)
+                                         })
+            linked_groups = from_group_relationship.get_linked_group_relationships()
+            if linked_groups:
+                for group in linked_groups:
+                    response_data.append({
+                                         "id": group.to_group_relationship_id,
+                                         "relationship_type": RELATIONSHIP_TYPES['graph'],
+                                         "uri": '{}/{}'.format(request.path, group.to_group_relationship_id)
+                                         })
+            response_status = status.HTTP_200_OK
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+
+
+@api_view(['GET', 'DELETE'])
+@permission_classes((ApiKeyHeaderPermission,))
+def group_groups_detail(request, group_id, related_group_id):
+    """
+    GET retrieves an existing group-group relationship from the system
+    DELETE removes/inactivates/etc. an existing group-group relationship
+    """
+    if request.method == 'GET':
+        response_data = {}
+        response_data['uri'] = request.path
+        response_data['from_group_id'] = group_id
+        response_data['to_group_id'] = related_group_id
+        response_status = status.HTTP_404_NOT_FOUND
+        from_group_relationship = GroupRelationship.objects.get(group__id=group_id)
+        if from_group_relationship:
+            to_group_relationship = GroupRelationship.objects.get(group__id=related_group_id)
+            if to_group_relationship and str(to_group_relationship.parent_group_id) == str(group_id):
+                response_data['relationship_type'] = RELATIONSHIP_TYPES['hierarchical']
+                response_status = status.HTTP_200_OK
+            else:
+                to_group = Group.objects.get(id=to_group_relationship.group_id)
+                linked_group_exists = from_group_relationship.check_linked_group_relationship(to_group, symmetrical=True)
+                if linked_group_exists:
+                    response_data['relationship_type'] = RELATIONSHIP_TYPES['graph']
+                    response_status = status.HTTP_200_OK
+        return Response(response_data, response_status)
+    elif request.method == 'DELETE':
+        try:
+            from_group_relationship = GroupRelationship.objects.get(group__id=group_id)
+        except ObjectDoesNotExist:
+            from_group_relationship = None
+        try:
+            to_group_relationship = GroupRelationship.objects.get(group__id=related_group_id)
+        except ObjectDoesNotExist:
+            to_group = None
+            to_group_relationship = None
+        if from_group_relationship:
+            if to_group_relationship:
+                if to_group_relationship.parent_group_id is from_group_relationship.group_id:
+                    to_group_relationship.parent_group_id = None
+                    to_group_relationship.save()
+                else:
+                    from_group_relationship.remove_linked_group_relationship(to_group_relationship)
+                    from_group_relationship.save()
+            # No 'else' clause here -> It's ok if we didn't find a match
+            response_status = status.HTTP_204_NO_CONTENT
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response({}, status=response_status)
