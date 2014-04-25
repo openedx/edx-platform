@@ -35,17 +35,12 @@ class CoursesTest(ModuleStoreTestCase):
         Tests that get_cms_course_link_by_id and get_cms_block_link_by_id return the right thing
         """
 
-        cms_url = u"//{}/course/org.num.name/branch/draft/block/name".format(CMS_BASE_TEST)
         self.course = CourseFactory.create(
             org='org', number='num', display_name='name'
         )
 
-        self.assertEqual(
-            u"//{}/course/edx:org+num.name/branch/draft/block/name".format(
-                CMS_BASE_TEST
-            ),
-            get_cms_course_link(self.course)
-        )
+        cms_url = u"//{}/course/slashes:org+num+name".format(CMS_BASE_TEST)
+        self.assertEqual(cms_url, get_cms_course_link(self.course))
 
     @mock.patch(
         'xmodule.modulestore.django.get_current_request_hostname',
