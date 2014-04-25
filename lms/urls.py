@@ -72,8 +72,9 @@ urlpatterns = ('',  # nopep8
 
     url(r'^embargo$', 'student.views.embargo', name="embargo"),
 
-url(r'^announcements/announcement_list$', 'student.views.announcement_list', name='announcement_list')
+    url(r'^stat$', 'courseware.views.stat', name='stat'),
 
+    url(r'^announcements/announcement_list$', 'student.views.announcement_list', name='announcement_list'),
 )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
