@@ -14,6 +14,7 @@ class StubHttpServiceTest(unittest.TestCase):
         self.server = StubHttpService()
         self.addCleanup(self.server.shutdown)
         self.url = "http://127.0.0.1:{0}/set_config".format(self.server.port)
+        self.reset_config_url = "http://127.0.0.1:{0}/del_config".format(self.server.port)
 
     def test_configure(self):
         """
@@ -61,6 +62,25 @@ class StubHttpServiceTest(unittest.TestCase):
             "http://127.0.0.1:{0}/invalid_url".format(self.server.port),
             data="{}"
         )
+        self.assertEqual(response.status_code, 404)
+
+    def test_reset_configuration(self):
+        # JSON-encode parameter
+        post_params = {'test_reset': json.dumps('This is a reset config test')}
+        requests.put(self.url, data=post_params)
+
+        # ensure that there is some data in server config dict
+        self.assertEqual(self.server.config.get('test_reset'), 'This is a reset config test')
+
+        # reset server configuration
+        response = requests.delete(self.reset_config_url)
+        self.assertEqual(response.status_code, 200)
+
+        # ensure that server config dict is empty after successful reset
+        self.assertEqual(self.server.config, {})
+
+    def test_reset_config_unknown_path(self):
+        response = requests.delete("http://127.0.0.1:{0}/invalid_url".format(self.server.port))
         self.assertEqual(response.status_code, 404)
 
 

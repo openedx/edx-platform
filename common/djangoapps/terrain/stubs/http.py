@@ -139,6 +139,17 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         else:
             return path
 
+    def do_DELETE(self):              # pylint: disable=C0103
+        """
+        Allow callers to delete all the server configurations using the /del_config URL.
+        """
+        if self.path == "/del_config" or self.path == "/del_config/":
+            self.server.config = dict()
+            self.log_message("Reset Server Configuration.")
+            self.send_response(200)
+        else:
+            self.send_response(404)
+
     def do_PUT(self):
         """
         Allow callers to configure the stub server using the /set_config URL.
