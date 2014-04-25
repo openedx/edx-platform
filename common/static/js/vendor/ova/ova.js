@@ -2389,7 +2389,7 @@ OpenVideoAnnotation.Annotator = function (element, options) {
 	if (typeof options.optionsAnnotator.highlightTags!='undefined')
 		this.annotator.addPlugin("HighlightTags", options.optionsAnnotator.highlightTags);
 
-    if (typeof options.optionsAnnotator.diacriticMarksk != 'undefined' && typeof Annotator.Plugin["Diacritics"] === 'function')
+    if (typeof options.optionsAnnotator.diacriticMarks != 'undefined' && typeof Annotator.Plugin["Diacritics"] === 'function')
     	this.annotator.addPlugin("Diacritics", options.optionsAnnotator.diacriticMarks);
 	
     if (typeof Annotator.Plugin["Geolocation"] === 'function') 
