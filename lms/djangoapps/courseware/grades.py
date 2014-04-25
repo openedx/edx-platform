@@ -128,7 +128,7 @@ def answer_distributions(course_key):
                 answer = unicode(raw_answer)
                 answer_counts[(url, display_name, problem_part_id)][answer] += 1
 
-        except ItemNotFoundError, InvalidKeyError:
+        except (ItemNotFoundError, InvalidKeyError):
             msg = "Answer Distribution: Item {} referenced in StudentModule {} " + \
                   "for user {} in course {} not found; " + \
                   "This can happen if a student answered a question that " + \

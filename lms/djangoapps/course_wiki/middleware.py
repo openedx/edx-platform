@@ -5,7 +5,6 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.core.exceptions import PermissionDenied
 from wiki.models import reverse
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 from courseware.courses import get_course_with_access
 from courseware.access import has_access

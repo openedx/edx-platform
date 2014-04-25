@@ -53,7 +53,7 @@ from student.models import CourseEnrollment
 from student.roles import CourseRole, UserBasedRole
 
 from xmodule.html_module import AboutDescriptor
-from xmodule.modulestore.keys import CourseKey, UsageKey
+from xmodule.modulestore.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff

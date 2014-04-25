@@ -13,7 +13,6 @@ from django.core.mail import send_mail
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
-from xmodule.modulestore.keys import CourseKey
 
 from microsite_configuration import microsite
 
@@ -203,7 +202,7 @@ def _reset_module_attempts(studentmodule):
     studentmodule.save()
 
 
-def get_email_params(request, course, auto_enroll):
+def get_email_params(_request, course, auto_enroll):
     """
     Generate parameters used when parsing email templates.
 

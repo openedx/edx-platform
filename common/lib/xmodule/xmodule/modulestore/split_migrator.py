@@ -7,7 +7,6 @@ In general, it's strategy is to treat the other modulestores as read-only and to
 manipulate storage but use existing api's.
 '''
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
-from xmodule.modulestore.locations import Location
 
 
 class SplitMigrator(object):

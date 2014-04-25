@@ -1,5 +1,5 @@
 from datetime import timedelta
-from xmodule.modulestore.django import loc_mapper, modulestore
+from xmodule.modulestore.django import modulestore
 from xblock.fields import Scope
 
 

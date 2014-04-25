@@ -1,6 +1,5 @@
 import re
 from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 import logging
 
@@ -61,16 +60,16 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     c4x_link_base = StaticContent.get_base_url_path_for_course_assets(source_course_id)
     try:
         text = re.sub(_prefix_only_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
-    except Exception as e:
-        logging.warning("Error going regex substitution %r on text = %r.\n\nError msg = %s", c4x_link_base, text, str(e))
+    except Exception as exc:  # pylint: disable=broad-except
+        logging.warning("Error going regex substitution %r on text = %r.\n\nError msg = %s", c4x_link_base, text, str(exc))
 
     jump_to_link_base = u'/courses/{course_key_string}/jump_to/i4x://{course_key.org}/{course_key.course}/'.format(
         course_key_string=source_course_id.to_deprecated_string(), course_key=source_course_id
     )
     try:
         text = re.sub(_prefix_and_category_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
-    except Exception as e:
-        logging.warning("Error on regex substitution %r for text = %r.\n\nError msg = %s", jump_to_link_base, text, str(e))
+    except Exception as exc:  # pylint: disable=broad-except
+        logging.warning("Error on regex substitution %r for text = %r.\n\nError msg = %s", jump_to_link_base, text, str(exc))
 
     # Also, there commonly is a set of link URL's used in the format:
     # /courses/<org>/<course>/<name> which will be broken if migrated to a different course_id
@@ -82,8 +81,8 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
         try:
             generic_courseware_link_base = u'/courses/{}/'.format(source_course_id.to_deprecated_string())
             text = re.sub(_prefix_only_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)
-        except Exception as e:
-            logging.warning("Error going regex substitution %r on text = %r.\n\nError msg = %s", source_course_id, text, str(e))
+        except Exception as exc:  # pylint: disable=broad-except
+            logging.warning("Error going regex substitution %r on text = %r.\n\nError msg = %s", source_course_id, text, str(exc))
 
     return text
 

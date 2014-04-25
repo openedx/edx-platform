@@ -10,7 +10,6 @@ from embargo.fixtures.country_codes import COUNTRY_CODES
 import socket
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
@@ -23,16 +22,17 @@ class EmbargoedCourseForm(forms.ModelForm):  # pylint: disable=incomplete-protoc
 
     def clean_course_id(self):
         """Validate the course id"""
+
+        cleaned_id = self.cleaned_data["course_id"]
+
         try:
-            course_id = SlashSeparatedCourseKey.from_deprecated_string(self.cleaned_data["course_id"])
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(cleaned_id)
 
         except InvalidKeyError:
             msg = 'COURSE NOT FOUND'
-            msg += u' --- Entered course id was: "{0}". '.format(self.cleaned_data["course_id"])
+            msg += u' --- Entered course id was: "{0}". '.format(cleaned_id)
             msg += 'Please recheck that you have supplied a valid course id.'
             raise forms.ValidationError(msg)
-
-            return self.cleaned_data["course_id"]
 
         # Try to get the course.  If this returns None, it's not a real course
         try:

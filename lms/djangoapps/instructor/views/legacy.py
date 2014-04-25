@@ -535,12 +535,12 @@ def instructor_dashboard(request, course_id):
                 aidx = allgrades['assignments'].index(aname)
                 datatable = {'header': [_('External email'), aname]}
                 ddata = []
-                for x in allgrades['students']:  # do one by one in case there is a student who has only partial grades
+                for student in allgrades['students']:  # do one by one in case there is a student who has only partial grades
                     try:
-                        ddata.append([x.email, x.grades[aidx]])
+                        ddata.append([student.email, student.grades[aidx]])
                     except IndexError:
                         log.debug('No grade for assignment {idx} ({name}) for student {email}'.format(
-                            idx=aidx, name=aname, email=x.email)
+                            idx=aidx, name=aname, email=student.email)
                         )
                 datatable['data'] = ddata
 
@@ -603,9 +603,9 @@ def instructor_dashboard(request, course_id):
                     'mailing_address', 'goals']
         datatable = {'header': ['username', 'email'] + profkeys}
 
-        def getdat(u):
-            p = u.profile
-            return [u.username, u.email] + [getattr(p, x, '') for x in profkeys]
+        def getdat(user):
+            profile = user.profile
+            return [user.username, user.email] + [getattr(profile, xkey, '') for xkey in profkeys]
 
         datatable['data'] = [getdat(u) for u in enrolled_students]
         datatable['title'] = _('Student profile data for course {course_id}').format(
@@ -1782,29 +1782,29 @@ def dump_grading_context(course):
     msg += "-----------------------------------------------------------------------------\n"
     msg += "Listing grading context for course %s\n" % course.id
 
-    gc = course.grading_context
+    gcontext = course.grading_context
     msg += "graded sections:\n"
 
-    msg += '%s\n' % gc['graded_sections'].keys()
-    for (gs, gsvals) in gc['graded_sections'].items():
-        msg += "--> Section %s:\n" % (gs)
+    msg += '%s\n' % gcontext['graded_sections'].keys()
+    for (gsections, gsvals) in gcontext['graded_sections'].items():
+        msg += "--> Section %s:\n" % (gsections)
         for sec in gsvals:
-            s = sec['section_descriptor']
-            grade_format = getattr(s, 'grade_format', None)
+            sdesc = sec['section_descriptor']
+            grade_format = getattr(sdesc, 'grade_format', None)
             aname = ''
             if grade_format in graders:
-                g = graders[grade_format]
-                aname = '%s %02d' % (g.short_label, g.index)
-                g.index += 1
-            elif s.display_name in graders:
-                g = graders[s.display_name]
-                aname = '%s' % g.short_label
+                gfmt = graders[grade_format]
+                aname = '%s %02d' % (gfmt.short_label, gfmt.index)
+                gfmt.index += 1
+            elif sdesc.display_name in graders:
+                gfmt = graders[sdesc.display_name]
+                aname = '%s' % gfmt.short_label
             notes = ''
-            if getattr(s, 'score_by_attempt', False):
+            if getattr(sdesc, 'score_by_attempt', False):
                 notes = ', score by attempt!'
             msg += "      %s (grade_format=%s, Assignment=%s%s)\n" % (s.display_name, grade_format, aname, notes)
     msg += "all descriptors:\n"
-    msg += "length=%d\n" % len(gc['all_descriptors'])
+    msg += "length=%d\n" % len(gcontext['all_descriptors'])
     msg = '<pre>%s</pre>' % msg.replace('<', '&lt;')
     return msg
 

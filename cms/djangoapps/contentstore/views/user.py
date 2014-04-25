@@ -9,9 +9,8 @@ from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.keys import CourseKey
-from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from util.json_request import JsonResponse, expect_json
-from student.roles import CourseRole, CourseInstructorRole, CourseStaffRole
+from student.roles import CourseInstructorRole, CourseStaffRole
 from course_creators.views import user_requested_access
 
 from .access import has_course_access

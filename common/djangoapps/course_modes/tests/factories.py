@@ -1,6 +1,5 @@
 from course_modes.models import CourseMode
 from factory.django import DjangoModelFactory
-from xmodule.modulestore.keys import CourseKey
 
 
 # Factories don't have __init__ methods, and are self documenting

@@ -18,7 +18,6 @@ from mock import patch
 from bulk_email.models import CourseAuthorization
 from bulk_email.forms import CourseAuthorizationAdminForm
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from opaque_keys import InvalidKeyError
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

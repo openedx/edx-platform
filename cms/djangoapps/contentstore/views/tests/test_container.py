@@ -6,7 +6,6 @@ from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import compute_publish_state, PublishState
 from contentstore.views.helpers import xblock_studio_url
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.tests.factories import ItemFactory
 
 

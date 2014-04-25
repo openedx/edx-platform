@@ -1,7 +1,7 @@
 import copy
 import json
 from unittest import TestCase
-from stevedore.extension import ExtensionManager, Extension
+from stevedore.extension import Extension
 from mock import Mock
 
 from opaque_keys import OpaqueKey, InvalidKeyError

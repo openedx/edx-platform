@@ -16,7 +16,6 @@ from wiki.models import URLPath, Article
 
 from courseware.courses import get_course_by_id
 from course_wiki.utils import course_wiki_slug
-from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)

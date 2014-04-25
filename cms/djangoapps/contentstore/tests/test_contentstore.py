@@ -26,7 +26,7 @@ from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore import mongo
-from xmodule.modulestore.keys import UsageKey, AssetKey
+from xmodule.modulestore.keys import UsageKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.store_utilities import clone_course
 from xmodule.modulestore.store_utilities import delete_course

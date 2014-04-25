@@ -75,57 +75,57 @@ class AccessTestCase(TestCase):
         ))
 
     def test__has_access_string(self):
-        u = Mock(is_staff=True)
-        self.assertFalse(access._has_access_string(u, 'staff', 'not_global', self.course.course_key))
+        user = Mock(is_staff=True)
+        self.assertFalse(access._has_access_string(user, 'staff', 'not_global', self.course.course_key))
 
-        u._has_global_staff_access.return_value = True
-        self.assertTrue(access._has_access_string(u, 'staff', 'global', self.course.course_key))
+        user._has_global_staff_access.return_value = True
+        self.assertTrue(access._has_access_string(user, 'staff', 'global', self.course.course_key))
 
-        self.assertRaises(ValueError, access._has_access_string, u, 'not_staff', 'global', self.course.course_key)
+        self.assertRaises(ValueError, access._has_access_string, user, 'not_staff', 'global', self.course.course_key)
 
     def test__has_access_descriptor(self):
         # TODO: override DISABLE_START_DATES and test the start date branch of the method
-        u = Mock()
-        d = Mock()
-        d.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)  # make sure the start time is in the past
+        user = Mock()
+        date = Mock()
+        date.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)  # make sure the start time is in the past
 
         # Always returns true because DISABLE_START_DATES is set in test.py
-        self.assertTrue(access._has_access_descriptor(u, 'load', d))
+        self.assertTrue(access._has_access_descriptor(user, 'load', date))
         with self.assertRaises(ValueError):
-            access._has_access_descriptor(u, 'not_load_or_staff', d)
+            access._has_access_descriptor(user, 'not_load_or_staff', date)
 
     def test__has_access_course_desc_can_enroll(self):
-        u = Mock()
+        user = Mock()
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
         tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
-        c = Mock(enrollment_start=yesterday, enrollment_end=tomorrow, enrollment_domain='')
+        course = Mock(enrollment_start=yesterday, enrollment_end=tomorrow, enrollment_domain='')
 
         # User can enroll if it is between the start and end dates
-        self.assertTrue(access._has_access_course_desc(u, 'enroll', c))
+        self.assertTrue(access._has_access_course_desc(user, 'enroll', course))
 
         # User can enroll if authenticated and specifically allowed for that course
         # even outside the open enrollment period
-        u = Mock(email='test@edx.org', is_staff=False)
-        u.is_authenticated.return_value = True
+        user = Mock(email='test@edx.org', is_staff=False)
+        user.is_authenticated.return_value = True
 
-        c = Mock(
+        course = Mock(
             enrollment_start=tomorrow, enrollment_end=tomorrow,
             id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'), enrollment_domain=''
         )
 
-        CourseEnrollmentAllowedFactory(email=u.email, course_id=c.id)
+        CourseEnrollmentAllowedFactory(email=user.email, course_id=course.id)
 
-        self.assertTrue(access._has_access_course_desc(u, 'enroll', c))
+        self.assertTrue(access._has_access_course_desc(user, 'enroll', course))
 
         # Staff can always enroll even outside the open enrollment period
-        u = Mock(email='test@edx.org', is_staff=True)
-        u.is_authenticated.return_value = True
+        user = Mock(email='test@edx.org', is_staff=True)
+        user.is_authenticated.return_value = True
 
-        c = Mock(
+        course = Mock(
             enrollment_start=tomorrow, enrollment_end=tomorrow,
             id=SlashSeparatedCourseKey('edX', 'test', 'Whenever'), enrollment_domain='',
         )
-        self.assertTrue(access._has_access_course_desc(u, 'enroll', c))
+        self.assertTrue(access._has_access_course_desc(user, 'enroll', course))
 
         # TODO:
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
