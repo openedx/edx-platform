@@ -341,9 +341,9 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     if wrap_xmodule_display is True:
         block_wrappers.append(partial(
             wrap_xblock, 'LmsRuntime',
-            extra_data={'course-id': course_id.to_deprecated_string()}),
+            extra_data={'course-id': course_id.to_deprecated_string()},
             usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string())
-        )
+        ))
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory

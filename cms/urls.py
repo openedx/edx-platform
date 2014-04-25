@@ -69,7 +69,7 @@ urlpatterns += patterns(
     url(r'^course_team/(?P<course_key_string>[^/]+)/(?P<email>.+)?$', 'course_team_handler'),
     url(r'^course_info/(?P<course_key_string>[^/]+)$', 'course_info_handler'),
     url(
-        r'^course_info_update/(?P<usage_key_string>[^/]+)/(?P<provided_id>\d+)?$',
+        r'^course_info_update/(?P<course_key_string>[^/]+)/(?P<provided_id>\d+)?$',
         'course_info_update_handler'
     ),
     url(r'^course/(?P<course_key_string>[^/]+)?$', 'course_handler'),

@@ -363,8 +363,8 @@ def create_new_course(request):
             'url': reverse(
                 'contentstore.views.course_handler',
                 kwargs={'course_key_string': unicode(new_course.id)}
-            )}
-        )
+            )
+        })
 
     except InvalidLocationError:
         return JsonResponse({
@@ -407,7 +407,6 @@ def course_info_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user)
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        update_locator = course_key.make_usage_key('course_info', 'updates')
 
         return render_to_response(
             'course_info.html',
@@ -415,7 +414,7 @@ def course_info_handler(request, course_key_string):
                 'context_course': course_module,
                 'updates_url': reverse(
                     'contentstore.views.course_info_update_handler',
-                    kwargs={'usage_key_string': unicode(update_locator)}
+                    kwargs={'course_key_string': unicode(course_key)}
                 ),
                 'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
                 'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id)
@@ -430,7 +429,7 @@ def course_info_handler(request, course_key_string):
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @expect_json
-def course_info_update_handler(request, usage_key_string, provided_id=None):
+def course_info_update_handler(request, course_key_string, provided_id=None):
     """
     restful CRUD operations on course_info updates.
     provided_id should be none if it's new (create) and index otherwise.
@@ -444,7 +443,8 @@ def course_info_update_handler(request, usage_key_string, provided_id=None):
     if 'application/json' not in request.META.get('HTTP_ACCEPT', 'application/json'):
         return HttpResponseBadRequest("Only supports json requests")
 
-    usage_key = UsageKey.from_string(usage_key_string)
+    course_key = CourseKey.from_string(course_key_string)
+    usage_key = course_key.make_usage_key('course_info', 'updates')
     if provided_id == '':
         provided_id = None
 

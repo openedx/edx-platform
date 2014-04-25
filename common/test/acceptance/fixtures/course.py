@@ -252,13 +252,6 @@ class CourseFixture(StudioApiFixture):
         return "location:{org}+{number}+{run}+course+{run}".format(**self._course_dict)
 
     @property
-    def _updates_loc(self):
-        """
-        Return the locator string for the course updates
-        """
-        return "location:{org}+{number}+{run}+course_info+updates".format(**self._course_dict)
-
-    @property
     def _assets_url(self):
         """
         Return the url string for the assets
@@ -367,7 +360,7 @@ class CourseFixture(StudioApiFixture):
         """
         Add updates to the course, if any are configured.
         """
-        url = STUDIO_BASE_URL + '/course_info_update/' + self._updates_loc + '/'
+        url = STUDIO_BASE_URL + '/course_info_update/' + self._course_key + '/'
 
         for update in self._updates:
 

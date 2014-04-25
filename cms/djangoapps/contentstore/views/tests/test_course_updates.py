@@ -14,8 +14,7 @@ class CourseUpdateTest(CourseTestCase):
     def create_update_url(self, provided_id=None, course_key=None):
         if course_key is None:
             course_key = self.course.id
-        usage_key = course_key.make_usage_key('course_info', 'updates')
-        kwargs = {'usage_key_string': unicode(usage_key)}
+        kwargs = {'course_key_string': unicode(course_key)}
         if provided_id:
             kwargs['provided_id'] = str(provided_id)
         return reverse(
