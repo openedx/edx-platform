@@ -12,10 +12,11 @@ import pytz
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.test.client import RequestFactory
+from django.test.client import RequestFactory, Client
 from django.contrib.auth.models import User, AnonymousUser
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import HttpResponse
+from unittest.case import SkipTest
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -146,12 +147,58 @@ class DashboardTest(TestCase):
     def setUp(self):
         self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         self.assertIsNotNone(self.course)
-        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org")
+        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
         CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug='honor',
             mode_display_name='Honor Code',
         )
+        self.client = Client()
+
+    def check_verification_status_on(self, mode, value):
+        """
+        Check that the css class and the status message are in the dashboard html.
+        """
+        CourseEnrollment.enroll(self.user, self.course.location.course_id, mode=mode)
+        try:
+            response = self.client.get(reverse('dashboard'))
+        except NoReverseMatch:
+            raise SkipTest("Skip this test if url cannot be found (ie running from CMS tests)")
+        self.assertContains(response, "class=\"course {0}\"".format(mode))
+        self.assertContains(response, value)
+
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': True})
+    def test_verification_status_visible(self):
+        """
+        Test that the certificate verification status for courses is visible on the dashboard.
+        """
+        self.client.login(username="jack", password="test")
+        self.check_verification_status_on('verified', 'You\'re enrolled as a verified student')
+        self.check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
+        self.check_verification_status_on('audit', 'You\'re auditing this course')
+
+    def check_verification_status_off(self, mode, value):
+        """
+        Check that the css class and the status message are not in the dashboard html.
+        """
+        CourseEnrollment.enroll(self.user, self.course.location.course_id, mode=mode)
+        try:
+            response = self.client.get(reverse('dashboard'))
+        except NoReverseMatch:
+            raise SkipTest("Skip this test if url cannot be found (ie running from CMS tests)")
+        self.assertNotContains(response, "class=\"course {0}\"".format(mode))
+        self.assertNotContains(response, value)
+
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
+    def test_verification_status_invisible(self):
+        """
+        Test that the certificate verification status for courses is not visible on the dashboard
+        if the verified certificates setting is off.
+        """
+        self.client.login(username="jack", password="test")
+        self.check_verification_status_off('verified', 'You\'re enrolled as a verified student')
+        self.check_verification_status_off('honor', 'You\'re enrolled as an honor code student')
+        self.check_verification_status_off('audit', 'You\'re auditing this course')
 
     def test_course_mode_info(self):
         verified_mode = CourseModeFactory.create(

@@ -172,6 +172,9 @@ FEATURES = {
     # Enable instructor dash beta version link
     'ENABLE_INSTRUCTOR_BETA_DASHBOARD': True,
 
+    # Toggle to enable certificates of courses on dashboard
+    'ENABLE_VERIFIED_CERTIFICATES': False,
+
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
 
