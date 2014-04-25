@@ -191,7 +191,7 @@ def import_from_xml(
                     log.debug('course data_dir={0}'.format(module.data_dir))
 
                     course = import_module(
-                        module, store, course_data_path, static_content_store,
+                        module, store,
                         course_id,
                         dest_course_id,
                         do_import_static=do_import_static
@@ -278,7 +278,7 @@ def import_from_xml(
                     ))
 
                 import_module(
-                    module, store, course_data_path, static_content_store,
+                    module, store,
                     course_id,
                     dest_course_id,
                     do_import_static=do_import_static,
@@ -309,7 +309,7 @@ def import_from_xml(
 
 
 def import_module(
-        module, store, course_data_path, static_content_store,
+        module, store,
         source_course_id, dest_course_id,
         do_import_static=True, system=None):
 
@@ -508,8 +508,8 @@ def import_course_draft(
                                 store.update_item(sequential, '**replace_user**')
 
                         import_module(
-                            module, draft_store, course_data_path,
-                            static_content_store, source_course_id,
+                            module, draft_store,
+                            source_course_id,
                             target_course_id, system=mongo_runtime
                         )
                         for child in module.get_children():
