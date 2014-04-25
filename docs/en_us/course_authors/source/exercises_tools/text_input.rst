@@ -292,7 +292,7 @@ Indicates that the problem is a text input problem.
   * ``<hintgroup>`` (optional)
     
 **Tag:** ``<textline />``
-
+ 
 Creates a response field in the LMS where the student enters a response.
 
   Attributes

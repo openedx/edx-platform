@@ -38,8 +38,6 @@ For example, the following example problems require the Advanced Editor.
 
 For more information about including a Python script in your problem, see :ref:`Write Your Own Grader`.
 
-.. note:: All problems must include labels for accessibility. The label generally includes the text of the main question in your problem. To add a label for a common problem, surround the text of the label with angle brackets pointed toward the text (>>label text<<).
-
 ==================
 Simple Editor
 ==================
@@ -283,6 +281,10 @@ Creates a response field in the LMS where students enter a response.
   .. list-table::
      :widths: 20 80
 
+     * - Attribute
+       - Description     
+     * - label (required)
+       - Specifies the name of the response field.
      * - size (optional)
        - Defines the width, in characters, of the response field in the LMS.
   
@@ -299,6 +301,8 @@ Specifies a tolerance, or margin of error, for an answer.
   .. list-table::
      :widths: 20 80
 
+     * - Attribute
+       - Description
      * - type (optional)
        - "tolerance": Defines a tolerance for a number
      * - default (optional)
@@ -319,6 +323,8 @@ As with all Python, indentation matters, even though the code is embedded in XML
   .. list-table::
      :widths: 20 80
 
+     * - Attribute
+       - Description
      * - type (required)
        - Must be set to "loncapa/python".
 
