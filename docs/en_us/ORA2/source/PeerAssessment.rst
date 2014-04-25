@@ -327,15 +327,35 @@ The following image shows a question in the component editor along with the way 
 
 To add the question:
 
-#. In the component editor, locate the ``<prompt>`` tags.
+#. In the component editor, locate the first set of ``<prompt>`` tags. The opening ``<prompt>`` tag appears directly below the opening ``<rubric>`` tag.
 
 #. Replace the sample text between the ``<prompt>`` tags with the text of your question. Note that the component editor respects paragraph breaks and new lines inside the ``<prompt>`` tags. You don't have to add ``<p>`` tags to create individual paragraphs.
 
-In this initial release, you cannot add text formatting or images in the Peer Assessment component. If you want to include text formatting or images in the text of your prompt, you can add an HTML component above the Peer Assessment component. The following image shows an HTML component that contains an image and the quote by Katherine Paterson, followed by a Peer Assessment component that contains the introductory Peer Assessment text ("This assignment has several steps...") and the text that appears between the ``<prompt>`` tags in the Peer Assessment component ("Write a persuasive essay...").
+Add Formatting or Images to the Question
+****************************************
 
-.. image:: /Images/PA_HTML-PA_LMS.png
-      :alt: Image of a peer assessment that has an image in an HTML component
+In this initial release, you cannot add text formatting or images in the Peer Assessment component. If you want to include formatting or images in the text of your prompt, you can add an HTML component that contains your text above the Peer Assessment component, and then remove the prompt from the Peer Assessment component. The instructions for the peer assessment still appear above the **Your Response** field.
+
+.. image:: /Images/PA_HTMLComponent.png
+      :alt: A peer assessment that has an image in an HTML component
       :width: 500
+
+To remove the prompt from the Peer Assessment component, open the component editor, and then delete the first set of ``<prompt>`` tags together with all the text between the tags. The first few lines of XML for the problem will then resemble the following.
+
+.. code-block:: xml
+
+  <openassessment>
+    <title></title>
+    <assessments>
+      <assessment name="peer-assessment" must_grade="5" must_be_graded_by="3"/>
+      <assessment name="self-assessment"/>
+    </assessments>
+    <rubric>
+      <criterion feedback="optional">
+        <name>Ideas</name>
+        <prompt>Determine if there is a unifying theme or main idea.</prompt>
+        <option points="0">
+
 
 .. _PA Add Rubric:
 
