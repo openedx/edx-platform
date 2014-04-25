@@ -43,7 +43,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         'sort_order': 'desc',
         'text': '',
         'commentable_id': discussion_id,
-        'course_id': course_id,
+        'course_id': course_id.to_deprecated_string(),
         'user_id': request.user.id,
     }
 
