@@ -348,11 +348,15 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
     # behavior appears correct without executing a step, it means important
     # invariants have been violated and future misbehavior is likely.
 
+    user_inactive = user and not user.is_active
+    user_unset = user is None
+    dispatch_to_login = (is_login and user_unset) or user_inactive
+
     if is_dashboard:
         return
 
-    if is_login and user is None or user and not user.is_active:
+    if dispatch_to_login:
         return redirect('/login', name='signin_user')
 
-    if is_register and user is None:
+    if is_register and user_unset:
         return redirect('/register', name='register_user')
