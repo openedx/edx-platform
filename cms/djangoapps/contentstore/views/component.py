@@ -343,7 +343,7 @@ def _get_item_in_course(request, usage_key):
 
 
 @login_required
-def component_handler(request, usage_id, handler, suffix=''):
+def component_handler(request, usage_key_string, handler, suffix=''):
     """
     Dispatch an AJAX action to an xblock
 
@@ -357,9 +357,9 @@ def component_handler(request, usage_id, handler, suffix=''):
             django response
     """
 
-    location = unquote_slashes(usage_id)
+    usage_key = UsageKey.from_string(usage_key_string)
 
-    descriptor = get_modulestore(location).get_item(location)
+    descriptor = get_modulestore(usage_key).get_item(usage_key)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 
@@ -372,6 +372,6 @@ def component_handler(request, usage_id, handler, suffix=''):
 
     # unintentional update to handle any side effects of handle call; so, request user didn't author
     # the change
-    get_modulestore(location).update_item(descriptor, None)
+    get_modulestore(usage_key).update_item(descriptor, None)
 
     return webob_to_django_response(resp)

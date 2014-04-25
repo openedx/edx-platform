@@ -18,7 +18,7 @@ urlpatterns = patterns('',  # nopep8
     url(r'^preview/xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
         'contentstore.views.preview_handler', name='preview_handler'),
 
-    url(r'^xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+    url(r'^xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
         'contentstore.views.component_handler', name='component_handler'),
 
     url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',

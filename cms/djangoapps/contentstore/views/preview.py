@@ -42,7 +42,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     """
     Dispatch an AJAX action to an xblock
 
-    usage_id: The usage-id of the block to dispatch to, passed through `quote_slashes`
+    usage_key_string: The usage_key_string-id of the block to dispatch to, passed through `quote_slashes`
     handler: The handler to execute
     suffix: The remainder of the url to be passed to the handler
     """
