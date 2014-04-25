@@ -304,6 +304,20 @@
     float: left;
     margin-right: flex-gutter();
     width: flex-grid(8);
+    font: normal 1em/1.6em $serif;
+    
+    h2 {
+      margin-top: ($baseline*1.5);
+    }
+
+    p {
+      margin-bottom: ($baseline/2);
+    }
+
+    dt {
+      margin-top: ($baseline/2);
+      font-weight: 700;
+    }
 
     .inner-wrapper {
       > section {
