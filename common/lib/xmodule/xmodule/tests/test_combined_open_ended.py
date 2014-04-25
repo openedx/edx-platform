@@ -1382,7 +1382,7 @@ class OpenEndedModuleUtilTest(unittest.TestCase):
     text_brs = u"St\xfcdent submission:<br/>I like lamp."
 
     link_text = u'I love going to www.lolcatz.com'
-    link_atag = u'I love going to <a href="http://www.lolcatz.com" target="_blank">www.lolcatz.com</a>'
+    link_atag = u'I love going to <a target="_blank" href="http://www.lolcatz.com">www.lolcatz.com</a>'
 
     def test_script(self):
         """
