@@ -141,17 +141,13 @@ h1.top-header {
     position: relative;
 
     a {
-      background: #f6f6f6 url('../images/slide-left-icon.png') center center no-repeat;
-      border: 1px solid #D3D3D3;
-      border-radius: 3px 0 0 3px;
-      height: 16px;
-      padding: 6px;
-      position: absolute;
-      right: -1px;
-      text-indent: -9999px;
-      top: 12px;
-      width: 16px;
       z-index: 99;
+      display: block;
+      padding: 6px;
+      height: 24px;
+      border-top-left-radius: 5px;
+      border-bottom: 1px solid $light-gray;
+      background: #efefef url('../images/slide-left-icon.png') center center no-repeat;
 
       &:hover, &:focus {
         background-color: white;
