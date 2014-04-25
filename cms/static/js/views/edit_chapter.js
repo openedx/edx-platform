@@ -65,7 +65,7 @@ define(["js/views/baseview", "underscore", "underscore.string", "jquery", "gette
                     if(!that.model.get('name')) {
                         options.name = response.asset.displayname;
                     }
-                    options.asset_path = response.asset.url;
+                    options.asset_path = response.asset.portable_url;
                     that.model.set(options);
                 }
             });
