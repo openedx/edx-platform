@@ -20,7 +20,11 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <li class="course-item">
-  <article class="course ${enrollment.mode}">
+  % if settings.FEATURES.get('VERIFIED_CERTIFICATES'):
+    <article class="course ${enrollment.mode}">
+  % else:
+    <article class="course">
+  %endif
     <%
       course_target = reverse('info', args=[course.id])
     %>
@@ -34,23 +38,24 @@
         <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course.number, course_name=course.display_name_with_default) | h}" />
       </div>
     % endif
-
-    % if enrollment.mode == "verified":
-      <span class="sts-enrollment" title="${_("You're enrolled as a verified student")}">
-        <span class="label">${_("Enrolled as: ")}</span>
-        <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
-        <span class="sts-enrollment-value">${_("Verified")}</span>
-      </span>
-    % elif enrollment.mode == "honor":
-      <span class="sts-enrollment" title="${_("You're enrolled as an honor code student")}">
-        <span class="label">${_("Enrolled as: ")}</span>
-        <span class="sts-enrollment-value">${_("Honor Code")}</span>
-      </span>
-    % elif enrollment.mode == "audit":
-      <span class="sts-enrollment" title="${_("You're auditing this course")}>
-        <span class="label">${_("Enrolled as: ")}</span>
-        <span class="sts-enrollment-value">${_("Auditing")}</span>
-      </span>
+    % if settings.FEATURES.get('VERIFIED_CERTIFICATES'):
+        % if enrollment.mode == "verified":
+          <span class="sts-enrollment" title="${_("You're enrolled as a verified student")}">
+            <span class="label">${_("Enrolled as: ")}</span>
+            <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
+            <span class="sts-enrollment-value">${_("Verified")}</span>
+          </span>
+        % elif enrollment.mode == "honor":
+          <span class="sts-enrollment" title="${_("You're enrolled as an honor code student")}">
+            <span class="label">${_("Enrolled as: ")}</span>
+            <span class="sts-enrollment-value">${_("Honor Code")}</span>
+          </span>
+        % elif enrollment.mode == "audit":
+          <span class="sts-enrollment" title="${_("You're auditing this course")}>
+            <span class="label">${_("Enrolled as: ")}</span>
+            <span class="sts-enrollment-value">${_("Auditing")}</span>
+          </span>
+        % endif
     % endif
 
     <section class="info">

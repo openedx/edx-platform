@@ -171,7 +171,7 @@ FEATURES = {
 
     # Enable instructor dash beta version link
     'ENABLE_INSTRUCTOR_BETA_DASHBOARD': True,
-
+    'VERIFIED_CERTIFICATES' : False,
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
 
