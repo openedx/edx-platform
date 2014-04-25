@@ -1,0 +1,61 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from microsite_configuration import page_title_breadcrumbs %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/><!DOCTYPE html>
+
+<center>
+<h1>
+	Страница статистики
+</h1>
+<h2>
+Статистика по оценкам
+</h2>
+<p>
+	<form method="post">
+		<input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+		<p>
+		Логин школы:
+		<input type="text" name="school_login">
+		</p>
+		<p>
+		Активирован ли аккаунт?<br/>
+		<input type="radio" name="activated" value="1">Да
+		<input type="radio" name="activated" value="">Нет
+		</p>
+		<p>
+		Выполнено ли 70 % заданий?<br/>
+		<input type="radio" name="complete70" value="1">Да
+		<input type="radio" name="complete70" value="">Нет
+		</p>
+		<p>
+		Выполнено ли 100 % заданий?<br/>
+		<input type="radio" name="complete100" value="1">Да
+		<input type="radio" name="complete100" value="">Нет
+		</p>
+		<p>
+		Дата регистрации на курс (в формате дд/мм/гггг):<br/>
+		От: <input type="text" name="min_date"><br>
+		До: <input type="text" name="max_date">
+		</p>
+		% if value_error_in_input:
+			<p>
+				Пожалуйста, введите дату в корректном формате.
+			</p>
+		% endif
+	    <p>
+	    <input type="reset" value="Сбросить фильтры">
+	    </p>
+	    <p>
+	    <input type="submit" name="download_stat_filtered" value="Скачать статистику с фильтрами" />
+	    </p>
+	</form>
+</p>
+<p>
+	<form method="post">
+		<input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+	    <input type="submit" name="download_stat_unfiltered" value="Скачать полную статистику" />
+	</form>
+</p>
+</center>
+
