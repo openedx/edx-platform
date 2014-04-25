@@ -1,8 +1,8 @@
 define ["jquery", "jquery.ui", "gettext", "backbone",
         "js/views/feedback_notification", "js/views/feedback_prompt",
         "coffee/src/views/module_edit", "js/models/module_info",
-        "js/views/baseview", "underscore"],
-($, ui, gettext, Backbone, NotificationView, PromptView, ModuleEditView, ModuleModel, BaseView, _) ->
+        "js/views/baseview"],
+($, ui, gettext, Backbone, NotificationView, PromptView, ModuleEditView, ModuleModel, BaseView) ->
   class UnitEditView extends BaseView
     events:
       'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates'

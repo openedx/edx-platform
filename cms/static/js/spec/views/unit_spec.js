@@ -189,7 +189,7 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec_helpers/creat
                     model: new ModuleModel({
                         id: 'unit_locator',
                         state: 'draft'
-                    }),
+                    })
                 });
                 // needed to stub out the ajax
                 window.analytics = jasmine.createSpyObj('analytics', ['track']);
