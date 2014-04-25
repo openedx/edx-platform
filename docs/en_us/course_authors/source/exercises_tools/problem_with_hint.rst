@@ -60,7 +60,7 @@ To create the above problem:
 .. _Drag and Drop Problem XML:
 
 *********************************
-Drag and Drop Problem XML
+Problem with Adaptive Hint XML
 *********************************
 
 ========
