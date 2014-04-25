@@ -33,7 +33,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                     fragmentsRendered;
 
                 fragmentsRendered = this.renderXBlockFragment(fragment, wrapper);
-                $.when(fragmentsRendered).done(function() {
+                fragmentsRendered.done(function() {
                     xblockElement = self.$('.xblock').first();
                     xblock = XBlock.initializeBlock(xblockElement);
                     self.xblock = xblock;
