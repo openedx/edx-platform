@@ -3,8 +3,6 @@ Provides unit tests for SSL based authentication portions
 of the external_auth app.
 """
 
-import logging
-import StringIO
 import unittest
 
 from django.conf import settings
@@ -197,7 +195,7 @@ class SSLClientTest(TestCase):
         with self.assertRaisesRegexp(
                 InvalidKeyError,
                 "<class 'xmodule.modulestore.keys.CourseKey'>: None"
-            ):
+        ):
             self.client.get(
                 reverse('signup'), follow=True,
                 SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
@@ -209,7 +207,7 @@ class SSLClientTest(TestCase):
         with self.assertRaisesRegexp(
                 InvalidKeyError,
                 "<class 'xmodule.modulestore.keys.CourseKey'>: None"
-            ):
+        ):
             self.client.get(reverse('signup'), follow=True)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -232,7 +230,6 @@ class SSLClientTest(TestCase):
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
         self.assertIn(reverse('dashboard'), response['location'])
         self.assertIn(SESSION_KEY, self.client.session)
-
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
