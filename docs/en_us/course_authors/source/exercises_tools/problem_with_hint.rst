@@ -24,9 +24,9 @@ To create the above problem:
 
 .. code-block:: xml
 
-	<problem>
-	  <text>
-	    <script type="text/python" system_path="python_lib">
+    <problem>
+	    <text>
+	        <script type="text/python" system_path="python_lib">
 	def test_str(expect, ans):
 	  print expect, ans
 	  ans = ans.strip("'")
@@ -46,17 +46,16 @@ To create the above problem:
 	  if hint:
 	    hint = "&lt;font color='blue'&gt;Hint: {0}&lt;/font&gt;".format(hint)
 	    new_cmap.set_hint_and_mode(aid,hint,'always')
-	</script>
-	    <p>
-	If a bat and a ball cost $1.10 together, and the bat costs $1.00 more than the ball, how much does the ball cost? Enter your answer in cents, and include only the number (that is, do not include a $ or a ¢ sign).</p>
-	    <p>
-	      <customresponse cfn="test_str" expect="5">
-	        <textline correct_answer="5" label="How much does the ball cost?"/>
-	        <hintgroup hintfn="hint_fn"/>
-	      </customresponse>
-	    </p>
-	  </text>
-	</problem>
+	        </script>
+	        <p>If a bat and a ball cost $1.10 together, and the bat costs $1.00 more than the ball, how much does the ball cost? Enter your answer in cents, and include only the number (that is, do not include a $ or a ¢ sign).</p>
+	        <p>
+	            <customresponse cfn="test_str" expect="5">
+	                <textline correct_answer="5" label="How much does the ball cost?"/>
+	                <hintgroup hintfn="hint_fn"/>
+	            </customresponse>
+	        </p>
+	    </text>
+    </problem>
 
 .. _Drag and Drop Problem XML:
 
