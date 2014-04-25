@@ -109,7 +109,9 @@ class CapaFactory(object):
             "SampleProblem{0}".format(cls.next_num()),
             None
         )
-        field_data = {'data': cls.sample_problem_xml}
+        if xml is None:
+            xml = cls.sample_problem_xml
+        field_data = {'data': xml}
         field_data.update(kwargs)
         descriptor = Mock(weight="1")
         if problem_state is not None:
