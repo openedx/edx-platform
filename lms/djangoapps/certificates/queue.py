@@ -130,7 +130,7 @@ class XQueueCertInterface(object):
 
         Arguments:
           student   - User.object
-          course_id - courseenrollment.course_id (string)
+          course_id - courseenrollment.course_id (CourseKey)
           forced_grade - a string indicating a grade parameter to pass with
                          the certificate request. If this is given, grading
                          will be skipped.
