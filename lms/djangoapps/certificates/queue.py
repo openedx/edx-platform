@@ -218,7 +218,7 @@ class XQueueCertInterface(object):
                     contents = {
                         'action': 'create',
                         'username': student.username,
-                        'course_id': course_id,
+                        'course_id': course_id.to_deprecated_string(),
                         'name': profile.name,
                         'grade': grade['grade'],
                         'template_pdf': template_pdf,
