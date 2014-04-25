@@ -26,7 +26,7 @@ class StudioApiFixture(object):
 
     @lazy
     def session(self):
-        """N
+        """
         Log in as a staff user, then return a `requests` `session` object for the logged in user.
         Raises a `StudioApiLoginError` if the login fails.
         """
@@ -256,14 +256,14 @@ class CourseFixture(StudioApiFixture):
         """
         Return the locator string for the course updates
         """
-        return self._course_key + "/updates"
+        return "location:{org}+{number}+{run}+course_info+updates".format(**self._course_dict)
 
     @property
     def _assets_url(self):
         """
         Return the url string for the assets
         """
-        return "/assets/" + self._course_key
+        return "/assets/" + self._course_key + "/"
 
     @property
     def _handouts_loc(self):
@@ -367,7 +367,7 @@ class CourseFixture(StudioApiFixture):
         """
         Add updates to the course, if any are configured.
         """
-        url = STUDIO_BASE_URL + '/course_info_update/' + self._updates_loc
+        url = STUDIO_BASE_URL + '/course_info_update/' + self._updates_loc + '/'
 
         for update in self._updates:
 
