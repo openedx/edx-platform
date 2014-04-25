@@ -486,7 +486,7 @@ To add a comment field:
          </option>
        </criterion>
 
-If you want to provide comment fields below additional criteria, add the ``feedback="optional"`` attribute to the opening tag for each criterion that you want.
+If you want to provide comment fields below additional criteria, add the ``feedback="optional"`` attribute to the opening tag for each criterion.
 
 .. _PA Test Problem:
 
