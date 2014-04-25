@@ -2,7 +2,6 @@
 
 import logging
 import re
-import urllib
 
 from opaque_keys import InvalidKeyError, OpaqueKey
 
@@ -275,6 +274,10 @@ class AssetLocation(LocationBase, AssetKey):
     @property
     def path(self):
         return self.name
+
+    def to_deprecated_string(self):
+        url = u"/{0.DEPRECATED_TAG}/{0.org}/{0.course}/{0.category}/{0.name}".format(self)
+        return url
 
     def map_into_course(self, course_key):
         return AssetLocation(course_key.org, course_key.course, course_key.run, self.category, self.name, self.revision)

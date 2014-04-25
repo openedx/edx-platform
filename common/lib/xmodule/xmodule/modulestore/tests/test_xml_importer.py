@@ -9,7 +9,6 @@ from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.xml_importer import remap_namespace
 
 
 class StubXBlock(XBlock, XModuleMixin, InheritanceMixin):

@@ -1596,8 +1596,8 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertEquals(len(course_module.pdf_textbooks), 1)
         self.assertEquals(len(course_module.pdf_textbooks[0]["chapters"]), 2)
-        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], 'asset-location:MITx+999+2013_Spring+asset+Chapter1.pdf')
-        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], 'asset-location:MITx+999+2013_Spring+asset+Chapter2.pdf')
+        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/c4x/MITx/999/asset/Chapter1.pdf')
+        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/c4x/MITx/999/asset/Chapter2.pdf')
 
     def test_import_into_new_course_id_wiki_slug_renamespacing(self):
         module_store = modulestore('direct')
