@@ -17,9 +17,21 @@
 }
 
 .annotator-wrapper .mce-container {
-	z-index:3000000000!important; /*To fix full-screen problems*/
+	z-index: 3000000000!important; /*To fix full-screen problems*/
 }
 
+.mce-container-body {
+	min-width: 400px;
+}
+
+.iframe[id="annotator-field"] {
+	width: inherit;
+	min-width: 400px;
+}
+
+div.mce-tinymce.mce-container.mce-panel {
+	min-width:400px;
+}
 
 /* Some change in the design of Annotator */
 .annotator-editor .annotator-widget{
