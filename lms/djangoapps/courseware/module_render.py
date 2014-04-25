@@ -34,10 +34,9 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.locations import Location, SlashSeparatedCourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.keys import CourseKey, UsageKey
 from xmodule.util.duedate import get_extended_due_date
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_markup, wrap_xblock
 from xmodule.lti_module import LTIModule
@@ -51,14 +50,14 @@ log = logging.getLogger(__name__)
 
 
 if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
-    requests_auth = HTTPBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
+    REQUESTS_AUTH = HTTPBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
 else:
-    requests_auth = None
+    REQUESTS_AUTH = None
 
-xqueue_interface = XQueueInterface(
+XQUEUE_INTERFACE = XQueueInterface(
     settings.XQUEUE_INTERFACE['url'],
     settings.XQUEUE_INTERFACE['django_auth'],
-    requests_auth,
+    REQUESTS_AUTH,
 )
 
 
@@ -249,7 +248,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
     xqueue = {
-        'interface': xqueue_interface,
+        'interface': XQUEUE_INTERFACE,
         'construct_callback': make_xqueue_callback,
         'default_queuename': xqueue_default_queuename.replace(' ', '_'),
         'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS

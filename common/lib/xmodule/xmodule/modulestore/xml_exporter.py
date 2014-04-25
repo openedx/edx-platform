@@ -6,7 +6,6 @@ import logging
 import lxml.etree
 from xblock.fields import Scope
 from xmodule.modulestore import Location
-from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
 from json import dumps
@@ -61,8 +60,8 @@ def export_to_xml(modulestore, contentstore, course_id, root_dir, course_dir, dr
 
     course = modulestore.get_course(course_id)
 
-    fs = OSFS(root_dir)
-    export_fs = course.runtime.export_fs = fs.makeopendir(course_dir)
+    fsm = OSFS(root_dir)
+    export_fs = course.runtime.export_fs = fsm.makeopendir(course_dir)
 
     root = lxml.etree.Element('unknown')
     course.add_xml_to_node(root)

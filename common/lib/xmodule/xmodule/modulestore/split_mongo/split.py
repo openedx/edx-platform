@@ -1129,7 +1129,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 block_id = self._generate_block_id(structure_blocks, xblock.category)
             encoded_block_id = LocMapperStore.encode_key_for_mongo(block_id)
             new_usage_id = xblock.scope_ids.usage_id.replace(block_id=block_id)
-            xblock.scope_ids = xblock.scope_ids._replace(usage_id=new_usage_id)
+            xblock.scope_ids = xblock.scope_ids._replace(usage_id=new_usage_id)  # pylint: disable=protected-access
         else:
             is_new = False
             encoded_block_id = LocMapperStore.encode_key_for_mongo(xblock.location.block_id)

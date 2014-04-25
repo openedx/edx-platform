@@ -26,7 +26,7 @@ from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.xml_exporter import export_to_xml
-from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.keys import CourseKey
 from xmodule.exceptions import SerializationError
 
@@ -330,40 +330,40 @@ def export_handler(request, course_key_string):
             logging.debug('tar file being generated at {0}'.format(export_file.name))
             with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
                 tar_file.add(root_dir / name, arcname=name)
-        except SerializationError as e:
-            logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
+        except SerializationError as exc:
+            logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(exc)))
             unit = None
             failed_item = None
             parent = None
             try:
-                failed_item = modulestore().get_item(e.location)
+                failed_item = modulestore().get_item(exc.location)
                 parent_locs = modulestore().get_parent_locations(failed_item.location)
 
                 if len(parent_locs) > 0:
                     parent = modulestore().get_item(parent_locs[0])
                     if parent.location.category == 'vertical':
                         unit = parent
-            except:
+            except:  # pylint: disable=bare-except
                 # if we have a nested exception, then we'll show the more generic error message
                 pass
 
             return render_to_response('export.html', {
                 'context_course': course_module,
                 'in_err': True,
-                'raw_err_msg': str(e),
+                'raw_err_msg': str(exc),
                 'failed_module': failed_item,
                 'unit': unit,
                 'edit_unit_url': reverse_usage_url("unit_handler", parent.location) if parent else "",
                 'course_home_url': reverse_course_url("course_handler", course_key),
                 'export_url': export_url
             })
-        except Exception, e:
-            logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
+        except Exception, exc:
+            logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(exc)))
             return render_to_response('export.html', {
                 'context_course': course_module,
                 'in_err': True,
                 'unit': None,
-                'raw_err_msg': str(e),
+                'raw_err_msg': str(exc),
                 'course_home_url': reverse_course_url("course_handler", course_key),
                 'export_url': export_url
             })

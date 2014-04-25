@@ -1,3 +1,6 @@
+"""
+Thorough tests of the Location class
+"""
 import ddt
 
 from unittest import TestCase
@@ -27,7 +30,7 @@ class TestLocations(TestCase):
         "org+course+run+category+name@revision"
     )
     def test_string_roundtrip(self, url):
-        self.assertEquals(url, Location._from_string(url)._to_string())
+        self.assertEquals(url, Location._from_string(url)._to_string())  # pylint: disable=protected-access
 
     @ddt.data(
         "i4x://org/course/category/name",

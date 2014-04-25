@@ -18,7 +18,6 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_exporter import export_to_xml
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.keys import CourseKey
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 

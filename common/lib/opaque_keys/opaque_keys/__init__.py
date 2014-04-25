@@ -1,3 +1,7 @@
+"""
+Defines OpaqueKey class, to be used as the base-class for
+implementing pluggable OpaqueKeys.
+"""
 from abc import ABCMeta, abstractmethod, abstractproperty
 from copy import deepcopy
 from collections import namedtuple
@@ -174,12 +178,13 @@ class OpaqueKey(object):
 
     @property
     def _key(self):
+        """Returns a tuple of key fields"""
         return tuple(getattr(self, field) for field in self.KEY_FIELDS)
 
     def __eq__(self, other):
         return (
             type(self) == type(other) and
-            self._key == other._key
+            self._key == other._key  # pylint: disable=protected-access
         )
 
     def __ne__(self, other):
@@ -188,7 +193,7 @@ class OpaqueKey(object):
     def __lt__(self, other):
         if type(self) != type(other):
             raise TypeError()
-        return self._key < other._key
+        return self._key < other._key  # pylint: disable=protected-access
 
     def __hash__(self):
         return hash(self._key)
@@ -227,7 +232,7 @@ class OpaqueKey(object):
         if serialized is None:
             raise InvalidKeyError(cls, serialized)
 
-        namespace, rest = cls._separate_namespace(serialized)
+        namespace, rest = cls._separate_namespace(serialized)  # pylint: disable=protected-access
         try:
             return cls._drivers()[namespace].plugin._from_string(rest)
         except KeyError:

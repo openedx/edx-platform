@@ -9,7 +9,6 @@ from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict
 from xblock.runtime import KeyValueStore, KvsFieldData
 
 from xmodule.fields import Date, Timedelta
-from xmodule.modulestore import ModuleStoreReadBase
 
 
 class InheritanceMixin(XBlockMixin):

@@ -25,7 +25,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.tests.factories import ItemFactory
 from student.tests.factories import UserFactory
 
 import courseware.views as views
@@ -171,6 +170,13 @@ class ViewsTestCase(TestCase):
         self.verify_end_date("edX/test_about_blob_end_date/2012_Fall", "Learning never ends")
 
     def verify_end_date(self, course_id, expected_end_text=None):
+        """
+        Visits the about page for `course_id` and tests that both the text "Classes End", as well
+        as the specified `expected_end_text`, is present on the page. 
+
+        If `expected_end_text` is None, verifies that the about page *does not* contain the text
+        "Classes End".
+        """
         request = self.request_factory.get("foo")
         request.user = self.user
 

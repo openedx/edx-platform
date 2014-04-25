@@ -10,7 +10,6 @@ from courseware.module_render import get_xqueue_callback_url_prefix
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.locations import Location
 from instructor_task.models import InstructorTask, PROGRESS
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 log = logging.getLogger(__name__)
@@ -23,13 +22,13 @@ class AlreadyRunningError(Exception):
 
 def _task_is_running(course_id, task_type, task_key):
     """Checks if a particular task is already running"""
-    runningTasks = InstructorTask.objects.filter(
+    running_tasks = InstructorTask.objects.filter(
         course_id=course_id, task_type=task_type, task_key=task_key
     )
     # exclude states that are "ready" (i.e. not "running", e.g. failure, success, revoked):
     for state in READY_STATES:
-        runningTasks = runningTasks.exclude(task_state=state)
-    return len(runningTasks) > 0
+        running_tasks = running_tasks.exclude(task_state=state)
+    return len(running_tasks) > 0
 
 
 def _reserve_task(course_id, task_type, task_key, task_input, requester):

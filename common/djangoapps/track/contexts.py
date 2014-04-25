@@ -1,8 +1,7 @@
 """Generates common contexts"""
 import logging
 
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.locations import SlashSeparatedCourseKey, CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 from util.request import COURSE_REGEX
 

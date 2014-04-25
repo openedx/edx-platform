@@ -11,7 +11,7 @@ from wiki.models import reverse as wiki_reverse
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from student.models import CourseEnrollment
-from xmodule.modulestore.keys import CourseKey
+from xmodule.modulestore.locations import SlashSeparatedCourseKey
 
 
 IN_COURSE_WIKI_REGEX = r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/(?P<wiki_path>.*|)$'
@@ -46,8 +46,13 @@ class Middleware(object):
         self.redirected = False
 
     def process_request(self, request):
+        """
+        Handles the request, redirecting if necessary. Returns None if no redirect is needed.
+
+        See docstring for base class for more detail.
+        """
         self.redirected = False
-        wiki_reverse._transform_url = lambda url: url
+        wiki_reverse._transform_url = lambda url: url  # pylint: disable=protected-access
 
         referer = request.META.get('HTTP_REFERER')
         destination = request.path
@@ -86,7 +91,7 @@ class Middleware(object):
                     return redirect(reverse('about_course', args=[course_id.to_deprecated_string()]))
 
             prepend_string = '/courses/' + course_id.to_deprecated_string()
-            wiki_reverse._transform_url = lambda url: prepend_string + url
+            wiki_reverse._transform_url = lambda url: prepend_string + url  # pylint: disable=protected-access
 
         return None
 
