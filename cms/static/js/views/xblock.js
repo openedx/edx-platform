@@ -25,18 +25,23 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
             },
 
             handleXBlockFragment: function(fragment, options) {
-                var wrapper = this.$el,
+                var self = this,
+                    wrapper = this.$el,
                     xblockElement,
                     success = options ? options.success : null,
-                    xblock;
-                this.renderXBlockFragment(fragment, wrapper);
-                xblockElement = this.$('.xblock').first();
-                xblock = XBlock.initializeBlock(xblockElement);
-                this.xblock = xblock;
-                this.xblockReady(xblock);
-                if (success) {
-                    success(xblock);
-                }
+                    xblock,
+                    fragmentsRendered;
+
+                fragmentsRendered = this.renderXBlockFragment(fragment, wrapper);
+                fragmentsRendered.done(function() {
+                    xblockElement = self.$('.xblock').first();
+                    xblock = XBlock.initializeBlock(xblockElement);
+                    self.xblock = xblock;
+                    self.xblockReady(xblock);
+                    if (success) {
+                        success(xblock);
+                    }
+                });
             },
 
             /**
