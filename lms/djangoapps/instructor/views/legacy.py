@@ -30,7 +30,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from lms.lib.xblock.runtime import quote_slashes
 
 from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
@@ -222,7 +222,7 @@ def instructor_dashboard(request, course_id):
                 for cmsg, cerr in course_errors:
                     msg += "<li>{0}: <pre>{1}</pre>".format(cmsg, escape(cerr))
                 msg += '</ul>'
-            except Exception as err:
+            except Exception as err:  # pylint: disable=broad-except
                 msg += '<br/><p>Error: {0}</p>'.format(escape(err))
 
     if action == 'Dump list of enrolled students' or action == 'List enrolled students':
@@ -290,7 +290,7 @@ def instructor_dashboard(request, course_id):
                     problem_url=problem_url
                 )
             )
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             log.error("Encountered exception from rescore: {0}".format(err))
             msg += '<font color="red">{text}</font>'.format(
                 text=_('Failed to create a background task for rescoring "{url}": {message}.').format(
@@ -324,7 +324,7 @@ def instructor_dashboard(request, course_id):
                     problem_url=problem_url
                 )
             )
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             log.error("Encountered exception from reset: {0}".format(err))
             msg += '<font color="red">{text}</font>'.format(
                 text=_('Failed to create a background task for resetting "{url}": {message}.').format(
@@ -396,7 +396,7 @@ def instructor_dashboard(request, course_id):
                         event,
                         page="idashboard"
                     )
-                except Exception as err:
+                except Exception as err:  # pylint: disable=broad-except
                     error_msg = _("Failed to delete module state for {id}/{url}. ").format(
                         id=unique_student_identifier, url=problem_urlname
                     )
@@ -423,7 +423,7 @@ def instructor_dashboard(request, course_id):
                     msg += "<font color='green'>{text}</font>".format(
                         text=_("Module state successfully reset!")
                     )
-                except Exception as err:
+                except Exception as err:  # pylint: disable=broad-except
                     error_msg = _("Couldn't reset module state for {id}/{url}. ").format(
                         id=unique_student_identifier, url=problem_urlname
                     )
@@ -450,7 +450,7 @@ def instructor_dashboard(request, course_id):
                             },
                             page="idashboard"
                         )
-                except Exception as err:
+                except Exception as err:  # pylint: disable=broad-except
                     msg += '<font color="red">{text}</font>'.format(
                         text=_('Failed to create a background task for rescoring "{key}": {id}.').format(
                             key=module_state_key, id=err.message
@@ -629,7 +629,7 @@ def instructor_dashboard(request, course_id):
             )
             smdat = smdat.order_by('student')
             msg += _("Found {num} records to dump.").format(num=smdat)
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             msg += "<font color='red'>{text}</font><pre>{err}</pre>".format(
                 text=_("Couldn't find module with that urlname."),
                 err=escape(err)
@@ -639,8 +639,8 @@ def instructor_dashboard(request, course_id):
         if smdat:
             datatable = {'header': ['username', 'state']}
             datatable['data'] = [[x.student.username, x.state] for x in smdat]
-            datatable['title'] = _('Student state for problem {problem}').format(problem = problem_to_dump)
-            return return_csv('student_state_from_{problem}.csv'.format(problem = problem_to_dump), datatable)
+            datatable['title'] = _('Student state for problem {problem}').format(problem=problem_to_dump)
+            return return_csv('student_state_from_{problem}.csv'.format(problem=problem_to_dump), datatable)
 
     elif 'Download CSV of all student anonymized IDs' in action:
         students = User.objects.filter(
@@ -817,7 +817,7 @@ def instructor_dashboard(request, course_id):
             # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
             submit_bulk_course_email(request, course_key, email.id)  # pylint: disable=E1101
 
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             # Catch any errors and deliver a message to the user
             error_msg = "Failed to send email! ({0})".format(err)
             msg += "<font color='red'>" + error_msg + "</font>"
@@ -868,7 +868,7 @@ def instructor_dashboard(request, course_id):
             )
         try:
             res = requests.get(url)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             log.exception("Error trying to access analytics at %s", url)
             return None
 
@@ -1030,20 +1030,20 @@ def _do_remote_gradebook(user, course, action, args=None, files=None):
     try:
         resp = requests.post(rgurl, data=data, verify=False, files=files)
         retdict = json.loads(resp.content)
-    except Exception as err:
-        msg = _("Failed to communicate with gradebook server at {url}").format(url = rgurl) + "<br/>"
-        msg += _("Error: {err}").format(err = err)
-        msg += "<br/>resp={resp}".format(resp = resp.content)
-        msg += "<br/>data={data}".format(data = data)
+    except Exception as err:  # pylint: disable=broad-except
+        msg = _("Failed to communicate with gradebook server at {url}").format(url=rgurl) + "<br/>"
+        msg += _("Error: {err}").format(err=err)
+        msg += "<br/>resp={resp}".format(resp=resp.content)
+        msg += "<br/>data={data}".format(data=data)
         return msg, {}
 
-    msg = '<pre>{msg}</pre>'.format(msg = retdict['msg'].replace('\n', '<br/>'))
+    msg = '<pre>{msg}</pre>'.format(msg=retdict['msg'].replace('\n', '<br/>'))
     retdata = retdict['data']  # a list of dicts
 
     if retdata:
         datatable = {'header': retdata[0].keys()}
         datatable['data'] = [x.values() for x in retdata]
-        datatable['title'] = _('Remote gradebook response for {action}').format(action = action)
+        datatable['title'] = _('Remote gradebook response for {action}').format(action=action)
         datatable['retdata'] = retdata
     else:
         datatable = {}
@@ -1618,7 +1618,7 @@ def _do_unenroll_students(course_key, students, email_students=False):
                     send_mail_ret = send_mail_to_student(student, d)
                     status[student] += (', email sent' if send_mail_ret else '')
 
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 if not isok:
                     status[student] = "Error!  Failed to un-enroll"
 
