@@ -483,7 +483,7 @@ You may want to present different students with different problems, or different
 
 Note that *problem randomization* is different from the **Randomization** setting in Studio. The **Randomization** setting randomizes variables within a single problem. Problem randomization offers different problems or problem versions to different students.
 
-.. note:: Creating problems with versions that can be randomized requires you to export your course, edit some of your course's XML files in a text editor, and then re-import your course. We recommend that you create a backup copy of your course before you do this. We also recommend that you only edit the files that will contain polls in the text editor if you're very familiar with editing XML.
+.. note:: Creating problems with versions that can be randomized requires you to export your course, edit some of your course's XML files in a text editor, and then re-import your course. We recommend that you create a backup copy of your course before you do this. We also recommend that you only edit your course files in the text editor if you're very familiar with editing XML.
 
 Terminology
 ************

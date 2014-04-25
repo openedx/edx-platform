@@ -80,7 +80,7 @@ Templates
     <p>Write an expression for the product of R_1, R_2, and the inverse of R_3.</p>
     <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="R_1*R_2/R_3">
       <responseparam type="tolerance" default="0.00001"/> 
-      <formulaequationinput size="40" />
+      <formulaequationinput size="40"  label="Enter the equation" />
     </formularesponse>
   </problem>
 
@@ -90,7 +90,7 @@ Templates
     <p>Problem text</p>
     <formularesponse type="ci" samples="VARIABLES@LOWER_BOUNDS:UPPER_BOUNDS#NUMBER_OF_SAMPLES" answer="$VoVi">
       <responseparam type="tolerance" default="0.00001"/>
-      <formulaequationinput size="20"  label="Enter the equation"/>
+      <formulaequationinput size="20"  label="Enter the equation" />
     </formularesponse>
 
   <script type="loncapa/python">
@@ -156,6 +156,8 @@ Creates a response field where a student types an answer to the problem in plain
 
      * - Attribute
        - Description
+     * - label (required)
+       - Specifies the name of the response field.
      * - size (optional)
        - Specifies the width, in characters, of the response field where students enter answers.
 
