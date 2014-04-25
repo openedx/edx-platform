@@ -79,6 +79,7 @@ Annotator.Plugin.Diacritics = (function(_super) {
             this.annotator.subscribe('annotationsLoaded', this.updateDiacritics);
             this.annotator.subscribe('annotationUploaded', this.updateDiacritics);
     		this.annotator.subscribe('annotationDeleted', this.updateDiacritics);
+            this.annotator.subscribe('annotationUpdated', this.updateDiacritics);
             this.annotator.subscribe('annotationEditorShown', this.updateEditorForDiacritics, this.field);
             
             var self = this;
@@ -135,7 +136,7 @@ Annotator.Plugin.Diacritics = (function(_super) {
         } else{
            $(newdiv).css('top',""+loc.y+"px");   
         }
-        $(newdiv).css('left',""+(loc.x+(loc.width/2.0)-10)+"px");
+        $(newdiv).css('left',""+(loc.x+(loc.width/2.0)-5)+"px");
         $(newdiv).css('background-image', 'url('+imgurl+')');
         $('.annotator-wrapper')[0].appendChild(newdiv);
     }
