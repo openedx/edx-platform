@@ -213,4 +213,6 @@ if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=log_level)
     # pylint: enable=invalid-name
 
+    print("Validating languages...")
     main(languages=args.language, empty=args.empty, verbosity=args.verbose)
+    print("Finished validating languages")

@@ -9,6 +9,7 @@
 # JoeyChiou <Joeyc0916@gmail.com>, 2013
 # JoeyChiou <Joeyc0916@gmail.com>, 2013
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013
+# bhsfmiao <mkr_mkr@163.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # tosti <tosti.chiang@gmail.com>, 2013
 # 毅 歐陽 <wishnoblog@gmail.com>, 2014
@@ -39,6 +40,7 @@
 # JoeyChiou <Joeyc0916@gmail.com>, 2013
 # lin31504 <lin31504@gmail.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
+# bhsfmiao <mkr_mkr@163.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # TSHIH <timothykshih@gmail.com>, 2013
 # tosti <tosti.chiang@gmail.com>, 2013
@@ -51,7 +53,9 @@
 # 
 # Translators:
 # JoeyChiou <Joeyc0916@gmail.com>, 2013
+# lin31504 <lin31504@gmail.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2014
+# bhsfmiao <mkr_mkr@163.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # tosti <tosti.chiang@gmail.com>, 2013
 # TSHIH <timothykshih@gmail.com>, 2013
@@ -79,7 +83,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-22 09:02-0400\n"
+"POT-Creation-Date: 2014-04-27 11:11-0400\n"
 "PO-Revision-Date: 2014-04-10 20:10+0000\n"
 "Last-Translator: Yu-Ren Chen <yrchen@atcity.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
@@ -211,6 +215,16 @@ msgstr "您還沒有註冊本課程"
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
 msgstr "註冊操作無效"
+
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication service (like
+#. Google or LinkedIn).
+#: common/djangoapps/student/views.py
+msgid ""
+"There is no {platform_name} account associated with your {provider_name} "
+"account. Please use your {platform_name} credentials or pick another "
+"provider."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
@@ -856,6 +870,10 @@ msgstr ""
 msgid ""
 "Submitted. As soon as a response is returned, this message will be replaced "
 "by that feedback."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1923,13 +1941,8 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#, fuzzy
 msgid "Data Download"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"資料下載\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"數據下載"
+msgstr "資料下載"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/courseware/instructor_dashboard.html
@@ -1938,7 +1951,7 @@ msgstr "分析"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Course Statistics At A Glance"
-msgstr ""
+msgstr "課程統計一覽"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Found a single student.  "
@@ -1950,7 +1963,7 @@ msgstr "無法透過電子郵件或是使用者名稱找到學生。"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of students enrolled in {course_id}"
-msgstr ""
+msgstr "已註冊{course_id}的學生清單"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Summary Grades of students enrolled in {course_id}"
@@ -2174,7 +2187,7 @@ msgstr "全名"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "edX email"
-msgstr ""
+msgstr "edX 電子郵件帳號"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Enrollment of students"
@@ -3874,7 +3887,8 @@ msgstr ""
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/provider_login.html lms/templates/register.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Password"
 msgstr ""
@@ -4221,10 +4235,46 @@ msgstr "發生錯誤。請稍後再試一次。"
 msgid "Please verify your new email"
 msgstr "請驗證您的新電子郵件信箱"
 
+#. Translators: this message is displayed when a user tries to link their
+#. account with a third-party authentication provider (for example, Google or
+#. LinkedIn) with a given edX account, but their third-party account is
+#. already
+#. associated with another edX account. provider_name is the name of the
+#. third-party authentication provider, and platform_name is the name of the
+#. edX deployment.
+#: lms/templates/dashboard.html
+msgid ""
+"The selected {provider_name} account is already linked to another "
+"{platform_name} account. Please {link_start}log out{link_end}, then log in "
+"with your {provider_name} account."
+msgstr ""
+
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
 msgstr "編輯"
+
+#. Translators: this section lists all the third-party authentication
+#. providers
+#. (for example, Google and LinkedIn) the user can link with or unlink from
+#. their edX account.
+#: lms/templates/dashboard.html
+msgid "Account Links"
+msgstr ""
+
+#. Translators: clicking on this removes the link between a user's edX account
+#. and their account with an external authentication provider (like Google or
+#. LinkedIn).
+#: lms/templates/dashboard.html
+msgid "unlink"
+msgstr ""
+
+#. Translators: clicking on this creates a link between a user's edX account
+#. and their account with an external authentication provider (like Google or
+#. LinkedIn).
+#: lms/templates/dashboard.html
+msgid "link"
+msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 msgid "Reset Password"
@@ -4788,6 +4838,21 @@ msgstr "帳戶偏好"
 msgid "Remember me"
 msgstr "記住我"
 
+#. Translators: this is the last choice of a number of choices of how to log
+#. in
+#. to the site.
+#: lms/templates/login.html
+msgid "or, if you have connected one of these providers, log in below."
+msgstr ""
+
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication provider (like Google or LinkedIn).
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication service (like Google or LinkedIn).
+#: lms/templates/login.html lms/templates/register.html
+msgid "Sign in with {provider_name}"
+msgstr ""
+
 #: lms/templates/lti.html
 msgid "External resource"
 msgstr "外部資源"
@@ -5124,6 +5189,26 @@ msgstr "歡迎 !"
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
 msgstr "請在下面註冊創建您的 {platform_name} 帳號"
+
+#: lms/templates/register.html
+msgid "Register to start learning today!"
+msgstr ""
+
+#: lms/templates/register.html
+msgid ""
+"or create your own {platform_name} account by completing all "
+"<strong>required*</strong> fields below."
+msgstr ""
+
+#. Translators: selected_provider is the name of an external, third-party user
+#. authentication service (like Google or LinkedIn).
+#: lms/templates/register.html
+msgid "You've successfully signed in with {selected_provider}."
+msgstr ""
+
+#: lms/templates/register.html
+msgid "Finish your account registration below to start learning."
+msgstr ""
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
@@ -5600,6 +5685,10 @@ msgstr ""
 msgid "{file_format}"
 msgstr ""
 
+#: lms/templates/video.html
+msgid "Download Handout"
+msgstr ""
+
 #: lms/templates/word_cloud.html
 msgid "Your words:"
 msgstr "您的話："
@@ -5886,7 +5975,7 @@ msgstr "額外資源"
 #. notification image that indicates the tab "needs attention".
 #: lms/templates/courseware/course_navigation.html
 msgid "needs attention"
-msgstr ""
+msgstr "需要注意"
 
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/course_navigation.html
@@ -6376,7 +6465,7 @@ msgstr "學生"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Score distribution for problems"
-msgstr ""
+msgstr "問題成績分布"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6528,6 +6617,10 @@ msgstr "在Studio中檢視評分"
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "學生 '{username}' ({email}) 的課程進度"
+
+#: lms/templates/courseware/progress.html
+msgid "Download your certificate"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{earned:.3n} of {total:.3n} possible points"
@@ -7190,10 +7283,6 @@ msgstr "論壇現在正在維護，將儘快恢復正常。"
 msgid "User Profile"
 msgstr "使用者資料"
 
-#: lms/templates/discussion/user_profile.html
-msgid "Active Threads"
-msgstr "活動主題"
-
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Expand discussion"
@@ -7216,6 +7305,10 @@ msgstr ""
 #: lms/templates/discussion/mustache/_profile_thread.mustache
 msgid "View discussion"
 msgstr "檢視討論"
+
+#: lms/templates/discussion/mustache/_user_profile.mustache
+msgid "Active Threads"
+msgstr "活動主題"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -7254,11 +7347,16 @@ msgstr "親愛的 {full_name}"
 msgid ""
 "You have been invited to be a beta tester for {course_name} at {site_name} "
 "by a member of the course staff."
+msgstr "您已被{site_name}上{course_name}課程的工作人員邀請成為課程的beta測試者。"
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
+#: lms/templates/emails/enroll_email_enrolledmessage.txt
+msgid "To start accessing course materials, please visit {course_url}"
 msgstr ""
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid "Visit {course_about_url} to join the course and begin the beta test."
-msgstr ""
+msgstr "拜訪{course_about_url}以加入課程並成為beta測試者。"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid "Visit {site_name} to enroll in the course and begin the beta test."
@@ -7273,7 +7371,7 @@ msgstr "此封電子郵件由{site_name}自動寄給{email_address}"
 
 #: lms/templates/emails/add_beta_tester_email_subject.txt
 msgid "You have been invited to a beta test for {course_name}"
-msgstr ""
+msgstr "您已被邀請參加{course_name}的beta測試。"
 
 #: lms/templates/emails/confirm_email_change.txt
 msgid ""
@@ -7359,10 +7457,6 @@ msgstr ""
 msgid ""
 "You have been enrolled in {course_name} at {site_name} by a member of the "
 "course staff. The course should now appear on your {site_name} dashboard."
-msgstr ""
-
-#: lms/templates/emails/enroll_email_enrolledmessage.txt
-msgid "To start accessing course materials, please visit {course_url}"
 msgstr ""
 
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
@@ -7536,7 +7630,7 @@ msgstr "跳過"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Score Distribution"
-msgstr ""
+msgstr "成績分布"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid ""
@@ -7628,7 +7722,7 @@ msgstr "對於小型課程，點選個人資訊清單以直接加入學生至課
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "List enrolled students' profile information"
-msgstr ""
+msgstr "列出註冊學生個人資料資訊"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7644,7 +7738,7 @@ msgstr "評分標準"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Click to download a CSV of anonymized student IDs:"
-msgstr ""
+msgstr "點選以下載匿名表示學生ID的CSV檔案："
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Get Student Anonymized IDs CSV"
@@ -7659,7 +7753,7 @@ msgid ""
 "Click to generate a CSV grade report for all currently enrolled students.  "
 "Links to generated reports appear in a table below when report generation is"
 " complete."
-msgstr ""
+msgstr "點選以產生所有目前註冊學生CSV格式的成績報告，報告的連結將會在生成後顯示在下方的表格中。"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -7853,7 +7947,7 @@ msgstr ""
 msgid ""
 "Note: Users must have an activated {platform_name} account before they can "
 "be enrolled as a beta tester."
-msgstr ""
+msgstr "注意：使用者在加入beta測試者之前，必須有個於{platform_name}上啟用的帳號。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -7867,11 +7961,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add beta testers"
-msgstr ""
+msgstr "新增beta測試者"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Remove beta testers"
-msgstr ""
+msgstr "移除beta測試者"
 
 #. Translators: an "Administration List" is a list, such as Course Staff, that
 #. users can be added to.
@@ -7884,7 +7978,7 @@ msgstr "管理員列表管理"
 #. users can be added to.
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Select an Administrator Group:"
-msgstr ""
+msgstr "選擇一個管理群組："
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Getting available lists..."
@@ -7941,7 +8035,7 @@ msgstr "Beta測試者可以在其餘學生之前看到課程內容。他們可�
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Beta Tester"
-msgstr ""
+msgstr "新增Beta測試者"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Admins"
@@ -7956,7 +8050,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Discussion Admin"
-msgstr ""
+msgstr "新增討論管理員"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Discussion Moderators"
@@ -8437,7 +8531,7 @@ msgstr "我們已經給您的郵箱發送郵件，您應該能夠很快收到，
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Data"
-msgstr "下載CSV數據"
+msgstr "下載CSV格式資料"
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "These reports are delimited by start and end dates."
@@ -8773,7 +8867,7 @@ msgstr ""
 msgid ""
 "Please wait a few seconds and then reload the page. If the problem persists,"
 " please email us at {email}."
-msgstr ""
+msgstr "請等待數秒後重新載入頁面。如果問題依然存在，請透過電子郵件{email}與我們聯絡"
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
@@ -9804,7 +9898,7 @@ msgstr "頁面功能"
 
 #: cms/templates/asset_index.html
 msgid "Loading&hellip;"
-msgstr ""
+msgstr "載入中&hellip;"
 
 #: cms/templates/asset_index.html
 msgid "What files are listed here?"
@@ -9910,7 +10004,7 @@ msgstr ""
 
 #: cms/templates/container.html
 msgid "This page has no content yet."
-msgstr ""
+msgstr "本頁面尚無內容"
 
 #: cms/templates/container.html cms/templates/container.html
 msgid "Publishing Status"
@@ -9918,13 +10012,13 @@ msgstr "發佈狀態"
 
 #: cms/templates/container.html
 msgid "Published"
-msgstr ""
+msgstr "已發佈"
 
 #: cms/templates/container.html
 msgid ""
 "To make changes to the content of this page, you need to edit unit "
 "{unit_link} as a draft."
-msgstr ""
+msgstr "要改變這個頁面的內容，您需要將單元{unit_link}設定為草稿"
 
 #: cms/templates/container.html
 msgid "Draft"
@@ -9934,7 +10028,7 @@ msgstr ""
 msgid ""
 "You can edit the content of this page, and your changes will be published "
 "with unit {unit_link}."
-msgstr ""
+msgstr "您可以編輯這個頁面的內容，所有變更將會發布在單元{unit_link}"
 
 #: cms/templates/container.html
 msgid ""
@@ -9997,7 +10091,7 @@ msgstr "無法復原此頁面"
 
 #: cms/templates/edit-tabs.html
 msgid "You can add additional custom pages to your course."
-msgstr ""
+msgstr "您可以增加額外的自訂頁面到您的課程中"
 
 #: cms/templates/edit-tabs.html
 msgid "Add a New Page"
@@ -10037,7 +10131,7 @@ msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "See an example"
-msgstr ""
+msgstr "瞧瞧範例"
 
 #: cms/templates/edit-tabs.html
 msgid "Pages in Your Course"
