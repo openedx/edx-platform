@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-22 10:03-0400\n"
-"PO-Revision-Date: 2014-04-22 14:03:27.086386\n"
+"POT-Creation-Date: 2014-04-27 17:15-0400\n"
+"PO-Revision-Date: 2014-04-27 21:15:36.951764\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -172,6 +172,19 @@ msgstr "Ýöü äré nöt énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρ#"
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
 msgstr "Énröllmént äçtïön ïs ïnvälïd Ⱡ'σяєм #"
+
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication service (like
+#. Google or LinkedIn).
+#: common/djangoapps/student/views.py
+msgid ""
+"There is no {platform_name} account associated with your {provider_name} "
+"account. Please use your {platform_name} credentials or pick another "
+"provider."
+msgstr ""
+"Théré ïs nö {platform_name} äççöünt ässöçïätéd wïth ýöür {provider_name} "
+"äççöünt. Pléäsé üsé ýöür {platform_name} çrédéntïäls ör pïçk änöthér "
+"prövïdér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
@@ -845,6 +858,12 @@ msgid ""
 msgstr ""
 "Süßmïttéd. Às söön äs ä réspönsé ïs rétürnéd, thïs méssägé wïll ßé répläçéd "
 "ßý thät féédßäçk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr ""
+"Nö réspönsé fröm Xqüéüé wïthïn {xqueue_timeout} séçönds. Àßörtéd. Ⱡ'σяєм "
+"ιρѕυм ∂σ#"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
@@ -4286,7 +4305,8 @@ msgstr "Förgöt pässwörd? Ⱡ'σ#"
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/provider_login.html lms/templates/register.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Password"
 msgstr "Pässwörd #"
@@ -4696,10 +4716,49 @@ msgstr "Àn érrör öççürréd. Pléäsé trý ägäïn lätér. Ⱡ'σяєм
 msgid "Please verify your new email"
 msgstr "Pléäsé vérïfý ýöür néw émäïl Ⱡ'σяєм #"
 
+#. Translators: this message is displayed when a user tries to link their
+#. account with a third-party authentication provider (for example, Google or
+#. LinkedIn) with a given edX account, but their third-party account is
+#. already
+#. associated with another edX account. provider_name is the name of the
+#. third-party authentication provider, and platform_name is the name of the
+#. edX deployment.
+#: lms/templates/dashboard.html
+msgid ""
+"The selected {provider_name} account is already linked to another "
+"{platform_name} account. Please {link_start}log out{link_end}, then log in "
+"with your {provider_name} account."
+msgstr ""
+"Thé séléçtéd {provider_name} äççöünt ïs älréädý lïnkéd tö änöthér "
+"{platform_name} äççöünt. Pléäsé {link_start}lög öüt{link_end}, thén lög ïn "
+"wïth ýöür {provider_name} äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
 msgstr "édït Ⱡ'σяєм#"
+
+#. Translators: this section lists all the third-party authentication
+#. providers
+#. (for example, Google and LinkedIn) the user can link with or unlink from
+#. their edX account.
+#: lms/templates/dashboard.html
+msgid "Account Links"
+msgstr "Àççöünt Lïnks Ⱡ'#"
+
+#. Translators: clicking on this removes the link between a user's edX account
+#. and their account with an external authentication provider (like Google or
+#. LinkedIn).
+#: lms/templates/dashboard.html
+msgid "unlink"
+msgstr "ünlïnk Ⱡ'σяєм ιρѕ#"
+
+#. Translators: clicking on this creates a link between a user's edX account
+#. and their account with an external authentication provider (like Google or
+#. LinkedIn).
+#: lms/templates/dashboard.html
+msgid "link"
+msgstr "lïnk Ⱡ'σяєм#"
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 msgid "Reset Password"
@@ -5313,6 +5372,23 @@ msgstr "Àççöünt Préférénçés Ⱡ'σя#"
 msgid "Remember me"
 msgstr "Rémémßér mé Ⱡ#"
 
+#. Translators: this is the last choice of a number of choices of how to log
+#. in
+#. to the site.
+#: lms/templates/login.html
+msgid "or, if you have connected one of these providers, log in below."
+msgstr ""
+"ör, ïf ýöü hävé çönnéçtéd öné öf thésé prövïdérs, lög ïn ßélöw. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя#"
+
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication provider (like Google or LinkedIn).
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication service (like Google or LinkedIn).
+#: lms/templates/login.html lms/templates/register.html
+msgid "Sign in with {provider_name}"
+msgstr "Sïgn ïn wïth {provider_name} Ⱡ'σ#"
+
 #: lms/templates/lti.html
 msgid "External resource"
 msgstr "Éxtérnäl résöürçé Ⱡ'σ#"
@@ -5684,6 +5760,29 @@ msgstr "Wélçömé! #"
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
 msgstr "Régïstér ßélöw tö çréäté ýöür {platform_name} äççöünt Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/register.html
+msgid "Register to start learning today!"
+msgstr "Régïstér tö stärt léärnïng tödäý! Ⱡ'σяєм ι#"
+
+#: lms/templates/register.html
+msgid ""
+"or create your own {platform_name} account by completing all "
+"<strong>required*</strong> fields below."
+msgstr ""
+"ör çréäté ýöür öwn {platform_name} äççöünt ßý çömplétïng äll "
+"<strong>réqüïréd*</strong> fïélds ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#. Translators: selected_provider is the name of an external, third-party user
+#. authentication service (like Google or LinkedIn).
+#: lms/templates/register.html
+msgid "You've successfully signed in with {selected_provider}."
+msgstr "Ýöü'vé süççéssfüllý sïgnéd ïn wïth {selected_provider}. Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/register.html
+msgid "Finish your account registration below to start learning."
+msgstr ""
+"Fïnïsh ýöür äççöünt régïsträtïön ßélöw tö stärt léärnïng. Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
@@ -6181,6 +6280,10 @@ msgstr "Döwnlöäd tränsçrïpt Ⱡ'σя#"
 #: lms/templates/video.html lms/templates/video.html
 msgid "{file_format}"
 msgstr "{file_format} Ⱡ'σя#"
+
+#: lms/templates/video.html
+msgid "Download Handout"
+msgstr "Döwnlöäd Händöüt Ⱡ'σ#"
 
 #: lms/templates/word_cloud.html
 msgid "Your words:"
@@ -7205,6 +7308,10 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Çöürsé Prögréss för Stüdént '{username}' ({email}) Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/courseware/progress.html
+msgid "Download your certificate"
+msgstr "Döwnlöäd ýöür çértïfïçäté Ⱡ'σяєм#"
+
+#: lms/templates/courseware/progress.html
 msgid "{earned:.3n} of {total:.3n} possible points"
 msgstr "{earned:.3n} öf {total:.3n} pössïßlé pöïnts Ⱡ'σяєм#"
 
@@ -7926,10 +8033,6 @@ msgstr ""
 msgid "User Profile"
 msgstr "Ûsér Pröfïlé Ⱡ#"
 
-#: lms/templates/discussion/user_profile.html
-msgid "Active Threads"
-msgstr "Àçtïvé Thréäds Ⱡ'#"
-
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Expand discussion"
@@ -7952,6 +8055,10 @@ msgstr "… #"
 #: lms/templates/discussion/mustache/_profile_thread.mustache
 msgid "View discussion"
 msgstr "Vïéw dïsçüssïön Ⱡ'#"
+
+#: lms/templates/discussion/mustache/_user_profile.mustache
+msgid "Active Threads"
+msgstr "Àçtïvé Thréäds Ⱡ'#"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
