@@ -1,0 +1,89 @@
+###################################
+April 30, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of April
+30, 2014.  See previous pages in this document for a history of changes.
+
+**************************
+edX Documentation
+**************************
+
+You can access the `edX Status`_ page to get an up-
+to-date status for all services on edx.org and edX Edge. The page also includes
+the Twitter feed for @edXstatus, which the edX Operations team uses to post
+updates.
+
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include: 
+
+  * Updated `Show or Hide the Course Wiki Page`_ to include a note about Wiki
+    content being available after you hide the Wiki page.
+
+  * Updated label information and added XML information to `Problem with
+    Adaptive Hint`_
+
+  * Updated `Beta Testing a Course`_ to reflect feature changes.
+    
+  * Expanded the `Grade and Answer Data`_ to include topics on interpreting the
+    grade reports and student progress page.
+
+  * Updated `Working with HTML Components`_ to reflect changes to the HTML
+    component editor.
+
+  * Reorganized information about problems into the `Creating Exercises and
+    Tools`_ section.
+  
+  * Added more information about collecting language and location data from
+    students to `Student Data`_.
+      
+
+* `edX Data Documentation`_
+  
+  Added new event types to `Tracking Logs`_ for interactions with PDF files.
+
+* `edX Platform Developer Documentation`_
+  
+  Recent changes include:
+  
+  Added the section `Contributing to Open edX`_
+
+
+
+*************
+edX Studio
+*************
+
+* The HTML component editor is updated to provide a raw HTML editing option. For
+  more information, see `Working with HTML Components`_. (STUD-1562)
+
+* You can now upload a handout that is associated with a video directly in the
+  Video component editor. Open the **Advanced** tab in the Video component
+  editor, and use the **Upload** button to find and add a file from your
+  computer:
+  
+  .. image:: images/upload_handout_video.png
+   :alt: Image of the Upload Handout section of the Video component editor.
+
+***************************************
+edX Learning Management System
+***************************************
+
+* Lines in bulk email messages were not wrapped at 998 characters, which caused
+  error messages and erroneous characters in some email programs. All lines are
+  now wrapped at 998 characters automatically. (LMS-1466)
+
+* Occasionally student submissions for MatLab problems are not graded
+  successfully and the MatLab grader times out. There is now a **Reset** button
+  that allows students to resubmit their answer without counting the
+  resubmission and another attempt of the problem.
+
+.. include:: links.rst
