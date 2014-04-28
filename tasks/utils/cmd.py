@@ -1,8 +1,6 @@
 """
 Helper functions for constructing shell commands.
 """
-from colorama import Fore
-
 
 def cmd(*args):
     """
@@ -23,10 +21,3 @@ def django_cmd(sys, settings, *args):
     # which calls "studio" "cms"
     sys = 'cms' if sys == 'studio' else sys
     return cmd("python manage.py", sys, "--settings={}".format(settings), *args)
-
-def test_cmd(name, *args):
-    print(Fore.green + """
-=======================================
-Running {} tests
-=======================================""".format(name)
-    )

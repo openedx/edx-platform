@@ -7,9 +7,7 @@ import os
 import subprocess
 import signal
 import psutil
-from colorama import init, Fore, Back, Style
-
-init(autoreset=True)
+from pygments.console import colorize
 
 def kill_process(proc):
     """
@@ -47,14 +45,14 @@ def run_multi_processes(cmd_list, out_log=None, err_log=None):
             pids.extend([subprocess.Popen(cmd, **kwargs)])
 
         def _signal_handler(*args):
-            print(Fore.WHITE + "\nEnding...")
+            print(colorize("lightgray", "\nEnding..."))
         signal.signal(signal.SIGINT, _signal_handler)
-        print(Fore.WHITE + "Enter CTL-C to end")
+        print(colorize("lightgray", "Enter CTL-C to end"))
         signal.pause()
-        print(Fore.WHITE + "Processes stopped")
+        print(colorize("lightgray", "Processes stopped"))
 
     except Exception as err:
-        print(Fore.RED + "Error running process {}".format(err), file=sys.stderr)
+        print(colorize("darkred", "Error running process {}".format(err), file=sys.stderr))
 
     finally:
         for pid in pids:

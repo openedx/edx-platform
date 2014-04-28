@@ -7,13 +7,12 @@ import argparse
 import traceback
 from invoke import task
 from invoke import run as sh
+from pygments.console import colorize
 from colorama import Fore, Back, Style
 from colorama import init as colorama_init
 
 from .utils.cmd import django_cmd
 from .utils.process import run_process, run_multi_processes
-
-colorama_init(autoreset=True)
 
 DEFAULT_PORT = {"lms": 8000, "studio": 8001}
 DEFAULT_SETTINGS = 'dev'
@@ -28,7 +27,7 @@ def run_server(system, settings=None, port=None, skip_assets=False):
     If `skip_assets` is True, skip the asset compilation step.
     """
     if system not in ['lms', 'cms']:
-        print(Fore.RED + "System must be either lms or cms", file=sys.stderr)
+        print(colorize("darkred", "System must be either lms or cms", file=sys.stderr))
         exit(1)
 
     if not skip_assets:
@@ -81,7 +80,7 @@ def devstack(system=None, fast=False):
     Start the devstack LMS or CMS server
     """
     if system is None:
-        print(Fore.WHITE + "Usage: invoke servers.devstack --system (lms|cms) [--fast]")
+        print(colorize("lightgray", "Usage: invoke servers.devstack --system (lms|cms) [--fast]"))
         sys.exit(2)
     run_server(system, settings='devstack', skip_assets=fast)
 
@@ -129,7 +128,7 @@ def update_db(settings='dev', verbose=False):
 
     sh(django_cmd('lms', settings, 'syncdb', '--traceback', '--pythonpath=.'), hide=hide, echo=True)
     sh(django_cmd('lms', settings, 'migrate', '--traceback', '--pythonpath=.'), hide=hide, echo=True)
-    print(Fore.GREEN + "DB sucessufully updated")
+    print(colorize("lightgreen", "DB sucessufully updated"))
 
 @task('prereqs.install',
       help={'system': "lms or cms",
@@ -140,10 +139,10 @@ def check_settings(system=None, settings=None):
     Checks settings files.
     """
     if system is None or settings is None:
-        print(Fore.WHITE +
+        print(colorize("lightgray",
 '''Usage:
     invoke servers.check_settings --system (lms|cms) --settings <settings>
-''')
+'''))
         print("Too few arguments")
         sys.exit(2)
 
@@ -151,7 +150,7 @@ def check_settings(system=None, settings=None):
         import_cmd = "echo 'import {system}.envs.{settings}'".format(system=system, settings=settings)
         django_shell_cmd = django_cmd(system, settings, 'shell', '--plain', '--pythonpath=.')
         sh("{import_cmd} | {shell_cmd}".format(import_cmd=import_cmd, shell_cmd=django_shell_cmd), hide='both')
-        print(Fore.GREEN + "{system} settings for {settings} are ok.".format(system=system, settings=settings))
+        print(colorize("lightgreen", "{system} settings for {settings} are ok.".format(system=system, settings=settings)))
     except Exception as exc:
         traceback.print_exc()
-        print(Fore.RED + "Failed to import settings", file=sys.stderr)
+        print(colorize("darkred", "Failed to import settings", file=sys.stderr))
