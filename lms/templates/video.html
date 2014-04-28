@@ -125,8 +125,8 @@
                   % else:
                   <li class="a11y-menu-item">
                   % endif
-                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_('{file_format}'.format(file_format=item['display_name']))}" data-value="${item['value']}">
-                        ${_('{file_format}'.format(file_format=item['display_name']))}
+                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(item['display_name'])}" data-value="${item['value']}">
+                        ${_(item['display_name'])}
                       </a>
                   </li>
                 % endfor

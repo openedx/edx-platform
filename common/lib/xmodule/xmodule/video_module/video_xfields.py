@@ -7,6 +7,9 @@ from xblock.fields import Scope, String, Float, Boolean, List, Dict
 
 from xmodule.fields import RelativeTime
 
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
+
 
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
@@ -121,8 +124,9 @@ class VideoFields(object):
         help="Transcript file format to download by user.",
         scope=Scope.preferences,
         values=[
-            {"display_name": "SubRip (.srt) file", "value": "srt"},
-            {"display_name": "Text (.txt) file", "value": "txt"}
+            # Translators: This is a type of file used for captioning in the video player.
+            {"display_name": _("SubRip (.srt) file"), "value": "srt"},
+            {"display_name": _("Text (.txt) file"), "value": "txt"}
         ],
         default='srt',
     )
