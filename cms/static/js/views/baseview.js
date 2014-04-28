@@ -1,13 +1,13 @@
 define(["jquery", "underscore", "backbone", "js/utils/handle_iframe_binding"],
     function ($, _, Backbone, IframeUtils) {
         /*
-          This view is extended from backbone to provide useful functionality for all Studio views.
-          This functionality includes:
-            - automatic expand and collapse of elements with the 'ui-toggle-expansion' class specified
-            - additional control of rendering by overriding 'beforeRender' or 'afterRender'
+         This view is extended from backbone to provide useful functionality for all Studio views.
+         This functionality includes:
+         - automatic expand and collapse of elements with the 'ui-toggle-expansion' class specified
+         - additional control of rendering by overriding 'beforeRender' or 'afterRender'
 
-          Note: the default 'afterRender' function calls a utility function 'iframeBinding' which modifies
-          iframe src urls on a page so that they are rendered as part of the DOM.
+         Note: the default 'afterRender' function calls a utility function 'iframeBinding' which modifies
+         iframe src urls on a page so that they are rendered as part of the DOM.
          */
 
         var BaseView = Backbone.View.extend({
@@ -61,12 +61,12 @@ define(["jquery", "underscore", "backbone", "js/utils/handle_iframe_binding"],
             },
 
             /**
-            * Disables a given element when a given operation is running.
-            * @param {jQuery} element: the element to be disabled.
-            * @param operation: the operation during whose duration the
-            * element should be disabled. The operation should return
-            * a jquery promise.
-            */
+             * Disables a given element when a given operation is running.
+             * @param {jQuery} element: the element to be disabled.
+             * @param operation: the operation during whose duration the
+             * element should be disabled. The operation should return
+             * a jquery promise.
+             */
             disableElementWhileRunning: function(element, operation) {
                 element.addClass("is-disabled");
                 operation().always(function() {
