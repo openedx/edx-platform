@@ -13,6 +13,8 @@ PREREQS_MD5_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache'
 NPM_REGISTRY = "http://registry.npmjs.org/"
 PYTHON_REQ_FILES = [
     'requirements/edx/pre.txt',
+    'requirements/edx/github.txt',
+    'requirements/edx/local.txt',
     'requirements/edx/base.txt',
     'requirements/edx/post.txt',
 ]
