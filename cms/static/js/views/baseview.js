@@ -61,9 +61,13 @@ define(["jquery", "underscore", "backbone", "js/utils/handle_iframe_binding"],
             },
 
             disableElementWhileRunning: function(element, operation) {
-                // element is a jquery object
-                // action is the function during whose duration the element
-                // should be disabled
+                /**
+                * Disables a given element when a given operation is running.
+                * @param {jQuery} element: the element to be disabled.
+                * @param operation: the operation during whose duration the
+                * element should be disabled. The operation should return
+                * a jquery promise.
+                */
                 element.addClass("is-disabled");
                 operation().always(function() {
                     element.removeClass("is-disabled");
