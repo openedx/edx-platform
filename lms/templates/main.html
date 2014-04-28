@@ -20,6 +20,9 @@
 <%def name="theme_enabled()">
   <% return settings.FEATURES.get("USE_CUSTOM_THEME", False) %>
 </%def>
+<%def name="is_microsite()">
+  <% return microsite.is_request_in_microsite() %>
+</%def>
 
 <%def name="stanford_theme_enabled()">
   <%
@@ -61,7 +64,7 @@
   <%block name="headextra"/>
 
 <%
-  if theme_enabled():
+  if theme_enabled() and not is_microsite():
     header_extra_file = 'theme-head-extra.html'
     header_file = 'theme-header.html'
     google_analytics_file = 'theme-google-analytics.html'
