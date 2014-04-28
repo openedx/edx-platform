@@ -17,6 +17,7 @@ Contents:
     change_log
     overview.rst
     extending_platform/index
+    process/index
 
 APIs
 -----
