@@ -1,5 +1,6 @@
 # pylint: disable=C0111
 # pylint: disable=W0621
+# pylint: disable=unused-argument
 
 from lettuce import world, step
 

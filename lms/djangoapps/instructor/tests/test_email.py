@@ -34,7 +34,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
         self.client.login(username=instructor.username, password="test")
 
         # URL for instructor dash
-        self.url = reverse('instructor_dashboard_2', kwargs={'course_id': self.course.id})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
         # URL for email view
         self.email_link = '<a href="" data-section="send_email">Email</a>'
 
@@ -122,7 +122,7 @@ class TestNewInstructorDashboardEmailViewXMLBacked(ModuleStoreTestCase):
         self.client.login(username=instructor.username, password="test")
 
         # URL for instructor dash
-        self.url = reverse('instructor_dashboard_2', kwargs={'course_id': self.course_name})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course_name})
         # URL for email view
         self.email_link = '<a href="" data-section="send_email">Email</a>'
 
