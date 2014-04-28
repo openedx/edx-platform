@@ -1,6 +1,7 @@
 # pylint: disable=E1101
 
 """ API implementation for session-oriented interactions. """
+import logging
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -17,6 +18,8 @@ from rest_framework.response import Response
 from api_manager.permissions import ApiKeyHeaderPermission
 from api_manager.serializers import UserSerializer
 from student.models import LoginFailures
+
+AUDIT_LOG = logging.getLogger("audit")
 
 
 def _generate_base_uri(request):
@@ -72,15 +75,20 @@ def session_list(request):
                 response_data['user'] = user_dto.data
                 response_data['uri'] = '{}/{}'.format(base_uri, request.session.session_key)
                 response_status = status.HTTP_201_CREATED
+
+                # add to audit log
+                AUDIT_LOG.info(u"API::User logged in successfully with user-id - {0}".format(user.id))
             else:
                 response_status = status.HTTP_403_FORBIDDEN
         else:
+            AUDIT_LOG.warn(u"API::User authentication failed with user-id - {0}".format(existing_user.id))
             # tick the failed login counters if the user exists in the database
             if LoginFailures.is_feature_enabled():
                 LoginFailures.increment_lockout_counter(existing_user)
 
             response_status = status.HTTP_401_UNAUTHORIZED
     else:
+        AUDIT_LOG.warn(u"API::Failed login attempt with unknown email/username")
         response_status = status.HTTP_404_NOT_FOUND
     return Response(response_data, status=response_status)
 
@@ -113,5 +121,7 @@ def session_detail(request, session_id):
         else:
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'DELETE':
+        user_id = session[SESSION_KEY]
+        AUDIT_LOG.info(u"API::User session terminated for user-id - {0}".format(user_id))
         session.flush()
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)

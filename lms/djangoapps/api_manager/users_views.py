@@ -25,7 +25,7 @@ from util.password_policy_validators import (
 )
 
 log = logging.getLogger(__name__)
-
+AUDIT_LOG = logging.getLogger("audit")
 
 def _generate_base_uri(request):
     """
@@ -142,6 +142,9 @@ def user_list(request):
         # NOTE, this will be a NOP unless the feature has been turned on in configuration
         password_history_entry = PasswordHistory()
         password_history_entry.create(user)
+
+        # add to audit log
+        AUDIT_LOG.info(u"API::New account created with user-id - {0}".format(user.id))
 
         # CDODGE:  @TODO: We will have to extend this to look in the CourseEnrollmentAllowed table and
         # auto-enroll students when they create a new account. Also be sure to remove from
