@@ -148,6 +148,24 @@
       }
     }
 
+    #course-success {
+      margin-bottom: 30px;
+      text-align: center;
+      > a {
+        @include button(simple, $button-color);
+        @include box-sizing(border-box);
+        border-radius: 3px;
+        font: normal 15px/1.6rem $sans-serif;
+        letter-spacing: 0;
+        padding: 5px 18px 6px;
+        text-align: center;
+
+        &:hover, &:focus {
+          text-decoration: none;
+        }
+      }
+    }
+
     #grade-detail-graph {
       min-height: 400px;
       width: 100%;

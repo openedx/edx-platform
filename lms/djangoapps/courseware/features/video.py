@@ -178,8 +178,6 @@ def add_videos_to_course(course, player_mode=None, display_names=None, hashes=No
 
 def add_video_to_course(course, parent_location=None, player_mode=None, data=None, display_name='Video'):
 
-    assert_less(world.youtube.config['youtube_api_response'].status_code, 400, "Real Youtube server is unavailable")
-
     if not parent_location:
         parent_location = add_vertical_to_course(course)
     kwargs = get_metadata(parent_location, player_mode, data, display_name=display_name)

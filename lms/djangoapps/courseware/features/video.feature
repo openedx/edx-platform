@@ -111,24 +111,24 @@ Feature: LMS.Video component
     Then menu "download_transcript" doesn't exist
 
   # 9
-  Scenario: Youtube video has correct transcript if fields for other speeds are filled
-    Given I am registered for the course "test_course"
-    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
-    And I have a "subs_b7xgknqkQk8.srt.sjson" transcript file in assets
-    And it has a video in "Youtube" mode:
-      | sub         | youtube_id_1_5 |
-      | OEoXaMPEzfM | b7xgknqkQk8    |
-    And I make sure captions are opened
-    Then I see "Hi, welcome to Edx." text in the captions
-    And I select the "1.50" speed
-    And I reload the page with video
-    Then I see "Hi, welcome to Edx." text in the captions
+#  Scenario: Youtube video has correct transcript if fields for other speeds are filled
+#    Given I am registered for the course "test_course"
+#    And I have a "subs_OEoXaMPEzfM.srt.sjson" transcript file in assets
+#    And I have a "subs_b7xgknqkQk8.srt.sjson" transcript file in assets
+#    And it has a video in "Youtube" mode:
+#      | sub         | youtube_id_1_5 |
+#      | OEoXaMPEzfM | b7xgknqkQk8    |
+#    And I make sure captions are opened
+#    Then I see "Hi, welcome to Edx." text in the captions
+#    And I select the "1.50" speed
+#    And I reload the page with video
+#    Then I see "Hi, welcome to Edx." text in the captions
     # The 1:56 time is the duration from metadata. 1:54 time is the duration reported
     # by the video API once the video starts playing. The next step is correct because
     # "1:56" is the duration in the VCR timer before the video plays.
-    And I see duration "1:56"
+#    And I see duration "1:56"
 
-  # 10
+  # 9
   Scenario: Verify that each video in each sub-section includes a transcript for non-Youtube countries
     Given youtube server is up and response time is 2 seconds
     And I am registered for the course "test_course"
@@ -157,7 +157,7 @@ Feature: LMS.Video component
     Then the video has rendered in "HTML5" mode
     And the video does not show the captions
 
-  # 11
+  # 10
   Scenario: Start time works for Youtube video
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -166,7 +166,7 @@ Feature: LMS.Video component
     And I click video button "play"
     Then I see video slider at "0:10" position
 
-  # 12
+  # 11
   Scenario: End time works for Youtube video
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -176,7 +176,7 @@ Feature: LMS.Video component
     And I wait "5" seconds
     Then I see video slider at "0:02" position
 
-  # 13
+  # 12
   Scenario: Youtube video with end-time at 1:00 and the video starts playing at 0:58
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -188,7 +188,7 @@ Feature: LMS.Video component
     And I wait "5" seconds
     Then I see video slider at "1:00" position
 
-  # 14
+  # 13
   Scenario: Start time and end time work together for Youtube video
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -199,7 +199,7 @@ Feature: LMS.Video component
     And I wait "5" seconds
     Then I see video slider at "0:12" position
 
-  # 15
+  # 14
   Scenario: Youtube video after pausing at end time video plays to the end from end time
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -214,7 +214,7 @@ Feature: LMS.Video component
     # The default video length is 00:01:55.
     Then I see video slider at "1:55" position
 
-  # 16
+  # 15
   Scenario: Youtube video with end-time at 0:32 and start-time at 0:30, the video starts playing from 0:28
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -226,7 +226,7 @@ Feature: LMS.Video component
     And I wait "8" seconds
     Then I see video slider at "0:32" position
 
-  # 17
+  # 16
   Scenario: Youtube video with end-time at 1:00, the video starts playing from 1:52
     Given I am registered for the course "test_course"
     And it has a video in "Youtube" mode:
@@ -239,7 +239,7 @@ Feature: LMS.Video component
     # Video stops at the end.
     Then I see video slider at "1:55" position
 
-  # 18
+  # 17
   @skip_firefox
   Scenario: Quality button appears on play
     Given the course has a Video component in "Youtube" mode
@@ -247,7 +247,7 @@ Feature: LMS.Video component
     And I click video button "play"
     Then I see video button "quality" is visible
 
-  # 19
+  # 18
   @skip_firefox
   Scenario: Quality button works correctly
     Given the course has a Video component in "Youtube" mode

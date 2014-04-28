@@ -54,7 +54,13 @@ BOK_CHOY_STUBS = {
         :port => 8777,
         :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_video_sources.log"),
         :config => "root_dir=#{VIDEO_SOURCE_DIR}"
+    },
+
+    :youtube => {
+        :port => 9080,
+        :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_youtube.log")
     }
+
 }
 
 # For the time being, stubs are used by both the bok-choy and lettuce acceptance tests

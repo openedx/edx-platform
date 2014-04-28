@@ -46,8 +46,15 @@ If true, it:
 from . import provider
 
 
+_FIELDS_STORED_IN_SESSION = ['auth_entry']
+_MIDDLEWARE_CLASSES = (
+    'third_party_auth.middleware.ExceptionMiddleware',
+)
+_SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
+
+
 def _merge_auth_info(django_settings, auth_info):
-    """Merge `auth_info` dict onto `django_settings` module."""
+    """Merge auth_info dict onto django_settings module."""
     enabled_provider_names = []
     to_merge = []
 
@@ -66,39 +73,77 @@ def _merge_auth_info(django_settings, auth_info):
 
 def _set_global_settings(django_settings):
     """Set provider-independent settings."""
+
+    # Whitelisted URL query parameters retrained in the pipeline session.
+    # Params not in this whitelist will be silently dropped.
+    django_settings.FIELDS_STORED_IN_SESSION = _FIELDS_STORED_IN_SESSION
+
     # Register and configure python-social-auth with Django.
     django_settings.INSTALLED_APPS += (
         'social.apps.django_app.default',
         'third_party_auth',
     )
+
+    # Inject exception middleware to make redirects fire.
+    django_settings.MIDDLEWARE_CLASSES += _MIDDLEWARE_CLASSES
+
+    # Where to send the user if there's an error during social authentication
+    # and we cannot send them to a more specific URL
+    # (see middleware.ExceptionMiddleware).
+    django_settings.SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
+
+    # Where to send the user once social authentication is successful.
+    django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL = _SOCIAL_AUTH_LOGIN_REDIRECT_URL
+
+    # Inject our customized auth pipeline. All auth backends must work with
+    # this pipeline.
+    django_settings.SOCIAL_AUTH_PIPELINE = (
+        'third_party_auth.pipeline.parse_query_params',
+        'social.pipeline.social_auth.social_details',
+        'social.pipeline.social_auth.social_uid',
+        'social.pipeline.social_auth.auth_allowed',
+        'social.pipeline.social_auth.social_user',
+        'social.pipeline.user.get_username',
+        'third_party_auth.pipeline.redirect_to_supplementary_form',
+        'social.pipeline.user.create_user',
+        'social.pipeline.social_auth.associate_user',
+        'social.pipeline.social_auth.load_extra_data',
+        'social.pipeline.user.user_details',
+    )
+
+    # We let the user specify their email address during signup.
+    django_settings.SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
+
+    # Disable exceptions by default for prod so you get redirect behavior
+    # instead of a Django error page. During development you may want to
+    # enable this when you want to get stack traces rather than redirections.
+    django_settings.SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+
+    # Context processors required under Django.
+    django_settings.SOCIAL_AUTH_UUID_LENGTH = 4
     django_settings.TEMPLATE_CONTEXT_PROCESSORS += (
         'social.apps.django_app.context_processors.backends',
         'social.apps.django_app.context_processors.login_redirect',
     )
-    # Inject our customized auth pipeline. All auth backends must work with
-    # this pipeline.
-    django_settings.SOCIAL_AUTH_PIPELINE = (
-        'third_party_auth.pipeline.step',
-    )
 
 
 def _set_provider_settings(django_settings, enabled_providers, auth_info):
-    """Set provider-specific settings."""
+    """Sets provider-specific settings."""
     # Must prepend here so we get called first.
     django_settings.AUTHENTICATION_BACKENDS = (
-        tuple(enabled_provider.AUTHENTICATION_BACKEND for enabled_provider in enabled_providers) +
+        tuple(enabled_provider.get_authentication_backend() for enabled_provider in enabled_providers) +
         django_settings.AUTHENTICATION_BACKENDS)
 
     # Merge settings from provider classes, and configure all placeholders.
     for enabled_provider in enabled_providers:
         enabled_provider.merge_onto(django_settings)
 
-    # Merge settings from <deployment>.auth.json.
+    # Merge settings from <deployment>.auth.json, overwriting placeholders.
     _merge_auth_info(django_settings, auth_info)
 
 
 def apply_settings(auth_info, django_settings):
-    """Apply settings from `auth_info` dict to `django_settings` module."""
+    """Applies settings from auth_info dict to django_settings module."""
     provider_names = auth_info.keys()
     provider.Registry.configure_once(provider_names)
     enabled_providers = provider.Registry.enabled()

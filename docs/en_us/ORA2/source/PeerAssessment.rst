@@ -327,15 +327,35 @@ The following image shows a question in the component editor along with the way 
 
 To add the question:
 
-#. In the component editor, locate the ``<prompt>`` tags.
+#. In the component editor, locate the first set of ``<prompt>`` tags. The opening ``<prompt>`` tag appears directly below the opening ``<rubric>`` tag.
 
 #. Replace the sample text between the ``<prompt>`` tags with the text of your question. Note that the component editor respects paragraph breaks and new lines inside the ``<prompt>`` tags. You don't have to add ``<p>`` tags to create individual paragraphs.
 
-In this initial release, you cannot add text formatting or images in the Peer Assessment component. If you want to include text formatting or images in the text of your prompt, you can add an HTML component above the Peer Assessment component. The following image shows an HTML component that contains an image and the quote by Katherine Paterson, followed by a Peer Assessment component that contains the introductory Peer Assessment text ("This assignment has several steps...") and the text that appears between the ``<prompt>`` tags in the Peer Assessment component ("Write a persuasive essay...").
+Add Formatting or Images to the Question
+****************************************
 
-.. image:: /Images/PA_HTML-PA_LMS.png
-      :alt: Image of a peer assessment that has an image in an HTML component
+In this initial release, you cannot add text formatting or images in the Peer Assessment component. If you want to include formatting or images in the text of your prompt, you can add an HTML component that contains your text above the Peer Assessment component, and then remove the prompt from the Peer Assessment component. The instructions for the peer assessment still appear above the **Your Response** field.
+
+.. image:: /Images/PA_HTMLComponent.png
+      :alt: A peer assessment that has an image in an HTML component
       :width: 500
+
+To remove the prompt from the Peer Assessment component, open the component editor, and then delete the first set of ``<prompt>`` tags together with all the text between the tags. The first few lines of XML for the problem will then resemble the following.
+
+.. code-block:: xml
+
+  <openassessment>
+    <title></title>
+    <assessments>
+      <assessment name="peer-assessment" must_grade="5" must_be_graded_by="3"/>
+      <assessment name="self-assessment"/>
+    </assessments>
+    <rubric>
+      <criterion feedback="optional">
+        <name>Ideas</name>
+        <prompt>Determine if there is a unifying theme or main idea.</prompt>
+        <option points="0">
+
 
 .. _PA Add Rubric:
 
@@ -410,13 +430,26 @@ You can use the following code as a template:
 	   </option>
 	 </criterion>
 
-.. _PA Change Feedback Prompt:
+.. _PA Provide Comment Options:
 
 =============================================
-Step 6 (optional). Change the Feedback Prompt
+Step 6 (optional). Provide Comment Options
 =============================================
 
-After students have filled out the rubric, they can provide additional feedback for the responses they've assessed. By default, the prompt text for this feedback is the following:
+After students fill out the rubric, they can provide additional comments for the responses they've assessed. By default, students see a field for comments below the rubric.
+
+.. image:: /Images/PA_CommentsField.png
+   :alt: Contents field 
+   :width: 500
+
+You can change the text that appears above this comment field. Additionally, you can provide a comment field for each individual criterion.
+
+.. _PA Change Comments Prompt:
+
+Change the Default Prompt Text
+*******************************
+
+By default, the prompt text for the comment field is the following:
 
 ``(Optional) What aspects of this response stood out to you? What did it do well? How could it improve?``
 
@@ -424,7 +457,7 @@ You can replace this default text with your own text.
 
 To change this text:
 
-#. Locate the ``<feedbackprompt>`` tags between the final ``</criterion>`` tag and the closing ``</rubric>`` tag:
+#. Locate the ``<feedbackprompt>`` tags between the last closing ``</criterion>`` tag for the rubric and the closing ``</rubric>`` tag for the problem:
 
   .. code-block:: xml
 
@@ -437,7 +470,43 @@ To change this text:
       </rubric>
      </openassessment>
 
-#. Change the text between the ``<feedbackprompt>`` tags to the text that you want.
+2. Change the text between the ``<feedbackprompt>`` tags to the text that you want.
+
+.. _PA Add Individual Criterion Comments:
+
+Provide a Comment Field for Individual Criteria
+**************************************************
+
+By default, students see only a single comment field below the entire rubric. However, you can add a comment field to an individual criterion or to several individual criteria. The comment field can contain up to 300 characters.
+
+In the following image, the first criterion has a comment field, but the second does not.
+
+.. image:: /Images/PA_Comments_Criterion.png
+   :alt: Comment box under an individual criterion
+   :width: 500
+
+To add a comment field:
+
+#. Locate the opening ``<criterion>`` tag for the criterion that you want to change.
+
+#. Add the ``feedback="optional"`` attribute to this tag:
+
+    .. code-block:: xml
+
+       <criterion feedback="optional">
+         <name>NAME</name>
+         <prompt>PROMPT TEXT</prompt>
+         <option points="NUMBER">
+           <name>NAME</name>
+           <explanation>EXPLANATION</explanation>
+         </option>
+         <option points="NUMBER">
+           <name>NAME</name>
+           <explanation>EXPLANATION</explanation>
+         </option>
+       </criterion>
+
+If you want to provide comment fields below additional criteria, add the ``feedback="optional"`` attribute to the opening tag for each criterion.
 
 .. _PA Test Problem:
 

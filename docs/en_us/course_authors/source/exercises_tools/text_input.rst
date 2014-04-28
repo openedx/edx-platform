@@ -15,7 +15,7 @@ In text input problems, students enter text into a response field. The response 
 Create a Text Input Problem
 ****************************
 
-You can create multiple choice problems in the Simple Editor or in the Advanced Editor.
+You can create text input problems in the Simple Editor or in the Advanced Editor.
 
 .. note:: All problems must include labels for accessibility. The label generally includes the text of the main question in your problem. To add a label for a common problem, surround the text of the label with angle brackets pointed toward the text (>>label text<<).
 
@@ -292,7 +292,7 @@ Indicates that the problem is a text input problem.
   * ``<hintgroup>`` (optional)
     
 **Tag:** ``<textline />``
-
+ 
 Creates a response field in the LMS where the student enters a response.
 
   Attributes

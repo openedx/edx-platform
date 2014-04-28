@@ -13,16 +13,16 @@ In drag and drop problems, students respond to a question by dragging text or ob
 Create a Drag and Drop Problem
 *********************************
 
-To create a drag and drop problem, you'll need the following files:
+To create the drag and drop problem that appears in the image above, you'll download two files from edX, upload these files to to the **Files & Uploads** page, and then add the code for the problem to a Problem component.
 
-* Allopurinol.gif
-* AllopurinolAnswer.gif
+#. Download the following files from edX:
 
-To download both these files in a .zip archive, go to http://files.edx.org/DragAndDropProblemFiles.zip.
+  * Allopurinol.gif
+  * AllopurinolAnswer.gif
 
-To create the molecule editor that appears in the image above, you'll upload the files for this problem, and then paste the code below into a Problem component.
+  To download both these files in a .zip archive, click http://files.edx.org/DragAndDropProblemFiles.zip.
 
-#. Upload the Allopurinol.gif and AllopurinolAnswer.gif files to the **Files & Uploads** page.
+2. Upload the Allopurinol.gif and AllopurinolAnswer.gif files to the **Files & Uploads** page.
 #. In the unit where you want to create the problem, click **Problem** under **Add New Component**, and then click the **Advanced** tab.
 #. Click **Drag and Drop**.
 #. In the component that appears, click **Edit**.

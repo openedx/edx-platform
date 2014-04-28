@@ -4,9 +4,11 @@ Contributing to edx-platform
 
 Contributions to edx-platform are very welcome, and strongly encouraged! The
 easiest way is to fork the repo and then make a pull request from your fork.
-Read on for details on how to become a contributor, edx-platform code quality,
-testing, making a pull request, and more.
+Check out our `process documentation`_, or read on for details on how to
+become a contributor, edx-platform code quality, testing, making a pull
+request, and more.
 
+.. _process documentation: https://github.com/edx/edx-platform/blob/master/docs/en_us/developers/source/process/index.rst
 
 Becoming a Contributor
 ======================

@@ -9,6 +9,7 @@
 # JoeyChiou <Joeyc0916@gmail.com>, 2013
 # lin31504 <lin31504@gmail.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013-2014
+# bhsfmiao <mkr_mkr@163.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013
 # Yu-Ren Chen <yrchen@atcity.org>, 2013-2014
 # Yu-Ren Chen <yrchen@atcity.org>, 2013
@@ -22,6 +23,7 @@
 # christtabris <christtabris@gmail.com>, 2014
 # JoeyChiou <Joeyc0916@gmail.com>, 2014
 # JoeyChiou <Joeyc0916@gmail.com>, 2013
+# bhsfmiao <mkr_mkr@163.com>, 2014
 # okalright <iftwoplustwoequalsfive@gmail.com>, 2013
 # Yu-Ren Chen <yrchen@atcity.org>, 2014
 # Yu-Ren Chen <yrchen@atcity.org>, 2013
@@ -30,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-22 09:01-0400\n"
-"PO-Revision-Date: 2014-04-10 20:30+0000\n"
+"POT-Creation-Date: 2014-04-27 11:10-0400\n"
+"PO-Revision-Date: 2014-04-24 13:20+0000\n"
 "Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -350,6 +352,7 @@ msgstr "顯示討論"
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
 msgstr "抱歉"
@@ -510,6 +513,10 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
 msgstr "你確定要刪除這項post？"
+
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
+msgid "We had some trouble loading the page you requested. Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
@@ -1563,6 +1570,10 @@ msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
 msgstr "檔案格式不支援，請上傳 <code>tar.gz</code> 格式的檔案。"
+
+#: cms/static/js/views/metadata.js
+msgid "Upload File"
+msgstr ""
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"

@@ -58,7 +58,7 @@ To create a discussion category:
 
 #. Change the second id value to a unique identifier. For example, append a reference to the category name.
 
-#. Add a comma between the two closing braces.
+#. Add a comma after the first closing brace.
 
  .. image:: ../Images/Discussion_Add_name.png
   :alt: Policy value of {"General": {"id": "i4x-test_doc-SB101-course-2014_Jan"}, "Course Q&A": {"id": "i4x-test_doc-SB101-course-2014_Jan_faq"}}
@@ -185,7 +185,7 @@ For information on setting up moderators for your course, see :ref:`Assigning_di
 Provide guidelines for students
 ========================================
 
-You can develop a set of best practices for discussion participation and make them avaiable to students as a course handout file or on a defined page in your course. These guidelines can define your expectations and optionally introduce features of edX discussions. 
+You can develop a set of best practices for discussion participation and make them available to students as a course handout file or on a defined page in your course. These guidelines can define your expectations and optionally introduce features of edX discussions. 
 
 .. For a template that you can use to develop your own guidelines, see :ref:`Discussion Forum Guidelines`.
 
