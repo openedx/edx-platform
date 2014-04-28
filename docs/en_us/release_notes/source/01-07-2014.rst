@@ -2,26 +2,33 @@
 January 7, 2014
 ###################################
 
-You can now access the public edX roadmap_ for details about the currently planned product direction.
+**************************
+edX Documentation
+**************************
 
-.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+* `edX Data Documentation`_
+
+
+* `edX Platform Developer Documentation`_
 
 
 *************
 edX Studio
 *************
 
-New documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface.
-
-.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
-
-=============
-New Features
-=============
 
 * The **Files & Uploads** page has been updated so that a maximum of 50 files now appear on a single page. If your course has more than 50 files, additional files are listed in separate pages. You can navigate to other pages through pagination controls at the top and bottom of the file list.  This change improves the page performance for courses with a large number of files.
 
-  For more information, see the `updated documentation for adding files <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#add-files-to-a-course>`_.
+  For more information, see the `Add Files to a Course`_.
 
   .. note::  The :ref:`October 29 2013` release notes describe a workaround to limit the number of files that appear on a single page. With the January 7, 2014 release, this method is not necessary and no longer works.
 
@@ -31,11 +38,11 @@ New Features
   .. image::  images/course_outline.png
     :alt: The Course Outline
 
-  To see the changes, view your course in Studio or see the `updated documentation for organizing your course content <http://edx.readthedocs.org/projects/ca/en/latest/organizing_course.html>`_.
+  To see the changes, view your course in Studio or see `Organizaing Your Course Content`_.
 
-* A template for custom JavaScript display and grading problems (also called JSInput problems) is now available. For more informatoin, see the `updated documentation for Custom JavaScript display and grading problems <http://edx.readthedocs.org/projects/ca/en/latest/advanced_problems.html#custom-javascript-display-and-grading>`_. (BLD-523) (BLD-556)
+* A template for custom JavaScript display and grading problems (also called JSInput problems) is now available. For more informatoin, see `Custom JavaScript Problem`_. (BLD-523) (BLD-556)
 
-* A template for the Zooming Image tool is now available. For more informatoin, see the `updated documentation for the zooming image tool <http://edx.readthedocs.org/projects/ca/en/latest/tools.html#zooming-image>`_. (BLD-206)
+* A template for the Zooming Image tool is now available. For more informatoin, see the `Zooming Image Tool`_. (BLD-206)
 
 ==========================
 Changes and Updates
@@ -69,3 +76,5 @@ edX Learning Management System
 * For Image Response problems, the correct answer now appears when a student clicks **Show Answer**. (BLD-21)
 
 * On iPads, the video player uses edX controls that appear after you click the video or the Play button. On iPhones, the video player uses native controls. (BLD-541)
+
+.. include:: links.rst

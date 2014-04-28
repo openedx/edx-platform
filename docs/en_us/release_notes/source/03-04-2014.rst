@@ -2,25 +2,32 @@
 March 4, 2014
 ###################################
 
-You can access the public edX roadmap_ for details about the currently planned product direction.
+**************************
+edX Documentation
+**************************
 
-.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include:
+  
+  * `Staff Debug Info`_ 
+  * `Add Files to a Course`_
 
 
-Course staff documentation, *Building a Course with edX Studio*, is available online_. You can also download the guide as a PDF from the edX Studio user interface.
+* `edX Data Documentation`_
 
-.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+   Recent changes include:
 
-Recent changes to *Building a Course with edX Studio* include:
+   * `Tracking Logs`_ 
 
-* `Staff Debug Info <http://edx.readthedocs.org/projects/ca/en/latest/staff_debug_info.html>`_ 
-
-* Updates to `Add Files to a Course <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#add-files-to-a-course>`_
-
-Recent changes to *edX Data Formats* include:
-
-* `Tracking Logs <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/tracking_logs.html>`_ 
-
+* `edX Platform Developer Documentation`_
 
 
 
@@ -34,7 +41,7 @@ edX Studio
 
 * A problem that caused the first line of an HTML component to be partially cut off in the unit page is resolved. (STUD-1380)
 
-* The Files & Uploads page now includes an external URL for each asset.  See `Add Files to a Course <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#add-files-to-a-course>`_ for more information.
+* The Files & Uploads page now includes an external URL for each asset.  See `Add Files to a Course`_ for more information.
 
 
 
@@ -73,3 +80,5 @@ Discussions
 *************
 
 * Tooltips for pinning threads are updated so students do not see the tooltip when they cannot pin a thread, and course staff see the appropriate tooltip text. (FOR-192)
+
+.. include:: links.rst

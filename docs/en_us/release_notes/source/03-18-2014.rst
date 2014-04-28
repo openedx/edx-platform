@@ -8,35 +8,41 @@ The following information reflects what is new in the edX Platform as of March 1
 edX Documentation
 **************************
 
-You can access the public edX `roadmap <https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap>`_ for details about the currently planned product direction.
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
 
 The following documentation is available:
 
-* `Building and Running an edX Course. <http://edx.readthedocs.org/projects/ca/en/latest/>`_ You can also download the guide as a PDF from the edX Studio user interface.
+* `Building and Running an edX Course`_ 
 
-  Recent changes include a reorganization of all content into the following sections:
+  You can also download the guide as a PDF from the edX Studio user interface.
 
-  * `Getting Started <http://edx.readthedocs.org/projects/ca/en/latest/getting_started/index.html#getting-started-index>`_
+  Recent changes include: 
 
-  * `Building a Course <http://edx.readthedocs.org/projects/ca/en/latest/building_course/index.html#building-a-course-index>`_
+  * `Getting Started`_
 
-  * `Creating Course Content <http://edx.readthedocs.org/projects/ca/en/latest/creating_content/index.html#creating-course-content-index>`_
+  * `Building a Course`_
 
-  * `Working with Problems <http://edx.readthedocs.org/projects/ca/en/latest/problems_tools/index.html#working-with-problems-index>`_
+  * `Creating Course Content`_
 
-  * `Releasing Your Course <http://edx.readthedocs.org/projects/ca/en/latest/releasing_course/index.html#releasing-your-course-index>`_
+  * `Creating Exercises and Tools`_
 
-  * `Running Your Course <http://edx.readthedocs.org/projects/ca/en/latest/running_course/index.html#running-your-course-index>`_
+  * `Releasing Your Course`_
 
-  * `Information for Your Students <http://edx.readthedocs.org/projects/ca/en/latest/students/index.html#information-for-your-students-index>`_
+  * `Running Your Course`_
+
+  * `Information for Your Students`_
 
 
-
-* `edX Data Documentation <http://edx.readthedocs.org/projects/devdata/en/latest/>`_
+* `edX Data Documentation`_
 
   Recent changes include:
 
-  * `Certificate Data <http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/sql_schema.html#certificates>`_ 
+  * `Certificate Data`_
+
+
+* `edX Platform Developer Documentation`_
+
 
 *************
 edX Studio
@@ -75,3 +81,5 @@ edX Discussions
 ***************************************
 
 * A problem that prevented students from viewing discussion components within a unit when cohorts were configured is resolved. (FOR-523)
+
+.. include:: links.rst

@@ -2,23 +2,33 @@
 March 11, 2014
 ###################################
 
-You can access the public edX roadmap_ for details about the currently planned product direction.
+**************************
+edX Documentation
+**************************
 
-.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+EdX+Public+Product+Roadmap
+You can access the public `edX roadmap`_ for
+details about the currently planned product direction.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  You can also download the guide as a PDF from the edX Studio user interface.
+
+  Recent changes include:
+  
+  * `The Course Start Date`_ 
+  * `The Course End Date`_ 
+  * `Add a Course Image`_ 
+  * `Add a Course Introduction Video`_ 
+  * `Describe Your Course`_ 
+  * `Create or Obtain a Video Transcript`_
 
 
-Course staff documentation, *Building a Course with edX Studio*, is available online_. You can also download the guide as a PDF from the edX Studio user interface.
+* `edX Data Documentation`_
 
-.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+* `edX Platform Developer Documentation`_
 
-Recent changes to *Building a Course with edX Studio* include:
-
-* `The Course Start Date <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#the-course-start-date>`_ 
-* `The Course End Date <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#the-course-end-date>`_ 
-* `Add a Course Image <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#add-a-course-image>`_ 
-* `Add a Course Introduction Video <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#add-a-course-video>`_ 
-* `Describe Your Course <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#describe-your-course>`_ 
-* `Create or Obtain a Video Transcript <http://ca.readthedocs.org/en/latest/create_video.html#step-2-create-or-obtain-a-video-transcript>`_
 
 *************
 edX Studio
@@ -44,7 +54,7 @@ edX Learning Management System
  .. image:: images/transcript-download.png
   :alt: Image of the transcript download format selection.
 
- The student selects the format, then clicks **Download transcript**. For more information, see `Create or Obtain a Video Transcript. <http://ca.readthedocs.org/en/latest/create_video.html#step-2-create-or-obtain-a-video-transcript>`_ (BLD-844)
+ The student selects the format, then clicks **Download transcript**. For more information, see `Create or Obtain a Video Transcript`_ (BLD-844)
 
 * A problem that prevented viewing videos in Firefox in full screen mode is resolved. (BLD-905)
 
@@ -57,3 +67,5 @@ Accessibility Improvements
 * When a user is viewing a unit page, the display name of only the first component is now used as the page and navigation title. The display names of subsequent components are not used. (STUD-1351)
 
 * When a user views a video in full screen mode, the transcript no longer obscures the video content. (BLD-852)
+
+.. include:: links.rst
