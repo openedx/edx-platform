@@ -18,6 +18,7 @@ Contents:
     overview.rst
     extending_platform/index
     process/index
+    testing/index
 
 APIs
 -----
