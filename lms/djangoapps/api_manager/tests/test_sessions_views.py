@@ -68,7 +68,6 @@ class SessionsApiTests(TestCase):
         response = self.client.delete(uri, headers=headers)
         return response
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_session_list_post_valid(self):
         local_username = self.test_username + str(randint(11, 99))
         local_username = local_username[3:-1]  # username is a 32-character field
@@ -86,7 +85,6 @@ class SessionsApiTests(TestCase):
         self.assertEqual(str(response.data['user']['username']), local_username)
         self.assertEqual(response.data['user']['id'], user_id)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_session_list_post_invalid(self):
         local_username = self.test_username + str(randint(11, 99))
         local_username = local_username[3:-1]  # username is a 32-character field
@@ -97,7 +95,6 @@ class SessionsApiTests(TestCase):
         response = self.do_post(self.base_sessions_uri, data)
         self.assertEqual(response.status_code, 401)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_session_list_post_valid_inactive(self):
         local_username = self.test_username + str(randint(11, 99))
         local_username = local_username[3:-1]  # username is a 32-character field
@@ -108,15 +105,13 @@ class SessionsApiTests(TestCase):
         user.save()
         data = {'username': local_username, 'password': self.test_password}
         response = self.do_post(self.base_sessions_uri, data)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_session_list_post_invalid_notfound(self):
         data = {'username': 'user_12321452334', 'password': self.test_password}
         response = self.do_post(self.base_sessions_uri, data)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_session_detail_get(self):
         local_username = self.test_username + str(randint(11, 99))
         local_username = local_username[3:-1]  # username is a 32-character field
@@ -134,13 +129,11 @@ class SessionsApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_session_detail_get_undefined(self):
         test_uri = self.base_sessions_uri + "/123456789"
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_session_detail_delete(self):
         local_username = self.test_username + str(randint(11, 99))
         local_username = local_username[3:-1]  # username is a 32-character field

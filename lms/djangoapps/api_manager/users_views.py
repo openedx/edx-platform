@@ -12,7 +12,9 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from api_manager.models import GroupProfile
 from api_manager.permissions import ApiKeyHeaderPermission
 from courseware import module_render
 from courseware.model_data import FieldDataCache
@@ -37,7 +39,7 @@ def _generate_base_uri(request):
     resource_uri = '{}://{}{}'.format(
         protocol,
         request.get_host(),
-        request.path
+        request.get_full_path()
     )
     return resource_uri
 
@@ -88,83 +90,81 @@ def _save_module_position(request, user, course_id, course_descriptor, position)
     saved_module = get_current_child(parent_module)
     return saved_module.id
 
+class UsersList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
 
-@api_view(['POST'])
-@permission_classes((ApiKeyHeaderPermission,))
-def user_list(request):
-    """
-    POST creates a new user in the system
-    """
-    response_data = {}
-    base_uri = _generate_base_uri(request)
-    email = request.DATA['email']
-    username = request.DATA['username']
-    password = request.DATA['password']
-    first_name = request.DATA.get('first_name', '')
-    last_name = request.DATA.get('last_name', '')
+    def post(self, request, format=None):
+        """
+        POST creates a new user in the system
+        """
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        email = request.DATA['email']
+        username = request.DATA['username']
+        password = request.DATA['password']
+        first_name = request.DATA.get('first_name', '')
+        last_name = request.DATA.get('last_name', '')
 
-    # enforce password complexity as an optional feature
-    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+        # enforce password complexity as an optional feature
+        if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+            try:
+                validate_password_length(password)
+                validate_password_complexity(password)
+                validate_password_dictionary(password)
+            except ValidationError, err:
+                status_code = status.HTTP_400_BAD_REQUEST
+                response_data['message'] = _('Password: ') + '; '.join(err.messages)
+                return Response(response_data, status=status_code)
         try:
-            validate_password_length(password)
-            validate_password_complexity(password)
-            validate_password_dictionary(password)
-        except ValidationError, err:
+            validate_email(email)
+        except ValidationError:
             status_code = status.HTTP_400_BAD_REQUEST
-            response_data['message'] = _('Password: ') + '; '.join(err.messages)
+            response_data['message'] = _('Valid e-mail is required.')
             return Response(response_data, status=status_code)
-    try:
-        validate_email(email)
-    except ValidationError:
-        status_code = status.HTTP_400_BAD_REQUEST
-        response_data['message'] = _('Valid e-mail is required.')
+
+        try:
+            validate_slug(username)
+        except ValidationError:
+            status_code = status.HTTP_400_BAD_REQUEST
+            response_data['message'] = _('Username should only consist of A-Z and 0-9, with no spaces.')
+            return Response(response_data, status=status_code)
+
+        try:
+            user = User.objects.create(email=email, username=username)
+        except IntegrityError:
+            user = None
+        else:
+            user.set_password(password)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+
+            # add this account creation to password history
+            # NOTE, this will be a NOP unless the feature has been turned on in configuration
+            password_history_entry = PasswordHistory()
+            password_history_entry.create(user)
+
+            # CDODGE:  @TODO: We will have to extend this to look in the CourseEnrollmentAllowed table and
+            # auto-enroll students when they create a new account. Also be sure to remove from
+            # the CourseEnrollmentAllow table after the auto-registration has taken place
+        if user:
+            status_code = status.HTTP_201_CREATED
+            response_data = _serialize_user(response_data, user)
+            response_data['uri'] = '{}/{}'.format(base_uri, str(user.id))
+        else:
+            status_code = status.HTTP_409_CONFLICT
+            response_data['message'] = "User '%s' already exists", username
+            response_data['field_conflict'] = "username"
         return Response(response_data, status=status_code)
 
-    try:
-        validate_slug(username)
-    except ValidationError:
-        status_code = status.HTTP_400_BAD_REQUEST
-        response_data['message'] = _('Username should only consist of A-Z and 0-9, with no spaces.')
-        return Response(response_data, status=status_code)
 
+class UsersDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
 
-    try:
-        user = User.objects.create(email=email, username=username)
-    except IntegrityError:
-        user = None
-    else:
-        user.set_password(password)
-        user.first_name = first_name
-        user.last_name = last_name
-        user.save()
-
-        # add this account creation to password history
-        # NOTE, this will be a NOP unless the feature has been turned on in configuration
-        password_history_entry = PasswordHistory()
-        password_history_entry.create(user)
-
-        # CDODGE:  @TODO: We will have to extend this to look in the CourseEnrollmentAllowed table and
-        # auto-enroll students when they create a new account. Also be sure to remove from
-        # the CourseEnrollmentAllow table after the auto-registration has taken place
-    if user:
-        status_code = status.HTTP_201_CREATED
-        response_data = _serialize_user(response_data, user)
-        response_data['uri'] = '{}/{}'.format(base_uri, str(user.id))
-    else:
-        status_code = status.HTTP_409_CONFLICT
-        response_data['message'] = "User '%s' already exists", username
-        response_data['field_conflict'] = "username"
-    return Response(response_data, status=status_code)
-
-
-@api_view(['GET', 'DELETE'])
-@permission_classes((ApiKeyHeaderPermission,))
-def user_detail(request, user_id):
-    """
-    GET retrieves an existing user from the system
-    DELETE removes/inactivates/etc. an existing user
-    """
-    if request.method == 'GET':
+    def get(self, request, user_id, format=None):
+        """
+        GET retrieves an existing user from the system
+        """
         response_data = {}
         base_uri = _generate_base_uri(request)
         try:
@@ -179,7 +179,11 @@ def user_detail(request, user_id):
             return Response(response_data, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
-    elif request.method == 'DELETE':
+
+    def delete(self, request, user_id, format=None):
+        """
+        DELETE removes/inactivates/etc. an existing user
+        """
         response_data = {}
         try:
             existing_user = User.objects.get(id=user_id, is_active=True)
@@ -191,50 +195,71 @@ def user_detail(request, user_id):
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['POST'])
-@permission_classes((ApiKeyHeaderPermission,))
-def user_groups_list(request, user_id):
-    """
-    POST creates a new user-group relationship in the system
-    """
-    response_data = {}
-    group_id = request.DATA['group_id']
-    base_uri = _generate_base_uri(request)
-    response_data['uri'] = '{}/{}'.format(base_uri, str(group_id))
-    try:
-        existing_user = User.objects.get(id=user_id)
-        existing_group = Group.objects.get(id=group_id)
-    except ObjectDoesNotExist:
-        existing_user = None
-        existing_group = None
-    if existing_user and existing_group:
+class UsersGroupsList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def post(self, request, user_id, format=None):
+        """
+        POST creates a new user-group relationship in the system
+        """
+        response_data = {}
+        group_id = request.DATA['group_id']
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = '{}/{}'.format(base_uri, str(group_id))
         try:
-            existing_relationship = existing_user.groups.get(id=existing_group.id)
+            existing_user = User.objects.get(id=user_id)
+            existing_group = Group.objects.get(id=group_id)
         except ObjectDoesNotExist:
-            existing_relationship = None
-        if existing_relationship is None:
-            existing_user.groups.add(existing_group.id)
-            response_data['uri'] = '{}/{}'.format(base_uri, existing_user.id)
-            response_data['group_id'] = str(existing_group.id)
-            response_data['user_id'] = str(existing_user.id)
-            response_status = status.HTTP_201_CREATED
+            existing_user = None
+            existing_group = None
+        if existing_user and existing_group:
+            try:
+                existing_relationship = existing_user.groups.get(id=existing_group.id)
+            except ObjectDoesNotExist:
+                existing_relationship = None
+            if existing_relationship is None:
+                existing_user.groups.add(existing_group.id)
+                response_data['uri'] = '{}/{}'.format(base_uri, existing_user.id)
+                response_data['group_id'] = str(existing_group.id)
+                response_data['user_id'] = str(existing_user.id)
+                response_status = status.HTTP_201_CREATED
+            else:
+                response_data['uri'] = '{}/{}'.format(base_uri, existing_group.id)
+                response_data['message'] = "Relationship already exists."
+                response_status = status.HTTP_409_CONFLICT
         else:
-            response_data['uri'] = '{}/{}'.format(base_uri, existing_group.id)
-            response_data['message'] = "Relationship already exists."
-            response_status = status.HTTP_409_CONFLICT
-    else:
-        response_status = status.HTTP_404_NOT_FOUND
-    return Response(response_data, status=response_status)
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+
+    def get(self, request, user_id, format=None):
+        """
+        GET retrieves the list of groups related to the specified user
+        """
+        try:
+            existing_user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+        groups = existing_user.groups.all()
+        response_data = {}
+        response_data['groups'] = []
+        for group in groups:
+            group_profile = GroupProfile.objects.get(group_id=group.id)
+            group_data = {}
+            group_data['id'] = group.id
+            group_data['name'] = group_profile.name
+            response_data['groups'].append(group_data)
+        response_status = status.HTTP_200_OK
+        return Response(response_data, status=response_status)
 
 
-@api_view(['GET', 'DELETE'])
-@permission_classes((ApiKeyHeaderPermission,))
-def user_groups_detail(request, user_id, group_id):
-    """
-    GET retrieves an existing user-group relationship from the system
-    DELETE removes/inactivates/etc. an existing user-group relationship
-    """
-    if request.method == 'GET':
+
+class UsersGroupsDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, user_id, group_id, format=None):
+        """
+        GET retrieves an existing user-group relationship from the system
+        """
         response_data = {}
         base_uri = _generate_base_uri(request)
         try:
@@ -251,21 +276,24 @@ def user_groups_detail(request, user_id, group_id):
         else:
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
-    elif request.method == 'DELETE':
+
+    def delete(self, request, user_id, group_id, format=None):
+        """
+        DELETE removes/inactivates/etc. an existing user-group relationship
+        """
         existing_user = User.objects.get(id=user_id, is_active=True)
         existing_user.groups.remove(group_id)
         existing_user.save()
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['POST', 'GET'])
-@permission_classes((ApiKeyHeaderPermission,))
-def user_courses_list(request, user_id):
-    """
-    POST creates a new course enrollment for a user
-    GET creates the list of enrolled courses for a user
-    """
-    if request.method == 'POST':
+class UsersCoursesList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def post(self, request, user_id, format=None):
+        """
+        POST creates a new course enrollment for a user
+        """
         store = modulestore()
         response_data = {}
         user_id = user_id
@@ -287,7 +315,11 @@ def user_courses_list(request, user_id):
         else:
             status_code = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=status_code)
-    elif request.method == 'GET':
+
+    def get(self, request, user_id, format=None):
+        """
+        GET creates the list of enrolled courses for a user
+        """
         store = modulestore()
         response_data = []
         base_uri = _generate_base_uri(request)
@@ -312,40 +344,13 @@ def user_courses_list(request, user_id):
         return Response(response_data, status=status_code)
 
 
-@api_view(['GET', 'POST', 'DELETE'])
-@permission_classes((ApiKeyHeaderPermission,))
-def user_courses_detail(request, user_id, course_id):
-    """
-    GET identifies an ACTIVE course enrollment for the specified user
-    DELETE unenrolls the specified user from a course
-    """
-    if request.method == 'GET':
-        store = modulestore()
-        response_data = {}
-        base_uri = _generate_base_uri(request)
-        try:
-            user = User.objects.get(id=user_id, is_active=True)
-            course_descriptor = store.get_course(course_id)
-        except (ObjectDoesNotExist, ValueError):
-            user = None
-            course_descriptor = None
-        if user and CourseEnrollment.is_enrolled(user, course_id):
-            response_data['user_id'] = user.id
-            response_data['course_id'] = course_id
-            response_data['uri'] = base_uri
-            field_data_cache = FieldDataCache([course_descriptor], course_id, user)
-            course_module = module_render.get_module(
-                user,
-                request,
-                course_descriptor.location,
-                field_data_cache,
-                course_id)
-            response_data['position'] = course_module.position
-            response_status = status.HTTP_200_OK
-        else:
-            response_status = status.HTTP_404_NOT_FOUND
-        return Response(response_data, status=response_status)
-    elif request.method == 'POST':
+class UsersCoursesDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def post(self, request, user_id, course_id, format=None):
+        """
+        POST creates an ACTIVE course enrollment for the specified user
+        """
         store = modulestore()
         base_uri = _generate_base_uri(request)
         response_data = {}
@@ -371,7 +376,41 @@ def user_courses_detail(request, user_id, course_id):
         else:
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
-    elif request.method == 'DELETE':
+
+    def get(self, request, user_id, course_id, format=None):
+        """
+        GET identifies an ACTIVE course enrollment for the specified user
+        """
+        store = modulestore()
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        try:
+            user = User.objects.get(id=user_id, is_active=True)
+            course_descriptor = store.get_course(course_id)
+        except (ObjectDoesNotExist, ValueError):
+            user = None
+            course_descriptor = None
+        if user and CourseEnrollment.is_enrolled(user, course_id):
+            response_data['user_id'] = user.id
+            response_data['course_id'] = course_id
+            response_data['uri'] = base_uri
+            field_data_cache = FieldDataCache([course_descriptor], course_id, user)
+            course_module = module_render.get_module(
+                user,
+                request,
+                course_descriptor.location,
+                field_data_cache,
+                course_id)
+            response_data['position'] = course_module.position
+            response_status = status.HTTP_200_OK
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+
+    def delete(self, request, user_id, course_id, format=None):
+        """
+        DELETE unenrolls the specified user from a course
+        """
         try:
             user = User.objects.get(id=user_id, is_active=True)
         except ObjectDoesNotExist:

@@ -105,6 +105,5 @@ class GroupProfile(models.Model):
 
     group = models.ForeignKey(Group, db_index=True)
     group_type = models.CharField(null=True, max_length=32, db_index=True)
-
+    name = models.CharField(max_length=255, null=True, blank=True)
     data = models.TextField(blank=True)  # JSON dictionary for generic key/value pairs
-

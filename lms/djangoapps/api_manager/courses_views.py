@@ -1,24 +1,29 @@
 """ API implementation for course-oriented interactions. """
 
-from django.contrib.auth.models import Group, User
-from django.core.exceptions import ObjectDoesNotExist
-from lxml import etree
-from StringIO import StringIO
 from collections import OrderedDict
 import logging
+from lxml import etree
+from StringIO import StringIO
+
+from django.contrib.auth.models import Group, User
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from api_manager.permissions import ApiKeyHeaderPermission
 from api_manager.models import CourseGroupRelationship
+from courseware import module_render
+from courseware.courses import get_course, get_course_about_section, get_course_info_section
+from courseware.model_data import FieldDataCache
+from courseware.views import get_static_tab_contents
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
 
-from courseware.courses import get_course_about_section, get_course_info_section, get_course_by_id
-from courseware.views import get_static_tab_contents
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +37,7 @@ def _generate_base_uri(request):
     resource_uri = '{}://{}{}'.format(
         protocol,
         request.get_host(),
-        request.path
+        request.get_full_path()
     )
     return resource_uri
 
@@ -111,233 +116,22 @@ def _serialize_module_submodules(request, course_id, submodules):
     return data
 
 
-@api_view(['GET'])
-@permission_classes((ApiKeyHeaderPermission,))
-def modules_list(request, course_id, module_id=None):
-    """
-    GET retrieves the list of submodules for a given module
-    We don't know where in the module hierarchy we are -- could even be the top
-    """
-    if module_id is None:
-        module_id = course_id
-    response_data = []
-    submodule_type = request.QUERY_PARAMS.get('type', None)
-    store = modulestore()
-    if course_id != module_id:
-        try:
-            module = store.get_instance(course_id, Location(module_id))
-        except InvalidLocationError:
-            module = None
-    else:
-        module = store.get_course(course_id)
-    if module:
-        submodules = _get_module_submodules(module, submodule_type)
-        response_data = _serialize_module_submodules(
-            request,
-            course_id,
-            submodules
-        )
-        status_code = status.HTTP_200_OK
-    else:
-        status_code = status.HTTP_404_NOT_FOUND
-    return Response(response_data, status=status_code)
-
-
-@api_view(['GET'])
-@permission_classes((ApiKeyHeaderPermission,))
-def modules_detail(request, course_id, module_id):
-    """
-    GET retrieves an existing module from the system
-    """
-    store = modulestore()
-    response_data = {}
-    submodule_type = request.QUERY_PARAMS.get('type', None)
-    if course_id != module_id:
-        try:
-            module = store.get_instance(course_id, Location(module_id))
-        except InvalidLocationError:
-            module = None
-    else:
-        module = store.get_course(course_id)
-    if module:
-        response_data = _serialize_module(
-            request,
-            course_id,
-            module
-        )
-        submodules = _get_module_submodules(module, submodule_type)
-        response_data['modules'] = _serialize_module_submodules(
-            request,
-            course_id,
-            submodules
-        )
-        status_code = status.HTTP_200_OK
-    else:
-        status_code = status.HTTP_404_NOT_FOUND
-    return Response(response_data, status=status_code)
-
-
-@api_view(['GET'])
-@permission_classes((ApiKeyHeaderPermission,))
-def courses_list(request):
-    """
-    GET returns the list of available courses
-    """
-    response_data = []
-    store = modulestore()
-    course_descriptors = store.get_courses()
-    for course_descriptor in course_descriptors:
-        course_data = _serialize_module(
-            request,
-            course_descriptor.id,
-            course_descriptor
-        )
-        response_data.append(course_data)
-    return Response(response_data, status=status.HTTP_200_OK)
-
-
-@api_view(['GET'])
-@permission_classes((ApiKeyHeaderPermission,))
-def courses_detail(request, course_id):
-    """
-    GET retrieves an existing course from the system
-    """
-    response_data = {}
-    store = modulestore()
-    try:
-        course_descriptor = store.get_course(course_id)
-    except ValueError:
-        course_descriptor = None
-    if course_descriptor:
-        response_data = _serialize_module(
-            request,
-            course_descriptor.id,
-            course_descriptor
-        )
-        submodules = _get_module_submodules(course_descriptor, None)
-        response_data['modules'] = _serialize_module_submodules(
-            request,
-            course_id,
-            submodules
-        )
-        status_code = status.HTTP_200_OK
-    else:
-        status_code = status.HTTP_404_NOT_FOUND
-    return Response(response_data, status=status_code)
-
-
-@api_view(['GET'])
-@permission_classes((ApiKeyHeaderPermission,))
-def course_tree(request, course_id, depth):
-    """
-    GET retrieves an existing course from the system and returns summary information about the submodules
-    to the specified depth
-    """
-    response_data = {}
-
-    depth_int = int(depth)
-
-    # note, passing in depth=N optimizes the number of round trips to the database
-    course_descriptor = get_course_by_id(course_id, depth=depth_int)
-    if not course_descriptor:
-        return Response({}, status.HTTP_404_NOT_FOUND)
-
-    def _serialize_node_with_children(descriptor, depth):
-        data = _serialize_module(
-            request,
-            course_descriptor.id,
-            descriptor
-        )
-
-        if depth > 0:
-            data['modules'] = []
-            for child in descriptor.get_children():
-                data['modules'].append(_serialize_node_with_children(child, depth-1))
-
-        return data
-
-    response_data = _serialize_node_with_children(course_descriptor, depth_int)
-    return Response(response_data)
-
-
-@api_view(['POST'])
-@permission_classes((ApiKeyHeaderPermission,))
-def courses_groups_list(request, course_id):
-    """
-    POST creates a new course-group relationship in the system
-    """
-    response_data = {}
-    group_id = request.DATA['group_id']
-    base_uri = _generate_base_uri(request)
-    store = modulestore()
-    try:
-        existing_course = store.get_course(course_id)
-    except ValueError:
-        existing_course = None
-    try:
-        existing_group = Group.objects.get(id=group_id)
-    except ObjectDoesNotExist:
-        existing_group = None
-    if existing_course and existing_group:
-        try:
-            existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
-        except ObjectDoesNotExist:
-            existing_relationship = None
-        if existing_relationship is None:
-            CourseGroupRelationship.objects.create(course_id=course_id, group=existing_group)
-            response_data['course_id'] = str(existing_course.id)
-            response_data['group_id'] = str(existing_group.id)
-            response_data['uri'] = '{}/{}'.format(base_uri, existing_group.id)
-            response_status = status.HTTP_201_CREATED
-        else:
-            response_data['message'] = "Relationship already exists."
-            response_status = status.HTTP_409_CONFLICT
-    else:
-        response_status = status.HTTP_404_NOT_FOUND
-    return Response(response_data, status=response_status)
-
-
-@api_view(['GET', 'DELETE'])
-@permission_classes((ApiKeyHeaderPermission,))
-def courses_groups_detail(request, course_id, group_id):
-    """
-    GET retrieves an existing course-group relationship from the system
-    DELETE removes/inactivates/etc. an existing course-group relationship
-    """
-    if request.method == 'GET':
-        response_data = {}
-        base_uri = _generate_base_uri(request)
-        response_data['uri'] = base_uri
-        response_data['course_id'] = course_id
-        response_data['group_id'] = group_id
-        store = modulestore()
-        try:
-            existing_course = store.get_course(course_id)
-        except ValueError:
-            existing_course = None
-        try:
-            existing_group = Group.objects.get(id=group_id)
-        except ObjectDoesNotExist:
-            existing_group = None
-        if existing_course and existing_group:
-            try:
-                existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
-            except ObjectDoesNotExist:
-                existing_relationship = None
-            if existing_relationship:
-                response_status = status.HTTP_200_OK
-            else:
-                response_status = status.HTTP_404_NOT_FOUND
-        else:
-            response_status = status.HTTP_404_NOT_FOUND
-        return Response(response_data, status=response_status)
-    elif request.method == 'DELETE':
-        try:
-            existing_group = Group.objects.get(id=group_id)
-            existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group).delete()
-        except ObjectDoesNotExist:
-            pass
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+def _serialize_module_with_children(request, course_descriptor, descriptor, depth):
+    data = _serialize_module(
+        request,
+        course_descriptor.id,
+        descriptor
+    )
+    if depth > 0:
+        data['modules'] = []
+        for child in descriptor.get_children():
+            data['modules'].append(_serialize_module_with_children(
+                request,
+                course_descriptor,
+                child,
+                depth-1
+            ))
+    return data
 
 
 def _inner_content(tag):
@@ -409,41 +203,6 @@ def _parse_overview_html(html):
     return result
 
 
-@api_view(['GET'])
-@permission_classes((ApiKeyHeaderPermission,))
-def course_overview(request, course_id):
-    """
-    GET retrieves the course overview module, which - in MongoDB - is stored with the following
-    naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"about", "_id.name":"overview"}
-    """
-    store = modulestore()
-    response_data = OrderedDict()
-
-    try:
-        course_module = store.get_course(course_id)
-        if not course_module:
-            return Response({}, status=status.HTTP_404_NOT_FOUND)
-
-        content = get_course_about_section(course_module, 'overview')
-
-        if request.GET.get('parse') and request.GET.get('parse') in ['True', 'true']:
-            try:
-                response_data['sections'] = _parse_overview_html(content)
-            except:
-                log.exception(
-                    u"Error prasing course overview. Content = {0}".format(
-                        content
-                    ))
-                return Response({'err': 'could_not_parse'}, status=status.HTTP_409_CONFLICT)
-        else:
-            response_data['overview_html'] = content
-
-    except InvalidLocationError:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
-
-    return Response(response_data)
-
-
 def _parse_updates_html(html):
     """
     Helper method to break up the course updates HTML into components
@@ -478,133 +237,383 @@ def _parse_updates_html(html):
     return result
 
 
-@api_view(['GET'])
-@permission_classes((ApiKeyHeaderPermission,))
-def course_updates(request, course_id):
-    """
-    GET retrieves the course overview module, which - in MongoDB - is stored with the following
-    naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"course_info", "_id.name":"updates"}
-    """
-    store = modulestore()
-    response_data = OrderedDict()
+class ModulesList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
 
-    try:
-        course_module = store.get_course(course_id)
-        if not course_module:
+    def get(self, request, course_id, module_id=None, format=None):
+        """
+        GET retrieves the list of submodules for a given module
+        We don't know where in the module hierarchy we are -- could even be the top
+        """
+        if module_id is None:
+            module_id = course_id
+        response_data = []
+        submodule_type = request.QUERY_PARAMS.get('type', None)
+        store = modulestore()
+        if course_id != module_id:
+            try:
+                module = store.get_instance(course_id, Location(module_id))
+            except InvalidLocationError:
+                module = None
+        else:
+            module = get_course(course_id)
+        if module:
+            submodules = _get_module_submodules(module, submodule_type)
+            response_data = _serialize_module_submodules(
+                request,
+                course_id,
+                submodules
+            )
+            status_code = status.HTTP_200_OK
+        else:
+            status_code = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=status_code)
+
+
+class ModulesDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, course_id, module_id, format=None):
+        """
+        GET retrieves an existing module from the system
+        """
+        store = modulestore()
+        response_data = {}
+        submodule_type = request.QUERY_PARAMS.get('type', None)
+        if course_id != module_id:
+            try:
+                module = store.get_instance(course_id, Location(module_id))
+            except InvalidLocationError:
+                module = None
+        else:
+            module = get_course(course_id)
+        if module:
+            response_data = _serialize_module(
+                request,
+                course_id,
+                module
+            )
+            submodules = _get_module_submodules(module, submodule_type)
+            response_data['modules'] = _serialize_module_submodules(
+                request,
+                course_id,
+                submodules
+            )
+            status_code = status.HTTP_200_OK
+        else:
+            status_code = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=status_code)
+
+
+class CoursesList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, format=None):
+        """
+        GET returns the list of available courses
+        """
+        response_data = []
+        store = modulestore()
+        course_descriptors = store.get_courses()
+        for course_descriptor in course_descriptors:
+            course_data = _serialize_module(
+                request,
+                course_descriptor.id,
+                course_descriptor
+            )
+            response_data.append(course_data)
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
+class CoursesDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, course_id, format=None):
+        """
+        GET retrieves an existing course from the system and returns summary information about the submodules
+        to the specified depth
+        """
+        depth = request.QUERY_PARAMS.get('depth', 0)
+        depth_int = int(depth)
+        # get_course_by_id raises an Http404 if the requested course is invalid
+        # Rather than catching it, we just let it bubble up
+        try:
+            course_descriptor = get_course(course_id)
+        except ValueError:
+            course_descriptor = None
+        if course_descriptor:
+            if depth_int > 0:
+                response_data = _serialize_module_with_children(
+                    request,
+                    course_descriptor,
+                    course_descriptor,  # Primer for recursive function
+                    depth_int
+                )
+            else:
+                response_data = _serialize_module(
+                    request,
+                    course_descriptor.id,
+                    course_descriptor
+                )
+            status_code = status.HTTP_200_OK
+            response_data['uri'] = _generate_base_uri(request)
+            return Response(response_data, status=status_code)
+        else:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
-        content = get_course_info_section(request, course_module, 'updates')
 
+class CoursesGroupsList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def post(self, request, course_id, format=None):
+        """
+        POST creates a new course-group relationship in the system
+        """
+        response_data = {}
+        group_id = request.DATA['group_id']
+        base_uri = _generate_base_uri(request)
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        try:
+            existing_group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            existing_group = None
+        if existing_course and existing_group:
+            try:
+                existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
+            except ObjectDoesNotExist:
+                existing_relationship = None
+            if existing_relationship is None:
+                CourseGroupRelationship.objects.create(course_id=course_id, group=existing_group)
+                response_data['course_id'] = str(existing_course.id)
+                response_data['group_id'] = str(existing_group.id)
+                response_data['uri'] = '{}/{}'.format(base_uri, existing_group.id)
+                response_status = status.HTTP_201_CREATED
+            else:
+                response_data['message'] = "Relationship already exists."
+                response_status = status.HTTP_409_CONFLICT
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+
+
+class CoursesGroupsDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, course_id, group_id, format=None):
+        """
+        GET retrieves an existing course-group relationship from the system
+        """
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        response_data['uri'] = base_uri
+        response_data['course_id'] = course_id
+        response_data['group_id'] = group_id
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        try:
+            existing_group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            existing_group = None
+        if existing_course and existing_group:
+            try:
+                existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group)
+            except ObjectDoesNotExist:
+                existing_relationship = None
+            if existing_relationship:
+                response_status = status.HTTP_200_OK
+            else:
+                response_status = status.HTTP_404_NOT_FOUND
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
+
+    def delete(self, request, course_id, group_id, format=None):
+        """
+        DELETE removes/inactivates/etc. an existing course-group relationship
+        """
+        try:
+            existing_group = Group.objects.get(id=group_id)
+            existing_relationship = CourseGroupRelationship.objects.get(course_id=course_id, group=existing_group).delete()
+        except ObjectDoesNotExist:
+            pass
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+
+class CoursesOverview(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, course_id, format=None):
+        """
+        GET retrieves the course overview module, which - in MongoDB - is stored with the following
+        naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"about", "_id.name":"overview"}
+        """
+        response_data = OrderedDict()
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if existing_course:
+            existing_content = get_course_about_section(existing_course, 'overview')
+            if existing_content:
+                if request.GET.get('parse') and request.GET.get('parse') in ['True', 'true']:
+                    response_data['sections'] = _parse_overview_html(existing_content)
+                else:
+                    response_data['overview_html'] = existing_content
+                return Response(response_data, status=status.HTTP_200_OK)
+            else:
+                return Response({}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+
+class CoursesUpdates(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, course_id, format=None):
+        """
+        GET retrieves the course overview module, which - in MongoDB - is stored with the following
+        naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"course_info", "_id.name":"updates"}
+        """
+        response_data = OrderedDict()
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if not existing_course:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        content = get_course_info_section(request, existing_course, 'updates')
         if not content:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-
         if request.GET.get('parse') and request.GET.get('parse') in ['True', 'true']:
-            try:
-                response_data['postings'] = _parse_updates_html(content)
-            except:
-                log.exception(
-                    u"Error prasing course updates. Content = {0}".format(
-                        content
-                    ))
-                return Response({'err': 'could_not_parse'}, status=status.HTTP_409_CONFLICT)
+            response_data['postings'] = _parse_updates_html(content)
         else:
             response_data['content'] = content
-
-    except InvalidLocationError:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
-
-    return Response(response_data)
+        return Response(response_data)
 
 
-@api_view(['GET'])
-@permission_classes((ApiKeyHeaderPermission,))
-def static_tabs_list(request, course_id):
-    """
-    GET returns an array of Static Tabs inside of a course
-    """
-    store = modulestore()
-    response_data = OrderedDict()
+class CoursesStaticTabsList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
 
-    try:
-        course_module = store.get_course(course_id)
-        if not course_module:
+    def get(self, request, course_id):
+        """
+        GET returns an array of Static Tabs inside of a course
+        """
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if not existing_course:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-
+        response_data = OrderedDict()
         tabs = []
-        for tab in course_module.tabs:
+        for tab in existing_course.tabs:
             if tab.type == 'static_tab':
                 tab_data = OrderedDict()
                 tab_data['id'] = tab.url_slug
                 tab_data['name'] = tab.name
                 if request.GET.get('detail') and request.GET.get('detail') in ['True', 'true']:
-                    tab_data['content'] = get_static_tab_contents(request,
-                        course_module,
+                    tab_data['content'] = get_static_tab_contents(
+                        request,
+                        existing_course,
                         tab,
                         wrap_xmodule_display=False
                     )
-
                 tabs.append(tab_data)
-
         response_data['tabs'] = tabs
-
-    except InvalidLocationError:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
-
-    return Response(response_data)
+        return Response(response_data)
 
 
-@api_view(['GET'])
-@permission_classes((ApiKeyHeaderPermission,))
-def static_tab_detail(request, course_id, tab_id):
-    """
-    GET returns an array of Static Tabs inside of a course
-    """
-    store = modulestore()
-    response_data = OrderedDict()
+class CoursesStaticTabsDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
 
-    try:
-        course_module = store.get_course(course_id)
-        if not course_module:
+    def get(self, request, course_id, tab_id):
+        """
+        GET returns the specified static tab for the specified course
+        """
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if existing_course:
+            response_data = OrderedDict()
+            for tab in existing_course.tabs:
+                if tab.type == 'static_tab' and tab.url_slug == tab_id:
+                    response_data['id'] = tab.url_slug
+                    response_data['name'] = tab.name
+                    response_data['content'] = get_static_tab_contents(
+                        request,
+                        existing_course,
+                        tab,
+                        wrap_xmodule_display=False
+                    )
+            if not response_data:
+                return Response({}, status=status.HTTP_404_NOT_FOUND)
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
-        for tab in course_module.tabs:
-            if tab.type == 'static_tab' and tab.url_slug == tab_id:
-                response_data['id'] = tab.url_slug
-                response_data['name'] = tab.name
-                response_data['content'] = get_static_tab_contents(request,
-                    course_module,
-                    tab,
-                    wrap_xmodule_display=False
-                )
 
-    except InvalidLocationError:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
+class CoursesUsersList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
 
-    if not response_data:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
-
-    return Response(response_data)
-
-@api_view(['GET', 'POST', 'DELETE'])
-@permission_classes((ApiKeyHeaderPermission,))
-def course_users_list(request, course_id):
-    """
-    GET returns a list of users enrolled in the course_id
-    POST enrolls a student in the course. Note, this can be a user_id or just an email, in case
-    the user does not exist in the system
-    """
-    store = modulestore()
-    response_data = OrderedDict()
-
-    try:
-        # find the course
-        course_module = store.get_course(course_id)
-        if not course_module:
+    def post(self, request, course_id, format=None):
+        """
+        POST enrolls a student in the course. Note, this can be a user_id or
+        just an email, in case the user does not exist in the system
+        """
+        response_data = OrderedDict()
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if not existing_course:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-    except InvalidLocationError:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
+        if 'user_id' in request.DATA:
+            user_id = request.DATA['user_id']
+            try:
+                existing_user = User.objects.get(id=user_id)
+            except ObjectDoesNotExist:
+                existing_user = None
+            if existing_user:
+                CourseEnrollment.enroll(existing_user, course_id)
+                return Response({}, status=status.HTTP_201_CREATED)
+            else:
+                return Response({}, status=status.HTTP_404_NOT_FOUND)
+        elif 'email' in request.DATA:
+            try:
+                email = request.DATA['email']
+                existing_user = User.objects.get(email=email)
+            except ObjectDoesNotExist:
+                if request.DATA.get('allow_pending'):
+                    # If the email doesn't exist we assume the student does not exist
+                    # and the instructor is pre-enrolling them
+                    # Store the pre-enrollment data in the CourseEnrollmentAllowed table
+                    # NOTE: This logic really should live in CourseEnrollment.....
+                    cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=email)
+                    cea.auto_enroll = True
+                    cea.save()
+                    return Response({}, status.HTTP_201_CREATED)
+                else:
+                    return Response({}, status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method == 'GET':
+    def get(self, request, course_id, format=None):
+        """
+        GET returns a list of users enrolled in the course_id
+        """
+        response_data = OrderedDict()
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if not existing_course:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
         # Get a list of all enrolled students
         users = CourseEnrollment.users_enrolled_in(course_id)
         response_data['enrollments'] = []
@@ -625,31 +634,58 @@ def course_users_list(request, course_id):
                 response_data['pending_enrollments'].append(cea.email)
         return Response(response_data)
 
-    elif request.method == 'POST':
-        if 'user_id' in request.DATA:
-            user_id = request.DATA['user_id']
-            try:
-                existing_user = User.objects.get(id=user_id)
-                CourseEnrollment.enroll(existing_user, course_id)
-            except ObjectDoesNotExist:
-                return Response({'err': 'user_does_not_exist'}, status=status.HTTP_400_BAD_REQUEST)
-        elif 'email' in request.DATA:
-            # If caller passed in an email, then let's look up user by email address
-            # if it doesn't exist then we need to assume that the student does not exist
-            # in our database and that the instructor is pre-enrolling ment
-            email = request.DATA['email']
-            try:
-                existing_user = User.objects.get(email=email)
-                CourseEnrollment.enroll(existing_user, course_id)
-            except ObjectDoesNotExist:
-                if not request.DATA.get('allow_pending', False):
-                    return Response({'err': 'user_does_not_exist'}, status=status.HTTP_400_BAD_REQUEST)
+class CoursesUsersDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
 
-                # In this case we can pre-enroll a non-existing student. This is what the
-                # CourseEnrollmentAllowed table is for
-                # NOTE: This logic really should live in CourseEnrollment.....
-                cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=email)
-                cea.auto_enroll = True
-                cea.save()
+    def get(self, request, course_id, user_id, format=None):
+        """
+        GET identifies an ACTIVE course enrollment for the specified user
+        """
+        base_uri = _generate_base_uri(request)
+        response_data = {
+            'course_id': course_id,
+            'user_id': user_id,
+            'uri': base_uri,
+        }
+        try:
+            course_descriptor = get_course(course_id)
+        except ValueError:
+            course_descriptor = None
+        if not course_descriptor:
+            return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+        try:
+            user = User.objects.get(id=user_id, is_active=True)
+        except ObjectDoesNotExist:
+            user = None
+        if user and CourseEnrollment.is_enrolled(user, course_id):
+            field_data_cache = FieldDataCache([course_descriptor], course_id, user)
+            course_module = module_render.get_module(
+                user,
+                request,
+                course_descriptor.location,
+                field_data_cache,
+                course_id)
+            response_data['position'] = course_module.position
+            response_status = status.HTTP_200_OK
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+        return Response(response_data, status=response_status)
 
-        return Response({}, status.HTTP_201_CREATED)
+    def delete(self, request, course_id, user_id, format=None):
+        """
+        DELETE unenrolls the specified user from the specified course
+        """
+        response_data = OrderedDict()
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if not existing_course:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            user = User.objects.get(id=user_id, is_active=True)
+        except ObjectDoesNotExist:
+            user = None
+        if user:
+            CourseEnrollment.unenroll(user, course_id)
+        return Response({}, status=status.HTTP_204_NO_CONTENT)

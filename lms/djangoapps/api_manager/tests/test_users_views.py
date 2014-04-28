@@ -73,7 +73,6 @@ class UsersApiTests(TestCase):
         response = self.client.delete(uri, headers=headers)
         return response
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_list_post(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -88,7 +87,6 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['first_name'], self.test_first_name)
         self.assertEqual(response.data['last_name'], self.test_last_name)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_list_post_duplicate(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -99,7 +97,6 @@ class UsersApiTests(TestCase):
         self.assertGreater(response.data['message'], 0)
         self.assertEqual(response.data['field_conflict'], 'username')
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_detail_get(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -117,7 +114,6 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['last_name'], self.test_last_name)
         self.assertEqual(len(response.data['resources']), 2)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_detail_delete(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -131,13 +127,11 @@ class UsersApiTests(TestCase):
         response = self.do_delete(test_uri)  # User no longer exists, should get a 204 all the same
         self.assertEqual(response.status_code, 204)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_detail_get_undefined(self):
         test_uri = '/api/users/123456789'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_groups_list_post(self):
         test_uri = '/api/groups'
         data = {'name': 'Alpha Group'}
@@ -160,7 +154,6 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['group_id'], str(group_id))
         self.assertEqual(response.data['user_id'], str(user_id))
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_groups_list_post_duplicate(self):
         test_uri = '/api/groups'
         data = {'name': 'Alpha Group'}
@@ -179,7 +172,6 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 409)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_groups_list_post_invalid_user(self):
         test_uri = '/api/groups'
         data = {'name': 'Alpha Group'}
@@ -190,7 +182,34 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_user_groups_list_get(self):
+        test_uri = '/api/groups'
+        group_name = 'Alpha Group'
+        data = {'name': group_name}
+        response = self.do_post(test_uri, data)
+        group_id = response.data['id']
+        test_uri = '/api/users'
+        local_username = self.test_username + str(randint(11, 99))
+        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        response = self.do_post(test_uri, data)
+        user_id = response.data['id']
+        test_uri = test_uri + '/' + str(response.data['id'])
+        response = self.do_get(test_uri)
+        test_uri = test_uri + '/groups'
+        data = {'group_id': group_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data['groups']), 0)
+        self.assertEqual(response.data['groups'][0]['id'], group_id)
+        self.assertEqual(response.data['groups'][0]['name'], str(group_name))
+
+    def test_user_groups_list_get_invalid_user(self):
+        test_uri = '/api/users/123124/groups'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
     def test_user_groups_detail_get(self):
         test_uri = '/api/groups'
         data = {'name': 'Alpha Group'}
@@ -213,7 +232,6 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['group_id'], group_id)
         self.assertEqual(response.data['user_id'], user_id)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_groups_detail_delete(self):
         test_uri = '/api/groups'
         data = {'name': 'Alpha Group'}
@@ -236,7 +254,11 @@ class UsersApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_user_groups_detail_get_invalid_user(self):
+        test_uri = '/api/users/123124/groups/12321'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
     def test_user_groups_detail_get_undefined(self):
         test_uri = '/api/groups'
         data = {'name': 'Alpha Group'}
@@ -251,7 +273,6 @@ class UsersApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_list_post(self):
         course = CourseFactory.create()
         test_uri = '/api/users'
@@ -268,7 +289,6 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['id'], course.id)
         self.assertTrue(response.data['is_active'])
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_list_post_undefined_user(self):
         course = CourseFactory.create()
         test_uri = '/api/users'
@@ -278,7 +298,6 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_list_post_undefined_course(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
@@ -290,7 +309,6 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_list_get(self):
         course = CourseFactory.create(display_name="TEST COURSE")
         test_uri = '/api/users'
@@ -310,13 +328,11 @@ class UsersApiTests(TestCase):
         self.assertTrue(response.data[0]['is_active'])
         self.assertEqual(response.data[0]['name'], course.display_name)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_list_get_undefined_user(self):
         test_uri = '/api/users/2134234/courses'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_detail_post_position_course_as_descriptor(self):
         course = CourseFactory.create()
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
@@ -358,7 +374,6 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data=position_data)
         self.assertEqual(response.data['position'], chapter3.id)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_detail_post_position_invalid_user(self):
         course = CourseFactory.create()
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
@@ -381,7 +396,6 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data=position_data)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_detail_post_position_course_as_module(self):
         course = CourseFactory.create()
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
@@ -411,7 +425,6 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data=position_data)
         self.assertEqual(response.data['position'], chapter1.id)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_detail_get(self):
         course = CourseFactory.create()
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
@@ -447,13 +460,11 @@ class UsersApiTests(TestCase):
         response = self.do_post(confirm_uri, data=position_data)
         self.assertEqual(response.data['position'], chapter1.id)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_detail_get_undefined_user(self):
         test_uri = '/api/users/2134234/courses/a8df7asvd98'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_detail_get_undefined_enrollment(self):
         course = CourseFactory.create()
         test_uri = '/api/users'
@@ -465,7 +476,6 @@ class UsersApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_detail_delete(self):
         course = CourseFactory.create()
         test_uri = '/api/users'
@@ -493,7 +503,6 @@ class UsersApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_detail_delete_undefined_user(self):
         course = CourseFactory.create()
         user_id = '2134234'
@@ -501,7 +510,6 @@ class UsersApiTests(TestCase):
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_user_courses_detail_delete_undefined_course(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))

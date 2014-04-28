@@ -10,6 +10,7 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from api_manager.permissions import ApiKeyHeaderPermission
 from api_manager.models import GroupRelationship, CourseGroupRelationship, GroupProfile
@@ -29,36 +30,18 @@ def _generate_base_uri(request):
     resource_uri = '{}://{}{}'.format(
         protocol,
         request.get_host(),
-        request.path
+        request.get_full_path()
     )
     return resource_uri
 
 
-@api_view(['GET', 'POST'])
-@permission_classes((ApiKeyHeaderPermission,))
-def group_list(request):
-    """
-    GET retrieves a list of groups in the system filtered by type
-    POST creates a new group in the system
-    """
-    if request.method == 'GET':
-        if not 'type' in request.GET:
-            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+class GroupsList(APIView):
+    permissions_classes = (ApiKeyHeaderPermission,)
 
-        response_data = []
-        profiles = GroupProfile.objects.filter(group_type=request.GET['type'])
-        for profile in profiles:
-            item_data = {}
-            item_data['group_id'] = profile.group_id
-            if profile.group_type:
-                item_data['group_type'] = profile.group_type
-
-            if profile.data:
-                item_data['data'] = json.loads(profile.data)
-            response_data.append(item_data)
-
-        return Response(response_data)
-    elif request.method == 'POST':
+    def post(self, request, format=None):
+        """
+        POST creates a new group in the system
+        """
         response_data = {}
         base_uri = _generate_base_uri(request)
         # Group name must be unique, but we need to support dupes
@@ -71,40 +54,85 @@ def group_list(request):
         group.record_date_modified = timezone.now()
         group.save()
 
-        # Relationship model also allows us to use duplicate names
-        GroupRelationship.objects.create(name=original_group_name, group_id=group.id, parent_group=None)
+        # Create a corresponding relationship management record
+        GroupRelationship.objects.create(group_id=group.id, parent_group=None)
 
-        # allow for optional meta information about groups, this will end up in the GroupProfile table
-        group_type = request.DATA.get('group_type')
-        data = json.dumps(request.DATA.get('data')) if request.DATA.get('data') else None
-
-        if group_type or data:
-            profile, _ = GroupProfile.objects.get_or_create(group_id=group.id, group_type=group_type, data=data)
-
-        response_data = {'id': group.id, 'name': original_group_name}
+        # Create a corresponding profile record (for extra meta info)
+        group_type = request.DATA.get('group_type', None)
+        data = json.dumps(request.DATA.get('data')) if request.DATA.get('data') else {}
+        profile, _ = GroupProfile.objects.get_or_create(group_id=group.id, group_type=group_type, name=original_group_name, data=data)
+        
+        response_data = {
+            'id': group.id, 
+            'name': original_group_name,
+            'type': group_type,
+        }
         base_uri = _generate_base_uri(request)
         response_data['uri'] = '{}/{}'.format(base_uri, group.id)
         response_status = status.HTTP_201_CREATED
         return Response(response_data, status=response_status)
 
+    def get(self, request, format=None):
+        """
+        GET retrieves a list of groups in the system filtered by type
+        """
+        response_data = []
+        if 'type' in request.GET:
+            profiles = GroupProfile.objects.filter(group_type=request.GET['type'])
+        else:
+            profiles = GroupProfile.objects.all()
+        for profile in profiles:
+            item_data = {}
+            item_data['group_id'] = profile.group_id
+            if len(profile.name):
+                group_name = profile.name
+            else:
+                group = Group.objects.get(id=profile.group_id)
+                group_name = group.name
+            item_data['name'] = group_name
+            if profile.group_type:
+                item_data['group_type'] = profile.group_type
+            if profile.data:
+                item_data['data'] = json.loads(profile.data)
+            response_data.append(item_data)
+        return Response(response_data, status=status.HTTP_200_OK)
 
-@api_view(['GET', 'POST'])
-@permission_classes((ApiKeyHeaderPermission,))
-def group_detail(request, group_id):
-    """
-    GET retrieves an existing group from the system
-    """
 
-    response_data = {}
-    base_uri = _generate_base_uri(request)
-    try:
-        existing_group = Group.objects.get(id=group_id)
-        existing_group_relationship = GroupRelationship.objects.get(group_id=group_id)
-    except ObjectDoesNotExist:
-        return Response({}, status.HTTP_404_NOT_FOUND)
+class GroupsDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
 
-    if request.method == 'GET':
-        response_data['name'] = existing_group_relationship.name
+    def post(self, request, group_id, format=None):
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        print base_uri
+        try:
+            existing_group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+        group_type = request.DATA.get('group_type')
+        data = json.dumps(request.DATA.get('data')) if request.DATA.get('data') else None
+        if not group_type and not data:
+            return Response({}, status.HTTP_400_BAD_REQUEST)
+        profile, _ = GroupProfile.objects.get_or_create(group_id=group_id)
+        profile.group_type = group_type
+        profile.data = data
+        profile.save()
+        response_data['id'] = existing_group.id
+        response_data['name'] = profile.name
+        response_data['uri'] = _generate_base_uri(request)
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+
+    def get(self, request, group_id, format=None):
+        """
+        GET retrieves an existing group from the system
+        """
+        response_data = {}
+        base_uri = _generate_base_uri(request)
+        try:
+            existing_group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
         response_data['id'] = existing_group.id
         response_data['uri'] = base_uri
         response_data['resources'] = []
@@ -113,76 +141,42 @@ def group_detail(request, group_id):
         resource_uri = '{}/groups'.format(base_uri)
         response_data['resources'].append({'uri': resource_uri})
 
-        # see if there is an (optional) GroupProfile
-        try:
-            existing_group_profile = GroupProfile.objects.get(group_id=group_id)
-            if existing_group_profile.group_type:
-                response_data['group_type'] = existing_group_profile.group_type
-            data = existing_group_profile.data
-            if data:
-                response_data['data'] = json.loads(data)
-        except ObjectDoesNotExist:
-            pass
+        group_profile = GroupProfile.objects.get(group_id=group_id)
+        if len(group_profile.name):
+            response_data['name'] = group_profile.name
+        else:
+            response_data['name'] = existing_group.name
+        if group_profile.group_type:
+            response_data['group_type'] = group_profile.group_type
+        data = group_profile.data
+        if data:
+            response_data['data'] = json.loads(data)
 
-        response_status = status.HTTP_200_OK
-
-        return Response(response_data, status=response_status)
-    elif request.method == 'POST':
-        # update GroupProfile data
-
-        group_type = request.DATA.get('group_type')
-        data = json.dumps(request.DATA.get('data')) if request.DATA.get('data') else None
-
-        if not group_type and not data:
-            return Response({}, status.HTTP_400_BAD_REQUEST)
-
-        profile, _ = GroupProfile.objects.get_or_create(group_id=group_id)
-        profile.group_type = group_type
-        profile.data = data
-        profile.save()
-
-        return Response({})
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
-@api_view(['GET', 'POST'])
-@permission_classes((ApiKeyHeaderPermission,))
-def group_users_list(request, group_id):
-    """
-    POST creates a new group-user relationship in the system
-    """
-    response_data = {}
+class GroupsUsersList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
 
-    try:
-        existing_group = Group.objects.get(id=group_id)
-    except ObjectDoesNotExist:
-        return Response({}, status.HTTP_404_NOT_FOUND)
-
-    if request.method == "GET":
-        users = existing_group.user_set.all()
-        response_data['users'] = []
-        for user in users:
-            user_data = {}
-            user_data['id'] = user.id
-            user_data['email'] = user.email
-            user_data['username'] = user.username
-            user_data['first_name'] = user.first_name
-            user_data['last_name'] = user.last_name
-            response_data['users'].append(user_data)
-
-        response_status = status.HTTP_200_OK
-
-    elif request.method == "POST":
-        user_id = request.DATA['user_id']
+    def post(self, request, group_id, format=None):
+        """
+        POST creates a new group-user relationship in the system
+        """
         base_uri = _generate_base_uri(request)
+        try:
+            existing_group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+        user_id = request.DATA['user_id']
         try:
             existing_user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
             return Response({}, status.HTTP_404_NOT_FOUND)
-
         try:
             existing_relationship = Group.objects.get(user=existing_user)
         except ObjectDoesNotExist:
             existing_relationship = None
+        response_data = {}
         if existing_relationship is None:
             existing_group.user_set.add(existing_user.id)
             response_data['uri'] = '{}/{}'.format(base_uri, existing_user.id)
@@ -193,18 +187,38 @@ def group_users_list(request, group_id):
             response_data['uri'] = '{}/{}'.format(base_uri, existing_user.id)
             response_data['message'] = "Relationship already exists."
             response_status = status.HTTP_409_CONFLICT
+        return Response(response_data, status=response_status)
 
-    return Response(response_data, status=response_status)
+    def get(self, request, group_id, format=None):
+        """
+        GET retrieves the list of users related to the specified group
+        """
+        try:
+            existing_group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+        users = existing_group.user_set.all()
+        response_data = {}
+        response_data['users'] = []
+        for user in users:
+            user_data = {}
+            user_data['id'] = user.id
+            user_data['email'] = user.email
+            user_data['username'] = user.username
+            user_data['first_name'] = user.first_name
+            user_data['last_name'] = user.last_name
+            response_data['users'].append(user_data)
+        response_status = status.HTTP_200_OK
+        return Response(response_data, status=response_status)
 
 
-@api_view(['GET', 'DELETE'])
-@permission_classes((ApiKeyHeaderPermission,))
-def group_users_detail(request, group_id, user_id):
-    """
-    GET retrieves an existing group-user relationship from the system
-    DELETE removes/inactivates/etc. an existing group-user relationship
-    """
-    if request.method == 'GET':
+class GroupsUsersDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, group_id, user_id, format=None):
+        """
+        GET retrieves an existing group-user relationship from the system
+        """
         response_data = {}
         base_uri = _generate_base_uri(request)
         try:
@@ -221,7 +235,12 @@ def group_users_detail(request, group_id, user_id):
         else:
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
-    elif request.method == 'DELETE':
+
+
+    def delete(self, request, group_id, user_id, format=None):
+        """
+        DELETE removes/inactivates/etc. an existing group-user relationship
+        """
         try:
             existing_group = Group.objects.get(id=group_id)
             existing_group.user_set.remove(user_id)
@@ -231,14 +250,13 @@ def group_users_detail(request, group_id, user_id):
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['POST', 'GET'])
-@permission_classes((ApiKeyHeaderPermission,))
-def group_groups_list(request, group_id):
-    """
-    POST creates a new group-group relationship in the system
-    GET retrieves the existing group-group relationships for the specified group
-    """
-    if request.method == 'POST':
+class GroupsGroupsList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def post(self, request, group_id, format=None):
+        """
+        POST creates a new group-group relationship in the system
+        """
         response_data = {}
         to_group_id = request.DATA['group_id']
         relationship_type = request.DATA['relationship_type']
@@ -266,7 +284,12 @@ def group_groups_list(request, group_id):
         else:
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
-    elif request.method == 'GET':
+
+
+    def get(self, request, group_id, format=None):
+        """
+        GET retrieves the existing group-group relationships for the specified group
+        """
         try:
             from_group_relationship = GroupRelationship.objects.get(group__id=group_id)
         except ObjectDoesNotExist:
@@ -278,32 +301,31 @@ def group_groups_list(request, group_id):
             if child_groups:
                 for group in child_groups:
                     response_data.append({
-                                         "id": group.group_id,
-                                         "relationship_type": RELATIONSHIP_TYPES['hierarchical'],
-                                         "uri": '{}/{}'.format(base_uri, group.group.id)
-                                         })
+                        "id": group.group_id,
+                        "relationship_type": RELATIONSHIP_TYPES['hierarchical'],
+                        "uri": '{}/{}'.format(base_uri, group.group.id)
+                    })
             linked_groups = from_group_relationship.get_linked_group_relationships()
             if linked_groups:
                 for group in linked_groups:
                     response_data.append({
-                                         "id": group.to_group_relationship_id,
-                                         "relationship_type": RELATIONSHIP_TYPES['graph'],
-                                         "uri": '{}/{}'.format(base_uri, group.to_group_relationship_id)
-                                         })
+                        "id": group.to_group_relationship_id,
+                        "relationship_type": RELATIONSHIP_TYPES['graph'],
+                        "uri": '{}/{}'.format(base_uri, group.to_group_relationship_id)
+                    })
             response_status = status.HTTP_200_OK
         else:
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
 
-@api_view(['GET', 'DELETE'])
-@permission_classes((ApiKeyHeaderPermission,))
-def group_groups_detail(request, group_id, related_group_id):
-    """
-    GET retrieves an existing group-group relationship from the system
-    DELETE removes/inactivates/etc. an existing group-group relationship
-    """
-    if request.method == 'GET':
+class GroupsGroupsDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, group_id, related_group_id, format=None):
+        """
+        GET retrieves an existing group-group relationship from the system
+        """
         response_data = {}
         base_uri = _generate_base_uri(request)
         response_data['uri'] = base_uri
@@ -323,7 +345,11 @@ def group_groups_detail(request, group_id, related_group_id):
                     response_data['relationship_type'] = RELATIONSHIP_TYPES['graph']
                     response_status = status.HTTP_200_OK
         return Response(response_data, response_status)
-    elif request.method == 'DELETE':
+
+    def delete(self, request, group_id, related_group_id, format=None):
+        """
+        DELETE removes/inactivates/etc. an existing group-group relationship
+        """
         try:
             from_group_relationship = GroupRelationship.objects.get(group__id=group_id)
         except ObjectDoesNotExist:
@@ -348,34 +374,19 @@ def group_groups_detail(request, group_id, related_group_id):
         return Response({}, status=response_status)
 
 
-@api_view(['GET', 'POST'])
-@permission_classes((ApiKeyHeaderPermission,))
-def group_courses_list(request, group_id):
-    """
-    GET returns all courses that has a relationship to the group
-    POST creates a new group-course relationship in the system
-    """
-    response_data = {}
+class GroupsCoursesList(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
 
-    try:
-        existing_group = Group.objects.get(id=group_id)
-    except ObjectDoesNotExist:
-        return Response({}, status.HTTP_404_NOT_FOUND)
-
-    store = modulestore()
-
-    if request.method == 'GET':
-        members = CourseGroupRelationship.objects.filter(group=existing_group)
-        response_data['courses'] = []
-        for member in members:
-            course = store.get_course(member.course_id)
-            course_data = {
-                'course_id': member.course_id,
-                'display_name': course.display_name
-            }
-            response_data['courses'].append(course_data)
-        response_status = status.HTTP_200_OK
-    else:
+    def post(self, request, group_id, format=None):
+        """
+        POST creates a new group-course relationship in the system
+        """
+        response_data = {}
+        try:
+            existing_group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+        store = modulestore()
         course_id = request.DATA['course_id']
 
         base_uri = _generate_base_uri(request)
@@ -398,18 +409,38 @@ def group_courses_list(request, group_id):
         else:
             response_data['message'] = "Relationship already exists."
             response_status = status.HTTP_409_CONFLICT
+        return Response(response_data, status=response_status)
 
-    return Response(response_data, status=response_status)
+    def get(self, request, group_id, format=None):
+        """
+        GET returns all courses that has a relationship to the group
+        """
+        response_data = {}
+        try:
+            existing_group = Group.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+        store = modulestore()
+        members = CourseGroupRelationship.objects.filter(group=existing_group)
+        response_data['courses'] = []
+        for member in members:
+            course = store.get_course(member.course_id)
+            course_data = {
+                'course_id': member.course_id,
+                'display_name': course.display_name
+            }
+            response_data['courses'].append(course_data)
+        response_status = status.HTTP_200_OK
+        return Response(response_data, status=response_status)
 
 
-@api_view(['GET', 'DELETE'])
-@permission_classes((ApiKeyHeaderPermission,))
-def group_courses_detail(request, group_id, course_id):
-    """
-    GET retrieves an existing group-course relationship from the system
-    DELETE removes/inactivates/etc. an existing group-course relationship
-    """
-    if request.method == 'GET':
+class GroupsCoursesDetail(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
+    def get(self, request, group_id, course_id, format=None):
+        """
+        GET retrieves an existing group-course relationship from the system
+        """
         response_data = {}
         base_uri = _generate_base_uri(request)
         response_data['uri'] = base_uri
@@ -426,7 +457,11 @@ def group_courses_detail(request, group_id, course_id):
         else:
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
-    elif request.method == 'DELETE':
+
+    def delete(self, request, group_id, course_id, format=None):
+        """
+        DELETE removes/inactivates/etc. an existing group-course relationship
+        """
         try:
             existing_group = Group.objects.get(id=group_id)
             existing_group.coursegrouprelationship_set.get(course_id=course_id).delete()
