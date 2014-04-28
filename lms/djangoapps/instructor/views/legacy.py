@@ -92,6 +92,11 @@ def instructor_dashboard(request, course_id):
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
     instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
+    
+    #use this variable to hide some elements from teachers in instructor_dashboard.html (issue №3343)
+    teacher_role = (
+        CourseTeacherRole(course, None).has_user(user)
+    )
 
     forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
 
