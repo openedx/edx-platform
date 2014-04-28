@@ -81,7 +81,7 @@ def instructor_dashboard_2(request, course_id):
 
     context = {
         'course': course,
-        'old_dashboard_url': reverse('instructor_dashboard_2', kwargs={'course_id': course_id}),
+        'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': course_id}),
         'studio_url': studio_url,
         'sections': sections,
         'disable_buttons': disable_buttons,
@@ -256,6 +256,7 @@ def _section_metrics(course_id, access):
         'get_students_problem_grades_url': reverse('get_students_problem_grades'),
     }
     return section_data
+
 
 #---- Gradebook (shown to small courses only) ----
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
