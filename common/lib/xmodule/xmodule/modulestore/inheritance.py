@@ -86,7 +86,10 @@ class InheritanceMixin(XBlockMixin):
               "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
     )
-
+    matlab_api_key = String(
+        help="API key for Matlab problems",
+        scope=Scope.settings
+    )
 
 
 def compute_inherited_metadata(descriptor):

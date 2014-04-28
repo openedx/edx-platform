@@ -783,14 +783,10 @@ class MatlabInput(CodeInput):
     """
     InputType for handling Matlab code input
 
-    TODO: API_KEY will go away once we have a way to specify it per-course
     Example:
      <matlabinput rows="10" cols="80" tabsize="4">
         Initial Text
-        <plot_payload>
-          %api_key=API_KEY
-        </plot_payload>
-    </matlabinput>
+     </matlabinput>
     """
     template = "matlabinput.html"
     tags = ['matlabinput']
@@ -807,8 +803,21 @@ class MatlabInput(CodeInput):
         self.setup_code_response_rendering()
 
         xml = self.xml
-        self.plot_payload = xml.findtext('./plot_payload')
 
+        # the new way to define the api key is to set it in the course advanced settings
+        api_key = getattr(self.capa_system, 'matlab_api_key', None)
+        if api_key:
+            plot_payload = '%api_key={}'.format(api_key)
+        else:
+            plot_payload = ''
+
+        # the old way to define api_key is to add it to the plot_payload xml.
+        # are there other things that go in the payload?
+        xml_payload = xml.findtext('./plot_payload')
+        if xml_payload:
+            plot_payload += '\n{}'.format(xml_payload)
+
+        self.plot_payload = plot_payload
         # Check if problem has been queued
         self.queuename = 'matlab'
         self.queue_msg = ''

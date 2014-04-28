@@ -1876,10 +1876,14 @@ class CodeResponse(LoncapaResponse):
             self.answer (an answer to display to the student in the LMS)
             self.payload
         """
-        # Note that CodeResponse is agnostic to the specific contents of
-        # grader_payload
         grader_payload = codeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
+        # matlab api key can be defined in course settings. if so, add it to the grader payload
+        # only if the problem didn't have an api key already defined.
+        api_key = getattr(self.capa_system, 'matlab_api_key', None)
+        if self.xml.find('matlabinput') and api_key and 'api_key' not in grader_payload:
+            grader_payload += '\n%api_key={}'.format(api_key)
+
         self.payload = {'grader_payload': grader_payload}
 
         self.initial_display = find_with_default(

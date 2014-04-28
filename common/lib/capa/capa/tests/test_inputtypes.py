@@ -628,6 +628,21 @@ class MatlabTest(unittest.TestCase):
         context = the_input._get_render_context()
         self.assertEqual(the_input.status, 'unsubmitted')
 
+    def test_matlab_api_key(self):
+        """
+        Test that api_key ends up in the xqueue payload
+        """
+        elt = etree.fromstring(self.xml)
+        system = test_capa_system()
+        system.matlab_api_key = 'test_api_key'
+        the_input = lookup_tag('matlabinput')(system, elt, {})
+
+        data = {'submission': 'x = 1234;'}
+        response = the_input.handle_ajax("plot", data)
+
+        body = system.xqueue['interface'].send_to_queue.call_args[1]['body']
+        payload = json.loads(body)
+        self.assertIn('%api_key=test_api_key', payload['grader_payload'])
 
     def test_get_html(self):
         # usual output
