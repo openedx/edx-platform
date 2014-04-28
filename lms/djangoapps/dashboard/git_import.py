@@ -21,7 +21,7 @@ from xmodule.modulestore import Location
 
 log = logging.getLogger(__name__)
 
-GIT_REPO_DIR = getattr(settings, 'GIT_REPO_DIR', '/opt/edx/course_repos')
+GIT_REPO_DIR = getattr(settings, 'GIT_REPO_DIR', '/edx/var/app/edxapp/course_repos')
 GIT_IMPORT_STATIC = getattr(settings, 'GIT_IMPORT_STATIC', True)
 
 
