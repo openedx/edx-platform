@@ -20,6 +20,8 @@ def run():
     """
     autostartup()
 
+    reset_email_content_transfer_encoding()
+
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
 
@@ -28,6 +30,17 @@ def run():
 
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
+
+
+def reset_email_content_transfer_encoding():
+    """
+    Django (version <= 1.6) globally overrides python's default Content-Transfer-Encoding for UTF-8 messages from base64
+    to 7bit. We set it to base64 again otherwise mail servers add newlines and exclamation marks when a line is longer
+    than 989 characters.
+    """
+    from email import charset as Charset
+    header_enc, body_enc, output_charset = Charset.CHARSETS['utf-8']
+    Charset.add_charset('utf-8', header_enc, Charset.BASE64, output_charset)
 
 
 def enable_theme():
