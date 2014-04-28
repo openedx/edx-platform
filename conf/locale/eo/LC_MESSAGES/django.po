@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-27 17:15-0400\n"
-"PO-Revision-Date: 2014-04-27 21:15:36.951764\n"
+"POT-Creation-Date: 2014-04-28 11:26-0400\n"
+"PO-Revision-Date: 2014-04-28 15:26:13.087798\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1480,6 +1480,16 @@ msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
 "À ÝöüTüßé ÛRL ör ä lïnk tö ä fïlé höstéd änýwhéré ön thé wéß. Ⱡ'σяєм ιρѕυм "
 "∂σłσя#"
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "SubRip (.srt) file"
+msgstr "SüßRïp (.srt) fïlé Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Text (.txt) file"
+msgstr "Téxt (.txt) fïlé Ⱡ'σ#"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
@@ -6276,10 +6286,6 @@ msgstr "Döwnlöäd vïdéö Ⱡ'#"
 #: lms/templates/video.html lms/templates/video.html
 msgid "Download transcript"
 msgstr "Döwnlöäd tränsçrïpt Ⱡ'σя#"
-
-#: lms/templates/video.html lms/templates/video.html
-msgid "{file_format}"
-msgstr "{file_format} Ⱡ'σя#"
 
 #: lms/templates/video.html
 msgid "Download Handout"
