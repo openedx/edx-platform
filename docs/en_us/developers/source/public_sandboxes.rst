@@ -7,7 +7,7 @@ to interact with the software without having to set it up themselves.
 
 * `edx.org Sandbox`_ for those looking to try out the software powering edx.org
 
-* `Language Sandboxes`_ for contributors helping to translate OpenEdX into
+* `Language Sandboxes`_ for contributors helping to translate Open edX into
   various languages, who have a need to see translations "in context" - that is,
   in use on an actual website.
 
@@ -59,7 +59,14 @@ Accessing The Sandboxes
 =======================
 There are two language sandboxes, one for right-to-left, aka "RTL", languages
 (Arabic, Farsi, Hebrew, and Urdu) and a second one for left-to-right, aka "LTR",
-languages.
+languages. Right now, RTL and LTR cannot be supported on the same installation,
+because the CSS needs to be compiled separately. Fixing this is a task on our
+backlog. 
+
+This is our first deployment of our alpha version of RTL language support! If
+you have any comments or find any visual bugs, please let us know by posting on the
+`openedx-translation <https://groups.google.com/forum/#!forum/openedx-translation>`_
+mailing list.
 
 You can visit the LMS, or learning management system, at:
 
@@ -95,7 +102,8 @@ So if you are working on Chinese (China), you'll log in with these credentials:
 You can also make new student-level user accounts, which is useful for verifying
 translations within the registration flow.
 
-Feel free to mess around in these sandboxes, you can't break anything!
+Feel free to mess around in these sandboxes. They can be reset if anything breaks,
+and are completely disconnected from the production version of the edx.org website.
 
 
 Caveats and Warnings
@@ -107,12 +115,16 @@ Caveats and Warnings
    dashboard page to set your language. However, when viewing Studio or when
    viewing the site logged-out, the site will use your browser preference to pick
    which language to display, so make sure your browser is set to the language
-   you're translating to.
+   you're translating to. See `this page on changing browser language
+   <http://www.wikihow.com/Change-Your-Browser's-Language>`_ if you need help.
+
+   Note that we recommend users utilize Chrome or Firefox when using the edX
+   courseware.
 
 #. To see a normal edX instance in English (useful for comparing), switch your
    language to English, or visit the `edx.org Sandbox`_.
 
-#. At the moment, the side does not properly work for languages with an ``@``
+#. At the moment, the site does not properly work for languages with an ``@``
    symbol in the language code, so for now, those languages cannot use the
    sandbox.
 
@@ -121,11 +133,15 @@ Caveats and Warnings
 
      tx pull -l LANGUAGE_CODE
 
-   Replace ``LANGUAGE_CODE`` with your code, eg ``zh_CN``. Next, run the script::
+   Replace ``LANGUAGE_CODE`` with your code, eg ``zh_CN``. See `this page for instructions on how to
+   configure Transifex <https://github.com/edx/edx-platform/wiki/Internationalization-and-localization>`_.
 
+   Next, run the commands::
+
+     rake i18n:generate
      python i18n/verify.py
 
-   This generates a report of broken translations in your language. This will not, however,
+   This will generate reports of broken translations in your language. This will not, however,
    catch HTML tags that are out of order (ex. ``</b> <b>`` instead of ``<b> </b>``).
 
 
