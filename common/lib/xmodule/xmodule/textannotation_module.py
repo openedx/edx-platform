@@ -45,6 +45,12 @@ class AnnotatableFields(object):
     )
     annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
     annotation_token_secret = String(help="Secret string for annotation storage", scope=Scope.settings, default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", display_name="Secret Token String for Annotation")
+    diacritics = String(
+        display_name="Diacritic Marks",
+        help= "Add diacritic marks to be added to a text using the comma-separated form, i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2",
+        scope=Scope.settings,
+        default='',
+    )
 
 
 class TextAnnotationModule(AnnotatableFields, XModule):
@@ -84,6 +90,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             'content_html': self.content,
             'annotation_storage': self.annotation_storage_url,
             'token':retrieve_token(self.user, self.annotation_token_secret),
+            'diacritic_marks': self.diacritics,
         }
         return self.system.render_template('textannotation.html', context)
 
