@@ -84,7 +84,6 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             'content_html': self.content,
             'annotation_storage': self.annotation_storage_url,
             'token':retrieve_token(self.user, self.annotation_token_secret),
-            'diacritic_marks': self.diacritics,
         }
         return self.system.render_template('textannotation.html', context)
 

@@ -91,7 +91,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
             'sourceUrl': self.sourceurl,
             'typeSource': extension,
             'poster': self.poster_url,
-            'content_html': self._render_content(),
+            'content_html': self.content,
             'annotation_storage': self.annotation_storage_url,
             'token': retrieve_token(self.user, self.annotation_token_secret),
         }
