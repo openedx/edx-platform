@@ -1,6 +1,7 @@
 # pylint: disable=E1101
 
 """ API implementation for session-oriented interactions. """
+import logging
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -20,6 +21,8 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from api_manager.permissions import ApiKeyHeaderPermission
 from api_manager.serializers import UserSerializer
 from student.models import LoginFailures
+
+AUDIT_LOG = logging.getLogger("audit")
 
 
 def _generate_base_uri(request):
@@ -82,6 +85,9 @@ class SessionsList(APIView):
                     response_data['user'] = user_dto.data
                     response_data['uri'] = '{}/{}'.format(base_uri, request.session.session_key)
                     response_status = status.HTTP_201_CREATED
+
+                    # add to audit log
+                    AUDIT_LOG.info(u"API::User logged in successfully with user-id - {0}".format(user.id))
                 else:
                     response_status = status.HTTP_401_UNAUTHORIZED
             else:
@@ -91,7 +97,9 @@ class SessionsList(APIView):
                     LoginFailures.increment_lockout_counter(existing_user)
 
                 response_status = status.HTTP_401_UNAUTHORIZED
+                AUDIT_LOG.warn(u"API::User authentication failed with user-id - {0}".format(existing_user.id))
         else:
+            AUDIT_LOG.warn(u"API::Failed login attempt with unknown email/username")
             response_status = status.HTTP_404_NOT_FOUND
         return Response(response_data, status=response_status)
 
@@ -131,5 +139,9 @@ class SessionsDetail(APIView):
         base_uri = _generate_base_uri(request)
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore(session_id)
+        user_id = session[SESSION_KEY]
+        AUDIT_LOG.info(u"API::User session terminated for user-id - {0}".format(user_id))
         session.flush()
+        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
+
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
