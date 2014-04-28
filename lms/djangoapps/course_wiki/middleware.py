@@ -52,11 +52,10 @@ class WikiAccessMiddleware(object):
             return redirect(reverse('accounts_login'), next=request.path)
 
         if course_id:
-            # this is a /course/123/wiki request
-            my_url = request.path.replace(wiki_path, '').replace('/wiki/', '')
-            # HACK: django-wiki monkeypatches the reverse function to enable
-            # urls to be rewritten
-            reverse._transform_url = lambda url: my_url + url  # pylint: disable=W0212
+            # This is a /courses/org/name/run/wiki request
+            # HACK: django-wiki monkeypatches the django reverse function to enable urls to be rewritten
+            url_prefix = "/courses/{0}".format(course_id)
+            reverse._transform_url = lambda url: url_prefix + url  # pylint: disable=protected-access
             # Authorization Check
             # Let's see if user is enrolled or the course allows for public access
             try:
