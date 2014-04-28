@@ -38,6 +38,7 @@ Internationalization
     i18n.rst
     i18n_translators_guide.rst
     pavelib.rst
+    public_sandboxes.rst
     xblocks.rst
 
 Indices and tables
