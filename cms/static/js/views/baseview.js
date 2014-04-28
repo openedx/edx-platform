@@ -60,14 +60,14 @@ define(["jquery", "underscore", "backbone", "js/utils/handle_iframe_binding"],
                 $('.ui-loading').hide();
             },
 
+            /**
+            * Disables a given element when a given operation is running.
+            * @param {jQuery} element: the element to be disabled.
+            * @param operation: the operation during whose duration the
+            * element should be disabled. The operation should return
+            * a jquery promise.
+            */
             disableElementWhileRunning: function(element, operation) {
-                /**
-                * Disables a given element when a given operation is running.
-                * @param {jQuery} element: the element to be disabled.
-                * @param operation: the operation during whose duration the
-                * element should be disabled. The operation should return
-                * a jquery promise.
-                */
                 element.addClass("is-disabled");
                 operation().always(function() {
                     element.removeClass("is-disabled");
