@@ -15,10 +15,11 @@ from distutils.spawn import find_executable
 from path import path
 from invoke import task
 from invoke import run as sh
+from pygments.console import colorize
 from .utils.cmd import cmd
 from .utils.envs import Env
 
-I18N_REPORT_DIR = Env.REPO_ROOT.joinpath('i18n')
+I18N_REPORT_DIR = Env.REPORT_ROOT.joinpath('i18n')
 I18N_XUNIT_REPORT = I18N_REPORT_DIR.joinpath('nosetests.xml')
 
 @task
@@ -28,7 +29,9 @@ def mk_i18n_report_dir():
 @task('i18n.mk_i18n_report_dir')
 def clean_report_dir():
     """Clean coverage files, to ensure that we don't use stale data to generate reports."""
+    print(colorize("lightgray", "Cleaning report directory "))
     sh("find {!s} -type f -delete".format(I18N_REPORT_DIR))
+
 
 @task('i18n.validate_gettext')
 def extract(verbose=False, **kwargs):
@@ -37,8 +40,9 @@ def extract(verbose=False, **kwargs):
     Params:
         verbose=False Display verbose output
     """
-    sh(cmd('invoke', 'update_assets', '--skip-collect'))
-    executable = str(Env.REPO_ROOT.joinpath('i18n/extract.py'))
+    sh(cmd('invoke', 'assets.update', '--skip-collect'))
+    executable = Env.REPO_ROOT / 'i18n/extract.py'
+    print("Executable", executable)
     if verbose:
         sh(cmd(executable, '-vv'))
     else:

@@ -2,8 +2,6 @@ from __future__ import print_function
 from invoke import run as sh
 from pygments.console import colorize
 
-init(autoreset=True)
-
 def deprecated(deprecated_by):
     def deprecated_decorator(func):
         def wrapper(*args, **kwargs):
