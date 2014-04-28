@@ -13,6 +13,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from api_manager.permissions import ApiKeyHeaderPermission
 from api_manager.serializers import UserSerializer
@@ -42,6 +43,12 @@ def session_list(request):
     1. Open edX username/password
     """
     response_data = {}
+    # Add some rate limiting here by re-using the RateLimitMixin as a helper class
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        response_data['message'] = _('Rate limit exceeded in api login.')
+        return Response(response_data, status=status.HTTP_403_FORBIDDEN)
+
     base_uri = _generate_base_uri(request)
     try:
         existing_user = User.objects.get(username=request.DATA['username'])
@@ -75,6 +82,7 @@ def session_list(request):
             else:
                 response_status = status.HTTP_403_FORBIDDEN
         else:
+            limiter.tick_bad_request_counter(request)
             # tick the failed login counters if the user exists in the database
             if LoginFailures.is_feature_enabled():
                 LoginFailures.increment_lockout_counter(existing_user)
