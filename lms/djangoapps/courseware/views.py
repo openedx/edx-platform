@@ -59,6 +59,10 @@ log = logging.getLogger("edx.courseware")
 template_imports = {'urllib': urllib}
 
 def stat(request):
+    
+    if not request.user.is_staff:
+            raise Http404
+
     context = {}
     context['csrf'] = csrf(request)['csrf_token']
     filename = '/edx/app/edxapp/edx-platform/fullstat.csv'
