@@ -12,6 +12,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.contrib.auth.models import AnonymousUser
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from xblock.field_data import FieldData
@@ -27,13 +28,16 @@ from xmodule.x_module import XModuleDescriptor
 from courseware import module_render as render
 from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
 from courseware.model_data import FieldDataCache
+from courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory, UserFactory, GlobalStaffFactory
 from courseware.tests.tests import LoginEnrollmentTestCase
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.test_submitting_problems import TestSubmittingProblems
 
+from student.models import anonymous_id_for_user
 from lms.lib.xblock.runtime import quote_slashes
 
 
@@ -95,7 +99,6 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # See if the url got rewritten to the target link
         # note if the URL mapping changes then this assertion will break
         self.assertIn('/courses/' + self.course_id + '/jump_to_id/vertical_test', html)
-
 
     def test_xqueue_callback_success(self):
         """
@@ -874,3 +877,106 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
     def test_missing_display_name(self, mock_tracker):
         actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker)
         self.assertTrue(actual_display_name.startswith('problem'))
+
+
+class TestXmoduleRuntimeEvent(TestSubmittingProblems):
+    """
+    Inherit from TestSubmittingProblems to get functionality that set up a course and problems structure
+    """
+
+    def setUp(self):
+        super(TestXmoduleRuntimeEvent, self).setUp()
+        self.homework = self.add_graded_section_to_course('homework')
+        self.problem = self.add_dropdown_to_section(self.homework.location, 'p1', 1)
+        self.grade_dict = {'value': 0.18, 'max_value': 32, 'user_id': self.student_user.id}
+        self.delete_dict = {'value': None, 'max_value': None, 'user_id': self.student_user.id}
+
+    def get_module_for_user(self, user):
+        """Helper function to get useful module at self.location in self.course_id for user"""
+        mock_request = MagicMock()
+        mock_request.user = user
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id, user, self.course, depth=2)
+
+        return render.get_module(  # pylint: disable=protected-access
+            user,
+            mock_request,
+            self.problem.id,
+            field_data_cache,
+            self.course.id)._xmodule
+
+    def set_module_grade_using_publish(self, grade_dict):
+        """Publish the user's grade, takes grade_dict as input"""
+        module = self.get_module_for_user(self.student_user)
+        module.system.publish(module, 'grade', grade_dict)
+        return module
+
+    def test_xmodule_runtime_publish(self):
+        """Tests the publish mechanism"""
+        self.set_module_grade_using_publish(self.grade_dict)
+        student_module = StudentModule.objects.get(student=self.student_user, module_state_key=self.problem.id)
+        self.assertEqual(student_module.grade, self.grade_dict['value'])
+        self.assertEqual(student_module.max_grade, self.grade_dict['max_value'])
+
+    def test_xmodule_runtime_publish_delete(self):
+        """Test deleting the grade using the publish mechanism"""
+        module = self.set_module_grade_using_publish(self.grade_dict)
+        module.system.publish(module, 'grade', self.delete_dict)
+        student_module = StudentModule.objects.get(student=self.student_user, module_state_key=self.problem.id)
+        self.assertIsNone(student_module.grade)
+        self.assertIsNone(student_module.max_grade)
+
+
+class TestRebindModule(TestSubmittingProblems):
+    """
+    Tests to verify the functionality of rebinding a module.
+    Inherit from TestSubmittingProblems to get functionality that set up a course structure
+    """
+    def setUp(self):
+        super(TestRebindModule, self).setUp()
+        self.homework = self.add_graded_section_to_course('homework')
+        self.lti = ItemFactory.create(category='lti', parent=self.homework)
+        self.user = UserFactory.create()
+        self.anon_user = AnonymousUser()
+
+    def get_module_for_user(self, user):
+        """Helper function to get useful module at self.location in self.course_id for user"""
+        mock_request = MagicMock()
+        mock_request.user = user
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id, user, self.course, depth=2)
+
+        return render.get_module(  # pylint: disable=protected-access
+            user,
+            mock_request,
+            self.lti.id,
+            field_data_cache,
+            self.course.id)._xmodule
+
+    def test_rebind_noauth_module_to_user_not_anonymous(self):
+        """
+        Tests that an exception is thrown when rebind_noauth_module_to_user is run from a
+        module bound to a real user
+        """
+        module = self.get_module_for_user(self.user)
+        user2 = UserFactory()
+        user2.id = 2
+        with self.assertRaisesRegexp(
+            render.LmsModuleRenderError,
+            "rebind_noauth_module_to_user can only be called from a module bound to an anonymous user"
+        ):
+            self.assertTrue(module.system.rebind_noauth_module_to_user(module, user2))
+
+    def test_rebind_noauth_module_to_user_anonymous(self):
+        """
+        Tests that get_user_module_for_noauth succeeds when rebind_noauth_module_to_user is run from a
+        module bound to AnonymousUser
+        """
+        module = self.get_module_for_user(self.anon_user)
+        user2 = UserFactory()
+        user2.id = 2
+        module.system.rebind_noauth_module_to_user(module, user2)
+        self.assertTrue(module)
+        self.assertEqual(module.system.anonymous_student_id, anonymous_id_for_user(user2, self.course.id))
+        self.assertEqual(module.scope_ids.user_id, user2.id)
+        self.assertEqual(module.descriptor.scope_ids.user_id, user2.id)
