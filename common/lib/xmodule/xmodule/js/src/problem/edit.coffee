@@ -48,7 +48,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   ###
   onShowXMLButton: (e) =>
     e.preventDefault();
-    @addRemoveCheatsheetCSS()
+    if @cheatsheet != undefined
+      @addRemoveCheatsheetCSS()
     if @confirmConversionToXml()
       @createXMLEditor(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
       # Need to refresh to get line numbers to display properly (and put cursor position to 0)
