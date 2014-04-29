@@ -10,6 +10,9 @@ Change Log
 
    * - Date
      - Change
+   * - 29 Apr 14
+     - Corrected misstatement on how :ref:`Discussion Forums Data` is sent in
+       data packages.
    * - 25 Apr 14
      - Added new event types to the :ref:`Tracking Logs` chapter for interactions with PDF files.
    * - 31 Mar 2014
