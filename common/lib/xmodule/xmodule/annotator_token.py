@@ -18,15 +18,15 @@ def retrieve_token(userid, secret):
     the id for identification purposes in the backend.
     '''
 
-    #retrieve difference between current time and Greenwich time to assure timezones are normalized
+    # the following five lines of code allows you to include the default timezone in the iso format
+    # for more information: http://stackoverflow.com/questions/3401428/how-to-get-an-isoformat-datetime-string-including-the-default-timezone
     dtnow = datetime.datetime.now()
     dtutcnow = datetime.datetime.utcnow()
     delta = dtnow - dtutcnow
-    #use the new normalized time to retreive the date the token was issued
     newhour, newmin = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60, 60)
     newtime = "%s%+02d:%02d" % (dtnow.isoformat(), newhour, newmin)
-    #uses the issued time, the consumer key and the user's email to maintain a 
-    #federated system in the annotation backend server
+    # uses the issued time (UTC plus timezone), the consumer key and the user's email to maintain a 
+    # federated system in the annotation backend server
     custom_data = {"issuedAt": newtime, "consumerKey": secret, "userId": userid, "ttl": 86400}
     newtoken = create_token(secret, custom_data)
     return newtoken
