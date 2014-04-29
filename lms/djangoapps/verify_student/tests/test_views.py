@@ -9,11 +9,14 @@ verify_student/start?course_id=MITx/6.002x/2013_Spring # create
  ---> To Payment
 
 """
+import json
+import mock
 import urllib
 from mock import patch, Mock
 import pytz
 from datetime import timedelta, datetime
 
+from django.test.client import Client
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.conf import settings
@@ -31,6 +34,13 @@ from verify_student.views import render_to_response
 from verify_student.models import SoftwareSecurePhotoVerification
 from reverification.tests.factories import MidcourseReverificationWindowFactory
 
+FAKE_SETTINGS = {
+    "SOFTWARE_SECURE":
+    {
+        "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
+        "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+    }
+}
 
 def mock_render_to_response(*args, **kwargs):
     return render_to_response(*args, **kwargs)
@@ -121,6 +131,161 @@ class TestReverifyView(TestCase):
         ((template, context), _kwargs) = render_mock.call_args
         self.assertIn('photo_reverification', template)
         self.assertTrue(context['error'])
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
+class TestPhotoVerificationResultsCallback(TestCase):
+    """ Tests for Photo Verification Result Callback """
+    def setUp(self):
+        self.course_id = 'Robot/999/Test_Course'
+        CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        self.user = UserFactory.create()
+        self.attempt = SoftwareSecurePhotoVerification(
+            status="submitted",
+            user=self.user
+        )
+        self.attempt.save()
+        self.receipt_id = self.attempt.receipt_id
+        self.client = Client()
+
+    def mocked_has_valid_signature(method, headers_dict, body_dict, access_key, secret_key):
+        return True
+
+    def test_invalid_json(self):
+        """
+        test for invalid json being posted by software secure
+        """
+        data = {"testing invalid"}
+        response = self.client.post(reverse('verify_student_results_callback'), data=data,
+                                    content_type='application/json', HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB: testing', HTTP_DATE='testdate')
+        self.assertIn('Invalid JSON', response.content)
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_dict(self):
+        """
+        test for invalid dictionary being posted by software secure
+        """
+        data = '"\\"test\\testing"'
+        response = self.client.post(reverse('verify_student_results_callback'), data=data,
+                                    content_type='application/json', HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing', HTTP_DATE='testdate')
+        self.assertIn('JSON should be dict', response.content)
+        self.assertEqual(response.status_code, 400)
+
+    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    def test_invalid_access_key(self):
+        """
+        test for invalid access key
+        """
+        data = {"EdX-ID": self.receipt_id,
+                "Result": "testing",
+                "Reason": "testing",
+                "MessageType": "testing"}
+        json_data = json.dumps(data)
+        response = self.client.post(reverse('verify_student_results_callback'), data=json_data,
+                                    content_type='application/json', HTTP_AUTHORIZATION='test testing:testing', HTTP_DATE='testdate')
+        self.assertIn('Access key invalid', response.content)
+        self.assertEqual(response.status_code, 400)
+
+    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    def test_wrong_edx_id(self):
+        """
+        test for wrong id of Software secure verification attempt
+        """
+        data = {"EdX-ID": "testing",
+                "Result": "testing",
+                "Reason": "testing",
+                "MessageType": "testing"}
+        json_data = json.dumps(data)
+        response = self.client.post(reverse('verify_student_results_callback'), data=json_data,
+                                    content_type='application/json', HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing', HTTP_DATE='testdate')
+        self.assertIn('edX ID testing not found', response.content)
+        self.assertEqual(response.status_code, 400)
+
+    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    def test_pass_result(self):
+        """
+        test for verification passed
+        """
+        data = {"EdX-ID": self.receipt_id,
+                "Result": "PASS",
+                "Reason": "Testing",
+                "MessageType": "you have been verified"}
+        json_data = json.dumps(data)
+        response = self.client.post(reverse('verify_student_results_callback'), data=json_data,
+                                    content_type='application/json', HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing', HTTP_DATE='testdate')
+        attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
+        self.assertEqual(attempt.status, u'approved')
+        self.assertEquals(response.content, 'OK!')
+
+    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    def test_fail_result(self):
+        """
+        test for verification failed
+        """
+        data = {"EdX-ID": self.receipt_id,
+                "Result": 'FAIL',
+                "Reason": 'Invalid Photo',
+                "MessageType": 'Your photo doesn\'t meet standards'}
+        json_data = json.dumps(data)
+        response = self.client.post(reverse('verify_student_results_callback'), data=json_data,
+                                    content_type='application/json', HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing', HTTP_DATE='testdate')
+        attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
+        self.assertEqual(attempt.status, u'denied')
+        self.assertEqual(attempt.error_code, u'Your photo doesn\'t meet standards')
+        self.assertEqual(attempt.error_msg, u'"Invalid Photo"')
+        self.assertEquals(response.content, 'OK!')
+
+    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    def test_system_fail_result(self):
+        """
+        test for software secure result system failure
+        """
+        data = {"EdX-ID": self.receipt_id,
+                "Result": 'SYSTEM FAIL',
+                "Reason": 'Memory overflow',
+                "MessageType": 'you must retry the verification'}
+        json_data = json.dumps(data)
+        response = self.client.post(reverse('verify_student_results_callback'), data=json_data,
+                                    content_type='application/json', HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing', HTTP_DATE='testdate')
+        attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
+        self.assertEqual(attempt.status, u'must_retry')
+        self.assertEqual(attempt.error_code, u'you must retry the verification')
+        self.assertEqual(attempt.error_msg, u'"Memory overflow"')
+        self.assertEquals(response.content, 'OK!')
+
+    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    def test_unknown_result(self):
+        """
+        test for unknown software secure result
+        """
+        data = {"EdX-ID": self.receipt_id,
+                "Result": 'unknown',
+                "Reason": 'unknown reason',
+                "MessageType": 'unknown message'}
+        json_data = json.dumps(data)
+        response = self.client.post(reverse('verify_student_results_callback'), data=json_data,
+                                    content_type='application/json', HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing', HTTP_DATE='testdate')
+        self.assertIn('Result unknown not understood', response.content)
+
+    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    def test_reverification(self):
+        """
+         Test software secure result for reverification window
+        """
+        data = {"EdX-ID": self.receipt_id,
+                "Result": "PASS",
+                "Reason": "Testing",
+                "MessageType": "you have been verified"}
+        window = MidcourseReverificationWindowFactory(course_id=self.course_id)
+        self.attempt.window = window
+        self.attempt.save()
+        json_data = json.dumps(data)
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id).count(), 0)
+        response = self.client.post(reverse('verify_student_results_callback'), data=json_data,
+                                    content_type='application/json', HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing', HTTP_DATE='testdate')
+        self.assertEquals(response.content, 'OK!')
+        self.assertIsNotNone(CourseEnrollment.objects.get(course_id=self.course_id))
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
