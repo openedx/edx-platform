@@ -45,11 +45,111 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 import shoppingcart
 
+#new
+import csv
+import datetime
+from django.http import HttpResponse
+from django.core.servers.basehttp import FileWrapper
+import logging
+
 from microsite_configuration import microsite
 
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
+
+def stat(request):
+
+    if not request.user.is_staff:
+            raise Http404
+
+    context = {}
+    context['csrf'] = csrf(request)['csrf_token']
+    filename = '/edx/app/edxapp/edx-platform/fullstat.csv'
+    if request.method == 'POST':
+        if 'download_stat_unfiltered' in request.POST:
+            return return_fullstat_csv(filename)
+        elif 'download_stat_filtered' in request.POST:
+            context['value_error_in_input'] = True
+            try:
+                register_date_min = None
+                register_date_max = None
+                if request.POST.get('min_date') != '':
+                    register_date_min = datetime.datetime.strptime(request.POST.get('min_date'), "%d/%m/%Y")
+                if request.POST.get('max_date') != '':
+                    register_date_max = datetime.datetime.strptime(request.POST.get('max_date'), "%d/%m/%Y")
+                context['value_error_in_input'] = False
+                return return_filtered_stat_csv(\
+                    school_login=request.POST.get('school_login'),\
+                    register_date_min=register_date_min,\
+                    register_date_max=register_date_max,\
+                    account_activated=request.POST.get('activated'),\
+                    complete70=request.POST.get('complete70'),\
+                    complete100=request.POST.get('complete100')\
+                )
+            except:
+                return render_to_response('stat.html', context)
+
+    return render_to_response('stat.html', context)
+
+
+def return_fullstat_csv(filename):
+    """
+    Returns fullstat.csv file.
+    """
+    wrapper = FileWrapper(file(filename))
+    response = HttpResponse(wrapper, content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=fullstat.csv'
+    return response
+
+
+def return_filtered_stat_csv(school_login='', register_date_min=None, register_date_max=None, account_activated=None, complete70=None, complete100=None):
+    """
+    Returns file with data from fullstat.csv filtered according to the parameters given (indices of columns can be changed):
+    [6] - school_login
+    [13] - register_date_min & register_date_max (changed)
+    [09] - account_activated
+    [14] - complete70
+    [15] - complete100
+
+    If no values are chosen, returns a filtered file with all row of fullstat.csv which contain a valid registration date in the corresponding field.
+    """
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="stat_filtered.csv"'
+    writer = csv.writer(response)
+
+    with open("/edx/app/edxapp/edx-platform/fullstat.csv", "r") as fullstatfile:
+        header_row = True
+        first_rows = True
+        for row in csv.reader(fullstatfile):
+            if header_row:
+                writer.writerow(row)
+                header_row = False
+            elif first_rows:
+                if len(row)>0 and row[0]=='-':
+                    writer.writerow(row)
+                else:
+                    first_rows = False
+            else:
+                if len(row) >= 16:    # must contain at least 16 columns    # change if new columns are added
+                    
+                    # no text in a text input --> str type
+                    # no choice in radio input --> NoneType
+
+                    try:
+                        register_date = datetime.datetime.strptime(row[13], "%d/%m/%Y")
+                        if (school_login == '' or row[6] == school_login) and\
+                        (register_date_min == None or register_date_min <= register_date) and\
+                        (register_date_max == None or register_date <= register_date_max) and\
+                        (account_activated == None or (len(row[9]) == 4) == bool(account_activated)) and\
+                        (complete70 == None or (len(row[14]) == 4) == bool(complete70)) and\
+                        (complete100 == None or (len(row[15]) == 4) == bool(complete100)):    # ultimate hack: len('da') == 4
+                            writer.writerow(row)
+                    except:
+                        pass
+                                        
+    return response
 
 
 def user_groups(user):
