@@ -13,6 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.license import parse_license
 from static_replace import replace_static_urls
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
@@ -230,6 +231,11 @@ def get_course_about_section(course, section_key):
         return course.display_number_with_default
 
     raise KeyError("Invalid about key " + str(section_key))
+
+def get_course_license_section(course):
+    license_section = "<h2>License</h2>"+ parse_license(course.license, course.license_version).html
+
+    return license_section
 
 
 def get_course_info_section_module(request, course, section_key):

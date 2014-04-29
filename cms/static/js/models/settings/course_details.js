@@ -5,6 +5,7 @@ var CourseDetails = Backbone.Model.extend({
         org : '',
         course_id: '',
         run: '',
+        license: '',
         start_date: null,	// maps to 'start'
         end_date: null,		// maps to 'end'
         enrollment_start: null,
@@ -20,6 +21,9 @@ var CourseDetails = Backbone.Model.extend({
 
     // When init'g from html script, ensure you pass {parse: true} as an option (2nd arg to reset)
     parse: function(attributes) {
+        if (attributes['license']) {
+            attributes.license = attributes.license;
+        }
         if (attributes['start_date']) {
             attributes.start_date = date.parse(attributes.start_date);
         }

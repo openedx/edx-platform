@@ -33,6 +33,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 $('li a.upload-button').on('click', this.showUploadModal);
                 $('.upload-modal .close-button').on('click', this.hideModal);
                 $('.upload-modal .choose-file-button').on('click', this.showFileSelectionMenu);
+                $('.change-license-modal .close-button').on('click', this.hideModal);
                 return this;
             },
 

@@ -11,11 +11,13 @@ from lazy import lazy
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
+from xmodule.license import parse_license, License
 import json
 
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
 from django.utils.timezone import UTC
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -558,6 +560,8 @@ class CourseFields(object):
                               help="Whether to restrict enrollment to invitation by the course staff.",
                               default=False,
                               scope=Scope.settings)
+    license = String(help="License for this course", scope=Scope.settings)
+    license_version = String(help="License version for this course", scope=Scope.settings)
 
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
@@ -568,6 +572,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         """
         super(CourseDescriptor, self).__init__(*args, **kwargs)
         _ = self.runtime.service(self, "i18n").ugettext
+
+        if self.license and not(self.license_version):
+          self.license_version = parse_license(self.license).version
 
         if self.wiki_slug is None:
             self.wiki_slug = self.location.course
@@ -681,6 +688,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         for textbook in xml_object.findall("textbook"):
             textbooks.append((textbook.get('title'), textbook.get('book_url')))
             xml_object.remove(textbook)
+
+        license = xml_object.find("license")
+        if license is not None:
+            definition["license_version"] = None
 
         # Load the wiki tag if it exists
         wiki_slug = None

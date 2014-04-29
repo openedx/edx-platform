@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from xmodule.license import parse_license %>
 
 % if display_name is not UNDEFINED and display_name is not None:
     <h2>${display_name}</h2>
@@ -16,6 +17,7 @@
     data-sources='${sources}'
     data-save-state-url="${ajax_url}"
     data-caption-data-dir="${data_dir}"
+    data-license="${license}"
     data-show-captions="${show_captions}"
     data-general-speed="${general_speed}"
     data-speed="${speed}"
@@ -93,6 +95,10 @@
           </section>
           <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>
       </article>
+
+      <div class="license">
+        ${license.html}
+      </div>
 
       <ol id="transcript-captions" class="subtitles" tabindex="0" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.')}">
         <li></li>

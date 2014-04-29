@@ -17,6 +17,7 @@ def url_class(is_active):
 <%! from django.conf import settings %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
+<%! from xmodule.license import parse_license %>
 <%! from courseware.views import notification_image_for_tab %>
 <%! from student.models import CourseEnrollment%>
 <%
@@ -93,4 +94,18 @@ masq = (function(){
 }() );
 </script>
   % endif
+% endif
+
+% if course.license:
+  <script type="text/javascript">
+        $(document).ready(function() {
+          $(".copyright").append($("#license").show());
+          $(".copyright").find("a").attr("target","_blank");
+        });
+  </script>
+  <div id="license" style="display:none;">
+    <br />
+    ${parse_license(course.license, course.license_version).html}
+    <br />
+  </div>
 % endif

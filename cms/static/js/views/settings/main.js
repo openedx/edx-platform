@@ -1,5 +1,5 @@
-define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
-    "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date"],
+define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "tzAbbr", "js/models/uploads",
+    "js/views/uploads", "js/utils/change_on_enter", "js/views/license-selector", "jquery.timepicker", "date"],
     function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
 
 var DetailsView = ValidatingView.extend({
@@ -16,7 +16,8 @@ var DetailsView = ValidatingView.extend({
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
         'blur :input' : "inputUnfocus",
-        'click .action-upload-image': "uploadImage"
+        'click .action-upload-image': "uploadImage",
+        "click .license-button": "saveLicense",
     },
 
     initialize : function() {
@@ -25,6 +26,10 @@ var DetailsView = ValidatingView.extend({
         this.$el.find("#course-organization").val(this.model.get('org'));
         this.$el.find("#course-number").val(this.model.get('course_id'));
         this.$el.find("#course-name").val(this.model.get('run'));
+
+        this.licenseSelector = new LicenseSelector({model: this.model.get('license'), imgSize: "big"});
+        this.$el.find("#course-license-form").html(this.licenseSelector.render().$el);
+
         this.$el.find('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
 
         // Avoid showing broken image on mistyped/nonexistent image
@@ -41,6 +46,7 @@ var DetailsView = ValidatingView.extend({
     },
 
     render: function() {
+        this.licenseSelector.setLicense(this.model.get('license'));
         this.setupDatePicker('start_date');
         this.setupDatePicker('end_date');
         this.setupDatePicker('enrollment_start');
@@ -78,6 +84,11 @@ var DetailsView = ValidatingView.extend({
         'course_image_asset_path': 'course-image-url'
     },
 
+    saveLicense: function(e) {
+        if (this.licenseSelector.license != this.licenseSelector.validate(this.model.get('license'))) {
+            this.model.set('license', this.licenseSelector.license);
+        }
+    },
     updateTime : function(e) {
         var now = new Date(),
             hours = now.getUTCHours(),

@@ -1,0 +1,56 @@
+<div class="license-buttons">
+  <ul class="license-allornothing">
+    <li class="action-item license-button" data-license="ARR">
+      <span class="icon"></span>
+      <div class="buttontext">
+        <h4><%= gettext('All rights reserved')%></h4>
+        <%= gettext('You reserve all rights for you work.')%>
+      </div>
+    </li>
+    <li class="action-item license-button" data-license="CC0">
+      <span class="icon"></span>
+      <div class="buttontext">
+        <h4><%= gettext('No Rights Reserved')%></h4>
+        <%= gettext('You waive all copyright and related rights to your work to the extent possible under the law.')%>
+      </div>
+    </li>
+  </ul>
+  <hr />
+  <ul class="license-cc">
+    <li class="action-item license-button" data-license="BY">
+      <span class="icon"></span>
+      <div class="buttontext">
+        <h4><%= gettext('Attribution')%></h4>
+        <%= gettext('You let others distribute, copy, display and perform your copyrighted work but only if they credit you.')%>
+      </div>
+    </li>
+
+    <li class="action-item license-button" data-license="NC">
+      <span class="icon"></span>
+      <div class="buttontext">
+        <h4><%= gettext('Noncommercial')%></h4>
+        <%= gettext('You let others distribute, copy, display and perform your copyrighted work - and derivative works based upon it - but for noncommercial purposes only.')%>
+      </div>
+    </li>
+
+    <li class="action-item license-button" data-license="ND">
+      <span class="icon"></span>
+      <div class="buttontext">
+        <h4><%= gettext('No Derivatives')%></h4>
+        <%= gettext('You let others distribute, copy, display and perform only verbatim copies of your work, not derivate works upon it.')%>
+      </div>
+    </li>
+
+    <li class="action-item license-button" data-license="SA">
+      <span class="icon"></span>
+      <div class="buttontext">
+        <h4><%= gettext('Share Alike')%></h4>
+        <%= gettext('You let others distribute derivative works only under a license identical to the license that governs your work.')%>
+      </div>
+    </li>
+  </ul>
+</div>
+<div class="selected-license-text">
+  <label for="license">You have selected the follow license:</label>&nbsp;<span class="selected-license"><%= default_license_img %></span>
+  <input class="license" type="hidden" name="license" aria-required="false" value="<%= default_license %>" />
+</div>

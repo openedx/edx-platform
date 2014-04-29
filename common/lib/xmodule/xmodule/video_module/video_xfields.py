@@ -20,6 +20,16 @@ class VideoFields(object):
         scope=Scope.settings
     )
 
+    license = String(
+        display_name="License", help="License name for this module.",
+        scope=Scope.settings
+    )
+
+    license_version = String(
+        display_name="License version", help="The version of the license for this module.",
+        scope=Scope.settings
+    )
+
     saved_video_position = RelativeTime(
         help=_("Current position in the video."),
         scope=Scope.user_state,

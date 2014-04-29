@@ -11,7 +11,7 @@
 %>
 
 <%block name="header_extras">
-% for template_name in ["basic-modal", "modal-button", "upload-dialog"]:
+% for template_name in ["basic-modal", "modal-button", "upload-dialog", "license-selector"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -307,6 +307,23 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               </ol>
             </section>
           % endif
+          
+            <hr class="divide" />
+            <section class="group-settings license">
+              <header>
+                <h2 class="title-2">${_("Course License")}</h2>
+                <span class="tip">${_("Selected license for this course")}</span>
+              </header>
+
+              <ol class="list-input">
+                <li class="field text" id="field-course-license">
+                  <div id="course-license-form"></div>
+                  <span class="tip tip-inline">${_("Selected license for this course")}</span>
+                </li>
+              </ol>
+            </section>
+
+
       </form>
     </article>
     <aside class="content-supplementary" role="complimentary">

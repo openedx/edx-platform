@@ -10,7 +10,7 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-% for template_name in ["asset-library", "asset", "paging-header", "paging-footer"]:
+% for template_name in ["asset-library", "asset", "paging-header", "paging-footer", "license-selector"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
@@ -104,6 +104,15 @@
             <input type="file" class="file-input" name="file" multiple>
         </form>
     </div>
+</div>
+
+<div class="change-license-modal modal">
+    <a href="#" class="close-button"><i class="icon-remove-sign"></i> <span class="sr">${_('close')}</span></a>
+    <div class="modal-body">
+        <h2>Change Asset License</h2>
+    </div>
+    <a href="#" class="save-license-button button">${_("Save License")}</a>
+    <div><br /><br /></div>
 </div>
 
 

@@ -24,6 +24,8 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
 from xmodule.partitions.partitions import UserPartition, Group
 from xmodule.modulestore import EdxJSONEncoder
+from xmodule.license import parse_license
+
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import Location
@@ -371,7 +373,8 @@ def course_listing(request):
             'rerun_link': _get_rerun_link_for_item(course.id),
             'org': course.display_org_with_default,
             'number': course.display_number_with_default,
-            'run': course.location.run
+            'run': course.location.run,
+			'license' : parse_license(course.license, course.license_version)
         }
 
     def format_in_process_course_view(uca):
@@ -520,6 +523,7 @@ def _create_or_rerun_course(request):
         # force the start date for reruns and allow us to override start via the client
         start = request.json.get('start', CourseFields.start.default)
         run = request.json.get('run')
+	    license = request.json.get('license')
 
         # allow/disable unicode characters in course_id according to settings
         if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):

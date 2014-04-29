@@ -3,9 +3,10 @@ define(
         "js/views/baseview", "underscore", "js/models/metadata", "js/views/abstract_editor",
         "js/models/uploads", "js/views/uploads",
         "js/views/video/transcripts/metadata_videolist",
-        "js/views/video/translations_editor"
+        "js/views/video/translations_editor",
+        "js/views/license-selector"
     ],
-function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, VideoList, VideoTranslations) {
+function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, VideoList, VideoTranslations, LicenseSelector) {
     var Metadata = {};
 
     Metadata.Editor = BaseView.extend({
@@ -42,8 +43,13 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
                     if (_.isFunction(Metadata[type])) {
                         new Metadata[type](data);
                     } else {
-                        // Everything else is treated as GENERIC_TYPE, which uses String editor.
-                        new Metadata.String(data);
+                        if(model.getFieldName()=='license') {
+                            new Metadata.License(data);
+                        }
+                        else {
+                           // Everything else is treated as GENERIC_TYPE, which uses String editor.
+                            new Metadata.String(data); 
+                        }
                     }
                 });
         },
@@ -114,6 +120,35 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
 
         setValueInEditor : function (value) {
             this.$el.find('input').val(value);
+        }
+    });
+
+    Metadata.License = AbstractEditor.extend({
+
+        events : {
+            "click .license-button" : "updateModel",
+        },
+
+        templateName: "metadata-license-entry",
+
+        render: function () {
+            AbstractEditor.prototype.render.apply(this);
+
+            // Render selector
+            if (!this.initialized) {
+                this.licenseSelector = new LicenseSelector({model: this.model.getValue(), buttonSize: "middle"});            
+            }
+            this.$el.find('.wrapper-license-selector').html(this.licenseSelector.render().$el);
+        },
+
+        getValueFromEditor : function () {
+            return this.licenseSelector.getLicense();
+        },
+
+        setValueInEditor : function (value) {
+            if (this.initialized) {
+                this.licenseSelector.setLicense(value);          
+            }
         }
     });
 

@@ -123,6 +123,10 @@
         &:after {
           margin-left: 5px;
           content: "-";
+        #license {
+          p {
+            text-align: right;
+          }
         }
       }
     }

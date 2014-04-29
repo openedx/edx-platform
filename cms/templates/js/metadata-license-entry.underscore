@@ -1,0 +1,5 @@
+<div class="wrapper-comp-setting">
+	<label class="label setting-label" for="<%= uniqueId %>"><%= model.get('display_name') %></label>
+	<div class="wrapper-license-selector"></div>
+</div>
+<span class="tip setting-help"><%= model.get('help') %></span>

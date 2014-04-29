@@ -36,6 +36,7 @@ from xmodule.x_module import XModule, module_attr
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
+from xmodule.license import parse_license
 
 from .transcripts_utils import Transcript, VideoTranscriptsMixin
 from .video_utils import create_youtube_string, get_video_from_cdn
@@ -229,6 +230,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             # isn't on the filesystem
             'data_dir': getattr(self, 'data_dir', None),
             'display_name': self.display_name_with_default,
+            'license': parse_license(self.license, self.license_version),
             'end': self.end_time.total_seconds(),
             'handout': self.handout,
             'id': self.location.html_id(),
@@ -261,6 +263,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     Descriptor for `VideoModule`.
     """
     module_class = VideoModule
+    course_id = module_attr('course_id')
     transcript = module_attr('transcript')
 
     tabs = [
@@ -312,6 +315,13 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 self.source_visible = True
                 if not download_video['explicitly_set']:
                     self.download_video = True
+        
+        # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
+        if not(self.license):
+            course = self.system.modulestore._get_course_for_item(self.scope_ids.usage_id)
+
+            self.license = course.license
+            self.license_version = course.license_version
 
         # for backward compatibility.
         # If course was existed and was not re-imported by the moment of adding `download_track` field,
@@ -423,6 +433,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         xml.set('url_name', self.url_name)
         attrs = {
             'display_name': self.display_name,
+            'license' : self.license,
+            'license_version' : self.license_version,
             'show_captions': json.dumps(self.show_captions),
             'start_time': self.start_time,
             'end_time': self.end_time,
@@ -471,6 +483,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         display_name = metadata_fields['display_name']
         video_url = metadata_fields['html5_sources']
+        license = metadata_fields['license']
+
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
 
         def get_youtube_link(video_id):
@@ -502,7 +516,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         metadata = {
             'display_name': display_name,
-            'video_url': video_url
+            'video_url': video_url,
+            'license': license
         }
 
         _context.update({'transcripts_basic_tab_metadata': metadata})
@@ -553,6 +568,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'from': 'start_time',
             'to': 'end_time'
         }
+
+        license = xml.get('license')
+        if license is not None:
+            field_data['license_version'] = None
+
         sources = xml.findall('source')
         if sources:
             field_data['html5_sources'] = [ele.get('src') for ele in sources]

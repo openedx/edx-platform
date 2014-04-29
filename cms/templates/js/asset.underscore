@@ -19,10 +19,16 @@
 <td class="embed-col">
     <input type="text" class="embeddable-xml-input" value="<%= external_url %>" readonly>
 </td>
+<td class="embed-col">
+    <span class="embeddable-xml-input license-img"><%= license_img %></span>
+</td>
 <td class="actions-col">
     <ul class="actions-list">
         <li class="action-item action-delete">
             <a href="#" data-tooltip="<%= gettext('Delete this asset') %>" class="remove-asset-button action-button"><i class="icon-remove-sign"></i> <span class="sr"><%= gettext('Delete this asset') %></span></a>
+        </li>
+        <li class="action-item action-change-license">
+            <a href="#" data-tooltip="<%= gettext('Change the license for this asset') %>" class="change-asset-license-button action-button"><i class="icon-tasks"></i> <span class="sr"><%= gettext('Change asset license') %></span></a>
         </li>
         <li class="action-item action-lock">
             <label for="<%= uniqueId %>"><span class="sr"><%= gettext('Lock this asset') %></span></label>
