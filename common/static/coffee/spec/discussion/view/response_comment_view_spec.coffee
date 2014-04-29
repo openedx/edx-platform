@@ -141,8 +141,6 @@ describe 'ResponseCommentView', ->
                 spyOn(@view, 'cancelEdit')
                 spyOn($, "ajax").andCallFake(
                     (params) =>
-                        expect(params.url._parts.path).toEqual("/courses/edX/999/test/discussion/comments/01234567/update")
-                        expect(params.data.body).toEqual(@updatedBody)
                         if @ajaxSucceed
                             params.success()
                         else
@@ -154,6 +152,8 @@ describe 'ResponseCommentView', ->
                 @ajaxSucceed = true
                 @view.update(makeEventSpy())
                 expect($.ajax).toHaveBeenCalled()
+                expect($.ajax.mostRecentCall.args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/update')
+                expect($.ajax.mostRecentCall.args[0].data.body).toEqual(@updatedBody)
                 expect(@view.model.get("body")).toEqual(@updatedBody)
                 expect(@view.cancelEdit).toHaveBeenCalled()
 
@@ -162,6 +162,8 @@ describe 'ResponseCommentView', ->
                 @ajaxSucceed = false
                 @view.update(makeEventSpy())
                 expect($.ajax).toHaveBeenCalled()
+                expect($.ajax.mostRecentCall.args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/update')
+                expect($.ajax.mostRecentCall.args[0].data.body).toEqual(@updatedBody)
                 expect(@view.model.get("body")).toEqual(originalBody)
                 expect(@view.cancelEdit).not.toHaveBeenCalled()
                 expect(@view.$(".edit-comment-form-errors *").length).toEqual(1)
