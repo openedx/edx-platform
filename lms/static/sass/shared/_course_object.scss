@@ -267,3 +267,23 @@
     }
   }
 }
+
+.xmodule_licensable {
+  @include transition(opacity .25s ease-in-out);
+  clear: both;
+  padding: ($baseline / 4) 0;
+  opacity: .4;
+  &, .license, .license-text {
+    color: $black;
+  }
+  &.opaque, &:hover {
+    opacity: 1;
+  }
+  .license {
+    @extend %t-copy-base;
+    color: $black;
+  }
+  .license-text {
+    @include margin-left(5px);
+  }
+}

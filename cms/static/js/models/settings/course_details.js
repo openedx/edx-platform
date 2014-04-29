@@ -1,11 +1,12 @@
-define(["backbone", "underscore", "gettext", "js/models/validation_helpers"],
-    function(Backbone, _, gettext, ValidationHelpers) {
+define(["backbone", "underscore", "gettext", "js/models/validation_helpers", "js/models/license", "backbone.associations"],
+    function(Backbone, _, gettext, ValidationHelpers, License) {
 
-var CourseDetails = Backbone.Model.extend({
+var CourseDetails = Backbone.AssociatedModel.extend({
     defaults: {
         org : '',
         course_id: '',
         run: '',
+        license: {},
         start_date: null,	// maps to 'start'
         end_date: null,		// maps to 'end'
         enrollment_start: null,
@@ -21,6 +22,12 @@ var CourseDetails = Backbone.Model.extend({
         entrance_exam_enabled : '',
         entrance_exam_minimum_score_pct: '50'
     },
+
+    relations: [{
+        type: Backbone.One,
+        key: 'license',
+        relatedModel: License
+    }],
 
     validate: function(newattrs) {
         // Returns either nothing (no return call) so that validate works or an object of {field: errorstring} pairs

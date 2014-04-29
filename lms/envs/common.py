@@ -291,6 +291,9 @@ FEATURES = {
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
 
+    # Whether or not to enable Creative Commons Licensing ability for courses
+    'CREATIVE_COMMONS_LICENSING': True,
+
     # Enable the new dashboard, account, and profile pages
     'ENABLE_NEW_DASHBOARD': False,
 
@@ -1160,7 +1163,9 @@ PIPELINE_CSS = {
     'style-app': {
         'source_filenames': [
             'sass/application.css',
-            'sass/ie.css'
+            'sass/ie.css',
+            'css/edx-cc.css',
+            'css/edx-cc-ie7.css',
         ],
         'output_filename': 'css/lms-style-app.css',
     },

@@ -40,6 +40,8 @@ class XBlockFixtureDesc(object):
         self.grader_type = grader_type
         self.publish = publish
         self.children = []
+        self.licensable = True
+        self.license = None
         self.locator = None
 
     def add_children(self, *args):
@@ -64,7 +66,9 @@ class XBlockFixtureDesc(object):
             'data': self.data,
             'metadata': self.metadata,
             'graderType': self.grader_type,
-            'publish': self.publish
+            'publish': self.publish,
+            'licensable': self.licensable,
+            'license': self.license
         })
 
     def __str__(self):
@@ -119,7 +123,9 @@ class CourseFixture(XBlockContainerFixture):
             'org': org,
             'number': number,
             'run': run,
-            'display_name': display_name
+            'display_name': display_name,
+            'licensable': True,
+            'license': None
         }
 
         # Set a default start date to the past, but use Studio's

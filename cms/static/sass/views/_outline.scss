@@ -173,6 +173,15 @@
     @extend %expand-collapse;
   }
 
+  // course content license
+  // --------------------
+  .course-license {
+    @extend .content-primary;
+    @include text-align(right);
+    display: block;
+  }
+
+
   // course status
   // --------------------
   .course-status {
@@ -209,7 +218,6 @@
 
     // STATE: hover
     &:hover {
-
       .status-actions {
         opacity: 1.0;
       }

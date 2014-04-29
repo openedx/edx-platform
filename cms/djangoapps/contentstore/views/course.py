@@ -28,6 +28,7 @@ from xmodule.tabs import PDFTextbookTabs
 from xmodule.partitions.partitions import UserPartition
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
+from xmodule.license import License
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
@@ -503,6 +504,7 @@ def course_index(request, course_key):
             ),
             'rerun_notification_id': current_action.id if current_action else None,
             'course_release_date': course_release_date,
+            'course_content_license': course_module.license,
             'settings_url': settings_url,
             'notification_dismiss_url': reverse_course_url(
                 'course_notifications_handler',
@@ -629,6 +631,12 @@ def _create_or_rerun_course(request):
                 )
 
         fields = {'start': start}
+
+        # Set course license if the licensing is enabled and the course is licensable
+        fields['licensable'] = settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and settings.FEATURES.get("DEFAULT_COURSE_LICENSABLE", False)
+        if fields['licensable']:
+            fields['license'] = License().from_json(request.json.get('license'))
+
         if display_name is not None:
             fields['display_name'] = display_name
 

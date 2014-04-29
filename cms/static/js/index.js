@@ -1,6 +1,6 @@
 define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/views/utils/create_course_utils",
-    "js/views/utils/create_library_utils", "js/views/utils/view_utils"],
-    function (domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibraryUtilsFactory, ViewUtils) {
+    "js/views/utils/create_library_utils", "js/views/utils/view_utils", "js/views/license-selector"],
+    function (domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibraryUtilsFactory, ViewUtils, LicenseSelector) {
         "use strict";
         var CreateCourseUtils = new CreateCourseUtilsFactory({
             name: '.new-course-name',
@@ -51,12 +51,19 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             var org = $newCourseForm.find('.new-course-org').val();
             var number = $newCourseForm.find('.new-course-number').val();
             var run = $newCourseForm.find('.new-course-run').val();
+            var license = {};
+            if(licenseSelector){
+                // When the license selector is present (CREATIVE_COMMONS_LICENSING feature flag is set to true)
+                // we will take the value of the selector into account.
+                license = licenseSelector.model.toJSON();
+            }
 
             var course_info = {
                 org: org,
                 number: number,
                 display_name: display_name,
-                run: run
+                run: run,
+                license: license
             };
 
             analytics.track('Created a Course', course_info);
@@ -144,7 +151,11 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
           };
         };
 
+        // Keep track of the license selector in the scope of this file
+        var licenseSelector;
+
         var onReady = function () {
+            var fieldCourseLicense;
             $('.new-course-button').bind('click', addNewCourse);
             $('.new-library-button').bind('click', addNewLibrary);
             $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function () {
@@ -153,6 +164,14 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             $('.action-reload').bind('click', ViewUtils.reload);
             $('#course-index-tabs .courses-tab').bind('click', showTab('courses'));
             $('#course-index-tabs .libraries-tab').bind('click', showTab('libraries'));
+
+            // When the user is not allowed to set the license on a course, the
+            // field-course-license element will not be found.
+            fieldCourseLicense = document.getElementById("field-course-license");
+            if(fieldCourseLicense){
+                // Licencing in new course form
+                licenseSelector = new LicenseSelector({el: fieldCourseLicense});
+            }
         };
 
         domReady(onReady);
