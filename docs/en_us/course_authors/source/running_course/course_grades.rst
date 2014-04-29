@@ -362,7 +362,6 @@ Download the Student Answer Distribution Report
 An automated process runs periodically on the edX servers to update the CSV file of student answer data. A link to the most recently updated version of the CSV file is available on the Instructor Dashboard. 
 
 To download the most recent file of student answer data:
->>>>>>> DOC-115 adds topics to make data interpretation easier
 
 #. View the live version of your course.
 
@@ -452,9 +451,9 @@ You can adjust your course content based on common student mistakes. While most 
 View a Histogram of Scores for a Single Problem
 ===================================================
 
-You can view a chart of the score distribution for a specified problem.
+You can view a chart of the score distribution for a specified problem. 
 
-.. note:: In order to view the score distribution for a problem, you need its unique identifier. See :ref:`find_URL`.
+.. note:: To view the score distribution for a problem, you need its unique identifier. You can display a histogram for problems that have the  ``/problem/`` prefix in the unique identifier. See :ref:`find_URL`.
 
 To display the distribution of scores for a problem:
 
@@ -466,9 +465,43 @@ To display the distribution of scores for a problem:
 
 #. In the Score Distribution section, select a problem by using its unique identifier. 
 
-   A histogram of scores for that problem displays.
+   The **Analytics** page updates to display a histogram of scores for that
+   problem.
 
    .. image:: ../Images/score_histogram.png
-     :alt: Graph of the numbers of students who got different scores for a selected problem
+     :alt: Graph of the number of students who received different scores for a
+         selected problem
 
 ..  **Question**: (sent to Olga 31 Jan 14) this is a tough UI to use: how do they correlate the codes in this drop-down with actual constructed problems? the copy-and-paste UI on the Student Admin page actually works a little better imo. LMS-2522
+
+===================================================
+Interpret a Score Histogram
+===================================================
+
+The histogram of scores for a selected problem provides the following
+information.
+
+   .. image:: ../Images/score_histogram_callouts.png
+     :alt: Histogram with indicators for the number of students scored value and
+         the x-axis numbers that indicate plotted scores
+
+* The x-axis indicates the number of points that students can receive for the
+  problem, unweighted. Although decimal values are marked on the x-axis, each
+  score is a whole number. The whole number value at the left of a plotted bar
+  is the score that applies to it.
+
+* The y-axis indicates the number of students who have answered and checked the
+  problem.
+
+* Above the graph, a number of **students scored** displays. This number
+  indicates the total number of database records that exist for the problem: it
+  includes not only students who have answered and checked the problem to
+  receive a score, but also students who have opened the problem but not yet
+  completed it.
+
+* An automated process runs approximately weekly on the edX servers to update
+  score histograms. This process runs less frequently than the process that
+  updates the student answer distribution report: at certain times during a
+  course the number of students shown in a score histogram can be quite
+  different than the **Count** for the same problem in a student answer
+  distribution report.
