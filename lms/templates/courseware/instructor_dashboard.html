@@ -392,7 +392,7 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Forum Admin'):
-  %if instructor_access:
+  %if instructor_access or teacher_role:
     <hr width="40%" style="align:left">
     <p>
     <input type="submit" name="action" onclick="this.value='List course forum admins'" value="${_("List course forum admins")}">
@@ -402,7 +402,7 @@ function goto( mode)
     <hr width="40%" style="align:left">
   %endif
 
-  %if instructor_access or forum_admin_access:
+  %if instructor_access or forum_admin_access or teacher_role:
     <p>
     <input type="submit" name="action" onclick="this.value='List course forum moderators'" value="${_("List course forum moderators")}">
     <input type="submit" name="action" onclick="this.value='List course forum community TAs'" value="${_("List course forum community TAs")}">
