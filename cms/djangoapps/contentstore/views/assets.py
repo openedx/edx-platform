@@ -220,7 +220,7 @@ def _upload_asset(request, course_key):
 
     locked = getattr(content, 'locked', False)
     response_payload = {
-        'asset': _get_asset_json(content.name, readback.last_modified_at, content.location, content.thumbnail_location, locked, content.license, content.license_version),
+        'asset': _get_asset_json(content.name, readback.last_modified_at, content.location, content.thumbnail_location, locked),
         'msg': _('Upload completed')
     }
 
