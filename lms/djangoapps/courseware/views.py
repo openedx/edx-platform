@@ -59,7 +59,7 @@ log = logging.getLogger("edx.courseware")
 template_imports = {'urllib': urllib}
 
 def stat(request):
-    
+
     if not request.user.is_staff:
             raise Http404
 
@@ -83,6 +83,7 @@ def stat(request):
                     school_login=request.POST.get('school_login'),\
                     register_date_min=register_date_min,\
                     register_date_max=register_date_max,\
+                    account_activated=request.POST.get('activated'),\
                     complete70=request.POST.get('complete70'),\
                     complete100=request.POST.get('complete100')\
                 )
@@ -106,10 +107,10 @@ def return_filtered_stat_csv(school_login='', register_date_min=None, register_d
     """
     Returns file with data from fullstat.csv filtered according to the parameters given (indices of columns can be changed):
     [6] - school_login
-    [12] - register_date_min & register_date_max
-    [??] - account_activated (no column yet)
-    [13] - complete70
-    [14] - complete100
+    [13] - register_date_min & register_date_max (changed)
+    [09] - account_activated
+    [14] - complete70
+    [15] - complete100
 
     If no values are chosen, returns a filtered file with all row of fullstat.csv which contain a valid registration date in the corresponding field.
     """
@@ -131,19 +132,19 @@ def return_filtered_stat_csv(school_login='', register_date_min=None, register_d
                 else:
                     first_rows = False
             else:
-                if len(row) >= 15:    # must contain at least 15 columns    # change if new columns are added
+                if len(row) >= 16:    # must contain at least 16 columns    # change if new columns are added
                     
                     # no text in a text input --> str type
                     # no choice in radio input --> NoneType
 
                     try:
-                        register_date = datetime.datetime.strptime(row[12], "%d/%m/%Y")
+                        register_date = datetime.datetime.strptime(row[13], "%d/%m/%Y")
                         if (school_login == '' or row[6] == school_login) and\
                         (register_date_min == None or register_date_min <= register_date) and\
                         (register_date_max == None or register_date <= register_date_max) and\
-                        (account_activated == None or True) and\
-                        (complete70 == None or (len(row[13]) == 4) == bool(complete70)) and\
-                        (complete100 == None or (len(row[14]) == 4) == bool(complete100)):    # ultimate hack: len('da') == 4
+                        (account_activated == None or (len(row[9]) == 4) == bool(account_activated)) and\
+                        (complete70 == None or (len(row[14]) == 4) == bool(complete70)) and\
+                        (complete100 == None or (len(row[15]) == 4) == bool(complete100)):    # ultimate hack: len('da') == 4
                             writer.writerow(row)
                     except:
                         pass
