@@ -108,6 +108,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 offering=course_entry_override.get('offering'),
                 branch=course_entry_override.get('branch'),
             ),
+            block_type=json_data.get('category'),
             block_id=block_id,
         )
 
@@ -131,6 +132,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 self,
                 BlockUsageLocator(
                     CourseLocator(version_guid=course_entry_override['structure']['_id']),
+                    block_type='error',
                     block_id=block_id
                 ),
                 error_msg=exc_info_to_str(sys.exc_info())

@@ -105,6 +105,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
             # create pointer for split
             course_or_parent_locator = BlockUsageLocator(
                 course_key=self.split_course_key,
+                block_type=parent_category,
                 block_id=parent_name
             )
         else:

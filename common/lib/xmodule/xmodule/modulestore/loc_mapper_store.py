@@ -150,6 +150,7 @@ class LocMapperStore(object):
             entry = self._migrate_if_necessary([entry])[0]
 
         block_id = entry['block_map'].get(self.encode_key_for_mongo(location.name))
+        category = location.category
         if block_id is None:
             if add_entry_if_missing:
                 block_id = self._add_to_block_map(
@@ -159,14 +160,15 @@ class LocMapperStore(object):
                 raise ItemNotFoundError(location)
         else:
             # jump_to_id uses a None category.
-            if location.category is None:
+            if category is None:
                 if len(block_id) == 1:
                     # unique match (most common case)
+                    category = block_id.keys()[0]
                     block_id = block_id.values()[0]
                 else:
                     raise InvalidLocationError()
-            elif location.category in block_id:
-                block_id = block_id[location.category]
+            elif category in block_id:
+                block_id = block_id[category]
             elif add_entry_if_missing:
                 block_id = self._add_to_block_map(location, course_son, entry['block_map'])
             else:
@@ -179,10 +181,12 @@ class LocMapperStore(object):
         )
         published_usage = BlockUsageLocator(
             prod_course_locator,
+            block_type=category,
             block_id=block_id
         )
         draft_usage = BlockUsageLocator(
             prod_course_locator.for_branch(entry['draft_branch']),
+            block_type=category,
             block_id=block_id
         )
         if published:
@@ -285,6 +289,7 @@ class LocMapperStore(object):
                         org=entry[entry_org], offering=entry[entry_offering],
                         branch=entry['prod_branch']
                     ),
+                    block_type=category,
                     block_id=block_id
                 )
                 draft_locator = BlockUsageLocator(
@@ -292,6 +297,7 @@ class LocMapperStore(object):
                         org=entry[entry_org], offering=entry[entry_offering],
                         branch=entry['draft_branch']
                     ),
+                    block_type=category,
                     block_id=block_id
                 )
                 self._cache_location_map_entry(location, published_locator, draft_locator)

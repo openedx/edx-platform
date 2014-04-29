@@ -13,15 +13,7 @@ from bson.errors import InvalidId
 
 from opaque_keys import OpaqueKey, InvalidKeyError
 
-from xmodule.modulestore.keys import CourseKey, UsageKey
-
-from xmodule.modulestore.parsers import (
-    parse_url,
-    parse_block_ref,
-    BRANCH_PREFIX,
-    BLOCK_PREFIX,
-    VERSION_PREFIX,
-    ALLOWED_ID_RE)
+from xmodule.modulestore.keys import CourseKey, UsageKey, DefinitionKey
 
 log = logging.getLogger(__name__)
 
@@ -45,14 +37,10 @@ class Locator(OpaqueKey):
     Locator is an abstract base class: do not instantiate
     """
 
-    @abstractmethod
-    def url(self):
-        """
-        Return a string containing the URL for this location. Raises
-        InvalidKeyError if the instance doesn't have a
-        complete enough specification to generate a url
-        """
-        raise NotImplementedError()
+    BLOCK_TYPE_PREFIX = r"type"
+    # Prefix for the version portion of a locator URL, when it is preceded by a course ID
+    VERSION_PREFIX = r"version"
+    ALLOWED_ID_CHARS = r'[\w\-~.:]'
 
     def __str__(self):
         '''
@@ -86,35 +74,42 @@ class BlockLocatorBase(Locator):
     # Token separating org from offering
     ORG_SEPARATOR = '+'
 
-    def version(self):
-        """
-        Returns the ObjectId referencing this specific location.
-        """
-        return self.version_guid
+    # Prefix for the branch portion of a locator URL
+    BRANCH_PREFIX = r"branch"
+    # Prefix for the block portion of a locator URL
+    BLOCK_PREFIX = r"block"
 
-    def url(self):
-        """
-        Return a string containing the URL for this location.
-        """
-        return self.NAMESPACE_SEPARATOR.join([self.CANONICAL_NAMESPACE, self._to_string()])
+    ALLOWED_ID_RE = re.compile(r'^' + Locator.ALLOWED_ID_CHARS + '+$', re.UNICODE)
+
+    URL_RE_SOURCE = r"""
+        ((?P<org>{ALLOWED_ID_CHARS}+)\+(?P<offering>{ALLOWED_ID_CHARS}+)\+?)??
+        ({BRANCH_PREFIX}\+(?P<branch>{ALLOWED_ID_CHARS}+)\+?)?
+        ({VERSION_PREFIX}\+(?P<version_guid>[A-F0-9]+)\+?)?
+        ({BLOCK_TYPE_PREFIX}\+(?P<block_type>{ALLOWED_ID_CHARS}+)\+?)?
+        ({BLOCK_PREFIX}\+(?P<block_id>{ALLOWED_ID_CHARS}+))?
+        """.format(
+            ALLOWED_ID_CHARS=Locator.ALLOWED_ID_CHARS, BRANCH_PREFIX=BRANCH_PREFIX,
+            VERSION_PREFIX=Locator.VERSION_PREFIX, BLOCK_TYPE_PREFIX=Locator.BLOCK_TYPE_PREFIX, BLOCK_PREFIX=BLOCK_PREFIX
+        )
+
+    URL_RE = re.compile('^' + URL_RE_SOURCE + '$', re.IGNORECASE | re.VERBOSE | re.UNICODE)
+
 
     @classmethod
-    def _parse_url(cls, url):
+    def parse_url(cls, string):
         """
-        url must be a string beginning with 'edx:' and containing
-        either a valid version_guid or org & offering (with optional branch), or both.
+        Raises InvalidKeyError if string cannot be parsed.
+
+        If it can be parsed as a version_guid with no preceding org + offering, returns a dict
+        with key 'version_guid' and the value,
+
+        If it can be parsed as a org + offering, returns a dict
+        with key 'id' and optional keys 'branch' and 'version_guid'.
         """
-        if not isinstance(url, basestring):
-            raise TypeError('%s is not an instance of basestring' % url)
-
-        parse = parse_url(url)
-        if not parse:
-            raise InvalidKeyError(cls, url)
-
-        if parse['version_guid']:
-            parse['version_guid'] = cls.as_object_id(parse['version_guid'])
-
-        return parse
+        match = cls.URL_RE.match(string)
+        if not match:
+            raise InvalidKeyError(cls, string)
+        return match.groupdict()
 
     @property
     def package_id(self):
@@ -130,13 +125,10 @@ class CourseLocator(BlockLocatorBase, CourseKey):
      CourseLocator(version_guid=ObjectId('519665f6223ebd6980884f2b'))
      CourseLocator(org='mit.eecs', offering='6.002x')
      CourseLocator(org='mit.eecs', offering='6002x', branch = 'published')
-     CourseLocator.from_string('edx:version/519665f6223ebd6980884f2b')
-     CourseLocator.from_string('version/519665f6223ebd6980884f2b')
-     CourseLocator.from_string('edx:mit.eecs+6002x')
-     CourseLocator.from_string('mit.eecs+6002x')
-     CourseLocator.from_string('edx:mit.eecs+6002x/branch/published')
-     CourseLocator.from_string('edx:mit.eecs+6002x/branch/published/version/519665f6223ebd6980884f2b')
-     CourseLocator.from_string('mit.eecs+6002x/branch/published/version/519665f6223ebd6980884f2b')
+     CourseLocator.from_string('course-locator:version+519665f6223ebd6980884f2b')
+     CourseLocator.from_string('course-locator:mit.eecs+6002x')
+     CourseLocator.from_string('course-locator:mit.eecs+6002x+branch+published')
+     CourseLocator.from_string('course-locator:mit.eecs+6002x+branch+published+version+519665f6223ebd6980884f2b')
 
     Should have at least a specific org & offering (id for the course as if it were a project w/
     versions) with optional 'branch',
@@ -163,7 +155,7 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         if version_guid:
             version_guid = self.as_object_id(version_guid)
 
-        if not all(field is None or ALLOWED_ID_RE.match(field) for field in [org, offering, branch]):
+        if not all(field is None or self.ALLOWED_ID_RE.match(field) for field in [org, offering, branch]):
             raise InvalidKeyError(self.__class__, [org, offering, branch])
 
         super(CourseLocator, self).__init__(
@@ -173,8 +165,14 @@ class CourseLocator(BlockLocatorBase, CourseKey):
             version_guid=version_guid
         )
 
-        if self.version_guid is None and self.org is None and self.offering is None:
+        if self.version_guid is None and (self.org is None or self.offering is None):
             raise InvalidKeyError(self.__class__, "Either version_guid or org and offering should be set")
+
+    def version(self):
+        """
+        Returns the ObjectId referencing this specific location.
+        """
+        return self.version_guid
 
     @classmethod
     def _from_string(cls, serialized):
@@ -182,22 +180,12 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         Return a CourseLocator parsing the given serialized string
         :param serialized: matches the string to a CourseLocator
         """
-        kwargs = cls._parse_url(serialized)
-        try:
-            return cls(**{key: kwargs.get(key) for key in cls.KEY_FIELDS})
-        except ValueError:
-            raise InvalidKeyError(cls, "Either version_guid or org and offering should be set: {}".format(serialized))
+        parse = cls.parse_url(serialized)
 
-    def is_fully_specified(self):
-        """
-        Returns True if either version_guid is specified, or org+offering+branch
-        are specified.
-        This should always return True, since this should be validated in the constructor.
-        """
-        return (
-            self.version_guid is not None or
-            (self.org is not None and self.offering is not None and self.branch is not None)
-        )
+        if parse['version_guid']:
+            parse['version_guid'] = cls.as_object_id(parse['version_guid'])
+
+        return cls(**{key: parse.get(key) for key in cls.KEY_FIELDS})
 
     def html_id(self):
         """
@@ -212,6 +200,7 @@ class CourseLocator(BlockLocatorBase, CourseKey):
     def make_usage_key(self, block_type, block_id):
         return BlockUsageLocator(
             course_key=self,
+            block_type=block_type,
             block_id=block_id
         )
 
@@ -280,13 +269,13 @@ class CourseLocator(BlockLocatorBase, CourseKey):
         if self.offering:
             parts.append(unicode(self.package_id))
             if self.branch:
-                parts.append(u"{prefix}{branch}".format(prefix=BRANCH_PREFIX, branch=self.branch))
+                parts.append(u"{prefix}+{branch}".format(prefix=self.BRANCH_PREFIX, branch=self.branch))
         if self.version_guid:
-            parts.append(u"{prefix}{guid}".format(prefix=VERSION_PREFIX, guid=self.version_guid))
-        return u"/".join(parts)
+            parts.append(u"{prefix}+{guid}".format(prefix=self.VERSION_PREFIX, guid=self.version_guid))
+        return u"+".join(parts)
 
 
-class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey methods
+class BlockUsageLocator(BlockLocatorBase, UsageKey):
     """
     Encodes a location.
 
@@ -305,12 +294,13 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         branch : string
     """
     CANONICAL_NAMESPACE = 'edx'
-    KEY_FIELDS = ('course_key', 'block_id')
+    KEY_FIELDS = ('course_key', 'block_type', 'block_id')
 
     # fake out class instrospection as this is an attr in this class's instances
     course_key = None
+    block_type = None
 
-    def __init__(self, course_key, block_id):
+    def __init__(self, course_key, block_type, block_id):
         """
         Construct a BlockUsageLocator
         """
@@ -318,7 +308,7 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         if block_id is None:
             raise InvalidKeyError(self.__class__, "Missing block id")
 
-        super(BlockUsageLocator, self).__init__(course_key=course_key, block_id=block_id)
+        super(BlockUsageLocator, self).__init__(course_key=course_key, block_type=block_type, block_id=block_id)
 
     @classmethod
     def _from_string(cls, serialized):
@@ -326,11 +316,11 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         Requests CourseLocator to deserialize its part and then adds the local deserialization of block
         """
         course_key = CourseLocator._from_string(serialized)
-        parsed_parts = parse_url(serialized)
-        block_id = parsed_parts.get('block_id')
+        parsed_parts = cls.parse_url(serialized)
+        block_id = parsed_parts.get('block_id', None)
         if block_id is None:
             raise InvalidKeyError(cls, serialized)
-        return cls(course_key, block_id)
+        return cls(course_key, parsed_parts.get('block_type'), block_id)
 
     def version_agnostic(self):
         """
@@ -342,7 +332,8 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         """
         return BlockUsageLocator(
             course_key=self.course_key.version_agnostic(),
-            block_id=self.block_id
+            block_type=self.block_type,
+            block_id=self.block_id,
         )
 
     def course_agnostic(self):
@@ -354,6 +345,7 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         """
         return BlockUsageLocator(
             course_key=self.course_key.course_agnostic(),
+            block_type=self.block_type,
             block_id=self.block_id
         )
 
@@ -363,6 +355,17 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         """
         return BlockUsageLocator(
             self.course_key.for_branch(branch),
+            block_type=self.block_type,
+            block_id=self.block_id
+        )
+
+    def for_version(self, version_guid):
+        """
+        Return a UsageLocator for the same block in a different branch of the course.
+        """
+        return BlockUsageLocator(
+            self.course_key.for_version(version_guid),
+            block_type=self.block_type,
             block_id=self.block_id
         )
 
@@ -370,11 +373,10 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
     def _parse_block_ref(cls, block_ref):
         if isinstance(block_ref, LocalId):
             return block_ref
+        elif len(block_ref) > 0 and cls.ALLOWED_ID_RE.match(block_ref):
+            return block_ref
         else:
-            parse = parse_block_ref(block_ref)
-            if not parse:
-                raise InvalidKeyError(cls, block_ref)
-            return parse.get('block_id')
+            raise InvalidKeyError(cls, block_ref)
 
     @property
     def definition_key(self):
@@ -400,6 +402,9 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
     def version_guid(self):
         return self.course_key.version_guid
 
+    def version(self):
+        return self.course_key.version_guid
+
     @property
     def name(self):
         """
@@ -411,7 +416,7 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         return self.course_key.is_fully_specified()
 
     @classmethod
-    def make_relative(cls, course_locator, block_id):
+    def make_relative(cls, course_locator, block_type, block_id):
         """
         Return a new instance which has the given block_id in the given course
         :param course_locator: may be a BlockUsageLocator in the same snapshot
@@ -420,6 +425,7 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
             course_locator = course_locator.course_key
         return BlockUsageLocator(
             course_key=course_locator,
+            block_type=block_type,
             block_id=block_id
         )
 
@@ -428,34 +434,17 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         Return a new instance which has the this block_id in the given course
         :param course_key: a CourseKey object representing the new course to map into
         """
-        return BlockUsageLocator.make_relative(course_key, self.block_id)
-
-    def url_reverse(self, prefix, postfix=''):
-        """
-        Do what reverse is supposed to do but seems unable to do. Generate a url using prefix unicode(self) postfix
-        :param prefix: the beginning of the url (will be forced to begin and end with / if non-empty)
-        :param postfix: the part to append to the url (will be forced to begin w/ / if non-empty)
-        """
-        if prefix:
-            if not prefix.endswith('/'):
-                prefix += '/'
-            if not prefix.startswith('/'):
-                prefix = '/' + prefix
-        else:
-            prefix = '/'
-        if postfix and not postfix.startswith('/'):
-            postfix = '/' + postfix
-        elif postfix is None:
-            postfix = ''
-        return prefix + unicode(self) + postfix
+        return BlockUsageLocator.make_relative(course_key, self.block_type, self.block_id)
 
     def _to_string(self):
         """
         Return a string representing this location.
         """
-        return u"{course_key}/{BLOCK_PREFIX}{block_id}".format(
+        return u"{course_key}+{BLOCK_TYPE_PREFIX}+{block_type}+{BLOCK_PREFIX}+{block_id}".format(
             course_key=self.course_key._to_string(),
-            BLOCK_PREFIX=BLOCK_PREFIX,
+            BLOCK_TYPE_PREFIX=self.BLOCK_TYPE_PREFIX,
+            block_type=self.block_type,
+            BLOCK_PREFIX=self.BLOCK_PREFIX,
             block_id=self.block_id
         )
 
@@ -467,43 +456,61 @@ class BlockUsageLocator(BlockLocatorBase, UsageKey):  # TODO implement UsageKey 
         place, but I have no way to override. We should clearly define the purpose and restrictions of this
         (e.g., I'm assuming periods are fine).
         """
-        return re.sub('[^\w-]', '-', self._to_string())
+        return unicode(self)
 
 
-class DefinitionLocator(Locator):
+class DefinitionLocator(Locator, DefinitionKey):
     """
     Container for how to locate a description (the course-independent content).
     """
     CANONICAL_NAMESPACE = 'defx'
-    KEY_FIELDS = ('definition_id',)
+    KEY_FIELDS = ('definition_id', 'block_type')
 
-    URL_RE = re.compile(r'^defx:' + VERSION_PREFIX + '([^/]+)$', re.IGNORECASE)
+    # override the abstractproperty
+    block_type = None
+    definition_id = None
 
-    def __init__(self, definition_id):
+    def __init__(self, block_type, definition_id):
         if isinstance(definition_id, LocalId):
-            super(DefinitionLocator, self).__init__(definition_id)
+            super(DefinitionLocator, self).__init__(definition_id=definition_id, block_type=block_type)
         elif isinstance(definition_id, basestring):
-            regex_match = self.URL_RE.match(definition_id)
-            if regex_match is not None:
-                super(DefinitionLocator, self).__init__(self.as_object_id(regex_match.group(1)))
-            else:
-                super(DefinitionLocator, self).__init__(self.as_object_id(definition_id))
-        else:
-            super(DefinitionLocator, self).__init__(self.as_object_id(definition_id))
+            try:
+                definition_id = self.as_object_id(definition_id)
+            except ValueError:
+                raise InvalidKeyError(self, definition_id)
+            super(DefinitionLocator, self).__init__(definition_id=definition_id, block_type=block_type)
+        elif isinstance(definition_id, ObjectId):
+            super(DefinitionLocator, self).__init__(definition_id=definition_id, block_type=block_type)
 
     def _to_string(self):
         '''
         Return a string representing this location.
-        unicode(self) returns something like this: "version/519665f6223ebd6980884f2b"
+        unicode(self) returns something like this: "519665f6223ebd6980884f2b+type+problem"
         '''
-        return VERSION_PREFIX + str(self.definition_id)
+        return u"{}+{}+{}".format(unicode(self.definition_id), self.BLOCK_TYPE_PREFIX, self.block_type)
 
-    def url(self):
+    URL_RE = re.compile(
+        r"^(?P<definition_id>[A-F0-9]+)\+{}\+(?P<block_type>{ALLOWED_ID_CHARS}+)$".format(
+            Locator.BLOCK_TYPE_PREFIX, ALLOWED_ID_CHARS=Locator.ALLOWED_ID_CHARS
+        ),
+        re.IGNORECASE | re.VERBOSE | re.UNICODE
+    )
+
+    @classmethod
+    def _from_string(cls, serialized):
         """
-        Return a string containing the URL for this location.
-        url(self) returns something like this: 'defx:version/519665f6223ebd6980884f2b'
+        Return a DefinitionLocator parsing the given serialized string
+        :param serialized: matches the string to
         """
-        return u'defx:' + self._to_string()
+        parse = cls.URL_RE.match(serialized)
+        if not parse:
+            raise InvalidKeyError(cls, serialized)
+
+        parse = parse.groupdict()
+        if parse['definition_id']:
+            parse['definition_id'] = cls.as_object_id(parse['definition_id'])
+
+        return cls(**{key: parse.get(key) for key in cls.KEY_FIELDS})
 
     def version(self):
         """
