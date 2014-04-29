@@ -10,7 +10,9 @@ Change Log
 
    * - Date
      - Change
+   * - 04/25/2014
+     - Added the :ref:`Contributing to Open edX` chapter.
    * - 03/28/2014
-     - Added the :ref:`Custom JavaScript Display and Grading` chapter.
+     - Added the :ref:`Custom JavaScript Applications` chapter.
    
 
