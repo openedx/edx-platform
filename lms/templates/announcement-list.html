@@ -192,62 +192,84 @@ heightStyle: "content"
   %endif
 
 <style>
-section.announcements > ul {
-list-style: none;
-margin-bottom: 1.41575em;
-padding-left: 0;
-padding-top: 5px !important;
-}
-section.announcements > div {
-margin-bottom: 1em;
+  section.announcements > ul {
+  list-style: none;
+  margin-bottom: 1.41575em;
+  padding-left: 0;
+  padding-top: 5px !important;
+  }
+  section.announcements > div {
+  margin-bottom: 1em;
+  }
+
+  section.announcements div > h3:first-child {
+  border-top: none;
+  }
+  section.announcements div > h3 {
+  border-top: 1px dotted #c8c8c8;
+  }
+
+  section.announcements div > h3 {
+    color:#646464;
+  font-size: 0.875em;
+  font-weight: bold !important;
+  padding-left: 20px;
+  margin-bottom: 3px;
+  margin-top: 5px;
+  padding-top: 5px;
+  overflow-x: hidden;
+  text-transform: capitalize;
+  }
+  section.announcements div > h3.title.ui-accordion-header-active {
+  background: url("/static/images/calendar-icon.png") 0px 10px no-repeat, url("/static/images/small-grey-arrows-right.png") 0px 28px no-repeat;
+  }
+  section.announcements div > h3.title {
+    background: url("/static/images/calendar-icon.png") 0px 10px no-repeat, url("/static/images/small-grey-arrows-down.png") 0px 28px no-repeat;
+  }
+  .announcement .content {
+  font-size: small;
+  padding-left: 5px;
+  }
+
+  div.announcements-wrapper section.announcements > ol {
+  list-style: none;
+  margin-bottom: 1.41575em;
+  padding-left: 0;
+  }
+  div.announcements-wrapper section.announcements > ol > li {
+  margin-bottom: 1em;
+  }
+  div.announcements-wrapper section.announcements > ol > li h2 {
+  font-size: normal;
+  font-weight: bold !important;
+  background: url("/static/images/calendar-icon.png") 0 center no-repeat;
+  padding-left: 20px;
+  margin-bottom: 0px;
+  text-transform: capitalize;
+  }
+
+html, body {
+  line-height: 1.2em;
 }
 
-section.announcements div > h3:first-child {
-border-top: none;
-}
-section.announcements div > h3 {
-border-top: 1px dotted #c8c8c8;
-}
-
-section.announcements div > h3 {
-  color:#646464;
-font-size: 0.875em;
-font-weight: bold !important;
-padding-left: 20px;
-margin-bottom: 3px;
-margin-top: 5px;
-padding-top: 5px;
-overflow-x: hidden;
-text-transform: capitalize;
-}
-section.announcements div > h3.title.ui-accordion-header-active {
-background: url("/static/images/calendar-icon.png") 0px 10px no-repeat, url("/static/images/small-grey-arrows-right.png") 0px 28px no-repeat;
-}
-section.announcements div > h3.title {
-  background: url("/static/images/calendar-icon.png") 0px 10px no-repeat, url("/static/images/small-grey-arrows-down.png") 0px 28px no-repeat;
-}
-.announcement .content {
-font-size: small;
-padding-left: 5px;
-}
-
-div.announcements-wrapper section.announcements > ol {
-list-style: none;
-margin-bottom: 1.41575em;
-padding-left: 0;
-}
-div.announcements-wrapper section.announcements > ol > li {
-margin-bottom: 1em;
-}
 div.announcements-wrapper section.announcements > ol > li h2 {
-font-size: normal;
-font-weight: bold !important;
-background: url("/static/images/calendar-icon.png") 0 center no-repeat;
-padding-left: 20px;
-margin-bottom: 0px;
-text-transform: capitalize;
+  margin-bottom: 10px !important;
 }
 
+div.announcements-wrapper section.announcements > ol > li {
+  margin-bottom: 35px !important;
+}
+
+.dashboard .my-courses {
+  margin-left: 20px;
+  margin-top: 10px;
+  width: 70.57627%; /* ðàçîáðàòüñÿ ñ òî÷íûì çíà÷åíèåì!!*/
+}
+
+/****** ×ÒÎÁÛ ÍÅ ÁÛËÎ SCROLL â îêíå íîâîñòåé ******************/
+section.announcements div > h3 {
+  overflow-y: hidden;
+}
 </style>
   <section class="profile-sidebar">
     <header class="profile">
@@ -293,14 +315,13 @@ text-transform: capitalize;
     <section class="user-info announcements">
       <ul>
       <div class="announcement-list">
-          % for announcement in site_wide_announcements:
+          % for announcement in site_wide_announcements[0:5]:
                     <h3 class="title">${_date(announcement.creation_date.astimezone(_timezone(settings.TIME_ZONE)),"d E Y")}</br>${announcement.title}</h2>
                     <div class="content">
-                    ${announcement.content}
+                    ${' '.join(announcement.content.split()[:10])}...<br/>
                     </div>
                 % endfor
                 </div>
-        <a href="${reverse('announcement_list')}" style="float:right">Все новости</a>
       </ul>
     </section>
 
