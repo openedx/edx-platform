@@ -179,6 +179,10 @@
       height: 365px;
     }
 
+    &.modal-type-problem .CodeMirror {
+      height: 435px;
+    }
+
     .wrapper-comp-settings {
 
       .list-input {
@@ -195,6 +199,11 @@
   .modal-window .editor-with-buttons {
     margin-bottom: ($baseline*3);
 
+    // temporary fix until xblock structure is set
+    &.wrapper-comp-settings .list-input.settings-list {
+      height: 375px;
+    }
+
     // TODO: need to sync up (alongside general editing mode) with xblocks.scss UI
     .xblock-actions {
       background-color: $gray-l4;
@@ -202,9 +211,6 @@
       width: 100%;
       bottom: 0;
     }
-
-
-
   }
 
 
