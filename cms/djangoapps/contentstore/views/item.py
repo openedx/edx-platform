@@ -125,9 +125,6 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
             delete_children = str_to_bool(request.REQUEST.get('recurse', 'False'))
             delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
 
-            # delete item from loc_mapper and cache
-            loc_mapper().delete_item_mapping(locator, old_location)
-
             return _delete_item_at_location(old_location, delete_children, delete_all_versions, request.user)
         else:  # Since we have a package_id, we are updating an existing xblock.
             if block == 'handouts' and old_location is None:
