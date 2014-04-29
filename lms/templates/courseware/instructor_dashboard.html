@@ -119,10 +119,10 @@ function goto( mode)
 
   <section class="instructor-dashboard-content" id="instructor-dashboard-content">
     <div class="wrap-instructor-info studio-view beta-button-wrapper">
-      %if studio_url:
+      %if studio_url and not teacher_role:
         <a class="instructor-info-action" href="${studio_url}">${_("View Course in Studio")}</a>
       %endif
-      %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+      %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD') and not teacher_role:
         <a class="instructor-info-action beta-button" href="${ beta_dashboard_url }">${_("Try New Beta Dashboard")}</a>
       %endif
     </div>
@@ -134,16 +134,18 @@ function goto( mode)
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">${_("Psychometrics")}</a> |
           %endif
           %if instructor_access:
-          <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">${_("Admin")}</a> |
+            <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">${_("Admin")}</a> |
           %endif
           <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">${_("Forum Admin")}</a> |
           <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">${_("Enrollment")}</a> |
-          <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">${_("DataDump")}</a> |
+          %if not teacher_role:
+            <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">${_("DataDump")}</a> |
+          %endif
           <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">${_("Manage Groups")}</a>
           %if show_email_tab:
              | <a href="#" onclick="goto('Email')" class="${modeflag.get('Email')}">${_("Email")}</a>
           %endif
-          %if settings.FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
+          %if settings.FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS') and not teacher_role:
              | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">${_("Analytics")}</a>
           %endif
           %if settings.FEATURES.get('CLASS_DASHBOARD'):
@@ -416,12 +418,15 @@ function goto( mode)
   %endif
   
   <br />
-  <h2>${_("Explanation of Roles:")}</h2>
-  <p>${_("Forum Moderators: can edit or delete any post, remove misuse flags, close and re-open threads, endorse "
-  "responses, and see posts from all cohorts (if the course is cohorted). Moderators' posts are marked as 'staff'.")}</p>
-  <p>${_("Forum Admins: have moderator privileges, as well as the ability to edit the list of forum moderators "
-  "(e.g. to appoint a new moderator). Admins' posts are marked as 'staff'.")}</p>
-  <p>${_("Community TAs: have forum moderator privileges, and their posts are labelled 'Community TA'.")}</p>
+
+  %if not teacher_role
+    <h2>${_("Explanation of Roles:")}</h2>
+    <p>${_("Forum Moderators: can edit or delete any post, remove misuse flags, close and re-open threads, endorse "
+    "responses, and see posts from all cohorts (if the course is cohorted). Moderators' posts are marked as 'staff'.")}</p>
+    <p>${_("Forum Admins: have moderator privileges, as well as the ability to edit the list of forum moderators "
+    "(e.g. to appoint a new moderator). Admins' posts are marked as 'staff'.")}</p>
+    <p>${_("Community TAs: have forum moderator privileges, and their posts are labelled 'Community TA'.")}</p>
+  %endif
 %endif
 
 ##-----------------------------------------------------------------------------
