@@ -136,6 +136,9 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                     mode = parent.data('mode');
                 event.preventDefault();
                 var $cheatsheet = $('.simple-editor-cheatsheet');
+                if ($cheatsheet.length == 0){
+                    $cheatsheet = $('.simple-editor-open-ended-cheatsheet');
+                }
                 if ($cheatsheet.hasClass("shown")) {
                     $(".CodeMirror").removeAttr("style");
                     $(".modal-content").removeAttr("style");
