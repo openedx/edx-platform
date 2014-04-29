@@ -7,16 +7,15 @@ import re
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
+from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from django_comment_common.utils import unseed_permissions_roles
-from xmodule.modulestore.store_utilities import delete_course
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import loc_mapper, modulestore
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
-from student.roles import CourseInstructorRole, CourseStaffRole
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.store_utilities import delete_course
 
 
 log = logging.getLogger(__name__)
@@ -51,6 +50,9 @@ def delete_course_and_groups(course_id, commit=False):
                 instructor_role.remove_users(*instructor_role.users_with_role())
             except Exception as err:
                 log.error("Error in deleting course groups for {0}: {1}".format(loc, err))
+
+            # remove location of this course from loc_mapper and cache
+            loc_mapper().delete_course_mapping(loc)
 
 
 def get_modulestore(category_or_location):

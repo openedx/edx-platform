@@ -21,6 +21,7 @@
 # 
 # Translators:
 # claudi <claudix.kernel@gmail.com>, 2014
+# mcolomer <mcmlilhity@gmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -42,13 +43,14 @@
 # 
 # Translators:
 # claudi <claudix.kernel@gmail.com>, 2014
+# mcolomer <mcmlilhity@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-22 09:02-0400\n"
-"PO-Revision-Date: 2014-03-23 19:30+0000\n"
-"Last-Translator: claudi <claudix.kernel@gmail.com>\n"
+"POT-Creation-Date: 2014-04-27 11:11-0400\n"
+"PO-Revision-Date: 2014-04-25 17:00+0000\n"
+"Last-Translator: mcolomer <mcmlilhity@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/edx-platform/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -75,15 +77,15 @@ msgstr "Inscripcions tancades"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment mode not supported"
-msgstr ""
+msgstr "Mode d'inscripció insuportable."
 
 #: common/djangoapps/course_modes/views.py
 msgid "Invalid amount selected."
-msgstr ""
+msgstr "Quantitat sel·leccionada invàlida."
 
 #: common/djangoapps/course_modes/views.py
 msgid "No selected price or selected price is too low."
-msgstr ""
+msgstr "Preu no sel·leccionat o massa baix."
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Administrator"
@@ -179,6 +181,16 @@ msgstr "No estàs inscrit en aquest curs"
 msgid "Enrollment action is invalid"
 msgstr "La inscripció no és vàlida"
 
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication service (like
+#. Google or LinkedIn).
+#: common/djangoapps/student/views.py
+msgid ""
+"There is no {platform_name} account associated with your {provider_name} "
+"account. Please use your {platform_name} credentials or pick another "
+"provider."
+msgstr ""
+
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
@@ -202,7 +214,7 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "Massa errors per entrar. Prova-ho de nou més tard."
 
-#: common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "Email contrasenya incorrectes."
 
@@ -826,6 +838,10 @@ msgid ""
 "by that feedback."
 msgstr ""
 
+#: common/lib/capa/capa/inputtypes.py
+msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr ""
+
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr ""
@@ -948,11 +964,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Check"
-msgstr ""
+msgstr "Comprovar"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Final Check"
-msgstr ""
+msgstr "Comprovació final"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Checking..."
@@ -1089,8 +1105,10 @@ msgstr ""
 msgid "Course Info"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: "Progress" is the name of the student's course progress page
 #: common/lib/xmodule/xmodule/tabs.py
+#: lms/templates/peer_grading/peer_grading.html
 msgid "Progress"
 msgstr "Progrés"
 
@@ -1126,9 +1144,10 @@ msgstr ""
 msgid "Peer grading"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: "Syllabus" appears on a tab that, when clicked, opens the
 #. syllabus of the course.
-#: common/lib/xmodule/xmodule/tabs.py
+#: common/lib/xmodule/xmodule/tabs.py lms/templates/courseware/syllabus.html
 msgid "Syllabus"
 msgstr "Síl·laba"
 
@@ -1379,10 +1398,13 @@ msgstr "Índex"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/discussion/_thread_list_template.html
 msgid "Search"
 msgstr "Cerca"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
+#: lms/templates/static_templates/copyright.html
+#: lms/templates/static_templates/copyright.html
 msgid "Copyright"
 msgstr "Copyright"
 
@@ -1440,7 +1462,7 @@ msgstr ""
 msgid "User {username} has never accessed problem {location}"
 msgstr ""
 
-#: lms/djangoapps/courseware/features/video.py
+#: lms/djangoapps/courseware/features/video.py lms/templates/video.html
 msgid "ERROR: No playable video sources found!"
 msgstr "ERROR: no s'han trobat fonts de vídeo visibles!"
 
@@ -1791,15 +1813,23 @@ msgstr "La tasca ja s'està executant."
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
 msgstr "Nom d'usuari"
 
-#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Name"
 msgstr "Nom"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/templates/dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/university_profile/edge.html
 msgid "Email"
 msgstr "Email"
 
@@ -1885,10 +1915,12 @@ msgid "Extensions"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Data Download"
 msgstr "Descàrrega de dades"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
 msgstr "Analítica"
 
@@ -2198,10 +2230,11 @@ msgstr ""
 msgid "reset"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
-#: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
 msgid "deleted"
 msgstr "esborrat"
 
@@ -2372,72 +2405,82 @@ msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "AI Assessment"
-msgstr ""
+msgstr "Avaluació d'Al"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Peer Assessment"
-msgstr ""
+msgstr "Avaluació per parelles"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Not yet available"
-msgstr ""
+msgstr "Encara no està disponible"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Automatic Checker"
-msgstr ""
+msgstr "Comprovador automàtic"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Instructor Assessment"
-msgstr ""
+msgstr "Avaluació de l'instructor"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid ""
 "Error occurred while contacting the grading service.  Please notify course "
 "staff."
 msgstr ""
+"Hi ha hagut un error mentre es contactava amb el servei de qualificacions. "
+"Si us plau, notifica-ho al personal del curs."
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid ""
 "Error occurred while contacting the grading service.  Please notify your edX"
 " point of contact."
 msgstr ""
+"Hi ha hagut un error mentre es contactava amb el servei de qualificacions. "
+"Si us plau, notifica-ho al teu punt de contacte de l'edX."
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "for course {0} and student {1}."
-msgstr ""
+msgstr "pel curs {0} i l'estudiant {1}."
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
 "View all problems that require peer assessment in this particular course."
 msgstr ""
+"Veure tots els problemes que requereixen avaluació per parelles en aquest "
+"curs en particular."
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
 "View ungraded submissions submitted by students for the open ended problems "
 "in the course."
 msgstr ""
+"Veure les presentacions sense qualificar dels estudiants per els problemes "
+"oberts en el curs."
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
 "View open ended problems that you have previously submitted for grading."
-msgstr ""
+msgstr "Veure els problemes oberts que prèviament ha presentat per avaluar."
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "View submissions that have been flagged by students as inappropriate."
 msgstr ""
+"Veure els submissions que han estat bandejades pels estudiants com a "
+"inapropiades."
 
 #: lms/djangoapps/open_ended_grading/views.py
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "New submissions to grade"
-msgstr ""
+msgstr "Noves submissions per avaluar"
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "New grades have been returned"
-msgstr ""
+msgstr "Noves avaluacions han sigut tornades"
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "Submissions have been flagged for review"
-msgstr ""
+msgstr "Les submissions han sigut etiquetades per revisió"
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
@@ -2447,6 +2490,10 @@ msgid ""
 "        Please check back later for this.\n"
 "        "
 msgstr ""
+"\n"
+"Error inicialitzant l'avaluació per parelles.\n"
+"No s'ha creat un mòdul d'avaluació per parelles en el curs que t'autoritzi a avaluar altres persones.\n"
+"Sisplau, torna-ho a provar més tard."
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Order Payment Confirmation"
@@ -2542,7 +2589,11 @@ msgstr ""
 msgid "Currency"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/reports.py
+#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: wiki/plugins/attachments/forms.py
 msgid "Description"
 msgstr "Descripció"
 
@@ -2637,7 +2688,7 @@ msgstr "Ha d'iniciar la sessió per afegir una cistella de compra"
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
 msgid "The course you requested does not exist."
-msgstr ""
+msgstr "El curs que ha demanat no existeix."
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
@@ -2651,7 +2702,7 @@ msgstr "Vostè ja està afegit al curs {0}."
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "Course added to cart."
-msgstr ""
+msgstr "Curs afegit a la cistella."
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
@@ -2659,23 +2710,29 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor did not return a required parameter: {0}"
-msgstr ""
+msgstr "El processedor de pagament no retorna un paràmetre obligatori: {0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
+"El processedor de pagament ha retornat un valor mal escrit {0} per el param "
+"{1}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "The payment processor accepted an order whose number is not in our system."
 msgstr ""
+"El processedor de pagaments ha acceptat una ordre el número de la qual no "
+"està al nostre sistema."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
 msgstr ""
+"La quantitat carregada per el processador {0} {1} és diferent que el cost "
+"total de la comanda {2} {3}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2728,15 +2785,15 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "Successful transaction."
-msgstr ""
+msgstr "Transacció exitosa."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The request is missing one or more required fields."
-msgstr ""
+msgstr "Falten un o més camps requerits a la sol·licitud."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "One or more fields in the request contains invalid data."
-msgstr ""
+msgstr "Un o més camps de la sol·licitud contenen informació no vàlida."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2752,6 +2809,8 @@ msgid ""
 "Error: General system failure. Possible fix: retry the payment after a few "
 "minutes."
 msgstr ""
+"Error: fallada del sistema general. Torni a provar de fer el pagament d'aquí"
+" uns quants minuts."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2775,6 +2834,8 @@ msgid ""
 "The issuing bank has questions about the request. Possible fix: retry with "
 "another form of payment"
 msgstr ""
+"El banc emissor té qüestions sobre la sol·licitud. Pot tornar-ho a intentar "
+"mitjançant una altra forma de pagament."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2798,16 +2859,18 @@ msgid ""
 "Insufficient funds in the account. Possible fix: retry with another form of "
 "payment"
 msgstr ""
+"Fons insuficients en el compte. Pot tornar-ho a provar mitjançant una altra "
+"forma de pagament."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "Unknown reason"
-msgstr ""
+msgstr "Raó desconeguda"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Issuing bank unavailable. Possible fix: retry again after a few minutes"
-msgstr ""
+msgstr "Banc emissor no disponible. Pot tornar-ho a provar d'aquí uns minuts."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2822,17 +2885,23 @@ msgid ""
 "The card has reached the credit limit. Possible fix: retry with another form"
 " of payment"
 msgstr ""
+"La tarjeta ha arribat al límit de crèdit. Pot tornar-ho a provar amb una "
+"altra forma de pagament."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Invalid card verification number. Possible fix: retry with another form of "
 "payment"
 msgstr ""
+"Número de verificació de la tarjeta invàlid. Pot tornar-ho a provar amb una "
+"altra forma de pagament."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Invalid account number. Possible fix: retry with another form of payment"
 msgstr ""
+"Número de compte no vàlid. Pot tornar-ho a provar amb una altra forma de "
+"pagament"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2847,6 +2916,8 @@ msgid ""
 "General decline by the processor.  Possible fix: retry with another form of "
 "payment"
 msgstr ""
+"Disminució general del processador. Pot tornar-ho a provar mitjançant una "
+"altra forma de pagament"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2857,20 +2928,22 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The requested amount exceeds the originally authorized amount."
-msgstr ""
+msgstr "La quantitat demanada sobrepassa la quantitat originalment permesa."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "Processor Failure.  Possible fix: retry the payment"
-msgstr ""
+msgstr "Fallada del processedor. Torni a provar el pagament"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The authorization has already been captured"
-msgstr ""
+msgstr "L'autorització ja ha sigut capturada"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "The requested transaction amount must match the previous transaction amount."
 msgstr ""
+"La quantitat demanada de transacció ha de concordar amb la quantitat prèvia "
+"de transacció."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2882,7 +2955,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The request ID is invalid."
-msgstr ""
+msgstr "L'ID sol·licitat és invàlid."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2893,7 +2966,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The transaction has already been settled or reversed."
-msgstr ""
+msgstr "La transacció ja ha estat col·locada o invertida."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -2906,6 +2979,8 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "You requested a credit for a capture that was previously voided"
 msgstr ""
+"Vostè ha sol·licitat un crèdit per una captura que ha sigut prèviament "
+"anul·lada."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -3062,6 +3137,8 @@ msgstr ""
 "(*)</strong>."
 
 #: lms/templates/registration/password_reset_confirm.html
+#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/register-shib.html lms/templates/register.html
 msgid "Required Information"
 msgstr "Informació obligatòria"
 
@@ -3095,6 +3172,8 @@ msgid "Password Reset Help"
 msgstr "Ajuda sobre restablir la contrasenya"
 
 #: lms/templates/registration/password_reset_confirm.html
+#: cms/templates/login.html lms/templates/login-sidebar.html
+#: lms/templates/register-sidebar.html
 msgid "Need Help?"
 msgstr "Necessites ajuda?"
 
@@ -3165,6 +3244,11 @@ msgstr "Esborrar article"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Delete"
 msgstr "Esborrar"
 
@@ -3200,7 +3284,14 @@ msgstr "... i més!"
 msgid "You are deleting an article. Please confirm."
 msgstr "Estàs esborrant un article. Si us plau, confirma-ho."
 
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html cms/templates/component.html
+#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
+#: lms/templates/wiki/includes/article_menu.html
 msgid "Edit"
 msgstr "Editar"
 
@@ -3208,12 +3299,26 @@ msgstr "Editar"
 msgid "Save changes"
 msgstr "Guardar els canvis"
 
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html cms/templates/unit.html
 msgid "Preview"
 msgstr "Previsualitzar"
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
+#: lms/templates/dashboard.html lms/templates/dashboard.html
+#: lms/templates/dashboard.html lms/templates/dashboard.html
+#: lms/templates/dashboard.html lms/templates/forgot_password_modal.html
+#: lms/templates/help_modal.html lms/templates/help_modal.html
+#: lms/templates/help_modal.html lms/templates/signup_modal.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/modal/_modal-settings-language.html
+#: lms/templates/modal/accessible_confirm.html
 msgid "Close"
 msgstr "Tancar"
 
@@ -3455,6 +3560,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/wiki_plugin.py
 msgid "Attachments"
 msgstr "Adjunts"
 
@@ -3541,98 +3647,114 @@ msgstr "No hi ha dades adjuntes per aquest article."
 #: cms/djangoapps/contentstore/course_info_model.py
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
-msgstr ""
+msgstr "Id d'actualització de curs invàlid"
 
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Course update not found."
-msgstr ""
+msgstr "No s'ha trobat l'actualització del curs."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
 "configure a different path with GIT_REPO_EXPORT_DIR"
 msgstr ""
+"No s'ha configurat GIT_REPO_EXPORT_DIR o el camí {0} no existeix. Si us "
+"plau, crea'l o configura un camí diferent mitjançant GIT_REPO_EXPORT_DIR "
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Non writable git url provided. Expecting something like: "
 "git@github.com:mitocw/edx4edx_lite.git"
 msgstr ""
+"No s'ha indicat cap url git amb permisos d'escriptura. S'esperava quelcom "
+"similar a: git@github.com:mitocw/edx4edx_lite.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "If using http urls, you must provide the username and password in the url. "
 "Similar to https://user:pass@github.com/user/course."
 msgstr ""
+"Si utilitzes urls http has d'indicar el nom d'usuari i contrasenya en la "
+"url. Similar a https://user:pass@github.com/user/course."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to determine branch, repo in detached HEAD mode"
-msgstr ""
+msgstr "No s'ha pogut determinar la branca, repositori en mode HEAD detached."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to update or clone git repository."
-msgstr ""
+msgstr "No s'ha pogut actualitzar o clonar el repositori git."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to export course to xml."
-msgstr ""
+msgstr "No s'ha pogut exportar el curs a xml."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to configure git username and password"
-msgstr ""
+msgstr "No s'ha pogut configurar el nom d'usuari i contrasenya del git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to commit changes. This is usually because there are no changes to be"
 " committed"
 msgstr ""
+"No s'han pogut enviar els canvis. Segurament perquè no hi ha canvis a "
+"enviar."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to push changes.  This is usually because the remote repository "
 "cannot be contacted"
 msgstr ""
+"No s'han pogut posar els canvis. Normalment es deu que no es pot accedir al "
+"repositori remot."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Bad course location provided"
-msgstr ""
+msgstr "S'ha indicat una localització de curs incorrecta"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Missing branch on fresh clone"
-msgstr ""
+msgstr "Falta branca en clonació recent"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Command was: {0!r}. Working directory was: {1!r}"
-msgstr ""
+msgstr "La comanda ha estat: {0!r}. El directori de treball ha estat: {1!r}"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Command output was: {0!r}"
-msgstr ""
+msgstr "El resultat de la comanda ha estat: {0!r}"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Directory already exists, doing a git reset and pull instead of git clone."
 msgstr ""
+"El directori ja existeix. Aplicant un reset al git i fent \"pull\" en lloc "
+"de clonar."
 
 #: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
 msgid "My Notes"
-msgstr ""
+msgstr "Les meves notes"
 
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
 ". Course directory must already be a git repository. Usage:  git_export <course_loc> <git_url>"
 msgstr ""
+"Prendre el curs especificat i provar d'exportar-lo a un repositori git\n"
+". El directori del curs ha de ser un repositori git. Ús: git_export <course_loc> <git_url>"
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
-msgstr ""
+msgstr "Càrrega completada"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
 "run."
 msgstr ""
+"No es permeten caràcters especials en l'organització, número de curs i "
+"progrés del curs."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -3640,6 +3762,9 @@ msgid ""
 "\n"
 "{err}"
 msgstr ""
+"No s'ha pogut crear el curs '{name}'.\n"
+"\n"
+"{err}"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -3647,6 +3772,9 @@ msgid ""
 " and course run. Please change either organization or course number to be "
 "unique."
 msgstr ""
+"Ja existeix un curs definit amb la mateixa organització, número de curs i "
+"progrés. Si us plau, canvia o bé l'organització o bé el número de curs per a"
+" que sigui únic."
 
 #: cms/djangoapps/contentstore/views/course.py
 #: cms/djangoapps/contentstore/views/course.py
@@ -3655,106 +3783,112 @@ msgstr ""
 msgid ""
 "Please change either the organization or course number so that it is unique."
 msgstr ""
+"Si us plau, canvia l'organització o el número de curs per a que sigui únic."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change at least one field to be unique."
 msgstr ""
+"Ja existeix un curs definit amb la mateixa organització i número de curs. Si"
+" us plau, canvia almenys un dels camps per a que sigui únic."
 
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
-msgstr ""
+msgstr "Curs exportat correctament a repositori git"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
-msgstr ""
+msgstr "Només se suporta la càrrega de fitxers .tar.gz."
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
-msgstr ""
+msgstr "Càrrega de fitxer corrupta. Si us plau, intenta-ho de nou."
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Could not find the course.xml file in the package."
-msgstr ""
+msgstr "No s'ha trobat el fitxer course.xml en el paquet."
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of {0}"
-msgstr ""
+msgstr "Duplicat de {0}"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of '{0}'"
-msgstr ""
+msgstr "Duplicat de '{0}'"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
-msgstr ""
+msgstr "No s'han rebut dades del vídeo."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Can't find item by locator."
-msgstr ""
+msgstr "No s'ha trobat l'element per localitzador."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" modules."
-msgstr ""
+msgstr "Només se suporten les transcripcions per a mòduls \"vídeo\"."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
-msgstr ""
+msgstr "Permisos insuficients"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Could not find user by email address '{email}'."
-msgstr ""
+msgstr "No s'ha trobat l'usuari a partir de l'adreça d'email '{email}'"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
+"L'usuari {email} s'ha enregistrat però encara no ha activat el seu compte."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "`role` is required"
-msgstr ""
+msgstr "es requereix `rol`"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Only instructors may create other instructors"
-msgstr ""
+msgstr "Només els instructors poden crear altres instructors"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "You may not remove the last instructor from a course"
-msgstr ""
+msgstr "No hauries d'eliminar l'últim instructor d'un curs"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
-msgstr ""
+msgstr "no sol·licitat"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "pending"
-msgstr ""
+msgstr "pendent"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "granted"
-msgstr ""
+msgstr "permès"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "denied"
-msgstr ""
+msgstr "denegat"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Studio user"
-msgstr ""
+msgstr "Usuari d'Studio"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "The date when state was last updated"
-msgstr ""
+msgstr "Data de quan es va actualitzar l'estat per últim cop"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Current course creator state"
-msgstr ""
+msgstr "Estat del creador del curs actual"
 
 #: cms/djangoapps/course_creators/models.py
 msgid ""
 "Optional notes about this user (for example, why course creation access was "
 "denied)"
 msgstr ""
+"Notes opcionals sobre aquest usuari (per exemple, per què l'accés a la "
+"creació del curs es va denegar)"
 
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
@@ -3775,7 +3909,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Loading..."
-msgstr ""
+msgstr "Carregant...."
 
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
@@ -3803,7 +3937,7 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 #: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
-msgstr ""
+msgstr "Cancel·lar"
 
 #: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -3829,7 +3963,8 @@ msgstr ""
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/provider_login.html lms/templates/register.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Password"
 msgstr ""
@@ -3839,7 +3974,7 @@ msgstr ""
 #: cms/templates/widgets/header.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Settings"
-msgstr ""
+msgstr "Configuració"
 
 #: cms/templates/manage_users.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -3853,7 +3988,7 @@ msgstr ""
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Save"
-msgstr ""
+msgstr "Guardar"
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
@@ -3901,7 +4036,7 @@ msgstr ""
 #: lms/templates/navigation.html lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
-msgstr ""
+msgstr "Ajuda"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration for {} | Choose Your Track"
@@ -4032,7 +4167,7 @@ msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "or"
-msgstr ""
+msgstr "o"
 
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
@@ -4048,7 +4183,7 @@ msgstr ""
 
 #: lms/templates/admin_dashboard.html
 msgid "{platform_name}-wide Summary"
-msgstr ""
+msgstr "Resum {platform_name}"
 
 #: lms/templates/annotatable.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -4058,43 +4193,43 @@ msgstr ""
 #: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
-msgstr ""
+msgstr "Instruccions"
 
 #: lms/templates/annotatable.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
 msgid "Collapse Instructions"
-msgstr ""
+msgstr "Col·lapsar instruccions"
 
 #: lms/templates/annotatable.html
 msgid "Guided Discussion"
-msgstr ""
+msgstr "Discussió guiada"
 
 #: lms/templates/annotatable.html
 msgid "Hide Annotations"
-msgstr ""
+msgstr "Ocultar anotacions"
 
 #: lms/templates/contact.html lms/templates/static_templates/about.html
 #: lms/templates/static_templates/about.html
 msgid "Vision"
-msgstr ""
+msgstr "Visió"
 
 #: lms/templates/contact.html
 msgid "Faq"
-msgstr ""
+msgstr "FAQ"
 
 #: lms/templates/contact.html lms/templates/footer.html
 msgid "Press"
-msgstr ""
+msgstr "Premsa"
 
 #: lms/templates/contact.html lms/templates/footer.html
 #: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
-msgstr ""
+msgstr "Contacte"
 
 #: lms/templates/contact.html
 msgid "Class Feedback"
-msgstr ""
+msgstr "Comentaris i suggeriments de la classe"
 
 #: lms/templates/contact.html
 msgid ""
@@ -4103,10 +4238,14 @@ msgid ""
 " issues specific to a particular class, please post on the discussion forums"
 " of that&nbsp;class."
 msgstr ""
+"Et demanem que ens facis comentaris i suggeriments per millorar els nostres "
+"cursos. Si ets usuari enregistrat i tens alguna pregunta o dubtes sobre "
+"alguna classe particular, fes-nos-ho saber enviant un missatge als fòrums de"
+" discussió de la classe en qüestió."
 
 #: lms/templates/contact.html
 msgid "General Inquiries and Feedback"
-msgstr ""
+msgstr "Preguntes generals i suggeriments"
 
 #: lms/templates/contact.html
 msgid ""
@@ -4119,7 +4258,7 @@ msgstr ""
 
 #: lms/templates/contact.html
 msgid "Technical Inquiries and Feedback"
-msgstr ""
+msgstr "Preguntes tècniques i suggeriments"
 
 #: lms/templates/contact.html
 msgid ""
@@ -4134,17 +4273,20 @@ msgstr ""
 
 #: lms/templates/contact.html
 msgid "Media"
-msgstr ""
+msgstr "Mitjans de comunicació"
 
 #: lms/templates/contact.html
 msgid ""
 "Please visit our {link_start}media/press page{link_end} for more "
 "information. For any media or press inquiries, please email {email}."
 msgstr ""
+"Si us plau, visit el nostre {link_start}media/press page{link_end} per més "
+"informació. Per qualsevol consulta dels mitjans de comunicació, si us plau, "
+"envieu un correu a {email}."
 
 #: lms/templates/contact.html
 msgid "Universities"
-msgstr ""
+msgstr "Universitats"
 
 #: lms/templates/contact.html
 msgid ""
@@ -4170,9 +4312,45 @@ msgstr ""
 msgid "Please verify your new email"
 msgstr ""
 
+#. Translators: this message is displayed when a user tries to link their
+#. account with a third-party authentication provider (for example, Google or
+#. LinkedIn) with a given edX account, but their third-party account is
+#. already
+#. associated with another edX account. provider_name is the name of the
+#. third-party authentication provider, and platform_name is the name of the
+#. edX deployment.
+#: lms/templates/dashboard.html
+msgid ""
+"The selected {provider_name} account is already linked to another "
+"{platform_name} account. Please {link_start}log out{link_end}, then log in "
+"with your {provider_name} account."
+msgstr ""
+
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
+msgstr ""
+
+#. Translators: this section lists all the third-party authentication
+#. providers
+#. (for example, Google and LinkedIn) the user can link with or unlink from
+#. their edX account.
+#: lms/templates/dashboard.html
+msgid "Account Links"
+msgstr ""
+
+#. Translators: clicking on this removes the link between a user's edX account
+#. and their account with an external authentication provider (like Google or
+#. LinkedIn).
+#: lms/templates/dashboard.html
+msgid "unlink"
+msgstr ""
+
+#. Translators: clicking on this creates a link between a user's edX account
+#. and their account with an external authentication provider (like Google or
+#. LinkedIn).
+#: lms/templates/dashboard.html
+msgid "link"
 msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
@@ -4373,7 +4551,7 @@ msgstr ""
 #: lms/templates/folditbasic.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Submitted"
-msgstr ""
+msgstr "Enviat"
 
 #: lms/templates/folditchallenge.html
 msgid "Puzzle Leaderboard"
@@ -4524,7 +4702,7 @@ msgstr ""
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Submit"
-msgstr ""
+msgstr "Enviar"
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -4723,6 +4901,21 @@ msgstr ""
 msgid "Remember me"
 msgstr ""
 
+#. Translators: this is the last choice of a number of choices of how to log
+#. in
+#. to the site.
+#: lms/templates/login.html
+msgid "or, if you have connected one of these providers, log in below."
+msgstr ""
+
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication provider (like Google or LinkedIn).
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication service (like Google or LinkedIn).
+#: lms/templates/login.html lms/templates/register.html
+msgid "Sign in with {provider_name}"
+msgstr ""
+
 #: lms/templates/lti.html
 msgid "External resource"
 msgstr ""
@@ -4887,11 +5080,11 @@ msgstr ""
 
 #: lms/templates/problem.html
 msgid "Show Answer"
-msgstr ""
+msgstr "Mostrar resposta"
 
 #: lms/templates/problem.html
 msgid "Reveal Answer"
-msgstr ""
+msgstr "Revelar resposta"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
@@ -5047,6 +5240,26 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
+msgstr ""
+
+#: lms/templates/register.html
+msgid "Register to start learning today!"
+msgstr ""
+
+#: lms/templates/register.html
+msgid ""
+"or create your own {platform_name} account by completing all "
+"<strong>required*</strong> fields below."
+msgstr ""
+
+#. Translators: selected_provider is the name of an external, third-party user
+#. authentication service (like Google or LinkedIn).
+#: lms/templates/register.html
+msgid "You've successfully signed in with {selected_provider}."
+msgstr ""
+
+#: lms/templates/register.html
+msgid "Finish your account registration below to start learning."
 msgstr ""
 
 #: lms/templates/register.html
@@ -5264,11 +5477,11 @@ msgstr ""
 
 #: lms/templates/staticbook.html
 msgid "Previous page"
-msgstr ""
+msgstr "Pàgina anterior"
 
 #: lms/templates/staticbook.html
 msgid "Next page"
-msgstr ""
+msgstr "Pàgina següent"
 
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -5463,11 +5676,11 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Video position"
-msgstr ""
+msgstr "Posició del vídeo"
 
 #: lms/templates/video.html
 msgid "Play"
-msgstr ""
+msgstr "Iniciar"
 
 #: lms/templates/video.html
 msgid "Speeds"
@@ -5479,19 +5692,19 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Volume"
-msgstr ""
+msgstr "Volum"
 
 #: lms/templates/video.html
 msgid "Fill browser"
-msgstr ""
+msgstr "Navegador complet"
 
 #: lms/templates/video.html
 msgid "HD off"
-msgstr ""
+msgstr "HD desactivat"
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Turn off captions"
-msgstr ""
+msgstr "Desactivar textos"
 
 #: lms/templates/video.html
 msgid "Skip to end of transcript."
@@ -5519,6 +5732,10 @@ msgstr ""
 msgid "{file_format}"
 msgstr ""
 
+#: lms/templates/video.html
+msgid "Download Handout"
+msgstr ""
+
 #: lms/templates/word_cloud.html
 msgid "Your words:"
 msgstr ""
@@ -5538,7 +5755,7 @@ msgstr ""
 #: lms/templates/combinedopenended/combined_open_ended.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Hide Question"
-msgstr ""
+msgstr "Ocultar pregunta"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "New Submission"
@@ -5844,7 +6061,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Open Calculator"
-msgstr ""
+msgstr "Obrir la calculadora"
 
 #: lms/templates/courseware/courseware.html
 msgid "Calculator Input Field"
@@ -6355,11 +6572,11 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task Type"
-msgstr ""
+msgstr "Tipus de tasca"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task inputs"
-msgstr ""
+msgstr "Entrades de tasca"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task Id"
@@ -6367,7 +6584,7 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Requester"
-msgstr ""
+msgstr "Sol·licitant"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task State"
@@ -6375,11 +6592,11 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Duration (sec)"
-msgstr ""
+msgstr "Durada (segons)"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task Progress"
-msgstr ""
+msgstr "Progrés de tasca"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6440,6 +6657,10 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Download your certificate"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -6737,7 +6958,7 @@ msgstr ""
 
 #: lms/templates/discussion/_discussion_module.html
 msgid "Show Discussion"
-msgstr ""
+msgstr "Mostrar discussió"
 
 #: lms/templates/discussion/_discussion_module_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
@@ -6811,7 +7032,7 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
 #: wiki/forms.py wiki/forms.py wiki/forms.py
 msgid "Title"
-msgstr ""
+msgstr "Títol"
 
 #: lms/templates/discussion/_inline_new_post.html
 #: lms/templates/discussion/_new_post.html
@@ -6849,7 +7070,7 @@ msgstr ""
 
 #: lms/templates/discussion/_similar_posts.html
 msgid "Hide"
-msgstr ""
+msgstr "Ocultar"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion Home"
@@ -6919,7 +7140,7 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/discussion/mustache/_profile_thread.mustache
 msgid "anonymous"
-msgstr ""
+msgstr "anònim"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "&bull; This thread is closed."
@@ -6938,16 +7159,16 @@ msgstr ""
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Report Misuse"
-msgstr ""
+msgstr "Informar de mal ús"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Pin Thread"
-msgstr ""
+msgstr "Fixar fil"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Pinned"
-msgstr ""
+msgstr "Fixat"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "(this post is about %(courseware_title_linked)s)"
@@ -7072,7 +7293,7 @@ msgstr ""
 
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
-msgstr ""
+msgstr ","
 
 #: lms/templates/discussion/_user_profile.html
 msgid "%s discussion started"
@@ -7105,10 +7326,6 @@ msgstr ""
 msgid "User Profile"
 msgstr ""
 
-#: lms/templates/discussion/user_profile.html
-msgid "Active Threads"
-msgstr ""
-
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Expand discussion"
@@ -7126,10 +7343,14 @@ msgstr ""
 #: lms/templates/discussion/mustache/_pagination.mustache
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "…"
-msgstr ""
+msgstr "..."
 
 #: lms/templates/discussion/mustache/_profile_thread.mustache
 msgid "View discussion"
+msgstr ""
+
+#: lms/templates/discussion/mustache/_user_profile.mustache
+msgid "Active Threads"
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
@@ -7169,6 +7390,11 @@ msgstr ""
 msgid ""
 "You have been invited to be a beta tester for {course_name} at {site_name} "
 "by a member of the course staff."
+msgstr ""
+
+#: lms/templates/emails/add_beta_tester_email_message.txt
+#: lms/templates/emails/enroll_email_enrolledmessage.txt
+msgid "To start accessing course materials, please visit {course_url}"
 msgstr ""
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
@@ -7271,10 +7497,6 @@ msgstr ""
 msgid ""
 "You have been enrolled in {course_name} at {site_name} by a member of the "
 "course staff. The course should now appear on your {site_name} dashboard."
-msgstr ""
-
-#: lms/templates/emails/enroll_email_enrolledmessage.txt
-msgid "To start accessing course materials, please visit {course_url}"
 msgstr ""
 
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
@@ -7422,7 +7644,7 @@ msgstr ""
 
 #: lms/templates/instructor/staff_grading.html
 msgid "(Hide)"
-msgstr ""
+msgstr "(Ocultar)"
 
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -8141,7 +8363,7 @@ msgstr ""
 #: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Problem Name"
-msgstr ""
+msgstr "Nom del problema"
 
 #: lms/templates/open_ended_problems/open_ended_problems.html
 msgid "Grader Type"
@@ -8177,7 +8399,7 @@ msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Graded"
-msgstr ""
+msgstr "Puntuat"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Available"
@@ -8185,7 +8407,7 @@ msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Required"
-msgstr ""
+msgstr "Requerit"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "No due date"
@@ -8297,11 +8519,11 @@ msgstr ""
 
 #: lms/templates/registration/activation_complete.html
 msgid "Activation Complete!"
-msgstr ""
+msgstr "Activació completa!"
 
 #: lms/templates/registration/activation_complete.html
 msgid "Account already active!"
-msgstr ""
+msgstr "El compte ja està actiu!"
 
 #: lms/templates/registration/activation_complete.html
 msgid "You can now {link_start}log in{link_end}."
@@ -8309,7 +8531,7 @@ msgstr ""
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Activation Invalid"
-msgstr ""
+msgstr "Activació no vàlida"
 
 #: lms/templates/registration/activation_invalid.html
 msgid ""
@@ -8317,10 +8539,14 @@ msgid ""
 "e-mail programs will sometimes split it into two lines. If you still have "
 "issues, e-mail us to let us know what happened at {email}."
 msgstr ""
+"Alguna cosa ha anat malament. Comprova que la URL a la que has anat és "
+"correcta -- els programes d'email de vegades les trenquen en dues línies. Si"
+" encara tens problemes, envia'ns un email i fes-nos saber què passa a "
+"{email}."
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Or you can go back to the {link_start}home page{link_end}."
-msgstr ""
+msgstr "O bé pots anar enrere a {link_start}la pàgina d'inici{link_end}."
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -9575,60 +9801,69 @@ msgstr ""
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
-msgstr ""
+msgstr "No s'ha trobat la pàgina que estaves buscant."
 
 #: cms/templates/404.html
 msgid ""
 "Go back to the {homepage} or let us know about any pages that may have been "
 "moved at {email}."
 msgstr ""
+"Vés enrere a la {homepage} o informa'ns de qualsevol pàgina que hagi estat "
+"moguda a {email}."
 
 #: cms/templates/500.html
 msgid "Studio Server Error"
-msgstr ""
+msgstr "Error de Studio Server"
 
 #: cms/templates/500.html
 msgid "The <em>Studio</em> servers encountered an error"
-msgstr ""
+msgstr "Els servidors <em>Studio</em> trobat un error"
 
 #: cms/templates/500.html
 msgid ""
 "An error occurred in Studio and the page could not be loaded. Please try "
 "again in a few moments."
 msgstr ""
+"Ha succeït un error en l'Studio i la pàgina no s'ha pogut carregar. Si us "
+"plau, torna-ho a intentar en breu."
 
 #: cms/templates/500.html
 msgid ""
 "We've logged the error and our staff is currently working to resolve this "
 "error as soon as possible."
 msgstr ""
+"Hem pres nota de l'error i el nostre personal hi està treballant per "
+"solucionar-lo el més aviat possible."
 
 #: cms/templates/500.html
 msgid "If the problem persists, please email us at {email_link}."
 msgstr ""
+"Si el problema persisteix, si us plau envia'ns un correu a {email_link}."
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
 msgid "Studio Account Activation"
-msgstr ""
+msgstr "Activació del compte Studio"
 
 #: cms/templates/activation_active.html
 msgid "Your account is already active"
-msgstr ""
+msgstr "El teu compte ja està actiu"
 
 #: cms/templates/activation_active.html
 msgid ""
 "This account, set up using {0}, has already been activated. Please sign in "
 "to start working within edX Studio."
 msgstr ""
+"Aquest compte, configurat utilitzant {0}, ja ha estat activat. Si us plau, "
+"entra per començar a treballar en edX Studio."
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 msgid "Sign into Studio"
-msgstr ""
+msgstr "Entrar a Studio"
 
 #: cms/templates/activation_complete.html
 msgid "Your account activation is complete!"
-msgstr ""
+msgstr "El teu compte ha estat activat!"
 
 #: cms/templates/activation_complete.html
 msgid ""
@@ -9738,7 +9973,7 @@ msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "Your file has been deleted."
-msgstr ""
+msgstr "El teu fitxer s'ha esborrat."
 
 #: cms/templates/asset_index.html
 msgid "close alert"
@@ -11014,7 +11249,7 @@ msgstr ""
 
 #: cms/templates/overview.html
 msgid "Collapse All Sections"
-msgstr ""
+msgstr "Col·lapsa totes les seccions"
 
 #: cms/templates/overview.html
 msgid "New Section"
@@ -11030,11 +11265,11 @@ msgstr ""
 
 #: cms/templates/overview.html
 msgid "Release date:"
-msgstr ""
+msgstr "Data de lliurament:"
 
 #: cms/templates/overview.html
 msgid "Edit section release date"
-msgstr ""
+msgstr "Edita la data de lliurament de la secció"
 
 #: cms/templates/overview.html
 msgid "Delete section"
@@ -11396,7 +11631,7 @@ msgstr ""
 
 #: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."
-msgstr ""
+msgstr "Els teus canvis de política s'han guardat."
 
 #: cms/templates/settings_advanced.html
 msgid "There was an error saving your information. Please see below."
@@ -11815,7 +12050,7 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "Looking for Help with Studio?"
-msgstr ""
+msgstr "Busques ajuda amb l'Studio?"
 
 #: cms/templates/widgets/sock.html
 msgid "edX Studio Help"
@@ -11872,23 +12107,24 @@ msgstr ""
 
 # empty
 msgid "This is a key string."
-msgstr ""
+msgstr "Aquesta és una cadena clau"
 
 #: wiki/admin.py wiki/models/article.py
 msgid "created"
-msgstr ""
+msgstr "creat"
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"
-msgstr ""
+msgstr "Només hostes locals... muahahaha"
 
 #: wiki/forms.py
 msgid "Initial title of the article. May be overridden with revision titles."
 msgstr ""
+"Títol inicial de l'article. Pot ser sobreescrit amb revisions de títols."
 
 #: wiki/forms.py
 msgid "Type in some contents"
-msgstr ""
+msgstr "Escriu un contingut"
 
 #: wiki/forms.py
 msgid ""
@@ -11896,19 +12132,24 @@ msgid ""
 "can use more complex features like adding plugins, meta data, related "
 "articles etc..."
 msgstr ""
+"Aquest és només el contingut inicial del teu article. Després de crear-lo, "
+"pots utilitzar característiques més complexes com afegir plugins, meta "
+"dades, articles relacionats, etc..."
 
 #: wiki/forms.py wiki/forms.py
 msgid "Contents"
-msgstr ""
+msgstr "Contingut"
 
 #: wiki/forms.py wiki/forms.py
 msgid "Summary"
-msgstr ""
+msgstr "Resum"
 
 #: wiki/forms.py
 msgid ""
 "Give a short reason for your edit, which will be stated in the revision log."
 msgstr ""
+"Dóna un motiu breu de la teva edició, la qual es mostrarà en el diari de "
+"revisions."
 
 #: wiki/forms.py
 msgid ""
@@ -11916,18 +12157,21 @@ msgid ""
 "have been automatically merged with the new contents. Please review the text"
 " below."
 msgstr ""
+"Mentre estaves editant, algú altre ha canviat la revisió. El teu contingut "
+"ha estat automàticament fusionat amb el nou contingut. Si us plau, revisa el"
+" text següent."
 
 #: wiki/forms.py
 msgid "No changes made. Nothing to save."
-msgstr ""
+msgstr "No s'han fet canvis. Res a guardar."
 
 #: wiki/forms.py
 msgid "Select an option"
-msgstr ""
+msgstr "Selecciona una opció"
 
 #: wiki/forms.py
 msgid "Slug"
-msgstr ""
+msgstr "URL amigable"
 
 #: wiki/forms.py
 msgid ""
@@ -11935,30 +12179,33 @@ msgid ""
 "alphanumeric characters and - or _. Note that you cannot change the slug "
 "after creating the article."
 msgstr ""
+"Aquesta serà l'adreça on el teu article serà trobat. Utilitza només "
+"caràcters alfanumèrics i - o _. Tingues en compte que no podràs canviar la "
+"URL amigable després de crear l'article."
 
 #: wiki/forms.py
 msgid "Write a brief message for the article's history log."
-msgstr ""
+msgstr "Escriu un missatge breu per al diari de l'article."
 
 #: wiki/forms.py
 msgid "A slug may not begin with an underscore."
-msgstr ""
+msgstr "La URL amigable no hauria de començar amb guionet baix."
 
 #: wiki/forms.py
 msgid "A deleted article with slug \"%s\" already exists."
-msgstr ""
+msgstr "Un article esborrat amb URL amigable \"%s\" ja existeix."
 
 #: wiki/forms.py
 msgid "A slug named \"%s\" already exists."
-msgstr ""
+msgstr "Una URL amigable \"%s\" ja existeix."
 
 #: wiki/forms.py
 msgid "Yes, I am sure"
-msgstr ""
+msgstr "Sí, n'estic segur"
 
 #: wiki/forms.py
 msgid "Purge"
-msgstr ""
+msgstr "Purgar"
 
 #: wiki/forms.py
 msgid ""
@@ -11966,236 +12213,254 @@ msgid ""
 " Purging is a good idea if you want to free the slug such that users can "
 "create new articles in its place."
 msgstr ""
+"Purgar l'article: esborrar-lo completament (i tot el seu contingut) sense "
+"possibilitat de desfer els canvis. Purgar és una bona idea si vols alliberar"
+" URL amigables per a que siguin utilitzades per altres usuaris que creïn "
+"nous articles."
 
 #: wiki/forms.py wiki/plugins/attachments/forms.py
 #: wiki/plugins/images/forms.py
 msgid "You are not sure enough!"
-msgstr ""
+msgstr "No estàs prou segur!"
 
 #: wiki/forms.py
 msgid "While you tried to delete this article, it was modified. TAKE CARE!"
 msgstr ""
+"Mentre provaves d'esborrar aquest article, ha estat modificat. VIGILA!"
 
 #: wiki/forms.py
 msgid "Lock article"
-msgstr ""
+msgstr "Bloquejar l'article"
 
 #: wiki/forms.py
 msgid "Deny all users access to edit this article."
-msgstr ""
+msgstr "Denegar l'accés de tots els usuaris a editar aquest article."
 
 #: wiki/forms.py
 msgid "Permissions"
-msgstr ""
+msgstr "Permisos"
 
 #: wiki/forms.py
 msgid "Owner"
-msgstr ""
+msgstr "Propietari"
 
 #: wiki/forms.py
 msgid "Enter the username of the owner."
-msgstr ""
+msgstr "Entra el nom d'usuari del propietari."
 
 #: wiki/forms.py
 msgid "(none)"
-msgstr ""
+msgstr "(cap)"
 
 #: wiki/forms.py
 msgid "Inherit permissions"
-msgstr ""
+msgstr "Heretar permisos"
 
 #: wiki/forms.py
 msgid ""
 "Check here to apply the above permissions recursively to articles under this"
 " one."
 msgstr ""
+"Marca aquí per aplicar els permisos anteriors als articles per sota d'aquest"
+" de manera recursiva."
 
 #: wiki/forms.py
 msgid "Permission settings for the article were updated."
-msgstr ""
+msgstr "S'han actualitzat els permisos de l'article."
 
 #: wiki/forms.py
 msgid "Your permission settings were unchanged, so nothing saved."
-msgstr ""
+msgstr "No s'han canviat els teus permisos. Res a guardar."
 
 #: wiki/forms.py
 msgid "No user with that username"
-msgstr ""
+msgstr "No hi ha cap usuari amb aquest nom"
 
 #: wiki/forms.py
 msgid "Article locked for editing"
-msgstr ""
+msgstr "Article bloquejat per editar"
 
 #: wiki/forms.py
 msgid "Article unlocked for editing"
-msgstr ""
+msgstr "Article desbloquejat per editar"
 
 #: wiki/forms.py
 msgid "Filter..."
-msgstr ""
+msgstr "Filtre..."
 
 #: wiki/core/plugins/base.py
 msgid "Settings for plugin"
-msgstr ""
+msgstr "Configuració del plugin"
 
 #: wiki/models/article.py wiki/models/pluginbase.py
 #: wiki/plugins/attachments/models.py
 msgid "current revision"
-msgstr ""
+msgstr "revisió actual"
 
 #: wiki/models/article.py
 msgid ""
 "The revision being displayed for this article. If you need to do a roll-"
 "back, simply change the value of this field."
 msgstr ""
+"La revisió mostrada per aquest article. Si necessites tirar enrere, "
+"simplement canvia el valor d'aquest camp."
 
 #: wiki/models/article.py
 msgid "modified"
-msgstr ""
+msgstr "modificat"
 
 #: wiki/models/article.py
 msgid "Article properties last modified"
-msgstr ""
+msgstr "Propietats de l'article darrerament modificades"
 
 #: wiki/models/article.py
 msgid "owner"
-msgstr ""
+msgstr "propietari"
 
 #: wiki/models/article.py
 msgid ""
 "The owner of the article, usually the creator. The owner always has both "
 "read and write access."
 msgstr ""
+"El propietari de l'article, normalment el creador. El propietari sempre té "
+"permisos de lectura i escriptura."
 
 #: wiki/models/article.py
 msgid "group"
-msgstr ""
+msgstr "grup"
 
 #: wiki/models/article.py
 msgid ""
 "Like in a UNIX file system, permissions can be given to a user according to "
 "group membership. Groups are handled through the Django auth system."
 msgstr ""
+"Com en un sistema d'arxius UNIX, els permisos es poden donar a un usuari "
+"d'acord amb la seva pertinença a un grup. Els grups es mantenen a través el "
+"sistema auth de Django."
 
 #: wiki/models/article.py
 msgid "group read access"
-msgstr ""
+msgstr "accés de lectura del grup"
 
 #: wiki/models/article.py
 msgid "group write access"
-msgstr ""
+msgstr "accés d'escriptura del grup"
 
 #: wiki/models/article.py
 msgid "others read access"
-msgstr ""
+msgstr "accés de lectura d'altres"
 
 #: wiki/models/article.py
 msgid "others write access"
-msgstr ""
+msgstr "accés d'escriptura d'altres"
 
 #: wiki/models/article.py
 msgid "Article without content (%(id)d)"
-msgstr ""
+msgstr "Article sense contingut (%(id)d)"
 
 #: wiki/models/article.py
 msgid "content type"
-msgstr ""
+msgstr "tipus de contingut"
 
 #: wiki/models/article.py
 msgid "object ID"
-msgstr ""
+msgstr "ID d'objecte"
 
 #: wiki/models/article.py
 msgid "Article for object"
-msgstr ""
+msgstr "Article per l'objecte"
 
 #: wiki/models/article.py
 msgid "Articles for object"
-msgstr ""
+msgstr "Articles per l'objecte"
 
 #: wiki/models/article.py
 msgid "revision number"
-msgstr ""
+msgstr "número de revisió"
 
 #: wiki/models/article.py
 msgid "IP address"
-msgstr ""
+msgstr "Adreça IP"
 
 #: wiki/models/article.py
 msgid "user"
-msgstr ""
+msgstr "usuari"
 
 #: wiki/models/article.py
 msgid "locked"
-msgstr ""
+msgstr "bloquejat"
 
 #: wiki/models/article.py wiki/models/pluginbase.py
 msgid "article"
-msgstr ""
+msgstr "article"
 
 #: wiki/models/article.py
 msgid "article contents"
-msgstr ""
+msgstr "contingut de l'article"
 
 #: wiki/models/article.py
 msgid "article title"
-msgstr ""
+msgstr "títol d'article"
 
 #: wiki/models/article.py
 msgid ""
 "Each revision contains a title field that must be filled out, even if the "
 "title has not changed"
 msgstr ""
+"Cada revisió conté un camp de títol que s'ha d'omplir, inclús si el títol no"
+" ha canviat"
 
 #: wiki/models/pluginbase.py
 msgid "original article"
-msgstr ""
+msgstr "article original"
 
 #: wiki/models/pluginbase.py
 msgid "Permissions are inherited from this article"
-msgstr ""
+msgstr "Els permisos s'hereten d'aquest article"
 
 #: wiki/models/pluginbase.py
 msgid "A plugin was changed"
-msgstr ""
+msgstr "S'ha canviat un plugin"
 
 #: wiki/models/pluginbase.py
 msgid ""
 "The revision being displayed for this plugin.If you need to do a roll-back, "
 "simply change the value of this field."
 msgstr ""
+"La revisió mostrada per aquest plugin. Si necessites fer-te enrere, "
+"simplement canvia el valor d'aquest camp."
 
 #: wiki/models/urlpath.py
 msgid "Cache lookup value for articles"
-msgstr ""
+msgstr "Valor de cerca d'articles en memòria"
 
 #: wiki/models/urlpath.py
 msgid "slug"
-msgstr ""
+msgstr "url amigable"
 
 #: wiki/models/urlpath.py
 msgid "(root)"
-msgstr ""
+msgstr "(arrel)"
 
 #: wiki/models/urlpath.py
 msgid "URL path"
-msgstr ""
+msgstr "Camí URL"
 
 #: wiki/models/urlpath.py
 msgid "URL paths"
-msgstr ""
+msgstr "Camins URL"
 
 #: wiki/models/urlpath.py
 msgid "Sorry but you cannot have a root article with a slug."
-msgstr ""
+msgstr "Ho sentim, no pots tenir un article arrel amb url amigable."
 
 #: wiki/models/urlpath.py
 msgid "A non-root note must always have a slug."
-msgstr ""
+msgstr "Una nota no-arrel ha de tenir sempre una url amigable."
 
 #: wiki/models/urlpath.py
 msgid "There is already a root node on %s"
-msgstr ""
+msgstr "Ja hi ha un node arrel en %s"
 
 #: wiki/models/urlpath.py
 msgid ""
@@ -12204,273 +12469,290 @@ msgid ""
 "\n"
 "The children of this article have had their parents deleted. You should probably find a new home for them."
 msgstr ""
+"Articles que han perdut els seus pares\n"
+"===============================\n"
+"\n"
+"Als fills d'aquest article se'ls ha esborrat els pares. Els hi hauràs de buscar un nou origen."
 
 #: wiki/models/urlpath.py
 msgid "Lost and found"
-msgstr ""
+msgstr "Perduts i trobats"
 
 #: wiki/plugins/attachments/forms.py
 msgid "A short summary of what the file contains"
-msgstr ""
+msgstr "Resum breu del contingut del fitxer"
 
 #: wiki/plugins/attachments/forms.py
 msgid "Yes I am sure..."
-msgstr ""
+msgstr "Sí, n'estic segur..."
 
 #: wiki/plugins/attachments/markdown_extensions.py
 msgid "Click to download file"
-msgstr ""
+msgstr "Clica per descarregar fitxer"
 
 #: wiki/plugins/attachments/models.py
 msgid ""
 "The revision of this attachment currently in use (on all articles using the "
 "attachment)"
 msgstr ""
+"La revisió d'aquest adjunt actualment en ús (en tots els articles que "
+"utilitzen l'adjunt)"
 
 #: wiki/plugins/attachments/models.py
 msgid "original filename"
-msgstr ""
+msgstr "nom de fitxer original"
 
 #: wiki/plugins/attachments/models.py
 msgid "attachment"
-msgstr ""
+msgstr "adjunt"
 
 #: wiki/plugins/attachments/models.py
 msgid "attachments"
-msgstr ""
+msgstr "adjunts"
 
 #: wiki/plugins/attachments/models.py
 msgid "file"
-msgstr ""
+msgstr "fitxer"
 
 #: wiki/plugins/attachments/models.py
 msgid "attachment revision"
-msgstr ""
+msgstr "revisió de l'adjunt"
 
 #: wiki/plugins/attachments/models.py
 msgid "attachment revisions"
-msgstr ""
+msgstr "revisions dels adjunts"
 
 #: wiki/plugins/attachments/views.py
 msgid "%s was successfully added."
-msgstr ""
+msgstr "%s correctament afegit."
 
 #: wiki/plugins/attachments/views.py wiki/plugins/attachments/views.py
 msgid "Your file could not be saved: %s"
-msgstr ""
+msgstr "El teu fitxer no s'ha pogut guardar: %s"
 
 #: wiki/plugins/attachments/views.py wiki/plugins/attachments/views.py
 msgid ""
 "Your file could not be saved, probably because of a permission error on the "
 "web server."
 msgstr ""
+"El teu fitxer no s'ha pogut guardar, probablement perquè hi ha hagut un "
+"error de permisos en el servidor web."
 
 #: wiki/plugins/attachments/views.py
 msgid "%s uploaded and replaces old attachment."
-msgstr ""
+msgstr "%s carregat i substitueix l'antic adjunt."
 
 #: wiki/plugins/attachments/views.py
 msgid ""
 "Your new file will automatically be renamed to match the file already "
 "present. Files with different extensions are not allowed."
 msgstr ""
+"El teu nou fitxer es reanomenarà automàticament perquè coincideixi amb el "
+"fitxer present actualment. No es permeten fitxers amb diferents extensions."
 
 #: wiki/plugins/attachments/views.py
 msgid "Current revision changed for %s."
-msgstr ""
+msgstr "La revisió actual ha canviat per %s."
 
 #: wiki/plugins/attachments/views.py
 msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
-msgstr ""
+msgstr "Referència afegida a \"%(att)s\" des de \"%(art)s\"."
 
 #: wiki/plugins/attachments/views.py
 msgid "The file %s was deleted."
-msgstr ""
+msgstr "El fitxer %s s'ha esborrat."
 
 #: wiki/plugins/attachments/views.py
 msgid "This article is no longer related to the file %s."
-msgstr ""
+msgstr "Aquest article ja no està relacionat amb el fitxer %s."
 
 #: wiki/plugins/attachments/wiki_plugin.py
 msgid "A file was changed: %s"
-msgstr ""
+msgstr "S'ha canviat un fitxer: %s"
 
 #: wiki/plugins/attachments/wiki_plugin.py
 msgid "A file was deleted: %s"
-msgstr ""
+msgstr "S'ha esborrat un fitxer: %s"
 
 #: wiki/plugins/images/forms.py
 msgid ""
 "New image %s was successfully uploaded. You can use it by selecting it from "
 "the list of available images."
 msgstr ""
+"S'ha carregat una nova imatge %s. Pots utilitzar-la seleccionant-la de la "
+"llista d'imatges disponibles."
 
 #: wiki/plugins/images/forms.py
 msgid "Are you sure?"
-msgstr ""
+msgstr "Segur?"
 
 #: wiki/plugins/images/models.py
 msgid "image"
-msgstr ""
+msgstr "imatge"
 
 #: wiki/plugins/images/models.py
 msgid "images"
-msgstr ""
+msgstr "imatges"
 
 #: wiki/plugins/images/models.py
 msgid "Image: %s"
-msgstr ""
+msgstr "Imatge: %s"
 
 #: wiki/plugins/images/models.py
 msgid "Current revision not set!!"
-msgstr ""
+msgstr "No s'ha establert la revisió actual!!"
 
 #: wiki/plugins/images/models.py
 msgid "image revision"
-msgstr ""
+msgstr "revisió d'imatge"
 
 #: wiki/plugins/images/models.py
 msgid "image revisions"
-msgstr ""
+msgstr "revisions d'imatge"
 
 #: wiki/plugins/images/models.py
 msgid "Image Revsion: %d"
-msgstr ""
+msgstr "Revisió d'imatge: %d"
 
 #: wiki/plugins/images/views.py
 msgid "%s has been restored"
-msgstr ""
+msgstr "%s ha estat restablert"
 
 #: wiki/plugins/images/views.py
 msgid "%s has been marked as deleted"
-msgstr ""
+msgstr "%s ha estat marcat com esborrat"
 
 #: wiki/plugins/images/views.py
 msgid "%(file)s has been changed to revision #%(revision)d"
-msgstr ""
+msgstr "%(file)s ha estat canviat a la revisió #%(revision)d"
 
 #: wiki/plugins/images/views.py
 msgid "%(file)s has been saved."
-msgstr ""
+msgstr "%(file)s ha estat guardat."
 
 #: wiki/plugins/images/wiki_plugin.py
 msgid "Images"
-msgstr ""
+msgstr "Imatges"
 
 #: wiki/plugins/images/wiki_plugin.py
 msgid "An image was added: %s"
-msgstr ""
+msgstr "S'ha afegit una imatge: %s"
 
 #: wiki/plugins/links/wiki_plugin.py
 msgid "Links"
-msgstr ""
+msgstr "Enllaços"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Notifications"
-msgstr ""
+msgstr "Notificacions"
 
 #: wiki/plugins/notifications/forms.py
 msgid "When this article is edited"
-msgstr ""
+msgstr "Quan aquest article és editat"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Also receive emails about article edits"
-msgstr ""
+msgstr "Rebre també emails sobre edicions d'article"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Your notification settings were updated."
-msgstr ""
+msgstr "S'ha actualitzat la configuració de notificacions."
 
 #: wiki/plugins/notifications/forms.py
 msgid "Your notification settings were unchanged, so nothing saved."
-msgstr ""
+msgstr "La teva configuració de notificacions no han canviat. Res a guardar."
 
 #: wiki/plugins/notifications/models.py
 msgid "%(user)s subscribing to %(article)s (%(type)s)"
-msgstr ""
+msgstr "%(user)s subscrit a %(article)s (%(type)s)"
 
 #: wiki/plugins/notifications/models.py
 msgid "Article deleted: %s"
-msgstr ""
+msgstr "Article esborrat: %s"
 
 #: wiki/plugins/notifications/models.py
 msgid "Article modified: %s"
-msgstr ""
+msgstr "Article modificat: %s"
 
 #: wiki/plugins/notifications/models.py
 msgid "New article created: %s"
-msgstr ""
+msgstr "Nou article creat: %s"
 
 #: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"
-msgstr ""
+msgstr "Ja estàs enregistrat... ara pots entrar!"
 
 #: wiki/views/accounts.py
 msgid "You are no longer logged in. Bye bye!"
-msgstr ""
+msgstr "Has sortit del sistema. Adéu!"
 
 #: wiki/views/accounts.py
 msgid "You are now logged in! Have fun!"
-msgstr ""
+msgstr "Ja ets dins! Diverteix-te!"
 
 #: wiki/views/article.py
 msgid "New article '%s' created."
-msgstr ""
+msgstr "S'ha creat un nou article '%s'."
 
 #: wiki/views/article.py
 msgid "There was an error creating this article: %s"
-msgstr ""
+msgstr "Hi ha hagut un error creant l'article: %s"
 
 #: wiki/views/article.py
 msgid "There was an error creating this article."
-msgstr ""
+msgstr "Error creant l'article."
 
 #: wiki/views/article.py
 msgid ""
 "This article cannot be deleted because it has children or is a root article."
 msgstr ""
+"No s'ha pogut esborrar l'article perquè té fills o no és un article arrel."
 
 #: wiki/views/article.py
 msgid ""
 "This article together with all its contents are now completely gone! Thanks!"
-msgstr ""
+msgstr "L'article juntament amb el seu contingut s'han eliminat. Gràcies!"
 
 #: wiki/views/article.py
 msgid ""
 "The article \"%s\" is now marked as deleted! Thanks for keeping the site "
 "free from unwanted material!"
 msgstr ""
+"L'article \"%s\" s'ha marcat com esborrat! Gràcies per mantenir el lloc "
+"lliure de material indesitjat!"
 
 #: wiki/views/article.py
 msgid "Your changes were saved."
-msgstr ""
+msgstr "S'han guardat els teus canvis."
 
 #: wiki/views/article.py
 msgid "A new revision of the article was succesfully added."
-msgstr ""
+msgstr "S'ha afegit correctament una nova revisió de l'article."
 
 #: wiki/views/article.py
 msgid "Restoring article"
-msgstr ""
+msgstr "Restablint l'article"
 
 #: wiki/views/article.py
 msgid "The article \"%s\" and its children are now restored."
-msgstr ""
+msgstr "L'article \"%s\" i els seus fills s'han restablert."
 
 #: wiki/views/article.py
 msgid "The article %s is now set to display revision #%d"
-msgstr ""
+msgstr "L'article %s s'ha configurat per mostrar la revisió #%d"
 
 #: wiki/views/article.py
 msgid "New title"
-msgstr ""
+msgstr "Nou títol"
 
 #: wiki/views/article.py
 msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
-msgstr ""
+msgstr "Fusiona la Revisió #%(r1)d i la Revisió #%(r2)d"
 
 #: wiki/views/article.py
 msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"
 msgstr ""
+"S'ha creat una nova revisió: fusió entre la Revisió #%(r1)d i la Revisió "
+"#%(r2)d"

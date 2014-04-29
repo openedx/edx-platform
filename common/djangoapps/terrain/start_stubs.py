@@ -1,7 +1,6 @@
 """
 Initialize and teardown stub and video HTTP services for use in acceptance tests.
 """
-import requests
 from lettuce import before, after, world
 from django.conf import settings
 from terrain.stubs.youtube import StubYouTubeService
@@ -15,8 +14,6 @@ SERVICES = {
     "xqueue": {"port": settings.XQUEUE_PORT, "class": StubXQueueService},
     "lti": {"port": settings.LTI_PORT, "class": StubLtiService},
 }
-
-YOUTUBE_API_RESPONSE = requests.get('http://www.youtube.com/iframe_api')
 
 
 @before.all  # pylint: disable=E1101
@@ -49,8 +46,6 @@ def start_stubs(_scenario):
     """
     for name, service in SERVICES.iteritems():
         fake_server = service['class'](port_num=service['port'])
-        if name == 'youtube':
-            fake_server.config['youtube_api_response'] = YOUTUBE_API_RESPONSE
         setattr(world, name, fake_server)
 
 

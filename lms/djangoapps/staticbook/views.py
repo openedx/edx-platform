@@ -51,6 +51,7 @@ def remap_static_url(original_url, course):
         input_url,
         getattr(course, 'data_dir', None),
         course_id=course.location.course_id,
+        static_asset_path=course.static_asset_path
     )
     # strip off the quotes again...
     return output_url[1:-1]

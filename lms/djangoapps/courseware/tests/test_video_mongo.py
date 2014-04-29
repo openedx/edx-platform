@@ -41,6 +41,7 @@ class TestVideoYouTube(TestVideo):
             'end': 3610.0,
             'id': self.item_descriptor.location.html_id(),
             'show_captions': 'true',
+            'handout': None,
             'sources': sources,
             'speed': 'null',
             'general_speed': 1.0,
@@ -104,6 +105,7 @@ class TestVideoNonYouTube(TestVideo):
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
+            'handout': None,
             'display_name': u'A Name',
             'end': 3610.0,
             'id': self.item_descriptor.location.html_id(),
@@ -203,6 +205,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
+            'handout': None,
             'display_name': u'A Name',
             'end': 3610.0,
             'id': None,
@@ -324,6 +327,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
+            'handout': None,
             'display_name': u'A Name',
             'end': 3610.0,
             'id': None,
@@ -469,6 +473,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
                     'options': [],
                 },
                 'transcripts': {},
+                'handout': {},
             }
         ):
             metadata = {

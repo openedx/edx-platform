@@ -13,15 +13,15 @@ define ["js/models/uploads"], (FileUpload) ->
         it "is valid by default", ->
             expect(@model.isValid()).toBeTruthy()
 
-        it "is invalid for text files by default", ->
+        it "is valid for text files by default", ->
             file = {"type": "text/plain", "name": "filename.txt"}
             @model.set("selectedFile", file);
-            expect(@model.isValid()).toBeFalsy()
+            expect(@model.isValid()).toBeTruthy()
 
-        it "is invalid for PNG files by default", ->
+        it "is valid for PNG files by default", ->
             file = {"type": "image/png", "name": "filename.png"}
             @model.set("selectedFile", file);
-            expect(@model.isValid()).toBeFalsy()
+            expect(@model.isValid()).toBeTruthy()
 
         it "can accept a file type when explicitly set", ->
             file = {"type": "image/png", "name": "filename.png"}

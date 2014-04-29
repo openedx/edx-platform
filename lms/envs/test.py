@@ -180,6 +180,9 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
+######### Third-party auth ##########
+FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
+
 ################################## OPENID #####################################
 FEATURES['AUTH_USE_OPENID'] = True
 FEATURES['AUTH_USE_OPENID_PROVIDER'] = True

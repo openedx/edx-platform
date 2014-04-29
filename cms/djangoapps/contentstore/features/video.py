@@ -11,6 +11,7 @@ VIDEO_BUTTONS = {
     'volume': '.volume',
     'play': '.video_control.play',
     'pause': '.video_control.pause',
+    'handout': '.video-handout.video-download-button a',
 }
 
 SELECTORS = {
@@ -35,8 +36,6 @@ def configure_youtube_api(_step, action):
 
 @step('I have created a Video component$')
 def i_created_a_video_component(_step):
-
-    assert_less(world.youtube.config['youtube_api_response'].status_code, 400,  "Real Youtube server is unavailable")
 
     world.create_course_with_unit()
     world.create_component_instance(

@@ -609,6 +609,41 @@ body.course.unit,.view-unit {
     display: block;
   }
 
+  .file-uploader {
+    .upload-setting {
+      @extend %ui-btn-flat-outline;
+      @extend %t-action3;
+      @include box-sizing(border-box);
+      display: inline-block;
+      padding: ($baseline/2);
+      font-weight: 600;
+      width: 49%;
+      margin-right: 2%;
+    }
+
+    .download-setting {
+      @extend %ui-btn-non;
+      @extend %t-action4;
+      @include box-sizing(border-box);
+      display: inline-block;
+      padding: ($baseline/2);
+      font-weight: 600;
+      width: 49%;
+      text-align: center;
+      color: $blue;
+
+      &:hover {
+        background-color: $blue;
+      }
+    }
+
+    .wrapper-uploader-actions {
+      width: 45%;
+      display: inline-block;
+      min-width: ($baseline*5);
+    }
+  }
+
   //settings-list
   .list-input.settings-list {
     margin: 0;

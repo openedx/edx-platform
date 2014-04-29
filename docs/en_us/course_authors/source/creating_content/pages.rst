@@ -33,7 +33,7 @@ You can create other pages for the grading policy, course slides, or any other p
 
 * A dynamic HTML calendar, using the template in :ref:`Code for Dynamic HTML Schedule`.
 
-* An instant hangout.  See :ref:`Using an Instant Hangout in Your Course` for more information.
+* An instant hangout.  See :ref:`Google Instant Hangout` for more information.
 
 See:
 
@@ -66,7 +66,7 @@ Add a Page
   .. image:: ../Images/pages_editor.png
    :alt: Image of the Page editor
 
-4. Enter text for your page. See :ref:`The HTML Editor` for more information about using the editor.
+4. Enter text for your page. See :ref:`Options for Editing HTML Components` for more information about using the editor.
 #. Click **Settings** to edit the **Display Name**. The display name is the name of the page visible to students in the course.
 #. Click **Save**. 
 

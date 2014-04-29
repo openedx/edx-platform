@@ -178,8 +178,6 @@ def add_videos_to_course(course, player_mode=None, display_names=None, hashes=No
 
 def add_video_to_course(course, parent_location=None, player_mode=None, data=None, display_name='Video'):
 
-    assert_less(world.youtube.config['youtube_api_response'].status_code, 400, "Real Youtube server is unavailable")
-
     if not parent_location:
         parent_location = add_vertical_to_course(course)
     kwargs = get_metadata(parent_location, player_mode, data, display_name=display_name)
@@ -482,6 +480,7 @@ def check_captions(_step):
 
 @step('I select language with code "([^"]*)"$')
 def select_language(_step, code):
+    world.wait_for_visible('.video-controls')
     # Make sure that all ajax requests that affects the language menu are finished.
     # For example, request to get new translation etc.
     world.wait_for_ajax_complete()
@@ -506,16 +505,19 @@ def select_language(_step, code):
 @step('I click video button "([^"]*)"$')
 def click_button(_step, button):
     world.css_click(VIDEO_BUTTONS[button])
+    if button == "play":
+        # Needs to wait for video buffrization
+        world.wait_for(
+            func=lambda _: world.css_has_class('.video', 'is-playing') and world.is_css_present(VIDEO_BUTTONS['pause']),
+            timeout=30
+        )
+
     world.wait_for_ajax_complete()
 
 
-@step('I see video slider at "([^"]*)" seconds$')
-def start_playing_video_from_n_seconds(_step, position):
-    world.wait_for(
-        func=lambda _: elapsed_time() > 0,
-        timeout=30
-    )
-
+@step('I see video slider at "([^"]*)" position$')
+def start_playing_video_from_n_seconds(_step, time_str):
+    position = parse_time_str(time_str)
     actual_position = elapsed_time()
     assert_equal(actual_position, int(position), "Current position is {}, but should be {}".format(actual_position, position))
 
@@ -530,12 +532,21 @@ def i_see_duration(_step, position):
     assert duration() == parse_time_str(position)
 
 
-@step('I seek video to "([^"]*)" seconds$')
-def seek_video_to_n_seconds(_step, seconds):
-    time = float(seconds.strip())
-    jsCode = "$('.video').data('video-player-state').videoPlayer.onSlideSeek({{time: {0:f}}})".format(time)
+@step('I wait for video controls appear$')
+def controls_appear(_step):
+    world.wait_for_visible('.video-controls')
+
+
+@step('I seek video to "([^"]*)" position$')
+def seek_video_to_n_seconds(_step, time_str):
+    time = parse_time_str(time_str)
+    jsCode = "$('.video').data('video-player-state').videoPlayer.onSlideSeek({{time: {0}}})".format(time)
     world.browser.execute_script(jsCode)
-    _step.given('I see video slider at "{}" seconds'.format(seconds))
+    world.wait_for(
+        func=lambda _: world.retry_on_exception(lambda: elapsed_time() == time and not world.css_has_class('.video', 'is-buffering')),
+        timeout=30
+    )
+    _step.given('I see video slider at "{0}" position'.format(time_str))
 
 
 @step('I have a "([^"]*)" transcript file in assets$')

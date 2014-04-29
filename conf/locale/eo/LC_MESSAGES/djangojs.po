@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-04-22 10:02-0400\n"
-"PO-Revision-Date: 2014-04-22 14:03:27.561369\n"
+"POT-Creation-Date: 2014-04-28 11:25-0400\n"
+"PO-Revision-Date: 2014-04-28 15:26:13.632347\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -349,6 +349,7 @@ msgstr "Shöw Dïsçüssïön Ⱡ'#"
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
 msgstr "Sörrý Ⱡ'σяєм ι#"
@@ -533,6 +534,12 @@ msgstr "Löäd néxt %(numResponses)s réspönsés Ⱡ'σяє#"
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
 msgstr "Àré ýöü süré ýöü wänt tö délété thïs pöst? Ⱡ'σяєм ιρѕυ#"
+
+#: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
+msgid "We had some trouble loading the page you requested. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé löädïng thé pägé ýöü réqüéstéd. Pléäsé trý ägäïn. Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
@@ -1712,6 +1719,10 @@ msgid ""
 msgstr ""
 "Fïlé förmät nöt süppörtéd. Pléäsé üplöäd ä fïlé wïth ä <code>tär.gz</code> "
 "éxténsïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: cms/static/js/views/metadata.js
+msgid "Upload File"
+msgstr "Ûplöäd Fïlé Ⱡ#"
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"

@@ -7,3 +7,4 @@ Extending the edX Platform
 
     extending.rst
     javascript
+    js_template_example

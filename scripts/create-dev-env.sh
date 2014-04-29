@@ -479,6 +479,10 @@ esac
 output "Installing edX pre-requirements"
 pip install -r $BASE/edx-platform/requirements/edx/pre.txt
 
+output "Installing edX paver-requirements"
+pip install -r $BASE/edx-platform/requirements/edx/paver.txt
+
+
 output "Installing edX requirements"
 # Install prereqs
 cd $BASE/edx-platform

@@ -205,7 +205,11 @@ class Command(BaseCommand):
                 'linkedin_add_url': self.certificate_url(cert),
             })
 
-        context = {'courses_list': courses_list, 'num_courses': len(courses_list)}
+        context = {
+            'courses_list': courses_list,
+            'num_courses': len(courses_list),
+            'google_analytics': settings.GOOGLE_ANALYTICS_LINKEDIN,
+        }
         body = render_to_string('linkedin/linkedin_email.html', context)
         subject = u'{}, Add your Achievements to your LinkedIn Profile'.format(user.profile.name)
         if mock_run:

@@ -19,9 +19,9 @@ Feature: CMS.Textbooks
     And I upload the textbook "textbook.pdf"
     And I wait for "2" seconds
     And I save the textbook
-    Then I should see a textbook named "Economics" with a chapter path containing "/c4x/MITx/999/asset/textbook.pdf"
+    Then I should see a textbook named "Economics" with a chapter path containing "/static/textbook.pdf"
     And I reload the page
-    Then I should see a textbook named "Economics" with a chapter path containing "/c4x/MITx/999/asset/textbook.pdf"
+    Then I should see a textbook named "Economics" with a chapter path containing "/static/textbook.pdf"
 
   Scenario: Create a textbook with multiple chapters
     Given I have opened a new course in Studio

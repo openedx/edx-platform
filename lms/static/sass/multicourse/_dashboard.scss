@@ -130,6 +130,23 @@
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
+
+            .third-party-auth {
+              color: inherit;
+              font-weight: inherit;
+
+              .control {
+                float: right;
+              }
+
+              .icon {
+                margin-top: 4px;
+              }
+
+              .provider {
+                display: inline;
+              }
+            }
           }
         }
       }

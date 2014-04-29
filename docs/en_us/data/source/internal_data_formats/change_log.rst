@@ -10,6 +10,8 @@ Change Log
 
    * - Date
      - Change
+   * - 25 Apr 14
+     - Added new event types to the :ref:`Tracking Logs` chapter for interactions with PDF files.
    * - 31 Mar 2014
      - Added new fields for the server ``problem_check`` event type to the :ref:`Tracking Logs` chapter.
    * -

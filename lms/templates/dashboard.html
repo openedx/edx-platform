@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.template import RequestContext %>
+<%! from third_party_auth import pipeline %>
 
 <%!
   from django.core.urlresolvers import reverse
@@ -34,8 +35,7 @@
     $("#failed-verification-button-dismiss").click(function(event) {
       $.ajax({
         url: "${reverse('verify_student_toggle_failed_banner_off')}",
-        type: "post",
-        data: { 'user_id': ${user.id}, }
+        type: "post"
         })
       $("#failed-verification-banner").addClass('is-hidden');
       })
@@ -195,6 +195,13 @@
     </section>
   %endif
 
+  % if duplicate_provider:
+    <section class="dashboard-banner third-party-auth">
+      ## Translators: this message is displayed when a user tries to link their account with a third-party authentication provider (for example, Google or LinkedIn) with a given edX account, but their third-party account is already associated with another edX account. provider_name is the name of the third-party authentication provider, and platform_name is the name of the edX deployment.
+      ${_('The selected {provider_name} account is already linked to another {platform_name} account. Please {link_start}log out{link_end}, then log in with your {provider_name} account.').format(link_end='</a>', link_start='<a href="%s">' % logout_url, provider_name='<strong>%s</strong>' % duplicate_provider.NAME, platform_name=platform_name)}
+    </section>
+  % endif
+
   <section class="profile-sidebar">
     <header class="profile">
       <h1 class="user-name">${ user.username }</h1>
@@ -215,6 +222,53 @@
         %if len(language_options) > 1:
         <%include file='dashboard/_dashboard_info_language.html' />
         %endif
+
+        % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+        <li class="controls--account">
+          <span class="title">
+            <div class="icon icon-gears"></div>
+            ## Translators: this section lists all the third-party authentication providers (for example, Google and LinkedIn) the user can link with or unlink from their edX account.
+            ${_("Account Links")}
+          </span>
+
+          <span class="data">
+            <span class="third-party-auth">
+
+            % for state in provider_user_states:
+            <div>
+
+              % if state.has_account:
+              <span class="icon icon-link pull-left"></span>
+              % else:
+              <span class="icon icon-unlink pull-left"></span>
+              % endif
+
+              <span class="provider">${state.provider.NAME}</span>
+              <span class="control">
+
+              % if state.has_account:
+                <form
+                  action="${pipeline.get_disconnect_url(state.provider.NAME)}"
+                  method="post"
+                  name="${state.get_unlink_form_name()}">
+                  <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+                </form>
+                <a href="#" onclick="document.${state.get_unlink_form_name()}.submit()">
+                  ## Translators: clicking on this removes the link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
+                  ${_("unlink")}
+                </a>
+              % else:
+                <a href="${pipeline.get_login_url(state.provider.NAME, pipeline.AUTH_ENTRY_DASHBOARD)}">
+                  ## Translators: clicking on this creates a link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
+                  ${_("link")}
+                </a>
+              % endif
+              </span>
+            </div>
+            % endfor
+          </span>
+        </li>
+        % endif
 
         % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
         <li class="controls--account">

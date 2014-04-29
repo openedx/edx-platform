@@ -176,6 +176,32 @@ def import_from_xml(
                 if module.scope_ids.block_type == 'course':
                     course_data_path = path(data_dir) / module.data_dir
                     course_location = module.location
+                    course_prefix = u'{0.org}/{0.course}'.format(course_location)
+
+                    # Check to see if a course with the same
+                    # pseudo_course_id, but different run exists in
+                    # the passed store to avoid broken courses
+                    courses = store.get_courses()
+                    bad_run = False
+                    for course in courses:
+                        if course.location.course_id.startswith(course_prefix):
+                            log.debug('Import is overwriting existing course')
+                            # Importing over existing course, check
+                            # that runs match or fail
+                            if course.location.name != module.location.name:
+                                log.error(
+                                    'A course with ID %s exists, and this '
+                                    'course has the same organization and '
+                                    'course number, but a different term that '
+                                    'is fully identified as %s.',
+                                    course.location.course_id,
+                                    module.location.course_id
+                                )
+                                bad_run = True
+                                break
+                    if bad_run:
+                        # Skip this course, but keep trying to import courses
+                        continue
 
                     log.debug('======> IMPORTING course to location {loc}'.format(
                         loc=course_location
@@ -517,12 +543,13 @@ def remap_namespace(module, target_location_namespace):
         # There is more re-namespacing work we have to do when
         # importing course modules
 
-        # remap pdf_textbook urls
+        # remap pdf_textbook urls to portable static URLs
         for entry in module.pdf_textbooks:
             for chapter in entry.get('chapters', []):
                 if StaticContent.is_c4x_path(chapter.get('url', '')):
-                    chapter['url'] = StaticContent.renamespace_c4x_path(
-                        chapter['url'], target_location_namespace
+                    chapter_loc = StaticContent.get_location_from_path(chapter['url'])
+                    chapter['url'] = StaticContent.get_static_path_from_location(
+                        chapter_loc
                     )
 
         # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.

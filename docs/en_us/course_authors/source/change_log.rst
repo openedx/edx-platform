@@ -11,12 +11,26 @@ April, 2014
    :header-rows: 1
 
    * - Date
-     - Change  
+     - Change
+   * - 04/26/14
+     - Updated label information; added XML information to :ref:`Problem with Adaptive Hint`  
+   * - 04/24/14
+     - Expanded the :ref:`Grades` chapter to include topics on interpreting the grade reports and student progress page.
+   * -    
+     - Updated the :ref:`Beta_Testing` section to reflect feature changes.
+   * -
+     - Updated the :ref:`Working with HTML Components` chapter to reflect changes to the HTML component editor.
+   * - 04/23/14
+     - Reorganized information about problems into :ref:`Exercises and Tools Index` section.
+   * - 04/23/14
+     - Added more information about collecting language and location data from students to :ref:`Student Data`.  
    * - 04/22/14
-     - Updated the :ref:`Bulk Email` section with information about the dashboard option to opt out of course email. 
+     - Updated the :ref:`Bulk Email` section with information about the dashboard option to opt out of course email.
    * - 
-     - In :ref:`Discussions`, corrected the steps to "Create" Discussion
+     - In :ref:`Discussions`, corrected the steps to "Create Discussion
        Categories".
+   * - 
+     - Updated the :ref:`Enrollment` section to reflect feature changes.
    * - 04/16/14
      - Updated "Transcripts in Additional Languages" in :ref:`Working with Video Components`.
    * -  
@@ -35,7 +49,6 @@ April, 2014
        new HTML editor. 
    * - 04/07/14
      - Expanded the :ref:`Course Data`, :ref:`Enrollment`, and
-       :ref:`Course_Staffing` sections.
    * - 04/03/14
      - Updated the :ref:`Adding Pages to a Course` chapter to reflect ability to :ref:`Show or Hide the Course Wiki Page`.
    * - 04/02/14
@@ -80,7 +93,7 @@ March, 2014
 
        * :ref:`Creating Course Content Index`
 
-       * :ref:`Working with Problems Index`
+       * :ref:`Exercises and Tools Index`
 
        * :ref:`Releasing Your Course Index`
 
@@ -138,19 +151,18 @@ February, 2014
      - Added the :ref:`Course Data`, :ref:`Course_Staffing`, and
        :ref:`Enrollment` chapters.
    * - 02/11/14
-     - Added :ref:`Gene Explorer` and updated :ref:`Interactive Periodic Table`
-       and :ref:`Molecule Editor` in :ref:`Additional Tools`.
+     - Added :ref:`Gene Explorer` and updated :ref:`Periodic Table`
+       and :ref:`Molecule Editor`.
    * - 02/07/14
      - Added section on :ref:`Full Screen Image`.
    * - 02/06/14
-     - Added :ref:`Interactive Periodic Table` and :ref:`Molecule Editor` to
-       :ref:`Additional Tools`
+     - Added :ref:`Periodic Table` and :ref:`Molecule Editor`
    * - 02/05/14
      - Added section :ref:`Set the Advertised Start Date`.
    * - 02/04/14
      - Added the :ref:`Student Data` and :ref:`Grades` chapters.
    * - 
-     - Added :ref:`Additional Tools` topic with :ref:`Multiple Choice and
+     - Added :ref:`Multiple Choice and
        Numerical Input` and :ref:`Protein Builder`.
    
 
@@ -165,7 +177,7 @@ January, 2014
    * - Date
      - Change  
    * - 01/29/2014
-     - Added the chapter :ref:`Using an Instant Hangout in Your Course`.
+     - Added the chapter :ref:`Google Instant Hangout`.
    * - 01/24/2014
      - Added the :ref:`Discussions` and :ref:`Guidance for Discussion
        Moderators` chapters.
@@ -176,7 +188,7 @@ January, 2014
        Textbooks`.
    * - 01/14/2014
      - Added info about scoring (:ref:`ORA Access Scores`) and due dates in
-       :ref:`Open Response Assessment Problems`.
+       :ref:`Open Response Assessment`.
    * - 01/13/2014
      - Extensive updates to :ref:`Organizing Your Course Content` and
        :ref:`Working with HTML Components`.
@@ -191,7 +203,7 @@ January, 2014
    * - 
      - Added info about template to :ref:`Checkbox`.
    * - 01/06/2014
-     - Created :ref:`Custom JavaScript Display and Grading`
+     - Created :ref:`Custom JavaScript`
    * - 01/06/2014
      - Created :ref:`Zooming image`
    * - 01/01/2014
@@ -213,7 +225,7 @@ December, 2013
      - Made :ref:`ORA for Students` into template that instructors can
        customize.
    * - 12/19/2013
-     - Created :ref:`Tools`.
+     - Created "Tools" topic. (Note 4/10/14: Topic merged into :ref:`Create Exercises`.)
    * - 12/18/2013
      - Updated documentation about video player options in :ref:`Working with
        Video Components`.
@@ -227,7 +239,7 @@ December, 2013
      - Added the chapter :ref:`Guidelines for Creating Accessible Content`.
    * - 12/10/2013
      - Added note about number of responses in "Available to Grade" column in
-       :ref:`Open Response Assessment Problems`.
+       :ref:`Open Response Assessment`.
    * - 
      - Added :ref:`MathJax in Studio`.
    * - 12/09/2013

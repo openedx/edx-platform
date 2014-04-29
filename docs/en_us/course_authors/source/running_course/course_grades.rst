@@ -16,7 +16,7 @@ To review student answers to the problems in your course, you can download data 
 
 For information about how you establish a grading policy and work with the Problem components in your course, see :ref:`Establish a Grading Policy` or :ref:`Working with Problem Components`.
 
-**Important**: If you make changes to your grading policy after a course starts, students can see the effect of your changes on their Progress pages. Be sure to announce any changes on your Course Info page.
+.. important:: If you make changes to your grading policy after a course starts, students can see the effect of your changes on their **Progress** pages. Be sure to announce any changes on your Course Info page.
 
 .. _Review_grades:
 
@@ -34,17 +34,17 @@ You establish a grading policy for your course when you create it in Studio. Whi
 
 #. Click **Data Download** > **Grading Configuration**.
 
-   A list of the assignment types in your course displays. In this example, Homework is weighted as 60% of the grade. 
+   A list of the assignment types in your course displays. In this example, Homework is weighted as 0.3 (30%) of the grade. 
+
+..  DOC-290: research this statement before including anything like it: Below the list of graded assignment types and their weights, each *public* subsection and unit that contains an assignment is listed.
 
    .. image:: ../Images/Grading_Configuration.png
      :alt: XML of course assignment types and weights for grading
 
-   In Studio, you define this information by selecting **Settings** > **Grading**.
+   In Studio, you define this information by selecting **Settings** > **Grading**. For more information, see :ref:`Configure the Assignment Types`.
 
    .. image:: ../Images/Grading_Configuration_Studio.png
      :alt: Studio example of homework assignment type and grading weight
-
-For more information, see :ref:`Configure the Assignment Types`.
 
 .. _Access_grades:
 
@@ -70,15 +70,17 @@ To generate grades for the students who are currently enrolled in your course:
 
 #. To start the grading process, click **Generate Grade Report**.
 
-A status message indicates that the grading process is in progress. This process can take some time to complete, but you can navigate away from this page and do other work while it runs.
+  A status message indicates that the grading process is in progress. This process can take some time to complete, but you can navigate away from this page and do other work while it runs.
 
-When the file is ready for download, a link to the CSV file displays at the bottom of this page.
+5. To track the progress of the grading process, reload the page in your browser and scroll down to the **Pending Instructor Tasks** section. 
 
 ==========================================
 Download Grades for Enrolled Students
 ==========================================
 
 After you request a grade report for your students, the result is a time-stamped CSV file that includes columns to identify each student: id, email, and username. It also includes a column for every assignment that is included in your grading configuration: each homework, lab, midterm, final, and any other assignment type you added to your course. 
+
+.. important:: Because this file contains confidential, personally identifiable data which may be subject to the Family Educational Rights and Privacy Act (FERPA), be sure to follow your institution's data stewardship policies when you open or save this file.
 
 To download a file of student grades:
 
@@ -90,19 +92,44 @@ To download a file of student grades:
 
 #. To open or save a grade report file, click the ``{course_id}_grade_report_{date}.csv`` file name at the bottom of the page.
 
-
 .. note:: To prevent the accidental distribution of student data, you can only download these files by clicking the links on this page. Do not copy these links for reuse elsewhere, as they expire within 5 minutes. The links on this page also expire if the page is open for more than 5 minutes: if necessary, refresh the page to generate new links. 
 
+.. _Interpret the Grade Report:
+
+=====================================
+Interpret the Grade Report
+=====================================
+
+Grade reports provide a snapshot of cumulative course scores, by assignment, of every currently enrolled student. 
+
+You can open ``{course_id}_grade_report_{date}.csv`` files in a spreadsheet application to sort, graph, and compare data.
+
+.. image:: ../Images/Grade_Report.png
+  :alt: A course grade report, opened in Excel, showing the grades acheived by students on several homework assignments and the midterm
+
+The CSV file contains one row of data for each student, and columns that provide the following information.
+
+* Student identifiers, including an internal ``id``, ``email`` address, and ``username``.
+
+* ``grade``, with the total score a student has currently attained in the course. This value is expressed as a decimal: a student with a grade of 0.65 has earned 65% of the credit in the course, and a student with a grade of 1 has earned 100%. 
+
+* Each ``{assignment type} {number}`` defined in your grading configuration, with the score a student attained for that specific assignment. For example, column HW 03 shows the scores for the third homework assignment.
+
+* An ``{assignment type} Avg`` with each student's current average score for that assignment type: for example, HW Avg.
+
+.. note:: The grade reports do not include information about individual questions within the assignments, or include student answer distributions.
 
 =========================================================
 Check the Progress of a Single Student
 =========================================================
 
-For a single student, you can review a chart that plots the grade earned for every graded assignment, and the overall total, as of the current date. You identify the student by supplying either an email address or username. You can check the progress for students who are currently enrolled in, or who have unenrolled from, the course.
+To check a single student's progress, you can locate the specific row on the grade report or review the student's **Progress** page. The **Progress** page includes a chart that plots the score the student has earned for every graded assignment and the total grade as of the current date. Below the chart, each assignment and the score attained are listed.
 
-Students can view a similar chart (of their own progress only) when they are logged in to the course.
+To review a student's **Progress** page, you supply an email address or username. You can check the progress for students who are either enrolled in, or who have unenrolled from, the course.
 
-To view current grades for a student:
+Students can view a similar chart and assignment list (of their own progress only) when they are logged in to the course.
+
+To view the **Progress** page for a student:
 
 #. View the live version of your course.
 
@@ -114,15 +141,48 @@ To view current grades for a student:
 
 #. Click **Student Progress Page**.
 
-The Course Progress page for the student displays a chart with the grade for each homework, lab, midterm, final, and any other assignment types in your course, and the total grade earned for the course to date. 
+   The **Progress** page for the student displays a chart with the grade for each homework, lab, midterm, final, and any other assignment types in your course, and the total grade earned for the course to date. 
 
    .. image:: ../Images/Student_Progress.png
-     :alt: A bar chart from a student's Progress page showing grade acheived for each assignment
+     :alt: Progress page chart for a student: includes a column graph with the score acheived for each assignment 
 
+   To learn more about a particular assignment, move the cursor onto the value in the chart. A brief description displays. 
 
-=========================================================
-Check a Student's Submission and Submission History
-=========================================================
+   .. image:: ../Images/Student_Progress_mouseover.png
+     :alt: Progress page with a tooltip for the X that was graphed for the last homework assignment, which indicates that the lowest homework score is dropped
+
+   Below the chart, subsections are listed on the left and the units that contain assignments are listed on the right. The student's individual problem scores display.
+
+.. image:: ../Images/Student_Progress_list.png
+     :alt: Bottom portion of a Progress page for the same student with the score acheived for each problem in the first course subsection 
+
+=============================================
+Interpret the Student Progress Page
+=============================================
+
+The chart of a student's scores on the **Progress** page and the rows of data on the grade report present assignment scores in a similar order. However, the total, cumulative score earned for the course is placed in a different position on the **Progress** page.
+
+In this example grade report, the indicated student has a current grade of 0.43 (43%). 
+
+.. image:: ../Images/Grade_Report_example.png
+  :alt: A course grade report with a single student's information indicated by a rectangle
+
+* On each of the first four homework assignments the student scored 1 (100%), but currently has a 0 (0%) on each of the remaining three assignments. 
+
+  Notice, however, that the student's current average score for homework assignments is listed as 0.666666667 (67%): in this course, the homework assignment with the lowest score is dropped, so this average is over six assignments rather than all seven. 
+
+* The student has a score of 0.75 (75%) on the midterm, and a score of 0 (0%) on the final. 
+
+On the student's **Progress** page, you see the same information graphically represented; however, the student's "total" of 43% is on the far right.
+
+.. image:: ../Images/Student_Progress.png
+   :alt: Progress page for a student also included on the grade report: includes a column graph with the grade acheived for each assignment 
+
+The chart on the **Progress** page includes y-axis labels for the grade ranges defined for the course. In this example, Pass is set to 60%, so at the end of the course students with a grade of 0.60 or higher can receive certificates.
+
+===========================================================
+Check a Student's Answer Submission and Submission History
+===========================================================
 
 For a single student and problem, you can review the exact response submitted, the number of attempts made, and the date and time of the submission. You identify the student by supplying a username. 
 
@@ -175,16 +235,15 @@ To find the unique identifier in the URL for a problem:
 
    Information about the problem displays, including its location or URL. This URL ends with the type of module, which is typically "problem", and the unique identifier. 
 
-   .. image:: ../Images/Problem_URL.png
+.. image:: ../Images/Problem_URL.png
     :alt: The Staff Debug view of a problem with the unique identifier indicated at the end of a URL address
 
 
-4. To copy the identifier that is assigned to the problem, select it, right click, and choose **Copy**.
+4. To copy the identifier for the problem, select it, right click, and choose **Copy**.
 
+.. note:: If the URL does not include "problem/" before the identifier, you will need to specify that module identifier as well. Select and copy both the module identifier and the problem identifier.
 
-   **Note:** If the URL does not include "problem/" before the identifier, you will need to specify that module identifier as well. Select and copy both the module identifier and the problem identifier.
-
-   To close the Staff Debug viewer, click on the browser page outside of the viewer.
+To close the Staff Debug viewer, click on the browser page outside of the viewer.
 
 ===================================================
 Rescore Student Submissions
@@ -194,7 +253,7 @@ Each problem that you define for your course includes a correct answer, and may 
 
 **Note**: You can only rescore problems that have a correct answer entered in edX Studio. Problems that are scored by an external grader cannot be rescored with this procedure.
 
-To rescore a problem, you need its unique identifier. See :ref:`find_URL`.
+To specify the problem you want to rescore, you need its unique identifier. See :ref:`find_URL`.
 
 To rescore a problem:
 
@@ -254,7 +313,7 @@ To reset student attempts for a problem:
 Student Answer Distribution
 ****************************************
 
-For certain problems in your course, you can download a CSV file with data about the distribution of student answers. Student answer distribution data is included in the file for problems of these types: 
+For certain types of problems in your course, you can download a CSV file with data about the distribution of student answers. Student answer distribution data is included in the file for problems of these types: 
 
 * Checkboxes (``<choiceresponse>``)
 * Dropdown (``<optionresponse>``)
@@ -294,19 +353,64 @@ The CSV file contains the following columns:
 
 Entries are sorted by the value in each column, starting with the ModuleID on the left and continuing through the columns to the right.
 
-Please note the following about the student answer distribution report:   
+.. _Download_Answer_Distributions:
 
-* This report includes only problems that at least one student has answered since 6 March 2014. For those problems, this report only includes activity that occurred after October 2013. 
+===================================================
+Download the Student Answer Distribution Report
+===================================================
 
-* For checkboxes and multiple choice problems, the answer choices actually selected by a student after 6 March 2014 display as described above. Answer choices selected by at least one student after October 2013, but not selected since 6 March 2014, are included on the report but do not include an **AnswerValue**. The **ValueID** does display the internal identifiers, such as choice_1 and choice_2, for those answers. 
+An automated process runs periodically on the edX servers to update the CSV file of student answer data. A link to the most recently updated version of the CSV file is available on the Instructor Dashboard. 
 
-* For problems that use the **Randomization** setting in Studio, if a particular answer has not been selected since 6 March 2014, the **Question** is blank for that answer.
+To download the most recent file of student answer data:
+>>>>>>> DOC-115 adds topics to make data interpretation easier
 
-* Problem **Count** values reflect the entire problem history. If you change a problem after it is released, it may not be possible for you to determine which answers were given before and after you made the change.
+#. View the live version of your course.
 
-* Some spreadsheet applications can alter the data in the CSV report for display purposes. For example, for different student answers of "0.5" and ".5" Excel correctly includes the two different lines from the CSV, but displays the **AnswerValue** on both of them as "0.5". If you notice answers that appear to be the same on separate lines with separate counts, you can review the actual, unaltered data by opening the CSV file in a text editor.
+#. Click **Instructor** > **Try New Beta Dashboard**.
 
-* The CSV file is UTF-8 encoded, but not all spreadsheet applications interpret and render UTF-8 encoded characters correctly. For example, a student answer distribution report with answer values in French displays differently in Microsoft Excel for Mac than in OpenOffice Calc. 
+#. Click **Data Download**.
+
+#. At the bottom of the page, click the ``{course_id}_answer_distribution.csv`` file name. You may have to scroll down to find this file.
+
+==========================================================================
+Frequently Asked Questions about the Student Answer Distribution Report
+==========================================================================
+
+Answers to questions about the student answer distribution report follow.   
+
+**My course doesn't have a student answer distribution report. How can I generate it?**
+
+Student answer distribution reports are generated automatically, and refreshed several times each day. The ``{course_id}_answer_distribution.csv`` file displays after all of the ``{course_id}_grade_report_{date}.csv`` files. Be sure to scroll to the end of the list of available reports. 
+
+**Why are some problems missing from this report? The ones that are missing do have the problem types listed under** :ref:`Review_Answers`.
+
+This report includes only problems that at least one student has answered since early March 2014. For those problems, this report only includes activity that occurred after October 2013. 
+
+**Why don't I see an AnswerValue for some of my problems?**
+
+For checkboxes and multiple choice problems, the answer choices actually selected by a student after early March 2014 display as described in the previous answer. Answer choices selected by at least one student after October 2013, but not selected since early March 2014, are included on the report but do not include an **AnswerValue**. The **ValueID** does display the internal identifiers, such as choice_1 and choice_2, for those answers. 
+
+**Why don't I see a Question for some of my problems?**
+
+The value in the **Question** column is the accessibility label for the problem. For more information about how to set up labels for problems, see :ref:`Create Exercises`.
+
+Also, for problems that use the **Randomization** setting in Studio, if a particular answer has not been selected since early March 2014, the **Question** is blank for that answer.
+
+**My students are saying that they answered a question, but it isn't showing up in the report. How can that be?**
+
+Only questions that have a **Maximum Attempts** setting of 1 or higher are included on the report.
+
+**I made a correction to a problem after it was released. How can I tell which students tried to answer it before I made the change?**
+
+Problem **Count** values reflect the entire problem history. If you change a problem after it is released, it may not be possible for you to determine which answers were given before and after you made the change.
+
+**Why is the same answer showing up in two different rows when I view the report in a spreadsheet?**
+
+Some spreadsheet applications can alter the data in the CSV report for display purposes. For example, for different student answers of "0.5" and ".5" Excel correctly includes the two different lines from the CSV, but displays the **AnswerValue** on both of them as "0.5". If you notice answers that appear to be the same on separate lines with separate counts, you can review the actual, unaltered data by opening the CSV file in a text editor.
+
+**Why are there strange characters in the report when I view it in a spreadsheet?**
+
+The CSV file is UTF-8 encoded, but not all spreadsheet applications interpret and render UTF-8 encoded characters correctly. For example, a student answer distribution report with answer values in French displays differently in Microsoft Excel for Mac than in OpenOffice Calc. 
 
   Answer Values in Microsoft Excel for Mac:
 
@@ -318,25 +422,7 @@ Please note the following about the student answer distribution report:
    .. image:: ../Images/student_answer_calc.png
      :alt: A spreadsheet that displays accented French characters correctly
 
-  If you notice characters that do not display as expected in a spreadsheet, try a different spreadsheet application such as LibreOffice or Apache OpenOffice to open the CSV file. (These applications are open-source office suites that are available for download online.)
-
-.. _Download_Answer_Distributions:
-
-===================================================
-Download the Student Answer Distribution Report
-===================================================
-
-An automated process runs periodically on the edX servers to update the CSV file of student answer data. A link to the most recently updated version of the CSV file is available on the Instructor Dashboard. 
-
-To download the most recent file of student answer data:
-
-#. View the live version of your course.
-
-#. Click **Instructor** > **Try New Beta Dashboard**.
-
-#. Click **Data Download**.
-
-#. At the bottom of the page, click the ``{course_id}_answer_distribution.csv`` file name.
+If you notice characters that do not display as expected in a spreadsheet, try a different spreadsheet application such as LibreOffice or Apache OpenOffice to open the CSV file. 
 
 ==========================================================================
 Interpret the Student Answer Distribution Report

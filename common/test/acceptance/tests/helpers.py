@@ -6,8 +6,13 @@ from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise
 
 
-def wait_for_ajax(browser):
-    """ Make sure that all ajax requests are finished.
+def wait_for_ajax(browser, try_limit=None, try_interval=0.5, timeout=60):
+    """
+    Make sure that all ajax requests are finished.
+    :param try_limit (int or None): Number of attempts to make to satisfy the `Promise`. Can be `None` to
+           disable the limit.
+    :param try_interval (float): Number of seconds to wait between attempts.
+    :param timeout (float): Maximum number of seconds to wait for the `Promise` to be satisfied before timing out.
     :param browser: selenium.webdriver, The Selenium-controlled browser that this page is loaded in.
     """
     def _is_ajax_finished():
@@ -17,7 +22,9 @@ def wait_for_ajax(browser):
         """
         return browser.execute_script("return jQuery.active") == 0
 
-    EmptyPromise(_is_ajax_finished, "Finished waiting for ajax requests.").fulfill()
+    EmptyPromise(_is_ajax_finished, "Finished waiting for ajax requests.", try_limit=try_limit,
+                 try_interval=try_interval, timeout=timeout).fulfill()
+
 
 def load_data_str(rel_path):
     """

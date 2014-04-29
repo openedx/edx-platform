@@ -57,6 +57,12 @@
                     .toEqual(1);
             });
 
+            it('initializes with a quality equal to large', function () {
+                videoPlayer.onPlay();
+
+                expect(player.setPlaybackQuality).toHaveBeenCalledWith('large');
+            });
+
             it('shows the quality control on play if HD is available',
                function () {
                 videoPlayer.onPlay();

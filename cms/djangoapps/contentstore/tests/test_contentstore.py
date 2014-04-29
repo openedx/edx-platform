@@ -1,62 +1,55 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=E1101
 
-import json
+import copy
 import mock
+import re
 import shutil
 
-from textwrap import dedent
-
-from django.test.utils import override_settings
-from django.conf import settings
-from path import path
-from tempdir import mkdtemp_clean
-from fs.osfs import OSFS
-import copy
-from json import loads
 from datetime import timedelta
-from django.test import TestCase
+from fs.osfs import OSFS
+from json import loads
+from path import path
+from pymongo import MongoClient
+from tempdir import mkdtemp_clean
+from textwrap import dedent
+from uuid import uuid4
 
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth.models import User, Group
 from django.dispatch import Signal
+from django.test import TestCase
+from django.test.utils import override_settings
+
 from contentstore.utils import get_modulestore
-from contentstore.tests.utils import parse_json, AjaxEnabledTestClient
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from contentstore.tests.utils import parse_json, AjaxEnabledTestClient
+from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 
-from xmodule.modulestore import Location, mongo
-from xmodule.modulestore.store_utilities import clone_course
-from xmodule.modulestore.store_utilities import delete_course
-from xmodule.modulestore.django import modulestore
+from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
+from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
+from xmodule.exceptions import NotFoundError, InvalidVersionError
+from xmodule.modulestore import Location, mongo
+from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.store_utilities import clone_course, delete_course
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
-from xmodule.modulestore.inheritance import own_metadata
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
 
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.locator import BlockUsageLocator
-
-from contentstore.views.component import ADVANCED_COMPONENT_TYPES
-from xmodule.exceptions import NotFoundError
-
-from django_comment_common.utils import are_permissions_roles_seeded
-from xmodule.exceptions import InvalidVersionError
-from uuid import uuid4
-from pymongo import MongoClient
-from student.models import CourseEnrollment
-import re
 
 from contentstore.utils import delete_course_and_groups
-from xmodule.modulestore.django import loc_mapper
-from student.roles import CourseCreatorRole
+from django_comment_common.utils import are_permissions_roles_seeded
 from student import auth
+from student.models import CourseEnrollment
+from student.roles import CourseCreatorRole, CourseInstructorRole
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -1492,6 +1485,30 @@ class ContentStoreTest(ModuleStoreTestCase):
         # check that user has form role "Student" for this course even after deleting it
         self.assertTrue(self.user.roles.filter(name="Student", course_id=course_id))  # pylint: disable=no-member
 
+    def test_course_access_groups_on_delete(self):
+        """
+        Test that course deletion removes users from 'instructor' and 'staff' groups of this course
+        of all format e.g, 'instructor_edX/Course/Run', 'instructor_edX.Course.Run', 'instructor_Course'
+        """
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        course_id = _get_course_id(test_course_data)
+        course_location = CourseDescriptor.id_to_location(course_id)
+
+        # Add user in possible groups and check that user in instructor groups of this course
+        instructor_role = CourseInstructorRole(course_location)
+        groupnames = instructor_role._group_names  # pylint: disable=protected-access
+        groups = Group.objects.filter(name__in=groupnames)
+        for group in groups:
+            group.user_set.add(self.user)
+
+        self.assertTrue(len(instructor_role.users_with_role()) > 0)
+
+        # Now delete course and check that user not in instructor groups of this course
+        delete_course_and_groups(course_location.course_id, commit=True)
+
+        self.assertFalse(instructor_role.has_user(self.user))
+        self.assertEqual(len(instructor_role.users_with_role()), 0)
+
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
         self.client.ajax_post('/course', self.course_data)
@@ -1792,10 +1809,10 @@ class ContentStoreTest(ModuleStoreTestCase):
         # first check PDF textbooks, to make sure the url paths got updated
         course_module = module_store.get_instance(target_course_id, target_location)
 
-        self.assertEquals(len(course_module.pdf_textbooks), 1)
-        self.assertEquals(len(course_module.pdf_textbooks[0]["chapters"]), 2)
-        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/c4x/MITx/999/asset/Chapter1.pdf')
-        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/c4x/MITx/999/asset/Chapter2.pdf')
+        self.assertEqual(len(course_module.pdf_textbooks), 1)
+        self.assertEqual(len(course_module.pdf_textbooks[0]["chapters"]), 2)
+        self.assertEqual(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/static/Chapter1.pdf')
+        self.assertEqual(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/static/Chapter2.pdf')
 
     def test_import_into_new_course_id_wiki_slug_renamespacing(self):
         module_store = modulestore('direct')

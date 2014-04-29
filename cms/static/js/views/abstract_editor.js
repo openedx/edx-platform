@@ -8,12 +8,7 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
             var templateName = _.result(this, 'templateName');
             // Backbone model cid is only unique within the collection.
             this.uniqueId = _.uniqueId(templateName + "_");
-
-            var tpl = document.getElementById(templateName).text;
-            if(!tpl) {
-                console.error("Couldn't load template: " + templateName);
-            }
-            this.template = _.template(tpl);
+            this.template = this.loadTemplate(templateName);
             this.$el.html(this.template({model: this.model, uniqueId: this.uniqueId}));
             this.listenTo(this.model, 'change', this.render);
             this.render();
@@ -85,6 +80,20 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
             }
 
             return this;
+        },
+
+        /**
+         * Loads the named template from the page, or logs an error if it fails.
+         * @param name The name of the template.
+         * @returns The loaded template.
+         */
+        loadTemplate: function(name) {
+            var templateSelector = "#" + name,
+                templateText = $(templateSelector).text();
+            if (!templateText) {
+                console.error("Failed to load " + name + " template");
+            }
+            return _.template(templateText);
         }
     });
 

@@ -35,9 +35,9 @@ When you create a peer assessment problem, you'll specify several elements:
 
 For step-by-step instructions, see :ref:`PA Create a PA Problem`.
 
-
+=======================================
 Number of Responses and Assessments
-***********************************
+=======================================
 
 In the problem code, you'll indicate the **number of responses** each student has to assess and the **number of peer assessments** each response has to receive.
 
@@ -47,20 +47,24 @@ If all responses have received assessments, but some students haven't completed 
 
 For more information, see :ref:`PA Specify Name and Assessment Types`.
 
+=====================
 Assessment Type
-********************
+=====================
 
 In your problem, you'll also specify the **assessment type or types**. You can see the type and order of the assessments when you look at the problem. In the following example, after students submit a response, they complete peer assessments on other students' responses ("Assess Peers") and then complete self assessments ("Assess Yourself").
 
-.. image:: /Images/PA_Steps_LMS.png
-  :alt: Image of peer assessment with assessment types circled
+.. image:: /Images/PA_AsmtWithResponse.png
+  :alt: Image of peer assessment with assessment steps and status labeled
+  :width: 600
+
 
 .. note:: In this initial release, the type and order of assessments cannot be changed. Students must complete peer assessments followed by a self assessment.
 
 For more information, see :ref:`PA Specify Name and Assessment Types`.
 
+===================================
 Start and Due Dates (optional)
-******************************
+===================================
 
 You can specify **start dates** and **due dates** for students to submit responses, perform peer assessments, and perform self assessments.
 
@@ -72,8 +76,9 @@ If you don't specify dates, the deadline for all elements--responses, peer asses
 
 For more information, see :ref:`PA Add Due Dates`.
 
+==============
 Question
-************
+==============
 
 You'll also specify the **question** that you want your students to answer. This appears near the top of the component, followed by a field where the student enters a response.
 
@@ -83,8 +88,9 @@ For more information, see :ref:`PA Add Question`.
 
 .. _PA Rubric:
 
+=======
 Rubric
-*********
+=======
 
 Your problem must include a **rubric** that you design. The same rubric is used for peer and self assessments, and the rubric appears when students begin grading. Students compare their peers' responses to the rubric.
 
@@ -193,10 +199,11 @@ Create a Peer Assessment Problem
 
 .. warning:: Peer assessments are in limited release and are only available in a few courses. To enable the peer assessment feature in your course, contact your edX program manager. After the feature has been enabled, you can create peer assessments by following the steps below.
 
-To create a peer assessment problem, you'll edit the XML code in a Problem component, similar to creating other problems. The following image shows what a peer assessment component looks like when you edit it in Studio, as well as the way that students see that peer assessment in the LMS.
+To create a peer assessment problem, you'll edit the XML code in a Problem component, similar to creating other problems. The following image shows what a peer assessment component looks like when you edit it in Studio, as well as the way that students see that peer assessment in the courseware.
 
-.. image:: /Images/PA_All_XML-LMS_small.png
+.. image:: /Images/PA_XML_LMS_All.png
    :alt: Image of a peer assessment in Studio and LMS views
+   :width: 800
 
 Creating a peer assessment is a multi-step process:
 
@@ -211,8 +218,9 @@ Each of these steps is covered in detail below.
 
 .. _PA Create Component:
 
+============================
 Step 1. Create the Component
-****************************
+============================
 
 #. In Studio, open the unit where you want to create the assessment.
 #. Under **Add New Component**, click **Advanced**, and then click **Peer Assessment**.
@@ -224,8 +232,9 @@ Step 1. Create the Component
 
 .. _PA Specify Name and Assessment Types:
 
+========================================================
 Step 2. Specify the Problem Name and Assessment Types
-*****************************************************
+========================================================
 
 To specify problem data such as the name and assessment types, you'll work with the XML at the top of the problem.
 
@@ -257,8 +266,9 @@ To specify your problem data, follow these steps.
 
 .. _PA Add Due Dates:
 
+==========================================
 Step 3. Add Start and Due Dates (optional)
-******************************************
+==========================================
 
 .. note:: Setting start and due dates is optional. If you don't specify dates, the deadline for all student responses and assessments is the due date that you set for the subsection that contains the peer assessment. If you do specify dates, those dates take precedence over the subsection due date.
 
@@ -305,29 +315,53 @@ In this example, the problem is set at the subsection level to open on February 
 
 .. _PA Add Question:
 
+============================
 Step 4. Add the Question
-********************************
+============================
 
-The following image shows a question in the component editor, followed by the way the question appears to students.
+The following image shows a question in the component editor along with the way the question appears to students.
 
 .. image:: /Images/PA_Question_XML-LMS.png
       :alt: Image of question in XML and the LMS
+      :width: 800
 
 To add the question:
 
-#. In the component editor, locate the ``<prompt>`` tags.
+#. In the component editor, locate the first set of ``<prompt>`` tags. The opening ``<prompt>`` tag appears directly below the opening ``<rubric>`` tag.
 
-#. Replace the sample text between the ``<prompt>`` tags with the text of your question. Note that the component editor respects paragraph breaks inside the ``<prompt>`` tags. You don't have to add ``<p>`` tags to create individual paragraphs.
+#. Replace the sample text between the ``<prompt>`` tags with the text of your question. Note that the component editor respects paragraph breaks and new lines inside the ``<prompt>`` tags. You don't have to add ``<p>`` tags to create individual paragraphs.
 
-In this initial release, you cannot add text formatting or images in the Peer Assessment component. If you want to include text formatting or images in the text of your prompt, you can add an HTML component above the Peer Assessment component. The following image shows an HTML component that contains an image and the quote by Katherine Paterson, followed by a Peer Assessment component that contains the introductory text ("This problem requires...") and the text that appears between the ``<prompt>`` tags in the Peer Assessment component ("Write a persuasive essay...").
+Add Formatting or Images to the Question
+****************************************
 
-.. image:: /Images/PA_HTML-PA_LMS.png
-      :alt: Image of a peer assessment that has an image in an HTML component
+In this initial release, you cannot add text formatting or images in the Peer Assessment component. If you want to include formatting or images in the text of your prompt, you can add an HTML component that contains your text above the Peer Assessment component, and then remove the prompt from the Peer Assessment component. The instructions for the peer assessment still appear above the **Your Response** field.
+
+.. image:: /Images/PA_HTMLComponent.png
+      :alt: A peer assessment that has an image in an HTML component
+      :width: 500
+
+To remove the prompt from the Peer Assessment component, open the component editor, and then delete the first set of ``<prompt>`` tags together with all the text between the tags. The first few lines of XML for the problem will then resemble the following.
+
+.. code-block:: xml
+
+  <openassessment>
+    <title></title>
+    <assessments>
+      <assessment name="peer-assessment" must_grade="5" must_be_graded_by="3"/>
+      <assessment name="self-assessment"/>
+    </assessments>
+    <rubric>
+      <criterion feedback="optional">
+        <name>Ideas</name>
+        <prompt>Determine if there is a unifying theme or main idea.</prompt>
+        <option points="0">
+
 
 .. _PA Add Rubric:
 
+============================
 Step 5. Add the Rubric
-********************************
+============================
 
 To add the rubric, you'll create your criteria and options in XML. The following image shows a highlighted criterion and its options in the component editor, followed by the way the criterion and options appear to students.
 
@@ -396,11 +430,89 @@ You can use the following code as a template:
 	   </option>
 	 </criterion>
 
+.. _PA Provide Comment Options:
+
+=============================================
+Step 6 (optional). Provide Comment Options
+=============================================
+
+After students fill out the rubric, they can provide additional comments for the responses they've assessed. By default, students see a field for comments below the rubric.
+
+.. image:: /Images/PA_CommentsField.png
+   :alt: Contents field 
+   :width: 500
+
+You can change the text that appears above this comment field. Additionally, you can provide a comment field for each individual criterion.
+
+.. _PA Change Comments Prompt:
+
+Change the Default Prompt Text
+*******************************
+
+By default, the prompt text for the comment field is the following:
+
+``(Optional) What aspects of this response stood out to you? What did it do well? How could it improve?``
+
+You can replace this default text with your own text.
+
+To change this text:
+
+#. Locate the ``<feedbackprompt>`` tags between the last closing ``</criterion>`` tag for the rubric and the closing ``</rubric>`` tag for the problem:
+
+  .. code-block:: xml
+
+          <option points="3">
+            <name>Excellent</name>
+            <explanation>Includes in-depth information and exceptional supporting details that are fully developed.  Explores all facets of the topic.</explanation>
+          </option>
+        </criterion>
+        <feedbackprompt>(Optional) What aspects of this response stood out to you? What did it do well? How could it improve?</feedbackprompt>
+      </rubric>
+     </openassessment>
+
+2. Change the text between the ``<feedbackprompt>`` tags to the text that you want.
+
+.. _PA Add Individual Criterion Comments:
+
+Provide a Comment Field for Individual Criteria
+**************************************************
+
+By default, students see only a single comment field below the entire rubric. However, you can add a comment field to an individual criterion or to several individual criteria. The comment field can contain up to 300 characters.
+
+In the following image, the first criterion has a comment field, but the second does not.
+
+.. image:: /Images/PA_Comments_Criterion.png
+   :alt: Comment box under an individual criterion
+   :width: 500
+
+To add a comment field:
+
+#. Locate the opening ``<criterion>`` tag for the criterion that you want to change.
+
+#. Add the ``feedback="optional"`` attribute to this tag:
+
+    .. code-block:: xml
+
+       <criterion feedback="optional">
+         <name>NAME</name>
+         <prompt>PROMPT TEXT</prompt>
+         <option points="NUMBER">
+           <name>NAME</name>
+           <explanation>EXPLANATION</explanation>
+         </option>
+         <option points="NUMBER">
+           <name>NAME</name>
+           <explanation>EXPLANATION</explanation>
+         </option>
+       </criterion>
+
+If you want to provide comment fields below additional criteria, add the ``feedback="optional"`` attribute to the opening tag for each criterion.
 
 .. _PA Test Problem:
 
-Step 6. Test the Problem
-********************************
+============================
+Step 7. Test the Problem
+============================
 
 To test your assignment, set up the assignment in a test course, and ask a group of beta users to submit responses and grade each other. The beta testers can then let you know if they found the question and the rubric easy to understand or if they found any problems with the assignment.
 
