@@ -131,7 +131,22 @@ Write a persuasive essay to a newspaper reflecting your views on censorship in l
       @cheatsheet = $($('#simple-editor-open-ended-cheatsheet').html())
       $(@markdown_editor.getWrapperElement()).append(@cheatsheet)
 
+    @addRemoveCheatsheetCSS()
+
     setTimeout (=> @cheatsheet.toggleClass('shown')), 10
+
+
+  ###
+  Function to add/remove CSS for cheatsheet.
+  ###
+  addRemoveCheatsheetCSS: () =>
+    if !@cheatsheet.hasClass("shown")
+      $(".CodeMirror").css({"overflow": "visible"})
+      $(".modal-content").css({"overflow-y": "visible", "overflow-x": "visible"})
+    else
+      $(".CodeMirror").removeAttr("style")
+      $(".modal-content").removeAttr("style")
+
 
   ###
   Stores the current editor and hides the one that is not displayed.
