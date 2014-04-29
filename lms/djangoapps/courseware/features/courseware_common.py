@@ -14,6 +14,11 @@ def i_click_on_the_tab(step, tab_text):
     world.click_link(tab_text)
 
 
+@step('I click on the "([^"]*)" link$')
+def i_click_on_the_link(step, link_text):
+    world.click_link(link_text)
+
+
 @step('I visit the courseware URL$')
 def i_visit_the_course_info_url(step):
     world.visit('/courses/MITx/6.002x/2012_Fall/courseware')
