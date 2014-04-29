@@ -1,3 +1,11 @@
+.course-footer {
+  .xmodule_licensable {
+    @include text-align(right);
+    border: none;
+    background: none;
+    box-shadow: none;
+  }
+}
 footer {
 	box-shadow: $courseware-footer-shadow;
 	margin-top: $courseware-footer-margin;

@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.conf import settings %>
 
 % if display_name is not UNDEFINED and display_name is not None:
     <h2>${display_name}</h2>
@@ -16,6 +17,9 @@
     data-sources='${sources}'
     data-save-state-url="${ajax_url}"
     data-caption-data-dir="${data_dir}"
+    % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and licensable and video_license:
+        data-license="${video_license}"
+    % endif
     data-show-captions="${show_captions}"
     data-general-speed="${general_speed}"
     data-speed="${speed}"
@@ -140,6 +144,11 @@
         <li class="video-handout video-download-button">
             ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
         </li>
+    % endif
+    % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and licensable and video_license:
+      <div class="xmodule_licensable license">
+        ${video_license.html}
+      </div>
     % endif
   </ul>
 </div>

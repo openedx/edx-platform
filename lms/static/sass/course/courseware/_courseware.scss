@@ -271,7 +271,12 @@ div.course-wrapper {
 .xmodule_VideoModule {
   margin-bottom: ($baseline*1.5);
 
-
+  .license {
+    @include float(right);
+    .tip {
+      display: inline;
+    }
+  }
 }
 
 textarea.short-form-response {

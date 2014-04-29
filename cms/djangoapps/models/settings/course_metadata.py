@@ -40,6 +40,7 @@ class CourseMetadata(object):
         'entrance_exam_enabled',
         'entrance_exam_minimum_score_pct',
         'entrance_exam_id',
+        'license',
     ]
 
     @classmethod
@@ -83,6 +84,11 @@ class CourseMetadata(object):
         for field in descriptor.fields.values():
             if field.scope != Scope.settings:
                 continue
+
+            # The licensable field should only be in the course settings if licensing is enabled globally.
+            if field.name is 'licensable' and not settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+                continue
+
             result[field.name] = {
                 'value': field.read_json(descriptor),
                 'display_name': _(field.display_name),

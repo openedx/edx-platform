@@ -141,6 +141,13 @@ FEATURES = {
 
     # Toggle course entrance exams feature
     'ENTRANCE_EXAMS': False,
+
+    # Whether or not to enable Creative Commons Licensing ability for courses
+    'CREATIVE_COMMONS_LICENSING': True,
+
+    # The default value for the licensable field of the course module.
+    # This determines whether a course is licensable or not by default, and will do nothing unless CREATIVE_COMMONS_LICENSING is True
+    'DEFAULT_COURSE_LICENSABLE': True,
 }
 
 ENABLE_JASMINE = False
@@ -410,6 +417,8 @@ PIPELINE_CSS = {
     'style-app': {
         'source_filenames': [
             'sass/style-app.css',
+            'css/edx-cc.css',
+            'css/edx-cc-ie7.css',
         ],
         'output_filename': 'css/cms-style-app.css',
     },
