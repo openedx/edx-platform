@@ -7,6 +7,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 from xmodule.annotator_token import retrieve_token
+from xmodule.annotator_mixin import get_instructions, ANNOTATOR_COMMON_JS, ANNOTATOR_COMMON_CSS
 
 import textwrap
 
@@ -56,8 +57,8 @@ class AnnotatableFields(object):
 class TextAnnotationModule(AnnotatableFields, XModule):
     ''' Text Annotation Module '''
     js = {'coffee': [],
-          'js': []}
-    css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
+          'js': ANNOTATOR_COMMON_JS}
+    css = {'scss': ANNOTATOR_COMMON_CSS + [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'textannotation'
 
     def __init__(self, *args, **kwargs):
@@ -73,12 +74,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
-        instructions = xmltree.find('instructions')
-        if instructions is not None:
-            instructions.tag = 'div'
-            xmltree.remove(instructions)
-            return etree.tostring(instructions, encoding='unicode')
-        return None
+        return get_instructions(xmltree)
 
     def get_html(self):
         """ Renders parameters to template. """
