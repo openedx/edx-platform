@@ -12,6 +12,8 @@ April, 2014
 
    * - Date
      - Change
+   * - 05/02/14
+     - Update :ref:`IFrame` documentation
    * - 04/28/14
      - Updated :ref:`Show or Hide the Course Wiki Page` to include note about Wiki content being available after you hide the Wiki page.
    * - 04/26/14
